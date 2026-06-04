@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Jadz AdCo ShoutOut Demo</title>
+<style>
+  :root{--bg:#050505;--card:#111827;--line:#263245;--text:#fff;--muted:#a7b0c0;--gold:#f7c948;--pink:#ff2bd6;--cyan:#19d3ff;--green:#34d399;--red:#ff4d4d}
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#172033,#020202 55%);color:var(--text)}
+  button,input,textarea,select{font:inherit} button{cursor:pointer;border:0;border-radius:14px;padding:12px 16px;font-weight:800;color:#06111a;background:linear-gradient(135deg,var(--gold),#ff8a00)}
+  .ghost{background:#1f2937;color:#fff;border:1px solid #3b4454}.danger{background:var(--red);color:white}.ok{background:var(--green);color:#031411}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px}.hero{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.logo{font-size:28px;font-weight:950;letter-spacing:.02em}.logo span{color:var(--gold)}
+  .pill{border:1px solid #334155;background:#0f172a;color:#cbd5e1;border-radius:999px;padding:8px 12px;font-size:13px}.grid{display:grid;grid-template-columns:390px 1fr;gap:18px}.card{background:rgba(15,23,42,.88);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  label{display:block;margin:13px 0 6px;color:#cbd5e1;font-weight:700;font-size:13px}.input,textarea,select{width:100%;border:1px solid #374151;background:#090f1b;color:#fff;border-radius:14px;padding:12px;outline:none}textarea{min-height:90px;resize:vertical}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1}.small{font-size:12px;color:var(--muted);line-height:1.5}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.step{padding:7px 10px;border-radius:999px;background:#111827;border:1px solid #374151;color:#94a3b8;font-size:12px;font-weight:800}.step.active{background:#16213e;color:#fff;border-color:var(--cyan)}
+  .templates{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tpl{border:1px solid #334155;border-radius:16px;padding:12px;background:#0b1220;min-height:120px;position:relative;overflow:hidden}.tpl:hover,.tpl.selected{outline:2px solid var(--gold)}.tpl b{position:relative;z-index:1}.tpl:after{content:"";position:absolute;inset:45% -20% -40%;background:linear-gradient(90deg,var(--pink),var(--cyan));filter:blur(18px);opacity:.45}.hidden{display:none!important}
+  .stage{aspect-ratio:16/9;background:#000;border-radius:18px;border:1px solid #334155;overflow:hidden;position:relative}.display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:58px;background:radial-gradient(circle at 50% 50%,#201000,#000 58%)}.display.neon{background:radial-gradient(circle at 20% 20%,rgba(255,43,214,.38),transparent 35%),radial-gradient(circle at 80% 30%,rgba(25,211,255,.28),transparent 33%),#020202}.display.gold{background:radial-gradient(circle at top,rgba(247,201,72,.38),transparent 42%),#020202}.display.video{background:linear-gradient(120deg,#0f172a,#111,#3b0764,#111);animation:bg 3s linear infinite}.brand{position:absolute;top:22px;left:28px;font-weight:950;letter-spacing:.08em;color:var(--gold)}.club{position:absolute;bottom:22px;right:28px;color:#cbd5e1;font-size:18px}.msg{font-size:clamp(34px,6vw,82px);font-weight:1000;text-transform:uppercase;line-height:.98;text-shadow:0 0 22px rgba(247,201,72,.7)}.sub{font-size:clamp(15px,2vw,28px);color:#e5e7eb;margin-top:12px}.media{max-width:34%;max-height:48%;object-fit:cover;border-radius:16px;margin-left:22px;box-shadow:0 0 24px rgba(255,255,255,.25)}.content{display:flex;align-items:center;justify-content:center;gap:10px}.admin-list{display:grid;gap:10px}.item{background:#0b1220;border:1px solid #334155;border-radius:16px;padding:12px}.badge{display:inline-block;font-size:11px;border-radius:999px;padding:4px 8px;background:#312e81;color:#ddd;margin-left:6px}@keyframes bg{to{filter:hue-rotate(360deg)}}
+  .displayOnly .wrap{max-width:none;padding:0}.displayOnly .hero,.displayOnly .grid>.card:first-child{display:none}.displayOnly .grid{display:block}.displayOnly .card{border:0;border-radius:0;padding:0;background:#000}.displayOnly .stage{height:100vh;aspect-ratio:auto;border:0;border-radius:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><div class="logo">Jadz <span>AdCo</span> ShoutOut</div><div class="pill" id="clubPill">Club: Loading...</div></div>
+  <div class="grid">
+    <section class="card">
+      <div class="steps"><span class="step active" id="s1">1 Club QR</span><span class="step" id="s2">2 Auth</span><span class="step" id="s3">3 Select</span><span class="step" id="s4">4 Submit</span></div>
+      <div id="authPanel">
+        <h2>Scan QR → Authenticate</h2>
+        <p class="small">Demo URL supports club routing with <b>?club=club-a</b>. Consumer login is simulated here. Production should use Entra External ID/Auth0/Firebase plus WhatsApp/SMS OTP.</p>
+        <label>Login method</label><select id="loginMethod" class="input"><option>Google</option><option>Facebook</option><option>Microsoft</option><option>WhatsApp OTP</option><option>iMessage/SMS OTP</option></select>
+        <label>Your display name</label><input id="userName" class="input" value="Donald" />
+        <button style="margin-top:14px;width:100%" onclick="login()">Continue</button>
+      </div>
+      <div id="composePanel" class="hidden">
+        <h2>Create a ShoutOut</h2>
+        <label>Choose shared/club template</label><div class="templates" id="templates"></div>
+        <div class="row"><div><label>Main text</label><input id="mainText" class="input" maxlength="42" value="Happy Birthday Maya!" oninput="render()"></div><div><label>Subtitle</label><input id="subText" class="input" maxlength="60" value="VIP Table 4 sends love" oninput="render()"></div></div>
+        <label>Image or short video URL</label><input id="mediaUrl" class="input" placeholder="https://example.com/photo.jpg or .mp4" oninput="render()">
+        <label>Playback window</label><div class="row"><input id="playTime" class="input" value="Tonight 11:30 PM"><select id="duration" class="input"><option>15 seconds</option><option>30 seconds</option><option>60 seconds</option></select></div>
+        <button style="margin-top:14px;width:100%" onclick="submitJob()">Submit for Club Admin Approval</button>
+        <p class="small">This demo stores submissions in browser localStorage. Production stores this in Azure SQL/Cosmos DB, uploads media to Blob Storage, then calls Xibo OAuth2 API after approval.</p>
+      </div>
+    </section>
+    <section class="card">
+      <div class="row" style="align-items:center;margin-bottom:12px"><h2 style="margin:0;flex:2">Live Preview / Xibo Webpage URL</h2><button class="ghost" onclick="showAdmin()">Admin Queue</button><button class="ghost" onclick="copyDisplayUrl()">Copy Display URL</button></div>
+      <div class="stage"><div class="display neon" id="display"><div class="brand">JADZ ADCO</div><div class="content"><div><div class="msg" id="mText">Happy Birthday Maya!</div><div class="sub" id="sText">VIP Table 4 sends love</div></div><img id="img" class="media hidden"><video id="vid" class="media hidden" autoplay muted loop></video></div><div class="club" id="clubName">Club</div></div></div>
+      <div id="adminPanel" class="hidden" style="margin-top:14px"><h3>Club Admin Approval Queue</h3><div class="admin-list" id="queue"></div></div>
+    </section>
+  </div>
+</div>
+<script>
+const qs=new URLSearchParams(location.search); const club=(qs.get('club')||'club-a').toLowerCase(); const displayMode=qs.get('mode')==='display'; const submissionId=qs.get('submissionId');
+const clubs={'club-a':'Club A / Demo Lounge','club-b':'Club B / Neon Room','club-c':'Club C / Skybar'};
+const templates=[{id:'neon',name:'Shared Neon Birthday',scope:'Shared'},{id:'gold',name:'Club Gold VIP',scope:'Club'},{id:'video',name:'Animated Hype',scope:'Shared'},{id:'neon2',name:'Bottle Service Glow',scope:'Club'}];
+let selected='neon'; document.getElementById('clubPill').textContent='Club: '+(clubs[club]||club); document.getElementById('clubName').textContent=clubs[club]||club;
+function login(){authPanel.classList.add('hidden');composePanel.classList.remove('hidden');s2.classList.add('active');s3.classList.add('active')}
+function drawTemplates(){templates.innerHTML='';}
+const tWrap=document.getElementById('templates'); templates.forEach(t=>{let d=document.createElement('div');d.className='tpl '+(t.id===selected?'selected':'');d.onclick=()=>{selected=t.id;document.querySelectorAll('.tpl').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');render()};d.innerHTML='<b>'+t.name+'</b><br><span class="badge">'+t.scope+'</span>';tWrap.appendChild(d)})
+function render(data){data=data||{}; let text=data.text||mainText?.value||'Happy Birthday Maya!'; let sub=data.sub||subText?.value||'VIP Table 4 sends love'; let media=data.media||mediaUrl?.value||''; let tpl=data.tpl||selected; display.className='display '+(tpl==='gold'?'gold':tpl==='video'?'video':'neon'); mText.textContent=text; sText.textContent=sub; img.classList.add('hidden'); vid.classList.add('hidden'); if(media){if(/\.mp4|\.webm|\.mov/i.test(media)){vid.src=media;vid.classList.remove('hidden')}else{img.src=media;img.classList.remove('hidden')}}}
+function submitJob(){let jobs=JSON.parse(localStorage.getItem('jadzJobs')||'[]'); let id='SO-'+Date.now(); jobs.unshift({id,club,tpl:selected,text:mainText.value,sub:subText.value,media:mediaUrl.value,time:playTime.value,duration:duration.value,status:'Pending'}); localStorage.setItem('jadzJobs',JSON.stringify(jobs)); s4.classList.add('active'); alert('Submitted: '+id); showAdmin();}
+function showAdmin(){adminPanel.classList.remove('hidden'); let jobs=JSON.parse(localStorage.getItem('jadzJobs')||'[]').filter(j=>j.club===club); queue.innerHTML=jobs.length?'':'<p class="small">No pending jobs yet.</p>'; jobs.forEach(j=>{let e=document.createElement('div');e.className='item';e.innerHTML='<b>'+j.id+'</b><span class="badge">'+j.status+'</span><p>'+j.text+'<br><span class="small">'+j.time+' · '+j.duration+'</span></p><button class="ok">Approve</button> <button class="danger">Reject</button>'; e.querySelector('.ok').onclick=()=>{j.status='Approved / Ready for Xibo Schedule API'; localStorage.setItem('jadzJobs',JSON.stringify(jobs)); render(j); showAdmin()}; e.querySelector('.danger').onclick=()=>{j.status='Rejected'; localStorage.setItem('jadzJobs',JSON.stringify(jobs)); showAdmin()}; queue.appendChild(e)})}
+function copyDisplayUrl(){let u=location.origin+location.pathname+'?club='+club+'&mode=display'; navigator.clipboard?.writeText(u); alert('Use this URL in Xibo Webpage widget: '+u)}
+if(displayMode){document.body.classList.add('displayOnly'); let jobs=JSON.parse(localStorage.getItem('jadzJobs')||'[]').filter(j=>j.club===club&&j.status.startsWith('Approved')); render(jobs[0]||{});} else render();
+</script>
+</body>
+</html>
