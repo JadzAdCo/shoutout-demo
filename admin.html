@@ -17,16 +17,19 @@
       </div>
       <div class="club-card"><span>Admin View</span><strong id="clubName">Loading...</strong><small>Add admin emails in app.js → ADMIN_EMAILS</small></div>
     </section>
-    <section class="auth-card" id="adminLogin">
-      <h2>Admin sign-in</h2>
-      <p class="sub">Sign in using an email listed in the ADMIN_EMAILS array inside app.js.</p>
-      <div class="auth-grid">
-        <button onclick="loginGoogle()">Admin Google Login</button>
-        <button onclick="loginMicrosoft()">Admin Microsoft Login</button>
-        <button onclick="loginFacebook()">Admin Facebook Login</button>
-      </div>
-      <p class="status" id="adminStatus"></p>
-    </section>
+<section class="auth-card" id="adminLogin">
+  <h2>Admin sign-in</h2>
+  <p class="sub">
+    Sign in using an email listed in the ADMIN_EMAILS array inside app.js.
+  </p>
+  <div class="auth-grid">
+    <button onclick="loginGoogle()">Admin Google Login</button>
+    <button onclick="loginMicrosoft()">Admin Microsoft Login</button>
+    <button onclick="loginFacebook()">Admin Facebook Login</button>
+  </div>
+  <button onclick="logout()">Sign out / Switch account</button>
+  <p class="status" id="adminStatus"></p>
+</section>
     <section class="composer hidden" id="adminPanel">
       <div class="panel wide"><h2>Pending Queue</h2><div id="queueList" class="queue-list"></div><button onclick="logout()">Sign out</button></div>
       <div class="panel preview-panel"><h2>Currently Live</h2><iframe id="liveFrame" title="Live Xibo display content"></iframe><div class="link-row"><a id="displayLink" target="_blank" rel="noopener">Open Display Page</a></div></div>
