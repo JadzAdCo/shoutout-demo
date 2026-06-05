@@ -37,6 +37,31 @@ Before testing:
 
 **Version 3 Changes**
 
+Upload/replace:
+- app.js
+- seed.html
+
+Keep:
+- index.html
+- styles.css
+- firebase-config.js
+- admin.html
+- display.html
+
+Then visit:
+https://jadzadco.github.io/shoutout-demo/seed.html
+
+Sign in with admin email and click Create / Update Club Records.
+
+Firestore collections created:
+- clubs
+- templates
+
+After this, the patron portal loads clubs/templates from Firestore instead of hardcoded app data.
+
+
+**Version 4 Changes**
+
 5. Upload/replace:
 - index.html
 - app.js
