@@ -1,15 +1,16 @@
 /*
-Jadz AdCo ShoutOut - app.js
-Purpose:
-- Firebase Authentication for Google, Microsoft, Facebook, and Phone OTP.
-- Uses redirect-based OAuth instead of popup-based OAuth to improve iPhone/Safari reliability.
-- Loads clubs/templates from Firestore.
-- Submits patron ShoutOuts to Firestore for admin approval.
+  Jadz AdCo ShoutOut - app.js
+  Rollback v12 - Popup Authentication Version
+
+  Purpose:
+  - Restores Firebase popup-based sign-in for Google, Microsoft, and Facebook.
+  - Keeps Firestore clubs/templates, admin approval, display page, and phone OTP logic.
+  - This rollback avoids the newer redirect-auth changes.
 */
 
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithPopup, signOut, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDocs, getDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
@@ -56,36 +57,43 @@ function updateLoginUI(user){
    else{actions.classList.add("hidden");login.classList.remove("hidden");}
  }
 }
-
-let redirectAlreadyHandled=false;
-async function handleRedirectResultOnce(){
-  if(redirectAlreadyHandled) return;
-  redirectAlreadyHandled=true;
-  try{
-    const result=await getRedirectResult(auth);
-    if(result?.user){
-      currentUser=result.user;
-      updateLoginUI(result.user);
-    }
-  }catch(e){
-    console.error('Redirect sign-in error:', e);
-    const el=document.getElementById('authStatus');
-    if(el)el.textContent=e.message;
+function setupAuthWatcher(after){onAuthStateChanged(auth,u=>{currentUser=u;updateLoginUI(u);if(u&&after)after(u)})}
+async function loginGoogle(){
+  try {
+    await signInWithPopup(auth,new GoogleAuthProvider());
+  } catch(e) {
+    const el=document.getElementById("authStatus");
+    if(el) el.textContent=e.message;
+    console.error("Google sign-in error:", e);
   }
 }
-
-function setupAuthWatcher(after){onAuthStateChanged(auth,u=>{currentUser=u;updateLoginUI(u);if(u&&after)after(u)})}
-async function loginGoogle(){const el=document.getElementById('authStatus');if(el)el.textContent='Opening Google sign-in...';await signInWithRedirect(auth,new GoogleAuthProvider())}
-async function loginFacebook(){const el=document.getElementById('authStatus');if(el)el.textContent='Opening Facebook sign-in...';await signInWithRedirect(auth,new FacebookAuthProvider())}
-async function loginMicrosoft(){const el=document.getElementById('authStatus');if(el)el.textContent='Opening Microsoft sign-in...';const p=new OAuthProvider('microsoft.com');p.setCustomParameters({prompt:'select_account'});await signInWithRedirect(auth,p)}
-async function logout(){await signOut(auth);location.href='./'}
+async function loginFacebook(){
+  try {
+    await signInWithPopup(auth,new FacebookAuthProvider());
+  } catch(e) {
+    const el=document.getElementById("authStatus");
+    if(el) el.textContent=e.message;
+    console.error("Facebook sign-in error:", e);
+  }
+}
+async function loginMicrosoft(){
+  try {
+    const p=new OAuthProvider("microsoft.com");
+    p.setCustomParameters({prompt:"select_account"});
+    await signInWithPopup(auth,p);
+  } catch(e) {
+    const el=document.getElementById("authStatus");
+    if(el) el.textContent=e.message;
+    console.error("Microsoft sign-in error:", e);
+  }
+});await signInWithPopup(auth,p)}
+async function logout(){await signOut(auth);location.reload()}
 function setupPhoneAuth(){if(!document.getElementById("recaptcha-container")||window.recaptchaVerifier)return;window.recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"})}
 async function sendPhoneCode(){try{setupPhoneAuth();const phone=document.getElementById("phoneNumber").value.trim();if(!phone.startsWith("+")){authStatus.textContent="Use international format, for example +12025550123.";return}confirmationResult=await signInWithPhoneNumber(auth,phone,window.recaptchaVerifier);authStatus.textContent="Code sent. Enter it below.";phoneCodeBlock.classList.remove("hidden")}catch(e){authStatus.textContent=e.message}}
 async function verifyPhoneCode(){try{await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());authStatus.textContent="Phone verified."}catch(e){authStatus.textContent=e.message}}
 
 async function initClientPortal() {
   pendingDirectClub = qs("club", "");
-  await handleRedirectResultOnce();
 
   setupAuthWatcher(async () => {
     await loadTemplates();
@@ -94,6 +102,7 @@ async function initClientPortal() {
     if (pendingDirectClub) {
       const club = await loadClubById(pendingDirectClub);
       selectedClubId = pendingDirectClub;
+
       showClubSelection();
 
       if (qrForwardNotice) {
@@ -145,7 +154,7 @@ function renderAdminQueue(){displayLink.href=`./display.html?club=${clubId()}`;l
 async function approveItem(id,item){await setDoc(doc(db,"liveContent",clubId()),{club:clubId(),clubName:item.clubName||getClub().name,template:item.template||"neon",templateName:item.templateName||"",mainText:item.mainText||"SHOUTOUT!",subText:item.subText||"",mediaUrl:item.mediaUrl||"",status:"approved",submittedBy:item.submittedBy||"unknown",approvedBy:safeEmail(),referenceNumber:item.referenceNumber||"",approvedAt:serverTimestamp()});await deleteDoc(doc(db,"shoutouts",id))}
 async function rejectItem(id){await deleteDoc(doc(db,"shoutouts",id))}
 async function initDisplayPage(){selectedClubId=qs("club","jadz");await loadTemplates();await loadClubById(selectedClubId);const c=getClub();displayBrand.textContent=c.brand;function render(p){displayCanvas.classList.remove("gold","ice","fire");const t=getTemplate(p.template);if(t.className&&t.className!=="neon")displayCanvas.classList.add(t.className);displayMain.textContent=p.mainText||c.defaultMain;displaySub.textContent=p.subText||"";if(p.mediaUrl){mediaSlot.classList.remove("hidden");const isVideo=/\.(mp4|webm|ogg)(\?|$)/i.test(p.mediaUrl);mediaSlot.innerHTML=isVideo?`<video src="${escAttr(p.mediaUrl)}" autoplay muted loop playsinline></video>`:`<img src="${escAttr(p.mediaUrl)}" alt="ShoutOut media">`}else{mediaSlot.classList.add("hidden");mediaSlot.innerHTML=""}}if(qs("main","")){render({mainText:qs("main"),subText:qs("sub"),template:qs("template","neon"),mediaUrl:qs("media","")});return}onSnapshot(doc(db,"liveContent",clubId()),s=>render(s.exists()?s.data():{mainText:c.defaultMain,subText:c.defaultSub,template:"neon",mediaUrl:""}),e=>render({mainText:"DISPLAY ERROR",subText:e.message,template:"fire"}))}
-function initSeedPage(){handleRedirectResultOnce();setupAuthWatcher(()=>{})}
+function initSeedPage(){setupAuthWatcher(()=>{})}
 const SEED_TEMPLATES=FALLBACK_TEMPLATES;
 const SEED_CLUBS={
 "zebbies-garden":{name:"Zebbies Garden",country:"United States",region:"District of Columbia",city:"Washington",locationLabel:"Washington, District of Columbia, United States",brand:"ZEBBIES GARDEN x JADZ ADCO",defaultMain:"USE SHOUT OUT @ ZEBBIES",defaultSub:"",dj:"DJ Nova",schedule:{Monday:"Hip Hop",Wednesday:"EDM",Friday:"Afro Beats",Saturday:"International"},templates:["birthday","vip","bottle","neon"],active:true},
