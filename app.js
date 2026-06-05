@@ -1,11 +1,10 @@
 /*
   Jadz AdCo ShoutOut - app.js
-  Rollback v12 - Popup Authentication Version
-
-  Purpose:
-  - Restores Firebase popup-based sign-in for Google, Microsoft, and Facebook.
-  - Keeps Firestore clubs/templates, admin approval, display page, and phone OTP logic.
-  - This rollback avoids the newer redirect-auth changes.
+  v14 Click/Auth Fix
+  - Restores simple onclick button handlers.
+  - Keeps popup authentication.
+  - Adds safer error display.
+  - Adds a visible app-loaded flag on startup so you can confirm JavaScript is actually running.
 */
 
 import { firebaseConfig } from "./firebase-config.js";
@@ -59,32 +58,37 @@ function updateLoginUI(user){
 }
 function setupAuthWatcher(after){onAuthStateChanged(auth,u=>{currentUser=u;updateLoginUI(u);if(u&&after)after(u)})}
 async function loginGoogle(){
-  try {
-    await signInWithPopup(auth,new GoogleAuthProvider());
-  } catch(e) {
-    const el=document.getElementById("authStatus");
-    if(el) el.textContent=e.message;
+  const el=document.getElementById("authStatus");
+  try{
+    if(el) el.textContent="Opening Google sign-in...";
+    const provider=new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  }catch(e){
     console.error("Google sign-in error:", e);
+    if(el) el.textContent=e.code ? `${e.code}: ${e.message}` : e.message;
   }
 }
 async function loginFacebook(){
-  try {
-    await signInWithPopup(auth,new FacebookAuthProvider());
-  } catch(e) {
-    const el=document.getElementById("authStatus");
-    if(el) el.textContent=e.message;
+  const el=document.getElementById("authStatus");
+  try{
+    if(el) el.textContent="Opening Facebook sign-in...";
+    const provider=new FacebookAuthProvider();
+    await signInWithPopup(auth, provider);
+  }catch(e){
     console.error("Facebook sign-in error:", e);
+    if(el) el.textContent=e.code ? `${e.code}: ${e.message}` : e.message;
   }
 }
 async function loginMicrosoft(){
-  try {
-    const p=new OAuthProvider("microsoft.com");
-    p.setCustomParameters({prompt:"select_account"});
-    await signInWithPopup(auth,p);
-  } catch(e) {
-    const el=document.getElementById("authStatus");
-    if(el) el.textContent=e.message;
+  const el=document.getElementById("authStatus");
+  try{
+    if(el) el.textContent="Opening Microsoft sign-in...";
+    const provider=new OAuthProvider("microsoft.com");
+    provider.setCustomParameters({prompt:"select_account"});
+    await signInWithPopup(auth, provider);
+  }catch(e){
     console.error("Microsoft sign-in error:", e);
+    if(el) el.textContent=e.code ? `${e.code}: ${e.message}` : e.message;
   }
 });await signInWithPopup(auth,p)}
 async function logout(){await signOut(auth);location.reload()}
@@ -93,6 +97,9 @@ async function sendPhoneCode(){try{setupPhoneAuth();const phone=document.getElem
 async function verifyPhoneCode(){try{await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());authStatus.textContent="Phone verified."}catch(e){authStatus.textContent=e.message}}
 
 async function initClientPortal() {
+  const el=document.getElementById("authStatus");
+  if(el) el.textContent="App loaded. Choose a sign-in option.";
+
   pendingDirectClub = qs("club", "");
 
   setupAuthWatcher(async () => {
@@ -105,9 +112,10 @@ async function initClientPortal() {
 
       showClubSelection();
 
-      if (qrForwardNotice) {
-        qrForwardNotice.classList.remove("hidden");
-        qrForwardNotice.textContent = `QR code detected. Routing to ${club.name}.`;
+      const notice=document.getElementById("qrForwardNotice");
+      if (notice) {
+        notice.classList.remove("hidden");
+        notice.textContent = `QR code detected. Routing to ${club.name}.`;
       }
 
       setTimeout(() => selectClub(pendingDirectClub), 600);
@@ -189,43 +197,9 @@ Object.assign(window, {
   startAnother,
   continueAfterLogin
 });
-
-/*
-  v13: No inline onclick handlers.
-  This helps when a browser/CSP blocks inline JavaScript event handlers.
-*/
-function bindClick(id, handler) {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener("click", handler);
-}
-
-function bindInput(id, handler) {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener("input", handler);
-}
+console.log('Jadz ShoutOut app.js v14 loaded');
 
 window.addEventListener("DOMContentLoaded", () => {
-  bindClick("googleLoginBtn", loginGoogle);
-  bindClick("microsoftLoginBtn", loginMicrosoft);
-  bindClick("facebookLoginBtn", loginFacebook);
-  bindClick("sendOtpBtn", sendPhoneCode);
-  bindClick("verifyOtpBtn", verifyPhoneCode);
-  bindClick("continueBtn", continueAfterLogin);
-  bindClick("logoutBtn1", logout);
-  bindClick("logoutBtn2", logout);
-  bindClick("logoutBtn3", logout);
-  bindClick("logoutBtn4", logout);
-  bindClick("backToClubsBtn", showClubSelection);
-  bindClick("backToTemplatesBtn", showTemplateSelection);
-  bindClick("goToEditorBtn", goToEditor);
-  bindClick("submitShoutoutBtn", submitShoutout);
-  bindClick("startAnotherBtn", startAnother);
-  bindClick("chooseAnotherClubBtn", showClubSelection);
-
-  bindInput("mainText", updatePreview);
-  bindInput("subText", updatePreview);
-  bindInput("mediaUrl", updatePreview);
-
   if (document.getElementById("landingPage")) {
     initClientPortal();
   }
