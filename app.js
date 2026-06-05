@@ -22,6 +22,7 @@ const FALLBACK_TEMPLATES = {
 };
 
 let currentUser=null, selectedClubId=null, selectedTemplate="neon", confirmationResult=null;
+let pendingDirectClub="";
 let CLUBS={}, TEMPLATES={...FALLBACK_TEMPLATES};
 
 function qs(n,f=""){return new URL(location.href).searchParams.get(n)||f}
@@ -36,7 +37,17 @@ async function loadTemplates(){TEMPLATES={...FALLBACK_TEMPLATES};const snap=awai
 async function loadClubs(){CLUBS={};const q=query(collection(db,"clubs"),where("active","==",true),orderBy("name","asc"));const snap=await getDocs(q);snap.forEach(d=>CLUBS[d.id]={id:d.id,...d.data()})}
 async function loadClubById(id){if(CLUBS[id])return CLUBS[id];const snap=await getDoc(doc(db,"clubs",id));if(snap.exists()){CLUBS[id]={id:snap.id,...snap.data()};return CLUBS[id]}return FALLBACK_CLUB}
 
-function setupAuthWatcher(after){onAuthStateChanged(auth,u=>{currentUser=u;const s=document.getElementById("signedInAs");if(s)s.textContent=u?`Signed in as ${u.displayName||u.email||u.phoneNumber}`:"Not signed in";if(u&&after)after(u)})}
+function updateLoginUI(user){
+ const s=document.getElementById("signedInAs");
+ if(s)s.textContent=user?`Signed in as ${user.displayName||user.email||user.phoneNumber}`:"Not signed in";
+ const actions=document.getElementById("signedInActions");
+ const login=document.getElementById("loginActions");
+ if(actions&&login){
+   if(user){actions.classList.remove("hidden");login.classList.add("hidden");}
+   else{actions.classList.add("hidden");login.classList.remove("hidden");}
+ }
+}
+function setupAuthWatcher(after){onAuthStateChanged(auth,u=>{currentUser=u;updateLoginUI(u);if(u&&after)after(u)})}
 async function loginGoogle(){await signInWithPopup(auth,new GoogleAuthProvider())}
 async function loginFacebook(){await signInWithPopup(auth,new FacebookAuthProvider())}
 async function loginMicrosoft(){const p=new OAuthProvider("microsoft.com");p.setCustomParameters({prompt:"select_account"});await signInWithPopup(auth,p)}
@@ -46,13 +57,27 @@ async function sendPhoneCode(){try{setupPhoneAuth();const phone=document.getElem
 async function verifyPhoneCode(){try{await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());authStatus.textContent="Phone verified."}catch(e){authStatus.textContent=e.message}}
 
 async function initClientPortal(){
- setupAuthWatcher(async ()=>{
-   await loadTemplates(); await loadClubs();
-   const direct=qs("club","");
-   if(direct){const club=await loadClubById(direct); selectedClubId=direct; showClubSelection(); if(qrForwardNotice){qrForwardNotice.classList.remove("hidden");qrForwardNotice.textContent=`QR code detected. Routing to ${club.name}.`;} setTimeout(()=>selectClub(direct),600)}
-   else showClubSelection();
- });
+ pendingDirectClub=qs("club","");
+ setupAuthWatcher(async ()=>{ await prepareAfterLogin(false); });
 }
+async function prepareAfterLogin(autoAdvance=true){
+ await loadTemplates(); await loadClubs();
+ if(autoAdvance){
+   if(pendingDirectClub){
+     const club=await loadClubById(pendingDirectClub);
+     selectedClubId=pendingDirectClub;
+     showClubSelection();
+     if(qrForwardNotice){
+       qrForwardNotice.classList.remove("hidden");
+       qrForwardNotice.textContent=`QR code detected. Routing to ${club.name}.`;
+     }
+     setTimeout(()=>selectClub(pendingDirectClub),600);
+   } else {
+     showClubSelection();
+   }
+ }
+}
+async function continueAfterLogin(){ await prepareAfterLogin(true); }
 function unique(a){return [...new Set(a.filter(Boolean))].sort()}
 function populateFilters(){const cf=countryFilter,lf=cityFilter,df=dayFilter,gf=genreFilter;if(!cf)return;cf.innerHTML='<option value="">All countries</option>';lf.innerHTML='<option value="">All locations</option>';df.innerHTML='<option value="">Any day</option>';gf.innerHTML='<option value="">All genres</option>';unique(Object.values(CLUBS).map(c=>c.country)).forEach(x=>cf.append(new Option(x,x)));unique(Object.values(CLUBS).map(c=>c.locationLabel)).forEach(x=>lf.append(new Option(x,x)));unique(Object.values(CLUBS).flatMap(c=>Object.keys(c.schedule||{}))).forEach(x=>df.append(new Option(x,x)));unique(Object.values(CLUBS).flatMap(c=>Object.values(c.schedule||{}))).forEach(x=>gf.append(new Option(x,x)))}
 function bindFilters(){["clubSearch","countryFilter","cityFilter","dayFilter","genreFilter"].forEach(id=>{const e=document.getElementById(id);if(e&&!e.dataset.bound){e.addEventListener("input",renderClubGrid);e.addEventListener("change",renderClubGrid);e.dataset.bound="1"}})}
@@ -89,4 +114,4 @@ const SEED_CLUBS={
 async function seedDatabase(){try{if(!isAdmin()){seedStatus.textContent="Sign in with an admin email first.";return}seedStatus.textContent="Seeding database...";for(const [id,t] of Object.entries(SEED_TEMPLATES))await setDoc(doc(db,"templates",id),t,{merge:true});for(const [id,c] of Object.entries(SEED_CLUBS))await setDoc(doc(db,"clubs",id),c,{merge:true});seedStatus.textContent="Done. Clubs and templates created/updated in Firestore."}catch(e){seedStatus.textContent=e.message}}
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function escAttr(v){return esc(v).replace(/`/g,"&#096;")}
-Object.assign(window,{initClientPortal,initAdminPortal,initDisplayPage,initSeedPage,seedDatabase,loginGoogle,loginFacebook,loginMicrosoft,logout,sendPhoneCode,verifyPhoneCode,submitShoutout,showClubSelection,showTemplateSelection,goToEditor,startAnother});
+Object.assign(window,{initClientPortal,initAdminPortal,initDisplayPage,initSeedPage,seedDatabase,loginGoogle,loginFacebook,loginMicrosoft,logout,sendPhoneCode,verifyPhoneCode,submitShoutout,showClubSelection,showTemplateSelection,goToEditor,startAnother,continueAfterLogin});

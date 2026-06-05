@@ -8,32 +8,55 @@
 </head>
 <body>
 <main class="app">
-  <!-- SCREEN 1: LOGIN -->
+  <!-- SCREEN 1: CUTE LOGIN -->
   <section id="landingPage" class="page active">
-    <div class="landing">
-      <div>
-        <p class="eyebrow">Jadz AdCo</p>
-        <h1>Send a ShoutOut to the LED screen.</h1>
-        <p class="sub">Sign in, choose a club, pick a template, create your message, and submit for approval.</p>
-        <div class="chips"><span>Nightclubs</span><span>VIP Tables</span><span>Birthdays</span><span>Live Events</span></div>
+    <div class="login-wrap">
+      <div class="brand-hero">
+        <div class="app-badge">✨ Jadz AdCo</div>
+        <h1>ShoutOut</h1>
+        <p>Send birthday wishes, VIP table love, bottle-service messages, and live club shoutouts to the LED screen.</p>
       </div>
-      <div class="card">
-        <h2>Screen 1 — Sign in</h2>
+
+      <div class="login-card">
+        <div class="logo-dot">💬</div>
+        <h2>Welcome</h2>
         <p id="signedInAs" class="status">Not signed in</p>
-        <div class="auth-grid">
-          <button onclick="loginGoogle()">Google</button>
-          <button onclick="loginFacebook()">Facebook</button>
-          <button onclick="loginMicrosoft()">Microsoft</button>
+
+        <div id="signedInActions" class="hidden">
+          <button class="primary full" onclick="continueAfterLogin()">Continue</button>
+          <button class="ghost full" onclick="logout()">Sign out</button>
         </div>
-        <hr/>
-        <h3>Phone OTP</h3>
-        <label>Phone number<input id="phoneNumber" placeholder="+12025550123"/></label>
-        <div id="recaptcha-container"></div>
-        <button onclick="sendPhoneCode()">Send OTP</button>
-        <div id="phoneCodeBlock" class="hidden">
-          <label>Verification code<input id="phoneCode" placeholder="123456"/></label>
-          <button onclick="verifyPhoneCode()">Verify OTP</button>
+
+        <div id="loginActions">
+          <button class="signin google" onclick="loginGoogle()">
+            <span class="icon google-icon">G</span>
+            Continue with Google
+          </button>
+          <button class="signin microsoft" onclick="loginMicrosoft()">
+            <span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>
+            Continue with Microsoft
+          </button>
+          <button class="signin facebook" onclick="loginFacebook()">
+            <span class="icon fb-icon">f</span>
+            Continue with Facebook
+          </button>
+
+          <div class="divider"><span>or use phone</span></div>
+
+          <label class="compact-label">Phone number
+            <input id="phoneNumber" placeholder="+12025550123"/>
+          </label>
+          <div id="recaptcha-container"></div>
+          <button class="signin phone" onclick="sendPhoneCode()">Send OTP</button>
+
+          <div id="phoneCodeBlock" class="hidden">
+            <label class="compact-label">Verification code
+              <input id="phoneCode" placeholder="123456"/>
+            </label>
+            <button class="signin phone" onclick="verifyPhoneCode()">Verify OTP</button>
+          </div>
         </div>
+
         <p id="authStatus" class="status"></p>
       </div>
     </div>
@@ -127,7 +150,7 @@
     </div>
   </section>
 </main>
-<script type="module" src="./app.js?v=8"></script>
+<script type="module" src="./app.js?v=9"></script>
 <script type="module">window.addEventListener("DOMContentLoaded",()=>window.initClientPortal());</script>
 </body>
 </html>
