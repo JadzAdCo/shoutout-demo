@@ -114,4 +114,22 @@ const SEED_CLUBS={
 async function seedDatabase(){try{if(!isAdmin()){seedStatus.textContent="Sign in with an admin email first.";return}seedStatus.textContent="Seeding database...";for(const [id,t] of Object.entries(SEED_TEMPLATES))await setDoc(doc(db,"templates",id),t,{merge:true});for(const [id,c] of Object.entries(SEED_CLUBS))await setDoc(doc(db,"clubs",id),c,{merge:true});seedStatus.textContent="Done. Clubs and templates created/updated in Firestore."}catch(e){seedStatus.textContent=e.message}}
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function escAttr(v){return esc(v).replace(/`/g,"&#096;")}
-Object.assign(window,{initClientPortal,initAdminPortal,initDisplayPage,initSeedPage,seedDatabase,loginGoogle,loginFacebook,loginMicrosoft,logout,sendPhoneCode,verifyPhoneCode,submitShoutout,showClubSelection,showTemplateSelection,goToEditor,startAnother,continueAfterLogin});
+Object.assign(window, {
+  initClientPortal,
+  initAdminPortal,
+  initDisplayPage,
+  initSeedPage,
+  seedDatabase,
+  loginGoogle,
+  loginFacebook,
+  loginMicrosoft,
+  logout,
+  sendPhoneCode,
+  verifyPhoneCode,
+  submitShoutout,
+  showClubSelection,
+  showTemplateSelection,
+  goToEditor,
+  startAnother,
+  continueAfterLogin
+});
