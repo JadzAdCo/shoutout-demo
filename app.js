@@ -8,7 +8,7 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 
 // UPDATE THIS with your real admin email(s).
-const ADMIN_EMAILS = ["don.b@jadzholdings.com"];
+const ADMIN_EMAILS = ["bans.don@gmail.com"];
 
 const CLUBS = {
   "club-a": { name: "Club A", hint: "Downtown demo venue", brand: "CLUB A x JADZ Ad Co", defaultMain: "USE SHOUT OUT @ CLUB A", defaultSub: "" },
