@@ -47,11 +47,11 @@
 
           <div class="divider"><span>or use phone</span></div>
 
-          <label class="compact-label">Phone number
-            <input id="phoneNumber" placeholder="+12025550123"/>
-          </label>
-          <div id="recaptcha-container"></div>
-          <button class="signin phone" onclick="sendPhoneCode()">Send OTP</button>
+<div class="phone-row">
+  <input id="phoneNumber" placeholder="Enter phone #"/>
+  <button class="signin phone" onclick="sendPhoneCode()">Send OTP</button>
+</div>
+<div id="recaptcha-container"></div>
 
           <div id="phoneCodeBlock" class="hidden">
             <label class="compact-label">Verification code
