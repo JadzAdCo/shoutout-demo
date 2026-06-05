@@ -189,3 +189,44 @@ Object.assign(window, {
   startAnother,
   continueAfterLogin
 });
+
+/*
+  v13: No inline onclick handlers.
+  This helps when a browser/CSP blocks inline JavaScript event handlers.
+*/
+function bindClick(id, handler) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("click", handler);
+}
+
+function bindInput(id, handler) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", handler);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  bindClick("googleLoginBtn", loginGoogle);
+  bindClick("microsoftLoginBtn", loginMicrosoft);
+  bindClick("facebookLoginBtn", loginFacebook);
+  bindClick("sendOtpBtn", sendPhoneCode);
+  bindClick("verifyOtpBtn", verifyPhoneCode);
+  bindClick("continueBtn", continueAfterLogin);
+  bindClick("logoutBtn1", logout);
+  bindClick("logoutBtn2", logout);
+  bindClick("logoutBtn3", logout);
+  bindClick("logoutBtn4", logout);
+  bindClick("backToClubsBtn", showClubSelection);
+  bindClick("backToTemplatesBtn", showTemplateSelection);
+  bindClick("goToEditorBtn", goToEditor);
+  bindClick("submitShoutoutBtn", submitShoutout);
+  bindClick("startAnotherBtn", startAnother);
+  bindClick("chooseAnotherClubBtn", showClubSelection);
+
+  bindInput("mainText", updatePreview);
+  bindInput("subText", updatePreview);
+  bindInput("mediaUrl", updatePreview);
+
+  if (document.getElementById("landingPage")) {
+    initClientPortal();
+  }
+});
