@@ -8,7 +8,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const ADMIN_EMAILS = ["bans.don@gmail.com","don.b@jadzholdings.com"];
-const FALLBACK_CLUB = {name:"Jadz Demo",locationLabel:"Shared master demo",brand:"JADZ ADCO",defaultMain:"USE SHOUT OUT",defaultSub:"",dj:"Jadz AdCo",schedule:{},templates:["neon","birthday","vip"]};
+const FALLBACK_CLUB = {name:"Jadz Demo",locationLabel:"Shared master demo",brand:"JADZ Ad Co",defaultMain:"Downoaded the SHOUT OUT APP",defaultSub:"",dj:"Jadz AdCo",schedule:{},templates:["neon","birthday","vip"]};
 const FALLBACK_TEMPLATES = {
  neon:{id:"neon",name:"Neon ShoutOut",scope:"Shared",className:"neon"},
  birthday:{id:"birthday",name:"Birthday Glow",scope:"Shared",className:"neon"},
@@ -56,9 +56,29 @@ function setupPhoneAuth(){if(!document.getElementById("recaptcha-container")||wi
 async function sendPhoneCode(){try{setupPhoneAuth();const phone=document.getElementById("phoneNumber").value.trim();if(!phone.startsWith("+")){authStatus.textContent="Use international format, for example +12025550123.";return}confirmationResult=await signInWithPhoneNumber(auth,phone,window.recaptchaVerifier);authStatus.textContent="Code sent. Enter it below.";phoneCodeBlock.classList.remove("hidden")}catch(e){authStatus.textContent=e.message}}
 async function verifyPhoneCode(){try{await confirmationResult.confirm(document.getElementById("phoneCode").value.trim());authStatus.textContent="Phone verified."}catch(e){authStatus.textContent=e.message}}
 
-async function initClientPortal(){
- pendingDirectClub=qs("club","");
- setupAuthWatcher(async ()=>{ await prepareAfterLogin(false); });
+async function initClientPortal() {
+  pendingDirectClub = qs("club", "");
+
+  setupAuthWatcher(async () => {
+    await loadTemplates();
+    await loadClubs();
+
+    if (pendingDirectClub) {
+      const club = await loadClubById(pendingDirectClub);
+      selectedClubId = pendingDirectClub;
+
+      showClubSelection();
+
+      if (qrForwardNotice) {
+        qrForwardNotice.classList.remove("hidden");
+        qrForwardNotice.textContent = `QR code detected. Routing to ${club.name}.`;
+      }
+
+      setTimeout(() => selectClub(pendingDirectClub), 600);
+    } else {
+      showClubSelection();
+    }
+  });
 }
 async function prepareAfterLogin(autoAdvance=true){
  await loadTemplates(); await loadClubs();
