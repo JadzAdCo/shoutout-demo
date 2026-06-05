@@ -11,9 +11,9 @@ const db = getFirestore(firebaseApp);
 const ADMIN_EMAILS = ["don.b@jadzholdings.com"];
 
 const CLUBS = {
-  "club-a": { name: "Club A", hint: "Downtown demo venue", brand: "CLUB A x JADZ ADCO", defaultMain: "USE SHOUT OUT @ CLUB A", defaultSub: "" },
-  "club-b": { name: "Club B", hint: "VIP lounge demo venue", brand: "CLUB B x JADZ ADCO", defaultMain: "USE SHOUT OUT @ CLUB B", defaultSub: "" },
-  "jadz": { name: "Jadz Demo", hint: "Shared master demo", brand: "JADZ ADCO", defaultMain: "USE SHOUT OUT", defaultSub: "" }
+  "club-a": { name: "Club A", hint: "Downtown demo venue", brand: "CLUB A x JADZ Ad Co", defaultMain: "USE SHOUT OUT @ CLUB A", defaultSub: "" },
+  "club-b": { name: "Club B", hint: "VIP lounge demo venue", brand: "CLUB B x JADZ Ad Co", defaultMain: "USE SHOUT OUT @ CLUB B", defaultSub: "" },
+  "jadz": { name: "Jadz Demo", hint: "Shared master demo", brand: "JADZ Ad Co", defaultMain: "USE SHOUT OUT", defaultSub: "" }
 };
 const TEMPLATES = [
   { id: "neon", name: "Neon Birthday", scope: "Shared", className: "neon" },
