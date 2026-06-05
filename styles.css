@@ -15,6 +15,61 @@
     border-radius:36px;
     box-shadow:0 0 40px rgba(255,0,255,.25);
 }
+/* ShoutOut logo image fix */
+.hero-logo {
+  display: block;
+  width: min(280px, 72vw);
+  max-height: 180px;
+  object-fit: contain;
+  margin: 14px auto 22px;
+  filter:
+    drop-shadow(0 0 10px #ff4fd8)
+    drop-shadow(0 0 22px #62eaff);
+}
+/* Better centered login-card layout */
+.login-card {
+  text-align: center;
+}
+.login-card > p:first-child {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+/* Remove old broken icon spacing if still present */
+.logo-dot {
+  display: none;
+}
+/* Make the first screen cleaner on mobile */
+.login-wrap {
+  grid-template-columns: 1fr;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.brand-hero {
+  text-align: center;
+}
+.app-badge {
+  margin: 0 auto;
+}
+/* Tighten vertical spacing */
+.brand-hero + .login-card {
+  margin-top: 18px;
+}
+.login-card h2 {
+  margin-top: 8px;
+}
+/* Keep buttons nice on iPhone */
+.signin {
+  min-height: 58px;
+  font-size: 16px;
+}
+/* Phone input should not be hidden behind browser bar */
+#phoneNumber,
+#phoneCode {
+  font-size: 16px;
+  min-height: 56px;
+}
 .login-card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 22px 70px rgba(0,0,0,.35);border-radius:30px;padding:26px;backdrop-filter:blur(14px)}
 .logo-dot{width:62px;height:62px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,var(--hot),var(--accent));font-size:30px;box-shadow:0 0 30px rgba(255,100,216,.35)}
 .login-card h2{font-size:42px;margin:18px 0 6px}
