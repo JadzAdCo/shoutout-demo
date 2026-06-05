@@ -6,6 +6,15 @@
 .app-badge{display:inline-flex;background:rgba(255,255,255,.13);border:1px solid var(--line);border-radius:999px;padding:10px 14px;color:var(--lime);font-weight:1000;letter-spacing:.08em;text-transform:uppercase}
 .brand-hero h1{font-size:clamp(72px,12vw,160px);line-height:.78;letter-spacing:-.08em;margin:22px 0 20px;text-transform:uppercase;text-shadow:0 0 30px rgba(98,234,255,.45)}
 .brand-hero p{font-size:clamp(19px,2.2vw,30px);line-height:1.25;color:#edf1ff;max-width:740px}
+.hero-logo{
+    width:180px;
+    height:180px;
+    object-fit:contain;
+    display:block;
+    margin:0 auto 20px auto;
+    border-radius:36px;
+    box-shadow:0 0 40px rgba(255,0,255,.25);
+}
 .login-card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 22px 70px rgba(0,0,0,.35);border-radius:30px;padding:26px;backdrop-filter:blur(14px)}
 .logo-dot{width:62px;height:62px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,var(--hot),var(--accent));font-size:30px;box-shadow:0 0 30px rgba(255,100,216,.35)}
 .login-card h2{font-size:42px;margin:18px 0 6px}
@@ -16,3 +25,5 @@
 .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:800;margin:16px 0}.divider:before,.divider:after{content:"";height:1px;background:var(--line);flex:1}.ghost{background:rgba(255,255,255,.08)}
 @media(max-width:900px){.login-wrap{display:grid;grid-template-columns:1fr}.brand-hero h1{font-size:clamp(54px,16vw,92px)}.login-card{border-radius:24px}}
 @media(max-width:520px){.login-card{padding:18px;border-radius:22px}.brand-hero p{font-size:18px}.logo-dot{width:52px;height:52px}}
+@media(max-width:768px){.hero-logo{width:120px;height:120px}
+}
