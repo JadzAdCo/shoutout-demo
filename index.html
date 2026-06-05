@@ -1,160 +1,69 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title> Shout Out App</title>
-<link rel="stylesheet" href="./styles.css"/>
+  <!-- Jadz AdCo ShoutOut - Patron Portal
+       Screen 1: Authentication
+       Screen 2: Club discovery
+       Screen 3: Template selection
+       Screen 4: ShoutOut editor
+       Screen 5: Confirmation -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ShoutOut App</title>
+  <link rel="stylesheet" href="./styles.css"/>
 </head>
 <body>
 <main class="app">
-  <!-- SCREEN 1: CUTE LOGIN -->
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
-        <img src="./images/ShoutOut-logo.png"
-  alt="ShoutOut"
-  class="hero-logo"
-/>
+        <img src="./images/ShoutOut-logo.png" alt="ShoutOut" class="hero-logo"/>
         <h2>Welcome</h2>
+        <p class="login-copy">Send bottle-service messages, birthday wishes, and live club shoutouts to the LED display.</p>
         <p id="signedInAs" class="status">Not signed in</p>
-
         <div id="signedInActions" class="hidden">
           <button class="primary full" onclick="continueAfterLogin()">Continue</button>
           <button class="ghost full" onclick="logout()">Sign out</button>
         </div>
-
         <div id="loginActions">
           <button class="signin google" onclick="loginGoogle()">
-            <span class="icon google-icon">
-  <svg viewBox="0 0 48 48" aria-hidden="true">
-    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-  </svg>
-</span>
+            <span class="icon google-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>
             Continue with Google
           </button>
-          <button class="signin microsoft" onclick="loginMicrosoft()">
-            <span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>
-            Continue with Microsoft
-          </button>
-          <button class="signin facebook" onclick="loginFacebook()">
-            <span class="icon fb-icon">f</span>
-            Continue with Facebook
-          </button>
-
+          <button class="signin microsoft" onclick="loginMicrosoft()"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+          <button class="signin facebook" onclick="loginFacebook()"><span class="icon fb-icon">f</span>Continue with Facebook</button>
           <div class="divider"><span>or use phone</span></div>
-
-<div class="phone-row">
-  <input id="phoneNumber" placeholder="Enter phone #"/>
-  <button class="signin phone" onclick="sendPhoneCode()">Send OTP</button>
-</div>
-<div id="recaptcha-container"></div>
-
-          <div id="phoneCodeBlock" class="hidden">
-            <label class="compact-label">Verification code
-              <input id="phoneCode" placeholder="123456"/>
-            </label>
-            <button class="signin phone" onclick="verifyPhoneCode()">Verify OTP</button>
-          </div>
+          <div class="phone-row"><input id="phoneNumber" placeholder="Enter phone #" autocomplete="tel"/><button class="signin phone" onclick="sendPhoneCode()">Send OTP</button></div>
+          <div id="recaptcha-container"></div>
+          <div id="phoneCodeBlock" class="hidden"><label class="compact-label">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label><button class="signin phone verify" onclick="verifyPhoneCode()">Verify OTP</button></div>
         </div>
-
         <p id="authStatus" class="status"></p>
       </div>
     </div>
   </section>
 
-  <!-- SCREEN 2: CLUB DISCOVERY -->
   <section id="clubPage" class="page">
-    <header class="topbar">
-      <div><p class="eyebrow">Screen 2 — Choose venue</p><h1>Where are you tonight?</h1><p class="sub">Search or browse by country, city, day, genre, DJ, or club name.</p></div>
-      <button onclick="logout()">Sign out</button>
-    </header>
+    <header class="topbar"><div><p class="eyebrow">Screen 2 — Choose venue</p><h1>Where are you tonight?</h1><p class="sub">Search or browse by country, city, day, genre, DJ, or club name.</p></div><button onclick="logout()">Sign out</button></header>
     <div id="qrForwardNotice" class="notice hidden"></div>
-    <div class="card">
-      <input id="clubSearch" class="search" placeholder="Search club, city, genre, DJ, or day..."/>
-      <div class="filters">
-        <label>Country<select id="countryFilter"><option value="">All countries</option></select></label>
-        <label>State / Region / City<select id="cityFilter"><option value="">All locations</option></select></label>
-        <label>Day<select id="dayFilter"><option value="">Any day</option></select></label>
-        <label>Music genre<select id="genreFilter"><option value="">All genres</option></select></label>
-      </div>
-    </div>
+    <div class="card"><input id="clubSearch" class="search" placeholder="Search club, city, genre, DJ, or day..."/><div class="filters"><label>Country<select id="countryFilter"><option value="">All countries</option></select></label><label>State / Region / City<select id="cityFilter"><option value="">All locations</option></select></label><label>Day<select id="dayFilter"><option value="">Any day</option></select></label><label>Music genre<select id="genreFilter"><option value="">All genres</option></select></label></div></div>
     <div id="clubGrid" class="club-grid"></div>
   </section>
 
-  <!-- SCREEN 3: TEMPLATE SELECTION -->
   <section id="templateSelectPage" class="page">
-    <header class="topbar">
-      <div>
-        <button onclick="showClubSelection()">← Back to clubs</button>
-        <p class="eyebrow">Screen 3 — Choose template</p>
-        <h1 id="selectedClubTitle">Club</h1>
-        <p id="selectedClubMeta" class="sub"></p>
-      </div>
-      <button onclick="logout()">Sign out</button>
-    </header>
-    <div class="template-layout">
-      <div class="card">
-        <h2>Available templates</h2>
-        <p class="sub small">Shared Jadz AdCo templates and club-specific templates appear here.</p>
-        <div id="templateGrid" class="template-grid"></div>
-      </div>
-      <div class="card">
-        <h2>Selected template</h2>
-        <div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div>
-        <button class="primary" onclick="goToEditor()">Continue to Editor</button>
-      </div>
-    </div>
+    <header class="topbar"><div><button onclick="showClubSelection()">← Back to clubs</button><p class="eyebrow">Screen 3 — Choose template</p><h1 id="selectedClubTitle">Club</h1><p id="selectedClubMeta" class="sub"></p></div><button onclick="logout()">Sign out</button></header>
+    <div class="template-layout"><div class="card"><h2>Available templates</h2><p class="sub small">Shared Jadz AdCo templates and club-specific templates appear here.</p><div id="templateGrid" class="template-grid"></div></div><div class="card"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button class="primary" onclick="goToEditor()">Continue to Editor</button></div></div>
   </section>
 
-  <!-- SCREEN 4: EDITOR -->
   <section id="editorPage" class="page">
-    <header class="topbar">
-      <div>
-        <button onclick="showTemplateSelection()">← Back to templates</button>
-        <p class="eyebrow">Screen 4 — Create ShoutOut</p>
-        <h1 id="editorClubTitle">Create your message</h1>
-        <p id="editorTemplateMeta" class="sub"></p>
-      </div>
-      <button onclick="logout()">Sign out</button>
-    </header>
-    <div class="composer">
-      <div class="card">
-        <h2>Message</h2>
-        <label>Main message<input id="mainText" maxlength="48" value="HAPPY BIRTHDAY MAYA!"/></label>
-        <label>Sub message<input id="subText" maxlength="80" value="VIP Table 4 sends love"/></label>
-        <label>Optional image/video URL<input id="mediaUrl" placeholder="https://example.com/photo.jpg or video.mp4"/></label>
-        <button class="primary" onclick="submitShoutout()">Submit for Approval</button>
-        <p id="submitStatus" class="status"></p>
-      </div>
-      <div class="card preview"><h2>Live Preview</h2><iframe id="previewFrame"></iframe></div>
-    </div>
+    <header class="topbar"><div><button onclick="showTemplateSelection()">← Back to templates</button><p class="eyebrow">Screen 4 — Create ShoutOut</p><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div><button onclick="logout()">Sign out</button></header>
+    <div class="composer"><div class="card"><h2>Message</h2><label>Main message<input id="mainText" maxlength="48" value="HAPPY BIRTHDAY MAYA!"/></label><label>Sub message<input id="subText" maxlength="80" value="VIP Table 4 sends love"/></label><label>Optional image/video URL<input id="mediaUrl" placeholder="https://example.com/photo.jpg or video.mp4"/></label><button class="primary" onclick="submitShoutout()">Submit for Approval</button><p id="submitStatus" class="status"></p></div><div class="card preview"><h2>Live Preview</h2><iframe id="previewFrame"></iframe></div></div>
   </section>
 
-  <!-- SCREEN 5: CONFIRMATION -->
   <section id="confirmationPage" class="page">
-    <div class="confirmation card">
-      <p class="eyebrow">Screen 5 — Confirmation</p>
-      <h1>ShoutOut submitted</h1>
-      <p class="sub">Your message has been sent to the club approval queue.</p>
-      <div class="receipt">
-        <p><strong>Reference:</strong> <span id="confirmRef">—</span></p>
-        <p><strong>Club:</strong> <span id="confirmClub">—</span></p>
-        <p><strong>Template:</strong> <span id="confirmTemplate">—</span></p>
-        <p><strong>Status:</strong> Pending Club Approval</p>
-      </div>
-      <div class="button-row">
-        <button class="primary" onclick="startAnother()">Create another ShoutOut</button>
-        <button onclick="showClubSelection()">Choose another club</button>
-        <button onclick="logout()">Sign out</button>
-      </div>
-    </div>
+    <div class="confirmation card"><p class="eyebrow">Screen 5 — Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the club approval queue.</p><div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Club:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Club Approval</p></div><div class="button-row"><button class="primary" onclick="startAnother()">Create another ShoutOut</button><button onclick="showClubSelection()">Choose another club</button><button onclick="logout()">Sign out</button></div></div>
   </section>
 </main>
-<script type="module" src="./app.js?v=11"></script>
+<script type="module" src="./app.js?v=12"></script>
 <script type="module">window.addEventListener("DOMContentLoaded",()=>window.initClientPortal());</script>
 </body>
 </html>
