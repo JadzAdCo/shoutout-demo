@@ -1,9 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Jadz AdCo ShoutOut - v16 Firebase Compat version.
-       This version does NOT use JavaScript module imports.
-       It loads Firebase with normal CDN script tags, then loads app.js. -->
+  <!-- Jadz AdCo ShoutOut Patron Portal v18 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
@@ -17,7 +15,6 @@
         <img src="./images/ShoutOut-logo.png" alt="ShoutOut" class="hero-logo"/>
         <h2>Welcome</h2>
         <p class="login-copy">Send bottle-service messages, birthday wishes, and live club shoutouts to the LED display.</p>
-
         <p id="signedInAs" class="status">Not signed in</p>
 
         <div id="signedInActions" class="hidden">
@@ -37,34 +34,20 @@
             </span>
             Continue with Google
           </button>
-
-          <button id="microsoftLoginBtn" class="signin microsoft" type="button">
-            <span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>
-            Continue with Microsoft
-          </button>
-
-          <button id="facebookLoginBtn" class="signin facebook" type="button">
-            <span class="icon fb-icon">f</span>
-            Continue with Facebook
-          </button>
+          <button id="microsoftLoginBtn" class="signin microsoft" type="button"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+          <button id="facebookLoginBtn" class="signin facebook" type="button"><span class="icon fb-icon">f</span>Continue with Facebook</button>
 
           <div class="divider"><span>or use phone</span></div>
-
           <div class="phone-row">
             <input id="phoneNumber" placeholder="Enter phone #" autocomplete="tel"/>
             <button id="sendOtpBtn" class="signin phone" type="button">Send OTP</button>
           </div>
-
           <div id="recaptcha-container"></div>
-
           <div id="phoneCodeBlock" class="hidden">
-            <label class="compact-label">Verification code
-              <input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/>
-            </label>
+            <label class="compact-label">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
             <button id="verifyOtpBtn" class="signin phone verify" type="button">Verify OTP</button>
           </div>
         </div>
-
         <p id="authStatus" class="status">Loading app...</p>
       </div>
     </div>
@@ -72,11 +55,7 @@
 
   <section id="clubPage" class="page">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Screen 2 — Choose venue</p>
-        <h1>Where are you tonight?</h1>
-        <p class="sub">Search or browse by country, city, day, genre, DJ, or club name.</p>
-      </div>
+      <div><p class="eyebrow">Screen 2 — Choose venue</p><h1>Where are you tonight?</h1><p class="sub">Search or browse by country, city, day, genre, DJ, or club name.</p></div>
       <button id="logoutBtn2" type="button">Sign out</button>
     </header>
     <div id="qrForwardNotice" class="notice hidden"></div>
@@ -94,36 +73,18 @@
 
   <section id="templateSelectPage" class="page">
     <header class="topbar">
-      <div>
-        <button id="backToClubsBtn" type="button">← Back to clubs</button>
-        <p class="eyebrow">Screen 3 — Choose template</p>
-        <h1 id="selectedClubTitle">Club</h1>
-        <p id="selectedClubMeta" class="sub"></p>
-      </div>
+      <div><button id="backToClubsBtn" type="button">← Back to clubs</button><p class="eyebrow">Screen 3 — Choose template</p><h1 id="selectedClubTitle">Club</h1><p id="selectedClubMeta" class="sub"></p></div>
       <button id="logoutBtn3" type="button">Sign out</button>
     </header>
     <div class="template-layout">
-      <div class="card">
-        <h2>Available templates</h2>
-        <p class="sub small">Shared Jadz AdCo templates and club-specific templates appear here.</p>
-        <div id="templateGrid" class="template-grid"></div>
-      </div>
-      <div class="card">
-        <h2>Selected template</h2>
-        <div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div>
-        <button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button>
-      </div>
+      <div class="card"><h2>Available templates</h2><p class="sub small">Shared Jadz AdCo templates and club-specific templates appear here.</p><div id="templateGrid" class="template-grid"></div></div>
+      <div class="card"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button></div>
     </div>
   </section>
 
   <section id="editorPage" class="page">
     <header class="topbar">
-      <div>
-        <button id="backToTemplatesBtn" type="button">← Back to templates</button>
-        <p class="eyebrow">Screen 4 — Create ShoutOut</p>
-        <h1 id="editorClubTitle">Create your message</h1>
-        <p id="editorTemplateMeta" class="sub"></p>
-      </div>
+      <div><button id="backToTemplatesBtn" type="button">← Back to templates</button><p class="eyebrow">Screen 4 — Create ShoutOut</p><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
       <button id="logoutBtn4" type="button">Sign out</button>
     </header>
     <div class="composer">
@@ -141,20 +102,9 @@
 
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
-      <p class="eyebrow">Screen 5 — Confirmation</p>
-      <h1>ShoutOut submitted</h1>
-      <p class="sub">Your message has been sent to the club approval queue.</p>
-      <div class="receipt">
-        <p><strong>Reference:</strong> <span id="confirmRef">—</span></p>
-        <p><strong>Club:</strong> <span id="confirmClub">—</span></p>
-        <p><strong>Template:</strong> <span id="confirmTemplate">—</span></p>
-        <p><strong>Status:</strong> Pending Club Approval</p>
-      </div>
-      <div class="button-row">
-        <button id="startAnotherBtn" class="primary" type="button">Create another ShoutOut</button>
-        <button id="chooseAnotherClubBtn" type="button">Choose another club</button>
-        <button id="logoutBtn5" type="button">Sign out</button>
-      </div>
+      <p class="eyebrow">Screen 5 — Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the club approval queue.</p>
+      <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Club:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Club Approval</p></div>
+      <div class="button-row"><button id="startAnotherBtn" class="primary" type="button">Create another ShoutOut</button><button id="chooseAnotherClubBtn" type="button">Choose another club</button><button id="logoutBtn5" type="button">Sign out</button></div>
     </div>
   </section>
 </main>
@@ -162,7 +112,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=16"></script>
-<script src="./app.js?v=16-compat"></script>
+<script src="./firebase-config.js?v=18"></script>
+<script src="./shared-data.js?v=18"></script>
+<script src="./patron-app.js?v=18"></script>
 </body>
 </html>

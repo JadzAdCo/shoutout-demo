@@ -1,29 +1,29 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Seed Jadz ShoutOut Clubs</title>
-<link rel="stylesheet" href="./styles.css"/>
-</head>
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Seed ShoutOut DB</title><link rel="stylesheet" href="./styles.css"/></head>
 <body>
 <main class="app">
-  <section class="card" style="margin-top:40px">
-    <p class="eyebrow">Jadz AdCo Setup</p>
-    <h1>Seed Club Database</h1>
-    <p class="sub">Use this once to create the Firestore club and template records. Sign in as an admin first.</p>
-    <p id="signedInAs" class="status">Not signed in</p>
-    <div class="auth-grid">
-      <button onclick="loginGoogle()">Google Login</button>
-      <button onclick="loginMicrosoft()">Microsoft Login</button>
-      <button onclick="loginFacebook()">Facebook Login</button>
+  <section class="page active">
+    <div class="card">
+      <p class="eyebrow">Jadz AdCo Setup</p>
+      <h1>Seed Club Database</h1>
+      <p class="sub">Use once to create/update Firestore club and template records.</p>
+      <p id="seedStatus" class="status">Loading seed app...</p>
+      <div class="auth-grid">
+        <button id="seedGoogleLoginBtn" type="button">Google Login</button>
+        <button id="seedMicrosoftLoginBtn" type="button">Microsoft Login</button>
+        <button id="seedFacebookLoginBtn" type="button">Facebook Login</button>
+      </div>
+      <button id="seedBtn" class="primary" type="button">Create / Update Club Records</button>
+      <button id="seedLogoutBtn" class="ghost" type="button">Sign out</button>
     </div>
-    <hr/>
-    <button class="primary" onclick="seedDatabase()">Create / Update Club Records</button>
-    <p id="seedStatus" class="status"></p>
   </section>
 </main>
-<script type="module" src="./app.js?v=7"></script>
-<script type="module">window.addEventListener("DOMContentLoaded",()=>window.initSeedPage());</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=18"></script>
+<script src="./shared-data.js?v=18"></script>
+<script src="./seed-app.js?v=18"></script>
 </body>
 </html>

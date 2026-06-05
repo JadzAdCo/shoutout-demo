@@ -1,18 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jadz AdCo ShoutOut - Xibo Display</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <!-- Jadz AdCo ShoutOut Display Page v18. Use only with ?club=... -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Jadz AdCo ShoutOut Display</title>
+  <link rel="stylesheet" href="./display.css"/>
 </head>
 <body class="display">
-  <div id="displayCanvas" class="display-canvas">
-    <div class="brand" id="displayBrand">JADZ ADCO</div>
-    <div class="display-center"><div id="mediaSlot" class="media-slot hidden"></div><h1 id="displayMain">USE SHOUT OUT</h1><h2 id="displaySub"></h2></div>
-    <div class="ticker" id="displayTicker">Live on Jadz AdCo • Approved content only</div>
-  </div>
-  <script type="module" src="./app.js"></script>
-  <script type="module">window.addEventListener("DOMContentLoaded", () => window.initDisplayPage());</script>
+  <main id="displayCanvas" class="display-canvas">
+    <div id="displayBrand" class="brand">JADZ ADCO</div>
+    <div class="display-center">
+      <div id="mediaSlot" class="media-slot hidden"></div>
+      <h1 id="displayMain">USE SHOUT OUT</h1>
+      <h2 id="displaySub"></h2>
+    </div>
+    <div class="ticker">Live on Jadz AdCo • Approved content only</div>
+  </main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=18"></script>
+<script src="./shared-data.js?v=18"></script>
+<script src="./display-app.js?v=18"></script>
 </body>
 </html>
