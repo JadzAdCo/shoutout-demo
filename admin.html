@@ -1,5 +1,38 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Jadz AdCo ShoutOut - Admin Portal</title><link rel="stylesheet" href="./styles.css"/></head>
-<body class="portal admin"><main class="shell"><section class="hero compact"><div><p class="eyebrow">Jadz AdCo Admin</p><h1>Approval Queue</h1><p class="sub">Approve or reject pending shoutouts. Approved content is copied to the live display page.</p></div><div class="club-card"><span>Admin View</span><strong id="clubName">Loading...</strong><small>Demo password: <b>admin123</b></small></div></section>
-<section class="auth-card" id="adminLogin"><h2>Admin sign-in</h2><label>Password<input id="adminPassword" type="password" placeholder="admin123"/></label><button class="primary" onclick="adminLogin()">Open Queue</button><p class="status" id="adminStatus"></p></section>
-<section class="composer hidden" id="adminPanel"><div class="panel wide"><h2>Pending Queue</h2><div id="queueList" class="queue-list"></div></div><div class="panel preview-panel"><h2>Currently Live</h2><iframe id="liveFrame" title="live content"></iframe><div class="link-row"><a id="displayLink" target="_blank">Open display page</a></div></div></section></main><script src="./app.js"></script><script>initAdminPortal();</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jadz AdCo ShoutOut - Admin Queue</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="portal admin">
+  <main class="shell">
+    <section class="hero compact">
+      <div>
+        <p class="eyebrow">Jadz AdCo Admin</p>
+        <h1>Approval Queue</h1>
+        <p class="sub">Approve or reject pending shoutouts. Approved content updates the Xibo display page in real time.</p>
+        <p id="signedInAs" class="status">Not signed in</p>
+      </div>
+      <div class="club-card"><span>Admin View</span><strong id="clubName">Loading...</strong><small>Add admin emails in app.js → ADMIN_EMAILS</small></div>
+    </section>
+    <section class="auth-card" id="adminLogin">
+      <h2>Admin sign-in</h2>
+      <p class="sub">Sign in using an email listed in the ADMIN_EMAILS array inside app.js.</p>
+      <div class="auth-grid">
+        <button onclick="loginGoogle()">Admin Google Login</button>
+        <button onclick="loginMicrosoft()">Admin Microsoft Login</button>
+        <button onclick="loginFacebook()">Admin Facebook Login</button>
+      </div>
+      <p class="status" id="adminStatus"></p>
+    </section>
+    <section class="composer hidden" id="adminPanel">
+      <div class="panel wide"><h2>Pending Queue</h2><div id="queueList" class="queue-list"></div><button onclick="logout()">Sign out</button></div>
+      <div class="panel preview-panel"><h2>Currently Live</h2><iframe id="liveFrame" title="Live Xibo display content"></iframe><div class="link-row"><a id="displayLink" target="_blank" rel="noopener">Open Display Page</a></div></div>
+    </section>
+  </main>
+  <script type="module" src="./app.js"></script>
+  <script type="module">window.addEventListener("DOMContentLoaded", () => window.initAdminPortal());</script>
+</body>
+</html>
