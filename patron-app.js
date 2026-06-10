@@ -69,13 +69,13 @@
   }
 
   const AD_CONTENT = {
-    "lounge-club": { title: "Gran Coramino Tequila", body: "A smooth premium tequila experience associated with Kevin Hart. Perfect for a Lounge-Club moment.", badge: "Sponsored Lounge-Club Moment" },
-    "clubs": { title: "Gucci Fragrances", body: "Luxury fragrance energy for a night out. Own the room before the first song drops.", badge: "Sponsored Club Moment" },
-    "events": { title: "Nike Air Max", body: "Step into the night with Nike energy. Built for movement, style, and the next event.", badge: "Sponsored Event Moment" },
-    "lounges": { title: "Teremana Tequila", body: "Dwayne Johnson's tequila brand brings a premium toast to the lounge experience.", badge: "Sponsored Lounge Moment" },
-    "beach-clubs": { title: "Advertise Here", body: "Beach club audiences are premium, social, and ready to discover your brand.", badge: "Beach Club Media Slot" },
-    "shoutout": { title: "Advertise Here", body: "Put your brand in front of patrons right before they create a live LED ShoutOut.", badge: "ShoutOut Media Slot" },
-    "default": { title: "Advertise Here", body: "Your brand can own this moment before patrons browse nightlife.", badge: "Jadz AdCo Media Slot" }
+    "lounge-club": { title: "Gran Coramino Tequila", body: "A smooth premium tequila experience associated with Kevin Hart. Perfect for a Lounge-Club moment.", badge: "Sponsored Lounge-Club Moment", image: "./ads/gran-coramino.svg" },
+    "clubs": { title: "Gucci Fragrances", body: "Luxury fragrance energy for a night out. Own the room before the first song drops.", badge: "Sponsored Club Moment", image: "./ads/gucci-fragrance.svg" },
+    "events": { title: "Nike Air Max", body: "Step into the night with Nike energy. Built for movement, style, and the next event.", badge: "Sponsored Event Moment", image: "./ads/nike-airmax.svg" },
+    "lounges": { title: "Teremana Tequila", body: "Dwayne Johnson's tequila brand brings a premium toast to the lounge experience.", badge: "Sponsored Lounge Moment", image: "./ads/teremana.svg" },
+    "beach-clubs": { title: "Advertise Here", body: "Beach club audiences are premium, social, and ready to discover your brand.", badge: "Beach Club Media Slot", image: "./ads/advertise-here.svg" },
+    "shoutout": { title: "Advertise Here", body: "Put your brand in front of patrons right before they create a live LED ShoutOut.", badge: "ShoutOut Media Slot", image: "./ads/advertise-here.svg" },
+    "default": { title: "Advertise Here", body: "Your brand can own this moment before patrons browse nightlife.", badge: "Jadz AdCo Media Slot", image: "./ads/advertise-here.svg" }
   };
 
   let pendingCategoryAfterAd = null;
@@ -87,6 +87,10 @@
     setText("adTitle", ad.title);
     setText("adBody", ad.body);
     setText("adBadge", ad.badge);
+    const adImageSlot = byId("adImageSlot");
+    if (adImageSlot) {
+      adImageSlot.innerHTML = `<img src="${ad.image || './ads/advertise-here.svg'}" alt="${ad.title} advertisement">`;
+    }
     let remaining = 10;
     setText("adCountdown", String(remaining));
     showPage("adSplashPage");
@@ -137,15 +141,107 @@
     updateUserMenu(user);
   }
 
-  async function afterLogin() {
-    await loadTemplates();
-    await loadLocations();
-    await loadEvents();
+  
+  async function getUserProfile() {
+    if (!currentUser) return null;
+    try {
+      const doc = await db.collection("users").doc(currentUser.uid).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      console.warn("Could not read user profile:", e.message);
+      return null;
+    }
+  }
+
+  function prefillSignupProfile() {
+    if (!currentUser) return;
+    const displayName = currentUser.displayName || "";
+    const emailName = (currentUser.email || "").split("@")[0] || "";
+    const cleanName = (displayName || emailName || "patron").replace(/[^a-zA-Z0-9_]/g, "").slice(0, 24);
+
+    if (byId("profileUsername") && !byId("profileUsername").value) byId("profileUsername").value = cleanName;
+    if (byId("profileDisplayName") && !byId("profileDisplayName").value) byId("profileDisplayName").value = displayName;
+  }
+
+  function showSignupProfile() {
+    prefillSignupProfile();
+    showPage("signupProfilePage");
+  }
+
+  function splitCSV(value) {
+    return String(value || "").split(",").map(x => x.trim()).filter(Boolean);
+  }
+
+  async function saveProfile() {
+    const status = byId("profileStatus");
+    try {
+      if (!currentUser) {
+        status.textContent = "Please sign in first.";
+        return;
+      }
+
+      const username = byId("profileUsername").value.trim();
+      if (!username) {
+        status.textContent = "Please choose a username.";
+        return;
+      }
+
+      const profile = {
+        uid: currentUser.uid,
+        username,
+        displayName: byId("profileDisplayName").value.trim() || currentUser.displayName || "",
+        email: currentUser.email || "",
+        phoneNumber: currentUser.phoneNumber || "",
+        photoURL: currentUser.photoURL || "",
+        providerIds: (currentUser.providerData || []).map(p => p.providerId),
+        country: byId("profileCountry").value.trim(),
+        region: byId("profileRegion").value.trim(),
+        city: byId("profileCity").value.trim(),
+        ageRange: byId("profileAgeRange").value,
+        favoriteGenres: splitCSV(byId("profileGenres").value),
+        nightlifeInterests: splitCSV(byId("profileInterests").value),
+        instagramHandle: byId("profileInstagram").value.trim(),
+        xHandle: byId("profileX").value.trim(),
+        analyticsConsent: byId("profileAnalyticsConsent").checked,
+        marketingConsent: byId("profileMarketingConsent").checked,
+        profileCompleted: true,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      await db.collection("users").doc(currentUser.uid).set({
+        ...profile,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      status.textContent = "Profile saved.";
+      await continueToMainCategories();
+    } catch (e) {
+      console.error(e);
+      status.textContent = e.message;
+    }
+  }
+
+  async function continueToMainCategories() {
     showPage("categoryPage");
     if (pendingDirectLocation) {
       openCategory("shoutout");
       setTimeout(() => selectLocationForShoutOut(pendingDirectLocation), 400);
     }
+  }
+
+
+  async function afterLogin() {
+    await loadTemplates();
+    await loadLocations();
+    await loadEvents();
+
+    const profile = await getUserProfile();
+    if (!profile || !profile.profileCompleted) {
+      showSignupProfile();
+      return;
+    }
+
+    await continueToMainCategories();
   }
 
   async function loginGoogle() { try { setStatus("Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
@@ -334,6 +430,7 @@
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);
+    bind("saveProfileBtn", saveProfile);
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });

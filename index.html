@@ -33,7 +33,7 @@
       <div class="login-card">
         <img src="./images/ShoutOut-logo.png" alt="ShoutOut" class="hero-logo"/>
         <h2>Welcome</h2>
-        <p class="login-copy">Search nightlife or send a live ShoutOut to one of our LED displays.</p>
+        <p class="login-copy">Search nightlife or send a live ShoutOut to the LED display.</p>
         <p id="signedInAs" class="status">Not signed in</p>
 
         <div id="signedInActions" class="hidden">
@@ -69,6 +69,72 @@
         </div>
         <p id="authStatus" class="status">Loading app...</p>
       </div>
+    </div>
+  </section>
+
+
+  <section id="signupProfilePage" class="page">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Complete Sign Up</p>
+        <h1>Create your profile</h1>
+        <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
+      </div>
+    </header>
+
+    <div class="card profile-card">
+      <div class="profile-grid">
+        <label>Username *
+          <input id="profileUsername" maxlength="28" placeholder="Choose a username"/>
+        </label>
+        <label>Display name
+          <input id="profileDisplayName" maxlength="60" placeholder="Your display name"/>
+        </label>
+        <label>Country
+          <input id="profileCountry" placeholder="United States"/>
+        </label>
+        <label>State / Region / Province
+          <input id="profileRegion" placeholder="District of Columbia"/>
+        </label>
+        <label>City
+          <input id="profileCity" placeholder="Washington"/>
+        </label>
+        <label>Age range
+          <select id="profileAgeRange">
+            <option value="">Prefer not to say</option>
+            <option value="18-20">18-20</option>
+            <option value="21-24">21-24</option>
+            <option value="25-34">25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45+">45+</option>
+          </select>
+        </label>
+        <label>Favorite music genres
+          <input id="profileGenres" placeholder="Hip Hop, Afro House, EDM"/>
+        </label>
+        <label>Nightlife interests
+          <input id="profileInterests" placeholder="Clubs, Lounges, Beach Clubs, Events"/>
+        </label>
+        <label>Instagram handle (optional)
+          <input id="profileInstagram" placeholder="@yourhandle"/>
+        </label>
+        <label>X handle (optional)
+          <input id="profileX" placeholder="@yourhandle"/>
+        </label>
+      </div>
+
+      <label class="consent-line">
+        <input id="profileAnalyticsConsent" type="checkbox"/>
+        I agree that Jadz AdCo may use my activity in aggregate analytics to improve recommendations, venue insights, and advertising performance.
+      </label>
+
+      <label class="consent-line">
+        <input id="profileMarketingConsent" type="checkbox"/>
+        I want to receive nightlife offers, event promotions, and venue recommendations.
+      </label>
+
+      <button id="saveProfileBtn" class="primary" type="button">Continue</button>
+      <p id="profileStatus" class="status"></p>
     </div>
   </section>
 
@@ -125,6 +191,7 @@
     <div class="splash-wrap">
       <div class="splash-card">
         <p class="eyebrow">Sponsored</p>
+        <div id="adImageSlot" class="ad-image-slot"></div>
         <h1 id="adTitle">Advertise Here</h1>
         <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
         <div id="adBadge" class="ad-badge">Jadz AdCo Media Slot</div>
