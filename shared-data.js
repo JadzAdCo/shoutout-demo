@@ -8,6 +8,25 @@ window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
   "don.b@jadzholdings.com"
 ];
 
+/*
+  v25 Master Admin Security Policy
+  Master admin must be explicitly listed, use an approved Jadz email domain,
+  use a verified email identity, and sign in through Google or Microsoft.
+  MFA must be enforced at Microsoft Entra ID / Google Workspace.
+*/
+window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS = [
+  "jadzadco.com",
+  "jadzholdings.com"
+];
+
+window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS = [
+  "google.com",
+  "microsoft.com"
+];
+
+window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL = true;
+window.SHOUTOUT_MASTER_ADMIN_REQUIRE_MFA_NOTICE = true;
+
 window.SHOUTOUT_ADMIN_EMAILS = [
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
@@ -407,3 +426,12 @@ window.SHOUTOUT_EVENTS = {
   }
 
 };
+
+/*
+  v25.1 Temporary Master Admin Exception.
+  Keeps bans.don@gmail.com working while corporate master admin accounts are finalized.
+  Remove this exception in production.
+*/
+window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS = [
+  "bans.don@gmail.com"
+];

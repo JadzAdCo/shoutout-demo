@@ -35,20 +35,30 @@
   }
 
   async function loginGoogle() {
-    try { setText("adminStatus","Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-    catch(e) { setText("adminStatus", `${e.code || "error"}: ${e.message}`); }
+    try {
+      setText("adminStatus","Redirecting to Google sign-in...");
+      await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
+    }
   }
   async function loginFacebook() {
-    try { setText("adminStatus","Opening Facebook sign-in..."); await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); }
-    catch(e) { setText("adminStatus", `${e.code || "error"}: ${e.message}`); }
+    try {
+      setText("adminStatus","Redirecting to Facebook sign-in...");
+      await auth.signInWithRedirect(new firebase.auth.FacebookAuthProvider());
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
+    }
   }
   async function loginMicrosoft() {
     try {
       const p = new firebase.auth.OAuthProvider("microsoft.com");
       p.setCustomParameters({prompt:"select_account"});
-      setText("adminStatus","Opening Microsoft sign-in...");
-      await auth.signInWithPopup(p);
-    } catch(e) { setText("adminStatus", `${e.code || "error"}: ${e.message}`); }
+      setText("adminStatus","Redirecting to Microsoft sign-in...");
+      await auth.signInWithRedirect(p);
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
+    }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
@@ -74,7 +84,6 @@
     db.collection("shoutouts")
       .where("clubLocationId","==",locationId)
       .where("status","==","pending")
-      .orderBy("submittedAt","desc")
       .onSnapshot(snapshot => {
         queueList.innerHTML = "";
         setText("metricPending", String(snapshot.size));
@@ -84,7 +93,13 @@
           return;
         }
 
-        snapshot.forEach(doc => {
+        const sortedDocs = snapshot.docs.slice().sort((a,b) => {
+          const av = a.data().submittedAt?.toMillis ? a.data().submittedAt.toMillis() : 0;
+          const bv = b.data().submittedAt?.toMillis ? b.data().submittedAt.toMillis() : 0;
+          return bv - av;
+        });
+
+        sortedDocs.forEach(doc => {
           const item = doc.data();
           const div = document.createElement("div");
           div.className = "queue-item";
@@ -246,6 +261,10 @@
     setupTabs();
     setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
+
+    auth.getRedirectResult().catch(e => {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
+    });
     byId("displayLink").href = `./display.html?location=${locationId}`;
     byId("liveFrame").src = `./display.html?location=${locationId}`;
 

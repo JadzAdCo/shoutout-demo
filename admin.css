@@ -19,3 +19,8 @@
 .report-table strong{text-align:right}
 .report-list{display:flex;flex-wrap:wrap;gap:10px}
 @media(max-width:720px){.report-table div{display:block}.report-table strong{display:block;text-align:left;margin-top:5px}.admin-tabs{gap:8px}.admin-tab{font-size:13px;padding:9px 11px}}
+
+/* v25.1 account status card */
+.account-status-card{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
+.account-status-card strong{display:block;font-size:18px}
+@media(max-width:720px){.account-status-card{display:block}.account-status-card button{margin-top:12px;width:100%}}

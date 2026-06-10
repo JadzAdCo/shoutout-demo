@@ -227,3 +227,101 @@ The next production step is to add real tracking events for:
 - Ad clicks
 - ShoutOut payment status
 - Payout records
+
+
+---
+
+# v25 Master Admin Security Update
+
+## Summary
+
+This package hardens the Master Admin portal.
+
+Master Admin now requires:
+
+1. The user email must be explicitly listed in:
+
+```javascript
+window.SHOUTOUT_MASTER_ADMIN_EMAILS
+```
+
+2. The user email domain must be one of:
+
+```javascript
+jadzadco.com
+jadzholdings.com
+```
+
+3. The user must use an email-based identity. Phone-only OTP is blocked for Master Admin.
+
+4. The user must sign in using:
+
+```javascript
+google.com
+microsoft.com
+```
+
+Facebook, phone-only, anonymous, and other weaker providers are blocked for Master Admin.
+
+5. The user email must be verified by the provider.
+
+6. MFA must be enforced upstream by Microsoft Entra ID or Google Workspace for the allowed Jadz corporate domains.
+
+## Important MFA Note
+
+Firebase client JavaScript can detect Firebase-native MFA enrollment, but Microsoft Entra ID or Google Workspace MFA is usually enforced at the identity provider before Firebase receives the login. This package enforces corporate domain, verified email, allowed provider, and explicit allow-list. Keep MFA enforced in Microsoft Entra ID / Google Workspace.
+
+## Master Admin URL
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25
+```
+
+## Practical Recommendation
+
+Use Microsoft authentication for Master Admin and enforce MFA with Microsoft Entra Conditional Access.
+
+Do not allow phone OTP, Facebook login, personal Gmail, personal Outlook, fake emails, or unverified identities for Master Admin access.
+
+
+---
+
+# v25.1 Admin Login, Queue, and Text Fixes
+
+## Changes
+
+1. Updated patron landing text:
+
+`Search and book entertainment and nightlife events or send a live ShoutOut to one of our ShoutOut displays.`
+
+2. Added visible Account Status and Sign out card to Master Admin after login.
+
+3. Changed admin and master-admin authentication from popup sign-in to redirect sign-in to reduce Microsoft `auth/popup-closed-by-user` issues.
+
+4. Kept `bans.don@gmail.com` as a temporary Master Admin exception while corporate-domain admin accounts are finalized.
+
+5. Fixed Zebbies Garden DC / club admin queue error by removing the Firestore composite-index requirement. The app now queries by `clubLocationId` and `status`, then sorts by `submittedAt` in the browser.
+
+## Test URLs
+
+Patron:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=25.1
+```
+
+Zebbies Garden DC Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.1
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.1
+```
+
+## Production Note
+
+For production scale, create the Firestore composite index and restore server-side ordering. For the current prototype, client-side sorting avoids deployment friction.

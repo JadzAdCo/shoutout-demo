@@ -14,25 +14,32 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
+  const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || []).map(x => x.toLowerCase());
+  const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());
+  const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com","microsoft.com"]).map(x => x.toLowerCase());
+  const REQUIRE_VERIFIED_EMAIL = window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL !== false;
+  const TEMPORARY_EXCEPTION_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS || []).map(x => x.toLowerCase());
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
   async function loginGoogle() {
-    try { setText("masterStatus","Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-    catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
+    try {
+      setText("masterStatus","Redirecting to Google sign-in...");
+      await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+    } catch(e) {
+      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+    }
   }
-  async function loginFacebook() {
-    try { setText("masterStatus","Opening Facebook sign-in..."); await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); }
-    catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
-  }
+
   async function loginMicrosoft() {
     try {
       const p = new firebase.auth.OAuthProvider("microsoft.com");
       p.setCustomParameters({prompt:"select_account"});
-      setText("masterStatus","Opening Microsoft sign-in...");
-      await auth.signInWithPopup(p);
-    } catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
+      setText("masterStatus","Redirecting to Microsoft sign-in...");
+      await auth.signInWithRedirect(p);
+    } catch(e) {
+      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+    }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
@@ -45,6 +52,63 @@
         byId(btn.dataset.panel)?.classList.add("active");
       });
     });
+  }
+
+
+  function getEmailDomain(email) {
+    return String(email || "").toLowerCase().split("@")[1] || "";
+  }
+
+  function getProviderIds(user) {
+    return (user?.providerData || []).map(p => String(p.providerId || "").toLowerCase());
+  }
+
+  function hasAllowedProvider(user) {
+    return getProviderIds(user).some(provider => ALLOWED_PROVIDERS.includes(provider));
+  }
+
+  function hasFirebaseMfaEnrollment(user) {
+    try {
+      return !!(user && user.multiFactor && user.multiFactor.enrolledFactors && user.multiFactor.enrolledFactors.length > 0);
+    } catch {
+      return false;
+    }
+  }
+
+  function masterSecurityCheck(user) {
+    if (!user) return { ok:false, reason:"Not signed in." };
+
+    const email = safeUser(user);
+    const domain = getEmailDomain(email);
+    const providers = getProviderIds(user);
+
+    if (!email || email === "unknown" || !email.includes("@")) {
+      return { ok:false, reason:"Master admin requires an email-based sign-in. Phone-only OTP is not allowed." };
+    }
+
+    if (!MASTER_ADMIN_EMAILS.includes(email)) {
+      return { ok:false, reason:`${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS.` };
+    }
+
+    const isTemporaryException = TEMPORARY_EXCEPTION_EMAILS.includes(email);
+
+    if (!ALLOWED_DOMAINS.includes(domain) && !isTemporaryException) {
+      return { ok:false, reason:`Master admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
+    }
+
+    if (REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
+      return { ok:false, reason:"Master admin email must be verified by the identity provider." };
+    }
+
+    if (!hasAllowedProvider(user)) {
+      return { ok:false, reason:`Master admin must sign in with ${ALLOWED_PROVIDERS.join(" or ")}. Phone, Facebook, and anonymous sign-ins are blocked.` };
+    }
+
+    const mfaMessage = hasFirebaseMfaEnrollment(user)
+      ? "Firebase MFA enrollment detected."
+      : "MFA must be enforced by Microsoft Entra ID / Google Workspace for this corporate account.";
+
+    return { ok:true, reason:`Master admin security verified. Providers: ${providers.join(", ")}. ${mfaMessage}` };
   }
 
   function simpleRows(rows) {
@@ -174,16 +238,21 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
-    setText("masterStatus", "Master admin app loaded. Sign in to continue.");
+    setText("masterStatus", "Master admin app loaded. Sign in with an approved corporate account.");
+
+    auth.getRedirectResult().catch(e => {
+      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+    });
 
     bind("masterGoogleLoginBtn", loginGoogle);
-    bind("masterFacebookLoginBtn", loginFacebook);
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
     bind("masterLogoutBtn", logout);
+    bind("masterPanelLogoutBtn", logout);
 
     auth.onAuthStateChanged(user => {
       const email = safeUser(user);
       setText("masterSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
+      setText("masterPanelSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
 
       if (!user) {
         byId("masterLogin").classList.remove("hidden");
@@ -191,16 +260,18 @@
         return;
       }
 
-      if (!MASTER_ADMIN_EMAILS.includes(email)) {
+      const check = masterSecurityCheck(user);
+      if (!check.ok) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");
-        setText("masterStatus", `Signed in as ${email}, but this email is not listed as a master admin.`);
+        setText("masterStatus", `Access denied: ${check.reason}`);
         return;
       }
 
       byId("masterLogin").classList.add("hidden");
       byId("masterPanel").classList.remove("hidden");
-      setText("masterStatus", "Master admin verified.");
+      setText("masterStatus", check.reason);
+      setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
     });
   });
