@@ -9,6 +9,25 @@
 </head>
 <body>
 <main class="app">
+
+  <div id="userMenu" class="user-menu">
+    <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
+      <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
+      <span id="userInitials" class="user-initials">?</span>
+      <span class="user-dots">⋮</span>
+    </button>
+    <div id="userDropdown" class="user-dropdown hidden">
+      <div class="user-dropdown-row">
+        <img id="dropdownUserPhoto" class="dropdown-user-photo hidden" alt="User profile"/>
+        <div>
+          <strong id="dropdownUserName">Not signed in</strong>
+          <p id="dropdownUserEmail">Guest</p>
+        </div>
+      </div>
+      <button id="dropdownSignOutBtn" class="ghost full" type="button">Sign out</button>
+    </div>
+  </div>
+
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
@@ -57,14 +76,16 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Screen 2 — Main Categories</p>
-        <h1>What are you looking for?</h1>
         <p class="sub category-sentence">
-          Search for <button id="eventsBtn" class="linklike" type="button">Events</button>,
+          <strong>Search for</strong>
+          <button id="eventsBtn" class="linklike" type="button">Events</button>,
           <button id="clubsBtn" class="linklike" type="button">Clubs</button>,
-          <button id="loungesBtn" class="linklike" type="button">Lounges</button>,
-          <button id="loungeClubBtn" class="linklike" type="button">Lounge-Club</button>, and
           <button id="beachClubsBtn" class="linklike" type="button">Beach Clubs</button>,
-          or “Throw a” <button id="shoutoutBtn" class="linklike hot" type="button">ShoutOut</button>.
+          <button id="loungesBtn" class="linklike" type="button">Lounges</button>, and
+          <button id="loungeClubBtn" class="linklike" type="button">Lounge-Clubs</button>.
+          <br/>
+          <strong>Or throw a</strong>
+          <button id="shoutoutBtn" class="linklike hot" type="button">ShoutOut</button>.
         </p>
       </div>
       <button id="logoutBtn2" type="button">Sign out</button>
@@ -97,6 +118,20 @@
       <button id="payVipEntryBtn" class="category-card hot" type="button">Pay VIP Entry</button>
       <button id="payEventEntryBtn" class="category-card" type="button">Pay Event Entry</button>
       <button id="payStdEntryBtn" class="category-card" type="button">Pay Std. Entry</button>
+    </div>
+  </section>
+
+
+  <section id="adSplashPage" class="page">
+    <div class="splash-wrap">
+      <div class="splash-card">
+        <p class="eyebrow">Sponsored</p>
+        <h1 id="adTitle">Advertise Here</h1>
+        <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
+        <div id="adBadge" class="ad-badge">Jadz AdCo Media Slot</div>
+        <p class="splash-countdown">Continuing in <span id="adCountdown">5</span> seconds...</p>
+        <button id="skipAdBtn" class="ghost" type="button">Skip</button>
+      </div>
     </div>
   </section>
 

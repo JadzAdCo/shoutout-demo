@@ -29,6 +29,113 @@
   function showPage(id) { document.querySelectorAll(".page").forEach(p => p.classList.remove("active")); byId(id)?.classList.add("active"); }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
+  function getInitials(user) {
+    const name = user?.displayName || user?.email || user?.phoneNumber || "Guest";
+    return name.split(/[ @._-]+/).filter(Boolean).slice(0,2).map(x => x[0].toUpperCase()).join("") || "?";
+  }
+
+  function updateUserMenu(user) {
+    const photoURL = user?.photoURL || "";
+    const displayName = user?.displayName || user?.email || user?.phoneNumber || "Not signed in";
+    const email = user?.email || user?.phoneNumber || "Guest";
+    const userPhoto = byId("userPhoto");
+    const dropdownPhoto = byId("dropdownUserPhoto");
+    const initials = byId("userInitials");
+
+    if (userPhoto) {
+      userPhoto.src = photoURL || "";
+      userPhoto.classList.toggle("hidden", !photoURL);
+    }
+    if (dropdownPhoto) {
+      dropdownPhoto.src = photoURL || "";
+      dropdownPhoto.classList.toggle("hidden", !photoURL);
+    }
+    if (initials) {
+      initials.textContent = user ? getInitials(user) : "?";
+      initials.classList.toggle("hidden", !!photoURL);
+    }
+    setText("dropdownUserName", displayName);
+    setText("dropdownUserEmail", email);
+  }
+
+  function toggleUserDropdown() { byId("userDropdown")?.classList.toggle("hidden"); }
+
+  function closeUserDropdownOnOutsideClick(event) {
+    const menu = byId("userMenu");
+    if (menu && !menu.contains(event.target)) byId("userDropdown")?.classList.add("hidden");
+  }
+
+  const AD_CONTENT = {
+    "lounge-club": {
+      title: "Gran Coramino Tequila",
+      body: "A smooth premium tequila experience associated with Kevin Hart. Perfect for a Lounge-Club moment.",
+      badge: "Sponsored Lounge-Club Moment"
+    },
+    "clubs": {
+      title: "Gucci Fragrances",
+      body: "Luxury fragrance energy for a night out. Own the room before the first song drops.",
+      badge: "Sponsored Club Moment"
+    },
+    "events": {
+      title: "Nike Air Max",
+      body: "Step into the night with Nike energy. Built for movement, style, and the next event.",
+      badge: "Sponsored Event Moment"
+    },
+    "lounges": {
+      title: "Teremana Tequila",
+      body: "Dwayne Johnson's tequila brand brings a premium toast to the lounge experience.",
+      badge: "Sponsored Lounge Moment"
+    },
+    "beach-clubs": {
+      title: "Advertise Here",
+      body: "Beach club audiences are premium, social, and ready to discover your brand.",
+      badge: "Beach Club Media Slot"
+    },
+    "shoutout": {
+      title: "Advertise Here",
+      body: "Put your brand in front of patrons right before they create a live LED ShoutOut.",
+      badge: "ShoutOut Media Slot"
+    },
+    "default": {
+      title: "Advertise Here",
+      body: "Your brand can own this moment before patrons browse nightlife.",
+      badge: "Jadz AdCo Media Slot"
+    }
+  };
+
+  let pendingCategoryAfterAd = null;
+  let adTimer = null;
+
+  function showAdSplash(type, nextFn) {
+    pendingCategoryAfterAd = nextFn;
+    const ad = AD_CONTENT[type] || AD_CONTENT.default;
+    setText("adTitle", ad.title);
+    setText("adBody", ad.body);
+    setText("adBadge", ad.badge);
+    let remaining = 5;
+    setText("adCountdown", String(remaining));
+    showPage("adSplashPage");
+    clearInterval(adTimer);
+    adTimer = setInterval(() => {
+      remaining -= 1;
+      setText("adCountdown", String(Math.max(remaining, 0)));
+      if (remaining <= 0) {
+        clearInterval(adTimer);
+        const fn = pendingCategoryAfterAd;
+        pendingCategoryAfterAd = null;
+        if (typeof fn === "function") fn();
+      }
+    }, 1000);
+  }
+
+  function skipAdSplash() {
+    clearInterval(adTimer);
+    const fn = pendingCategoryAfterAd;
+    pendingCategoryAfterAd = null;
+    if (typeof fn === "function") fn();
+  }
+
+
   async function loadTemplates() {
     templates = {...window.SHOUTOUT_TEMPLATES};
     try { const snap = await db.collection("templates").get(); snap.forEach(doc => templates[doc.id] = {id:doc.id, ...doc.data()}); } catch(e) {}
@@ -52,6 +159,7 @@
     setText("signedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
     byId("signedInActions")?.classList.toggle("hidden", !user);
     byId("loginActions")?.classList.toggle("hidden", !!user);
+    updateUserMenu(user);
   }
 
   async function afterLogin() {
@@ -84,6 +192,10 @@
   async function verifyPhoneCode() { try { if (!confirmationResult) { setStatus("Send the OTP first."); return; } await confirmationResult.confirm(byId("phoneCode").value.trim()); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
 
   function openCategory(type) {
+    showAdSplash(type, () => openCategoryAfterAd(type));
+  }
+
+  function openCategoryAfterAd(type) {
     if (type === "clubs") {
       showPage("clubActionsPage");
       return;
@@ -236,6 +348,10 @@
     bind("payEventEntryBtn", () => openCategory("club-action:pay-event-entry"));
     bind("payStdEntryBtn", () => openCategory("club-action:pay-std-entry"));
     bind("backToCategoriesBtn", () => showPage("categoryPage")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("userMenuBtn", toggleUserDropdown);
+    bind("dropdownSignOutBtn", logout);
+    bind("skipAdBtn", skipAdSplash);
+    document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
 })();
