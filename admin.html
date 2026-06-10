@@ -29,6 +29,7 @@
     <div id="adminLogin" class="card">
       <h2>Club admin sign-in</h2>
       <p class="sub">Sign in using an approved admin email. Master admins should use <strong>master-admin.html</strong>.</p>
+      <p class="sub small"><strong>Microsoft sign-in note:</strong> this page now uses redirect sign-in to avoid popup-blocker issues. If Microsoft still fails, verify Firebase Microsoft provider settings and Microsoft App Registration redirect URI.</p>
       <div class="auth-grid">
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
         <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
@@ -126,8 +127,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=25.1"></script>
-<script src="./shared-data.js?v=25.1"></script>
-<script src="./admin-app.js?v=25.1"></script>
+<script src="./firebase-config.js?v=25.2"></script>
+<script src="./shared-data.js?v=25.2"></script>
+<script src="./admin-app.js?v=25.2"></script>
 </body>
 </html>

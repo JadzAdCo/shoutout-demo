@@ -22,23 +22,62 @@
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
+  function masterAuthErrorMessage(e) {
+    const code = e?.code || "error";
+    const message = e?.message || String(e || "Unknown error");
+
+    if (code === "auth/popup-closed-by-user") {
+      return "Microsoft sign-in was interrupted before completion. This version uses redirect sign-in, but if you still see this, hard refresh and try again. Also verify Microsoft is enabled in Firebase Authentication.";
+    }
+
+    if (code === "auth/operation-not-allowed") {
+      return "Microsoft sign-in is not enabled in Firebase Authentication. Go to Firebase Console > Authentication > Sign-in method > Microsoft and enable it.";
+    }
+
+    if (code === "auth/unauthorized-domain") {
+      return "This domain is not authorized in Firebase Authentication. Add jadzadco.github.io and your Firebase hosting domains under Authentication > Settings > Authorized domains.";
+    }
+
+    if (code === "auth/account-exists-with-different-credential") {
+      return "This email already exists with another sign-in method. Sign in with the original provider first, then link Microsoft later.";
+    }
+
+    if (code === "auth/invalid-credential" || code === "auth/invalid-oauth-client-id") {
+      return "Microsoft OAuth configuration appears invalid. Verify Microsoft Client ID, Client Secret, and Firebase redirect URI in the Microsoft App Registration.";
+    }
+
+    return `${code}: ${message}`;
+  }
+
+  function buildMicrosoftProvider() {
+    const p = new firebase.auth.OAuthProvider("microsoft.com");
+    p.setCustomParameters({
+      prompt: "select_account",
+      tenant: "common"
+    });
+    try { p.addScope("openid"); } catch(e) {}
+    try { p.addScope("profile"); } catch(e) {}
+    try { p.addScope("email"); } catch(e) {}
+    return p;
+  }
+
+
   async function loginGoogle() {
     try {
       setText("masterStatus","Redirecting to Google sign-in...");
       await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
     } catch(e) {
-      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+      setText("masterStatus", masterAuthErrorMessage(e));
     }
   }
 
   async function loginMicrosoft() {
     try {
-      const p = new firebase.auth.OAuthProvider("microsoft.com");
-      p.setCustomParameters({prompt:"select_account"});
+      const p = buildMicrosoftProvider();
       setText("masterStatus","Redirecting to Microsoft sign-in...");
       await auth.signInWithRedirect(p);
     } catch(e) {
-      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+      setText("masterStatus", masterAuthErrorMessage(e));
     }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
@@ -241,7 +280,7 @@
     setText("masterStatus", "Master admin app loaded. Sign in with an approved corporate account.");
 
     auth.getRedirectResult().catch(e => {
-      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+      setText("masterStatus", masterAuthErrorMessage(e));
     });
 
     bind("masterGoogleLoginBtn", loginGoogle);

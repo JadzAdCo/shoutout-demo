@@ -325,3 +325,102 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.1
 ## Production Note
 
 For production scale, create the Firestore composite index and restore server-side ordering. For the current prototype, client-side sorting avoids deployment friction.
+
+
+---
+
+# v25.2 Microsoft Admin Authentication Diagnostics
+
+## Summary
+
+This package improves Microsoft authentication handling for the Club Admin and Master Admin portals.
+
+## Changes
+
+1. Microsoft admin sign-in continues to use `signInWithRedirect()` instead of popup.
+2. Microsoft provider now includes:
+   - `tenant: "common"`
+   - `prompt: "select_account"`
+   - scopes: `openid`, `profile`, `email`
+3. Added clearer admin error messages for:
+   - `auth/popup-closed-by-user`
+   - `auth/operation-not-allowed`
+   - `auth/unauthorized-domain`
+   - `auth/account-exists-with-different-credential`
+   - invalid OAuth client configuration
+4. Added Microsoft sign-in notes to:
+   - `admin.html`
+   - `master-admin.html`
+5. Cache-busting updated to `v=25.2`.
+
+## Critical Firebase / Microsoft Console Checklist
+
+If Microsoft sign-in still fails, verify these items:
+
+### Firebase Console
+
+Go to:
+
+```text
+Firebase Console > Authentication > Sign-in method > Microsoft
+```
+
+Confirm:
+
+- Microsoft provider is enabled.
+- Client ID is correct.
+- Client Secret is correct.
+- Callback / redirect URI shown by Firebase is copied.
+
+### Microsoft Azure App Registration
+
+Go to:
+
+```text
+Azure Portal > App registrations > Your app > Authentication
+```
+
+Add the Firebase callback URI exactly as shown in Firebase. It usually looks like:
+
+```text
+https://<your-firebase-project-id>.firebaseapp.com/__/auth/handler
+```
+
+Also confirm:
+
+- Supported account type allows the accounts you are testing.
+- If testing personal Microsoft accounts, use "common" / personal + organizational support.
+- If testing only company accounts, use the correct tenant setup.
+- The client secret has not expired.
+
+### Firebase Authorized Domains
+
+Go to:
+
+```text
+Firebase Console > Authentication > Settings > Authorized domains
+```
+
+Confirm:
+
+```text
+jadzadco.github.io
+shoutoutdemo-5b402.firebaseapp.com
+shoutoutdemo-5b402.web.app
+```
+
+or your exact Firebase hosting domains are listed.
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.2
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.2
+```
