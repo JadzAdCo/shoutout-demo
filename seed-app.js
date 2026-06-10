@@ -1,5 +1,4 @@
-
-/* seed-app.js v18 */
+/* seed-app.js v19 */
 (function(){
   const byId = id => document.getElementById(id);
   const setStatus = t => byId("seedStatus").textContent = t;
@@ -13,8 +12,9 @@
     if (!user || !window.SHOUTOUT_ADMIN_EMAILS.includes(safeUser(user))) { setStatus("Sign in with an admin email first."); return; }
     setStatus("Seeding...");
     for (const [id,t] of Object.entries(window.SHOUTOUT_TEMPLATES)) await db.collection("templates").doc(id).set(t,{merge:true});
-    for (const [id,c] of Object.entries(window.SHOUTOUT_CLUBS)) await db.collection("clubs").doc(id).set(c,{merge:true});
-    setStatus("Done. Clubs and templates created/updated in Firestore.");
+    for (const [id,c] of Object.entries(window.SHOUTOUT_CLUB_LOCATIONS)) await db.collection("clubLocations").doc(id).set(c,{merge:true});
+    for (const [id,e] of Object.entries(window.SHOUTOUT_EVENTS)) await db.collection("events").doc(id).set(e,{merge:true});
+    setStatus("Done. Templates, clubLocations, and events created/updated in Firestore.");
   }
   document.addEventListener("DOMContentLoaded",()=>{
     byId("seedGoogleLoginBtn").onclick = () => login(new firebase.auth.GoogleAuthProvider());

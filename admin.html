@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Jadz AdCo ShoutOut Admin Portal v18 -->
+  <!-- Jadz AdCo ShoutOut Admin Portal v19 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Jadz AdCo Admin Queue</title>
@@ -15,20 +15,20 @@
       <div>
         <p class="eyebrow">Jadz AdCo Admin</p>
         <h1>Approval Queue</h1>
-        <p class="sub">Approve or reject pending shoutouts. Approved content updates this club's display page in real time.</p>
+        <p class="sub">Approve or reject pending shoutouts. Approved content updates this location's display page in real time.</p>
         <p id="adminSignedInAs" class="status">Not signed in</p>
         <p id="adminStatus" class="status">Loading admin app...</p>
       </div>
       <div class="card admin-club-card">
         <p class="eyebrow">Admin View</p>
         <h2 id="clubName">Loading...</h2>
-        <p class="sub small">Club-specific approval queue.</p>
+        <p class="sub small">Location-specific approval queue.</p>
       </div>
     </header>
 
     <div id="adminLogin" class="card">
       <h2>Admin sign-in</h2>
-      <p class="sub">Sign in using an email listed in ADMIN_EMAILS inside admin-app.js.</p>
+      <p class="sub">Sign in using an email listed in shared-data.js.</p>
       <div class="auth-grid">
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
         <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
@@ -49,8 +49,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=18"></script>
-<script src="./shared-data.js?v=18"></script>
-<script src="./admin-app.js?v=18"></script>
+<script src="./firebase-config.js?v=19"></script>
+<script src="./shared-data.js?v=19"></script>
+<script src="./admin-app.js?v=19"></script>
 </body>
 </html>

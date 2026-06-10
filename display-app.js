@@ -1,5 +1,4 @@
-
-/* display-app.js v18 - Club-specific display only */
+/* display-app.js v19 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -8,8 +7,8 @@
   if (!window.firebaseConfig) { byId("displayMain").textContent = "CONFIG ERROR"; byId("displaySub").textContent = "firebase-config.js missing"; return; }
   firebase.initializeApp(window.firebaseConfig);
   const db = firebase.firestore();
-  const clubId = qs("club", "zebbies-garden");
-  const club = window.SHOUTOUT_CLUBS[clubId] || window.SHOUTOUT_CLUBS["zebbies-garden"];
+  const locationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
+  const loc = window.SHOUTOUT_CLUB_LOCATIONS[locationId] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
   const templates = window.SHOUTOUT_TEMPLATES || {};
 
   function render(data) {
@@ -17,8 +16,8 @@
     const canvas = byId("displayCanvas");
     canvas.classList.remove("gold","ice","fire");
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
-    byId("displayBrand").textContent = data.clubName ? `${data.clubName} x JADZ ADCO` : (club.brand || "JADZ ADCO");
-    byId("displayMain").textContent = data.mainText || club.defaultMain || "USE SHOUT OUT";
+    byId("displayBrand").textContent = data.locationName ? `${data.locationName} x JADZ ADCO` : (loc.brand || "JADZ ADCO");
+    byId("displayMain").textContent = data.mainText || loc.defaultMain || "USE SHOUT OUT";
     byId("displaySub").textContent = data.subText || "";
     const mediaSlot = byId("mediaSlot");
     if (data.mediaUrl) {
@@ -33,11 +32,11 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     if (qs("main","")) {
-      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), clubName: club.name });
+      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), locationName: loc.locationName });
       return;
     }
-    db.collection("liveContent").doc(clubId).onSnapshot(doc => {
-      render(doc.exists ? doc.data() : {clubName: club.name, mainText: club.defaultMain, subText: club.defaultSub, template: "neon"});
-    }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", clubName: club.name}));
+    db.collection("liveContent").doc(locationId).onSnapshot(doc => {
+      render(doc.exists ? doc.data() : {locationName: loc.locationName, mainText: loc.defaultMain, subText: loc.defaultSub, template: "neon"});
+    }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });
 })();

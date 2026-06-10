@@ -1,6 +1,10 @@
 /*
+  firebase-config.js
   Firebase web config for Jadz AdCo ShoutOut demo.
-  This file must define window.firebaseConfig for the compat Firebase scripts.
+
+  IMPORTANT:
+  This file uses Firebase Compat syntax.
+  Do not use: export const firebaseConfig = ...
 */
 window.firebaseConfig = {
   apiKey: "AIzaSyB68VIfHGE-HicL0L8pocXq3pdK7LHBW_g",
