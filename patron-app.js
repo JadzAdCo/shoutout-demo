@@ -36,7 +36,7 @@
 
   function updateUserMenu(user) {
     const photoURL = user?.photoURL || "";
-    const displayName = user?.displayName || user?.email || user?.phoneNumber || "Not signed in";
+    const displayName = user?.displayName || user?.email || user?.phoneNumber || "Please Sign-In or Sign-Up:";
     const email = user?.email || user?.phoneNumber || "Guest";
     const userPhoto = byId("userPhoto");
     const dropdownPhoto = byId("dropdownUserPhoto");
@@ -135,7 +135,7 @@
   }
 
   function updateLoginUI(user) {
-    setText("signedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
+    setText("signedInAs", user ? "" : "Please Sign-In or Sign-Up:");
     byId("signedInActions")?.classList.toggle("hidden", !user);
     byId("loginActions")?.classList.toggle("hidden", !!user);
     updateUserMenu(user);
@@ -408,7 +408,7 @@
   function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; showTemplateSelection(); }
 
   document.addEventListener("DOMContentLoaded", function(){
-    setStatus("App loaded. Choose a sign-in option.");
+    setStatus("Choose a sign-in/up option.");
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
     bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
