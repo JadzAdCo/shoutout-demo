@@ -8,26 +8,26 @@
   <link rel="stylesheet" href="./styles.css"/>
 </head>
 <body>
-<main class="app">
 
-  <div id="userMenu" class="user-menu">
-    <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
-      <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
-      <span id="userInitials" class="user-initials">?</span>
-      <span class="user-dots">⋮</span>
-    </button>
-    <div id="userDropdown" class="user-dropdown hidden">
-      <div class="user-dropdown-row">
-        <img id="dropdownUserPhoto" class="dropdown-user-photo hidden" alt="User profile"/>
-        <div>
-          <strong id="dropdownUserName">Not signed in</strong>
-          <p id="dropdownUserEmail">Guest</p>
-        </div>
+<div id="userMenu" class="user-menu">
+  <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
+    <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
+    <span id="userInitials" class="user-initials">?</span>
+    <span class="user-dots">⋮</span>
+  </button>
+  <div id="userDropdown" class="user-dropdown hidden">
+    <div class="user-dropdown-row">
+      <img id="dropdownUserPhoto" class="dropdown-user-photo hidden" alt="User profile"/>
+      <div>
+        <strong id="dropdownUserName">Not signed in</strong>
+        <p id="dropdownUserEmail">Guest</p>
       </div>
-      <button id="dropdownSignOutBtn" class="ghost full" type="button">Sign out</button>
     </div>
+    <button id="dropdownSignOutBtn" class="ghost full" type="button">Sign out</button>
   </div>
+</div>
 
+<main class="app">
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
@@ -91,16 +91,15 @@
       <button id="logoutBtn2" type="button">Sign out</button>
     </header>
 
-    <div class="category-grid">
+    <div class="category-grid compact-category-grid">
       <button id="eventsBtnCard" class="category-card" type="button">Events</button>
       <button id="clubsBtnCard" class="category-card" type="button">Clubs</button>
-      <button id="loungesBtnCard" class="category-card" type="button">Lounges</button>
-      <button id="loungeClubBtnCard" class="category-card" type="button">Lounge-Club</button>
       <button id="beachClubsBtnCard" class="category-card" type="button">Beach Clubs</button>
+      <button id="loungesBtnCard" class="category-card" type="button">Lounges</button>
+      <button id="loungeClubBtnCard" class="category-card" type="button">Lounge-Clubs</button>
       <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
     </div>
   </section>
-
 
   <section id="clubActionsPage" class="page">
     <header class="topbar">
@@ -129,7 +128,7 @@
         <h1 id="adTitle">Advertise Here</h1>
         <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
         <div id="adBadge" class="ad-badge">Jadz AdCo Media Slot</div>
-        <p class="splash-countdown">Continuing in <span id="adCountdown">5</span> seconds...</p>
+        <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
         <button id="skipAdBtn" class="ghost" type="button">Skip</button>
       </div>
     </div>

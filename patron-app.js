@@ -58,7 +58,10 @@
     setText("dropdownUserEmail", email);
   }
 
-  function toggleUserDropdown() { byId("userDropdown")?.classList.toggle("hidden"); }
+  function toggleUserDropdown(event) {
+    if (event) event.stopPropagation();
+    byId("userDropdown")?.classList.toggle("hidden");
+  }
 
   function closeUserDropdownOnOutsideClick(event) {
     const menu = byId("userMenu");
@@ -66,41 +69,13 @@
   }
 
   const AD_CONTENT = {
-    "lounge-club": {
-      title: "Gran Coramino Tequila",
-      body: "A smooth premium tequila experience associated with Kevin Hart. Perfect for a Lounge-Club moment.",
-      badge: "Sponsored Lounge-Club Moment"
-    },
-    "clubs": {
-      title: "Gucci Fragrances",
-      body: "Luxury fragrance energy for a night out. Own the room before the first song drops.",
-      badge: "Sponsored Club Moment"
-    },
-    "events": {
-      title: "Nike Air Max",
-      body: "Step into the night with Nike energy. Built for movement, style, and the next event.",
-      badge: "Sponsored Event Moment"
-    },
-    "lounges": {
-      title: "Teremana Tequila",
-      body: "Dwayne Johnson's tequila brand brings a premium toast to the lounge experience.",
-      badge: "Sponsored Lounge Moment"
-    },
-    "beach-clubs": {
-      title: "Advertise Here",
-      body: "Beach club audiences are premium, social, and ready to discover your brand.",
-      badge: "Beach Club Media Slot"
-    },
-    "shoutout": {
-      title: "Advertise Here",
-      body: "Put your brand in front of patrons right before they create a live LED ShoutOut.",
-      badge: "ShoutOut Media Slot"
-    },
-    "default": {
-      title: "Advertise Here",
-      body: "Your brand can own this moment before patrons browse nightlife.",
-      badge: "Jadz AdCo Media Slot"
-    }
+    "lounge-club": { title: "Gran Coramino Tequila", body: "A smooth premium tequila experience associated with Kevin Hart. Perfect for a Lounge-Club moment.", badge: "Sponsored Lounge-Club Moment" },
+    "clubs": { title: "Gucci Fragrances", body: "Luxury fragrance energy for a night out. Own the room before the first song drops.", badge: "Sponsored Club Moment" },
+    "events": { title: "Nike Air Max", body: "Step into the night with Nike energy. Built for movement, style, and the next event.", badge: "Sponsored Event Moment" },
+    "lounges": { title: "Teremana Tequila", body: "Dwayne Johnson's tequila brand brings a premium toast to the lounge experience.", badge: "Sponsored Lounge Moment" },
+    "beach-clubs": { title: "Advertise Here", body: "Beach club audiences are premium, social, and ready to discover your brand.", badge: "Beach Club Media Slot" },
+    "shoutout": { title: "Advertise Here", body: "Put your brand in front of patrons right before they create a live LED ShoutOut.", badge: "ShoutOut Media Slot" },
+    "default": { title: "Advertise Here", body: "Your brand can own this moment before patrons browse nightlife.", badge: "Jadz AdCo Media Slot" }
   };
 
   let pendingCategoryAfterAd = null;
@@ -112,7 +87,7 @@
     setText("adTitle", ad.title);
     setText("adBody", ad.body);
     setText("adBadge", ad.badge);
-    let remaining = 5;
+    let remaining = 10;
     setText("adCountdown", String(remaining));
     showPage("adSplashPage");
     clearInterval(adTimer);
@@ -196,21 +171,21 @@
   }
 
   function openCategoryAfterAd(type) {
-    if (type === "clubs") {
+    if (type === "clubs" || type === "lounges" || type === "lounge-club" || type === "beach-clubs") {
+      byId("clubActionsPage")?.setAttribute("data-category-type", type);
       showPage("clubActionsPage");
       return;
     }
+
     byId("listingType").value = type;
     byId("listingTitle").textContent =
       type === "events" ? "Search Events" :
-      type === "lounges" ? "Search Lounges" :
-      type === "lounge-club" ? "Search Lounge-Clubs" :
-      type === "beach-clubs" ? "Search Beach Clubs" :
+      type === "shoutout" ? "Choose Location for ShoutOut" :
       type.startsWith("club-action:") ? type.replace("club-action:","").replaceAll("-"," ").replace(/\b\w/g, c => c.toUpperCase()) :
-      "Choose location for ShoutOut";
+      "Search";
     byId("listingIntro").textContent =
       type === "shoutout" ? "Pick the exact location where your ShoutOut should appear." :
-      type.startsWith("club-action:") ? "Select the exact club/location for this action. Payment and booking integration will be connected later." :
+      type.startsWith("club-action:") ? "Select the exact venue/location for this action. Payment and booking integration will be connected later." :
       "Search by country, state/region/province, city, genre, artist, event day, or activity time.";
     showListing();
   }
@@ -272,11 +247,13 @@
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const matches = Object.entries(locations).filter(([id,l]) => {
       const hay = `${l.brandName} ${l.locationName} ${l.country} ${l.region} ${l.city} ${l.locationLabel} ${(l.genres||[]).join(" ")} ${(l.artists||[]).join(" ")} ${(l.activityDates||[]).join(" ")}`.toLowerCase();
+      const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
+      const effectiveType = type.startsWith("club-action:") ? actionBase : type;
       const typeOk =
-        type === "lounges" ? (l.type === "lounge" || (l.categories||[]).includes("Lounges")) :
-        type === "lounge-club" ? (l.type === "lounge-club" || (l.categories||[]).includes("Lounge-Club")) :
-        type === "beach-clubs" ? (l.type === "beach-club" || (l.categories||[]).includes("Beach Clubs")) :
-        type === "clubs" || type === "shoutout" || type.startsWith("club-action:") ? (l.type === "club" || l.type === "lounge-club" || l.type === "beach-club" || (l.categories||[]).includes("Clubs")) :
+        effectiveType === "lounges" ? (l.type === "lounge" || (l.categories||[]).includes("Lounges")) :
+        effectiveType === "lounge-club" ? (l.type === "lounge-club" || (l.categories||[]).includes("Lounge-Club")) :
+        effectiveType === "beach-clubs" ? (l.type === "beach-club" || (l.categories||[]).includes("Beach Clubs")) :
+        effectiveType === "clubs" || effectiveType === "shoutout" ? (l.type === "club" || l.type === "lounge-club" || l.type === "beach-club" || (l.categories||[]).includes("Clubs")) :
         true;
       return typeOk && (!s || hay.includes(s)) && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
     });
@@ -347,7 +324,13 @@
     bind("payVipEntryBtn", () => openCategory("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategory("club-action:pay-event-entry"));
     bind("payStdEntryBtn", () => openCategory("club-action:pay-std-entry"));
-    bind("backToCategoriesBtn", () => showPage("categoryPage")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("backToCategoriesBtn", () => showPage("categoryPage"));
+    bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
+    bind("reserveTableBtn", () => openCategoryAfterAd("club-action:reserve-a-table"));
+    bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
+    bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
+    bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);

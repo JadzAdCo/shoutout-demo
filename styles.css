@@ -16,20 +16,24 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 @media(max-width:900px){.topbar,.composer,.template-layout{display:grid;grid-template-columns:1fr}.app{padding:16px}.login-wrap{padding-top:18px}.login-card{border-radius:24px}}@media(max-width:520px){.login-card,.card,.club-option,.notice{padding:18px;border-radius:22px}.filters{grid-template-columns:1fr}.club-option-head{display:block}.hero-logo{width:min(230px,68vw);max-height:150px;margin-top:2px}.login-card h2{font-size:42px}.phone-row{grid-template-columns:1fr 132px;gap:8px}.phone-row .phone{padding-left:10px;padding-right:10px;font-size:14px}}
 .category-card:nth-child(5),.category-card:nth-child(6){min-height:135px}
 
-/* v21 profile menu, smaller category buttons, and ad splash */
-.user-menu{position:fixed;top:16px;right:18px;z-index:1000}
-.user-menu-btn{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.38);backdrop-filter:blur(12px)}
-.user-photo,.dropdown-user-photo{width:34px;height:34px;border-radius:999px;object-fit:cover;border:1px solid var(--line)}
-.user-initials{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;font-weight:1000}
-.user-dots{font-size:20px;line-height:1}
-.user-dropdown{position:absolute;right:0;top:54px;width:290px;border:1px solid var(--line);background:rgba(10,10,28,.94);box-shadow:0 22px 70px rgba(0,0,0,.45);border-radius:22px;padding:14px;backdrop-filter:blur(14px)}
-.user-dropdown-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-.user-dropdown-row p{margin:4px 0 0;color:var(--muted);font-size:13px;word-break:break-word}
-.category-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
-.category-card{min-height:72px;font-size:17px;border-radius:18px;padding:16px 18px}
+/* v22 fixes: top-right profile, 10s ad splash, smaller standardized buttons */
+.user-menu{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 10px)!important;right:12px!important;left:auto!important;z-index:99999!important;width:auto!important}
+.user-menu-btn{width:auto!important;min-width:58px!important;height:42px!important;min-height:42px!important;padding:5px 8px!important;border-radius:18px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;background:rgba(31,22,69,.72)!important;border:1px solid rgba(255,255,255,.20)!important;backdrop-filter:blur(14px)!important}
+.user-photo,.dropdown-user-photo{width:30px!important;height:30px!important;border-radius:999px!important;object-fit:cover!important}
+.user-initials{width:30px!important;height:30px!important;border-radius:999px!important;display:grid!important;place-items:center!important;background:linear-gradient(90deg,var(--hot),var(--accent))!important;color:#06101c!important;font-size:13px!important;font-weight:1000!important}
+.user-dots{font-size:18px!important;line-height:1!important}
+.user-dropdown{position:absolute!important;right:0!important;top:48px!important;width:278px!important;border:1px solid var(--line)!important;background:rgba(10,10,28,.96)!important;box-shadow:0 22px 70px rgba(0,0,0,.45)!important;border-radius:20px!important;padding:14px!important;backdrop-filter:blur(14px)!important}
+.user-dropdown-row{display:flex!important;gap:12px!important;align-items:center!important;margin-bottom:12px!important}
+.user-dropdown-row p{margin:3px 0 0!important;color:var(--muted)!important;font-size:13px!important;word-break:break-word!important}
+.topbar > button[id^="logout"], #logoutBtnClubActions{display:none!important}
+.category-grid,.compact-category-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:10px!important;margin-top:16px!important}
+.category-card{min-height:54px!important;height:auto!important;font-size:15px!important;border-radius:14px!important;padding:10px 12px!important;line-height:1.1!important}
+.linklike{font-size:inherit!important;padding:0!important;min-height:0!important;border-radius:0!important}
+button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
+.signin,.full{min-height:52px;padding:13px 16px}
 .splash-wrap{min-height:calc(100vh - 48px);display:grid;place-items:center}
-.splash-card{width:min(760px,92vw);border:1px solid var(--line);background:radial-gradient(circle at 20% 20%,rgba(255,100,216,.26),transparent 35%),radial-gradient(circle at 80% 20%,rgba(98,234,255,.22),transparent 38%),linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 22px 70px rgba(0,0,0,.45);border-radius:34px;padding:34px;text-align:center;backdrop-filter:blur(16px)}
-.splash-card h1{font-size:clamp(42px,7vw,92px);line-height:.9;letter-spacing:-.05em;margin:10px 0 18px;text-transform:uppercase}
-.ad-badge{display:inline-block;margin-top:20px;padding:10px 16px;border:1px solid var(--line);border-radius:999px;color:var(--lime);font-weight:1000;background:rgba(0,0,0,.25)}
+.splash-card{width:min(760px,92vw);border:1px solid var(--line);background:radial-gradient(circle at 20% 20%,rgba(255,100,216,.26),transparent 35%),radial-gradient(circle at 80% 20%,rgba(98,234,255,.22),transparent 38%),linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 22px 70px rgba(0,0,0,.45);border-radius:30px;padding:28px;text-align:center;backdrop-filter:blur(16px)}
+.splash-card h1{font-size:clamp(36px,7vw,86px);line-height:.9;letter-spacing:-.05em;margin:10px 0 18px;text-transform:uppercase}
+.ad-badge{display:inline-block;margin-top:18px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--lime);font-weight:1000;background:rgba(0,0,0,.25)}
 .splash-countdown{color:var(--muted);font-weight:900}
-@media(max-width:520px){.user-menu{top:10px;right:10px}.category-card{min-height:62px;font-size:15px}.user-dropdown{width:260px}}
+@media(max-width:520px){.app{padding-top:64px!important}.category-card{min-height:48px!important;font-size:14px!important;padding:9px 10px!important}.category-grid,.compact-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.user-dropdown{width:260px!important}}
