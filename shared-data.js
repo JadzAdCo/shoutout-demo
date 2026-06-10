@@ -3,6 +3,11 @@
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
+window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
+  "bans.don@gmail.com",
+  "don.b@jadzholdings.com"
+];
+
 window.SHOUTOUT_ADMIN_EMAILS = [
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"

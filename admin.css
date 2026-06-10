@@ -1,2 +1,21 @@
 /* Jadz AdCo ShoutOut admin styles v19 */
 .admin-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.admin-preview{width:100%;height:360px;border:1px solid var(--line);border-radius:18px;background:#000}.admin-club-card{min-width:280px}.queue-item{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:rgba(0,0,0,.22)}.queue-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.approve{background:rgba(80,255,180,.25)}.reject{background:rgba(255,80,80,.25)}@media(max-width:900px){.admin-grid{grid-template-columns:1fr}.admin-preview{height:260px}}
+
+/* v24 admin dashboards */
+.admin-shell .topbar h1{max-width:900px}
+.admin-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 22px}
+.admin-tab{min-height:40px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08)}
+.admin-tab.active{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;border:0}
+.admin-panel-section{display:none}
+.admin-panel-section.active{display:block}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:12px 0 18px}
+.metric-card{border:1px solid var(--line);border-radius:22px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.06));box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.metric-card span{display:block;color:var(--muted);font-weight:800;font-size:13px}
+.metric-card strong{display:block;font-size:clamp(28px,4vw,46px);line-height:1;margin-top:8px;color:var(--lime)}
+.report-block{color:var(--text)}
+.report-table{display:grid;gap:10px}
+.report-table div{display:flex;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.18)}
+.report-table span{color:var(--muted);font-weight:800}
+.report-table strong{text-align:right}
+.report-list{display:flex;flex-wrap:wrap;gap:10px}
+@media(max-width:720px){.report-table div{display:block}.report-table strong{display:block;text-align:left;margin-top:5px}.admin-tabs{gap:8px}.admin-tab{font-size:13px;padding:9px 11px}}

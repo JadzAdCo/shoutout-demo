@@ -1,0 +1,207 @@
+/* master-admin-app.js v24 - Network-level master admin portal */
+(function () {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+  const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
+  const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
+
+  if (!window.firebaseConfig) { setText("masterStatus", "firebase-config.js missing window.firebaseConfig."); return; }
+
+  firebase.initializeApp(window.firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
+
+  function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
+
+  async function loginGoogle() {
+    try { setText("masterStatus","Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+    catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
+  }
+  async function loginFacebook() {
+    try { setText("masterStatus","Opening Facebook sign-in..."); await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); }
+    catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
+  }
+  async function loginMicrosoft() {
+    try {
+      const p = new firebase.auth.OAuthProvider("microsoft.com");
+      p.setCustomParameters({prompt:"select_account"});
+      setText("masterStatus","Opening Microsoft sign-in...");
+      await auth.signInWithPopup(p);
+    } catch(e) { setText("masterStatus", `${e.code || "error"}: ${e.message}`); }
+  }
+  async function logout() { await auth.signOut(); window.location.reload(); }
+
+  function setupTabs() {
+    document.querySelectorAll(".admin-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".admin-tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        byId(btn.dataset.panel)?.classList.add("active");
+      });
+    });
+  }
+
+  function simpleRows(rows) {
+    return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
+  }
+
+  async function getCollectionSafe(name, limit=1000) {
+    try {
+      const snap = await db.collection(name).limit(limit).get();
+      return snap.docs.map(d => ({id:d.id, ...d.data()}));
+    } catch(e) {
+      console.warn(`Could not read ${name}:`, e.message);
+      return [];
+    }
+  }
+
+  function countBy(items, fn) {
+    const out = {};
+    items.forEach(item => {
+      const key = fn(item);
+      if (key) out[key] = (out[key] || 0) + 1;
+    });
+    return out;
+  }
+
+  function topList(counts, n=6) {
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v]) => `${k} (${v})`).join(", ") || "Not enough data yet";
+  }
+
+  async function loadNetworkReports() {
+    const [users, shoutouts, liveDocs, locations, events] = await Promise.all([
+      getCollectionSafe("users"),
+      getCollectionSafe("shoutouts"),
+      getCollectionSafe("liveContent"),
+      getCollectionSafe("clubLocations"),
+      getCollectionSafe("events")
+    ]);
+
+    const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
+    const locationRows = locations.length ? locations : fallbackLocations;
+
+    const pending = shoutouts.filter(x => (x.status || "pending") === "pending");
+    const revenue = pending.length * 10 + liveDocs.length * 25;
+    const impressions = Math.max(10000, locationRows.length * 1250 + pending.length * 50);
+    const clicks = Math.round(impressions * 0.035);
+
+    setText("netLocations", locationRows.length.toLocaleString());
+    setText("netUsers", users.length.toLocaleString());
+    setText("netPending", pending.length.toLocaleString());
+    setText("netRevenue", money(revenue));
+
+    const byLocation = countBy(pending, x => x.locationName || x.clubName || x.clubLocationId || x.location || "Unknown");
+    byId("topLocationsReport").innerHTML = simpleRows([
+      ["Top queue locations", topList(byLocation)],
+      ["Live display docs", liveDocs.length.toLocaleString()],
+      ["Seeded event records", events.length.toLocaleString()],
+      ["Network status", "Prototype reporting live"]
+    ]);
+
+    const cityCounts = countBy(users, x => x.city);
+    const genreCounts = {};
+    users.forEach(u => (u.favoriteGenres || []).forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1));
+    locationRows.forEach(l => (l.genres || []).forEach(g => genreCounts[g] = (genreCounts[g] || 0) + 1));
+
+    byId("networkAudienceReport").innerHTML = simpleRows([
+      ["Known patrons", users.length.toLocaleString()],
+      ["Top cities", topList(cityCounts)],
+      ["Marketing opt-ins", users.filter(u => u.marketingConsent).length.toLocaleString()],
+      ["Analytics opt-ins", users.filter(u => u.analyticsConsent).length.toLocaleString()]
+    ]);
+
+    byId("networkMusicReport").innerHTML = simpleRows([
+      ["Top genres", topList(genreCounts, 8)],
+      ["Booking insight", "Compare patron searched genres with actual event programming"],
+      ["High-value trend", "Afro House, Hip Hop, Deep House, EDM, Amapiano"],
+      ["Recommended report", "Demand gap: searched genre vs booked event genre"]
+    ]);
+
+    byId("networkEventReport").innerHTML = simpleRows([
+      ["Internal event records", events.length.toLocaleString()],
+      ["Ticketmaster Discovery API", "Recommended for event discovery"],
+      ["Ticketmaster Partner API", "Restricted to official distribution relationships"],
+      ["Eventbrite API", "Useful for event creation, management, attendee/order workflows"]
+    ]);
+
+    byId("networkAdReport").innerHTML = simpleRows([
+      ["Estimated impressions", impressions.toLocaleString()],
+      ["Estimated clicks", clicks.toLocaleString()],
+      ["Estimated CTR", `${((clicks / impressions) * 100).toFixed(2)}%`],
+      ["Top sponsor categories", "Spirits, fashion, fragrance, sneakers, luxury, rideshare"],
+      ["Best media units", "Splash ads, LED display wall, portable displays, window displays"]
+    ]);
+
+    const gross = revenue + Math.round(impressions / 1000 * 25);
+    const platformShare = Math.round(gross * 0.35);
+    const venueShare = gross - platformShare;
+
+    byId("networkReconReport").innerHTML = simpleRows([
+      ["Estimated gross revenue", money(gross)],
+      ["Estimated Jadz platform share", money(platformShare)],
+      ["Estimated venue payouts", money(venueShare)],
+      ["Locations requiring payout", locationRows.length.toLocaleString()],
+      ["Reconciliation status", "Prototype — connect payment processor ledger later"]
+    ]);
+
+    byId("ticketPartnerReport").innerHTML = `
+      ${simpleRows([
+        ["Ticketmaster Discovery API", "Open developer API for event discovery and outbound ticket links"],
+        ["Ticketmaster Affiliate / Distribution", "Apply for affiliate access and Impact publisher tracking"],
+        ["Ticketmaster Partner API", "Restricted; requires official distribution relationship"],
+        ["Eventbrite API", "Good candidate for event publishing, checkout customization, attendees, orders, webhooks"],
+        ["Jadz near-term approach", "Start with outbound ticket links, then affiliate tracking, then direct checkout/reservation integrations"]
+      ])}
+      <p class="sub small">Use Events as a discovery layer first. Add affiliate tracking after program approval. Use Jadz-owned VIP/table reservations for higher-margin revenue.</p>`;
+
+    byId("allQueueList").innerHTML = pending.length ? pending.map(item => `
+      <div class="queue-item">
+        <strong>${esc(item.mainText || "Untitled ShoutOut")}</strong>
+        <p>${esc(item.subText || "")}</p>
+        <small>
+          ${esc(item.locationName || item.clubName || item.clubLocationId || "Unknown location")}
+          • ${esc(item.referenceNumber || "")}
+          • ${esc(item.submittedBy || "unknown")}
+        </small>
+      </div>`).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setupTabs();
+    setText("masterStatus", "Master admin app loaded. Sign in to continue.");
+
+    bind("masterGoogleLoginBtn", loginGoogle);
+    bind("masterFacebookLoginBtn", loginFacebook);
+    bind("masterMicrosoftLoginBtn", loginMicrosoft);
+    bind("masterLogoutBtn", logout);
+
+    auth.onAuthStateChanged(user => {
+      const email = safeUser(user);
+      setText("masterSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
+
+      if (!user) {
+        byId("masterLogin").classList.remove("hidden");
+        byId("masterPanel").classList.add("hidden");
+        return;
+      }
+
+      if (!MASTER_ADMIN_EMAILS.includes(email)) {
+        byId("masterLogin").classList.remove("hidden");
+        byId("masterPanel").classList.add("hidden");
+        setText("masterStatus", `Signed in as ${email}, but this email is not listed as a master admin.`);
+        return;
+      }
+
+      byId("masterLogin").classList.add("hidden");
+      byId("masterPanel").classList.remove("hidden");
+      setText("masterStatus", "Master admin verified.");
+      loadNetworkReports();
+    });
+  });
+})();

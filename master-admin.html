@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Jadz AdCo ShoutOut Master Admin Portal v24 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Jadz AdCo Master Admin</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main id="masterAdminPage" class="app admin-shell">
+  <section class="page active">
+    <header class="topbar admin-topbar">
+      <div>
+        <p class="eyebrow">Jadz AdCo Master Admin</p>
+        <h1>Network Intelligence Center</h1>
+        <p class="sub">Master admins can view all venues, all ShoutOut queues, all reports, advertiser data, reconciliation summaries, and network-level analytics.</p>
+        <p id="masterSignedInAs" class="status">Not signed in</p>
+        <p id="masterStatus" class="status">Loading master admin app...</p>
+      </div>
+      <div class="card admin-club-card">
+        <p class="eyebrow">Network View</p>
+        <h2>All Locations</h2>
+        <p class="sub small">Jadz AdCo internal use only.</p>
+      </div>
+    </header>
+
+    <div id="masterLogin" class="card">
+      <h2>Master admin sign-in</h2>
+      <p class="sub">Only emails listed in <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong> may access this page.</p>
+      <div class="auth-grid">
+        <button id="masterGoogleLoginBtn" type="button">Master Google Login</button>
+        <button id="masterMicrosoftLoginBtn" type="button">Master Microsoft Login</button>
+        <button id="masterFacebookLoginBtn" type="button">Master Facebook Login</button>
+      </div>
+      <button id="masterLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+    </div>
+
+    <div id="masterPanel" class="hidden">
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
+        <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
+        <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
+        <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
+        <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
+        <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
+      </nav>
+
+      <section id="networkDashboard" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Total Locations</span><strong id="netLocations">0</strong></div>
+          <div class="metric-card"><span>Total Users</span><strong id="netUsers">0</strong></div>
+          <div class="metric-card"><span>All Pending ShoutOuts</span><strong id="netPending">0</strong></div>
+          <div class="metric-card"><span>Estimated Network Revenue</span><strong id="netRevenue">$0</strong></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card"><h2>Top Locations</h2><div id="topLocationsReport" class="report-block"></div></div>
+          <div class="card"><h2>Audience Intelligence</h2><div id="networkAudienceReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="allQueues" class="admin-panel-section">
+        <div class="card">
+          <h2>All Pending ShoutOut Queues</h2>
+          <p class="sub small">Master admins see every location's queue.</p>
+          <div id="allQueueList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="allReports" class="admin-panel-section">
+        <div class="admin-grid">
+          <div class="card"><h2>Music Demand</h2><div id="networkMusicReport" class="report-block"></div></div>
+          <div class="card"><h2>Events / Ticketing</h2><div id="networkEventReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="advertiserReports" class="admin-panel-section">
+        <div class="card">
+          <h2>Advertiser Intelligence</h2>
+          <div id="networkAdReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="networkReconciliation" class="admin-panel-section">
+        <div class="card">
+          <h2>Network Account Reconciliation</h2>
+          <div id="networkReconReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="partnerIntegrations" class="admin-panel-section">
+        <div class="card">
+          <h2>Ticketing Partner Opportunities</h2>
+          <div id="ticketPartnerReport" class="report-block"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=24"></script>
+<script src="./shared-data.js?v=24"></script>
+<script src="./master-admin-app.js?v=24"></script>
+</body>
+</html>
