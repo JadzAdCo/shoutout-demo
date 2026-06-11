@@ -478,3 +478,194 @@ jadzadco.github.io
 ```
 
 The app should then retry with redirect fallback automatically.
+
+
+---
+
+# v25.4 Admin Redirect-Only Authentication Fix
+
+## Why this update exists
+
+The admin pages continued to show:
+
+```text
+auth/popup-closed-by-user
+```
+
+That means the admin page was still opening a popup, or the browser was treating the provider flow as a popup-based session.
+
+## What changed
+
+1. Club Admin authentication is now redirect-only:
+   - Google uses `signInWithRedirect()`
+   - Microsoft uses `signInWithRedirect()`
+   - Facebook uses `signInWithRedirect()` for club admin only
+
+2. Master Admin authentication is now redirect-only:
+   - Google uses `signInWithRedirect()`
+   - Microsoft uses `signInWithRedirect()`
+   - Facebook remains unavailable for Master Admin
+
+3. Popup-based admin login is removed from admin pages.
+
+4. Patron login is unchanged.
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.4
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.4
+```
+
+## Important
+
+After uploading, do a hard refresh or open the URL in an incognito/private window so the browser does not use cached `admin-app.js`.
+
+
+---
+
+# v25.5 Master Admin Email Allow-List Only
+
+## Why this update exists
+
+The Master Admin page was working with Google, but the corporate-domain restriction added unnecessary complexity during the prototype phase.
+
+## What changed
+
+1. Domain enforcement is now disabled by default:
+
+```javascript
+window.SHOUTOUT_MASTER_ADMIN_ENFORCE_DOMAINS = false;
+```
+
+2. Master Admin access is still protected by:
+
+```javascript
+window.SHOUTOUT_MASTER_ADMIN_EMAILS
+```
+
+Only explicitly listed emails can access Master Admin.
+
+3. Master Admin still requires an approved provider:
+
+```javascript
+google.com
+microsoft.com
+```
+
+4. Phone-only login and Facebook login remain blocked for Master Admin.
+
+5. `bans.don@gmail.com` continues to work as a Master Admin as long as it remains listed in `SHOUTOUT_MASTER_ADMIN_EMAILS`.
+
+## Current Recommended Development Policy
+
+Use explicit email allow-list only:
+
+```javascript
+window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
+  "bans.don@gmail.com",
+  "don.b@jadzholdings.com"
+];
+```
+
+## Production Recommendation
+
+Later, replace JavaScript-based admin authorization with a Firestore `adminRoles` collection or Firebase custom claims.
+
+Recommended future model:
+
+```text
+adminRoles/{uid}
+  role: "masterAdmin"
+  email: "admin@jadzadco.com"
+  allowedLocations: ["*"]
+  mfaRequired: true
+```
+
+## Test URL
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.5
+```
+
+
+---
+
+# v25.6 Admin Popup Authentication Alignment
+
+## Why this update exists
+
+Google authentication works on the patron page using a popup. The admin pages were changed to redirect during troubleshooting, but you requested Microsoft/admin authentication to behave identically to Google.
+
+## What changed
+
+1. Club Admin Google uses:
+
+```javascript
+auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+```
+
+2. Club Admin Microsoft uses:
+
+```javascript
+auth.signInWithPopup(new firebase.auth.OAuthProvider("microsoft.com"))
+```
+
+3. Master Admin Google uses popup sign-in.
+
+4. Master Admin Microsoft uses popup sign-in.
+
+5. Redirect-only admin authentication was removed.
+
+6. Patron login remains unchanged.
+
+7. Master Admin domain enforcement remains disabled for development.
+
+8. Master Admin remains protected by explicit email allow-list:
+
+```javascript
+window.SHOUTOUT_MASTER_ADMIN_EMAILS
+```
+
+## Microsoft Provider Settings
+
+The Microsoft provider now uses a simpler popup-friendly configuration:
+
+```javascript
+const p = new firebase.auth.OAuthProvider("microsoft.com");
+p.setCustomParameters({ prompt: "select_account" });
+p.addScope("openid");
+p.addScope("profile");
+p.addScope("email");
+```
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.6
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.6
+```
+
+## Important Browser Note
+
+Because popup sign-in is now used again, make sure popups are allowed for:
+
+```text
+jadzadco.github.io
+```
+
+If Microsoft still fails while Google works, the issue is likely Microsoft provider-specific, not the page flow.

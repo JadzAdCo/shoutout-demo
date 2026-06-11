@@ -28,8 +28,8 @@
 
     <div id="masterLogin" class="card">
       <h2>Master admin sign-in</h2>
-      <p class="sub">Master admin requires an approved <strong>@jadzadco.com</strong> or <strong>@jadzholdings.com</strong> email, verified email identity, MFA at the identity provider, and explicit listing in <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong>. <strong>bans.don@gmail.com</strong> is temporarily allowed for testing.</p>
-      <p class="sub small"><strong>Sign-in note:</strong> Master Admin login uses popup sign-in with redirect fallback. Phone-only and Facebook access remain blocked for Master Admin.</p>
+      <p class="sub">Master admin access is currently controlled by explicit listing in <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong>, verified email identity, and approved Google/Microsoft provider. Domain enforcement is temporarily disabled during development.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Master Admin login now uses popup sign-in for Google and Microsoft, matching the working Google patron-page behavior. Phone-only and Facebook access remain blocked for Master Admin.</p>
       <div class="auth-grid">
         <button id="masterGoogleLoginBtn" type="button">Master Google Login</button>
         <button id="masterMicrosoftLoginBtn" type="button">Master Microsoft Login</button>
@@ -110,8 +110,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=25.3"></script>
-<script src="./shared-data.js?v=25.3"></script>
-<script src="./master-admin-app.js?v=25.3"></script>
+<script src="./firebase-config.js?v=25.6"></script>
+<script src="./shared-data.js?v=25.6"></script>
+<script src="./master-admin-app.js?v=25.6"></script>
 </body>
 </html>

@@ -15,7 +15,8 @@
   const db = firebase.firestore();
 
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || []).map(x => x.toLowerCase());
-  /*const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());*/
+  const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());
+  const ENFORCE_DOMAINS = window.SHOUTOUT_MASTER_ADMIN_ENFORCE_DOMAINS === true;
   const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com","microsoft.com"]).map(x => x.toLowerCase());
   const REQUIRE_VERIFIED_EMAIL = window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL !== false;
   const TEMPORARY_EXCEPTION_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS || []).map(x => x.toLowerCase());
@@ -51,10 +52,7 @@
 
   function buildMicrosoftProvider() {
     const p = new firebase.auth.OAuthProvider("microsoft.com");
-    p.setCustomParameters({
-      prompt: "select_account",
-      tenant: "common"
-    });
+    p.setCustomParameters({ prompt: "select_account" });
     try { p.addScope("openid"); } catch(e) {}
     try { p.addScope("profile"); } catch(e) {}
     try { p.addScope("email"); } catch(e) {}
@@ -87,11 +85,21 @@
 
 
   async function loginGoogle() {
-    await signInWithPopupThenRedirect(new firebase.auth.GoogleAuthProvider(), "masterStatus", "Google");
+    try {
+      setText("masterStatus", "Opening Google sign-in popup...");
+      await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch (e) {
+      setText("masterStatus", masterAuthErrorMessage(e));
+    }
   }
 
   async function loginMicrosoft() {
-    await signInWithPopupThenRedirect(buildMicrosoftProvider(), "masterStatus", "Microsoft");
+    try {
+      setText("masterStatus", "Opening Microsoft sign-in popup...");
+      await auth.signInWithPopup(buildMicrosoftProvider());
+    } catch (e) {
+      setText("masterStatus", masterAuthErrorMessage(e));
+    }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
@@ -144,7 +152,7 @@
 
     const isTemporaryException = TEMPORARY_EXCEPTION_EMAILS.includes(email);
 
-    if (!ALLOWED_DOMAINS.includes(domain) && !isTemporaryException) {
+    if (ENFORCE_DOMAINS && !ALLOWED_DOMAINS.includes(domain) && !isTemporaryException) {
       return { ok:false, reason:`Master admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
     }
 
@@ -158,9 +166,13 @@
 
     const mfaMessage = hasFirebaseMfaEnrollment(user)
       ? "Firebase MFA enrollment detected."
-      : "MFA must be enforced by Microsoft Entra ID / Google Workspace for this corporate account.";
+      : "MFA should be enforced by the identity provider for production Master Admin accounts.";
 
-    return { ok:true, reason:`Master admin security verified. Providers: ${providers.join(", ")}. ${mfaMessage}` };
+    const domainMessage = ENFORCE_DOMAINS
+      ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
+      : "Domain enforcement temporarily disabled; explicit email allow-list is active.";
+
+    return { ok:true, reason:`Master admin security verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}` };
   }
 
   function simpleRows(rows) {
@@ -291,9 +303,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     setText("masterStatus", "Master admin app loaded. Sign in with an approved corporate account.");
-
-    auth.getRedirectResult().catch(e => {
-      setText("masterStatus", masterAuthErrorMessage(e));
     });
 
     bind("masterGoogleLoginBtn", loginGoogle);

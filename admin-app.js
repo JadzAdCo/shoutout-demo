@@ -51,10 +51,7 @@
 
   function buildMicrosoftProvider() {
     const p = new firebase.auth.OAuthProvider("microsoft.com");
-    p.setCustomParameters({
-      prompt: "select_account",
-      tenant: "common"
-    });
+    p.setCustomParameters({ prompt: "select_account" });
     try { p.addScope("openid"); } catch(e) {}
     try { p.addScope("profile"); } catch(e) {}
     try { p.addScope("email"); } catch(e) {}
@@ -99,13 +96,28 @@
   }
 
   async function loginGoogle() {
-    await signInWithPopupThenRedirect(new firebase.auth.GoogleAuthProvider(), "adminStatus", "Google");
+    try {
+      setText("adminStatus", "Opening Google sign-in popup...");
+      await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch (e) {
+      setText("adminStatus", adminAuthErrorMessage(e));
+    }
   }
   async function loginFacebook() {
-    await signInWithPopupThenRedirect(new firebase.auth.FacebookAuthProvider(), "adminStatus", "Facebook");
+    try {
+      setText("adminStatus", "Opening Facebook sign-in popup...");
+      await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    } catch (e) {
+      setText("adminStatus", adminAuthErrorMessage(e));
+    }
   }
   async function loginMicrosoft() {
-    await signInWithPopupThenRedirect(buildMicrosoftProvider(), "adminStatus", "Microsoft");
+    try {
+      setText("adminStatus", "Opening Microsoft sign-in popup...");
+      await auth.signInWithPopup(buildMicrosoftProvider());
+    } catch (e) {
+      setText("adminStatus", adminAuthErrorMessage(e));
+    }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
@@ -308,9 +320,6 @@
     setupTabs();
     setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
-
-    auth.getRedirectResult().catch(e => {
-      setText("adminStatus", adminAuthErrorMessage(e));
     });
     byId("displayLink").href = `./display.html?location=${locationId}`;
     byId("liveFrame").src = `./display.html?location=${locationId}`;
