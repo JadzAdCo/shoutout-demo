@@ -15,7 +15,7 @@
   const db = firebase.firestore();
 
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || []).map(x => x.toLowerCase());
-  const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());
+  /*const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());*/
   const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com","microsoft.com"]).map(x => x.toLowerCase());
   const REQUIRE_VERIFIED_EMAIL = window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL !== false;
   const TEMPORARY_EXCEPTION_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS || []).map(x => x.toLowerCase());
