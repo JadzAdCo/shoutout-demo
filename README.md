@@ -669,3 +669,37 @@ jadzadco.github.io
 ```
 
 If Microsoft still fails while Google works, the issue is likely Microsoft provider-specific, not the page flow.
+
+
+---
+
+# v25.7 Master Admin Load Fix
+
+## Why this update exists
+
+The Master Admin page was stuck on:
+
+```text
+Loading master admin app...
+```
+
+This usually means `master-admin-app.js` failed before completing initialization.
+
+## What changed
+
+1. Rebuilt `master-admin-app.js` cleanly to remove broken remnants from prior domain enforcement edits.
+2. Domain enforcement is disabled during development.
+3. Master Admin access is controlled by `SHOUTOUT_MASTER_ADMIN_EMAILS`.
+4. Google/Microsoft provider checks remain active.
+5. Phone-only and Facebook Master Admin access remain blocked.
+6. `bans.don@gmail.com` works as Master Admin if listed in `SHOUTOUT_MASTER_ADMIN_EMAILS`.
+
+## Test URL
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.7
+```
+
+## Production Note
+
+Later, move Master Admin roles to Firestore `adminRoles` or Firebase custom claims.

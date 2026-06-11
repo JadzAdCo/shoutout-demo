@@ -1,4 +1,8 @@
-/* master-admin-app.js v24 - Network-level master admin portal */
+/* master-admin-app.js v25.7
+   Clean Master Admin app.
+   Domain enforcement is disabled during development.
+   Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
+*/
 (function () {
   "use strict";
 
@@ -8,43 +12,44 @@
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
 
-  if (!window.firebaseConfig) { setText("masterStatus", "firebase-config.js missing window.firebaseConfig."); return; }
+  if (!window.firebaseConfig) {
+    setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
+    return;
+  }
 
   firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || []).map(x => x.toLowerCase());
-  const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com","jadzholdings.com"]).map(x => x.toLowerCase());
+  const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
+  const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com", "microsoft.com"]).map(x => String(x).toLowerCase());
   const ENFORCE_DOMAINS = window.SHOUTOUT_MASTER_ADMIN_ENFORCE_DOMAINS === true;
-  const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com","microsoft.com"]).map(x => x.toLowerCase());
+  const ALLOWED_DOMAINS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS || ["jadzadco.com", "jadzholdings.com"]).map(x => String(x).toLowerCase());
+  const TEMPORARY_EXCEPTION_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS || []).map(x => String(x).toLowerCase());
   const REQUIRE_VERIFIED_EMAIL = window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL !== false;
-  const TEMPORARY_EXCEPTION_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS || []).map(x => x.toLowerCase());
 
-  function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
+  function bind(id, fn) {
+    byId(id)?.addEventListener("click", fn);
+  }
 
   function masterAuthErrorMessage(e) {
     const code = e?.code || "error";
     const message = e?.message || String(e || "Unknown error");
 
     if (code === "auth/popup-closed-by-user") {
-      return "Microsoft sign-in was interrupted before completion. This version uses redirect sign-in, but if you still see this, hard refresh and try again. Also verify Microsoft is enabled in Firebase Authentication.";
+      return "The sign-in popup was closed before completion. Try again and complete the popup flow.";
     }
-
+    if (code === "auth/popup-blocked") {
+      return "The browser blocked the sign-in popup. Allow popups for jadzadco.github.io and try again.";
+    }
     if (code === "auth/operation-not-allowed") {
-      return "Microsoft sign-in is not enabled in Firebase Authentication. Go to Firebase Console > Authentication > Sign-in method > Microsoft and enable it.";
+      return "This provider is not enabled in Firebase Authentication.";
     }
-
     if (code === "auth/unauthorized-domain") {
-      return "This domain is not authorized in Firebase Authentication. Add jadzadco.github.io and your Firebase hosting domains under Authentication > Settings > Authorized domains.";
+      return "This domain is not authorized in Firebase Authentication.";
     }
-
     if (code === "auth/account-exists-with-different-credential") {
-      return "This email already exists with another sign-in method. Sign in with the original provider first, then link Microsoft later.";
-    }
-
-    if (code === "auth/invalid-credential" || code === "auth/invalid-oauth-client-id") {
-      return "Microsoft OAuth configuration appears invalid. Verify Microsoft Client ID, Client Secret, and Firebase redirect URI in the Microsoft App Registration.";
+      return "This email exists with another sign-in provider. Sign in with the original provider first.";
     }
 
     return `${code}: ${message}`;
@@ -58,31 +63,6 @@
     try { p.addScope("email"); } catch(e) {}
     return p;
   }
-
-  function isPopupIssue(e) {
-    const code = e?.code || "";
-    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
-  }
-
-  async function signInWithPopupThenRedirect(provider, statusId, label) {
-    try {
-      setText(statusId, `Opening ${label} sign-in...`);
-      await auth.signInWithPopup(provider);
-    } catch (e) {
-      if (isPopupIssue(e)) {
-        try {
-          setText(statusId, `${label} popup was blocked or closed. Redirecting instead...`);
-          await auth.signInWithRedirect(provider);
-          return;
-        } catch (redirectError) {
-          setText(statusId, masterAuthErrorMessage ? masterAuthErrorMessage(redirectError) : `${redirectError.code || "error"}: ${redirectError.message}`);
-          return;
-        }
-      }
-      setText(statusId, masterAuthErrorMessage ? masterAuthErrorMessage(e) : `${e.code || "error"}: ${e.message}`);
-    }
-  }
-
 
   async function loginGoogle() {
     try {
@@ -101,7 +81,11 @@
       setText("masterStatus", masterAuthErrorMessage(e));
     }
   }
-  async function logout() { await auth.signOut(); window.location.reload(); }
+
+  async function logout() {
+    await auth.signOut();
+    window.location.reload();
+  }
 
   function setupTabs() {
     document.querySelectorAll(".admin-tab").forEach(btn => {
@@ -114,17 +98,12 @@
     });
   }
 
-
-  function getEmailDomain(email) {
-    return String(email || "").toLowerCase().split("@")[1] || "";
-  }
-
   function getProviderIds(user) {
     return (user?.providerData || []).map(p => String(p.providerId || "").toLowerCase());
   }
 
-  function hasAllowedProvider(user) {
-    return getProviderIds(user).some(provider => ALLOWED_PROVIDERS.includes(provider));
+  function getEmailDomain(email) {
+    return String(email || "").toLowerCase().split("@")[1] || "";
   }
 
   function hasFirebaseMfaEnrollment(user) {
@@ -143,36 +122,36 @@
     const providers = getProviderIds(user);
 
     if (!email || email === "unknown" || !email.includes("@")) {
-      return { ok:false, reason:"Master admin requires an email-based sign-in. Phone-only OTP is not allowed." };
+      return { ok:false, reason:"Master Admin requires email-based Google or Microsoft sign-in." };
     }
 
     if (!MASTER_ADMIN_EMAILS.includes(email)) {
       return { ok:false, reason:`${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS.` };
     }
 
-    const isTemporaryException = TEMPORARY_EXCEPTION_EMAILS.includes(email);
+    const providerOk = providers.some(p => ALLOWED_PROVIDERS.includes(p));
+    if (!providerOk) {
+      return { ok:false, reason:`Master Admin must sign in with ${ALLOWED_PROVIDERS.join(" or ")}.` };
+    }
 
+    const isTemporaryException = TEMPORARY_EXCEPTION_EMAILS.includes(email);
     if (ENFORCE_DOMAINS && !ALLOWED_DOMAINS.includes(domain) && !isTemporaryException) {
-      return { ok:false, reason:`Master admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
+      return { ok:false, reason:`Master Admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
     }
 
     if (REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
-      return { ok:false, reason:"Master admin email must be verified by the identity provider." };
+      return { ok:false, reason:"Master Admin email must be verified by the provider." };
     }
 
-    if (!hasAllowedProvider(user)) {
-      return { ok:false, reason:`Master admin must sign in with ${ALLOWED_PROVIDERS.join(" or ")}. Phone, Facebook, and anonymous sign-ins are blocked.` };
-    }
+    const domainMessage = ENFORCE_DOMAINS
+      ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
+      : "Domain enforcement disabled; explicit email allow-list is active.";
 
     const mfaMessage = hasFirebaseMfaEnrollment(user)
       ? "Firebase MFA enrollment detected."
       : "MFA should be enforced by the identity provider for production Master Admin accounts.";
 
-    const domainMessage = ENFORCE_DOMAINS
-      ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
-      : "Domain enforcement temporarily disabled; explicit email allow-list is active.";
-
-    return { ok:true, reason:`Master admin security verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}` };
+    return { ok:true, reason:`Master admin verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}` };
   }
 
   function simpleRows(rows) {
@@ -213,7 +192,6 @@
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
     const locationRows = locations.length ? locations : fallbackLocations;
-
     const pending = shoutouts.filter(x => (x.status || "pending") === "pending");
     const revenue = pending.length * 10 + liveDocs.length * 25;
     const impressions = Math.max(10000, locationRows.length * 1250 + pending.length * 50);
@@ -302,8 +280,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
-    setText("masterStatus", "Master admin app loaded. Sign in with an approved corporate account.");
-    });
+    setText("masterStatus", "Master admin app loaded. Sign in to continue.");
 
     bind("masterGoogleLoginBtn", loginGoogle);
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
@@ -311,7 +288,6 @@
     bind("masterPanelLogoutBtn", logout);
 
     auth.onAuthStateChanged(user => {
-      const email = safeUser(user);
       setText("masterSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
       setText("masterPanelSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
 
