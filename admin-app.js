@@ -51,10 +51,7 @@
 
   function buildMicrosoftProvider() {
     const p = new firebase.auth.OAuthProvider("microsoft.com");
-    p.setCustomParameters({ prompt: "select_account" });
-    try { p.addScope("openid"); } catch(e) {}
-    try { p.addScope("profile"); } catch(e) {}
-    try { p.addScope("email"); } catch(e) {}
+    p.setCustomParameters({prompt:"select_account"});
     return p;
   }
 
@@ -97,26 +94,27 @@
 
   async function loginGoogle() {
     try {
-      setText("adminStatus", "Opening Google sign-in popup...");
+      setText("adminStatus", "Opening Google sign-in...");
       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    } catch (e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
   async function loginFacebook() {
     try {
-      setText("adminStatus", "Opening Facebook sign-in popup...");
+      setText("adminStatus", "Opening Facebook sign-in...");
       await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
-    } catch (e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
   async function loginMicrosoft() {
     try {
-      setText("adminStatus", "Redirecting to Microsoft sign-in...");
-      await auth.signInWithRedirect(buildMicrosoftProvider());
-    } catch (e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
+      const p = buildMicrosoftProvider();
+      setText("adminStatus", "Opening Microsoft sign-in...");
+      await auth.signInWithPopup(p);
+    } catch(e) {
+      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
@@ -320,16 +318,6 @@
     setupTabs();
     setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
-
-    auth.getRedirectResult()
-      .then(result => {
-        if (result && result.user) {
-          setText("adminStatus", "Microsoft redirect sign-in completed.");
-        }
-      })
-      .catch(e => {
-        setText("adminStatus", adminAuthErrorMessage(e));
-      });
     });
     byId("displayLink").href = `./display.html?location=${locationId}`;
     byId("liveFrame").src = `./display.html?location=${locationId}`;

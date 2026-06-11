@@ -29,7 +29,7 @@
     <div id="masterLogin" class="card">
       <h2>Master admin sign-in</h2>
       <p class="sub">Master admin access is controlled by <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong>. Domain enforcement is disabled during development.</p>
-      <p class="sub small"><strong>Sign-in note:</strong> Google uses popup sign-in. Microsoft now uses full-page redirect sign-in to avoid popup-closed errors. Phone-only and Facebook access remain blocked for Master Admin.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Master Admin login uses the same popup configuration as the patron page for Google and Microsoft. Use auth-debug.html if Microsoft still fails.</p>
       <div class="auth-grid">
         <button id="masterGoogleLoginBtn" type="button">Master Google Login</button>
         <button id="masterMicrosoftLoginBtn" type="button">Master Microsoft Login</button>
@@ -110,8 +110,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=25.8"></script>
-<script src="./shared-data.js?v=25.8"></script>
-<script src="./master-admin-app.js?v=25.8"></script>
+<script src="./firebase-config.js?v=25.9"></script>
+<script src="./shared-data.js?v=25.9"></script>
+<script src="./master-admin-app.js?v=25.9"></script>
 </body>
 </html>

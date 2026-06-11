@@ -754,3 +754,51 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.8
 ## Important
 
 After upload, test in an incognito/private window or hard refresh with Ctrl+F5.
+
+
+---
+
+# v25.9 Admin Auth Matched to Patron Auth
+
+## Why this update exists
+
+Microsoft redirect completed MFA but returned to the app without an authenticated Firebase user. Firebase documents that redirect sign-in can fail on browsers that block third-party storage when the app is served from a different domain than the Firebase Auth helper domain.
+
+## What changed
+
+1. Club Admin Google/Microsoft/Facebook now use popup sign-in, matching the patron page.
+2. Master Admin Google/Microsoft now use popup sign-in, matching the patron page.
+3. Microsoft provider config now matches the patron page:
+   - `new firebase.auth.OAuthProvider("microsoft.com")`
+   - `p.setCustomParameters({prompt:"select_account"})`
+   - no extra tenant/scopes
+4. Redirect handling was removed from admin/master admin.
+5. Added `auth-debug.html` and `auth-debug.js` to test Firebase provider sign-in without admin role checks.
+
+## Diagnostic URL
+
+Use this first if Microsoft still fails:
+
+```text
+https://jadzadco.github.io/shoutout-demo/auth-debug.html?v=25.9
+```
+
+If Microsoft fails on `auth-debug.html`, the issue is provider/browser/Firebase configuration, not the admin role logic.
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.9
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.9
+```
+
+## Production recommendation
+
+For Microsoft redirect sign-in on GitHub Pages, Firebase recommends one of the redirect best-practice options, such as using Firebase Hosting/custom auth domain or proxying the auth helper path, because redirect sign-in relies on a Firebase Auth helper iframe that can be affected by third-party storage restrictions.

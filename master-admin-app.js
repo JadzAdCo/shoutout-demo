@@ -57,28 +57,26 @@
 
   function buildMicrosoftProvider() {
     const p = new firebase.auth.OAuthProvider("microsoft.com");
-    p.setCustomParameters({ prompt: "select_account" });
-    try { p.addScope("openid"); } catch(e) {}
-    try { p.addScope("profile"); } catch(e) {}
-    try { p.addScope("email"); } catch(e) {}
+    p.setCustomParameters({prompt:"select_account"});
     return p;
   }
 
   async function loginGoogle() {
     try {
-      setText("masterStatus", "Opening Google sign-in popup...");
+      setText("masterStatus", "Opening Google sign-in...");
       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    } catch (e) {
-      setText("masterStatus", masterAuthErrorMessage(e));
+    } catch(e) {
+      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
 
   async function loginMicrosoft() {
     try {
-      setText("masterStatus", "Redirecting to Microsoft sign-in...");
-      await auth.signInWithRedirect(buildMicrosoftProvider());
-    } catch (e) {
-      setText("masterStatus", masterAuthErrorMessage(e));
+      const p = buildMicrosoftProvider();
+      setText("masterStatus", "Opening Microsoft sign-in...");
+      await auth.signInWithPopup(p);
+    } catch(e) {
+      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
 
@@ -281,16 +279,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     setText("masterStatus", "Master admin app loaded. Sign in to continue.");
-
-    auth.getRedirectResult()
-      .then(result => {
-        if (result && result.user) {
-          setText("masterStatus", "Microsoft/Google redirect sign-in completed.");
-        }
-      })
-      .catch(e => {
-        setText("masterStatus", masterAuthErrorMessage(e));
-      });
 
     bind("masterGoogleLoginBtn", loginGoogle);
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
