@@ -13,12 +13,12 @@ window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
   Master admin must be explicitly listed, use an approved Jadz email domain,
   use a verified email identity, and sign in through Google or Microsoft.
   MFA must be enforced at Microsoft Entra ID / Google Workspace.
-*/
+
 window.SHOUTOUT_MASTER_ADMIN_ALLOWED_DOMAINS = [
   "jadzadco.com",
   "jadzholdings.com"
 ];
-
+*/
 window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS = [
   "google.com",
   "microsoft.com"
