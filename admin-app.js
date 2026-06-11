@@ -113,8 +113,8 @@
   }
   async function loginMicrosoft() {
     try {
-      setText("adminStatus", "Opening Microsoft sign-in popup...");
-      await auth.signInWithPopup(buildMicrosoftProvider());
+      setText("adminStatus", "Redirecting to Microsoft sign-in...");
+      await auth.signInWithRedirect(buildMicrosoftProvider());
     } catch (e) {
       setText("adminStatus", adminAuthErrorMessage(e));
     }
@@ -320,6 +320,16 @@
     setupTabs();
     setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
+
+    auth.getRedirectResult()
+      .then(result => {
+        if (result && result.user) {
+          setText("adminStatus", "Microsoft redirect sign-in completed.");
+        }
+      })
+      .catch(e => {
+        setText("adminStatus", adminAuthErrorMessage(e));
+      });
     });
     byId("displayLink").href = `./display.html?location=${locationId}`;
     byId("liveFrame").src = `./display.html?location=${locationId}`;

@@ -29,7 +29,7 @@
     <div id="adminLogin" class="card">
       <h2>Club admin sign-in</h2>
       <p class="sub">Sign in using an approved admin email. Master admins should use <strong>master-admin.html</strong>.</p>
-      <p class="sub small"><strong>Sign-in note:</strong> Admin login now uses popup sign-in for Google, Microsoft, and Facebook, matching the patron-page behavior.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Google and Facebook use popup sign-in. Microsoft now uses full-page redirect sign-in to avoid popup-closed errors.</p>
       <div class="auth-grid">
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
         <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
@@ -127,8 +127,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=25.7"></script>
-<script src="./shared-data.js?v=25.7"></script>
-<script src="./admin-app.js?v=25.7"></script>
+<script src="./firebase-config.js?v=25.8"></script>
+<script src="./shared-data.js?v=25.8"></script>
+<script src="./admin-app.js?v=25.8"></script>
 </body>
 </html>

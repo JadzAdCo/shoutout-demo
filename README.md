@@ -703,3 +703,54 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.7
 ## Production Note
 
 Later, move Master Admin roles to Firestore `adminRoles` or Firebase custom claims.
+
+
+---
+
+# v25.8 Microsoft Redirect Fallback / Popup-Closed Fix
+
+## Why this update exists
+
+Microsoft authentication continued to produce:
+
+```text
+auth/popup-closed-by-user
+```
+
+even after browser popups were allowed.
+
+This usually means the provider flow is still being interrupted or the Microsoft OAuth popup is being closed before Firebase receives the final credential.
+
+## What changed
+
+1. Google sign-in still uses popup behavior.
+2. Microsoft sign-in now uses full-page redirect behavior on both:
+   - Club Admin
+   - Master Admin
+3. `auth.getRedirectResult()` was added back to process the returning Microsoft login result.
+4. Master Admin domain enforcement remains disabled during development.
+5. Master Admin is still protected by `SHOUTOUT_MASTER_ADMIN_EMAILS`.
+
+## Why Microsoft is different from Google
+
+Google popup works in your patron page. Microsoft OAuth can behave differently in Chrome because of account picker behavior, cross-site cookie policies, tenant/account-type prompts, and provider redirect handling.
+
+Using redirect for Microsoft avoids popup closure entirely.
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.8
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.8
+```
+
+## Important
+
+After upload, test in an incognito/private window or hard refresh with Ctrl+F5.

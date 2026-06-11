@@ -37,7 +37,7 @@
     const message = e?.message || String(e || "Unknown error");
 
     if (code === "auth/popup-closed-by-user") {
-      return "The sign-in popup was closed before completion. Try again and complete the popup flow.";
+      return "The sign-in popup was closed before completion. If this happens repeatedly, use Microsoft sign-in because it now uses full-page redirect, or retry Google and complete the popup flow.";
     }
     if (code === "auth/popup-blocked") {
       return "The browser blocked the sign-in popup. Allow popups for jadzadco.github.io and try again.";
@@ -75,8 +75,8 @@
 
   async function loginMicrosoft() {
     try {
-      setText("masterStatus", "Opening Microsoft sign-in popup...");
-      await auth.signInWithPopup(buildMicrosoftProvider());
+      setText("masterStatus", "Redirecting to Microsoft sign-in...");
+      await auth.signInWithRedirect(buildMicrosoftProvider());
     } catch (e) {
       setText("masterStatus", masterAuthErrorMessage(e));
     }
@@ -281,6 +281,16 @@
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     setText("masterStatus", "Master admin app loaded. Sign in to continue.");
+
+    auth.getRedirectResult()
+      .then(result => {
+        if (result && result.user) {
+          setText("masterStatus", "Microsoft/Google redirect sign-in completed.");
+        }
+      })
+      .catch(e => {
+        setText("masterStatus", masterAuthErrorMessage(e));
+      });
 
     bind("masterGoogleLoginBtn", loginGoogle);
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
