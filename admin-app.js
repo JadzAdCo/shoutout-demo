@@ -61,6 +61,30 @@
     return p;
   }
 
+  function isPopupIssue(e) {
+    const code = e?.code || "";
+    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
+  }
+
+  async function signInWithPopupThenRedirect(provider, statusId, label) {
+    try {
+      setText(statusId, `Opening ${label} sign-in...`);
+      await auth.signInWithPopup(provider);
+    } catch (e) {
+      if (isPopupIssue(e)) {
+        try {
+          setText(statusId, `${label} popup was blocked or closed. Redirecting instead...`);
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (redirectError) {
+          setText(statusId, adminAuthErrorMessage ? adminAuthErrorMessage(redirectError) : `${redirectError.code || "error"}: ${redirectError.message}`);
+          return;
+        }
+      }
+      setText(statusId, adminAuthErrorMessage ? adminAuthErrorMessage(e) : `${e.code || "error"}: ${e.message}`);
+    }
+  }
+
 
   function displayUrl(item) {
     const url = new URL("./display.html", window.location.href);
@@ -75,29 +99,13 @@
   }
 
   async function loginGoogle() {
-    try {
-      setText("adminStatus","Redirecting to Google sign-in...");
-      await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
-    } catch(e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
-    }
+    await signInWithPopupThenRedirect(new firebase.auth.GoogleAuthProvider(), "adminStatus", "Google");
   }
   async function loginFacebook() {
-    try {
-      setText("adminStatus","Redirecting to Facebook sign-in...");
-      await auth.signInWithRedirect(new firebase.auth.FacebookAuthProvider());
-    } catch(e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
-    }
+    await signInWithPopupThenRedirect(new firebase.auth.FacebookAuthProvider(), "adminStatus", "Facebook");
   }
   async function loginMicrosoft() {
-    try {
-      const p = buildMicrosoftProvider();
-      setText("adminStatus","Redirecting to Microsoft sign-in...");
-      await auth.signInWithRedirect(p);
-    } catch(e) {
-      setText("adminStatus", adminAuthErrorMessage(e));
-    }
+    await signInWithPopupThenRedirect(buildMicrosoftProvider(), "adminStatus", "Microsoft");
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 

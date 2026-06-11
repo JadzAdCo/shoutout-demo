@@ -424,3 +424,57 @@ Master Admin:
 ```text
 https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.2
 ```
+
+
+---
+
+# v25.3 Admin Authentication Unification
+
+## Why this update exists
+
+The patron page Google authentication was working, but the admin page began showing Microsoft popup errors and Google stopped working after redirect-only changes.
+
+## What changed
+
+1. Club Admin and Master Admin now use the same primary authentication behavior as the patron portal:
+   - `signInWithPopup()` first
+   - automatic `signInWithRedirect()` fallback only if popup is blocked, closed, or cancelled
+
+2. This fixes the regression where admin Google stopped working while patron Google still worked.
+
+3. Microsoft sign-in keeps the Microsoft provider settings:
+   - `tenant: "common"`
+   - `prompt: "select_account"`
+   - scopes: `openid`, `profile`, `email`
+
+4. Master Admin security remains:
+   - Google or Microsoft only
+   - phone-only blocked
+   - Facebook blocked
+   - approved email list required
+   - corporate domain requirement remains
+   - `bans.don@gmail.com` remains temporarily allowed for testing
+
+## Test URLs
+
+Club Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=25.3
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.3
+```
+
+## Troubleshooting
+
+If Microsoft still shows `auth/popup-blocked`, manually allow popups for:
+
+```text
+jadzadco.github.io
+```
+
+The app should then retry with redirect fallback automatically.

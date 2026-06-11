@@ -61,24 +61,37 @@
     return p;
   }
 
+  function isPopupIssue(e) {
+    const code = e?.code || "";
+    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
+  }
 
-  async function loginGoogle() {
+  async function signInWithPopupThenRedirect(provider, statusId, label) {
     try {
-      setText("masterStatus","Redirecting to Google sign-in...");
-      await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
-    } catch(e) {
-      setText("masterStatus", masterAuthErrorMessage(e));
+      setText(statusId, `Opening ${label} sign-in...`);
+      await auth.signInWithPopup(provider);
+    } catch (e) {
+      if (isPopupIssue(e)) {
+        try {
+          setText(statusId, `${label} popup was blocked or closed. Redirecting instead...`);
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (redirectError) {
+          setText(statusId, masterAuthErrorMessage ? masterAuthErrorMessage(redirectError) : `${redirectError.code || "error"}: ${redirectError.message}`);
+          return;
+        }
+      }
+      setText(statusId, masterAuthErrorMessage ? masterAuthErrorMessage(e) : `${e.code || "error"}: ${e.message}`);
     }
   }
 
+
+  async function loginGoogle() {
+    await signInWithPopupThenRedirect(new firebase.auth.GoogleAuthProvider(), "masterStatus", "Google");
+  }
+
   async function loginMicrosoft() {
-    try {
-      const p = buildMicrosoftProvider();
-      setText("masterStatus","Redirecting to Microsoft sign-in...");
-      await auth.signInWithRedirect(p);
-    } catch(e) {
-      setText("masterStatus", masterAuthErrorMessage(e));
-    }
+    await signInWithPopupThenRedirect(buildMicrosoftProvider(), "masterStatus", "Microsoft");
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
