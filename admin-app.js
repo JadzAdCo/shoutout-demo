@@ -318,7 +318,6 @@
     setupTabs();
     setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
-    });
     byId("displayLink").href = `./display.html?location=${locationId}`;
     byId("liveFrame").src = `./display.html?location=${locationId}`;
 
