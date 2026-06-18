@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Jadz AdCo Patron Portal v28 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>My Jadz AdCo Activity</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Patron Portal</p>
+        <h1>My Jadz AdCo Activity</h1>
+        <p class="sub">Profile, member level, ShoutOuts, guest lists, messages, chats, and privacy.</p>
+        <p id="portalSignedInAs" class="status">Not signed in</p>
+        <p id="portalStatus" class="status">Loading patron portal...</p>
+      </div>
+    </header>
+
+    <div id="portalLogin" class="card">
+      <h2>Sign in</h2>
+      <p class="sub">Sign in to view and update your patron profile.</p>
+      <button id="portalGoogleLoginBtn" type="button">Continue with Google</button>
+    </div>
+
+    <div id="portalPanel" class="hidden">
+      <div class="card account-status-card">
+        <div>
+          <p class="eyebrow">Account</p>
+          <strong id="portalAccountName">—</strong>
+          <p id="portalAccountEmail" class="sub small">—</p>
+        </div>
+        <button id="portalLogoutBtn" class="ghost" type="button">Sign out</button>
+      </div>
+
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
+        <button class="admin-tab" data-panel="portalProfile" type="button">Edit Profile</button>
+        <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
+        <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
+        <button class="admin-tab" data-panel="portalMessages" type="button">Messages</button>
+        <button class="admin-tab" data-panel="portalChats" type="button">Chats</button>
+        <button class="admin-tab" data-panel="portalPrivacy" type="button">Privacy / GDPR</button>
+      </nav>
+
+      <section id="portalOverview" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
+          <div class="metric-card"><span>Messages</span><strong id="metricMessages">0/0</strong></div>
+          <div class="metric-card"><span>Chats</span><strong id="metricChats">0/0</strong></div>
+          <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">—</strong></div>
+        </div>
+        <div class="card"><h2>Profile Summary</h2><div id="profileSummary" class="report-block"></div></div>
+      </section>
+
+      <section id="portalProfile" class="admin-panel-section">
+        <div class="card">
+          <h2>Edit Profile</h2>
+          <p class="sub small">Use legal first and last name for guest lists where ID checks are required.</p>
+          <div class="profile-grid">
+            <label>First Name <input id="editFirstName"/></label>
+            <label>Last Name <input id="editLastName"/></label>
+            <label>Display Name <input id="editDisplayName"/></label>
+            <label>Phone Number <input id="editPhone"/></label>
+            <label>City <input id="editCity"/></label>
+            <label>Country <input id="editCountry"/></label>
+            <label>Preferred Language
+              <select id="editLanguage">
+                <option value="">Select language</option>
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="it">Italian</option>
+                <option value="de">German</option>
+                <option value="el">Greek</option>
+              </select>
+            </label>
+            <label>Instagram Handle <input id="editInstagram"/></label>
+            <label>X Handle <input id="editX"/></label>
+          </div>
+          <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
+        </div>
+      </section>
+
+      <section id="portalShoutouts" class="admin-panel-section">
+        <div class="card"><h2>My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
+      </section>
+
+      <section id="portalGuestLists" class="admin-panel-section">
+        <div class="card"><h2>My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
+      </section>
+
+      <section id="portalMessages" class="admin-panel-section">
+        <div class="card"><h2>Messages <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
+      </section>
+
+      <section id="portalChats" class="admin-panel-section">
+        <div class="card"><h2>Chats <span id="chatCountLabel">(0/0)</span></h2><div id="myChats" class="report-block"></div></div>
+      </section>
+
+      <section id="portalPrivacy" class="admin-panel-section">
+        <div class="card">
+          <h2>Privacy / GDPR</h2>
+          <div class="profile-grid">
+            <label><input id="privacyMarketing" type="checkbox"/> Marketing consent</label>
+            <label><input id="privacyAnalytics" type="checkbox"/> Analytics consent</label>
+            <label><input id="privacySharing" type="checkbox"/> Third-party data sharing consent</label>
+          </div>
+          <button id="savePrivacyBtn" class="primary" type="button">Save Privacy Preferences</button>
+          <button id="exportDataBtn" type="button">Download My Data JSON</button>
+          <button id="deleteDataBtn" class="ghost" type="button">Request Data Delete</button>
+          <div id="privacyReport" class="report-block"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=28"></script>
+<script src="./shared-data.js?v=28"></script>
+<script src="./patron-portal-app.js?v=28"></script>
+</body>
+</html>

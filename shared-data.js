@@ -490,7 +490,7 @@ window.SHOUTOUT_PROMOTER_ADMINS = {
 
 
 /*
-  v27 Localization / Translation Policy
+  v28 Localization / Translation Policy
   These product and brand terms must never be translated.
   Example: French should say "Envoyer un ShoutOut", not translate ShoutOut.
 */
@@ -515,7 +515,7 @@ window.SHOUTOUT_TRANSLATION_EXAMPLES = {
   el: "Αποστολή ενός ShoutOut"
 };
 
-/* v27 Patron rank thresholds are displayed/configurable by Master Admin later. */
+/* v28 Patron rank thresholds are displayed/configurable by Master Admin later. */
 window.SHOUTOUT_PATRON_RANKS = [
   { id:"superstar", label:"Superstar", monthlySpend:30000, annualSpend:120000 },
   { id:"big-baller", label:"Big Baller", monthlySpend:20000, annualSpend:70000 },
@@ -523,22 +523,3 @@ window.SHOUTOUT_PATRON_RANKS = [
   { id:"money-spender", label:"Money Spender", monthlySpend:7500, annualSpend:30000 },
   { id:"bruv-diva", label:"Bruv / Diva", monthlySpend:5000, annualSpend:20000 }
 ];
-
-
-/* v28 Role Request Settings - Patron is default */
-window.SHOUTOUT_ROLE_TYPES = {
-  clubAdmin: "Club Admin",
-  clubDj: "Club DJ",
-  promoter: "Promoter",
-  venueOwner: "Venue Owner",
-  advertiser: "Advertiser"
-};
-window.SHOUTOUT_ROLE_REQUEST_STATUS = { pending:"pending", approved:"approved", rejected:"rejected", moreInfo:"moreInfo" };
-window.SHOUTOUT_MEMBER_LEVELS = [
-  { id:"superstar", name:"Superstar", monthlySpend:30000, annualSpend:120000 },
-  { id:"big-baller", name:"Big Baller", monthlySpend:20000, annualSpend:70000 },
-  { id:"baller-diva", name:"Baller / Diva", monthlySpend:10000, annualSpend:50000 },
-  { id:"money-spender", name:"Money Spender", monthlySpend:7500, annualSpend:30000 },
-  { id:"bruv-diva", name:"Bruv / Diva", monthlySpend:5000, annualSpend:20000 }
-];
-window.SHOUTOUT_PROTECTED_TRANSLATION_TERMS = ["ShoutOut","Jadz AdCo","Jadz Holdings","Superstar","Big Baller","Baller","Diva","Money Spender","Bruv"];

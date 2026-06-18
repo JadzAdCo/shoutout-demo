@@ -28,8 +28,15 @@
 /* v26 promoter guest list additions */
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}
 
-/* v27 guest invitee rows */
+/* v28 guest invitee rows */
 .soft-card{background:rgba(255,255,255,.05);margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:18px}
 .invitee-row{align-items:end;border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:rgba(0,0,0,.12)}
 .consent-line{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:16px;padding:14px;margin:16px 0;background:rgba(0,0,0,.16)}
 .consent-line input{width:auto;margin-top:3px}
+
+/* v28 patron portal menu */
+.profile-menu-link,.profile-menu-line{display:block;padding:10px 12px;color:var(--text);font-weight:900;text-decoration:none}
+.profile-menu-link:hover{text-decoration:underline}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.profile-grid label{display:grid;gap:7px}
+.profile-grid input,.profile-grid select{width:100%}

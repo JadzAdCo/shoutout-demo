@@ -428,10 +428,87 @@
   }
   function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; showTemplateSelection(); }
 
-  function openPatronPortal() { window.location.href = "./portal.html?v=28"; }
-  function ensurePortalMenuLink() { const menu = document.querySelector(".profile-menu, .user-menu, .account-menu, #profileMenu, #userMenu"); if (!menu || menu.querySelector("[data-portal-link='true']")) return; const btn = document.createElement("button"); btn.type="button"; btn.dataset.portalLink="true"; btn.className="ghost full"; btn.textContent="My Portal"; btn.addEventListener("click", openPatronPortal); const so = Array.from(menu.querySelectorAll("button")).find(b => /sign out/i.test(b.textContent || "")); if (so) menu.insertBefore(btn, so); else menu.appendChild(btn); }
-  document.addEventListener("click", () => setTimeout(ensurePortalMenuLink, 50));
-  setInterval(ensurePortalMenuLink, 1500);
+
+  function ensureProfileMenuEnhancements(user) {
+    const menus = [
+      byId("profileMenu"),
+      byId("userMenu"),
+      document.querySelector(".profile-menu"),
+      document.querySelector(".user-menu"),
+      document.querySelector(".account-menu")
+    ].filter(Boolean);
+
+    const menu = menus[0];
+    if (!menu || !user) return;
+
+    if (!menu.querySelector("[data-patron-menu='portal']")) {
+      const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
+
+      const portalLink = document.createElement("a");
+      portalLink.href = "./patron-portal.html?v=28";
+      portalLink.textContent = "My Profile";
+      portalLink.dataset.patronMenu = "portal";
+      portalLink.className = "profile-menu-link";
+      menu.insertBefore(portalLink, signOutButton);
+
+      const level = document.createElement("div");
+      level.textContent = "Member Level: Patron";
+      level.dataset.patronMenu = "level";
+      level.className = "profile-menu-line";
+      menu.insertBefore(level, signOutButton);
+
+      const messages = document.createElement("a");
+      messages.href = "./patron-portal.html?tab=messages&v=28";
+      messages.textContent = "Messages (0/0)";
+      messages.dataset.patronMenu = "messages";
+      messages.className = "profile-menu-link";
+      menu.insertBefore(messages, signOutButton);
+
+      const chats = document.createElement("a");
+      chats.href = "./patron-portal.html?tab=chats&v=28";
+      chats.textContent = "Chats (0/0)";
+      chats.dataset.patronMenu = "chats";
+      chats.className = "profile-menu-link";
+      menu.insertBefore(chats, signOutButton);
+    }
+
+    updateProfileMenuCounts(user.uid);
+  }
+
+  async function updateProfileMenuCounts(uid) {
+    try {
+      const profileDoc = await db.collection("users").doc(uid).get();
+      const profile = profileDoc.exists ? profileDoc.data() : {};
+      const levelEl = document.querySelector("[data-patron-menu='level']");
+      if (levelEl) levelEl.textContent = `Member Level: ${profile.memberLevel || "Patron"}`;
+
+      let totalMessages = 0, unreadMessages = 0, totalChats = 0, unreadChats = 0;
+
+      try {
+        const msgSnap = await db.collection("messages").where("recipientUid", "==", uid).limit(1000).get();
+        totalMessages = msgSnap.size;
+        msgSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
+      } catch(e) {}
+
+      try {
+        const chatSnap = await db.collection("chatRooms").where("participants", "array-contains", uid).limit(1000).get();
+        totalChats = chatSnap.size;
+        chatSnap.forEach(d => {
+          const unread = d.data().unreadCounts && d.data().unreadCounts[uid] ? Number(d.data().unreadCounts[uid]) : 0;
+          unreadChats += unread;
+        });
+      } catch(e) {}
+
+      const msgEl = document.querySelector("[data-patron-menu='messages']");
+      if (msgEl) msgEl.textContent = `Messages (${unreadMessages}/${totalMessages})`;
+
+      const chatEl = document.querySelector("[data-patron-menu='chats']");
+      if (chatEl) chatEl.textContent = `Chats (${unreadChats}/${totalChats})`;
+    } catch(e) {
+      console.warn("Could not update profile menu counts", e);
+    }
+  }
+
 
   document.addEventListener("DOMContentLoaded", function(){
     setStatus("Choose a sign-in/up option.");
@@ -460,4 +537,9 @@
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
+
+  auth.onAuthStateChanged(user => {
+    if (user) setTimeout(() => ensureProfileMenuEnhancements(user), 500);
+  });
+
 })();

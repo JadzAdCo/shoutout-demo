@@ -1,4 +1,4 @@
-/* guest-list-app.js v27 - Guest list intake with legal names and invitees */
+/* guest-list-app.js v28 - Guest list intake with legal names and invitees */
 (function(){
   "use strict";
   const byId = id => document.getElementById(id);
