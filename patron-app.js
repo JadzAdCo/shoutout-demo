@@ -1,4 +1,4 @@
-/* patron-app.js v19 */
+/* patron-app.js v28.2 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -445,7 +445,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28";
+      portalLink.href = "./patron-portal.html?v=28.2";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -458,14 +458,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28";
+      messages.href = "./patron-portal.html?tab=messages&v=28.2";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28";
+      chats.href = "./patron-portal.html?tab=chats&v=28.2";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -542,4 +542,81 @@
     if (user) setTimeout(() => ensureProfileMenuEnhancements(user), 500);
   });
 
+})();
+
+
+
+/* v28.2 override: patron menu + guest-list routing */
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
+  function initials(user){
+    const n = user?.displayName || user?.email || "Patron";
+    return n.split(/[ @._-]+/).filter(Boolean).slice(0,2).map(x => x[0]).join("").toUpperCase() || "P";
+  }
+  function selectedLocationId(){
+    return window.selectedLocationId || window.locationId?.() || new URL(location.href).searchParams.get("location") || new URL(location.href).searchParams.get("club") || "zebbies-garden-washington-dc";
+  }
+  window.openGuestListForLocation = function(locationId){
+    const url = new URL("./guest-list.html", location.href);
+    url.searchParams.set("v","28.2");
+    url.searchParams.set("location", locationId || selectedLocationId());
+    const promoter = new URL(location.href).searchParams.get("promoter");
+    if (promoter) url.searchParams.set("promoter", promoter);
+    location.href = url.toString();
+  };
+
+  async function counts(uid){
+    const out = {tm:0, um:0, tc:0, uc:0};
+    try{
+      const db = firebase.firestore();
+      const ms = await db.collection("messages").where("recipientUid","==",uid).limit(1000).get();
+      out.tm = ms.size; ms.forEach(d => { if(!d.data().read) out.um++; });
+    }catch(e){}
+    try{
+      const db = firebase.firestore();
+      const cs = await db.collection("chatRooms").where("participants","array-contains",uid).limit(1000).get();
+      out.tc = cs.size; cs.forEach(d => { out.uc += Number((d.data().unreadCounts || {})[uid] || 0); });
+    }catch(e){}
+    return out;
+  }
+
+  async function enhanceMenu(user){
+    if(!user) return;
+    const menu = byId("userDropdown") || byId("profileMenu") || byId("userMenu") || document.querySelector(".user-dropdown,.profile-menu,.user-menu,.account-menu");
+    if(!menu) return;
+    const c = await counts(user.uid);
+    const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
+    menu.innerHTML = `
+      <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.2">My Profile</a>
+      <div class="profile-menu-line">Member Level: Patron</div>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.2">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.2">Chats (${c.uc}/${c.tc})</a>
+      <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
+  }
+
+  document.addEventListener("click", function(e){
+    const el = e.target.closest("button,a,[role='button']");
+    if(!el) return;
+    const text = String(el.textContent || el.getAttribute("aria-label") || "").toLowerCase();
+    if(text.includes("guest list") || text.includes("join guest")){
+      window.__jadzActionMode = "guest-list";
+    }
+    if(window.__jadzActionMode === "guest-list" && text.trim() === "continue"){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      window.openGuestListForLocation();
+    }
+  }, true);
+
+  const waitAuth = setInterval(function(){
+    try{
+      if(window.firebase && firebase.auth){
+        clearInterval(waitAuth);
+        firebase.auth().onAuthStateChanged(user => {
+          if(user) setTimeout(() => enhanceMenu(user), 350);
+        });
+      }
+    }catch(e){}
+  }, 250);
 })();

@@ -40,3 +40,6 @@
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .profile-grid label{display:grid;gap:7px}
 .profile-grid input,.profile-grid select{width:100%}
+
+/* v28.2 fixes */
+.profile-menu-link,.profile-menu-line{display:block;padding:10px 12px;color:var(--text);font-weight:900;text-decoration:none}.profile-menu-link:hover{text-decoration:underline}.menu-user-row{display:flex;align-items:center;gap:12px;padding:10px 12px}.menu-user-row p{margin:3px 0 0;opacity:.8}.menu-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover}.menu-avatar-fallback{width:42px;height:42px;border-radius:50%;display:inline-grid;place-items:center;font-weight:900;background:linear-gradient(135deg,#ff4fd8,#5eeaff);color:#111}.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}.additional-guest-row{margin:10px 0;padding:10px;border:1px solid rgba(255,255,255,.18);border-radius:18px}
