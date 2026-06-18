@@ -181,6 +181,29 @@
       }, e => { queueList.innerHTML = `<p class="status">${esc(e.message)}</p>`; });
   }
 
+
+  async function createStatusNotification(item, status, title) {
+    try {
+      await db.collection("inboxNotifications").add({
+        recipientUid: item.submittedByUid || "",
+        recipientEmail: item.submittedBy || item.submittedByEmail || "",
+        type: "shoutoutStatus",
+        title: title || `ShoutOut ${status}`,
+        body: `Your ShoutOut status is now ${status}.`,
+        referenceNumber: item.referenceNumber || "",
+        clubLocationId: item.clubLocationId || locationId,
+        locationName: item.locationName || loc.locationName || locationId,
+        status,
+        read:false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        link:"./patron-portal.html?tab=shoutouts&v=28.3"
+      });
+    } catch(e) {}
+  }
+  async function auditShoutout(id, item, action) {
+    try { await db.collection("shoutoutAudit").add({shoutoutId:id, action, clubLocationId:item.clubLocationId||locationId, referenceNumber:item.referenceNumber||"", actorUid:auth.currentUser?.uid||"", actorEmail:safeUser(auth.currentUser), createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
+  }
+
   async function approve(id, item) {
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
@@ -199,11 +222,17 @@
       approvedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
 
+    await createStatusNotification(item,"approved","ShoutOut Approved");
+    await auditShoutout(id,item,"approved");
+    await createStatusNotification(item,"rejected","ShoutOut Rejected");
+    await auditShoutout(id,item,"rejected");
     await db.collection("shoutouts").doc(id).delete();
     loadReports();
   }
 
   async function reject(id) {
+    const snap = await db.collection("shoutouts").doc(id).get();
+    const item = snap.exists ? snap.data() : {};
     await db.collection("shoutouts").doc(id).delete();
     loadReports();
   }

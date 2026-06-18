@@ -523,3 +523,25 @@ window.SHOUTOUT_PATRON_RANKS = [
   { id:"money-spender", label:"Money Spender", monthlySpend:7500, annualSpend:30000 },
   { id:"bruv-diva", label:"Bruv / Diva", monthlySpend:5000, annualSpend:20000 }
 ];
+
+/* v28.3 club/location service catalog */
+window.SHOUTOUT_DEFAULT_LOCATION_SERVICES = ["shoutout","guestList"];
+window.SHOUTOUT_LOCATION_SERVICES = {
+  "zebbies-garden-washington-dc": ["shoutout","guestList","vipReservation","stdEntry"],
+  "shoko-barcelona-spain": ["shoutout","guestList","vipReservation","ticketing"],
+  "christie-cannes-france": ["shoutout","guestList","vipReservation","ticketing"],
+  "abigail-washington-dc": ["shoutout","guestList","vipReservation"],
+  "signature-lounge-washington-dc": ["shoutout","guestList","vipReservation"],
+  "josephine-atlanta-ga": ["shoutout","guestList","vipReservation"]
+};
+window.SHOUTOUT_SERVICE_LABELS = {
+  shoutout: "Throw a ShoutOut",
+  guestList: "Join Guest List",
+  vipReservation: "Reserve VIP / Table",
+  stdEntry: "Pay Standard Entry",
+  vipEntry: "Pay VIP Entry",
+  ticketing: "Buy Ticket",
+  bottleService: "Bottle Service",
+  cabanaBooking: "Cabana Booking"
+};
+window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","scheduled","displayed","archived"];

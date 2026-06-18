@@ -95,6 +95,15 @@
       </section>
 
       <section id="portalMessages" class="admin-panel-section">
+        <div class="card" id="portalCompose">
+          <h2>Send Message</h2>
+          <div class="profile-grid">
+            <label>Recipient Email<input id="composeRecipientEmail" placeholder="friend@example.com or club admin email"/></label>
+            <label>Subject<input id="composeSubject" placeholder="Subject"/></label>
+          </div>
+          <label>Message<input id="composeBody" placeholder="Write your message..."/></label>
+          <button id="sendMessageBtn" class="primary" type="button">Send Message</button>
+        </div>
         <div class="card"><h2>Messages <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
       </section>
 
@@ -122,8 +131,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.2"></script>
-<script src="./shared-data.js?v=28.2"></script>
-<script src="./patron-portal-app.js?v=28.2"></script>
+<script src="./firebase-config.js?v=28.3"></script>
+<script src="./shared-data.js?v=28.3"></script>
+<script src="./patron-portal-app.js?v=28.3"></script>
 </body>
 </html>

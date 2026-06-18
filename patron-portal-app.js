@@ -41,7 +41,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.2"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.3"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -168,6 +168,19 @@
     byId("privacyReport").innerHTML = simpleRows([["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"]]);
   }
 
+
+  async function sendPortalMessage() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const recipientEmail = byId("composeRecipientEmail")?.value.trim().toLowerCase();
+    const subject = byId("composeSubject")?.value.trim() || "Message";
+    const body = byId("composeBody")?.value.trim();
+    if (!recipientEmail || !body) { setText("portalStatus", "Recipient email and message are required."); return; }
+    await db.collection("messages").add({type:"patronMessage",senderUid:user.uid,senderEmail:user.email||"",recipientEmail,subject,body,read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    setText("portalStatus", "Message sent.");
+    byId("composeBody").value = "";
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     bind("portalGoogleLoginBtn", loginGoogle);
@@ -176,6 +189,7 @@
     bind("savePrivacyBtn", savePrivacy);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
+    bind("sendMessageBtn", sendPortalMessage);
 
     auth.onAuthStateChanged(user => {
       setText("portalSignedInAs", user ? `Signed in as ${user.displayName || user.email}` : "Not signed in");
