@@ -428,6 +428,11 @@
   }
   function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; showTemplateSelection(); }
 
+  function openPatronPortal() { window.location.href = "./portal.html?v=28"; }
+  function ensurePortalMenuLink() { const menu = document.querySelector(".profile-menu, .user-menu, .account-menu, #profileMenu, #userMenu"); if (!menu || menu.querySelector("[data-portal-link='true']")) return; const btn = document.createElement("button"); btn.type="button"; btn.dataset.portalLink="true"; btn.className="ghost full"; btn.textContent="My Portal"; btn.addEventListener("click", openPatronPortal); const so = Array.from(menu.querySelectorAll("button")).find(b => /sign out/i.test(b.textContent || "")); if (so) menu.insertBefore(btn, so); else menu.appendChild(btn); }
+  document.addEventListener("click", () => setTimeout(ensurePortalMenuLink, 50));
+  setInterval(ensurePortalMenuLink, 1500);
+
   document.addEventListener("DOMContentLoaded", function(){
     setStatus("Choose a sign-in/up option.");
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });

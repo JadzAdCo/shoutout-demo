@@ -53,6 +53,7 @@
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
+        <button class="admin-tab" data-panel="roleApprovalPanel" type="button">Role Requests</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
       </nav>
 
@@ -101,6 +102,8 @@
         </div>
       </section>
 
+      <section id="roleApprovalPanel" class="admin-panel-section"><div class="card"><h2>Pending Role Requests</h2><p class="sub small">Approve club admin, DJ, promoter, venue owner, and advertiser requests.</p><div id="roleRequestsList" class="report-block"></div></div></section>
+
       <section id="partnerIntegrations" class="admin-panel-section">
         <div class="card">
           <h2>Ticketing Partner Opportunities</h2>
@@ -114,8 +117,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=27.1"></script>
-<script src="./shared-data.js?v=27.1"></script>
-<script src="./master-admin-app.js?v=27.1"></script>
+<script src="./firebase-config.js?v=28"></script>
+<script src="./shared-data.js?v=28"></script>
+<script src="./master-admin-app.js?v=28"></script>
 </body>
 </html>

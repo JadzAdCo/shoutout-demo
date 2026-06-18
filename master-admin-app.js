@@ -292,6 +292,11 @@
       </div>`).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
   }
 
+
+  async function renderRoleRequests() { const box = byId("roleRequestsList"); if (!box) return; const requests = await getCollectionSafe("roleRequests", 1000); const pending = requests.filter(x => (x.status || "pending") === "pending"); if (!pending.length) { box.innerHTML = "<p class='sub'>No pending role requests.</p>"; return; } box.innerHTML = pending.map(x => `<div class="queue-item"><strong>${esc((x.requestedRoles || []).join(", "))}</strong><p>${esc(x.displayName || x.email || x.userId)} • ${esc(x.businessName || "")}</p><small>Clubs: ${esc((x.clubs || []).join(", "))} • Events: ${esc((x.events || []).join(", "))}</small><div class="queue-actions"><button type="button" onclick="window.approveRoleRequest('${esc(x.id)}')">Approve</button><button type="button" onclick="window.rejectRoleRequest('${esc(x.id)}')">Reject</button></div></div>`).join(""); }
+  window.approveRoleRequest = async function(id) { await db.collection("roleRequests").doc(id).set({status:"approved", approvedAt:firebase.firestore.FieldValue.serverTimestamp(), approvedBy:auth.currentUser?.email || ""}, {merge:true}); renderRoleRequests(); };
+  window.rejectRoleRequest = async function(id) { await db.collection("roleRequests").doc(id).set({status:"rejected", rejectedAt:firebase.firestore.FieldValue.serverTimestamp(), rejectedBy:auth.currentUser?.email || ""}, {merge:true}); renderRoleRequests(); };
+
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     setText("masterStatus", "Master admin app loaded. Sign in to continue.");
@@ -324,6 +329,7 @@
       setText("masterStatus", check.reason);
       setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
+      renderRoleRequests();
     });
   });
 })();
