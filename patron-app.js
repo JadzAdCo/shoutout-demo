@@ -263,6 +263,26 @@
   }
   async function verifyPhoneCode() { try { if (!confirmationResult) { setStatus("Send the OTP first."); return; } await confirmationResult.confirm(byId("phoneCode").value.trim()); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
 
+
+  function openGuestListForSelectedLocation() {
+    const id =
+      selectedLocation?.id ||
+      selectedClub?.id ||
+      selectedClub?.locationId ||
+      selectedClub?.clubLocationId ||
+      new URL(window.location.href).searchParams.get("location") ||
+      "";
+
+    const url = new URL("./guest-list.html", window.location.href);
+    if (id) url.searchParams.set("location", id);
+
+    const promoter = new URL(window.location.href).searchParams.get("promoter");
+    if (promoter) url.searchParams.set("promoter", promoter);
+
+    window.location.href = url.toString();
+  }
+
+
   function openCategory(type) {
     showAdSplash(type, () => openCategoryAfterAd(type));
   }

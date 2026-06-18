@@ -29,6 +29,7 @@
 
   function renderSelects() {
     const requestedLocation = qs("location") || "";
+    const requestedPromoter = qs("promoter") || "";
     byId("guestLocation").innerHTML = `<option value="">Select club/location</option>` +
       Object.entries(locations).map(([id, loc]) => `<option value="${esc(id)}">${esc(loc.locationName || loc.name || id)}</option>`).join("");
     if (requestedLocation && locations[requestedLocation]) byId("guestLocation").value = requestedLocation;

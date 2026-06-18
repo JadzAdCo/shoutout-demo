@@ -1243,3 +1243,67 @@ Confirm these still work:
 ## Known Limitation
 
 Friend request approval, inbox, real-time chat, and true end-to-end encrypted chat are not fully implemented in v27. v27 prepares guest-list invitee data structures and friend-based invitee selection for the future `friendships` collection.
+
+
+---
+
+# v27.1 Guest List Routing Fix
+
+## What changed
+
+1. The patron portal now routes **Join Guest List** actions to:
+
+```text
+guest-list.html
+```
+
+instead of the default ShoutOut flow.
+
+2. Guest list links preserve the selected location:
+
+```text
+guest-list.html?location=<clubLocationId>
+```
+
+3. Promoter referral links are preserved when present:
+
+```text
+guest-list.html?location=<clubLocationId>&promoter=<promoterId>
+```
+
+## Patron Access URL
+
+Patrons access their portal here:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=27.1
+```
+
+## Guest List Direct URLs
+
+Zebbies Garden DC:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=27.1
+```
+
+Shôko Barcelona:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=27.1
+```
+
+Christie Cannes:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=christie-cannes-france&v=27.1
+```
+
+## Test
+
+1. Open patron portal.
+2. Sign in.
+3. Choose Clubs.
+4. Select a venue.
+5. Click **Join Guest List**.
+6. Confirm that the app opens `guest-list.html` and not the ShoutOut editor.
