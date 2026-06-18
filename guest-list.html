@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Jadz AdCo Guest List</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Guest List</p>
+        <h1>Join a club guest list</h1>
+        <p class="sub">Select a club, event/day, and the promoter or promoting group that referred you.</p>
+        <p id="guestSignedInAs" class="status">Not signed in</p>
+        <p id="guestStatus" class="status">Loading guest list app...</p>
+      </div>
+    </header>
+
+    <div id="guestLogin" class="card">
+      <h2>Sign in first</h2>
+      <button id="guestGoogleLoginBtn" type="button">Continue with Google</button>
+    </div>
+
+    <div id="guestFormCard" class="card hidden">
+      <h2>Guest list request</h2>
+      <div class="profile-grid">
+        <label>Club / Location *<select id="guestLocation"></select></label>
+        <label>Event or Day *
+          <select id="guestEventOrDay">
+            <option value="">Select event/day</option>
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option>
+            <option>Friday</option><option>Saturday</option><option>Sunday</option><option>Future Event</option>
+          </select>
+        </label>
+        <label>Promoter / Promoting Group *<select id="guestPromoter"></select></label>
+        <label>First Name *<input id="guestFirstName" placeholder="First name as shown on ID"/></label>
+        <label>Last Name *<input id="guestLastName" placeholder="Last name as shown on ID"/></label>
+        <label>Phone number<input id="guestPhone" placeholder="+12025550123"/></label>
+        <label>Email<input id="guestEmail" placeholder="name@example.com"/></label>
+        <label>Party size *<input id="guestPartySize" type="number" min="1" max="50" value="1" readonly/></label>
+        <label>Notes<input id="guestNotes" placeholder="Birthday, VIP, arriving at 11pm, etc."/></label>
+      </div>
+
+      <div id="additionalGuestsCard" class="card soft-card">
+        <h3>Additional invitees</h3>
+        <p class="sub small">Every person on the guest list should match the government-issued photo ID they will present at the venue entrance.</p>
+        <div id="additionalGuestsList"></div>
+        <div class="button-row">
+          <button id="addManualGuestBtn" type="button">Add Invitee Manually</button>
+          <button id="addFriendGuestBtn" type="button">Add Friend From App</button>
+        </div>
+        <label id="friendPickerWrap" class="hidden">Select friend
+          <select id="friendPicker"></select>
+        </label>
+      </div>
+
+      <label class="consent-line">
+        <input id="legalNameConfirm" type="checkbox"/>
+        I confirm the First Name and Last Name for me and my invitees exactly match the government-issued photo IDs that will be presented at venue entry.
+      </label>
+
+      <button id="submitGuestListBtn" class="primary" type="button">Submit Guest List Request</button>
+      <button id="guestLogoutBtn" class="ghost" type="button">Sign out</button>
+    </div>
+
+    <div id="guestReceipt" class="card hidden">
+      <h2>Guest list submitted</h2>
+      <div id="guestReceiptBody" class="report-block"></div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=27"></script>
+<script src="./shared-data.js?v=27"></script>
+<script src="./guest-list-app.js?v=27"></script>
+</body>
+</html>

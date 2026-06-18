@@ -24,3 +24,12 @@
 .account-status-card{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
 .account-status-card strong{display:block;font-size:18px}
 @media(max-width:720px){.account-status-card{display:block}.account-status-card button{margin-top:12px;width:100%}}
+
+/* v26 promoter guest list additions */
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}
+
+/* v27 guest invitee rows */
+.soft-card{background:rgba(255,255,255,.05);margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:18px}
+.invitee-row{align-items:end;border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:rgba(0,0,0,.12)}
+.consent-line{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:16px;padding:14px;margin:16px 0;background:rgba(0,0,0,.16)}
+.consent-line input{width:auto;margin-top:3px}

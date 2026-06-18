@@ -44,6 +44,7 @@
         <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
         <button class="admin-tab" data-panel="panelAnalytics" type="button">Analytics</button>
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
+        <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
         <button class="admin-tab" data-panel="panelReports" type="button">Reports</button>
       </nav>
@@ -106,6 +107,12 @@
         </div>
       </section>
 
+      <section id="panelGuestLists" class="admin-panel-section">
+        <div class="admin-grid">
+          <div class="card"><h2>Guest List Requests</h2><div id="clubGuestListReport" class="report-block"></div></div>
+          <div class="card"><h2>Promoter Performance</h2><div id="clubPromoterReport" class="report-block"></div></div>
+        </div>
+      </section>
       <section id="panelReconciliation" class="admin-panel-section">
         <div class="card">
           <h2>Account Reconciliation</h2>
@@ -127,8 +134,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=25.9"></script>
-<script src="./shared-data.js?v=25.9"></script>
-<script src="./admin-app.js?v=25.9"></script>
+<script src="./firebase-config.js?v=27"></script>
+<script src="./shared-data.js?v=27"></script>
+<script src="./admin-app.js?v=27"></script>
 </body>
 </html>

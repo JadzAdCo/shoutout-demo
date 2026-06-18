@@ -445,3 +445,81 @@ window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS = [
   Re-enable this in production after corporate-domain authentication is stable.
 */
 window.SHOUTOUT_MASTER_ADMIN_ENFORCE_DOMAINS = false;
+
+
+/* v26 promoter registry */
+window.SHOUTOUT_PROMOTERS = {
+  "jadz-demo-promotions": {
+    id: "jadz-demo-promotions",
+    name: "Jadz Demo Promotions",
+    promoterGroup: "Jadz Demo Promotions",
+    contactEmail: "promoters@jadzadco.com",
+    active: true,
+    locations: ["*"]
+  },
+  "zebbies-street-team": {
+    id: "zebbies-street-team",
+    name: "Zebbies Street Team",
+    promoterGroup: "Zebbies Street Team",
+    contactEmail: "promoters@zebbies.example",
+    active: true,
+    locations: ["zebbies-garden-washington-dc"]
+  },
+  "shoko-global-promotions": {
+    id: "shoko-global-promotions",
+    name: "Shôko Global Promotions",
+    promoterGroup: "Shôko Global Promotions",
+    contactEmail: "promoters@shoko.example",
+    active: true,
+    locations: ["shoko-barcelona-spain"]
+  },
+  "cannes-nightlife-group": {
+    id: "cannes-nightlife-group",
+    name: "Cannes Nightlife Group",
+    promoterGroup: "Cannes Nightlife Group",
+    contactEmail: "promoters@cannes.example",
+    active: true,
+    locations: ["christie-cannes-france"]
+  }
+};
+
+window.SHOUTOUT_PROMOTER_ADMINS = {
+  "bans.don@gmail.com": ["*"],
+  "don.b@jadzholdings.com": ["*"]
+};
+
+
+/*
+  v27 Localization / Translation Policy
+  These product and brand terms must never be translated.
+  Example: French should say "Envoyer un ShoutOut", not translate ShoutOut.
+*/
+window.SHOUTOUT_PROTECTED_TERMS = [
+  "ShoutOut",
+  "Jadz AdCo",
+  "Jadz Holdings",
+  "Superstar",
+  "Big Baller",
+  "Baller",
+  "Diva",
+  "Money Spender",
+  "Bruv"
+];
+
+window.SHOUTOUT_TRANSLATION_EXAMPLES = {
+  en: "Send a ShoutOut",
+  fr: "Envoyer un ShoutOut",
+  es: "Enviar un ShoutOut",
+  it: "Invia un ShoutOut",
+  de: "Einen ShoutOut senden",
+  el: "Αποστολή ενός ShoutOut"
+};
+
+/* v27 Patron rank thresholds are displayed/configurable by Master Admin later. */
+window.SHOUTOUT_PATRON_RANKS = [
+  { id:"superstar", label:"Superstar", monthlySpend:30000, annualSpend:120000 },
+  { id:"big-baller", label:"Big Baller", monthlySpend:20000, annualSpend:70000 },
+  { id:"baller-diva", label:"Baller / Diva", monthlySpend:10000, annualSpend:50000 },
+  { id:"money-spender", label:"Money Spender", monthlySpend:7500, annualSpend:30000 },
+  { id:"bruv-diva", label:"Bruv / Diva", monthlySpend:5000, annualSpend:20000 }
+];

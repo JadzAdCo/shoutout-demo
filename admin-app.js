@@ -219,15 +219,17 @@
   }
 
   async function loadReports() {
-    const [users, shoutouts, liveDocs, events] = await Promise.all([
+    const [users, shoutouts, liveDocs, events, guestLists] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
-      getCollectionSafe("events")
+      getCollectionSafe("events"),
+      getCollectionSafe("guestListRequests")
     ]);
 
     const locationShoutouts = shoutouts.filter(x => (x.clubLocationId || x.location || x.club) === locationId);
     const locationEvents = events.filter(x => (x.locationId || x.clubLocationId || x.location) === locationId);
+    const clubGuestLists = guestLists.filter(x => (x.clubLocationId || x.location) === locationId);
     const live = liveDocs.find(x => x.id === locationId);
 
     const estimatedShoutOutRevenue = locationShoutouts.length * 10;
@@ -303,6 +305,30 @@
       ["Pending payout", money(venueShare + adShare)],
       ["Reconciliation status", "Prototype — connect Stripe/Square/PayPal later"]
     ]);
+
+
+    const promoterCounts = {};
+    clubGuestLists.forEach(x => {
+      const key = x.promoterName || x.promoterId || "Unknown promoter";
+      promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0};
+      promoterCounts[key].requests += 1;
+      promoterCounts[key].guests += Number(x.totalGuestCount || x.partySize || 0);
+    });
+
+    if (byId("clubGuestListReport")) {
+      byId("clubGuestListReport").innerHTML = clubGuestLists.length ? simpleRows([
+        ["Total guest list requests", clubGuestLists.length.toLocaleString()],
+        ["Total referred guests", clubGuestLists.reduce((s,x) => s + Number(x.totalGuestCount || x.partySize || 0), 0).toLocaleString()],
+        ["Pending requests", clubGuestLists.filter(x => (x.status || "pending") === "pending").length.toLocaleString()]
+      ]) : "<p class='sub'>No guest list requests yet.</p>";
+    }
+
+    if (byId("clubPromoterReport")) {
+      const rows = Object.entries(promoterCounts)
+        .sort((a,b) => b[1].requests - a[1].requests)
+        .map(([promoter,v]) => [promoter, `${v.requests} requests / ${v.guests} guests`]);
+      byId("clubPromoterReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter guest-list data yet.</p>";
+    }
 
     byId("reportsList").innerHTML = `
       <div class="report-list">

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Jadz Promoter Admin</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Promoter Admin</p>
+        <h1>Promoter Referral Dashboard</h1>
+        <p class="sub">Track patron app signup referrals and guest list referrals by period and club.</p>
+        <p id="promoterSignedInAs" class="status">Not signed in</p>
+        <p id="promoterStatus" class="status">Loading promoter admin...</p>
+      </div>
+    </header>
+
+    <div id="promoterLogin" class="card">
+      <h2>Promoter sign-in</h2>
+      <button id="promoterGoogleLoginBtn" type="button">Continue with Google</button>
+    </div>
+
+    <div id="promoterPanel" class="hidden">
+      <div class="card account-status-card">
+        <div>
+          <p class="eyebrow">Account Status</p>
+          <strong id="promoterPanelSignedInAs">Signed in</strong>
+          <p id="promoterAccessSummary" class="sub small">Access pending...</p>
+        </div>
+        <button id="promoterLogoutBtn" class="ghost" type="button">Sign out</button>
+      </div>
+
+      <div class="card">
+        <h2>Reporting Period</h2>
+        <select id="periodFilter">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="biweekly">Biweekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="sixMonths">6 months</option>
+          <option value="oneYear">1 year</option>
+          <option value="twoYears">2 years</option>
+          <option value="fiveYears">5 years</option>
+        </select>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card"><span>Patron Signup Referrals</span><strong id="metricSignupRefs">0</strong></div>
+        <div class="metric-card"><span>Guest List Referrals</span><strong id="metricGuestRefs">0</strong></div>
+        <div class="metric-card"><span>Total Guest Count</span><strong id="metricGuestCount">0</strong></div>
+        <div class="metric-card"><span>Estimated Promoter Credit</span><strong id="metricPromoterCredit">$0</strong></div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="card"><h2>Guest List Referrals by Club</h2><div id="guestByClubReport" class="report-block"></div></div>
+        <div class="card"><h2>Signup Referrals</h2><div id="signupReport" class="report-block"></div></div>
+      </div>
+
+      <div class="card"><h2>Recent Guest List Requests</h2><div id="recentGuestListReport" class="report-block"></div></div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=27"></script>
+<script src="./shared-data.js?v=27"></script>
+<script src="./promoter-admin-app.js?v=27"></script>
+</body>
+</html>

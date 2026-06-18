@@ -802,3 +802,444 @@ https://jadzadco.github.io/shoutout-demo/master-admin.html?v=25.9
 ## Production recommendation
 
 For Microsoft redirect sign-in on GitHub Pages, Firebase recommends one of the redirect best-practice options, such as using Firebase Hosting/custom auth domain or proxying the auth helper path, because redirect sign-in relies on a Firebase Auth helper iframe that can be affected by third-party storage restrictions.
+
+
+---
+
+# v26 Guest List + Promoter Referral System
+
+## Major Additions
+
+### Guest List Intake
+
+New files:
+
+```text
+guest-list.html
+guest-list-app.js
+```
+
+Supports:
+
+- Club/location selection
+- Event/day selection
+- Required promoter/promoting group selection
+- Guest name, phone, email, party size, notes
+- Firestore submission to `guestListRequests`
+
+Example:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=26
+```
+
+### Promoter Admin Panel
+
+New files:
+
+```text
+promoter-admin.html
+promoter-admin-app.js
+```
+
+Reports include:
+
+- Patron app signup referrals
+- Guest list referrals
+- Total referred guests
+- Estimated promoter credit
+- Referrals by club
+- Recent guest list requests
+
+Supported reporting periods:
+
+- Daily
+- Weekly
+- Biweekly
+- Monthly
+- 6 months
+- 1 year
+- 2 years
+- 5 years
+
+Example:
+
+```text
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=26
+```
+
+### Club Admin Updates
+
+Club Admin now includes:
+
+```text
+Guest Lists / Promoters
+```
+
+Club admins can view guest list and promoter data linked to their club/location.
+
+### Master Admin Updates
+
+Master Admin now includes:
+
+```text
+Promoters
+```
+
+Master admins can view network-level promoter and guest list data.
+
+### Promoter Registry
+
+`shared-data.js` now includes:
+
+```javascript
+window.SHOUTOUT_PROMOTERS
+window.SHOUTOUT_PROMOTER_ADMINS
+```
+
+### Patron Signup Referral Tracking
+
+If a patron arrives with:
+
+```text
+?promoter=<promoterId>
+```
+
+the app can store:
+
+```text
+referredByPromoterId
+```
+
+on profile completion.
+
+## Firestore Rules Needed
+
+Add:
+
+```javascript
+match /guestListRequests/{id} {
+  allow create: if request.auth != null;
+  allow read, update, delete: if request.auth != null;
+}
+```
+
+## Test URLs
+
+Guest List - Zebbies DC:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=26
+```
+
+Guest List - Shôko Barcelona:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=26
+```
+
+Promoter Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=26
+```
+
+Club Admin - Zebbies DC:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=26
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=26
+```
+
+## Access Intent
+
+- Promoter admin sees assigned promoter data.
+- Club admin sees guest-list/promoter data linked to that club.
+- Master admin sees network-wide data.
+
+## Future Production Recommendation
+
+Move access control into:
+
+```text
+adminRoles
+promoters
+promoterAdmins
+promoterPayouts
+guestListCheckIns
+```
+
+or Firebase custom claims.
+
+
+---
+
+# v27 Legal Guest Lists + Protected Translation Terms
+
+## New in v27
+
+1. Guest list primary guest now uses:
+   - First Name
+   - Last Name
+   - Full Name
+
+2. The form includes a required legal-name confirmation:
+
+```text
+I confirm the First Name and Last Name for me and my invitees exactly match the government-issued photo IDs that will be presented at venue entry.
+```
+
+3. Additional invitees are now supported.
+
+Patrons can:
+- Add invitees manually
+- Add accepted app friends later from the `friendships` collection
+
+4. Guest list records now store:
+
+```text
+primaryGuest
+additionalGuests
+firstName
+lastName
+fullName
+totalGuestCount
+legalNameConfirmed
+```
+
+5. Translation policy added.
+
+Protected terms must never be translated:
+
+```text
+ShoutOut
+Jadz AdCo
+Jadz Holdings
+Superstar
+Big Baller
+Baller
+Diva
+Money Spender
+Bruv
+```
+
+Examples:
+
+```text
+French: Envoyer un ShoutOut
+German: Einen ShoutOut senden
+Italian: Invia un ShoutOut
+Spanish: Enviar un ShoutOut
+```
+
+6. New reference page:
+
+```text
+translation-policy.html
+```
+
+## Firestore Rules Needed
+
+Add:
+
+```javascript
+match /guestListRequests/{id} {
+  allow create: if request.auth != null;
+  allow read, update, delete: if request.auth != null;
+}
+
+match /friendships/{id} {
+  allow read, write: if request.auth != null;
+}
+
+match /friendRequests/{id} {
+  allow read, write: if request.auth != null;
+}
+```
+
+## Test URLs
+
+Guest List — Zebbies Garden DC:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=27
+```
+
+Guest List — Shôko Barcelona:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=27
+```
+
+Promoter Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=27
+```
+
+Club Admin — Zebbies Garden DC:
+
+```text
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=27
+```
+
+Master Admin:
+
+```text
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=27
+```
+
+Translation Policy:
+
+```text
+https://jadzadco.github.io/shoutout-demo/translation-policy.html?v=27
+```
+
+# Comprehensive Testing Plan
+
+## A. Upload / Cache Test
+
+1. Upload all package files to GitHub Pages.
+2. Open each page with `?v=27`.
+3. Hard refresh with Ctrl+Shift+R.
+4. Confirm no page is stuck on `Loading...`.
+
+## B. Guest List Intake Test
+
+1. Open:
+
+```text
+guest-list.html?location=zebbies-garden-washington-dc&v=27
+```
+
+2. Sign in with Google.
+3. Confirm First Name and Last Name auto-fill from profile or Google display name.
+4. Select Event/Day.
+5. Select Promoter / Promoting Group.
+6. Add one manual invitee.
+7. Confirm Party Size updates from 1 to 2.
+8. Try submitting without legal-name confirmation; submission should fail.
+9. Check legal-name confirmation.
+10. Submit.
+11. Confirm receipt shows:
+   - Reference
+   - Club
+   - Event / Day
+   - Promoter
+   - Primary Guest
+   - Additional Invitees
+   - Party Size
+   - Pending status
+
+## C. Firestore Guest List Record Test
+
+In Firebase Console, check:
+
+```text
+guestListRequests
+```
+
+Confirm record includes:
+
+```text
+primaryGuest.firstName
+primaryGuest.lastName
+primaryGuest.fullName
+additionalGuests[]
+totalGuestCount
+legalNameConfirmed: true
+promoterId
+clubLocationId
+submittedByUid
+```
+
+## D. Club Admin Guest List / Promoter Test
+
+1. Open:
+
+```text
+admin.html?location=zebbies-garden-washington-dc&v=27
+```
+
+2. Sign in with approved admin Google account.
+3. Open `Guest Lists / Promoters` tab.
+4. Confirm guest list totals appear for Zebbies only.
+5. Confirm promoter performance appears.
+6. Confirm Shôko or Christie records do not appear on Zebbies admin.
+
+## E. Promoter Admin Test
+
+1. Open:
+
+```text
+promoter-admin.html?v=27
+```
+
+2. Sign in with an email in `SHOUTOUT_PROMOTER_ADMINS`.
+3. Change report periods:
+   - Daily
+   - Weekly
+   - Biweekly
+   - Monthly
+   - 6 months
+   - 1 year
+   - 2 years
+   - 5 years
+4. Confirm metrics update:
+   - Patron Signup Referrals
+   - Guest List Referrals
+   - Total Guest Count
+   - Estimated Promoter Credit
+
+## F. Master Admin Promoter Test
+
+1. Open:
+
+```text
+master-admin.html?v=27
+```
+
+2. Sign in with master admin Google account.
+3. Open `Promoters` tab.
+4. Confirm network-wide promoter totals appear.
+
+## G. Translation / Protected Terms Test
+
+1. Open:
+
+```text
+translation-policy.html?v=27
+```
+
+2. Confirm examples show:
+
+```text
+Envoyer un ShoutOut
+Einen ShoutOut senden
+Invia un ShoutOut
+Enviar un ShoutOut
+```
+
+3. Use browser auto-translate to French, German, or Italian.
+4. Confirm `ShoutOut` remains visible as `ShoutOut`.
+
+## H. Regression Test
+
+Confirm these still work:
+
+- Patron login
+- Patron profile completion
+- ShoutOut submission
+- Club admin ShoutOut queue
+- Approve and push live
+- Display URL per location
+- Master admin dashboard
+
+## Known Limitation
+
+Friend request approval, inbox, real-time chat, and true end-to-end encrypted chat are not fully implemented in v27. v27 prepares guest-list invitee data structures and friend-based invitee selection for the future `friendships` collection.

@@ -204,6 +204,7 @@
         xHandle: byId("profileX").value.trim(),
         analyticsConsent: byId("profileAnalyticsConsent").checked,
         marketingConsent: byId("profileMarketingConsent").checked,
+        referredByPromoterId: new URL(window.location.href).searchParams.get("promoter") || "",
         profileCompleted: true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };

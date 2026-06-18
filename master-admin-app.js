@@ -180,12 +180,13 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, events] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, events, guestLists] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("clubLocations"),
-      getCollectionSafe("events")
+      getCollectionSafe("events"),
+      getCollectionSafe("guestListRequests")
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
@@ -263,6 +264,21 @@
         ["Jadz near-term approach", "Start with outbound ticket links, then affiliate tracking, then direct checkout/reservation integrations"]
       ])}
       <p class="sub small">Use Events as a discovery layer first. Add affiliate tracking after program approval. Use Jadz-owned VIP/table reservations for higher-margin revenue.</p>`;
+
+
+    if (byId("promoterNetworkReport")) {
+      const promoterCounts = {};
+      guestLists.forEach(x => {
+        const key = x.promoterName || x.promoterId || "Unknown promoter";
+        promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0};
+        promoterCounts[key].requests += 1;
+        promoterCounts[key].guests += Number(x.partySize || 0);
+      });
+      const rows = Object.entries(promoterCounts)
+        .sort((a,b) => b[1].requests - a[1].requests)
+        .map(([promoter,v]) => [promoter, `${v.requests} guest list requests / ${v.guests} guests`]);
+      byId("promoterNetworkReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter referrals yet.</p>";
+    }
 
     byId("allQueueList").innerHTML = pending.length ? pending.map(item => `
       <div class="queue-item">
