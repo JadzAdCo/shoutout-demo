@@ -499,7 +499,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.4";
+      portalLink.href = "./patron-portal.html?v=28.5";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -512,14 +512,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.4";
+      messages.href = "./patron-portal.html?tab=messages&v=28.5";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.4";
+      chats.href = "./patron-portal.html?tab=chats&v=28.5";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -643,10 +643,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.4">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.5">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.4">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.4">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.5">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.5">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -682,6 +682,46 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.4"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.5"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
+})();
+
+/* v28.5 media upload templates override */
+(function(){
+"use strict";
+function byId(id){return document.getElementById(id);}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function editorHost(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
+function templateHost(){return byId("templateList")||byId("templatesList")||document.querySelector(".template-list");}
+function ensureMediaEditor(){
+ const host=editorHost(); if(!host||byId("shoutoutMediaUpload"))return;
+ const box=document.createElement("div"); box.className="card"; box.innerHTML=`<h2>Photo / Video Upload</h2><p class="sub small">Upload image or short video from your phone.</p><label>Upload Image or Video<input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`; host.appendChild(box);
+ byId("shoutoutMediaUpload").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0],prev=byId("shoutoutMediaPreview"); if(!f||!prev)return; const url=URL.createObjectURL(f); const isV=f.type.startsWith("video/"); prev.classList.remove("hidden"); prev.innerHTML=isV?`<video src="${url}" controls playsinline muted loop></video><p>${esc(f.name)}</p>`:`<img src="${url}" alt=""><p>${esc(f.name)}</p>`;});
+}
+async function uploadSelectedMedia(){
+ const input=byId("shoutoutMediaUpload"), file=input&&input.files&&input.files[0]; if(!file)return {mediaUrl:"",mediaType:""};
+ if(!firebase.storage){alert("Firebase Storage SDK is not loaded.");return {mediaUrl:"",mediaType:""};}
+ const user=firebase.auth().currentUser; if(!user)throw new Error("Sign in first.");
+ const safeName=(Date.now()+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
+ const ref=firebase.storage().ref().child(`shoutouts/${user.uid}/${safeName}`);
+ await ref.put(file,{contentType:file.type}); const mediaUrl=await ref.getDownloadURL(); const mediaType=file.type.startsWith("video/")?"video":"image";
+ byId("shoutoutMediaUrl").value=mediaUrl; byId("shoutoutMediaType").value=mediaType; return {mediaUrl,mediaType};
+}
+function ensureTemplates(){
+ const host=templateHost(); if(!host||host.dataset.v285==="1")return; host.dataset.v285="1";
+ const lib=window.SHOUTOUT_MEDIA_TEMPLATE_LIBRARY||{};
+ const wrap=document.createElement("div"); wrap.className="media-template-grid";
+ wrap.innerHTML=Object.values(lib).map(t=>`<button class="media-template-card" data-template-id="${esc(t.id)}" type="button"><div class="template-preview-board tpl-${esc(t.previewStyle)}">${t.supportsVideo?'<div class="video-placeholder">VIDEO</div>':''}${t.supportsImage?'<div class="photo-placeholder">PHOTO</div>':''}<div><strong>${esc(t.mainText||t.name)}</strong><span>${esc(t.subText||t.category)}</span></div></div><h3>${esc(t.name)}</h3><p class="sub small">${esc(t.description||"")}</p></button>`).join("");
+ host.prepend(wrap);
+ wrap.addEventListener("click",e=>{const c=e.target.closest("[data-template-id]"); if(!c)return; wrap.querySelectorAll(".selected").forEach(x=>x.classList.remove("selected")); c.classList.add("selected"); window.selectedTemplate=c.dataset.templateId;});
+}
+function ensureSuggestions(){
+ const host=editorHost(); if(!host||byId("aiSuggestionsBox"))return;
+ const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><p class="sub small">Demo suggestions. Full AI backend comes later.</p><div id="aiSuggestionList"></div>`; host.appendChild(box);
+ const samples=["Happy Birthday! VIP energy all night.","Big ShoutOut to the table making the night unforgettable.","Bottle service vibes. Celebrate loud.","Tonight belongs to the birthday star.","Luxury entrance. Big celebration. Bigger memories."];
+ byId("aiSuggestionList").innerHTML=samples.map(s=>`<button type="button" class="ghost ai-suggestion">${esc(s)}</button>`).join("");
+ byId("aiSuggestionList").onclick=e=>{const b=e.target.closest(".ai-suggestion"); if(!b)return; const inp=byId("mainText")||byId("shoutoutText")||document.querySelector("textarea"); if(inp)inp.value=b.textContent;};
+}
+window.jadzUploadSelectedShoutoutMedia=uploadSelectedMedia;
+document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},1000);setInterval(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},2500);});
 })();

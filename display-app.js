@@ -40,3 +40,14 @@
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });
 })();
+
+/* v28.5 media renderer for Xibo HTML */
+(function(){
+function byId(id){return document.getElementById(id);}
+window.jadzRenderDisplayMedia=function(data){
+ if(!data||!data.mediaUrl)return;
+ let host=byId("mediaHost")||byId("displayMedia")||document.querySelector(".display-media");
+ if(!host){host=document.createElement("div");host.id="mediaHost";host.className="display-media";document.body.appendChild(host);}
+ host.innerHTML=data.mediaType==="video"?`<video src="${data.mediaUrl}" autoplay muted loop playsinline style="max-width:100%;max-height:80vh;border-radius:18px;"></video>`:`<img src="${data.mediaUrl}" alt="" style="max-width:100%;max-height:80vh;border-radius:18px;">`;
+};
+})();

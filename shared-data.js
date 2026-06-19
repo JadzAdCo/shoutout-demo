@@ -585,3 +585,14 @@ window.SHOUTOUT_ROLE_TYPES = {
   dj: 'DJ',
   promoter: 'Promoter'
 };
+
+/* v28.5 media/video template library */
+window.SHOUTOUT_MEDIA_TEMPLATE_LIBRARY = {
+  "classic-black-white": {id:"classic-black-white", name:"Classic Black & White", category:"Classic", supportsImage:true, supportsVideo:false, previewStyle:"classic-board", mainText:"HAPPY BIRTHDAY", subText:"STACY", description:"Black words on a clean white classic board."},
+  "ferrari-f8-vip": {id:"ferrari-f8-vip", name:"Ferrari F8 VIP", category:"Cars", supportsImage:true, supportsVideo:true, previewStyle:"ferrari", mainText:"VIP ARRIVAL", subText:"FERRARI NIGHT", description:"Red exotic-car inspired VIP theme."},
+  "rolls-cullinan-vip": {id:"rolls-cullinan-vip", name:"Rolls-Royce Cullinan VIP", category:"Cars", supportsImage:true, supportsVideo:true, previewStyle:"rolls", mainText:"VIP EXPERIENCE", subText:"TABLE RESERVED", description:"Black-and-gold luxury SUV VIP theme."},
+  "summer-vibes": {id:"summer-vibes", name:"Summer Vibes", category:"Seasonal", supportsImage:true, supportsVideo:true, previewStyle:"summer", mainText:"SUMMER VIBES", subText:"ALL NIGHT", description:"Beach and summer party theme."},
+  "champagne-gold": {id:"champagne-gold", name:"Champagne Gold", category:"VIP", supportsImage:true, supportsVideo:true, previewStyle:"gold", mainText:"CHAMPAGNE", subText:"CELEBRATION", description:"Gold VIP celebration theme."},
+  "neon-party": {id:"neon-party", name:"Neon Party", category:"Nightclub", supportsImage:true, supportsVideo:true, previewStyle:"neon", mainText:"SHOUTOUT", subText:"LIVE TONIGHT", description:"Neon nightclub theme."}
+};
+window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*1024};
