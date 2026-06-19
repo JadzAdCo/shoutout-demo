@@ -41,11 +41,19 @@
 .profile-grid label{display:grid;gap:7px}
 .profile-grid input,.profile-grid select{width:100%}
 
-/* v28.2 fixes */
+/* v28.4 fixes */
 .profile-menu-link,.profile-menu-line{display:block;padding:10px 12px;color:var(--text);font-weight:900;text-decoration:none}.profile-menu-link:hover{text-decoration:underline}.menu-user-row{display:flex;align-items:center;gap:12px;padding:10px 12px}.menu-user-row p{margin:3px 0 0;opacity:.8}.menu-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover}.menu-avatar-fallback{width:42px;height:42px;border-radius:50%;display:inline-grid;place-items:center;font-weight:900;background:linear-gradient(135deg,#ff4fd8,#5eeaff);color:#111}.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}.additional-guest-row{margin:10px 0;padding:10px;border:1px solid rgba(255,255,255,.18);border-radius:18px}
 
-/* v28.3 global notification center */
+/* v28.4 global notification center */
 .jadz-global-status-bar{position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:8px;flex-wrap:wrap;background:rgba(7,10,25,.92);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 10px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .jadz-global-status-bar.hidden{display:none}
 .jadz-global-status-bar a{color:#fff;text-decoration:none;font-weight:900;font-size:12px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.10)}
 .service-action{min-width:160px}
+
+/* v28.4 templates and role request */
+.template.classic-bw,.classic-bw{background:linear-gradient(135deg,#fff,#111);color:#111;border:2px solid #fff}
+.template.summer,.summer{background:linear-gradient(135deg,#00d4ff,#ffe66d,#ff7aa2);color:#101020}
+.template.car,.car{background:linear-gradient(135deg,#111,#555,#d4af37);color:#fff}
+.selected-summary.hidden{display:none}
+.role-request-card{margin-top:18px}
+.profile-grid textarea{width:100%;min-height:90px}

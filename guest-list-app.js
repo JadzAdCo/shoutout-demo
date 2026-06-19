@@ -1,4 +1,4 @@
-/* guest-list-app.js v28.2 */
+/* guest-list-app.js v28.4 */
 (function(){
 "use strict";
 const byId=id=>document.getElementById(id);
@@ -11,7 +11,7 @@ const auth=firebase.auth(), db=firebase.firestore();
 const locations=window.SHOUTOUT_CLUB_LOCATIONS||{}, promoters=window.SHOUTOUT_PROMOTERS||{};
 function bind(id,fn){byId(id)?.addEventListener("click",fn);}
 async function loginGoogle(){try{setText("guestStatus","Opening Google sign-in...");await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){setText("guestStatus",`${e.code||"error"}: ${e.message}`);}}
-async function logout(){await auth.signOut();location.href="./?v=28.3";}
+async function logout(){await auth.signOut();location.href="./?v=28.4";}
 function renderSelects(){
  const rl=qs("location"), rp=qs("promoter");
  byId("guestLocation").innerHTML=`<option value="">Select club/location</option>`+Object.entries(locations).map(([id,l])=>`<option value="${esc(id)}">${esc(l.locationName||l.name||id)}</option>`).join("");

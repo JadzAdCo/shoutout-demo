@@ -524,7 +524,7 @@ window.SHOUTOUT_PATRON_RANKS = [
   { id:"bruv-diva", label:"Bruv / Diva", monthlySpend:5000, annualSpend:20000 }
 ];
 
-/* v28.3 club/location service catalog */
+/* v28.4 club/location service catalog */
 window.SHOUTOUT_DEFAULT_LOCATION_SERVICES = ["shoutout","guestList"];
 window.SHOUTOUT_LOCATION_SERVICES = {
   "zebbies-garden-washington-dc": ["shoutout","guestList","vipReservation","stdEntry"],
@@ -545,3 +545,43 @@ window.SHOUTOUT_SERVICE_LABELS = {
   cabanaBooking: "Cabana Booking"
 };
 window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","scheduled","displayed","archived"];
+
+
+/* v28.4 enhanced templates, AI suggestions, and role request config */
+Object.assign(window.SHOUTOUT_TEMPLATES, {
+  blackwhite: { id:'blackwhite', name:'Classic Black & White', scope:'Shared', className:'classic-bw', category:'Classic' },
+  summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal' },
+  car: { id:'car', name:'Car Meet / Luxury Ride', scope:'Shared', className:'car', category:'Lifestyle' },
+  champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP' },
+  beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach' },
+  graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone' },
+  wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone' },
+  sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle' },
+  luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP' },
+  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business' }
+});
+
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','summer','car','champagne','beach','graduation','wedding','sports','luxury','corporate'];
+
+Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
+  const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];
+  loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]));
+});
+
+window.SHOUTOUT_AI_SUGGESTIONS = [
+  {category:'birthday', main:'HAPPY BIRTHDAY!', sub:'VIP vibes all night long.'},
+  {category:'vip', main:'VIP TABLE IN THE BUILDING', sub:'Champagne ready. Lights up.'},
+  {category:'summer', main:'SUMMER NIGHTS', sub:'Good people. Great music. Better memories.'},
+  {category:'car', main:'LUXURY RIDE CREW', sub:'Pull up clean. Celebrate louder.'},
+  {category:'classic', main:'TONIGHT IS YOUR NIGHT', sub:'Classic style. Big energy.'},
+  {category:'love', main:'LOVE IS IN THE ROOM', sub:'Cheers to the perfect night.'},
+  {category:'graduation', main:'CONGRATS GRAD!', sub:'The future starts tonight.'},
+  {category:'afrobeats', main:'AFROBEATS ENERGY', sub:'From the table to the dance floor.'}
+];
+
+window.SHOUTOUT_ROLE_TYPES = {
+  clubAdmin: 'Club Admin',
+  clubMasterAdmin: 'Club Master Admin',
+  dj: 'DJ',
+  promoter: 'Promoter'
+};

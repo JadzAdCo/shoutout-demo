@@ -68,7 +68,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.3">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.4">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -251,7 +251,14 @@
         <h2>Message</h2>
         <label>Main message<input id="mainText" maxlength="48" value="HAPPY BIRTHDAY MAYA!"/></label>
         <label>Sub message<input id="subText" maxlength="80" value="VIP Table 4 sends love"/></label>
-        <label>Optional image/video URL<input id="mediaUrl" placeholder="https://example.com/photo.jpg or video.mp4"/></label>
+        <label>Upload Photo<input id="shoutoutPhoto" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+        <input id="mediaUrl" type="hidden"/>
+        <p id="uploadStatus" class="status"></p>
+        <div class="button-row">
+          <button id="aiSuggestBtn" type="button">AI Suggest ShoutOut</button>
+          <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
+        </div>
+        <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
         <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
         <p id="submitStatus" class="status"></p>
       </div>
@@ -266,14 +273,16 @@
       <div class="button-row"><button id="startAnotherBtn" class="primary" type="button">Create another ShoutOut</button><button id="chooseAnotherClubBtn" type="button">Choose another location</button><button id="logoutBtn6" type="button">Sign out</button></div>
     </div>
   </section>
+<p class="sub small"><a href="./role-request.html?v=28.4">Request Club Admin / DJ / Promoter Access</a></p>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.3"></script>
-<script src="./shared-data.js?v=28.3"></script>
-<script src="./patron-app.js?v=28.3"></script>
-<script src="./notification-center.js?v=28.3"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="./firebase-config.js?v=28.4"></script>
+<script src="./shared-data.js?v=28.4"></script>
+<script src="./patron-app.js?v=28.4"></script>
+<script src="./notification-center.js?v=28.4"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.3"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.4"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {

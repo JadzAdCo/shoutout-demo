@@ -1,4 +1,4 @@
-/* patron-app.js v28.2 */
+/* patron-app.js v28.4 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -12,6 +12,7 @@
   firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage ? firebase.storage() : null;
 
   let currentUser = null;
   let selectedLocationId = null;
@@ -415,18 +416,71 @@
     const frame=byId("previewFrame");
     if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl:byId("mediaUrl")?.value.trim()||"", template:selectedTemplate}, locationId());
   }
+
+  async function uploadShoutoutPhoto(referenceNumber) {
+    const file = byId("shoutoutPhoto")?.files?.[0];
+    if (!file) return "";
+    if (!storage) throw new Error("Firebase Storage is not initialized. Add firebase-storage-compat.js and enable Storage.");
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Only JPG, PNG, and WEBP images are allowed.");
+    if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8MB or smaller.");
+    setText("uploadStatus", "Uploading photo...");
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `shoutouts/${currentUser.uid}/${referenceNumber}-${Date.now()}-${safeName}`;
+    const ref = storage.ref().child(path);
+    const snap = await ref.put(file, { contentType: file.type, customMetadata: { uploadedBy: currentUser.uid, referenceNumber } });
+    const url = await snap.ref.getDownloadURL();
+    setText("uploadStatus", "Photo uploaded.");
+    return url;
+  }
+
+  function applyAiSuggestion() {
+    const pool = window.SHOUTOUT_AI_SUGGESTIONS || [];
+    const item = pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
+    byId("mainText").value = item.main;
+    byId("subText").value = item.sub;
+    const box = byId("shoutoutSuggestionBox");
+    if (box) { box.classList.remove("hidden"); box.innerHTML = `<strong>AI Suggestion</strong><p>${esc(item.main)} — ${esc(item.sub)}</p>`; }
+    updatePreview();
+  }
+
+  async function loadPastShoutoutsForReuse() {
+    const box = byId("shoutoutSuggestionBox");
+    if (!box || !currentUser) return;
+    box.classList.remove("hidden");
+    box.innerHTML = "Loading past ShoutOuts...";
+    try {
+      const snap = await db.collection("shoutouts").where("submittedBy", "==", safeUser()).limit(10).get();
+      const rows = [];
+      snap.forEach(doc => rows.push({id:doc.id, ...doc.data()}));
+      if (!rows.length) { box.innerHTML = "<p>No previous ShoutOuts found yet.</p>"; return; }
+      box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||"")}</button>`).join("");
+      box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
+        const s = rows[Number(btn.dataset.i)];
+        byId("mainText").value = s.mainText || "";
+        byId("subText").value = s.subText || "";
+        if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
+        updatePreview();
+      }));
+    } catch(e) { box.innerHTML = `<p>${esc(e.message)}</p>`; }
+  }
+
   async function submitShoutout() {
     const status=byId("submitStatus");
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
       const l=getLocation(), t=getTemplate();
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", mediaUrl:byId("mediaUrl").value.trim(), status:"pending", submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber:`SO-${Date.now().toString().slice(-7)}` };
-      await db.collection("shoutouts").add(payload);
+      const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
+      const uploadedMediaUrl = await uploadShoutoutPhoto(referenceNumber);
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", mediaUrl:uploadedMediaUrl || byId("mediaUrl").value.trim(), status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const shoutoutRef = await db.collection("shoutouts").add(payload);
+      await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
+      if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       setText("confirmRef",payload.referenceNumber); setText("confirmClub",l.locationName); setText("confirmTemplate",t.name); showPage("confirmationPage");
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; showTemplateSelection(); }
+  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; showTemplateSelection(); }
 
 
   function ensureProfileMenuEnhancements(user) {
@@ -445,7 +499,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.3";
+      portalLink.href = "./patron-portal.html?v=28.4";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -458,14 +512,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.3";
+      messages.href = "./patron-portal.html?tab=messages&v=28.4";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.3";
+      chats.href = "./patron-portal.html?tab=chats&v=28.4";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -529,7 +583,7 @@
     bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
     bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", applyAiSuggestion); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);
@@ -546,7 +600,7 @@
 
 
 
-/* v28.2 override: patron menu + guest-list routing */
+/* v28.4 override: patron menu + guest-list routing */
 (function(){
   function byId(id){ return document.getElementById(id); }
   function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
@@ -589,10 +643,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.3">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.4">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.3">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.3">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.4">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.4">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -621,13 +675,13 @@
   }, 250);
 })();
 
-/* v28.3 override: club service isolation + inbox notification */
+/* v28.4 override: club service isolation + inbox notification */
 (function(){
 function qs(n){return new URL(location.href).searchParams.get(n)||"";}
 function currentLoc(){return window.selectedLocationId||window.locationId?.()||qs("location")||qs("club")||"zebbies-garden-washington-dc";}
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.3"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.4"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
