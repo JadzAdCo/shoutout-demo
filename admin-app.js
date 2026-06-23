@@ -192,7 +192,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=28.24-f"
+        link:"./patron-portal.html?tab=shoutouts&v=28.25-nf"
       });
     } catch(e) {}
   }

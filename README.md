@@ -1,117 +1,81 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.24-f SMS OTP Button Text Fix Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.25-nf Profile Templates + Messaging Rules Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.24-f
+https://jadzadco.github.io/shoutout-demo/?v=28.25-nf
 ```
 
 Current release highlights:
 
-- Fix package. `-f` means fix release.
-- Changed SMS OTP button text from `Continue using SMS OTP` to `Continue with SMS OTP`.
-- No behavior changes from v28.23-nf.
 - New feature package. `-nf` means new feature release.
-- SMS sign-in prompt now reads `Or use One Time Password (OTP) via SMS`.
-- Added a full-width `Continue with SMS OTP` button styled with the same sign-in button system.
-- SMS OTP phone entry is hidden until the patron chooses `Continue with SMS OTP`.
-- SMS OTP section now includes a country code dropdown and a separate local phone number input.
-- The app combines country code plus phone number before sending the Firebase SMS OTP.
-- reCAPTCHA is initialized only when the SMS OTP panel is opened or when Send OTP is used.
-- Stable rollback baseline remains `v28.22-s`.
-- Stable baseline package. `-s` means stable release.
-- This package preserves the verified working authentication state: Google, Microsoft, Facebook, and SMS.
-- Use this package as the known-good rollback baseline before future fix (`-f`) or new-feature (`-nf`) packages.
-- Microsoft sign-in now tries popup first and falls back to full-page redirect if the popup is blocked, closed, or cancelled.
-- Patron, Club Admin, Master Admin, and `auth-debug.html` now use the safer Microsoft popup/redirect fallback path.
-- Patron, Club Admin, Master Admin, and Auth Debug now process Microsoft redirect results on return to the app.
-- Microsoft authentication errors now show clearer troubleshooting messages for disabled provider, unauthorized domain, invalid OAuth config, and existing account conflicts.
-- `auth-debug.html` remains the first test page for isolating Firebase/Microsoft provider issues from app role logic.
-- Emojis and special characters are now preserved in Classic Black & White preview/display text.
-- Classic board text cleanup now removes only control characters instead of stripping symbols.
-- Board wrapping and sizing now count visible Unicode characters better, so emojis do not count as two normal letters.
-- Added emoji-capable font fallbacks for display rendering, including `Segoe UI Emoji`, `Apple Color Emoji`, and `Noto Color Emoji`.
-- Mobile Classic Black & White rows now keep the same auto-fit font sizing logic as desktop.
-- Removed the default `STACY` text from the Traditional Black & White template thumbnail and default template data.
-- Replaced the free-form second message input with an optional `Post my name or handle` attribution control.
-- Attribution can use display name, username, or Instagram handle; username/Instagram are normalized with an `@` prefix.
-- Classic Black & White main message is capped at 36 characters, matching three rows of roughly 12 characters each.
-- Classic Black & White display now auto-wraps the main message across up to three board rows.
-- Classic Black & White board letters now auto-size per row based on character count.
-- Classic Black & White letters are larger and remain bold with the physical cut-out shadow effect.
-- AI-generated ShoutOut text now fills the main message only; attribution remains controlled by the patron.
-- Text-only template submissions no longer carry stale second-line or media values unless attribution is selected.
-- Left-aligned the Screen 2 `Or` divider before `Throw a ShoutOut`.
-- Added browser/device context detection for mobile, tablet, desktop, touch support, operating system, viewport changes, orientation changes, and browser language.
-- Simplified the template selection page so it shows the template search input and the default Traditional Black & White template first.
-- Template search now uses contextual/fuzzy matching instead of basic exact substring matching.
-- Tapping or keyboard-selecting a template now opens the editor directly.
-- Removed the old selected-template / continue panel from the template selection page.
-- The editor now shows media upload only when the selected template supports media.
-- Traditional Black & White and other text-only templates no longer show image/video upload inputs.
-- Image-only templates use image-only upload acceptance; image/video templates use image/video upload acceptance.
-- Text-only template submissions clear stale media values so old uploads cannot accidentally attach to the wrong template.
-- Fixed the top-right profile dropdown `Sign out` button after the profile menu is rebuilt.
-- Removed the redundant linked category text after `Search for` on Screen 2.
-- Kept the actual category buttons as the primary Screen 2 search choices.
-- Added an `Or` divider before `Throw a ShoutOut` so patrons are guided to search activities or throw a ShoutOut.
-- Preserved the v28.17-f navigation cleanup, Messages-only notification treatment, media pipeline fix, and Classic Black & White template refinements.
+- Added a `Public Profile` tab in the patron portal.
+- Added role profile templates for Patron, Promoter, DJ, and Waiter / Waitress / Bottle Girl.
+- Expanded patron profile fields for music interests, travel interests, general hobbies, nightlife style, looking-to-meet preference, bio, public profile type, and profile visibility.
+- Added 10 patron profile media slots: 8 photo slots and 2 short-video slots.
+- Profile media uploads to Firebase Storage under `profileMedia/{uid}/images` and `profileMedia/{uid}/videos`.
+- Saved profile media metadata to `users/{uid}.profileMediaSlots`.
+- Added a public profile preview card that renders the patron or role template with media, bio, interests, and privacy visibility context.
+- Corrected Role-Based Direct Message logic: patron-to-patron direct inbox messages are blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.
+- Updated Inbox to display sender, timestamp, subject, read/unread state, and body.
+- Inbox messages are marked read only when the user opens the message envelope.
+- System notifications are normalized as internal inbox messages with sender `System Message`.
+- Added Chat rules copy: Chat is separate from Inbox, Master Admin is excluded from member chat, patron-to-patron chat requires mutual follow, and role-to-patron chat must be tied to a patron-originated action.
+- Bumped active cache-busting query strings to `v=28.25-nf`.
 
-- Removed the duplicate generic `← Back` button from patron workflow pages.
-- Kept page-specific navigation such as `← Back to categories`, `← Back to club search`, and `← Back to template selection`.
-- Added missing workflow labels so each patron workflow page is easier to reference during troubleshooting.
-- Removed the bottom Messages / Chats / Notifications status bar.
-- Notifications now roll into `Messages`; there is no separate patron-facing Notifications label.
-- Consolidates the v28.16 media upload/display pipeline fix and the Classic Black & White board sizing refinement into one fix package.
-- Version suffix convention starts here: `-f` means fix release, `-nf` means new feature release.
-- Refined the Classic Black & White display with a larger white center board.
-- Increased Classic Black & White text size and weight while keeping it inside the board.
-- Reduced excess red/black header space above the white board.
-- Fixed the ShoutOut media upload/display pipeline for image and video templates.
-- Patron submit now awaits the visible Photo/Video uploader before creating the Firestore ShoutOut.
-- ShoutOut documents now carry `mediaUrl`, `mediaType`, `mediaFileName`, `mediaStoragePath`, and `mediaUploadedAt`.
-- Admin approval now copies the same media fields into `liveContent/{clubLocationId}`.
-- Display rendering now uses `mediaType` to render uploaded images or autoplay muted looping videos.
-- Placeholder `IMAGE / VIDEO` only appears when no uploaded media URL exists.
-- Fixed Classic Black & White preview text alignment so rows sit inside the white board.
-- Forced the Classic Black & White subtitle into the same three-row board renderer instead of floating separately.
-- Reduced and constrained board letter sizing for iframe previews and mobile screens.
-- Updated the Classic Black & White ShoutOut template text layout.
-- Classic Black & White now renders patron text only inside the white center board.
-- Birthday-style text auto-breaks into physical board rows, for example `HAPPY / BIRTHDAY / D`.
-- Added three board rows, faint horizontal guide rails, bold uppercase cut-out lettering, and subtle letter depth/shadow.
-- Preview iframe and final display use the same `display.html` renderer and layout.
-- Added a reusable Back button to the patron app workflow pages for easier navigation.
-- Added Back navigation to the patron portal and role request page.
-- Removed the public role-request link from the main search/ShoutOut workflow.
-- Kept Club Admin / DJ / Promoter access requests available only from the patron portal profile area.
-- Fixed the role request form submit logic so it uses the current form field IDs and can submit DJ/Promoter/Club Admin opt-in requests.
-- Fixed avatar dropdown anchor link colors so My Profile, Messages, and Chats stay white.
-- Added CSS for link, visited, hover, active, and focus states in the user menu dropdown.
-- Updated ShoutOut templates and display preview styling.
-- Traditional Black & White now uses a tighter full-sign marquee board direction.
-- Removed unnecessary brand/footer text from the display preview.
-- Added clearly labeled image/video placeholder template options.
-- Added 50/50 media/text layout support for image/video templates.
-- Added a simplified searchable template selection screen.
-- Default ShoutOut template is now Traditional Black & White.
-- Removed the Country, State / Region / Province, City, and Music Genre dropdown filters from the search display page.
-- Kept the single contextual search box as the primary patron search workflow.
-- Updated search helper text and placeholder examples for natural-language search.
-- Clean `Throw a ShoutOut` button on Club Options.
-- Removed timer-based ShoutOut button injection patches.
-- Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.24-f`.
-- No Firestore, Storage, Firebase config, or rules changes required.
+Firebase / Firestore / Storage impact:
+
+- Firebase config: no changes.
+- Firestore rules: no rules included in this package, but production enforcement is required before launch.
+- Firestore indexes: none added.
+- Storage rules: no rules included in this package, but profile-media uploads require authenticated users to write their own `profileMedia/{uid}/...` paths.
+- New/expanded Firestore fields on `users/{uid}` include `publicProfileType`, `publicProfileVisibility`, `musicInterests`, `travelInterests`, `hobbies`, `nightlifeStyle`, `lookingToMeet`, `bio`, and `profileMediaSlots`.
+- Existing `messages` and `inboxNotifications` documents may receive `read`, `readAt`, `openedAt`, and `firstOpenedAt` when opened by the recipient.
+
+Install / upload steps:
+
+1. Extract `shoutoutwepp,vers-28.25-nf-full-package.zip`.
+2. Upload the extracted files to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+3. Replace existing files.
+4. Commit with:
+
+```text
+Upload v28.25-nf profile templates and messaging rules package
+```
+
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.25-nf
+```
+
+Manual test checklist:
+
+1. Sign in and open `My Profile`.
+2. Open the `Public Profile` tab.
+3. Confirm role template cards appear for Patron, Promoter, DJ, and Hospitality.
+4. Save music, travel, hobbies, nightlife style, looking-to-meet, and bio fields.
+5. Upload one photo slot and one short-video slot.
+6. Confirm `users/{uid}.profileMediaSlots` contains saved media metadata.
+7. Open Messages and confirm inbox items show sender, timestamp, subject, read/unread state, and body only after opening.
+8. Confirm system notifications display sender as `System Message`.
+9. Confirm standard Patron accounts cannot send direct inbox messages.
+10. Confirm Chat rules explain mutual-follow and patron-originated-action requirements.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.24-f because this stable package does not require Firestore/Storage rules, index, or config changes.
-- Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
-
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.24-f-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Database rollback: no migration is required, but profile media fields can be ignored or manually removed from `users/{uid}` if needed.
+- Storage rollback: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if the feature is rolled back.
+- Helper script: `rollback-v28-25-nf.ps1`.
 ---
 
 # Jadz AdCo ShoutOut v24 Admin Analytics + Master Admin Package
