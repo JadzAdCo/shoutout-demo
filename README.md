@@ -1,15 +1,26 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.15 Classic Board Preview Alignment Fix
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.16-f Consolidated Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.15
+https://jadzadco.github.io/shoutout-demo/?v=28.16-f
 ```
 
 Current release highlights:
 
+- Consolidates the v28.16 media upload/display pipeline fix and the Classic Black & White board sizing refinement into one fix package.
+- Version suffix convention starts here: `-f` means fix release, `-nf` means new feature release.
+- Refined the Classic Black & White display with a larger white center board.
+- Increased Classic Black & White text size and weight while keeping it inside the board.
+- Reduced excess red/black header space above the white board.
+- Fixed the ShoutOut media upload/display pipeline for image and video templates.
+- Patron submit now awaits the visible Photo/Video uploader before creating the Firestore ShoutOut.
+- ShoutOut documents now carry `mediaUrl`, `mediaType`, `mediaFileName`, `mediaStoragePath`, and `mediaUploadedAt`.
+- Admin approval now copies the same media fields into `liveContent/{clubLocationId}`.
+- Display rendering now uses `mediaType` to render uploaded images or autoplay muted looping videos.
+- Placeholder `IMAGE / VIDEO` only appears when no uploaded media URL exists.
 - Fixed Classic Black & White preview text alignment so rows sit inside the white board.
 - Forced the Classic Black & White subtitle into the same three-row board renderer instead of floating separately.
 - Reduced and constrained board letter sizing for iframe previews and mobile screens.
@@ -38,13 +49,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.15`.
+- Bumped cache-busting query strings to `v=28.16-f`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.15 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
+- Database rollback: no database rollback is needed for v28.16-f because this release does not require Firestore/Storage rules, index, or config changes.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2608,3 +2619,193 @@ Helper script:
 The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
 
 No Firestore or Storage rollback is needed for v28.15.
+
+---
+
+# Jadz AdCo ShoutOut v28.16 Media Upload Display Pipeline Fix
+
+## Package
+
+```text
+jadz-shoutout-v28-16-media-upload-display-pipeline-full-package.zip
+```
+
+## What Changed
+
+- Fixed patron media submissions so the visible Photo/Video uploader is awaited before the Firestore ShoutOut document is created.
+- Saves these fields on submitted ShoutOut documents when media exists:
+
+```text
+mediaUrl
+mediaType
+mediaFileName
+mediaStoragePath
+mediaUploadedAt
+```
+
+- Admin approval now copies those media fields into `liveContent/{clubLocationId}`.
+- Display rendering now uses `mediaType` first:
+  - `image` renders an `<img>`.
+  - `video` renders `<video autoplay muted loop playsinline>`.
+- The `IMAGE / VIDEO` placeholder appears only when no `mediaUrl` exists.
+- Admin preview links now include `mediaType`.
+- Existing text-only ShoutOuts continue to work.
+- Fixed an approval notification bug where approval also created rejected audit/notification entries.
+- Bumped active cache-busting links and scripts to `v=28.16`.
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase config changes.
+
+No Firestore rules changes.
+
+No Firestore indexes added or removed.
+
+No Firebase Storage rules or path changes.
+
+No migration is required. New media metadata fields are added only to new submissions with uploaded media.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Upload the extracted files to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+3. Replace existing files.
+4. Commit with:
+
+```text
+Upload v28.16 media upload display pipeline full package
+```
+
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.16
+```
+
+## Manual Test Checklist
+
+1. Submit a ShoutOut with an image.
+2. Confirm `shoutouts/{id}` contains `mediaUrl` and `mediaType: image`.
+3. Approve it as admin.
+4. Confirm `liveContent/{clubLocationId}` contains the same media fields.
+5. Open `display.html?location=zebbies-garden-washington-dc&v=28.16`.
+6. Confirm the uploaded image appears instead of `IMAGE / VIDEO`.
+7. Repeat with an MP4 video.
+8. Confirm the video autoplays muted and loops.
+9. Submit a text-only media template ShoutOut.
+10. Confirm the placeholder appears only when no media was uploaded.
+
+## Rollback Plan
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.16.
+2. Or upload the previous known-good package, such as v28.15.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.15-rollback-test
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-16.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+Database rollback is normally not needed. If a specific media ShoutOut must be removed, delete or update only that `liveContent/{clubLocationId}` document or the related pending `shoutouts/{id}` document manually.
+
+---
+
+# Jadz AdCo ShoutOut v28.16-f Consolidated Fix Package
+
+## Package
+
+```text
+shoutoutwepp,vers-28.16-f-full-package.zip
+```
+
+## What Changed
+
+- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.16-f` fix release.
+- Adopted release suffix convention: `-f` for fixes and `-nf` for new features.
+- Enlarged the Classic Black & White white center board.
+- Moved the white board upward to reduce excess red/black header space.
+- Enlarged and strengthened the three cut-out letter rows.
+- Preserved the three-row board behavior and birthday split.
+- Preserved the v28.16 media upload/display pipeline fix.
+- Bumped active cache-busting links and scripts to `v=28.16-f`.
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase config changes.
+
+No Firestore rules changes.
+
+No Firestore indexes added or removed.
+
+No Firebase Storage rules or path changes.
+
+No database migration is required. This is a frontend display CSS refinement only.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Upload the extracted files to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+3. Replace existing files.
+4. Commit with:
+
+```text
+Upload v28.16-f consolidated fix package
+```
+
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.16-f
+```
+
+## Manual Test Checklist
+
+1. Open a Classic Black & White display preview.
+2. Confirm the white center board is larger than v28.16.
+3. Confirm the text is larger and bolder.
+4. Confirm text remains fully inside the white board.
+5. Confirm the red/black header space above the board is reduced.
+6. Confirm image/video templates still render uploaded media.
+
+## Rollback Plan
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.16-f.
+2. Or upload the previous known-good package, such as v28.16.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.16-rollback-test
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-16-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+No Firestore or Storage rollback is needed for v28.16-f.

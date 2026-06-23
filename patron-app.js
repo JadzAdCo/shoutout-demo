@@ -516,18 +516,20 @@
   function displayUrl(payload, id=locationId()) {
     const url = new URL("./display.html", window.location.href);
     url.searchParams.set("location", id);
-    if(payload){ url.searchParams.set("main",payload.mainText||""); url.searchParams.set("sub",payload.subText||""); url.searchParams.set("template",payload.template||"neon"); url.searchParams.set("media",payload.mediaUrl||""); }
+    if(payload){ url.searchParams.set("main",payload.mainText||""); url.searchParams.set("sub",payload.subText||""); url.searchParams.set("template",payload.template||"neon"); url.searchParams.set("media",payload.mediaUrl||""); url.searchParams.set("mediaType",payload.mediaType||""); }
     return url.href;
   }
   function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} • Template: ${t.name}`); updatePreview(); showPage("editorPage"); }
   function updatePreview() {
     const frame=byId("previewFrame");
-    if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl:byId("mediaUrl")?.value.trim()||"", template:selectedTemplate}, locationId());
+    const mediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
+    const mediaType = byId("shoutoutMediaType")?.value.trim() || "";
+    if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl, mediaType, template:selectedTemplate}, locationId());
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
     const file = byId("shoutoutPhoto")?.files?.[0];
-    if (!file) return "";
+    if (!file) return {};
     if (!storage) throw new Error("Firebase Storage is not initialized. Add firebase-storage-compat.js and enable Storage.");
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Only JPG, PNG, and WEBP images are allowed.");
     if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8MB or smaller.");
@@ -538,7 +540,25 @@
     const snap = await ref.put(file, { contentType: file.type, customMetadata: { uploadedBy: currentUser.uid, referenceNumber } });
     const url = await snap.ref.getDownloadURL();
     setText("uploadStatus", "Photo uploaded.");
-    return url;
+    return {
+      mediaUrl: url,
+      mediaType: "image",
+      mediaFileName: file.name,
+      mediaStoragePath: path,
+      mediaUploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  async function uploadShoutoutMedia(referenceNumber) {
+    if (window.jadzUploadSelectedShoutoutMedia && byId("shoutoutMediaUpload")?.files?.[0]) {
+      setText("uploadStatus", "Uploading media...");
+      const media = await window.jadzUploadSelectedShoutoutMedia(referenceNumber);
+      if (media?.mediaUrl) {
+        setText("uploadStatus", `${media.mediaType === "video" ? "Video" : "Image"} uploaded.`);
+        return media;
+      }
+    }
+    return uploadShoutoutPhoto(referenceNumber);
   }
 
   function applyAiSuggestion() {
@@ -567,6 +587,8 @@
         byId("mainText").value = s.mainText || "";
         byId("subText").value = s.subText || "";
         if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
+        if (s.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = s.mediaUrl;
+        if (s.mediaType && byId("shoutoutMediaType")) byId("shoutoutMediaType").value = s.mediaType;
         updatePreview();
       }));
     } catch(e) { box.innerHTML = `<p>${esc(e.message)}</p>`; }
@@ -579,8 +601,17 @@
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
       const l=getLocation(), t=getTemplate();
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
-      const uploadedMediaUrl = await uploadShoutoutPhoto(referenceNumber);
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", mediaUrl:uploadedMediaUrl || byId("mediaUrl").value.trim(), status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const uploadedMedia = await uploadShoutoutMedia(referenceNumber);
+      const existingMediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
+      const existingMediaType = byId("shoutoutMediaType")?.value.trim() || "";
+      const mediaPayload = {
+        mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
+        mediaType: uploadedMedia.mediaType || existingMediaType || "",
+        mediaFileName: uploadedMedia.mediaFileName || "",
+        mediaStoragePath: uploadedMedia.mediaStoragePath || "",
+        mediaUploadedAt: uploadedMedia.mediaUploadedAt || null
+      };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
@@ -588,7 +619,7 @@
       setText("confirmRef",payload.referenceNumber); setText("confirmClub",l.locationName); setText("confirmTemplate",t.name); showPage("confirmationPage");
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; showTemplateSelection(); }
+  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
 
 
   function ensureProfileMenuEnhancements(user) {
@@ -607,7 +638,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.15";
+      portalLink.href = "./patron-portal.html?v=28.16-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -620,14 +651,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.15";
+      messages.href = "./patron-portal.html?tab=messages&v=28.16-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.15";
+      chats.href = "./patron-portal.html?tab=chats&v=28.16-f";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -749,10 +780,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.15">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.16-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.15">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.15">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.16-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.16-f">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -788,7 +819,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.15"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.16-f"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -804,14 +835,15 @@ function ensureMediaEditor(){
  const box=document.createElement("div"); box.className="card"; box.innerHTML=`<h2>Photo / Video Upload</h2><p class="sub small">Upload image or short video from your phone.</p><label>Upload Image or Video<input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`; host.appendChild(box);
  byId("shoutoutMediaUpload").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0],prev=byId("shoutoutMediaPreview"); if(!f||!prev)return; const url=URL.createObjectURL(f); const isV=f.type.startsWith("video/"); prev.classList.remove("hidden"); prev.innerHTML=isV?`<video src="${url}" controls playsinline muted loop></video><p>${esc(f.name)}</p>`:`<img src="${url}" alt=""><p>${esc(f.name)}</p>`;});
 }
-async function uploadSelectedMedia(){
+async function uploadSelectedMedia(referenceNumber){
  const input=byId("shoutoutMediaUpload"), file=input&&input.files&&input.files[0]; if(!file)return {mediaUrl:"",mediaType:""};
  if(!firebase.storage){alert("Firebase Storage SDK is not loaded.");return {mediaUrl:"",mediaType:""};}
  const user=firebase.auth().currentUser; if(!user)throw new Error("Sign in first.");
- const safeName=(Date.now()+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
- const ref=firebase.storage().ref().child(`shoutouts/${user.uid}/${safeName}`);
+ const safeName=((referenceNumber||Date.now())+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
+ const storagePath=`shoutouts/${user.uid}/${safeName}`;
+ const ref=firebase.storage().ref().child(storagePath);
  await ref.put(file,{contentType:file.type}); const mediaUrl=await ref.getDownloadURL(); const mediaType=file.type.startsWith("video/")?"video":"image";
- byId("shoutoutMediaUrl").value=mediaUrl; byId("shoutoutMediaType").value=mediaType; return {mediaUrl,mediaType};
+ byId("shoutoutMediaUrl").value=mediaUrl; byId("shoutoutMediaType").value=mediaType; return {mediaUrl,mediaType,mediaFileName:file.name,mediaStoragePath:storagePath,mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()};
 }
 function ensureTemplates(){
  const host=templateHost(); if(!host||host.dataset.v285==="1")return; host.dataset.v285="1";
@@ -905,22 +937,23 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
     if(main&&!main.dataset.v286Bound){main.dataset.v286Bound="1";main.addEventListener("input",refreshPreviewText);main.addEventListener("change",refreshPreviewText);}
     if(sub&&!sub.dataset.v286Bound){sub.dataset.v286Bound="1";sub.addEventListener("input",refreshPreviewText);sub.addEventListener("change",refreshPreviewText);}
   }
-  async function uploadSingleSelectedMedia(){
+  async function uploadSingleSelectedMedia(referenceNumber){
     const input=byId("shoutoutMediaUpload");
     const file=input&&input.files&&input.files[0];
     if(!file)return {mediaUrl:"",mediaType:""};
     if(!firebase.storage){alert("Firebase Storage SDK is not loaded.");return {mediaUrl:"",mediaType:""};}
     const user=firebase.auth().currentUser;
     if(!user)throw new Error("Please sign in before uploading media.");
-    const safeName=(Date.now()+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
-    const ref=firebase.storage().ref().child(`shoutouts/${user.uid}/${safeName}`);
+    const safeName=((referenceNumber||Date.now())+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
+    const storagePath=`shoutouts/${user.uid}/${safeName}`;
+    const ref=firebase.storage().ref().child(storagePath);
     await ref.put(file,{contentType:file.type});
     const mediaUrl=await ref.getDownloadURL();
     const mediaType=file.type.startsWith("video/")?"video":"image";
     const mediaUrlInput=byId("shoutoutMediaUrl"), mediaTypeInput=byId("shoutoutMediaType");
     if(mediaUrlInput)mediaUrlInput.value=mediaUrl;
     if(mediaTypeInput)mediaTypeInput.value=mediaType;
-    return {mediaUrl,mediaType};
+    return {mediaUrl,mediaType,mediaFileName:file.name,mediaStoragePath:storagePath,mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()};
   }
   window.jadzUploadSelectedShoutoutMedia=uploadSingleSelectedMedia;
   window.jadzRefreshShoutoutMediaPreview=refreshPreviewText;

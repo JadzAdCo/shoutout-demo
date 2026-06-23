@@ -69,13 +69,15 @@
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
     const mediaSlot = byId("mediaSlot");
-    const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && data.mediaUrl);
+    const mediaUrl = data.mediaUrl || "";
+    const mediaType = data.mediaType || "";
+    const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
     if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
     if (usesSplitMedia) {
       mediaSlot.classList.remove("hidden");
-      if (data.mediaUrl) {
-        const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(data.mediaUrl);
-        mediaSlot.innerHTML = isVideo ? `<video src="${esc(data.mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(data.mediaUrl)}" alt="ShoutOut media">`;
+      if (mediaUrl) {
+        const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
+        mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
@@ -98,7 +100,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     if (qs("main","")) {
-      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), locationName: loc.locationName });
+      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), mediaType: qs("mediaType",""), locationName: loc.locationName });
       return;
     }
     db.collection("liveContent").doc(locationId).onSnapshot(doc => {

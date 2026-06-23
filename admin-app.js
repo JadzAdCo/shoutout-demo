@@ -88,6 +88,7 @@
       url.searchParams.set("sub", item.subText || "");
       url.searchParams.set("template", item.template || "neon");
       url.searchParams.set("media", item.mediaUrl || "");
+      url.searchParams.set("mediaType", item.mediaType || "");
     }
     return url.href;
   }
@@ -196,7 +197,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=28.15"
+        link:"./patron-portal.html?tab=shoutouts&v=28.16-f"
       });
     } catch(e) {}
   }
@@ -215,6 +216,10 @@
       mainText: item.mainText || "SHOUTOUT!",
       subText: item.subText || "",
       mediaUrl: item.mediaUrl || "",
+      mediaType: item.mediaType || "",
+      mediaFileName: item.mediaFileName || "",
+      mediaStoragePath: item.mediaStoragePath || "",
+      mediaUploadedAt: item.mediaUploadedAt || null,
       status: "approved",
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
@@ -224,8 +229,6 @@
 
     await createStatusNotification(item,"approved","ShoutOut Approved");
     await auditShoutout(id,item,"approved");
-    await createStatusNotification(item,"rejected","ShoutOut Rejected");
-    await auditShoutout(id,item,"rejected");
     await db.collection("shoutouts").doc(id).delete();
     loadReports();
   }
