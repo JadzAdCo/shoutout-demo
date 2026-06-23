@@ -12,21 +12,39 @@
   const templates = window.SHOUTOUT_TEMPLATES || {};
 
   function cleanBoardText(value) {
-    return String(value || "").toUpperCase().replace(/[^\w\s&'-]/g, " ").replace(/\s+/g, " ").trim();
+    return String(value || "")
+      .normalize("NFC")
+      .toUpperCase()
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function glyphs(value) {
+    return Array.from(String(value || ""));
+  }
+
+  function glyphLen(value) {
+    return glyphs(value).length;
+  }
+
+  function glyphSlice(value, start, end) {
+    return glyphs(value).slice(start, end).join("");
   }
 
   function pushWrapped(rows, words, maxRows, maxChars) {
     let line = "";
     words.forEach(word => {
       if (!word) return;
-      if (word.length > maxChars) {
+      if (glyphLen(word) > maxChars) {
         if (line && rows.length < maxRows) rows.push(line);
         line = "";
-        for (let i = 0; i < word.length && rows.length < maxRows; i += maxChars) rows.push(word.slice(i, i + maxChars));
+        const chars = glyphs(word);
+        for (let i = 0; i < chars.length && rows.length < maxRows; i += maxChars) rows.push(chars.slice(i, i + maxChars).join(""));
         return;
       }
       const next = line ? `${line} ${word}` : word;
-      if (next.length <= maxChars) line = next;
+      if (glyphLen(next) <= maxChars) line = next;
       else {
         if (rows.length < maxRows) rows.push(line);
         line = word;
@@ -38,9 +56,9 @@
   function classicBoardRows(mainText, subText) {
     const maxRows = 3;
     const maxChars = 12;
-    const attribution = cleanBoardText(subText).slice(0, maxChars);
+    const attribution = glyphSlice(cleanBoardText(subText), 0, maxChars);
     const availableRows = attribution ? 2 : maxRows;
-    const words = cleanBoardText(mainText).slice(0, 36).split(" ").filter(Boolean);
+    const words = glyphSlice(cleanBoardText(mainText), 0, 36).split(" ").filter(Boolean);
     const rows = [];
 
     if (words[0] === "HAPPY" && words[1] === "BIRTHDAY") {
@@ -57,8 +75,8 @@
   }
 
   function classicFitStyle(row, rows) {
-    const longest = Math.max(...rows.map(x => x.length), 1);
-    const rowLen = Math.max(row.length, longest);
+    const longest = Math.max(...rows.map(x => glyphLen(x)), 1);
+    const rowLen = Math.max(glyphLen(row), longest);
     const maxPx = rowLen <= 5 ? 118 : rowLen <= 8 ? 106 : rowLen <= 10 ? 96 : rowLen <= 12 ? 88 : rowLen <= 16 ? 72 : 58;
     const vw = rowLen <= 8 ? 8.6 : rowLen <= 12 ? 7.4 : rowLen <= 16 ? 6.2 : 5.2;
     return `--fit-size:clamp(38px,${vw}vw,${maxPx}px)`;
