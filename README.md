@@ -1,15 +1,18 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.14 Classic Black & White Board Text Layout
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.15 Classic Board Preview Alignment Fix
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.14
+https://jadzadco.github.io/shoutout-demo/?v=28.15
 ```
 
 Current release highlights:
 
+- Fixed Classic Black & White preview text alignment so rows sit inside the white board.
+- Forced the Classic Black & White subtitle into the same three-row board renderer instead of floating separately.
+- Reduced and constrained board letter sizing for iframe previews and mobile screens.
 - Updated the Classic Black & White ShoutOut template text layout.
 - Classic Black & White now renders patron text only inside the white center board.
 - Birthday-style text auto-breaks into physical board rows, for example `HAPPY / BIRTHDAY / D`.
@@ -35,13 +38,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.14`.
+- Bumped cache-busting query strings to `v=28.15`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.14 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
+- Database rollback: no database rollback is needed for v28.15 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2502,3 +2505,106 @@ Helper script:
 The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
 
 No Firestore or Storage rollback is needed for v28.14.
+
+---
+
+# Jadz AdCo ShoutOut v28.15 Classic Board Preview Alignment Fix
+
+## Package
+
+```text
+jadz-shoutout-v28-15-classic-board-preview-alignment-full-package.zip
+```
+
+## What Changed
+
+- Fixed the Classic Black & White preview so text no longer floats into the red/black background.
+- Moved the three-row text grid lower and tighter inside the white center board.
+- Reduced row font sizing for iframe/mobile previews so large words stay inside the board.
+- Forced the normal subtitle element to stay hidden for the Classic Black & White template.
+- Renders the main and sub message through the same three board rows.
+- Example: `DB in da House` plus `Holla @the_don_4ld` now becomes:
+
+```text
+DB IN DA
+HOUSE
+HOLLA
+```
+
+- Preserves the birthday-specific split:
+
+```text
+HAPPY
+BIRTHDAY
+D
+```
+
+- Bumped active cache-busting links and scripts to `v=28.15`.
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase config changes.
+
+No Firestore rules changes.
+
+No Firestore indexes added or removed.
+
+No Firebase Storage rules or path changes.
+
+No database migration is required. This is a frontend display rendering update only.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Upload the extracted files to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+3. Replace existing files.
+4. Commit with:
+
+```text
+Upload v28.15 classic board preview alignment full package
+```
+
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.15
+```
+
+## Manual Test Checklist
+
+1. Open the patron app and sign in.
+2. Choose Traditional Black & White.
+3. Enter `DB in da House` as the main message.
+4. Enter `Holla @the_don_4ld` as the sub message.
+5. Confirm the preview text stays inside the white board.
+6. Confirm the sub message does not appear as a separate floating line.
+7. Test `Happy Birthday D` and confirm the rows are `HAPPY`, `BIRTHDAY`, and `D`.
+8. Confirm final display URL matches the editor preview.
+
+## Rollback Plan
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.15.
+2. Or upload the previous known-good package, such as v28.14.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.14-rollback-test
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-15.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+No Firestore or Storage rollback is needed for v28.15.

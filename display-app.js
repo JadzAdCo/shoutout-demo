@@ -85,10 +85,12 @@
     }
     if (isClassicBoard) {
       byId("displayMain").classList.add("classic-bw-board");
-      byId("displayMain").innerHTML = classicBoardRows(mainText, subText).map(row => `<span>${esc(row)}</span>`).join("");
+      byId("displayMain").innerHTML = `<span class="classic-board-lines">${classicBoardRows(mainText, subText).map(row => `<b>${esc(row)}</b>`).join("")}</span>`;
+      byId("displaySub").classList.add("classic-bw-sub-hidden");
       byId("displaySub").textContent = "";
     } else {
       byId("displayMain").classList.remove("classic-bw-board");
+      byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displayMain").textContent = mainText;
       byId("displaySub").textContent = subText;
     }
