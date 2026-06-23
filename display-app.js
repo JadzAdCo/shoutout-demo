@@ -11,11 +11,59 @@
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[locationId] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
   const templates = window.SHOUTOUT_TEMPLATES || {};
 
+  function cleanBoardText(value) {
+    return String(value || "").toUpperCase().replace(/[^\w\s&'-]/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  function pushWrapped(rows, words, maxRows, maxChars) {
+    let line = "";
+    words.forEach(word => {
+      if (!word) return;
+      if (word.length > maxChars) {
+        if (line && rows.length < maxRows) rows.push(line);
+        line = "";
+        for (let i = 0; i < word.length && rows.length < maxRows; i += maxChars) rows.push(word.slice(i, i + maxChars));
+        return;
+      }
+      const next = line ? `${line} ${word}` : word;
+      if (next.length <= maxChars) line = next;
+      else {
+        if (rows.length < maxRows) rows.push(line);
+        line = word;
+      }
+    });
+    if (line && rows.length < maxRows) rows.push(line);
+  }
+
+  function classicBoardRows(mainText, subText) {
+    const maxRows = 3;
+    const maxChars = 12;
+    const words = cleanBoardText(mainText).split(" ").filter(Boolean);
+    const rows = [];
+
+    if (words[0] === "HAPPY" && words[1] === "BIRTHDAY") {
+      rows.push("HAPPY", "BIRTHDAY");
+      pushWrapped(rows, words.slice(2), maxRows, maxChars);
+    } else {
+      pushWrapped(rows, words, maxRows, maxChars);
+    }
+
+    if (rows.length < maxRows && cleanBoardText(subText)) {
+      pushWrapped(rows, cleanBoardText(subText).split(" "), maxRows, maxChars);
+    }
+
+    while (rows.length < maxRows) rows.push("");
+    return rows.slice(0, maxRows);
+  }
+
   function render(data) {
-    const t = templates[data.template || "neon"] || templates.neon || {};
+    const templateId = data.template || "neon";
+    const t = templates[templateId] || templates.neon || {};
+    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite";
     const canvas = byId("displayCanvas");
     canvas.className = "display-canvas";
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
+    if (isClassicBoard) canvas.classList.add("classic-board-template");
     const mainText = data.mainText || t.defaultMain || loc.defaultMain || "USE SHOUT OUT";
     const subText = data.subText || t.defaultSub || "";
     byId("displayBrand").textContent = "";
@@ -35,8 +83,15 @@
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
     }
-    byId("displayMain").textContent = mainText;
-    byId("displaySub").textContent = subText;
+    if (isClassicBoard) {
+      byId("displayMain").classList.add("classic-bw-board");
+      byId("displayMain").innerHTML = classicBoardRows(mainText, subText).map(row => `<span>${esc(row)}</span>`).join("");
+      byId("displaySub").textContent = "";
+    } else {
+      byId("displayMain").classList.remove("classic-bw-board");
+      byId("displayMain").textContent = mainText;
+      byId("displaySub").textContent = subText;
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
