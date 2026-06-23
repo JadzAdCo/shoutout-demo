@@ -68,7 +68,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.8">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.10">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -210,18 +210,12 @@
         <button id="backToCategoriesBtn" type="button">← Back to categories</button>
         <p class="eyebrow">Search</p>
         <h1 id="listingTitle">Search Clubs</h1>
-        <p id="listingIntro" class="sub">Search by country, state/region/province, city, genre, artist, or activity date.</p>
+        <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
       <button id="logoutBtn3" type="button">Sign out</button>
     </header>
     <div class="card">
-      <input id="locationSearch" class="search" placeholder="Search location, city, genre, artist, event day..."/>
-      <div class="filters">
-        <label>Country<select id="countryFilter"><option value="">All countries</option></select></label>
-        <label>State / Region / Province<select id="regionFilter"><option value="">All states / regions</option></select></label>
-        <label>City<select id="cityFilter"><option value="">All cities</option></select></label>
-        <label>Music genre<select id="genreFilter"><option value="">All genres</option></select></label>
-      </div>
+      <input id="locationSearch" class="search" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
     </div>
     <div id="locationGrid" class="club-grid"></div>
   </section>
@@ -274,16 +268,16 @@
       <div class="button-row"><button id="startAnotherBtn" class="primary" type="button">Create another ShoutOut</button><button id="chooseAnotherClubBtn" type="button">Choose another location</button><button id="logoutBtn6" type="button">Sign out</button></div>
     </div>
   </section>
-<p class="sub small"><a href="./role-request.html?v=28.8">Request Club Admin / DJ / Promoter Access</a></p>
+<p class="sub small"><a href="./role-request.html?v=28.10">Request Club Admin / DJ / Promoter Access</a></p>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.8"></script>
-<script src="./shared-data.js?v=28.8"></script>
-<script src="./patron-app.js?v=28.8"></script>
-<script src="./notification-center.js?v=28.8"></script>
+<script src="./firebase-config.js?v=28.10"></script>
+<script src="./shared-data.js?v=28.10"></script>
+<script src="./patron-app.js?v=28.10"></script>
+<script src="./notification-center.js?v=28.10"></script>
 </body>
 </html>

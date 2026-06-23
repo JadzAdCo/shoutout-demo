@@ -1,3 +1,32 @@
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.10 Contextual Search UI Cleanup
+
+This ZIP is a full web app package for upload to the GitHub repo root.
+
+Current live test URL after upload:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.10
+```
+
+Current release highlights:
+
+- Removed the Country, State / Region / Province, City, and Music Genre dropdown filters from the search display page.
+- Kept the single contextual search box as the primary patron search workflow.
+- Updated search helper text and placeholder examples for natural-language search.
+- Clean `Throw a ShoutOut` button on Club Options.
+- Removed timer-based ShoutOut button injection patches.
+- Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
+- Bumped cache-busting query strings to `v=28.10`.
+- No Firestore, Storage, Firebase config, or rules changes required.
+
+Rollback summary:
+
+- Code rollback: revert the GitHub commit or upload the previous known-good package.
+- Database rollback: no database rollback is needed for v28.10 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
+- Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
+
+---
+
 # Jadz AdCo ShoutOut v24 Admin Analytics + Master Admin Package
 
 ## Deployment
@@ -1632,3 +1661,368 @@ https://jadzadco.github.io/shoutout-demo/patron-app.js?v=28.8
 
 Search for:
 v28.8 hardcoded club option ShoutOut insertion
+
+---
+
+# v28.9 Codex Release — Clean Club Options + Contextual Search
+
+Generated: 2026-06-23  
+Package: `jadz-shoutout-v28-9-codex-contextual-search-full-package.zip`
+
+This is a full upload package. It contains all web app files, not only changed files.
+
+## What Changed
+
+1. Club Options now includes a real `Throw a ShoutOut` button in `index.html`.
+2. Removed the v28.7/v28.8 timer-based ShoutOut button injection patches from `patron-app.js`.
+3. Added contextual/fuzzy patron search in `patron-app.js`.
+4. Search now supports natural variations such as:
+   - `hiphop clubs in Barcelona`
+   - `hip hop clubs in Barcelona, Spain`
+   - `hip-hop clubs in Barcelona Spain`
+   - `Hip Hope clubs Barcelona Spain`
+5. HTML cache-busting query strings were bumped from `v=28.8` to `v=28.9`.
+
+## Files Changed In This Release
+
+```text
+index.html
+patron-app.js
+README.md
+*.html cache-busting query strings
+```
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase project configuration changes are required for v28.9.
+
+No Firestore collections were added or removed.
+
+No Firestore document shapes were changed.
+
+No Firebase Storage paths were changed.
+
+No Firestore Security Rules or Storage Rules changes are required for this release.
+
+Existing Firebase services still used:
+
+```text
+Firebase Auth
+Firestore
+Firebase Storage
+GitHub Pages hosting
+```
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Open the extracted folder.
+3. Upload the contents of the extracted folder to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+4. Replace the existing files in the repo root.
+5. Commit with a clear message:
+
+```text
+Upload v28.9 contextual search full package
+```
+
+6. Wait 1-3 minutes for GitHub Pages to publish.
+7. Test with a cache-busting URL:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.9
+```
+
+Important: do not upload the parent folder itself. Upload the files inside the package so `index.html`, `patron-app.js`, `firebase-config.js`, and the other app files remain at the repository root.
+
+## Test URLs
+
+Patron app:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.9
+```
+
+Barcelona ShoutOut search flow:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.9
+```
+
+Guest list direct page:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.9
+```
+
+Patron portal:
+
+```text
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.9
+```
+
+Role request:
+
+```text
+https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.9
+```
+
+Display page:
+
+```text
+https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-spain&v=28.9
+```
+
+## Manual Test Checklist
+
+1. Open the patron app URL.
+2. Sign in as a patron.
+3. Select `Clubs`.
+4. Confirm Club Options shows `Throw a ShoutOut`.
+5. Click `Throw a ShoutOut`.
+6. Confirm the ShoutOut location picker opens.
+7. Search:
+
+```text
+hiphop
+hiphop clubs in Barcelona
+hip hop clubs in Barcelona, Spain
+hip-hop clubs in Barcelona Spain
+Hip Hope clubs Barcelona Spain
+```
+
+8. Confirm Barcelona Hip Hop-capable venues appear, including Shoko Barcelona / Shoko Barcelona Beach Club where available.
+9. Pick a location.
+10. Confirm the template page opens.
+11. Go back and test `Join Guest List`.
+12. Confirm Guest List does not route to ShoutOut templates.
+13. Submit a test ShoutOut only if you want to create real Firestore/Storage records.
+
+## Rollback Plan
+
+### Code Rollback
+
+Preferred rollback:
+
+1. In GitHub, open the commit that uploaded v28.9.
+2. Use GitHub's revert option, or manually upload the previous known-good package.
+3. Test:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.8-rollback-test
+```
+
+Manual rollback:
+
+1. Keep the prior package ZIP before uploading a new release.
+2. If v28.9 has problems, upload the prior package contents back to the repo root.
+3. Commit with:
+
+```text
+Rollback from v28.9 to previous package
+```
+
+### Firestore / Storage Rollback
+
+This v28.9 release does not require Firestore or Storage config changes.
+
+For future releases that change Firestore data, rules, indexes, or Storage rules:
+
+1. Export or document the current rules before changing them.
+2. Record every new collection, document field, index, and Storage path in this README.
+3. Include a forward migration and rollback migration.
+4. If seed data changes, keep the old seed package or a JSON export.
+5. For destructive data changes, do not run them from the live app; use a reviewed admin script and keep a backup/export first.
+
+Recommended future rollback artifacts per release:
+
+```text
+release ZIP
+README.md with changed files
+Firestore rules before/after
+Storage rules before/after
+Firestore indexes before/after
+Seed/migration notes
+Known-good test URL
+Rollback test URL
+```
+
+## Known Limits
+
+The contextual search is a lightweight client-side matcher. It normalizes punctuation, spacing, accents, and common genre aliases, and allows small typos. It is not yet a server-side semantic search engine.
+
+Future upgrade path:
+
+```text
+Firestore indexed search fields
+Algolia / Typesense / Meilisearch
+AI-assisted search query parsing
+User preference ranking
+Location-aware ranking
+```
+
+---
+
+# v28.10 Codex Release — Search Display Cleanup
+
+Generated: 2026-06-23  
+Package: `jadz-shoutout-v28-10-contextual-search-ui-cleanup-full-package.zip`
+
+This is a full upload package. It contains all web app files, not only changed files.
+
+## What Changed
+
+1. Removed the visible dropdown filters from the Search / Choose Location page:
+   - Country
+   - State / Region / Province
+   - City
+   - Music genre
+2. Kept the single contextual search box as the main search interface.
+3. Updated the search page helper copy:
+
+```text
+Search naturally by city, country, venue, genre, artist, event day, or activity date.
+```
+
+4. Updated the search placeholder:
+
+```text
+Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC...
+```
+
+5. Bumped HTML/JS cache-busting query strings to `v=28.10`.
+
+## Files Changed In This Release
+
+```text
+index.html
+patron-app.js
+README.md
+ROLLBACK-V28-10.md
+*.html / *.js cache-busting query strings
+```
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase project configuration changes are required for v28.10.
+
+No Firestore collections were added or removed.
+
+No Firestore document shapes were changed.
+
+No Firebase Storage paths were changed.
+
+No Firestore Security Rules or Storage Rules changes are required for this release.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Open the extracted folder.
+3. Upload the contents of the extracted folder to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+4. Replace the existing files in the repo root.
+5. Commit with a clear message:
+
+```text
+Upload v28.10 contextual search UI cleanup full package
+```
+
+6. Wait 1-3 minutes for GitHub Pages to publish.
+7. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.10
+```
+
+Important: do not upload the parent folder itself. Upload the files inside the package so `index.html`, `patron-app.js`, `firebase-config.js`, and the other app files remain at the repository root.
+
+## Test URLs
+
+Patron app:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.10
+```
+
+Guest list direct page:
+
+```text
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.10
+```
+
+Patron portal:
+
+```text
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.10
+```
+
+Role request:
+
+```text
+https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.10
+```
+
+Display page:
+
+```text
+https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-spain&v=28.10
+```
+
+## Manual Test Checklist
+
+1. Open the patron app URL.
+2. Sign in as a patron.
+3. Click `Throw a ShoutOut`.
+4. Confirm the search page shows only one search input and no Country / State / City / Music Genre dropdown row.
+5. Search:
+
+```text
+hiphop in dc
+hiphop clubs in Barcelona
+hip hop clubs in Barcelona, Spain
+hip-hop clubs in Barcelona Spain
+Hip Hope clubs Barcelona Spain
+```
+
+6. Confirm matching venues appear.
+7. Pick a location.
+8. Confirm the template page opens.
+9. Go back and test `Join Guest List`.
+10. Confirm Guest List does not route to ShoutOut templates.
+
+## Rollback Plan
+
+### Code Rollback
+
+Preferred rollback:
+
+1. In GitHub, revert the commit that uploaded v28.10.
+2. Or upload the previous known-good package, such as v28.9.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.9-rollback-test
+```
+
+Manual rollback:
+
+1. Upload the prior package contents back to the repo root.
+2. Commit with:
+
+```text
+Rollback from v28.10 to previous package
+```
+
+### Firestore / Storage Rollback
+
+This v28.10 release does not require Firestore or Storage config changes.
+
+No database rollback is needed unless live test submissions were created manually during testing. If test ShoutOuts or guest list requests were submitted, delete only those specific test records from Firestore and any matching test media under `shoutouts/{uid}/...` in Firebase Storage.

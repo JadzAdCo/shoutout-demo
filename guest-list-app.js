@@ -11,7 +11,7 @@ const auth=firebase.auth(), db=firebase.firestore();
 const locations=window.SHOUTOUT_CLUB_LOCATIONS||{}, promoters=window.SHOUTOUT_PROMOTERS||{};
 function bind(id,fn){byId(id)?.addEventListener("click",fn);}
 async function loginGoogle(){try{setText("guestStatus","Opening Google sign-in...");await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){setText("guestStatus",`${e.code||"error"}: ${e.message}`);}}
-async function logout(){await auth.signOut();location.href="./?v=28.8";}
+async function logout(){await auth.signOut();location.href="./?v=28.10";}
 function renderSelects(){
  const rl=qs("location"), rp=qs("promoter");
  byId("guestLocation").innerHTML=`<option value="">Select club/location</option>`+Object.entries(locations).map(([id,l])=>`<option value="${esc(id)}">${esc(l.locationName||l.name||id)}</option>`).join("");
