@@ -110,13 +110,8 @@
     }
   }
   async function loginMicrosoft() {
-    try {
-      const p = buildMicrosoftProvider();
-      setText("adminStatus", "Opening Microsoft sign-in...");
-      await auth.signInWithPopup(p);
-    } catch(e) {
-      setText("adminStatus", `${e.code || "error"}: ${e.message}`);
-    }
+    const p = buildMicrosoftProvider();
+    await signInWithPopupThenRedirect(p, "adminStatus", "Microsoft");
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
@@ -197,7 +192,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=28.21-f"
+        link:"./patron-portal.html?tab=shoutouts&v=28.22-f"
       });
     } catch(e) {}
   }
@@ -383,6 +378,10 @@
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+
+    auth.getRedirectResult().then(result => {
+      if (result?.user) setText("adminStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
+    }).catch(e => setText("adminStatus", adminAuthErrorMessage(e)));
 
     auth.onAuthStateChanged(user => {
       const email = safeUser(user);

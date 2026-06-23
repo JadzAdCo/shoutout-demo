@@ -61,6 +61,11 @@
     return p;
   }
 
+  function isMicrosoftPopupIssue(e) {
+    const code = e?.code || "";
+    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
+  }
+
   async function loginGoogle() {
     try {
       setText("masterStatus", "Opening Google sign-in...");
@@ -71,12 +76,22 @@
   }
 
   async function loginMicrosoft() {
+    const p = buildMicrosoftProvider();
     try {
-      const p = buildMicrosoftProvider();
       setText("masterStatus", "Opening Microsoft sign-in...");
       await auth.signInWithPopup(p);
     } catch(e) {
-      setText("masterStatus", `${e.code || "error"}: ${e.message}`);
+      if (isMicrosoftPopupIssue(e)) {
+        try {
+          setText("masterStatus", "Microsoft popup was blocked or closed. Redirecting instead...");
+          await auth.signInWithRedirect(p);
+          return;
+        } catch(redirectError) {
+          setText("masterStatus", masterAuthErrorMessage(redirectError));
+          return;
+        }
+      }
+      setText("masterStatus", masterAuthErrorMessage(e));
     }
   }
 
@@ -300,6 +315,10 @@
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
     bind("masterLogoutBtn", logout);
     bind("masterPanelLogoutBtn", logout);
+
+    auth.getRedirectResult().then(result => {
+      if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
+    }).catch(e => setText("masterStatus", masterAuthErrorMessage(e)));
 
     auth.onAuthStateChanged(user => {
       setText("masterSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");

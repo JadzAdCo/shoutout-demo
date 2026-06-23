@@ -40,12 +40,22 @@
   }
 
   async function microsoft() {
+    const p = new firebase.auth.OAuthProvider("microsoft.com");
+    p.setCustomParameters({prompt:"select_account"});
     try {
-      const p = new firebase.auth.OAuthProvider("microsoft.com");
-      p.setCustomParameters({prompt:"select_account"});
       setText("debugStatus", "Opening Microsoft popup...");
       await auth.signInWithPopup(p);
     } catch(e) {
+      if (["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(e?.code || "")) {
+        try {
+          setText("debugStatus", "Microsoft popup was blocked or closed. Redirecting instead...");
+          await auth.signInWithRedirect(p);
+          return;
+        } catch(redirectError) {
+          setText("debugStatus", `${redirectError.code || "error"}: ${redirectError.message}`);
+          return;
+        }
+      }
       setText("debugStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
@@ -65,3 +75,6 @@
     });
   });
 })();
+    auth.getRedirectResult().then(result => {
+      if (result?.user) setText("debugStatus", `Redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
+    }).catch(e => setText("debugStatus", `${e.code || "error"}: ${e.message}`));

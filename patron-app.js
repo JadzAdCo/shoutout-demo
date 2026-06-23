@@ -309,7 +309,45 @@
 
   async function loginGoogle() { try { setStatus("Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
   async function loginFacebook() { try { setStatus("Opening Facebook sign-in..."); await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
-  async function loginMicrosoft() { try { const p = new firebase.auth.OAuthProvider("microsoft.com"); p.setCustomParameters({prompt:"select_account"}); setStatus("Opening Microsoft sign-in..."); await auth.signInWithPopup(p); } catch(e) { setStatus(`${e.code || "error"}: ${e.message}`); } }
+  function microsoftAuthErrorMessage(e) {
+    const code = e?.code || "error";
+    const message = e?.message || String(e || "Unknown error");
+    if (code === "auth/popup-closed-by-user") return "Microsoft sign-in popup closed before completion. Try again, or allow popups for this site.";
+    if (code === "auth/popup-blocked") return "Your browser blocked Microsoft sign-in. Allow popups for jadzadco.github.io and try again.";
+    if (code === "auth/operation-not-allowed") return "Microsoft sign-in is not enabled in Firebase Authentication.";
+    if (code === "auth/unauthorized-domain") return "This site is not authorized in Firebase Authentication. Add jadzadco.github.io under Authentication > Settings > Authorized domains.";
+    if (code === "auth/account-exists-with-different-credential") return "This email already exists with another sign-in method. Sign in with the original provider first.";
+    if (code === "auth/invalid-credential" || code === "auth/invalid-oauth-client-id") return "Microsoft OAuth configuration appears invalid. Verify Microsoft Client ID, Client Secret, and Firebase redirect URI.";
+    return `${code}: ${message}`;
+  }
+  function buildMicrosoftProvider() {
+    const p = new firebase.auth.OAuthProvider("microsoft.com");
+    p.setCustomParameters({prompt:"select_account"});
+    return p;
+  }
+  function isMicrosoftPopupIssue(e) {
+    const code = e?.code || "";
+    return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
+  }
+  async function loginMicrosoft() {
+    const p = buildMicrosoftProvider();
+    try {
+      setStatus("Opening Microsoft sign-in...");
+      await auth.signInWithPopup(p);
+    } catch(e) {
+      if (isMicrosoftPopupIssue(e)) {
+        try {
+          setStatus("Microsoft popup was blocked or closed. Redirecting instead...");
+          await auth.signInWithRedirect(p);
+          return;
+        } catch(redirectError) {
+          setStatus(microsoftAuthErrorMessage(redirectError));
+          return;
+        }
+      }
+      setStatus(microsoftAuthErrorMessage(e));
+    }
+  }
   async function logout() { await auth.signOut(); window.location.href = "./"; }
   window.jadzPatronLogout = logout;
 
@@ -733,7 +771,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.21-f";
+      portalLink.href = "./patron-portal.html?v=28.22-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -746,14 +784,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.21-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.22-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.21-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.22-f";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -808,6 +846,9 @@
     window.addEventListener("resize", detectRenderContext);
     window.addEventListener("orientationchange", detectRenderContext);
     setStatus("Choose a sign-in/up option.");
+    auth.getRedirectResult().then(result => {
+      if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
+    }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
     bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
@@ -892,10 +933,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.21-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.22-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.21-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.21-f">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.22-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.22-f">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -938,7 +979,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.21-f"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.22-f"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

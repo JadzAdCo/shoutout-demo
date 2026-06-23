@@ -1,4 +1,4 @@
-/* notification-center.js v28.21-f */
+/* notification-center.js v28.22-f */
 (function(){
 "use strict";
 if(window.JADZ_NOTIFICATION_CENTER_LOADED)return;
