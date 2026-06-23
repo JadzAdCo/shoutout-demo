@@ -1,15 +1,26 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.22-f Microsoft Authentication Troubleshooting Fix Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.23-nf SMS OTP Login UI Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.22-f
+https://jadzadco.github.io/shoutout-demo/?v=28.23-nf
 ```
 
 Current release highlights:
 
+- New feature package. `-nf` means new feature release.
+- SMS sign-in prompt now reads `Or use One Time Password (OTP) via SMS`.
+- Added a full-width `Continue using SMS OTP` button styled with the same sign-in button system.
+- SMS OTP phone entry is hidden until the patron chooses `Continue using SMS OTP`.
+- SMS OTP section now includes a country code dropdown and a separate local phone number input.
+- The app combines country code plus phone number before sending the Firebase SMS OTP.
+- reCAPTCHA is initialized only when the SMS OTP panel is opened or when Send OTP is used.
+- Stable rollback baseline remains `v28.22-s`.
+- Stable baseline package. `-s` means stable release.
+- This package preserves the verified working authentication state: Google, Microsoft, Facebook, and SMS.
+- Use this package as the known-good rollback baseline before future fix (`-f`) or new-feature (`-nf`) packages.
 - Microsoft sign-in now tries popup first and falls back to full-page redirect if the popup is blocked, closed, or cancelled.
 - Patron, Club Admin, Master Admin, and `auth-debug.html` now use the safer Microsoft popup/redirect fallback path.
 - Patron, Club Admin, Master Admin, and Auth Debug now process Microsoft redirect results on return to the app.
@@ -89,13 +100,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.22-f`.
+- Bumped cache-busting query strings to `v=28.23-nf`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.22-f because this release does not require Firestore/Storage rules, index, or config changes.
+- Database rollback: no database rollback is needed for v28.23-nf because this stable package does not require Firestore/Storage rules, index, or config changes.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2765,12 +2776,12 @@ Database rollback is normally not needed. If a specific media ShoutOut must be r
 
 ---
 
-# Jadz AdCo ShoutOut v28.22-f Navigation + Messages Fix Package
+# Jadz AdCo ShoutOut v28.23-nf Navigation + Messages Fix Package
 
 ## Package
 
 ```text
-shoutoutwepp,vers-28.22-f-full-package.zip
+shoutoutwepp,vers-28.23-nf-full-package.zip
 ```
 
 ## What Changed
@@ -2780,14 +2791,14 @@ shoutoutwepp,vers-28.22-f-full-package.zip
 - Added clearer workflow labels such as `Screen 3B — Club / Search` and `Screen 4 — Club / Select ShoutOut Template`.
 - Removed the bottom Messages / Chats / Notifications bar.
 - Merged notifications into Messages counts and the Messages tab.
-- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.22-f` fix release.
+- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.23-nf` fix release.
 - Adopted release suffix convention: `-f` for fixes and `-nf` for new features.
 - Enlarged the Classic Black & White white center board.
 - Moved the white board upward to reduce excess red/black header space.
 - Enlarged and strengthened the three cut-out letter rows.
 - Preserved the three-row board behavior and birthday split.
 - Preserved the v28.16 media upload/display pipeline fix.
-- Bumped active cache-busting links and scripts to `v=28.22-f`.
+- Bumped active cache-busting links and scripts to `v=28.23-nf`.
 
 ## Firebase / Firestore / Storage Impact
 
@@ -2814,14 +2825,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.22-f navigation messages fix package
+Upload v28.23-nf navigation messages fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.22-f
+https://jadzadco.github.io/shoutout-demo/?v=28.23-nf
 ```
 
 ## Manual Test Checklist
@@ -2837,7 +2848,7 @@ https://jadzadco.github.io/shoutout-demo/?v=28.22-f
 
 Preferred rollback:
 
-1. Revert the GitHub commit that uploaded v28.22-f.
+1. Revert the GitHub commit that uploaded v28.23-nf.
 2. Or upload the previous known-good package, such as v28.16.
 3. Test with:
 
@@ -2848,9 +2859,9 @@ https://jadzadco.github.io/shoutout-demo/?v=28.16-rollback-test
 Helper script:
 
 ```powershell
-.\rollback-v28-22-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+.\rollback-v28-23-nf.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
 ```
 
 The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
 
-No Firestore or Storage rollback is needed for v28.22-f.
+No Firestore or Storage rollback is needed for v28.23-nf.

@@ -57,19 +57,69 @@
           <button id="microsoftLoginBtn" class="signin microsoft" type="button"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
           <button id="facebookLoginBtn" class="signin facebook" type="button"><span class="icon fb-icon">f</span>Continue with Facebook</button>
 
-          <div class="divider"><span>or use phone</span></div>
-          <div class="phone-row">
-            <input id="phoneNumber" placeholder="Enter phone #" autocomplete="tel"/>
-            <button id="sendOtpBtn" class="signin phone" type="button">Send OTP</button>
+          <div class="divider"><span>Or use One Time Password (OTP) via SMS</span></div>
+          <button id="showSmsOtpBtn" class="signin sms" type="button">Continue using SMS OTP</button>
+          <div id="smsOtpPanel" class="sms-otp-panel hidden">
+          <div class="phone-row sms-number-row">
+            <label>Country code
+              <select id="phoneCountryCode" autocomplete="tel-country-code">
+                <option value="+1">United States / Canada (+1)</option>
+                <option value="+44">United Kingdom (+44)</option>
+                <option value="+234">Nigeria (+234)</option>
+                <option value="+34">Spain (+34)</option>
+                <option value="+33">France (+33)</option>
+                <option value="+49">Germany (+49)</option>
+                <option value="+39">Italy (+39)</option>
+                <option value="+971">United Arab Emirates (+971)</option>
+                <option value="+52">Mexico (+52)</option>
+                <option value="+55">Brazil (+55)</option>
+                <option value="+91">India (+91)</option>
+                <option value="+81">Japan (+81)</option>
+                <option value="+61">Australia (+61)</option>
+                <option value="+27">South Africa (+27)</option>
+                <option value="+233">Ghana (+233)</option>
+                <option value="+254">Kenya (+254)</option>
+                <option value="+86">China (+86)</option>
+                <option value="+82">South Korea (+82)</option>
+                <option value="+65">Singapore (+65)</option>
+                <option value="+60">Malaysia (+60)</option>
+                <option value="+63">Philippines (+63)</option>
+                <option value="+62">Indonesia (+62)</option>
+                <option value="+66">Thailand (+66)</option>
+                <option value="+31">Netherlands (+31)</option>
+                <option value="+32">Belgium (+32)</option>
+                <option value="+41">Switzerland (+41)</option>
+                <option value="+46">Sweden (+46)</option>
+                <option value="+47">Norway (+47)</option>
+                <option value="+45">Denmark (+45)</option>
+                <option value="+353">Ireland (+353)</option>
+                <option value="+351">Portugal (+351)</option>
+                <option value="+30">Greece (+30)</option>
+                <option value="+90">Turkey (+90)</option>
+                <option value="+972">Israel (+972)</option>
+                <option value="+20">Egypt (+20)</option>
+                <option value="+212">Morocco (+212)</option>
+                <option value="+54">Argentina (+54)</option>
+                <option value="+56">Chile (+56)</option>
+                <option value="+57">Colombia (+57)</option>
+                <option value="+51">Peru (+51)</option>
+              </select>
+            </label>
+            <label>Phone number
+              <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
+            </label>
+            <input id="phoneNumber" type="hidden"/>
+            <button id="sendOtpBtn" class="signin sms phone" type="button">Send OTP</button>
           </div>
           <div id="recaptcha-container"></div>
           <div id="phoneCodeBlock" class="hidden">
             <label class="compact-label">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
-            <button id="verifyOtpBtn" class="signin phone verify" type="button">Verify OTP</button>
+            <button id="verifyOtpBtn" class="signin sms phone verify" type="button">Verify OTP</button>
+          </div>
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.22-f">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.23-nf">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -282,9 +332,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.22-f"></script>
-<script src="./shared-data.js?v=28.22-f"></script>
-<script src="./patron-app.js?v=28.22-f"></script>
-<script src="./notification-center.js?v=28.22-f"></script>
+<script src="./firebase-config.js?v=28.23-nf"></script>
+<script src="./shared-data.js?v=28.23-nf"></script>
+<script src="./patron-app.js?v=28.23-nf"></script>
+<script src="./notification-center.js?v=28.23-nf"></script>
 </body>
 </html>
