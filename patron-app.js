@@ -335,13 +335,84 @@
     return renderLocationGrid();
   }
 
+  const SEARCH_STOP_WORDS = new Set(["a","an","and","at","for","in","near","of","on","the","to","with","club","clubs","venue","venues","event","events","night","nightlife"]);
+  const SEARCH_ALIASES = {
+    hiphop: ["hiphop","hip hop","hip-hop","rap"],
+    hop: ["hop","hope"],
+    afrobeats: ["afrobeats","afro beats","afrobeat","afro beat"],
+    afrobeat: ["afrobeat","afro beat","afrobeats","afro beats"],
+    rnb: ["rnb","r b","r&b","r and b"],
+    edm: ["edm","electronic dance music"],
+    loungeclub: ["loungeclub","lounge club","lounge-club"],
+    beachclub: ["beachclub","beach club","beach-club"]
+  };
+
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function compactSearchText(value) {
+    return normalizeSearchText(value).replace(/[^a-z0-9]/g, "");
+  }
+
+  function searchTokens(value) {
+    return normalizeSearchText(value).split(/\s+/).filter(token => token && !SEARCH_STOP_WORDS.has(token));
+  }
+
+  function searchFields(value) {
+    const text = normalizeSearchText(value);
+    return { text, compact: text.replace(/[^a-z0-9]/g, ""), tokens: text.split(/\s+/).filter(Boolean) };
+  }
+
+  function editDistanceWithin(a, b, limit) {
+    if (Math.abs(a.length - b.length) > limit) return false;
+    const prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i += 1) {
+      const curr = [i];
+      let rowMin = curr[0];
+      for (let j = 1; j <= b.length; j += 1) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+        rowMin = Math.min(rowMin, curr[j]);
+      }
+      if (rowMin > limit) return false;
+      for (let j = 0; j < curr.length; j += 1) prev[j] = curr[j];
+    }
+    return prev[b.length] <= limit;
+  }
+
+  function tokenMatchesSearchField(token, field) {
+    const variants = SEARCH_ALIASES[compactSearchText(token)] || [token];
+    return variants.some(variant => {
+      const normalized = normalizeSearchText(variant);
+      const compact = compactSearchText(variant);
+      if (!compact) return true;
+      if (field.text.includes(normalized) || field.compact.includes(compact)) return true;
+      const tolerance = compact.length >= 6 ? 2 : compact.length >= 3 ? 1 : 0;
+      return tolerance > 0 && field.tokens.some(candidate => editDistanceWithin(compact, candidate, tolerance));
+    });
+  }
+
+  function contextualSearchMatch(query, value) {
+    const tokens = searchTokens(query);
+    if (!tokens.length) return true;
+    const field = searchFields(value);
+    return tokens.every(token => tokenMatchesSearchField(token, field));
+  }
+
   function renderEventGrid() {
     const grid = byId("locationGrid");
-    const s = (byId("locationSearch")?.value || "").toLowerCase();
+    const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const matches = Object.entries(events).filter(([id,e]) => {
-      const hay = `${e.eventName} ${e.country} ${e.region} ${e.city} ${(e.genres||[]).join(" ")} ${(e.artists||[]).join(" ")} ${e.eventDay} ${e.eventTime} ${e.eventDate}`.toLowerCase();
-      return (!s || hay.includes(s)) && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre));
+      const hay = `${e.eventName} ${e.country} ${e.region} ${e.city} ${(e.genres||[]).join(" ")} ${(e.artists||[]).join(" ")} ${e.eventDay} ${e.eventTime} ${e.eventDate}`;
+      return contextualSearchMatch(s, hay) && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre));
     });
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching events found.</div>';
     matches.forEach(([id,e]) => {
@@ -361,10 +432,10 @@
   function renderLocationGrid() {
     const grid = byId("locationGrid");
     const type = byId("listingType").value || "clubs";
-    const s = (byId("locationSearch")?.value || "").toLowerCase();
+    const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const matches = Object.entries(locations).filter(([id,l]) => {
-      const hay = `${l.brandName} ${l.locationName} ${l.country} ${l.region} ${l.city} ${l.locationLabel} ${(l.genres||[]).join(" ")} ${(l.artists||[]).join(" ")} ${(l.activityDates||[]).join(" ")}`.toLowerCase();
+      const hay = `${l.brandName} ${l.locationName} ${l.country} ${l.region} ${l.city} ${l.locationLabel} ${(l.categories||[]).join(" ")} ${(l.genres||[]).join(" ")} ${(l.artists||[]).join(" ")} ${(l.activityDates||[]).join(" ")}`;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
       const effectiveType = type.startsWith("club-action:") ? actionBase : type;
       const typeOk =
@@ -373,7 +444,7 @@
         effectiveType === "beach-clubs" ? (l.type === "beach-club" || (l.categories||[]).includes("Beach Clubs")) :
         effectiveType === "clubs" || effectiveType === "shoutout" ? (l.type === "club" || l.type === "lounge-club" || l.type === "beach-club" || (l.categories||[]).includes("Clubs")) :
         true;
-      return typeOk && (!s || hay.includes(s)) && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
+      return typeOk && contextualSearchMatch(s, hay) && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
     });
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching results found.</div>';
     matches.forEach(([id,l]) => {
@@ -819,4 +890,3 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
     setInterval(()=>{ensureSingleMediaUploader();bindTextPreviewRefresh();removeDuplicateMediaInputs();},1000);
   });
 })();
-
