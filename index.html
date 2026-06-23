@@ -69,7 +69,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.18-f">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.19-f">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -228,8 +228,8 @@
       <button id="logoutBtn4" type="button">Sign out</button>
     </header>
     <div class="template-layout">
-      <div class="card"><h2>Choose a template</h2><p class="sub small">Search by occasion, style, or media type.</p><input id="templateSearch" class="search" placeholder="Search birthday, anniversary, car, image, video, classic..."/><div id="templateGrid" class="template-grid"></div></div>
-      <div class="card"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button></div>
+      <div class="card"><h2>Choose a template</h2><input id="templateSearch" class="search" placeholder="Search birthday, anniversary, car, image, video, classic..."/><div id="templateGrid" class="template-grid"></div></div>
+      <div class="card template-selected-panel"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button></div>
     </div>
   </section>
 
@@ -243,7 +243,7 @@
         <h2>Message</h2>
         <label>Main message<input id="mainText" maxlength="48" value="HAPPY BIRTHDAY MAYA!"/></label>
         <label>Sub message<input id="subText" maxlength="80" value="VIP Table 4 sends love"/></label>
-        <label>Upload Photo<input id="shoutoutPhoto" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+        <label id="shoutoutPhotoWrap" class="template-media-field">Upload Photo<input id="shoutoutPhoto" type="file" accept="image/jpeg,image/png,image/webp"/></label>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
         <div class="button-row">
@@ -272,9 +272,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.18-f"></script>
-<script src="./shared-data.js?v=28.18-f"></script>
-<script src="./patron-app.js?v=28.18-f"></script>
-<script src="./notification-center.js?v=28.18-f"></script>
+<script src="./firebase-config.js?v=28.19-f"></script>
+<script src="./shared-data.js?v=28.19-f"></script>
+<script src="./patron-app.js?v=28.19-f"></script>
+<script src="./notification-center.js?v=28.19-f"></script>
 </body>
 </html>

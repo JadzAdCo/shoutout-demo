@@ -26,7 +26,33 @@
   function locationId() { return (selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc").toLowerCase(); }
   function getLocation(id = locationId()) { return locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]; }
   function getTemplate(id = selectedTemplate) { return templates[id] || window.SHOUTOUT_TEMPLATES[id] || window.SHOUTOUT_TEMPLATES.neon; }
+  function currentTemplateSupportsMedia() {
+    const t = getTemplate();
+    return !!(t.supportsMedia || t.supportsImage || t.supportsVideo);
+  }
+  function currentTemplateAccepts() {
+    const t = getTemplate();
+    if (t.supportsVideo || t.supportsMedia) return "image/*,video/mp4,video/quicktime,video/webm";
+    if (t.supportsImage) return "image/*";
+    return "";
+  }
   function safeUser() { return (currentUser?.email || currentUser?.phoneNumber || "unknown").toLowerCase(); }
+  function detectRenderContext() {
+    const ua = navigator.userAgent || "";
+    const width = window.innerWidth || document.documentElement.clientWidth || 0;
+    const isTouch = navigator.maxTouchPoints > 0 || matchMedia("(pointer: coarse)").matches;
+    const isTablet = /iPad|Tablet/i.test(ua) || (isTouch && width >= 700 && width <= 1180);
+    const isMobile = !isTablet && (/Mobi|Android|iPhone|iPod/i.test(ua) || width <= 640);
+    const os = /Android/i.test(ua) ? "android" : /iPhone|iPad|iPod/i.test(ua) ? "ios" : /Windows/i.test(ua) ? "windows" : /Mac OS X/i.test(ua) ? "mac" : "other";
+    document.documentElement.lang = (navigator.language || "en").slice(0, 12);
+    document.body.dataset.device = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
+    document.body.dataset.os = os;
+    document.body.dataset.touch = isTouch ? "true" : "false";
+    document.body.dataset.lang = navigator.language || "en";
+    document.body.classList.toggle("device-mobile", isMobile);
+    document.body.classList.toggle("device-tablet", isTablet);
+    document.body.classList.toggle("device-desktop", !isMobile && !isTablet);
+  }
   function showPage(id) {
     if (!id || !byId(id)) return;
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -473,11 +499,12 @@
     setText("selectedClubTitle", loc.locationName);
     setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
     selectedTemplate = "blackwhite";
+    if (byId("templateSearch")) byId("templateSearch").value = "";
     renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
   function templateSearchText(t) {
-    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${t.supportsMedia ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
   function renderTemplates() {
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
@@ -485,20 +512,27 @@
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
     const filteredIds = ids.filter(id => {
       const t = getTemplate(id);
-      return !query || templateSearchText(t).includes(query);
+      return !query ? id === "blackwhite" : contextualSearchMatch(query, templateSearchText(t));
     });
     grid.innerHTML = filteredIds.length ? "" : '<div class="empty">No matching templates found.</div>';
     filteredIds.forEach(id => {
       const t = getTemplate(id), item = document.createElement("div");
       item.className = `template ${t.className || "neon"} ${t.id === selectedTemplate ? "selected" : ""}`;
+      item.setAttribute("role", "button");
+      item.tabIndex = 0;
       item.innerHTML = `<div class="template-mini-preview"><strong>${esc(t.defaultMain || "SHOUTOUT")}</strong><span>${esc(t.defaultSub || t.category || "")}</span></div><div class="name">${esc(t.name)}</div><div class="tag">${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>`;
-      item.addEventListener("click", () => { selectedTemplate = t.id; renderTemplates(); updateTemplateSummary(); });
+      const openTemplate = () => { selectedTemplate = t.id; renderTemplates(); updateTemplateSummary(); goToEditor(); };
+      item.addEventListener("click", openTemplate);
+      item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTemplate(); } });
       grid.appendChild(item);
     });
   }
   function updateTemplateSummary() {
     const t = getTemplate();
+    document.body.dataset.selectedTemplate = t.id || selectedTemplate;
+    document.body.classList.toggle("template-media-unavailable", !currentTemplateSupportsMedia());
     byId("selectedTemplateSummary").innerHTML = `<h3>${esc(t.name)}</h3><p>${esc(t.description || "Template selected.")}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span></div>`;
+    updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {
     const url = new URL("./display.html", window.location.href);
@@ -515,6 +549,7 @@
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
+    if (!currentTemplateSupportsMedia()) return {};
     const file = byId("shoutoutPhoto")?.files?.[0];
     if (!file) return {};
     if (!storage) throw new Error("Firebase Storage is not initialized. Add firebase-storage-compat.js and enable Storage.");
@@ -537,6 +572,7 @@
   }
 
   async function uploadShoutoutMedia(referenceNumber) {
+    if (!currentTemplateSupportsMedia()) return {};
     if (window.jadzUploadSelectedShoutoutMedia && byId("shoutoutMediaUpload")?.files?.[0]) {
       setText("uploadStatus", "Uploading media...");
       const media = await window.jadzUploadSelectedShoutoutMedia(referenceNumber);
@@ -588,16 +624,16 @@
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
       const l=getLocation(), t=getTemplate();
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
-      const uploadedMedia = await uploadShoutoutMedia(referenceNumber);
+      const uploadedMedia = currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
       const existingMediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
       const existingMediaType = byId("shoutoutMediaType")?.value.trim() || "";
-      const mediaPayload = {
+      const mediaPayload = currentTemplateSupportsMedia() ? {
         mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
         mediaFileName: uploadedMedia.mediaFileName || "",
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
         mediaUploadedAt: uploadedMedia.mediaUploadedAt || null
-      };
+      } : { mediaUrl:"", mediaType:"", mediaFileName:"", mediaStoragePath:"", mediaUploadedAt:null };
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
@@ -607,6 +643,43 @@
     } catch(e) { status.textContent=e.message; }
   }
   function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
+
+  function updateMediaEditorForTemplate() {
+    const t = getTemplate();
+    const allowsMedia = currentTemplateSupportsMedia();
+    const accepts = currentTemplateAccepts();
+    document.body.dataset.selectedTemplate = t.id || selectedTemplate;
+    document.body.classList.toggle("template-media-unavailable", !allowsMedia);
+    const photoWrap = byId("shoutoutPhotoWrap");
+    const photoInput = byId("shoutoutPhoto");
+    if (photoWrap) photoWrap.classList.toggle("hidden", !allowsMedia);
+    if (photoInput) {
+      photoInput.accept = accepts || "image/jpeg,image/png,image/webp";
+      if (!allowsMedia) photoInput.value = "";
+    }
+    const mediaInput = byId("shoutoutMediaUpload");
+    const mediaCard = mediaInput?.closest(".media-upload-card") || mediaInput?.closest(".card");
+    if (mediaInput) {
+      mediaInput.accept = accepts;
+      if (!allowsMedia) mediaInput.value = "";
+    }
+    if (mediaCard) mediaCard.classList.toggle("hidden", !allowsMedia);
+    const mediaUrl = byId("shoutoutMediaUrl"), mediaType = byId("shoutoutMediaType"), legacyUrl = byId("mediaUrl");
+    if (!allowsMedia) {
+      if (mediaUrl) mediaUrl.value = "";
+      if (mediaType) mediaType.value = "";
+      if (legacyUrl) legacyUrl.value = "";
+    }
+  }
+
+  function goToEditor() {
+    const l=getLocation(), t=getTemplate();
+    setText("editorClubTitle", l.locationName);
+    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${t.name}`);
+    updateMediaEditorForTemplate();
+    updatePreview();
+    showPage("editorPage");
+  }
 
 
   function ensureProfileMenuEnhancements(user) {
@@ -625,7 +698,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.18-f";
+      portalLink.href = "./patron-portal.html?v=28.19-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -638,14 +711,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.18-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.19-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.18-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.19-f";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -696,6 +769,9 @@
 
 
   document.addEventListener("DOMContentLoaded", function(){
+    detectRenderContext();
+    window.addEventListener("resize", detectRenderContext);
+    window.addEventListener("orientationchange", detectRenderContext);
     setStatus("Choose a sign-in/up option.");
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
     bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
@@ -779,10 +855,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.18-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.19-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.18-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.18-f">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.19-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.19-f">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -825,7 +901,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.18-f"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.19-f"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -834,11 +910,14 @@ document.addEventListener("click",function(e){let b=e.target.closest("[data-serv
 "use strict";
 function byId(id){return document.getElementById(id);}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function templateAllowsMedia(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};return !!(t.supportsMedia||t.supportsImage||t.supportsVideo);}
+function templateAcceptsMedia(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};if(t.supportsVideo||t.supportsMedia)return "image/*,video/mp4,video/quicktime,video/webm";if(t.supportsImage)return "image/*";return "";}
+function templateUploadLabel(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};return (t.supportsVideo||t.supportsMedia)?"Upload Image or Video":"Upload Image";}
 function editorHost(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
 function templateHost(){return byId("templateList")||byId("templatesList")||document.querySelector(".template-list");}
 function ensureMediaEditor(){
- const host=editorHost(); if(!host||byId("shoutoutMediaUpload"))return;
- const box=document.createElement("div"); box.className="card"; box.innerHTML=`<h2>Photo / Video Upload</h2><p class="sub small">Upload image or short video from your phone.</p><label>Upload Image or Video<input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`; host.appendChild(box);
+ const host=editorHost(); if(!host||byId("shoutoutMediaUpload")||!templateAllowsMedia())return;
+ const box=document.createElement("div"); box.className="card media-upload-card"; box.innerHTML=`<h2>Media Upload</h2><p class="sub small">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`; host.appendChild(box);
  byId("shoutoutMediaUpload").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0],prev=byId("shoutoutMediaPreview"); if(!f||!prev)return; const url=URL.createObjectURL(f); const isV=f.type.startsWith("video/"); prev.classList.remove("hidden"); prev.innerHTML=isV?`<video src="${url}" controls playsinline muted loop></video><p>${esc(f.name)}</p>`:`<img src="${url}" alt=""><p>${esc(f.name)}</p>`;});
 }
 async function uploadSelectedMedia(referenceNumber){
@@ -874,8 +953,11 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
 /* v28.6 single media input and live preview fix */
 (function(){
   "use strict";
-  function byId(id){return document.getElementById(id);}
-  function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function byId(id){return document.getElementById(id);}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+  function templateAllowsMedia(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};return !!(t.supportsMedia||t.supportsImage||t.supportsVideo);}
+  function templateAcceptsMedia(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};if(t.supportsVideo||t.supportsMedia)return "image/*,video/mp4,video/quicktime,video/webm";if(t.supportsImage)return "image/*";return "";}
+  function templateUploadLabel(){const id=document.body?.dataset.selectedTemplate||"blackwhite";const t=(window.SHOUTOUT_TEMPLATES||{})[id]||{};return (t.supportsVideo||t.supportsMedia)?"Upload Image or Video":"Upload Image";}
   function findTextInput(){return byId("mainText")||byId("shoutoutText")||byId("messageText")||document.querySelector("textarea[name='mainText']")||document.querySelector("textarea")||document.querySelector("input[name='mainText']");}
   function findSubTextInput(){return byId("subText")||byId("shoutoutSubText")||document.querySelector("input[name='subText']")||document.querySelector("textarea[name='subText']");}
   function findEditor(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
@@ -889,16 +971,17 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
   }
   function ensureSingleMediaUploader(){
     const editor=findEditor(); if(!editor)return;
+    if(!templateAllowsMedia()){removeDuplicateMediaInputs();return;}
     removeDuplicateMediaInputs();
     let input=byId("shoutoutMediaUpload");
     if(!input){
       const card=document.createElement("div");
-      card.className="card";
-      card.innerHTML=`<h2>Photo or Video</h2><p class="single-media-upload-note">Use one upload field only. Select either a photo or a short video.</p><label>Upload Photo or Video<input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
+      card.className="card media-upload-card";
+      card.innerHTML=`<h2>Media Upload</h2><p class="single-media-upload-note">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
       editor.appendChild(card);
       input=byId("shoutoutMediaUpload");
     }
-    input.accept="image/*,video/mp4,video/quicktime,video/webm";
+    input.accept=templateAcceptsMedia();
     input.onchange=renderLiveMediaPreview;
   }
   function getCurrentText(){
@@ -944,6 +1027,7 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
     if(sub&&!sub.dataset.v286Bound){sub.dataset.v286Bound="1";sub.addEventListener("input",refreshPreviewText);sub.addEventListener("change",refreshPreviewText);}
   }
   async function uploadSingleSelectedMedia(referenceNumber){
+    if(!templateAllowsMedia())return {mediaUrl:"",mediaType:""};
     const input=byId("shoutoutMediaUpload");
     const file=input&&input.files&&input.files[0];
     if(!file)return {mediaUrl:"",mediaType:""};
