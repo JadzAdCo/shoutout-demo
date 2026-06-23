@@ -549,9 +549,13 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Classic Black & White', scope:'Shared', className:'classic-bw', category:'Classic' },
+  blackwhite: { id:'blackwhite', name:'Traditional Black & White', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'STACY', description:'Classic marquee lightbox with bold black letters.' },
+  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.' },
+  anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.' },
+  engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.' },
+  fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.' },
   summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal' },
-  car: { id:'car', name:'Car Meet / Luxury Ride', scope:'Shared', className:'car', category:'Lifestyle' },
+  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts.' },
   champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP' },
   beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach' },
   graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone' },
@@ -561,7 +565,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business' }
 });
 
-window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','summer','car','champagne','beach','graduation','wedding','sports','luxury','corporate'];
+window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate'];
 
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];

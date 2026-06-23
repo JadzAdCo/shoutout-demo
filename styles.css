@@ -25,6 +25,9 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .user-dropdown{position:absolute!important;right:0!important;top:48px!important;width:278px!important;border:1px solid var(--line)!important;background:rgba(10,10,28,.96)!important;box-shadow:0 22px 70px rgba(0,0,0,.45)!important;border-radius:20px!important;padding:14px!important;backdrop-filter:blur(14px)!important}
 .user-dropdown-row{display:flex!important;gap:12px!important;align-items:center!important;margin-bottom:12px!important}
 .user-dropdown-row p{margin:3px 0 0!important;color:var(--muted)!important;font-size:13px!important;word-break:break-word!important}
+.user-menu a,.user-menu a:link,.user-menu a:visited,.user-menu a:hover,.user-menu a:active,.user-menu a:focus,.user-dropdown a,.user-dropdown a:link,.user-dropdown a:visited,.user-dropdown a:hover,.user-dropdown a:active,.user-dropdown a:focus{color:#fff!important;text-decoration:none!important}
+.user-menu .profile-menu-link,.user-dropdown .profile-menu-link{display:block!important;padding:8px 0!important;font-weight:600!important;transition:opacity .2s ease!important}
+.user-menu .profile-menu-link:hover,.user-dropdown .profile-menu-link:hover{opacity:.8!important}
 .topbar > button[id^="logout"], #logoutBtnClubActions{display:none!important}
 .category-grid,.compact-category-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:10px!important;margin-top:16px!important}
 .category-card{min-height:54px!important;height:auto!important;font-size:15px!important;border-radius:14px!important;padding:10px 12px!important;line-height:1.1!important}
@@ -46,3 +49,23 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .ad-image-slot{width:min(520px,86vw);margin:0 auto 14px}
 .ad-image-slot img{width:100%;height:auto;max-height:280px;object-fit:contain;border-radius:24px;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.35)}
 @media(max-width:520px){.profile-grid{grid-template-columns:1fr}.ad-image-slot img{max-height:210px}}
+
+/* v28.11 preview: simplified template selector */
+.template-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.template{min-height:220px;display:flex;flex-direction:column;gap:12px}
+.template-mini-preview{min-height:108px;border-radius:16px;display:grid;place-items:center;text-align:center;padding:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}
+.template-mini-preview strong{display:block;font-size:22px;line-height:1.05;text-transform:uppercase}
+.template-mini-preview span{display:block;margin-top:6px;font-size:13px;color:rgba(255,255,255,.78);text-transform:uppercase}
+.template.classic-bw{background:linear-gradient(135deg,#060606,#1b1b1b 32%,#e41616 33%,#111 58%,#e41616 74%,#060606);color:#fff}
+.template.classic-bw .template-mini-preview{background:#f6f8fb;color:#070707;border:4px solid #e41616;box-shadow:inset 0 0 0 5px #fff}
+.template.classic-bw .template-mini-preview span{color:#222}
+.template.car .template-mini-preview{background:linear-gradient(180deg,#333,#050505);position:relative;overflow:hidden}
+.template.car .template-mini-preview:before{content:"";position:absolute;left:14%;right:14%;bottom:18px;height:32px;background:#e41616;border-radius:60px 60px 18px 18px;box-shadow:0 -16px 0 #111 inset}
+.template.car .template-mini-preview strong,.template.car .template-mini-preview span{position:relative;z-index:1}
+.template.celebration-media .template-mini-preview,.template.anniversary-media .template-mini-preview,.template.engagement-media .template-mini-preview{grid-template-columns:1fr 1fr;gap:8px}
+.template.celebration-media .template-mini-preview:before,.template.anniversary-media .template-mini-preview:before,.template.engagement-media .template-mini-preview:before{content:"IMAGE / VIDEO";display:grid;place-items:center;align-self:stretch;border:2px dashed rgba(255,255,255,.75);border-radius:12px;font-size:11px;font-weight:1000;color:rgba(255,255,255,.82)}
+
+/* v28.11 preview revision: tighter selector thumbnail for traditional template */
+.template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 28%,#e41616 29%,#111 50%,#e41616 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #e41616;color:#fff;overflow:hidden}
+.template.classic-bw .template-mini-preview strong{display:inline-block;background:#f5f8fb;color:#050505;border:3px solid #e41616;border-radius:10px;padding:8px 12px;max-width:92%}
+.template.classic-bw .template-mini-preview span{color:#f5f8fb}

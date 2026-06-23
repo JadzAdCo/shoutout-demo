@@ -1,28 +1,37 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.10 Contextual Search UI Cleanup
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.12 Avatar Dropdown Link Color Fix
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.10
+https://jadzadco.github.io/shoutout-demo/?v=28.12
 ```
 
 Current release highlights:
 
+- Fixed avatar dropdown anchor link colors so My Profile, Messages, and Chats stay white.
+- Added CSS for link, visited, hover, active, and focus states in the user menu dropdown.
+- Updated ShoutOut templates and display preview styling.
+- Traditional Black & White now uses a tighter full-sign marquee board direction.
+- Removed unnecessary brand/footer text from the display preview.
+- Added clearly labeled image/video placeholder template options.
+- Added 50/50 media/text layout support for image/video templates.
+- Added a simplified searchable template selection screen.
+- Default ShoutOut template is now Traditional Black & White.
 - Removed the Country, State / Region / Province, City, and Music Genre dropdown filters from the search display page.
 - Kept the single contextual search box as the primary patron search workflow.
 - Updated search helper text and placeholder examples for natural-language search.
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.10`.
+- Bumped cache-busting query strings to `v=28.12`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.10 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
+- Database rollback: no database rollback is needed for v28.12 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2026,3 +2035,271 @@ Rollback from v28.10 to previous package
 This v28.10 release does not require Firestore or Storage config changes.
 
 No database rollback is needed unless live test submissions were created manually during testing. If test ShoutOuts or guest list requests were submitted, delete only those specific test records from Firestore and any matching test media under `shoutouts/{uid}/...` in Firebase Storage.
+
+---
+
+# v28.11 Codex Release — Template Preview Cleanup
+
+Generated: 2026-06-23  
+Package: `jadz-shoutout-v28-11-template-preview-cleanup-full-package.zip`
+
+This is a full upload package. It contains all web app files, not only changed files.
+
+## What Changed
+
+1. Traditional Black & White now uses a tighter red/black marquee-board direction.
+2. Removed extra brand text from display preview output.
+3. Removed the display footer line from preview output.
+4. Added clear labels for templates that do or do not use media.
+5. Added image/video placeholder templates:
+   - Happy Birthday with image/video placeholder
+   - Happy Anniversary with image/video placeholder
+   - Happy Engagement with image/video placeholder
+   - Fiance Celebration with image/video placeholder
+6. Added 50/50 split layout for media templates: media on one side, ShoutOut text on the other.
+7. Added a car-themed Luxury Car Celebration template direction.
+8. Simplified template selection with a search box.
+9. Set Traditional Black & White as the default template.
+10. Bumped cache-busting query strings to `v=28.11`.
+
+## Files Changed In This Release
+
+```text
+index.html
+shared-data.js
+patron-app.js
+display.html
+display-app.js
+display.css
+styles.css
+README.md
+ROLLBACK-V28-11.md
+rollback-v28-11.ps1
+```
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase project configuration changes are required for v28.11.
+
+No Firestore collections were added or removed.
+
+No Firestore document shapes were changed.
+
+No Firebase Storage paths were changed.
+
+No Firestore Security Rules or Storage Rules changes are required for this release.
+
+This release changes frontend display/template behavior only.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Open the extracted folder.
+3. Upload the contents of the extracted folder to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+4. Replace the existing files in the repo root.
+5. Commit with:
+
+```text
+Upload v28.11 template preview cleanup full package
+```
+
+6. Wait 1-3 minutes for GitHub Pages to publish.
+7. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.11
+```
+
+## Test URLs
+
+Patron app:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.11
+```
+
+Display preview:
+
+```text
+https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-spain&template=blackwhite&main=HAPPY%20BIRTHDAY&sub=STACY&v=28.11
+```
+
+Birthday media template preview:
+
+```text
+https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-spain&template=birthdayMedia&main=HAPPY%20BIRTHDAY&sub=CELEBRATE%20BIG&v=28.11
+```
+
+Car template preview:
+
+```text
+https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-spain&template=car&main=LUXURY%20RIDE%20CREW&sub=PULL%20UP%20CLEAN&v=28.11
+```
+
+## Manual Test Checklist
+
+1. Open the patron app URL.
+2. Sign in as a patron.
+3. Search and select a location.
+4. Confirm the template selection screen has a template search box.
+5. Confirm Traditional Black & White is selected by default.
+6. Confirm media templates are labeled as image/video placeholder templates.
+7. Continue to editor.
+8. Confirm the display preview no longer shows club name / Jadz AdCo header text.
+9. Confirm the display preview no longer shows the footer line.
+10. Test Traditional Black & White.
+11. Test one image/video placeholder template.
+12. Test Luxury Car Celebration.
+
+## Rollback Plan
+
+### Code Rollback
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.11.
+2. Or upload the previous known-good package, such as v28.10.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.10-rollback-test
+```
+
+Manual rollback:
+
+1. Upload the prior package contents back to the repo root.
+2. Commit with:
+
+```text
+Rollback from v28.11 to previous package
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-11.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+### Firestore / Storage Rollback
+
+This v28.11 release does not require Firestore or Storage config changes.
+
+No database rollback is needed unless live test submissions were created manually during testing. If test ShoutOuts, guest list requests, or media uploads were created, delete only those test records/media.
+
+---
+
+# v28.12 Codex Release — Avatar Dropdown Link Color Fix
+
+Generated: 2026-06-23  
+Package: `jadz-shoutout-v28-12-avatar-dropdown-link-color-full-package.zip`
+
+This is a full upload package. It contains all web app files, not only changed files.
+
+## What Changed
+
+1. Fixed avatar/user dropdown links so they remain white in all browser link states.
+2. Added explicit CSS coverage for:
+   - normal links
+   - unvisited links
+   - visited links
+   - hover
+   - active
+   - focus
+3. Applied the rule to both `.user-menu` and `.user-dropdown`.
+4. Preserved the dropdown link layout with block display, readable spacing, and hover opacity.
+5. Bumped cache-busting query strings to `v=28.12`.
+
+## Files Changed In This Release
+
+```text
+styles.css
+README.md
+ROLLBACK-V28-12.md
+rollback-v28-12.ps1
+*.html / *.js cache-busting query strings
+```
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase project configuration changes are required for v28.12.
+
+No Firestore collections were added or removed.
+
+No Firestore document shapes were changed.
+
+No Firebase Storage paths were changed.
+
+No Firestore Security Rules or Storage Rules changes are required for this release.
+
+This release changes frontend CSS only.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Open the extracted folder.
+3. Upload the contents of the extracted folder to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+4. Replace the existing files in the repo root.
+5. Commit with:
+
+```text
+Upload v28.12 avatar dropdown link color full package
+```
+
+6. Wait 1-3 minutes for GitHub Pages to publish.
+7. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.12
+```
+
+## Manual Test Checklist
+
+1. Open the patron app URL.
+2. Sign in.
+3. Open the avatar/user dropdown.
+4. Confirm `My Profile`, `Messages (0/0)`, and `Chats (0/0)` are white.
+5. Click one of the links.
+6. Go back to the app.
+7. Open the dropdown again.
+8. Confirm the clicked/visited link is still white, not blue or purple.
+9. Hard refresh or open incognito and repeat.
+
+## Rollback Plan
+
+### Code Rollback
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.12.
+2. Or upload the previous known-good package, such as v28.11.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.11-rollback-test
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-12.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+### Firestore / Storage Rollback
+
+This v28.12 release does not require Firestore or Storage config changes.
+
+No database rollback is needed.

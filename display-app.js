@@ -14,20 +14,29 @@
   function render(data) {
     const t = templates[data.template || "neon"] || templates.neon || {};
     const canvas = byId("displayCanvas");
-    canvas.classList.remove("gold","ice","fire");
+    canvas.className = "display-canvas";
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
-    byId("displayBrand").textContent = data.locationName ? `${data.locationName} x JADZ ADCO` : (loc.brand || "JADZ ADCO");
-    byId("displayMain").textContent = data.mainText || loc.defaultMain || "USE SHOUT OUT";
-    byId("displaySub").textContent = data.subText || "";
+    const mainText = data.mainText || t.defaultMain || loc.defaultMain || "USE SHOUT OUT";
+    const subText = data.subText || t.defaultSub || "";
+    byId("displayBrand").textContent = "";
+    const center = document.querySelector(".display-center");
     const mediaSlot = byId("mediaSlot");
-    if (data.mediaUrl) {
+    const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && data.mediaUrl);
+    if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
+    if (usesSplitMedia) {
       mediaSlot.classList.remove("hidden");
-      const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(data.mediaUrl);
-      mediaSlot.innerHTML = isVideo ? `<video src="${esc(data.mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(data.mediaUrl)}" alt="ShoutOut media">`;
+      if (data.mediaUrl) {
+        const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(data.mediaUrl);
+        mediaSlot.innerHTML = isVideo ? `<video src="${esc(data.mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(data.mediaUrl)}" alt="ShoutOut media">`;
+      } else {
+        mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
+      }
     } else {
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
     }
+    byId("displayMain").textContent = mainText;
+    byId("displaySub").textContent = subText;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
