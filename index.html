@@ -69,7 +69,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.19-f">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.20-f">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -241,8 +241,18 @@
     <div class="composer">
       <div class="card">
         <h2>Message</h2>
-        <label>Main message<input id="mainText" maxlength="48" value="HAPPY BIRTHDAY MAYA!"/></label>
-        <label>Sub message<input id="subText" maxlength="80" value="VIP Table 4 sends love"/></label>
+        <label>Main message<input id="mainText" maxlength="36" value="HAPPY BIRTHDAY MAYA!"/></label>
+        <div class="attribution-controls">
+          <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Post my name or handle</span></label>
+          <label id="attributionChoiceWrap" class="hidden">Show as
+            <select id="attributionChoice">
+              <option value="displayName">Display name</option>
+              <option value="username">Username</option>
+              <option value="instagram">Instagram handle</option>
+            </select>
+          </label>
+          <input id="subText" type="hidden" value=""/>
+        </div>
         <label id="shoutoutPhotoWrap" class="template-media-field">Upload Photo<input id="shoutoutPhoto" type="file" accept="image/jpeg,image/png,image/webp"/></label>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
@@ -272,9 +282,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.19-f"></script>
-<script src="./shared-data.js?v=28.19-f"></script>
-<script src="./patron-app.js?v=28.19-f"></script>
-<script src="./notification-center.js?v=28.19-f"></script>
+<script src="./firebase-config.js?v=28.20-f"></script>
+<script src="./shared-data.js?v=28.20-f"></script>
+<script src="./patron-app.js?v=28.20-f"></script>
+<script src="./notification-center.js?v=28.20-f"></script>
 </body>
 </html>

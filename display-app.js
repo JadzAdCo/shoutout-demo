@@ -38,22 +38,30 @@
   function classicBoardRows(mainText, subText) {
     const maxRows = 3;
     const maxChars = 12;
-    const words = cleanBoardText(mainText).split(" ").filter(Boolean);
+    const attribution = cleanBoardText(subText).slice(0, maxChars);
+    const availableRows = attribution ? 2 : maxRows;
+    const words = cleanBoardText(mainText).slice(0, 36).split(" ").filter(Boolean);
     const rows = [];
 
     if (words[0] === "HAPPY" && words[1] === "BIRTHDAY") {
       rows.push("HAPPY", "BIRTHDAY");
-      pushWrapped(rows, words.slice(2), maxRows, maxChars);
+      pushWrapped(rows, words.slice(2), availableRows, maxChars);
     } else {
-      pushWrapped(rows, words, maxRows, maxChars);
+      pushWrapped(rows, words, availableRows, maxChars);
     }
 
-    if (rows.length < maxRows && cleanBoardText(subText)) {
-      pushWrapped(rows, cleanBoardText(subText).split(" "), maxRows, maxChars);
-    }
+    if (attribution) rows.push(attribution);
 
     while (rows.length < maxRows) rows.push("");
     return rows.slice(0, maxRows);
+  }
+
+  function classicFitStyle(row, rows) {
+    const longest = Math.max(...rows.map(x => x.length), 1);
+    const rowLen = Math.max(row.length, longest);
+    const maxPx = rowLen <= 5 ? 118 : rowLen <= 8 ? 106 : rowLen <= 10 ? 96 : rowLen <= 12 ? 88 : rowLen <= 16 ? 72 : 58;
+    const vw = rowLen <= 8 ? 8.6 : rowLen <= 12 ? 7.4 : rowLen <= 16 ? 6.2 : 5.2;
+    return `--fit-size:clamp(38px,${vw}vw,${maxPx}px)`;
   }
 
   function render(data) {
@@ -86,8 +94,9 @@
       mediaSlot.innerHTML = "";
     }
     if (isClassicBoard) {
+      const rows = classicBoardRows(mainText, subText);
       byId("displayMain").classList.add("classic-bw-board");
-      byId("displayMain").innerHTML = `<span class="classic-board-lines">${classicBoardRows(mainText, subText).map(row => `<b>${esc(row)}</b>`).join("")}</span>`;
+      byId("displayMain").innerHTML = `<span class="classic-board-lines">${rows.map(row => `<b style="${classicFitStyle(row, rows)}">${esc(row)}</b>`).join("")}</span>`;
       byId("displaySub").classList.add("classic-bw-sub-hidden");
       byId("displaySub").textContent = "";
     } else {

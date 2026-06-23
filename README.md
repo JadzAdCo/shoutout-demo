@@ -1,15 +1,24 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.19-f Responsive Template Selection + Media Input Fix Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.20-f Classic Board Text + Attribution Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.19-f
+https://jadzadco.github.io/shoutout-demo/?v=28.20-f
 ```
 
 Current release highlights:
 
+- Removed the default `STACY` text from the Traditional Black & White template thumbnail and default template data.
+- Replaced the free-form second message input with an optional `Post my name or handle` attribution control.
+- Attribution can use display name, username, or Instagram handle; username/Instagram are normalized with an `@` prefix.
+- Classic Black & White main message is capped at 36 characters, matching three rows of roughly 12 characters each.
+- Classic Black & White display now auto-wraps the main message across up to three board rows.
+- Classic Black & White board letters now auto-size per row based on character count.
+- Classic Black & White letters are larger and remain bold with the physical cut-out shadow effect.
+- AI-generated ShoutOut text now fills the main message only; attribution remains controlled by the patron.
+- Text-only template submissions no longer carry stale second-line or media values unless attribution is selected.
 - Left-aligned the Screen 2 `Or` divider before `Throw a ShoutOut`.
 - Added browser/device context detection for mobile, tablet, desktop, touch support, operating system, viewport changes, orientation changes, and browser language.
 - Simplified the template selection page so it shows the template search input and the default Traditional Black & White template first.
@@ -70,13 +79,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.19-f`.
+- Bumped cache-busting query strings to `v=28.20-f`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.19-f because this release does not require Firestore/Storage rules, index, or config changes.
+- Database rollback: no database rollback is needed for v28.20-f because this release does not require Firestore/Storage rules, index, or config changes.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2746,12 +2755,12 @@ Database rollback is normally not needed. If a specific media ShoutOut must be r
 
 ---
 
-# Jadz AdCo ShoutOut v28.19-f Navigation + Messages Fix Package
+# Jadz AdCo ShoutOut v28.20-f Navigation + Messages Fix Package
 
 ## Package
 
 ```text
-shoutoutwepp,vers-28.19-f-full-package.zip
+shoutoutwepp,vers-28.20-f-full-package.zip
 ```
 
 ## What Changed
@@ -2761,14 +2770,14 @@ shoutoutwepp,vers-28.19-f-full-package.zip
 - Added clearer workflow labels such as `Screen 3B — Club / Search` and `Screen 4 — Club / Select ShoutOut Template`.
 - Removed the bottom Messages / Chats / Notifications bar.
 - Merged notifications into Messages counts and the Messages tab.
-- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.19-f` fix release.
+- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.20-f` fix release.
 - Adopted release suffix convention: `-f` for fixes and `-nf` for new features.
 - Enlarged the Classic Black & White white center board.
 - Moved the white board upward to reduce excess red/black header space.
 - Enlarged and strengthened the three cut-out letter rows.
 - Preserved the three-row board behavior and birthday split.
 - Preserved the v28.16 media upload/display pipeline fix.
-- Bumped active cache-busting links and scripts to `v=28.19-f`.
+- Bumped active cache-busting links and scripts to `v=28.20-f`.
 
 ## Firebase / Firestore / Storage Impact
 
@@ -2795,14 +2804,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.19-f navigation messages fix package
+Upload v28.20-f navigation messages fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.19-f
+https://jadzadco.github.io/shoutout-demo/?v=28.20-f
 ```
 
 ## Manual Test Checklist
@@ -2818,7 +2827,7 @@ https://jadzadco.github.io/shoutout-demo/?v=28.19-f
 
 Preferred rollback:
 
-1. Revert the GitHub commit that uploaded v28.19-f.
+1. Revert the GitHub commit that uploaded v28.20-f.
 2. Or upload the previous known-good package, such as v28.16.
 3. Test with:
 
@@ -2829,9 +2838,9 @@ https://jadzadco.github.io/shoutout-demo/?v=28.16-rollback-test
 Helper script:
 
 ```powershell
-.\rollback-v28-19-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+.\rollback-v28-20-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
 ```
 
 The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
 
-No Firestore or Storage rollback is needed for v28.19-f.
+No Firestore or Storage rollback is needed for v28.20-f.

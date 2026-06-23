@@ -60,6 +60,8 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .template-media-unavailable .template-media-field,.template-media-unavailable .media-upload-card{display:none!important}
 .template-media-note{color:var(--muted);font-weight:800;margin-top:8px}
 .device-mobile .preview iframe{height:min(390px,70vh)}
+.attribution-controls{margin:12px 0 4px}
+.attribution-controls .consent-line{margin:0 0 10px}
 .template-mini-preview{min-height:108px;border-radius:16px;display:grid;place-items:center;text-align:center;padding:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}
 .template-mini-preview strong{display:block;font-size:22px;line-height:1.05;text-transform:uppercase}
 .template-mini-preview span{display:block;margin-top:6px;font-size:13px;color:rgba(255,255,255,.78);text-transform:uppercase}

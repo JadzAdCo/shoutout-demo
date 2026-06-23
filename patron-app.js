@@ -22,6 +22,7 @@
   let templates = {};
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
+  let cachedUserProfile = null;
 
   function locationId() { return (selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc").toLowerCase(); }
   function getLocation(id = locationId()) { return locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]; }
@@ -183,7 +184,8 @@
     if (!currentUser) return null;
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
-      return doc.exists ? doc.data() : null;
+      cachedUserProfile = doc.exists ? doc.data() : null;
+      return cachedUserProfile;
     } catch (e) {
       console.warn("Could not read user profile:", e.message);
       return null;
@@ -198,6 +200,29 @@
 
     if (byId("profileUsername") && !byId("profileUsername").value) byId("profileUsername").value = cleanName;
     if (byId("profileDisplayName") && !byId("profileDisplayName").value) byId("profileDisplayName").value = displayName;
+  }
+
+  function cleanHandle(value) {
+    const raw = String(value || "").trim().replace(/^@+/, "");
+    return raw ? `@${raw.replace(/[^a-zA-Z0-9._]/g, "").slice(0, 30)}` : "";
+  }
+
+  function currentAttributionValue() {
+    if (!byId("includeAttribution")?.checked) return "";
+    const profile = cachedUserProfile || {};
+    const choice = byId("attributionChoice")?.value || "displayName";
+    const emailName = (currentUser?.email || "").split("@")[0] || "";
+    const username = profile.username || emailName || currentUser?.displayName || "patron";
+    if (choice === "instagram") return cleanHandle(profile.instagramHandle || byId("profileInstagram")?.value || username);
+    if (choice === "username") return cleanHandle(username);
+    return String(profile.displayName || currentUser?.displayName || username).trim().slice(0, 30);
+  }
+
+  function syncAttribution() {
+    const enabled = !!byId("includeAttribution")?.checked;
+    byId("attributionChoiceWrap")?.classList.toggle("hidden", !enabled);
+    if (byId("subText")) byId("subText").value = currentAttributionValue();
+    updatePreview();
   }
 
   function showSignupProfile() {
@@ -587,8 +612,9 @@
   function applyAiSuggestion() {
     const pool = window.SHOUTOUT_AI_SUGGESTIONS || [];
     const item = pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
-    byId("mainText").value = item.main;
-    byId("subText").value = item.sub;
+    const mainInput = byId("mainText");
+    if (mainInput) mainInput.value = String(item.main || "").slice(0, Number(mainInput.maxLength || 36));
+    syncAttribution();
     const box = byId("shoutoutSuggestionBox");
     if (box) { box.classList.remove("hidden"); box.innerHTML = `<strong>AI Suggestion</strong><p>${esc(item.main)} — ${esc(item.sub)}</p>`; }
     updatePreview();
@@ -607,8 +633,10 @@
       box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||"")}</button>`).join("");
       box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
         const s = rows[Number(btn.dataset.i)];
-        byId("mainText").value = s.mainText || "";
-        byId("subText").value = s.subText || "";
+        const mainInput = byId("mainText");
+        if (mainInput) mainInput.value = String(s.mainText || "").slice(0, Number(mainInput.maxLength || 36));
+        if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText;
+        syncAttribution();
         if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
         if (s.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = s.mediaUrl;
         if (s.mediaType && byId("shoutoutMediaType")) byId("shoutoutMediaType").value = s.mediaType;
@@ -642,12 +670,18 @@
       setText("confirmRef",payload.referenceNumber); setText("confirmClub",l.locationName); setText("confirmTemplate",t.name); showPage("confirmationPage");
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; byId("subText").value="VIP Table 4 sends love"; byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
+  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
     const allowsMedia = currentTemplateSupportsMedia();
     const accepts = currentTemplateAccepts();
+    const mainInput = byId("mainText");
+    if (mainInput) {
+      const isClassic = (t.id || selectedTemplate) === "blackwhite";
+      mainInput.maxLength = isClassic ? 36 : 60;
+      if (mainInput.value.length > mainInput.maxLength) mainInput.value = mainInput.value.slice(0, mainInput.maxLength);
+    }
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
     const photoWrap = byId("shoutoutPhotoWrap");
@@ -677,6 +711,7 @@
     setText("editorClubTitle", l.locationName);
     setText("editorTemplateMeta", `${l.locationLabel} - Template: ${t.name}`);
     updateMediaEditorForTemplate();
+    syncAttribution();
     updatePreview();
     showPage("editorPage");
   }
@@ -698,7 +733,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.19-f";
+      portalLink.href = "./patron-portal.html?v=28.20-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -711,14 +746,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.19-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.20-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.19-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.20-f";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -795,8 +830,10 @@
     bind("skipAdBtn", skipAdSplash);
     bind("saveProfileBtn", saveProfile);
     byId("templateSearch")?.addEventListener("input", renderTemplates);
+    byId("includeAttribution")?.addEventListener("change", syncAttribution);
+    byId("attributionChoice")?.addEventListener("change", syncAttribution);
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
-    ["mainText","subText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
+    ["mainText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
 
   auth.onAuthStateChanged(user => {
@@ -855,10 +892,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.19-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.20-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.19-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.19-f">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.20-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.20-f">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -901,7 +938,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.19-f"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.20-f"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
