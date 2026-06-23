@@ -74,3 +74,13 @@
 .tpl-neon{background:radial-gradient(circle at 20% 20%,#ff4fd8,transparent 35%),radial-gradient(circle at 80% 70%,#5eeaff,transparent 35%),#050719}
 .media-preview-box{border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:12px;margin-top:12px}
 .media-preview-box img,.media-preview-box video{max-width:100%;border-radius:16px;display:block}
+
+/* v28.6 media preview fixes */
+#shoutoutMediaPreview,#liveShoutoutPreview,.shoutout-live-preview{min-height:360px;border-radius:24px;overflow:hidden;position:relative;background:#050505}
+#shoutoutMediaPreview img,#shoutoutMediaPreview video,#liveShoutoutPreview img,#liveShoutoutPreview video,.shoutout-live-preview img,.shoutout-live-preview video{width:100%;max-height:520px;object-fit:cover;border-radius:22px;display:block}
+.media-preview-stage{position:relative;min-height:360px;background:#050505;border-radius:24px;overflow:hidden}
+.media-preview-stage img,.media-preview-stage video{width:100%;min-height:360px;max-height:560px;object-fit:cover;display:block}
+.media-preview-overlay{position:absolute;left:0;right:0;bottom:0;padding:24px 28px;background:linear-gradient(transparent,rgba(0,0,0,.82));color:#fff;text-align:center;text-shadow:0 4px 18px rgba(0,0,0,.85)}
+.media-preview-overlay strong{display:block;font-size:clamp(30px,6vw,70px);line-height:.95;letter-spacing:2px;text-transform:uppercase}
+.media-preview-overlay span{display:block;margin-top:10px;font-size:clamp(18px,3vw,34px);letter-spacing:1px;text-transform:uppercase}
+.single-media-upload-note{font-size:12px;opacity:.8}

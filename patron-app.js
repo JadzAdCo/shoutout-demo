@@ -499,7 +499,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.5";
+      portalLink.href = "./patron-portal.html?v=28.7";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -512,14 +512,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.5";
+      messages.href = "./patron-portal.html?tab=messages&v=28.7";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.5";
+      chats.href = "./patron-portal.html?tab=chats&v=28.7";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -643,10 +643,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.5">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.7">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.5">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.5">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.7">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.7">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -682,7 +682,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.5"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.7"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -724,4 +724,161 @@ function ensureSuggestions(){
 }
 window.jadzUploadSelectedShoutoutMedia=uploadSelectedMedia;
 document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},1000);setInterval(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},2500);});
+})();
+
+
+/* v28.6 single media input and live preview fix */
+(function(){
+  "use strict";
+  function byId(id){return document.getElementById(id);}
+  function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+  function findTextInput(){return byId("mainText")||byId("shoutoutText")||byId("messageText")||document.querySelector("textarea[name='mainText']")||document.querySelector("textarea")||document.querySelector("input[name='mainText']");}
+  function findSubTextInput(){return byId("subText")||byId("shoutoutSubText")||document.querySelector("input[name='subText']")||document.querySelector("textarea[name='subText']");}
+  function findEditor(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
+  function removeDuplicateMediaInputs(){
+    const fileInputs=Array.from(document.querySelectorAll("input[type='file']")).filter(i=>/image|photo|video|media|upload/i.test(((i.closest("label")||{}).textContent||"")+" "+(i.id||"")+" "+(i.name||"")));
+    if(fileInputs.length<=1)return;
+    let keep=byId("shoutoutMediaUpload")||fileInputs[0];
+    keep.id="shoutoutMediaUpload";
+    keep.accept="image/*,video/mp4,video/quicktime,video/webm";
+    fileInputs.forEach(input=>{if(input!==keep){const wrap=input.closest("label")||input.parentElement;if(wrap)wrap.style.display="none";}});
+  }
+  function ensureSingleMediaUploader(){
+    const editor=findEditor(); if(!editor)return;
+    removeDuplicateMediaInputs();
+    let input=byId("shoutoutMediaUpload");
+    if(!input){
+      const card=document.createElement("div");
+      card.className="card";
+      card.innerHTML=`<h2>Photo or Video</h2><p class="single-media-upload-note">Use one upload field only. Select either a photo or a short video.</p><label>Upload Photo or Video<input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
+      editor.appendChild(card);
+      input=byId("shoutoutMediaUpload");
+    }
+    input.accept="image/*,video/mp4,video/quicktime,video/webm";
+    input.onchange=renderLiveMediaPreview;
+  }
+  function getCurrentText(){
+    const main=findTextInput(), sub=findSubTextInput();
+    return {mainText:main?main.value.trim():"", subText:sub?sub.value.trim():""};
+  }
+  function renderLiveMediaPreview(){
+    const input=byId("shoutoutMediaUpload");
+    const file=input&&input.files&&input.files[0];
+    const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
+    if(!file||!preview)return;
+    const url=URL.createObjectURL(file);
+    const isVideo=file.type.startsWith("video/");
+    const text=getCurrentText();
+    preview.classList.remove("hidden");
+    preview.innerHTML=`<div class="media-preview-stage">${isVideo?`<video src="${url}" autoplay muted loop playsinline controls></video>`:`<img src="${url}" alt="">`}<div class="media-preview-overlay"><strong>${esc(text.mainText||"YOUR SHOUTOUT")}</strong><span>${esc(text.subText||"LIVE ON THE DISPLAY")}</span></div></div><p class="sub small">${esc(file.name)} • ${isVideo?"Video":"Image"} preview</p>`;
+  }
+  function refreshPreviewText(){
+    const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
+    if(!preview||preview.classList.contains("hidden"))return;
+    const text=getCurrentText();
+    const strong=preview.querySelector(".media-preview-overlay strong");
+    const span=preview.querySelector(".media-preview-overlay span");
+    if(strong)strong.textContent=text.mainText||"YOUR SHOUTOUT";
+    if(span)span.textContent=text.subText||"LIVE ON THE DISPLAY";
+  }
+  function patchAISuggestionButtons(){
+    document.addEventListener("click",function(e){
+      const btn=e.target.closest(".ai-suggestion,[data-ai-suggestion]");
+      if(!btn)return;
+      const input=findTextInput();
+      if(input){
+        input.value=btn.textContent.trim();
+        input.dispatchEvent(new Event("input",{bubbles:true}));
+        input.dispatchEvent(new Event("change",{bubbles:true}));
+        refreshPreviewText();
+      }
+    },true);
+  }
+  function bindTextPreviewRefresh(){
+    const main=findTextInput(), sub=findSubTextInput();
+    if(main&&!main.dataset.v286Bound){main.dataset.v286Bound="1";main.addEventListener("input",refreshPreviewText);main.addEventListener("change",refreshPreviewText);}
+    if(sub&&!sub.dataset.v286Bound){sub.dataset.v286Bound="1";sub.addEventListener("input",refreshPreviewText);sub.addEventListener("change",refreshPreviewText);}
+  }
+  async function uploadSingleSelectedMedia(){
+    const input=byId("shoutoutMediaUpload");
+    const file=input&&input.files&&input.files[0];
+    if(!file)return {mediaUrl:"",mediaType:""};
+    if(!firebase.storage){alert("Firebase Storage SDK is not loaded.");return {mediaUrl:"",mediaType:""};}
+    const user=firebase.auth().currentUser;
+    if(!user)throw new Error("Please sign in before uploading media.");
+    const safeName=(Date.now()+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
+    const ref=firebase.storage().ref().child(`shoutouts/${user.uid}/${safeName}`);
+    await ref.put(file,{contentType:file.type});
+    const mediaUrl=await ref.getDownloadURL();
+    const mediaType=file.type.startsWith("video/")?"video":"image";
+    const mediaUrlInput=byId("shoutoutMediaUrl"), mediaTypeInput=byId("shoutoutMediaType");
+    if(mediaUrlInput)mediaUrlInput.value=mediaUrl;
+    if(mediaTypeInput)mediaTypeInput.value=mediaType;
+    return {mediaUrl,mediaType};
+  }
+  window.jadzUploadSelectedShoutoutMedia=uploadSingleSelectedMedia;
+  window.jadzRefreshShoutoutMediaPreview=refreshPreviewText;
+  document.addEventListener("DOMContentLoaded",()=>{
+    patchAISuggestionButtons();
+    setInterval(()=>{ensureSingleMediaUploader();bindTextPreviewRefresh();removeDuplicateMediaInputs();},1000);
+  });
+})();
+
+
+/* v28.7 ensure ShoutOut button appears on all club service screens */
+(function(){
+  "use strict";
+
+  function goToShoutOut(){
+    window.__jadzActionMode = "shoutout";
+
+    const fns = ["showTemplateSelection", "goToTemplateSelection", "showTemplates", "openTemplateSelection"];
+    for (const fn of fns) {
+      if (typeof window[fn] === "function") {
+        window[fn]();
+        return;
+      }
+    }
+
+    const page = document.getElementById("templatePage") || document.getElementById("screenTemplates");
+    if (page) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      page.classList.add("active");
+    }
+  }
+
+  function ensureButton(){
+    const text = Array.from(document.querySelectorAll("h1,h2,p,.eyebrow"))
+      .map(x => (x.textContent || "").toLowerCase()).join(" ");
+
+    if (!text.includes("club options") && !text.includes("what would you like to do")) return;
+
+    const already = Array.from(document.querySelectorAll("button,a"))
+      .some(x => (x.textContent || "").toLowerCase().includes("shoutout"));
+    if (already) return;
+
+    const serviceButtons = Array.from(document.querySelectorAll("button")).filter(b => {
+      const t = (b.textContent || "").toLowerCase();
+      return t.includes("reserve") || t.includes("guest list") || t.includes("vip") || t.includes("entry");
+    });
+
+    const host = serviceButtons[0] && serviceButtons[0].parentElement;
+    if (!host) return;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "primary service-action";
+    btn.dataset.service = "shoutout";
+    btn.textContent = "Throw a ShoutOut";
+    btn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      goToShoutOut();
+    };
+    host.insertBefore(btn, host.firstChild);
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    setInterval(ensureButton, 700);
+  });
 })();

@@ -596,3 +596,19 @@ window.SHOUTOUT_MEDIA_TEMPLATE_LIBRARY = {
   "neon-party": {id:"neon-party", name:"Neon Party", category:"Nightclub", supportsImage:true, supportsVideo:true, previewStyle:"neon", mainText:"SHOUTOUT", subText:"LIVE TONIGHT", description:"Neon nightclub theme."}
 };
 window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*1024};
+
+
+/* v28.7 force ShoutOut service for every club/location */
+(function(){
+  window.SHOUTOUT_SERVICE_LABELS = window.SHOUTOUT_SERVICE_LABELS || {};
+  window.SHOUTOUT_SERVICE_LABELS.shoutout = "Throw a ShoutOut";
+
+  window.SHOUTOUT_DEFAULT_LOCATION_SERVICES =
+    Array.from(new Set(["shoutout", ...(window.SHOUTOUT_DEFAULT_LOCATION_SERVICES || ["guestList"])]));
+
+  const services = window.SHOUTOUT_LOCATION_SERVICES || {};
+  Object.keys(services).forEach(id => {
+    if (!services[id].includes("shoutout")) services[id].unshift("shoutout");
+  });
+  window.SHOUTOUT_LOCATION_SERVICES = services;
+})();

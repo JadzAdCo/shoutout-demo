@@ -7,7 +7,7 @@ Upload/replace **all files** in this ZIP at the GitHub repository root.
 Then test:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
 ```
 
 Club admin example:
@@ -274,7 +274,7 @@ Firebase client JavaScript can detect Firebase-native MFA enrollment, but Micros
 ## Master Admin URL
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Practical Recommendation
@@ -307,19 +307,19 @@ Do not allow phone OTP, Facebook login, personal Gmail, personal Outlook, fake e
 Patron:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
 ```
 
 Zebbies Garden DC Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Production Note
@@ -351,7 +351,7 @@ This package improves Microsoft authentication handling for the Club Admin and M
 4. Added Microsoft sign-in notes to:
    - `admin.html`
    - `master-admin.html`
-5. Cache-busting updated to `v=28.5`.
+5. Cache-busting updated to `v=28.7`.
 
 ## Critical Firebase / Microsoft Console Checklist
 
@@ -416,13 +416,13 @@ or your exact Firebase hosting domains are listed.
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 
@@ -460,13 +460,13 @@ The patron page Google authentication was working, but the admin page began show
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Troubleshooting
@@ -515,13 +515,13 @@ That means the admin page was still opening a popup, or the browser was treating
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Important
@@ -592,7 +592,7 @@ adminRoles/{uid}
 ## Test URL
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 
@@ -651,13 +651,13 @@ p.addScope("email");
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Important Browser Note
@@ -697,7 +697,7 @@ This usually means `master-admin-app.js` failed before completing initialization
 ## Test URL
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Production Note
@@ -742,13 +742,13 @@ Using redirect for Microsoft avoids popup closure entirely.
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Important
@@ -780,7 +780,7 @@ Microsoft redirect completed MFA but returned to the app without an authenticate
 Use this first if Microsoft still fails:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/auth-debug.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/auth-debug.html?v=28.7
 ```
 
 If Microsoft fails on `auth-debug.html`, the issue is provider/browser/Firebase configuration, not the admin role logic.
@@ -790,13 +790,13 @@ If Microsoft fails on `auth-debug.html`, the issue is provider/browser/Firebase 
 Club Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Production recommendation
@@ -830,7 +830,7 @@ Supports:
 Example:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 ### Promoter Admin Panel
@@ -865,7 +865,7 @@ Supported reporting periods:
 Example:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.7
 ```
 
 ### Club Admin Updates
@@ -929,31 +929,31 @@ match /guestListRequests/{id} {
 Guest List - Zebbies DC:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Guest List - Shôko Barcelona:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.7
 ```
 
 Promoter Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.7
 ```
 
 Club Admin - Zebbies DC:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 ## Access Intent
@@ -1067,37 +1067,37 @@ match /friendRequests/{id} {
 Guest List — Zebbies Garden DC:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Guest List — Shôko Barcelona:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.7
 ```
 
 Promoter Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.7
 ```
 
 Club Admin — Zebbies Garden DC:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Master Admin:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/master-admin.html?v=28.7
 ```
 
 Translation Policy:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/translation-policy.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/translation-policy.html?v=28.7
 ```
 
 # Comprehensive Testing Plan
@@ -1105,7 +1105,7 @@ https://jadzadco.github.io/shoutout-demo/translation-policy.html?v=28.5
 ## A. Upload / Cache Test
 
 1. Upload all package files to GitHub Pages.
-2. Open each page with `?v=28.5`.
+2. Open each page with `?v=28.7`.
 3. Hard refresh with Ctrl+Shift+R.
 4. Confirm no page is stuck on `Loading...`.
 
@@ -1114,7 +1114,7 @@ https://jadzadco.github.io/shoutout-demo/translation-policy.html?v=28.5
 1. Open:
 
 ```text
-guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 2. Sign in with Google.
@@ -1163,7 +1163,7 @@ submittedByUid
 1. Open:
 
 ```text
-admin.html?location=zebbies-garden-washington-dc&v=28.5
+admin.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 2. Sign in with approved admin Google account.
@@ -1177,7 +1177,7 @@ admin.html?location=zebbies-garden-washington-dc&v=28.5
 1. Open:
 
 ```text
-promoter-admin.html?v=28.5
+promoter-admin.html?v=28.7
 ```
 
 2. Sign in with an email in `SHOUTOUT_PROMOTER_ADMINS`.
@@ -1201,7 +1201,7 @@ promoter-admin.html?v=28.5
 1. Open:
 
 ```text
-master-admin.html?v=28.5
+master-admin.html?v=28.7
 ```
 
 2. Sign in with master admin Google account.
@@ -1213,7 +1213,7 @@ master-admin.html?v=28.5
 1. Open:
 
 ```text
-translation-policy.html?v=28.5
+translation-policy.html?v=28.7
 ```
 
 2. Confirm examples show:
@@ -1276,7 +1276,7 @@ guest-list.html?location=<clubLocationId>&promoter=<promoterId>
 Patrons access their portal here:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
 ```
 
 ## Guest List Direct URLs
@@ -1284,19 +1284,19 @@ https://jadzadco.github.io/shoutout-demo/?v=28.5
 Zebbies Garden DC:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 Shôko Barcelona:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.7
 ```
 
 Christie Cannes:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=christie-cannes-france&v=28.5
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=christie-cannes-france&v=28.7
 ```
 
 ## Test
@@ -1364,7 +1364,7 @@ Chats (2/14)
 ## Test URL
 
 ```text
-https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.7
 ```
 
 
@@ -1412,25 +1412,25 @@ The requested patron-profile-menu and editable-patron-portal changes are now pac
 Patron portal:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.7
 ```
 
 Patron home:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
 ```
 
 
 # v28.4 Fix
 
-Fixes patron expanded menu and guest-list routing. Upload all files, replace existing files, commit, then test `?v=28.5`.
+Fixes patron expanded menu and guest-list routing. Upload all files, replace existing files, commit, then test `?v=28.7`.
 
 Test:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.5
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 ```
 
 # v28.4 Inbox, Chat Status, ShoutOut Confirmation, and Club Service Isolation
@@ -1451,9 +1451,9 @@ https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden
 6. Test in Incognito or hard refresh.
 
 ## Test URLs
-https://jadzadco.github.io/shoutout-demo/?v=28.5
-https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.5
-https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.7
+https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.7
 
 ## Firestore Rule Additions
 ```javascript
@@ -1488,12 +1488,12 @@ match /chatMessages/{id} {
 4. Commit: `Upload v28.4 storage AI templates and role requests`.
 5. Configure Firebase Storage using the guide in ChatGPT response.
 6. Add Firestore and Storage rules.
-7. Test in Incognito with `?v=28.5`.
+7. Test in Incognito with `?v=28.7`.
 
 ## Test URLs
-https://jadzadco.github.io/shoutout-demo/?v=28.5
-https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.5
-https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
+https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=28.7
+https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.7
 
 ## Future Feature Requests Noted
 - DJ public profiles with work samples.
@@ -1565,6 +1565,50 @@ match /shoutoutRecommendations/{id} {
 6. Test in Incognito.
 
 ## Test URLs
-https://jadzadco.github.io/shoutout-demo/?v=28.5
-https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.5
-https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&v=28.5
+https://jadzadco.github.io/shoutout-demo/?v=28.7
+https://jadzadco.github.io/shoutout-demo/role-request.html?v=28.7
+https://jadzadco.github.io/shoutout-demo/display.html?location=zebbies-garden-washington-dc&v=28.7
+
+# v28.6 Media Preview Fix
+
+## Fixes
+- Single upload input only: photo OR video.
+- Larger displayed media preview.
+- Text overlay added to photo/video preview.
+- AI recommendation selection now populates the text field and refreshes preview.
+- Preview updates when text fields change.
+
+## Install
+1. Extract ZIP.
+2. Upload all files to GitHub repo root.
+3. Replace existing files.
+4. Commit.
+5. Test with:
+   https://jadzadco.github.io/shoutout-demo/?v=28.7
+
+
+---
+
+# v28.7 ShoutOut Link on All Club Views
+
+## Fix
+
+Every club/location options screen now forces a visible:
+
+```text
+Throw a ShoutOut
+```
+
+button, even if the service catalog is missing it.
+
+## Install
+
+1. Extract ZIP.
+2. Upload all files to GitHub repo root.
+3. Replace existing files.
+4. Commit.
+5. Test:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.7
+```
