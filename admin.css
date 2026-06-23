@@ -84,3 +84,12 @@
 .media-preview-overlay strong{display:block;font-size:clamp(30px,6vw,70px);line-height:.95;letter-spacing:2px;text-transform:uppercase}
 .media-preview-overlay span{display:block;margin-top:10px;font-size:clamp(18px,3vw,34px);letter-spacing:1px;text-transform:uppercase}
 .single-media-upload-note{font-size:12px;opacity:.8}
+
+/* v28.8 shoutout club option force */
+.v28-8-shoutout-club-option{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  min-width:210px;
+  margin-right:8px;
+}

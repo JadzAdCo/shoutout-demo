@@ -499,7 +499,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.7";
+      portalLink.href = "./patron-portal.html?v=28.8";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -512,14 +512,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.7";
+      messages.href = "./patron-portal.html?tab=messages&v=28.8";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.7";
+      chats.href = "./patron-portal.html?tab=chats&v=28.8";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -572,11 +572,7 @@
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", () => openCategory("shoutout"));
     bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
-    bind("reserveTableBtn", () => openCategory("club-action:reserve-a-table"));
-    bind("joinGuestListBtn", () => openCategory("club-action:join-guest-list"));
-    bind("payVipEntryBtn", () => openCategory("club-action:pay-vip-entry"));
-    bind("payEventEntryBtn", () => openCategory("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategory("club-action:pay-std-entry"));
+    bind("clubShoutoutBtn", () => openCategoryAfterAd("shoutout"));
     bind("backToCategoriesBtn", () => showPage("categoryPage"));
     bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
     bind("reserveTableBtn", () => openCategoryAfterAd("club-action:reserve-a-table"));
@@ -643,10 +639,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.7">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.8">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.7">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.7">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.8">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.8">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -682,7 +678,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.7"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.8"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -824,61 +820,3 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplate
   });
 })();
 
-
-/* v28.7 ensure ShoutOut button appears on all club service screens */
-(function(){
-  "use strict";
-
-  function goToShoutOut(){
-    window.__jadzActionMode = "shoutout";
-
-    const fns = ["showTemplateSelection", "goToTemplateSelection", "showTemplates", "openTemplateSelection"];
-    for (const fn of fns) {
-      if (typeof window[fn] === "function") {
-        window[fn]();
-        return;
-      }
-    }
-
-    const page = document.getElementById("templatePage") || document.getElementById("screenTemplates");
-    if (page) {
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      page.classList.add("active");
-    }
-  }
-
-  function ensureButton(){
-    const text = Array.from(document.querySelectorAll("h1,h2,p,.eyebrow"))
-      .map(x => (x.textContent || "").toLowerCase()).join(" ");
-
-    if (!text.includes("club options") && !text.includes("what would you like to do")) return;
-
-    const already = Array.from(document.querySelectorAll("button,a"))
-      .some(x => (x.textContent || "").toLowerCase().includes("shoutout"));
-    if (already) return;
-
-    const serviceButtons = Array.from(document.querySelectorAll("button")).filter(b => {
-      const t = (b.textContent || "").toLowerCase();
-      return t.includes("reserve") || t.includes("guest list") || t.includes("vip") || t.includes("entry");
-    });
-
-    const host = serviceButtons[0] && serviceButtons[0].parentElement;
-    if (!host) return;
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "primary service-action";
-    btn.dataset.service = "shoutout";
-    btn.textContent = "Throw a ShoutOut";
-    btn.onclick = function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      goToShoutOut();
-    };
-    host.insertBefore(btn, host.firstChild);
-  }
-
-  document.addEventListener("DOMContentLoaded", function(){
-    setInterval(ensureButton, 700);
-  });
-})();

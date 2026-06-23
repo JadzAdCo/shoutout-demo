@@ -612,3 +612,17 @@ window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*10
   });
   window.SHOUTOUT_LOCATION_SERVICES = services;
 })();
+
+/* v28.8 service catalog shoutout force */
+(function(){
+  window.SHOUTOUT_SERVICE_LABELS = window.SHOUTOUT_SERVICE_LABELS || {};
+  window.SHOUTOUT_SERVICE_LABELS.shoutout = "Throw a ShoutOut";
+  window.SHOUTOUT_DEFAULT_LOCATION_SERVICES = Array.from(new Set(["shoutout", ...(window.SHOUTOUT_DEFAULT_LOCATION_SERVICES || [])]));
+  if (window.SHOUTOUT_LOCATION_SERVICES) {
+    Object.keys(window.SHOUTOUT_LOCATION_SERVICES).forEach(function(id){
+      if (!window.SHOUTOUT_LOCATION_SERVICES[id].includes("shoutout")) {
+        window.SHOUTOUT_LOCATION_SERVICES[id].unshift("shoutout");
+      }
+    });
+  }
+})();
