@@ -41,7 +41,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.16-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.17-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -137,13 +137,18 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    const [shoutouts, guestLists, messages, chats] = await Promise.all([
+    const [shoutouts, guestLists, directMessages, inboxNotifications, chats] = await Promise.all([
       getCollectionSafe("shoutouts", x => x.submittedByUid === user.uid || x.submittedBy === user.email),
       getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
       getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
+      getCollectionSafe("inboxNotifications", x => x.recipientUid === user.uid || x.recipientEmail === user.email),
       getCollectionSafe("chatRooms", x => Array.isArray(x.participants) && x.participants.includes(user.uid))
     ]);
 
+    const messages = [
+      ...directMessages,
+      ...inboxNotifications.map(x => ({...x, subject:x.title || "Message", body:x.body || x.preview || "", type:x.type || "notification"}))
+    ];
     const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
     const unreadChats = chats.reduce((sum,x) => sum + Number(x.unreadCounts?.[user.uid] || 0), 0);
 

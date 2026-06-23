@@ -12,7 +12,7 @@
 .classic-bw-sub-hidden,.classic-bw #displaySub{display:none!important}
 @media(max-width:760px){.classic-bw.classic-board-template #displayMain.classic-bw-board{left:14%!important;right:14%!important;top:36%!important;bottom:13%!important;padding:8px 10px!important}.classic-board-lines b{font-size:clamp(22px,10vw,50px)!important;letter-spacing:.015em!important}}
 
-/* v28.16-f classic board refinement: larger white board and stronger lettering */
+/* v28.17-f classic board refinement: larger white board and stronger lettering */
 .classic-bw.classic-board-template .display-center:after{inset:26% 8.5% 7%!important;border-width:clamp(5px,.7vw,9px)!important;border-radius:clamp(18px,2.4vw,32px)!important}
 .classic-bw.classic-board-template #displayMain.classic-bw-board{left:10.5%!important;right:10.5%!important;top:30%!important;bottom:10%!important;padding:clamp(10px,1.35vw,20px) clamp(14px,1.8vw,28px)!important}
 .classic-bw.classic-board-template .classic-board-lines b{font-size:clamp(34px,6.8vw,92px)!important;line-height:.84!important;letter-spacing:.025em!important;color:#1d1f24!important;text-shadow:0 2px 0 #6d6d6d,2px 4px 0 rgba(0,0,0,.23),0 8px 10px rgba(0,0,0,.20)!important}

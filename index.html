@@ -28,11 +28,11 @@
 </div>
 
 <main class="app">
-  <button id="globalBackBtn" class="global-back-btn hidden" type="button">← Back</button>
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
         <img src="./images/ShoutOut-logo.png" alt="ShoutOut" class="hero-logo"/>
+        <p class="eyebrow">Screen 0 — Welcome / Sign In</p>
         <h2>Welcome</h2>
         <p class="login-copy">Search and book entertainment and nightlife events or send a live ShoutOut to one of our ShoutOut displays.</p>
         <p id="signedInAs" class="status">Please Sign-In or Sign-Up:</p>
@@ -69,7 +69,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./?v=28.16-f">My Patron Portal</a></p>
+        <p class="sub small"><a href="./?v=28.17-f">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -78,7 +78,8 @@
   <section id="signupProfilePage" class="page">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Complete Sign Up</p>
+        <button id="backToWelcomeFromProfileBtn" type="button">← Back to welcome</button>
+        <p class="eyebrow">Screen 1 — Patron Profile</p>
         <h1>Create your profile</h1>
         <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
       </div>
@@ -143,6 +144,7 @@
   <section id="categoryPage" class="page">
     <header class="topbar">
       <div>
+        <button id="backToWelcomeBtn" type="button">← Back to welcome</button>
         <p class="eyebrow">Screen 2 — Main Categories</p>
         <p class="sub category-sentence">
           <strong>Search for</strong>
@@ -173,7 +175,7 @@
     <header class="topbar">
       <div>
         <button id="backToCategoriesFromActionsBtn" type="button">← Back to categories</button>
-        <p class="eyebrow">Club Options</p>
+        <p class="eyebrow">Screen 3 — Club / Select Action</p>
         <h1>What would you like to do?</h1>
         <p class="sub">Choose a club action, then select the exact location.</p>
       </div>
@@ -193,7 +195,8 @@
   <section id="adSplashPage" class="page">
     <div class="splash-wrap">
       <div class="splash-card">
-        <p class="eyebrow">Sponsored</p>
+        <button id="backFromAdBtn" type="button">← Back to categories</button>
+        <p class="eyebrow">Screen 3A — Sponsored Message</p>
         <div id="adImageSlot" class="ad-image-slot"></div>
         <h1 id="adTitle">Advertise Here</h1>
         <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
@@ -209,7 +212,7 @@
     <header class="topbar">
       <div>
         <button id="backToCategoriesBtn" type="button">← Back to categories</button>
-        <p class="eyebrow">Search</p>
+        <p class="eyebrow">Screen 3B — Club / Search</p>
         <h1 id="listingTitle">Search Clubs</h1>
         <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
@@ -224,8 +227,8 @@
   <section id="templateSelectPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToListingBtn" type="button">← Back to search</button>
-        <p class="eyebrow">Screen 4 — Choose template</p>
+        <button id="backToListingBtn" type="button">← Back to club search</button>
+        <p class="eyebrow">Screen 4 — Club / Select ShoutOut Template</p>
         <h1 id="selectedClubTitle">Location</h1>
         <p id="selectedClubMeta" class="sub"></p>
       </div>
@@ -239,7 +242,7 @@
 
   <section id="editorPage" class="page">
     <header class="topbar">
-      <div><button id="backToTemplatesBtn" type="button">← Back to templates</button><p class="eyebrow">Screen 5 — Create ShoutOut</p><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <div><button id="backToTemplatesBtn" type="button">← Back to template selection</button><p class="eyebrow">Screen 5 — Club / Create ShoutOut</p><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
       <button id="logoutBtn5" type="button">Sign out</button>
     </header>
     <div class="composer">
@@ -264,7 +267,8 @@
 
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
-      <p class="eyebrow">Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
+      <button id="backToEditorFromConfirmBtn" type="button">← Back to editor</button>
+      <p class="eyebrow">Screen 6 — ShoutOut Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
       <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
       <div class="button-row"><button id="startAnotherBtn" class="primary" type="button">Create another ShoutOut</button><button id="chooseAnotherClubBtn" type="button">Choose another location</button><button id="logoutBtn6" type="button">Sign out</button></div>
     </div>
@@ -275,9 +279,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.16-f"></script>
-<script src="./shared-data.js?v=28.16-f"></script>
-<script src="./patron-app.js?v=28.16-f"></script>
-<script src="./notification-center.js?v=28.16-f"></script>
+<script src="./firebase-config.js?v=28.17-f"></script>
+<script src="./shared-data.js?v=28.17-f"></script>
+<script src="./patron-app.js?v=28.17-f"></script>
+<script src="./notification-center.js?v=28.17-f"></script>
 </body>
 </html>

@@ -22,35 +22,15 @@
   let templates = {};
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
-  let currentPageId = "landingPage";
-  let pageHistory = [];
-  let suppressPageHistory = false;
 
   function locationId() { return (selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc").toLowerCase(); }
   function getLocation(id = locationId()) { return locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]; }
   function getTemplate(id = selectedTemplate) { return templates[id] || window.SHOUTOUT_TEMPLATES[id] || window.SHOUTOUT_TEMPLATES.neon; }
   function safeUser() { return (currentUser?.email || currentUser?.phoneNumber || "unknown").toLowerCase(); }
-  function updateGlobalBackButton() {
-    const btn = byId("globalBackBtn");
-    if (!btn) return;
-    const hide = currentPageId === "landingPage" || currentPageId === "adSplashPage";
-    btn.classList.toggle("hidden", hide);
-  }
   function showPage(id) {
     if (!id || !byId(id)) return;
-    if (!suppressPageHistory && currentPageId && currentPageId !== id) pageHistory.push(currentPageId);
-    currentPageId = id;
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
-    updateGlobalBackButton();
-  }
-  function goBack() {
-    const previous = pageHistory.pop();
-    suppressPageHistory = true;
-    if (previous && byId(previous)) showPage(previous);
-    else if (currentUser && currentPageId !== "categoryPage") showPage("categoryPage");
-    else showPage("landingPage");
-    suppressPageHistory = false;
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -137,6 +117,12 @@
     const fn = pendingCategoryAfterAd;
     pendingCategoryAfterAd = null;
     if (typeof fn === "function") fn();
+  }
+
+  function cancelAdSplash() {
+    clearInterval(adTimer);
+    pendingCategoryAfterAd = null;
+    showPage("categoryPage");
   }
 
 
@@ -638,7 +624,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.16-f";
+      portalLink.href = "./patron-portal.html?v=28.17-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -651,14 +637,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.16-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.17-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.16-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.17-f";
       chats.textContent = "Chats (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -681,6 +667,11 @@
         const msgSnap = await db.collection("messages").where("recipientUid", "==", uid).limit(1000).get();
         totalMessages = msgSnap.size;
         msgSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
+      } catch(e) {}
+      try {
+        const noteSnap = await db.collection("inboxNotifications").where("recipientUid", "==", uid).limit(1000).get();
+        totalMessages += noteSnap.size;
+        noteSnap.forEach(d => { if (!d.data().read) unreadMessages += 1; });
       } catch(e) {}
 
       try {
@@ -710,6 +701,9 @@
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", () => openCategory("shoutout"));
+    bind("backToWelcomeFromProfileBtn", () => showPage("landingPage"));
+    bind("backToWelcomeBtn", () => showPage("landingPage"));
+    bind("backFromAdBtn", cancelAdSplash);
     bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
     bind("clubShoutoutBtn", () => openCategoryAfterAd("shoutout"));
     bind("backToCategoriesBtn", () => showPage("categoryPage"));
@@ -718,9 +712,8 @@
     bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
     bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", applyAiSuggestion); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("backToEditorFromConfirmBtn", goToEditor); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", applyAiSuggestion); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
     bind("userMenuBtn", toggleUserDropdown);
-    bind("globalBackBtn", goBack);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);
     bind("saveProfileBtn", saveProfile);
@@ -766,6 +759,11 @@
     }catch(e){}
     try{
       const db = firebase.firestore();
+      const ns = await db.collection("inboxNotifications").where("recipientUid","==",uid).limit(1000).get();
+      out.tm += ns.size; ns.forEach(d => { if(!d.data().read) out.um++; });
+    }catch(e){}
+    try{
+      const db = firebase.firestore();
       const cs = await db.collection("chatRooms").where("participants","array-contains",uid).limit(1000).get();
       out.tc = cs.size; cs.forEach(d => { out.uc += Number((d.data().unreadCounts || {})[uid] || 0); });
     }catch(e){}
@@ -780,10 +778,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.16-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.17-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.16-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.16-f">Chats (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.17-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.17-f">Chats (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" onclick="logout()">Sign out</button>`;
   }
 
@@ -819,7 +817,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.16-f"});};
+window.createShoutOutSubmissionNotification=async function(s){await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.`,referenceNumber:s.referenceNumber||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link:"./patron-portal.html?tab=shoutouts&v=28.17-f"});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

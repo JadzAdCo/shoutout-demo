@@ -1,15 +1,20 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.16-f Consolidated Fix Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.17-f Navigation + Messages Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.16-f
+https://jadzadco.github.io/shoutout-demo/?v=28.17-f
 ```
 
 Current release highlights:
 
+- Removed the duplicate generic `← Back` button from patron workflow pages.
+- Kept page-specific navigation such as `← Back to categories`, `← Back to club search`, and `← Back to template selection`.
+- Added missing workflow labels so each patron workflow page is easier to reference during troubleshooting.
+- Removed the bottom Messages / Chats / Notifications status bar.
+- Notifications now roll into `Messages`; there is no separate patron-facing Notifications label.
 - Consolidates the v28.16 media upload/display pipeline fix and the Classic Black & White board sizing refinement into one fix package.
 - Version suffix convention starts here: `-f` means fix release, `-nf` means new feature release.
 - Refined the Classic Black & White display with a larger white center board.
@@ -49,13 +54,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.16-f`.
+- Bumped cache-busting query strings to `v=28.17-f`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.16-f because this release does not require Firestore/Storage rules, index, or config changes.
+- Database rollback: no database rollback is needed for v28.17-f because this release does not require Firestore/Storage rules, index, or config changes.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2725,24 +2730,29 @@ Database rollback is normally not needed. If a specific media ShoutOut must be r
 
 ---
 
-# Jadz AdCo ShoutOut v28.16-f Consolidated Fix Package
+# Jadz AdCo ShoutOut v28.17-f Navigation + Messages Fix Package
 
 ## Package
 
 ```text
-shoutoutwepp,vers-28.16-f-full-package.zip
+shoutoutwepp,vers-28.17-f-full-package.zip
 ```
 
 ## What Changed
 
-- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.16-f` fix release.
+- Removed the duplicated generic `← Back` button.
+- Standardized workflow back buttons as page-specific `← Back to ...` controls.
+- Added clearer workflow labels such as `Screen 3B — Club / Search` and `Screen 4 — Club / Select ShoutOut Template`.
+- Removed the bottom Messages / Chats / Notifications bar.
+- Merged notifications into Messages counts and the Messages tab.
+- Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.17-f` fix release.
 - Adopted release suffix convention: `-f` for fixes and `-nf` for new features.
 - Enlarged the Classic Black & White white center board.
 - Moved the white board upward to reduce excess red/black header space.
 - Enlarged and strengthened the three cut-out letter rows.
 - Preserved the three-row board behavior and birthday split.
 - Preserved the v28.16 media upload/display pipeline fix.
-- Bumped active cache-busting links and scripts to `v=28.16-f`.
+- Bumped active cache-busting links and scripts to `v=28.17-f`.
 
 ## Firebase / Firestore / Storage Impact
 
@@ -2769,14 +2779,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.16-f consolidated fix package
+Upload v28.17-f navigation messages fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.16-f
+https://jadzadco.github.io/shoutout-demo/?v=28.17-f
 ```
 
 ## Manual Test Checklist
@@ -2792,7 +2802,7 @@ https://jadzadco.github.io/shoutout-demo/?v=28.16-f
 
 Preferred rollback:
 
-1. Revert the GitHub commit that uploaded v28.16-f.
+1. Revert the GitHub commit that uploaded v28.17-f.
 2. Or upload the previous known-good package, such as v28.16.
 3. Test with:
 
@@ -2803,9 +2813,9 @@ https://jadzadco.github.io/shoutout-demo/?v=28.16-rollback-test
 Helper script:
 
 ```powershell
-.\rollback-v28-16-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+.\rollback-v28-17-f.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
 ```
 
 The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
 
-No Firestore or Storage rollback is needed for v28.16-f.
+No Firestore or Storage rollback is needed for v28.17-f.
