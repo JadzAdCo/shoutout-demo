@@ -1,15 +1,20 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.12 Avatar Dropdown Link Color Fix
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.13 Navigation + Patron Role Request Fix
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.12
+https://jadzadco.github.io/shoutout-demo/?v=28.13
 ```
 
 Current release highlights:
 
+- Added a reusable Back button to the patron app workflow pages for easier navigation.
+- Added Back navigation to the patron portal and role request page.
+- Removed the public role-request link from the main search/ShoutOut workflow.
+- Kept Club Admin / DJ / Promoter access requests available only from the patron portal profile area.
+- Fixed the role request form submit logic so it uses the current form field IDs and can submit DJ/Promoter/Club Admin opt-in requests.
 - Fixed avatar dropdown anchor link colors so My Profile, Messages, and Chats stay white.
 - Added CSS for link, visited, hover, active, and focus states in the user menu dropdown.
 - Updated ShoutOut templates and display preview styling.
@@ -25,13 +30,13 @@ Current release highlights:
 - Clean `Throw a ShoutOut` button on Club Options.
 - Removed timer-based ShoutOut button injection patches.
 - Added contextual/fuzzy search for terms like `hiphop`, `hip hop`, `hip-hop`, and `Hip Hope`.
-- Bumped cache-busting query strings to `v=28.12`.
+- Bumped cache-busting query strings to `v=28.13`.
 - No Firestore, Storage, Firebase config, or rules changes required.
 
 Rollback summary:
 
 - Code rollback: revert the GitHub commit or upload the previous known-good package.
-- Database rollback: no database rollback is needed for v28.12 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
+- Database rollback: no database rollback is needed for v28.13 because this release does not change Firestore/Storage schema, rules, indexes, or paths.
 - Future packages should include release ZIP, README, changed-files list, Firebase rules/index notes, migration notes, and rollback steps.
 
 ---
@@ -2303,3 +2308,93 @@ The helper script prepares a rollback upload folder from a previous ZIP. It does
 This v28.12 release does not require Firestore or Storage config changes.
 
 No database rollback is needed.
+
+---
+
+# Jadz AdCo ShoutOut v28.13 Navigation + Patron Role Request Fix
+
+## Package
+
+```text
+jadz-shoutout-v28-13-navigation-role-request-full-package.zip
+```
+
+## What Changed
+
+- Added a global Back button to the patron app workflow after sign-in.
+- Added Back navigation to `patron-portal.html` and `role-request.html`.
+- Removed the Club Admin / DJ / Promoter request link from the public search/ShoutOut page.
+- Kept the access request link only inside the patron portal profile summary.
+- Updated the role request script to match the current form IDs and submit the selected role request.
+- Preserved the v28.12 avatar dropdown white-link fix.
+- Bumped active cache-busting links and scripts to `v=28.13`.
+
+## Firebase / Firestore / Storage Impact
+
+No Firebase config changes.
+
+No Firestore rules changes.
+
+No Firestore indexes added or removed.
+
+No Firebase Storage rules or path changes.
+
+The role request form continues to use existing request/profile collections. No schema migration is required.
+
+## Install / Upload Steps
+
+1. Extract the ZIP package.
+2. Upload the extracted files to the GitHub repo root:
+
+```text
+https://github.com/jadzadco/shoutout-demo
+```
+
+3. Replace existing files.
+4. Commit with:
+
+```text
+Upload v28.13 navigation role request full package
+```
+
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.13
+```
+
+## Manual Test Checklist
+
+1. Open the patron app and sign in.
+2. Confirm the Back button appears after leaving the login screen.
+3. Move through category, search, template, editor, and confirmation screens.
+4. Confirm Back returns to the previous workflow screen.
+5. Confirm the main search/ShoutOut page does not show `Request Club Admin / DJ / Promoter Access`.
+6. Open `patron-portal.html?v=28.13`.
+7. Confirm the profile summary still shows `Request Club Admin / DJ / Promoter Access`.
+8. Open the role request page from the patron portal.
+9. Confirm DJ, Promoter, and Club Admin choices are available.
+10. Open the avatar dropdown and confirm My Profile, Messages, and Chats remain white, including visited links.
+
+## Rollback Plan
+
+Preferred rollback:
+
+1. Revert the GitHub commit that uploaded v28.13.
+2. Or upload the previous known-good package, such as v28.12.
+3. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.12-rollback-test
+```
+
+Helper script:
+
+```powershell
+.\rollback-v28-13.ps1 -PreviousPackagePath "C:\path\to\previous-package.zip" -OutputPath "C:\path\to\rollback-upload"
+```
+
+The helper script prepares a rollback upload folder from a previous ZIP. It does not push to GitHub or delete live data.
+
+No Firestore or Storage rollback is needed for v28.13.

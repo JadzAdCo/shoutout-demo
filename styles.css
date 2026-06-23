@@ -28,6 +28,7 @@ label{display:block;margin:14px 0;color:var(--muted);font-weight:800}input,selec
 .user-menu a,.user-menu a:link,.user-menu a:visited,.user-menu a:hover,.user-menu a:active,.user-menu a:focus,.user-dropdown a,.user-dropdown a:link,.user-dropdown a:visited,.user-dropdown a:hover,.user-dropdown a:active,.user-dropdown a:focus{color:#fff!important;text-decoration:none!important}
 .user-menu .profile-menu-link,.user-dropdown .profile-menu-link{display:block!important;padding:8px 0!important;font-weight:600!important;transition:opacity .2s ease!important}
 .user-menu .profile-menu-link:hover,.user-dropdown .profile-menu-link:hover{opacity:.8!important}
+.global-back-btn{position:sticky;top:12px;z-index:9990;margin:0 0 16px 0;width:auto;min-width:92px;background:rgba(31,22,69,.78);border:1px solid rgba(255,255,255,.24);box-shadow:0 12px 34px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
 .topbar > button[id^="logout"], #logoutBtnClubActions{display:none!important}
 .category-grid,.compact-category-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:10px!important;margin-top:16px!important}
 .category-card{min-height:54px!important;height:auto!important;font-size:15px!important;border-radius:14px!important;padding:10px 12px!important;line-height:1.1!important}
