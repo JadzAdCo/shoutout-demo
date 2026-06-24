@@ -1,42 +1,40 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.25-nf Profile Templates + Messaging Rules Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.26-f System Message Link + Profile Media Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.25-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.26-f
 ```
 
 Current release highlights:
 
-- New feature package. `-nf` means new feature release.
-- Added a `Public Profile` tab in the patron portal.
-- Added role profile templates for Patron, Promoter, DJ, and Waiter / Waitress / Bottle Girl.
-- Expanded patron profile fields for music interests, travel interests, general hobbies, nightlife style, looking-to-meet preference, bio, public profile type, and profile visibility.
-- Added 10 patron profile media slots: 8 photo slots and 2 short-video slots.
-- Profile media uploads to Firebase Storage under `profileMedia/{uid}/images` and `profileMedia/{uid}/videos`.
-- Saved profile media metadata to `users/{uid}.profileMediaSlots`.
-- Added a public profile preview card that renders the patron or role template with media, bio, interests, and privacy visibility context.
-- Corrected Role-Based Direct Message logic: patron-to-patron direct inbox messages are blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.
-- Updated Inbox to display sender, timestamp, subject, read/unread state, and body.
-- Inbox messages are marked read only when the user opens the message envelope.
-- System notifications are normalized as internal inbox messages with sender `System Message`.
-- Added Chat rules copy: Chat is separate from Inbox, Master Admin is excluded from member chat, patron-to-patron chat requires mutual follow, and role-to-patron chat must be tied to a patron-originated action.
-- Bumped active cache-busting query strings to `v=28.25-nf`.
+- Fix package. `-f` means fix release.
+- Added the ShoutOut modification/reference link directly inside the system message body after a patron submits a ShoutOut.
+- New ShoutOut submission notifications now store `shoutoutId`, `referenceNumber`, `link`, and a visible `Modify ShoutOut:` line in the body.
+- Patron portal message envelopes now render safe clickable links inside opened message bodies.
+- My ShoutOuts remains the destination for finding the submitted ShoutOut by reference/id.
+- Fixed the public profile media upload flow by allowing patrons to preview and save one media slot at a time.
+- Each profile media slot now has its own `Save This Slot` button.
+- Selecting an image/video immediately shows a local preview before upload.
+- The public profile preview now includes an Image Gallery section that displays saved profile photos and short videos.
+- Kept the 10-slot model from v28.25-nf: 8 images and 2 short videos.
+- Bumped active cache-busting query strings to `v=28.26-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: no rules included in this package, but production enforcement is required before launch.
+- Firestore rules: no rule file included in this package.
 - Firestore indexes: none added.
-- Storage rules: no rules included in this package, but profile-media uploads require authenticated users to write their own `profileMedia/{uid}/...` paths.
-- New/expanded Firestore fields on `users/{uid}` include `publicProfileType`, `publicProfileVisibility`, `musicInterests`, `travelInterests`, `hobbies`, `nightlifeStyle`, `lookingToMeet`, `bio`, and `profileMediaSlots`.
-- Existing `messages` and `inboxNotifications` documents may receive `read`, `readAt`, `openedAt`, and `firstOpenedAt` when opened by the recipient.
+- Storage rules: no rule file included in this package.
+- Existing `inboxNotifications` for future ShoutOut submissions may include `shoutoutId`, `referenceNumber`, `link`, and a body containing a modification link.
+- Existing `users/{uid}.profileMediaSlots` continues to be used.
+- Profile media continues to upload under `profileMedia/{uid}/images/...` and `profileMedia/{uid}/videos/...`.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.25-nf-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.26-f-full-package.zip`.
 2. Upload the extracted files to the GitHub repo root:
 
 ```text
@@ -47,35 +45,34 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.25-nf profile templates and messaging rules package
+Upload v28.26-f system message link and profile media fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.25-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.26-f
 ```
 
 Manual test checklist:
 
-1. Sign in and open `My Profile`.
-2. Open the `Public Profile` tab.
-3. Confirm role template cards appear for Patron, Promoter, DJ, and Hospitality.
-4. Save music, travel, hobbies, nightlife style, looking-to-meet, and bio fields.
-5. Upload one photo slot and one short-video slot.
-6. Confirm `users/{uid}.profileMediaSlots` contains saved media metadata.
-7. Open Messages and confirm inbox items show sender, timestamp, subject, read/unread state, and body only after opening.
-8. Confirm system notifications display sender as `System Message`.
-9. Confirm standard Patron accounts cannot send direct inbox messages.
-10. Confirm Chat rules explain mutual-follow and patron-originated-action requirements.
+1. Submit a new ShoutOut.
+2. Open Patron Portal > Messages.
+3. Open the `ShoutOut Submitted` system message.
+4. Confirm it shows sender `System Message`, timestamp, subject, body, and a clickable `Modify ShoutOut:` link.
+5. Open Patron Portal > Public Profile.
+6. Choose one image slot, confirm the preview appears before upload, then click `Save This Slot`.
+7. Confirm the image appears in the public profile Image Gallery.
+8. Repeat with another image slot one at a time.
+9. Optional: test one short-video slot and confirm it appears in the gallery.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.24-f-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
-- Database rollback: no migration is required, but profile media fields can be ignored or manually removed from `users/{uid}` if needed.
-- Storage rollback: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if the feature is rolled back.
-- Helper script: `rollback-v28-25-nf.ps1`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.25-nf-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Database rollback: no migration is required. New notification link fields can remain safely.
+- Storage rollback: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if needed.
+- Helper script: `rollback-v28-26-f.ps1`.
 ---
 
 # Jadz AdCo ShoutOut v24 Admin Analytics + Master Admin Package

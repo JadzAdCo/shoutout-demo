@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.25-nf */
+/* patron-portal-app.js v28.26-f */
 (function(){
   "use strict";
 
@@ -7,6 +7,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const splitCSV = value => String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   const joinCSV = value => Array.isArray(value) ? value.join(", ") : String(value || "");
+  const linkify = value => esc(value).replace(/(https?:\/\/[^\s<]+|\.\/[^\s<]+)/g, match => `<a href="${match}" class="message-inline-link">${match}</a>`);
   const fmtDate = value => {
     if (!value) return "-";
     const d = value.toDate ? value.toDate() : value.seconds ? new Date(value.seconds * 1000) : new Date(value);
@@ -78,7 +79,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.25-nf"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.26-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -221,8 +222,11 @@
         <label>Caption<input class="profile-media-caption" value="${esc(slot.caption || "")}" maxlength="60"/></label>
         <input class="profile-media-url" type="hidden" value="${esc(slot.url || "")}"/>
         <input class="profile-media-path" type="hidden" value="${esc(slot.storagePath || "")}"/>
+        <button class="primary save-one-media-slot" type="button">Save This Slot</button>
       </div>`;
     }).join("");
+    wrap.querySelectorAll(".profile-media-file").forEach(input => input.addEventListener("change", previewSelectedMedia));
+    wrap.querySelectorAll(".save-one-media-slot").forEach(button => button.addEventListener("click", () => saveSingleMediaSlot(button.closest(".profile-media-slot"))));
   }
 
   async function saveMediaSlots() {
@@ -262,6 +266,56 @@
     await loadPortal(user);
   }
 
+  function previewSelectedMedia(event) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    const slotEl = input.closest(".profile-media-slot");
+    const preview = slotEl?.querySelector(".profile-media-preview");
+    if (!file || !preview) return;
+    const url = URL.createObjectURL(file);
+    const isVideo = file.type.startsWith("video/");
+    preview.innerHTML = isVideo ? `<video src="${url}" muted loop playsinline controls></video>` : `<img src="${url}" alt="Selected profile media"/>`;
+    setText("portalStatus", "Preview ready. Save this slot to upload it.");
+  }
+
+  async function saveSingleMediaSlot(slotEl) {
+    const user = auth.currentUser;
+    if (!user || !slotEl) return;
+    const profile = currentProfile || {};
+    const slots = mediaSlotDefaults(profile);
+    const slotNumber = Number(slotEl.dataset.slot);
+    const slotIndex = Math.max(0, slotNumber - 1);
+    const type = slotNumber <= 8 ? "image" : "video";
+    const file = slotEl.querySelector(".profile-media-file")?.files?.[0];
+    const caption = slotEl.querySelector(".profile-media-caption")?.value.trim() || "";
+    let url = slotEl.querySelector(".profile-media-url")?.value || "";
+    let storagePath = slotEl.querySelector(".profile-media-path")?.value || "";
+    if (!file && !url) {
+      setText("portalStatus", "Choose an image or video first, then save this slot.");
+      return;
+    }
+    try {
+      setText("portalStatus", `Saving slot ${slotNumber}...`);
+      if (file) {
+        const folder = type === "video" ? "videos" : "images";
+        const safeName = file.name.replace(/[^a-z0-9._-]/gi, "-").slice(-80);
+        storagePath = `profileMedia/${user.uid}/${folder}/slot-${slotNumber}-${Date.now()}-${safeName}`;
+        const ref = storage.ref(storagePath);
+        await ref.put(file, {contentType:file.type || (type === "video" ? "video/mp4" : "image/jpeg")});
+        url = await ref.getDownloadURL();
+      }
+      slots[slotIndex] = {slot:slotNumber, type, url, storagePath, caption, updatedAt:new Date().toISOString()};
+      await db.collection("users").doc(user.uid).set({
+        profileMediaSlots: slots,
+        profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      setText("portalStatus", `Profile media slot ${slotNumber} saved.`);
+      await loadPortal(user);
+    } catch(e) {
+      setText("portalStatus", `Media upload failed: ${e.message}`);
+    }
+  }
+
   function chips(items) {
     const values = Array.isArray(items) ? items : splitCSV(items);
     return values.length ? `<div class="profile-chip-row">${values.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : `<p class="sub small">Not added yet.</p>`;
@@ -273,6 +327,10 @@
     const media = mediaSlotDefaults(profile).filter(x => x.url).slice(0, 10);
     const heroMedia = media[0];
     const hero = heroMedia ? (heroMedia.type === "video" ? `<video src="${esc(heroMedia.url)}" muted loop playsinline autoplay></video>` : `<img src="${esc(heroMedia.url)}" alt="Profile media"/>`) : `<span>${esc(template.title)}</span>`;
+    const gallery = media.length ? `<div class="public-profile-gallery">${media.map((item, index) => {
+      const mediaEl = item.type === "video" ? `<video src="${esc(item.url)}" muted loop playsinline controls></video>` : `<img src="${esc(item.url)}" alt="Profile gallery ${index + 1}"/>`;
+      return `<figure>${mediaEl}<figcaption>${esc(item.caption || (item.type === "video" ? "Short video" : "Photo"))}</figcaption></figure>`;
+    }).join("")}</div>` : `<p class="sub small">No public gallery media yet.</p>`;
     byId("profileTemplatePreview").innerHTML = `<article class="public-profile-card profile-${esc(profileType)}">
       <div class="public-profile-hero">${hero}</div>
       <div class="public-profile-body">
@@ -285,7 +343,7 @@
         <div class="profile-section"><strong>Nightlife Style</strong><p>${esc(profile.nightlifeStyle || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Looking To Meet</strong><p>${esc(profile.lookingToMeet || "Not added yet.")}</p></div>
       </div>
-    </article>`;
+    </article><section class="public-profile-gallery-wrap"><h3>Image Gallery</h3>${gallery}</section>`;
   }
 
   function renderRoleGuide() {
@@ -324,11 +382,21 @@
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${esc(x.body)}</div>
+      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}</div>
     </div>`).join("") : "<p class='sub'>No messages yet.</p>";
     document.querySelectorAll(".message-envelope").forEach(el => {
       el.addEventListener("click", () => openMessage(el, user));
     });
+    document.querySelectorAll(".message-envelope a").forEach(a => a.addEventListener("click", event => event.stopPropagation()));
+  }
+
+  function shoutoutModifyUrl(item) {
+    const url = new URL("./patron-portal.html", window.location.href);
+    url.searchParams.set("tab", "shoutouts");
+    url.searchParams.set("v", "28.26-f");
+    if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
+    if (item.id) url.searchParams.set("id", item.id);
+    return url.toString();
   }
 
   async function openMessage(el, user) {
@@ -429,7 +497,15 @@
       ["Visibility", profile.publicProfileVisibility || "followers"]
     ]);
 
-    byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map(x => `<div class="queue-item"><strong>${esc(x.mainText || "ShoutOut")}</strong><p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")}</p><small>${esc(fmtDate(x.submittedAt))}</small></div>`).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
+    byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map(x => {
+      const canModify = x.editable !== false && String(x.status || "pending").toLowerCase() === "pending";
+      return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
+        <strong>${esc(x.mainText || "ShoutOut")}</strong>
+        <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")}</p>
+        <small>${esc(fmtDate(x.submittedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
+        ${canModify ? `<p><a class="buttonlike" href="${esc(shoutoutModifyUrl(x))}">Modify ShoutOut</a></p>` : ""}
+      </div>`;
+    }).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
     byId("myChats").innerHTML = chats.length ? chats.map(x => `<div class="queue-item"><strong>${esc(x.title || "Chat")}</strong><p>${esc(x.lastMessage || "")}</p><small>Unread: ${esc(x.unreadCounts?.[user.uid] || 0)}</small></div>`).join("") : "<p class='sub'>No chats yet.</p>";
