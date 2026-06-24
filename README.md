@@ -1,21 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut + Mingl v28.30-f Firestore Rules Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.31-f Firestore ClubLocations Rebrand Migration Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.30-f
+https://jadzadco.github.io/shoutout-demo/?v=28.31-f
 ```
 
 Current release highlights:
 
-- Fix package. `-f` means this release fixes and consolidates v28.29-nf behavior.
-- Adds a consolidated `firestore.rules` file based on the current live rules plus Mingl rules.
-- Adds `firestore-rules-before-v28-29-nf.txt` so rollback can remove/negate every Mingl rule addition.
-- Updates Mingl chat message writes to include `roomType: "mingl"` and `connectionId` for rule enforcement.
+- Fix package. `-f` means this release fixes data/config behavior.
+- Adds a browser-based Firestore migration tool for existing `clubLocations` documents.
+- Fixes the welcome/sign-in logo rendering by using the smaller FLOQR color logo and adding styled text fallbacks when an image asset is missing.
+- Migration path: `migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html`.
+- The migration scans `clubLocations` and replaces `Jadz AdCo`, `Jadz Ad Co`, `JADZ ADCO`, and `JADZ AD CO` with `FLOQR`.
+- The migration previews changes first, downloads a rollback JSON backup, then applies updates.
+- The migration page also supports rollback from the downloaded backup JSON.
+- Keeps the v28.30-f consolidated Firestore rules package files.
 - Rebrands the company/platform layer to `FLOQR`.
-- Adds the FLOQR chrome logo to the welcome/sign-in page and stores the new logo assets under `images/`.
+- Adds FLOQR logo assets under `images/`; the welcome/sign-in page uses `images/floqr-color.png`.
 - Adds an independent ShoutOut landing page before the ShoutOut venue search.
 - Adds `Mingl` as the social/chat product button on Screen 2 after `Throw a ShoutOut`.
 - Adds an independent Mingl landing page with Mingl logo, contextual patron search, Mingl requests, Mingl Back acceptance, and Mingl Chat.
@@ -23,7 +27,7 @@ Current release highlights:
 - Adds optional `Gender` profile data so Mingl can select the blue Mingl logo for female profiles when that profile value exists.
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
-- Bumped active cache-busting query strings to `v=28.30-f`.
+- Bumped active cache-busting query strings to `v=28.31-f`.
 
 Firebase / Firestore / Storage impact:
 
@@ -31,11 +35,11 @@ Firebase / Firestore / Storage impact:
 - Firestore rules: consolidated rules are included as `firestore.rules`. The previous live rules are preserved as `firestore-rules-before-v28-29-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
-- No database migration is required. New Mingl data writes use `minglConnections`, `chatRooms`, and `chatMessages`.
+- Database migration: optional but included. Run the v28.31-f migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.30-f-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.31-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -46,19 +50,34 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.30-f FLOQR Mingl Firestore rules fix package
+Upload v28.31-f FLOQR Firestore clubLocations rebrand migration package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.30-f
+https://jadzadco.github.io/shoutout-demo/?v=28.31-f
 ```
+
+Firestore migration steps:
+
+1. Upload the package first.
+2. Open:
+
+```text
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.31-f
+```
+
+3. Sign in with an approved admin email.
+4. Click `Preview Changes`.
+5. Click `Download Rollback Backup` and keep the JSON file.
+6. Click `Apply Migration`.
+7. Re-open the app and confirm Firestore-backed locations now show `FLOQR`.
 
 Manual test checklist:
 
-1. Open the welcome/sign-in page and confirm the FLOQR chrome logo appears.
+1. Open the welcome/sign-in page and confirm the FLOQR logo appears at a readable size.
 2. Open Patron Portal and confirm the title/header uses FLOQR wording.
 3. Open Club Admin and Master Admin pages and confirm visible app branding uses FLOQR.
 4. Search for a club/location and confirm display brand strings use `FLOQR` instead of `LEGACY BRAND`.
@@ -68,16 +87,16 @@ Manual test checklist:
 8. With two test patron accounts, send a Mingl request from one account, Mingl Back from the other account, then confirm Mingl Chat opens and sends messages.
 9. Submit a test ShoutOut and confirm System Message behavior still works.
 10. Test profile media upload and confirm Storage Rules behavior still works.
-11. Apply the consolidated Firestore rules from `firestore.rules` in Firebase Console, then test Mingl request and Mingl Chat again.
-12. Confirm rollback file `firestore-rules-before-v28-29-nf.txt` is kept with the package.
+11. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
+12. Confirm rollback file `ROLLBACK-V28-31-f.md` is kept with the package.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.29-nf-full-package.zip`, `shoutoutwepp,vers-28.28-nf-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.30-f-full-package.zip`, `shoutoutwepp,vers-28.29-nf-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
 - Firestore rules rollback: replace the live Firestore rules with `firestore-rules-before-v28-29-nf.txt` to negate the Mingl additions.
 - Storage rules rollback: no new Storage Rules change beyond v28.27-f.
-- Database rollback: no migration is required. Optional cleanup can delete test docs from `minglConnections`, `chatRooms`, and `chatMessages`.
-- Helper script: `rollback-v28-30-f.ps1`.
+- Database rollback: use the backup JSON downloaded from the v28.31-f migration page and click `Apply Rollback JSON`.
+- Helper script: `rollback-v28-31-f.ps1`.
 ---
 
 # FLOQR ShoutOut v24 Admin Analytics + Master Admin Package

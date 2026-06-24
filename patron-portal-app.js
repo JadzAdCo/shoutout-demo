@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.30-f */
+/* patron-portal-app.js v28.31-f */
 (function(){
   "use strict";
 
@@ -79,7 +79,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.30-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.31-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -416,7 +416,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.30-f");
+    url.searchParams.set("v", "28.31-f");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
