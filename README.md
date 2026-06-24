@@ -1,50 +1,38 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.27-f Profile Media Storage Rules Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut + Mingl v28.29-nf Feature Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.27-f
+https://jadzadco.github.io/shoutout-demo/?v=28.29-nf
 ```
 
 Current release highlights:
 
-- Fix package. `-f` means fix release.
-- Adds `storage.rules` with Firebase Storage rules for profile media uploads.
-- Allows signed-in users to upload only to their own `profileMedia/{uid}/images/...` and `profileMedia/{uid}/videos/...` folders.
-- Keeps public read access for saved profile gallery media so public profiles can display images/videos.
-- Preserves ShoutOut media upload rules under `shoutouts/{uid}/...`.
-- Improves the profile media upload error message when Firebase returns `storage/unauthorized`.
-- Bumped active cache-busting query strings to `v=28.27-f`.
-
-Why the screenshot error happened:
-
-Firebase Storage rejected this path:
-
-```text
-profileMedia/{uid}/images/...
-```
-
-The app was signed in and using the correct UID folder, but the live Firebase Storage Rules do not currently allow that write. Uploading the web package alone does not update Firebase Storage Rules. The rules must be published separately in Firebase Console or with Firebase CLI.
+- New feature package. `-nf` means new feature release.
+- Rebrands the company/platform layer to `FLOQR`.
+- Adds the FLOQR chrome logo to the welcome/sign-in page and stores the new logo assets under `images/`.
+- Adds an independent ShoutOut landing page before the ShoutOut venue search.
+- Adds `Mingl` as the social/chat product button on Screen 2 after `Throw a ShoutOut`.
+- Adds an independent Mingl landing page with Mingl logo, contextual patron search, Mingl requests, Mingl Back acceptance, and Mingl Chat.
+- Renames visible `Chats` surfaces to `Mingl` / `Mingl Chat` where patrons see the feature.
+- Adds optional `Gender` profile data so Mingl can select the blue Mingl logo for female profiles when that profile value exists.
+- Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
+- Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
+- Bumped active cache-busting query strings to `v=28.29-nf`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: no Firestore rule changes in this package.
+- Firestore rules: no live rules file is overwritten. A draft add-on is included as `firestore-rules-mingl-addon.txt` for `minglConnections`, `chatRooms`, and `chatMessages`.
 - Firestore indexes: none added.
-- Storage rules: `storage.rules` added and must be manually published to Firebase Storage Rules.
-- Storage write paths enabled by the rules:
-
-```text
-profileMedia/{uid}/images/...
-profileMedia/{uid}/videos/...
-shoutouts/{uid}/...
-```
+- Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
+- No database migration is required. New Mingl data writes use `minglConnections`, `chatRooms`, and `chatMessages`.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.27-f-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.29-nf-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -55,45 +43,39 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.27-f profile media storage rules fix package
+Upload v28.29-nf FLOQR Mingl feature package
 ```
 
-5. Publish the Storage Rules from `storage.rules` in Firebase Console:
+5. Wait 1-3 minutes for GitHub Pages to publish.
+6. Test with:
 
 ```text
-Firebase Console > Storage > Rules
-```
-
-6. Click `Publish` after pasting/reviewing the rules.
-7. Wait 1-3 minutes for GitHub Pages to publish.
-8. Test with:
-
-```text
-https://jadzadco.github.io/shoutout-demo/?v=28.27-f
+https://jadzadco.github.io/shoutout-demo/?v=28.29-nf
 ```
 
 Manual test checklist:
 
-1. Sign in as a patron.
-2. Open Patron Portal > Public Profile.
-3. Choose Photo 1.
-4. Confirm the image preview appears before upload.
-5. Click `Save This Slot`.
-6. Confirm no `storage/unauthorized` error appears.
-7. Confirm the image appears in the Image Gallery.
-8. Confirm the file appears in Firebase Storage under `profileMedia/{uid}/images/...`.
-9. Confirm another user cannot upload to that UID folder.
+1. Open the welcome/sign-in page and confirm the FLOQR chrome logo appears.
+2. Open Patron Portal and confirm the title/header uses FLOQR wording.
+3. Open Club Admin and Master Admin pages and confirm visible app branding uses FLOQR.
+4. Search for a club/location and confirm display brand strings use `FLOQR` instead of `LEGACY BRAND`.
+5. On Screen 2, confirm `Throw a ShoutOut` opens the ShoutOut landing page and `Start ShoutOut` continues to location search.
+6. On Screen 2, confirm `Mingl` opens the Mingl landing page.
+7. Search Mingl by city, music, travel, hobbies, or username.
+8. With two test patron accounts, send a Mingl request from one account, Mingl Back from the other account, then confirm Mingl Chat opens and sends messages.
+9. Submit a test ShoutOut and confirm System Message behavior still works.
+10. Test profile media upload and confirm Storage Rules behavior still works.
+11. Before production Mingl launch, review and apply the Firestore permission pattern from `firestore-rules-mingl-addon.txt` inside your existing Firestore Rules.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.26-f-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
-- Storage rules rollback: restore the previous Firebase Storage Rules from Firebase Console rule history if needed.
-- Database rollback: no migration is required.
-- Storage cleanup: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if needed.
-- Helper script: `rollback-v28-27-f.ps1`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.28-nf-full-package.zip`, `shoutoutwepp,vers-28.27-f-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Storage rules rollback: no new Storage Rules change beyond v28.27-f.
+- Database rollback: no migration is required. Optional cleanup can delete test docs from `minglConnections`, `chatRooms`, and `chatMessages`.
+- Helper script: `rollback-v28-29-nf.ps1`.
 ---
 
-# Jadz AdCo ShoutOut v24 Admin Analytics + Master Admin Package
+# FLOQR ShoutOut v24 Admin Analytics + Master Admin Package
 
 ## Deployment
 
@@ -143,7 +125,7 @@ New club admin sections:
 The club admin now includes a prototype reconciliation page showing:
 
 - Estimated ShoutOut gross
-- Jadz platform fee estimate
+- FLOQR platform fee estimate
 - Venue ShoutOut share estimate
 - Estimated local ad share
 - Pending payout
@@ -199,7 +181,7 @@ Master admin:
 master-admin.html
 ```
 
-Sees the full Jadz AdCo network.
+Sees the full FLOQR network.
 
 ### 6. Master Admin Email List Added
 
@@ -232,12 +214,12 @@ Ticketmaster's Partner API is different from the Discovery API. It is restricted
 
 Eventbrite has a public platform/API for event management workflows, including data access, event creation, attendee/order workflows, and checkout customization. This may be easier for early event organizer integrations.
 
-### Recommended Jadz Integration Path
+### Recommended FLOQR Integration Path
 
 Phase 1:
 
 ```text
-Use Jadz-owned Firestore events
+Use FLOQR-owned Firestore events
 ```
 
 Phase 2:
@@ -261,7 +243,7 @@ Add Eventbrite API for promoter-created events and ticket workflows
 Phase 5:
 
 ```text
-Build Jadz-owned reservation, VIP table, guest list, and ticket checkout for higher-margin venue transactions
+Build FLOQR-owned reservation, VIP table, guest list, and ticket checkout for higher-margin venue transactions
 ```
 
 ## Recommended Firestore Rules Additions
@@ -360,7 +342,7 @@ Facebook, phone-only, anonymous, and other weaker providers are blocked for Mast
 
 5. The user email must be verified by the provider.
 
-6. MFA must be enforced upstream by Microsoft Entra ID or Google Workspace for the allowed Jadz corporate domains.
+6. MFA must be enforced upstream by Microsoft Entra ID or Google Workspace for the allowed FLOQR corporate domains.
 
 ## Important MFA Note
 
@@ -1113,8 +1095,8 @@ Protected terms must never be translated:
 
 ```text
 ShoutOut
-Jadz AdCo
-Jadz Holdings
+FLOQR
+FLOQR Holdings
 Superstar
 Big Baller
 Baller
@@ -2207,7 +2189,7 @@ https://jadzadco.github.io/shoutout-demo/display.html?location=shoko-barcelona-s
 5. Confirm Traditional Black & White is selected by default.
 6. Confirm media templates are labeled as image/video placeholder templates.
 7. Continue to editor.
-8. Confirm the display preview no longer shows club name / Jadz AdCo header text.
+8. Confirm the display preview no longer shows club name / FLOQR header text.
 9. Confirm the display preview no longer shows the footer line.
 10. Test Traditional Black & White.
 11. Test one image/video placeholder template.
@@ -2363,7 +2345,7 @@ No database rollback is needed.
 
 ---
 
-# Jadz AdCo ShoutOut v28.13 Navigation + Patron Role Request Fix
+# FLOQR ShoutOut v28.13 Navigation + Patron Role Request Fix
 
 ## Package
 
@@ -2453,7 +2435,7 @@ No Firestore or Storage rollback is needed for v28.13.
 
 ---
 
-# Jadz AdCo ShoutOut v28.14 Classic Black & White Board Text Layout
+# FLOQR ShoutOut v28.14 Classic Black & White Board Text Layout
 
 ## Package
 
@@ -2552,7 +2534,7 @@ No Firestore or Storage rollback is needed for v28.14.
 
 ---
 
-# Jadz AdCo ShoutOut v28.15 Classic Board Preview Alignment Fix
+# FLOQR ShoutOut v28.15 Classic Board Preview Alignment Fix
 
 ## Package
 
@@ -2655,7 +2637,7 @@ No Firestore or Storage rollback is needed for v28.15.
 
 ---
 
-# Jadz AdCo ShoutOut v28.16 Media Upload Display Pipeline Fix
+# FLOQR ShoutOut v28.16 Media Upload Display Pipeline Fix
 
 ## Package
 
@@ -2758,7 +2740,7 @@ Database rollback is normally not needed. If a specific media ShoutOut must be r
 
 ---
 
-# Jadz AdCo ShoutOut v28.24-f Navigation + Messages Fix Package
+# FLOQR ShoutOut v28.24-f Navigation + Messages Fix Package
 
 ## Package
 

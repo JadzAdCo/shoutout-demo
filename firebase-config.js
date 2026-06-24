@@ -1,6 +1,6 @@
 /*
   firebase-config.js
-  Firebase web config for Jadz AdCo ShoutOut demo.
+  Firebase web config for FLOQR ShoutOut demo.
 
   IMPORTANT:
   This file uses Firebase Compat syntax.

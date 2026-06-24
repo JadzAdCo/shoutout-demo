@@ -192,7 +192,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=28.27-f"
+        link:"./patron-portal.html?tab=shoutouts&v=28.28-nf"
       });
     } catch(e) {}
   }
@@ -326,7 +326,7 @@
 
     byId("reconciliationReport").innerHTML = simpleRows([
       ["Estimated ShoutOut gross", money(estimatedShoutOutRevenue)],
-      ["Jadz platform fee estimate", money(platformFee)],
+      ["FLOQR platform fee estimate", money(platformFee)],
       ["Venue ShoutOut share estimate", money(venueShare)],
       ["Estimated local ad share", money(adShare)],
       ["Pending payout", money(venueShare + adShare)],

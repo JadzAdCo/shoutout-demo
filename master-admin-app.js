@@ -264,7 +264,7 @@
 
     byId("networkReconReport").innerHTML = simpleRows([
       ["Estimated gross revenue", money(gross)],
-      ["Estimated Jadz platform share", money(platformShare)],
+      ["Estimated FLOQR platform share", money(platformShare)],
       ["Estimated venue payouts", money(venueShare)],
       ["Locations requiring payout", locationRows.length.toLocaleString()],
       ["Reconciliation status", "Prototype — connect payment processor ledger later"]
@@ -276,9 +276,9 @@
         ["Ticketmaster Affiliate / Distribution", "Apply for affiliate access and Impact publisher tracking"],
         ["Ticketmaster Partner API", "Restricted; requires official distribution relationship"],
         ["Eventbrite API", "Good candidate for event publishing, checkout customization, attendees, orders, webhooks"],
-        ["Jadz near-term approach", "Start with outbound ticket links, then affiliate tracking, then direct checkout/reservation integrations"]
+        ["FLOQR near-term approach", "Start with outbound ticket links, then affiliate tracking, then direct checkout/reservation integrations"]
       ])}
-      <p class="sub small">Use Events as a discovery layer first. Add affiliate tracking after program approval. Use Jadz-owned VIP/table reservations for higher-margin revenue.</p>`;
+      <p class="sub small">Use Events as a discovery layer first. Add affiliate tracking after program approval. Use FLOQR-owned VIP/table reservations for higher-margin revenue.</p>`;
 
 
     if (byId("promoterNetworkReport")) {

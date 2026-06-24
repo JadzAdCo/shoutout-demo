@@ -1,4 +1,4 @@
-Jadz AdCo ShoutOut v23 Sign-up + Ad Image Update
+FLOQR ShoutOut v23 Sign-up + Ad Image Update
 
 Upload/replace all files in this ZIP.
 

@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.27-f */
+/* patron-portal-app.js v28.29-nf */
 (function(){
   "use strict";
 
@@ -68,7 +68,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", chats:"portalChats", profile:"portalProfile", public:"portalPublicProfile"};
+      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
     }
@@ -79,7 +79,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.27-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.29-nf"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -125,6 +125,7 @@
     byId("editCity").value = profile.city || "";
     byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
+    byId("editGender").value = profile.gender || "";
     byId("editInstagram").value = profile.instagramHandle || "";
     byId("editX").value = profile.xHandle || "";
     byId("editProfileType").value = profile.publicProfileType || "patron";
@@ -151,6 +152,7 @@
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
       preferredLanguage: byId("editLanguage").value,
+      gender: byId("editGender").value,
       instagramHandle: byId("editInstagram").value.trim(),
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
@@ -349,7 +351,7 @@
       <div class="public-profile-hero">${hero}</div>
       <div class="public-profile-body">
         <p class="eyebrow">${esc(ROLE_LABELS[profileType] || "Patron")} Profile</p>
-        <h3>${esc(profile.displayName || user.displayName || user.email || "Jadz Member")}</h3>
+        <h3>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</h3>
         <p>${esc(profile.bio || template.headline)}</p>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
         <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
@@ -407,7 +409,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.27-f");
+    url.searchParams.set("v", "28.29-nf");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -447,13 +449,13 @@
       <li>Your current approved role set: <strong>${esc(roles.join(", "))}</strong>.</li>
     </ul>`;
     byId("chatPolicySummary").innerHTML = `<ul>
-      <li>Chat is separate from Inbox.</li>
-      <li>Master Admin is excluded from member chat.</li>
-      <li>Patron-to-patron chat requires mutual follow.</li>
-      <li>Role members cannot initiate chat with patrons unless the thread is tied to a patron-originated action such as a payment, guest list request, ShoutOut purchase, reservation, or support question.</li>
-      <li>Role-specific chat permissions must be enforced by Firestore rules or a server function before production launch.</li>
+      <li>Mingl Chat is separate from Inbox.</li>
+      <li>Master Admin is excluded from member Mingl Chat.</li>
+      <li>Patron-to-patron Mingl Chat requires both patrons to Mingl back.</li>
+      <li>Role members cannot initiate Mingl Chat with patrons unless the thread is tied to a patron-originated action such as a payment, guest list request, ShoutOut purchase, reservation, or support question.</li>
+      <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
     </ul>`;
-    byId("composePolicyNote").textContent = canDirect ? "Direct inbox messaging is enabled for your approved role. Patron-originated context should still be used before contacting a patron." : "Direct inbox messaging is disabled for standard Patron accounts. Use Chat after mutual follow when that feature is enabled.";
+    byId("composePolicyNote").textContent = canDirect ? "Direct inbox messaging is enabled for your approved role. Patron-originated context should still be used before contacting a patron." : "Direct inbox messaging is disabled for standard Patron accounts. Use Mingl Chat after both patrons Mingl back.";
     byId("sendMessageBtn").disabled = !canDirect;
     byId("composeRecipientEmail").disabled = !canDirect;
     byId("composeSubject").disabled = !canDirect;
@@ -522,7 +524,7 @@
     }).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
-    byId("myChats").innerHTML = chats.length ? chats.map(x => `<div class="queue-item"><strong>${esc(x.title || "Chat")}</strong><p>${esc(x.lastMessage || "")}</p><small>Unread: ${esc(x.unreadCounts?.[user.uid] || 0)}</small></div>`).join("") : "<p class='sub'>No chats yet.</p>";
+    byId("myChats").innerHTML = chats.length ? chats.map(x => `<div class="queue-item"><strong>${esc(x.title || "Mingl Chat")}</strong><p>${esc(x.lastMessage || "")}</p><small>Unread: ${esc(x.unreadCounts?.[user.uid] || 0)}</small></div>`).join("") : "<p class='sub'>No Mingl chats yet.</p>";
     byId("privacyReport").innerHTML = simpleRows([["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"]]);
   }
 

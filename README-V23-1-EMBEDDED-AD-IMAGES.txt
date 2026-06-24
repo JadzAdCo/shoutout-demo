@@ -1,4 +1,4 @@
-Jadz ShoutOut v23.1 Embedded Ad Images Fix
+FLOQR ShoutOut v23.1 Embedded Ad Images Fix
 
 Fix:
 - Splash ad images are embedded directly in patron-app.js as SVG data URIs.

@@ -1,22 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Jadz AdCo Patron Portal v28.27-f -->
+  <!-- FLOQR Patron Portal v28.29-nf -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>My Jadz AdCo Activity</title>
+  <title>My FLOQR Activity</title>
   <link rel="stylesheet" href="./styles.css"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a class="global-back-btn buttonlike" href="./?v=28.27-f">&larr; Back to main app</a>
+  <a class="global-back-btn buttonlike" href="./?v=28.29-nf">&larr; Back to main app</a>
   <section class="page active">
     <header class="topbar">
       <div>
         <p class="eyebrow">Patron Portal</p>
-        <h1>My Jadz AdCo Activity</h1>
-        <p class="sub">Profile, member level, ShoutOuts, guest lists, messages, chats, and privacy.</p>
+        <h1>My FLOQR Activity</h1>
+        <p class="sub">Profile, member level, ShoutOuts, guest lists, messages, Mingl, and privacy.</p>
         <p id="portalSignedInAs" class="status">Not signed in</p>
         <p id="portalStatus" class="status">Loading patron portal...</p>
       </div>
@@ -45,7 +45,7 @@
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">Messages</button>
-        <button class="admin-tab" data-panel="portalChats" type="button">Chats</button>
+        <button class="admin-tab" data-panel="portalChats" type="button">Mingl</button>
         <button class="admin-tab" data-panel="portalPrivacy" type="button">Privacy / GDPR</button>
       </nav>
 
@@ -53,13 +53,13 @@
         <div class="metric-grid">
           <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
           <div class="metric-card"><span>Messages</span><strong id="metricMessages">0/0</strong></div>
-          <div class="metric-card"><span>Chats</span><strong id="metricChats">0/0</strong></div>
+          <div class="metric-card"><span>Mingl</span><strong id="metricChats">0/0</strong></div>
           <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
         </div>
         <div class="card">
           <h2>Profile Summary</h2>
           <div id="profileSummary" class="report-block"></div>
-          <p><a href="./role-request.html?v=28.27-f">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
+          <p><a href="./role-request.html?v=28.29-nf">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
         </div>
       </section>
 
@@ -83,6 +83,15 @@
                 <option value="it">Italian</option>
                 <option value="de">German</option>
                 <option value="el">Greek</option>
+              </select>
+            </label>
+            <label>Gender
+              <select id="editGender">
+                <option value="">Prefer not to say</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="nonbinary">Non-binary</option>
+                <option value="self-described">Self-described</option>
               </select>
             </label>
             <label>Instagram Handle <input id="editInstagram"/></label>
@@ -158,10 +167,10 @@
 
       <section id="portalChats" class="admin-panel-section">
         <div class="card">
-          <h2>Chat Rules</h2>
+          <h2>Mingl Rules</h2>
           <div id="chatPolicySummary" class="policy-list"></div>
         </div>
-        <div class="card"><h2>Chats <span id="chatCountLabel">(0/0)</span></h2><div id="myChats" class="report-block"></div></div>
+        <div class="card"><h2>Mingl <span id="chatCountLabel">(0/0)</span></h2><div id="myChats" class="report-block"></div></div>
       </section>
 
       <section id="portalPrivacy" class="admin-panel-section">
@@ -185,8 +194,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.27-f"></script>
-<script src="./shared-data.js?v=28.27-f"></script>
-<script src="./patron-portal-app.js?v=28.27-f"></script>
+<script src="./firebase-config.js?v=28.29-nf"></script>
+<script src="./shared-data.js?v=28.29-nf"></script>
+<script src="./patron-portal-app.js?v=28.29-nf"></script>
 </body>
 </html>

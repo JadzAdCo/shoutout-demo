@@ -1,4 +1,4 @@
-# Rollback Guide: Jadz AdCo ShoutOut v28.23-nf
+# Rollback Guide: FLOQR ShoutOut v28.23-nf
 
 Release package:
 

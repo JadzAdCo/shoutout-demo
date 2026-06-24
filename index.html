@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Jadz AdCo ShoutOut Patron Portal v19 -->
+  <!-- FLOQR ShoutOut Patron Portal v28.29-nf -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
@@ -31,7 +31,7 @@
   <section id="landingPage" class="page active">
     <div class="login-wrap">
       <div class="login-card">
-        <img src="./images/ShoutOut-logo.png" alt="ShoutOut" class="hero-logo"/>
+        <img src="./images/floqr-chrome-logo.png" alt="FLOQR" class="hero-logo"/>
         <p class="eyebrow">Screen 0 — Welcome / Sign In</p>
         <h2>Welcome</h2>
         <p class="login-copy">Search and book entertainment and nightlife events or send a live ShoutOut to one of our ShoutOut displays.</p>
@@ -119,7 +119,7 @@
           </div>
         </div>
         <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./patron-portal.html?v=28.27-f">My Patron Portal</a></p>
+        <p class="sub small"><a href="./patron-portal.html?v=28.29-nf">My Patron Portal</a></p>
       </div>
     </div>
   </section>
@@ -162,6 +162,15 @@
             <option value="45+">45+</option>
           </select>
         </label>
+        <label>Gender
+          <select id="profileGender">
+            <option value="">Prefer not to say</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="nonbinary">Non-binary</option>
+            <option value="self-described">Self-described</option>
+          </select>
+        </label>
         <label>Favorite music genres
           <input id="profileGenres" placeholder="Hip Hop, Afro House, EDM"/>
         </label>
@@ -178,7 +187,7 @@
 
       <label class="consent-line">
         <input id="profileAnalyticsConsent" type="checkbox"/>
-        I agree that Jadz AdCo may use my activity in aggregate analytics to improve recommendations, venue insights, and advertising performance.
+        I agree that FLOQR may use my activity in aggregate analytics to improve recommendations, venue insights, and advertising performance.
       </label>
 
       <label class="consent-line">
@@ -211,6 +220,54 @@
       <button id="loungeClubBtnCard" class="category-card" type="button">Lounge-Clubs</button>
       <div class="category-or">Or</div>
       <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
+      <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
+    </div>
+  </section>
+
+  <section id="shoutoutLandingPage" class="page product-page shoutout-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromShoutoutLandingBtn" type="button">&larr; Back to main categories</button>
+        <p class="eyebrow">Screen 2A - ShoutOut Landing</p>
+        <img src="./images/floqr-color.png" alt="FLOQR" class="product-logo small-logo"/>
+        <h1>Throw a ShoutOut</h1>
+        <p class="sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display.</p>
+      </div>
+    </header>
+    <div class="product-action-row">
+      <button id="startShoutoutFlowBtn" class="category-card hot" type="button">Start ShoutOut</button>
+      <button id="backToCategoriesFromShoutoutLandingBtn2" class="category-card" type="button">Back to Search</button>
+    </div>
+  </section>
+
+  <section id="minglLandingPage" class="page product-page mingl-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromMinglBtn" type="button">&larr; Back to main categories</button>
+        <p class="eyebrow">Screen 2B - Mingl / Social</p>
+        <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo"/>
+        <h1>Mingl</h1>
+        <p class="sub">Find patrons, Mingl with someone, and open chat only after both patrons Mingl back.</p>
+      </div>
+    </header>
+    <div class="mingl-layout">
+      <div class="card">
+        <h2>Mingl with Someone</h2>
+        <input id="minglSearch" class="search" placeholder="Search music, travel, hobbies, city, username..."/>
+        <div id="minglPeopleGrid" class="mingl-people-grid"></div>
+      </div>
+      <div class="card">
+        <h2>Mingl Chat</h2>
+        <div id="minglChatList" class="mingl-chat-list"></div>
+        <div id="minglChatPanel" class="mingl-chat-panel hidden">
+          <h3 id="minglChatTitle">Chat</h3>
+          <div id="minglMessages" class="mingl-messages"></div>
+          <div class="mingl-compose">
+            <input id="minglMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
+            <button id="sendMinglMessageBtn" class="primary" type="button">Send</button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -243,7 +300,7 @@
         <div id="adImageSlot" class="ad-image-slot"></div>
         <h1 id="adTitle">Advertise Here</h1>
         <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
-        <div id="adBadge" class="ad-badge">Jadz AdCo Media Slot</div>
+        <div id="adBadge" class="ad-badge">FLOQR Media Slot</div>
         <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
         <button id="skipAdBtn" class="ghost" type="button">Skip</button>
       </div>
@@ -332,9 +389,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.27-f"></script>
-<script src="./shared-data.js?v=28.27-f"></script>
-<script src="./patron-app.js?v=28.27-f"></script>
-<script src="./notification-center.js?v=28.27-f"></script>
+<script src="./firebase-config.js?v=28.29-nf"></script>
+<script src="./shared-data.js?v=28.29-nf"></script>
+<script src="./patron-app.js?v=28.29-nf"></script>
+<script src="./notification-center.js?v=28.29-nf"></script>
 </body>
 </html>

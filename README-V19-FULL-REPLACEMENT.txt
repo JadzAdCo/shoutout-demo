@@ -1,4 +1,4 @@
-Jadz AdCo ShoutOut v19 Full Replacement Package
+FLOQR ShoutOut v19 Full Replacement Package
 
 Upload/replace every file in this ZIP at the GitHub repository root.
 Keep your existing images folder:

@@ -2,42 +2,35 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    function signedIn() {
-      return request.auth != null;
+
+    match /shoutouts/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 30 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
     }
 
-    function ownsFolder(uid) {
-      return signedIn() && request.auth.uid == uid;
-    }
+    match /profileMedia/{userId}/images/{allPaths=**} {
+      allow read: if request.auth != null;
 
-    function validImage(maxSizeMb) {
-      return request.resource != null
-        && request.resource.size < maxSizeMb * 1024 * 1024
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
     }
 
-    function validVideo(maxSizeMb) {
-      return request.resource != null
-        && request.resource.size < maxSizeMb * 1024 * 1024
+    match /profileMedia/{userId}/videos/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 60 * 1024 * 1024
         && request.resource.contentType.matches('video/.*');
-    }
-
-    match /profileMedia/{uid}/images/{fileName=**} {
-      allow read: if true;
-      allow create, update: if ownsFolder(uid) && validImage(10);
-      allow delete: if ownsFolder(uid);
-    }
-
-    match /profileMedia/{uid}/videos/{fileName=**} {
-      allow read: if true;
-      allow create, update: if ownsFolder(uid) && validVideo(60);
-      allow delete: if ownsFolder(uid);
-    }
-
-    match /shoutouts/{uid}/{fileName=**} {
-      allow read: if true;
-      allow create, update: if ownsFolder(uid) && (validImage(25) || validVideo(120));
-      allow delete: if ownsFolder(uid);
     }
   }
 }
