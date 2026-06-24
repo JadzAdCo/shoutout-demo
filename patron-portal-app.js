@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.29-nf */
+/* patron-portal-app.js v28.30-f */
 (function(){
   "use strict";
 
@@ -79,13 +79,20 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.29-nf"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.30-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
       const snap = await db.collection(name).limit(limit).get();
       const rows = snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
       return filterFn ? rows.filter(filterFn) : rows;
+    } catch(e) { return []; }
+  }
+
+  async function getParticipantCollectionSafe(name, uid, limit=1000) {
+    try {
+      const snap = await db.collection(name).where("participants", "array-contains", uid).limit(limit).get();
+      return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
     } catch(e) { return []; }
   }
 
@@ -409,7 +416,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.29-nf");
+    url.searchParams.set("v", "28.30-f");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -487,7 +494,7 @@
       getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
       getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
       getCollectionSafe("inboxNotifications", x => x.recipientUid === user.uid || x.recipientEmail === user.email),
-      getCollectionSafe("chatRooms", x => Array.isArray(x.participants) && x.participants.includes(user.uid))
+      getParticipantCollectionSafe("chatRooms", user.uid)
     ]);
 
     const messages = [

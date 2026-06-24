@@ -1,16 +1,19 @@
-# CURRENT PACKAGE: FLOQR ShoutOut + Mingl v28.29-nf Feature Package
+# CURRENT PACKAGE: FLOQR ShoutOut + Mingl v28.30-f Firestore Rules Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.29-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.30-f
 ```
 
 Current release highlights:
 
-- New feature package. `-nf` means new feature release.
+- Fix package. `-f` means this release fixes and consolidates v28.29-nf behavior.
+- Adds a consolidated `firestore.rules` file based on the current live rules plus Mingl rules.
+- Adds `firestore-rules-before-v28-29-nf.txt` so rollback can remove/negate every Mingl rule addition.
+- Updates Mingl chat message writes to include `roomType: "mingl"` and `connectionId` for rule enforcement.
 - Rebrands the company/platform layer to `FLOQR`.
 - Adds the FLOQR chrome logo to the welcome/sign-in page and stores the new logo assets under `images/`.
 - Adds an independent ShoutOut landing page before the ShoutOut venue search.
@@ -20,19 +23,19 @@ Current release highlights:
 - Adds optional `Gender` profile data so Mingl can select the blue Mingl logo for female profiles when that profile value exists.
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
-- Bumped active cache-busting query strings to `v=28.29-nf`.
+- Bumped active cache-busting query strings to `v=28.30-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: no live rules file is overwritten. A draft add-on is included as `firestore-rules-mingl-addon.txt` for `minglConnections`, `chatRooms`, and `chatMessages`.
+- Firestore rules: consolidated rules are included as `firestore.rules`. The previous live rules are preserved as `firestore-rules-before-v28-29-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - No database migration is required. New Mingl data writes use `minglConnections`, `chatRooms`, and `chatMessages`.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.29-nf-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.30-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -43,14 +46,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.29-nf FLOQR Mingl feature package
+Upload v28.30-f FLOQR Mingl Firestore rules fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.29-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.30-f
 ```
 
 Manual test checklist:
@@ -65,14 +68,16 @@ Manual test checklist:
 8. With two test patron accounts, send a Mingl request from one account, Mingl Back from the other account, then confirm Mingl Chat opens and sends messages.
 9. Submit a test ShoutOut and confirm System Message behavior still works.
 10. Test profile media upload and confirm Storage Rules behavior still works.
-11. Before production Mingl launch, review and apply the Firestore permission pattern from `firestore-rules-mingl-addon.txt` inside your existing Firestore Rules.
+11. Apply the consolidated Firestore rules from `firestore.rules` in Firebase Console, then test Mingl request and Mingl Chat again.
+12. Confirm rollback file `firestore-rules-before-v28-29-nf.txt` is kept with the package.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.28-nf-full-package.zip`, `shoutoutwepp,vers-28.27-f-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.29-nf-full-package.zip`, `shoutoutwepp,vers-28.28-nf-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Firestore rules rollback: replace the live Firestore rules with `firestore-rules-before-v28-29-nf.txt` to negate the Mingl additions.
 - Storage rules rollback: no new Storage Rules change beyond v28.27-f.
 - Database rollback: no migration is required. Optional cleanup can delete test docs from `minglConnections`, `chatRooms`, and `chatMessages`.
-- Helper script: `rollback-v28-29-nf.ps1`.
+- Helper script: `rollback-v28-30-f.ps1`.
 ---
 
 # FLOQR ShoutOut v24 Admin Analytics + Master Admin Package
