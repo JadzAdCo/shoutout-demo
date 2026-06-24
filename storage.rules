@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsFolder(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validImage(maxSizeMb) {
+      return request.resource != null
+        && request.resource.size < maxSizeMb * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function validVideo(maxSizeMb) {
+      return request.resource != null
+        && request.resource.size < maxSizeMb * 1024 * 1024
+        && request.resource.contentType.matches('video/.*');
+    }
+
+    match /profileMedia/{uid}/images/{fileName=**} {
+      allow read: if true;
+      allow create, update: if ownsFolder(uid) && validImage(10);
+      allow delete: if ownsFolder(uid);
+    }
+
+    match /profileMedia/{uid}/videos/{fileName=**} {
+      allow read: if true;
+      allow create, update: if ownsFolder(uid) && validVideo(60);
+      allow delete: if ownsFolder(uid);
+    }
+
+    match /shoutouts/{uid}/{fileName=**} {
+      allow read: if true;
+      allow create, update: if ownsFolder(uid) && (validImage(25) || validVideo(120));
+      allow delete: if ownsFolder(uid);
+    }
+  }
+}

@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.26-f */
+/* patron-portal-app.js v28.27-f */
 (function(){
   "use strict";
 
@@ -79,7 +79,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.26-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.27-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -208,6 +208,16 @@
     });
   }
 
+  function mediaUploadErrorMessage(error, user) {
+    const code = error?.code || "";
+    if (code === "storage/unauthorized") {
+      return `Media upload blocked by Firebase Storage Rules. Allow signed-in user ${user?.uid || ""} to write under profileMedia/${user?.uid || "{uid}"}/images or videos.`;
+    }
+    if (code === "storage/canceled") return "Media upload was canceled.";
+    if (code === "storage/quota-exceeded") return "Firebase Storage quota was exceeded.";
+    return `Media upload failed: ${error?.message || "Unknown error"}`;
+  }
+
   function renderMediaSlots(profile) {
     const wrap = byId("profileMediaSlots");
     if (!wrap) return;
@@ -232,38 +242,42 @@
   async function saveMediaSlots() {
     const user = auth.currentUser;
     if (!user) return;
-    const slotEls = Array.from(document.querySelectorAll(".profile-media-slot"));
-    const slots = [];
-    setText("portalStatus", "Saving profile media...");
-    for (const slotEl of slotEls) {
-      const slot = Number(slotEl.dataset.slot);
-      const type = slot <= 8 ? "image" : "video";
-      const file = slotEl.querySelector(".profile-media-file")?.files?.[0];
-      let url = slotEl.querySelector(".profile-media-url")?.value || "";
-      let storagePath = slotEl.querySelector(".profile-media-path")?.value || "";
-      if (file) {
-        const folder = type === "video" ? "videos" : "images";
-        const safeName = file.name.replace(/[^a-z0-9._-]/gi, "-").slice(-80);
-        storagePath = `profileMedia/${user.uid}/${folder}/slot-${slot}-${Date.now()}-${safeName}`;
-        const ref = storage.ref(storagePath);
-        await ref.put(file, {contentType:file.type || (type === "video" ? "video/mp4" : "image/jpeg")});
-        url = await ref.getDownloadURL();
+    try {
+      const slotEls = Array.from(document.querySelectorAll(".profile-media-slot"));
+      const slots = [];
+      setText("portalStatus", "Saving profile media...");
+      for (const slotEl of slotEls) {
+        const slot = Number(slotEl.dataset.slot);
+        const type = slot <= 8 ? "image" : "video";
+        const file = slotEl.querySelector(".profile-media-file")?.files?.[0];
+        let url = slotEl.querySelector(".profile-media-url")?.value || "";
+        let storagePath = slotEl.querySelector(".profile-media-path")?.value || "";
+        if (file) {
+          const folder = type === "video" ? "videos" : "images";
+          const safeName = file.name.replace(/[^a-z0-9._-]/gi, "-").slice(-80);
+          storagePath = `profileMedia/${user.uid}/${folder}/slot-${slot}-${Date.now()}-${safeName}`;
+          const ref = storage.ref(storagePath);
+          await ref.put(file, {contentType:file.type || (type === "video" ? "video/mp4" : "image/jpeg")});
+          url = await ref.getDownloadURL();
+        }
+        slots.push({
+          slot,
+          type,
+          url,
+          storagePath,
+          caption: slotEl.querySelector(".profile-media-caption")?.value.trim() || "",
+          updatedAt: new Date().toISOString()
+        });
       }
-      slots.push({
-        slot,
-        type,
-        url,
-        storagePath,
-        caption: slotEl.querySelector(".profile-media-caption")?.value.trim() || "",
-        updatedAt: new Date().toISOString()
-      });
+      await db.collection("users").doc(user.uid).set({
+        profileMediaSlots: slots,
+        profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      setText("portalStatus", "Profile media saved.");
+      await loadPortal(user);
+    } catch(e) {
+      setText("portalStatus", mediaUploadErrorMessage(e, user));
     }
-    await db.collection("users").doc(user.uid).set({
-      profileMediaSlots: slots,
-      profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
-    setText("portalStatus", "Profile media saved.");
-    await loadPortal(user);
   }
 
   function previewSelectedMedia(event) {
@@ -312,7 +326,7 @@
       setText("portalStatus", `Profile media slot ${slotNumber} saved.`);
       await loadPortal(user);
     } catch(e) {
-      setText("portalStatus", `Media upload failed: ${e.message}`);
+      setText("portalStatus", mediaUploadErrorMessage(e, user));
     }
   }
 
@@ -393,7 +407,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.26-f");
+    url.searchParams.set("v", "28.27-f");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();

@@ -1,41 +1,51 @@
-# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.26-f System Message Link + Profile Media Fix Package
+# CURRENT PACKAGE: Jadz AdCo ShoutOut v28.27-f Profile Media Storage Rules Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.26-f
+https://jadzadco.github.io/shoutout-demo/?v=28.27-f
 ```
 
 Current release highlights:
 
 - Fix package. `-f` means fix release.
-- Added the ShoutOut modification/reference link directly inside the system message body after a patron submits a ShoutOut.
-- New ShoutOut submission notifications now store `shoutoutId`, `referenceNumber`, `link`, and a visible `Modify ShoutOut:` line in the body.
-- Patron portal message envelopes now render safe clickable links inside opened message bodies.
-- My ShoutOuts remains the destination for finding the submitted ShoutOut by reference/id.
-- Fixed the public profile media upload flow by allowing patrons to preview and save one media slot at a time.
-- Each profile media slot now has its own `Save This Slot` button.
-- Selecting an image/video immediately shows a local preview before upload.
-- The public profile preview now includes an Image Gallery section that displays saved profile photos and short videos.
-- Kept the 10-slot model from v28.25-nf: 8 images and 2 short videos.
-- Bumped active cache-busting query strings to `v=28.26-f`.
+- Adds `storage.rules` with Firebase Storage rules for profile media uploads.
+- Allows signed-in users to upload only to their own `profileMedia/{uid}/images/...` and `profileMedia/{uid}/videos/...` folders.
+- Keeps public read access for saved profile gallery media so public profiles can display images/videos.
+- Preserves ShoutOut media upload rules under `shoutouts/{uid}/...`.
+- Improves the profile media upload error message when Firebase returns `storage/unauthorized`.
+- Bumped active cache-busting query strings to `v=28.27-f`.
+
+Why the screenshot error happened:
+
+Firebase Storage rejected this path:
+
+```text
+profileMedia/{uid}/images/...
+```
+
+The app was signed in and using the correct UID folder, but the live Firebase Storage Rules do not currently allow that write. Uploading the web package alone does not update Firebase Storage Rules. The rules must be published separately in Firebase Console or with Firebase CLI.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: no rule file included in this package.
+- Firestore rules: no Firestore rule changes in this package.
 - Firestore indexes: none added.
-- Storage rules: no rule file included in this package.
-- Existing `inboxNotifications` for future ShoutOut submissions may include `shoutoutId`, `referenceNumber`, `link`, and a body containing a modification link.
-- Existing `users/{uid}.profileMediaSlots` continues to be used.
-- Profile media continues to upload under `profileMedia/{uid}/images/...` and `profileMedia/{uid}/videos/...`.
+- Storage rules: `storage.rules` added and must be manually published to Firebase Storage Rules.
+- Storage write paths enabled by the rules:
+
+```text
+profileMedia/{uid}/images/...
+profileMedia/{uid}/videos/...
+shoutouts/{uid}/...
+```
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.26-f-full-package.zip`.
-2. Upload the extracted files to the GitHub repo root:
+1. Extract `shoutoutwepp,vers-28.27-f-full-package.zip`.
+2. Upload the extracted web files to the GitHub repo root:
 
 ```text
 https://github.com/jadzadco/shoutout-demo
@@ -45,34 +55,42 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.26-f system message link and profile media fix package
+Upload v28.27-f profile media storage rules fix package
 ```
 
-5. Wait 1-3 minutes for GitHub Pages to publish.
-6. Test with:
+5. Publish the Storage Rules from `storage.rules` in Firebase Console:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.26-f
+Firebase Console > Storage > Rules
+```
+
+6. Click `Publish` after pasting/reviewing the rules.
+7. Wait 1-3 minutes for GitHub Pages to publish.
+8. Test with:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=28.27-f
 ```
 
 Manual test checklist:
 
-1. Submit a new ShoutOut.
-2. Open Patron Portal > Messages.
-3. Open the `ShoutOut Submitted` system message.
-4. Confirm it shows sender `System Message`, timestamp, subject, body, and a clickable `Modify ShoutOut:` link.
-5. Open Patron Portal > Public Profile.
-6. Choose one image slot, confirm the preview appears before upload, then click `Save This Slot`.
-7. Confirm the image appears in the public profile Image Gallery.
-8. Repeat with another image slot one at a time.
-9. Optional: test one short-video slot and confirm it appears in the gallery.
+1. Sign in as a patron.
+2. Open Patron Portal > Public Profile.
+3. Choose Photo 1.
+4. Confirm the image preview appears before upload.
+5. Click `Save This Slot`.
+6. Confirm no `storage/unauthorized` error appears.
+7. Confirm the image appears in the Image Gallery.
+8. Confirm the file appears in Firebase Storage under `profileMedia/{uid}/images/...`.
+9. Confirm another user cannot upload to that UID folder.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.25-nf-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
-- Database rollback: no migration is required. New notification link fields can remain safely.
-- Storage rollback: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if needed.
-- Helper script: `rollback-v28-26-f.ps1`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.26-f-full-package.zip` or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Storage rules rollback: restore the previous Firebase Storage Rules from Firebase Console rule history if needed.
+- Database rollback: no migration is required.
+- Storage cleanup: uploaded profile media can be manually removed from `profileMedia/{uid}/...` if needed.
+- Helper script: `rollback-v28-27-f.ps1`.
 ---
 
 # Jadz AdCo ShoutOut v24 Admin Analytics + Master Admin Package
