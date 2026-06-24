@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.31-f */
+/* patron-portal-app.js v28.33-f */
 (function(){
   "use strict";
 
@@ -79,7 +79,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.31-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.33-f"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -140,6 +140,8 @@
     byId("editMusicInterests").value = joinCSV(profile.musicInterests || profile.favoriteGenres);
     byId("editTravelInterests").value = joinCSV(profile.travelInterests);
     byId("editHobbies").value = joinCSV(profile.hobbies || profile.generalHobbies);
+    byId("editFoodChoices").value = joinCSV(profile.foodChoices) || "Sushi, Tapas, Steakhouse";
+    byId("editFavoriteBeverages").value = joinCSV(profile.favoriteBeverages) || "Champagne, Tequila, Mocktails";
     byId("editNightlifeStyle").value = profile.nightlifeStyle || joinCSV(profile.nightlifeInterests);
     byId("editLookingToMeet").value = profile.lookingToMeet || "";
     byId("editBio").value = profile.bio || "";
@@ -167,6 +169,8 @@
       musicInterests: splitCSV(byId("editMusicInterests").value),
       travelInterests: splitCSV(byId("editTravelInterests").value),
       hobbies: splitCSV(byId("editHobbies").value),
+      foodChoices: splitCSV(byId("editFoodChoices").value || "Sushi, Tapas, Steakhouse"),
+      favoriteBeverages: splitCSV(byId("editFavoriteBeverages").value || "Champagne, Tequila, Mocktails"),
       nightlifeStyle: byId("editNightlifeStyle").value.trim(),
       lookingToMeet: byId("editLookingToMeet").value.trim(),
       bio: byId("editBio").value.trim(),
@@ -363,6 +367,8 @@
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
         <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
+        <div class="profile-section"><strong>Food Choices</strong>${chips(profile.foodChoices)}</div>
+        <div class="profile-section"><strong>Favorite Beverages</strong>${chips(profile.favoriteBeverages)}</div>
         <div class="profile-section"><strong>Nightlife Style</strong><p>${esc(profile.nightlifeStyle || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Looking To Meet</strong><p>${esc(profile.lookingToMeet || "Not added yet.")}</p></div>
       </div>
@@ -416,7 +422,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.31-f");
+    url.searchParams.set("v", "28.33-f");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -514,6 +520,9 @@
       ["Email", user.email || "-"],
       ["City", profile.city || "-"],
       ["Country", profile.country || "-"],
+      ["Gender", profile.gender || "-"],
+      ["Food Choices", joinCSV(profile.foodChoices) || "-"],
+      ["Favorite Beverages", joinCSV(profile.favoriteBeverages) || "-"],
       ["Preferred Language", profile.preferredLanguage || "-"],
       ["Member Level", profile.memberLevel || "Patron"],
       ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],

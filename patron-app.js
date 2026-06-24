@@ -3,7 +3,12 @@
   "use strict";
   const byId = id => document.getElementById(id);
   const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
-  const setStatus = value => setText("authStatus", value);
+  const setStatus = value => {
+    const el = byId("authStatus");
+    if (!el) return;
+    el.textContent = value || "";
+    el.classList.toggle("hidden", !value);
+  };
   const qs = (name, fallback = "") => new URL(window.location.href).searchParams.get(name) || fallback;
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const unique = items => [...new Set(items.filter(Boolean))].sort();
@@ -266,6 +271,9 @@
         gender: byId("profileGender")?.value || "",
         favoriteGenres: splitCSV(byId("profileGenres").value),
         nightlifeInterests: splitCSV(byId("profileInterests").value),
+        musicInterests: splitCSV(byId("profileGenres").value),
+        foodChoices: splitCSV(byId("profileFoodChoices")?.value || "Sushi, Tapas, Steakhouse"),
+        favoriteBeverages: splitCSV(byId("profileBeverageChoices")?.value || "Champagne, Tequila, Mocktails"),
         instagramHandle: byId("profileInstagram").value.trim(),
         xHandle: byId("profileX").value.trim(),
         analyticsConsent: byId("profileAnalyticsConsent").checked,
@@ -557,11 +565,54 @@
   function publicProfileHaystack(profile) {
     return [
       profile.displayName, profile.username, profile.city, profile.country, profile.bio,
-      profile.nightlifeStyle, profile.lookingToMeet,
+      profile.nightlifeStyle, profile.lookingToMeet, profile.gender,
       ...(profile.musicInterests || profile.favoriteGenres || []),
       ...(profile.travelInterests || []),
-      ...(profile.hobbies || profile.generalHobbies || [])
+      ...(profile.hobbies || profile.generalHobbies || []),
+      ...(profile.foodChoices || []),
+      ...(profile.favoriteBeverages || [])
     ].join(" ");
+  }
+
+  function normValue(value) {
+    return normalizeSearchText(value).replace(/\s+/g, " ").trim();
+  }
+
+  function valueSet(value) {
+    const items = Array.isArray(value) ? value : splitCSV(value);
+    return new Set(items.map(normValue).filter(Boolean));
+  }
+
+  function setsOverlap(a, b) {
+    for (const item of a) if (b.has(item)) return true;
+    return false;
+  }
+
+  function profileMatchScore(a = {}, b = {}) {
+    const checks = [
+      normValue(a.city) && normValue(a.city) === normValue(b.city),
+      normValue(a.country) && normValue(a.country) === normValue(b.country),
+      normValue(a.gender) && normValue(b.gender) && normValue(a.gender) === normValue(b.gender),
+      setsOverlap(valueSet(a.musicInterests || a.favoriteGenres), valueSet(b.musicInterests || b.favoriteGenres)),
+      setsOverlap(valueSet(a.travelInterests), valueSet(b.travelInterests)),
+      setsOverlap(valueSet(a.hobbies || a.generalHobbies), valueSet(b.hobbies || b.generalHobbies)),
+      setsOverlap(valueSet(a.nightlifeInterests), valueSet(b.nightlifeInterests)),
+      normValue(a.nightlifeStyle) && normValue(a.nightlifeStyle) === normValue(b.nightlifeStyle),
+      setsOverlap(valueSet(a.foodChoices), valueSet(b.foodChoices)),
+      setsOverlap(valueSet(a.favoriteBeverages), valueSet(b.favoriteBeverages)),
+      normValue(a.lookingToMeet) && normValue(a.lookingToMeet) === normValue(b.lookingToMeet)
+    ];
+    return checks.filter(Boolean).length;
+  }
+
+  function isPublicMinglCandidate(profile = {}) {
+    const visibility = String(profile.publicProfileVisibility || "").toLowerCase();
+    return visibility === "public" && !!profileMinglPhoto(profile) && profileMatchScore(cachedUserProfile || {}, profile) >= 3;
+  }
+
+  function profileMinglPhoto(profile = {}) {
+    const media = Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots.find(x => x?.url && x.type !== "video") : null;
+    return media?.url || profile.photoURL || profile.avatarUrl || "";
   }
 
   function connectionFor(uid) {
@@ -582,7 +633,9 @@
       profile.city || profile.country || "",
       joinList(profile.musicInterests || profile.favoriteGenres),
       joinList(profile.travelInterests),
-      joinList(profile.hobbies || profile.generalHobbies)
+      joinList(profile.hobbies || profile.generalHobbies),
+      joinList(profile.foodChoices),
+      joinList(profile.favoriteBeverages)
     ].filter(Boolean);
     return parts.join(" - ");
   }
@@ -611,7 +664,7 @@
   async function loadMingl() {
     if (!currentUser) return;
     const [users, connections] = await Promise.all([
-      getCollectionSafe("users", x => x.uid !== currentUser.uid && (x.publicProfileVisibility || "followers") !== "private"),
+      getCollectionSafe("users", x => x.uid !== currentUser.uid && isPublicMinglCandidate(x)),
       getParticipantCollectionSafe("minglConnections", currentUser.uid)
     ]);
     minglCandidates = users;
@@ -625,18 +678,19 @@
     if (!grid) return;
     const query = byId("minglSearch")?.value || "";
     const matches = minglCandidates.filter(p => contextualSearchMatch(query, publicProfileHaystack(p))).slice(0, 40);
-    grid.innerHTML = matches.length ? "" : '<div class="empty">No matching Mingl profiles found.</div>';
+    grid.innerHTML = matches.length ? "" : '<div class="empty">No public Mingl profiles with at least 3 matching profile data points and a profile photo were found.</div>';
     matches.forEach(profile => {
       const uid = profile.uid || profile.id;
       const status = connectionStatusFor(uid);
-      const media = Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots.find(x => x?.url) : null;
+      const photoUrl = profileMinglPhoto(profile);
       const card = document.createElement("div");
       card.className = "mingl-person-card";
       const buttonText = status.state === "mutual" ? "Open Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back" : "Mingl with Someone";
       card.innerHTML = `
-        <div class="mingl-person-photo">${media?.url ? `<img src="${esc(media.url)}" alt="${esc(profile.displayName || "Mingl profile")}">` : `<span>${esc((profile.displayName || profile.username || "M").slice(0,1).toUpperCase())}</span>`}</div>
+        <div class="mingl-person-photo">${photoUrl ? `<img src="${esc(photoUrl)}" alt="${esc(profile.displayName || "Mingl profile")}">` : `<span>${esc((profile.displayName || profile.username || "M").slice(0,1).toUpperCase())}</span>`}</div>
         <div>
           <h3>${esc(profile.displayName || profile.username || "Mingl Member")}</h3>
+          <small>${profileMatchScore(cachedUserProfile || {}, profile)} shared profile matches</small>
           <p>${esc(profileSummaryText(profile) || "Nightlife profile")}</p>
           <button class="primary" type="button" ${status.state === "sent" ? "disabled" : ""}>${esc(buttonText)}</button>
         </div>`;
@@ -969,7 +1023,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.31-f`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.33-f`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -1039,7 +1093,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.31-f";
+      portalLink.href = "./patron-portal.html?v=28.33-f";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -1052,14 +1106,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.31-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.33-f";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.31-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.33-f";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -1113,7 +1167,7 @@
     detectRenderContext();
     window.addEventListener("resize", detectRenderContext);
     window.addEventListener("orientationchange", detectRenderContext);
-    setStatus("Choose a sign-in/up option.");
+    setStatus("");
     auth.getRedirectResult().then(result => {
       if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
     }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
@@ -1207,10 +1261,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.31-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.33-f">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.31-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.31-f">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.33-f">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.33-f">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -1253,7 +1307,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.31-f`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.33-f`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

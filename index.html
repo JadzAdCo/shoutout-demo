@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Patron Portal v28.31-f -->
+  <!-- FLOQR ShoutOut Patron Portal v28.33-f -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
@@ -35,7 +35,7 @@
         <div class="hero-logo-fallback hidden">FLOQR</div>
         <p class="eyebrow">Screen 0 — Welcome / Sign In</p>
         <h2>Welcome</h2>
-        <p class="login-copy">Search and book entertainment and nightlife events or send a live ShoutOut to one of our ShoutOut displays.</p>
+        <p class="login-copy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
         <p id="signedInAs" class="status">Please Sign-In or Sign-Up:</p>
 
         <div id="signedInActions" class="hidden">
@@ -119,8 +119,7 @@
           </div>
           </div>
         </div>
-        <p id="authStatus" class="status">Choose a sign-in/up option.</p>
-        <p class="sub small"><a href="./patron-portal.html?v=28.31-f">My Patron Portal</a></p>
+        <p id="authStatus" class="status"></p>
       </div>
     </div>
   </section>
@@ -177,6 +176,12 @@
         </label>
         <label>Nightlife interests
           <input id="profileInterests" placeholder="Clubs, Lounges, Beach Clubs, Events"/>
+        </label>
+        <label>Food choices
+          <input id="profileFoodChoices" placeholder="Sushi, tapas, steakhouse"/>
+        </label>
+        <label>Favorite beverage choices
+          <input id="profileBeverageChoices" placeholder="Champagne, tequila, mocktails"/>
         </label>
         <label>Instagram handle (optional)
           <input id="profileInstagram" placeholder="@yourhandle"/>
@@ -247,10 +252,9 @@
       <div>
         <button id="backToCategoriesFromMinglBtn" type="button">&larr; Back to main categories</button>
         <p class="eyebrow">Screen 2B - Mingl / Social</p>
-        <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+        <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
-        <h1>Mingl</h1>
-        <p class="sub">Find patrons, Mingl with someone, and open chat only after both patrons Mingl back.</p>
+        <p class="sub">Find friends or people with similar interest to Mingl with.</p>
       </div>
     </header>
     <div class="mingl-layout">
@@ -392,9 +396,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=28.31-f"></script>
-<script src="./shared-data.js?v=28.31-f"></script>
-<script src="./patron-app.js?v=28.31-f"></script>
-<script src="./notification-center.js?v=28.31-f"></script>
+<script src="./firebase-config.js?v=28.33-f"></script>
+<script src="./shared-data.js?v=28.33-f"></script>
+<script src="./patron-app.js?v=28.33-f"></script>
+<script src="./notification-center.js?v=28.33-f"></script>
 </body>
 </html>

@@ -116,6 +116,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .category-card.mingl-card{background:linear-gradient(90deg,#101724,#263b63 48%,#f43abf);color:#fff;border-color:rgba(38,216,255,.55)}
 .product-logo{display:block;width:min(420px,88vw);max-height:220px;object-fit:contain;margin:10px 0 18px;filter:drop-shadow(0 0 18px rgba(38,216,255,.48))}
 .product-logo.small-logo{width:min(330px,82vw);max-height:130px}
+.product-logo.mingl-hero-logo{width:min(440px,86vw);max-height:175px;object-position:left center;margin:18px 0 16px}
 .product-action-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:760px}
 .mingl-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:18px}
 .mingl-people-grid{display:grid;gap:12px}
