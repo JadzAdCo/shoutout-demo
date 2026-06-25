@@ -1,17 +1,18 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.41-f Migration Root Fallback Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.42-f Migration Root Fallback Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.41-f
+https://jadzadco.github.io/shoutout-demo/?v=28.42-f
 ```
 
 Current release highlights:
 
 - Fix package. `-f` means this release corrects upload/deployment behavior from the previous package.
 - Adds root-level copies of the Firestore rebrand migration page and script so the migration can be uploaded without creating a `migrations` folder manually.
+- Fixes the root fallback migration page so it loads `styles.css`, `firebase-config.js`, and `shared-data.js` from the correct root path.
 - Keeps the original `migrations/` folder path for deployments that support folder upload.
 - Adds a Master Admin `Patron Diagnostics` tab.
 - Adds a patron datapoint diagnostic summary for city, state/region/province, country, age, food, music, hobbies, travel, events, beverages, and meeting preferences.
@@ -73,19 +74,19 @@ Current release highlights:
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
 - Includes a preview-only coupe/car ShoutOut direction in `previews/`; this is not yet wired into the live template picker.
-- Bumped active cache-busting query strings to `v=28.41-f`.
+- Bumped active cache-busting query strings to `v=28.42-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: consolidated rules are included as `firestore.rules`; v28.41-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
+- Firestore rules: consolidated rules are included as `firestore.rules`; v28.42-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - Database migration: optional but included from v28.31-f. Run the migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.41-f-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.42-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -96,14 +97,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.41-f FLOQR migration root fallback package
+Upload v28.42-f FLOQR migration root fallback package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.41-f
+https://jadzadco.github.io/shoutout-demo/?v=28.42-f
 ```
 
 Firestore migration steps:
@@ -112,13 +113,13 @@ Firestore migration steps:
 2. Open:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.41-f
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.42-f
 ```
 
 If the `migrations` folder was not uploaded or the folder URL returns 404, use the root fallback:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.41-f
+https://jadzadco.github.io/shoutout-demo/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.42-f
 ```
 
 3. Sign in with an approved admin email.
@@ -152,7 +153,7 @@ Manual test checklist:
 21. Submit a test ShoutOut and confirm System Message behavior still works.
 22. Test profile media upload and confirm Storage Rules behavior still works.
 23. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
-24. Open `role-profiles.html?v=28.41-f` and confirm the role/profile landing scaffold loads.
+24. Open `role-profiles.html?v=28.42-f` and confirm the role/profile landing scaffold loads.
 25. Open Master Admin > Patron Diagnostics and confirm the patron datapoint table and 2+ common datapoint report render.
 26. Confirm rollback file `ROLLBACK-V28-40-nf.md` is kept with the package.
 
