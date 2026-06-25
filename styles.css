@@ -120,11 +120,11 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 
 /* v28.29-nf FLOQR + Mingl product surfaces */
 .category-card.mingl-card{background:linear-gradient(90deg,#101724,#263b63 48%,#f43abf);color:#fff;border-color:rgba(38,216,255,.55)}
-.product-brand-stack{display:grid;justify-items:start;gap:6px;margin:4px 0 8px}.product-parent-logo{display:block;width:min(190px,48vw);max-height:64px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
+.product-brand-stack{display:grid;justify-items:start;gap:6px;width:100%;max-width:1120px;margin:4px 0 8px}.product-parent-logo{display:block;justify-self:center;width:min(220px,50vw);max-height:72px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
 .product-logo{display:block;width:min(420px,88vw);max-height:220px;object-fit:contain;margin:10px 0 18px;filter:drop-shadow(0 0 18px rgba(38,216,255,.48))}
 .product-logo.small-logo{width:min(330px,82vw);max-height:130px}
 .product-logo.shoutout-hero-logo{width:min(380px,82vw);max-height:220px;margin:0;object-position:left center}
-.product-logo.mingl-hero-logo{width:min(620px,92vw);height:172px;max-height:none;object-fit:cover;object-position:center;margin:-8px 0 -2px;filter:drop-shadow(0 18px 28px rgba(0,0,0,.28))}
+.product-logo.mingl-hero-logo{justify-self:start;width:min(620px,92vw);height:172px;max-height:none;object-fit:cover;object-position:left center;margin:-8px 0 -2px;filter:drop-shadow(0 18px 28px rgba(0,0,0,.28))}
 .shoutout-product-page .topbar{margin-bottom:8px}.shoutout-product-page .topbar h1{font-size:clamp(44px,8vw,96px);letter-spacing:0;margin:8px 0 6px;max-width:1120px}.shoutout-product-page .sub{margin:0 0 16px}.shoutout-product-page .product-action-row{max-width:1040px;grid-template-columns:minmax(240px,560px) minmax(220px,560px)}
 .product-action-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:760px}
 .mingl-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:18px}
@@ -149,4 +149,4 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
 .mingl-compose{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}}
-@media(max-width:520px){.product-parent-logo{width:min(154px,46vw);max-height:52px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px 1fr}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}}
+@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px 1fr}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}}

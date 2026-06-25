@@ -1,16 +1,19 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.38-f Product Logo Hierarchy Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.39-f Mingl Location State Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.38-f
+https://jadzadco.github.io/shoutout-demo/?v=28.39-f
 ```
 
 Current release highlights:
 
 - Fix package. `-f` means this release corrects behavior from the previous package.
+- Fixes the Mingl `Location` datapoint so it displays city, state/region/province, and country.
+- Updates Mingl contextual matching and profile summaries to include state/region/province fields.
+- Centers the FLOQR parent logo at the top of ShoutOut/Mingl product landing pages and left-aligns the feature logo below it.
 - Fixes product landing page branding so FLOQR remains visible as the parent platform and ShoutOut/Mingl remain visible as feature logos.
 - ShoutOut landing now shows both the FLOQR logo and the ShoutOut logo instead of replacing FLOQR.
 - Mingl landing uses the same parent/feature logo stack for visual consistency.
@@ -64,19 +67,19 @@ Current release highlights:
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
 - Includes a preview-only coupe/car ShoutOut direction in `previews/`; this is not yet wired into the live template picker.
-- Bumped active cache-busting query strings to `v=28.38-f`.
+- Bumped active cache-busting query strings to `v=28.39-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: consolidated rules are included as `firestore.rules`; v28.38-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
+- Firestore rules: consolidated rules are included as `firestore.rules`; v28.39-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - Database migration: optional but included from v28.31-f. Run the migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.38-f-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.39-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -87,14 +90,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.38-f FLOQR product logo hierarchy fix package
+Upload v28.39-f FLOQR Mingl location state fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.38-f
+https://jadzadco.github.io/shoutout-demo/?v=28.39-f
 ```
 
 Firestore migration steps:
@@ -103,7 +106,7 @@ Firestore migration steps:
 2. Open:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.38-f
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.39-f
 ```
 
 3. Sign in with an approved admin email.
@@ -137,7 +140,7 @@ Manual test checklist:
 21. Submit a test ShoutOut and confirm System Message behavior still works.
 22. Test profile media upload and confirm Storage Rules behavior still works.
 23. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
-24. Open `role-profiles.html?v=28.38-f` and confirm the role/profile landing scaffold loads.
+24. Open `role-profiles.html?v=28.39-f` and confirm the role/profile landing scaffold loads.
 25. Confirm rollback file `ROLLBACK-V28-37-f.md` is kept with the package.
 
 Rollback summary:
