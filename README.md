@@ -1,18 +1,21 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.37-f Authentication + ShoutOut Landing Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.38-f Product Logo Hierarchy Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.37-f
+https://jadzadco.github.io/shoutout-demo/?v=28.38-f
 ```
 
 Current release highlights:
 
 - Fix package. `-f` means this release corrects behavior from the previous package.
+- Fixes product landing page branding so FLOQR remains visible as the parent platform and ShoutOut/Mingl remain visible as feature logos.
+- ShoutOut landing now shows both the FLOQR logo and the ShoutOut logo instead of replacing FLOQR.
+- Mingl landing uses the same parent/feature logo stack for visual consistency.
 - Restores Google and Microsoft authentication to the known-good popup-first flow, with redirect used only as a popup-blocked fallback.
-- Adds `images/shoutout-logo.svg` and uses it on the ShoutOut landing page instead of the FLOQR company logo.
+- Adds `images/shoutout-logo.svg` and uses it as the ShoutOut feature logo.
 - Tightens the ShoutOut landing layout so the logo, heading, copy, and action buttons follow a clean left-to-right/down page flow and do not overflow the screen.
 - Keeps the `migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html` migration page in the full package; if the live URL returns 404, re-upload the package and confirm the `migrations` folder was uploaded to GitHub Pages.
 - Adds a Patron Portal ShoutOut diagnostic tool for modified ShoutOuts that appear stuck or in limbo.
@@ -61,19 +64,19 @@ Current release highlights:
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
 - Includes a preview-only coupe/car ShoutOut direction in `previews/`; this is not yet wired into the live template picker.
-- Bumped active cache-busting query strings to `v=28.37-f`.
+- Bumped active cache-busting query strings to `v=28.38-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: consolidated rules are included as `firestore.rules`; v28.37-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
+- Firestore rules: consolidated rules are included as `firestore.rules`; v28.38-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - Database migration: optional but included from v28.31-f. Run the migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.37-f-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.38-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -84,14 +87,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.37-f FLOQR authentication and ShoutOut landing fix package
+Upload v28.38-f FLOQR product logo hierarchy fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.37-f
+https://jadzadco.github.io/shoutout-demo/?v=28.38-f
 ```
 
 Firestore migration steps:
@@ -100,7 +103,7 @@ Firestore migration steps:
 2. Open:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.37-f
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.38-f
 ```
 
 3. Sign in with an approved admin email.
@@ -134,7 +137,7 @@ Manual test checklist:
 21. Submit a test ShoutOut and confirm System Message behavior still works.
 22. Test profile media upload and confirm Storage Rules behavior still works.
 23. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
-24. Open `role-profiles.html?v=28.37-f` and confirm the role/profile landing scaffold loads.
+24. Open `role-profiles.html?v=28.38-f` and confirm the role/profile landing scaffold loads.
 25. Confirm rollback file `ROLLBACK-V28-37-f.md` is kept with the package.
 
 Rollback summary:
