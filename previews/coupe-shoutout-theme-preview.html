@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coupe ShoutOut Theme Preview</title>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:#071022;
+      color:#fff;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .preview{
+      width:min(1180px,94vw);
+      aspect-ratio:16/9;
+      position:relative;
+      overflow:hidden;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at 18% 22%,rgba(244,58,191,.3),transparent 28%),
+        radial-gradient(circle at 82% 58%,rgba(38,216,255,.28),transparent 30%),
+        linear-gradient(135deg,#090818 0%,#11183c 45%,#071826 100%);
+      border:2px solid rgba(255,255,255,.14);
+      box-shadow:0 30px 80px rgba(0,0,0,.55);
+    }
+    .preview:before{
+      content:"";
+      position:absolute;
+      inset:28px;
+      border:3px solid rgba(38,216,255,.75);
+      border-radius:20px;
+      box-shadow:0 0 24px rgba(38,216,255,.55), inset 0 0 24px rgba(244,58,191,.25);
+    }
+    .car{
+      position:absolute;
+      left:2%;
+      right:2%;
+      bottom:3%;
+      width:96%;
+      z-index:1;
+      filter:drop-shadow(0 24px 26px rgba(0,0,0,.7)) drop-shadow(0 0 28px rgba(38,216,255,.35));
+    }
+    .copy{
+      position:absolute;
+      z-index:2;
+      left:7%;
+      top:9%;
+      width:min(620px,60%);
+      text-transform:uppercase;
+      letter-spacing:0;
+    }
+    .copy .tag{
+      display:inline-block;
+      color:#d7ff3f;
+      font-size:clamp(13px,1.5vw,22px);
+      font-weight:900;
+      margin-bottom:12px;
+    }
+    .copy h1{
+      margin:0;
+      font-size:clamp(38px,7vw,96px);
+      line-height:.92;
+      font-weight:1000;
+      text-shadow:0 4px 0 #000,0 0 18px rgba(38,216,255,.65);
+    }
+    .copy p{
+      width:max-content;
+      max-width:100%;
+      margin:18px 0 0;
+      padding:12px 18px;
+      border-radius:999px;
+      background:linear-gradient(90deg,#f43abf,#26d8ff);
+      color:#06101e;
+      font-weight:1000;
+      font-size:clamp(15px,2vw,28px);
+      box-shadow:0 14px 38px rgba(0,0,0,.35);
+    }
+    @media(max-width:700px){
+      .preview{aspect-ratio:9/14;border-radius:18px}
+      .preview:before{inset:18px}
+      .copy{left:8%;top:7%;width:84%}
+      .copy h1{font-size:clamp(42px,13vw,78px)}
+      .car{left:-38%;right:auto;bottom:12%;width:168%}
+    }
+  </style>
+</head>
+<body>
+  <main class="preview" aria-label="Coupe ShoutOut theme preview">
+    <section class="copy">
+      <span class="tag">Coupe / Luxury Ride</span>
+      <h1>Luxury Ride Crew</h1>
+      <p>Pull up clean</p>
+    </section>
+    <img class="car" src="./coupe-shoutout-preview-transparent.png" alt="Original coupe cutout">
+  </main>
+</body>
+</html>
