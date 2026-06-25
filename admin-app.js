@@ -170,10 +170,47 @@
     return approvedRoles(profile).some(role => role.includes("Waiter"));
   }
 
+  function isClubWorkerOrAffiliate(profile = {}) {
+    return approvedRoles(profile).some(role => (
+      role === "Club Admin" ||
+      role === "Promoter" ||
+      role === "DJ" ||
+      role === "Waiter / Waitress / Bottle Girl"
+    ));
+  }
+
+  function promoterCompanyLabel(profile = {}) {
+    return profile.promoterCompany || profile.promotionCompany || profile.companyName || profile.company || (profile.independentPromoter ? "Independent promoter" : "");
+  }
+
+  function profileLocationText(profile = {}) {
+    return [
+      profile.clubLocationId,
+      profile.pendingClubLocationId,
+      profile.requestedClubLocationId,
+      ...(Array.isArray(profile.clubLocationIds) ? profile.clubLocationIds : []),
+      ...(Array.isArray(profile.approvedLocations) ? profile.approvedLocations : []),
+      ...(Array.isArray(profile.affiliatedClubLocationIds) ? profile.affiliatedClubLocationIds : []),
+      ...(Array.isArray(profile.requestedClubLocationIds) ? profile.requestedClubLocationIds : [])
+    ].filter(Boolean).join(" ");
+  }
+
+  function hasPendingWorkerRequest(profile = {}) {
+    const requested = [
+      profile.pendingClubLocationId,
+      profile.requestedClubLocationId,
+      ...(Array.isArray(profile.requestedClubLocationIds) ? profile.requestedClubLocationIds : [])
+    ].filter(Boolean);
+    const nested = Array.isArray(profile.clubJoinRequests)
+      ? profile.clubJoinRequests.some(item => item?.clubLocationId === locationId && String(item?.status || "pending").toLowerCase() === "pending")
+      : false;
+    return requested.includes(locationId) || nested;
+  }
+
   function employeeSearchText(profile = {}) {
     return [
       profile.displayName, profile.fullName, profile.username, profile.email, profile.city, profile.country,
-      approvedRoles(profile).join(" "), ...(profile.clubLocationIds || []), ...(profile.approvedLocations || [])
+      promoterCompanyLabel(profile), approvedRoles(profile).join(" "), profileLocationText(profile)
     ].join(" ");
   }
 
@@ -221,25 +258,55 @@
     if (!candidateWrap || !csrWrap) return;
     const query = byId("employeeSearch")?.value || "";
     const workers = adminUsers
-      .filter(isHospitalityWorker)
+      .filter(isClubWorkerOrAffiliate)
       .filter(profile => contextualTextMatch(query, employeeSearchText(profile)))
       .slice(0, 40);
     candidateWrap.innerHTML = workers.length ? workers.map(profile => {
       const uid = profile.uid || profile.id;
       const checked = isDesignatedCSR(uid);
+      const roles = approvedRoles(profile);
+      const canBeCSR = isHospitalityWorker(profile);
+      const company = promoterCompanyLabel(profile);
       return `<div class="queue-item employee-row">
         <div>
           <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Club worker")}</strong>
           <p>${esc(profile.username ? `@${profile.username}` : profile.email || "")}</p>
-          <small>${esc(approvedRoles(profile).join(", ") || "Approved worker")}</small>
+          <small>${esc(roles.join(", ") || "Approved worker")}${company ? ` - ${esc(company)}` : ""}</small>
         </div>
-        <button type="button" data-uid="${esc(uid)}" data-action="${checked ? "remove" : "add"}">${checked ? "Remove CSR" : "Designate CSR"}</button>
+        ${canBeCSR ? `<button type="button" data-uid="${esc(uid)}" data-action="${checked ? "remove" : "add"}">${checked ? "Remove CSR" : "Designate CSR"}</button>` : `<span class="status-pill">${roles.includes("Promoter") ? "Promoter / affiliate" : roles[0] || "Worker"}</span>`}
       </div>`;
-    }).join("") : "<p class='sub'>No approved hospitality workers matched this search.</p>";
+    }).join("") : "<p class='sub'>No approved workers or affiliates matched this search.</p>";
     candidateWrap.querySelectorAll("button[data-uid]").forEach(btn => {
       const profile = workers.find(x => (x.uid || x.id) === btn.dataset.uid);
       btn.addEventListener("click", () => setCSR(profile, btn.dataset.action === "add"));
     });
+
+    const roleCounts = new Map();
+    adminUsers.filter(isClubWorkerOrAffiliate).forEach(profile => {
+      approvedRoles(profile).forEach(role => roleCounts.set(role, (roleCounts.get(role) || 0) + 1));
+    });
+    byId("workerSummaryReport").innerHTML = simpleRows([
+      ["Club admins", roleCounts.get("Club Admin") || 0],
+      ["DJs / visiting DJs", roleCounts.get("DJ") || 0],
+      ["Promoters / companies", roleCounts.get("Promoter") || 0],
+      ["Waiters / waitresses / bottle girls", roleCounts.get("Waiter / Waitress / Bottle Girl") || 0],
+      ["Designated CSRs", adminDesignations.filter(x => x.isCSR !== false).length]
+    ]);
+    byId("workerRoleReport").innerHTML = workers.length ? workers.slice(0, 12).map(profile => {
+      const company = promoterCompanyLabel(profile);
+      return `<div class="queue-item">
+        <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Worker")}</strong>
+        <p>${esc(approvedRoles(profile).join(", ") || "Role not labeled")}</p>
+        ${company ? `<small>${esc(company)}</small>` : ""}
+      </div>`;
+    }).join("") : "<p class='sub'>Search or approve role members to populate role groups.</p>";
+
+    const pending = adminUsers.filter(profile => isClubWorkerOrAffiliate(profile) && hasPendingWorkerRequest(profile));
+    byId("pendingWorkerRequests").innerHTML = pending.length ? pending.map(profile => `<div class="queue-item">
+      <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Worker request")}</strong>
+      <p>${esc(approvedRoles(profile).join(", ") || "Requested worker role")}</p>
+      <small>${esc(profile.email || profile.username || "")}</small>
+    </div>`).join("") : "<p class='sub'>No pending worker requests for this club location yet.</p>";
 
     const active = adminDesignations.filter(x => x.isCSR !== false);
     csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">

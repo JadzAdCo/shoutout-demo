@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Role Profiles</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <a class="global-back-btn buttonlike" href="./admin.html?v=28.36-nf">&larr; Back to club admin</a>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Role Profiles / Promotion Logic</p>
+        <h1>Club Worker, Promoter, DJ, and Admin Landing Pages</h1>
+        <p class="sub">Use this as the operating model for profiles, affiliations, promotion templates, and analytics.</p>
+      </div>
+    </header>
+
+    <div class="admin-grid">
+      <div class="card">
+        <h2>Club Admin</h2>
+        <p class="sub small">Manages location profile, ShoutOut queue, guest lists, employee/worker approvals, CSR assignments, and promotion permissions.</p>
+        <div class="tag-row"><span>Approve workers</span><span>Assign CSR</span><span>Send opted-in promotions</span></div>
+      </div>
+      <div class="card">
+        <h2>Promotion Company</h2>
+        <p class="sub small">Represents a promoting company with linked promoters, campaigns, guest-list referrals, and campaign analytics.</p>
+        <div class="tag-row"><span>Linked promoters</span><span>Campaign reports</span><span>Referral attribution</span></div>
+      </div>
+      <div class="card">
+        <h2>Promoter</h2>
+        <p class="sub small">Can be an independent contractor or affiliated with a promotion company. Tracks referred guests and promotion outcomes.</p>
+        <div class="tag-row"><span>Independent</span><span>Company affiliated</span><span>Guest-list referrals</span></div>
+      </div>
+      <div class="card">
+        <h2>DJ</h2>
+        <p class="sub small">Supports resident DJs, visiting DJs, event nights, music profile, and fan/event engagement reporting.</p>
+        <div class="tag-row"><span>Resident DJ</span><span>Visiting DJ</span><span>Event lineup</span></div>
+      </div>
+      <div class="card">
+        <h2>Waiter / Waitress / Bottle Girl</h2>
+        <p class="sub small">Workers elect to join a club before club admins can approve, designate CSR, or attach them to service actions.</p>
+        <div class="tag-row"><span>Worker request</span><span>Club approval</span><span>CSR eligible</span></div>
+      </div>
+      <div class="card">
+        <h2>Customer Service Representative</h2>
+        <p class="sub small">Receives patron support messages for a club location when designated by a club admin.</p>
+        <div class="tag-row"><span>Internal messages</span><span>Support context</span><span>Club location scoped</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Promotion Templates</h2>
+      <div class="report-table">
+        <div><span>Internal Message</span><strong>Tonight at {club}: {offer}. Tap to join the guest list.</strong></div>
+        <div><span>Email</span><strong>{eventName} at {clubName}. RSVP, reserve, or buy entry from your FLOQR account.</strong></div>
+        <div><span>SMS</span><strong>{clubName}: {shortOffer}. Reply STOP to opt out where external SMS is enabled.</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Analytics Model</h2>
+      <p class="sub small">Track read receipts, guest-list joins, purchases, and ShoutOut activity only when the patron profile allows marketing and privacy settings permit the report.</p>
+      <div class="tag-row"><span>Read promotion</span><span>Joined guest list</span><span>Purchased</span><span>Opt-in only</span></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

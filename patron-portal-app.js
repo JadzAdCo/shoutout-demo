@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.35-nf */
+/* patron-portal-app.js v28.36-nf */
 (function(){
   "use strict";
 
@@ -82,7 +82,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.35-nf"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.36-nf"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -524,7 +524,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.35-nf");
+    url.searchParams.set("v", "28.36-nf");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -539,6 +539,12 @@
     byId("shoutoutEditCard").scrollIntoView({behavior:"smooth", block:"start"});
   }
 
+  function showShoutoutDiagnostic(refOrId = "") {
+    byId("shoutoutDiagnosticCard").classList.remove("hidden");
+    byId("diagnosticShoutoutRef").value = refOrId || byId("diagnosticShoutoutRef").value || "";
+    byId("shoutoutDiagnosticCard").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
   function cancelShoutoutEdit() {
     activeShoutoutEditId = "";
     byId("editShoutoutMain").value = "";
@@ -546,7 +552,7 @@
     byId("shoutoutEditCard").classList.add("hidden");
   }
 
-  async function saveShoutoutEdit() {
+  async function saveShoutoutEdit(options = {}) {
     const user = auth.currentUser;
     if (!user || !activeShoutoutEditId) return;
     const item = currentShoutouts.find(x => x.id === activeShoutoutEditId);
@@ -557,15 +563,53 @@
     const mainText = byId("editShoutoutMain").value.trim();
     const subText = byId("editShoutoutSub").value.trim();
     if (!mainText) { setText("shoutoutEditStatus", "Main message is required."); return; }
-    await db.collection("shoutouts").doc(activeShoutoutEditId).set({
+    const update = {
       mainText,
       subText,
       modifiedByUid:user.uid,
       modifiedAt:firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
-    setText("portalStatus", "ShoutOut updated.");
+    };
+    if (options.resubmit) {
+      update.status = "pending";
+      update.editable = true;
+      update.resubmittedAt = firebase.firestore.FieldValue.serverTimestamp();
+      update.resubmittedByUid = user.uid;
+    }
+    await db.collection("shoutouts").doc(activeShoutoutEditId).set(update, {merge:true});
+    try {
+      await db.collection("shoutoutAudit").add({
+        shoutoutId:activeShoutoutEditId,
+        referenceNumber:item.referenceNumber || "",
+        action:options.resubmit ? "modified_resubmitted" : "modified",
+        actorUid:user.uid,
+        actorEmail:user.email || "",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e) {}
+    setText("portalStatus", options.resubmit ? "ShoutOut updated and resubmitted for approval." : "ShoutOut updated and still pending for approval.");
     cancelShoutoutEdit();
     await loadPortal(user);
+  }
+
+  async function runShoutoutDiagnostic() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const needle = byId("diagnosticShoutoutRef").value.trim();
+    if (!needle) { setText("shoutoutDiagnosticReport", "Enter a reference number or document id."); return; }
+    setText("shoutoutDiagnosticReport", "Searching ShoutOut records...");
+    const [pending, liveContent, notifications, audit] = await Promise.all([
+      getCollectionSafe("shoutouts", x => x.id === needle || x.referenceNumber === needle || x.shoutoutId === needle),
+      getCollectionSafe("liveContent", x => x.id === needle || x.referenceNumber === needle || x.shoutoutId === needle),
+      getCollectionSafe("inboxNotifications", x => x.referenceNumber === needle || x.shoutoutId === needle || x.id === needle),
+      getCollectionSafe("shoutoutAudit", x => x.referenceNumber === needle || x.shoutoutId === needle || x.id === needle)
+    ]);
+    const rows = [
+      ["Pending ShoutOut queue", pending.length ? pending.map(x => `${x.referenceNumber || x.id} - ${x.status || "pending"} - ${x.locationName || x.clubLocationId || ""}`).join(" | ") : "Not found"],
+      ["Live display content", liveContent.length ? liveContent.map(x => `${x.referenceNumber || x.id} - ${x.status || "live"} - ${x.locationName || x.clubLocationId || ""}`).join(" | ") : "Not found"],
+      ["System messages", notifications.length ? notifications.map(x => `${x.title || x.subject || "Notification"} - ${fmtDate(x.createdAt)}`).join(" | ") : "Not found"],
+      ["Audit trail", audit.length ? audit.map(x => `${x.action || "audit"} - ${fmtDate(x.createdAt)} - ${x.actorEmail || ""}`).join(" | ") : "Not found"]
+    ];
+    byId("shoutoutDiagnosticReport").innerHTML = simpleRows(rows);
   }
 
   async function openMessage(el, user) {
@@ -681,11 +725,20 @@
         <strong>${esc(x.mainText || "ShoutOut")}</strong>
         <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")}</p>
         <small>${esc(fmtDate(x.submittedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
-        ${canModify ? `<p><button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">Modify ShoutOut</button></p>` : ""}
+        <p class="queue-actions">
+          ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">Modify ShoutOut</button>` : ""}
+          <button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">Diagnose</button>
+        </p>
       </div>`;
     }).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
     document.querySelectorAll(".modify-shoutout-btn").forEach(btn => {
       btn.addEventListener("click", () => startShoutoutEdit(currentShoutouts[Number(btn.dataset.shoutoutIndex)]));
+    });
+    document.querySelectorAll(".diagnose-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showShoutoutDiagnostic(btn.dataset.shoutoutRef || "");
+        runShoutoutDiagnostic();
+      });
     });
     const params = new URL(window.location.href).searchParams;
     const requestedId = params.get("id");
@@ -693,6 +746,9 @@
     const requestedItem = currentShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
     if (requestedItem && !activeShoutoutEditId && requestedItem.editable !== false && String(requestedItem.status || "pending").toLowerCase() === "pending") {
       startShoutoutEdit(requestedItem);
+    } else if ((requestedId || requestedRef) && !requestedItem) {
+      showShoutoutDiagnostic(requestedRef || requestedId);
+      runShoutoutDiagnostic();
     }
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
@@ -749,8 +805,10 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
-    bind("saveShoutoutEditBtn", saveShoutoutEdit);
+    bind("saveShoutoutEditBtn", () => saveShoutoutEdit({resubmit:false}));
+    bind("resubmitShoutoutEditBtn", () => saveShoutoutEdit({resubmit:true}));
     bind("cancelShoutoutEditBtn", cancelShoutoutEdit);
+    bind("runShoutoutDiagnosticBtn", runShoutoutDiagnostic);
     byId("composeRecipientSearch")?.addEventListener("input", () => {
       byId("composeRecipientUid").value = "";
       byId("composeRecipientEmail").value = "";
