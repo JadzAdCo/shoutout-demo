@@ -51,6 +51,7 @@
         <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
+        <button class="admin-tab" data-panel="patronDiagnostics" type="button">Patron Diagnostics</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
@@ -91,6 +92,22 @@
         </div>
       </section>
 
+      <section id="patronDiagnostics" class="admin-panel-section">
+        <div class="card">
+          <h2>Patron Datapoint Diagnostic</h2>
+          <p class="sub small">Internal Master Admin view of patron profile datapoints used for Mingl matching and audience diagnostics.</p>
+          <div id="patronDatapointSummary" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Patrons With 2+ Common Datapoints</h2>
+          <div id="patronOverlapReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>All Patron Datapoints</h2>
+          <div id="patronDatapointTable" class="report-block"></div>
+        </div>
+      </section>
+
       <section id="promoterNetwork" class="admin-panel-section">
         <div class="card"><h2>Network Promoter Data</h2><div id="promoterNetworkReport" class="report-block"></div></div>
       </section>
@@ -114,9 +131,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.39-f"></script>
-<script src="./shared-data.js?v=28.39-f"></script>
-<script src="./master-admin-app.js?v=28.39-f"></script>
-<script src="./notification-center.js?v=28.39-f"></script>
+<script src="./firebase-config.js?v=28.40-nf"></script>
+<script src="./shared-data.js?v=28.40-nf"></script>
+<script src="./master-admin-app.js?v=28.40-nf"></script>
+<script src="./notification-center.js?v=28.40-nf"></script>
 </body>
 </html>

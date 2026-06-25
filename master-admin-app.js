@@ -194,6 +194,123 @@
     return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v]) => `${k} (${v})`).join(", ") || "Not enough data yet";
   }
 
+  function splitCSV(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String);
+    return String(value || "").split(/[,;|/]+/).map(x => x.trim()).filter(Boolean);
+  }
+
+  function norm(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function firstValue(...values) {
+    return values.find(value => String(value || "").trim()) || "";
+  }
+
+  function profileStateRegion(profile = {}) {
+    return firstValue(profile.state, profile.region, profile.province, profile.stateRegionProvince, profile.stateProvince, profile.regionProvince);
+  }
+
+  function profileAge(profile = {}) {
+    const direct = firstValue(profile.age, profile.patronAge);
+    if (direct) return String(direct);
+    const birthYear = Number(profile.birthYear || 0);
+    if (birthYear > 1900) return String(new Date().getFullYear() - birthYear);
+    return "";
+  }
+
+  function datapointValue(profile = {}, key) {
+    const map = {
+      City: profile.city,
+      "State / Region": profileStateRegion(profile),
+      Country: profile.country,
+      Age: profileAge(profile),
+      Food: profile.foodChoices || profile.favoriteFoods,
+      Music: profile.musicInterests || profile.favoriteGenres,
+      Hobbies: profile.hobbies || profile.generalHobbies,
+      Travel: profile.travelInterests,
+      Events: profile.nightlifeInterests || profile.nightlifeStyle,
+      Beverages: profile.favoriteBeverages || profile.beverageChoices,
+      Meet: profile.lookingToMeet
+    };
+    return map[key];
+  }
+
+  const PATRON_DIAGNOSTIC_KEYS = ["City", "State / Region", "Country", "Age", "Food", "Music", "Hobbies", "Travel", "Events", "Beverages", "Meet"];
+
+  function datapointList(profile = {}, key) {
+    const value = datapointValue(profile, key);
+    return splitCSV(value).map(x => x.trim()).filter(Boolean);
+  }
+
+  function datapointText(profile = {}, key) {
+    return datapointList(profile, key).join(", ");
+  }
+
+  function datapointOverlap(a = {}, b = {}, key) {
+    const left = datapointList(a, key).map(norm).filter(Boolean);
+    const right = datapointList(b, key).map(norm).filter(Boolean);
+    return left.some(item => right.includes(item));
+  }
+
+  function isPatronProfile(profile = {}) {
+    const roleText = [
+      profile.memberLevel,
+      profile.role,
+      profile.approvedRole,
+      ...(Array.isArray(profile.roles) ? profile.roles : []),
+      ...(Array.isArray(profile.approvedRoles) ? profile.approvedRoles : [])
+    ].join(" ").toLowerCase();
+    if (!roleText.trim()) return true;
+    return roleText.includes("patron") && !roleText.includes("master admin");
+  }
+
+  function patronName(profile = {}) {
+    return profile.displayName || profile.fullName || profile.username || profile.email || profile.uid || profile.id || "Unknown patron";
+  }
+
+  function renderPatronDiagnostics(users = []) {
+    const patrons = users.filter(isPatronProfile);
+    const rows = PATRON_DIAGNOSTIC_KEYS.map(key => [key, topList(countBy(patrons, p => datapointText(p, key)), 5)]);
+    byId("patronDatapointSummary").innerHTML = simpleRows([
+      ["Patrons scanned", patrons.length.toLocaleString()],
+      ["Public profiles", patrons.filter(p => String(p.publicProfileVisibility || "").toLowerCase() === "public").length.toLocaleString()],
+      ...rows
+    ]);
+
+    byId("patronDatapointTable").innerHTML = patrons.length ? patrons.map(profile => `
+      <div class="queue-item">
+        <strong>${esc(patronName(profile))}</strong>
+        <p>${esc(profile.email || profile.username || profile.uid || profile.id || "")}</p>
+        <div class="tag-row">
+          ${PATRON_DIAGNOSTIC_KEYS.map(key => {
+            const value = datapointText(profile, key);
+            return value ? `<span>${esc(key)}: ${esc(value)}</span>` : "";
+          }).join("")}
+        </div>
+      </div>`).join("") : "<p class='sub'>No patron profiles found.</p>";
+
+    const pairs = [];
+    for (let i = 0; i < patrons.length; i += 1) {
+      for (let j = i + 1; j < patrons.length; j += 1) {
+        const matched = PATRON_DIAGNOSTIC_KEYS.filter(key => datapointOverlap(patrons[i], patrons[j], key));
+        if (matched.length >= 2) pairs.push({a:patrons[i], b:patrons[j], matched});
+      }
+    }
+    pairs.sort((a,b) => b.matched.length - a.matched.length);
+    byId("patronOverlapReport").innerHTML = pairs.length ? pairs.slice(0, 100).map(pair => `
+      <div class="queue-item">
+        <strong>${esc(patronName(pair.a))} + ${esc(patronName(pair.b))}</strong>
+        <p>${esc(pair.matched.length)} common datapoints: ${esc(pair.matched.join(", "))}</p>
+      </div>`).join("") : "<p class='sub'>No patron pairs have 2 or more matching datapoints yet.</p>";
+  }
+
   async function loadNetworkReports() {
     const [users, shoutouts, liveDocs, locations, events, guestLists] = await Promise.all([
       getCollectionSafe("users"),
@@ -257,6 +374,8 @@
       ["Top sponsor categories", "Spirits, fashion, fragrance, sneakers, luxury, rideshare"],
       ["Best media units", "Splash ads, LED display wall, portable displays, window displays"]
     ]);
+
+    renderPatronDiagnostics(users);
 
     const gross = revenue + Math.round(impressions / 1000 * 25);
     const platformShare = Math.round(gross * 0.35);
