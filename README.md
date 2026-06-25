@@ -1,16 +1,20 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.36-nf Mingl/Workers + ShoutOut Diagnostic Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.37-f Authentication + ShoutOut Landing Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.36-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.37-f
 ```
 
 Current release highlights:
 
-- New feature package. `-nf` means this release adds user-facing feature behavior.
+- Fix package. `-f` means this release corrects behavior from the previous package.
+- Restores Google and Microsoft authentication to the known-good popup-first flow, with redirect used only as a popup-blocked fallback.
+- Adds `images/shoutout-logo.svg` and uses it on the ShoutOut landing page instead of the FLOQR company logo.
+- Tightens the ShoutOut landing layout so the logo, heading, copy, and action buttons follow a clean left-to-right/down page flow and do not overflow the screen.
+- Keeps the `migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html` migration page in the full package; if the live URL returns 404, re-upload the package and confirm the `migrations` folder was uploaded to GitHub Pages.
 - Adds a Patron Portal ShoutOut diagnostic tool for modified ShoutOuts that appear stuck or in limbo.
 - Adds a `Resubmit for Approval` action after modifying a pending ShoutOut.
 - Enlarges and left-aligns the Mingl landing logo, reduces the vertical gap before the landing copy, and uses the blue Mingl logo for male patron profiles.
@@ -18,7 +22,6 @@ Current release highlights:
 - Renames Club Admin `Employees / CSR` to `Employee/Workers`.
 - Expands the Employee/Workers page with worker/affiliate summary, role groups, pending worker requests, CSR designation, and promotion/outreach tool placeholders.
 - Adds `role-profiles.html` as a landing/scaffold page for Club Admin, Promotion Company, Promoter, DJ, Waiter/Waitress/Bottle Girl, and CSR profile logic.
-- Adjusts mobile authentication to prefer same-tab redirect for Google, Facebook, and Microsoft so sign-in is less likely to leave the patron stranded in a separate browser tab.
 - Fixes `Modify ShoutOut` from Patron Portal > My ShoutOuts by adding an inline editor for pending ShoutOuts.
 - Existing ShoutOut modification links with `ref` or `id` now auto-open the pending ShoutOut editor.
 - Simplifies Mingl as a social playground landing page with the patron's main profile picture at the top.
@@ -58,19 +61,19 @@ Current release highlights:
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
 - Includes a preview-only coupe/car ShoutOut direction in `previews/`; this is not yet wired into the live template picker.
-- Bumped active cache-busting query strings to `v=28.36-nf`.
+- Bumped active cache-busting query strings to `v=28.37-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: consolidated rules are included as `firestore.rules`; v28.36-nf keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
+- Firestore rules: consolidated rules are included as `firestore.rules`; v28.37-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - Database migration: optional but included from v28.31-f. Run the migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.36-nf-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.37-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -81,14 +84,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.36-nf FLOQR Mingl workers and ShoutOut diagnostic package
+Upload v28.37-f FLOQR authentication and ShoutOut landing fix package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.36-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.37-f
 ```
 
 Firestore migration steps:
@@ -97,7 +100,7 @@ Firestore migration steps:
 2. Open:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.36-nf
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.37-f
 ```
 
 3. Sign in with an approved admin email.
@@ -131,17 +134,17 @@ Manual test checklist:
 21. Submit a test ShoutOut and confirm System Message behavior still works.
 22. Test profile media upload and confirm Storage Rules behavior still works.
 23. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
-24. Open `role-profiles.html?v=28.36-nf` and confirm the role/profile landing scaffold loads.
-25. Confirm rollback file `ROLLBACK-V28-36-nf.md` is kept with the package.
+24. Open `role-profiles.html?v=28.37-f` and confirm the role/profile landing scaffold loads.
+25. Confirm rollback file `ROLLBACK-V28-37-f.md` is kept with the package.
 
 Rollback summary:
 
-- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.35-nf-full-package.zip`, `shoutoutwepp,vers-28.34-nf-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
+- Code rollback: revert the GitHub commit or upload the previous known-good package, such as `shoutoutwepp,vers-28.36-nf-full-package.zip`, `shoutoutwepp,vers-28.35-nf-full-package.zip`, or stable `shoutoutwepp,vers-28.22-s-full-package.zip`.
 - Firestore rules rollback: remove the `clubEmployeeDesignations` block or replace live Firestore rules with `firestore-rules-before-v28-34-nf.txt`.
 - Storage rules rollback: no new Storage Rules change beyond v28.27-f.
 - Database rollback: use the backup JSON downloaded from the v28.31-f migration page and click `Apply Rollback JSON`.
-- New CSR data rollback: delete only test documents from `clubEmployeeDesignations` and remove test `designatedCSRLocations` values from test users.
-- Helper script: `rollback-v28-36-nf.ps1`.
+- New worker/CSR test data rollback: delete only test documents from `clubEmployeeDesignations` and remove test `designatedCSRLocations` values from test users.
+- Helper script: `rollback-v28-37-f.ps1`.
 ---
 
 # FLOQR ShoutOut v24 Admin Analytics + Master Admin Package
