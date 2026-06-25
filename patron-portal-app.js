@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.34-nf */
+/* patron-portal-app.js v28.35-nf */
 (function(){
   "use strict";
 
@@ -55,6 +55,8 @@
   let currentProfile = {};
   let currentMessages = [];
   let messageRecipients = [];
+  let currentShoutouts = [];
+  let activeShoutoutEditId = "";
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -80,7 +82,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.34-nf"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.35-nf"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -522,10 +524,48 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.34-nf");
+    url.searchParams.set("v", "28.35-nf");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
+  }
+
+  function startShoutoutEdit(item) {
+    activeShoutoutEditId = item.id || "";
+    byId("editShoutoutMain").value = item.mainText || "";
+    byId("editShoutoutSub").value = item.subText || "";
+    setText("shoutoutEditStatus", `Editing ${item.referenceNumber || item.id || "pending ShoutOut"}. Changes apply only while the ShoutOut is pending.`);
+    byId("shoutoutEditCard").classList.remove("hidden");
+    byId("shoutoutEditCard").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function cancelShoutoutEdit() {
+    activeShoutoutEditId = "";
+    byId("editShoutoutMain").value = "";
+    byId("editShoutoutSub").value = "";
+    byId("shoutoutEditCard").classList.add("hidden");
+  }
+
+  async function saveShoutoutEdit() {
+    const user = auth.currentUser;
+    if (!user || !activeShoutoutEditId) return;
+    const item = currentShoutouts.find(x => x.id === activeShoutoutEditId);
+    if (!item) { setText("shoutoutEditStatus", "Could not find that pending ShoutOut."); return; }
+    const ownsItem = item.submittedByUid === user.uid || item.submittedBy === user.email;
+    const pending = String(item.status || "pending").toLowerCase() === "pending" && item.editable !== false;
+    if (!ownsItem || !pending) { setText("shoutoutEditStatus", "This ShoutOut can no longer be modified."); return; }
+    const mainText = byId("editShoutoutMain").value.trim();
+    const subText = byId("editShoutoutSub").value.trim();
+    if (!mainText) { setText("shoutoutEditStatus", "Main message is required."); return; }
+    await db.collection("shoutouts").doc(activeShoutoutEditId).set({
+      mainText,
+      subText,
+      modifiedByUid:user.uid,
+      modifiedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    setText("portalStatus", "ShoutOut updated.");
+    cancelShoutoutEdit();
+    await loadPortal(user);
   }
 
   async function openMessage(el, user) {
@@ -634,15 +674,26 @@
       ["Visibility", profile.publicProfileVisibility || "followers"]
     ]);
 
-    byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map(x => {
+    currentShoutouts = shoutouts;
+    byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map((x, index) => {
       const canModify = x.editable !== false && String(x.status || "pending").toLowerCase() === "pending";
       return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
         <strong>${esc(x.mainText || "ShoutOut")}</strong>
         <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")}</p>
         <small>${esc(fmtDate(x.submittedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
-        ${canModify ? `<p><a class="buttonlike" href="${esc(shoutoutModifyUrl(x))}">Modify ShoutOut</a></p>` : ""}
+        ${canModify ? `<p><button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">Modify ShoutOut</button></p>` : ""}
       </div>`;
     }).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
+    document.querySelectorAll(".modify-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => startShoutoutEdit(currentShoutouts[Number(btn.dataset.shoutoutIndex)]));
+    });
+    const params = new URL(window.location.href).searchParams;
+    const requestedId = params.get("id");
+    const requestedRef = params.get("ref");
+    const requestedItem = currentShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
+    if (requestedItem && !activeShoutoutEditId && requestedItem.editable !== false && String(requestedItem.status || "pending").toLowerCase() === "pending") {
+      startShoutoutEdit(requestedItem);
+    }
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
     byId("myChats").innerHTML = chats.length ? chats.map(x => `<div class="queue-item"><strong>${esc(x.title || "Mingl Chat")}</strong><p>${esc(x.lastMessage || "")}</p><small>Unread: ${esc(x.unreadCounts?.[user.uid] || 0)}</small></div>`).join("") : "<p class='sub'>No Mingl chats yet.</p>";
@@ -698,6 +749,8 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
+    bind("saveShoutoutEditBtn", saveShoutoutEdit);
+    bind("cancelShoutoutEditBtn", cancelShoutoutEdit);
     byId("composeRecipientSearch")?.addEventListener("input", () => {
       byId("composeRecipientUid").value = "";
       byId("composeRecipientEmail").value = "";

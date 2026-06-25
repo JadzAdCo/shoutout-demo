@@ -460,10 +460,22 @@
     return renderLocationGrid();
   }
 
-  const SEARCH_STOP_WORDS = new Set(["a","an","and","at","for","in","near","of","on","the","to","with","club","clubs","venue","venues","event","events","night","nightlife"]);
+  const SEARCH_STOP_WORDS = new Set(["a","an","and","am","are","at","for","i","in","interested","interest","into","like","likes","looking","near","of","on","people","person","the","to","want","who","with","going","go","club","clubs","venue","venues","event","events","night","nightlife"]);
   const SEARCH_ALIASES = {
     hiphop: ["hiphop","hip hop","hip-hop","rap"],
     hop: ["hop","hope"],
+    girl: ["girl","girls","female","woman","women","lady","ladies"],
+    girls: ["girl","girls","female","woman","women","lady","ladies"],
+    female: ["female","girl","girls","woman","women"],
+    woman: ["woman","women","female","girl","girls"],
+    women: ["woman","women","female","girl","girls"],
+    car: ["car","cars","fast car","fast cars","coupe","luxury car","exotic car"],
+    cars: ["car","cars","fast car","fast cars","coupe","luxury car","exotic car"],
+    fast: ["fast","fast car","fast cars","car","cars","coupe"],
+    fastcar: ["fast car","fast cars","car","cars","coupe","luxury car"],
+    fastcars: ["fast cars","fast car","car","cars","coupe","luxury car"],
+    latina: ["latina","latin","latino","reggaeton","salsa","bachata","latin events","latin night"],
+    latin: ["latin","latina","latino","reggaeton","salsa","bachata","latin events","latin night"],
     afrobeats: ["afrobeats","afro beats","afrobeat","afro beat"],
     afrobeat: ["afrobeat","afro beat","afrobeats","afro beats"],
     rnb: ["rnb","r b","r&b","r and b"],
@@ -617,6 +629,41 @@
     return checks.filter(Boolean).length;
   }
 
+  const PROFILE_DATAPOINTS = [
+    {key:"gender", label:"Gender", get:p => p.gender},
+    {key:"music", label:"Music", get:p => p.musicInterests || p.favoriteGenres},
+    {key:"events", label:"Events", get:p => p.nightlifeInterests || p.nightlifeStyle},
+    {key:"travel", label:"Travel", get:p => p.travelInterests},
+    {key:"hobbies", label:"Hobbies", get:p => p.hobbies || p.generalHobbies},
+    {key:"food", label:"Food", get:p => p.foodChoices},
+    {key:"beverage", label:"Beverages", get:p => p.favoriteBeverages},
+    {key:"meet", label:"Meet", get:p => p.lookingToMeet},
+    {key:"location", label:"Location", get:p => [p.city, p.country].filter(Boolean)}
+  ];
+
+  function dataPointValues(value) {
+    if (Array.isArray(value)) return value.filter(Boolean);
+    return splitCSV(value).length ? splitCSV(value) : (value ? [String(value)] : []);
+  }
+
+  function profileSearchHaystack(profile = {}) {
+    return [
+      publicProfileHaystack(profile),
+      ...PROFILE_DATAPOINTS.flatMap(point => dataPointValues(point.get(profile)))
+    ].join(" ");
+  }
+
+  function queryIntentScore(query, profile = {}) {
+    const tokens = searchTokens(query);
+    if (!tokens.length) return 0;
+    const haystack = searchFields(profileSearchHaystack(profile));
+    return tokens.reduce((sum, token) => sum + (tokenMatchesSearchField(token, haystack) ? 1 : 0), 0);
+  }
+
+  function sharedDataPointLabels(a = {}, b = {}) {
+    return PROFILE_DATAPOINTS.filter(point => valuesContextuallyOverlap(point.get(a), point.get(b)) || contextualValueEquals(point.get(a), point.get(b))).map(point => point.label);
+  }
+
   function isPublicMinglCandidate(profile = {}) {
     const visibility = String(profile.publicProfileVisibility || "").toLowerCase();
     return visibility === "public" && !!profileMinglPhoto(profile) && profileMatchScore(cachedUserProfile || {}, profile) >= 3;
@@ -681,29 +728,67 @@
     ]);
     minglCandidates = users;
     minglConnections = connections;
+    renderMinglSelfCard();
     renderMinglPeople();
     renderMinglChats();
+  }
+
+  function renderProfileDatapoints(profile = {}, prefix = "profile") {
+    return `<div class="profile-datapoint-grid">${PROFILE_DATAPOINTS.map((point, index) => {
+      const values = dataPointValues(point.get(profile));
+      if (!values.length) return "";
+      const id = `${prefix}-${point.key}-${index}`;
+      return `<details class="profile-datapoint">
+        <summary>${esc(point.label)}</summary>
+        <div>${values.map(value => `<span>${esc(value)}</span>`).join("")}</div>
+      </details>`;
+    }).join("")}</div>`;
+  }
+
+  function renderMinglSelfCard() {
+    const wrap = byId("minglSelfCard");
+    if (!wrap || !currentUser) return;
+    const profile = cachedUserProfile || {};
+    const photo = profileMinglPhoto(profile) || currentUser.photoURL || "";
+    wrap.innerHTML = `
+      <div class="mingl-self-photo">${photo ? `<img src="${esc(photo)}" alt="${esc(profile.displayName || "Your profile")}">` : `<span>${esc((profile.displayName || currentUser.displayName || "M").slice(0,1).toUpperCase())}</span>`}</div>
+      <div>
+        <p class="eyebrow">Your Mingl Profile</p>
+        <h3>${esc(profile.displayName || currentUser.displayName || currentUser.email || "Your Profile")}</h3>
+        ${renderProfileDatapoints(profile, "self")}
+      </div>`;
   }
 
   function renderMinglPeople() {
     const grid = byId("minglPeopleGrid");
     if (!grid) return;
     const query = byId("minglSearch")?.value || "";
-    const matches = minglCandidates.filter(p => contextualSearchMatch(query, publicProfileHaystack(p))).slice(0, 40);
-    grid.innerHTML = matches.length ? "" : '<div class="empty">No public Mingl profiles with at least 3 matching profile data points and a profile photo were found.</div>';
-    matches.forEach(profile => {
+    const matches = minglCandidates
+      .map(profile => ({
+        profile,
+        sharedScore: profileMatchScore(cachedUserProfile || {}, profile),
+        intentScore: queryIntentScore(query, profile)
+      }))
+      .filter(item => !query || item.intentScore > 0 || contextualSearchMatch(query, publicProfileHaystack(item.profile)))
+      .sort((a,b) => (b.intentScore + b.sharedScore) - (a.intentScore + a.sharedScore))
+      .slice(0, 40);
+    grid.innerHTML = matches.length ? "" : '<div class="empty">No public Mingl profiles matched that search yet. Try interests like fast cars, Latin events, Afro House, travel, food, city, or hobbies.</div>';
+    matches.forEach(({profile, sharedScore, intentScore}) => {
       const uid = profile.uid || profile.id;
       const status = connectionStatusFor(uid);
       const photoUrl = profileMinglPhoto(profile);
       const card = document.createElement("div");
       card.className = "mingl-person-card";
-      const buttonText = status.state === "mutual" ? "Open Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back" : "Mingl with Someone";
+      const buttonText = status.state === "mutual" ? "Start Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back and Start Chat" : "Start Chat / Mingl";
+      const sharedLabels = sharedDataPointLabels(cachedUserProfile || {}, profile).slice(0, 5);
       card.innerHTML = `
         <div class="mingl-person-photo">${photoUrl ? `<img src="${esc(photoUrl)}" alt="${esc(profile.displayName || "Mingl profile")}">` : `<span>${esc((profile.displayName || profile.username || "M").slice(0,1).toUpperCase())}</span>`}</div>
         <div>
           <h3>${esc(profile.displayName || profile.username || "Mingl Member")}</h3>
-          <small>${profileMatchScore(cachedUserProfile || {}, profile)} shared profile matches</small>
+          <small>${sharedScore} shared profile matches${query ? ` - ${intentScore} search signals` : ""}</small>
+          ${sharedLabels.length ? `<div class="mingl-shared-row">${sharedLabels.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
           <p>${esc(profileSummaryText(profile) || "Nightlife profile")}</p>
+          ${renderProfileDatapoints(profile, `match-${esc(uid)}`)}
           <button class="primary" type="button" ${status.state === "sent" ? "disabled" : ""}>${esc(buttonText)}</button>
         </div>`;
       card.querySelector("button").addEventListener("click", () => handleMinglAction(profile));
@@ -1035,7 +1120,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.34-nf`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.35-nf`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -1105,7 +1190,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.34-nf";
+      portalLink.href = "./patron-portal.html?v=28.35-nf";
       portalLink.textContent = "My Profile";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -1118,14 +1203,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.34-nf";
+      messages.href = "./patron-portal.html?tab=messages&v=28.35-nf";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.34-nf";
+      chats.href = "./patron-portal.html?tab=chats&v=28.35-nf";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -1273,10 +1358,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.34-nf">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.35-nf">My Profile</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.34-nf">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.34-nf">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.35-nf">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.35-nf">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -1319,7 +1404,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.34-nf`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.35-nf`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
