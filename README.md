@@ -1,16 +1,18 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.40-nf Master Patron Diagnostic Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.41-f Migration Root Fallback Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.40-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.41-f
 ```
 
 Current release highlights:
 
-- New feature package. `-nf` means this release adds user-facing or admin-facing feature behavior.
+- Fix package. `-f` means this release corrects upload/deployment behavior from the previous package.
+- Adds root-level copies of the Firestore rebrand migration page and script so the migration can be uploaded without creating a `migrations` folder manually.
+- Keeps the original `migrations/` folder path for deployments that support folder upload.
 - Adds a Master Admin `Patron Diagnostics` tab.
 - Adds a patron datapoint diagnostic summary for city, state/region/province, country, age, food, music, hobbies, travel, events, beverages, and meeting preferences.
 - Adds a Master Admin overlap report showing patron pairs with 2 or more common datapoints.
@@ -24,7 +26,7 @@ Current release highlights:
 - Restores Google and Microsoft authentication to the known-good popup-first flow, with redirect used only as a popup-blocked fallback.
 - Adds `images/shoutout-logo.svg` and uses it as the ShoutOut feature logo.
 - Tightens the ShoutOut landing layout so the logo, heading, copy, and action buttons follow a clean left-to-right/down page flow and do not overflow the screen.
-- Keeps the `migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html` migration page in the full package; if the live URL returns 404, re-upload the package and confirm the `migrations` folder was uploaded to GitHub Pages.
+- Keeps the `migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html` migration page in the full package and adds a root fallback at `firestore-rebrand-jadz-to-floqr-v28.31-f.html`.
 - Adds a Patron Portal ShoutOut diagnostic tool for modified ShoutOuts that appear stuck or in limbo.
 - Adds a `Resubmit for Approval` action after modifying a pending ShoutOut.
 - Enlarges and left-aligns the Mingl landing logo, reduces the vertical gap before the landing copy, and uses the blue Mingl logo for male patron profiles.
@@ -71,19 +73,19 @@ Current release highlights:
 - Preserved technical URLs, Firebase authorized-domain guidance, internal function names, existing email domains, and GitHub Pages URLs so authentication and deployment do not break.
 - Preserved v28.27-f Storage Rules behavior, including signed-in-only profile media reads.
 - Includes a preview-only coupe/car ShoutOut direction in `previews/`; this is not yet wired into the live template picker.
-- Bumped active cache-busting query strings to `v=28.40-nf`.
+- Bumped active cache-busting query strings to `v=28.41-f`.
 
 Firebase / Firestore / Storage impact:
 
 - Firebase config: no changes.
-- Firestore rules: consolidated rules are included as `firestore.rules`; v28.40-nf keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
+- Firestore rules: consolidated rules are included as `firestore.rules`; v28.41-f keeps the v28.34-nf `clubEmployeeDesignations` block. Pre-v28.34 rules are preserved as `firestore-rules-before-v28-34-nf.txt` for rollback.
 - Firestore indexes: none added.
 - Storage rules: preserves the consolidated signed-in profile media `storage.rules` from v28.27-f.
 - Database migration: optional but included from v28.31-f. Run the migration tool only if existing Firestore `clubLocations` documents still contain old company branding.
 
 Install / upload steps:
 
-1. Extract `shoutoutwepp,vers-28.40-nf-full-package.zip`.
+1. Extract `shoutoutwepp,vers-28.41-f-full-package.zip`.
 2. Upload the extracted web files to the GitHub repo root:
 
 ```text
@@ -94,14 +96,14 @@ https://github.com/jadzadco/shoutout-demo
 4. Commit with:
 
 ```text
-Upload v28.40-nf FLOQR master patron diagnostic package
+Upload v28.41-f FLOQR migration root fallback package
 ```
 
 5. Wait 1-3 minutes for GitHub Pages to publish.
 6. Test with:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.40-nf
+https://jadzadco.github.io/shoutout-demo/?v=28.41-f
 ```
 
 Firestore migration steps:
@@ -110,7 +112,13 @@ Firestore migration steps:
 2. Open:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.40-nf
+https://jadzadco.github.io/shoutout-demo/migrations/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.41-f
+```
+
+If the `migrations` folder was not uploaded or the folder URL returns 404, use the root fallback:
+
+```text
+https://jadzadco.github.io/shoutout-demo/firestore-rebrand-jadz-to-floqr-v28.31-f.html?v=28.41-f
 ```
 
 3. Sign in with an approved admin email.
@@ -144,7 +152,7 @@ Manual test checklist:
 21. Submit a test ShoutOut and confirm System Message behavior still works.
 22. Test profile media upload and confirm Storage Rules behavior still works.
 23. Open the migration page, preview `clubLocations`, download backup, and apply only if old branding appears.
-24. Open `role-profiles.html?v=28.40-nf` and confirm the role/profile landing scaffold loads.
+24. Open `role-profiles.html?v=28.41-f` and confirm the role/profile landing scaffold loads.
 25. Open Master Admin > Patron Diagnostics and confirm the patron datapoint table and 2+ common datapoint report render.
 26. Confirm rollback file `ROLLBACK-V28-40-nf.md` is kept with the package.
 
