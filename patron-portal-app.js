@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.33-f */
+/* patron-portal-app.js v28.34-nf */
 (function(){
   "use strict";
 
@@ -54,6 +54,7 @@
   const storage = firebase.storage();
   let currentProfile = {};
   let currentMessages = [];
+  let messageRecipients = [];
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -79,7 +80,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.33-f"; }
+  async function logout() { await auth.signOut(); window.location.href = "./?v=28.34-nf"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -122,6 +123,105 @@
 
   function canSendDirectInbox(profile = currentProfile) {
     return getApprovedRoles(profile).some(role => ["masterAdmin","clubAdmin","promoter","dj","hospitality"].includes(role));
+  }
+
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function contextualTextMatch(query, value) {
+    const tokens = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    const haystack = normalizeSearchText(value);
+    return !tokens.length || tokens.every(token => haystack.includes(token));
+  }
+
+  function recipientText(recipient = {}) {
+    return [
+      recipient.label, recipient.displayName, recipient.username, recipient.email,
+      recipient.roleLabel, recipient.locationName, recipient.clubLocationId
+    ].join(" ");
+  }
+
+  function supportRecipientLabel(recipient = {}) {
+    const role = recipient.roleLabel || "Internal Recipient";
+    const location = recipient.locationName ? ` - ${recipient.locationName}` : "";
+    return `${recipient.label || recipient.email || "Recipient"} (${role}${location})`;
+  }
+
+  function buildMessageRecipients(user, users = [], designations = []) {
+    const canDirect = canSendDirectInbox(currentProfile);
+    const byKey = new Map();
+    const add = item => {
+      const key = item.uid || item.email || item.label;
+      if (!key || key === user.uid || item.email === user.email) return;
+      byKey.set(key, item);
+    };
+
+    (window.SHOUTOUT_ADMIN_EMAILS || []).forEach(email => add({
+      uid: "",
+      email,
+      label: "Club Admin",
+      displayName: "Club Admin",
+      roleLabel: "Club Admin",
+      recipientType: "club_admin"
+    }));
+
+    designations.filter(x => x.isCSR !== false).forEach(item => add({
+      uid: item.workerUid || "",
+      email: item.workerEmail || "",
+      label: item.workerName || item.workerUsername || "Customer Service Representative",
+      username: item.workerUsername || "",
+      roleLabel: "Customer Service Representative",
+      recipientType: "club_csr",
+      clubLocationId: item.clubLocationId || "",
+      locationName: item.clubLocationName || item.clubLocationId || ""
+    }));
+
+    if (canDirect) {
+      users.forEach(profile => add({
+        uid: profile.uid || profile.id || "",
+        email: profile.email || "",
+        label: profile.displayName || profile.fullName || profile.username || profile.email || "Member",
+        username: profile.username || "",
+        roleLabel: getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x).join(", ") || "Member",
+        recipientType: "member"
+      }));
+    }
+
+    return Array.from(byKey.values()).sort((a,b) => supportRecipientLabel(a).localeCompare(supportRecipientLabel(b)));
+  }
+
+  function selectMessageRecipient(recipient) {
+    byId("composeRecipientUid").value = recipient.uid || "";
+    byId("composeRecipientEmail").value = recipient.email || "";
+    byId("composeRecipientLabel").value = supportRecipientLabel(recipient);
+    byId("composeRecipientSearch").value = supportRecipientLabel(recipient);
+    renderRecipientSearchResults();
+  }
+
+  function renderRecipientSearchResults() {
+    const wrap = byId("recipientSearchResults");
+    if (!wrap) return;
+    const query = byId("composeRecipientSearch")?.value || "";
+    const selectedUid = byId("composeRecipientUid")?.value || "";
+    const selectedEmail = byId("composeRecipientEmail")?.value || "";
+    const rows = messageRecipients
+      .filter(x => contextualTextMatch(query, recipientText(x)))
+      .slice(0, 12);
+    wrap.innerHTML = rows.length ? rows.map((item, index) => `<button type="button" class="${(item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail) ? "selected" : ""}" data-recipient-index="${index}">
+      <strong>${esc(item.label || item.email || "Recipient")}</strong>
+      <span>${esc(item.username ? `@${item.username}` : item.email || "")}</span>
+      <small>${esc(item.roleLabel || "Internal Recipient")}${item.locationName ? ` - ${esc(item.locationName)}` : ""}</small>
+    </button>`).join("") : "<p class='sub small'>No allowed internal recipients matched this search.</p>";
+    wrap.querySelectorAll("button[data-recipient-index]").forEach(btn => {
+      btn.addEventListener("click", () => selectMessageRecipient(rows[Number(btn.dataset.recipientIndex)]));
+    });
   }
 
   function fillProfileForm(profile, user) {
@@ -422,7 +522,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.33-f");
+    url.searchParams.set("v", "28.34-nf");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -458,7 +558,8 @@
     byId("messagePolicySummary").innerHTML = `<ul>
       <li>System notifications are internal inbox messages and use <strong>System Message</strong> as the sender.</li>
       <li>Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
-      <li>Patron-to-patron direct inbox messages are blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
+      <li>Patrons can send internal support messages to Club Admins or club-designated Customer Service Representatives.</li>
+      <li>Patron-to-patron direct inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
       <li>Your current approved role set: <strong>${esc(roles.join(", "))}</strong>.</li>
     </ul>`;
     byId("chatPolicySummary").innerHTML = `<ul>
@@ -468,11 +569,11 @@
       <li>Role members cannot initiate Mingl Chat with patrons unless the thread is tied to a patron-originated action such as a payment, guest list request, ShoutOut purchase, reservation, or support question.</li>
       <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
     </ul>`;
-    byId("composePolicyNote").textContent = canDirect ? "Direct inbox messaging is enabled for your approved role. Patron-originated context should still be used before contacting a patron." : "Direct inbox messaging is disabled for standard Patron accounts. Use Mingl Chat after both patrons Mingl back.";
-    byId("sendMessageBtn").disabled = !canDirect;
-    byId("composeRecipientEmail").disabled = !canDirect;
-    byId("composeSubject").disabled = !canDirect;
-    byId("composeBody").disabled = !canDirect;
+    byId("composePolicyNote").textContent = canDirect ? "Internal messaging is enabled for your approved role. Use patron-originated context before contacting a patron." : "Patrons can message Club Admins and designated Customer Service Representatives here. Patron-to-patron conversations use Mingl Chat after both patrons Mingl back.";
+    byId("sendMessageBtn").disabled = false;
+    byId("composeRecipientSearch").disabled = false;
+    byId("composeSubject").disabled = false;
+    byId("composeBody").disabled = false;
   }
 
   async function loadPortal(user) {
@@ -495,13 +596,17 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    const [shoutouts, guestLists, directMessages, inboxNotifications, chats] = await Promise.all([
+    const [shoutouts, guestLists, directMessages, inboxNotifications, chats, allUsers, employeeDesignations] = await Promise.all([
       getCollectionSafe("shoutouts", x => x.submittedByUid === user.uid || x.submittedBy === user.email),
       getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
       getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
       getCollectionSafe("inboxNotifications", x => x.recipientUid === user.uid || x.recipientEmail === user.email),
-      getParticipantCollectionSafe("chatRooms", user.uid)
+      getParticipantCollectionSafe("chatRooms", user.uid),
+      getCollectionSafe("users"),
+      getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false)
     ]);
+    messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
+    renderRecipientSearchResults();
 
     const messages = [
       ...directMessages,
@@ -547,21 +652,25 @@
   async function sendPortalMessage() {
     const user = auth.currentUser;
     if (!user) return;
-    if (!canSendDirectInbox(currentProfile)) {
-      setText("portalStatus", "Direct inbox messaging is available only to approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl roles.");
-      return;
-    }
+    const recipientUid = byId("composeRecipientUid")?.value.trim();
     const recipientEmail = byId("composeRecipientEmail")?.value.trim().toLowerCase();
+    const recipientLabel = byId("composeRecipientLabel")?.value.trim();
+    const selectedRecipient = messageRecipients.find(x => (recipientUid && x.uid === recipientUid) || (recipientEmail && x.email === recipientEmail));
     const subject = byId("composeSubject")?.value.trim() || "Message";
     const body = byId("composeBody")?.value.trim();
-    if (!recipientEmail || !body) { setText("portalStatus", "Recipient email and message are required."); return; }
+    if ((!recipientUid && !recipientEmail) || !selectedRecipient || !body) { setText("portalStatus", "Select an internal recipient from search and enter a message."); return; }
     await db.collection("messages").add({
-      messageType:"role_direct",
+      messageType:selectedRecipient.recipientType === "club_csr" || selectedRecipient.recipientType === "club_admin" ? "patron_support" : "role_direct",
       senderUid:user.uid,
       senderEmail:user.email || "",
       senderName:currentProfile.displayName || user.displayName || user.email || "Member",
       senderRoles:getApprovedRoles(currentProfile),
+      recipientUid:recipientUid || "",
       recipientEmail,
+      recipientName:recipientLabel || selectedRecipient.label || recipientEmail || "Recipient",
+      recipientType:selectedRecipient.recipientType || "member",
+      clubLocationId:selectedRecipient.clubLocationId || "",
+      locationName:selectedRecipient.locationName || "",
       subject,
       body,
       read:false,
@@ -571,6 +680,11 @@
     });
     setText("portalStatus", "Message sent.");
     byId("composeBody").value = "";
+    byId("composeSubject").value = "";
+    byId("composeRecipientSearch").value = "";
+    byId("composeRecipientUid").value = "";
+    byId("composeRecipientEmail").value = "";
+    byId("composeRecipientLabel").value = "";
     await loadPortal(user);
   }
 
@@ -584,6 +698,12 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
+    byId("composeRecipientSearch")?.addEventListener("input", () => {
+      byId("composeRecipientUid").value = "";
+      byId("composeRecipientEmail").value = "";
+      byId("composeRecipientLabel").value = "";
+      renderRecipientSearchResults();
+    });
 
     auth.onAuthStateChanged(user => {
       setText("portalSignedInAs", user ? `Signed in as ${user.displayName || user.email}` : "Not signed in");

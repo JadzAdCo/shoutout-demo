@@ -111,12 +111,7 @@ service cloud.firestore {
 
     match /roleRequests/{id} {
       allow create, read, update, delete: if signedIn();
-    }
-
-    match /clubEmployeeDesignations/{id} {
-      allow create, read, update, delete: if signedIn();
-    }
-
+    }`r`n
     match /patronRanks/{id} {
       allow read: if true;
       allow write: if signedIn();

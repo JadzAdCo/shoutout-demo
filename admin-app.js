@@ -19,6 +19,8 @@
   const loc = window.SHOUTOUT_CLUB_LOCATIONS?.[locationId] || { locationName: locationId, brand: locationId, genres: [], activityDates: [] };
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
+  let adminUsers = [];
+  let adminDesignations = [];
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -128,6 +130,140 @@
 
   function simpleRows(rows) {
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
+  }
+
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function contextualTextMatch(query, value) {
+    const tokens = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    const haystack = normalizeSearchText(value);
+    return !tokens.length || tokens.every(token => haystack.includes(token));
+  }
+
+  function approvedRoles(profile = {}) {
+    const raw = [
+      profile.memberLevel,
+      profile.role,
+      profile.approvedRole,
+      ...(Array.isArray(profile.approvedRoles) ? profile.approvedRoles : []),
+      ...(Array.isArray(profile.roles) ? profile.roles : [])
+    ].filter(Boolean).map(x => String(x).toLowerCase());
+    const roles = new Set();
+    raw.forEach(x => {
+      if (x.includes("club")) roles.add("Club Admin");
+      if (x.includes("promoter")) roles.add("Promoter");
+      if (x.includes("dj")) roles.add("DJ");
+      if (x.includes("waiter") || x.includes("waitress") || x.includes("bottle") || x.includes("hospitality")) roles.add("Waiter / Waitress / Bottle Girl");
+    });
+    return Array.from(roles);
+  }
+
+  function isHospitalityWorker(profile = {}) {
+    return approvedRoles(profile).some(role => role.includes("Waiter"));
+  }
+
+  function employeeSearchText(profile = {}) {
+    return [
+      profile.displayName, profile.fullName, profile.username, profile.email, profile.city, profile.country,
+      approvedRoles(profile).join(" "), ...(profile.clubLocationIds || []), ...(profile.approvedLocations || [])
+    ].join(" ");
+  }
+
+  function designationId(uid) {
+    return `${locationId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  }
+
+  function isDesignatedCSR(uid) {
+    return adminDesignations.some(x => (x.workerUid || x.uid) === uid && x.isCSR !== false);
+  }
+
+  async function setCSR(profile, enabled) {
+    if (!profile.uid && !profile.id) return;
+    const uid = profile.uid || profile.id;
+    const payload = {
+      clubLocationId: locationId,
+      clubLocationName: loc.locationName || locationId,
+      workerUid: uid,
+      workerEmail: profile.email || "",
+      workerName: profile.displayName || profile.fullName || profile.username || profile.email || "Club worker",
+      workerUsername: profile.username || "",
+      workerRoles: approvedRoles(profile),
+      isCSR: !!enabled,
+      designationType: "customer_service_representative",
+      updatedByUid: auth.currentUser?.uid || "",
+      updatedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set(payload, {merge:true});
+    try {
+      await db.collection("users").doc(uid).set({
+        designatedCSRLocations: enabled ? firebase.firestore.FieldValue.arrayUnion(locationId) : firebase.firestore.FieldValue.arrayRemove(locationId),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    } catch(e) {
+      console.warn("CSR designation saved, but user profile mirror was not updated:", e.message);
+    }
+    setText("adminStatus", enabled ? "CSR designation saved." : "CSR designation removed.");
+    await loadEmployeeDesignations();
+  }
+
+  function renderEmployeeDesignations() {
+    const candidateWrap = byId("employeeCandidates");
+    const csrWrap = byId("csrList");
+    if (!candidateWrap || !csrWrap) return;
+    const query = byId("employeeSearch")?.value || "";
+    const workers = adminUsers
+      .filter(isHospitalityWorker)
+      .filter(profile => contextualTextMatch(query, employeeSearchText(profile)))
+      .slice(0, 40);
+    candidateWrap.innerHTML = workers.length ? workers.map(profile => {
+      const uid = profile.uid || profile.id;
+      const checked = isDesignatedCSR(uid);
+      return `<div class="queue-item employee-row">
+        <div>
+          <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Club worker")}</strong>
+          <p>${esc(profile.username ? `@${profile.username}` : profile.email || "")}</p>
+          <small>${esc(approvedRoles(profile).join(", ") || "Approved worker")}</small>
+        </div>
+        <button type="button" data-uid="${esc(uid)}" data-action="${checked ? "remove" : "add"}">${checked ? "Remove CSR" : "Designate CSR"}</button>
+      </div>`;
+    }).join("") : "<p class='sub'>No approved hospitality workers matched this search.</p>";
+    candidateWrap.querySelectorAll("button[data-uid]").forEach(btn => {
+      const profile = workers.find(x => (x.uid || x.id) === btn.dataset.uid);
+      btn.addEventListener("click", () => setCSR(profile, btn.dataset.action === "add"));
+    });
+
+    const active = adminDesignations.filter(x => x.isCSR !== false);
+    csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">
+      <div>
+        <strong>${esc(item.workerName || item.workerEmail || "CSR")}</strong>
+        <p>${esc(item.workerUsername ? `@${item.workerUsername}` : item.workerEmail || "")}</p>
+        <small>${esc(item.clubLocationName || locationId)}</small>
+      </div>
+      <button type="button" data-uid="${esc(item.workerUid)}">Remove CSR</button>
+    </div>`).join("") : "<p class='sub'>No customer service representative designated for this location yet.</p>";
+    csrWrap.querySelectorAll("button[data-uid]").forEach(btn => {
+      const profile = adminUsers.find(x => (x.uid || x.id) === btn.dataset.uid) || {uid:btn.dataset.uid};
+      btn.addEventListener("click", () => setCSR(profile, false));
+    });
+  }
+
+  async function loadEmployeeDesignations() {
+    const [users, designations] = await Promise.all([
+      getCollectionSafe("users"),
+      getCollectionSafe("clubEmployeeDesignations")
+    ]);
+    adminUsers = users;
+    adminDesignations = designations.filter(x => x.clubLocationId === locationId);
+    renderEmployeeDesignations();
   }
 
   function renderQueue() {
@@ -378,6 +514,7 @@
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+    byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("adminStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -405,6 +542,7 @@
       setText("adminStatus", "Club admin verified.");
       renderQueue();
       loadReports();
+      loadEmployeeDesignations();
     });
   });
 })();
