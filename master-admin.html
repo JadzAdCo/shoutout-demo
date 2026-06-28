@@ -183,6 +183,20 @@
           <div id="diagnosticsFeatureMatrix" class="report-block"></div>
         </div>
         <div class="card">
+          <h2>Package Install Diagnostics</h2>
+          <p class="sub small">Checks feature markers added by each package after upload so Master Admin can confirm the installed files match the expected release behavior.</p>
+          <button id="runPackageDiagnosticsBtn" type="button">Run Package Install Diagnostics</button>
+          <div id="packageInstallDiagnosticsSummary" class="report-block"></div>
+          <div id="packageInstallDiagnosticsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Firebase Rules Smoke Test</h2>
+          <p class="sub small">Runs signed-in Firestore and Storage read/write/delete checks for the package collections and paths. This confirms deployed rules are compatible with the installed package.</p>
+          <button id="runRulesSmokeTestBtn" class="primary" type="button">Run Rules Smoke Test</button>
+          <div id="rulesSmokeTestSummary" class="report-block"></div>
+          <div id="rulesSmokeTestReport" class="report-block"></div>
+        </div>
+        <div class="card">
           <h2>Crawler Search Criteria</h2>
           <p class="sub small">Manual runs create reviewable aiDiscoveryQueue records. Real public-source crawling requires backend scheduled functions.</p>
           <div class="profile-grid">
@@ -241,8 +255,8 @@
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-discovery-service.js?v=28.44-ai"></script>
-<script src="./ai-diagnostics-service.js?v=28.45-diag"></script>
-<script src="./master-admin-app.js?v=28.45-diag"></script>
+<script src="./ai-diagnostics-service.js?v=28.47-rules-diag"></script>
+<script src="./master-admin-app.js?v=28.47-rules-diag"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

@@ -20,6 +20,7 @@
   firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage ? firebase.storage() : null;
 
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
   const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com", "microsoft.com"]).map(x => String(x).toLowerCase());
@@ -463,7 +464,7 @@
       setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
-      if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth});
+      if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});
     });
   });
 })();

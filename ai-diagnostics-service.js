@@ -8,6 +8,7 @@
   const state = {
     db: null,
     auth: null,
+    storage: null,
     mounted: false,
     lastData: {}
   };
@@ -95,7 +96,55 @@
     "aiDiscoveryQueue",
     "aiDiscoveryRatingCriteria",
     "aiCrawlRuns",
-    "aiCrawlerSchedules"
+    "aiCrawlerSchedules",
+    "aiDiagnosticsReports"
+  ];
+
+  const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "v28.44-ai",
+      title: "FLOQR AI Core Layer",
+      checks: [
+        {label:"AI feature flags", file:"shared-data.js", includes:["FLOQR_AI_ENABLED", "FLOQR_AI_PROVIDER", "FLOQR_AI_FALLBACK_MODE"]},
+        {label:"Local fallback search", file:"ai-search-service.js", includes:["window.floqrSearch", "localContextualSearch", "aiSemanticSearch"]},
+        {label:"Assistant scaffold", file:"ai-assistant-ui.js", includes:["Ask FLOQR", "role"]},
+        {label:"Template Studio scaffold", file:"ai-template-studio.js", includes:["patronTemplateVariants", "aiTemplatePromptHistory"]},
+        {label:"AI Discovery module", file:"master-admin.html", includes:["ai-discovery-service.js"]}
+      ]
+    },
+    {
+      version: "v28.45-diagnostics",
+      title: "Diagnostics + AI Discovery Controls",
+      checks: [
+        {label:"Diagnostics page tab", file:"master-admin.html", includes:["data-panel=\"diagnostics\"", "Master Admin Settings - Diagnostics"]},
+        {label:"Crawler controls", file:"master-admin.html", includes:["crawlSearchCriteria", "runManualCrawlBtn", "crawlAnalyticsInsights"]},
+        {label:"Diagnostics module loaded", file:"master-admin.html", includes:["ai-diagnostics-service.js"]},
+        {label:"Crawler rules collections", file:"firestore.rules", includes:["match /aiCrawlRuns/{id}", "match /aiCrawlerSchedules/{id}", "match /aiDiagnosticsReports/{id}"]},
+        {label:"Public profile language", file:"patron-portal.html", includes:["editPublicProfileLanguageMode", "editBioEnglish"]}
+      ]
+    },
+    {
+      version: "v28.46-video-trim",
+      title: "First-7-Second Video Trim Correction",
+      checks: [
+        {label:"Video trim media service", file:"ai-media-service.js", includes:["trimVideoToFirstSevenSeconds", "first-7-second", "trimProcessingMode"]},
+        {label:"Patron trim metadata save", file:"patron-app.js", includes:["trimmedMediaUrl", "trimProcessingMode", "trimWarning"]},
+        {label:"Admin approval trim pass-through", file:"admin-app.js", includes:["trimmedMediaUrl", "originalMediaUploaded", "trimProcessingMode"]},
+        {label:"Display trim playback enforcement", file:"display-app.js", includes:["enforceTrimmedVideoPlayback", "selectedMediaVersion !== \"trimmed\""]},
+        {label:"Cache-busted installed scripts", file:"index.html", includes:["28.46-video-trim", "ai-media-service.js"]}
+      ]
+    },
+    {
+      version: "v28.47-rules-diag",
+      title: "Rules Smoke Tests + Per-Package Diagnostics",
+      checks: [
+        {label:"Rules smoke test UI", file:"master-admin.html", includes:["runRulesSmokeTestBtn", "rulesSmokeTestReport"]},
+        {label:"Package diagnostics UI", file:"master-admin.html", includes:["runPackageDiagnosticsBtn", "packageInstallDiagnosticsReport"]},
+        {label:"Rules smoke test runner", file:"ai-diagnostics-service.js", includes:["runRulesSmokeTest", "aiDiagnosticsReports", "template-backgrounds"]},
+        {label:"Package install runner", file:"ai-diagnostics-service.js", includes:["PACKAGE_INSTALL_CHECKS", "runPackageInstallDiagnostics"]},
+        {label:"Storage passed to diagnostics", file:"master-admin-app.js", includes:["const storage", "FLOQRDiagnostics", "storage"]}
+      ]
+    }
   ];
 
   function setText(id, value) {
@@ -162,6 +211,219 @@
       TBI: "#475569"
     };
     return `<span style="display:inline-flex;align-items:center;border-radius:999px;padding:0.2rem 0.55rem;background:${colors[status] || "#475569"};color:#fff;font-size:0.78rem;font-weight:800;">${esc(status)}</span>`;
+  }
+
+  function renderCheckCards(wrapId, results = []) {
+    const wrap = byId(wrapId);
+    if (!wrap) return;
+    wrap.innerHTML = results.length ? results.map(item => `<div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>${esc(item.package ? `${item.package}: ${item.label}` : item.label)}</strong>
+        ${statusBadge(item.status)}
+      </div>
+      <p>${esc(item.evidence || "")}</p>
+    </div>`).join("") : "<p class='sub'>No diagnostic checks have run yet.</p>";
+  }
+
+  function renderCheckSummary(wrapId, results = [], extraRows = []) {
+    const counts = countBy(results, item => item.status);
+    const rows = [
+      ["Pass", counts.Pass || 0],
+      ["Soft Fail", counts["Soft Fail"] || 0],
+      ["Failed", counts.Failed || 0],
+      ["TBI", counts.TBI || 0],
+      ...extraRows
+    ];
+    const wrap = byId(wrapId);
+    if (wrap) wrap.innerHTML = simpleRows(rows);
+  }
+
+  async function fetchPackageFile(file, cache = new Map()) {
+    if (cache.has(file)) return cache.get(file);
+    const response = await fetch(`./${file}?diagnostics=${Date.now()}`, {cache:"no-store"});
+    if (!response.ok) throw new Error(`${file} returned ${response.status}`);
+    const text = await response.text();
+    cache.set(file, text);
+    return text;
+  }
+
+  async function runPackageInstallDiagnostics(options = {}) {
+    if (!options.silent) setText("diagnosticsStatus", "Running package install diagnostics...");
+    const cache = new Map();
+    const results = [];
+    for (const pkg of PACKAGE_INSTALL_CHECKS) {
+      for (const check of pkg.checks) {
+        try {
+          const text = await fetchPackageFile(check.file, cache);
+          const missing = check.includes.filter(token => !text.includes(token));
+          results.push({
+            package: `${pkg.version} ${pkg.title}`,
+            label: check.label,
+            status: missing.length ? "Failed" : "Pass",
+            evidence: missing.length
+              ? `${check.file} is missing: ${missing.join(", ")}`
+              : `${check.file} contains expected package marker(s).`
+          });
+        } catch (error) {
+          results.push({
+            package: `${pkg.version} ${pkg.title}`,
+            label: check.label,
+            status: "Failed",
+            evidence: error?.message || String(error)
+          });
+        }
+      }
+    }
+    renderCheckSummary("packageInstallDiagnosticsSummary", results, [
+      ["Packages checked", PACKAGE_INSTALL_CHECKS.length],
+      ["Purpose", "Confirms installed files contain package feature markers"]
+    ]);
+    renderCheckCards("packageInstallDiagnosticsReport", results);
+    if (!options.silent) {
+      const failed = results.filter(item => item.status === "Failed").length;
+      setText("diagnosticsStatus", failed ? `Package install diagnostics found ${failed} failed checks.` : "Package install diagnostics passed.");
+    }
+    return results;
+  }
+
+  function tinyPngBlob() {
+    const bytes = Uint8Array.from([
+      137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,31,21,196,137,
+      0,0,0,13,73,68,65,84,120,156,99,248,255,255,63,0,5,254,2,254,167,53,129,132,0,0,0,0,73,69,78,68,174,66,96,130
+    ]);
+    return new Blob([bytes], {type:"image/png"});
+  }
+
+  async function firestoreDocLifecycle(collection, data, runId) {
+    const ref = state.db.collection(collection).doc(`${runId}-${collection}`);
+    await ref.set({...data, diagnosticRunId:runId, createdAt:fieldValue(), updatedAt:fieldValue()});
+    const snap = await ref.get();
+    if (!snap.exists) throw new Error(`${collection} test document was not readable after create.`);
+    await ref.set({diagnosticUpdatedAt:fieldValue()}, {merge:true});
+    await ref.delete();
+  }
+
+  async function ownPreferenceLifecycle(runId, user) {
+    const ref = state.db.collection("aiUserNotificationPreferences").doc(user.uid);
+    await ref.set({
+      uid:user.uid,
+      diagnosticRuleTest:{runId, checkedAt:new Date().toISOString()}
+    }, {merge:true});
+    const snap = await ref.get();
+    if (!snap.exists) throw new Error("Own aiUserNotificationPreferences document was not readable.");
+    await ref.set({diagnosticRuleTest:firebase.firestore.FieldValue.delete()}, {merge:true});
+  }
+
+  async function storageLifecycle(path) {
+    if (!state.storage) throw new Error("Firebase Storage SDK or bucket is unavailable on this page.");
+    const ref = state.storage.ref().child(path);
+    await ref.put(tinyPngBlob(), {contentType:"image/png"});
+    await ref.getDownloadURL();
+    await ref.delete();
+  }
+
+  async function saveRulesSmokeReport(results, overallStatus) {
+    try {
+      const user = state.auth?.currentUser || {};
+      await state.db.collection("aiDiagnosticsReports").add({
+        type:"rulesSmokeTest",
+        packageVersion:"v28.47-rules-diag",
+        status:overallStatus,
+        results:results.map(item => ({
+          label:item.label,
+          status:item.status,
+          evidence:item.evidence || ""
+        })),
+        createdByUid:user.uid || "",
+        createdByEmail:user.email || "",
+        createdAt:fieldValue()
+      });
+      return {status:"Pass", evidence:"Rules smoke test report saved to aiDiagnosticsReports."};
+    } catch (error) {
+      return {status:"Soft Fail", evidence:`Rules checks ran, but report save failed: ${error?.message || error}`};
+    }
+  }
+
+  async function runRulesSmokeTest() {
+    const user = state.auth?.currentUser;
+    if (!user) {
+      setText("diagnosticsStatus", "Sign in as Master Admin before running rules smoke tests.");
+      return [];
+    }
+    setText("diagnosticsStatus", "Running Firebase rules smoke test...");
+    const runId = `diagnostic-${user.uid.slice(0, 8)}-${Date.now()}`;
+    const results = [];
+    async function capture(label, fn) {
+      try {
+        await fn();
+        results.push({label, status:"Pass", evidence:"Create/read/update/delete or upload/read/delete succeeded for the signed-in user."});
+      } catch (error) {
+        results.push({label, status:"Failed", evidence:error?.message || String(error)});
+      }
+    }
+
+    await capture("Firestore: aiCrawlRuns lifecycle", () => firestoreDocLifecycle("aiCrawlRuns", {
+      trigger:"diagnostic",
+      mode:"rules-smoke-test",
+      status:"completed"
+    }, runId));
+    await capture("Firestore: aiCrawlerSchedules lifecycle", () => firestoreDocLifecycle("aiCrawlerSchedules", {
+      enabled:false,
+      frequency:"manualOnly",
+      scheduleHours:[],
+      criteria:{search:"diagnostic"}
+    }, runId));
+    await capture("Firestore: aiDiagnosticsReports lifecycle", () => firestoreDocLifecycle("aiDiagnosticsReports", {
+      type:"diagnosticLifecycle",
+      status:"temporary"
+    }, runId));
+    await capture("Firestore: aiIndex owner/private lifecycle", () => firestoreDocLifecycle("aiIndex", {
+      sourceType:"diagnostic",
+      sourceId:runId,
+      title:"Diagnostics Rule Test",
+      summary:"Temporary private aiIndex rule test.",
+      keywords:["diagnostic"],
+      visibility:"private",
+      ownerUid:user.uid,
+      allowedRoles:["masterAdmin"]
+    }, runId));
+    await capture("Firestore: patronTemplateVariants owner lifecycle", () => firestoreDocLifecycle("patronTemplateVariants", {
+      ownerUid:user.uid,
+      ownerDisplayName:user.displayName || user.email || "Diagnostics",
+      baseTemplateId:"diagnostic",
+      baseTemplateName:"Diagnostic",
+      variantName:"Diagnostic Rule Test",
+      backgroundType:"color",
+      backgroundColor:"#000000",
+      visibility:"private",
+      promptShared:false,
+      isPublicProfileItem:false,
+      status:"diagnostic"
+    }, runId));
+    await capture("Firestore: aiTemplatePromptHistory owner lifecycle", () => firestoreDocLifecycle("aiTemplatePromptHistory", {
+      uid:user.uid,
+      templateId:"diagnostic",
+      variantId:runId,
+      prompt:"diagnostic rule test",
+      sourceType:"rule-test",
+      visibility:"private"
+    }, runId));
+    await capture("Firestore: aiUserNotificationPreferences own doc", () => ownPreferenceLifecycle(runId, user));
+    await capture("Storage: template-backgrounds image path", () => storageLifecycle(`template-backgrounds/${user.uid}/${runId}/uploaded/rules-smoke-test.png`));
+    await capture("Storage: shoutouts original image path", () => storageLifecycle(`shoutouts/${user.uid}/${runId}/original/rules-smoke-test.png`));
+
+    const failed = results.filter(item => item.status === "Failed").length;
+    const overallStatus = failed ? "Failed" : "Pass";
+    const saved = await saveRulesSmokeReport(results, overallStatus);
+    results.push({label:"Diagnostics report persistence", status:saved.status, evidence:saved.evidence});
+    renderCheckSummary("rulesSmokeTestSummary", results, [
+      ["Overall", overallStatus],
+      ["Scope", "Tests signed-in allowed operations; it does not impersonate another user."]
+    ]);
+    renderCheckCards("rulesSmokeTestReport", results);
+    await refreshDiagnostics();
+    setText("diagnosticsStatus", failed ? `Rules smoke test found ${failed} failed checks.` : "Rules smoke test passed and report was saved.");
+    return results;
   }
 
   async function readCollectionSafe(name, limit = 750) {
@@ -405,6 +667,10 @@
     const scheduleRows = data.aiCrawlerSchedules?.rows || [];
     const crawlRuns = data.aiCrawlRuns?.rows || [];
     const discoveryQueue = data.aiDiscoveryQueue?.rows || [];
+    const diagnosticsReports = data.aiDiagnosticsReports?.rows || [];
+    const latestRulesReport = diagnosticsReports
+      .filter(row => row.type === "rulesSmokeTest")
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))[0];
     const hasSearch = !!window.floqrSearch;
     const hasDiscovery = !!window.FLOQRAIDiscovery;
 
@@ -445,7 +711,9 @@
       ["AI Discovery", "Backend scheduled internet crawler", "TBI", "Cloud Functions or Cloud Run scheduler must perform real public-source crawling 4-6 times per day."],
       ["AI Discovery", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
-      ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, crawler controls, reports, and analytics are mounted under Master Admin settings."]
+      ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, crawler controls, reports, and analytics are mounted under Master Admin settings."],
+      ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
+      ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
     ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
   }
 
@@ -552,6 +820,7 @@
     renderCrawlActivity(data, schedule);
     renderCollectedRecords(data);
     renderAnalyticsInsights(data);
+    await runPackageInstallDiagnostics({silent:true});
     const failures = features.filter(item => item.status === "Failed").length;
     const soft = features.filter(item => item.status === "Soft Fail").length;
     setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.`);
@@ -559,6 +828,8 @@
 
   function bindControls() {
     byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
+    byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
+    byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
   }
@@ -566,6 +837,7 @@
   async function mount(options = {}) {
     state.db = options.db;
     state.auth = options.auth;
+    state.storage = options.storage || (window.firebase?.storage ? firebase.storage() : null);
     if (!state.db) {
       setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
       return;
@@ -583,6 +855,8 @@
   window.FLOQRDiagnostics = {
     mount,
     refreshDiagnostics,
+    runPackageInstallDiagnostics,
+    runRulesSmokeTest,
     DEFAULT_EVENT_TYPES,
     DEFAULT_GENRES,
     DEFAULT_MARKET_LANGUAGE_PLAN

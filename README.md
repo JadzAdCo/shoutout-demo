@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.46 Diagnostics + Video Trim Correction Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.47 Rules + Package Diagnostics Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.46-video-trim
+https://jadzadco.github.io/shoutout-demo/?v=28.47-rules-diag
 ```
 
 Current release highlights:
@@ -27,6 +27,8 @@ Current release highlights:
 - Adds Master Admin Settings > Diagnostics with app-wide feature status, crawler controls, crawl reports, collected-record analytics, and status labels: Pass, Soft Fail, Failed, and TBI.
 - Adds crawler search criteria for rooftop lounges, rooftop bars, comedy shows, Latin and Arabic music, DJs, Ticketmaster/Eventbrite/resale ticket discovery, Dubai, Istanbul, Singapore, Thailand, Shanghai, and Western European market/language searches.
 - Adds public profile language publishing choices so patrons can display their public profile in their preferred/original language or the English version. AI translation is scaffolded without frontend AI keys.
+- Adds Package Install Diagnostics under Master Admin > Diagnostics so each package can verify its own feature markers after upload.
+- Adds Firebase Rules Smoke Test under Master Admin > Diagnostics to verify signed-in Firestore and Storage rules compatibility after publishing a package.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -46,6 +48,8 @@ Live in this package:
 - ShoutOut media enhancement preview metadata and first-7-second video trim metadata.
 - Super Admin AI Discovery review and listing soft-delete UI.
 - Master Admin Diagnostics feature matrix, crawler controls, crawl activity report, collected-record analytics, and manual crawl queue seeding.
+- Master Admin Package Install Diagnostics grouped by package version.
+- Master Admin Firebase Rules Smoke Test with saved reports in `aiDiagnosticsReports`.
 - Public profile language mode and English translation metadata in Settings.
 
 Scaffolded for later Firebase AI / Gemini configuration:
@@ -145,6 +149,18 @@ New rules cover user-owned notification preferences, prompt history, template va
 
 The v28.45 Diagnostics package changed Firestore rules for `aiCrawlRuns`, `aiCrawlerSchedules`, and `aiDiagnosticsReports`. Firebase Storage rules did not change for v28.45 Diagnostics or this video-trim correction.
 
+Post-install rules testing:
+
+1. Publish `firestore.rules` in Firebase Console after uploading this package if the v28.45 rules were not already published.
+2. Keep `storage.rules` unchanged unless your deployed project is older than the current package rules.
+3. Sign in as Master Admin.
+4. Open Master Admin > Diagnostics.
+5. Click `Run Package Install Diagnostics`.
+6. Click `Run Rules Smoke Test`.
+7. Confirm the smoke test creates a saved `aiDiagnosticsReports` record and shows `Pass` for the package collections and storage paths.
+
+The rules smoke test verifies signed-in allowed operations. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
+
 Rollback plan:
 
 1. Set all FLOQR AI flags in `shared-data.js` to false.
@@ -166,6 +182,8 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, and v28.47 package marker checks run.
+- Click Run Rules Smoke Test and confirm temporary Firestore docs and Storage images are created/read/cleaned up.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
 - Save a patron public profile with preferred/original language mode, then save again with English version mode and confirm the preview switches bio source.
