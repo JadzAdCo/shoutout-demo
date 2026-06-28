@@ -1,19 +1,19 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.43-f Upload-Friendly History Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.45 Diagnostics + AI Discovery Controls Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.43-f
+https://jadzadco.github.io/shoutout-demo/?v=28.45-diagnostics
 ```
 
 Current release highlights:
 
 - Adds the FLOQR AI-ready layer as a contextual platform service instead of isolated one-off AI features.
 - Adds default-off feature flags in `shared-data.js`: `FLOQR_AI_ENABLED`, `FLOQR_AI_PROVIDER`, `FLOQR_AI_FALLBACK_MODE`, `FLOQR_AI_STUDIO_ENABLED`, and `FLOQR_AI_ASSISTANT_ENABLED`.
-- Adds standalone AI modules: `ai-service.js`, `ai-index-service.js`, `ai-search-service.js`, `ai-notification-service.js`, `ai-assistant-ui.js`, `ai-template-studio.js`, `ai-media-service.js`, and `ai-discovery-service.js`.
-- Adds Firestore-ready schemas and rules for `aiIndex`, `aiUserNotificationPreferences`, `aiUserSignals`, `aiSearchLogs`, `aiRecommendations`, `aiDiscoveryQueue`, `aiAssistantSessions`, `aiAssistantMessages`, `patronTemplateVariants`, `aiTemplatePromptHistory`, `aiDiscoverySources`, and `aiDiscoveryRatingCriteria`.
+- Adds standalone AI modules: `ai-service.js`, `ai-index-service.js`, `ai-search-service.js`, `ai-notification-service.js`, `ai-assistant-ui.js`, `ai-template-studio.js`, `ai-media-service.js`, `ai-discovery-service.js`, and `ai-diagnostics-service.js`.
+- Adds Firestore-ready schemas and rules for `aiIndex`, `aiUserNotificationPreferences`, `aiUserSignals`, `aiSearchLogs`, `aiRecommendations`, `aiDiscoveryQueue`, `aiAssistantSessions`, `aiAssistantMessages`, `patronTemplateVariants`, `aiTemplatePromptHistory`, `aiDiscoverySources`, `aiDiscoveryRatingCriteria`, `aiCrawlRuns`, `aiCrawlerSchedules`, and `aiDiagnosticsReports`.
 - Keeps FLOQR AI disabled by default. With all AI flags false, the app loads normally and uses local contextual search.
 - Adds `floqrSearch(query, context)` with local contextual fallback for venue, event, Mingl, and ShoutOut template search.
 - Adds a flag-gated `Ask FLOQR` assistant shell after login when `FLOQR_AI_ASSISTANT_ENABLED` is true.
@@ -24,6 +24,9 @@ Current release highlights:
 - Adds FLOQR Studio / Design Background with AI UI. Live image generation is not configured yet, so it uses safe placeholder behavior and does not expose API keys.
 - Adds ShoutOut media AI readiness: browser filter previews, enhancement metadata, AI-ready moderation fields, and 7-second video enforcement.
 - Adds Super Admin AI Discovery scaffold for public event/venue discovery review, rating criteria, approve/reject/delete/duplicate actions, and soft delete/restore for `clubLocations` and `events`.
+- Adds Master Admin Settings > Diagnostics with app-wide feature status, crawler controls, crawl reports, collected-record analytics, and status labels: Pass, Soft Fail, Failed, and TBI.
+- Adds crawler search criteria for rooftop lounges, rooftop bars, comedy shows, Latin and Arabic music, DJs, Ticketmaster/Eventbrite/resale ticket discovery, Dubai, Istanbul, Singapore, Thailand, Shanghai, and Western European market/language searches.
+- Adds public profile language publishing choices so patrons can display their public profile in their preferred/original language or the English version. AI translation is scaffolded without frontend AI keys.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -42,15 +45,18 @@ Live in this package:
 - ShoutOut copy improvement fallback.
 - ShoutOut media enhancement preview metadata.
 - Super Admin AI Discovery review and listing soft-delete UI.
+- Master Admin Diagnostics feature matrix, crawler controls, crawl activity report, collected-record analytics, and manual crawl queue seeding.
+- Public profile language mode and English translation metadata in Settings.
 
 Scaffolded for later Firebase AI / Gemini configuration:
 
 - Semantic AI search provider calls.
 - Gemini media understanding and moderation notes.
 - AI background image generation/modification.
-- Scheduled crawler execution.
+- Scheduled crawler execution through Firebase Cloud Functions or Cloud Run.
 - Backend video trimming with ffmpeg.
 - Email/SMS notification delivery.
+- Live AI translation of public profile text.
 
 Frontend code must never contain AI API keys. Future live AI should use Firebase AI Logic when safe, or HTTPS callable Cloud Functions / Cloud Run Functions that verify Firebase Auth, role permissions, and visibility rules before calling Gemini.
 
@@ -97,7 +103,7 @@ Firestore ShoutOut records now support selected/original/enhanced media fields, 
 
 ## AI Discovery Workflow
 
-Backend scheduled discovery should run 4-6 times per day, prefer official APIs/feeds, respect robots.txt and site terms, and never scrape private or login-protected content. Target sources include Ticketmaster, Eventbrite, approved resale partners, official venue websites/feeds, comedy shows, nightclubs, lounges, beach clubs, brunch parties, pool parties, summer parties, DJ events, and promoter events.
+Backend scheduled discovery should run 4-6 times per day, prefer official APIs/feeds, respect robots.txt and site terms, and never scrape private or login-protected content. Target sources include Ticketmaster, Eventbrite, approved resale partners, official venue websites/feeds, comedy shows, nightclubs, lounges, rooftop lounges, rooftop bars, beach clubs, brunch parties, pool parties, summer parties, DJ events, promoter events, Latin music, Arabic music, and DJs.
 
 Flow:
 
@@ -109,6 +115,30 @@ Discovered records must not publish directly. Super Admin can edit, approve, rej
 
 Club public profiles are public search records. When a club admin claims ownership by subscribing to FLOQR, they can modify the club public profile fields: address, official website, email, social media handles, and telephone number. Third-party taxi hailing is modeled as a future partner integration, not a crawler input.
 
+## Master Admin Diagnostics
+
+Open Master Admin > Diagnostics to review:
+
+- App-wide feature health from authentication through ShoutOut, guest lists, Mingl, chat, Bata scaffolding, AI search, AI Discovery, templates, club profiles, ticketing, and partner integrations.
+- Status labels: `Pass`, `Soft Fail`, `Failed`, and `TBI`.
+- Crawler search criteria including search text, genres, languages, cities, regions, countries, event types, and market/language plans.
+- Schedule settings for every 4 hours, six times daily, daily, or manual-only mode.
+- Manual crawl scaffold button that writes `aiCrawlRuns` and review-only `aiDiscoveryQueue` records. It does not crawl the public internet from the static frontend.
+- Crawl activity reports, collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
+
+Real internet crawling must run in backend code using Firebase scheduled functions or Cloud Run. The backend crawler should validate official APIs and public source terms, handle robots.txt, deduplicate records, classify event/venue type, rate records from Super Admin criteria, and write only to `aiDiscoveryQueue`.
+
+## Public Profile Language
+
+Settings > My Profile now includes:
+
+- Preferred language.
+- Public Profile Language: preferred/original language or English version.
+- English Bio Translation field.
+- Translation status metadata: `provided` or `ai-ready-not-live`.
+
+When live AI translation is configured later, it must run through Firebase AI Logic or a Cloud Functions proxy. The frontend must not expose AI API keys. FLOQR, ShoutOut, Mingl, and Bata must never be translated or altered.
+
 ## Security And Rollback
 
 New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
@@ -116,7 +146,7 @@ New rules cover user-owned notification preferences, prompt history, template va
 Rollback plan:
 
 1. Set all FLOQR AI flags in `shared-data.js` to false.
-2. Remove the new AI script tags from `index.html`, `patron-portal.html`, and `master-admin.html` if needed.
+2. Remove the new AI script tags from `index.html`, `patron-portal.html`, and `master-admin.html` if needed, including `ai-diagnostics-service.js`.
 3. Keep existing ShoutOut, Mingl, Bata scaffolding, guest list routing, local search, and display files unchanged.
 4. Revert Firestore/Storage rule additions only if the new collections are not being used.
 
@@ -133,6 +163,10 @@ Test plan:
 - Submit a text-only ShoutOut and a media ShoutOut.
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
+- Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
+- Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
+- Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
+- Save a patron public profile with preferred/original language mode, then save again with English version mode and confirm the preview switches bio source.
 
 - Fix package. `-f` means this release corrects upload/deployment behavior from the previous package.
 - Adds root-level copies of the Firestore rebrand migration page and script so the migration can be uploaded without creating a `migrations` folder manually.

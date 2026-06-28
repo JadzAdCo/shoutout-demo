@@ -463,6 +463,7 @@
       setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
+      if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth});
     });
   });
 })();

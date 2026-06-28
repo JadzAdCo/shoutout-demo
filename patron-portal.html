@@ -85,6 +85,18 @@
                 <option value="it">Italian</option>
                 <option value="de">German</option>
                 <option value="el">Greek</option>
+                <option value="pt">Portuguese</option>
+                <option value="nl">Dutch</option>
+                <option value="sv">Swedish</option>
+                <option value="da">Danish</option>
+                <option value="no">Norwegian</option>
+                <option value="fi">Finnish</option>
+                <option value="is">Icelandic</option>
+                <option value="ar">Arabic</option>
+                <option value="tr">Turkish</option>
+                <option value="zh">Chinese</option>
+                <option value="th">Thai</option>
+                <option value="ms">Malay</option>
               </select>
             </label>
             <label>Gender
@@ -113,6 +125,12 @@
                 <option value="private">Private</option>
               </select>
             </label>
+            <label>Public Profile Language
+              <select id="editPublicProfileLanguageMode">
+                <option value="preferred">Preferred/original language</option>
+                <option value="english">English version</option>
+              </select>
+            </label>
             <label>Music Interests <input id="editMusicInterests" placeholder="Hip Hop, Afro House, EDM"/></label>
             <label>Travel Interests <input id="editTravelInterests" placeholder="Barcelona, Miami, beach trips"/></label>
             <label>General Hobbies <input id="editHobbies" placeholder="Dining, dancing, fashion, fitness"/></label>
@@ -121,7 +139,9 @@
             <label>Favorite Nightlife Style <input id="editNightlifeStyle" placeholder="Lounges, clubs, rooftops, live music"/></label>
             <label>Looking To Meet <input id="editLookingToMeet" placeholder="Friends, event crew, travelers, music lovers"/></label>
             <label>Profile Bio <input id="editBio" maxlength="180" placeholder="A short intro shown to followers"/></label>
+            <label>English Bio Translation <input id="editBioEnglish" maxlength="180" placeholder="English version for public profile search"/></label>
           </div>
+          <button id="prepareProfileTranslationBtn" type="button">Prepare English Translation</button>
           <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
         </div>
       </section>

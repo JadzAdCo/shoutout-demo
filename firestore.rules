@@ -215,6 +215,18 @@ service cloud.firestore {
       allow read, write: if signedIn();
     }
 
+    match /aiCrawlRuns/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /aiCrawlerSchedules/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /aiDiagnosticsReports/{id} {
+      allow read, write: if signedIn();
+    }
+
     match /aiAssistantSessions/{uid} {
       allow read, write: if isSelf(uid);
     }

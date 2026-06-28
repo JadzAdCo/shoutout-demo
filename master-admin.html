@@ -56,6 +56,7 @@
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiDiscovery" type="button">AI Discovery</button>
+        <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
       </nav>
 
       <section id="networkDashboard" class="admin-panel-section active">
@@ -167,6 +168,65 @@
           <div id="listingDeleteResults" class="report-block"></div>
         </div>
       </section>
+
+      <section id="diagnostics" class="admin-panel-section">
+        <div class="card">
+          <h2>Master Admin Settings - Diagnostics</h2>
+          <p class="sub small">System-wide health, feature status, crawler controls, crawl reports, and discovery data analytics.</p>
+          <div id="diagnosticsSummary" class="report-block"></div>
+          <button id="diagnosticsRefreshBtn" type="button">Refresh Diagnostics</button>
+          <p id="diagnosticsStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Feature Diagnostics</h2>
+          <p class="sub small">Statuses: Pass, Soft Fail, Failed, and TBI.</p>
+          <div id="diagnosticsFeatureMatrix" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Crawler Search Criteria</h2>
+          <p class="sub small">Manual runs create reviewable aiDiscoveryQueue records. Real public-source crawling requires backend scheduled functions.</p>
+          <div class="profile-grid">
+            <label>Search<input id="crawlSearchCriteria" placeholder="nightlife tickets, comedy shows, rooftop lounges"/></label>
+            <label>Genres<input id="crawlGenreCriteria" placeholder="Hip Hop, Latin, Arabic Music, Afro Beats"/></label>
+            <label>Languages<input id="crawlLanguageCriteria" placeholder="local language, English, Spanish, Arabic"/></label>
+            <label>Cities<input id="crawlCityCriteria" placeholder="Dubai, Istanbul, Singapore, Shanghai"/></label>
+            <label>Regions<input id="crawlRegionCriteria" placeholder="Western Europe, Middle East, Southeast Asia"/></label>
+            <label>Countries<input id="crawlCountryCriteria" placeholder="Spain, France, United Arab Emirates, Turkey"/></label>
+          </div>
+          <label>Event Types<textarea id="crawlEventTypeCriteria" rows="4"></textarea></label>
+          <label>Market Language Plan<textarea id="crawlMarketLanguageCriteria" rows="10"></textarea></label>
+        </div>
+        <div class="card">
+          <h2>Crawler Schedule</h2>
+          <div class="profile-grid">
+            <label>Frequency
+              <select id="crawlFrequency">
+                <option value="every4Hours">Every 4 hours</option>
+                <option value="sixTimesDaily">Six times daily</option>
+                <option value="daily">Daily</option>
+                <option value="manualOnly">Manual only</option>
+              </select>
+            </label>
+            <label>Run Times<input id="crawlScheduleHours" placeholder="00:00, 04:00, 08:00, 12:00, 16:00, 20:00"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="saveCrawlScheduleBtn" class="primary" type="button">Save Crawl Schedule</button>
+            <button id="runManualCrawlBtn" type="button">Run Manual Crawl</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Crawl Activity Report</h2>
+          <div id="crawlActivityReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Collected Discovery Records</h2>
+          <div id="crawlCollectedRecordsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Collected Data Analytics</h2>
+          <div id="crawlAnalyticsInsights" class="report-block"></div>
+        </div>
+      </section>
     </div>
   </section>
 </main>
@@ -174,13 +234,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
 <script src="./shared-data.js?v=28.43-f"></script>
 <script src="./ai-service.js?v=28.44-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-discovery-service.js?v=28.44-ai"></script>
-<script src="./master-admin-app.js?v=28.43-f"></script>
+<script src="./ai-diagnostics-service.js?v=28.45-diag"></script>
+<script src="./master-admin-app.js?v=28.45-diag"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

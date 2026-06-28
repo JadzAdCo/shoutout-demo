@@ -46,6 +46,27 @@
     }
   };
 
+  const LANGUAGE_LABELS = {
+    en: "English",
+    fr: "French",
+    es: "Spanish",
+    it: "Italian",
+    de: "German",
+    el: "Greek",
+    pt: "Portuguese",
+    nl: "Dutch",
+    sv: "Swedish",
+    da: "Danish",
+    no: "Norwegian",
+    fi: "Finnish",
+    is: "Icelandic",
+    ar: "Arabic",
+    tr: "Turkish",
+    zh: "Chinese",
+    th: "Thai",
+    ms: "Malay"
+  };
+
   if (!window.firebaseConfig) { setText("portalStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
   firebase.initializeApp(window.firebaseConfig);
@@ -101,6 +122,39 @@
 
   function simpleRows(rows) {
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
+  }
+
+  function languageLabel(code) {
+    return LANGUAGE_LABELS[code] || code || "Not selected";
+  }
+
+  function publicProfileBio(profile = {}, template = PROFILE_TEMPLATES.patron) {
+    const mode = profile.publicProfileLanguageMode || "preferred";
+    if (mode === "english") {
+      return profile.publicProfileBioEnglish || profile.bioEnglish || profile.publicProfileBioOriginal || profile.bio || template.headline;
+    }
+    return profile.publicProfileBioOriginal || profile.bio || template.headline;
+  }
+
+  function publicProfileLanguageLabel(profile = {}) {
+    return (profile.publicProfileLanguageMode || "preferred") === "english"
+      ? "English"
+      : languageLabel(profile.preferredLanguage);
+  }
+
+  function buildProfileTranslationState(originalBio, englishBio, preferredLanguage) {
+    const language = preferredLanguage || "en";
+    const isEnglish = language === "en" || !language;
+    const finalEnglishBio = englishBio || (isEnglish ? originalBio : "");
+    return {
+      publicProfileBioOriginal: originalBio,
+      publicProfileBioEnglish: finalEnglishBio,
+      publicProfileOriginalLanguage: language,
+      publicProfileTranslationStatus: finalEnglishBio
+        ? "provided"
+        : "ai-ready-not-live",
+      publicProfileTranslationProviderMode: window.FLOQR_AI_ENABLED ? "firebase-ai-logic-ready" : "local-placeholder"
+    };
   }
 
   function getApprovedRoles(profile = currentProfile) {
@@ -239,6 +293,7 @@
     byId("editX").value = profile.xHandle || "";
     byId("editProfileType").value = profile.publicProfileType || "patron";
     byId("editProfileVisibility").value = profile.publicProfileVisibility || "followers";
+    byId("editPublicProfileLanguageMode").value = profile.publicProfileLanguageMode || "preferred";
     byId("editMusicInterests").value = joinCSV(profile.musicInterests || profile.favoriteGenres);
     byId("editTravelInterests").value = joinCSV(profile.travelInterests);
     byId("editHobbies").value = joinCSV(profile.hobbies || profile.generalHobbies);
@@ -246,7 +301,8 @@
     byId("editFavoriteBeverages").value = joinCSV(profile.favoriteBeverages) || "Champagne, Tequila, Mocktails";
     byId("editNightlifeStyle").value = profile.nightlifeStyle || joinCSV(profile.nightlifeInterests);
     byId("editLookingToMeet").value = profile.lookingToMeet || "";
-    byId("editBio").value = profile.bio || "";
+    byId("editBio").value = profile.publicProfileBioOriginal || profile.bio || "";
+    byId("editBioEnglish").value = profile.publicProfileBioEnglish || profile.bioEnglish || "";
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
@@ -255,6 +311,10 @@
   async function saveProfile() {
     const user = auth.currentUser;
     if (!user) return;
+    const preferredLanguage = byId("editLanguage").value;
+    const originalBio = byId("editBio").value.trim();
+    const englishBio = byId("editBioEnglish").value.trim();
+    const translationState = buildProfileTranslationState(originalBio, englishBio, preferredLanguage);
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
@@ -262,12 +322,13 @@
       phone: byId("editPhone").value.trim(),
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
-      preferredLanguage: byId("editLanguage").value,
+      preferredLanguage,
       gender: byId("editGender").value,
       instagramHandle: byId("editInstagram").value.trim(),
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
       publicProfileVisibility: byId("editProfileVisibility").value,
+      publicProfileLanguageMode: byId("editPublicProfileLanguageMode").value,
       musicInterests: splitCSV(byId("editMusicInterests").value),
       travelInterests: splitCSV(byId("editTravelInterests").value),
       hobbies: splitCSV(byId("editHobbies").value),
@@ -275,13 +336,33 @@
       favoriteBeverages: splitCSV(byId("editFavoriteBeverages").value || "Champagne, Tequila, Mocktails"),
       nightlifeStyle: byId("editNightlifeStyle").value.trim(),
       lookingToMeet: byId("editLookingToMeet").value.trim(),
-      bio: byId("editBio").value.trim(),
+      bio: originalBio,
+      ...translationState,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     updates.fullName = `${updates.firstName} ${updates.lastName}`.trim();
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
     setText("portalStatus", "Profile updated.");
     await loadPortal(user);
+  }
+
+  function prepareProfileTranslation() {
+    const originalBio = byId("editBio")?.value.trim() || "";
+    const language = byId("editLanguage")?.value || "en";
+    if (!originalBio) {
+      setText("portalStatus", "Add a profile bio before preparing an English translation.");
+      return;
+    }
+    if (language === "en" || !language) {
+      byId("editBioEnglish").value = originalBio;
+      setText("portalStatus", "English bio prepared from your profile bio.");
+      return;
+    }
+    if (window.FLOQR_AI_ENABLED) {
+      setText("portalStatus", "AI translation is ready for a safe Firebase AI or Cloud Functions provider. No frontend AI key is used.");
+      return;
+    }
+    setText("portalStatus", "English translation field is ready. Add the English version manually until live AI translation is configured.");
   }
 
   async function savePrivacy() {
@@ -456,6 +537,8 @@
     const media = mediaSlotDefaults(profile).filter(x => x.url).slice(0, 10);
     const heroMedia = media[0];
     const hero = heroMedia ? (heroMedia.type === "video" ? `<video src="${esc(heroMedia.url)}" muted loop playsinline autoplay></video>` : `<img src="${esc(heroMedia.url)}" alt="Profile media"/>`) : `<span>${esc(template.title)}</span>`;
+    const displayLanguage = publicProfileLanguageLabel(profile);
+    const displayBio = publicProfileBio(profile, template);
     const gallery = media.length ? `<div class="public-profile-gallery">${media.map((item, index) => {
       const mediaEl = item.type === "video" ? `<video src="${esc(item.url)}" muted loop playsinline controls></video>` : `<img src="${esc(item.url)}" alt="Profile gallery ${index + 1}"/>`;
       return `<figure>${mediaEl}<figcaption>${esc(item.caption || (item.type === "video" ? "Short video" : "Photo"))}</figcaption></figure>`;
@@ -463,9 +546,9 @@
     byId("profileTemplatePreview").innerHTML = `<article class="public-profile-card profile-${esc(profileType)}">
       <div class="public-profile-hero">${hero}</div>
       <div class="public-profile-body">
-        <p class="eyebrow">${esc(ROLE_LABELS[profileType] || "Patron")} Profile</p>
+        <p class="eyebrow">${esc(ROLE_LABELS[profileType] || "Patron")} Profile - ${esc(displayLanguage)}</p>
         <h3>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</h3>
-        <p>${esc(profile.bio || template.headline)}</p>
+        <p>${esc(displayBio)}</p>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
         <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
@@ -746,6 +829,8 @@
       ["Food Choices", joinCSV(profile.foodChoices) || "-"],
       ["Favorite Beverages", joinCSV(profile.favoriteBeverages) || "-"],
       ["Preferred Language", profile.preferredLanguage || "-"],
+      ["Public Profile Language", publicProfileLanguageLabel(profile)],
+      ["English Translation", profile.publicProfileTranslationStatus || "not prepared"],
       ["Member Level", profile.memberLevel || "Patron"],
       ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],
       ["Visibility", profile.publicProfileVisibility || "followers"]
@@ -833,6 +918,7 @@
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("portalLogoutBtn", logout);
     bind("saveProfileBtn", saveProfile);
+    bind("prepareProfileTranslationBtn", prepareProfileTranslation);
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
     bind("exportDataBtn", downloadData);
