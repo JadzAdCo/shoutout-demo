@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.62 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.63 */
 (function () {
   "use strict";
 
@@ -26,7 +26,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.62-ai-crawling-page";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.63-crawling-discovery-consolidation";
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -301,6 +301,17 @@
         {label:"Consolidated crawler report logic", file:"ai-diagnostics-service.js", includes:["consolidateCrawlRecords", "addressConflicts", "canonicalAddress"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.62-ai-crawling-page"]},
         {label:"README AI Crawling page explanation", file:"README.md", includes:["Master Admin > AI Crawling", "consolidates duplicate clubs/events"]}
+      ]
+    },
+    {
+      version: "v28.63-crawling-discovery-consolidation",
+      title: "AI Crawling + Discovery Consolidation",
+      checks: [
+        {label:"Single AI Crawling tab", file:"master-admin.html", includes:["data-panel=\"aiCrawling\"", "Review Discovery Queue"]},
+        {label:"Standalone AI Discovery tab removed", file:"master-admin.html", includes:["AI crawling controls live on the AI Crawling tab"], notIncludes:["data-panel=\"aiDiscovery\"", "id=\"aiDiscovery\""]},
+        {label:"Discovery module mounts on AI Crawling", file:"ai-discovery-service.js", includes:["byId(\"aiCrawling\")", "loadDiscoveryQueue"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.63-crawling-discovery-consolidation"]},
+        {label:"README consolidation note", file:"README.md", includes:["standalone AI Discovery tab was removed", "review/approval tools remain on AI Crawling"]}
       ]
     }
   ];
@@ -987,13 +998,18 @@
       for (const check of pkg.checks) {
         try {
           const text = await fetchPackageFile(check.file, cache);
-          const missing = check.includes.filter(token => !text.includes(token));
+          const missing = (check.includes || []).filter(token => !text.includes(token));
+          const presentButForbidden = (check.notIncludes || []).filter(token => text.includes(token));
+          const failed = missing.length || presentButForbidden.length;
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
-            status: missing.length ? "Failed" : "Pass",
-            evidence: missing.length
-              ? `${check.file} is missing: ${missing.join(", ")}`
+            status: failed ? "Failed" : "Pass",
+            evidence: failed
+              ? [
+                  missing.length ? `${check.file} is missing: ${missing.join(", ")}` : "",
+                  presentButForbidden.length ? `${check.file} still contains removed marker(s): ${presentButForbidden.join(", ")}` : ""
+                ].filter(Boolean).join(" ")
               : `${check.file} contains expected package marker(s).`
           });
         } catch (error) {
@@ -2271,8 +2287,8 @@
       ["Ticketing", "Ticketmaster/Eventbrite discovery", "Soft Fail", "Search criteria and queue records include ticketing partners; live API credentials/partnerships are not configured in frontend."],
       ["Ticketing", "Approved resale partner flow", "TBI", "Partner contracts, affiliate tracking, and resale APIs must be configured later."],
       ["Transportation", "Third-party taxi hailing integration", "TBI", "Reserved as partner integration; not connected to current app workflows."],
-      ["AI Discovery", "Discovery queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned.`],
-      ["AI Discovery", "Review/approve/reject/delete", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "AI Discovery Master Admin module loaded." : "FLOQRAIDiscovery module was not loaded."],
+      ["AI Crawling", "Discovery review queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned under the AI Crawling tab.`],
+      ["AI Crawling", "Approve/reject/delete review tools", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "Discovery review tools are mounted on the AI Crawling tab." : "FLOQRAIDiscovery module was not loaded."],
       ["AI Crawling", "Manual crawl control", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl adds reviewable records to aiDiscoveryQueue from the AI Crawling tab."],
       ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
       ["AI Crawling", "Backend scheduled internet crawler", "TBI", "Cloud Functions or Cloud Run scheduler must perform real public-source crawling 4-6 times per day."],

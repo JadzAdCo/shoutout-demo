@@ -55,7 +55,6 @@
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
-        <button class="admin-tab" data-panel="aiDiscovery" type="button">AI Discovery</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
         <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
       </nav>
@@ -128,10 +127,11 @@
         </div>
       </section>
 
-      <section id="aiDiscovery" class="admin-panel-section">
+      <section id="aiCrawling" class="admin-panel-section">
         <div class="card">
-          <h2>AI Discovery</h2>
-          <p class="sub small">Public-source crawler architecture is scaffolded for backend scheduled functions. Discovered records must be approved here before becoming live listings.</p>
+          <h2>AI Crawling</h2>
+          <p class="sub small">Configure public-source crawling, review discovered records, consolidate duplicate destinations, and prepare JSON imports for Master Admin or Club Admin review.</p>
+          <div id="aiCrawlingSummary" class="report-block"></div>
           <div id="aiDiscoverySummary" class="report-block"></div>
           <p id="aiDiscoveryStatus" class="status"></p>
         </div>
@@ -143,7 +143,7 @@
           <button id="saveAiDiscoveryCriteriaBtn" class="primary" type="button">Save Criteria</button>
         </div>
         <div class="card">
-          <h2>Discovery Queue</h2>
+          <h2>Review Discovery Queue</h2>
           <div class="profile-grid">
             <label>Status
               <select id="aiDiscoveryStatusFilter">
@@ -167,14 +167,6 @@
             <label class="consent-line"><input id="listingIncludeDeleted" type="checkbox"/> Include deleted listings</label>
           </div>
           <div id="listingDeleteResults" class="report-block"></div>
-        </div>
-      </section>
-
-      <section id="aiCrawling" class="admin-panel-section">
-        <div class="card">
-          <h2>AI Crawling</h2>
-          <p class="sub small">Configure public-source crawling, review crawler reports, consolidate duplicate destinations, and prepare JSON imports for Master Admin or Club Admin review.</p>
-          <div id="aiCrawlingSummary" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Crawler Search Criteria</h2>
@@ -293,9 +285,9 @@
 <script src="./ai-service.js?v=28.44-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-discovery-service.js?v=28.44-ai"></script>
-<script src="./ai-diagnostics-service.js?v=28.62-ai-crawling-page"></script>
-<script src="./master-admin-app.js?v=28.62-ai-crawling-page"></script>
+<script src="./ai-discovery-service.js?v=28.63-crawling-discovery-consolidation"></script>
+<script src="./ai-diagnostics-service.js?v=28.63-crawling-discovery-consolidation"></script>
+<script src="./master-admin-app.js?v=28.63-crawling-discovery-consolidation"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

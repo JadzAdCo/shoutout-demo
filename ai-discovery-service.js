@@ -315,7 +315,7 @@
   async function mountMasterAdminPanel(options = {}) {
     db = options.db || db;
     auth = options.auth || auth;
-    if (!db || !auth || !byId("aiDiscovery")) return;
+    if (!db || !auth || !byId("aiCrawling")) return;
     await ensureDiscoveryDefaults();
     byId("aiDiscoverySummary").innerHTML = simpleRows([
       ["Crawler schedule", "Backend scaffold supports every 4 hours or 4-6 runs per day"],
