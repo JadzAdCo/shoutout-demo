@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.49 Language Plan Help Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.54 App Rules Compatibility Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.49-language-plan-help
+https://jadzadco.github.io/shoutout-demo/?v=28.54-app-rules-compatibility
 ```
 
 Current release highlights:
@@ -33,6 +33,14 @@ Current release highlights:
 - Adds clearer Storage unauthorized guidance when deployed Storage rules are missing the package media paths.
 - Separates discovered-record workflow statuses from feature-health statuses.
 - Simplifies the crawler Market Language Plan explanation with a one-line format and examples.
+- Adds a clearer onboarding/profile permission message when Firestore rules block `users/{uid}` profile save.
+- Adds a Master Admin rules smoke test for the exact `users/{uid}` profile save path.
+- Protects already-onboarded users from being treated as new users when Firestore profile reads are blocked.
+- Preserves existing profile values by not writing blank onboarding fields over populated fields.
+- Preserves existing `createdAt` values by only setting `createdAt` when the user profile document does not already exist.
+- Adds a visible `FLOQR FIRESTORE RULES VERSION` note at the top of `firestore.rules` so Firebase Console rules can be checked quickly.
+- Adds a Master Admin Diagnostics rules status panel showing the expected Firestore rules version, package rules note status, latest live smoke-test result, and overall rules status.
+- Expands `Run Rules Smoke Test` into an app-wide rules compatibility diagnostic for core app collections, AI collections, Mingl/chat queries, and Storage paths required by FLOQR.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -161,11 +169,50 @@ Post-install rules testing:
 4. Open Master Admin > Diagnostics.
 5. Click `Run Package Install Diagnostics`.
 6. Click `Run Rules Smoke Test`.
-7. Confirm the smoke test creates a saved `aiDiagnosticsReports` record and shows `Pass` for the package collections and storage paths.
+7. Confirm the smoke test creates a saved `aiDiagnosticsReports` record and shows `Pass` for the app-required Firestore collections, Mingl/chat queries, and Storage paths.
 
-The rules smoke test verifies signed-in allowed operations. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
+The top of `firestore.rules` should show:
+
+```js
+// FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note
+// EXPECTED DEPLOYED RULES VERSION: v28.52-rules-version-note or newer
+```
+
+If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
+
+Master Admin > Diagnostics now also shows `Firebase Rules Smoke Test` with:
+
+- Expected Firestore rules version.
+- Current diagnostics package version.
+- Whether the installed package's `firestore.rules` file contains the expected rules-version note.
+- Whether the latest live Firestore/Storage compatibility smoke test passed.
+- Overall rules status.
+
+Because browser code cannot read Firebase Console's deployed rules text directly, the live proof is the smoke test: it attempts the same signed-in reads, writes, query patterns, and uploads the app needs.
+
+The rules smoke test verifies signed-in allowed operations for authentication/profile save, public discovery reads, ShoutOut records, guest list records, Mingl/chat participant queries, AI diagnostics/discovery/search collections, template variants, notification preferences, and Storage media paths. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
+
+If onboarding shows `Missing or insufficient permissions` while saving the profile, publish `firestore.rules` in Firebase Console > Firestore Database > Rules. The package rule must include:
+
+```js
+match /users/{userId} {
+  allow create: if isSelf(userId);
+  allow read: if signedIn();
+  allow update: if isSelf(userId);
+  allow delete: if false;
+}
+```
+
+Then open Master Admin > Diagnostics > Run Rules Smoke Test and confirm `Firestore: users/{uid} profile save path` shows `Pass`.
+
+Existing profile data safety:
+
+- If FLOQR cannot read `users/{uid}`, the user stays on the landing screen and sees a rules message. The app does not open the create-profile form.
+- If a profile already exists, onboarding save uses merge and preserves existing populated fields when the form field is blank.
+- Existing `createdAt` values are not replaced.
+- For an already registered user such as `bans.don@gmail.com`, publish the Firestore rules first, then sign in again. Do not delete or recreate their user document.
 
 `Market Language Plan` means: tell FLOQR where to search, what language to search in, which cities matter, and what to look for.
 
@@ -203,8 +250,10 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, and v28.49 package marker checks run.
-- Click Run Rules Smoke Test and confirm temporary Firestore docs and Storage images are created/read/cleaned up.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, and v28.54 package marker checks run.
+- Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
+- Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
+- Confirm `Firestore: users/{uid} profile save path` passes before testing new-user onboarding.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
 - Save a patron public profile with preferred/original language mode, then save again with English version mode and confirm the preview switches bio source.

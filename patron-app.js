@@ -29,6 +29,7 @@
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
   let cachedUserProfile = null;
+  let lastProfileReadError = null;
   let minglCandidates = [];
   let minglConnections = [];
   let activeMinglRoomId = "";
@@ -200,13 +201,15 @@
   
   async function getUserProfile() {
     if (!currentUser) return null;
+    lastProfileReadError = null;
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
       cachedUserProfile = doc.exists ? doc.data() : null;
       return cachedUserProfile;
     } catch (e) {
+      lastProfileReadError = e;
       console.warn("Could not read user profile:", e.message);
-      return null;
+      throw e;
     }
   }
 
@@ -252,6 +255,38 @@
     return String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   }
 
+  function profileSaveErrorMessage(error) {
+    const code = error?.code || "";
+    const message = error?.message || String(error || "Unknown error");
+    if (code === "permission-denied" || /missing or insufficient permissions/i.test(message)) {
+      return "Profile save was blocked by Firestore rules. Publish this package's firestore.rules and confirm users/{uid} allows the signed-in user to create/update their own profile.";
+    }
+    return message;
+  }
+
+  function profileReadErrorMessage(error) {
+    const code = error?.code || "";
+    const message = error?.message || String(error || "Unknown error");
+    if (code === "permission-denied" || /missing or insufficient permissions/i.test(message)) {
+      return "FLOQR could not read your existing profile because Firestore rules are blocking users/{uid}. Your saved profile data was not changed. Please publish this package's firestore.rules, then sign in again.";
+    }
+    return message;
+  }
+
+  function preserveExistingProfileData(updates, existing = {}) {
+    const protectedUpdates = {...updates};
+    Object.entries(protectedUpdates).forEach(([key, value]) => {
+      if (["uid", "email", "phoneNumber", "photoURL", "providerIds", "analyticsConsent", "marketingConsent", "profileCompleted", "updatedAt"].includes(key)) return;
+      const existingValue = existing[key];
+      const isBlankString = typeof value === "string" && !value.trim();
+      const isBlankArray = Array.isArray(value) && value.length === 0;
+      if ((isBlankString || isBlankArray) && existingValue !== undefined && existingValue !== null && String(existingValue).length > 0) {
+        delete protectedUpdates[key];
+      }
+    });
+    return protectedUpdates;
+  }
+
   async function saveProfile() {
     const status = byId("profileStatus");
     try {
@@ -293,16 +328,26 @@
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      await db.collection("users").doc(currentUser.uid).set({
-        ...profile,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      const profileRef = db.collection("users").doc(currentUser.uid);
+      let existingSnap;
+      try {
+        existingSnap = await profileRef.get();
+      } catch (readError) {
+        status.textContent = profileReadErrorMessage(readError);
+        return;
+      }
+      const existingProfile = existingSnap.exists ? existingSnap.data() : {};
+      const savePayload = existingSnap.exists
+        ? preserveExistingProfileData(profile, existingProfile)
+        : {...profile, createdAt: firebase.firestore.FieldValue.serverTimestamp()};
+
+      await profileRef.set(savePayload, { merge: true });
 
       status.textContent = "Profile saved.";
       await continueToMainCategories();
     } catch (e) {
       console.error(e);
-      status.textContent = e.message;
+      status.textContent = profileSaveErrorMessage(e);
     }
   }
 
@@ -321,7 +366,14 @@
     await loadEvents();
     await loadTemplateVariants();
 
-    const profile = await getUserProfile();
+    let profile = null;
+    try {
+      profile = await getUserProfile();
+    } catch (readError) {
+      setStatus(profileReadErrorMessage(readError));
+      showPage("landingPage");
+      return;
+    }
     if (!profile || !profile.profileCompleted) {
       showSignupProfile();
       return;

@@ -1,5 +1,13 @@
 rules_version = '2';
 
+// FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note
+// EXPECTED DEPLOYED RULES VERSION: v28.52-rules-version-note or newer
+// Last required Firestore rules update added/confirmed:
+// - users/{uid} self create/read/update support for onboarding and existing profiles
+// - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
+// - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
+// If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
+
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {

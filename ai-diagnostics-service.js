@@ -20,6 +20,9 @@
     TBI: "To be implemented"
   };
 
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.52-rules-version-note";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.54-app-rules-compatibility";
+
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
     "lounge",
@@ -164,6 +167,53 @@
         {label:"Plain language crawler market format", file:"master-admin.html", includes:["Use one line per market", "Country or market | language(s) to search in | cities | event or venue types"]},
         {label:"Crawler plan examples", file:"master-admin.html", includes:["Spain | Spanish, Catalan", "United Arab Emirates | Arabic, English"]}
       ]
+    },
+    {
+      version: "v28.50-profile-rules-diagnostic",
+      title: "Profile Save Permission Diagnostic",
+      checks: [
+        {label:"Profile permission helper", file:"patron-app.js", includes:["profileSaveErrorMessage", "users/{uid} allows the signed-in user"]},
+        {label:"Profile rules smoke test", file:"ai-diagnostics-service.js", includes:["ownUserProfileLifecycle", "Firestore: users/{uid} profile save path"]},
+        {label:"User profile Firestore rule", file:"firestore.rules", includes:["match /users/{userId}", "allow create: if isSelf(userId)", "allow update: if isSelf(userId)"]}
+      ]
+    },
+    {
+      version: "v28.51-profile-data-protection",
+      title: "Existing Profile Data Protection",
+      checks: [
+        {label:"Blocked profile read stays off onboarding", file:"patron-app.js", includes:["profileReadErrorMessage", "showPage(\"landingPage\")"]},
+        {label:"Existing profile blank-field protection", file:"patron-app.js", includes:["preserveExistingProfileData", "delete protectedUpdates[key]"]},
+        {label:"CreatedAt preserved for existing users", file:"patron-app.js", includes:["existingSnap.exists", "createdAt: firebase.firestore.FieldValue.serverTimestamp()"]}
+      ]
+    },
+    {
+      version: "v28.52-rules-version-note",
+      title: "Firestore Rules Version Note",
+      checks: [
+        {label:"Firestore rules version note", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note", "EXPECTED DEPLOYED RULES VERSION"]},
+        {label:"Profile rules called out in note", file:"firestore.rules", includes:["users/{uid} self create/read/update support"]},
+        {label:"Diagnostics rules called out in note", file:"firestore.rules", includes:["aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports"]}
+      ]
+    },
+    {
+      version: "v28.53-rules-diagnostics-status",
+      title: "Rules Version + Compatibility Status",
+      checks: [
+        {label:"Rules version status UI", file:"master-admin.html", includes:["rulesVersionStatus", "rules-version note"]},
+        {label:"Rules version status renderer", file:"ai-diagnostics-service.js", includes:["EXPECTED_FIRESTORE_RULES_VERSION", "renderRulesVersionStatus"]},
+        {label:"Rules diagnostics status marker", file:"ai-diagnostics-service.js", includes:["v28.53-rules-diagnostics-status", "renderRulesVersionStatus"]}
+      ]
+    },
+    {
+      version: "v28.54-app-rules-compatibility",
+      title: "Full App Rules Compatibility Diagnostics",
+      checks: [
+        {label:"Rules smoke test covers core collections", file:"ai-diagnostics-service.js", includes:["runCoreFirestoreRuleTests", "Firestore: users collection read for Mingl/profile discovery"]},
+        {label:"Rules smoke test covers AI collections", file:"ai-diagnostics-service.js", includes:["runAiFirestoreRuleTests", "Firestore: aiAssistantMessages owner lifecycle"]},
+        {label:"Rules smoke test covers Mingl/chat queries", file:"ai-diagnostics-service.js", includes:["runMinglChatRuleTests", "participants\", \"array-contains\""]},
+        {label:"Rules smoke test covers Storage paths", file:"ai-diagnostics-service.js", includes:["runStorageRuleTests", "profileMedia", "template-backgrounds"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.54-app-rules-compatibility"]}
+      ]
     }
   ];
 
@@ -277,6 +327,12 @@
     if (wrap) wrap.innerHTML = simpleRows(rows);
   }
 
+  function latestRulesSmokeReport(data = state.lastData || {}) {
+    return (data.aiDiagnosticsReports?.rows || [])
+      .filter(row => row.type === "rulesSmokeTest")
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))[0] || null;
+  }
+
   async function fetchPackageFile(file, cache = new Map()) {
     if (cache.has(file)) return cache.get(file);
     const response = await fetch(`./${file}?diagnostics=${Date.now()}`, {cache:"no-store"});
@@ -284,6 +340,40 @@
     const text = await response.text();
     cache.set(file, text);
     return text;
+  }
+
+  async function renderRulesVersionStatus(data = state.lastData || {}) {
+    const wrap = byId("rulesVersionStatus");
+    if (!wrap) return;
+    let packageRulesStatus = "Failed";
+    let packageRulesEvidence = "Could not read firestore.rules from the installed package.";
+    try {
+      const text = await fetchPackageFile("firestore.rules");
+      const hasExpected = text.includes(`FLOQR FIRESTORE RULES VERSION: ${EXPECTED_FIRESTORE_RULES_VERSION}`)
+        && text.includes(`EXPECTED DEPLOYED RULES VERSION: ${EXPECTED_FIRESTORE_RULES_VERSION}`);
+      packageRulesStatus = hasExpected ? "Pass" : "Failed";
+      packageRulesEvidence = hasExpected
+        ? `Installed firestore.rules contains expected rules note: ${EXPECTED_FIRESTORE_RULES_VERSION}.`
+        : `Installed firestore.rules does not contain expected rules note: ${EXPECTED_FIRESTORE_RULES_VERSION}.`;
+    } catch (error) {
+      packageRulesEvidence = error?.message || String(error);
+    }
+
+    const latest = latestRulesSmokeReport(data);
+    const smokeStatus = latest ? (latest.status === "Pass" ? "Pass" : "Failed") : "Soft Fail";
+    const smokeEvidence = latest
+      ? `Latest live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
+      : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
+    const overall = packageRulesStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
+
+    wrap.innerHTML = simpleRows([
+      ["Expected Firestore rules version", EXPECTED_FIRESTORE_RULES_VERSION],
+      ["Current Diagnostics package", CURRENT_DIAGNOSTICS_PACKAGE_VERSION],
+      ["Package firestore.rules note", `${packageRulesStatus}: ${packageRulesEvidence}`],
+      ["Live deployed rules compatibility", `${smokeStatus}: ${smokeEvidence}`],
+      ["Overall rules status", overall],
+      ["How this is tested", "Package note is read from firestore.rules; deployed rules are verified by live Firestore/Storage operations."]
+    ]);
   }
 
   async function runPackageInstallDiagnostics(options = {}) {
@@ -342,6 +432,26 @@
     await ref.delete();
   }
 
+  async function firestoreCollectionRead(collection, limit = 1) {
+    const snap = await state.db.collection(collection).limit(limit).get();
+    return `${collection} read/query succeeded (${snap.size} doc(s) visible to this signed-in account).`;
+  }
+
+  async function firestoreQueryRead(collection, buildQuery) {
+    const query = buildQuery(state.db.collection(collection));
+    const snap = await query.limit(1).get();
+    return `${collection} app-style query succeeded (${snap.size} doc(s) visible to this signed-in account).`;
+  }
+
+  async function ownFieldLifecycle(collection, docId, fieldName, value) {
+    const ref = state.db.collection(collection).doc(docId);
+    await ref.set({[fieldName]: value, updatedAt:fieldValue()}, {merge:true});
+    const snap = await ref.get();
+    if (!snap.exists || !snap.data()?.[fieldName]) throw new Error(`${collection}/${docId} diagnostic field was not readable after update.`);
+    await ref.set({[fieldName]:firebase.firestore.FieldValue.delete(), updatedAt:fieldValue()}, {merge:true});
+    return `${collection}/${docId} owner read/write succeeded without deleting the document.`;
+  }
+
   async function ownPreferenceLifecycle(runId, user) {
     const ref = state.db.collection("aiUserNotificationPreferences").doc(user.uid);
     await ref.set({
@@ -351,6 +461,30 @@
     const snap = await ref.get();
     if (!snap.exists) throw new Error("Own aiUserNotificationPreferences document was not readable.");
     await ref.set({diagnosticRuleTest:firebase.firestore.FieldValue.delete()}, {merge:true});
+  }
+
+  async function ownUserProfileLifecycle(runId, user) {
+    const ref = state.db.collection("users").doc(user.uid);
+    const before = await ref.get();
+    await ref.set({
+      uid:user.uid,
+      email:user.email || "",
+      diagnosticProfileRuleTest:{runId, checkedAt:new Date().toISOString()},
+      updatedAt:fieldValue(),
+      ...(before.exists ? {} : {
+        displayName:user.displayName || user.email || "Diagnostics User",
+        profileCompleted:false,
+        createdAt:fieldValue()
+      })
+    }, {merge:true});
+    const after = await ref.get();
+    if (!after.exists || after.data()?.diagnosticProfileRuleTest?.runId !== runId) {
+      throw new Error("Own users/{uid} profile document was not readable after create/update.");
+    }
+    await ref.set({diagnosticProfileRuleTest:firebase.firestore.FieldValue.delete()}, {merge:true});
+    return before.exists
+      ? "Own users/{uid} profile update/read succeeded."
+      : "Own users/{uid} profile create/read succeeded. A minimal signed-in user profile record was left in place because user document deletes are intentionally blocked.";
   }
 
   async function storageLifecycle(path) {
@@ -368,12 +502,163 @@
     }
   }
 
+  async function storageLifecycleWithBlob(path, blob, contentType) {
+    if (!state.storage) throw new Error("Firebase Storage SDK or bucket is unavailable on this page.");
+    const ref = state.storage.ref().child(path);
+    try {
+      await ref.put(blob, {contentType});
+      await ref.getDownloadURL();
+      await ref.delete();
+    } catch (error) {
+      if (error?.code === "storage/unauthorized") {
+        throw new Error(`Storage rules denied ${path}. Publish this package's storage.rules in Firebase Console > Storage > Rules, then rerun this smoke test.`);
+      }
+      throw error;
+    }
+  }
+
+  function tinyVideoBlob() {
+    return new Blob([new Uint8Array([0, 0, 0, 24, 102, 116, 121, 112, 109, 112, 52, 50])], {type:"video/mp4"});
+  }
+
+  async function runCoreFirestoreRuleTests(capture, runId, user) {
+    await capture("Firestore: users/{uid} profile save path", () => ownUserProfileLifecycle(runId, user));
+    await capture("Firestore: users collection read for Mingl/profile discovery", () => firestoreCollectionRead("users"));
+    await capture("Firestore: clubs lifecycle", () => firestoreDocLifecycle("clubs", {name:"Diagnostics Club", status:"diagnostic"}, runId));
+    await capture("Firestore: clubLocations lifecycle", () => firestoreDocLifecycle("clubLocations", {locationName:"Diagnostics Location", visibility:"public", status:"active"}, runId));
+    await capture("Firestore: events lifecycle", () => firestoreDocLifecycle("events", {title:"Diagnostics Event", active:true, status:"active"}, runId));
+    await capture("Firestore: templates lifecycle", () => firestoreDocLifecycle("templates", {name:"Diagnostics Template", visibility:"public"}, runId));
+    await capture("Firestore: shoutouts lifecycle", () => firestoreDocLifecycle("shoutouts", {
+      uid:user.uid,
+      submittedByUid:user.uid,
+      mainText:"Diagnostics ShoutOut",
+      status:"pending"
+    }, runId));
+    await capture("Firestore: liveContent lifecycle", () => firestoreDocLifecycle("liveContent", {mainText:"Diagnostics Live", status:"diagnostic"}, runId));
+    await capture("Firestore: guestListRequests lifecycle", () => firestoreDocLifecycle("guestListRequests", {
+      uid:user.uid,
+      submittedByUid:user.uid,
+      clubLocationId:"diagnostic",
+      status:"pending"
+    }, runId));
+    await capture("Firestore: messages lifecycle", () => firestoreDocLifecycle("messages", {
+      senderUid:user.uid,
+      recipientUid:user.uid,
+      subject:"Diagnostics",
+      body:"Diagnostics message",
+      read:false
+    }, runId));
+    await capture("Firestore: privacyConsents lifecycle", () => firestoreDocLifecycle("privacyConsents", {uid:user.uid, type:"diagnostic"}, runId));
+    await capture("Firestore: friendRequests lifecycle", () => firestoreDocLifecycle("friendRequests", {fromUid:user.uid, toUid:user.uid, status:"diagnostic"}, runId));
+    await capture("Firestore: friendships lifecycle", () => firestoreDocLifecycle("friendships", {participants:[user.uid], status:"diagnostic"}, runId));
+    await capture("Firestore: notifications lifecycle", () => firestoreDocLifecycle("notifications", {recipientUid:user.uid, title:"Diagnostics", read:false}, runId));
+    await capture("Firestore: roleRequests lifecycle", () => firestoreDocLifecycle("roleRequests", {uid:user.uid, requestedRole:"diagnostic", status:"pending"}, runId));
+    await capture("Firestore: clubEmployeeDesignations lifecycle", () => firestoreDocLifecycle("clubEmployeeDesignations", {workerUid:user.uid, clubLocationId:"diagnostic", isCSR:true}, runId));
+    await capture("Firestore: patronRanks lifecycle", () => firestoreDocLifecycle("patronRanks", {uid:user.uid, rank:"diagnostic"}, runId));
+    await capture("Firestore: approvedShoutOutLibrary lifecycle", () => firestoreDocLifecycle("approvedShoutOutLibrary", {mainText:"Diagnostics", visibility:"public"}, runId));
+    await capture("Firestore: translationSettings lifecycle", () => firestoreDocLifecycle("translationSettings", {language:"en", enabled:true, status:"diagnostic"}, runId));
+    await capture("Firestore: inboxNotifications lifecycle", () => firestoreDocLifecycle("inboxNotifications", {recipientUid:user.uid, title:"Diagnostics", read:false}, runId));
+    await capture("Firestore: shoutoutAudit lifecycle", () => firestoreDocLifecycle("shoutoutAudit", {actorUid:user.uid, action:"diagnostic"}, runId));
+    await capture("Firestore: djProfiles lifecycle", () => firestoreDocLifecycle("djProfiles", {uid:user.uid, visibility:"public", displayName:"Diagnostics DJ"}, runId));
+    await capture("Firestore: promoterProfiles lifecycle", () => firestoreDocLifecycle("promoterProfiles", {uid:user.uid, visibility:"public", displayName:"Diagnostics Promoter"}, runId));
+    await capture("Firestore: shoutoutRecommendations lifecycle", () => firestoreDocLifecycle("shoutoutRecommendations", {uid:user.uid, title:"Diagnostics"}, runId));
+  }
+
+  async function runAiFirestoreRuleTests(capture, runId, user) {
+    await capture("Firestore: aiIndex owner/private lifecycle", () => firestoreDocLifecycle("aiIndex", {
+      sourceType:"diagnostic",
+      sourceId:runId,
+      title:"Diagnostics Rule Test",
+      summary:"Temporary private aiIndex rule test.",
+      keywords:["diagnostic"],
+      visibility:"private",
+      ownerUid:user.uid,
+      allowedRoles:["masterAdmin"]
+    }, runId));
+    await capture("Firestore: aiUserNotificationPreferences own doc", () => ownPreferenceLifecycle(runId, user));
+    await capture("Firestore: aiUserSignals owner lifecycle", () => firestoreDocLifecycle("aiUserSignals", {uid:user.uid, type:"diagnostic"}, runId));
+    await capture("Firestore: aiSearchLogs owner lifecycle", () => firestoreDocLifecycle("aiSearchLogs", {uid:user.uid, query:"diagnostic"}, runId));
+    await capture("Firestore: aiRecommendations recipient lifecycle", () => firestoreDocLifecycle("aiRecommendations", {
+      uid:user.uid,
+      recipientUid:user.uid,
+      title:"Diagnostics Recommendation"
+    }, runId));
+    await capture("Firestore: aiDiscoverySources lifecycle", () => firestoreDocLifecycle("aiDiscoverySources", {sourceName:"Diagnostics", enabled:false}, runId));
+    await capture("Firestore: aiDiscoveryQueue lifecycle", () => firestoreDocLifecycle("aiDiscoveryQueue", {proposedTitle:"Diagnostics Discovery", status:"pendingReview"}, runId));
+    await capture("Firestore: aiDiscoveryRatingCriteria lifecycle", () => firestoreDocLifecycle("aiDiscoveryRatingCriteria", {criteriaName:"Diagnostics", active:false}, runId));
+    await capture("Firestore: aiCrawlRuns lifecycle", () => firestoreDocLifecycle("aiCrawlRuns", {
+      trigger:"diagnostic",
+      mode:"rules-smoke-test",
+      status:"completed"
+    }, runId));
+    await capture("Firestore: aiCrawlerSchedules lifecycle", () => firestoreDocLifecycle("aiCrawlerSchedules", {
+      enabled:false,
+      frequency:"manualOnly",
+      scheduleHours:[],
+      criteria:{search:"diagnostic"}
+    }, runId));
+    await capture("Firestore: aiDiagnosticsReports lifecycle", () => firestoreDocLifecycle("aiDiagnosticsReports", {
+      type:"diagnosticLifecycle",
+      status:"temporary"
+    }, runId));
+    await capture("Firestore: aiAssistantSessions owner doc", () => ownFieldLifecycle("aiAssistantSessions", user.uid, "diagnosticAssistantRuleTest", {runId}));
+    await capture("Firestore: aiAssistantMessages owner lifecycle", () => firestoreDocLifecycle("aiAssistantMessages", {uid:user.uid, body:"diagnostic"}, runId));
+    await capture("Firestore: patronTemplateVariants owner lifecycle", () => firestoreDocLifecycle("patronTemplateVariants", {
+      ownerUid:user.uid,
+      ownerDisplayName:user.displayName || user.email || "Diagnostics",
+      baseTemplateId:"diagnostic",
+      baseTemplateName:"Diagnostic",
+      variantName:"Diagnostic Rule Test",
+      backgroundType:"color",
+      backgroundColor:"#000000",
+      visibility:"private",
+      promptShared:false,
+      isPublicProfileItem:false,
+      status:"diagnostic"
+    }, runId));
+    await capture("Firestore: aiTemplatePromptHistory owner lifecycle", () => firestoreDocLifecycle("aiTemplatePromptHistory", {
+      uid:user.uid,
+      templateId:"diagnostic",
+      variantId:runId,
+      prompt:"diagnostic rule test",
+      sourceType:"rule-test",
+      visibility:"private"
+    }, runId));
+  }
+
+  async function runMinglChatRuleTests(capture, runId, user) {
+    await capture("Firestore: minglConnections participant query", () => firestoreQueryRead("minglConnections", query => query.where("participants", "array-contains", user.uid)));
+    await capture("Firestore: chatRooms participant query", () => firestoreQueryRead("chatRooms", query => query.where("participants", "array-contains", user.uid)));
+    await capture("Firestore: chatMessages participant query", () => firestoreQueryRead("chatMessages", query => query.where("participants", "array-contains", user.uid)));
+    await capture("Firestore: non-Mingl chatRooms lifecycle", () => firestoreDocLifecycle("chatRooms", {
+      type:"diagnostic",
+      participants:[user.uid],
+      title:"Diagnostics Room"
+    }, runId));
+    await capture("Firestore: non-Mingl chatMessages lifecycle", () => firestoreDocLifecycle("chatMessages", {
+      roomType:"diagnostic",
+      roomId:`${runId}-room`,
+      participants:[user.uid],
+      senderUid:user.uid,
+      body:"Diagnostics chat message"
+    }, runId));
+  }
+
+  async function runStorageRuleTests(capture, runId, user) {
+    await capture("Storage: template-backgrounds image path", () => storageLifecycle(`template-backgrounds/${user.uid}/${runId}/uploaded/rules-smoke-test.png`));
+    await capture("Storage: shoutouts original image path", () => storageLifecycle(`shoutouts/${user.uid}/${runId}/original/rules-smoke-test.png`));
+    await capture("Storage: shoutouts enhanced image path", () => storageLifecycle(`shoutouts/${user.uid}/${runId}/enhanced/rules-smoke-test.png`));
+    await capture("Storage: shoutouts trimmed video path", () => storageLifecycleWithBlob(`shoutouts/${user.uid}/${runId}/trimmed/rules-smoke-test.mp4`, tinyVideoBlob(), "video/mp4"));
+    await capture("Storage: profileMedia image path", () => storageLifecycle(`profileMedia/${user.uid}/images/rules-smoke-test.png`));
+    await capture("Storage: profileMedia video path", () => storageLifecycleWithBlob(`profileMedia/${user.uid}/videos/rules-smoke-test.mp4`, tinyVideoBlob(), "video/mp4"));
+  }
+
   async function saveRulesSmokeReport(results, overallStatus) {
     try {
       const user = state.auth?.currentUser || {};
       await state.db.collection("aiDiagnosticsReports").add({
         type:"rulesSmokeTest",
-        packageVersion:"v28.47-rules-diag",
+        packageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
         status:overallStatus,
         results:results.map(item => ({
           label:item.label,
@@ -401,62 +686,17 @@
     const results = [];
     async function capture(label, fn) {
       try {
-        await fn();
-        results.push({label, status:"Pass", evidence:"Create/read/update/delete or upload/read/delete succeeded for the signed-in user."});
+        const evidence = await fn();
+        results.push({label, status:"Pass", evidence:evidence || "Create/read/update/delete or upload/read/delete succeeded for the signed-in user."});
       } catch (error) {
         results.push({label, status:"Failed", evidence:error?.message || String(error)});
       }
     }
 
-    await capture("Firestore: aiCrawlRuns lifecycle", () => firestoreDocLifecycle("aiCrawlRuns", {
-      trigger:"diagnostic",
-      mode:"rules-smoke-test",
-      status:"completed"
-    }, runId));
-    await capture("Firestore: aiCrawlerSchedules lifecycle", () => firestoreDocLifecycle("aiCrawlerSchedules", {
-      enabled:false,
-      frequency:"manualOnly",
-      scheduleHours:[],
-      criteria:{search:"diagnostic"}
-    }, runId));
-    await capture("Firestore: aiDiagnosticsReports lifecycle", () => firestoreDocLifecycle("aiDiagnosticsReports", {
-      type:"diagnosticLifecycle",
-      status:"temporary"
-    }, runId));
-    await capture("Firestore: aiIndex owner/private lifecycle", () => firestoreDocLifecycle("aiIndex", {
-      sourceType:"diagnostic",
-      sourceId:runId,
-      title:"Diagnostics Rule Test",
-      summary:"Temporary private aiIndex rule test.",
-      keywords:["diagnostic"],
-      visibility:"private",
-      ownerUid:user.uid,
-      allowedRoles:["masterAdmin"]
-    }, runId));
-    await capture("Firestore: patronTemplateVariants owner lifecycle", () => firestoreDocLifecycle("patronTemplateVariants", {
-      ownerUid:user.uid,
-      ownerDisplayName:user.displayName || user.email || "Diagnostics",
-      baseTemplateId:"diagnostic",
-      baseTemplateName:"Diagnostic",
-      variantName:"Diagnostic Rule Test",
-      backgroundType:"color",
-      backgroundColor:"#000000",
-      visibility:"private",
-      promptShared:false,
-      isPublicProfileItem:false,
-      status:"diagnostic"
-    }, runId));
-    await capture("Firestore: aiTemplatePromptHistory owner lifecycle", () => firestoreDocLifecycle("aiTemplatePromptHistory", {
-      uid:user.uid,
-      templateId:"diagnostic",
-      variantId:runId,
-      prompt:"diagnostic rule test",
-      sourceType:"rule-test",
-      visibility:"private"
-    }, runId));
-    await capture("Firestore: aiUserNotificationPreferences own doc", () => ownPreferenceLifecycle(runId, user));
-    await capture("Storage: template-backgrounds image path", () => storageLifecycle(`template-backgrounds/${user.uid}/${runId}/uploaded/rules-smoke-test.png`));
-    await capture("Storage: shoutouts original image path", () => storageLifecycle(`shoutouts/${user.uid}/${runId}/original/rules-smoke-test.png`));
+    await runCoreFirestoreRuleTests(capture, runId, user);
+    await runAiFirestoreRuleTests(capture, runId, user);
+    await runMinglChatRuleTests(capture, runId, user);
+    await runStorageRuleTests(capture, runId, user);
 
     const failed = results.filter(item => item.status === "Failed").length;
     const overallStatus = failed ? "Failed" : "Pass";
@@ -468,6 +708,7 @@
     ]);
     renderCheckCards("rulesSmokeTestReport", results);
     await refreshDiagnostics();
+    await renderRulesVersionStatus(state.lastData);
     setText("diagnosticsStatus", failed ? `Rules smoke test found ${failed} failed checks.` : "Rules smoke test passed and report was saved.");
     return results;
   }
@@ -713,10 +954,7 @@
     const scheduleRows = data.aiCrawlerSchedules?.rows || [];
     const crawlRuns = data.aiCrawlRuns?.rows || [];
     const discoveryQueue = data.aiDiscoveryQueue?.rows || [];
-    const diagnosticsReports = data.aiDiagnosticsReports?.rows || [];
-    const latestRulesReport = diagnosticsReports
-      .filter(row => row.type === "rulesSmokeTest")
-      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))[0];
+    const latestRulesReport = latestRulesSmokeReport(data);
     const hasSearch = !!window.floqrSearch;
     const hasDiscovery = !!window.FLOQRAIDiscovery;
 
@@ -863,6 +1101,7 @@
     if (schedule) applyScheduleToControls(schedule);
     const features = buildFeatureDiagnostics(data);
     renderFeatureDiagnostics(features);
+    await renderRulesVersionStatus(data);
     renderCrawlActivity(data, schedule);
     renderCollectedRecords(data);
     renderAnalyticsInsights(data);
