@@ -1290,6 +1290,7 @@
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
         originalMediaUrl: uploadedMedia.originalMediaUrl || uploadedMedia.mediaUrl || existingMediaUrl,
         enhancedMediaUrl: uploadedMedia.enhancedMediaUrl || "",
+        trimmedMediaUrl: uploadedMedia.trimmedMediaUrl || "",
         selectedMediaVersion: uploadedMedia.selectedMediaVersion || "original",
         aiEnhancementApplied: !!uploadedMedia.aiEnhancementApplied,
         aiEnhancementType: uploadedMedia.aiEnhancementType || "none",
@@ -1298,6 +1299,9 @@
         trimmedDuration: uploadedMedia.trimmedDuration || null,
         trimStart: uploadedMedia.trimStart || null,
         trimEnd: uploadedMedia.trimEnd || null,
+        trimProcessingMode: uploadedMedia.trimProcessingMode || "",
+        trimWarning: uploadedMedia.trimWarning || "",
+        originalMediaUploaded: uploadedMedia.originalMediaUploaded !== false,
         aiMediaSafetyStatus: uploadedMedia.aiMediaSafetyStatus || "notChecked",
         aiMediaSafetyNotes: uploadedMedia.aiMediaSafetyNotes || "",
         mediaUploadedAt: uploadedMedia.mediaUploadedAt || null

@@ -1,4 +1,4 @@
-/* FLOQR ShoutOut media AI readiness: filters, safety metadata, 7-second video guard. */
+/* FLOQR ShoutOut media AI readiness: filters, safety metadata, first-7-second video trim. */
 (function () {
   "use strict";
 
@@ -20,6 +20,8 @@
   let currentDuration = 0;
   let safetyStatus = "notChecked";
   let safetyNotes = "";
+  let trimProcessingMode = "";
+  let trimWarning = "";
   let wrappedUpload = false;
 
   function editor() {
@@ -37,6 +39,11 @@
   function setPanelStatus(value) {
     const el = byId("aiMediaStatus");
     if (el) el.textContent = value || "";
+  }
+
+  function setHidden(id, value) {
+    const el = byId(id);
+    if (el) el.value = value == null ? "" : String(value);
   }
 
   function ensurePanel() {
@@ -75,46 +82,106 @@
     });
   }
 
+  function selectedFile() {
+    const input = mediaInput();
+    return input?.files?.[0] || null;
+  }
+
+  function isSelectedLongVideo() {
+    const file = selectedFile();
+    return !!file && file.type.startsWith("video/") && Number(currentDuration || 0) > MAX_VIDEO_SECONDS;
+  }
+
+  function markTrimmed(duration, options = {}) {
+    const trimEnd = Math.min(Number(duration || currentDuration || MAX_VIDEO_SECONDS), MAX_VIDEO_SECONDS);
+    setHidden("aiSelectedMediaVersion", "trimmed");
+    setHidden("aiEnhancementType", "trim");
+    setHidden("aiEnhancementPrompt", options.prompt || "Trim Video to 7 Seconds");
+    setHidden("aiOriginalDuration", duration || currentDuration || "");
+    setHidden("aiTrimStart", 0);
+    setHidden("aiTrimEnd", trimEnd);
+    setHidden("aiTrimmedDuration", trimEnd);
+    safetyStatus = "passed";
+    safetyNotes = options.notes || "Video will use only the first 7 seconds.";
+    trimProcessingMode = options.mode || trimProcessingMode || "metadata-pending";
+    trimWarning = options.warning || "This video is longer than 7 seconds. FLOQR will use only the first 7 seconds.";
+    enforcePreviewTrimPlayback();
+    setPanelStatus(trimWarning);
+  }
+
   function applyFilter(key) {
     selectedFilter = FILTERS[key] ? key : "original";
     const media = previewMediaEl();
     if (media) media.style.filter = FILTERS[selectedFilter].css;
-    byId("aiEnhancementType").value = FILTERS[selectedFilter].type;
-    byId("aiEnhancementPrompt").value = FILTERS[selectedFilter].label;
-    byId("aiSelectedMediaVersion").value = selectedFilter === "original" ? "original" : "enhanced";
+    if (isSelectedLongVideo()) {
+      markTrimmed(currentDuration, {
+        prompt: `${FILTERS[selectedFilter].label}; Trim Video to 7 Seconds`,
+        notes: "Video exceeded 7 seconds; first 7 seconds selected for trim.",
+        mode: trimProcessingMode || "metadata-pending"
+      });
+      return;
+    }
+    setHidden("aiEnhancementType", FILTERS[selectedFilter].type);
+    setHidden("aiEnhancementPrompt", FILTERS[selectedFilter].label);
+    setHidden("aiSelectedMediaVersion", selectedFilter === "original" ? "original" : "enhanced");
     setPanelStatus(selectedFilter === "original" ? "Original media selected." : `${FILTERS[selectedFilter].label} preview applied. The original file will be uploaded with enhancement metadata.`);
   }
 
   function setSelectedVersion(version) {
-    byId("aiSelectedMediaVersion").value = version === "enhanced" ? "enhanced" : "original";
+    if (isSelectedLongVideo()) {
+      markTrimmed(currentDuration, {
+        notes: "Video exceeded 7 seconds; full original playback is not allowed for ShoutOut display.",
+        mode: trimProcessingMode || "metadata-pending"
+      });
+      return;
+    }
+    setHidden("aiSelectedMediaVersion", version === "enhanced" ? "enhanced" : "original");
     setPanelStatus(version === "enhanced" ? "Enhanced preview selected. Metadata will be saved with the ShoutOut." : "Original media selected.");
   }
 
   function trimVideoMetadataOnly() {
-    const input = mediaInput();
-    const file = input?.files?.[0];
+    const file = selectedFile();
     if (!file || !file.type.startsWith("video/")) {
       setPanelStatus("Choose a video before trimming.");
       return;
     }
-    if (currentDuration > MAX_VIDEO_SECONDS) {
-      setPanelStatus("Please upload a video that is 7 seconds or shorter.");
-      return;
-    }
-    byId("aiSelectedMediaVersion").value = "trimmed";
-    byId("aiEnhancementType").value = "trim";
-    byId("aiTrimStart").value = "0";
-    byId("aiTrimEnd").value = String(Math.min(currentDuration || MAX_VIDEO_SECONDS, MAX_VIDEO_SECONDS));
-    byId("aiTrimmedDuration").value = String(Math.min(currentDuration || MAX_VIDEO_SECONDS, MAX_VIDEO_SECONDS));
-    setPanelStatus("Video is within 7 seconds. Trim metadata is ready.");
+    markTrimmed(currentDuration || MAX_VIDEO_SECONDS, {
+      notes: currentDuration > MAX_VIDEO_SECONDS
+        ? "Video exceeded 7 seconds; first 7 seconds selected for trim."
+        : "Video is within 7 seconds; trim metadata is ready.",
+      mode: currentDuration > MAX_VIDEO_SECONDS ? "metadata-pending" : "metadata-only",
+      warning: currentDuration > MAX_VIDEO_SECONDS
+        ? "Warning: this video is longer than 7 seconds. FLOQR will cut and use only the first 7 seconds."
+        : "Video is within 7 seconds. Trim metadata is ready."
+    });
+  }
+
+  function enforcePreviewTrimPlayback() {
+    const media = previewMediaEl();
+    if (!media || media.tagName !== "VIDEO") return;
+    const end = Number(byId("aiTrimEnd")?.value || 0);
+    if (!end || media.dataset.floqrTrimBound === "1") return;
+    media.dataset.floqrTrimBound = "1";
+    const start = Number(byId("aiTrimStart")?.value || 0);
+    const loopTrim = () => {
+      if (media.currentTime < start || media.currentTime >= end) {
+        try { media.currentTime = start; } catch (e) {}
+        media.play?.().catch(() => {});
+      }
+    };
+    media.addEventListener("loadedmetadata", () => {
+      try { media.currentTime = start; } catch (e) {}
+    });
+    media.addEventListener("timeupdate", loopTrim);
   }
 
   function inspectSelectedMedia() {
-    const input = mediaInput();
-    const file = input?.files?.[0];
+    const file = selectedFile();
     if (!file) return;
     safetyStatus = "passed";
     safetyNotes = "Browser checks passed. AI moderation is scaffolded for backend processing.";
+    trimProcessingMode = "";
+    trimWarning = "";
     if (!/^image\//.test(file.type) && !/^video\//.test(file.type)) {
       safetyStatus = "flagged";
       safetyNotes = "Unsupported file type.";
@@ -128,15 +195,21 @@
       video.onloadedmetadata = () => {
         currentDuration = Number(video.duration || 0);
         URL.revokeObjectURL(url);
-        byId("aiOriginalDuration").value = String(currentDuration || "");
-        byId("aiTrimEnd").value = String(Math.min(currentDuration || MAX_VIDEO_SECONDS, MAX_VIDEO_SECONDS));
+        setHidden("aiOriginalDuration", currentDuration || "");
+        setHidden("aiTrimEnd", Math.min(currentDuration || MAX_VIDEO_SECONDS, MAX_VIDEO_SECONDS));
         if (currentDuration > MAX_VIDEO_SECONDS) {
-          safetyStatus = "flagged";
-          safetyNotes = "Video is longer than 7 seconds.";
-          setPanelStatus("Please upload a video that is 7 seconds or shorter.");
+          markTrimmed(currentDuration, {
+            notes: "Video exceeded 7 seconds; first 7 seconds selected for trim.",
+            mode: "metadata-pending",
+            warning: `Warning: video is ${currentDuration.toFixed(1)} seconds. FLOQR will cut and use only the first 7 seconds.`
+          });
         } else {
           setPanelStatus(`Video duration ${currentDuration.toFixed(1)}s. Ready.`);
         }
+      };
+      video.onerror = () => {
+        URL.revokeObjectURL(url);
+        setPanelStatus("Video metadata could not be read. FLOQR will attempt safe upload metadata.");
       };
       video.src = url;
     } else {
@@ -166,9 +239,86 @@
     });
   }
 
+  function chooseRecordingMimeType() {
+    const options = [
+      "video/webm;codecs=vp9",
+      "video/webm;codecs=vp8",
+      "video/webm"
+    ];
+    return options.find(type => window.MediaRecorder?.isTypeSupported?.(type)) || "";
+  }
+
+  function waitForEvent(target, eventName, timeoutMs = 4000) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`${eventName} timed out`));
+      }, timeoutMs);
+      const cleanup = () => {
+        clearTimeout(timer);
+        target.removeEventListener(eventName, onEvent);
+        target.removeEventListener("error", onError);
+      };
+      const onEvent = event => {
+        cleanup();
+        resolve(event);
+      };
+      const onError = () => {
+        cleanup();
+        reject(new Error(`${eventName} failed`));
+      };
+      target.addEventListener(eventName, onEvent, {once:true});
+      target.addEventListener("error", onError, {once:true});
+    });
+  }
+
+  async function trimVideoToFirstSevenSeconds(file) {
+    if (!file || !file.type.startsWith("video/") || !window.MediaRecorder) return null;
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.preload = "auto";
+    video.muted = true;
+    video.playsInline = true;
+    video.src = url;
+    try {
+      await waitForEvent(video, "loadedmetadata");
+      if (video.currentTime !== 0) {
+        video.currentTime = 0;
+        await waitForEvent(video, "seeked", 2000);
+      }
+      const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream ? video.mozCaptureStream() : null;
+      const mimeType = chooseRecordingMimeType();
+      if (!stream || !mimeType) throw new Error("Browser video recording is not available.");
+      const chunks = [];
+      const recorder = new MediaRecorder(stream, {mimeType});
+      recorder.ondataavailable = event => {
+        if (event.data && event.data.size) chunks.push(event.data);
+      };
+      const stopped = waitForEvent(recorder, "stop", MAX_VIDEO_SECONDS * 1000 + 4000);
+      recorder.start();
+      await video.play();
+      await new Promise(resolve => setTimeout(resolve, MAX_VIDEO_SECONDS * 1000));
+      video.pause();
+      if (recorder.state !== "inactive") recorder.stop();
+      await stopped;
+      const blob = new Blob(chunks, {type:mimeType});
+      if (!blob.size) throw new Error("Trimmed video output was empty.");
+      const base = String(file.name || "shoutout-video").replace(/\.[a-z0-9]+$/i, "");
+      return {
+        blob,
+        mimeType,
+        fileName:`${base}-first-7-seconds.webm`
+      };
+    } catch (error) {
+      console.warn("FLOQR client video trim unavailable:", error.message);
+      return null;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
   function metadata() {
-    const input = mediaInput();
-    const file = input?.files?.[0];
+    const file = selectedFile();
     const selectedVersion = byId("aiSelectedMediaVersion")?.value || "original";
     const enhancementType = byId("aiEnhancementType")?.value || "none";
     return {
@@ -182,24 +332,78 @@
       trimEnd:Number(byId("aiTrimEnd")?.value || 0) || null,
       aiMediaSafetyStatus:safetyStatus,
       aiMediaSafetyNotes:safetyNotes,
+      trimProcessingMode,
+      trimWarning,
       mediaUploadedAt:window.firebase?.firestore?.FieldValue ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
       _fileType:file?.type || "",
       _fileDuration:currentDuration
     };
   }
 
-  async function validateBeforeUpload() {
-    const input = mediaInput();
-    const file = input?.files?.[0];
+  async function prepareBeforeUpload() {
+    const file = selectedFile();
     if (!file) return;
     if (file.type.startsWith("video/") && !currentDuration) {
       currentDuration = await readVideoDuration(file);
-      const originalDuration = byId("aiOriginalDuration");
-      if (originalDuration) originalDuration.value = String(currentDuration || "");
+      setHidden("aiOriginalDuration", currentDuration || "");
     }
     if (file.type.startsWith("video/") && currentDuration > MAX_VIDEO_SECONDS) {
-      throw new Error("Please upload a video that is 7 seconds or shorter.");
+      markTrimmed(currentDuration, {
+        notes: "Video exceeded 7 seconds; first 7 seconds selected for trim.",
+        mode: "metadata-pending",
+        warning: `Warning: video is ${currentDuration.toFixed(1)} seconds. FLOQR will cut and use only the first 7 seconds.`
+      });
     }
+  }
+
+  async function uploadBlob(referenceNumber, blob, fileName, contentType) {
+    if (!firebase.storage) {
+      alert("Firebase Storage SDK is not loaded.");
+      return {mediaUrl:"", mediaType:""};
+    }
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error("Please sign in before uploading media.");
+    const safeName = `${referenceNumber || Date.now()}-${fileName || "trimmed-video.webm"}`.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const storagePath = `shoutouts/${user.uid}/${referenceNumber || Date.now()}/trimmed/${safeName}`;
+    const ref = firebase.storage().ref().child(storagePath);
+    await ref.put(blob, {contentType:contentType || blob.type || "video/webm"});
+    const mediaUrl = await ref.getDownloadURL();
+    const mediaUrlInput = byId("shoutoutMediaUrl");
+    const mediaTypeInput = byId("shoutoutMediaType");
+    if (mediaUrlInput) mediaUrlInput.value = mediaUrl;
+    if (mediaTypeInput) mediaTypeInput.value = "video";
+    return {
+      mediaUrl,
+      mediaType:"video",
+      mediaFileName:fileName || safeName,
+      mediaStoragePath:storagePath,
+      mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  function decorateResult(result, overrides = {}) {
+    const meta = metadata();
+    if (!result || !result.mediaUrl) return result;
+    const trimmed = meta.selectedMediaVersion === "trimmed";
+    return {
+      ...result,
+      originalMediaUrl: trimmed ? (overrides.originalMediaUrl || "") : result.mediaUrl,
+      enhancedMediaUrl: meta.selectedMediaVersion === "enhanced" ? result.mediaUrl : "",
+      trimmedMediaUrl: trimmed ? result.mediaUrl : "",
+      selectedMediaVersion: meta.selectedMediaVersion,
+      aiEnhancementApplied: meta.aiEnhancementApplied,
+      aiEnhancementType: meta.aiEnhancementType,
+      aiEnhancementPrompt: meta.aiEnhancementPrompt,
+      originalDuration: meta.originalDuration,
+      trimmedDuration: meta.trimmedDuration,
+      trimStart: meta.trimStart,
+      trimEnd: meta.trimEnd,
+      aiMediaSafetyStatus: meta.aiMediaSafetyStatus,
+      aiMediaSafetyNotes: meta.aiMediaSafetyNotes,
+      trimProcessingMode: overrides.trimProcessingMode || meta.trimProcessingMode,
+      trimWarning: overrides.trimWarning || meta.trimWarning,
+      originalMediaUploaded: overrides.originalMediaUploaded !== undefined ? overrides.originalMediaUploaded : !trimmed
+    };
   }
 
   function wrapUpload() {
@@ -207,25 +411,33 @@
     wrappedUpload = true;
     const original = window.jadzUploadSelectedShoutoutMedia;
     window.jadzUploadSelectedShoutoutMedia = async function floqrAiMediaUpload(referenceNumber) {
-      await validateBeforeUpload();
+      await prepareBeforeUpload();
+      const file = selectedFile();
+      if (file?.type?.startsWith("video/") && currentDuration > MAX_VIDEO_SECONDS) {
+        setPanelStatus("Creating a first-7-second video cut...");
+        const trimmed = await trimVideoToFirstSevenSeconds(file);
+        if (trimmed?.blob) {
+          trimProcessingMode = "client-side-webm";
+          trimWarning = "Video was longer than 7 seconds. FLOQR uploaded a first-7-second trimmed version.";
+          setPanelStatus(trimWarning);
+          const result = await uploadBlob(referenceNumber, trimmed.blob, trimmed.fileName, trimmed.mimeType);
+          return decorateResult(result, {
+            trimProcessingMode,
+            trimWarning,
+            originalMediaUploaded:false
+          });
+        }
+        trimProcessingMode = "metadata-display-only";
+        trimWarning = "Video was longer than 7 seconds. Browser trimming was unavailable, so FLOQR will display only the first 7 seconds. Configure backend AI/video trimming for a permanent file cut.";
+        safetyNotes = trimWarning;
+        setPanelStatus(trimWarning);
+      }
       const result = await original(referenceNumber);
-      const meta = metadata();
-      if (!result || !result.mediaUrl) return result;
-      return {
-        ...result,
-        originalMediaUrl: result.mediaUrl,
-        enhancedMediaUrl: meta.selectedMediaVersion === "enhanced" ? result.mediaUrl : "",
-        selectedMediaVersion: meta.selectedMediaVersion,
-        aiEnhancementApplied: meta.aiEnhancementApplied,
-        aiEnhancementType: meta.aiEnhancementType,
-        aiEnhancementPrompt: meta.aiEnhancementPrompt,
-        originalDuration: meta.originalDuration,
-        trimmedDuration: meta.trimmedDuration,
-        trimStart: meta.trimStart,
-        trimEnd: meta.trimEnd,
-        aiMediaSafetyStatus: meta.aiMediaSafetyStatus,
-        aiMediaSafetyNotes: meta.aiMediaSafetyNotes
-      };
+      return decorateResult(result, {
+        trimProcessingMode,
+        trimWarning,
+        originalMediaUploaded:!(file?.type?.startsWith("video/") && currentDuration > MAX_VIDEO_SECONDS)
+      });
     };
   }
 
@@ -236,6 +448,15 @@
     input.addEventListener("change", () => {
       currentDuration = 0;
       selectedFilter = "original";
+      trimProcessingMode = "";
+      trimWarning = "";
+      setHidden("aiSelectedMediaVersion", "original");
+      setHidden("aiEnhancementType", "none");
+      setHidden("aiEnhancementPrompt", "");
+      setHidden("aiOriginalDuration", "");
+      setHidden("aiTrimmedDuration", "");
+      setHidden("aiTrimStart", 0);
+      setHidden("aiTrimEnd", "");
       setTimeout(() => {
         inspectSelectedMedia();
         applyFilter("original");
@@ -255,7 +476,8 @@
     MAX_VIDEO_SECONDS,
     FILTERS,
     getSelectedMediaMetadata:metadata,
-    validateBeforeUpload
+    validateBeforeUpload:prepareBeforeUpload,
+    trimVideoToFirstSevenSeconds
   };
   document.addEventListener("DOMContentLoaded", boot);
 })();

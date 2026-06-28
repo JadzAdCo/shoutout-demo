@@ -82,6 +82,23 @@
     return `--fit-size:clamp(38px,${vw}vw,${maxPx}px)`;
   }
 
+  function enforceTrimmedVideoPlayback(video, data = {}) {
+    if (!video || data.selectedMediaVersion !== "trimmed") return;
+    const start = Number(data.trimStart || 0);
+    const end = Number(data.trimEnd || data.trimmedDuration || 7);
+    if (!end || end <= start) return;
+    const loopTrim = () => {
+      if (video.currentTime < start || video.currentTime >= end) {
+        try { video.currentTime = start; } catch (e) {}
+        video.play?.().catch(() => {});
+      }
+    };
+    video.addEventListener("loadedmetadata", () => {
+      try { video.currentTime = start; } catch (e) {}
+    });
+    video.addEventListener("timeupdate", loopTrim);
+  }
+
   function render(data) {
     const templateId = data.template || "neon";
     const t = templates[templateId] || templates.neon || {};
@@ -118,6 +135,7 @@
       if (mediaUrl) {
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
+        if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
@@ -158,5 +176,10 @@ window.jadzRenderDisplayMedia=function(data){
  let host=byId("mediaHost")||byId("displayMedia")||document.querySelector(".display-media");
  if(!host){host=document.createElement("div");host.id="mediaHost";host.className="display-media";document.body.appendChild(host);}
  host.innerHTML=data.mediaType==="video"?`<video src="${data.mediaUrl}" autoplay muted loop playsinline style="max-width:100%;max-height:80vh;border-radius:18px;"></video>`:`<img src="${data.mediaUrl}" alt="" style="max-width:100%;max-height:80vh;border-radius:18px;">`;
+ const video=host.querySelector("video");
+ if(video&&data.selectedMediaVersion==="trimmed"){
+  const start=Number(data.trimStart||0),end=Number(data.trimEnd||data.trimmedDuration||7);
+  video.addEventListener("timeupdate",function(){if(video.currentTime<start||video.currentTime>=end){try{video.currentTime=start;}catch(e){} video.play&&video.play().catch(function(){});}});
+ }
 };
 })();

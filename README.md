@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.45 Diagnostics + AI Discovery Controls Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.46 Diagnostics + Video Trim Correction Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.45-diagnostics
+https://jadzadco.github.io/shoutout-demo/?v=28.46-video-trim
 ```
 
 Current release highlights:
@@ -22,7 +22,7 @@ Current release highlights:
 - Adds patron-created ShoutOut template variants. Official/admin template layout stays locked; patrons can customize only the background.
 - Adds template gallery sections: Official FLOQR Templates, My Saved Templates, and Community Templates.
 - Adds FLOQR Studio / Design Background with AI UI. Live image generation is not configured yet, so it uses safe placeholder behavior and does not expose API keys.
-- Adds ShoutOut media AI readiness: browser filter previews, enhancement metadata, AI-ready moderation fields, and 7-second video enforcement.
+- Adds ShoutOut media AI readiness: browser filter previews, enhancement metadata, AI-ready moderation fields, and first-7-second video trim behavior with user warnings.
 - Adds Super Admin AI Discovery scaffold for public event/venue discovery review, rating criteria, approve/reject/delete/duplicate actions, and soft delete/restore for `clubLocations` and `events`.
 - Adds Master Admin Settings > Diagnostics with app-wide feature status, crawler controls, crawl reports, collected-record analytics, and status labels: Pass, Soft Fail, Failed, and TBI.
 - Adds crawler search criteria for rooftop lounges, rooftop bars, comedy shows, Latin and Arabic music, DJs, Ticketmaster/Eventbrite/resale ticket discovery, Dubai, Istanbul, Singapore, Thailand, Shanghai, and Western European market/language searches.
@@ -43,7 +43,7 @@ Live in this package:
 - Patron template variants with locked base template layouts.
 - FLOQR Studio UI with safe background values.
 - ShoutOut copy improvement fallback.
-- ShoutOut media enhancement preview metadata.
+- ShoutOut media enhancement preview metadata and first-7-second video trim metadata.
 - Super Admin AI Discovery review and listing soft-delete UI.
 - Master Admin Diagnostics feature matrix, crawler controls, crawl activity report, collected-record analytics, and manual crawl queue seeding.
 - Public profile language mode and English translation metadata in Settings.
@@ -54,7 +54,7 @@ Scaffolded for later Firebase AI / Gemini configuration:
 - Gemini media understanding and moderation notes.
 - AI background image generation/modification.
 - Scheduled crawler execution through Firebase Cloud Functions or Cloud Run.
-- Backend video trimming with ffmpeg.
+- Backend video trimming with ffmpeg or approved AI/video processor for browsers that cannot create a client-side trim.
 - Email/SMS notification delivery.
 - Live AI translation of public profile text.
 
@@ -83,12 +83,12 @@ template-backgrounds/{uid}/{variantId}/generated/
 
 ## Media AI Workflow
 
-The ShoutOut editor has an AI Media Enhancement panel with browser-only filter previews: Bright, Contrast, Neon, VIP Gold, Club Ready, Black & White, and Warm. The original file is still uploaded unless a future backend processor returns an enhanced asset.
+The ShoutOut editor has an AI Media Enhancement panel with browser-only filter previews: Bright, Contrast, Neon, VIP Gold, Club Ready, Black & White, and Warm. The original file is still uploaded for photos and videos that are already 7 seconds or shorter unless a future backend processor returns an enhanced asset.
 
-Videos must be 7 seconds or shorter. Longer videos are blocked with:
+Videos longer than 7 seconds are not blocked. The user is warned, FLOQR selects only the first 7 seconds, and the app attempts to create a trimmed browser-side WebM upload under the `trimmed/` path. If the browser cannot create the cut, the app still saves trim metadata and the display renderer loops only the first 7 seconds. Backend AI/video trimming should later replace this fallback for permanent server-side cuts.
 
 ```text
-Please upload a video that is 7 seconds or shorter.
+Warning: this video is longer than 7 seconds. FLOQR will cut and use only the first 7 seconds.
 ```
 
 Storage paths:
@@ -99,7 +99,7 @@ shoutouts/{uid}/{referenceOrId}/enhanced/{fileName}
 shoutouts/{uid}/{referenceOrId}/trimmed/{fileName}
 ```
 
-Firestore ShoutOut records now support selected/original/enhanced media fields, trim metadata, enhancement metadata, safety status, and safety notes.
+Firestore ShoutOut records now support selected/original/enhanced/trimmed media fields, trim metadata, trim processing mode, enhancement metadata, safety status, and safety notes.
 
 ## AI Discovery Workflow
 
@@ -143,6 +143,8 @@ When live AI translation is configured later, it must run through Firebase AI Lo
 
 New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
 
+The v28.45 Diagnostics package changed Firestore rules for `aiCrawlRuns`, `aiCrawlerSchedules`, and `aiDiagnosticsReports`. Firebase Storage rules did not change for v28.45 Diagnostics or this video-trim correction.
+
 Rollback plan:
 
 1. Set all FLOQR AI flags in `shared-data.js` to false.
@@ -159,7 +161,7 @@ Test plan:
 - Create a private ShoutOut template variant and confirm it appears only under My ShoutOut Templates.
 - Create a public variant and confirm it appears in Community Templates and Public Sharing.
 - Upload a photo and preview media filters.
-- Try a video longer than 7 seconds and confirm it is blocked.
+- Try a video longer than 7 seconds and confirm the user is warned, the first 7 seconds are selected, trim metadata is saved, and the display loops only that first 7-second window.
 - Submit a text-only ShoutOut and a media ShoutOut.
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
