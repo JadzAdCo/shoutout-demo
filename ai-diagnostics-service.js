@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.60 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.62 */
 (function () {
   "use strict";
 
@@ -26,7 +26,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.60-optional-mingl-query-guidance";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.62-ai-crawling-page";
+  // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -278,6 +279,29 @@
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.60-optional-mingl-query-guidance"]},
         {label:"README optional Mingl explanation", file:"README.md", includes:["optional compatibility check", "Do not loosen Firestore rules broadly"]}
       ]
+    },
+    {
+      version: "v28.61-crawler-profile-import",
+      title: "AI Crawler Profile Import",
+      checks: [
+        {label:"Crawler profile import card", file:"master-admin.html", includes:["AI Crawler Profile Import", "clubProfileImportJson", "saveClubProfileImportDraftsBtn"]},
+        {label:"Club profile backfill action", file:"ai-diagnostics-service.js", includes:["backfillClubProfileFields", "Backfill Missing Club Profile Fields"]},
+        {label:"Crawler JSON generator", file:"ai-diagnostics-service.js", includes:["generateCrawlerProfileJson", "profile-import-draft", "clubAdminImportUrl"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.61-crawler-profile-import"]},
+        {label:"Club admin import link loader", file:"admin-app.js", includes:["profileImportDraft", "applyProfileImportDraftToForm"]},
+        {label:"README crawler import explanation", file:"README.md", includes:["AI Crawler Profile Import", "Club Admin import link"]}
+      ]
+    },
+    {
+      version: "v28.62-ai-crawling-page",
+      title: "AI Crawling Page + Consolidated Reports",
+      checks: [
+        {label:"AI Crawling master tab", file:"master-admin.html", includes:["data-panel=\"aiCrawling\"", "Consolidated Discovery Records"]},
+        {label:"Diagnostics separated from crawler UI", file:"master-admin.html", includes:["AI crawling controls live on the AI Crawling tab", "id=\"diagnostics\""]},
+        {label:"Consolidated crawler report logic", file:"ai-diagnostics-service.js", includes:["consolidateCrawlRecords", "addressConflicts", "canonicalAddress"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.62-ai-crawling-page"]},
+        {label:"README AI Crawling page explanation", file:"README.md", includes:["Master Admin > AI Crawling", "consolidates duplicate clubs/events"]}
+      ]
     }
   ];
 
@@ -354,6 +378,104 @@
       .slice(0, limit)
       .map(([key, value]) => `${key} (${value})`)
       .join(", ") || "Not enough data yet";
+  }
+
+  function proposedFamily(item = {}) {
+    const draftCollection = item.profileImport?.targetCollection || item.targetCollection || "";
+    const text = normalized(`${draftCollection} ${item.proposedType || ""} ${item.targetType || ""}`);
+    if (text.includes("event")) return "event";
+    return "club";
+  }
+
+  function destinationName(item = {}) {
+    return item.profileImport?.displayName ||
+      item.profileImport?.proposedLocationName ||
+      item.proposedLocationName ||
+      item.locationName ||
+      item.proposedTitle ||
+      item.title ||
+      item.eventName ||
+      item.id ||
+      "Unknown destination";
+  }
+
+  function destinationCity(item = {}) {
+    return item.profileImport?.publicProfile?.city || item.city || "";
+  }
+
+  function destinationCountry(item = {}) {
+    return item.profileImport?.publicProfile?.country || item.country || "";
+  }
+
+  function destinationAddress(item = {}) {
+    return item.profileImport?.publicProfile?.address ||
+      item.proposedAddress ||
+      item.address ||
+      "";
+  }
+
+  function destinationKey(item = {}) {
+    return [
+      proposedFamily(item),
+      normalized(destinationName(item)),
+      normalized(destinationCity(item)),
+      normalized(destinationCountry(item))
+    ].join("|");
+  }
+
+  function consolidateCrawlRecords(records = []) {
+    const map = new Map();
+    records.forEach(item => {
+      const key = destinationKey(item);
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          family: proposedFamily(item),
+          name: destinationName(item),
+          city: destinationCity(item),
+          country: destinationCountry(item),
+          items: [],
+          addresses: new Map(),
+          statuses: new Set(),
+          sources: new Set(),
+          genres: new Set(),
+          maxStar: 0,
+          maxConfidence: 0
+        });
+      }
+      const group = map.get(key);
+      group.items.push(item);
+      group.statuses.add(item.status || "unknown");
+      group.sources.add(item.sourceName || item.profileImport?.sourceName || "unknown");
+      splitList(item.genres || item.extractedTags || item.categories).forEach(value => group.genres.add(value));
+      group.maxStar = Math.max(group.maxStar, Number(item.aiStarRating || 0));
+      group.maxConfidence = Math.max(group.maxConfidence, Number(item.aiConfidenceScore || 0));
+      const address = String(destinationAddress(item) || "").trim();
+      const addressKey = normalized(address);
+      if (addressKey) {
+        const current = group.addresses.get(addressKey) || {address, count:0, sources:new Set()};
+        current.count += 1;
+        current.sources.add(item.sourceName || "unknown");
+        group.addresses.set(addressKey, current);
+      }
+    });
+    return Array.from(map.values()).map(group => {
+      const addressRows = Array.from(group.addresses.values()).sort((a, b) => b.count - a.count);
+      const addressConflicts = addressRows.length > 1;
+      return {
+        ...group,
+        canonicalAddress: addressRows[0]?.address || "",
+        addressOptions: addressRows,
+        addressConflicts,
+        itemCount: group.items.length,
+        sourceList: Array.from(group.sources).filter(Boolean),
+        statusList: Array.from(group.statuses).filter(Boolean),
+        genreList: Array.from(group.genres).filter(Boolean)
+      };
+    }).sort((a, b) => {
+      if (a.addressConflicts !== b.addressConflicts) return a.addressConflicts ? -1 : 1;
+      return b.itemCount - a.itemCount;
+    });
   }
 
   function simpleRows(rows) {
@@ -1627,6 +1749,480 @@
     return "Pass";
   }
 
+  function hasOwnField(row = {}, key) {
+    return Object.prototype.hasOwnProperty.call(row, key);
+  }
+
+  function socialHandleValues(row = {}) {
+    const socials = row.socialMediaHandles || row.socialHandles || {};
+    return [
+      socials.instagram,
+      socials.x,
+      socials.tiktok,
+      socials.facebook,
+      socials.twitter,
+      socials.youtube
+    ].filter(value => String(value || "").trim());
+  }
+
+  function hasPublicClubProfileSchema(row = {}) {
+    return [
+      "address",
+      "officialWebsite",
+      "website",
+      "email",
+      "telephone",
+      "phone",
+      "socialMediaHandles",
+      "socialHandles",
+      "publicProfileType",
+      "clubOwnershipStatus",
+      "subscriptionRequiredForPublicProfileEdits"
+    ].some(key => hasOwnField(row, key));
+  }
+
+  function hasPublicClubContactValue(row = {}) {
+    return [
+      row.address,
+      row.officialWebsite || row.website,
+      row.email,
+      row.telephone || row.phone,
+      ...socialHandleValues(row)
+    ].some(value => String(value || "").trim());
+  }
+
+  function staticClubProfileDefaultsReady() {
+    const rows = Object.values(window.SHOUTOUT_CLUB_LOCATIONS || {});
+    return rows.length > 0 && rows.some(hasPublicClubProfileSchema);
+  }
+
+  function clubProfileDiagnostics(data = {}) {
+    const rows = data.clubLocations?.rows || [];
+    const schemaRows = rows.filter(hasPublicClubProfileSchema);
+    const contentRows = rows.filter(hasPublicClubContactValue);
+    const adminUiReady = !!(
+      document.getElementById("backfillClubProfileFieldsBtn") &&
+      window.SHOUTOUT_CLUB_LOCATIONS &&
+      staticClubProfileDefaultsReady()
+    );
+    return {
+      rows,
+      schemaRows,
+      contentRows,
+      adminUiReady,
+      fieldSupportReady: adminUiReady || schemaRows.length > 0
+    };
+  }
+
+  function renderClubProfileDiagnostics(data = state.lastData || {}) {
+    const wrap = byId("clubProfileDiagnosticsReport");
+    if (!wrap) return;
+    const details = clubProfileDiagnostics(data);
+    wrap.innerHTML = simpleRows([
+      ["Firestore club records scanned", details.rows.length.toLocaleString()],
+      ["Records with public profile schema fields", details.schemaRows.length.toLocaleString()],
+      ["Records with filled contact values", details.contentRows.length.toLocaleString()],
+      ["Static club defaults include profile fields", staticClubProfileDefaultsReady() ? "Yes" : "No"],
+      ["Safe setup action", "Backfill only adds missing keys; it does not overwrite existing club profile values."]
+    ]);
+  }
+
+  function missingClubProfilePayload(row = {}) {
+    const payload = {};
+    const setMissing = (key, value) => {
+      if (!hasOwnField(row, key)) payload[key] = value;
+    };
+    const socials = row.socialMediaHandles || row.socialHandles || {};
+    setMissing("address", row.address || "");
+    setMissing("officialWebsite", row.officialWebsite || row.website || "");
+    setMissing("email", row.email || "");
+    setMissing("telephone", row.telephone || row.phone || "");
+    if (!hasOwnField(row, "socialMediaHandles")) {
+      payload.socialMediaHandles = {
+        instagram:socials.instagram || "",
+        x:socials.x || socials.twitter || "",
+        tiktok:socials.tiktok || "",
+        facebook:socials.facebook || ""
+      };
+    }
+    setMissing("visibility", row.visibility || "public");
+    setMissing("publicProfileType", "club");
+    setMissing("clubOwnershipStatus", row.clubOwnershipStatus || "unclaimed");
+    setMissing("subscriptionRequiredForPublicProfileEdits", row.subscriptionRequiredForPublicProfileEdits ?? true);
+    if (!hasOwnField(row, "publicSearchKeywords")) {
+      payload.publicSearchKeywords = Array.from(new Set([
+        row.locationName,
+        row.brandName,
+        row.city,
+        row.stateRegion || row.region || row.state,
+        row.country,
+        ...(Array.isArray(row.categories) ? row.categories : []),
+        ...(Array.isArray(row.genres) ? row.genres : [])
+      ].filter(Boolean)));
+    }
+    return payload;
+  }
+
+  function slugId(value = "") {
+    return normalized(value).replace(/\s+/g, "-").slice(0, 90) || `profile-${Date.now()}`;
+  }
+
+  function publicSourceProfileFromRow(row = {}) {
+    const socials = row.socialMediaHandles || row.socialHandles || {};
+    return {
+      address: row.address || row.proposedAddress || "",
+      officialWebsite: row.officialWebsite || row.website || "",
+      email: row.email || "",
+      telephone: row.telephone || row.phone || "",
+      socialMediaHandles: {
+        instagram: socials.instagram || "",
+        x: socials.x || socials.twitter || "",
+        tiktok: socials.tiktok || "",
+        facebook: socials.facebook || ""
+      },
+      city: row.city || "",
+      stateRegion: row.stateRegion || row.region || row.state || "",
+      country: row.country || "",
+      sourceUrl: row.sourceUrl || "",
+      sourceName: row.sourceName || "AI crawler public source",
+      sourceLanguage: row.searchLanguage || row.language || "",
+      tags: [
+        ...(Array.isArray(row.extractedTags) ? row.extractedTags : []),
+        ...(Array.isArray(row.categories) ? row.categories : []),
+        ...(Array.isArray(row.genres) ? row.genres : [])
+      ].filter(Boolean)
+    };
+  }
+
+  function crawlerProfileDraftFromRecord(row = {}, index = 0) {
+    const proposedType = normalized(row.proposedType || row.type || row.collection || "");
+    const isEvent = proposedType.includes("event") || proposedType.includes("ticket") || row.eventName;
+    const targetCollection = isEvent ? "events" : "clubLocations";
+    const title = row.proposedTitle || row.locationName || row.proposedLocationName || row.eventName || row.title || `Crawler profile ${index + 1}`;
+    const targetId = row.approvedRecordId || row.targetId || row.clubLocationId || row.locationId || row.id || slugId(`${title} ${row.city || ""} ${row.country || ""}`);
+    return {
+      targetCollection,
+      targetId,
+      targetType: isEvent ? "eventDestination" : "clubLocation",
+      displayName: title,
+      proposedLocationName: row.proposedLocationName || row.locationName || title,
+      proposedType: row.proposedType || (isEvent ? "event" : "club"),
+      sourceQueueId: row.id || "",
+      sourceUrl: row.sourceUrl || "",
+      sourceName: row.sourceName || "AI crawler public source",
+      aiSummary: row.aiSummary || "AI crawler public-source profile draft.",
+      aiConfidenceScore: row.aiConfidenceScore || 0,
+      aiStarRating: row.aiStarRating || 0,
+      publicProfile: publicSourceProfileFromRow(row),
+      importPolicy: {
+        publicDataOnly: true,
+        requiresReview: true,
+        applyMode: "missingOnly",
+        neverOverwriteExisting: true
+      }
+    };
+  }
+
+  function profileImportEnvelope(records = []) {
+    return {
+      schemaVersion: "floqr-ai-crawler-profile-import-v1",
+      generatedAt: new Date().toISOString(),
+      generatedBy: state.auth?.currentUser?.email || state.auth?.currentUser?.uid || "",
+      source: "ai-crawler-public-source-review",
+      privacyRule: "Public source data only. Review required before live profile update.",
+      records
+    };
+  }
+
+  function buildProfileImportRecords(data = state.lastData || {}) {
+    const queueRows = (data.aiDiscoveryQueue?.rows || [])
+      .filter(row => String(row.status || "pendingReview") !== "deleted")
+      .filter(row => row.discoveryMode !== "profile-import-draft");
+    const clubRows = (data.clubLocations?.rows || []).filter(row => !hasPublicClubContactValue(row));
+    const eventRows = (data.events?.rows || []).filter(row => row.sourceUrl || row.ticketUrl || row.officialWebsite || row.website);
+    const sourceRows = [
+      ...queueRows,
+      ...clubRows.map((row, index) => ({...row, collection:"clubLocations", proposedType:"club", proposedTitle:row.locationName || row.brandName || row.id, _profileImportSourceIndex:index})),
+      ...eventRows.map((row, index) => ({...row, collection:"events", proposedType:"event", proposedTitle:row.eventName || row.title || row.id, _profileImportSourceIndex:index}))
+    ];
+    const drafts = consolidateCrawlRecords(sourceRows).map((group, index) => {
+      const source = group.items[0] || {};
+      const draft = crawlerProfileDraftFromRecord({
+        ...source,
+        proposedLocationName: group.name,
+        proposedTitle: group.name,
+        city: group.city,
+        country: group.country,
+        proposedAddress: group.addressConflicts ? "" : group.canonicalAddress
+      }, index);
+      draft.consolidation = {
+        groupedRecordCount: group.itemCount,
+        addressConflict: group.addressConflicts,
+        addressOptions: group.addressOptions.map(item => ({
+          address:item.address,
+          count:item.count,
+          sources:Array.from(item.sources)
+        })),
+        sourceNames: group.sourceList
+      };
+      if (group.addressConflicts) {
+        draft.aiSummary = `${draft.aiSummary} Address conflict detected across crawler sources. Master Admin must choose the correct address before import.`;
+        draft.importPolicy.requiresAddressReview = true;
+      }
+      return draft;
+    });
+    const seen = new Set();
+    return drafts.filter(draft => {
+      const key = `${draft.targetCollection}/${draft.targetId}/${draft.sourceQueueId || draft.sourceUrl || draft.displayName}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 100);
+  }
+
+  function generateCrawlerProfileJson() {
+    const records = buildProfileImportRecords(state.lastData || {});
+    const envelope = profileImportEnvelope(records);
+    const text = JSON.stringify(envelope, null, 2);
+    if (byId("clubProfileImportJson")) byId("clubProfileImportJson").value = text;
+    renderClubProfileImportDrafts(records, "Generated crawler JSON from current discovery, club, and event records. Review or edit before saving import drafts.");
+    setText("diagnosticsStatus", `Generated crawler profile JSON with ${records.length} record(s).`);
+    return envelope;
+  }
+
+  function parseProfileImportJson() {
+    const raw = byId("clubProfileImportJson")?.value.trim() || "";
+    if (!raw) return profileImportEnvelope([]);
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return profileImportEnvelope(parsed);
+    return {
+      ...parsed,
+      records: Array.isArray(parsed.records) ? parsed.records : []
+    };
+  }
+
+  function cleanProfileImportDraft(draft = {}) {
+    const publicProfile = draft.publicProfile || {};
+    return {
+      targetCollection: draft.targetCollection === "events" ? "events" : "clubLocations",
+      targetId: String(draft.targetId || slugId(draft.displayName || draft.proposedLocationName || "profile")).trim(),
+      targetType: draft.targetType || (draft.targetCollection === "events" ? "eventDestination" : "clubLocation"),
+      displayName: String(draft.displayName || draft.proposedLocationName || draft.targetId || "Crawler profile draft").trim(),
+      proposedLocationName: draft.proposedLocationName || draft.displayName || "",
+      proposedType: draft.proposedType || (draft.targetCollection === "events" ? "event" : "club"),
+      sourceQueueId: draft.sourceQueueId || "",
+      sourceUrl: draft.sourceUrl || publicProfile.sourceUrl || "",
+      sourceName: draft.sourceName || publicProfile.sourceName || "AI crawler public source",
+      aiSummary: draft.aiSummary || "Public-source club/event destination profile data formatted by the AI crawler workflow.",
+      aiConfidenceScore: Number(draft.aiConfidenceScore || 0),
+      aiStarRating: Number(draft.aiStarRating || 0),
+      publicProfile: {
+        address: publicProfile.address || "",
+        officialWebsite: publicProfile.officialWebsite || publicProfile.website || "",
+        email: publicProfile.email || "",
+        telephone: publicProfile.telephone || publicProfile.phone || "",
+        socialMediaHandles: {
+          instagram: publicProfile.socialMediaHandles?.instagram || "",
+          x: publicProfile.socialMediaHandles?.x || publicProfile.socialMediaHandles?.twitter || "",
+          tiktok: publicProfile.socialMediaHandles?.tiktok || "",
+          facebook: publicProfile.socialMediaHandles?.facebook || ""
+        },
+        city: publicProfile.city || "",
+        stateRegion: publicProfile.stateRegion || publicProfile.region || "",
+        country: publicProfile.country || "",
+        sourceUrl: publicProfile.sourceUrl || draft.sourceUrl || "",
+        sourceName: publicProfile.sourceName || draft.sourceName || "AI crawler public source",
+        sourceLanguage: publicProfile.sourceLanguage || "",
+        tags: Array.isArray(publicProfile.tags) ? publicProfile.tags.filter(Boolean) : []
+      },
+      importPolicy: {
+        publicDataOnly: true,
+        requiresReview: true,
+        applyMode: "missingOnly",
+        neverOverwriteExisting: true,
+        ...(draft.importPolicy || {})
+      }
+    };
+  }
+
+  function clubAdminImportUrl(draftId, targetId) {
+    const url = new URL("./admin.html", window.location.href);
+    url.searchParams.set("location", targetId);
+    url.searchParams.set("profileImportDraft", draftId);
+    url.searchParams.set("v", "28.61-crawler-profile-import");
+    return url.href;
+  }
+
+  async function saveClubProfileImportDrafts() {
+    if (!state.db) return;
+    let envelope;
+    try {
+      envelope = parseProfileImportJson();
+    } catch (error) {
+      setText("diagnosticsStatus", `Crawler JSON could not be parsed: ${error?.message || error}`);
+      return;
+    }
+    const drafts = envelope.records.map(cleanProfileImportDraft).filter(draft => draft.targetId);
+    if (!drafts.length) {
+      setText("diagnosticsStatus", "No crawler profile import records were found in the JSON.");
+      return;
+    }
+    const saved = [];
+    for (const draft of drafts) {
+      const ref = state.db.collection("aiDiscoveryQueue").doc();
+      const importUrl = draft.targetCollection === "clubLocations" ? clubAdminImportUrl(ref.id, draft.targetId) : "";
+      await ref.set({
+        proposedType: draft.targetCollection === "events" ? "eventDestinationProfile" : "clubProfile",
+        proposedTitle: draft.displayName,
+        proposedDescription: draft.aiSummary,
+        proposedLocationName: draft.proposedLocationName || draft.displayName,
+        proposedAddress: draft.publicProfile.address || "",
+        city: draft.publicProfile.city || "",
+        stateRegion: draft.publicProfile.stateRegion || "",
+        country: draft.publicProfile.country || "",
+        sourceUrl: draft.sourceUrl || draft.publicProfile.sourceUrl || "",
+        sourceName: draft.sourceName || draft.publicProfile.sourceName || "AI crawler public source",
+        extractedTags: draft.publicProfile.tags || [],
+        categories: ["profile-import-draft", draft.targetType],
+        aiSummary: draft.aiSummary,
+        aiConfidenceScore: draft.aiConfidenceScore,
+        aiStarRating: draft.aiStarRating || 3,
+        aiRatingReasons: [
+          "Public-source profile/contact data requires review",
+          "Applies missing fields only",
+          "Ready for Master Admin import or Club Admin import link"
+        ],
+        duplicateCandidateIds: [],
+        status: "pendingReview",
+        discoveryMode: "profile-import-draft",
+        profileImport: draft,
+        clubAdminImportUrl: importUrl,
+        createdByUid: state.auth?.currentUser?.uid || "",
+        createdByEmail: state.auth?.currentUser?.email || "",
+        createdAt: fieldValue(),
+        updatedAt: fieldValue()
+      });
+      saved.push({id: ref.id, ...draft, clubAdminImportUrl: importUrl});
+    }
+    await refreshDiagnostics();
+    renderClubProfileImportDrafts(saved, `Saved ${saved.length} crawler profile import draft(s) to aiDiscoveryQueue.`);
+    setText("diagnosticsStatus", `Saved ${saved.length} crawler profile import draft(s).`);
+  }
+
+  function mergeMissingProfileFields(existing = {}, profile = {}) {
+    const payload = {};
+    const setIfMissing = (key, value) => {
+      const clean = String(value || "").trim();
+      if (clean && !String(existing[key] || "").trim()) payload[key] = clean;
+    };
+    setIfMissing("address", profile.address);
+    setIfMissing("officialWebsite", profile.officialWebsite || profile.website);
+    setIfMissing("email", profile.email);
+    setIfMissing("telephone", profile.telephone || profile.phone);
+    if (profile.city && !existing.city) payload.city = profile.city;
+    if (profile.stateRegion && !existing.stateRegion && !existing.region) payload.stateRegion = profile.stateRegion;
+    if (profile.country && !existing.country) payload.country = profile.country;
+    const existingSocials = existing.socialMediaHandles || existing.socialHandles || {};
+    const incomingSocials = profile.socialMediaHandles || {};
+    const mergedSocials = {...existingSocials};
+    ["instagram", "x", "tiktok", "facebook"].forEach(key => {
+      if (!String(mergedSocials[key] || "").trim() && String(incomingSocials[key] || "").trim()) {
+        mergedSocials[key] = incomingSocials[key].trim();
+      }
+    });
+    if (Object.keys(mergedSocials).length) payload.socialMediaHandles = mergedSocials;
+    payload.visibility = existing.visibility || "public";
+    payload.publicProfileType = existing.publicProfileType || (profile.targetCollection === "events" ? "eventDestination" : "club");
+    payload.publicProfileImportUpdatedAt = fieldValue();
+    payload.publicProfileImportSourceUrl = profile.sourceUrl || "";
+    payload.publicProfileImportMode = "missingOnly";
+    payload.updatedAt = fieldValue();
+    payload.updatedByUid = state.auth?.currentUser?.uid || "";
+    payload.updatedByEmail = state.auth?.currentUser?.email || "";
+    return payload;
+  }
+
+  async function applyProfileImportDraft(draftId) {
+    if (!state.db || !draftId) return;
+    const ref = state.db.collection("aiDiscoveryQueue").doc(draftId);
+    const snap = await ref.get();
+    if (!snap.exists) throw new Error("Crawler profile import draft was not found.");
+    const row = {id:snap.id, ...snap.data()};
+    const draft = cleanProfileImportDraft(row.profileImport || {});
+    const targetRef = state.db.collection(draft.targetCollection).doc(draft.targetId);
+    const targetSnap = await targetRef.get();
+    const existing = targetSnap.exists ? targetSnap.data() : {};
+    const payload = mergeMissingProfileFields(existing, {...draft.publicProfile, targetCollection:draft.targetCollection, sourceUrl:draft.sourceUrl});
+    await targetRef.set(payload, {merge:true});
+    await ref.set({
+      status:"approved",
+      appliedAt:fieldValue(),
+      appliedByUid:state.auth?.currentUser?.uid || "",
+      appliedByEmail:state.auth?.currentUser?.email || "",
+      appliedCollection:draft.targetCollection,
+      appliedRecordId:draft.targetId,
+      updatedAt:fieldValue()
+    }, {merge:true});
+    setText("diagnosticsStatus", `Applied crawler profile import to ${draft.targetCollection}/${draft.targetId}. Existing values were preserved.`);
+    await refreshDiagnostics();
+  }
+
+  function renderClubProfileImportDrafts(records = [], note = "") {
+    const wrap = byId("clubProfileDiagnosticsReport");
+    if (!wrap) return;
+    const rows = records.slice(0, 20);
+    const cards = rows.map(item => {
+      const id = item.id || "";
+      const url = item.clubAdminImportUrl || "";
+      const target = `${item.targetCollection || "clubLocations"}/${item.targetId || ""}`;
+      return `<div class="queue-item">
+        <div class="message-envelope-head">
+          <strong>${esc(item.displayName || item.proposedTitle || item.targetId || "Crawler profile draft")}</strong>
+          ${statusBadge(item.status || "Soft Fail")}
+        </div>
+        <p>${esc(target)} ${item.sourceName ? `- ${item.sourceName}` : ""}</p>
+        <small>${esc(item.sourceUrl || item.publicProfile?.sourceUrl || "")}</small>
+        <div class="queue-actions">
+          ${id ? `<button type="button" data-profile-import-action="apply" data-id="${esc(id)}">Apply Missing Fields</button>` : ""}
+          ${url ? `<button type="button" data-profile-import-action="copy" data-url="${esc(url)}">Copy Club Admin Import Link</button>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+    wrap.innerHTML = `${note ? `<p class="sub small">${esc(note)}</p>` : ""}${cards || simpleRows([
+      ["Crawler profile import drafts", "No drafts generated yet."],
+      ["Next step", "Click Generate Crawler JSON after running or importing public-source crawl records."]
+    ])}`;
+    wrap.querySelectorAll("[data-profile-import-action='apply']").forEach(btn => {
+      btn.addEventListener("click", () => applyProfileImportDraft(btn.dataset.id).catch(error => {
+        setText("diagnosticsStatus", `Profile import failed: ${error?.message || error}`);
+      }));
+    });
+    wrap.querySelectorAll("[data-profile-import-action='copy']").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        await copyTextToClipboard(btn.dataset.url || "");
+        setText("diagnosticsStatus", "Club Admin import link copied.");
+      });
+    });
+  }
+
+  async function backfillClubProfileFields() {
+    if (!state.db) return;
+    setText("diagnosticsStatus", "Backfill Missing Club Profile Fields: scanning clubLocations...");
+    const snap = await state.db.collection("clubLocations").limit(1000).get();
+    let updated = 0;
+    for (const doc of snap.docs) {
+      const row = {id:doc.id, ...doc.data()};
+      const payload = missingClubProfilePayload(row);
+      if (Object.keys(payload).length) {
+        payload.updatedAt = fieldValue();
+        await doc.ref.set(payload, {merge:true});
+        updated += 1;
+      }
+    }
+    setText("diagnosticsStatus", `Backfill Missing Club Profile Fields complete. ${updated} club record(s) received missing field keys. Existing values were not overwritten.`);
+    await refreshDiagnostics();
+  }
+
   function buildFeatureDiagnostics(data) {
     const aiIndexRows = data.aiIndex?.rows || [];
     const unsafeIndexRows = aiIndexRows.filter(row => {
@@ -1634,7 +2230,7 @@
       const visibility = String(row.visibility || "").toLowerCase();
       return type.includes("chat") || type.includes("message") || (visibility && !["public", "shared", "private"].includes(visibility));
     });
-    const publicClubProfiles = (data.clubLocations?.rows || []).filter(row => row.officialWebsite || row.website || row.email || row.telephone || row.phone || row.socialMediaHandles);
+    const clubProfile = clubProfileDiagnostics(data);
     const userLanguageRows = (data.users?.rows || []).filter(row => row.publicProfileLanguageMode || row.publicProfileBioEnglish || row.publicProfileTranslationStatus);
     const scheduleRows = data.aiCrawlerSchedules?.rows || [];
     const crawlRuns = data.aiCrawlRuns?.rows || [];
@@ -1669,19 +2265,21 @@
       ["AI Notifications", "Notification preferences", collectionStatus(data, "aiUserNotificationPreferences", true), `${collectionCount(data, "aiUserNotificationPreferences")} preference records scanned.`],
       ["Templates", "Patron template variants", collectionStatus(data, "patronTemplateVariants", true), `${collectionCount(data, "patronTemplateVariants")} patron template variants scanned.`],
       ["Templates", "FLOQR Studio background designer", window.FLOQR_AI_STUDIO_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_STUDIO_ENABLED ? "Studio flag on; live image generation still requires a safe provider." : "Studio is AI-ready and disabled by default."],
-      ["Club Profiles", "Public club profile fields", publicClubProfiles.length ? "Pass" : "Soft Fail", publicClubProfiles.length ? `${publicClubProfiles.length} club profiles include public contact/profile fields.` : "No club records with website/email/social/telephone fields found yet."],
+      ["Club Profiles", "Public club profile field support", clubProfile.fieldSupportReady ? "Pass" : "Soft Fail", clubProfile.fieldSupportReady ? "Club profile schema/UI and crawler import support are available." : "Club profile schema fields are not present yet; use Master Admin > AI Crawling > Backfill Missing Field Keys."],
+      ["Club Profiles", "Filled public contact values", clubProfile.contentRows.length ? "Pass" : "Soft Fail", clubProfile.contentRows.length ? `${clubProfile.contentRows.length} club profiles include filled public contact values.` : "No club records have filled website/email/social/telephone values yet. Use AI Crawling profile import drafts or Club Admin public profile editing."],
       ["Club Profiles", "Claimed club owner editing", "Soft Fail", "Club profile editing is scaffolded; production subscription/ownership enforcement needs backend rules or claims."],
       ["Ticketing", "Ticketmaster/Eventbrite discovery", "Soft Fail", "Search criteria and queue records include ticketing partners; live API credentials/partnerships are not configured in frontend."],
       ["Ticketing", "Approved resale partner flow", "TBI", "Partner contracts, affiliate tracking, and resale APIs must be configured later."],
       ["Transportation", "Third-party taxi hailing integration", "TBI", "Reserved as partner integration; not connected to current app workflows."],
       ["AI Discovery", "Discovery queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned.`],
       ["AI Discovery", "Review/approve/reject/delete", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "AI Discovery Master Admin module loaded." : "FLOQRAIDiscovery module was not loaded."],
-      ["AI Discovery", "Manual crawl control", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl adds reviewable records to aiDiscoveryQueue."],
-      ["AI Discovery", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
-      ["AI Discovery", "Backend scheduled internet crawler", "TBI", "Cloud Functions or Cloud Run scheduler must perform real public-source crawling 4-6 times per day."],
-      ["AI Discovery", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
+      ["AI Crawling", "Manual crawl control", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl adds reviewable records to aiDiscoveryQueue from the AI Crawling tab."],
+      ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
+      ["AI Crawling", "Backend scheduled internet crawler", "TBI", "Cloud Functions or Cloud Run scheduler must perform real public-source crawling 4-6 times per day."],
+      ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
-      ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, crawler controls, reports, and analytics are mounted under Master Admin settings."],
+      ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
+      ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
       ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
       ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `Latest saved rules smoke test is stale: ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. Run the rules smoke test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
     ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
@@ -1730,19 +2328,24 @@
     const queue = (data.aiDiscoveryQueue?.rows || []).slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
     const wrap = byId("crawlCollectedRecordsReport");
     if (!wrap) return;
-    wrap.innerHTML = queue.length ? queue.slice(0, 25).map(item => `<div class="queue-item">
+    const groups = consolidateCrawlRecords(queue);
+    wrap.innerHTML = groups.length ? groups.slice(0, 25).map(group => `<div class="queue-item">
       <div class="message-envelope-head">
-        <strong>${esc(item.proposedTitle || item.title || item.id)}</strong>
-        ${queueStatusBadge(item.status)}
+        <strong>${esc(group.name)}</strong>
+        ${statusBadge(group.addressConflicts ? "Soft Fail" : "Pass")}
       </div>
-      <p>${esc(item.city || "")}${item.country ? `, ${esc(item.country)}` : ""} | ${esc(item.proposedType || "")} | ${esc((item.genres || []).join(", "))}</p>
-      <small>Stars: ${esc(item.aiStarRating || "-")} | Confidence: ${esc(item.aiConfidenceScore || "-")} | Source: ${esc(item.sourceName || "")}</small>
+      <p>${esc(group.city || "")}${group.country ? `, ${esc(group.country)}` : ""} | ${esc(group.family)} | ${esc(group.genreList.slice(0, 5).join(", "))}</p>
+      <p>${group.canonicalAddress ? `Address: ${esc(group.canonicalAddress)}` : "Address: not collected yet"}</p>
+      ${group.addressConflicts ? `<p class="sub small">Address conflict: ${esc(group.addressOptions.map(item => `${item.address} (${item.count})`).join(" | "))}</p>` : ""}
+      <small>Grouped records: ${esc(group.itemCount)} | Sources: ${esc(group.sourceList.join(", ") || "-")} | Max stars: ${esc(group.maxStar || "-")} | Max confidence: ${esc(group.maxConfidence || "-")}</small>
     </div>`).join("") : "<p class='sub'>No collected discovery records yet. Run a manual crawl scaffold to seed review records.</p>";
   }
 
   function renderAnalyticsInsights(data) {
     const queue = data.aiDiscoveryQueue?.rows || [];
     const runs = data.aiCrawlRuns?.rows || [];
+    const groups = consolidateCrawlRecords(queue);
+    const addressConflicts = groups.filter(group => group.addressConflicts);
     const byStatus = countBy(queue, item => item.status || "unknown");
     const byType = countBy(queue, item => item.proposedType || "unknown");
     const byCity = countBy(queue, item => item.city || "unknown");
@@ -1757,7 +2360,9 @@
     const targetMarkets = ["Dubai", "Istanbul", "Singapore", "Thailand", "Shanghai", "Barcelona", "London", "Paris", "Amsterdam", "Berlin", "Milan"];
     const missingMarkets = targetMarkets.filter(market => !queue.some(item => normalized(item.city).includes(normalized(market)) || normalized(item.country).includes(normalized(market))));
     const insights = [
-      ["Collected records", queue.length.toLocaleString()],
+      ["Raw collected records", queue.length.toLocaleString()],
+      ["Consolidated destinations", groups.length.toLocaleString()],
+      ["Address conflicts to review", addressConflicts.length.toLocaleString()],
       ["Crawl runs", runs.length.toLocaleString()],
       ["Queue status mix", topList(byStatus, 8)],
       ["Top proposed types", topList(byType, 8)],
@@ -1771,6 +2376,23 @@
     ];
     const wrap = byId("crawlAnalyticsInsights");
     if (wrap) wrap.innerHTML = simpleRows(insights);
+  }
+
+  function renderAiCrawlingSummary(data, schedule) {
+    const wrap = byId("aiCrawlingSummary");
+    if (!wrap) return;
+    const queue = data.aiDiscoveryQueue?.rows || [];
+    const groups = consolidateCrawlRecords(queue);
+    const addressConflicts = groups.filter(group => group.addressConflicts);
+    const profileDrafts = queue.filter(item => item.discoveryMode === "profile-import-draft");
+    wrap.innerHTML = simpleRows([
+      ["Raw collected records", queue.length.toLocaleString()],
+      ["Consolidated clubs/events", groups.length.toLocaleString()],
+      ["Address conflicts", addressConflicts.length.toLocaleString()],
+      ["Profile import drafts", profileDrafts.length.toLocaleString()],
+      ["Crawl schedule", schedule?.frequency || "Not saved"],
+      ["Publishing rule", "Crawler results stay in review/import drafts until Master Admin or Club Admin approves them."]
+    ]);
   }
 
   async function loadDiagnosticsData() {
@@ -1794,6 +2416,8 @@
       state.lastSchedule = schedule || null;
       renderFeatureDiagnostics(features);
       await renderRulesVersionStatus(data);
+      renderAiCrawlingSummary(data, schedule);
+      renderClubProfileDiagnostics(data);
       renderCrawlActivity(data, schedule);
       renderCollectedRecords(data);
       renderAnalyticsInsights(data);
@@ -1818,6 +2442,8 @@
     state.lastSchedule = schedule || null;
     renderFeatureDiagnostics(features);
     await renderRulesVersionStatus(data);
+    renderAiCrawlingSummary(data, schedule);
+    renderClubProfileDiagnostics(data);
     renderCrawlActivity(data, schedule);
     renderCollectedRecords(data);
     renderAnalyticsInsights(data);
@@ -1834,6 +2460,9 @@
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
+    byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
+    byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
+    byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
   }
 
   async function mount(options = {}) {

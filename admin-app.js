@@ -16,6 +16,7 @@
   const db = firebase.firestore();
 
   const locationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
+  const profileImportDraftId = qs("profileImportDraft", "");
   const loc = window.SHOUTOUT_CLUB_LOCATIONS?.[locationId] || { locationName: locationId, brand: locationId, genres: [], activityDates: [] };
   let publicClubProfile = {...loc};
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
@@ -24,6 +25,63 @@
   let adminDesignations = [];
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
+
+  function setInputIfMissing(id, value) {
+    const el = byId(id);
+    const clean = String(value || "").trim();
+    if (el && clean && !String(el.value || "").trim()) el.value = clean;
+  }
+
+  function applyProfileImportDraftToForm(draft = {}, source = {}) {
+    const profile = draft.publicProfile || {};
+    const socials = profile.socialMediaHandles || {};
+    setInputIfMissing("clubProfileAddress", profile.address);
+    setInputIfMissing("clubProfileWebsite", profile.officialWebsite || profile.website);
+    setInputIfMissing("clubProfileEmail", profile.email);
+    setInputIfMissing("clubProfileTelephone", profile.telephone || profile.phone);
+    setInputIfMissing("clubProfileInstagram", socials.instagram);
+    setInputIfMissing("clubProfileX", socials.x || socials.twitter);
+    setInputIfMissing("clubProfileTiktok", socials.tiktok);
+    setInputIfMissing("clubProfileFacebook", socials.facebook);
+    const report = byId("clubPublicProfileReport");
+    if (report) {
+      report.innerHTML += `<div class="queue-item">
+        <strong>AI crawler profile import loaded</strong>
+        <p>Review the public-source values, then click Save Public Profile if they are correct. Existing filled fields were not overwritten.</p>
+        ${simpleRows([
+          ["Draft", source.id || profileImportDraftId],
+          ["Source", source.sourceName || profile.sourceName || "AI crawler public source"],
+          ["Source URL", source.sourceUrl || profile.sourceUrl || "-"],
+          ["Import mode", "Missing fields only"]
+        ])}
+      </div>`;
+    }
+    setText("adminStatus", "AI crawler profile import loaded. Review values and click Save Public Profile to apply.");
+  }
+
+  async function loadProfileImportDraft() {
+    if (!profileImportDraftId) return;
+    try {
+      const snap = await db.collection("aiDiscoveryQueue").doc(profileImportDraftId).get();
+      if (!snap.exists) {
+        setText("adminStatus", "AI crawler profile import link was not found or is no longer available.");
+        return;
+      }
+      const row = {id:snap.id, ...snap.data()};
+      const draft = row.profileImport || {};
+      if (draft.targetCollection && draft.targetCollection !== "clubLocations") {
+        setText("adminStatus", "AI crawler profile import is not for a club profile.");
+        return;
+      }
+      if (draft.targetId && draft.targetId !== locationId) {
+        setText("adminStatus", `AI crawler profile import is for ${draft.targetId}, but this page is ${locationId}.`);
+        return;
+      }
+      applyProfileImportDraftToForm(draft, row);
+    } catch (error) {
+      setText("adminStatus", `AI crawler profile import failed to load: ${error?.message || error}`);
+    }
+  }
 
   async function loadClubPublicProfile() {
     try {
@@ -49,6 +107,7 @@
         ["AI index", "Public profile fields only"]
       ]);
     }
+    await loadProfileImportDraft();
   }
 
   async function saveClubPublicProfile() {

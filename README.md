@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.60 Optional Mingl Query Guidance Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.62 AI Crawling Page Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.60-optional-mingl-query-guidance
+https://jadzadco.github.io/shoutout-demo/?v=28.62-ai-crawling-page
 ```
 
 Current release highlights:
@@ -24,7 +24,8 @@ Current release highlights:
 - Adds FLOQR Studio / Design Background with AI UI. Live image generation is not configured yet, so it uses safe placeholder behavior and does not expose API keys.
 - Adds ShoutOut media AI readiness: browser filter previews, enhancement metadata, AI-ready moderation fields, and first-7-second video trim behavior with user warnings.
 - Adds Super Admin AI Discovery scaffold for public event/venue discovery review, rating criteria, approve/reject/delete/duplicate actions, and soft delete/restore for `clubLocations` and `events`.
-- Adds Master Admin Settings > Diagnostics with app-wide feature status, crawler controls, crawl reports, collected-record analytics, and status labels: Pass, Soft Fail, Failed, and TBI.
+- Adds Master Admin Settings > Diagnostics with app-wide feature status, package checks, Firebase rules smoke tests, diagnostic export, and status labels: Pass, Soft Fail, Failed, and TBI.
+- Adds a separate Master Admin > AI Crawling page for crawler criteria, crawl schedule, manual crawl scaffold, consolidated crawl reports, collected-record analytics, and crawler JSON/profile imports.
 - Adds crawler search criteria for rooftop lounges, rooftop bars, comedy shows, Latin and Arabic music, DJs, Ticketmaster/Eventbrite/resale ticket discovery, Dubai, Istanbul, Singapore, Thailand, Shanghai, and Western European market/language searches.
 - Adds public profile language publishing choices so patrons can display their public profile in their preferred/original language or the English version. AI translation is scaffolded without frontend AI keys.
 - Adds Package Install Diagnostics under Master Admin > Diagnostics so each package can verify its own feature markers after upload.
@@ -53,6 +54,8 @@ Current release highlights:
 - Adds step-level rules smoke-test evidence so failed Mingl/chat checks identify create/read/update/delete, and failed Storage checks identify upload/download/delete.
 - Clarifies `Firestore: minglConnections participant query compatibility` as an optional compatibility check. If the deterministic Mingl participant lifecycle passes but the array-contains participant query is denied, Diagnostics now reports a non-blocking Soft Fail: `Optional participant query blocked; fallback participant document reads passed.`
 - Keeps Firestore rules strict for Mingl. Do not loosen Firestore rules broadly or allow all signed-in users to list `minglConnections` just to make the optional query pass.
+- Adds AI Crawler Profile Import. Crawler-discovered public club/event destination data can be formatted as JSON, saved as reviewable `aiDiscoveryQueue` import drafts, applied by Master Admin as missing fields only, or sent to a Club Admin as an import link.
+- Consolidates crawler reports so matching clubs/events are grouped together. If crawler sources provide different non-empty addresses for the same destination, Master Admin sees an address-conflict warning before approval/import.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -71,7 +74,8 @@ Live in this package:
 - ShoutOut copy improvement fallback.
 - ShoutOut media enhancement preview metadata and first-7-second video trim metadata.
 - Super Admin AI Discovery review and listing soft-delete UI.
-- Master Admin Diagnostics feature matrix, crawler controls, crawl activity report, collected-record analytics, and manual crawl queue seeding.
+- Master Admin Diagnostics feature matrix, package checks, rules smoke test, and TXT export.
+- Master Admin > AI Crawling page for crawler controls, crawl activity reports, consolidated collected-record analytics, manual crawl queue seeding, and AI Crawler Profile Import.
 - Master Admin Package Install Diagnostics grouped by package version.
 - Master Admin Firebase Rules Smoke Test with saved reports in `aiDiagnosticsReports`.
 - Master Admin Diagnostics TXT export for sharing failure reports and fix prompts.
@@ -150,10 +154,23 @@ Open Master Admin > Diagnostics to review:
 
 - App-wide feature health from authentication through ShoutOut, guest lists, Mingl, chat, Bata scaffolding, AI search, AI Discovery, templates, club profiles, ticketing, and partner integrations.
 - Status labels: `Pass`, `Soft Fail`, `Failed`, and `TBI`. `Soft Fail` means the feature is implemented and safe, but has missing optional data, a fallback mode, or a non-blocking setup gap. It is not the same as a broken feature.
+- Package install diagnostics and Firebase rules smoke tests.
+- Diagnostic TXT export with failure reasons and a copy/paste fix prompt.
+
+## Master Admin AI Crawling
+
+Open Master Admin > AI Crawling to manage crawler setup and crawler-derived data:
+
 - Crawler search criteria including search text, genres, languages, cities, regions, countries, event types, and market/language plans.
 - Schedule settings for every 4 hours, six times daily, daily, or manual-only mode.
 - Manual crawl scaffold button that writes `aiCrawlRuns` and review-only `aiDiscoveryQueue` records. It does not crawl the public internet from the static frontend.
-- Crawl activity reports, collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
+- Crawl activity reports, consolidated collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
+- Duplicate destination consolidation. Matching clubs/events are grouped by normalized name, city, country, and destination type.
+- The consolidated report consolidates duplicate clubs/events so the same destination does not appear as separate records with conflicting addresses.
+- Address-conflict warnings. If multiple crawler sources claim different non-empty addresses for the same club/event destination, Master Admin sees an address-conflict warning before approval/import.
+- AI Crawler Profile Import. Public-source club/event destination data can be generated as JSON, saved as `aiDiscoveryQueue` import drafts, applied by Master Admin as missing fields only, or opened by Club Admin through a `profileImportDraft` link.
+
+The import workflow does not overwrite existing club profile values. Master Admin import applies missing fields only. Club Admin import links prefill the public profile editor and require the Club Admin to review and click Save Public Profile.
 
 Real internet crawling must run in backend code using Firebase scheduled functions or Cloud Run. The backend crawler should validate official APIs and public source terms, handle robots.txt, deduplicate records, classify event/venue type, rate records from Super Admin criteria, and write only to `aiDiscoveryQueue`.
 
@@ -172,7 +189,7 @@ When live AI translation is configured later, it must run through Firebase AI Lo
 
 New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
 
-The v28.60 package does not loosen Firestore rules. It keeps the v28.59 Firestore and Storage rules versions and improves Diagnostics wording for optional Mingl participant queries. If v28.59 rules have not been published yet, publish both files in Firebase Console before trusting the live smoke-test result.
+The v28.62 package does not loosen Firestore rules. It keeps the v28.59 Firestore and Storage rules versions, keeps the optional Mingl participant-query guidance, and moves crawler controls into Master Admin > AI Crawling. If v28.59 rules have not been published yet, publish both files in Firebase Console before trusting the live smoke-test result.
 
 Post-install rules testing:
 
@@ -286,14 +303,15 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, and v28.60 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, and v28.62 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
 - Confirm the Firebase Rules Smoke Test panel shows plain-English meaning, suggested fixes, and a Copy Fix Prompt button.
 - Confirm `Firestore: users/{uid} profile save path` passes before testing new-user onboarding.
-- Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
-- Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
+- Open Master Admin > AI Crawling, save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
+- Confirm AI Crawling analytics show raw collected record counts, consolidated clubs/events, address conflicts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
+- Generate AI Crawler Profile Import JSON, save import drafts, copy a Club Admin import link, and confirm the Club Admin public profile editor pre-fills missing fields without auto-saving.
 - Save a patron public profile with preferred/original language mode, then save again with English version mode and confirm the preview switches bio source.
 
 - Fix package. `-f` means this release corrects upload/deployment behavior from the previous package.
