@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.59 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.60 */
 (function () {
   "use strict";
 
@@ -26,7 +26,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.59-rules-step-diagnostics";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.60-optional-mingl-query-guidance";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -267,6 +267,16 @@
         {label:"Rules smoke step labels", file:"ai-diagnostics-service.js", includes:["runDiagnosticStep", "delete diagnostic Mingl connection"]},
         {label:"Storage smoke step labels", file:"ai-diagnostics-service.js", includes:["runStorageStep", "delete uploaded smoke-test media"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.59-rules-step-diagnostics"]}
+      ]
+    },
+    {
+      version: "v28.60-optional-mingl-query-guidance",
+      title: "Optional Mingl Query Guidance",
+      checks: [
+        {label:"Optional Mingl query wording", file:"ai-diagnostics-service.js", includes:["Optional participant query blocked; fallback participant document reads passed", "deterministicFallbackPassed"]},
+        {label:"Capture returns rule rows", file:"ai-diagnostics-service.js", includes:["return row", "const minglConnectionResult = await capture"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.60-optional-mingl-query-guidance"]},
+        {label:"README optional Mingl explanation", file:"README.md", includes:["optional compatibility check", "Do not loosen Firestore rules broadly"]}
       ]
     }
   ];
@@ -915,13 +925,21 @@
     return `${collection} app-style query succeeded (${snap.size} doc(s) visible to this signed-in account).`;
   }
 
-  async function participantQuerySoftCheck(collection, user) {
+  async function participantQuerySoftCheck(collection, user, options = {}) {
+    const deterministicFallbackPassed = options.deterministicFallbackPassed === true;
+    const fallbackName = options.fallbackName || "fallback participant document reads";
     try {
       return await firestoreQueryRead(collection, query => query.where("participants", "array-contains", user.uid));
     } catch (error) {
+      if (deterministicFallbackPassed) {
+        return {
+          status:"Soft Fail",
+          evidence:`Optional participant query blocked; fallback participant document reads passed. ${collection} array-contains query was denied (${error?.message || error}), but FLOQR uses ${fallbackName} as the supported safe path. Do not loosen Firestore rules broadly just to make this optional query pass.`
+        };
+      }
       return {
         status:"Soft Fail",
-        evidence:`${collection} participant query blocked (${error?.message || error}). FLOQR now verifies deterministic participant document access and uses fallback reads when a deployed project rejects participant list queries.`
+        evidence:`Optional ${collection} participant query blocked (${error?.message || error}). Run the deterministic Mingl/chat lifecycle checks above; FLOQR treats this query as optional and uses participant document fallback reads when those checks pass.`
       };
     }
   }
@@ -1172,11 +1190,22 @@
   }
 
   async function runMinglChatRuleTests(capture, runId, user) {
-    await capture("Firestore: minglConnections deterministic participant lifecycle", () => minglConnectionRuleLifecycle(runId, user));
-    await capture("Firestore: chatRooms deterministic Mingl participant lifecycle", () => minglChatRoomRuleLifecycle(runId, user));
-    await capture("Firestore: minglConnections participant query compatibility", () => participantQuerySoftCheck("minglConnections", user));
-    await capture("Firestore: chatRooms participant query compatibility", () => participantQuerySoftCheck("chatRooms", user));
-    await capture("Firestore: chatMessages participant query compatibility", () => participantQuerySoftCheck("chatMessages", user));
+    const minglConnectionResult = await capture("Firestore: minglConnections deterministic participant lifecycle", () => minglConnectionRuleLifecycle(runId, user));
+    const chatRoomResult = await capture("Firestore: chatRooms deterministic Mingl participant lifecycle", () => minglChatRoomRuleLifecycle(runId, user));
+    const deterministicMinglPassed = minglConnectionResult?.status === "Pass";
+    const deterministicChatPassed = chatRoomResult?.status === "Pass";
+    await capture("Firestore: minglConnections participant query compatibility", () => participantQuerySoftCheck("minglConnections", user, {
+      deterministicFallbackPassed:deterministicMinglPassed,
+      fallbackName:"deterministic Mingl participant document reads"
+    }));
+    await capture("Firestore: chatRooms participant query compatibility", () => participantQuerySoftCheck("chatRooms", user, {
+      deterministicFallbackPassed:deterministicChatPassed,
+      fallbackName:"deterministic Mingl chat room participant reads"
+    }));
+    await capture("Firestore: chatMessages participant query compatibility", () => participantQuerySoftCheck("chatMessages", user, {
+      deterministicFallbackPassed:deterministicChatPassed,
+      fallbackName:"deterministic Mingl chat participant reads"
+    }));
     await capture("Firestore: non-Mingl chatRooms lifecycle", () => firestoreDocLifecycle("chatRooms", {
       type:"diagnostic",
       participants:[user.uid],
@@ -1235,16 +1264,21 @@
       try {
         const evidence = await fn();
         if (evidence && typeof evidence === "object" && evidence.status) {
-          results.push({
+          const row = {
             label,
             status:evidence.status,
             evidence:evidence.evidence || "Diagnostic completed with a non-blocking note."
-          });
-          return;
+          };
+          results.push(row);
+          return row;
         }
-        results.push({label, status:"Pass", evidence:evidence || "Create/read/update/delete or upload/read/delete succeeded for the signed-in user."});
+        const row = {label, status:"Pass", evidence:evidence || "Create/read/update/delete or upload/read/delete succeeded for the signed-in user."};
+        results.push(row);
+        return row;
       } catch (error) {
-        results.push({label, status:"Failed", evidence:error?.message || String(error)});
+        const row = {label, status:"Failed", evidence:error?.message || String(error)};
+        results.push(row);
+        return row;
       }
     }
 

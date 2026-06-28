@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.59 Rules Step Diagnostics Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.60 Optional Mingl Query Guidance Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.59-rules-step-diagnostics
+https://jadzadco.github.io/shoutout-demo/?v=28.60-optional-mingl-query-guidance
 ```
 
 Current release highlights:
@@ -51,6 +51,8 @@ Current release highlights:
 - Updates Firestore rules to `v28.59-diagnostic-cleanup-rules` so temporary `diagnosticRunId` Mingl connection records can be deleted by their participant during the rules smoke test.
 - Updates Storage rules to `v28.59-storage-lifecycle-rules` so uploads still require owner, size, and file-type checks while deletes use an explicit owner delete rule.
 - Adds step-level rules smoke-test evidence so failed Mingl/chat checks identify create/read/update/delete, and failed Storage checks identify upload/download/delete.
+- Clarifies `Firestore: minglConnections participant query compatibility` as an optional compatibility check. If the deterministic Mingl participant lifecycle passes but the array-contains participant query is denied, Diagnostics now reports a non-blocking Soft Fail: `Optional participant query blocked; fallback participant document reads passed.`
+- Keeps Firestore rules strict for Mingl. Do not loosen Firestore rules broadly or allow all signed-in users to list `minglConnections` just to make the optional query pass.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -170,7 +172,7 @@ When live AI translation is configured later, it must run through Firebase AI Lo
 
 New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
 
-The v28.59 package changes both Firestore and Storage rules. Publish both files in Firebase Console before trusting the live smoke-test result.
+The v28.60 package does not loosen Firestore rules. It keeps the v28.59 Firestore and Storage rules versions and improves Diagnostics wording for optional Mingl participant queries. If v28.59 rules have not been published yet, publish both files in Firebase Console before trusting the live smoke-test result.
 
 Post-install rules testing:
 
@@ -222,7 +224,8 @@ Plain meaning for common results:
 - `Live deployed rules compatibility = Failed` means Firebase Console's currently deployed rules denied one or more live app operations.
 - `Overall rules status = Failed` means the app should not be considered rules-ready until the live smoke test passes.
 - The usual fix is to publish `firestore.rules` and/or `storage.rules` in Firebase Console, rerun `Run Rules Smoke Test`, then use `Export Diagnostics TXT` if anything still fails.
-- A Mingl participant query compatibility result can show `Soft Fail` if Firebase denies a participant list query but deterministic participant document reads pass. FLOQR uses fallback reads for that case.
+- A Mingl participant query compatibility result can show `Soft Fail` if Firebase denies the optional `participants array-contains currentUser.uid` query but deterministic participant document reads pass. This is an optional compatibility check, not a blocking Mingl failure.
+- Do not loosen Firestore rules broadly to make the optional Mingl participant query pass. Keep deterministic Mingl participant reads as the supported safe path; never allow all signed-in users to list `minglConnections`.
 - Historical failed `aiDiagnosticsReports` remain in the TXT export for reference, but only the current package's rules smoke test is counted as the live rules status.
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to upload/read/delete their own ShoutOut media, profile media, and template background paths. Upload/create/update still checks owner, size, and content type; delete checks owner because Firebase Storage delete requests do not include `request.resource`.
@@ -283,7 +286,7 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, and v28.59 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, and v28.60 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
