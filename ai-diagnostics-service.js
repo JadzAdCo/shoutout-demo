@@ -106,7 +106,8 @@
       title: "FLOQR AI Core Layer",
       checks: [
         {label:"AI feature flags", file:"shared-data.js", includes:["FLOQR_AI_ENABLED", "FLOQR_AI_PROVIDER", "FLOQR_AI_FALLBACK_MODE"]},
-        {label:"Local fallback search", file:"ai-search-service.js", includes:["window.floqrSearch", "localContextualSearch", "aiSemanticSearch"]},
+        {label:"Local fallback search engine", file:"ai-service.js", includes:["function localContextualSearch", "function floqrSearch", "window.floqrSearch"]},
+        {label:"Search record adapters", file:"ai-search-service.js", includes:["window.FLOQRAISearch", "searchRecords", "window.floqrSearch"]},
         {label:"Assistant scaffold", file:"ai-assistant-ui.js", includes:["Ask FLOQR", "role"]},
         {label:"Template Studio scaffold", file:"ai-template-studio.js", includes:["patronTemplateVariants", "aiTemplatePromptHistory"]},
         {label:"AI Discovery module", file:"master-admin.html", includes:["ai-discovery-service.js"]}
@@ -143,6 +144,17 @@
         {label:"Rules smoke test runner", file:"ai-diagnostics-service.js", includes:["runRulesSmokeTest", "aiDiagnosticsReports", "template-backgrounds"]},
         {label:"Package install runner", file:"ai-diagnostics-service.js", includes:["PACKAGE_INSTALL_CHECKS", "runPackageInstallDiagnostics"]},
         {label:"Storage passed to diagnostics", file:"master-admin-app.js", includes:["const storage", "FLOQRDiagnostics", "storage"]}
+      ]
+    },
+    {
+      version: "v28.48-diagnostics-fix",
+      title: "Diagnostics Marker + Storage Guidance Fix",
+      checks: [
+        {label:"AI search marker fixed", file:"ai-diagnostics-service.js", includes:["Local fallback search engine", "function localContextualSearch", "Search record adapters"]},
+        {label:"Storage unauthorized guidance", file:"ai-diagnostics-service.js", includes:["Publish this package's storage.rules", "storage/unauthorized"]},
+        {label:"Queue status labels", file:"ai-diagnostics-service.js", includes:["function queueStatusBadge", "Pending Review"]},
+        {label:"Soft Fail definition in UI", file:"master-admin.html", includes:["Soft Fail means the feature is present and safe"]},
+        {label:"Market Language Plan definition in UI", file:"master-admin.html", includes:["Market Language Plan tells the future backend crawler"]}
       ]
     }
   ];
@@ -211,6 +223,25 @@
       TBI: "#475569"
     };
     return `<span style="display:inline-flex;align-items:center;border-radius:999px;padding:0.2rem 0.55rem;background:${colors[status] || "#475569"};color:#fff;font-size:0.78rem;font-weight:800;">${esc(status)}</span>`;
+  }
+
+  function queueStatusBadge(status) {
+    const labelMap = {
+      pendingReview: "Pending Review",
+      approved: "Approved",
+      rejected: "Rejected",
+      deleted: "Deleted",
+      duplicate: "Duplicate"
+    };
+    const colors = {
+      pendingReview: "#2563eb",
+      approved: "#0f766e",
+      rejected: "#b91c1c",
+      deleted: "#475569",
+      duplicate: "#7c3aed"
+    };
+    const key = status || "pendingReview";
+    return `<span style="display:inline-flex;align-items:center;border-radius:999px;padding:0.2rem 0.55rem;background:${colors[key] || "#475569"};color:#fff;font-size:0.78rem;font-weight:800;">${esc(labelMap[key] || key)}</span>`;
   }
 
   function renderCheckCards(wrapId, results = []) {
@@ -317,9 +348,16 @@
   async function storageLifecycle(path) {
     if (!state.storage) throw new Error("Firebase Storage SDK or bucket is unavailable on this page.");
     const ref = state.storage.ref().child(path);
-    await ref.put(tinyPngBlob(), {contentType:"image/png"});
-    await ref.getDownloadURL();
-    await ref.delete();
+    try {
+      await ref.put(tinyPngBlob(), {contentType:"image/png"});
+      await ref.getDownloadURL();
+      await ref.delete();
+    } catch (error) {
+      if (error?.code === "storage/unauthorized") {
+        throw new Error(`Storage rules denied ${path}. Publish this package's storage.rules in Firebase Console > Storage > Rules, then rerun this smoke test.`);
+      }
+      throw error;
+    }
   }
 
   async function saveRulesSmokeReport(results, overallStatus) {
@@ -763,7 +801,7 @@
     wrap.innerHTML = queue.length ? queue.slice(0, 25).map(item => `<div class="queue-item">
       <div class="message-envelope-head">
         <strong>${esc(item.proposedTitle || item.title || item.id)}</strong>
-        ${statusBadge(item.status === "pendingReview" ? "Soft Fail" : item.status === "approved" ? "Pass" : item.status === "rejected" || item.status === "deleted" ? "Failed" : "TBI")}
+        ${queueStatusBadge(item.status)}
       </div>
       <p>${esc(item.city || "")}${item.country ? `, ${esc(item.country)}` : ""} | ${esc(item.proposedType || "")} | ${esc((item.genres || []).join(", "))}</p>
       <small>Stars: ${esc(item.aiStarRating || "-")} | Confidence: ${esc(item.aiConfidenceScore || "-")} | Source: ${esc(item.sourceName || "")}</small>

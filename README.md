@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.47 Rules + Package Diagnostics Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.48 Diagnostics Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.47-rules-diag
+https://jadzadco.github.io/shoutout-demo/?v=28.48-diagnostics-fix
 ```
 
 Current release highlights:
@@ -29,6 +29,9 @@ Current release highlights:
 - Adds public profile language publishing choices so patrons can display their public profile in their preferred/original language or the English version. AI translation is scaffolded without frontend AI keys.
 - Adds Package Install Diagnostics under Master Admin > Diagnostics so each package can verify its own feature markers after upload.
 - Adds Firebase Rules Smoke Test under Master Admin > Diagnostics to verify signed-in Firestore and Storage rules compatibility after publishing a package.
+- Fixes the v28.44 AI search package marker diagnostic so it checks the fallback engine in `ai-service.js` and the adapters in `ai-search-service.js`.
+- Adds clearer Storage unauthorized guidance when deployed Storage rules are missing the package media paths.
+- Separates discovered-record workflow statuses from feature-health statuses.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -124,7 +127,7 @@ Club public profiles are public search records. When a club admin claims ownersh
 Open Master Admin > Diagnostics to review:
 
 - App-wide feature health from authentication through ShoutOut, guest lists, Mingl, chat, Bata scaffolding, AI search, AI Discovery, templates, club profiles, ticketing, and partner integrations.
-- Status labels: `Pass`, `Soft Fail`, `Failed`, and `TBI`.
+- Status labels: `Pass`, `Soft Fail`, `Failed`, and `TBI`. `Soft Fail` means the feature is implemented and safe, but has missing optional data, a fallback mode, or a non-blocking setup gap. It is not the same as a broken feature.
 - Crawler search criteria including search text, genres, languages, cities, regions, countries, event types, and market/language plans.
 - Schedule settings for every 4 hours, six times daily, daily, or manual-only mode.
 - Manual crawl scaffold button that writes `aiCrawlRuns` and review-only `aiDiscoveryQueue` records. It does not crawl the public internet from the static frontend.
@@ -161,6 +164,10 @@ Post-install rules testing:
 
 The rules smoke test verifies signed-in allowed operations. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
 
+If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
+
+`Market Language Plan` means the crawler's per-market search map: country, local language(s), target cities, and relevant categories. Example: Spain searches in Spanish/Catalan for Barcelona, Madrid, Ibiza, and Marbella using terms for Latin nights, rooftops, beach clubs, and ticket resale.
+
 Rollback plan:
 
 1. Set all FLOQR AI flags in `shared-data.js` to false.
@@ -182,7 +189,7 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, and v28.47 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, and v28.48 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs and Storage images are created/read/cleaned up.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
