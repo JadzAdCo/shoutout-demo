@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.55 Diagnostics Export Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.56 Plain Diagnostics Guidance Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.55-diagnostics-export
+https://jadzadco.github.io/shoutout-demo/?v=28.56-plain-diagnostics-guidance
 ```
 
 Current release highlights:
@@ -42,6 +42,7 @@ Current release highlights:
 - Adds a Master Admin Diagnostics rules status panel showing the expected Firestore rules version, package rules note status, latest live smoke-test result, and overall rules status.
 - Expands `Run Rules Smoke Test` into an app-wide rules compatibility diagnostic for core app collections, AI collections, Mingl/chat queries, and Storage paths required by FLOQR.
 - Adds `Export Diagnostics TXT` under Master Admin > Diagnostics. The export includes current feature diagnostics, package install diagnostics, saved `aiDiagnosticsReports`, failure reasons/evidence, and a copy/paste prompt for Codex to fix the reported issues.
+- Adds plain-English rules guidance in Master Admin Diagnostics so the page explains whether the package file is current, whether live Firebase deployed rules passed, the likely fix, and a copyable prompt for Codex.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -190,10 +191,20 @@ Master Admin > Diagnostics now also shows `Firebase Rules Smoke Test` with:
 - Whether the installed package's `firestore.rules` file contains the expected rules-version note.
 - Whether the latest live Firestore/Storage compatibility smoke test passed.
 - Overall rules status.
+- Plain-English meaning of the result.
+- Failed rule checks with suggested fixes.
+- A copyable Codex fix prompt.
 
 Because browser code cannot read Firebase Console's deployed rules text directly, the live proof is the smoke test: it attempts the same signed-in reads, writes, query patterns, and uploads the app needs.
 
 The rules smoke test verifies signed-in allowed operations for authentication/profile save, public discovery reads, ShoutOut records, guest list records, Mingl/chat participant queries, AI diagnostics/discovery/search collections, template variants, notification preferences, and Storage media paths. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
+
+Plain meaning for common results:
+
+- `Package firestore.rules note = Pass` means the uploaded package file contains the expected rules-version note.
+- `Live deployed rules compatibility = Failed` means Firebase Console's currently deployed rules denied one or more live app operations.
+- `Overall rules status = Failed` means the app should not be considered rules-ready until the live smoke test passes.
+- The usual fix is to publish `firestore.rules` and/or `storage.rules` in Firebase Console, rerun `Run Rules Smoke Test`, then use `Export Diagnostics TXT` if anything still fails.
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
 
@@ -253,10 +264,11 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, and v28.55 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, and v28.56 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
+- Confirm the Firebase Rules Smoke Test panel shows plain-English meaning, suggested fixes, and a Copy Fix Prompt button.
 - Confirm `Firestore: users/{uid} profile save path` passes before testing new-user onboarding.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.

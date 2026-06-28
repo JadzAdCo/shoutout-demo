@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, and TXT export v28.55 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and plain fix guidance v28.56 */
 (function () {
   "use strict";
 
@@ -25,7 +25,7 @@
   };
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.52-rules-version-note";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.55-diagnostics-export";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.56-plain-diagnostics-guidance";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -227,6 +227,15 @@
         {label:"Diagnostics export builder", file:"ai-diagnostics-service.js", includes:["buildDiagnosticsExport", "exportDiagnosticsReport", "downloadTextFile"]},
         {label:"Fix prompt included in export", file:"ai-diagnostics-service.js", includes:["COPY/PASTE FIX PROMPT", "Do not rebuild FLOQR from scratch"]}
       ]
+    },
+    {
+      version: "v28.56-plain-diagnostics-guidance",
+      title: "Plain Diagnostics Guidance + Fix Suggestions",
+      checks: [
+        {label:"Plain rules explanation", file:"ai-diagnostics-service.js", includes:["Plain English meaning", "Package file is current, but deployed Firebase rules failed live testing"]},
+        {label:"Suggested fix field", file:"ai-diagnostics-service.js", includes:["suggestDiagnosticFix", "Suggested fix"]},
+        {label:"Copy prompt action", file:"ai-diagnostics-service.js", includes:["copyRulesFixPromptBtn", "Copy Fix Prompt"]}
+      ]
     }
   ];
 
@@ -359,6 +368,32 @@
     return rows.slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   }
 
+  function suggestDiagnosticFix(source, label, reason, status) {
+    const text = normalized(`${source} ${label} ${reason}`);
+    if (text.includes("storage") || text.includes("storage unauthorized") || text.includes("template backgrounds") || text.includes("shoutouts original image path")) {
+      return "Publish the package `storage.rules` in Firebase Console > Storage > Rules, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
+    }
+    if (text.includes("firestore") || text.includes("missing or insufficient permissions") || text.includes("permission denied")) {
+      return "Publish the package `firestore.rules` in Firebase Console > Firestore Database > Rules, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
+    }
+    if (text.includes("package install") || text.includes("is missing") || text.includes("package marker")) {
+      return "Upload the latest full package ZIP to the GitHub repo root, use the README cache-busted URL, then rerun Package Install Diagnostics.";
+    }
+    if (text.includes("no saved rules smoke test") || text.includes("run the rules smoke test")) {
+      return "Click `Run Rules Smoke Test`. If it fails, click `Export Diagnostics TXT` and paste the exported fix prompt back into Codex.";
+    }
+    if (text.includes("backend") || text.includes("cloud functions") || text.includes("scheduler") || text.includes("gemini")) {
+      return "This is expected until backend Firebase/AI services are configured. Leave it as TBI or schedule it as a future backend package.";
+    }
+    if (status === "TBI") {
+      return "No emergency fix required. This means the feature is planned but not implemented yet; choose it for a future package when ready.";
+    }
+    if (status === "Soft Fail") {
+      return "Usually non-blocking. Add the missing setup/data or keep the fallback behavior if production can continue safely.";
+    }
+    return "Use the failure reason and exported diagnostic prompt to request a focused fix package from Codex.";
+  }
+
   function collectDiagnosticIssues({data = {}, features = [], packageResults = [], reports = []} = {}) {
     const issues = [];
     const add = (source, label, status, reason) => {
@@ -367,7 +402,8 @@
           source: cleanText(source),
           label: cleanText(label),
           status: cleanText(status),
-          reason: cleanText(reason)
+          reason: cleanText(reason),
+          suggestedFix: suggestDiagnosticFix(source, label, reason, status)
         });
       }
     };
@@ -392,7 +428,7 @@
 
   function buildDiagnosticsFixPrompt(issues = []) {
     const issueText = issues.length
-      ? issues.map((item, index) => `${index + 1}. ${item.source}: [${item.status}] ${item.label}. Failure reason: ${item.reason}`).join("\n")
+      ? issues.map((item, index) => `${index + 1}. ${item.source}: [${item.status}] ${item.label}. Failure reason: ${item.reason}. Suggested fix: ${item.suggestedFix || "Review and fix this item."}`).join("\n")
       : "No Failed, Soft Fail, or TBI items were found in this export. Please review the full report for anything unusual.";
 
     return [
@@ -440,6 +476,7 @@
       issues.forEach((item, index) => {
         lines.push(`${index + 1}. ${item.source}: [${item.status}] ${item.label}`);
         lines.push(`   Failure reason: ${item.reason}`);
+        lines.push(`   Suggested fix: ${item.suggestedFix}`);
       });
     } else {
       lines.push("No Failed, Soft Fail, or TBI items were found in the exported diagnostics.");
@@ -451,6 +488,7 @@
     features.forEach(item => {
       lines.push(`[${item.status}] ${item.area}: ${item.feature}`);
       lines.push(`Reason: ${cleanText(item.evidence)}`);
+      if (attentionStatus(item.status)) lines.push(`Suggested fix: ${suggestDiagnosticFix("Feature Diagnostics", `${item.area}: ${item.feature}`, item.evidence, item.status)}`);
     });
 
     lines.push("");
@@ -459,6 +497,7 @@
     packageResults.forEach(item => {
       lines.push(`[${item.status}] ${item.package || "Package"}: ${item.label}`);
       lines.push(`Reason: ${cleanText(item.evidence)}`);
+      if (attentionStatus(item.status)) lines.push(`Suggested fix: ${suggestDiagnosticFix("Package Install Diagnostics", `${item.package || "Package"}: ${item.label}`, item.evidence, item.status)}`);
     });
 
     lines.push("");
@@ -495,6 +534,7 @@
         results.forEach(result => {
           lines.push(`- [${result.status || "-"}] ${cleanText(result.label)}`);
           lines.push(`  Failure reason/evidence: ${cleanText(result.evidence)}`);
+          if (attentionStatus(result.status)) lines.push(`  Suggested fix: ${suggestDiagnosticFix(`Saved Diagnostic Report: ${report.type || "diagnosticReport"}`, result.label, result.evidence, result.status)}`);
         });
       }
     });
@@ -516,6 +556,88 @@
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function copyTextToClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "readonly");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  function ruleStatusMeaning(packageRulesStatus, smokeStatus, latest) {
+    if (packageRulesStatus === "Pass" && smokeStatus === "Pass") {
+      return "The package file contains the expected rules note, and the live Firebase project allowed the app-required test operations.";
+    }
+    if (packageRulesStatus === "Pass" && smokeStatus === "Failed") {
+      return "Package file is current, but deployed Firebase rules failed live testing. This usually means Firestore rules or Storage rules still need to be published in Firebase Console, or one live rule path is still too strict.";
+    }
+    if (packageRulesStatus === "Pass" && !latest) {
+      return "The package file looks current, but no live deployed-rules test has been run yet. Click Run Rules Smoke Test.";
+    }
+    if (packageRulesStatus === "Failed") {
+      return "The website package does not appear to contain the expected `firestore.rules` note. Upload the latest full package before testing deployed rules.";
+    }
+    return "Diagnostics needs a live smoke test result before it can confirm deployed Firebase rules.";
+  }
+
+  function ruleNextSteps(packageRulesStatus, smokeStatus, failedChecks = []) {
+    if (packageRulesStatus === "Failed") {
+      return [
+        "Upload the latest full package ZIP to GitHub.",
+        "Open the README cache-busted URL so the browser loads the new diagnostics files.",
+        "Rerun Package Install Diagnostics."
+      ];
+    }
+    if (!failedChecks.length && smokeStatus === "Soft Fail") {
+      return [
+        "Click Run Rules Smoke Test.",
+        "If it fails, review the failed check names under the rules report.",
+        "Click Export Diagnostics TXT and paste the COPY/PASTE FIX PROMPT back into Codex."
+      ];
+    }
+    const hasStorageFailure = failedChecks.some(item => normalized(`${item.label} ${item.evidence}`).includes("storage"));
+    const hasFirestoreFailure = failedChecks.some(item => normalized(`${item.label} ${item.evidence}`).includes("firestore") || normalized(item.evidence).includes("permission"));
+    const steps = [];
+    if (hasFirestoreFailure) steps.push("Publish the package `firestore.rules` in Firebase Console > Firestore Database > Rules.");
+    if (hasStorageFailure) steps.push("Publish the package `storage.rules` in Firebase Console > Storage > Rules.");
+    if (!steps.length && smokeStatus === "Failed") steps.push("Open the detailed failed check below and use its failure reason to decide whether Firestore rules, Storage rules, or the package upload needs the fix.");
+    steps.push("Rerun Run Rules Smoke Test.");
+    steps.push("Click Export Diagnostics TXT and paste the COPY/PASTE FIX PROMPT into Codex if anything still fails.");
+    return steps;
+  }
+
+  function buildRulesPanelPrompt({packageRulesStatus, smokeStatus, latest, failedChecks = []}) {
+    const issues = failedChecks.length
+      ? failedChecks.map((item, index) => `${index + 1}. [${item.status || "Failed"}] ${cleanText(item.label)}. Failure reason: ${cleanText(item.evidence)}. Suggested fix: ${suggestDiagnosticFix("Firebase Rules Smoke Test", item.label, item.evidence, item.status || "Failed")}`).join("\n")
+      : `No detailed failed rule checks are available yet. Current package rules note status: ${packageRulesStatus}. Live deployed rules status: ${smokeStatus}.`;
+    return [
+      "You are working on the FLOQR web app.",
+      "",
+      "Please fix the Firebase rules/diagnostics issue shown by Master Admin Diagnostics.",
+      "",
+      "Do not rebuild FLOQR from scratch. Preserve existing user profile data and keep ShoutOut, Mingl, Bata, guest lists, Firebase Auth, Firestore, Firebase Storage, and GitHub Pages working.",
+      "",
+      `Expected Firestore rules version: ${EXPECTED_FIRESTORE_RULES_VERSION}`,
+      `Current diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`,
+      `Package firestore.rules note status: ${packageRulesStatus}`,
+      `Live deployed rules compatibility status: ${smokeStatus}`,
+      `Latest smoke test: ${latest ? `${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}` : "none"}`,
+      "",
+      "Failed checks / context:",
+      issues,
+      "",
+      "Please update the relevant rule file or diagnostics code, update README if needed, run syntax/static checks, and create the next full package ZIP."
+    ].join("\n");
   }
 
   function latestRulesSmokeReport(data = state.lastData || {}) {
@@ -556,15 +678,54 @@
       ? `Latest live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
       : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
     const overall = packageRulesStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
+    const failedChecks = (Array.isArray(latest?.results) ? latest.results : []).filter(item => item.status === "Failed");
+    const meaning = ruleStatusMeaning(packageRulesStatus, smokeStatus, latest);
+    const nextSteps = ruleNextSteps(packageRulesStatus, smokeStatus, failedChecks);
+    const prompt = buildRulesPanelPrompt({packageRulesStatus, smokeStatus, latest, failedChecks});
+    const failedHtml = failedChecks.length
+      ? failedChecks.slice(0, 8).map(item => `<div style="border:1px solid rgba(255,255,255,0.16);border-radius:8px;padding:0.75rem;margin-top:0.75rem;">
+        <div class="message-envelope-head"><strong>${esc(item.label || "Failed rule check")}</strong>${statusBadge(item.status || "Failed")}</div>
+        <p><strong>Failure reason:</strong> ${esc(item.evidence || "")}</p>
+        <p><strong>Suggested fix:</strong> ${esc(suggestDiagnosticFix("Firebase Rules Smoke Test", item.label, item.evidence, item.status || "Failed"))}</p>
+      </div>`).join("")
+      : "<p class='sub'>No detailed failed rule checks are available yet. Run the smoke test to see exact failing paths.</p>";
 
-    wrap.innerHTML = simpleRows([
+    wrap.innerHTML = `${simpleRows([
       ["Expected Firestore rules version", EXPECTED_FIRESTORE_RULES_VERSION],
       ["Current Diagnostics package", CURRENT_DIAGNOSTICS_PACKAGE_VERSION],
       ["Package firestore.rules note", `${packageRulesStatus}: ${packageRulesEvidence}`],
       ["Live deployed rules compatibility", `${smokeStatus}: ${smokeEvidence}`],
       ["Overall rules status", overall],
       ["How this is tested", "Package note is read from firestore.rules; deployed rules are verified by live Firestore/Storage operations."]
-    ]);
+    ])}
+    <div class="queue-item">
+      <div class="message-envelope-head"><strong>Plain English meaning</strong>${statusBadge(overall)}</div>
+      <p>${esc(meaning)}</p>
+    </div>
+    <div class="queue-item">
+      <strong>What to do next</strong>
+      <ol>${nextSteps.map(step => `<li>${esc(step)}</li>`).join("")}</ol>
+    </div>
+    <div class="queue-item">
+      <strong>Failed rule checks and suggested fixes</strong>
+      ${failedHtml}
+    </div>
+    <div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>Prompt to paste into Codex</strong>
+        <button id="copyRulesFixPromptBtn" type="button">Copy Fix Prompt</button>
+      </div>
+      <textarea id="rulesFixPromptText" rows="9" readonly>${esc(prompt)}</textarea>
+      <p class="sub small">For the fullest report, click Export Diagnostics TXT and paste the COPY/PASTE FIX PROMPT section back into Codex.</p>
+    </div>`;
+    byId("copyRulesFixPromptBtn")?.addEventListener("click", async () => {
+      try {
+        await copyTextToClipboard(prompt);
+        setText("diagnosticsStatus", "Rules fix prompt copied. Paste it into Codex with the exported diagnostics if the issue remains.");
+      } catch (error) {
+        setText("diagnosticsStatus", `Could not copy prompt automatically: ${error?.message || error}`);
+      }
+    });
   }
 
   async function runPackageInstallDiagnostics(options = {}) {
