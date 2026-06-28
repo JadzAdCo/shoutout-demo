@@ -1,12 +1,14 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.57-mingl-diagnostic-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.59-diagnostic-cleanup-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
 // - users/{uid} self create/read/update support for onboarding and existing profiles
 // - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
 // - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
+// - explicit diagnostic-only delete support for temporary Mingl connection records
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -46,6 +48,19 @@ service cloud.firestore {
     function isDiagnosticResource() {
       return signedIn()
         && resource.data.diagnosticRunId is string;
+    }
+
+    function isDiagnosticParticipantResource() {
+      return isDiagnosticResource()
+        && resource.data.participants is list
+        && request.auth.uid in resource.data.participants;
+    }
+
+    function isDiagnosticParticipantRequest() {
+      return signedIn()
+        && request.resource.data.diagnosticRunId is string
+        && request.resource.data.participants is list
+        && request.auth.uid in request.resource.data.participants;
     }
 
     function isMutualMingl(connectionId) {
@@ -281,7 +296,7 @@ service cloud.firestore {
           request.auth.uid == resource.data.requestedTo ||
           request.auth.uid == resource.data.requestedBy
         );
-      allow delete: if false;
+      allow delete: if isDiagnosticParticipantResource();
     }
 
     match /chatRooms/{roomId} {
@@ -313,11 +328,7 @@ service cloud.firestore {
       allow delete: if signedIn()
         && (
           !isExistingMinglRoom() ||
-          (
-            isExistingMinglRoom()
-            && isParticipant()
-            && isDiagnosticResource()
-          )
+          (isExistingMinglRoom() && isDiagnosticParticipantResource())
         );
     }
 
@@ -348,12 +359,7 @@ service cloud.firestore {
       allow update, delete: if signedIn()
         && (
           !isExistingMinglMessage() ||
-          (
-            isExistingMinglMessage()
-            && resource.data.participants is list
-            && request.auth.uid in resource.data.participants
-            && isDiagnosticResource()
-          )
+          (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );
     }
   }

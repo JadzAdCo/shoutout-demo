@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.58 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.59 */
 (function () {
   "use strict";
 
@@ -24,9 +24,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.57-mingl-diagnostic-rules";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.57-storage-media-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.58-diagnostics-signal-cleanup";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.59-rules-step-diagnostics";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -257,6 +257,17 @@
         {label:"Historical report issue filter", file:"ai-diagnostics-service.js", includes:["collectCurrentRulesReportIssues", "Historical saved reports are exported for reference"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.58-diagnostics-signal-cleanup"]}
       ]
+    },
+    {
+      version: "v28.59-rules-step-diagnostics",
+      title: "Rules Cleanup + Step Diagnostics",
+      checks: [
+        {label:"Firestore diagnostic cleanup rule", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules", "allow delete: if isDiagnosticParticipantResource()"]},
+        {label:"Storage delete lifecycle rule", file:"storage.rules", includes:["FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules", "allow delete: if request.auth != null"]},
+        {label:"Rules smoke step labels", file:"ai-diagnostics-service.js", includes:["runDiagnosticStep", "delete diagnostic Mingl connection"]},
+        {label:"Storage smoke step labels", file:"ai-diagnostics-service.js", includes:["runStorageStep", "delete uploaded smoke-test media"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.59-rules-step-diagnostics"]}
+      ]
     }
   ];
 
@@ -267,6 +278,29 @@
 
   function fieldValue() {
     return firebase.firestore.FieldValue.serverTimestamp();
+  }
+
+  function diagnosticErrorMessage(error) {
+    return error?.message || String(error);
+  }
+
+  async function runDiagnosticStep(label, fn) {
+    try {
+      return await fn();
+    } catch (error) {
+      throw new Error(`${label} failed: ${diagnosticErrorMessage(error)}`);
+    }
+  }
+
+  async function runStorageStep(label, path, fn) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error?.code === "storage/unauthorized") {
+        throw new Error(`${label} failed: Storage rules denied ${path} (storage/unauthorized). Expected Storage rules ${EXPECTED_STORAGE_RULES_VERSION}. Publish this package's storage.rules in Firebase Console > Storage > Rules, then rerun this smoke test.`);
+      }
+      throw new Error(`${label} failed: ${diagnosticErrorMessage(error)}`);
+    }
   }
 
   function fmtDate(value) {
@@ -406,7 +440,7 @@
   function suggestDiagnosticFix(source, label, reason, status) {
     const text = normalized(`${source} ${label} ${reason}`);
     if (text.includes("storage") || text.includes("storage unauthorized") || text.includes("template backgrounds") || text.includes("shoutouts original image path")) {
-      return "Publish the package `storage.rules` in Firebase Console > Storage > Rules, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
+      return "Publish the package `storage.rules` in Firebase Console > Storage > Rules. This package separates upload checks from owner delete rules so the smoke test can upload/read/delete media. Then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
     }
     if (text.includes("firestore") || text.includes("missing or insufficient permissions") || text.includes("permission denied")) {
       return "Publish the package `firestore.rules` in Firebase Console > Firestore Database > Rules, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
@@ -896,7 +930,7 @@
     const peerUid = `diagnostic-peer-${runId}`;
     const connectionId = `${runId}-mingl`;
     const ref = state.db.collection("minglConnections").doc(connectionId);
-    await ref.set({
+    await runDiagnosticStep("create diagnostic Mingl connection", () => ref.set({
       connectionId,
       participants:[user.uid, peerUid],
       requestedBy:user.uid,
@@ -909,13 +943,13 @@
       },
       createdAt:fieldValue(),
       updatedAt:fieldValue()
-    });
-    const snap = await ref.get();
+    }));
+    const snap = await runDiagnosticStep("read diagnostic Mingl connection", () => ref.get());
     if (!snap.exists || !(snap.data().participants || []).includes(user.uid)) {
       throw new Error("Temporary Mingl connection was not readable by its participant.");
     }
-    await ref.set({diagnosticUpdatedAt:fieldValue()}, {merge:true});
-    await ref.delete();
+    await runDiagnosticStep("update diagnostic Mingl connection", () => ref.set({diagnosticUpdatedAt:fieldValue()}, {merge:true}));
+    await runDiagnosticStep("delete diagnostic Mingl connection", () => ref.delete());
     return "Temporary Mingl participant connection create/read/update/delete succeeded.";
   }
 
@@ -926,7 +960,7 @@
     const connectionRef = state.db.collection("minglConnections").doc(connectionId);
     const roomRef = state.db.collection("chatRooms").doc(roomId);
     let connectionCleanupError = null;
-    await connectionRef.set({
+    await runDiagnosticStep("create diagnostic Mingl connection for chat room", () => connectionRef.set({
       connectionId,
       participants:[user.uid, peerUid],
       requestedBy:user.uid,
@@ -935,9 +969,9 @@
       diagnosticRunId:runId,
       createdAt:fieldValue(),
       updatedAt:fieldValue()
-    });
+    }));
     try {
-      await roomRef.set({
+      await runDiagnosticStep("create diagnostic Mingl chat room", () => roomRef.set({
         id:roomId,
         type:"mingl",
         title:"Diagnostics Mingl Chat",
@@ -952,18 +986,18 @@
         unreadCounts:{},
         createdAt:fieldValue(),
         updatedAt:fieldValue()
-      });
-      const snap = await roomRef.get();
+      }));
+      const snap = await runDiagnosticStep("read diagnostic Mingl chat room", () => roomRef.get());
       if (!snap.exists || !(snap.data().participants || []).includes(user.uid)) {
         throw new Error("Temporary Mingl chat room was not readable by its participant.");
       }
-      await roomRef.set({diagnosticUpdatedAt:fieldValue()}, {merge:true});
-      await roomRef.delete();
+      await runDiagnosticStep("update diagnostic Mingl chat room", () => roomRef.set({diagnosticUpdatedAt:fieldValue()}, {merge:true}));
+      await runDiagnosticStep("delete diagnostic Mingl chat room", () => roomRef.delete());
     } finally {
       try { await connectionRef.delete(); } catch (error) { connectionCleanupError = error; }
     }
     if (connectionCleanupError) {
-      throw new Error(`Temporary Mingl connection cleanup failed: ${connectionCleanupError?.message || connectionCleanupError}`);
+      throw new Error(`delete diagnostic Mingl connection for chat room failed: ${diagnosticErrorMessage(connectionCleanupError)}`);
     }
     return "Temporary Mingl chat room create/read/update/delete succeeded for its participant.";
   }
@@ -1015,31 +1049,17 @@
   async function storageLifecycle(path) {
     if (!state.storage) throw new Error("Firebase Storage SDK or bucket is unavailable on this page.");
     const ref = state.storage.ref().child(path);
-    try {
-      await ref.put(tinyPngBlob(), {contentType:"image/png"});
-      await ref.getDownloadURL();
-      await ref.delete();
-    } catch (error) {
-      if (error?.code === "storage/unauthorized") {
-        throw new Error(`Storage rules denied ${path}. Publish this package's storage.rules in Firebase Console > Storage > Rules, then rerun this smoke test.`);
-      }
-      throw error;
-    }
+    await runStorageStep("upload smoke-test image", path, () => ref.put(tinyPngBlob(), {contentType:"image/png"}));
+    await runStorageStep("read smoke-test image download URL", path, () => ref.getDownloadURL());
+    await runStorageStep("delete uploaded smoke-test media", path, () => ref.delete());
   }
 
   async function storageLifecycleWithBlob(path, blob, contentType) {
     if (!state.storage) throw new Error("Firebase Storage SDK or bucket is unavailable on this page.");
     const ref = state.storage.ref().child(path);
-    try {
-      await ref.put(blob, {contentType});
-      await ref.getDownloadURL();
-      await ref.delete();
-    } catch (error) {
-      if (error?.code === "storage/unauthorized") {
-        throw new Error(`Storage rules denied ${path}. Publish this package's storage.rules in Firebase Console > Storage > Rules, then rerun this smoke test.`);
-      }
-      throw error;
-    }
+    await runStorageStep("upload smoke-test media", path, () => ref.put(blob, {contentType}));
+    await runStorageStep("read smoke-test media download URL", path, () => ref.getDownloadURL());
+    await runStorageStep("delete uploaded smoke-test media", path, () => ref.delete());
   }
 
   function tinyVideoBlob() {
