@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics and crawler controls v28.45 */
+/* FLOQR AI diagnostics, crawler controls, and TXT export v28.55 */
 (function () {
   "use strict";
 
@@ -10,7 +10,11 @@
     auth: null,
     storage: null,
     mounted: false,
-    lastData: {}
+    lastData: {},
+    lastSchedule: null,
+    lastFeatures: [],
+    lastPackageDiagnostics: [],
+    lastRulesSmokeResults: []
   };
 
   const STATUS_COPY = {
@@ -21,7 +25,7 @@
   };
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.52-rules-version-note";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.54-app-rules-compatibility";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.55-diagnostics-export";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -214,6 +218,15 @@
         {label:"Rules smoke test covers Storage paths", file:"ai-diagnostics-service.js", includes:["runStorageRuleTests", "profileMedia", "template-backgrounds"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.54-app-rules-compatibility"]}
       ]
+    },
+    {
+      version: "v28.55-diagnostics-export",
+      title: "Diagnostic Report TXT Export",
+      checks: [
+        {label:"Diagnostics export button", file:"master-admin.html", includes:["exportDiagnosticsTxtBtn", "Export Diagnostics TXT"]},
+        {label:"Diagnostics export builder", file:"ai-diagnostics-service.js", includes:["buildDiagnosticsExport", "exportDiagnosticsReport", "downloadTextFile"]},
+        {label:"Fix prompt included in export", file:"ai-diagnostics-service.js", includes:["COPY/PASTE FIX PROMPT", "Do not rebuild FLOQR from scratch"]}
+      ]
     }
   ];
 
@@ -327,6 +340,184 @@
     if (wrap) wrap.innerHTML = simpleRows(rows);
   }
 
+  function cleanText(value) {
+    return String(value ?? "")
+      .replace(/\r?\n/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || "-";
+  }
+
+  function exportTimestamp() {
+    return new Date().toISOString().replace(/[:.]/g, "-");
+  }
+
+  function attentionStatus(status) {
+    return ["Failed", "Soft Fail", "TBI"].includes(status);
+  }
+
+  function sortByCreatedDesc(rows = []) {
+    return rows.slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  }
+
+  function collectDiagnosticIssues({data = {}, features = [], packageResults = [], reports = []} = {}) {
+    const issues = [];
+    const add = (source, label, status, reason) => {
+      if (attentionStatus(status)) {
+        issues.push({
+          source: cleanText(source),
+          label: cleanText(label),
+          status: cleanText(status),
+          reason: cleanText(reason)
+        });
+      }
+    };
+
+    features.forEach(item => add("Feature Diagnostics", `${item.area}: ${item.feature}`, item.status, item.evidence));
+    packageResults.forEach(item => add("Package Install Diagnostics", `${item.package || "Package"}: ${item.label}`, item.status, item.evidence));
+
+    Object.entries(data).forEach(([name, value]) => {
+      if (value?.error) add("Firestore Read", name, "Failed", value.error);
+    });
+
+    reports.forEach(report => {
+      const reportName = `${report.type || "diagnosticReport"} ${report.packageVersion || report.id || ""}`.trim();
+      add("Saved Diagnostic Report", reportName, report.status, `Saved report status ${report.status || "unknown"} at ${fmtDate(report.createdAt)}.`);
+      (Array.isArray(report.results) ? report.results : []).forEach(result => {
+        add(`Saved Diagnostic Report: ${reportName}`, result.label, result.status, result.evidence);
+      });
+    });
+
+    return issues;
+  }
+
+  function buildDiagnosticsFixPrompt(issues = []) {
+    const issueText = issues.length
+      ? issues.map((item, index) => `${index + 1}. ${item.source}: [${item.status}] ${item.label}. Failure reason: ${item.reason}`).join("\n")
+      : "No Failed, Soft Fail, or TBI items were found in this export. Please review the full report for anything unusual.";
+
+    return [
+      "You are working on the FLOQR web app.",
+      "",
+      "I exported Master Admin Diagnostics. Please use the diagnostic report below to fix the issue or issues incrementally and safely.",
+      "",
+      "Rules:",
+      "- Do not rebuild FLOQR from scratch.",
+      "- Preserve existing user profile data and do not overwrite already-onboarded users with blank profile fields.",
+      "- Keep ShoutOut, Mingl, Bata, guest list routing, Firebase Auth, Firestore, Firebase Storage, and GitHub Pages deployment working.",
+      "- If the issue is a Firebase rule issue, update the relevant rule file and keep the rules-version note clear.",
+      "- If the issue is a Diagnostics issue, update Master Admin Diagnostics so the next package can verify the fix.",
+      "- Run available syntax/static checks and create the next full package ZIP.",
+      "",
+      "Issues to prioritize:",
+      issueText
+    ].join("\n");
+  }
+
+  function buildDiagnosticsExport({data = {}, schedule = null, features = [], packageResults = []} = {}) {
+    const reports = sortByCreatedDesc(data.aiDiagnosticsReports?.rows || []);
+    const latestRules = reports.find(row => row.type === "rulesSmokeTest") || null;
+    const issues = collectDiagnosticIssues({data, features, packageResults, reports});
+    const lines = [];
+    const counts = countBy(features, item => item.status);
+    const packageCounts = countBy(packageResults, item => item.status);
+
+    lines.push("FLOQR MASTER ADMIN DIAGNOSTICS EXPORT");
+    lines.push(`Exported at: ${new Date().toLocaleString()}`);
+    lines.push(`Diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`);
+    lines.push(`Expected Firestore rules version: ${EXPECTED_FIRESTORE_RULES_VERSION}`);
+    lines.push(`Signed-in Master Admin: ${state.auth?.currentUser?.email || state.auth?.currentUser?.uid || "unknown"}`);
+    lines.push(`FLOQR_AI_ENABLED: ${window.FLOQR_AI_ENABLED === true}`);
+    lines.push(`FLOQR_AI_ASSISTANT_ENABLED: ${window.FLOQR_AI_ASSISTANT_ENABLED === true}`);
+    lines.push(`FLOQR_AI_STUDIO_ENABLED: ${window.FLOQR_AI_STUDIO_ENABLED === true}`);
+
+    lines.push("");
+    lines.push("STATUS LEGEND");
+    Object.entries(STATUS_COPY).forEach(([status, text]) => lines.push(`${status}: ${text}`));
+
+    lines.push("");
+    lines.push("ATTENTION SUMMARY");
+    if (issues.length) {
+      issues.forEach((item, index) => {
+        lines.push(`${index + 1}. ${item.source}: [${item.status}] ${item.label}`);
+        lines.push(`   Failure reason: ${item.reason}`);
+      });
+    } else {
+      lines.push("No Failed, Soft Fail, or TBI items were found in the exported diagnostics.");
+    }
+
+    lines.push("");
+    lines.push("CURRENT FEATURE DIAGNOSTICS");
+    lines.push(`Totals: Pass=${counts.Pass || 0}, Soft Fail=${counts["Soft Fail"] || 0}, Failed=${counts.Failed || 0}, TBI=${counts.TBI || 0}`);
+    features.forEach(item => {
+      lines.push(`[${item.status}] ${item.area}: ${item.feature}`);
+      lines.push(`Reason: ${cleanText(item.evidence)}`);
+    });
+
+    lines.push("");
+    lines.push("PACKAGE INSTALL DIAGNOSTICS");
+    lines.push(`Totals: Pass=${packageCounts.Pass || 0}, Soft Fail=${packageCounts["Soft Fail"] || 0}, Failed=${packageCounts.Failed || 0}, TBI=${packageCounts.TBI || 0}`);
+    packageResults.forEach(item => {
+      lines.push(`[${item.status}] ${item.package || "Package"}: ${item.label}`);
+      lines.push(`Reason: ${cleanText(item.evidence)}`);
+    });
+
+    lines.push("");
+    lines.push("FIREBASE RULES STATUS");
+    lines.push(`Latest saved rules smoke test: ${latestRules ? `${latestRules.status || "unknown"} at ${fmtDate(latestRules.createdAt)}` : "No saved rules smoke test found"}`);
+    lines.push("Note: Browser diagnostics cannot read Firebase Console deployed rules source. Deployed rules are verified by live Firestore/Storage operations.");
+
+    lines.push("");
+    lines.push("CRAWLER AND DISCOVERY SNAPSHOT");
+    lines.push(`Schedule frequency: ${schedule?.frequency || "not saved"}`);
+    lines.push(`Schedule enabled: ${schedule?.enabled ? "yes" : "no"}`);
+    lines.push(`Schedule hours: ${joinList(schedule?.scheduleHours) || "-"}`);
+    lines.push(`Discovery queue records visible: ${collectionCount(data, "aiDiscoveryQueue")}`);
+    lines.push(`Crawl run records visible: ${collectionCount(data, "aiCrawlRuns")}`);
+    lines.push(`Diagnostics report records visible: ${reports.length}`);
+
+    lines.push("");
+    lines.push("SAVED aiDiagnosticsReports");
+    if (!reports.length) {
+      lines.push("No saved aiDiagnosticsReports records were readable.");
+    }
+    reports.forEach((report, index) => {
+      lines.push("");
+      lines.push(`Report ${index + 1}: ${report.id || "-"}`);
+      lines.push(`Type: ${report.type || "-"}`);
+      lines.push(`Package version: ${report.packageVersion || "-"}`);
+      lines.push(`Status: ${report.status || "-"}`);
+      lines.push(`Created: ${fmtDate(report.createdAt)}`);
+      lines.push(`Created by: ${report.createdByEmail || report.createdByUid || "-"}`);
+      const results = Array.isArray(report.results) ? report.results : [];
+      if (!results.length) {
+        lines.push("Results: no embedded check results.");
+      } else {
+        results.forEach(result => {
+          lines.push(`- [${result.status || "-"}] ${cleanText(result.label)}`);
+          lines.push(`  Failure reason/evidence: ${cleanText(result.evidence)}`);
+        });
+      }
+    });
+
+    lines.push("");
+    lines.push("COPY/PASTE FIX PROMPT");
+    lines.push(buildDiagnosticsFixPrompt(issues));
+
+    return lines.join("\n");
+  }
+
+  function downloadTextFile(filename, text) {
+    const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   function latestRulesSmokeReport(data = state.lastData || {}) {
     return (data.aiDiagnosticsReports?.rows || [])
       .filter(row => row.type === "rulesSmokeTest")
@@ -408,6 +599,7 @@
       ["Purpose", "Confirms installed files contain package feature markers"]
     ]);
     renderCheckCards("packageInstallDiagnosticsReport", results);
+    state.lastPackageDiagnostics = results;
     if (!options.silent) {
       const failed = results.filter(item => item.status === "Failed").length;
       setText("diagnosticsStatus", failed ? `Package install diagnostics found ${failed} failed checks.` : "Package install diagnostics passed.");
@@ -697,6 +889,7 @@
     await runAiFirestoreRuleTests(capture, runId, user);
     await runMinglChatRuleTests(capture, runId, user);
     await runStorageRuleTests(capture, runId, user);
+    state.lastRulesSmokeResults = results;
 
     const failed = results.filter(item => item.status === "Failed").length;
     const overallStatus = failed ? "Failed" : "Pass";
@@ -1094,12 +1287,42 @@
     return data;
   }
 
+  async function exportDiagnosticsReport() {
+    if (!state.db) {
+      setText("diagnosticsStatus", "Diagnostics export failed because Firestore is unavailable.");
+      return;
+    }
+    try {
+      setText("diagnosticsStatus", "Preparing diagnostics TXT export...");
+      const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
+      if (schedule) applyScheduleToControls(schedule);
+      const features = buildFeatureDiagnostics(data);
+      state.lastFeatures = features;
+      state.lastSchedule = schedule || null;
+      renderFeatureDiagnostics(features);
+      await renderRulesVersionStatus(data);
+      renderCrawlActivity(data, schedule);
+      renderCollectedRecords(data);
+      renderAnalyticsInsights(data);
+      const packageResults = await runPackageInstallDiagnostics({silent:true});
+      const filename = `floqr-diagnostics-${exportTimestamp()}.txt`;
+      const text = buildDiagnosticsExport({data, schedule, features, packageResults});
+      downloadTextFile(filename, text);
+      const issues = collectDiagnosticIssues({data, features, packageResults, reports:data.aiDiagnosticsReports?.rows || []});
+      setText("diagnosticsStatus", `Diagnostics export downloaded as ${filename}. ${issues.length} failed, soft-fail, or TBI item(s) included in the fix prompt.`);
+    } catch (error) {
+      setText("diagnosticsStatus", `Diagnostics export failed: ${error?.message || error}`);
+    }
+  }
+
   async function refreshDiagnostics() {
     if (!state.db) return;
     setText("diagnosticsStatus", "Refreshing diagnostics...");
     const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
     if (schedule) applyScheduleToControls(schedule);
     const features = buildFeatureDiagnostics(data);
+    state.lastFeatures = features;
+    state.lastSchedule = schedule || null;
     renderFeatureDiagnostics(features);
     await renderRulesVersionStatus(data);
     renderCrawlActivity(data, schedule);
@@ -1113,6 +1336,7 @@
 
   function bindControls() {
     byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
+    byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
@@ -1142,6 +1366,7 @@
     refreshDiagnostics,
     runPackageInstallDiagnostics,
     runRulesSmokeTest,
+    exportDiagnosticsReport,
     DEFAULT_EVENT_TYPES,
     DEFAULT_GENRES,
     DEFAULT_MARKET_LANGUAGE_PLAN

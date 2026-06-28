@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.54 App Rules Compatibility Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.55 Diagnostics Export Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.54-app-rules-compatibility
+https://jadzadco.github.io/shoutout-demo/?v=28.55-diagnostics-export
 ```
 
 Current release highlights:
@@ -41,6 +41,7 @@ Current release highlights:
 - Adds a visible `FLOQR FIRESTORE RULES VERSION` note at the top of `firestore.rules` so Firebase Console rules can be checked quickly.
 - Adds a Master Admin Diagnostics rules status panel showing the expected Firestore rules version, package rules note status, latest live smoke-test result, and overall rules status.
 - Expands `Run Rules Smoke Test` into an app-wide rules compatibility diagnostic for core app collections, AI collections, Mingl/chat queries, and Storage paths required by FLOQR.
+- Adds `Export Diagnostics TXT` under Master Admin > Diagnostics. The export includes current feature diagnostics, package install diagnostics, saved `aiDiagnosticsReports`, failure reasons/evidence, and a copy/paste prompt for Codex to fix the reported issues.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -62,6 +63,7 @@ Live in this package:
 - Master Admin Diagnostics feature matrix, crawler controls, crawl activity report, collected-record analytics, and manual crawl queue seeding.
 - Master Admin Package Install Diagnostics grouped by package version.
 - Master Admin Firebase Rules Smoke Test with saved reports in `aiDiagnosticsReports`.
+- Master Admin Diagnostics TXT export for sharing failure reports and fix prompts.
 - Public profile language mode and English translation metadata in Settings.
 
 Scaffolded for later Firebase AI / Gemini configuration:
@@ -170,6 +172,7 @@ Post-install rules testing:
 5. Click `Run Package Install Diagnostics`.
 6. Click `Run Rules Smoke Test`.
 7. Confirm the smoke test creates a saved `aiDiagnosticsReports` record and shows `Pass` for the app-required Firestore collections, Mingl/chat queries, and Storage paths.
+8. Click `Export Diagnostics TXT` to download a text report with failure reasons and a copy/paste fix prompt.
 
 The top of `firestore.rules` should show:
 
@@ -250,9 +253,10 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, and v28.54 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, and v28.55 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
+- Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
 - Confirm `Firestore: users/{uid} profile save path` passes before testing new-user onboarding.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.
