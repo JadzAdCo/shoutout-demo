@@ -27,6 +27,12 @@ window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS = [
 window.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL = true;
 window.SHOUTOUT_MASTER_ADMIN_REQUIRE_MFA_NOTICE = true;
 
+window.FLOQR_AI_ENABLED = false;
+window.FLOQR_AI_PROVIDER = "firebase-ai-logic";
+window.FLOQR_AI_FALLBACK_MODE = "local-contextual-search";
+window.FLOQR_AI_STUDIO_ENABLED = false;
+window.FLOQR_AI_ASSISTANT_ENABLED = false;
+
 window.SHOUTOUT_ADMIN_EMAILS = [
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
@@ -570,7 +576,37 @@ window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversa
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];
   loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]));
+  loc.visibility = loc.visibility || "public";
+  loc.publicProfileType = "club";
+  loc.clubOwnershipStatus = loc.clubOwnershipStatus || "unclaimed";
+  loc.subscriptionRequiredForPublicProfileEdits = true;
+  loc.address = loc.address || "";
+  loc.officialWebsite = loc.officialWebsite || loc.website || "";
+  loc.email = loc.email || "";
+  loc.telephone = loc.telephone || loc.phone || "";
+  loc.socialMediaHandles = loc.socialMediaHandles || {
+    instagram: "",
+    x: "",
+    tiktok: "",
+    facebook: ""
+  };
+  loc.publicSearchKeywords = Array.from(new Set([
+    ...(loc.publicSearchKeywords || []),
+    loc.locationName,
+    loc.brandName,
+    loc.city,
+    loc.country,
+    ...(loc.categories || []),
+    ...(loc.genres || [])
+  ].filter(Boolean)));
 });
+
+window.FLOQR_AI_DISCOVERY_PARTNERS = {
+  eventDiscoveryApis: ["Ticketmaster Discovery API", "Eventbrite API"],
+  ticketResalePartnerTypes: ["official resale partner", "affiliate ticketing partner", "distribution partner"],
+  categories: ["nightclub", "lounge", "beachClub", "brunchParty", "poolParty", "summerParty", "djEvent", "promoterEvent", "comedyShow"],
+  taxiHailingPartnerMode: "third-party-integration-planned"
+};
 
 window.SHOUTOUT_AI_SUGGESTIONS = [
   {category:'birthday', main:'HAPPY BIRTHDAY!', sub:'VIP vibes all night long.'},
