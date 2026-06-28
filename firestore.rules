@@ -10,6 +10,18 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function createsOwnUid() {
+      return signedIn()
+        && request.resource.data.uid is string
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    function ownsResourceUid() {
+      return signedIn()
+        && resource.data.uid is string
+        && resource.data.uid == request.auth.uid;
+    }
+
     function isParticipant() {
       return signedIn()
         && resource.data.participants is list
@@ -152,6 +164,83 @@ service cloud.firestore {
 
     match /shoutoutRecommendations/{id} {
       allow create, read, update, delete: if signedIn();
+    }
+
+    match /aiIndex/{id} {
+      allow read: if resource.data.visibility == "public"
+        || (
+          signedIn()
+          && (
+            resource.data.ownerUid == request.auth.uid
+            || resource.data.visibility == "shared"
+          )
+        );
+      allow create, update: if signedIn()
+        && request.resource.data.visibility in ["public", "shared", "private"];
+      allow delete: if signedIn();
+    }
+
+    match /aiUserNotificationPreferences/{uid} {
+      allow read, write: if isSelf(uid);
+    }
+
+    match /aiUserSignals/{id} {
+      allow create: if createsOwnUid();
+      allow read, update, delete: if ownsResourceUid();
+    }
+
+    match /aiSearchLogs/{id} {
+      allow create: if createsOwnUid();
+      allow read, update, delete: if ownsResourceUid();
+    }
+
+    match /aiRecommendations/{id} {
+      allow create: if signedIn();
+      allow read, update, delete: if signedIn()
+        && (
+          resource.data.uid == request.auth.uid
+          || resource.data.recipientUid == request.auth.uid
+        );
+    }
+
+    match /aiDiscoverySources/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /aiDiscoveryQueue/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /aiDiscoveryRatingCriteria/{id} {
+      allow read, write: if signedIn();
+    }
+
+    match /aiAssistantSessions/{uid} {
+      allow read, write: if isSelf(uid);
+    }
+
+    match /aiAssistantMessages/{id} {
+      allow create: if createsOwnUid();
+      allow read, update, delete: if ownsResourceUid();
+    }
+
+    match /patronTemplateVariants/{variantId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      allow read: if signedIn()
+        && (
+          resource.data.ownerUid == request.auth.uid ||
+          resource.data.visibility == "public"
+        );
+
+      allow update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /aiTemplatePromptHistory/{id} {
+      allow create: if createsOwnUid();
+      allow read, update, delete: if ownsResourceUid();
     }
 
     match /minglConnections/{connectionId} {

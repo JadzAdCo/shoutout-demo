@@ -4,7 +4,7 @@
   <!-- FLOQR Patron Portal v28.43-f -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>My FLOQR Activity</title>
+  <title>FLOQR Settings</title>
   <link rel="stylesheet" href="./styles.css"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
@@ -14,9 +14,9 @@
   <section class="page active">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Patron Portal</p>
-        <h1>My FLOQR Activity</h1>
-        <p class="sub">Profile, member level, ShoutOuts, guest lists, messages, Mingl, and privacy.</p>
+        <p class="eyebrow">Settings</p>
+        <h1>FLOQR Settings</h1>
+        <p class="sub">My Profile, Privacy, AI Notification Preferences, My ShoutOut Templates, Public Sharing, ShoutOuts, guest lists, messages, and Mingl.</p>
         <p id="portalSignedInAs" class="status">Not signed in</p>
         <p id="portalStatus" class="status">Loading patron portal...</p>
       </div>
@@ -40,13 +40,15 @@
 
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
-        <button class="admin-tab" data-panel="portalProfile" type="button">Edit Profile</button>
-        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Profile</button>
+        <button class="admin-tab" data-panel="portalProfile" type="button">My Profile</button>
+        <button class="admin-tab" data-panel="portalPrivacy" type="button">Privacy</button>
+        <button class="admin-tab" data-panel="portalAiNotifications" type="button">AI Notification Preferences</button>
+        <button class="admin-tab" data-panel="portalTemplateVariants" type="button">My ShoutOut Templates</button>
+        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Sharing</button>
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">Messages</button>
         <button class="admin-tab" data-panel="portalChats" type="button">Mingl</button>
-        <button class="admin-tab" data-panel="portalPrivacy" type="button">Privacy / GDPR</button>
       </nav>
 
       <section id="portalOverview" class="admin-panel-section active">
@@ -126,7 +128,7 @@
 
       <section id="portalPublicProfile" class="admin-panel-section">
         <div class="card">
-          <h2>Public Profile</h2>
+          <h2>Public Sharing</h2>
           <p class="sub small">Patron profiles support 10 media slots: 8 image slots and 2 short-video slots. Followers see only what your visibility setting allows.</p>
           <div id="profileTemplatePreview" class="profile-template-preview"></div>
         </div>
@@ -138,6 +140,23 @@
         <div class="card">
           <h2>Profile Template Guide</h2>
           <div id="roleTemplateGuide" class="role-template-grid"></div>
+        </div>
+      </section>
+
+      <section id="portalAiNotifications" class="admin-panel-section">
+        <div id="aiNotificationPreferencesMount"></div>
+      </section>
+
+      <section id="portalTemplateVariants" class="admin-panel-section">
+        <div class="card">
+          <h2>My ShoutOut Templates</h2>
+          <p class="sub small">Saved variants use locked official/admin template layouts. Only background values can be customized.</p>
+          <div id="myTemplateVariants" class="template-grid"></div>
+        </div>
+        <div class="card">
+          <h2>Community Templates</h2>
+          <p class="sub small">Public variants are searchable and can appear on public profiles when shared.</p>
+          <div id="communityTemplateVariants" class="template-grid"></div>
         </div>
       </section>
 
@@ -224,6 +243,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
 <script src="./shared-data.js?v=28.43-f"></script>
+<script src="./ai-service.js?v=28.44-ai"></script>
+<script src="./ai-index-service.js?v=28.44-ai"></script>
+<script src="./ai-search-service.js?v=28.44-ai"></script>
+<script src="./ai-notification-service.js?v=28.44-ai"></script>
+<script src="./ai-template-studio.js?v=28.44-ai"></script>
 <script src="./patron-portal-app.js?v=28.43-f"></script>
 </body>
 </html>

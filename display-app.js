@@ -90,6 +90,20 @@
     canvas.className = "display-canvas";
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
     if (isClassicBoard) canvas.classList.add("classic-board-template");
+    const backgroundUrl = data.backgroundUrl || "";
+    const backgroundColor = data.backgroundColor || "";
+    const backgroundGradient = data.backgroundGradient || "";
+    canvas.style.backgroundImage = "";
+    canvas.style.background = "";
+    canvas.style.backgroundSize = "";
+    canvas.style.backgroundPosition = "";
+    if (backgroundUrl) {
+      canvas.style.backgroundImage = `url("${backgroundUrl.replace(/"/g, "%22")}")`;
+      canvas.style.backgroundSize = "cover";
+      canvas.style.backgroundPosition = "center";
+    }
+    else if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) canvas.style.background = backgroundGradient;
+    else if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) canvas.style.background = backgroundColor;
     const mainText = data.mainText || t.defaultMain || loc.defaultMain || "USE SHOUT OUT";
     const subText = data.subText || t.defaultSub || "";
     byId("displayBrand").textContent = "";
@@ -127,7 +141,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     if (qs("main","")) {
-      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), mediaType: qs("mediaType",""), locationName: loc.locationName });
+      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), mediaType: qs("mediaType",""), backgroundUrl: qs("backgroundUrl",""), backgroundColor: qs("backgroundColor",""), backgroundGradient: qs("backgroundGradient",""), locationName: loc.locationName });
       return;
     }
     db.collection("liveContent").doc(locationId).onSnapshot(doc => {

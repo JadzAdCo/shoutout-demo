@@ -17,12 +17,77 @@
 
   const locationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
   const loc = window.SHOUTOUT_CLUB_LOCATIONS?.[locationId] || { locationName: locationId, brand: locationId, genres: [], activityDates: [] };
+  let publicClubProfile = {...loc};
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
+
+  async function loadClubPublicProfile() {
+    try {
+      const snap = await db.collection("clubLocations").doc(locationId).get();
+      publicClubProfile = snap.exists ? {id:snap.id, ...loc, ...snap.data()} : {...loc};
+    } catch(e) {
+      publicClubProfile = {...loc};
+    }
+    const socials = publicClubProfile.socialMediaHandles || publicClubProfile.socialHandles || {};
+    if (byId("clubProfileAddress")) byId("clubProfileAddress").value = publicClubProfile.address || "";
+    if (byId("clubProfileWebsite")) byId("clubProfileWebsite").value = publicClubProfile.officialWebsite || publicClubProfile.website || "";
+    if (byId("clubProfileEmail")) byId("clubProfileEmail").value = publicClubProfile.email || "";
+    if (byId("clubProfileTelephone")) byId("clubProfileTelephone").value = publicClubProfile.telephone || publicClubProfile.phone || "";
+    if (byId("clubProfileInstagram")) byId("clubProfileInstagram").value = socials.instagram || "";
+    if (byId("clubProfileX")) byId("clubProfileX").value = socials.x || "";
+    if (byId("clubProfileTiktok")) byId("clubProfileTiktok").value = socials.tiktok || "";
+    if (byId("clubProfileFacebook")) byId("clubProfileFacebook").value = socials.facebook || "";
+    if (byId("clubPublicProfileReport")) {
+      byId("clubPublicProfileReport").innerHTML = simpleRows([
+        ["Search visibility", publicClubProfile.visibility || "public"],
+        ["Ownership status", publicClubProfile.clubOwnershipStatus || "unclaimed"],
+        ["Subscription required for edits", publicClubProfile.subscriptionRequiredForPublicProfileEdits === false ? "No" : "Yes"],
+        ["AI index", "Public profile fields only"]
+      ]);
+    }
+  }
+
+  async function saveClubPublicProfile() {
+    const payload = {
+      address:byId("clubProfileAddress")?.value.trim() || "",
+      officialWebsite:byId("clubProfileWebsite")?.value.trim() || "",
+      email:byId("clubProfileEmail")?.value.trim() || "",
+      telephone:byId("clubProfileTelephone")?.value.trim() || "",
+      socialMediaHandles:{
+        instagram:byId("clubProfileInstagram")?.value.trim() || "",
+        x:byId("clubProfileX")?.value.trim() || "",
+        tiktok:byId("clubProfileTiktok")?.value.trim() || "",
+        facebook:byId("clubProfileFacebook")?.value.trim() || ""
+      },
+      visibility:"public",
+      publicProfileType:"club",
+      subscriptionRequiredForPublicProfileEdits:true,
+      clubOwnershipStatus:publicClubProfile.clubOwnershipStatus || "unclaimed",
+      publicSearchKeywords:[
+        publicClubProfile.locationName || loc.locationName,
+        publicClubProfile.brandName || loc.brandName,
+        publicClubProfile.city || loc.city,
+        publicClubProfile.country || loc.country,
+        byId("clubProfileAddress")?.value.trim() || "",
+        byId("clubProfileWebsite")?.value.trim() || ""
+      ].filter(Boolean),
+      updatedByUid:auth.currentUser?.uid || "",
+      updatedByEmail:safeUser(auth.currentUser),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("clubLocations").doc(locationId).set(payload, {merge:true});
+    publicClubProfile = {...publicClubProfile, ...payload};
+    if (window.FLOQRAIIndex) {
+      const indexRecord = window.FLOQRAIIndex.clubLocationIndexRecord(locationId, publicClubProfile);
+      await window.FLOQRAIIndex.upsertAiIndex(db, `clubLocation_${locationId}`, indexRecord);
+    }
+    setText("adminStatus", "Club public profile saved.");
+    await loadClubPublicProfile();
+  }
 
   function adminAuthErrorMessage(e) {
     const code = e?.code || "error";
@@ -91,6 +156,9 @@
       url.searchParams.set("template", item.template || "neon");
       url.searchParams.set("media", item.mediaUrl || "");
       url.searchParams.set("mediaType", item.mediaType || "");
+      url.searchParams.set("backgroundUrl", item.backgroundUrl || "");
+      url.searchParams.set("backgroundColor", item.backgroundColor || "");
+      url.searchParams.set("backgroundGradient", item.backgroundGradient || "");
     }
     return url.href;
   }
@@ -417,7 +485,27 @@
       mediaType: item.mediaType || "",
       mediaFileName: item.mediaFileName || "",
       mediaStoragePath: item.mediaStoragePath || "",
+      originalMediaUrl: item.originalMediaUrl || item.mediaUrl || "",
+      enhancedMediaUrl: item.enhancedMediaUrl || "",
+      selectedMediaVersion: item.selectedMediaVersion || "original",
+      aiEnhancementApplied: !!item.aiEnhancementApplied,
+      aiEnhancementType: item.aiEnhancementType || "none",
+      aiEnhancementPrompt: item.aiEnhancementPrompt || "",
+      originalDuration: item.originalDuration || null,
+      trimmedDuration: item.trimmedDuration || null,
+      trimStart: item.trimStart || null,
+      trimEnd: item.trimEnd || null,
+      aiMediaSafetyStatus: item.aiMediaSafetyStatus || "notChecked",
+      aiMediaSafetyNotes: item.aiMediaSafetyNotes || "",
       mediaUploadedAt: item.mediaUploadedAt || null,
+      templateVariantId: item.templateVariantId || "",
+      templateVariantName: item.templateVariantName || "",
+      lockedBaseTemplateId: item.lockedBaseTemplateId || "",
+      backgroundType: item.backgroundType || "",
+      backgroundUrl: item.backgroundUrl || "",
+      backgroundColor: item.backgroundColor || "",
+      backgroundGradient: item.backgroundGradient || "",
+      backgroundStoragePath: item.backgroundStoragePath || "",
       status: "approved",
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
@@ -470,13 +558,27 @@
     setText("metricLive", live ? "1" : "0");
     setText("metricAdImpressions", adImpressions.toLocaleString());
 
+    const venueProfile = publicClubProfile || loc;
     byId("venueSummary").innerHTML = simpleRows([
-      ["Location", loc.locationName || locationId],
+      ["Location", venueProfile.locationName || loc.locationName || locationId],
       ["City", loc.city || "—"],
       ["Region", loc.region || "—"],
       ["Country", loc.country || "—"],
       ["Genres", (loc.genres || []).join(", ") || "—"],
       ["Activity", (loc.activityDates || []).slice(0,3).join(" | ") || "—"]
+    ]);
+
+    byId("venueSummary").innerHTML = simpleRows([
+      ["Location", venueProfile.locationName || loc.locationName || locationId],
+      ["City", venueProfile.city || loc.city || "-"],
+      ["Region", venueProfile.region || loc.region || "-"],
+      ["Country", venueProfile.country || loc.country || "-"],
+      ["Address", venueProfile.address || "-"],
+      ["Official website", venueProfile.officialWebsite || venueProfile.website || "-"],
+      ["Email", venueProfile.email || "-"],
+      ["Telephone", venueProfile.telephone || venueProfile.phone || "-"],
+      ["Genres", (venueProfile.genres || loc.genres || []).join(", ") || "-"],
+      ["Activity", (venueProfile.activityDates || loc.activityDates || []).slice(0,3).join(" | ") || "-"]
     ]);
 
     const cities = {};
@@ -581,6 +683,7 @@
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+    bind("saveClubPublicProfileBtn", saveClubPublicProfile);
     byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
 
     auth.getRedirectResult().then(result => {
@@ -608,7 +711,7 @@
       byId("adminPanel").classList.remove("hidden");
       setText("adminStatus", "Club admin verified.");
       renderQueue();
-      loadReports();
+      loadClubPublicProfile().then(loadReports);
       loadEmployeeDesignations();
     });
   });

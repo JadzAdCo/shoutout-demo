@@ -22,6 +22,7 @@
   let currentUser = null;
   let selectedLocationId = null;
   let selectedTemplate = "blackwhite";
+  let selectedTemplateVariant = null;
   let confirmationResult = null;
   let locations = {};
   let templates = {};
@@ -31,6 +32,7 @@
   let minglCandidates = [];
   let minglConnections = [];
   let activeMinglRoomId = "";
+  let templateVariants = {mine:[], community:[]};
 
   function locationId() { return (selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc").toLowerCase(); }
   function getLocation(id = locationId()) { return locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]; }
@@ -165,14 +167,22 @@
     templates = {...window.SHOUTOUT_TEMPLATES};
     try { const snap = await db.collection("templates").get(); snap.forEach(doc => templates[doc.id] = {id:doc.id, ...doc.data()}); } catch(e) {}
   }
+  async function loadTemplateVariants() {
+    if (!window.FLOQRStudio || !currentUser) {
+      templateVariants = {mine:[], community:[]};
+      return templateVariants;
+    }
+    templateVariants = await window.FLOQRStudio.loadPatronTemplateVariants({db, uid:currentUser.uid});
+    return templateVariants;
+  }
   async function loadLocations() {
     locations = {};
-    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => locations[doc.id] = {id:doc.id, ...doc.data()}); } catch(e) {}
+    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (String(data.status || "active") !== "deleted") locations[doc.id] = {id:doc.id, ...data}; }); } catch(e) {}
     if (Object.keys(locations).length === 0) locations = {...window.SHOUTOUT_CLUB_LOCATIONS};
   }
   async function loadEvents() {
     events = {...(window.SHOUTOUT_EVENTS || {})};
-    try { const snap = await db.collection("events").where("active","==",true).get(); snap.forEach(doc => events[doc.id] = {id:doc.id, ...doc.data()}); } catch(e) {}
+    try { const snap = await db.collection("events").where("active","==",true).get(); snap.forEach(doc => { const data = doc.data(); if (String(data.status || "active") !== "deleted") events[doc.id] = {id:doc.id, ...data}; }); } catch(e) {}
   }
   async function loadLocationById(id) {
     if (locations[id]) return locations[id];
@@ -309,6 +319,7 @@
     await loadTemplates();
     await loadLocations();
     await loadEvents();
+    await loadTemplateVariants();
 
     const profile = await getUserProfile();
     if (!profile || !profile.profileCompleted) {
@@ -797,17 +808,28 @@
     setupDatapointPopouts(wrap);
   }
 
-  function renderMinglPeople() {
+  async function renderMinglPeople() {
     const grid = byId("minglPeopleGrid");
     if (!grid) return;
     const query = byId("minglSearch")?.value || "";
-    const matches = minglCandidates
+    const usedFloqrSearch = !!(query && window.floqrSearch && window.FLOQRAISearch);
+    const searchedProfiles = usedFloqrSearch
+      ? (await window.floqrSearch(query, {
+          records:window.FLOQRAISearch.profilesToRecords(minglCandidates),
+          db,
+          currentUser,
+          profile:cachedUserProfile,
+          role:"patron",
+          source:"mingl"
+        })).map(record => record.data).filter(Boolean)
+      : minglCandidates;
+    const matches = searchedProfiles
       .map(profile => ({
         profile,
         sharedScore: profileMatchScore(cachedUserProfile || {}, profile),
         intentScore: queryIntentScore(query, profile)
       }))
-      .filter(item => !query || item.intentScore > 0 || contextualSearchMatch(query, publicProfileHaystack(item.profile)))
+      .filter(item => !query || usedFloqrSearch || item.intentScore > 0 || contextualSearchMatch(query, publicProfileHaystack(item.profile)))
       .sort((a,b) => (b.intentScore + b.sharedScore) - (a.intentScore + a.sharedScore))
       .slice(0, 40);
     grid.innerHTML = matches.length ? "" : '<div class="empty">No public Mingl profiles matched that search yet. Try interests like fast cars, Latin events, Afro House, travel, food, city, or hobbies.</div>';
@@ -962,14 +984,15 @@
     await renderMinglChats();
   }
 
-  function renderEventGrid() {
+  async function renderEventGrid() {
     const grid = byId("locationGrid");
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
-    const matches = Object.entries(events).filter(([id,e]) => {
-      const hay = `${e.eventName} ${e.country} ${e.region} ${e.city} ${(e.genres||[]).join(" ")} ${(e.artists||[]).join(" ")} ${e.eventDay} ${e.eventTime} ${e.eventDate}`;
-      return contextualSearchMatch(s, hay) && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre));
-    });
+    const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.eventsToRecords(events) : Object.entries(events).map(([id,e]) => ({id, data:e, title:e.eventName || id}));
+    const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
+    const matches = searched
+      .map(record => [record.id, record.data || events[record.id]])
+      .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)));
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching events found.</div>';
     matches.forEach(([id,e]) => {
       const loc = getLocation(e.locationId);
@@ -985,13 +1008,15 @@
     });
   }
 
-  function renderLocationGrid() {
+  async function renderLocationGrid() {
     const grid = byId("locationGrid");
     const type = byId("listingType").value || "clubs";
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
-    const matches = Object.entries(locations).filter(([id,l]) => {
-      const hay = `${l.brandName} ${l.locationName} ${l.country} ${l.region} ${l.city} ${l.locationLabel} ${(l.categories||[]).join(" ")} ${(l.genres||[]).join(" ")} ${(l.artists||[]).join(" ")} ${(l.activityDates||[]).join(" ")}`;
+    const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.locationsToRecords(locations) : Object.entries(locations).map(([id,l]) => ({id, data:l, title:l.locationName || id}));
+    const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
+    const matches = searched.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
+      if (!l) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
       const effectiveType = type.startsWith("club-action:") ? actionBase : type;
       const typeOk =
@@ -1000,7 +1025,7 @@
         effectiveType === "beach-clubs" ? (l.type === "beach-club" || (l.categories||[]).includes("Beach Clubs")) :
         effectiveType === "clubs" || effectiveType === "shoutout" ? (l.type === "club" || l.type === "lounge-club" || l.type === "beach-club" || (l.categories||[]).includes("Clubs")) :
         true;
-      return typeOk && contextualSearchMatch(s, hay) && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
+      return l && typeOk && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
     });
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching results found.</div>';
     matches.forEach(([id,l]) => {
@@ -1018,6 +1043,8 @@
     setText("selectedClubTitle", loc.locationName);
     setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
     selectedTemplate = "blackwhite";
+    selectedTemplateVariant = null;
+    await loadTemplateVariants();
     if (byId("templateSearch")) byId("templateSearch").value = "";
     renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
   }
@@ -1025,46 +1052,138 @@
   function templateSearchText(t) {
     return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
-  function renderTemplates() {
+  function variantSearchText(variant = {}) {
+    return `${variant.variantName || ""} ${variant.baseTemplateName || ""} ${variant.ownerDisplayName || ""} ${(variant.tags||[]).join(" ")} ${(variant.searchKeywords||[]).join(" ")} ${variant.promptShared ? variant.aiPrompt || "" : ""}`.toLowerCase();
+  }
+  async function openStudioForTemplate(template) {
+    if (!window.FLOQRStudio) {
+      alert("FLOQR Studio is not loaded.");
+      return;
+    }
+    await window.FLOQRStudio.openFloqrTemplateStudio({
+      db,
+      storage,
+      currentUser,
+      baseTemplateId:template.id,
+      baseTemplate:template,
+      onSaved:async variant => {
+        await loadTemplateVariants();
+        selectedTemplate = variant.baseTemplateId || template.id;
+        selectedTemplateVariant = variant;
+        renderTemplates();
+        updateTemplateSummary();
+      }
+    });
+  }
+  function templateCard(template, options = {}) {
+    const selected = !selectedTemplateVariant && template.id === selectedTemplate;
+    return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}">
+      <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
+      <div class="name">${esc(template.name)}</div>
+      <div class="tag">${esc(template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>
+      <div class="button-row template-card-actions">
+        <button type="button" data-template-open="${esc(template.id)}">Use</button>
+        <button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>
+      </div>
+    </div>`;
+  }
+  function variantCard(variant = {}, isMine = false) {
+    const base = getTemplate(variant.baseTemplateId || "blackwhite");
+    const selected = selectedTemplateVariant && (selectedTemplateVariant.id || selectedTemplateVariant.variantId) === (variant.id || variant.variantId);
+    const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(variant) : "";
+    return `<div class="template ${esc(base.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
+      <div class="template-mini-preview" style="${esc(style)}"><strong>${esc(base.defaultMain || "SHOUTOUT")}</strong><span>${esc(variant.variantName || base.category || "")}</span></div>
+      <div class="name">${esc(variant.variantName || "Saved Background")}</div>
+      <div class="tag">${esc(variant.baseTemplateName || base.name)}${isMine ? " - Mine" : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
+      <div class="tag-row">${(variant.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <button type="button" data-variant-open="${esc(variant.id || variant.variantId || "")}">Use Template</button>
+    </div>`;
+  }
+  async function renderTemplates() {
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
-    const filteredIds = ids.filter(id => {
-      const t = getTemplate(id);
-      return !query ? id === "blackwhite" : contextualSearchMatch(query, templateSearchText(t));
-    });
-    grid.innerHTML = filteredIds.length ? "" : '<div class="empty">No matching templates found.</div>';
-    filteredIds.forEach(id => {
-      const t = getTemplate(id), item = document.createElement("div");
-      item.className = `template ${t.className || "neon"} ${t.id === selectedTemplate ? "selected" : ""}`;
-      item.setAttribute("role", "button");
-      item.tabIndex = 0;
-      item.innerHTML = `<div class="template-mini-preview"><strong>${esc(t.defaultMain || "SHOUTOUT")}</strong><span>${esc(t.defaultSub || t.category || "")}</span></div><div class="name">${esc(t.name)}</div><div class="tag">${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>`;
-      const openTemplate = () => { selectedTemplate = t.id; renderTemplates(); updateTemplateSummary(); goToEditor(); };
-      item.addEventListener("click", openTemplate);
-      item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTemplate(); } });
-      grid.appendChild(item);
+    const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}));
+    const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active");
+    const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid);
+    const [officialRecords, mineRecords, communityRecords] = query && window.floqrSearch ? await Promise.all([
+      window.floqrSearch(query, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
+      window.floqrSearch(query, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
+      window.floqrSearch(query, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
+    ]) : [official, mine.map(x => ({id:x.id, data:x})), community.map(x => ({id:x.id, data:x}))];
+    const officialHtml = officialRecords.map(record => templateCard(record.data)).join("");
+    const mineHtml = mineRecords.map(record => variantCard(record.data, true)).join("") || '<div class="empty">No saved templates yet. Choose an official template and customize its background.</div>';
+    const communityHtml = communityRecords.map(record => variantCard(record.data, false)).join("") || '<div class="empty">No public community templates matched.</div>';
+    grid.innerHTML = `
+      <section class="template-section"><h3>Official FLOQR Templates</h3><div class="template-grid">${officialHtml || '<div class="empty">No official templates matched.</div>'}</div></section>
+      <section class="template-section"><h3>My Saved Templates</h3><div class="template-grid">${mineHtml}</div></section>
+      <section class="template-section"><h3>Community Templates</h3><div class="template-grid">${communityHtml}</div></section>`;
+    grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {
+      event.stopPropagation();
+      selectedTemplate = btn.dataset.templateOpen;
+      selectedTemplateVariant = null;
+      renderTemplates();
+      updateTemplateSummary();
+      goToEditor();
+    }));
+    grid.querySelectorAll("[data-template-customize]").forEach(btn => btn.addEventListener("click", event => {
+      event.stopPropagation();
+      openStudioForTemplate(getTemplate(btn.dataset.templateCustomize));
+    }));
+    grid.querySelectorAll("[data-variant-open]").forEach(btn => btn.addEventListener("click", event => {
+      event.stopPropagation();
+      const variant = [...mine, ...community].find(x => (x.id || x.variantId) === btn.dataset.variantOpen);
+      if (!variant) return;
+      selectedTemplate = variant.baseTemplateId || "blackwhite";
+      selectedTemplateVariant = variant;
+      renderTemplates();
+      updateTemplateSummary();
+      goToEditor();
+    }));
+    grid.querySelectorAll(".template[role='button']").forEach(item => {
+      item.addEventListener("click", () => {
+        if (item.dataset.templateId) {
+          selectedTemplate = item.dataset.templateId;
+          selectedTemplateVariant = null;
+        } else if (item.dataset.variantId) {
+          const variant = [...mine, ...community].find(x => (x.id || x.variantId) === item.dataset.variantId);
+          selectedTemplate = variant?.baseTemplateId || "blackwhite";
+          selectedTemplateVariant = variant || null;
+        }
+        renderTemplates(); updateTemplateSummary(); goToEditor();
+      });
+      item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); item.click(); } });
     });
   }
   function updateTemplateSummary() {
     const t = getTemplate();
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !currentTemplateSupportsMedia());
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(t.name)}</h3><p>${esc(t.description || "Template selected.")}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span></div>`;
+    const variant = selectedTemplateVariant;
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {
     const url = new URL("./display.html", window.location.href);
     url.searchParams.set("location", id);
-    if(payload){ url.searchParams.set("main",payload.mainText||""); url.searchParams.set("sub",payload.subText||""); url.searchParams.set("template",payload.template||"neon"); url.searchParams.set("media",payload.mediaUrl||""); url.searchParams.set("mediaType",payload.mediaType||""); }
+    if(payload){
+      url.searchParams.set("main",payload.mainText||"");
+      url.searchParams.set("sub",payload.subText||"");
+      url.searchParams.set("template",payload.template||"neon");
+      url.searchParams.set("media",payload.mediaUrl||"");
+      url.searchParams.set("mediaType",payload.mediaType||"");
+      url.searchParams.set("backgroundUrl",payload.backgroundUrl||"");
+      url.searchParams.set("backgroundColor",payload.backgroundColor||"");
+      url.searchParams.set("backgroundGradient",payload.backgroundGradient||"");
+    }
     return url.href;
   }
-  function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} • Template: ${t.name}`); updatePreview(); showPage("editorPage"); }
+  function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`); updatePreview(); showPage("editorPage"); }
   function updatePreview() {
     const frame=byId("previewFrame");
     const mediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
     const mediaType = byId("shoutoutMediaType")?.value.trim() || "";
-    if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl, mediaType, template:selectedTemplate}, locationId());
+    if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl, mediaType, template:selectedTemplate, backgroundUrl:selectedTemplateVariant?.backgroundUrl || "", backgroundColor:selectedTemplateVariant?.backgroundColor || "", backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""}, locationId());
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -1076,7 +1195,7 @@
     if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8MB or smaller.");
     setText("uploadStatus", "Uploading photo...");
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `shoutouts/${currentUser.uid}/${referenceNumber}-${Date.now()}-${safeName}`;
+    const path = `shoutouts/${currentUser.uid}/${referenceNumber || Date.now()}/original/${Date.now()}-${safeName}`;
     const ref = storage.ref().child(path);
     const snap = await ref.put(file, { contentType: file.type, customMetadata: { uploadedBy: currentUser.uid, referenceNumber } });
     const url = await snap.ref.getDownloadURL();
@@ -1104,12 +1223,27 @@
   }
 
   function applyAiSuggestion() {
+    const suggestion = window.floqrSuggestShoutOut ? window.floqrSuggestShoutOut({
+      mainText:byId("mainText")?.value || "",
+      subText:byId("subText")?.value || "",
+      templateId:selectedTemplate,
+      clubLocationId:locationId(),
+      eventType:getLocation()?.type || "",
+      tone:byId("shoutoutTone")?.value || "party",
+      mainLimit:Number(byId("mainText")?.maxLength || 36)
+    }) : null;
     const pool = window.SHOUTOUT_AI_SUGGESTIONS || [];
-    const item = pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
+    const item = suggestion || pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
     const mainInput = byId("mainText");
-    if (mainInput) mainInput.value = String(item.main || "").slice(0, Number(mainInput.maxLength || 36));
+    if (mainInput) mainInput.value = String(item.mainText || item.main || "").slice(0, Number(mainInput.maxLength || 36));
     syncAttribution();
     const box = byId("shoutoutSuggestionBox");
+    if (box) {
+      box.classList.remove("hidden");
+      box.innerHTML = `<strong>Improve My ShoutOut</strong><p>${esc(item.mainText || item.main)} - ${esc(item.subText || item.sub || "")}</p><small>${esc(item.providerMode || "curated-fallback")}</small>`;
+      updatePreview();
+      return;
+    }
     if (box) { box.classList.remove("hidden"); box.innerHTML = `<strong>AI Suggestion</strong><p>${esc(item.main)} — ${esc(item.sub)}</p>`; }
     updatePreview();
   }
@@ -1154,9 +1288,31 @@
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
         mediaFileName: uploadedMedia.mediaFileName || "",
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
+        originalMediaUrl: uploadedMedia.originalMediaUrl || uploadedMedia.mediaUrl || existingMediaUrl,
+        enhancedMediaUrl: uploadedMedia.enhancedMediaUrl || "",
+        selectedMediaVersion: uploadedMedia.selectedMediaVersion || "original",
+        aiEnhancementApplied: !!uploadedMedia.aiEnhancementApplied,
+        aiEnhancementType: uploadedMedia.aiEnhancementType || "none",
+        aiEnhancementPrompt: uploadedMedia.aiEnhancementPrompt || "",
+        originalDuration: uploadedMedia.originalDuration || null,
+        trimmedDuration: uploadedMedia.trimmedDuration || null,
+        trimStart: uploadedMedia.trimStart || null,
+        trimEnd: uploadedMedia.trimEnd || null,
+        aiMediaSafetyStatus: uploadedMedia.aiMediaSafetyStatus || "notChecked",
+        aiMediaSafetyNotes: uploadedMedia.aiMediaSafetyNotes || "",
         mediaUploadedAt: uploadedMedia.mediaUploadedAt || null
       } : { mediaUrl:"", mediaType:"", mediaFileName:"", mediaStoragePath:"", mediaUploadedAt:null };
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const variantPayload = selectedTemplateVariant ? {
+        templateVariantId:selectedTemplateVariant.id || selectedTemplateVariant.variantId || "",
+        templateVariantName:selectedTemplateVariant.variantName || "",
+        lockedBaseTemplateId:selectedTemplateVariant.baseTemplateId || selectedTemplate,
+        backgroundType:selectedTemplateVariant.backgroundType || "",
+        backgroundUrl:selectedTemplateVariant.backgroundUrl || "",
+        backgroundColor:selectedTemplateVariant.backgroundColor || "",
+        backgroundGradient:selectedTemplateVariant.backgroundGradient || "",
+        backgroundStoragePath:selectedTemplateVariant.backgroundStoragePath || ""
+      } : {};
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
       payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.43-f`;
@@ -1166,7 +1322,7 @@
       setText("confirmRef",payload.referenceNumber); setText("confirmClub",l.locationName); setText("confirmTemplate",t.name); showPage("confirmationPage");
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -1205,7 +1361,7 @@
   function goToEditor() {
     const l=getLocation(), t=getTemplate();
     setText("editorClubTitle", l.locationName);
-    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${t.name}`);
+    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
     updateMediaEditorForTemplate();
     syncAttribution();
     updatePreview();
@@ -1230,7 +1386,7 @@
 
       const portalLink = document.createElement("a");
       portalLink.href = "./patron-portal.html?v=28.43-f";
-      portalLink.textContent = "My Profile";
+      portalLink.textContent = "Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
       menu.insertBefore(portalLink, signOutButton);
@@ -1401,7 +1557,7 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.43-f">My Profile</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.43-f">Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
       <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.43-f">Messages (${c.um}/${c.tm})</a>
       <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.43-f">Mingl (${c.uc}/${c.tc})</a>
@@ -1471,7 +1627,7 @@ async function uploadSelectedMedia(referenceNumber){
  if(!firebase.storage){alert("Firebase Storage SDK is not loaded.");return {mediaUrl:"",mediaType:""};}
  const user=firebase.auth().currentUser; if(!user)throw new Error("Sign in first.");
  const safeName=((referenceNumber||Date.now())+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
- const storagePath=`shoutouts/${user.uid}/${safeName}`;
+ const storagePath=`shoutouts/${user.uid}/${referenceNumber||Date.now()}/original/${safeName}`;
  const ref=firebase.storage().ref().child(storagePath);
  await ref.put(file,{contentType:file.type}); const mediaUrl=await ref.getDownloadURL(); const mediaType=file.type.startsWith("video/")?"video":"image";
  byId("shoutoutMediaUrl").value=mediaUrl; byId("shoutoutMediaType").value=mediaType; return {mediaUrl,mediaType,mediaFileName:file.name,mediaStoragePath:storagePath,mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()};
@@ -1581,7 +1737,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const user=firebase.auth().currentUser;
     if(!user)throw new Error("Please sign in before uploading media.");
     const safeName=((referenceNumber||Date.now())+"-"+file.name).replace(/[^a-zA-Z0-9._-]/g,"_");
-    const storagePath=`shoutouts/${user.uid}/${safeName}`;
+    const storagePath=`shoutouts/${user.uid}/${referenceNumber||Date.now()}/original/${safeName}`;
     const ref=firebase.storage().ref().child(storagePath);
     await ref.put(file,{contentType:file.type});
     const mediaUrl=await ref.getDownloadURL();

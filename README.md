@@ -10,6 +10,130 @@ https://jadzadco.github.io/shoutout-demo/?v=28.43-f
 
 Current release highlights:
 
+- Adds the FLOQR AI-ready layer as a contextual platform service instead of isolated one-off AI features.
+- Adds default-off feature flags in `shared-data.js`: `FLOQR_AI_ENABLED`, `FLOQR_AI_PROVIDER`, `FLOQR_AI_FALLBACK_MODE`, `FLOQR_AI_STUDIO_ENABLED`, and `FLOQR_AI_ASSISTANT_ENABLED`.
+- Adds standalone AI modules: `ai-service.js`, `ai-index-service.js`, `ai-search-service.js`, `ai-notification-service.js`, `ai-assistant-ui.js`, `ai-template-studio.js`, `ai-media-service.js`, and `ai-discovery-service.js`.
+- Adds Firestore-ready schemas and rules for `aiIndex`, `aiUserNotificationPreferences`, `aiUserSignals`, `aiSearchLogs`, `aiRecommendations`, `aiDiscoveryQueue`, `aiAssistantSessions`, `aiAssistantMessages`, `patronTemplateVariants`, `aiTemplatePromptHistory`, `aiDiscoverySources`, and `aiDiscoveryRatingCriteria`.
+- Keeps FLOQR AI disabled by default. With all AI flags false, the app loads normally and uses local contextual search.
+- Adds `floqrSearch(query, context)` with local contextual fallback for venue, event, Mingl, and ShoutOut template search.
+- Adds a flag-gated `Ask FLOQR` assistant shell after login when `FLOQR_AI_ASSISTANT_ENABLED` is true.
+- Adds Settings > AI Notification Preferences in the patron portal.
+- Renames the patron portal framing to Settings and adds My Profile, Privacy, AI Notification Preferences, My ShoutOut Templates, and Public Sharing surfaces.
+- Adds patron-created ShoutOut template variants. Official/admin template layout stays locked; patrons can customize only the background.
+- Adds template gallery sections: Official FLOQR Templates, My Saved Templates, and Community Templates.
+- Adds FLOQR Studio / Design Background with AI UI. Live image generation is not configured yet, so it uses safe placeholder behavior and does not expose API keys.
+- Adds ShoutOut media AI readiness: browser filter previews, enhancement metadata, AI-ready moderation fields, and 7-second video enforcement.
+- Adds Super Admin AI Discovery scaffold for public event/venue discovery review, rating criteria, approve/reject/delete/duplicate actions, and soft delete/restore for `clubLocations` and `events`.
+- Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
+
+## FLOQR AI Architecture
+
+FLOQR AI is a contextual intelligence layer across ShoutOut, Mingl, Bata, venue/event discovery, admin review, notifications, and public profile/template discovery. The static frontend remains deployable to GitHub Pages and continues to use Firebase Auth, Firestore, and Firebase Storage.
+
+Live in this package:
+
+- Local `floqrSearch()` fallback with typo/synonym matching.
+- Privacy-aware record filtering for public/shared/owned data.
+- AI-ready data models and security rule blocks.
+- Ask FLOQR assistant shell, disabled by flag.
+- AI Notification Preferences persistence.
+- Patron template variants with locked base template layouts.
+- FLOQR Studio UI with safe background values.
+- ShoutOut copy improvement fallback.
+- ShoutOut media enhancement preview metadata.
+- Super Admin AI Discovery review and listing soft-delete UI.
+
+Scaffolded for later Firebase AI / Gemini configuration:
+
+- Semantic AI search provider calls.
+- Gemini media understanding and moderation notes.
+- AI background image generation/modification.
+- Scheduled crawler execution.
+- Backend video trimming with ffmpeg.
+- Email/SMS notification delivery.
+
+Frontend code must never contain AI API keys. Future live AI should use Firebase AI Logic when safe, or HTTPS callable Cloud Functions / Cloud Run Functions that verify Firebase Auth, role permissions, and visibility rules before calling Gemini.
+
+## AI Privacy And Indexing Rules
+
+AI may index, search, summarize, recommend, or notify only from public, shared, user-owned, or permissioned data. Allowed sources include published venue/event data, public profile fields, public DJ/promoter/club fields, public Bata listings, approved ShoutOut content, public/shared Mingl datapoints, and public patron template variants.
+
+AI must not crawl or learn from private messages, private chats, private prompts, private template backgrounds, unpublished profile fields, non-public guest lists, private admin data, payment data, sensitive personal data, unapproved ShoutOut submissions, or any document where `visibility !== "public"` unless the current user owns it or has permission.
+
+Protected terms must not be translated or altered: FLOQR, ShoutOut, Mingl, Bata.
+
+## Template Variant Workflow
+
+Patrons choose an official/admin ShoutOut template, click Customize Background, choose a safe color/gradient or upload an image, optionally enter an AI prompt, and save the variant as private or public. Saved variants appear in Settings > My ShoutOut Templates. Public variants can appear in Community Templates, template search, and the patron public profile when `isPublicProfileItem` is true.
+
+Patrons cannot change layout, text positioning, media placeholder position, video placeholder position, font rules, animation timing, template structure, approval format, or display format.
+
+Storage paths:
+
+```text
+template-backgrounds/{uid}/{variantId}/uploaded/
+template-backgrounds/{uid}/{variantId}/generated/
+```
+
+## Media AI Workflow
+
+The ShoutOut editor has an AI Media Enhancement panel with browser-only filter previews: Bright, Contrast, Neon, VIP Gold, Club Ready, Black & White, and Warm. The original file is still uploaded unless a future backend processor returns an enhanced asset.
+
+Videos must be 7 seconds or shorter. Longer videos are blocked with:
+
+```text
+Please upload a video that is 7 seconds or shorter.
+```
+
+Storage paths:
+
+```text
+shoutouts/{uid}/{referenceOrId}/original/{fileName}
+shoutouts/{uid}/{referenceOrId}/enhanced/{fileName}
+shoutouts/{uid}/{referenceOrId}/trimmed/{fileName}
+```
+
+Firestore ShoutOut records now support selected/original/enhanced media fields, trim metadata, enhancement metadata, safety status, and safety notes.
+
+## AI Discovery Workflow
+
+Backend scheduled discovery should run 4-6 times per day, prefer official APIs/feeds, respect robots.txt and site terms, and never scrape private or login-protected content. Target sources include Ticketmaster, Eventbrite, approved resale partners, official venue websites/feeds, comedy shows, nightclubs, lounges, beach clubs, brunch parties, pool parties, summer parties, DJ events, and promoter events.
+
+Flow:
+
+```text
+Public source -> crawler -> AI classification/scoring -> aiDiscoveryQueue -> Super Admin review -> approved live collection
+```
+
+Discovered records must not publish directly. Super Admin can edit, approve, reject, delete, or mark duplicates. Approved venue records write to `clubLocations`; approved event/comedy/ticket records write to `events`; both get indexed for AI/contextual search.
+
+Club public profiles are public search records. When a club admin claims ownership by subscribing to FLOQR, they can modify the club public profile fields: address, official website, email, social media handles, and telephone number. Third-party taxi hailing is modeled as a future partner integration, not a crawler input.
+
+## Security And Rollback
+
+New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
+
+Rollback plan:
+
+1. Set all FLOQR AI flags in `shared-data.js` to false.
+2. Remove the new AI script tags from `index.html`, `patron-portal.html`, and `master-admin.html` if needed.
+3. Keep existing ShoutOut, Mingl, Bata scaffolding, guest list routing, local search, and display files unchanged.
+4. Revert Firestore/Storage rule additions only if the new collections are not being used.
+
+Test plan:
+
+- Load the app with all AI flags false.
+- Search clubs/events with local fallback queries such as `hiphop clubs in Barcelona`, `DJs playing Afro Beats tonight`, and `comedy shows`.
+- Open Mingl and search public profiles only.
+- Save AI Notification Preferences in Settings.
+- Create a private ShoutOut template variant and confirm it appears only under My ShoutOut Templates.
+- Create a public variant and confirm it appears in Community Templates and Public Sharing.
+- Upload a photo and preview media filters.
+- Try a video longer than 7 seconds and confirm it is blocked.
+- Submit a text-only ShoutOut and a media ShoutOut.
+- Approve a ShoutOut from club admin and confirm selected media/background render on display.
+- Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
+
 - Fix package. `-f` means this release corrects upload/deployment behavior from the previous package.
 - Adds root-level copies of the Firestore rebrand migration page and script so the migration can be uploaded without creating a `migrations` folder manually.
 - Fixes the root fallback migration page so it loads `styles.css`, `firebase-config.js`, and `shared-data.js` from the correct root path.

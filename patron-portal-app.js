@@ -71,7 +71,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile"};
+      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", settings:"portalProfile", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
     }
@@ -477,6 +477,38 @@
     </article><section class="public-profile-gallery-wrap"><h3>Image Gallery</h3>${gallery}</section>`;
   }
 
+  function renderTemplateVariantCard(variant = {}, mine = false) {
+    const templates = window.SHOUTOUT_TEMPLATES || {};
+    const base = templates[variant.baseTemplateId] || templates.blackwhite || {};
+    const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(variant) : "";
+    return `<div class="template ${esc(base.className || "neon")}">
+      <div class="template-mini-preview" style="${esc(style)}"><strong>${esc(base.defaultMain || "SHOUTOUT")}</strong><span>${esc(variant.variantName || base.category || "Variant")}</span></div>
+      <div class="name">${esc(variant.variantName || "Saved Background")}</div>
+      <div class="tag">${esc(variant.baseTemplateName || base.name || "Official template")} - ${esc(variant.visibility || "private")}</div>
+      <div class="tag-row">${(variant.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <p class="sub small">${mine ? "Only the background is customized. Official layout remains locked." : `Created by ${esc(variant.ownerDisplayName || "FLOQR member")}.`}</p>
+    </div>`;
+  }
+
+  async function renderTemplateVariantSettings(user, profile) {
+    if (!window.FLOQRStudio || !user) return;
+    const variants = await window.FLOQRStudio.loadPatronTemplateVariants({db, uid:user.uid});
+    const mine = variants.mine || [];
+    const community = (variants.community || []).filter(x => x.ownerUid !== user.uid);
+    const mineWrap = byId("myTemplateVariants");
+    const communityWrap = byId("communityTemplateVariants");
+    if (mineWrap) mineWrap.innerHTML = mine.length ? mine.map(x => renderTemplateVariantCard(x, true)).join("") : "<div class='empty'>No saved ShoutOut template variants yet.</div>";
+    if (communityWrap) communityWrap.innerHTML = community.length ? community.map(x => renderTemplateVariantCard(x, false)).join("") : "<div class='empty'>No community template variants yet.</div>";
+    const publicMine = mine.filter(x => x.visibility === "public" && x.isPublicProfileItem !== false);
+    const preview = byId("profileTemplatePreview");
+    if (preview && publicMine.length) {
+      preview.insertAdjacentHTML("beforeend", `<section class="public-profile-gallery-wrap"><h3>Public ShoutOut Templates</h3><div class="template-grid">${publicMine.map(x => renderTemplateVariantCard(x, true)).join("")}</div></section>`);
+    }
+    if (window.FLOQRAINotifications) {
+      await window.FLOQRAINotifications.renderAiNotificationPreferences(byId("aiNotificationPreferencesMount"), {db, user, profile});
+    }
+  }
+
   function renderRoleGuide() {
     const guide = byId("roleTemplateGuide");
     if (!guide) return;
@@ -673,6 +705,7 @@
     fillProfileForm(profile, user);
     renderMediaSlots(profile);
     renderProfilePreview(profile, user);
+    await renderTemplateVariantSettings(user, profile);
     renderRoleGuide();
     renderPolicies(profile);
     setText("portalAccountName", profile.displayName || user.displayName || user.email || "Patron");
