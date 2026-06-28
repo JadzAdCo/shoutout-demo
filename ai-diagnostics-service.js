@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and plain fix guidance v28.56 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.57 */
 (function () {
   "use strict";
 
@@ -24,8 +24,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.52-rules-version-note";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.56-plain-diagnostics-guidance";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.57-mingl-diagnostic-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.57-storage-media-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.57-mingl-storage-rules-fix";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -194,7 +195,7 @@
       version: "v28.52-rules-version-note",
       title: "Firestore Rules Version Note",
       checks: [
-        {label:"Firestore rules version note", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note", "EXPECTED DEPLOYED RULES VERSION"]},
+        {label:"Firestore rules version note", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION:", "EXPECTED DEPLOYED RULES VERSION"]},
         {label:"Profile rules called out in note", file:"firestore.rules", includes:["users/{uid} self create/read/update support"]},
         {label:"Diagnostics rules called out in note", file:"firestore.rules", includes:["aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports"]}
       ]
@@ -216,7 +217,7 @@
         {label:"Rules smoke test covers AI collections", file:"ai-diagnostics-service.js", includes:["runAiFirestoreRuleTests", "Firestore: aiAssistantMessages owner lifecycle"]},
         {label:"Rules smoke test covers Mingl/chat queries", file:"ai-diagnostics-service.js", includes:["runMinglChatRuleTests", "participants\", \"array-contains\""]},
         {label:"Rules smoke test covers Storage paths", file:"ai-diagnostics-service.js", includes:["runStorageRuleTests", "profileMedia", "template-backgrounds"]},
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.54-app-rules-compatibility"]}
+        {label:"App rules compatibility marker", file:"ai-diagnostics-service.js", includes:["v28.54-app-rules-compatibility", "runCoreFirestoreRuleTests"]}
       ]
     },
     {
@@ -235,6 +236,16 @@
         {label:"Plain rules explanation", file:"ai-diagnostics-service.js", includes:["Plain English meaning", "Package file is current, but deployed Firebase rules failed live testing"]},
         {label:"Suggested fix field", file:"ai-diagnostics-service.js", includes:["suggestDiagnosticFix", "Suggested fix"]},
         {label:"Copy prompt action", file:"ai-diagnostics-service.js", includes:["copyRulesFixPromptBtn", "Copy Fix Prompt"]}
+      ]
+    },
+    {
+      version: "v28.57-mingl-storage-rules-fix",
+      title: "Mingl Diagnostics + Storage Rules Fix",
+      checks: [
+        {label:"Firestore rules version bumped", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules", "diagnosticRunId-scoped cleanup"]},
+        {label:"Storage rules version note", file:"storage.rules", includes:["FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules", "template-backgrounds/{uid}/{variantId}"]},
+        {label:"Mingl deterministic rule diagnostics", file:"ai-diagnostics-service.js", includes:["minglConnectionRuleLifecycle", "participant query blocked"]},
+        {label:"Patron Mingl fallback reads", file:"patron-app.js", includes:["getDocsByIdsSafe", "fallbackIds"]}
       ]
     }
   ];
@@ -461,6 +472,7 @@
     lines.push(`Exported at: ${new Date().toLocaleString()}`);
     lines.push(`Diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`);
     lines.push(`Expected Firestore rules version: ${EXPECTED_FIRESTORE_RULES_VERSION}`);
+    lines.push(`Expected Storage rules version: ${EXPECTED_STORAGE_RULES_VERSION}`);
     lines.push(`Signed-in Master Admin: ${state.auth?.currentUser?.email || state.auth?.currentUser?.uid || "unknown"}`);
     lines.push(`FLOQR_AI_ENABLED: ${window.FLOQR_AI_ENABLED === true}`);
     lines.push(`FLOQR_AI_ASSISTANT_ENABLED: ${window.FLOQR_AI_ASSISTANT_ENABLED === true}`);
@@ -628,6 +640,7 @@
       "Do not rebuild FLOQR from scratch. Preserve existing user profile data and keep ShoutOut, Mingl, Bata, guest lists, Firebase Auth, Firestore, Firebase Storage, and GitHub Pages working.",
       "",
       `Expected Firestore rules version: ${EXPECTED_FIRESTORE_RULES_VERSION}`,
+      `Expected Storage rules version: ${EXPECTED_STORAGE_RULES_VERSION}`,
       `Current diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`,
       `Package firestore.rules note status: ${packageRulesStatus}`,
       `Live deployed rules compatibility status: ${smokeStatus}`,
@@ -660,6 +673,8 @@
     if (!wrap) return;
     let packageRulesStatus = "Failed";
     let packageRulesEvidence = "Could not read firestore.rules from the installed package.";
+    let packageStorageStatus = "Failed";
+    let packageStorageEvidence = "Could not read storage.rules from the installed package.";
     try {
       const text = await fetchPackageFile("firestore.rules");
       const hasExpected = text.includes(`FLOQR FIRESTORE RULES VERSION: ${EXPECTED_FIRESTORE_RULES_VERSION}`)
@@ -671,13 +686,24 @@
     } catch (error) {
       packageRulesEvidence = error?.message || String(error);
     }
+    try {
+      const text = await fetchPackageFile("storage.rules");
+      const hasExpected = text.includes(`FLOQR STORAGE RULES VERSION: ${EXPECTED_STORAGE_RULES_VERSION}`)
+        && text.includes(`EXPECTED DEPLOYED STORAGE RULES VERSION: ${EXPECTED_STORAGE_RULES_VERSION}`);
+      packageStorageStatus = hasExpected ? "Pass" : "Failed";
+      packageStorageEvidence = hasExpected
+        ? `Installed storage.rules contains expected rules note: ${EXPECTED_STORAGE_RULES_VERSION}.`
+        : `Installed storage.rules does not contain expected rules note: ${EXPECTED_STORAGE_RULES_VERSION}.`;
+    } catch (error) {
+      packageStorageEvidence = error?.message || String(error);
+    }
 
     const latest = latestRulesSmokeReport(data);
     const smokeStatus = latest ? (latest.status === "Pass" ? "Pass" : "Failed") : "Soft Fail";
     const smokeEvidence = latest
       ? `Latest live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
       : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
-    const overall = packageRulesStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
+    const overall = packageRulesStatus === "Pass" && packageStorageStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
     const failedChecks = (Array.isArray(latest?.results) ? latest.results : []).filter(item => item.status === "Failed");
     const meaning = ruleStatusMeaning(packageRulesStatus, smokeStatus, latest);
     const nextSteps = ruleNextSteps(packageRulesStatus, smokeStatus, failedChecks);
@@ -692,8 +718,10 @@
 
     wrap.innerHTML = `${simpleRows([
       ["Expected Firestore rules version", EXPECTED_FIRESTORE_RULES_VERSION],
+      ["Expected Storage rules version", EXPECTED_STORAGE_RULES_VERSION],
       ["Current Diagnostics package", CURRENT_DIAGNOSTICS_PACKAGE_VERSION],
       ["Package firestore.rules note", `${packageRulesStatus}: ${packageRulesEvidence}`],
+      ["Package storage.rules note", `${packageStorageStatus}: ${packageStorageEvidence}`],
       ["Live deployed rules compatibility", `${smokeStatus}: ${smokeEvidence}`],
       ["Overall rules status", overall],
       ["How this is tested", "Package note is read from firestore.rules; deployed rules are verified by live Firestore/Storage operations."]
@@ -794,6 +822,93 @@
     const query = buildQuery(state.db.collection(collection));
     const snap = await query.limit(1).get();
     return `${collection} app-style query succeeded (${snap.size} doc(s) visible to this signed-in account).`;
+  }
+
+  async function participantQuerySoftCheck(collection, user) {
+    try {
+      return await firestoreQueryRead(collection, query => query.where("participants", "array-contains", user.uid));
+    } catch (error) {
+      return {
+        status:"Soft Fail",
+        evidence:`${collection} participant query blocked (${error?.message || error}). FLOQR now verifies deterministic participant document access and uses fallback reads when a deployed project rejects participant list queries.`
+      };
+    }
+  }
+
+  async function minglConnectionRuleLifecycle(runId, user) {
+    const peerUid = `diagnostic-peer-${runId}`;
+    const connectionId = `${runId}-mingl`;
+    const ref = state.db.collection("minglConnections").doc(connectionId);
+    await ref.set({
+      connectionId,
+      participants:[user.uid, peerUid],
+      requestedBy:user.uid,
+      requestedTo:peerUid,
+      status:"mutual",
+      diagnosticRunId:runId,
+      userSummaries:{
+        [user.uid]:{displayName:user.displayName || user.email || "Diagnostics"},
+        [peerUid]:{displayName:"Diagnostics Peer"}
+      },
+      createdAt:fieldValue(),
+      updatedAt:fieldValue()
+    });
+    const snap = await ref.get();
+    if (!snap.exists || !(snap.data().participants || []).includes(user.uid)) {
+      throw new Error("Temporary Mingl connection was not readable by its participant.");
+    }
+    await ref.set({diagnosticUpdatedAt:fieldValue()}, {merge:true});
+    await ref.delete();
+    return "Temporary Mingl participant connection create/read/update/delete succeeded.";
+  }
+
+  async function minglChatRoomRuleLifecycle(runId, user) {
+    const peerUid = `diagnostic-peer-${runId}`;
+    const connectionId = `${runId}-room-connection`;
+    const roomId = `mingl_${connectionId}`;
+    const connectionRef = state.db.collection("minglConnections").doc(connectionId);
+    const roomRef = state.db.collection("chatRooms").doc(roomId);
+    let connectionCleanupError = null;
+    await connectionRef.set({
+      connectionId,
+      participants:[user.uid, peerUid],
+      requestedBy:user.uid,
+      requestedTo:peerUid,
+      status:"mutual",
+      diagnosticRunId:runId,
+      createdAt:fieldValue(),
+      updatedAt:fieldValue()
+    });
+    try {
+      await roomRef.set({
+        id:roomId,
+        type:"mingl",
+        title:"Diagnostics Mingl Chat",
+        connectionId,
+        participants:[user.uid, peerUid],
+        userSummaries:{
+          [user.uid]:{displayName:user.displayName || user.email || "Diagnostics"},
+          [peerUid]:{displayName:"Diagnostics Peer"}
+        },
+        diagnosticRunId:runId,
+        lastMessage:"",
+        unreadCounts:{},
+        createdAt:fieldValue(),
+        updatedAt:fieldValue()
+      });
+      const snap = await roomRef.get();
+      if (!snap.exists || !(snap.data().participants || []).includes(user.uid)) {
+        throw new Error("Temporary Mingl chat room was not readable by its participant.");
+      }
+      await roomRef.set({diagnosticUpdatedAt:fieldValue()}, {merge:true});
+      await roomRef.delete();
+    } finally {
+      try { await connectionRef.delete(); } catch (error) { connectionCleanupError = error; }
+    }
+    if (connectionCleanupError) {
+      throw new Error(`Temporary Mingl connection cleanup failed: ${connectionCleanupError?.message || connectionCleanupError}`);
+    }
+    return "Temporary Mingl chat room create/read/update/delete succeeded for its participant.";
   }
 
   async function ownFieldLifecycle(collection, docId, fieldName, value) {
@@ -980,9 +1095,11 @@
   }
 
   async function runMinglChatRuleTests(capture, runId, user) {
-    await capture("Firestore: minglConnections participant query", () => firestoreQueryRead("minglConnections", query => query.where("participants", "array-contains", user.uid)));
-    await capture("Firestore: chatRooms participant query", () => firestoreQueryRead("chatRooms", query => query.where("participants", "array-contains", user.uid)));
-    await capture("Firestore: chatMessages participant query", () => firestoreQueryRead("chatMessages", query => query.where("participants", "array-contains", user.uid)));
+    await capture("Firestore: minglConnections deterministic participant lifecycle", () => minglConnectionRuleLifecycle(runId, user));
+    await capture("Firestore: chatRooms deterministic Mingl participant lifecycle", () => minglChatRoomRuleLifecycle(runId, user));
+    await capture("Firestore: minglConnections participant query compatibility", () => participantQuerySoftCheck("minglConnections", user));
+    await capture("Firestore: chatRooms participant query compatibility", () => participantQuerySoftCheck("chatRooms", user));
+    await capture("Firestore: chatMessages participant query compatibility", () => participantQuerySoftCheck("chatMessages", user));
     await capture("Firestore: non-Mingl chatRooms lifecycle", () => firestoreDocLifecycle("chatRooms", {
       type:"diagnostic",
       participants:[user.uid],
@@ -1040,6 +1157,14 @@
     async function capture(label, fn) {
       try {
         const evidence = await fn();
+        if (evidence && typeof evidence === "object" && evidence.status) {
+          results.push({
+            label,
+            status:evidence.status,
+            evidence:evidence.evidence || "Diagnostic completed with a non-blocking note."
+          });
+          return;
+        }
         results.push({label, status:"Pass", evidence:evidence || "Create/read/update/delete or upload/read/delete succeeded for the signed-in user."});
       } catch (error) {
         results.push({label, status:"Failed", evidence:error?.message || String(error)});

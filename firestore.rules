@@ -1,11 +1,12 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note
-// EXPECTED DEPLOYED RULES VERSION: v28.52-rules-version-note or newer
+// FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.57-mingl-diagnostic-rules or newer
 // Last required Firestore rules update added/confirmed:
 // - users/{uid} self create/read/update support for onboarding and existing profiles
 // - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
+// - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -42,6 +43,11 @@ service cloud.firestore {
         && request.auth.uid in request.resource.data.participants;
     }
 
+    function isDiagnosticResource() {
+      return signedIn()
+        && resource.data.diagnosticRunId is string;
+    }
+
     function isMutualMingl(connectionId) {
       return signedIn()
         && exists(/databases/$(database)/documents/minglConnections/$(connectionId))
@@ -71,7 +77,8 @@ service cloud.firestore {
       allow create: if isSelf(userId);
       allow read: if signedIn();
       allow update: if isSelf(userId);
-      allow delete: if false;
+      allow delete: if isParticipant()
+        && isDiagnosticResource();
     }
 
     match /clubs/{id} {
@@ -303,7 +310,15 @@ service cloud.firestore {
           ) ||
           !isExistingMinglRoom()
         );
-      allow delete: if signedIn() && !isExistingMinglRoom();
+      allow delete: if signedIn()
+        && (
+          !isExistingMinglRoom() ||
+          (
+            isExistingMinglRoom()
+            && isParticipant()
+            && isDiagnosticResource()
+          )
+        );
     }
 
     match /chatMessages/{messageId} {
@@ -331,7 +346,15 @@ service cloud.firestore {
           !isNewMinglMessage()
         );
       allow update, delete: if signedIn()
-        && !isExistingMinglMessage();
+        && (
+          !isExistingMinglMessage() ||
+          (
+            isExistingMinglMessage()
+            && resource.data.participants is list
+            && request.auth.uid in resource.data.participants
+            && isDiagnosticResource()
+          )
+        );
     }
   }
 }

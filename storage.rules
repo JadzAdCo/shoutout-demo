@@ -1,5 +1,13 @@
 rules_version = '2';
 
+// FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.57-storage-media-rules or newer
+// Required media paths:
+// - shoutouts/{uid}/... for original, enhanced, and trimmed ShoutOut media
+// - profileMedia/{uid}/images/... and profileMedia/{uid}/videos/...
+// - template-backgrounds/{uid}/{variantId}/... for patron template background media
+// If Firebase Console Storage Rules does not show this note near the top, Storage rules are not updated to this package.
+
 service firebase.storage {
   match /b/{bucket}/o {
 

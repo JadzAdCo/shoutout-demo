@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.56 Plain Diagnostics Guidance Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.57 Mingl + Storage Rules Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.56-plain-diagnostics-guidance
+https://jadzadco.github.io/shoutout-demo/?v=28.57-mingl-storage-rules-fix
 ```
 
 Current release highlights:
@@ -43,6 +43,9 @@ Current release highlights:
 - Expands `Run Rules Smoke Test` into an app-wide rules compatibility diagnostic for core app collections, AI collections, Mingl/chat queries, and Storage paths required by FLOQR.
 - Adds `Export Diagnostics TXT` under Master Admin > Diagnostics. The export includes current feature diagnostics, package install diagnostics, saved `aiDiagnosticsReports`, failure reasons/evidence, and a copy/paste prompt for Codex to fix the reported issues.
 - Adds plain-English rules guidance in Master Admin Diagnostics so the page explains whether the package file is current, whether live Firebase deployed rules passed, the likely fix, and a copyable prompt for Codex.
+- Updates Firestore rules to `v28.57-mingl-diagnostic-rules` with narrow `diagnosticRunId` cleanup for temporary Mingl/chat smoke-test records.
+- Adds a Storage rules version note, `v28.57-storage-media-rules`, covering ShoutOut media, profile media, and template background paths.
+- Adds a safer Mingl fallback path so patron Mingl can read deterministic participant docs if Firebase rejects participant list queries.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -162,12 +165,12 @@ When live AI translation is configured later, it must run through Firebase AI Lo
 
 New rules cover user-owned notification preferences, prompt history, template variants, assistant sessions/messages, and template background storage. Public variants are searchable. Private variants and private prompts remain private. Public prompts are searchable only when the patron explicitly shares the prompt and makes the variant public.
 
-The v28.45 Diagnostics package changed Firestore rules for `aiCrawlRuns`, `aiCrawlerSchedules`, and `aiDiagnosticsReports`. Firebase Storage rules did not change for v28.45 Diagnostics or this video-trim correction.
+The v28.57 package changes Firestore rules and Storage rules notes. Publish both files in Firebase Console before trusting the live smoke-test result.
 
 Post-install rules testing:
 
-1. Publish `firestore.rules` in Firebase Console after uploading this package if the v28.45 rules were not already published.
-2. Keep `storage.rules` unchanged unless your deployed project is older than the current package rules.
+1. Publish `firestore.rules` in Firebase Console after uploading this package.
+2. Publish `storage.rules` in Firebase Console > Storage > Rules after uploading this package.
 3. Sign in as Master Admin.
 4. Open Master Admin > Diagnostics.
 5. Click `Run Package Install Diagnostics`.
@@ -178,11 +181,20 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.52-rules-version-note
-// EXPECTED DEPLOYED RULES VERSION: v28.52-rules-version-note or newer
+// FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.57-mingl-diagnostic-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
+
+The top of `storage.rules` should show:
+
+```js
+// FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.57-storage-media-rules or newer
+```
+
+If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.
 
 Master Admin > Diagnostics now also shows `Firebase Rules Smoke Test` with:
 
@@ -205,6 +217,7 @@ Plain meaning for common results:
 - `Live deployed rules compatibility = Failed` means Firebase Console's currently deployed rules denied one or more live app operations.
 - `Overall rules status = Failed` means the app should not be considered rules-ready until the live smoke test passes.
 - The usual fix is to publish `firestore.rules` and/or `storage.rules` in Firebase Console, rerun `Run Rules Smoke Test`, then use `Export Diagnostics TXT` if anything still fails.
+- A Mingl participant query compatibility result can show `Soft Fail` if Firebase denies a participant list query but deterministic participant document reads pass. FLOQR uses fallback reads for that case.
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
 
@@ -264,7 +277,7 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, and v28.56 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, and v28.57 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.

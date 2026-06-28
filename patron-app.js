@@ -631,13 +631,27 @@
     }
   }
 
-  async function getParticipantCollectionSafe(name, uid, limit = 1000) {
+  async function getDocsByIdsSafe(name, ids = []) {
+    const uniqueIds = Array.from(new Set(ids.filter(Boolean))).slice(0, 250);
+    const rows = [];
+    for (const id of uniqueIds) {
+      try {
+        const snap = await db.collection(name).doc(id).get();
+        if (snap.exists) rows.push({id:snap.id, ...snap.data()});
+      } catch(e) {
+        console.warn(`Could not read ${name}/${id}:`, e.message);
+      }
+    }
+    return rows;
+  }
+
+  async function getParticipantCollectionSafe(name, uid, limit = 1000, fallbackIds = []) {
     try {
       const snap = await db.collection(name).where("participants", "array-contains", uid).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, ...d.data()}));
     } catch(e) {
       console.warn(`Could not read participant ${name}:`, e.message);
-      return [];
+      return fallbackIds.length ? getDocsByIdsSafe(name, fallbackIds) : [];
     }
   }
 
@@ -809,10 +823,9 @@
 
   async function loadMingl() {
     if (!currentUser) return;
-    const [users, connections] = await Promise.all([
-      getCollectionSafe("users", x => x.uid !== currentUser.uid && isPublicMinglCandidate(x)),
-      getParticipantCollectionSafe("minglConnections", currentUser.uid)
-    ]);
+    const users = await getCollectionSafe("users", x => x.uid !== currentUser.uid && isPublicMinglCandidate(x));
+    const fallbackConnectionIds = users.map(profile => pairId(currentUser.uid, profile.uid || profile.id));
+    const connections = await getParticipantCollectionSafe("minglConnections", currentUser.uid, 1000, fallbackConnectionIds);
     minglCandidates = users;
     minglConnections = connections;
     renderMinglSelfCard();
@@ -966,7 +979,11 @@
   async function renderMinglChats() {
     const list = byId("minglChatList");
     if (!list || !currentUser) return;
-    const rooms = (await getParticipantCollectionSafe("chatRooms", currentUser.uid)).filter(x => x.type === "mingl");
+    const fallbackRoomIds = minglConnections
+      .filter(connection => connection.status === "mutual")
+      .map(connection => `mingl_${connection.connectionId || connection.id}`)
+      .filter(Boolean);
+    const rooms = (await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, fallbackRoomIds)).filter(x => x.type === "mingl");
     list.innerHTML = rooms.length ? "" : "<p class='sub'>No Mingl chats yet. Send a Mingl request and wait for them to Mingl back.</p>";
     rooms.forEach(room => {
       const otherUid = (room.participants || []).find(uid => uid !== currentUser.uid);
