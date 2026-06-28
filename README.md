@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.48 Diagnostics Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.49 Language Plan Help Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.48-diagnostics-fix
+https://jadzadco.github.io/shoutout-demo/?v=28.49-language-plan-help
 ```
 
 Current release highlights:
@@ -32,6 +32,7 @@ Current release highlights:
 - Fixes the v28.44 AI search package marker diagnostic so it checks the fallback engine in `ai-service.js` and the adapters in `ai-search-service.js`.
 - Adds clearer Storage unauthorized guidance when deployed Storage rules are missing the package media paths.
 - Separates discovered-record workflow statuses from feature-health statuses.
+- Simplifies the crawler Market Language Plan explanation with a one-line format and examples.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -166,7 +167,20 @@ The rules smoke test verifies signed-in allowed operations. It does not imperson
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
 
-`Market Language Plan` means the crawler's per-market search map: country, local language(s), target cities, and relevant categories. Example: Spain searches in Spanish/Catalan for Barcelona, Madrid, Ibiza, and Marbella using terms for Latin nights, rooftops, beach clubs, and ticket resale.
+`Market Language Plan` means: tell FLOQR where to search, what language to search in, which cities matter, and what to look for.
+
+Simple format:
+
+```text
+Country or market | language(s) | cities | what to search for
+```
+
+Example:
+
+```text
+Spain | Spanish, Catalan | Barcelona, Madrid, Ibiza | Latin nights, rooftop bars, beach clubs, resale tickets
+United Arab Emirates | Arabic, English | Dubai | rooftop lounges, Arabic music DJs, comedy shows, tickets
+```
 
 Rollback plan:
 
@@ -189,7 +203,7 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, and v28.48 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, and v28.49 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs and Storage images are created/read/cleaned up.
 - Save crawler schedule criteria, run a manual crawl scaffold, and confirm new `aiCrawlRuns` and pending `aiDiscoveryQueue` records appear.
 - Confirm crawler analytics show collected record counts, top cities/countries, top genres/tags, sources, star ratings, and market gaps.

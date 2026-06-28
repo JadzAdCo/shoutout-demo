@@ -154,7 +154,15 @@
         {label:"Storage unauthorized guidance", file:"ai-diagnostics-service.js", includes:["Publish this package's storage.rules", "storage/unauthorized"]},
         {label:"Queue status labels", file:"ai-diagnostics-service.js", includes:["function queueStatusBadge", "Pending Review"]},
         {label:"Soft Fail definition in UI", file:"master-admin.html", includes:["Soft Fail means the feature is present and safe"]},
-        {label:"Market Language Plan definition in UI", file:"master-admin.html", includes:["Market Language Plan tells the future backend crawler"]}
+        {label:"Market Language Plan definition in UI", file:"master-admin.html", includes:["Simple Market + Language Plan", "Where? What language? Which cities? What should FLOQR look for?"]}
+      ]
+    },
+    {
+      version: "v28.49-language-plan-help",
+      title: "Simplified Crawler Language Plan Explanation",
+      checks: [
+        {label:"Plain language crawler market format", file:"master-admin.html", includes:["Use one line per market", "Country or market | language(s) to search in | cities | event or venue types"]},
+        {label:"Crawler plan examples", file:"master-admin.html", includes:["Spain | Spanish, Catalan", "United Arab Emirates | Arabic, English"]}
       ]
     }
   ];

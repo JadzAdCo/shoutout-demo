@@ -208,8 +208,22 @@
             <label>Countries<input id="crawlCountryCriteria" placeholder="Spain, France, United Arab Emirates, Turkey"/></label>
           </div>
           <label>Event Types<textarea id="crawlEventTypeCriteria" rows="4"></textarea></label>
-          <label>Market Language Plan<textarea id="crawlMarketLanguageCriteria" rows="10"></textarea></label>
-          <p class="sub small">Market Language Plan tells the future backend crawler which countries/cities to search, which local languages to use, and which nightlife/ticket categories matter in that market.</p>
+          <label>Simple Market + Language Plan<textarea id="crawlMarketLanguageCriteria" rows="10"></textarea></label>
+          <p class="sub small">Use one line per market. Each line answers four simple questions: Where? What language? Which cities? What should FLOQR look for?</p>
+          <div class="report-block">
+            <div class="queue-item">
+              <strong>Format</strong>
+              <p>Country or market | language(s) to search in | cities | event or venue types</p>
+            </div>
+            <div class="queue-item">
+              <strong>Example</strong>
+              <p>Spain | Spanish, Catalan | Barcelona, Madrid, Ibiza | Latin nights, rooftop bars, beach clubs, resale tickets</p>
+            </div>
+            <div class="queue-item">
+              <strong>Example</strong>
+              <p>United Arab Emirates | Arabic, English | Dubai | rooftop lounges, Arabic music DJs, comedy shows, tickets</p>
+            </div>
+          </div>
         </div>
         <div class="card">
           <h2>Crawler Schedule</h2>
@@ -256,8 +270,8 @@
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-discovery-service.js?v=28.44-ai"></script>
-<script src="./ai-diagnostics-service.js?v=28.48-diagnostics-fix"></script>
-<script src="./master-admin-app.js?v=28.48-diagnostics-fix"></script>
+<script src="./ai-diagnostics-service.js?v=28.49-language-plan-help"></script>
+<script src="./master-admin-app.js?v=28.49-language-plan-help"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>
