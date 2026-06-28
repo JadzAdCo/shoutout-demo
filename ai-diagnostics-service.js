@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.57 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.58 */
 (function () {
   "use strict";
 
@@ -26,7 +26,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.57-mingl-diagnostic-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.57-storage-media-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.57-mingl-storage-rules-fix";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.58-diagnostics-signal-cleanup";
 
   const DEFAULT_EVENT_TYPES = [
     "nightclub",
@@ -204,7 +204,7 @@
       version: "v28.53-rules-diagnostics-status",
       title: "Rules Version + Compatibility Status",
       checks: [
-        {label:"Rules version status UI", file:"master-admin.html", includes:["rulesVersionStatus", "rules-version note"]},
+        {label:"Rules version status UI", file:"master-admin.html", includes:["rulesVersionStatus", "Firebase Rules Smoke Test"]},
         {label:"Rules version status renderer", file:"ai-diagnostics-service.js", includes:["EXPECTED_FIRESTORE_RULES_VERSION", "renderRulesVersionStatus"]},
         {label:"Rules diagnostics status marker", file:"ai-diagnostics-service.js", includes:["v28.53-rules-diagnostics-status", "renderRulesVersionStatus"]}
       ]
@@ -246,6 +246,16 @@
         {label:"Storage rules version note", file:"storage.rules", includes:["FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules", "template-backgrounds/{uid}/{variantId}"]},
         {label:"Mingl deterministic rule diagnostics", file:"ai-diagnostics-service.js", includes:["minglConnectionRuleLifecycle", "participant query blocked"]},
         {label:"Patron Mingl fallback reads", file:"patron-app.js", includes:["getDocsByIdsSafe", "fallbackIds"]}
+      ]
+    },
+    {
+      version: "v28.58-diagnostics-signal-cleanup",
+      title: "Diagnostics Signal Cleanup",
+      checks: [
+        {label:"Current-package rules report logic", file:"ai-diagnostics-service.js", includes:["currentPackageRulesSmokeReport", "Latest saved rules smoke test is stale"]},
+        {label:"Protected collection scoped reads", file:"ai-diagnostics-service.js", includes:["readProtectedCollectionSafe", "Protected collection uses scoped diagnostics"]},
+        {label:"Historical report issue filter", file:"ai-diagnostics-service.js", includes:["collectCurrentRulesReportIssues", "Historical saved reports are exported for reference"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.58-diagnostics-signal-cleanup"]}
       ]
     }
   ];
@@ -379,6 +389,20 @@
     return rows.slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   }
 
+  function rulesSmokeReports(data = state.lastData || {}) {
+    return sortByCreatedDesc(data.aiDiagnosticsReports?.rows || [])
+      .filter(row => row.type === "rulesSmokeTest");
+  }
+
+  function latestRulesSmokeReport(data = state.lastData || {}) {
+    return rulesSmokeReports(data)[0] || null;
+  }
+
+  function currentPackageRulesSmokeReport(data = state.lastData || {}) {
+    return rulesSmokeReports(data)
+      .find(row => row.packageVersion === CURRENT_DIAGNOSTICS_PACKAGE_VERSION) || null;
+  }
+
   function suggestDiagnosticFix(source, label, reason, status) {
     const text = normalized(`${source} ${label} ${reason}`);
     if (text.includes("storage") || text.includes("storage unauthorized") || text.includes("template backgrounds") || text.includes("shoutouts original image path")) {
@@ -405,7 +429,44 @@
     return "Use the failure reason and exported diagnostic prompt to request a focused fix package from Codex.";
   }
 
-  function collectDiagnosticIssues({data = {}, features = [], packageResults = [], reports = []} = {}) {
+  function collectCurrentRulesReportIssues(data = {}) {
+    const latest = latestRulesSmokeReport(data);
+    const current = currentPackageRulesSmokeReport(data);
+    if (current) {
+      const reportName = `${current.type || "rulesSmokeTest"} ${current.packageVersion || current.id || ""}`.trim();
+      const rows = [{
+        source:"Current Rules Smoke Test",
+        label:reportName,
+        status:current.status,
+        reason:`Saved report status ${current.status || "unknown"} at ${fmtDate(current.createdAt)}.`
+      }];
+      (Array.isArray(current.results) ? current.results : []).forEach(result => {
+        rows.push({
+          source:`Current Rules Smoke Test: ${reportName}`,
+          label:result.label,
+          status:result.status,
+          reason:result.evidence
+        });
+      });
+      return rows;
+    }
+    if (latest) {
+      return [{
+        source:"Current Rules Smoke Test",
+        label:"No current-package rules smoke test",
+        status:"Soft Fail",
+        reason:`Latest saved rules smoke test is stale: ${latest.packageVersion || "unknown package"} at ${fmtDate(latest.createdAt)}. Run Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.`
+      }];
+    }
+    return [{
+      source:"Current Rules Smoke Test",
+      label:"No rules smoke test has been run",
+      status:"Soft Fail",
+      reason:`Run Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION} after publishing Firestore and Storage rules.`
+    }];
+  }
+
+  function collectDiagnosticIssues({data = {}, features = [], packageResults = []} = {}) {
     const issues = [];
     const add = (source, label, status, reason) => {
       if (attentionStatus(status)) {
@@ -426,12 +487,8 @@
       if (value?.error) add("Firestore Read", name, "Failed", value.error);
     });
 
-    reports.forEach(report => {
-      const reportName = `${report.type || "diagnosticReport"} ${report.packageVersion || report.id || ""}`.trim();
-      add("Saved Diagnostic Report", reportName, report.status, `Saved report status ${report.status || "unknown"} at ${fmtDate(report.createdAt)}.`);
-      (Array.isArray(report.results) ? report.results : []).forEach(result => {
-        add(`Saved Diagnostic Report: ${reportName}`, result.label, result.status, result.evidence);
-      });
+    collectCurrentRulesReportIssues(data).forEach(item => {
+      add(item.source, item.label, item.status, item.reason);
     });
 
     return issues;
@@ -462,7 +519,8 @@
 
   function buildDiagnosticsExport({data = {}, schedule = null, features = [], packageResults = []} = {}) {
     const reports = sortByCreatedDesc(data.aiDiagnosticsReports?.rows || []);
-    const latestRules = reports.find(row => row.type === "rulesSmokeTest") || null;
+    const latestRules = latestRulesSmokeReport(data);
+    const currentRules = currentPackageRulesSmokeReport(data);
     const issues = collectDiagnosticIssues({data, features, packageResults, reports});
     const lines = [];
     const counts = countBy(features, item => item.status);
@@ -514,7 +572,8 @@
 
     lines.push("");
     lines.push("FIREBASE RULES STATUS");
-    lines.push(`Latest saved rules smoke test: ${latestRules ? `${latestRules.status || "unknown"} at ${fmtDate(latestRules.createdAt)}` : "No saved rules smoke test found"}`);
+    lines.push(`Current-package rules smoke test: ${currentRules ? `${currentRules.status || "unknown"} at ${fmtDate(currentRules.createdAt)}` : "Not run yet"}`);
+    lines.push(`Latest saved rules smoke test: ${latestRules ? `${latestRules.status || "unknown"} from ${latestRules.packageVersion || "unknown package"} at ${fmtDate(latestRules.createdAt)}` : "No saved rules smoke test found"}`);
     lines.push("Note: Browser diagnostics cannot read Firebase Console deployed rules source. Deployed rules are verified by live Firestore/Storage operations.");
 
     lines.push("");
@@ -528,6 +587,7 @@
 
     lines.push("");
     lines.push("SAVED aiDiagnosticsReports");
+    lines.push("Historical saved reports are exported for reference and are not counted as current package failures.");
     if (!reports.length) {
       lines.push("No saved aiDiagnosticsReports records were readable.");
     }
@@ -653,12 +713,6 @@
     ].join("\n");
   }
 
-  function latestRulesSmokeReport(data = state.lastData || {}) {
-    return (data.aiDiagnosticsReports?.rows || [])
-      .filter(row => row.type === "rulesSmokeTest")
-      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))[0] || null;
-  }
-
   async function fetchPackageFile(file, cache = new Map()) {
     if (cache.has(file)) return cache.get(file);
     const response = await fetch(`./${file}?diagnostics=${Date.now()}`, {cache:"no-store"});
@@ -698,11 +752,14 @@
       packageStorageEvidence = error?.message || String(error);
     }
 
-    const latest = latestRulesSmokeReport(data);
+    const latestAny = latestRulesSmokeReport(data);
+    const latest = currentPackageRulesSmokeReport(data);
     const smokeStatus = latest ? (latest.status === "Pass" ? "Pass" : "Failed") : "Soft Fail";
     const smokeEvidence = latest
-      ? `Latest live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
-      : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
+      ? `Latest current-package live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
+      : latestAny
+        ? `Latest saved rules smoke test is stale: ${latestAny.packageVersion || "unknown package"} at ${fmtDate(latestAny.createdAt)}. Rerun Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.`
+        : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
     const overall = packageRulesStatus === "Pass" && packageStorageStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
     const failedChecks = (Array.isArray(latest?.results) ? latest.results : []).filter(item => item.status === "Failed");
     const meaning = ruleStatusMeaning(packageRulesStatus, smokeStatus, latest);
@@ -1192,7 +1249,102 @@
     return results;
   }
 
+  async function scopedQueryRows(name, buildQuery, limit = 750) {
+    const snap = await buildQuery(state.db.collection(name)).limit(limit).get();
+    return snap.docs.map(doc => ({id: doc.id, _collection: name, ...doc.data()}));
+  }
+
+  function uniqueRows(rows = []) {
+    const seen = new Set();
+    return rows.filter(row => {
+      const key = `${row._collection || ""}/${row.id || ""}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  async function readOwnDocAsCollection(name, docId) {
+    if (!docId) return {rows: [], error: "", note:"Signed-in user is required for scoped diagnostics."};
+    const snap = await state.db.collection(name).doc(docId).get();
+    return {
+      rows: snap.exists ? [{id:snap.id, _collection:name, ...snap.data()}] : [],
+      error:"",
+      note:"Protected collection uses scoped diagnostics instead of broad collection reads."
+    };
+  }
+
+  async function readProtectedCollectionSafe(name, limit = 750) {
+    const user = state.auth?.currentUser;
+    const uid = user?.uid || "";
+    try {
+      if (name === "aiUserNotificationPreferences") {
+        return await readOwnDocAsCollection(name, uid);
+      }
+      if (["aiUserSignals", "aiSearchLogs"].includes(name)) {
+        return {
+          rows: await scopedQueryRows(name, query => query.where("uid", "==", uid), limit),
+          error:"",
+          note:"Protected collection uses scoped diagnostics by uid."
+        };
+      }
+      if (name === "aiRecommendations") {
+        const rows = [
+          ...await scopedQueryRows(name, query => query.where("uid", "==", uid), limit),
+          ...await scopedQueryRows(name, query => query.where("recipientUid", "==", uid), limit)
+        ];
+        return {
+          rows: uniqueRows(rows),
+          error:"",
+          note:"Protected collection uses scoped diagnostics by uid/recipientUid."
+        };
+      }
+      if (name === "patronTemplateVariants") {
+        const rows = [
+          ...await scopedQueryRows(name, query => query.where("ownerUid", "==", uid), limit),
+          ...await scopedQueryRows(name, query => query.where("visibility", "==", "public"), limit)
+        ];
+        return {
+          rows: uniqueRows(rows),
+          error:"",
+          note:"Protected collection uses owner/public scoped diagnostics."
+        };
+      }
+      if (name === "aiIndex") {
+        const rows = [
+          ...await scopedQueryRows(name, query => query.where("visibility", "==", "public"), limit),
+          ...await scopedQueryRows(name, query => query.where("ownerUid", "==", uid), limit)
+        ];
+        return {
+          rows: uniqueRows(rows),
+          error:"",
+          note:"Protected index uses public/owner scoped diagnostics."
+        };
+      }
+      if (["minglConnections", "chatRooms", "chatMessages"].includes(name)) {
+        try {
+          return {
+            rows: await scopedQueryRows(name, query => query.where("participants", "array-contains", uid), limit),
+            error:"",
+            note:"Protected Mingl/chat collection uses participant-scoped diagnostics."
+          };
+        } catch (error) {
+          return {
+            rows: [],
+            error:"",
+            note:`Protected Mingl/chat participant query blocked by deployed rules: ${error?.message || error}. App fallback reads deterministic participant docs; run Rules Smoke Test for live proof.`
+          };
+        }
+      }
+    } catch (error) {
+      return {rows: [], error: error?.message || String(error)};
+    }
+    return null;
+  }
+
   async function readCollectionSafe(name, limit = 750) {
+    const protectedResult = await readProtectedCollectionSafe(name, limit);
+    if (protectedResult) return protectedResult;
     try {
       const snap = await state.db.collection(name).limit(limit).get();
       return {rows: snap.docs.map(doc => ({id: doc.id, _collection: name, ...doc.data()})), error: ""};
@@ -1433,7 +1585,8 @@
     const scheduleRows = data.aiCrawlerSchedules?.rows || [];
     const crawlRuns = data.aiCrawlRuns?.rows || [];
     const discoveryQueue = data.aiDiscoveryQueue?.rows || [];
-    const latestRulesReport = latestRulesSmokeReport(data);
+    const latestRulesReport = currentPackageRulesSmokeReport(data);
+    const latestAnyRulesReport = latestRulesSmokeReport(data);
     const hasSearch = !!window.floqrSearch;
     const hasDiscovery = !!window.FLOQRAIDiscovery;
 
@@ -1453,7 +1606,7 @@
       ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
       ["Mingl", "Mingl matching", collectionStatus(data, "minglConnections", true), `${collectionCount(data, "minglConnections")} Mingl connection records scanned.`],
       ["Mingl", "Mingl chat rooms", collectionStatus(data, "chatRooms", true), `${collectionCount(data, "chatRooms")} chat room records scanned.`],
-      ["Mingl", "Chat messages privacy", collectionStatus(data, "chatMessages", true), "Diagnostics count chat records but do not copy private chat bodies into aiIndex."],
+      ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
       ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
       ["Bata", "Marketplace discovery/search", "TBI", "Bata search hooks are AI-ready, but production listing and checkout workflows are not live yet."],
       ["AI Search", "floqrSearch local fallback", hasSearch ? "Pass" : "Failed", hasSearch ? `FLOQR_AI_ENABLED=${window.FLOQR_AI_ENABLED === true}; fallback=${window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search"}.` : "FLOQRSearch module was not loaded."],
@@ -1476,7 +1629,7 @@
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
       ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, crawler controls, reports, and analytics are mounted under Master Admin settings."],
       ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
-      ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
+      ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `Latest saved rules smoke test is stale: ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. Run the rules smoke test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
     ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
   }
 

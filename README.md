@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.57 Mingl + Storage Rules Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.58 Diagnostics Signal Cleanup Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.57-mingl-storage-rules-fix
+https://jadzadco.github.io/shoutout-demo/?v=28.58-diagnostics-signal-cleanup
 ```
 
 Current release highlights:
@@ -46,6 +46,9 @@ Current release highlights:
 - Updates Firestore rules to `v28.57-mingl-diagnostic-rules` with narrow `diagnosticRunId` cleanup for temporary Mingl/chat smoke-test records.
 - Adds a Storage rules version note, `v28.57-storage-media-rules`, covering ShoutOut media, profile media, and template background paths.
 - Adds a safer Mingl fallback path so patron Mingl can read deterministic participant docs if Firebase rejects participant list queries.
+- Cleans up Master Admin Diagnostics so old failed rules smoke tests are shown as historical reference, not current package failures.
+- Uses scoped reads for protected collections in Diagnostics instead of broad collection reads that Firebase rules should deny.
+- Fixes the older v28.53 package marker check so it no longer fails on wording that was intentionally simplified later.
 - Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
 
 ## FLOQR AI Architecture
@@ -218,6 +221,7 @@ Plain meaning for common results:
 - `Overall rules status = Failed` means the app should not be considered rules-ready until the live smoke test passes.
 - The usual fix is to publish `firestore.rules` and/or `storage.rules` in Firebase Console, rerun `Run Rules Smoke Test`, then use `Export Diagnostics TXT` if anything still fails.
 - A Mingl participant query compatibility result can show `Soft Fail` if Firebase denies a participant list query but deterministic participant document reads pass. FLOQR uses fallback reads for that case.
+- Historical failed `aiDiagnosticsReports` remain in the TXT export for reference, but only the current package's rules smoke test is counted as the live rules status.
 
 If the rules smoke test fails on `template-backgrounds/...` or `shoutouts/...` with `storage/unauthorized`, publish `storage.rules` in Firebase Console > Storage > Rules. The package rules allow signed-in users to write their own ShoutOut media, profile media, and template background paths.
 
@@ -277,7 +281,7 @@ Test plan:
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
 - Review AI Discovery as Master Admin, approve a queue item, soft delete a listing, and restore it.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, and v28.57 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, and v28.58 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
