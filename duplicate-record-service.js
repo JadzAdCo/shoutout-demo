@@ -1,4 +1,4 @@
-/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.70 */
+/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.71 */
 (function () {
   "use strict";
 
@@ -7,6 +7,14 @@
   let db = null;
   let auth = null;
   let duplicateGroups = [];
+  let lastDuplicateReadError = "";
+  let duplicateScanMeta = {
+    dataSource:"Not scanned yet",
+    scannedAt:"",
+    readCount:0,
+    activeCount:0,
+    staticAliasCount:0
+  };
 
   function nowField() {
     return firebase.firestore.FieldValue.serverTimestamp();
@@ -69,8 +77,10 @@
   async function getCollectionSafe(name, limit = 1000) {
     try {
       const snap = await db.collection(name).limit(limit).get();
-      return snap.docs.map(doc => ({id:doc.id, _collection:name, ...doc.data()}));
+      lastDuplicateReadError = "";
+      return snap.docs.map(doc => ({id:doc.id, _collection:name, _dataSource:`Live Firestore: ${name}`, ...doc.data()}));
     } catch (error) {
+      lastDuplicateReadError = formatError(error);
       console.warn(`Could not read ${name}:`, error?.message || error);
       return [];
     }
@@ -158,9 +168,181 @@
     return `<div class="report-table">${rows.map(([key, value]) => `<div><span>${esc(key)}</span><strong>${esc(value)}</strong></div>`).join("")}</div>`;
   }
 
+  function statusBadge(status = "Soft Fail") {
+    return `<span class="status-pill">${esc(status)}</span>`;
+  }
+
+  function formatError(error) {
+    const code = error?.code ? `${error.code}: ` : "";
+    return `${code}${error?.message || error || "Unknown Firebase error"}`;
+  }
+
   function setStatus(message = "") {
     const el = byId("duplicateRecordStatus");
     if (el) el.textContent = message;
+  }
+
+  function manualPairIds() {
+    const primaryId = byId("duplicatePrimaryId")?.value.trim().toLowerCase() || "";
+    const duplicateText = byId("duplicateAliasId")?.value.trim().toLowerCase() || "";
+    const duplicateIds = duplicateText.split(/[,\s]+/).map(x => x.trim()).filter(Boolean);
+    return {primaryId, duplicateIds};
+  }
+
+  function overallStatus(rows = []) {
+    if (rows.some(row => row.status === "Failed")) return "Failed";
+    if (rows.some(row => row.status === "Soft Fail")) return "Soft Fail";
+    return "Pass";
+  }
+
+  function renderMergeDiagnosticReport(rows = [], context = {}) {
+    const wrap = byId("duplicateMergeDiagnosticReport");
+    if (!wrap) return;
+    const status = overallStatus(rows);
+    wrap.innerHTML = `<div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>Duplicate Merge Diagnostic</strong>
+        ${statusBadge(status)}
+      </div>
+      ${simpleRows([
+        ["Primary club id", context.primaryId || "-"],
+        ["Duplicate club id(s)", (context.duplicateIds || []).join(", ") || "-"],
+        ["Checked at", new Date().toLocaleString()],
+        ["Meaning", status === "Pass" ? "Merge is verified." : status === "Soft Fail" ? "Merge mostly works, but one non-blocking item needs review." : "Merge did not complete or Firebase rules blocked a required step."]
+      ])}
+      <div class="report-table">
+        ${rows.map(row => `<div><span>${esc(row.label)}</span><strong>${esc(row.status)} - ${esc(row.evidence)}</strong></div>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  function addDiagnostic(rows, label, status, evidence) {
+    rows.push({label, status, evidence});
+  }
+
+  function staticAliasTarget(id = "") {
+    const row = (window.SHOUTOUT_CLUB_LOCATIONS || {})[String(id || "").toLowerCase()] || {};
+    return String(row.canonicalLocationId || row.aliasOf || row.mergedInto || "").toLowerCase();
+  }
+
+  async function referenceCountsForDuplicate(duplicateId) {
+    const fields = ["locationId", "clubLocationId", "location"];
+    const collections = ["events", "shoutouts", "guestListRequests"];
+    const matches = [];
+    const blocked = [];
+    for (const collection of collections) {
+      for (const field of fields) {
+        try {
+          const snap = await db.collection(collection).where(field, "==", duplicateId).limit(20).get();
+          if (!snap.empty) matches.push(`${collection}.${field}: ${snap.size}`);
+        } catch (error) {
+          blocked.push(`${collection}.${field}: ${formatError(error)}`);
+        }
+      }
+    }
+    return {matches, blocked};
+  }
+
+  async function runDuplicateMergeDiagnostic(primaryIdArg = "", duplicateIdsArg = []) {
+    if (!db) return;
+    const manual = manualPairIds();
+    const primaryId = String(primaryIdArg || manual.primaryId || "").trim().toLowerCase();
+    const duplicateIds = (Array.isArray(duplicateIdsArg) && duplicateIdsArg.length ? duplicateIdsArg : manual.duplicateIds)
+      .map(id => String(id || "").trim().toLowerCase())
+      .filter(Boolean)
+      .filter(id => id !== primaryId);
+    if (!primaryId || !duplicateIds.length) {
+      setStatus("Enter a primary club id and duplicate club id, then run the merge diagnostic.");
+      renderMergeDiagnosticReport([{
+        label:"Diagnostic input",
+        status:"Failed",
+        evidence:"Missing primary or duplicate club id."
+      }], {primaryId, duplicateIds});
+      return "Failed";
+    }
+
+    setStatus("Running duplicate merge diagnostic...");
+    const rows = [];
+    let primary = null;
+    try {
+      const primarySnap = await db.collection("clubLocations").doc(primaryId).get();
+      if (!primarySnap.exists) {
+        addDiagnostic(rows, `Primary club ${primaryId}`, "Failed", "Primary clubLocation document was not found.");
+      } else {
+        primary = {id:primarySnap.id, ...primarySnap.data()};
+        const active = primary.active !== false && !["merged", "deleted"].includes(String(primary.status || "active").toLowerCase());
+        addDiagnostic(rows, `Primary club ${primaryId}`, active ? "Pass" : "Failed", active ? "Primary exists and is still active." : `Primary exists but status/active flag is not active (${primary.status || "no status"}).`);
+      }
+    } catch (error) {
+      addDiagnostic(rows, `Primary club ${primaryId}`, "Failed", `Could not read primary club: ${formatError(error)}`);
+    }
+
+    for (const duplicateId of duplicateIds) {
+      let duplicate = null;
+      try {
+        const duplicateSnap = await db.collection("clubLocations").doc(duplicateId).get();
+        if (!duplicateSnap.exists) {
+          addDiagnostic(rows, `Duplicate club ${duplicateId}`, "Failed", "Duplicate clubLocation document was not found.");
+        } else {
+          duplicate = {id:duplicateSnap.id, ...duplicateSnap.data()};
+          const canonical = String(duplicate.canonicalLocationId || duplicate.aliasOf || duplicate.mergedInto || "").toLowerCase();
+          const status = String(duplicate.status || "").toLowerCase();
+          const merged = canonical === primaryId && (status === "merged" || duplicate.active === false);
+          addDiagnostic(rows, `Duplicate club ${duplicateId}`, merged ? "Pass" : "Failed", merged ? "Duplicate is marked merged/inactive and points to the primary club." : `Duplicate does not yet point cleanly to ${primaryId}. status=${duplicate.status || "-"}, active=${duplicate.active}, canonical=${canonical || "-"}.`);
+        }
+      } catch (error) {
+        addDiagnostic(rows, `Duplicate club ${duplicateId}`, "Failed", `Could not read duplicate club: ${formatError(error)}`);
+      }
+
+      try {
+        const aliasSnap = await db.collection("clubLocationAliases").doc(duplicateId).get();
+        if (!aliasSnap.exists) {
+          addDiagnostic(rows, `Alias document ${duplicateId}`, "Failed", "clubLocationAliases document was not found. If merge just failed, publish v28.70+ firestore.rules and retry.");
+        } else {
+          const alias = aliasSnap.data() || {};
+          const canonical = String(alias.canonicalLocationId || "").toLowerCase();
+          addDiagnostic(rows, `Alias document ${duplicateId}`, canonical === primaryId ? "Pass" : "Failed", canonical === primaryId ? "Alias document points old links to the primary club." : `Alias points to ${canonical || "-"} instead of ${primaryId}.`);
+        }
+      } catch (error) {
+        addDiagnostic(rows, `Alias document ${duplicateId}`, "Failed", `Could not read alias document: ${formatError(error)}`);
+      }
+
+      if (primary) {
+        const aliasIds = Array.isArray(primary.aliasLocationIds) ? primary.aliasLocationIds.map(x => String(x).toLowerCase()) : [];
+        const mergedIds = Array.isArray(primary.mergedDuplicateIds) ? primary.mergedDuplicateIds.map(x => String(x).toLowerCase()) : [];
+        const primaryHasAlias = aliasIds.includes(duplicateId) || mergedIds.includes(duplicateId);
+        addDiagnostic(rows, `Primary alias list for ${duplicateId}`, primaryHasAlias ? "Pass" : "Soft Fail", primaryHasAlias ? "Primary includes this duplicate in alias/merged lists." : "Primary does not list this duplicate yet. Old links can still work if the alias document passed.");
+      }
+
+      const staticTarget = staticAliasTarget(duplicateId);
+      addDiagnostic(rows, `Static fallback alias ${duplicateId}`, staticTarget === primaryId ? "Pass" : "Soft Fail", staticTarget === primaryId ? "Static fallback data resolves this duplicate to the primary club." : "Static fallback does not include this alias. Firestore alias can still handle live records.");
+
+      const refs = await referenceCountsForDuplicate(duplicateId);
+      if (refs.blocked.length) {
+        addDiagnostic(rows, `Reference query permissions for ${duplicateId}`, "Soft Fail", `Some reference checks were blocked: ${refs.blocked.join("; ")}`);
+      }
+      addDiagnostic(rows, `Leftover references to ${duplicateId}`, refs.matches.length ? "Soft Fail" : "Pass", refs.matches.length ? `Some records still reference duplicate id: ${refs.matches.join("; ")}.` : "No leftover Firestore references found in events, shoutouts, or guestListRequests.");
+    }
+
+    const status = overallStatus(rows);
+    renderMergeDiagnosticReport(rows, {primaryId, duplicateIds});
+    setStatus(status === "Pass" ? "Merge diagnostic passed." : status === "Soft Fail" ? "Merge diagnostic completed with non-blocking items to review." : "Merge diagnostic failed. Review the report below.");
+    try {
+      await db.collection("aiDiagnosticsReports").add({
+        type:"duplicateMergeDiagnostic",
+        packageVersion:"v28.71-duplicate-merge-diagnostics",
+        status,
+        primaryId,
+        duplicateIds,
+        results:rows,
+        createdAt:nowField(),
+        createdByUid:auth.currentUser?.uid || "",
+        createdByEmail:auth.currentUser?.email || ""
+      });
+    } catch (error) {
+      console.warn("Could not save duplicate merge diagnostic report:", error?.message || error);
+    }
+    return status;
   }
 
   function recordSearchText(row = {}) {
@@ -177,10 +359,17 @@
     const wrap = byId("duplicateRecordResults");
     if (!wrap) return;
     const filtered = filterGroups(groups);
+    const query = byId("duplicateRecordSearch")?.value.trim() || "";
     if (byId("duplicateRecordSummary")) {
       byId("duplicateRecordSummary").innerHTML = simpleRows([
+        ["Data source", duplicateScanMeta.dataSource],
+        ["Last scan", duplicateScanMeta.scannedAt || "-"],
+        ["Firestore club records read", duplicateScanMeta.readCount.toLocaleString()],
+        ["Active Firestore records scanned", duplicateScanMeta.activeCount.toLocaleString()],
+        ["Static fallback aliases known", duplicateScanMeta.staticAliasCount.toLocaleString()],
         ["Duplicate groups found", groups.length.toLocaleString()],
         ["Visible after search", filtered.length.toLocaleString()],
+        ["Current search filter", query || "None"],
         ["Merge behavior", "Primary stays active; duplicates become aliases/merged records"],
         ["Alias collection", "clubLocationAliases"]
       ]);
@@ -197,7 +386,7 @@
           ${group.records.map(record => `<label class="wide-field">
             <input type="radio" name="duplicate-primary-${groupIndex}" value="${esc(record.id)}" ${record.id === group.suggestedPrimaryId ? "checked" : ""}/>
             <strong>${esc(titleOf(record))}</strong>
-            <span class="sub small">${esc(record.id)} | ${esc(record.type || "club")} | ${esc(record.city || "")}, ${esc(record.country || "")} | status: ${esc(record.status || "active")}</span>
+            <span class="sub small">${esc(record.id)} | ${esc(record.type || "club")} | ${esc(record.city || "")}, ${esc(record.country || "")} | status: ${esc(record.status || "active")} | source: ${esc(record._dataSource || "Live Firestore")}</span>
           </label>`).join("")}
         </div>
         ${simpleRows(group.records.map(record => [
@@ -206,14 +395,20 @@
         ]))}
         <div class="queue-actions">
           <button type="button" data-duplicate-action="merge">Merge Other Records Into Selected Primary</button>
+          <button type="button" data-duplicate-action="diagnose">Run Merge Diagnostic</button>
         </div>
       </div>`;
     }).join("") : "<p class='sub'>No duplicate club groups matched. Use Manual primary/duplicate IDs if you already know the pair.</p>";
-    wrap.querySelectorAll("[data-duplicate-action='merge']").forEach(button => {
+    wrap.querySelectorAll("[data-duplicate-action]").forEach(button => {
       button.addEventListener("click", () => {
         const card = button.closest("[data-duplicate-group]");
         const group = duplicateGroups[Number(card.dataset.duplicateGroup)];
         const primaryId = card.querySelector("input[type='radio']:checked")?.value || group.suggestedPrimaryId;
+        if (button.dataset.duplicateAction === "diagnose") {
+          const duplicateIds = group.records.filter(item => item.id !== primaryId).map(item => item.id);
+          runDuplicateMergeDiagnostic(primaryId, duplicateIds);
+          return;
+        }
         mergeDuplicateGroup(group, primaryId);
       });
     });
@@ -223,9 +418,20 @@
     if (!db) return;
     setStatus("Scanning clubLocations for duplicate records...");
     const rows = await getCollectionSafe("clubLocations", 1200);
+    duplicateScanMeta = {
+      dataSource:lastDuplicateReadError ? `Live Firestore read failed: ${lastDuplicateReadError}` : "Live Firestore: clubLocations. This duplicate list is not hardcoded.",
+      scannedAt:new Date().toLocaleString(),
+      readCount:rows.length,
+      activeCount:rows.filter(activeForDuplicateScan).length,
+      staticAliasCount:Object.values(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(row => row?.canonicalLocationId || row?.aliasOf || row?.mergedInto).length
+    };
     duplicateGroups = groupDuplicates(rows);
     renderDuplicateGroups();
-    setStatus(duplicateGroups.length ? `Found ${duplicateGroups.length} possible duplicate group(s).` : "No duplicate club groups found.");
+    if (lastDuplicateReadError) {
+      setStatus(`Could not scan live Firestore duplicate records: ${lastDuplicateReadError}`);
+    } else {
+      setStatus(duplicateGroups.length ? `Live Firestore scan complete. Found ${duplicateGroups.length} possible duplicate group(s).` : "Live Firestore scan complete. No duplicate club groups found.");
+    }
   }
 
   function mergePayloadForPrimary(primary = {}, duplicates = []) {
@@ -309,40 +515,40 @@
     const confirmed = confirm(`Merge ${duplicates.map(titleOf).join(", ")} into ${titleOf(primary)}? Duplicate records become aliases and are hidden from normal search.`);
     if (!confirmed) return;
     setStatus("Merging duplicate club records...");
-    const batch = db.batch();
-    batch.set(db.collection("clubLocations").doc(primary.id), mergePayloadForPrimary(primary, duplicates), {merge:true});
-    duplicates.forEach(duplicate => {
-      const aliasNames = unique([duplicate.locationName, duplicate.brandName, duplicate.id]);
-      batch.set(db.collection("clubLocations").doc(duplicate.id), {
-        status:"merged",
-        active:false,
-        aliasOf:primary.id,
-        canonicalLocationId:primary.id,
-        mergedInto:primary.id,
-        aliasNames,
-        mergeReason:"Duplicate club location merged by Master Admin.",
-        mergedAt:nowField(),
-        mergedByUid:auth.currentUser?.uid || "",
-        mergedByEmail:auth.currentUser?.email || "",
-        updatedAt:nowField()
-      }, {merge:true});
-      batch.set(db.collection("clubLocationAliases").doc(duplicate.id), {
-        aliasId:duplicate.id,
-        aliasName:duplicate.locationName || duplicate.brandName || duplicate.id,
-        aliasNames,
-        canonicalLocationId:primary.id,
-        canonicalName:primary.locationName || primary.brandName || primary.id,
-        collection:"clubLocations",
-        status:"active",
-        city:primary.city || duplicate.city || "",
-        country:primary.country || duplicate.country || "",
-        createdAt:nowField(),
-        updatedAt:nowField(),
-        createdByUid:auth.currentUser?.uid || "",
-        createdByEmail:auth.currentUser?.email || ""
-      }, {merge:true});
-    });
     try {
+      const batch = db.batch();
+      batch.set(db.collection("clubLocations").doc(primary.id), mergePayloadForPrimary(primary, duplicates), {merge:true});
+      duplicates.forEach(duplicate => {
+        const aliasNames = unique([duplicate.locationName, duplicate.brandName, duplicate.id]);
+        batch.set(db.collection("clubLocations").doc(duplicate.id), {
+          status:"merged",
+          active:false,
+          aliasOf:primary.id,
+          canonicalLocationId:primary.id,
+          mergedInto:primary.id,
+          aliasNames,
+          mergeReason:"Duplicate club location merged by Master Admin.",
+          mergedAt:nowField(),
+          mergedByUid:auth.currentUser?.uid || "",
+          mergedByEmail:auth.currentUser?.email || "",
+          updatedAt:nowField()
+        }, {merge:true});
+        batch.set(db.collection("clubLocationAliases").doc(duplicate.id), {
+          aliasId:duplicate.id,
+          aliasName:duplicate.locationName || duplicate.brandName || duplicate.id,
+          aliasNames,
+          canonicalLocationId:primary.id,
+          canonicalName:primary.locationName || primary.brandName || primary.id,
+          collection:"clubLocations",
+          status:"active",
+          city:primary.city || duplicate.city || "",
+          country:primary.country || duplicate.country || "",
+          createdAt:nowField(),
+          updatedAt:nowField(),
+          createdByUid:auth.currentUser?.uid || "",
+          createdByEmail:auth.currentUser?.email || ""
+        }, {merge:true});
+      });
       batch.set(db.collection("aiIndex").doc(`clubLocation_${primary.id}`), {
         sourceType:"clubLocation",
         sourceId:primary.id,
@@ -363,17 +569,28 @@
           updatedAt:nowField()
         }, {merge:true});
       });
+      await batch.commit();
+      let referencesUpdated = 0;
+      for (const duplicate of duplicates) {
+        referencesUpdated += await updateReferencesForAlias(duplicate, primary);
+      }
+      setStatus(`Merge complete. ${duplicates.length} duplicate record(s) became aliases; ${referencesUpdated} related record reference(s) were updated. Running verification...`);
+      await runDuplicateMergeDiagnostic(primary.id, duplicates.map(item => item.id));
+      await refreshDuplicateDiagnostics();
+      if (window.FLOQRAIDiscovery?.loadListingDeleteTool) window.FLOQRAIDiscovery.loadListingDeleteTool();
     } catch (error) {
-      console.warn("AI index duplicate merge update skipped:", error?.message || error);
+      setStatus(`Merge failed: ${formatError(error)}. Publish firestore.rules v28.70+ if permissions are missing, then retry or run the merge diagnostic below.`);
+      renderMergeDiagnosticReport([{
+        label:"Merge write",
+        status:"Failed",
+        evidence:formatError(error)
+      }], {primaryId:primary.id, duplicateIds:duplicates.map(item => item.id)});
+      try {
+        await runDuplicateMergeDiagnostic(primary.id, duplicates.map(item => item.id));
+      } catch (diagnosticError) {
+        console.warn("Post-failure duplicate diagnostic failed:", diagnosticError?.message || diagnosticError);
+      }
     }
-    await batch.commit();
-    let referencesUpdated = 0;
-    for (const duplicate of duplicates) {
-      referencesUpdated += await updateReferencesForAlias(duplicate, primary);
-    }
-    setStatus(`Merge complete. ${duplicates.length} duplicate record(s) became aliases; ${referencesUpdated} related record reference(s) were updated.`);
-    await refreshDuplicateDiagnostics();
-    if (window.FLOQRAIDiscovery?.loadListingDeleteTool) window.FLOQRAIDiscovery.loadListingDeleteTool();
   }
 
   async function mergeManualPair() {
@@ -407,14 +624,21 @@
     auth = options.auth || auth;
     if (!db || !auth || !byId("duplicateRecords")) return;
     byId("refreshDuplicateRecordsBtn")?.addEventListener("click", refreshDuplicateDiagnostics);
-    byId("duplicateRecordSearch")?.addEventListener("input", () => renderDuplicateGroups());
+    byId("duplicateRecordSearch")?.addEventListener("input", () => {
+      renderDuplicateGroups();
+      const query = byId("duplicateRecordSearch")?.value.trim() || "";
+      const visible = filterGroups(duplicateGroups).length;
+      setStatus(query ? `Search filter applied to last live scan: "${query}" (${visible} visible group(s)).` : `Search cleared. Showing ${visible} duplicate group(s) from the last live scan.`);
+    });
     byId("mergeManualDuplicateBtn")?.addEventListener("click", mergeManualPair);
+    byId("runDuplicateMergeDiagnosticBtn")?.addEventListener("click", () => runDuplicateMergeDiagnostic());
     await refreshDuplicateDiagnostics();
   }
 
   window.FLOQRDuplicateRecords = {
     mount,
     refreshDuplicateDiagnostics,
+    runDuplicateMergeDiagnostic,
     mergeDuplicateGroup,
     mergeManualPair,
     baseInstitutionName,

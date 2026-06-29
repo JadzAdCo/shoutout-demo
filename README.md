@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.70 Duplicate Record Merge Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.71 Duplicate Merge Diagnostics Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.70-duplicate-record-merge
+https://jadzadco.github.io/shoutout-demo/?v=28.71-duplicate-merge-diagnostics
 ```
 
 Current release highlights:
@@ -80,6 +80,11 @@ Current release highlights:
 - Adds a known static Shôko Barcelona alias so `Shôko Barcelona Beach Club` resolves to `Shôko Barcelona` and the duplicate no longer appears as a separate active static listing.
 - Updates patron, club admin, and display routing to resolve club aliases before rendering public search, ShoutOut selection, admin queues, and LED/display live content.
 - Updates Firestore rules to `v28.70-duplicate-alias-rules` for the new alias collection. Publish `firestore.rules` after installing this package, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.
+- Adds `Run Merge Diagnostic` on Master Admin > Duplicate Records so Master Admin can verify whether a merge actually completed.
+- Duplicate Records now labels the data source. A successful duplicate scan uses live Firestore `clubLocations`; static fallback data is used only as alias evidence, not as the live duplicate list.
+- The Duplicate Merge Diagnostic checks the primary club, duplicate club, `clubLocationAliases/{duplicateId}`, static fallback aliasing, and leftover references in `events`, `shoutouts`, and `guestListRequests`.
+- Fixes the stuck `Merging duplicate club records...` state by catching Firebase write failures and showing the exact failure reason.
+- Adds Master Admin click feedback so button/link clicks show a visible confirmation message while the feature-specific result loads.
 
 ## FLOQR AI Architecture
 
@@ -219,8 +224,10 @@ Automatic internet crawling runs in backend code using Firebase scheduled functi
 Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `Shôko Barcelona Beach Club` and `Shôko Barcelona`.
 
 - Click `Refresh Duplicate Scan` to find likely duplicate `clubLocations` by normalized club name, city, country, brand, website, and address.
+- The scan summary shows whether the list came from live Firestore or failed back to static alias evidence. If it says `Live Firestore: clubLocations`, the records are not hardcoded.
 - Select the record that should remain as the primary club.
 - Click `Merge Other Records Into Selected Primary`.
+- Click `Run Merge Diagnostic` when you are unsure whether the merge completed. The report returns Pass, Soft Fail, or Failed with the specific reason.
 - FLOQR keeps the primary record active, adds `aliasLocationIds`, `aliasNames`, and search keywords to the primary, and marks the duplicate records as `status: "merged"` and `active: false`.
 - FLOQR writes `clubLocationAliases/{duplicateId}` with the canonical primary club id. Old patron, club admin, display, and record links can then resolve to the primary club instead of showing a duplicate.
 - The merge updates common related references in `events`, `shoutouts`, and `guestListRequests` where the duplicate id was stored, while preserving `previousLocationIds` for audit.

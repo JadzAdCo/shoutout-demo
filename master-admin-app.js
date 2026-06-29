@@ -1,4 +1,4 @@
-/* master-admin-app.js v25.7
+/* master-admin-app.js v28.71
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -110,6 +110,24 @@
         byId(btn.dataset.panel)?.classList.add("active");
       });
     });
+  }
+
+  function setupActionFeedback() {
+    document.addEventListener("click", event => {
+      const target = event.target?.closest?.("a,button");
+      if (!target || !byId("masterAdminPage")?.contains(target)) return;
+      const rawLabel = target.textContent || target.getAttribute("aria-label") || target.id || target.href || "action";
+      const label = rawLabel.replace(/\s+/g, " ").trim().slice(0, 140) || "action";
+      const href = target.tagName === "A" ? target.href : "";
+      const message = href
+        ? `Clicked link: ${label}. Destination: ${href}`
+        : `Clicked action: ${label}. Waiting for the feature-specific result message...`;
+      setText("masterActionFeedback", message);
+      if (target.closest("#diagnostics")) setText("diagnosticsStatus", message);
+      if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
+      if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
+      if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
+    }, true);
   }
 
   function getProviderIds(user) {
@@ -429,6 +447,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
+    setupActionFeedback();
     setText("masterStatus", "Master admin app loaded. Sign in to continue.");
 
     bind("masterGoogleLoginBtn", loginGoogle);

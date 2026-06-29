@@ -43,6 +43,7 @@
           <p class="eyebrow">Account Status</p>
           <strong id="masterPanelSignedInAs">Signed in</strong>
           <p id="masterPanelSecurityStatus" class="sub small">Security status pending...</p>
+          <p id="masterActionFeedback" class="sub small">No admin action clicked yet.</p>
         </div>
         <button id="masterPanelLogoutBtn" class="ghost" type="button">Sign out</button>
       </div>
@@ -300,7 +301,7 @@
       <section id="duplicateRecords" class="admin-panel-section">
         <div class="card">
           <h2>Duplicate Records</h2>
-          <p class="sub small">Find club records that represent the same institution, choose a primary record, and merge duplicates into aliases. Merge is soft: the duplicate is marked `status: merged`, and `clubLocationAliases/{duplicateId}` points old links to the primary club.</p>
+          <p class="sub small">Find live Firestore club records that represent the same institution, choose a primary record, and merge duplicates into aliases. This list is not hardcoded when Firestore scan succeeds. Static fallback data is shown only as alias evidence in diagnostics.</p>
           <div id="duplicateRecordSummary" class="report-block"></div>
           <div class="profile-grid">
             <label>Search duplicates<input id="duplicateRecordSearch" placeholder="Shoko, Barcelona, beach club, club id"/></label>
@@ -310,8 +311,10 @@
           <div class="queue-actions">
             <button id="refreshDuplicateRecordsBtn" type="button">Refresh Duplicate Diagnostics</button>
             <button id="mergeManualDuplicateBtn" type="button">Merge Manual Pair</button>
+            <button id="runDuplicateMergeDiagnosticBtn" type="button">Run Merge Diagnostic</button>
           </div>
           <p id="duplicateRecordStatus" class="status"></p>
+          <div id="duplicateMergeDiagnosticReport" class="report-block"></div>
           <div id="duplicateRecordResults" class="report-block"></div>
         </div>
       </section>
@@ -361,10 +364,10 @@
 <script src="./ai-service.js?v=28.44-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-discovery-service.js?v=28.70-duplicate-record-merge"></script>
-<script src="./ai-diagnostics-service.js?v=28.70-duplicate-record-merge"></script>
-<script src="./duplicate-record-service.js?v=28.70-duplicate-record-merge"></script>
-<script src="./master-admin-app.js?v=28.70-duplicate-record-merge"></script>
+<script src="./ai-discovery-service.js?v=28.71-duplicate-merge-diagnostics"></script>
+<script src="./ai-diagnostics-service.js?v=28.71-duplicate-merge-diagnostics"></script>
+<script src="./duplicate-record-service.js?v=28.71-duplicate-merge-diagnostics"></script>
+<script src="./master-admin-app.js?v=28.71-duplicate-merge-diagnostics"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>
