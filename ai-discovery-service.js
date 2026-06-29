@@ -162,6 +162,50 @@
     return `<div class="queue-actions">${links.map(link => `<a class="buttonlike" target="_blank" href="${esc(link.href)}">${esc(link.label || "Open source")}</a>`).join("")}</div>`;
   }
 
+  function parsedDataFallback(item = {}) {
+    return {
+      proposedType:item.proposedType || "",
+      proposedTitle:item.proposedTitle || item.proposedLocationName || "",
+      proposedDescription:item.proposedDescription || item.aiSummary || "",
+      proposedDate:item.proposedDate || "",
+      proposedTime:item.proposedTime || "",
+      proposedLocationName:item.proposedLocationName || "",
+      proposedAddress:item.proposedAddress || item.address || "",
+      city:item.city || "",
+      stateRegion:item.stateRegion || item.region || "",
+      country:item.country || "",
+      telephone:item.telephone || item.phone || "",
+      officialWebsite:item.officialWebsite || item.website || "",
+      email:item.email || "",
+      sourceUrl:item.sourceUrl || "",
+      ticketUrl:item.ticketUrl || "",
+      categories:item.categories || [],
+      genres:item.genres || [],
+      missingDatapoints:item.missingDatapoints || [],
+      crawlResultStatus:item.crawlResultStatus || ""
+    };
+  }
+
+  function auditDetailsHtml(item = {}) {
+    const raw = item.rawCrawlInput || item.initialCrawlData || {
+      note:"No raw crawl/input audit was saved on this older record.",
+      sourceUrl:item.sourceUrl || "",
+      searchQuery:item.searchQuery || "",
+      discoveryMode:item.discoveryMode || ""
+    };
+    const parsed = item.parsedData || parsedDataFallback(item);
+    return `<div class="profile-grid">
+      <details class="admin-detail wide-field">
+        <summary>Raw crawled/input data</summary>
+        <pre class="diagnostic-json">${esc(JSON.stringify(raw, null, 2))}</pre>
+      </details>
+      <details class="admin-detail wide-field">
+        <summary>Parsed data used by FLOQR</summary>
+        <pre class="diagnostic-json">${esc(JSON.stringify(parsed, null, 2))}</pre>
+      </details>
+    </div>`;
+  }
+
   function queueCard(item, index) {
     const missing = missingDatapoints(item);
     return `<div class="queue-item ai-discovery-item" data-queue-index="${index}">
@@ -174,6 +218,7 @@
       </div>
       <p>${esc(item.proposedDescription || item.aiSummary || "No description yet.")}</p>
       ${missing.length ? `<p class="sub small"><strong>Missing required datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Required datapoints complete.</strong> Ready for final source review and approval.</p>`}
+      ${auditDetailsHtml(item)}
       ${datapointChecklist(item)}
       ${sourceLinksHtml(item)}
       <div class="profile-grid">

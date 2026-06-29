@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.66 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.67 */
 (function () {
   "use strict";
 
@@ -28,7 +28,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.66-search-results-guard";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.67-crawl-raw-parsed-output";
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -414,6 +414,16 @@
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.66-search-results-guard"]},
         {label:"README search results explanation", file:"README.md", includes:["search-results page", "final event-detail URL"]}
       ]
+    },
+    {
+      version: "v28.67-crawl-raw-parsed-output",
+      title: "Raw + Parsed Crawl Output",
+      checks: [
+        {label:"Extraction report raw and parsed output", file:"ai-diagnostics-service.js", includes:["rawCrawlInput", "parsedData", "renderAuditJsonBlock"]},
+        {label:"Queue card raw and parsed output", file:"ai-discovery-service.js", includes:["auditDetailsHtml", "Raw crawled/input data", "Parsed data used by FLOQR"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.67-crawl-raw-parsed-output"]},
+        {label:"README raw parsed explanation", file:"README.md", includes:["raw crawled/input data", "parsed data"]}
+      ]
     }
   ];
 
@@ -709,7 +719,7 @@
     const query = searchQueryFromSourceUrl(sourceUrl) || "public event search";
     const sourceName = sourceNameForUrl(sourceUrl);
     const market = extractCityCountryFromSource(sourceUrl, sourceText || query);
-    return {
+    const record = {
       proposedType:"sourceSearchResults",
       proposedTitle:`${sourceName} search results: ${query}`,
       proposedDescription:"This is a search-results page, not a final event or venue detail page. Use it to find candidates, then open one specific event/venue page or paste copied event-card details before saving an approvable review record.",
@@ -754,6 +764,15 @@
       createdAt:fieldValue(),
       updatedAt:fieldValue()
     };
+    return attachCrawlAudit(record, {
+      inputType:"search-results-url",
+      sourceUrl,
+      sourceName,
+      sourceTextPreview:String(sourceText || "").slice(0, 2000),
+      searchQuery:query,
+      receivedAt:new Date().toISOString(),
+      note:"Search-results pages are candidate-finding inputs, not final event/venue detail records."
+    });
   }
 
   function titleCase(value = "") {
@@ -866,6 +885,51 @@
     }[key] || key));
   }
 
+  function parsedDiscoveryData(record = {}) {
+    return {
+      proposedType: record.proposedType || "",
+      proposedTitle: record.proposedTitle || "",
+      proposedDescription: record.proposedDescription || record.aiSummary || "",
+      proposedDate: record.proposedDate || "",
+      proposedTime: record.proposedTime || "",
+      proposedLocationName: record.proposedLocationName || "",
+      proposedAddress: record.proposedAddress || "",
+      city: record.city || "",
+      stateRegion: record.stateRegion || "",
+      country: record.country || "",
+      telephone: record.telephone || record.phone || "",
+      officialWebsite: record.officialWebsite || record.website || "",
+      email: record.email || "",
+      sourceUrl: record.sourceUrl || "",
+      ticketUrl: record.ticketUrl || "",
+      categories: record.categories || [],
+      genres: record.genres || [],
+      missingDatapoints: record.missingDatapoints || [],
+      crawlResultStatus: record.crawlResultStatus || "",
+      sourcePageType: record.sourcePageType || "detailOrGeneratedRecord"
+    };
+  }
+
+  function attachCrawlAudit(record = {}, rawInput = {}) {
+    const parsedData = parsedDiscoveryData(record);
+    return {
+      ...record,
+      rawCrawlInput: {
+        ...rawInput,
+        auditVersion:"v28.67",
+        protectedTerms:"FLOQR, ShoutOut, Mingl, Bata are preserved"
+      },
+      parsedData,
+      extractionAudit: {
+        rawCaptured:true,
+        parsedCaptured:true,
+        generatedAt:new Date().toISOString(),
+        parserVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
+        sourceMode:record.discoveryMode || rawInput.inputType || "unknown"
+      }
+    };
+  }
+
   function extractSourceDetailsFromText(sourceUrl = "", sourceText = "") {
     if (isSearchResultsUrl(sourceUrl)) return searchResultsRecord(sourceUrl, sourceText);
     const text = String(sourceText || "");
@@ -924,7 +988,14 @@
     };
     record.missingDatapoints = sourceRecordMissingDatapoints(record);
     record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
-    return record;
+    return attachCrawlAudit(record, {
+      inputType:"source-detail-extraction",
+      sourceUrl,
+      sourceName:record.sourceName,
+      sourceTextPreview:text.slice(0, 4000),
+      receivedAt:new Date().toISOString(),
+      extractionMethod:record.extractionMethod
+    });
   }
 
   function proposedFamily(item = {}) {
@@ -2260,7 +2331,7 @@
       ["Source", record.sourceName || record.sourceUrl || "-"],
       ["Missing datapoints", (record.missingDatapoints || []).join(", ") || "None"]
     ];
-    wrap.innerHTML = `${simpleRows(rows)}<div class="queue-item">
+    wrap.innerHTML = `${simpleRows(rows)}${renderAuditJsonBlock("Initial crawled/input data", record.rawCrawlInput || {})}${renderAuditJsonBlock("Parsed data output", record.parsedData || parsedDiscoveryData(record))}<div class="queue-item">
       <div class="message-envelope-head">
         <strong>${esc(record.proposedTitle || "Extracted source")}</strong>
         ${statusBadge(record.notApprovable ? "Failed" : (record.missingDatapoints || []).length ? "Soft Fail" : "Pass")}
@@ -2270,6 +2341,14 @@
       <p class="sub small">Categories: ${esc(joinList(record.categories) || "-")} | Genres/tags: ${esc(joinList(record.genres) || "-")}</p>
       ${record.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(record.sourceUrl)}">Open Source</a>` : ""}
     </div>`;
+  }
+
+  function renderAuditJsonBlock(title, value = {}) {
+    const text = JSON.stringify(value || {}, null, 2);
+    return `<details class="admin-detail" open>
+      <summary>${esc(title)}</summary>
+      <pre class="diagnostic-json">${esc(text)}</pre>
+    </details>`;
   }
 
   async function tryBackendSourceExtraction(sourceUrl, sourceText) {
@@ -2295,7 +2374,7 @@
     setText("diagnosticsStatus", "Extracting source details...");
     const backendRecord = await tryBackendSourceExtraction(sourceUrl, sourceText);
     const localRecord = extractSourceDetailsFromText(sourceUrl, sourceText);
-    const record = {
+    let record = {
       ...localRecord,
       ...(backendRecord || {}),
       sourceUrl: backendRecord?.sourceUrl || localRecord.sourceUrl,
@@ -2305,6 +2384,15 @@
     };
     record.missingDatapoints = sourceRecordMissingDatapoints(record);
     record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    record = attachCrawlAudit(record, {
+      ...(record.rawCrawlInput || localRecord.rawCrawlInput || {}),
+      inputType:backendRecord ? "backend-source-detail-extraction" : (localRecord.rawCrawlInput?.inputType || "local-source-detail-extraction"),
+      sourceUrl,
+      sourceName:record.sourceName,
+      sourceTextPreview:sourceText.slice(0, 4000),
+      receivedAt:new Date().toISOString(),
+      backendExtractorUsed:!!backendRecord
+    });
     state.lastExtractedSourceRecord = record;
     renderSourceExtractionReport(record);
     setText("diagnosticsStatus", backendRecord
@@ -2393,7 +2481,7 @@
       "Phone",
       ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
     ];
-    return {
+    const record = {
       proposedType,
       proposedTitle: title,
       proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete the required datapoints, verify the source, then approve into FLOQR search.`,
@@ -2439,6 +2527,23 @@
       createdAt: fieldValue(),
       updatedAt: fieldValue()
     };
+    return attachCrawlAudit(record, {
+      inputType:"manual-crawl-search-plan",
+      naturalLanguage:criteria.naturalLanguage || "",
+      advancedSearch:criteria.search || "",
+      structuredJob:{
+        city,
+        country,
+        stateRegion:override.region || market.region || criteria.regions[0] || "",
+        genre,
+        eventType,
+        query,
+        sourceSearchLinks
+      },
+      criteriaSnapshot:criteria,
+      runId,
+      generatedAt:new Date().toISOString()
+    });
   }
 
   function buildManualCrawlCandidates(criteria, runId) {

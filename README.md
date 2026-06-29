@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.66 Search Results Guard Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.67 Raw Parsed Crawl Output Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.66-search-results-guard
+https://jadzadco.github.io/shoutout-demo/?v=28.67-crawl-raw-parsed-output
 ```
 
 Current release highlights:
@@ -68,6 +68,8 @@ Current release highlights:
 - Adds a search-results page guard. Google search pages, Ticketmaster search pages such as `ticketmaster.com/search?q=comedy+shows`, and Eventbrite directory pages are treated as candidate-finding pages, not final event records.
 - Blocks saving broad search-results pages into `aiDiscoveryQueue` as approvable review records. Master Admin must open one specific event/venue detail page, provide a final event-detail URL, or paste copied event-card details before saving.
 - Adds the same search-results guard to the Firebase callable extractor so frontend and backend behavior match.
+- Adds raw crawled/input data and parsed data output to Source Detail Extraction previews and AI Crawling review cards. Master Admin can now see the original input/search/source snapshot beside the exact fields FLOQR parsed and saved.
+- New records include `rawCrawlInput`, `parsedData`, and `extractionAudit` so cached/saved queue records can be distinguished from freshly extracted records.
 
 ## FLOQR AI Architecture
 
@@ -185,6 +187,7 @@ Open Master Admin > AI Crawling to manage crawler setup and crawler-derived data
 - Source Detail Extraction. Paste the final Eventbrite/Ticketmaster/resale/venue source URL and copied page details, click `Extract Source Details`, then save the extracted review record into `aiDiscoveryQueue`.
 - Search-results page guard. If the source URL is a broad results page, such as `ticketmaster.com/search?q=comedy+shows`, FLOQR explains that the page is not a final event/venue source and blocks saving it as an approvable review record.
 - Firebase source extraction. If `aiExtractPublicSourceUrl` is deployed, FLOQR fetches the public page server-side and extracts JSON-LD/metadata/text. If the callable is unavailable, the page still parses pasted source details locally.
+- Raw and parsed output. Source Detail Extraction and discovery review cards show `rawCrawlInput` and `parsedData` side by side. `rawCrawlInput` contains the plain-English crawl request, generated search job, pasted source text preview, source URL, or search-results URL. `parsedData` contains the event/club fields FLOQR will use for review, approval, search, and import.
 - Crawl activity reports, consolidated collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
 - Duplicate destination consolidation. Matching clubs/events are grouped by normalized name, city, country, and destination type.
 - The consolidated report consolidates duplicate clubs/events so the same destination does not appear as separate records with conflicting addresses.
@@ -328,10 +331,11 @@ Test plan:
 - Click `Create Crawl Review Records` and confirm the created review cards show name, description, address, phone, website/source, ticket link, city/country, categories, genres, missing required datapoints, and source-search links.
 - Paste an Eventbrite source URL and copied page details into Source Detail Extraction, click `Extract Source Details`, and confirm title/date/time/address/source fields are parsed into the preview.
 - Paste `https://www.ticketmaster.com/search?q=comedy+shows` into Source Detail Extraction and confirm FLOQR labels it as a search-results page, explains that one specific event/detail page is required, and blocks saving it as an approvable record.
+- Confirm Source Detail Extraction and each new crawl review card show both `Raw crawled/input data` and `Parsed data used by FLOQR`.
 - Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, v28.62, v28.63, v28.64, v28.65, and v28.66 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, v28.62, v28.63, v28.64, v28.65, v28.66, and v28.67 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.

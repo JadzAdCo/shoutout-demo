@@ -61,6 +61,7 @@
 .admin-detail summary{cursor:pointer;font-weight:1000;color:var(--text);padding:4px 0}
 .admin-detail[open] summary{margin-bottom:12px}
 .ai-discovery-item textarea{width:100%;min-height:86px}
+.diagnostic-json{max-height:320px;overflow:auto;white-space:pre-wrap;word-break:break-word;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.24);padding:12px;font-size:12px;line-height:1.45}
 
 /* v28.5 media templates */
 .media-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
