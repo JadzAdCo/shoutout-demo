@@ -1,4 +1,4 @@
-/* FLOQR AI Discovery admin scaffold. Public-source queue, approval, and soft-delete tools. */
+/* FLOQR AI Discovery review tools. Public-source queue, datapoint validation, approval, and soft-delete tools. */
 (function () {
   "use strict";
 
@@ -40,6 +40,84 @@
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
 
+  function clean(value) {
+    return String(value || "").trim();
+  }
+
+  function isVenueRecord(item = {}) {
+    return /club|venue|lounge|bar|beach/i.test(`${item.proposedType || ""} ${item.categories || ""}`);
+  }
+
+  function isComedyRecord(item = {}) {
+    return /comedy/i.test(`${item.proposedType || ""} ${item.proposedTitle || ""} ${item.categories || ""}`);
+  }
+
+  function recordKind(item = {}) {
+    const text = String(item.proposedType || "").replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+    if (/rooftop/i.test(text) && /bar/i.test(text)) return "Rooftop Bar";
+    if (/rooftop/i.test(text)) return "Rooftop Lounge";
+    if (/beach/i.test(text)) return "Beach Club";
+    if (/lounge/i.test(text)) return "Lounge";
+    if (/club/i.test(text)) return "Club";
+    if (isComedyRecord(item)) return "Comedy Show";
+    return "Event";
+  }
+
+  function queueText(item, field) {
+    if (field === "description") return item.proposedDescription || item.aiSummary || "";
+    if (field === "name") return item.proposedTitle || item.proposedLocationName || "";
+    if (field === "phone") return item.telephone || item.phone || "";
+    if (field === "website") return item.officialWebsite || item.website || "";
+    return item[field] || "";
+  }
+
+  function hasAny(value) {
+    if (Array.isArray(value)) return value.length > 0;
+    return clean(value).length > 0;
+  }
+
+  function requiredDatapoints(item = {}) {
+    const categories = Array.isArray(item.categories) ? item.categories : splitCSV(item.categories);
+    const genres = Array.isArray(item.genres) ? item.genres : splitCSV(item.genres);
+    if (isVenueRecord(item)) {
+      return [
+        ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
+        ["description", "Description", hasAny(item.proposedDescription || item.aiSummary)],
+        ["address", "Address", hasAny(item.proposedAddress || item.address)],
+        ["city", "City", hasAny(item.city)],
+        ["country", "Country", hasAny(item.country)],
+        ["phone", "Phone", hasAny(item.telephone || item.phone)],
+        ["website", "Website or source", hasAny(item.officialWebsite || item.website || item.sourceUrl)],
+        ["categories", "Venue categories", hasAny(categories)],
+        ["genres", "Music genres/tags", hasAny(genres)]
+      ];
+    }
+    return [
+      ["name", "Name", hasAny(item.proposedTitle)],
+      ["description", "Description", hasAny(item.proposedDescription || item.aiSummary)],
+      ["location", "Location name", hasAny(item.proposedLocationName)],
+      ["address", "Address", hasAny(item.proposedAddress || item.address)],
+      ["city", "City", hasAny(item.city)],
+      ["country", "Country", hasAny(item.country)],
+      ["phone", "Phone", hasAny(item.telephone || item.phone)],
+      ["source", "Source or ticket link", hasAny(item.sourceUrl || item.ticketUrl)],
+      ["categories", "Event categories", hasAny(categories)],
+      ...(isComedyRecord(item) ? [
+        ["date", "Date", hasAny(item.proposedDate)],
+        ["time", "Time", hasAny(item.proposedTime)]
+      ] : [])
+    ];
+  }
+
+  function missingDatapoints(item = {}) {
+    return requiredDatapoints(item).filter(([, , ok]) => !ok).map(([, label]) => label);
+  }
+
+  function datapointChecklist(item = {}) {
+    const rows = requiredDatapoints(item);
+    return `<div class="tag-row">${rows.map(([, label, ok]) => `<span>${ok ? "Pass" : "Missing"}: ${esc(label)}</span>`).join("")}</div>`;
+  }
+
   async function getCollectionSafe(name, limit = 500) {
     try {
       const snap = await db.collection(name).limit(limit).get();
@@ -70,32 +148,52 @@
   }
 
   function queueField(item, field, label, wide) {
-    const value = Array.isArray(item[field]) ? item[field].join(", ") : item[field] || "";
+    const value = Array.isArray(item[field]) ? item[field].join(", ") : queueText(item, field);
     return `<label class="${wide ? "wide-field" : ""}">${esc(label)}<input data-queue-field="${esc(field)}" value="${esc(value)}"/></label>`;
   }
 
+  function queueTextArea(item, field, label) {
+    return `<label class="wide-field">${esc(label)}<textarea data-queue-field="${esc(field)}" rows="3">${esc(queueText(item, field))}</textarea></label>`;
+  }
+
+  function sourceLinksHtml(item = {}) {
+    const links = Array.isArray(item.sourceSearchLinks) ? item.sourceSearchLinks : [];
+    if (!links.length) return "";
+    return `<div class="queue-actions">${links.map(link => `<a class="buttonlike" target="_blank" href="${esc(link.href)}">${esc(link.label || "Open source")}</a>`).join("")}</div>`;
+  }
+
   function queueCard(item, index) {
+    const missing = missingDatapoints(item);
     return `<div class="queue-item ai-discovery-item" data-queue-index="${index}">
       <div class="club-option-head">
         <div>
-          <strong>${esc(item.proposedTitle || "Untitled discovery")}</strong>
-          <p>${esc(item.proposedType || "event")} - ${esc(item.city || "")}, ${esc(item.country || "")}</p>
+          <strong>${esc(item.proposedTitle || item.proposedLocationName || "Untitled discovery")}</strong>
+          <p>${esc(recordKind(item))} - ${esc(item.city || "")}${item.country ? `, ${esc(item.country)}` : ""}</p>
         </div>
         <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
       </div>
-      <p>${esc(item.aiSummary || item.proposedDescription || "No AI summary yet.")}</p>
+      <p>${esc(item.proposedDescription || item.aiSummary || "No description yet.")}</p>
+      ${missing.length ? `<p class="sub small"><strong>Missing required datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Required datapoints complete.</strong> Ready for final source review and approval.</p>`}
+      ${datapointChecklist(item)}
+      ${sourceLinksHtml(item)}
       <div class="profile-grid">
         ${queueField(item, "proposedType", "Type")}
-        ${queueField(item, "proposedTitle", "Title")}
+        ${queueField(item, "proposedTitle", "Name")}
+        ${queueTextArea(item, "description", "Description")}
         ${queueField(item, "proposedDate", "Date")}
         ${queueField(item, "proposedTime", "Time")}
         ${queueField(item, "proposedLocationName", "Location name")}
+        ${queueField(item, "proposedAddress", "Address", true)}
+        ${queueField(item, "phone", "Phone")}
+        ${queueField(item, "website", "Official website")}
+        ${queueField(item, "email", "Email")}
         ${queueField(item, "city", "City")}
         ${queueField(item, "stateRegion", "State / region")}
         ${queueField(item, "country", "Country")}
         ${queueField(item, "categories", "Categories", true)}
         ${queueField(item, "genres", "Genres", true)}
         ${queueField(item, "sourceUrl", "Source URL", true)}
+        ${queueField(item, "ticketUrl", "Ticket URL", true)}
       </div>
       ${item.aiRatingReasons?.length ? `<div class="tag-row">${item.aiRatingReasons.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
       <div class="queue-actions">
@@ -112,38 +210,74 @@
     const next = {...original};
     card.querySelectorAll("[data-queue-field]").forEach(input => {
       const field = input.dataset.queueField;
-      if (["categories", "genres"].includes(field)) next[field] = splitCSV(input.value);
-      else next[field] = input.value.trim();
+      const value = input.value.trim();
+      if (["categories", "genres"].includes(field)) next[field] = splitCSV(value);
+      else if (field === "description") {
+        next.proposedDescription = value;
+        next.aiSummary = value || next.aiSummary;
+      } else if (field === "name") {
+        next.proposedTitle = value;
+      } else if (field === "phone") {
+        next.telephone = value;
+        next.phone = value;
+      } else if (field === "website") {
+        next.officialWebsite = value;
+        next.website = value;
+      } else {
+        next[field] = value;
+      }
     });
+    next.missingDatapoints = missingDatapoints(next);
+    next.crawlResultStatus = next.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     return next;
   }
 
   async function approveQueueItem(card, item) {
     const edited = readEditedQueueItem(card, item);
+    const missing = missingDatapoints(edited);
+    if (missing.length) {
+      await db.collection("aiDiscoveryQueue").doc(item.id).set({
+        ...edited,
+        missingDatapoints: missing,
+        crawlResultStatus: "missing-required-datapoints",
+        updatedAt:nowField()
+      }, {merge:true});
+      setStatus(`Cannot approve yet. Missing required datapoints: ${missing.join(", ")}.`);
+      alert(`Cannot approve yet. Missing required datapoints: ${missing.join(", ")}.`);
+      await loadDiscoveryQueue();
+      return;
+    }
     const proposedType = String(edited.proposedType || "").toLowerCase();
-    const isVenue = /club|venue|lounge|beach/.test(proposedType);
+    const isVenue = /club|venue|lounge|beach|bar|rooftop/.test(proposedType);
     const id = slug(`${edited.proposedTitle || edited.proposedLocationName || "listing"}-${edited.city || ""}-${edited.country || ""}`);
     const payload = isVenue ? {
       locationName:edited.proposedTitle || edited.proposedLocationName || id,
       brandName:edited.proposedLocationName || edited.proposedTitle || id,
-      type:proposedType.includes("beach") ? "beach-club" : proposedType.includes("lounge") ? "lounge" : "club",
+      type:proposedType.includes("beach") ? "beach-club" : proposedType.includes("rooftop") ? (proposedType.includes("bar") ? "rooftop-bar" : "rooftop-lounge") : proposedType.includes("lounge") ? "lounge" : proposedType.includes("bar") ? "bar" : "club",
       categories:edited.categories || [],
       genres:edited.genres || [],
+      description:edited.proposedDescription || edited.aiSummary || "",
       country:edited.country || "",
       region:edited.stateRegion || "",
       stateRegion:edited.stateRegion || "",
       city:edited.city || "",
       address:edited.proposedAddress || "",
       officialWebsite:edited.officialWebsite || "",
+      website:edited.officialWebsite || "",
       email:edited.email || "",
       telephone:edited.telephone || "",
-      socialMediaHandles:edited.socialMediaHandles || {},
+      phone:edited.telephone || "",
+      socialMediaHandles:edited.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
       locationLabel:[edited.city, edited.stateRegion, edited.country].filter(Boolean).join(", "),
       activityStatus:"Approved from AI discovery",
       active:true,
       status:"active",
       visibility:"public",
       clubOwnershipStatus:"unclaimed",
+      publicProfileType:"club",
+      subscriptionRequiredForPublicProfileEdits:true,
+      requiredProfileDatapointsComplete:true,
+      publicSearchKeywords:[edited.proposedTitle, edited.proposedLocationName, edited.city, edited.country, ...(edited.categories || []), ...(edited.genres || [])].filter(Boolean),
       approvedFromDiscoveryQueueId:item.id,
       sourceUrl:edited.sourceUrl || "",
       updatedAt:nowField()
@@ -154,14 +288,22 @@
       eventDay:edited.proposedDate || "",
       locationId:edited.locationId || "",
       locationName:edited.proposedLocationName || "",
+      description:edited.proposedDescription || edited.aiSummary || "",
+      address:edited.proposedAddress || "",
       city:edited.city || "",
       region:edited.stateRegion || "",
       stateRegion:edited.stateRegion || "",
       country:edited.country || "",
+      officialWebsite:edited.officialWebsite || "",
+      website:edited.officialWebsite || "",
+      email:edited.email || "",
+      telephone:edited.telephone || "",
+      phone:edited.telephone || "",
       categories:edited.categories || [],
       category:/comedy/i.test([edited.proposedTitle, edited.categories].flat().join(" ")) ? "Comedy" : "Event",
       genres:edited.genres || [],
       ticketProvider:edited.ticketProvider || "Ticketmaster/Eventbrite/resale partner ready",
+      ticketUrl:edited.ticketUrl || edited.sourceUrl || "",
       ticketResalePartner:edited.ticketResalePartner || "",
       sourceUrl:edited.sourceUrl || "",
       active:true,
@@ -174,6 +316,8 @@
     await db.collection("aiDiscoveryQueue").doc(item.id).set({
       ...edited,
       status:"approved",
+      missingDatapoints:[],
+      crawlResultStatus:"approved",
       reviewedByUid:auth.currentUser?.uid || "",
       reviewedAt:nowField(),
       approvedCollection:isVenue ? "clubLocations" : "events",
@@ -318,10 +462,10 @@
     if (!db || !auth || !byId("aiCrawling")) return;
     await ensureDiscoveryDefaults();
     byId("aiDiscoverySummary").innerHTML = simpleRows([
-      ["Crawler schedule", "Backend scaffold supports every 4 hours or 4-6 runs per day"],
-      ["Publish behavior", "Discovered records stay in aiDiscoveryQueue until Super Admin approval"],
-      ["Event partners", "Ticketmaster, Eventbrite, comedy shows, and resale partners are modeled as public-source candidates"],
-      ["Taxi hailing", "Third-party taxi services remain a future partner integration, not an AI crawler input"]
+      ["Crawler input", "Plain-English requests are expanded into structured search jobs"],
+      ["Publish behavior", "Records remain in review until required datapoints are complete and Master Admin approves"],
+      ["Required public fields", "Name, description, address, city/country, phone, source/ticket link, categories, and genres"],
+      ["Event partners", "Ticketmaster, Eventbrite, comedy shows, and resale partners are represented as source-search links"]
     ]);
     byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
     byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);

@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.63 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.64 */
 (function () {
   "use strict";
 
@@ -12,6 +12,7 @@
     mounted: false,
     lastData: {},
     lastSchedule: null,
+    lastCrawlPlan: null,
     lastFeatures: [],
     lastPackageDiagnostics: [],
     lastRulesSmokeResults: []
@@ -26,7 +27,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.63-crawling-discovery-consolidation";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.64-natural-language-crawl-review";
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -80,6 +81,56 @@
     "Thailand | Thai, English | Bangkok, Phuket | rooftops, beach clubs, DJs, ticketed events",
     "China | Chinese, English | Shanghai | lounges, clubs, comedy shows, DJs"
   ];
+
+  const KNOWN_MARKETS = [
+    {city:"Paris", country:"France", region:"Ile-de-France", language:"French"},
+    {city:"Marseille", country:"France", region:"Provence-Alpes-Cote d'Azur", language:"French"},
+    {city:"Monaco", country:"Monaco", region:"Monaco", language:"French, English"},
+    {city:"Saint-Tropez", aliases:["St. Tropez", "St Tropez", "Saint Tropez"], country:"France", region:"Provence-Alpes-Cote d'Azur", language:"French"},
+    {city:"Cannes", country:"France", region:"Provence-Alpes-Cote d'Azur", language:"French"},
+    {city:"Nice", country:"France", region:"Provence-Alpes-Cote d'Azur", language:"French"},
+    {city:"Dubai", country:"United Arab Emirates", region:"Dubai", language:"Arabic, English"},
+    {city:"Istanbul", country:"Turkey", region:"Istanbul", language:"Turkish"},
+    {city:"Singapore", country:"Singapore", region:"Singapore", language:"English, Mandarin, Malay, Tamil"},
+    {city:"Bangkok", country:"Thailand", region:"Bangkok", language:"Thai, English"},
+    {city:"Phuket", country:"Thailand", region:"Phuket", language:"Thai, English"},
+    {city:"Shanghai", country:"China", region:"Shanghai", language:"Chinese, English"},
+    {city:"Barcelona", country:"Spain", region:"Catalonia", language:"Spanish, Catalan"},
+    {city:"Madrid", country:"Spain", region:"Madrid", language:"Spanish"},
+    {city:"Ibiza", country:"Spain", region:"Balearic Islands", language:"Spanish, Catalan"},
+    {city:"Marbella", country:"Spain", region:"Andalusia", language:"Spanish"},
+    {city:"London", country:"United Kingdom", region:"England", language:"English"},
+    {city:"Manchester", country:"United Kingdom", region:"England", language:"English"},
+    {city:"Amsterdam", country:"Netherlands", region:"North Holland", language:"Dutch, English"},
+    {city:"Berlin", country:"Germany", region:"Berlin", language:"German"},
+    {city:"Milan", aliases:["Milano"], country:"Italy", region:"Lombardy", language:"Italian"},
+    {city:"Rome", country:"Italy", region:"Lazio", language:"Italian"}
+  ];
+
+  const COUNTRY_LANGUAGES = {
+    france:"French",
+    monaco:"French, English",
+    spain:"Spanish",
+    "united arab emirates":"Arabic, English",
+    turkey:"Turkish",
+    singapore:"English, Mandarin, Malay, Tamil",
+    thailand:"Thai, English",
+    china:"Chinese, English",
+    "united kingdom":"English",
+    netherlands:"Dutch, English",
+    germany:"German",
+    italy:"Italian",
+    portugal:"Portuguese",
+    belgium:"French, Dutch",
+    switzerland:"German, French, Italian",
+    austria:"German",
+    ireland:"English, Irish",
+    denmark:"Danish",
+    norway:"Norwegian",
+    sweden:"Swedish",
+    finland:"Finnish, Swedish",
+    iceland:"Icelandic, English"
+  };
 
   const COLLECTIONS = [
     "users",
@@ -313,6 +364,17 @@
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.63-crawling-discovery-consolidation"]},
         {label:"README consolidation note", file:"README.md", includes:["standalone AI Discovery tab was removed", "review/approval tools remain on AI Crawling"]}
       ]
+    },
+    {
+      version: "v28.64-natural-language-crawl-review",
+      title: "Natural-Language Crawl Review",
+      checks: [
+        {label:"Plain-English crawl input", file:"master-admin.html", includes:["crawlNaturalLanguageInput", "Build Search Plan", "Create Crawl Review Records"]},
+        {label:"Crawl search plan parser", file:"ai-diagnostics-service.js", includes:["buildCrawlSearchPlan", "detectGenresFromText", "sourceSearchLinksForJob"]},
+        {label:"Review card required datapoints", file:"ai-discovery-service.js", includes:["requiredDatapoints", "Missing required datapoints", "Cannot approve yet"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.64-natural-language-crawl-review"]},
+        {label:"README natural-language crawl note", file:"README.md", includes:["Plain-English crawl input", "required datapoints"]}
+      ]
     }
   ];
 
@@ -391,6 +453,175 @@
       .join(", ") || "Not enough data yet";
   }
 
+  function includesWord(text, phrase) {
+    const source = ` ${normalized(text)} `;
+    const target = ` ${normalized(phrase)} `;
+    return source.includes(target);
+  }
+
+  function uniqueByNormalized(values = []) {
+    const seen = new Set();
+    const out = [];
+    values.filter(Boolean).forEach(value => {
+      const key = normalized(value);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(value);
+    });
+    return out;
+  }
+
+  function marketForCityName(city) {
+    const key = normalized(city);
+    return KNOWN_MARKETS.find(market => {
+      if (normalized(market.city) === key || includesWord(city, market.city)) return true;
+      return (market.aliases || []).some(alias => normalized(alias) === key || includesWord(city, alias));
+    }) || null;
+  }
+
+  function detectMarketsFromText(text = "") {
+    const matches = [];
+    KNOWN_MARKETS.forEach(market => {
+      const names = [market.city, ...(market.aliases || [])];
+      if (names.some(name => includesWord(text, name))) matches.push(market);
+    });
+    return uniqueByNormalized(matches.map(market => market.city))
+      .map(city => marketForCityName(city))
+      .filter(Boolean);
+  }
+
+  function detectCountriesFromText(text = "") {
+    const countryNames = Object.keys(COUNTRY_LANGUAGES).map(key => key.replace(/\b\w/g, c => c.toUpperCase()));
+    return uniqueByNormalized(countryNames.filter(country => includesWord(text, country)));
+  }
+
+  function detectGenresFromText(text = "") {
+    const aliases = [
+      ["Hip Hop", ["hip hop", "hiphop", "rap"]],
+      ["EDM", ["edm", "electronic dance", "electronic music"]],
+      ["Afro Beats", ["afro beats", "afrobeats"]],
+      ["Amapiano", ["amapiano"]],
+      ["House", ["house", "deep house", "tech house"]],
+      ["Latin", ["latin", "latin music"]],
+      ["Arabic Music", ["arabic music", "arabic", "arab"]],
+      ["R&B", ["r and b", "r&b", "rnb"]],
+      ["Reggaeton", ["reggaeton"]]
+    ];
+    const found = aliases.filter(([, terms]) => terms.some(term => includesWord(text, term))).map(([genre]) => genre);
+    return uniqueByNormalized(found.length ? found : DEFAULT_GENRES.filter(genre => includesWord(text, genre)));
+  }
+
+  function detectEventTypesFromText(text = "") {
+    const aliases = [
+      ["nightclub", ["club", "clubs", "nightclub", "nightclubs"]],
+      ["lounge", ["lounge", "lounges"]],
+      ["rooftop lounge", ["rooftop lounge", "roof top lounge", "rooftop lounges", "roof top lounges"]],
+      ["rooftop bar", ["rooftop bar", "roof top bar", "rooftop bars", "roof top bars"]],
+      ["beach club", ["beach club", "beach clubs"]],
+      ["brunch party", ["brunch", "brunch party", "brunch parties"]],
+      ["pool party", ["pool party", "pool parties"]],
+      ["summer party", ["summer party", "summer parties"]],
+      ["DJ event", ["dj", "djs", "dj event", "dj events"]],
+      ["promoter event", ["promoter", "promoter event", "promoter events"]],
+      ["comedy show", ["comedy", "comedy show", "comedy shows"]],
+      ["ticket resale event", ["ticket", "tickets", "resale", "ticket resale"]]
+    ];
+    const found = aliases.filter(([, terms]) => terms.some(term => includesWord(text, term))).map(([type]) => type);
+    const cleaned = found.filter(type => !(type === "ticket resale event" && found.some(other => other !== "ticket resale event")));
+    return uniqueByNormalized(cleaned.length ? cleaned : ["nightclub"]);
+  }
+
+  function inferLanguages(markets = [], countries = [], existing = []) {
+    return uniqueByNormalized([
+      ...existing,
+      ...markets.flatMap(market => splitList(market.language)),
+      ...countries.flatMap(country => splitList(COUNTRY_LANGUAGES[normalized(country)] || ""))
+    ]);
+  }
+
+  function buildCrawlSearchPlan(criteria = {}) {
+    const natural = criteria.naturalLanguage || criteria.search || "";
+    const markets = detectMarketsFromText(natural);
+    const detectedCountries = detectCountriesFromText(natural);
+    const detectedGenres = detectGenresFromText(natural);
+    const detectedEventTypes = detectEventTypesFromText(natural);
+    const hasNaturalSignal = cleanText(natural) !== "-" && (
+      markets.length ||
+      detectedCountries.length ||
+      detectedGenres.length ||
+      detectedEventTypes.length
+    );
+    const cities = uniqueByNormalized([
+      ...markets.map(market => market.city),
+      ...(hasNaturalSignal ? [] : (criteria.cities || []))
+    ]);
+    const countries = uniqueByNormalized([
+      ...detectedCountries,
+      ...(hasNaturalSignal ? [] : (criteria.countries || [])),
+      ...markets.map(market => market.country)
+    ]);
+    const genres = uniqueByNormalized([
+      ...detectedGenres,
+      ...(hasNaturalSignal ? [] : (criteria.genres || []))
+    ]);
+    const eventTypes = uniqueByNormalized([
+      ...detectedEventTypes,
+      ...(hasNaturalSignal ? [] : (criteria.eventTypes || []))
+    ]);
+    const fallbackMarkets = cities.length ? cities.map(city => marketForCityName(city)).filter(Boolean) : markets;
+    const languages = inferLanguages(fallbackMarkets, countries, hasNaturalSignal ? [] : (criteria.languages || []));
+    const finalCities = cities.length ? cities : ["Dubai", "Istanbul", "Singapore", "Shanghai"];
+    const finalGenres = genres.length ? genres : ["Hip Hop"];
+    const finalEventTypes = eventTypes.length ? eventTypes : ["nightclub"];
+    const jobs = [];
+    finalCities.forEach(city => {
+      const market = marketForCityName(city);
+      finalGenres.forEach(genre => {
+        finalEventTypes.forEach(eventType => {
+          const country = market?.country || countries[0] || "";
+          const language = market?.language || languages[0] || "";
+          jobs.push({
+            city,
+            country,
+            stateRegion: market?.region || "",
+            language,
+            genre,
+            eventType,
+            query: `${eventType} ${genre} ${city} ${country}`.replace(/\s+/g, " ").trim(),
+            requiredDatapoints: requiredDatapointLabels(eventType)
+          });
+        });
+      });
+    });
+    return {
+      naturalLanguage: natural,
+      cities: finalCities,
+      countries,
+      genres: finalGenres,
+      eventTypes: finalEventTypes,
+      languages,
+      jobCount: jobs.length,
+      jobs: jobs.slice(0, 80),
+      parser: "local-contextual-crawl-parser",
+      note: "Plain-English input expanded into city x genre x event-type crawl/search jobs."
+    };
+  }
+
+  function isVenueEventType(type = "") {
+    return /club|venue|lounge|bar|beach/i.test(type);
+  }
+
+  function isComedyEventType(type = "") {
+    return /comedy/i.test(type);
+  }
+
+  function requiredDatapointLabels(type = "") {
+    if (isVenueEventType(type)) {
+      return ["name", "description", "address", "city", "country", "telephone", "officialWebsite", "sourceUrl", "categories", "genres"];
+    }
+    return ["name", "description", "locationName", "address", "city", "country", "telephone", "sourceUrl", "ticketUrl", "categories", ...(isComedyEventType(type) ? ["date", "time"] : [])];
+  }
+
   function proposedFamily(item = {}) {
     const draftCollection = item.profileImport?.targetCollection || item.targetCollection || "";
     const text = normalized(`${draftCollection} ${item.proposedType || ""} ${item.targetType || ""}`);
@@ -425,6 +656,20 @@
       "";
   }
 
+  function destinationPhone(item = {}) {
+    return item.profileImport?.publicProfile?.telephone ||
+      item.telephone ||
+      item.phone ||
+      "";
+  }
+
+  function destinationDescription(item = {}) {
+    return item.proposedDescription ||
+      item.description ||
+      item.aiSummary ||
+      "";
+  }
+
   function destinationKey(item = {}) {
     return [
       proposedFamily(item),
@@ -450,6 +695,9 @@
           statuses: new Set(),
           sources: new Set(),
           genres: new Set(),
+          phones: new Set(),
+          descriptions: new Set(),
+          missingRequired: new Set(),
           maxStar: 0,
           maxConfidence: 0
         });
@@ -459,6 +707,11 @@
       group.statuses.add(item.status || "unknown");
       group.sources.add(item.sourceName || item.profileImport?.sourceName || "unknown");
       splitList(item.genres || item.extractedTags || item.categories).forEach(value => group.genres.add(value));
+      const phone = String(destinationPhone(item) || "").trim();
+      if (phone) group.phones.add(phone);
+      const description = String(destinationDescription(item) || "").trim();
+      if (description) group.descriptions.add(description);
+      splitList(item.missingDatapoints || []).forEach(value => group.missingRequired.add(value));
       group.maxStar = Math.max(group.maxStar, Number(item.aiStarRating || 0));
       group.maxConfidence = Math.max(group.maxConfidence, Number(item.aiConfidenceScore || 0));
       const address = String(destinationAddress(item) || "").trim();
@@ -481,7 +734,10 @@
         itemCount: group.items.length,
         sourceList: Array.from(group.sources).filter(Boolean),
         statusList: Array.from(group.statuses).filter(Boolean),
-        genreList: Array.from(group.genres).filter(Boolean)
+        genreList: Array.from(group.genres).filter(Boolean),
+        phoneList: Array.from(group.phones).filter(Boolean),
+        descriptionList: Array.from(group.descriptions).filter(Boolean),
+        missingRequiredList: Array.from(group.missingRequired).filter(Boolean)
       };
     }).sort((a, b) => {
       if (a.addressConflicts !== b.addressConflicts) return a.addressConflicts ? -1 : 1;
@@ -1555,6 +1811,9 @@
   }
 
   function hydrateDefaultControls() {
+    if (byId("crawlNaturalLanguageInput") && !byId("crawlNaturalLanguageInput").value) {
+      byId("crawlNaturalLanguageInput").value = "Search for all clubs playing hip hop and EDM in Paris, Marseille, Monaco, St. Tropez, France. Include official website, address, phone, email, social handles, and ticket links.";
+    }
     if (byId("crawlSearchCriteria") && !byId("crawlSearchCriteria").value) {
       byId("crawlSearchCriteria").value = "nightlife tickets, comedy shows, rooftop lounges, rooftop bars, DJ events, beach clubs, brunch parties, pool parties, summer parties";
     }
@@ -1589,6 +1848,7 @@
     if (byId("crawlFrequency")) byId("crawlFrequency").value = schedule.frequency || "every4Hours";
     if (byId("crawlScheduleHours")) byId("crawlScheduleHours").value = joinList(schedule.scheduleHours) || byId("crawlScheduleHours").value;
     const criteria = schedule.criteria || {};
+    if (criteria.naturalLanguage && byId("crawlNaturalLanguageInput")) byId("crawlNaturalLanguageInput").value = criteria.naturalLanguage;
     if (criteria.search && byId("crawlSearchCriteria")) byId("crawlSearchCriteria").value = criteria.search;
     if (criteria.genres && byId("crawlGenreCriteria")) byId("crawlGenreCriteria").value = joinList(criteria.genres);
     if (criteria.languages && byId("crawlLanguageCriteria")) byId("crawlLanguageCriteria").value = joinList(criteria.languages);
@@ -1605,6 +1865,7 @@
 
   function readCriteriaFromControls() {
     return {
+      naturalLanguage: byId("crawlNaturalLanguageInput")?.value.trim() || "",
       search: byId("crawlSearchCriteria")?.value.trim() || "",
       genres: splitList(byId("crawlGenreCriteria")?.value),
       languages: splitList(byId("crawlLanguageCriteria")?.value),
@@ -1617,11 +1878,16 @@
   }
 
   function readScheduleFromControls() {
+    const criteria = readCriteriaFromControls();
+    const plan = buildCrawlSearchPlan(criteria);
     return {
       enabled: byId("crawlFrequency")?.value !== "manualOnly",
       frequency: byId("crawlFrequency")?.value || "every4Hours",
       scheduleHours: splitList(byId("crawlScheduleHours")?.value),
-      criteria: readCriteriaFromControls(),
+      criteria: {
+        ...criteria,
+        structuredPlan: plan
+      },
       updatedAt: fieldValue(),
       updatedByUid: state.auth?.currentUser?.uid || "",
       updatedByEmail: state.auth?.currentUser?.email || ""
@@ -1640,17 +1906,39 @@
     return schedule;
   }
 
+  function renderCrawlSearchPlan(plan = state.lastCrawlPlan || buildCrawlSearchPlan(readCriteriaFromControls())) {
+    const wrap = byId("crawlSearchPlanReport");
+    if (!wrap) return;
+    state.lastCrawlPlan = plan;
+    const rows = [
+      ["Interpreted request", plan.naturalLanguage || "Advanced structured criteria"],
+      ["Expanded searches", plan.jobCount.toLocaleString()],
+      ["Cities", joinList(plan.cities)],
+      ["Genres", joinList(plan.genres)],
+      ["Record types", joinList(plan.eventTypes)],
+      ["Languages", joinList(plan.languages) || "Market default"]
+    ];
+    const jobsHtml = plan.jobs.length ? plan.jobs.slice(0, 24).map((job, index) => `<div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>${esc(index + 1)}. ${esc(job.query)}</strong>
+        ${statusBadge("Pass")}
+      </div>
+      <p>${esc(job.eventType)} | ${esc(job.genre)} | ${esc(job.city)}${job.country ? `, ${esc(job.country)}` : ""} | ${esc(job.language || "local language")}</p>
+      <small>Required datapoints: ${esc(job.requiredDatapoints.join(", "))}</small>
+    </div>`).join("") : "<p class='sub'>No search jobs were generated. Add a city, genre, or event type.</p>";
+    wrap.innerHTML = `${simpleRows(rows)}${jobsHtml}`;
+  }
+
+  function previewCrawlPlan() {
+    const plan = buildCrawlSearchPlan(readCriteriaFromControls());
+    renderCrawlSearchPlan(plan);
+    setText("diagnosticsStatus", `Search plan ready: ${plan.jobCount} crawl/search job(s) generated from plain English input.`);
+    return plan;
+  }
+
   function marketForCity(city) {
-    const key = normalized(city);
-    if (key.includes("dubai")) return {country: "United Arab Emirates", language: "Arabic, English"};
-    if (key.includes("istanbul")) return {country: "Turkey", language: "Turkish"};
-    if (key.includes("singapore")) return {country: "Singapore", language: "English, Mandarin, Malay, Tamil"};
-    if (key.includes("bangkok") || key.includes("phuket")) return {country: "Thailand", language: "Thai, English"};
-    if (key.includes("shanghai")) return {country: "China", language: "Chinese, English"};
-    if (key.includes("barcelona") || key.includes("madrid") || key.includes("ibiza")) return {country: "Spain", language: "Spanish"};
-    if (key.includes("paris") || key.includes("cannes") || key.includes("nice")) return {country: "France", language: "French"};
-    if (key.includes("london") || key.includes("manchester")) return {country: "United Kingdom", language: "English"};
-    return {country: "", language: ""};
+    const market = marketForCityName(city);
+    return market ? {country: market.country, language: market.language, region: market.region} : {country: "", language: "", region: ""};
   }
 
   function ticketPartnerUrl(partner, query, city) {
@@ -1660,64 +1948,109 @@
     return `https://www.google.com/search?q=${encoded}+tickets+resale`;
   }
 
+  function officialSearchUrl(query, city) {
+    return `https://www.google.com/search?q=${encodeURIComponent(`${query} ${city} official website address phone instagram`)}`;
+  }
+
+  function eventTypeToProposedType(eventType = "") {
+    const text = normalized(eventType);
+    if (text.includes("comedy")) return "comedyShow";
+    if (text.includes("rooftop lounge")) return "rooftopLounge";
+    if (text.includes("rooftop bar")) return "rooftopBar";
+    if (text.includes("lounge")) return "lounge";
+    if (text.includes("beach club")) return "beachClub";
+    if (text.includes("club")) return "club";
+    if (text.includes("dj")) return "event";
+    if (text.includes("ticket")) return "event";
+    return "event";
+  }
+
+  function sourceSearchLinksForJob(job = {}) {
+    const query = job.query || `${job.eventType || ""} ${job.genre || ""} ${job.city || ""}`.trim();
+    return [
+      {label:"Official/source search", href:officialSearchUrl(query, job.city || "")},
+      {label:"Ticketmaster", href:ticketPartnerUrl("Ticketmaster", query, job.city || "")},
+      {label:"Eventbrite", href:ticketPartnerUrl("Eventbrite", query, job.city || "")},
+      {label:"Resale/partner search", href:ticketPartnerUrl("Resale", query, job.city || "")}
+    ];
+  }
+
   function candidateBase(criteria, runId, index, override = {}) {
     const city = override.city || criteria.cities[index % Math.max(criteria.cities.length, 1)] || "Dubai";
     const market = marketForCity(city);
-    const country = override.country || criteria.countries[index % Math.max(criteria.countries.length, 1)] || market.country || "";
+    const country = market.country || override.country || criteria.countries[index % Math.max(criteria.countries.length, 1)] || "";
     const genre = override.genre || criteria.genres[index % Math.max(criteria.genres.length, 1)] || "Hip Hop";
     const eventType = override.eventType || criteria.eventTypes[index % Math.max(criteria.eventTypes.length, 1)] || "nightclub";
     const sourceName = override.sourceName || (index % 2 === 0 ? "Ticketmaster public search" : "Eventbrite public search");
-    const title = override.title || `${city} ${eventType} ${genre}`;
-    const query = `${title} ${criteria.search || ""}`.trim();
+    const proposedType = override.proposedType || eventTypeToProposedType(eventType);
+    const title = override.title || `${genre} ${eventType} in ${city}`;
+    const query = override.query || `${eventType} ${genre} ${city} ${country}`.trim();
+    const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, genre, eventType});
+    const requiredDatapoints = requiredDatapointLabels(eventType);
+    const defaultMissing = [
+      "Address",
+      "Phone",
+      ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
+    ];
     return {
-      proposedType: override.proposedType || (eventType.includes("rooftop") || eventType.includes("lounge") ? "lounge" : "event"),
+      proposedType,
       proposedTitle: title,
-      proposedDescription: override.description || `AI-ready public-source candidate for ${eventType}, ${genre}, and ticket discovery in ${city}.`,
+      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete the required datapoints, verify the source, then approve into FLOQR search.`,
       proposedDate: "",
       proposedTime: "",
       proposedLocationName: override.locationName || title,
-      proposedAddress: "",
+      proposedAddress: override.address || "",
+      officialWebsite: override.officialWebsite || "",
+      email: override.email || "",
+      telephone: override.telephone || "",
+      phone: override.phone || override.telephone || "",
+      socialMediaHandles: override.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
+      ticketUrl: override.ticketUrl || sourceSearchLinks.find(link => link.label === "Ticketmaster")?.href || "",
       city,
-      stateRegion: override.region || criteria.regions[0] || "",
+      stateRegion: override.region || market.region || criteria.regions[0] || "",
       country,
-      sourceUrl: ticketPartnerUrl(sourceName.includes("Ticketmaster") ? "Ticketmaster" : sourceName.includes("Eventbrite") ? "Eventbrite" : "Resale", query, city),
+      sourceUrl: override.sourceUrl || sourceSearchLinks[0]?.href || ticketPartnerUrl(sourceName.includes("Ticketmaster") ? "Ticketmaster" : sourceName.includes("Eventbrite") ? "Eventbrite" : "Resale", query, city),
       sourceName,
+      sourceSearchLinks,
       extractedImages: [],
       extractedTags: [eventType, genre, city, country].filter(Boolean),
       categories: [eventType, "public-discovery", "ticketing"].filter(Boolean),
       genres: [genre],
       searchLanguage: override.language || market.language || criteria.languages[0] || "local language",
       searchQuery: query,
+      requiredDatapoints,
+      missingDatapoints: defaultMissing,
+      crawlResultStatus: "needs-public-source-details",
       ticketingPartners: ["Ticketmaster", "Eventbrite", "approved resale partners"],
-      aiSummary: `Candidate generated from Master Admin crawl criteria. Review public source, deduplicate, and edit before approval.`,
+      aiSummary: `Structured crawl result generated from Master Admin input. Fill required datapoints from public sources before approval.`,
       aiConfidenceScore: override.confidence || 0.68,
       aiStarRating: override.star || 3,
       aiRatingReasons: [
-        "Matches configured nightlife/event search criteria",
-        "Prepared for public-source validation",
-        "Requires Super Admin approval before publishing"
+        "Matches the expanded crawl/search plan",
+        "Includes required datapoint checklist",
+        "Requires verified public-source details before publishing"
       ],
       duplicateCandidateIds: [],
       status: "pendingReview",
       crawlRunId: runId,
       criteriaSnapshot: criteria,
-      discoveryMode: "manual-simulated-public-source",
+      discoveryMode: "manual-natural-language-crawl-result",
       createdAt: fieldValue(),
       updatedAt: fieldValue()
     };
   }
 
   function buildManualCrawlCandidates(criteria, runId) {
-    const cities = criteria.cities.length ? criteria.cities : ["Dubai", "Istanbul", "Singapore", "Shanghai"];
-    const countries = criteria.countries.length ? criteria.countries : [];
-    const items = [
-      {city: cities[0] || "Dubai", country: countries[0] || "United Arab Emirates", eventType: "rooftop lounge", genre: "Arabic Music", title: `${cities[0] || "Dubai"} rooftop lounge Arabic DJ tickets`, star: 4, confidence: 0.77, sourceName: "Ticketmaster public search"},
-      {city: cities[1] || "Istanbul", country: countries[1] || "Turkey", eventType: "rooftop bar", genre: "Latin", title: `${cities[1] || "Istanbul"} rooftop bar Latin night`, star: 4, confidence: 0.74, sourceName: "Eventbrite public search"},
-      {city: cities[2] || "Singapore", country: countries[2] || "Singapore", eventType: "comedy show", genre: "Live Entertainment", title: `${cities[2] || "Singapore"} comedy show tickets`, star: 3, confidence: 0.7, sourceName: "Ticket resale public search"},
-      {city: cities[3] || "Shanghai", country: countries[3] || "China", eventType: "DJ event", genre: criteria.genres[0] || "Hip Hop", title: `${cities[3] || "Shanghai"} DJ event ticket discovery`, star: 3, confidence: 0.66, sourceName: "Eventbrite public search"},
-      {city: cities[4] || "Barcelona", country: countries[4] || "Spain", eventType: "beach club", genre: "Latin", title: `${cities[4] || "Barcelona"} beach club Latin DJ event`, star: 4, confidence: 0.79, sourceName: "Ticketmaster public search"}
-    ];
-    return items.map((item, index) => candidateBase(criteria, runId, index, item));
+    const plan = buildCrawlSearchPlan(criteria);
+    state.lastCrawlPlan = plan;
+    return plan.jobs.map((job, index) => candidateBase(criteria, runId, index, {
+      ...job,
+      title: `${job.genre} ${job.eventType} in ${job.city}`,
+      description: `Crawl/search result for ${job.genre} ${job.eventType} in ${job.city}${job.country ? `, ${job.country}` : ""}. Required datapoints are listed on the review card.`,
+      sourceName: "FLOQR public-source search plan",
+      confidence: 0.72,
+      star: isVenueEventType(job.eventType) ? 4 : 3
+    }));
   }
 
   async function runManualCrawl() {
@@ -1726,16 +2059,19 @@
     const schedule = await saveCrawlSchedule({silent: true});
     const criteria = schedule.criteria;
     const runRef = state.db.collection("aiCrawlRuns").doc();
-    setText("diagnosticsStatus", "Running manual public-source crawl scaffold...");
+    const plan = buildCrawlSearchPlan(criteria);
+    renderCrawlSearchPlan(plan);
+    setText("diagnosticsStatus", `Creating ${plan.jobCount} reviewable crawl result record(s) from the expanded search plan...`);
     await runRef.set({
       trigger: "manual",
-      mode: "manual-simulated-public-source",
+      mode: "manual-natural-language-crawl",
       status: "running",
       criteria,
+      structuredPlan: plan,
       requestedByUid: user?.uid || "",
       requestedByEmail: user?.email || "",
       startedAt: fieldValue(),
-      note: "Static app scaffold. Backend scheduled crawler must validate public sources, robots.txt, APIs, and source terms before production use."
+      note: "Manual Master Admin crawl workflow. Records require public-source datapoint completion before approval."
     });
     const candidates = buildManualCrawlCandidates(criteria, runRef.id);
     for (const item of candidates) {
@@ -1747,7 +2083,7 @@
       completedAt: fieldValue(),
       updatedAt: fieldValue()
     }, {merge: true});
-    setText("diagnosticsStatus", `Manual crawl scaffold complete. ${candidates.length} records added to aiDiscoveryQueue for Super Admin review.`);
+    setText("diagnosticsStatus", `Manual crawl complete. ${candidates.length} structured review record(s) added with required datapoint checklists.`);
     await refreshDiagnostics();
   }
 
@@ -2289,9 +2625,10 @@
       ["Transportation", "Third-party taxi hailing integration", "TBI", "Reserved as partner integration; not connected to current app workflows."],
       ["AI Crawling", "Discovery review queue", collectionStatus(data, "aiDiscoveryQueue", true), `${discoveryQueue.length} discovery queue records scanned under the AI Crawling tab.`],
       ["AI Crawling", "Approve/reject/delete review tools", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "Discovery review tools are mounted on the AI Crawling tab." : "FLOQRAIDiscovery module was not loaded."],
-      ["AI Crawling", "Manual crawl control", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl adds reviewable records to aiDiscoveryQueue from the AI Crawling tab."],
+      ["AI Crawling", "Plain-English crawl input", byId("crawlNaturalLanguageInput") && byId("previewCrawlPlanBtn") ? "Pass" : "Failed", "Master Admin can type one contextual request and build an expanded search plan."],
+      ["AI Crawling", "Manual crawl review records", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl creates reviewable records with required datapoint checklists in aiDiscoveryQueue."],
       ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
-      ["AI Crawling", "Backend scheduled internet crawler", "TBI", "Cloud Functions or Cloud Run scheduler must perform real public-source crawling 4-6 times per day."],
+      ["AI Crawling", "Automatic crawl schedule", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Saved schedule includes structured crawl criteria and search-plan output." : "Save the schedule to persist automatic crawl criteria."],
       ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
       ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
@@ -2330,7 +2667,8 @@
       ["Automatic crawl setting", schedule?.frequency || "Not saved"],
       ["Schedule enabled", schedule?.enabled ? "Yes" : "No"],
       ["Planned run times", joinList(schedule?.scheduleHours) || "00:00, 04:00, 08:00, 12:00, 16:00, 20:00"],
-      ["Backend requirement", "Deploy Firebase scheduled function or Cloud Run scheduler for real crawling"]
+      ["Manual crawl workflow", "Plain-English input creates structured review records with required datapoint checks"],
+      ["Automatic execution path", "Saved schedule is ready for Firebase scheduled execution"]
     ];
     const runHtml = runs.length ? runs.slice(0, 12).map(run => `<div class="queue-item">
       <strong>${esc(run.status || "crawl run")} - ${esc(run.mode || run.trigger || "manual")}</strong>
@@ -2351,10 +2689,13 @@
         ${statusBadge(group.addressConflicts ? "Soft Fail" : "Pass")}
       </div>
       <p>${esc(group.city || "")}${group.country ? `, ${esc(group.country)}` : ""} | ${esc(group.family)} | ${esc(group.genreList.slice(0, 5).join(", "))}</p>
+      <p>${group.descriptionList[0] ? `Description: ${esc(group.descriptionList[0])}` : "Description: missing"}</p>
       <p>${group.canonicalAddress ? `Address: ${esc(group.canonicalAddress)}` : "Address: not collected yet"}</p>
+      <p>${group.phoneList[0] ? `Phone: ${esc(group.phoneList[0])}` : "Phone: not collected yet"}</p>
+      ${group.missingRequiredList.length ? `<p class="sub small">Missing required datapoints: ${esc(group.missingRequiredList.join(", "))}</p>` : ""}
       ${group.addressConflicts ? `<p class="sub small">Address conflict: ${esc(group.addressOptions.map(item => `${item.address} (${item.count})`).join(" | "))}</p>` : ""}
       <small>Grouped records: ${esc(group.itemCount)} | Sources: ${esc(group.sourceList.join(", ") || "-")} | Max stars: ${esc(group.maxStar || "-")} | Max confidence: ${esc(group.maxConfidence || "-")}</small>
-    </div>`).join("") : "<p class='sub'>No collected discovery records yet. Run a manual crawl scaffold to seed review records.</p>";
+    </div>`).join("") : "<p class='sub'>No collected discovery records yet. Create crawl review records from the plain-English input to seed the queue.</p>";
   }
 
   function renderAnalyticsInsights(data) {
@@ -2401,13 +2742,15 @@
     const groups = consolidateCrawlRecords(queue);
     const addressConflicts = groups.filter(group => group.addressConflicts);
     const profileDrafts = queue.filter(item => item.discoveryMode === "profile-import-draft");
+    const plan = schedule?.criteria?.structuredPlan || state.lastCrawlPlan || buildCrawlSearchPlan(readCriteriaFromControls());
     wrap.innerHTML = simpleRows([
+      ["Active search-plan jobs", (plan?.jobCount || 0).toLocaleString()],
       ["Raw collected records", queue.length.toLocaleString()],
       ["Consolidated clubs/events", groups.length.toLocaleString()],
       ["Address conflicts", addressConflicts.length.toLocaleString()],
       ["Profile import drafts", profileDrafts.length.toLocaleString()],
       ["Crawl schedule", schedule?.frequency || "Not saved"],
-      ["Publishing rule", "Crawler results stay in review/import drafts until Master Admin or Club Admin approves them."]
+      ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
     ]);
   }
 
@@ -2427,6 +2770,7 @@
       setText("diagnosticsStatus", "Preparing diagnostics TXT export...");
       const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
       if (schedule) applyScheduleToControls(schedule);
+      renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
       const features = buildFeatureDiagnostics(data);
       state.lastFeatures = features;
       state.lastSchedule = schedule || null;
@@ -2453,6 +2797,7 @@
     setText("diagnosticsStatus", "Refreshing diagnostics...");
     const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
     if (schedule) applyScheduleToControls(schedule);
+    renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
     const features = buildFeatureDiagnostics(data);
     state.lastFeatures = features;
     state.lastSchedule = schedule || null;
@@ -2475,6 +2820,7 @@
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
+    byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
     byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
@@ -2496,6 +2842,7 @@
     }
     const schedule = await readScheduleSafe();
     if (schedule) applyScheduleToControls(schedule);
+    renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
     await refreshDiagnostics();
   }
 

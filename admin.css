@@ -57,6 +57,10 @@
 .selected-summary.hidden{display:none}
 .role-request-card{margin-top:18px}
 .profile-grid textarea{width:100%;min-height:90px}
+.admin-detail{border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.18);padding:12px;margin-top:14px}
+.admin-detail summary{cursor:pointer;font-weight:1000;color:var(--text);padding:4px 0}
+.admin-detail[open] summary{margin-bottom:12px}
+.ai-discovery-item textarea{width:100%;min-height:86px}
 
 /* v28.5 media templates */
 .media-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
