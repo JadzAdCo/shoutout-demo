@@ -18,9 +18,18 @@ Do not place AI API keys in frontend code. Use Firebase Functions, Cloud Run Fun
 
 Set the Gemini API key as a Firebase Functions secret before deploying:
 
+Run these commands from the package/repo root where `firebase.json` is located:
+
+```bash
+firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402
+npm.cmd --prefix functions install
+firebase deploy --only functions:aiEnhanceShoutOutMedia
+```
+
+If `GEMINI_API_KEY` does not exist yet, set it before deployment:
+
 ```bash
 firebase functions:secrets:set GEMINI_API_KEY
-firebase deploy --only functions:aiEnhanceShoutOutMedia
 ```
 
 The default image model is `gemini-3.1-flash-image`. To override it in backend runtime configuration, set `FLOQR_GEMINI_IMAGE_MODEL`.

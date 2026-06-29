@@ -1,10 +1,10 @@
 {
   "name": "floqr-ai-functions",
-  "version": "28.74.0",
+  "version": "28.75.0",
   "private": true,
   "main": "index.js",
   "engines": {
-    "node": "20"
+    "node": ">=22"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0",
