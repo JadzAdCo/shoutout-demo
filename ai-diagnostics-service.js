@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.75 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.76 */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.75-firebase-functions-deploy-fix";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.76-diagnostics-current-signal";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -532,6 +532,16 @@
         {label:"Functions package engine accepts Node 22+", file:"functions/package.json", includes:["\"node\": \">=22\"", "\"firebase-functions\""]},
         {label:"Root README installs function dependencies correctly", file:"README.md", includes:["npm.cmd --prefix functions install", "firebase deploy --only functions:aiEnhanceShoutOutMedia --project shoutoutdemo-5b402"]},
         {label:"Functions README deploy guidance", file:"functions/README.md", includes:["npm.cmd --prefix functions install", "firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402"]}
+      ]
+    },
+    {
+      version: "v28.76-diagnostics-current-signal",
+      title: "Diagnostics Current Signal Cleanup",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.76-diagnostics-current-signal"]},
+        {label:"Superseded package marker checks are non-blocking", file:"ai-diagnostics-service.js", includes:["supersededPackageCheck ? \"Pass\"", "historical package marker check is superseded"]},
+        {label:"Rules smoke test stale wording", file:"ai-diagnostics-service.js", includes:["This is not a deployed-rules failure yet", "CURRENT_DIAGNOSTICS_PACKAGE_VERSION"]},
+        {label:"README diagnostics signal note", file:"README.md", includes:["v28.76 Diagnostics Current Signal Cleanup", "Historical cache-bust marker checks now pass as superseded"]}
       ]
     }
   ];
@@ -1417,14 +1427,14 @@
         source:"Current Rules Smoke Test",
         label:"No current-package rules smoke test",
         status:"Soft Fail",
-        reason:`Latest saved rules smoke test is stale: ${latest.packageVersion || "unknown package"} at ${fmtDate(latest.createdAt)}. Run Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.`
+        reason:`No saved rules smoke test exists for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}. Latest saved test is from ${latest.packageVersion || "unknown package"} at ${fmtDate(latest.createdAt)}. This is not a deployed-rules failure yet; click Run Rules Smoke Test after uploading this package.`
       }];
     }
     return [{
       source:"Current Rules Smoke Test",
       label:"No rules smoke test has been run",
       status:"Soft Fail",
-      reason:`Run Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION} after publishing Firestore and Storage rules.`
+      reason:`Run Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION} after publishing Firestore and Storage rules. This is not a deployed-rules failure yet; it means no browser proof has been saved.`
     }];
   }
 
@@ -1720,8 +1730,8 @@
     const smokeEvidence = latest
       ? `Latest current-package live deployed-rules smoke test: ${latest.status || "unknown"} at ${fmtDate(latest.createdAt)}.`
       : latestAny
-        ? `Latest saved rules smoke test is stale: ${latestAny.packageVersion || "unknown package"} at ${fmtDate(latestAny.createdAt)}. Rerun Rules Smoke Test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.`
-        : "No live rules smoke test has been run yet. Click Run Rules Smoke Test after publishing rules.";
+        ? `No saved rules smoke test exists for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}. Latest saved test is from ${latestAny.packageVersion || "unknown package"} at ${fmtDate(latestAny.createdAt)}. This is not a deployed-rules failure yet; click Run Rules Smoke Test after uploading this package.`
+        : "No live rules smoke test has been run yet. This is not a deployed-rules failure yet; click Run Rules Smoke Test after publishing rules.";
     const overall = packageRulesStatus === "Pass" && packageStorageStatus === "Pass" && smokeStatus === "Pass" ? "Pass" : smokeStatus === "Soft Fail" ? "Soft Fail" : "Failed";
     const failedChecks = (Array.isArray(latest?.results) ? latest.results : []).filter(item => item.status === "Failed");
     const meaning = ruleStatusMeaning(packageRulesStatus, smokeStatus, latest);
@@ -1790,9 +1800,9 @@
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
-            status: supersededPackageCheck ? "Soft Fail" : (failed ? "Failed" : "Pass"),
+            status: supersededPackageCheck ? "Pass" : (failed ? "Failed" : "Pass"),
             evidence: supersededPackageCheck
-              ? `${check.file} now points to current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; historical package ${pkg.version} is superseded. Original evidence: ${[
+              ? `${check.file} now points to current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; this historical package marker check is superseded and non-blocking. Original evidence: ${[
                   missing.length ? `${check.file} is missing: ${missing.join(", ")}` : "",
                   presentButForbidden.length ? `${check.file} still contains removed marker(s): ${presentButForbidden.join(", ")}` : ""
                 ].filter(Boolean).join(" ")}`
@@ -3761,7 +3771,7 @@
       ["Master Admin", "Duplicate record diagnostics", byId("duplicateRecords") && window.FLOQRDuplicateRecords ? "Pass" : "Failed", "Master Admin can scan duplicate club records and merge duplicates into aliases."],
       ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
       ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
-      ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `Latest saved rules smoke test is stale: ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. Run the rules smoke test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
+      ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `No saved rules smoke test exists for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}. Latest saved test is from ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. This is not a deployed-rules failure yet; click Run Rules Smoke Test after uploading this package.` : "Run the rules smoke test after publishing Firestore/Storage rules. This is not a deployed-rules failure yet; it means no browser proof has been saved."]
     ].map(([area, feature, status, evidence]) => ({area, feature, status, evidence}));
   }
 

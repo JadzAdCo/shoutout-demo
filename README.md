@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.75 Firebase Functions Deploy Fix Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.76 Diagnostics Current Signal Cleanup Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.75-firebase-functions-deploy-fix
+https://jadzadco.github.io/shoutout-demo/?v=28.76-diagnostics-current-signal
 ```
 
 Current release highlights:
@@ -97,6 +97,8 @@ Current release highlights:
 - Updates Firestore rules to `v28.74-gemini-media-editing-rules` with owner-visible `aiMediaEdits` audit records.
 - Adds root `firebase.json` pointing Firebase CLI to the `functions/` folder with Node 22.
 - Fixes Firebase Functions deployment guidance: install backend dependencies with `npm.cmd --prefix functions install` from the repo root before deploying `aiEnhanceShoutOutMedia`.
+- Adds v28.76 Diagnostics Current Signal Cleanup. Historical cache-bust marker checks now pass as superseded when the current package intentionally replaces older package URLs, so the Attention Summary focuses on current failures instead of old package markers.
+- Clarifies stale rules-smoke-test wording. If no current-package smoke test has been saved yet, Diagnostics now says this is not a deployed-rules failure yet and tells Master Admin to click `Run Rules Smoke Test`.
 
 ## FLOQR AI Architecture
 
@@ -406,7 +408,7 @@ Test plan:
 - Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44 through v28.74 package marker checks run, including Gemini media editing backend, frontend, diagnostics, and rules markers.
+- Click Run Package Install Diagnostics and confirm v28.44 through v28.76 package marker checks run, including Gemini media editing backend, frontend, diagnostics, rules markers, and diagnostics signal-cleanup markers.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
