@@ -1,4 +1,4 @@
-/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.72 */
+/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.73 */
 (function () {
   "use strict";
 
@@ -199,6 +199,9 @@
     const wrap = byId("duplicateMergeDiagnosticReport");
     if (!wrap) return;
     const status = overallStatus(rows);
+    const repairButton = status === "Pass" || !context.primaryId || !(context.duplicateIds || []).length
+      ? ""
+      : `<div class="queue-actions"><button type="button" data-duplicate-repair-primary="${esc(context.primaryId)}" data-duplicate-repair-ids="${esc((context.duplicateIds || []).join(","))}">Complete / Repair Merge Now</button></div>`;
     wrap.innerHTML = `<div class="queue-item">
       <div class="message-envelope-head">
         <strong>Duplicate Merge Diagnostic</strong>
@@ -213,7 +216,15 @@
       <div class="report-table">
         ${rows.map(row => `<div><span>${esc(row.label)}</span><strong>${esc(row.status)} - ${esc(row.evidence)}</strong></div>`).join("")}
       </div>
+      ${repairButton}
     </div>`;
+    wrap.querySelectorAll("[data-duplicate-repair-primary]").forEach(button => {
+      button.addEventListener("click", () => {
+        const primaryId = button.dataset.duplicateRepairPrimary || "";
+        const duplicateIds = String(button.dataset.duplicateRepairIds || "").split(",").map(x => x.trim()).filter(Boolean);
+        mergePairByIds(primaryId, duplicateIds);
+      });
+    });
   }
 
   function addDiagnostic(rows, label, status, evidence) {
@@ -298,25 +309,25 @@
       try {
         const aliasSnap = await db.collection("clubLocationAliases").doc(duplicateId).get();
         if (!aliasSnap.exists) {
-          addDiagnostic(rows, `Alias document ${duplicateId}`, duplicateMerged ? "Soft Fail" : "Failed", duplicateMerged ? "Alias document was not found, but the duplicate club doc now points to the primary. Publish firestore.rules v28.70+ to enable alias-document reads/writes for old links." : "clubLocationAliases document was not found. If merge just failed, publish v28.70+ firestore.rules and retry.");
+          addDiagnostic(rows, `Optional alias document ${duplicateId}`, duplicateMerged ? "Pass" : "Failed", duplicateMerged ? "Alias document was not found, but the duplicate clubLocation document points to the primary and is sufficient." : "clubLocationAliases document was not found and the duplicate club doc does not point to the primary yet.");
         } else {
           const alias = aliasSnap.data() || {};
           const canonical = String(alias.canonicalLocationId || "").toLowerCase();
-          addDiagnostic(rows, `Alias document ${duplicateId}`, canonical === primaryId ? "Pass" : "Failed", canonical === primaryId ? "Alias document points old links to the primary club." : `Alias points to ${canonical || "-"} instead of ${primaryId}.`);
+          addDiagnostic(rows, `Optional alias document ${duplicateId}`, canonical === primaryId || duplicateMerged ? "Pass" : "Failed", canonical === primaryId ? "Alias document points old links to the primary club." : duplicateMerged ? `Alias points to ${canonical || "-"}, but the duplicate clubLocation document points to ${primaryId} and is sufficient.` : `Alias points to ${canonical || "-"} instead of ${primaryId}.`);
         }
       } catch (error) {
-        addDiagnostic(rows, `Alias document ${duplicateId}`, duplicateMerged ? "Soft Fail" : "Failed", duplicateMerged ? `Alias document read is blocked (${formatError(error)}), but the duplicate club doc points to the primary. Publish firestore.rules v28.70+ to unlock alias-document diagnostics and old-link alias reads.` : `Could not read alias document: ${formatError(error)}`);
+        addDiagnostic(rows, `Optional alias document ${duplicateId}`, duplicateMerged ? "Pass" : "Failed", duplicateMerged ? `Alias document read is blocked (${formatError(error)}), but the duplicate clubLocation document points to the primary and is sufficient.` : `Could not read alias document: ${formatError(error)}`);
       }
 
       if (primary) {
         const aliasIds = Array.isArray(primary.aliasLocationIds) ? primary.aliasLocationIds.map(x => String(x).toLowerCase()) : [];
         const mergedIds = Array.isArray(primary.mergedDuplicateIds) ? primary.mergedDuplicateIds.map(x => String(x).toLowerCase()) : [];
         const primaryHasAlias = aliasIds.includes(duplicateId) || mergedIds.includes(duplicateId);
-        addDiagnostic(rows, `Primary alias list for ${duplicateId}`, primaryHasAlias ? "Pass" : "Soft Fail", primaryHasAlias ? "Primary includes this duplicate in alias/merged lists." : "Primary does not list this duplicate yet. Old links can still work if the alias document passed.");
+        addDiagnostic(rows, `Primary alias list for ${duplicateId}`, primaryHasAlias || duplicateMerged ? "Pass" : "Soft Fail", primaryHasAlias ? "Primary includes this duplicate in alias/merged lists." : duplicateMerged ? "Primary alias list is not populated yet, but the duplicate clubLocation document points to the primary and is sufficient." : "Primary does not list this duplicate yet.");
       }
 
       const staticTarget = staticAliasTarget(duplicateId);
-      addDiagnostic(rows, `Static fallback alias ${duplicateId}`, staticTarget === primaryId ? "Pass" : "Soft Fail", staticTarget === primaryId ? "Static fallback data resolves this duplicate to the primary club." : "Static fallback does not include this alias. Firestore alias can still handle live records.");
+      addDiagnostic(rows, `Static fallback alias ${duplicateId}`, staticTarget === primaryId || duplicateMerged ? "Pass" : "Soft Fail", staticTarget === primaryId ? "Static fallback data resolves this duplicate to the primary club." : duplicateMerged ? "Static fallback does not include this alias, but live Firestore duplicate document resolves it." : "Static fallback does not include this alias and the duplicate is not merged yet.");
 
       const refs = await referenceCountsForDuplicate(duplicateId);
       if (refs.blocked.length) {
@@ -331,7 +342,7 @@
     try {
       await db.collection("aiDiagnosticsReports").add({
         type:"duplicateMergeDiagnostic",
-        packageVersion:"v28.72-alias-resilient-merge",
+        packageVersion:"v28.73-canonical-merge-completion",
         status,
         primaryId,
         duplicateIds,
@@ -344,6 +355,42 @@
       console.warn("Could not save duplicate merge diagnostic report:", error?.message || error);
     }
     return status;
+  }
+
+  async function mergePairByIds(primaryId = "", duplicateIds = []) {
+    const cleanPrimary = String(primaryId || "").trim().toLowerCase();
+    const cleanDuplicates = duplicateIds.map(id => String(id || "").trim().toLowerCase()).filter(Boolean).filter(id => id !== cleanPrimary);
+    if (!cleanPrimary || !cleanDuplicates.length) {
+      setStatus("Enter a primary club id and at least one duplicate club id before completing the merge.");
+      return;
+    }
+    setStatus("Loading primary and duplicate records for repair merge...");
+    try {
+      const [primarySnap, ...duplicateSnaps] = await Promise.all([
+        db.collection("clubLocations").doc(cleanPrimary).get(),
+        ...cleanDuplicates.map(id => db.collection("clubLocations").doc(id).get())
+      ]);
+      if (!primarySnap.exists) {
+        setStatus(`Repair merge failed: primary clubLocation ${cleanPrimary} was not found.`);
+        return;
+      }
+      const missing = duplicateSnaps.filter(snap => !snap.exists).map((snap, index) => cleanDuplicates[index]);
+      if (missing.length) {
+        setStatus(`Repair merge failed: duplicate clubLocation record(s) not found: ${missing.join(", ")}.`);
+        return;
+      }
+      await mergeDuplicateGroup({
+        records:[
+          {id:primarySnap.id, _collection:"clubLocations", _dataSource:"Live Firestore: clubLocations", ...primarySnap.data()},
+          ...duplicateSnaps.map(snap => ({id:snap.id, _collection:"clubLocations", _dataSource:"Live Firestore: clubLocations", ...snap.data()}))
+        ],
+        suggestedPrimaryId:cleanPrimary,
+        score:100,
+        reasons:["manual complete/repair merge"]
+      }, cleanPrimary);
+    } catch (error) {
+      setStatus(`Repair merge failed: ${formatError(error)}`);
+    }
   }
 
   function recordSearchText(row = {}) {
@@ -395,7 +442,7 @@
           `${record.id} | ${record.address || record.locationLabel || "-"} | ${record.officialWebsite || record.website || "-"}`
         ]))}
         <div class="queue-actions">
-          <button type="button" data-duplicate-action="merge">Merge Other Records Into Selected Primary</button>
+          <button type="button" data-duplicate-action="merge">Complete / Repair Merge Into Selected Primary</button>
           <button type="button" data-duplicate-action="diagnose">Run Merge Diagnostic</button>
         </div>
       </div>`;
@@ -618,29 +665,12 @@
   }
 
   async function mergeManualPair() {
-    const primaryId = byId("duplicatePrimaryId")?.value.trim();
-    const aliasId = byId("duplicateAliasId")?.value.trim();
-    if (!primaryId || !aliasId || primaryId === aliasId) {
+    const {primaryId, duplicateIds} = manualPairIds();
+    if (!primaryId || !duplicateIds.length || duplicateIds.includes(primaryId)) {
       setStatus("Enter a primary club id and a different duplicate club id.");
       return;
     }
-    const [primarySnap, aliasSnap] = await Promise.all([
-      db.collection("clubLocations").doc(primaryId).get(),
-      db.collection("clubLocations").doc(aliasId).get()
-    ]);
-    if (!primarySnap.exists || !aliasSnap.exists) {
-      setStatus("Manual merge failed: one or both clubLocation records were not found in Firestore.");
-      return;
-    }
-    await mergeDuplicateGroup({
-      records:[
-        {id:primarySnap.id, _collection:"clubLocations", ...primarySnap.data()},
-        {id:aliasSnap.id, _collection:"clubLocations", ...aliasSnap.data()}
-      ],
-      suggestedPrimaryId:primaryId,
-      score:100,
-      reasons:["manual Master Admin pair"]
-    }, primaryId);
+    await mergePairByIds(primaryId, duplicateIds);
   }
 
   async function mount(options = {}) {
@@ -663,6 +693,7 @@
     mount,
     refreshDuplicateDiagnostics,
     runDuplicateMergeDiagnostic,
+    mergePairByIds,
     mergeDuplicateGroup,
     mergeManualPair,
     baseInstitutionName,

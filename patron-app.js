@@ -236,6 +236,17 @@
         return String(alias.data().canonicalLocationId).toLowerCase();
       }
     } catch(e) {}
+    try {
+      const locDoc = await db.collection("clubLocations").doc(key).get();
+      if (locDoc.exists) {
+        const data = locDoc.data() || {};
+        const canonical = String(data.canonicalLocationId || data.aliasOf || data.mergedInto || "").toLowerCase();
+        if (canonical && canonical !== key) {
+          locationAliases[key] = {id:key, canonicalLocationId:canonical, aliasName:data.locationName || data.brandName || key, status:"active"};
+          return canonical;
+        }
+      }
+    } catch(e) {}
     return key;
   }
   async function loadLocationById(id) {

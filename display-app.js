@@ -1,4 +1,4 @@
-/* display-app.js v28.70 */
+/* display-app.js v28.73 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);

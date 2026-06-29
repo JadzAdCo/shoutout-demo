@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.72 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.73 */
 (function () {
   "use strict";
 
@@ -29,7 +29,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.70-duplicate-alias-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.72-alias-resilient-merge";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.73-canonical-merge-completion";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -493,6 +493,18 @@
         {label:"Alias write blocked is non-core", file:"duplicate-record-service.js", includes:["alias document write blocked", "Alias document read is blocked", "Soft Fail"]},
         {label:"Script cache bust", file:"master-admin.html", includes:["v=28.72-alias-resilient-merge", "duplicate-record-service.js"]},
         {label:"README resilient merge note", file:"README.md", includes:["alias-resilient", "core duplicate merge"]}
+      ]
+    },
+    {
+      version: "v28.73-canonical-merge-completion",
+      title: "Canonical Duplicate Merge Completion",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.73-canonical-merge-completion"]},
+        {label:"Repair action in diagnostic report", file:"duplicate-record-service.js", includes:["Complete / Repair Merge Now", "mergePairByIds", "data-duplicate-repair-primary"]},
+        {label:"Alias collection optional after canonical merge", file:"duplicate-record-service.js", includes:["Optional alias document", "is sufficient", "duplicate clubLocation document"]},
+        {label:"Patron canonical duplicate resolver", file:"patron-app.js", includes:["clubLocations\").doc(key)", "canonicalLocationId", "locationAliases[key]"]},
+        {label:"Script cache bust", file:"master-admin.html", includes:["v=28.73-canonical-merge-completion", "duplicate-record-service.js"]},
+        {label:"README canonical completion note", file:"README.md", includes:["canonical duplicate document", "Complete / Repair Merge"]}
       ]
     }
   ];
