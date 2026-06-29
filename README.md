@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.67 Raw Parsed Crawl Output Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.69 Stale ShoutOut Cleanup Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.67-crawl-raw-parsed-output
+https://jadzadco.github.io/shoutout-demo/?v=28.69-stale-shoutout-cleanup
 ```
 
 Current release highlights:
@@ -70,6 +70,10 @@ Current release highlights:
 - Adds the same search-results guard to the Firebase callable extractor so frontend and backend behavior match.
 - Adds raw crawled/input data and parsed data output to Source Detail Extraction previews and AI Crawling review cards. Master Admin can now see the original input/search/source snapshot beside the exact fields FLOQR parsed and saved.
 - New records include `rawCrawlInput`, `parsedData`, and `extractionAudit` so cached/saved queue records can be distinguished from freshly extracted records.
+- Adds stale crawl cleanup under Master Admin > Stale Record Cleanup. This soft-clears old generated/search-plan crawl records from active review without touching approved listings, user profiles, ShoutOuts, guest lists, or audit history.
+- Fixes clean crawl query generation so recognized cities use their real country/region and do not inherit broad defaults. Example: `Singapore comedy show tickets` now plans a Singapore/Singapore record with a clean crawl query such as `comedy show Singapore tickets`, not a Western Europe/France queue record.
+- Adds a dedicated Master Admin > Stale Record Cleanup tab. Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.
+- Stale cleanup now covers both AI discovery queue records and club ShoutOut queue records. ShoutOut cleanup soft-marks queue records as `status: "stale"` with `staleCleanupStatus: "stale-shoutout-cleared"` instead of deleting approved/live ShoutOut history.
 
 ## FLOQR AI Architecture
 
@@ -188,6 +192,10 @@ Open Master Admin > AI Crawling to manage crawler setup and crawler-derived data
 - Search-results page guard. If the source URL is a broad results page, such as `ticketmaster.com/search?q=comedy+shows`, FLOQR explains that the page is not a final event/venue source and blocks saving it as an approvable review record.
 - Firebase source extraction. If `aiExtractPublicSourceUrl` is deployed, FLOQR fetches the public page server-side and extracts JSON-LD/metadata/text. If the callable is unavailable, the page still parses pasted source details locally.
 - Raw and parsed output. Source Detail Extraction and discovery review cards show `rawCrawlInput` and `parsedData` side by side. `rawCrawlInput` contains the plain-English crawl request, generated search job, pasted source text preview, source URL, or search-results URL. `parsedData` contains the event/club fields FLOQR will use for review, approval, search, and import.
+- Stale record cleanup. Open Master Admin > Stale Record Cleanup to search AI discovery queue records and ShoutOut queue records. A stale record is a queue record more than 4 days old, a record that references old Firestore/Storage rules, or a record that points to an old/unknown location.
+- Stale ShoutOut cleanup. Pending club ShoutOut queue records older than the threshold, tied to old/unknown locations, or referencing old rules can be soft-cleared. FLOQR sets `status: "stale"` and `staleCleanupStatus: "stale-shoutout-cleared"` so club admin queues stop showing the stale item while the record remains available for audit/review.
+- Stale crawl cleanup. AI discovery queue cleanup marks stale queue records with `crawlResultStatus: "stale-cache-cleared"` and leaves approved listings, profiles, ShoutOuts, guest lists, live display content, and audit history untouched.
+- Clean crawl query output. Fresh search-plan records use city-aware clean crawl queries. Recognized cities such as Singapore, Dubai, Istanbul, Paris, and Shanghai carry their own country/region, and generated source links avoid repeating broad criteria text across Ticketmaster, Eventbrite, Google, and resale searches.
 - Crawl activity reports, consolidated collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
 - Duplicate destination consolidation. Matching clubs/events are grouped by normalized name, city, country, and destination type.
 - The consolidated report consolidates duplicate clubs/events so the same destination does not appear as separate records with conflicting addresses.

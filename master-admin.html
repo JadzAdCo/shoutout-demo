@@ -56,6 +56,7 @@
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
+        <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
         <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
       </nav>
 
@@ -261,6 +262,40 @@
         </div>
       </section>
 
+      <section id="staleRecordCleanup" class="admin-panel-section">
+        <div class="card">
+          <h2>Stale Record Cleanup</h2>
+          <p class="sub small">Search stale AI discovery queue records and stale club ShoutOut queue records, review why FLOQR considers them stale, and remove them from active review.</p>
+          <div class="profile-grid">
+            <label>Search stale records<input id="staleRecordSearchInput" placeholder="Singapore, old location, club name, reference number, rules version, source URL"/></label>
+            <label>Record source
+              <select id="staleRecordSourceFilter">
+                <option value="all">AI discovery + ShoutOut queues</option>
+                <option value="aiDiscoveryQueue">AI discovery queue records</option>
+                <option value="shoutouts">ShoutOut queue records</option>
+              </select>
+            </label>
+            <label>Status
+              <select id="staleRecordStatusFilter">
+                <option value="active">Active stale records</option>
+                <option value="removed">Already removed</option>
+                <option value="all">All stale records</option>
+              </select>
+            </label>
+            <label>Older than days<input id="staleRecordAgeDays" type="number" min="1" value="4"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="searchStaleRecordsBtn" type="button">Search Stale Records</button>
+            <button id="removeSelectedStaleRecordsBtn" type="button">Remove Selected</button>
+            <button id="removeAllFoundStaleRecordsBtn" type="button">Remove All Found</button>
+            <button id="clearCachedCrawlsBtn" type="button">Remove All Active Stale Records</button>
+          </div>
+          <p class="sub small">A stale record is a queue record older than 4 days, a record that references old Firestore/Storage rules, or a record that points to an old/unknown location. Remove means soft-clear: discovery records get `stale-cache-cleared`; ShoutOut queue records get `stale-shoutout-cleared`. Approved listings, live display content, user profiles, guest lists, and audit history are not changed.</p>
+          <p id="staleRecordCleanupStatus" class="status"></p>
+          <div id="staleRecordCleanupResults" class="report-block"></div>
+        </div>
+      </section>
+
       <section id="diagnostics" class="admin-panel-section">
         <div class="card">
           <h2>Master Admin Settings - Diagnostics</h2>
@@ -306,9 +341,9 @@
 <script src="./ai-service.js?v=28.44-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-discovery-service.js?v=28.67-crawl-raw-parsed-output"></script>
-<script src="./ai-diagnostics-service.js?v=28.67-crawl-raw-parsed-output"></script>
-<script src="./master-admin-app.js?v=28.67-crawl-raw-parsed-output"></script>
+<script src="./ai-discovery-service.js?v=28.69-stale-shoutout-cleanup"></script>
+<script src="./ai-diagnostics-service.js?v=28.69-stale-shoutout-cleanup"></script>
+<script src="./master-admin-app.js?v=28.69-stale-shoutout-cleanup"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

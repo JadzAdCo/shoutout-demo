@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.67 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.69 */
 (function () {
   "use strict";
 
@@ -14,6 +14,7 @@
     lastSchedule: null,
     lastCrawlPlan: null,
     lastExtractedSourceRecord: null,
+    lastStaleRecords: [],
     lastFeatures: [],
     lastPackageDiagnostics: [],
     lastRulesSmokeResults: []
@@ -28,7 +29,9 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.67-crawl-raw-parsed-output";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.69-stale-shoutout-cleanup";
+  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -47,6 +50,8 @@
   ];
 
   const DEFAULT_GENRES = [
+    "Nightlife",
+    "Live Entertainment",
     "Hip Hop",
     "Afro Beats",
     "Amapiano",
@@ -424,6 +429,29 @@
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.67-crawl-raw-parsed-output"]},
         {label:"README raw parsed explanation", file:"README.md", includes:["raw crawled/input data", "parsed data"]}
       ]
+    },
+    {
+      version: "v28.68-crawl-cache-query-fix",
+      title: "Crawler Cache Cleanup + Query Fix",
+      checks: [
+        {label:"Stale crawl cleanup action", file:"master-admin.html", includes:["clearCachedCrawlsBtn", "Remove All Active Stale Records"]},
+        {label:"Stale crawl cleanup logic", file:"ai-diagnostics-service.js", includes:["clearCachedCrawlRecords", "isStaleCachedCrawlRecord", "stale-cache-cleared"]},
+        {label:"Clean crawl query builder", file:"ai-diagnostics-service.js", includes:["crawlQueryForJob", "searchPhraseFromParts", "defaultGenreForEventType"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.68-crawl-cache-query-fix"]},
+        {label:"README stale cache/query explanation", file:"README.md", includes:["stale crawl records", "clean crawl query"]}
+      ]
+    },
+    {
+      version: "v28.69-stale-shoutout-cleanup",
+      title: "Stale Record Cleanup",
+      checks: [
+        {label:"Stale cleanup tab", file:"master-admin.html", includes:["data-panel=\"staleRecordCleanup\"", "Stale Record Cleanup"]},
+        {label:"Stale source filter", file:"master-admin.html", includes:["staleRecordSourceFilter", "ShoutOut queue records"]},
+        {label:"Four-day stale threshold", file:"ai-diagnostics-service.js", includes:["STALE_RECORD_DEFAULT_DAYS", "recordAgeDays", "more than 4 day"]},
+        {label:"Stale ShoutOut cleanup logic", file:"ai-diagnostics-service.js", includes:["shoutoutStaleReasons", "loadStaleShoutoutRows", "stale-shoutout-cleared"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.69-stale-shoutout-cleanup"]},
+        {label:"README stale ShoutOut explanation", file:"README.md", includes:["stale ShoutOut", "more than 4 days"]}
+      ]
     }
   ];
 
@@ -588,6 +616,45 @@
     ]);
   }
 
+  function defaultGenreForEventType(eventType = "") {
+    const type = normalized(eventType);
+    if (type.includes("comedy")) return "Live Entertainment";
+    if (type.includes("ticket")) return "Live Entertainment";
+    if (type.includes("dj")) return "DJ";
+    if (/club|lounge|bar|beach|brunch|pool|summer/.test(type)) return "Nightlife";
+    return "Nightlife";
+  }
+
+  function searchPhraseFromParts(parts = []) {
+    const seen = new Set();
+    const output = [];
+    parts.forEach(part => {
+      const value = String(part || "").replace(/\s+/g, " ").trim();
+      if (!value) return;
+      const key = normalized(value);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      output.push(value);
+    });
+    return output.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function genreShouldAppearInQuery(genre = "") {
+    const key = normalized(genre);
+    return !!key && !["nightlife", "live entertainment"].includes(key);
+  }
+
+  function crawlQueryForJob({eventType = "", genre = "", city = "", country = ""} = {}) {
+    const needsTickets = /comedy|ticket|event|dj|promoter|party/i.test(eventType);
+    return searchPhraseFromParts([
+      eventType,
+      genreShouldAppearInQuery(genre) ? genre : "",
+      city,
+      country && normalized(country) !== normalized(city) ? country : "",
+      needsTickets && !includesWord(eventType, "ticket") ? "tickets" : ""
+    ]);
+  }
+
   function buildCrawlSearchPlan(criteria = {}) {
     const natural = criteria.naturalLanguage || criteria.search || "";
     const markets = detectMarketsFromText(natural);
@@ -620,14 +687,15 @@
     const fallbackMarkets = cities.length ? cities.map(city => marketForCityName(city)).filter(Boolean) : markets;
     const languages = inferLanguages(fallbackMarkets, countries, hasNaturalSignal ? [] : (criteria.languages || []));
     const finalCities = cities.length ? cities : ["Dubai", "Istanbul", "Singapore", "Shanghai"];
-    const finalGenres = genres.length ? genres : ["Hip Hop"];
     const finalEventTypes = eventTypes.length ? eventTypes : ["nightclub"];
+    const explicitGenres = genres.length ? genres : [""];
     const jobs = [];
     finalCities.forEach(city => {
       const market = marketForCityName(city);
-      finalGenres.forEach(genre => {
+      explicitGenres.forEach(genreInput => {
         finalEventTypes.forEach(eventType => {
-          const country = market?.country || countries[0] || "";
+          const genre = genreInput || defaultGenreForEventType(eventType);
+          const country = market?.country || (countries.length === 1 ? countries[0] : "");
           const language = market?.language || languages[0] || "";
           jobs.push({
             city,
@@ -636,12 +704,13 @@
             language,
             genre,
             eventType,
-            query: `${eventType} ${genre} ${city} ${country}`.replace(/\s+/g, " ").trim(),
+            query: crawlQueryForJob({eventType, genre, city, country}),
             requiredDatapoints: requiredDatapointLabels(eventType)
           });
         });
       });
     });
+    const finalGenres = uniqueByNormalized(jobs.map(job => job.genre));
     return {
       naturalLanguage: natural,
       cities: finalCities,
@@ -2431,14 +2500,27 @@
   }
 
   function ticketPartnerUrl(partner, query, city) {
-    const encoded = encodeURIComponent(`${query} ${city}`.trim());
+    const search = searchPhraseFromParts([
+      query,
+      city && !includesWord(query, city) ? city : ""
+    ]);
+    const encoded = encodeURIComponent(search);
     if (partner === "Ticketmaster") return `https://www.ticketmaster.com/search?q=${encoded}`;
     if (partner === "Eventbrite") return `https://www.eventbrite.com/d/${encoded}/events/`;
-    return `https://www.google.com/search?q=${encoded}+tickets+resale`;
+    return `https://www.google.com/search?q=${encodeURIComponent(searchPhraseFromParts([
+      search,
+      includesWord(search, "tickets") ? "" : "tickets",
+      "resale"
+    ]))}`;
   }
 
   function officialSearchUrl(query, city) {
-    return `https://www.google.com/search?q=${encodeURIComponent(`${query} ${city} official website address phone instagram`)}`;
+    const search = searchPhraseFromParts([
+      query,
+      city && !includesWord(query, city) ? city : "",
+      "official website address phone instagram"
+    ]);
+    return `https://www.google.com/search?q=${encodeURIComponent(search)}`;
   }
 
   function eventTypeToProposedType(eventType = "") {
@@ -2455,7 +2537,7 @@
   }
 
   function sourceSearchLinksForJob(job = {}) {
-    const query = job.query || `${job.eventType || ""} ${job.genre || ""} ${job.city || ""}`.trim();
+    const query = job.query || crawlQueryForJob(job);
     return [
       {label:"Official/source search", href:officialSearchUrl(query, job.city || "")},
       {label:"Ticketmaster", href:ticketPartnerUrl("Ticketmaster", query, job.city || "")},
@@ -2467,14 +2549,15 @@
   function candidateBase(criteria, runId, index, override = {}) {
     const city = override.city || criteria.cities[index % Math.max(criteria.cities.length, 1)] || "Dubai";
     const market = marketForCity(city);
-    const country = market.country || override.country || criteria.countries[index % Math.max(criteria.countries.length, 1)] || "";
+    const country = market.country || override.country || ((criteria.countries || []).length === 1 ? criteria.countries[0] : "");
     const genre = override.genre || criteria.genres[index % Math.max(criteria.genres.length, 1)] || "Hip Hop";
     const eventType = override.eventType || criteria.eventTypes[index % Math.max(criteria.eventTypes.length, 1)] || "nightclub";
     const sourceName = override.sourceName || (index % 2 === 0 ? "Ticketmaster public search" : "Eventbrite public search");
     const proposedType = override.proposedType || eventTypeToProposedType(eventType);
     const title = override.title || `${genre} ${eventType} in ${city}`;
-    const query = override.query || `${eventType} ${genre} ${city} ${country}`.trim();
-    const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, genre, eventType});
+    const stateRegion = override.stateRegion || override.region || market.region || ((criteria.regions || []).length === 1 ? criteria.regions[0] : "");
+    const query = override.query || crawlQueryForJob({eventType, genre, city, country});
+    const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, country, genre, eventType});
     const requiredDatapoints = requiredDatapointLabels(eventType);
     const defaultMissing = [
       "Address",
@@ -2496,7 +2579,7 @@
       socialMediaHandles: override.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
       ticketUrl: override.ticketUrl || sourceSearchLinks.find(link => link.label === "Ticketmaster")?.href || "",
       city,
-      stateRegion: override.region || market.region || criteria.regions[0] || "",
+      stateRegion,
       country,
       sourceUrl: override.sourceUrl || sourceSearchLinks[0]?.href || ticketPartnerUrl(sourceName.includes("Ticketmaster") ? "Ticketmaster" : sourceName.includes("Eventbrite") ? "Eventbrite" : "Resale", query, city),
       sourceName,
@@ -2534,7 +2617,7 @@
       structuredJob:{
         city,
         country,
-        stateRegion:override.region || market.region || criteria.regions[0] || "",
+        stateRegion,
         genre,
         eventType,
         query,
@@ -2591,6 +2674,394 @@
     }, {merge: true});
     setText("diagnosticsStatus", `Manual crawl complete. ${candidates.length} structured review record(s) added with required datapoint checklists.`);
     await refreshDiagnostics();
+  }
+
+  function staleAgeThresholdDays() {
+    const value = Number(byId("staleRecordAgeDays")?.value || STALE_RECORD_DEFAULT_DAYS);
+    return Number.isFinite(value) && value > 0 ? value : STALE_RECORD_DEFAULT_DAYS;
+  }
+
+  function valueToDate(value) {
+    if (!value) return null;
+    if (value.toDate) return value.toDate();
+    if (value.seconds) return new Date(value.seconds * 1000);
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function firstRecordDate(row = {}, fields = []) {
+    for (const field of fields) {
+      const date = valueToDate(row[field]);
+      if (date) return date;
+    }
+    return null;
+  }
+
+  function recordAgeDays(row = {}, fields = ["createdAt", "submittedAt"]) {
+    const date = firstRecordDate(row, fields);
+    if (!date) return null;
+    return (Date.now() - date.getTime()) / 86400000;
+  }
+
+  function ageStaleReason(row = {}, fields = ["createdAt"], label = "Record") {
+    const age = recordAgeDays(row, fields);
+    const threshold = staleAgeThresholdDays();
+    if (age === null || age <= threshold) return "";
+    return `${label} has been in the queue for more than ${threshold} day(s) (${Math.floor(age)} day(s)).`;
+  }
+
+  function rowText(row = {}) {
+    try {
+      return JSON.stringify(row);
+    } catch (error) {
+      return String(row || "");
+    }
+  }
+
+  function oldRuleReferenceReasons(row = {}) {
+    const text = rowText(row);
+    const versions = uniqueByNormalized(text.match(/v\d+\.\d+(?:[-][A-Za-z0-9]+)*/g) || []);
+    const reasons = [];
+    const mentionsFirestore = /firestore(?:\.rules|\s+rules|\s+rule)/i.test(text);
+    const mentionsStorage = /storage(?:\.rules|\s+rules|\s+rule)/i.test(text);
+    if (mentionsFirestore) {
+      const old = versions.filter(version => version !== EXPECTED_FIRESTORE_RULES_VERSION && version !== CURRENT_DIAGNOSTICS_PACKAGE_VERSION);
+      if (old.length) reasons.push(`References old Firestore rules/package marker(s): ${old.join(", ")}. Expected Firestore rules: ${EXPECTED_FIRESTORE_RULES_VERSION}.`);
+    }
+    if (mentionsStorage) {
+      const old = versions.filter(version => version !== EXPECTED_STORAGE_RULES_VERSION && version !== CURRENT_DIAGNOSTICS_PACKAGE_VERSION);
+      if (old.length) reasons.push(`References old Storage rules/package marker(s): ${old.join(", ")}. Expected Storage rules: ${EXPECTED_STORAGE_RULES_VERSION}.`);
+    }
+    return reasons;
+  }
+
+  function knownLocationIds(data = state.lastData || {}) {
+    const ids = new Set();
+    Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => ids.add(normalized(id)));
+    (data.clubLocations?.rows || []).forEach(row => {
+      if (row.id && String(row.status || "active") !== "deleted") ids.add(normalized(row.id));
+    });
+    return ids;
+  }
+
+  function locationReferences(row = {}) {
+    return uniqueByNormalized([
+      row.clubLocationId,
+      row.locationId,
+      row.location,
+      row.club,
+      row.targetCollection === "clubLocations" ? row.targetId : "",
+      row.profileImport?.targetCollection === "clubLocations" ? row.profileImport?.targetId : "",
+      row.parsedData?.clubLocationId,
+      row.parsedData?.locationId,
+      row.rawCrawlInput?.structuredJob?.locationId
+    ].filter(Boolean));
+  }
+
+  function oldLocationReasons(row = {}, locationIds = knownLocationIds()) {
+    const refs = locationReferences(row);
+    const reasons = [];
+    refs.forEach(ref => {
+      const key = normalized(ref);
+      if (!key) return;
+      if (locationIds.has(key)) return;
+      if (marketForCityName(ref)) return;
+      reasons.push(`References old/unknown location id: ${ref}.`);
+    });
+    return reasons;
+  }
+
+  function discoveryStaleReasons(row = {}, locationIds = knownLocationIds()) {
+    const reasons = [];
+    const status = normalized(row.status || "pendingReview");
+    if (status === "approved" || row.approvedRecordId || row.approvedFromDiscoveryQueueId) return reasons;
+    const mode = normalized(row.discoveryMode || "");
+    const result = normalized(row.crawlResultStatus || "");
+    const pageType = normalized(row.sourcePageType || "");
+    const rawType = normalized(row.rawCrawlInput?.inputType || "");
+    const title = row.proposedTitle || row.proposedLocationName || "";
+    const city = row.city || row.parsedData?.city || "";
+    const country = row.country || row.parsedData?.country || "";
+    const market = marketForCityName(city);
+    const ageReason = ageStaleReason(row, ["createdAt", "updatedAt"], "AI discovery queue record");
+    if (ageReason && !["deleted", "rejected"].includes(status)) reasons.push(ageReason);
+    if (market && country && normalized(country) !== normalized(market.country)) {
+      reasons.push(`City/country mismatch: ${city} should map to ${market.country}, not ${country}.`);
+    }
+    if (market && row.stateRegion && normalized(row.stateRegion) !== normalized(market.region) && normalized(row.stateRegion).includes("western europe") && normalized(market.region) !== "western europe") {
+      reasons.push(`Region mismatch: ${city} should use ${market.region}, not ${row.stateRegion}.`);
+    }
+    reasons.push(...oldRuleReferenceReasons(row), ...oldLocationReasons(row, locationIds));
+    if (mode.includes("manual natural language crawl result") || rawType.includes("manual crawl search plan")) {
+      reasons.push("Generated search-plan placeholder, not a followed public source record.");
+    }
+    if (mode.includes("source results follow up") || pageType.includes("searchresultspage") || isSearchResultsUrl(row.sourceUrl || "")) {
+      reasons.push("Broad search-results page; needs a final event or venue detail source.");
+    }
+    if (result.includes("needs public source details") || result.includes("needs final event source")) {
+      reasons.push("Still waiting for verified public source details.");
+    }
+    if (!row.rawCrawlInput && !row.parsedData) {
+      reasons.push("Older cached record without raw/parsed audit output.");
+    }
+    if (!row.proposedAddress && !row.address && !(row.telephone || row.phone) && /tickets?|search|generated|public-source/i.test(`${title} ${mode}`)) {
+      reasons.push("Missing real address and phone; likely generated from a search query rather than a source page.");
+    }
+    if (status === "deleted" || result.includes("stale cache cleared")) {
+      reasons.push("Already removed from active review.");
+    }
+    return uniqueByNormalized(reasons);
+  }
+
+  function shoutoutStaleReasons(row = {}, locationIds = knownLocationIds()) {
+    const reasons = [];
+    const status = normalized(row.status || "pending");
+    if (status === "approved" || status === "live") return reasons;
+    const removed = status === "stale" || status === "deleted" || normalized(row.staleCleanupStatus).includes("stale shoutout cleared");
+    const ageReason = ageStaleReason(row, ["submittedAt", "createdAt", "updatedAt"], "ShoutOut queue record");
+    if (ageReason && !removed) reasons.push(ageReason);
+    reasons.push(...oldRuleReferenceReasons(row), ...oldLocationReasons(row, locationIds));
+    if (!locationReferences(row).length) reasons.push("Missing club location reference.");
+    if (removed) reasons.push("Already removed from the ShoutOut queue.");
+    return uniqueByNormalized(reasons);
+  }
+
+  function staleRecordReasons(row = {}, locationIds = knownLocationIds()) {
+    return row._collection === "shoutouts"
+      ? shoutoutStaleReasons(row, locationIds)
+      : discoveryStaleReasons(row, locationIds);
+  }
+
+  function isStaleCachedCrawlRecord(row = {}) {
+    return discoveryStaleReasons(row).length > 0;
+  }
+
+  function staleRecordSearchText(row = {}) {
+    return [
+      row._collection,
+      row.id,
+      row.proposedTitle,
+      row.proposedLocationName,
+      row.proposedDescription,
+      row.mainText,
+      row.subText,
+      row.referenceNumber,
+      row.submittedBy,
+      row.city,
+      row.stateRegion,
+      row.country,
+      row.sourceUrl,
+      row.ticketUrl,
+      row.sourceName,
+      row.searchQuery,
+      row.discoveryMode,
+      row.crawlResultStatus,
+      row.staleCleanupStatus,
+      ...locationReferences(row),
+      ...(row.categories || []),
+      ...(row.genres || []),
+      ...(row._staleReasons || [])
+    ].filter(Boolean).join(" ");
+  }
+
+  function staleRecordStatus(row = {}) {
+    const status = normalized(row.status || "");
+    const result = normalized(row.crawlResultStatus || "");
+    const cleanup = normalized(row.staleCleanupStatus || "");
+    return status === "deleted" || status === "stale" || result.includes("stale cache cleared") || cleanup.includes("stale shoutout cleared") ? "removed" : "active";
+  }
+
+  function setStaleStatus(value) {
+    setText("staleRecordCleanupStatus", value);
+    setText("diagnosticsStatus", value);
+  }
+
+  function renderStaleRecordCleanup(rows = state.lastStaleRecords, message = "") {
+    const wrap = byId("staleRecordCleanupResults");
+    if (!wrap) return;
+    if (message) setText("staleRecordCleanupStatus", message);
+    if (!rows.length) {
+      wrap.innerHTML = "<p class='sub'>No stale records found for the current search.</p>";
+      return;
+    }
+    wrap.innerHTML = rows.map(row => {
+      const removed = staleRecordStatus(row) === "removed";
+      const reasons = row._staleReasons || staleRecordReasons(row);
+      const isShoutOut = row._collection === "shoutouts";
+      const parsed = isShoutOut ? {
+        mainText:row.mainText || "",
+        subText:row.subText || "",
+        status:row.status || "",
+        referenceNumber:row.referenceNumber || "",
+        clubLocationId:row.clubLocationId || row.location || row.club || "",
+        locationName:row.locationName || row.clubName || "",
+        submittedBy:row.submittedBy || row.submittedByEmail || "",
+        submittedAt:fmtDate(row.submittedAt || row.createdAt),
+        mediaStoragePath:row.mediaStoragePath || row.originalMediaStoragePath || "",
+        selectedMediaVersion:row.selectedMediaVersion || ""
+      } : (row.parsedData || parsedDiscoveryData(row));
+      const raw = isShoutOut
+        ? {collection:"shoutouts", documentId:row.id, recordType:"club ShoutOut queue record", submittedAt:fmtDate(row.submittedAt || row.createdAt), locationReferences:locationReferences(row)}
+        : (row.rawCrawlInput || {note:"No raw crawl/input audit was saved on this older cached record.", sourceUrl:row.sourceUrl || "", searchQuery:row.searchQuery || ""});
+      const recordRef = `${row._collection || "aiDiscoveryQueue"}/${row.id}`;
+      return `<div class="queue-item stale-record-item" data-stale-id="${esc(recordRef)}">
+        <div class="message-envelope-head">
+          <label class="consent-line"><input type="checkbox" data-stale-select value="${esc(recordRef)}" ${removed ? "disabled" : ""}/> <strong>${esc(row.proposedTitle || row.proposedLocationName || row.mainText || row.referenceNumber || row.id || "Untitled stale record")}</strong></label>
+          ${statusBadge(removed ? "Soft Fail" : "Failed")}
+        </div>
+        <p>${esc(row.proposedDescription || row.aiSummary || row.subText || "No description saved.")}</p>
+        <p class="sub small">${esc([isShoutOut ? "ShoutOut queue" : "AI Discovery", row.proposedType || "", row.locationName || row.clubName || row.city, row.stateRegion, row.country].filter(Boolean).join(" - "))}</p>
+        <div class="tag-row">${reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div>
+        <details class="admin-detail">
+          <summary>${isShoutOut ? "Original queue record snapshot" : "Raw crawled/input data"}</summary>
+          <pre class="diagnostic-json">${esc(JSON.stringify(raw, null, 2))}</pre>
+        </details>
+        <details class="admin-detail">
+          <summary>${isShoutOut ? "ShoutOut queue fields" : "Parsed data used by FLOQR"}</summary>
+          <pre class="diagnostic-json">${esc(JSON.stringify(parsed, null, 2))}</pre>
+        </details>
+        <div class="queue-actions">
+          ${removed ? "<span class='status-pill'>Removed from active review</span>" : `<button type="button" data-stale-action="remove" data-stale-id="${esc(recordRef)}">Remove This Stale Record</button>`}
+          ${row.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(row.sourceUrl)}">Open Source/Search</a>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+    wrap.querySelectorAll("[data-stale-action='remove']").forEach(btn => {
+      btn.addEventListener("click", () => removeStaleRecords([btn.dataset.staleId]));
+    });
+  }
+
+  async function loadStaleDiscoveryRows(locationIds) {
+    const snap = await state.db.collection("aiDiscoveryQueue").limit(750).get();
+    return snap.docs.map(doc => {
+      const row = {id:doc.id, _collection:"aiDiscoveryQueue", ...doc.data()};
+      row._staleReasons = discoveryStaleReasons(row, locationIds);
+      return row;
+    }).filter(row => row._staleReasons.length);
+  }
+
+  async function loadStaleShoutoutRows(locationIds) {
+    const snap = await state.db.collection("shoutouts").limit(750).get();
+    return snap.docs.map(doc => {
+      const row = {id:doc.id, _collection:"shoutouts", ...doc.data()};
+      row._staleReasons = shoutoutStaleReasons(row, locationIds);
+      return row;
+    }).filter(row => row._staleReasons.length);
+  }
+
+  async function loadStaleRecordRows() {
+    const locationSnap = await state.db.collection("clubLocations").limit(1000).get().catch(() => null);
+    const data = {
+      ...state.lastData,
+      clubLocations:{
+        rows: locationSnap ? locationSnap.docs.map(doc => ({id:doc.id, ...doc.data()})) : (state.lastData?.clubLocations?.rows || [])
+      }
+    };
+    const locationIds = knownLocationIds(data);
+    const [discoveryRows, shoutoutRows] = await Promise.all([
+      loadStaleDiscoveryRows(locationIds),
+      loadStaleShoutoutRows(locationIds)
+    ]);
+    return [...discoveryRows, ...shoutoutRows];
+  }
+
+  async function searchStaleRecords(options = {}) {
+    if (!state.db) return [];
+    setStaleStatus("Searching stale queue records...");
+    const query = normalized(byId("staleRecordSearchInput")?.value || "");
+    const sourceFilter = byId("staleRecordSourceFilter")?.value || "all";
+    const statusFilter = byId("staleRecordStatusFilter")?.value || "active";
+    const rows = (await loadStaleRecordRows()).filter(row => {
+      if (sourceFilter !== "all" && row._collection !== sourceFilter) return false;
+      const rowStatus = staleRecordStatus(row);
+      if (statusFilter === "active" && rowStatus !== "active") return false;
+      if (statusFilter === "removed" && rowStatus !== "removed") return false;
+      if (query && !normalized(staleRecordSearchText(row)).includes(query)) return false;
+      return true;
+    });
+    state.lastStaleRecords = rows;
+    renderStaleRecordCleanup(rows, `Found ${rows.length} stale record(s).`);
+    if (!options.silent && !rows.length) setStaleStatus("No stale records matched the current search.");
+    return rows;
+  }
+
+  function selectedStaleRecordIds() {
+    return Array.from(document.querySelectorAll("[data-stale-select]:checked")).map(input => input.value).filter(Boolean);
+  }
+
+  function parseRecordRef(value = "") {
+    const [collection, ...rest] = String(value || "").split("/");
+    return {collection: collection || "aiDiscoveryQueue", id: rest.join("/")};
+  }
+
+  async function removeStaleRecords(refs = []) {
+    if (!state.db || !refs.length) {
+      setStaleStatus("Select at least one active stale record first.");
+      return;
+    }
+    const confirmed = confirm(`Remove ${refs.length} stale record(s) from active review? This soft-clears AI discovery queue records and ShoutOut queue records without deleting approved/live history.`);
+    if (!confirmed) return;
+    const batch = state.db.batch();
+    const byRef = new Map((state.lastStaleRecords || []).map(row => [`${row._collection}/${row.id}`, row]));
+    refs.forEach(value => {
+      const {collection, id} = parseRecordRef(value);
+      if (!id || !["aiDiscoveryQueue", "shoutouts"].includes(collection)) return;
+      const ref = state.db.collection(collection).doc(id);
+      const row = byRef.get(`${collection}/${id}`) || {};
+      const reasons = row._staleReasons || [];
+      const base = {
+        staleCleanupReasons:reasons,
+        clearedAt:fieldValue(),
+        clearedByUid:state.auth?.currentUser?.uid || "",
+        clearedByEmail:state.auth?.currentUser?.email || "",
+        updatedAt:fieldValue()
+      };
+      if (collection === "shoutouts") {
+        batch.set(ref, {
+          ...base,
+          previousStatus:row.status || "pending",
+          status:"stale",
+          staleCleanupStatus:"stale-shoutout-cleared",
+          clearReason:"Master Admin removed stale ShoutOut queue record."
+        }, {merge:true});
+      } else {
+        batch.set(ref, {
+          ...base,
+          status:"deleted",
+          crawlResultStatus:"stale-cache-cleared",
+          clearReason:"Master Admin removed stale generated crawl/search-plan record."
+        }, {merge:true});
+      }
+    });
+    await batch.commit();
+    setStaleStatus(`Removed ${refs.length} stale record(s) from active review.`);
+    await searchStaleRecords({silent:true});
+    if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
+    await refreshDiagnostics();
+  }
+
+  async function removeSelectedStaleRecords() {
+    await removeStaleRecords(selectedStaleRecordIds());
+  }
+
+  async function removeAllFoundStaleRecords() {
+    const refs = (state.lastStaleRecords || []).filter(row => staleRecordStatus(row) === "active").map(row => `${row._collection}/${row.id}`);
+    if (!refs.length) {
+      setStaleStatus("No active stale records in the current search results.");
+      return;
+    }
+    await removeStaleRecords(refs);
+  }
+
+  async function clearCachedCrawlRecords() {
+    if (!state.db) return;
+    const rows = await searchStaleRecords({silent:true});
+    const refs = rows.filter(row => staleRecordStatus(row) === "active").map(row => `${row._collection}/${row.id}`);
+    if (!refs.length) {
+      setStaleStatus("No active stale records found to clear.");
+      return;
+    }
+    await removeStaleRecords(refs);
   }
 
   function collectionCount(data, name) {
@@ -3139,6 +3610,7 @@
       ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
       ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
+      ["Master Admin", "Stale record cleanup", byId("staleRecordCleanup") && byId("searchStaleRecordsBtn") ? "Pass" : "Failed", "Master Admin can search and soft-clear stale AI discovery and ShoutOut queue records."],
       ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
       ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
       ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `Latest saved rules smoke test is stale: ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. Run the rules smoke test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]
@@ -3330,6 +3802,10 @@
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
+    byId("searchStaleRecordsBtn")?.addEventListener("click", () => searchStaleRecords());
+    byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
+    byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);
+    byId("clearCachedCrawlsBtn")?.addEventListener("click", clearCachedCrawlRecords);
     byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
     byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
@@ -3345,6 +3821,7 @@
       setText("diagnosticsStatus", "Diagnostics could not start because Firestore is unavailable.");
       return;
     }
+    if (byId("staleRecordAgeDays") && !byId("staleRecordAgeDays").value) byId("staleRecordAgeDays").value = String(STALE_RECORD_DEFAULT_DAYS);
     hydrateDefaultControls();
     if (!state.mounted) {
       state.mounted = true;
@@ -3365,6 +3842,10 @@
     exportDiagnosticsReport,
     extractSourceDetails,
     saveExtractedDiscoveryRecord,
+    searchStaleRecords,
+    removeSelectedStaleRecords,
+    removeAllFoundStaleRecords,
+    clearCachedCrawlRecords,
     DEFAULT_EVENT_TYPES,
     DEFAULT_GENRES,
     DEFAULT_MARKET_LANGUAGE_PLAN
