@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.79-package-hygiene";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.80-location-template-ai";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -576,6 +576,23 @@
         {label:"README documents package hygiene", file:"README.md", includes:["v28.79 Package Hygiene Cleanup", "Future full packages should include only the live `README.md` and the current direct rollback note"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-79.md", includes:["FLOQR Rollback - v28.79 Package Hygiene", "This rollback does not change Firebase Auth"]},
         {label:"Master Admin diagnostics cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=28.79-package-hygiene"]}
+      ]
+    },
+    {
+      version: "v28.80-location-template-ai",
+      title: "Location-Aware ShoutOut and Template AI",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.80-location-template-ai"]},
+        {label:"Patron assets cache-busted", file:"index.html", includes:["styles.css?v=28.80-location-template-ai", "shared-data.js?v=28.80-location-template-ai", "patron-app.js?v=28.80-location-template-ai", "ai-media-service.js?v=28.80-location-template-ai"]},
+        {label:"Location ranking module", file:"ai-location-service.js", includes:["getUserLocationContext", "rankLocationsForUser", "geminiRankLocations", "localRankLocations"]},
+        {label:"Patron search uses location context", file:"patron-app.js", includes:["userLocationContext", "rankLocationsForUser(searched, context)", "locationContextPromise"]},
+        {label:"Heist Houston static data removed", file:"shared-data.js", includes:["FLOQR_OBSOLETE_LOCATION_IDS"], notIncludes:["locationName:\"Heist Houston\"", "brandName:\"Heist Houston\""]},
+        {label:"Seeder marks obsolete location records deleted", file:"seed-app.js", includes:["cleanupObsoleteLocations", "Fictitious Heist Houston record removed from FLOQR package"]},
+        {label:"Gemini ShoutOut suggestion wiring", file:"ai-service.js", includes:["floqrSuggestShoutOutAsync", "aiSuggestShoutOut", "FLOQR_AI_TEMPLATE_HELP_ENABLED"]},
+        {label:"Gemini backend callables", file:"functions/ai-discovery-functions.js", includes:["exports.aiSuggestShoutOut", "exports.aiRankLocations", "GEMINI_TEXT_MODEL"]},
+        {label:"Media upload remove control", file:"patron-app.js", includes:["removeShoutoutMediaBtn", "clearSelectedMedia", "Upload Image or Video"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-80.md", includes:["FLOQR Rollback - v28.80 Location Template AI", "This rollback does not remove user profile data"]},
+        {label:"README documents v28.80", file:"README.md", includes:["v28.80 Location-Aware ShoutOut and Template AI", "Heist Houston", "Browser geolocation", "Gemini contextual ranking"]}
       ]
     }
   ];

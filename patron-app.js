@@ -35,6 +35,7 @@
   let minglConnections = [];
   let activeMinglRoomId = "";
   let templateVariants = {mine:[], community:[]};
+  let locationContextPromise = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -62,6 +63,22 @@
     return "";
   }
   function safeUser() { return (currentUser?.email || currentUser?.phoneNumber || "unknown").toLowerCase(); }
+  async function userLocationContext() {
+    if (!window.FLOQRLocationAI || !currentUser) {
+      return {uid:currentUser?.uid || "", locationSource:"unknown", preferredGenres:[], preferredVenueTypes:[], preferredCities:[], interests:[]};
+    }
+    if (!locationContextPromise) {
+      locationContextPromise = window.FLOQRLocationAI.getUserLocationContext({
+        ...(cachedUserProfile || {}),
+        profile:cachedUserProfile || {},
+        uid:currentUser.uid
+      });
+    }
+    return locationContextPromise;
+  }
+  function resetUserLocationContext() {
+    locationContextPromise = null;
+  }
   function detectRenderContext() {
     const ua = navigator.userAgent || "";
     const width = window.innerWidth || document.documentElement.clientWidth || 0;
@@ -213,7 +230,9 @@
     });
   }
   function visibleLocationEntry([id, loc]) {
-    return loc && loc.active !== false && !isMergedLocation(loc) && String(loc.status || "active") !== "deleted";
+    const obsoleteIds = new Set((window.FLOQR_OBSOLETE_LOCATION_IDS || []).map(value => String(value || "").toLowerCase()));
+    const key = String(id || loc?.id || "").toLowerCase();
+    return loc && !obsoleteIds.has(key) && loc.active !== false && !isMergedLocation(loc) && String(loc.status || "active") !== "deleted";
   }
   async function loadLocations() {
     await loadLocationAliases();
@@ -279,6 +298,7 @@
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
       cachedUserProfile = doc.exists ? doc.data() : null;
+      resetUserLocationContext();
       return cachedUserProfile;
     } catch (e) {
       lastProfileReadError = e;
@@ -1133,7 +1153,10 @@
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.eventsToRecords(events) : Object.entries(events).map(([id,e]) => ({id, data:e, title:e.eventName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
-    const matches = searched
+    const context = await userLocationContext();
+    context.query = s;
+    const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
+    const matches = ranked
       .map(record => [record.id, record.data || events[record.id]])
       .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)));
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching events found.</div>';
@@ -1158,7 +1181,10 @@
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.locationsToRecords(locations) : Object.entries(locations).map(([id,l]) => ({id, data:l, title:l.locationName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
-    const matches = searched.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
+    const context = await userLocationContext();
+    context.query = s;
+    const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
+    const matches = ranked.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
       if (!l) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
       const effectiveType = type.startsWith("club-action:") ? actionBase : type;
@@ -1375,16 +1401,31 @@
     return uploadShoutoutPhoto(referenceNumber);
   }
 
-  function applyAiSuggestion() {
-    const suggestion = window.floqrSuggestShoutOut ? window.floqrSuggestShoutOut({
+  async function applyAiSuggestion(toneOverride = "") {
+    const requestedTone = typeof toneOverride === "string" ? toneOverride : "";
+    const fallbackSuggestion = () => window.floqrSuggestShoutOut ? window.floqrSuggestShoutOut({
       mainText:byId("mainText")?.value || "",
       subText:byId("subText")?.value || "",
       templateId:selectedTemplate,
       clubLocationId:locationId(),
       eventType:getLocation()?.type || "",
-      tone:byId("shoutoutTone")?.value || "party",
+      tone:requestedTone || byId("shoutoutTone")?.value || "party",
       mainLimit:Number(byId("mainText")?.maxLength || 36)
     }) : null;
+    let suggestion = null;
+    try {
+      suggestion = window.floqrSuggestShoutOutAsync ? await window.floqrSuggestShoutOutAsync({
+        mainText:byId("mainText")?.value || "",
+        subText:byId("subText")?.value || "",
+        templateId:selectedTemplate,
+        clubLocationId:locationId(),
+        eventType:getLocation()?.type || "",
+        tone:requestedTone || byId("shoutoutTone")?.value || "party",
+        mainLimit:Number(byId("mainText")?.maxLength || 36)
+      }) : fallbackSuggestion();
+    } catch(e) {
+      suggestion = fallbackSuggestion();
+    }
     const pool = window.SHOUTOUT_AI_SUGGESTIONS || [];
     const item = suggestion || pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
     const mainInput = byId("mainText");
@@ -1393,7 +1434,7 @@
     const box = byId("shoutoutSuggestionBox");
     if (box) {
       box.classList.remove("hidden");
-      box.innerHTML = `<strong>Improve My ShoutOut</strong><p>${esc(item.mainText || item.main)} - ${esc(item.subText || item.sub || "")}</p><small>${esc(item.providerMode || "curated-fallback")}</small>`;
+      box.innerHTML = `<strong>Improve My ShoutOut</strong><p>${esc(item.mainText || item.main)} - ${esc(item.subText || item.sub || "")}</p><small>${esc(item.providerMode || item.provider || "curated-fallback")}</small>`;
       updatePreview();
       return;
     }
@@ -1650,7 +1691,8 @@
     bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
     bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("backToEditorFromConfirmBtn", goToEditor); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", applyAiSuggestion); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("backToEditorFromConfirmBtn", goToEditor); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);
@@ -1803,7 +1845,7 @@ function ensureTemplates(){
 }
 function ensureSuggestions(){
  const host=editorHost(); if(!host||byId("aiSuggestionsBox"))return;
- const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><p class="sub small">Demo suggestions. Full AI backend comes later.</p><div id="aiSuggestionList"></div>`; host.appendChild(box);
+ const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><p class="sub small">Gemini runs through Firebase Functions when enabled; curated suggestions remain available as fallback.</p><div id="aiSuggestionList"></div>`; host.appendChild(box);
  const samples=["Happy Birthday! VIP energy all night.","Big ShoutOut to the table making the night unforgettable.","Bottle service vibes. Celebrate loud.","Tonight belongs to the birthday star.","Luxury entrance. Big celebration. Bigger memories."];
  byId("aiSuggestionList").innerHTML=samples.map(s=>`<button type="button" class="ghost ai-suggestion">${esc(s)}</button>`).join("");
  byId("aiSuggestionList").onclick=e=>{const b=e.target.closest(".ai-suggestion"); if(!b)return; const inp=byId("mainText")||byId("shoutoutText")||document.querySelector("textarea"); if(inp)inp.value=b.textContent;};
@@ -1831,6 +1873,15 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const anchor=(panel&&panel.parentElement===host)?panel:(submit&&submit.parentElement===host)?submit:(status&&status.parentElement===host)?status:null;
     if(card.parentElement!==host||card.nextElementSibling!==anchor) host.insertBefore(card, anchor||null);
   }
+  function clearSelectedMedia(){
+    const input=byId("shoutoutMediaUpload"), preview=byId("shoutoutMediaPreview");
+    if(input) input.value="";
+    if(preview){preview.classList.add("hidden");preview.innerHTML="";}
+    ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl"].forEach(id=>{const el=byId(id);if(el){el.value="";el.dispatchEvent(new Event("input",{bubbles:true}));}});
+    const status=byId("uploadStatus"); if(status)status.textContent="Media removed.";
+    if(window.FLOQRAIMedia?.resetSelection) window.FLOQRAIMedia.resetSelection();
+    if(typeof window.updatePreview==="function") window.updatePreview();
+  }
   function hideLegacyPhotoInput(){
     const legacy=byId("shoutoutPhotoWrap");
     if(legacy) legacy.classList.add("hidden");
@@ -1853,13 +1904,22 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     if(!input){
       card=document.createElement("div");
       card.className="card media-upload-card";
-      card.innerHTML=`<h2>Media Upload</h2><p class="single-media-upload-note">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
+      card.innerHTML=`<h2>Media Upload</h2><p class="single-media-upload-note">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div class="button-row"><button id="removeShoutoutMediaBtn" type="button">Remove file</button></div><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
       placeMediaCard(card);
       input=byId("shoutoutMediaUpload");
+    }
+    if(card&&!byId("removeShoutoutMediaBtn")){
+      const row=document.createElement("div");
+      row.className="button-row";
+      row.innerHTML=`<button id="removeShoutoutMediaBtn" type="button">Remove file</button>`;
+      const preview=byId("shoutoutMediaPreview");
+      card.insertBefore(row, preview||null);
     }
     if(card) placeMediaCard(card);
     input.accept=templateAcceptsMedia();
     input.onchange=renderLiveMediaPreview;
+    const removeBtn=byId("removeShoutoutMediaBtn");
+    if(removeBtn&&!removeBtn.dataset.bound){removeBtn.dataset.bound="1";removeBtn.addEventListener("click",clearSelectedMedia);}
   }
   function getCurrentText(){
     const main=findTextInput(), sub=findSubTextInput();

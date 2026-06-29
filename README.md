@@ -1,15 +1,31 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.79 Package Hygiene Cleanup Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.80 Location-Aware ShoutOut and Template AI Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.79-package-hygiene
+https://jadzadco.github.io/shoutout-demo/?v=28.80-location-template-ai
 ```
 
 Current release highlights:
 
+- Adds v28.80 Location-Aware ShoutOut and Template AI.
+- Adds `ai-location-service.js` with `getUserLocationContext(user)`, `rankLocationsForUser(locations, userContext)`, `geminiRankLocations(locations, userContext)`, and `localRankLocations(locations, userContext)`.
+- Browser geolocation is requested only as an optional ranking signal. If the patron denies geolocation, FLOQR falls back to the signed-in user's own profile/settings city, state/region, country, preferred cities, favorite genres, venue types, and interests.
+- Adds Gemini contextual ranking through the safe Firebase callable `aiRankLocations` when `FLOQR_AI_ENABLED` and Firebase Functions are configured. Local deterministic ranking remains the default fallback.
+- Removes the fictitious Heist Houston test record from static/local club data and seed data. Seeder cleanup now marks obsolete Heist Houston Firestore and AI index records deleted so it does not appear in patron search, contextual search, default recommendations, or club cards.
+- Enables Gemini-ready ShoutOut template help through `floqrSuggestShoutOutAsync` and the backend callable `aiSuggestShoutOut`. The UI keeps curated LED-safe suggestions as fallback and never exposes Gemini API keys in frontend code.
+- Adds tone shortcut buttons for ShoutOut copy help: Birthday, VIP, Romantic, Party, and Classy.
+- Keeps the default ShoutOut template gallery behavior: the first view shows only Traditional Black and White ShoutOut. Search, contextual recommendations, user-owned templates, and community matches reveal other templates.
+- Keeps admin/official template layouts locked. Patrons can customize only backgrounds for saved variants.
+- Improves media-capable templates with one clear `Upload Image or Video` control, `Remove file`, preview, AI media enhancement controls, and first-7-second video trim/warning behavior.
+- Uploaded images and videos continue to use contained mobile previews with `object-fit: contain`, so portrait photos, landscape photos, and videos do not expand out of the editor.
+- Live Preview stays below text inputs, AI suggestions, media upload, AI media enhancement, and submit controls.
+- Adds package diagnostics for location ranking, Gemini ShoutOut help, obsolete Heist cleanup, media remove control, and the current direct rollback file.
+- Keeps package hygiene from v28.79: future full packages should include only the live `README.md` and current direct rollback note.
+- v28.80 test checklist: upload the package, hard-refresh with `?v=28.80-location-template-ai`, confirm Heist Houston is absent from club search, confirm nearby/preferred clubs rank higher, confirm Traditional Black and White ShoutOut is the only default template, search for `birthday template with flowers`, upload portrait/landscape/video media on mobile, remove the selected media, submit a media ShoutOut, approve it, and verify the display page renders the selected media.
+- v28.80 rollback note: use only `ROLLBACK-V28-80.md` for the direct rollback path. The rollback restores the previous package files and does not remove Firebase Auth users, user profiles, ShoutOut history, Mingl data, Bata planning data, guest lists, or uploaded media.
 - Adds the FLOQR AI-ready layer as a contextual platform service instead of isolated one-off AI features.
 - Adds default-off feature flags in `shared-data.js`: `FLOQR_AI_ENABLED`, `FLOQR_AI_PROVIDER`, `FLOQR_AI_FALLBACK_MODE`, `FLOQR_AI_STUDIO_ENABLED`, and `FLOQR_AI_ASSISTANT_ENABLED`.
 - Adds standalone AI modules: `ai-service.js`, `ai-index-service.js`, `ai-search-service.js`, `ai-notification-service.js`, `ai-assistant-ui.js`, `ai-template-studio.js`, `ai-media-service.js`, `ai-discovery-service.js`, and `ai-diagnostics-service.js`.

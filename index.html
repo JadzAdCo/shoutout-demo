@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=28.78-template-media-layout"/>
+  <link rel="stylesheet" href="./styles.css?v=28.80-location-template-ai"/>
 </head>
 <body>
 
@@ -392,6 +392,11 @@
         </label>
         <div class="button-row">
           <button id="aiSuggestBtn" type="button">Improve My ShoutOut</button>
+          <button type="button" data-ai-tone="birthday">Birthday</button>
+          <button type="button" data-ai-tone="vip">VIP</button>
+          <button type="button" data-ai-tone="romantic">Romantic</button>
+          <button type="button" data-ai-tone="party">Party</button>
+          <button type="button" data-ai-tone="classy">Classy</button>
           <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
         </div>
         <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
@@ -418,15 +423,16 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.78-template-media-layout"></script>
-<script src="./ai-service.js?v=28.44-ai"></script>
+<script src="./shared-data.js?v=28.80-location-template-ai"></script>
+<script src="./ai-service.js?v=28.80-location-template-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
+<script src="./ai-location-service.js?v=28.80-location-template-ai"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./patron-app.js?v=28.78-template-media-layout"></script>
+<script src="./patron-app.js?v=28.80-location-template-ai"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
-<script src="./ai-media-service.js?v=28.78-template-media-layout"></script>
+<script src="./ai-media-service.js?v=28.80-location-template-ai"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

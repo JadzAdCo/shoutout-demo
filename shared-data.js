@@ -32,9 +32,13 @@ window.FLOQR_AI_PROVIDER = "firebase-ai-logic";
 window.FLOQR_AI_FALLBACK_MODE = "local-contextual-search";
 window.FLOQR_AI_STUDIO_ENABLED = false;
 window.FLOQR_AI_ASSISTANT_ENABLED = false;
+window.FLOQR_AI_TEMPLATE_HELP_ENABLED = true;
 window.FLOQR_AI_FUNCTIONS_REGION = "us-central1";
 window.FLOQR_AI_GEMINI_MEDIA_FUNCTION = "aiEnhanceShoutOutMedia";
 window.FLOQR_AI_GEMINI_MEDIA_MODEL = "gemini-3.1-flash-image";
+window.FLOQR_AI_LOCATION_RANK_FUNCTION = "aiRankLocations";
+window.FLOQR_AI_SHOUTOUT_SUGGEST_FUNCTION = "aiSuggestShoutOut";
+window.FLOQR_OBSOLETE_LOCATION_IDS = ["heist-houston-tx", "heist-houston", "heist-houston-texas"];
 
 window.SHOUTOUT_ADMIN_EMAILS = [
   "bans.don@gmail.com",
@@ -76,16 +80,6 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     genres:["Hip Hop","Afro Beats","House"], artists:["Resident DJ"],
     activityStatus:"Demo location", activityDates:["Friday Hip Hop","Saturday House"],
     templates:["hiphop","bottle","birthday","fire"], active:true
-  },
-  "heist-houston-tx": {
-    brandName:"Heist", locationName:"Heist Houston", type:"club",
-    country:"United States", regionType:"State", region:"Texas", city:"Houston",
-    locationLabel:"Houston, Texas, United States",
-    brand:"HEIST HOUSTON x FLOQR",
-    defaultMain:"USE SHOUT OUT @ HEIST HOUSTON", defaultSub:"",
-    genres:["Hip Hop","Afro Beats","Amapiano","House"], artists:["DJ H-Town"],
-    activityStatus:"Demo location", activityDates:["Monday Afro Beats","Friday Hip Hop","Saturday International"],
-    templates:["hiphop","bottle","birthday","gold"], active:true
   },
   "shoko-barcelona-spain": {
     brandName:"Shôko", locationName:"Shôko Barcelona", type:"club",

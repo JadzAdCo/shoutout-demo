@@ -560,6 +560,19 @@
     });
   }
 
+  function resetSelection() {
+    selectedFilter = "original";
+    currentDuration = 0;
+    safetyStatus = "notChecked";
+    safetyNotes = "";
+    trimProcessingMode = "";
+    trimWarning = "";
+    ["aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id => setHidden(id, id === "aiTrimStart" ? 0 : ""));
+    setHidden("aiSelectedMediaVersion", "original");
+    setHidden("aiEnhancementType", "none");
+    setPanelStatus("Media removed.");
+  }
+
   function boot() {
     setInterval(() => {
       ensurePanel();
@@ -573,7 +586,8 @@
     FILTERS,
     getSelectedMediaMetadata:metadata,
     validateBeforeUpload:prepareBeforeUpload,
-    trimVideoToFirstSevenSeconds
+    trimVideoToFirstSevenSeconds,
+    resetSelection
   };
   document.addEventListener("DOMContentLoaded", boot);
 })();

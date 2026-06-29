@@ -7,7 +7,8 @@
   const AI_FLAGS = {
     enabled: () => window.FLOQR_AI_ENABLED === true,
     provider: () => window.FLOQR_AI_PROVIDER || "firebase-ai-logic",
-    fallbackMode: () => window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search"
+    fallbackMode: () => window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search",
+    templateHelpEnabled: () => window.FLOQR_AI_TEMPLATE_HELP_ENABLED !== false
   };
 
   const SEARCH_ALIASES = {
@@ -280,6 +281,50 @@
     };
   }
 
+  function functionsClient() {
+    if (!window.firebase?.app || !window.firebase?.functions) return null;
+    const region = window.FLOQR_AI_FUNCTIONS_REGION || "us-central1";
+    try {
+      return firebase.app().functions(region);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function aiSuggestShoutOut(inputs = {}) {
+    const fallback = () => safeShoutOutSuggestion(inputs);
+    if (!AI_FLAGS.templateHelpEnabled()) return fallback();
+    const client = functionsClient();
+    if (!client) return fallback();
+    try {
+      const functionName = window.FLOQR_AI_SHOUTOUT_SUGGEST_FUNCTION || "aiSuggestShoutOut";
+      const callable = client.httpsCallable(functionName);
+      const response = await callable({
+        mainText:String(inputs.mainText || "").slice(0, 120),
+        subText:String(inputs.subText || "").slice(0, 120),
+        templateId:String(inputs.templateId || "").slice(0, 80),
+        clubLocationId:String(inputs.clubLocationId || "").slice(0, 120),
+        eventType:String(inputs.eventType || "").slice(0, 80),
+        tone:String(inputs.tone || "party").slice(0, 40),
+        mainLimit:Number(inputs.mainLimit || 36),
+        subLimit:Number(inputs.subLimit || 60)
+      });
+      const data = response?.data || {};
+      if (!data.mainText && !data.subText) throw new Error("AI suggestion response was empty.");
+      const safeFallback = fallback();
+      return {
+        ...safeFallback,
+        ...data,
+        mainText:restoreProtectedTerms(String(data.mainText || safeFallback.mainText || "").slice(0, Number(inputs.mainLimit || 36))),
+        subText:restoreProtectedTerms(String(data.subText || safeFallback.subText || "").slice(0, Number(inputs.subLimit || 60))),
+        providerMode:data.provider || data.providerMode || "gemini"
+      };
+    } catch (error) {
+      console.warn("FLOQR ShoutOut AI suggestion fallback used:", error?.message || error);
+      return fallback();
+    }
+  }
+
   window.FLOQRAI = {
     protectedTerms: PROTECTED_TERMS,
     normalizeQuery,
@@ -290,11 +335,13 @@
     scoreRecord,
     recordText,
     roleSet,
-    safeShoutOutSuggestion
+    safeShoutOutSuggestion,
+    aiSuggestShoutOut
   };
   window.normalizeQuery = normalizeQuery;
   window.floqrSearch = floqrSearch;
   window.aiSemanticSearch = aiSemanticSearch;
   window.localContextualSearch = localContextualSearch;
   window.floqrSuggestShoutOut = safeShoutOutSuggestion;
+  window.floqrSuggestShoutOutAsync = aiSuggestShoutOut;
 })();
