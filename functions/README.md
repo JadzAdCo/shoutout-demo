@@ -8,6 +8,8 @@ Included functions:
 - Search-results guard. Google/Ticketmaster/Eventbrite directory pages are not saved as approvable discovery records; the crawler must use a final event/venue detail URL or official API detail data.
 - `aiExtractPublicSourceUrl`, which fetches a public source URL server-side, parses Eventbrite/Ticketmaster/venue metadata where available, extracts JSON-LD event data, and returns a structured `aiDiscoveryQueue`-ready record.
 - `aiEnhanceShoutOutMedia`, which checks Firebase Auth, verifies the requested Storage path is owned by the signed-in user, calls Gemini image editing with the server-side `GEMINI_API_KEY` secret, stores the enhanced image under `shoutouts/{uid}/{reference}/enhanced/`, and returns structured media metadata.
+- `aiSuggestShoutOut`, which uses Gemini text generation through the same server-side secret to return LED-safe ShoutOut copy, with curated fallback if Gemini is unavailable.
+- `aiRankLocations`, which ranks public club/event/location results using the signed-in user's own non-sensitive location and preference context, with deterministic fallback if Gemini is unavailable.
 - HTTPS callable AI/search placeholders for app integration points.
 
 Supported discovery targets include Ticketmaster, Eventbrite, approved resale partners, official venue/feed pages, nightclubs, lounges, rooftop lounges, rooftop bars, beach clubs, brunch parties, pool parties, summer parties, DJ events, promoter events, comedy shows, Latin music, Arabic music, and ticket resale opportunities.
@@ -23,7 +25,7 @@ Run these commands from the package/repo root where `firebase.json` is located:
 ```bash
 firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402
 npm.cmd --prefix functions install
-firebase deploy --only functions:aiEnhanceShoutOutMedia
+firebase deploy --only functions:aiEnhanceShoutOutMedia,functions:aiSuggestShoutOut,functions:aiRankLocations
 ```
 
 If `GEMINI_API_KEY` does not exist yet, set it before deployment:
@@ -32,6 +34,6 @@ If `GEMINI_API_KEY` does not exist yet, set it before deployment:
 firebase functions:secrets:set GEMINI_API_KEY
 ```
 
-The default image model is `gemini-3.1-flash-image`. To override it in backend runtime configuration, set `FLOQR_GEMINI_IMAGE_MODEL`.
+The default image model is `gemini-3.1-flash-image`. The default text model is `gemini-2.5-flash`. To override them in backend runtime configuration, set `FLOQR_GEMINI_IMAGE_MODEL` and `FLOQR_GEMINI_TEXT_MODEL`.
 
 After deployment, run Master Admin > Diagnostics. `ShoutOut: Media AI panel` passes only when the callable responds in diagnostic mode and the secret is available.

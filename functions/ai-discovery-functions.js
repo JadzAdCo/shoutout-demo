@@ -15,6 +15,7 @@ const db = admin.firestore();
 const MAX_SOURCE_BYTES = 750000;
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
+const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-2.5-flash";
 const MAX_GEMINI_IMAGE_BYTES = 8 * 1024 * 1024;
 
 const MONTHS = {
@@ -472,8 +473,16 @@ async function writeDiscoveryQueueItem(record) {
   return ref.id;
 }
 
+function optionalGeminiSecretValue() {
+  try {
+    return GEMINI_API_KEY.value() || process.env.GEMINI_API_KEY || "";
+  } catch (error) {
+    return process.env.GEMINI_API_KEY || "";
+  }
+}
+
 function geminiSecretValue() {
-  const value = GEMINI_API_KEY.value() || process.env.GEMINI_API_KEY || "";
+  const value = optionalGeminiSecretValue();
   if (!value) {
     throw new HttpsError(
       "failed-precondition",
@@ -481,6 +490,99 @@ function geminiSecretValue() {
     );
   }
   return value;
+}
+
+function clampText(value = "", max = 80) {
+  return String(value || "")
+    .replace(/[^\p{L}\p{N} @!?.'&:-]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+
+function preserveProtectedTerms(value = "") {
+  let out = String(value || "");
+  ["FLOQR", "ShoutOut", "Mingl", "Bata"].forEach(term => {
+    out = out.replace(new RegExp(term, "ig"), term);
+  });
+  return out;
+}
+
+function fallbackShoutOutSuggestion(data = {}) {
+  const tone = normalized(data.tone || "party");
+  const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
+  const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
+  const options = [
+    {tone:"vip", mainText:"VIP ShoutOut IN THE BUILDING", subText:"Luxury energy all night."},
+    {tone:"funny", mainText:"BIG ShoutOut TO THE TABLE", subText:"They came to celebrate."},
+    {tone:"romantic", mainText:"LOVE IS IN THE ROOM", subText:"A perfect night for two."},
+    {tone:"birthday", mainText:"HAPPY BIRTHDAY", subText:"Your ShoutOut moment is live."},
+    {tone:"classy", mainText:"TONIGHT IS YOUR NIGHT", subText:"Elegant, bright, unforgettable."},
+    {tone:"party", mainText:"THE PARTY STARTS HERE", subText:"Big ShoutOut energy."},
+    {tone:"corporate", mainText:"WELCOME TO THE CELEBRATION", subText:"A polished ShoutOut moment."},
+    {tone:"graduation", mainText:"CONGRATS GRAD", subText:"The future starts tonight."}
+  ];
+  const picked = options.find(item => tone.includes(item.tone)) || options[5];
+  return {
+    mainText:preserveProtectedTerms(clampText(data.mainText || picked.mainText, mainLimit)),
+    subText:preserveProtectedTerms(clampText(picked.subText, subLimit)),
+    tone:picked.tone,
+    provider:"curated-fallback",
+    providerMode:"curated-fallback",
+    safetyStatus:"passed"
+  };
+}
+
+function extractJsonObject(text = "") {
+  const clean = String(text || "").trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```$/i, "").trim();
+  try { return JSON.parse(clean); } catch (error) {}
+  const match = clean.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try { return JSON.parse(match[0]); } catch (error) { return null; }
+}
+
+async function callGeminiJson(prompt, schemaHint = "") {
+  const apiKey = optionalGeminiSecretValue();
+  if (!apiKey) return null;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_TEXT_MODEL)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const response = await fetch(endpoint, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      contents:[{role:"user", parts:[{text:prompt}]}],
+      generationConfig:{
+        responseMimeType:"application/json",
+        temperature:0.35
+      }
+    })
+  });
+  const bodyText = await response.text();
+  let payload = {};
+  try { payload = bodyText ? JSON.parse(bodyText) : {}; } catch (error) {}
+  if (!response.ok) {
+    const message = payload?.error?.message || bodyText || `Gemini returned HTTP ${response.status}`;
+    throw new HttpsError("failed-precondition", `${schemaHint || "Gemini JSON"} failed: ${message}`);
+  }
+  const text = payload?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("\n") || "";
+  return extractJsonObject(text);
+}
+
+function locationRankFallback(locations = [], userContext = {}) {
+  const hay = value => normalized(Array.isArray(value) ? value.join(" ") : value);
+  const city = normalized(userContext.city);
+  const country = normalized(userContext.country);
+  const prefs = hay([userContext.preferredGenres, userContext.preferredVenueTypes, userContext.preferredCities, userContext.interests]);
+  return [...locations].map((item, index) => {
+    const data = item.data || item;
+    const text = hay([data.locationName, data.brandName, data.city, data.country, data.genres, data.categories, data.type, data.description]);
+    let score = Math.max(0, 1000 - index) / 1000;
+    if (city && normalized(data.city) === city) score += 80;
+    if (country && normalized(data.country) === country) score += 20;
+    prefs.split(/\s+/).filter(Boolean).forEach(token => {
+      if (token.length > 2 && text.includes(token)) score += 4;
+    });
+    return {id:String(item.id || data.id || ""), score};
+  }).sort((a, b) => b.score - a.score).map(item => item.id).filter(Boolean);
 }
 
 function assertOwnedOriginalShoutOutMediaPath(path = "", uid = "") {
@@ -694,9 +796,101 @@ exports.aiEnhanceShoutOutMedia = onCall({
   };
 });
 
-exports.aiSuggestShoutOut = functions.https.onCall(async (data, context) => {
-  if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Sign in required.");
-  return {mainText:String(data?.mainText || "BIG ShoutOut").slice(0, 36), subText:"Curated fallback until Gemini is configured.", safetyStatus:"passed"};
+exports.aiSuggestShoutOut = onCall({
+  region:"us-central1",
+  secrets:[GEMINI_API_KEY],
+  timeoutSeconds:45,
+  memory:"512MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const data = request.data || {};
+  const fallback = fallbackShoutOutSuggestion(data);
+  if (!optionalGeminiSecretValue()) return fallback;
+  const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
+  const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
+  const prompt = [
+    "You are FLOQR AI helping write public LED-safe ShoutOut copy.",
+    "Return only JSON with keys: mainText, subText, tone, safetyStatus.",
+    `mainText must be ${mainLimit} characters or fewer. subText must be ${subLimit} characters or fewer.`,
+    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those terms.",
+    "Do not include offensive, explicit, hateful, illegal, private, payment, or sensitive personal data.",
+    "Keep the copy suitable for a public nightlife display.",
+    `Tone: ${clampText(data.tone || "party", 40)}`,
+    `Current main text: ${clampText(data.mainText || "", 120)}`,
+    `Current sub text: ${clampText(data.subText || "", 120)}`,
+    `Template id: ${clampText(data.templateId || "", 80)}`,
+    `Venue/event type: ${clampText(data.eventType || "", 80)}`
+  ].join("\n");
+  try {
+    const json = await callGeminiJson(prompt, "ShoutOut suggestion");
+    return {
+      mainText:preserveProtectedTerms(clampText(json?.mainText || fallback.mainText, mainLimit)),
+      subText:preserveProtectedTerms(clampText(json?.subText || fallback.subText, subLimit)),
+      tone:clampText(json?.tone || data.tone || fallback.tone, 40),
+      provider:"gemini",
+      providerMode:"gemini",
+      model:GEMINI_TEXT_MODEL,
+      safetyStatus:json?.safetyStatus === "flagged" ? "flagged" : "passed"
+    };
+  } catch (error) {
+    console.warn("Gemini ShoutOut suggestion fallback:", error.message);
+    return fallback;
+  }
+});
+
+exports.aiRankLocations = onCall({
+  region:"us-central1",
+  secrets:[GEMINI_API_KEY],
+  timeoutSeconds:45,
+  memory:"512MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const locations = Array.isArray(request.data?.locations) ? request.data.locations.slice(0, 80) : [];
+  const userContext = request.data?.userContext || {};
+  const fallbackIds = locationRankFallback(locations, userContext);
+  if (!optionalGeminiSecretValue() || locations.length < 2) {
+    return {rankedIds:fallbackIds, provider:"local-fallback"};
+  }
+  const compactLocations = locations.map(item => {
+    const data = item.data || item;
+    return {
+      id:String(item.id || data.id || "").slice(0, 120),
+      name:clampText(data.locationName || data.brandName || data.name || "", 90),
+      city:clampText(data.city || "", 60),
+      country:clampText(data.country || "", 60),
+      type:clampText(data.type || "", 50),
+      genres:Array.isArray(data.genres) ? data.genres.slice(0, 8).map(value => clampText(value, 40)) : []
+    };
+  });
+  const safeContext = {
+    city:clampText(userContext.city || "", 60),
+    stateRegion:clampText(userContext.stateRegion || "", 60),
+    country:clampText(userContext.country || "", 60),
+    preferredGenres:Array.isArray(userContext.preferredGenres) ? userContext.preferredGenres.slice(0, 12).map(value => clampText(value, 40)) : [],
+    preferredVenueTypes:Array.isArray(userContext.preferredVenueTypes) ? userContext.preferredVenueTypes.slice(0, 12).map(value => clampText(value, 40)) : [],
+    preferredCities:Array.isArray(userContext.preferredCities) ? userContext.preferredCities.slice(0, 12).map(value => clampText(value, 40)) : [],
+    interests:Array.isArray(userContext.interests) ? userContext.interests.slice(0, 12).map(value => clampText(value, 40)) : [],
+    locationSource:clampText(userContext.locationSource || "unknown", 30)
+  };
+  const prompt = [
+    "You are FLOQR AI ranking public venue/event results for the signed-in user.",
+    "Use only this provided public venue data and this user's own non-sensitive preference context.",
+    "Return only JSON: {\"rankedIds\":[\"id1\",\"id2\"]}. Include every id exactly once.",
+    "Prioritize nearby city/country matches, preferred genres, preferred venue types, and interests.",
+    `User context JSON: ${JSON.stringify(safeContext)}`,
+    `Locations JSON: ${JSON.stringify(compactLocations)}`
+  ].join("\n");
+  try {
+    const json = await callGeminiJson(prompt, "Location ranking");
+    const ids = Array.isArray(json?.rankedIds) ? json.rankedIds.map(String) : [];
+    const allowed = new Set(compactLocations.map(item => item.id));
+    const clean = ids.filter(id => allowed.has(id));
+    const missing = compactLocations.map(item => item.id).filter(id => !clean.includes(id));
+    return {rankedIds:[...clean, ...missing], provider:"gemini", model:GEMINI_TEXT_MODEL};
+  } catch (error) {
+    console.warn("Gemini location ranking fallback:", error.message);
+    return {rankedIds:fallbackIds, provider:"local-fallback"};
+  }
 });
 
 exports.aiGenerateTemplateBackground = functions.https.onCall(async (data, context) => {
