@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.64 Natural-Language Crawl Review Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.65 Source Detail Extraction Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.64-natural-language-crawl-review
+https://jadzadco.github.io/shoutout-demo/?v=28.65-source-detail-extraction
 ```
 
 Current release highlights:
@@ -61,7 +61,10 @@ Current release highlights:
 - Expands crawl requests into structured search jobs with city, country, language, genre, event type, query, and required datapoints. The example above creates eight search jobs: Hip Hop and EDM across Paris, Marseille, Monaco, and Saint-Tropez.
 - Replaces confusing discovery queue output with review cards showing record type, name, description, address, phone, website/source, ticket link, city/country, categories, genres, missing required datapoints, and source-search links.
 - Blocks approval of crawler-discovered clubs, lounges, rooftop bars, beach clubs, events, and comedy shows until required datapoints are filled.
-- Adds optional backend scaffold under `functions/` for scheduled discovery and callable Gemini/Firebase AI Logic integration. This is not required by GitHub Pages.
+- Adds Source Detail Extraction under Master Admin > AI Crawling. After opening a Google/Eventbrite/Ticketmaster/resale/venue result, Master Admin can paste the final source URL and copied page details, extract real datapoints, and save a proper review record.
+- Adds Firebase callable `aiExtractPublicSourceUrl` for server-side public URL extraction. When deployed, it can fetch public Eventbrite/source pages, parse JSON-LD/metadata/text, and return structured review records that include date, time, address, ticket URL, source URL, categories, and missing-datapoint status.
+- Explains the v28.64 miss: FLOQR generated a source-search URL but did not follow the Eventbrite page, so it could not extract visible details such as `30 Crosford Road Singapore 499550`.
+- Adds deployable `functions/index.js` and `functions/package.json` for the FLOQR AI functions folder.
 
 ## FLOQR AI Architecture
 
@@ -79,6 +82,8 @@ Live in this package:
 - ShoutOut copy improvement fallback.
 - ShoutOut media enhancement preview metadata and first-7-second video trim metadata.
 - Super Admin discovery review and listing soft-delete UI on Master Admin > AI Crawling.
+- Source Detail Extraction for followed Eventbrite, Ticketmaster, resale, venue, and comedy pages.
+- Deployable Firebase callable `aiExtractPublicSourceUrl` for server-side public page extraction.
 - Master Admin Diagnostics feature matrix, package checks, rules smoke test, and TXT export.
 - Master Admin > AI Crawling page for crawler controls, crawl activity reports, consolidated collected-record analytics, manual crawl queue seeding, and AI Crawler Profile Import.
 - Master Admin Package Install Diagnostics grouped by package version.
@@ -86,12 +91,12 @@ Live in this package:
 - Master Admin Diagnostics TXT export for sharing failure reports and fix prompts.
 - Public profile language mode and English translation metadata in Settings.
 
-Scaffolded for later Firebase AI / Gemini configuration:
+Requires Firebase AI / Gemini configuration for live generative AI:
 
 - Semantic AI search provider calls.
 - Gemini media understanding and moderation notes.
 - AI background image generation/modification.
-- Scheduled crawler execution through Firebase Cloud Functions or Cloud Run.
+- Scheduled crawler execution through Firebase Cloud Functions or Cloud Run. The source URL extractor function is included in `functions/` and can be deployed with Firebase Functions.
 - Backend video trimming with ffmpeg or approved AI/video processor for browsers that cannot create a client-side trim.
 - Email/SMS notification delivery.
 - Live AI translation of public profile text.
@@ -174,6 +179,8 @@ Open Master Admin > AI Crawling to manage crawler setup and crawler-derived data
 - Crawler search criteria including search text, genres, languages, cities, regions, countries, event types, and market/language plans.
 - Schedule settings for every 4 hours, six times daily, daily, or manual-only mode.
 - Manual crawl button that writes `aiCrawlRuns` and review-only `aiDiscoveryQueue` records with required datapoint checklists and source-search links.
+- Source Detail Extraction. Paste the final Eventbrite/Ticketmaster/resale/venue source URL and copied page details, click `Extract Source Details`, then save the extracted review record into `aiDiscoveryQueue`.
+- Firebase source extraction. If `aiExtractPublicSourceUrl` is deployed, FLOQR fetches the public page server-side and extracts JSON-LD/metadata/text. If the callable is unavailable, the page still parses pasted source details locally.
 - Crawl activity reports, consolidated collected discovery records, and analytics insights such as status mix, cities, countries, genres/tags, sources, star ratings, high-value candidates, and market gaps.
 - Duplicate destination consolidation. Matching clubs/events are grouped by normalized name, city, country, and destination type.
 - The consolidated report consolidates duplicate clubs/events so the same destination does not appear as separate records with conflicting addresses.
@@ -183,7 +190,7 @@ Open Master Admin > AI Crawling to manage crawler setup and crawler-derived data
 
 The import workflow does not overwrite existing club profile values. Master Admin import applies missing fields only. Club Admin import links prefill the public profile editor and require the Club Admin to review and click Save Public Profile.
 
-Real internet crawling must run in backend code using Firebase scheduled functions or Cloud Run. The backend crawler should validate official APIs and public source terms, handle robots.txt, deduplicate records, classify event/venue type, rate records from Super Admin criteria, and write only to `aiDiscoveryQueue`.
+Automatic internet crawling runs in backend code using Firebase scheduled functions or Cloud Run. The package includes Firebase callable source extraction for public URL detail parsing. The scheduled crawler should validate official APIs and public source terms, handle robots.txt, deduplicate records, classify event/venue type, rate records from Super Admin criteria, and write only to `aiDiscoveryQueue`.
 
 ## Public Profile Language
 
@@ -315,9 +322,11 @@ Test plan:
 - Review the discovery queue under Master Admin > AI Crawling, approve a queue item, soft delete a listing, and restore it.
 - On Master Admin > AI Crawling, enter `search for all clubs playing hip hop and EDM in Paris, Marseille, Monaco, St. Tropez, France`, click `Build Search Plan`, and confirm eight search jobs are shown.
 - Click `Create Crawl Review Records` and confirm the created review cards show name, description, address, phone, website/source, ticket link, city/country, categories, genres, missing required datapoints, and source-search links.
+- Paste an Eventbrite source URL and copied page details into Source Detail Extraction, click `Extract Source Details`, and confirm title/date/time/address/source fields are parsed into the preview.
+- Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, v28.62, v28.63, and v28.64 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, v28.62, v28.63, v28.64, and v28.65 package marker checks run.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.

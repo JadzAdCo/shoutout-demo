@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.64 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.65 */
 (function () {
   "use strict";
 
@@ -13,6 +13,7 @@
     lastData: {},
     lastSchedule: null,
     lastCrawlPlan: null,
+    lastExtractedSourceRecord: null,
     lastFeatures: [],
     lastPackageDiagnostics: [],
     lastRulesSmokeResults: []
@@ -27,7 +28,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.64-natural-language-crawl-review";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.65-source-detail-extraction";
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -130,6 +131,21 @@
     sweden:"Swedish",
     finland:"Finnish, Swedish",
     iceland:"Icelandic, English"
+  };
+
+  const MONTHS = {
+    jan: "01", january: "01",
+    feb: "02", february: "02",
+    mar: "03", march: "03",
+    apr: "04", april: "04",
+    may: "05",
+    jun: "06", june: "06",
+    jul: "07", july: "07",
+    aug: "08", august: "08",
+    sep: "09", sept: "09", september: "09",
+    oct: "10", october: "10",
+    nov: "11", november: "11",
+    dec: "12", december: "12"
   };
 
   const COLLECTIONS = [
@@ -374,6 +390,18 @@
         {label:"Review card required datapoints", file:"ai-discovery-service.js", includes:["requiredDatapoints", "Missing required datapoints", "Cannot approve yet"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.64-natural-language-crawl-review"]},
         {label:"README natural-language crawl note", file:"README.md", includes:["Plain-English crawl input", "required datapoints"]}
+      ]
+    },
+    {
+      version: "v28.65-source-detail-extraction",
+      title: "Source Detail Extraction",
+      checks: [
+        {label:"Source extraction UI", file:"master-admin.html", includes:["sourceExtractUrl", "Extract Source Details", "Save Extracted Review Record"]},
+        {label:"Frontend source parser", file:"ai-diagnostics-service.js", includes:["extractSourceDetailsFromText", "saveExtractedDiscoveryRecord", "sourceExtractionReport"]},
+        {label:"Backend source extractor", file:"functions/ai-discovery-functions.js", includes:["aiExtractPublicSourceUrl", "extractDiscoveryRecordFromHtml", "application\\/ld\\+json"]},
+        {label:"Firebase Functions compat script", file:"master-admin.html", includes:["firebase-functions-compat.js"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.65-source-detail-extraction"]},
+        {label:"README source extraction explanation", file:"README.md", includes:["Source Detail Extraction", "Eventbrite"]}
       ]
     }
   ];
@@ -620,6 +648,192 @@
       return ["name", "description", "address", "city", "country", "telephone", "officialWebsite", "sourceUrl", "categories", "genres"];
     }
     return ["name", "description", "locationName", "address", "city", "country", "telephone", "sourceUrl", "ticketUrl", "categories", ...(isComedyEventType(type) ? ["date", "time"] : [])];
+  }
+
+  function sourceHost(sourceUrl = "") {
+    try {
+      return new URL(sourceUrl).hostname.replace(/^www\./, "");
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function sourceNameForUrl(sourceUrl = "") {
+    const host = sourceHost(sourceUrl);
+    if (/eventbrite/i.test(host)) return "Eventbrite";
+    if (/ticketmaster/i.test(host)) return "Ticketmaster";
+    if (/google/i.test(host)) return "Google public search";
+    return host || "Public source";
+  }
+
+  function titleCase(value = "") {
+    return String(value || "").toLowerCase().replace(/\b[a-z]/g, char => char.toUpperCase()).replace(/\bDj\b/g, "DJ").replace(/\bEdm\b/g, "EDM");
+  }
+
+  function titleFromSourceUrl(sourceUrl = "") {
+    try {
+      const url = new URL(sourceUrl);
+      const parts = url.pathname.split("/").filter(Boolean);
+      const eventSegment = parts.includes("e") ? parts[parts.indexOf("e") + 1] : parts[parts.length - 1] || "";
+      const clean = decodeURIComponent(eventSegment)
+        .replace(/-tickets-\d+.*$/i, "")
+        .replace(/-\d{8,}.*$/i, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return clean ? titleCase(clean) : "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function extractDate(value = "") {
+    const text = String(value || "");
+    const dayMonth = text.match(/\b(\d{1,2})\s+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{4})\b/i);
+    if (dayMonth) return `${dayMonth[3]}-${MONTHS[normalized(dayMonth[2])] || "01"}-${String(dayMonth[1]).padStart(2, "0")}`;
+    const monthDay = text.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2}),?\s+(\d{4})\b/i);
+    if (monthDay) return `${monthDay[3]}-${MONTHS[normalized(monthDay[1])] || "01"}-${String(monthDay[2]).padStart(2, "0")}`;
+    const iso = text.match(/\b(20\d{2})-(\d{2})-(\d{2})\b/);
+    return iso ? iso[0] : "";
+  }
+
+  function extractTime(value = "") {
+    const match = String(value || "").match(/\b([01]?\d|2[0-3]):([0-5]\d)\s*(AM|PM)\b/i);
+    return match ? `${match[1]}:${match[2]} ${match[3].toUpperCase()}` : "";
+  }
+
+  function extractEmail(value = "") {
+    const match = String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+    return match ? match[0] : "";
+  }
+
+  function extractPhone(value = "") {
+    const matches = String(value || "").match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
+    const phone = matches.find(item => {
+      const digits = item.replace(/\D/g, "");
+      return digits.length >= 8 && digits.length <= 15 && !/^\d{6}$/.test(digits);
+    });
+    return phone ? phone.trim() : "";
+  }
+
+  function extractAddress(value = "") {
+    const text = String(value || "").replace(/\s+/g, " ");
+    const singapore = text.match(/\b(\d{1,5}\s+[A-Z0-9][A-Z0-9 .'-]+?(?:ROAD|RD|STREET|ST|AVENUE|AVE|LANE|LN|DRIVE|DR|BOULEVARD|BLVD|CRESCENT|CRES|WAY|PLACE|PLAZA|QUAY|WALK|CLOSE)\s*(?:SINGAPORE)?\s*\d{6})\b/i);
+    if (singapore) return singapore[1].replace(/\s+/g, " ").trim();
+    const general = text.match(/\b(\d{1,6}\s+[A-Z0-9][A-Z0-9 .'-]+?(?:ROAD|RD|STREET|ST|AVENUE|AVE|LANE|LN|DRIVE|DR|BOULEVARD|BLVD|CRESCENT|CRES|WAY|PLACE|PLAZA|QUAY|WALK|CLOSE))\b/i);
+    return general ? general[1].replace(/\s+/g, " ").trim() : "";
+  }
+
+  function extractCityCountryFromSource(sourceUrl = "", text = "") {
+    const combined = `${sourceUrl} ${text}`;
+    const market = detectMarketsFromText(combined)[0];
+    if (market) return {city: market.city, country: market.country, stateRegion: market.region, language: market.language};
+    const host = sourceHost(sourceUrl);
+    if (host.endsWith(".sg") || includesWord(combined, "Singapore")) return {city:"Singapore", country:"Singapore", stateRegion:"Singapore", language:"English, Mandarin, Malay, Tamil"};
+    return {city:"", country:"", stateRegion:"", language:""};
+  }
+
+  function descriptionFromSourceText(text = "", title = "") {
+    const lines = String(text || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const useful = lines.filter(line => !line.match(/^(sign in|find events|create events|updates|help centre|search)$/i));
+    const description = useful.find(line => line.length > 40 && !line.includes(title)) || useful.slice(0, 3).join(" ");
+    return String(description || title || "Public-source event or venue discovery record.").slice(0, 500);
+  }
+
+  function sourceRecordMissingDatapoints(record = {}) {
+    const required = requiredDatapointLabels(record.proposedType || "");
+    const has = {
+      name: !!record.proposedTitle,
+      description: !!record.proposedDescription,
+      locationName: !!record.proposedLocationName,
+      address: !!record.proposedAddress,
+      city: !!record.city,
+      country: !!record.country,
+      telephone: !!(record.telephone || record.phone),
+      officialWebsite: !!(record.officialWebsite || record.website || record.sourceUrl),
+      sourceUrl: !!record.sourceUrl,
+      ticketUrl: !!record.ticketUrl,
+      categories: !!(record.categories || []).length,
+      genres: !!(record.genres || []).length,
+      date: !!record.proposedDate,
+      time: !!record.proposedTime
+    };
+    return required.filter(key => !has[key]).map(key => ({
+      name:"Name",
+      description:"Description",
+      locationName:"Location name",
+      address:"Address",
+      city:"City",
+      country:"Country",
+      telephone:"Phone",
+      officialWebsite:"Official website",
+      sourceUrl:"Source URL",
+      ticketUrl:"Ticket URL",
+      categories:"Categories",
+      genres:"Genres",
+      date:"Date",
+      time:"Time"
+    }[key] || key));
+  }
+
+  function extractSourceDetailsFromText(sourceUrl = "", sourceText = "") {
+    const text = String(sourceText || "");
+    const fromUrl = titleFromSourceUrl(sourceUrl);
+    const titleLine = text.split(/\r?\n/).map(line => line.trim()).find(line => /show|club|lounge|party|tickets?|event/i.test(line) && line.length >= 8 && line.length <= 120);
+    const title = titleLine || fromUrl || "Public source discovery";
+    const market = extractCityCountryFromSource(sourceUrl, text);
+    const proposedType = /comedy|stand.?up/i.test(`${title} ${text} ${sourceUrl}`) ? "comedyShow" : eventTypeToProposedType(`${title} ${text}`);
+    const genres = proposedType === "comedyShow" ? ["Comedy", "Live Entertainment"] : detectGenresFromText(`${title} ${text}`);
+    const categories = uniqueByNormalized([
+      proposedType === "comedyShow" ? "comedy show" : proposedType,
+      "public-source-extracted",
+      /ticket|eventbrite|ticketmaster/i.test(`${sourceUrl} ${text}`) ? "ticketing" : ""
+    ]);
+    const record = {
+      proposedType,
+      proposedTitle:title,
+      proposedDescription:descriptionFromSourceText(text, title),
+      proposedDate:extractDate(text),
+      proposedTime:extractTime(text),
+      proposedLocationName:title,
+      proposedAddress:extractAddress(text),
+      city:market.city,
+      stateRegion:market.stateRegion,
+      country:market.country,
+      officialWebsite:sourceUrl,
+      website:sourceUrl,
+      email:extractEmail(text),
+      telephone:extractPhone(text),
+      phone:extractPhone(text),
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      ticketUrl:sourceUrl,
+      sourceUrl,
+      sourceName:sourceNameForUrl(sourceUrl),
+      sourceSearchLinks:sourceUrl ? [{label:"Source page", href:sourceUrl}] : [],
+      extractedImages:[],
+      extractedTags:categories,
+      categories,
+      genres,
+      searchLanguage:market.language || "",
+      searchQuery:title,
+      aiSummary:"Extracted from a followed public source page. Master Admin must verify before approval.",
+      aiConfidenceScore: text ? 0.84 : 0.62,
+      aiStarRating: text ? 4 : 3,
+      aiRatingReasons:[
+        "Parsed from followed public source details",
+        "Contains source URL for review",
+        "Approval remains blocked until required datapoints are complete"
+      ],
+      duplicateCandidateIds:[],
+      status:"pendingReview",
+      discoveryMode:"source-detail-extraction",
+      extractionMethod:text ? "pasted-source-details" : "source-url-slug",
+      createdAt:fieldValue(),
+      updatedAt:fieldValue()
+    };
+    record.missingDatapoints = sourceRecordMissingDatapoints(record);
+    record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    return record;
   }
 
   function proposedFamily(item = {}) {
@@ -1936,6 +2150,95 @@
     return plan;
   }
 
+  function renderSourceExtractionReport(record = state.lastExtractedSourceRecord) {
+    const wrap = byId("sourceExtractionReport");
+    if (!wrap) return;
+    if (!record) {
+      wrap.innerHTML = "<p class='sub'>No source details extracted yet.</p>";
+      return;
+    }
+    const rows = [
+      ["Name", record.proposedTitle || "-"],
+      ["Type", record.proposedType || "-"],
+      ["Date", record.proposedDate || "-"],
+      ["Time", record.proposedTime || "-"],
+      ["Address", record.proposedAddress || "-"],
+      ["City / country", [record.city, record.country].filter(Boolean).join(", ") || "-"],
+      ["Phone", record.telephone || record.phone || "-"],
+      ["Source", record.sourceName || record.sourceUrl || "-"],
+      ["Missing datapoints", (record.missingDatapoints || []).join(", ") || "None"]
+    ];
+    wrap.innerHTML = `${simpleRows(rows)}<div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>${esc(record.proposedTitle || "Extracted source")}</strong>
+        ${statusBadge((record.missingDatapoints || []).length ? "Soft Fail" : "Pass")}
+      </div>
+      <p>${esc(record.proposedDescription || record.aiSummary || "")}</p>
+      <p class="sub small">Categories: ${esc(joinList(record.categories) || "-")} | Genres/tags: ${esc(joinList(record.genres) || "-")}</p>
+      ${record.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(record.sourceUrl)}">Open Source</a>` : ""}
+    </div>`;
+  }
+
+  async function tryBackendSourceExtraction(sourceUrl, sourceText) {
+    if (!sourceUrl || !window.firebase?.functions) return null;
+    try {
+      const callable = firebase.app().functions().httpsCallable("aiExtractPublicSourceUrl");
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Backend extractor timeout")), 9000));
+      const result = await Promise.race([callable({sourceUrl, sourceText}), timeout]);
+      return result?.data?.record || null;
+    } catch (error) {
+      console.warn("Backend source extractor unavailable:", error?.message || error);
+      return null;
+    }
+  }
+
+  async function extractSourceDetails() {
+    const sourceUrl = byId("sourceExtractUrl")?.value.trim() || "";
+    const sourceText = byId("sourceExtractText")?.value.trim() || "";
+    if (!sourceUrl && !sourceText) {
+      setText("diagnosticsStatus", "Paste a source URL or copied source page details first.");
+      return null;
+    }
+    setText("diagnosticsStatus", "Extracting source details...");
+    const backendRecord = await tryBackendSourceExtraction(sourceUrl, sourceText);
+    const localRecord = extractSourceDetailsFromText(sourceUrl, sourceText);
+    const record = {
+      ...localRecord,
+      ...(backendRecord || {}),
+      sourceUrl: backendRecord?.sourceUrl || localRecord.sourceUrl,
+      sourceName: backendRecord?.sourceName || localRecord.sourceName,
+      createdAt: fieldValue(),
+      updatedAt: fieldValue()
+    };
+    record.missingDatapoints = sourceRecordMissingDatapoints(record);
+    record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    state.lastExtractedSourceRecord = record;
+    renderSourceExtractionReport(record);
+    setText("diagnosticsStatus", backendRecord
+      ? "Source details extracted with Firebase backend and prepared for review."
+      : "Source details extracted locally from pasted URL/details and prepared for review.");
+    return record;
+  }
+
+  async function saveExtractedDiscoveryRecord() {
+    if (!state.db) return;
+    const record = state.lastExtractedSourceRecord || await extractSourceDetails();
+    if (!record) return;
+    await state.db.collection("aiDiscoveryQueue").add({
+      ...record,
+      createdByUid: state.auth?.currentUser?.uid || "",
+      createdByEmail: state.auth?.currentUser?.email || "",
+      createdAt: fieldValue(),
+      updatedAt: fieldValue()
+    });
+    setText("diagnosticsStatus", `Saved extracted review record for ${record.proposedTitle || "source"} to aiDiscoveryQueue.`);
+    state.lastExtractedSourceRecord = null;
+    renderSourceExtractionReport(null);
+    if (byId("sourceExtractText")) byId("sourceExtractText").value = "";
+    await refreshDiagnostics();
+    if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
+  }
+
   function marketForCity(city) {
     const market = marketForCityName(city);
     return market ? {country: market.country, language: market.language, region: market.region} : {country: "", language: "", region: ""};
@@ -2627,6 +2930,7 @@
       ["AI Crawling", "Approve/reject/delete review tools", hasDiscovery ? "Pass" : "Failed", hasDiscovery ? "Discovery review tools are mounted on the AI Crawling tab." : "FLOQRAIDiscovery module was not loaded."],
       ["AI Crawling", "Plain-English crawl input", byId("crawlNaturalLanguageInput") && byId("previewCrawlPlanBtn") ? "Pass" : "Failed", "Master Admin can type one contextual request and build an expanded search plan."],
       ["AI Crawling", "Manual crawl review records", byId("runManualCrawlBtn") ? "Pass" : "Failed", "Manual crawl creates reviewable records with required datapoint checklists in aiDiscoveryQueue."],
+      ["AI Crawling", "Source detail extraction", byId("sourceExtractUrl") && byId("extractSourceDetailsBtn") ? "Pass" : "Failed", "Master Admin can extract followed Eventbrite/source page details into a review record."],
       ["AI Crawling", "Crawler scheduler settings", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Default schedule saved." : "Controls are ready; save a schedule to create aiCrawlerSchedules/default."],
       ["AI Crawling", "Automatic crawl schedule", scheduleRows.length ? "Pass" : "Soft Fail", scheduleRows.length ? "Saved schedule includes structured crawl criteria and search-plan output." : "Save the schedule to persist automatic crawl criteria."],
       ["AI Crawling", "Crawl run reports", crawlRuns.length ? "Pass" : "Soft Fail", crawlRuns.length ? `${crawlRuns.length} crawl run records found.` : "No crawl runs logged yet."],
@@ -2804,6 +3108,7 @@
     renderFeatureDiagnostics(features);
     await renderRulesVersionStatus(data);
     renderAiCrawlingSummary(data, schedule);
+    renderSourceExtractionReport();
     renderClubProfileDiagnostics(data);
     renderCrawlActivity(data, schedule);
     renderCollectedRecords(data);
@@ -2822,6 +3127,8 @@
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
+    byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
+    byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
     byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
     byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
@@ -2843,6 +3150,7 @@
     const schedule = await readScheduleSafe();
     if (schedule) applyScheduleToControls(schedule);
     renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+    renderSourceExtractionReport();
     await refreshDiagnostics();
   }
 
@@ -2852,6 +3160,8 @@
     runPackageInstallDiagnostics,
     runRulesSmokeTest,
     exportDiagnosticsReport,
+    extractSourceDetails,
+    saveExtractedDiscoveryRecord,
     DEFAULT_EVENT_TYPES,
     DEFAULT_GENRES,
     DEFAULT_MARKET_LANGUAGE_PLAN
