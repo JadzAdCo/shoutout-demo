@@ -62,6 +62,11 @@
 .admin-detail[open] summary{margin-bottom:12px}
 .ai-discovery-item textarea{width:100%;min-height:86px}
 .diagnostic-json{max-height:320px;overflow:auto;white-space:pre-wrap;word-break:break-word;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.24);padding:12px;font-size:12px;line-height:1.45}
+.manual-feature-test label{margin-top:12px}
+.manual-test-actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.manual-test-choice{display:inline-flex!important;align-items:center;gap:8px;width:auto!important;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.08);padding:8px 12px;font-weight:1000}
+.manual-test-choice input{width:auto!important;margin:0}
+#manualFeatureDiagnosticsOutput,#manualFeatureDiagnosticsPrompt{min-height:220px;font-size:12px;line-height:1.45}
 
 /* v28.5 media templates */
 .media-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
