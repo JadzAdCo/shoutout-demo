@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.74 Gemini Media Editing Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.75 Firebase Functions Deploy Fix Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.74-gemini-media-editing
+https://jadzadco.github.io/shoutout-demo/?v=28.75-firebase-functions-deploy-fix
 ```
 
 Current release highlights:
@@ -95,7 +95,8 @@ Current release highlights:
 - Adds patron-side Gemini enhancement after original photo upload. If Gemini succeeds, the enhanced image becomes the selected ShoutOut media; if Gemini is unavailable, FLOQR keeps the original media and saves the fallback reason.
 - Adds Master Admin Diagnostics callable probing for Gemini media editing. `ShoutOut: Media AI panel` now passes only when the callable is deployed and the `GEMINI_API_KEY` secret is available.
 - Updates Firestore rules to `v28.74-gemini-media-editing-rules` with owner-visible `aiMediaEdits` audit records.
-- Adds root `firebase.json` pointing Firebase CLI to the `functions/` folder with Node 20.
+- Adds root `firebase.json` pointing Firebase CLI to the `functions/` folder with Node 22.
+- Fixes Firebase Functions deployment guidance: install backend dependencies with `npm.cmd --prefix functions install` from the repo root before deploying `aiEnhanceShoutOutMedia`.
 
 ## FLOQR AI Architecture
 
@@ -182,10 +183,12 @@ Firestore ShoutOut records now support selected/original/enhanced/trimmed media 
 Gemini setup:
 
 ```bash
-cd functions
-firebase functions:secrets:set GEMINI_API_KEY
-firebase deploy --only functions:aiEnhanceShoutOutMedia
+firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402
+npm.cmd --prefix functions install
+firebase deploy --only functions:aiEnhanceShoutOutMedia --project shoutoutdemo-5b402
 ```
+
+If `GEMINI_API_KEY` does not exist yet, run `firebase functions:secrets:set GEMINI_API_KEY --project shoutoutdemo-5b402` before deployment.
 
 Also publish `firestore.rules` so `aiMediaEdits` owner-visible audit records are allowed. Frontend code must never contain the Gemini key.
 

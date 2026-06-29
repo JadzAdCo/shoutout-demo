@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.74 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.75 */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.74-gemini-media-editing";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.75-firebase-functions-deploy-fix";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -520,7 +520,18 @@
         {label:"Functions SDK loaded on patron page", file:"index.html", includes:["firebase-functions-compat.js", "v=28.74-gemini-media-editing", "ai-media-service.js"]},
         {label:"Gemini diagnostics callable check", file:"ai-diagnostics-service.js", includes:["runGeminiMediaDiagnostic", "aiEnhanceShoutOutMedia", "Gemini media editing callable"]},
         {label:"Gemini media audit Firestore rule", file:"firestore.rules", includes:["v28.74-gemini-media-editing-rules", "match /aiMediaEdits/{id}", "ownsResourceUid"]},
-        {label:"Firebase Functions deploy config", file:"firebase.json", includes:["\"functions\"", "\"source\": \"functions\"", "\"runtime\": \"nodejs20\""]}
+        {label:"Firebase Functions deploy config", file:"firebase.json", includes:["\"functions\"", "\"source\": \"functions\"", "\"runtime\": \"nodejs22\""]}
+      ]
+    },
+    {
+      version: "v28.75-firebase-functions-deploy-fix",
+      title: "Firebase Functions Deploy Fix",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.75-firebase-functions-deploy-fix"]},
+        {label:"Functions runtime is Node 22", file:"firebase.json", includes:["\"runtime\": \"nodejs22\""]},
+        {label:"Functions package engine accepts Node 22+", file:"functions/package.json", includes:["\"node\": \">=22\"", "\"firebase-functions\""]},
+        {label:"Root README installs function dependencies correctly", file:"README.md", includes:["npm.cmd --prefix functions install", "firebase deploy --only functions:aiEnhanceShoutOutMedia --project shoutoutdemo-5b402"]},
+        {label:"Functions README deploy guidance", file:"functions/README.md", includes:["npm.cmd --prefix functions install", "firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402"]}
       ]
     }
   ];
