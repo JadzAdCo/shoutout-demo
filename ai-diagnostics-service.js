@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.76 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.77 */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.76-diagnostics-current-signal";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.77-optional-query-pass";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -542,6 +542,17 @@
         {label:"Superseded package marker checks are non-blocking", file:"ai-diagnostics-service.js", includes:["supersededPackageCheck ? \"Pass\"", "historical package marker check is superseded"]},
         {label:"Rules smoke test stale wording", file:"ai-diagnostics-service.js", includes:["This is not a deployed-rules failure yet", "CURRENT_DIAGNOSTICS_PACKAGE_VERSION"]},
         {label:"README diagnostics signal note", file:"README.md", includes:["v28.76 Diagnostics Current Signal Cleanup", "Historical cache-bust marker checks now pass as superseded"]}
+      ]
+    },
+    {
+      version: "v28.77-optional-query-pass",
+      title: "Optional Participant Query Pass",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.77-optional-query-pass"]},
+        {label:"Optional query denial becomes compatible pass", file:"ai-diagnostics-service.js", includes:["Optional participant query blocked; supported fallback participant document reads passed.", "status:\"Pass\""]},
+        {label:"Optional query excluded from action items", file:"ai-diagnostics-service.js", includes:["isOptionalParticipantCompatibilityNote", "No Firebase rules fix is required"]},
+        {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=28.77-optional-query-pass"]},
+        {label:"README optional query note", file:"README.md", includes:["v28.77 Optional Participant Query Pass", "deterministic Mingl participant reads pass"]}
       ]
     }
   ];
@@ -1354,6 +1365,16 @@
     return ["Failed", "Soft Fail", "TBI"].includes(status);
   }
 
+  function isOptionalParticipantCompatibilityNote(label, reason) {
+    const text = normalized(`${label || ""} ${reason || ""}`);
+    return text.includes("participant query compatibility")
+      && text.includes("optional participant query blocked")
+      && (
+        text.includes("fallback participant document reads passed")
+        || text.includes("supported fallback participant document reads passed")
+      );
+  }
+
   function sortByCreatedDesc(rows = []) {
     return rows.slice().sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   }
@@ -1374,6 +1395,9 @@
 
   function suggestDiagnosticFix(source, label, reason, status) {
     const text = normalized(`${source} ${label} ${reason}`);
+    if (isOptionalParticipantCompatibilityNote(label, reason)) {
+      return "No Firebase rules fix is required. Deterministic Mingl/chat participant document reads passed, so FLOQR can keep broad participant array queries blocked for privacy.";
+    }
     if (text.includes("storage") || text.includes("storage unauthorized") || text.includes("template backgrounds") || text.includes("shoutouts original image path")) {
       return "Publish the package `storage.rules` in Firebase Console > Storage > Rules. This package separates upload checks from owner delete rules so the smoke test can upload/read/delete media. Then rerun Master Admin > Diagnostics > Run Rules Smoke Test.";
     }
@@ -1441,7 +1465,7 @@
   function collectDiagnosticIssues({data = {}, features = [], packageResults = []} = {}) {
     const issues = [];
     const add = (source, label, status, reason) => {
-      if (attentionStatus(status)) {
+      if (attentionStatus(status) && !isOptionalParticipantCompatibilityNote(label, reason)) {
         issues.push({
           source: cleanText(source),
           label: cleanText(label),
@@ -1924,8 +1948,8 @@
     } catch (error) {
       if (deterministicFallbackPassed) {
         return {
-          status:"Soft Fail",
-          evidence:`Optional participant query blocked; fallback participant document reads passed. ${collection} array-contains query was denied (${error?.message || error}), but FLOQR uses ${fallbackName} as the supported safe path. Do not loosen Firestore rules broadly just to make this optional query pass.`
+          status:"Pass",
+          evidence:`Optional participant query blocked; supported fallback participant document reads passed. ${collection} array-contains query was denied (${error?.message || error}), and FLOQR uses ${fallbackName} as the supported safe path. This is compatible with strict Firestore privacy rules; do not loosen rules broadly just to make this optional query pass.`
         };
       }
       return {
