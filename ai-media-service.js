@@ -29,6 +29,25 @@
     return byId("editorPage");
   }
 
+  function controlsCard() {
+    return editor()?.querySelector(".composer > .card:not(.preview)") || editor()?.querySelector(".composer .card") || editor();
+  }
+
+  function placePanel(panel) {
+    const host = controlsCard();
+    if (!host || !panel) return;
+    const mediaCard = byId("shoutoutMediaUpload")?.closest(".media-upload-card");
+    const submit = byId("submitShoutoutBtn");
+    const anchor = mediaCard && mediaCard.parentElement === host
+      ? mediaCard.nextSibling
+      : submit && submit.parentElement === host
+        ? submit
+        : null;
+    if (panel.parentElement !== host || panel.previousElementSibling !== mediaCard) {
+      host.insertBefore(panel, anchor || null);
+    }
+  }
+
   function mediaInput() {
     return byId("shoutoutMediaUpload") || byId("shoutoutPhoto");
   }
@@ -49,8 +68,12 @@
 
   function ensurePanel() {
     const host = editor();
-    if (!host || byId("aiMediaPanel")) return;
-    const messageCard = host.querySelector(".composer .card") || host;
+    const existing = byId("aiMediaPanel");
+    if (!host) return;
+    if (existing) {
+      placePanel(existing);
+      return;
+    }
     const panel = document.createElement("div");
     panel.id = "aiMediaPanel";
     panel.className = "ai-media-panel";
@@ -73,7 +96,7 @@
       <input id="aiTrimStart" type="hidden" value="0"/>
       <input id="aiTrimEnd" type="hidden" value=""/>
       <p id="aiMediaStatus" class="status"></p>`;
-    messageCard.appendChild(panel);
+    placePanel(panel);
     panel.addEventListener("click", event => {
       const filterBtn = event.target.closest("[data-ai-filter]");
       if (filterBtn) applyFilter(filterBtn.dataset.aiFilter);

@@ -1195,6 +1195,10 @@
   function templateSearchText(t) {
     return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
+  function templateContextQuery() {
+    const explicitContext = window.FLOQR_TEMPLATE_CONTEXT_QUERY || document.body?.dataset?.templateContextQuery || "";
+    return String(explicitContext || "").trim().toLowerCase();
+  }
   function variantSearchText(variant = {}) {
     return `${variant.variantName || ""} ${variant.baseTemplateName || ""} ${variant.ownerDisplayName || ""} ${(variant.tags||[]).join(" ")} ${(variant.searchKeywords||[]).join(" ")} ${variant.promptShared ? variant.aiPrompt || "" : ""}`.toLowerCase();
   }
@@ -1245,22 +1249,28 @@
   async function renderTemplates() {
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
+    const discoveryQuery = query || templateContextQuery();
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}));
     const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active");
     const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid);
-    const [officialRecords, mineRecords, communityRecords] = query && window.floqrSearch ? await Promise.all([
-      window.floqrSearch(query, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
-      window.floqrSearch(query, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
-      window.floqrSearch(query, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
-    ]) : [official, mine.map(x => ({id:x.id, data:x})), community.map(x => ({id:x.id, data:x}))];
-    const officialHtml = officialRecords.map(record => templateCard(record.data)).join("");
-    const mineHtml = mineRecords.map(record => variantCard(record.data, true)).join("") || '<div class="empty">No saved templates yet. Choose an official template and customize its background.</div>';
-    const communityHtml = communityRecords.map(record => variantCard(record.data, false)).join("") || '<div class="empty">No public community templates matched.</div>';
-    grid.innerHTML = `
-      <section class="template-section"><h3>Official FLOQR Templates</h3><div class="template-grid">${officialHtml || '<div class="empty">No official templates matched.</div>'}</div></section>
-      <section class="template-section"><h3>My Saved Templates</h3><div class="template-grid">${mineHtml}</div></section>
-      <section class="template-section"><h3>Community Templates</h3><div class="template-grid">${communityHtml}</div></section>`;
+    if (!discoveryQuery) {
+      const defaultRecord = official.find(record => record.id === "blackwhite") || official[0];
+      grid.innerHTML = `<section class="template-section template-section-default"><h3>Default Template</h3><div class="template-grid">${templateCard(defaultRecord.data)}</div></section>`;
+    } else {
+      const [officialRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
+        window.floqrSearch(discoveryQuery, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
+        window.floqrSearch(discoveryQuery, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
+        window.floqrSearch(discoveryQuery, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
+      ]) : [official.filter(record => record.searchText.includes(discoveryQuery)), mine.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), community.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x}))];
+      const officialHtml = officialRecords.map(record => templateCard(record.data)).join("");
+      const mineHtml = mineRecords.map(record => variantCard(record.data, true)).join("") || '<div class="empty">No saved templates matched.</div>';
+      const communityHtml = communityRecords.map(record => variantCard(record.data, false)).join("") || '<div class="empty">No public community templates matched.</div>';
+      grid.innerHTML = `
+        <section class="template-section"><h3>Matching Official FLOQR Templates</h3><div class="template-grid">${officialHtml || '<div class="empty">No official templates matched.</div>'}</div></section>
+        <section class="template-section"><h3>My Saved Templates</h3><div class="template-grid">${mineHtml}</div></section>
+        <section class="template-section"><h3>Community Templates</h3><div class="template-grid">${communityHtml}</div></section>`;
+    }
     grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
       selectedTemplate = btn.dataset.templateOpen;
@@ -1814,6 +1824,17 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
   function findTextInput(){return byId("mainText")||byId("shoutoutText")||byId("messageText")||document.querySelector("textarea[name='mainText']")||document.querySelector("textarea")||document.querySelector("input[name='mainText']");}
   function findSubTextInput(){return byId("subText")||byId("shoutoutSubText")||document.querySelector("input[name='subText']")||document.querySelector("textarea[name='subText']");}
   function findEditor(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
+  function controlsCard(){return byId("editorPage")?.querySelector(".composer > .card:not(.preview)")||byId("editorPage")?.querySelector(".composer .card")||findEditor();}
+  function placeMediaCard(card){
+    const host=controlsCard(); if(!host||!card)return;
+    const panel=byId("aiMediaPanel"), submit=byId("submitShoutoutBtn"), status=byId("submitStatus");
+    const anchor=(panel&&panel.parentElement===host)?panel:(submit&&submit.parentElement===host)?submit:(status&&status.parentElement===host)?status:null;
+    if(card.parentElement!==host||card.nextElementSibling!==anchor) host.insertBefore(card, anchor||null);
+  }
+  function hideLegacyPhotoInput(){
+    const legacy=byId("shoutoutPhotoWrap");
+    if(legacy) legacy.classList.add("hidden");
+  }
   function removeDuplicateMediaInputs(){
     const fileInputs=Array.from(document.querySelectorAll("input[type='file']")).filter(i=>/image|photo|video|media|upload/i.test(((i.closest("label")||{}).textContent||"")+" "+(i.id||"")+" "+(i.name||"")));
     if(fileInputs.length<=1)return;
@@ -1826,14 +1847,17 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const editor=findEditor(); if(!editor)return;
     if(!templateAllowsMedia()){removeDuplicateMediaInputs();return;}
     removeDuplicateMediaInputs();
+    hideLegacyPhotoInput();
     let input=byId("shoutoutMediaUpload");
+    let card=input?.closest(".media-upload-card");
     if(!input){
-      const card=document.createElement("div");
+      card=document.createElement("div");
       card.className="card media-upload-card";
       card.innerHTML=`<h2>Media Upload</h2><p class="single-media-upload-note">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
-      editor.appendChild(card);
+      placeMediaCard(card);
       input=byId("shoutoutMediaUpload");
     }
+    if(card) placeMediaCard(card);
     input.accept=templateAcceptsMedia();
     input.onchange=renderLiveMediaPreview;
   }

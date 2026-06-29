@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.77 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.78 */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.77-optional-query-pass";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.78-template-media-layout";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -553,6 +553,19 @@
         {label:"Optional query excluded from action items", file:"ai-diagnostics-service.js", includes:["isOptionalParticipantCompatibilityNote", "No Firebase rules fix is required"]},
         {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=28.77-optional-query-pass"]},
         {label:"README optional query note", file:"README.md", includes:["v28.77 Optional Participant Query Pass", "deterministic Mingl participant reads pass"]}
+      ]
+    },
+    {
+      version: "v28.78-template-media-layout",
+      title: "ShoutOut Template Gallery + Mobile Media Preview Layout",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.78-template-media-layout"]},
+        {label:"Patron assets cache-busted", file:"index.html", includes:["styles.css?v=28.78-template-media-layout", "patron-app.js?v=28.78-template-media-layout", "ai-media-service.js?v=28.78-template-media-layout"]},
+        {label:"Default template name", file:"shared-data.js", includes:["Traditional Black and White ShoutOut"]},
+        {label:"Default-only template gallery", file:"patron-app.js", includes:["template-section-default", "Matching Official FLOQR Templates", "templateContextQuery"]},
+        {label:"Media uploader before submit", file:"patron-app.js", includes:["placeMediaCard", "submitShoutoutBtn", "media-upload-card"]},
+        {label:"AI media panel follows upload", file:"ai-media-service.js", includes:["placePanel", "mediaCard", "aiMediaPanel"]},
+        {label:"Contained mobile media preview CSS", file:"styles.css", includes:["v28.78 ShoutOut template gallery and mobile media preview layout", "object-fit:contain", "max-height:42vh"]}
       ]
     }
   ];

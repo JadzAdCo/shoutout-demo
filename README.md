@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.77 Optional Participant Query Pass Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.78 Template Gallery + Mobile Media Preview Layout Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.77-optional-query-pass
+https://jadzadco.github.io/shoutout-demo/?v=28.78-template-media-layout
 ```
 
 Current release highlights:
@@ -101,6 +101,9 @@ Current release highlights:
 - Clarifies stale rules-smoke-test wording. If no current-package smoke test has been saved yet, Diagnostics now says this is not a deployed-rules failure yet and tells Master Admin to click `Run Rules Smoke Test`.
 - Adds v28.77 Optional Participant Query Pass. When deterministic Mingl participant reads pass, optional `array-contains` participant query denials are treated as a privacy-compatible `Pass`, not a Soft Fail or Firebase rules issue.
 - Keeps Firestore rules strict for Mingl/chat participant list queries. Do not loosen broad reads just to make optional compatibility queries pass.
+- Adds v28.78 ShoutOut Template Gallery + Mobile Media Preview Layout. Initial ShoutOut template selection now shows only the official Traditional Black and White ShoutOut template until the patron searches or a contextual template hint is present.
+- Fixes mobile uploaded image/video previews so portrait photos, landscape photos, and videos fit inside the preview area with `object-fit: contain` and viewport-based max heights.
+- Keeps the editor flow in the intended order: template name, text inputs, AI ShoutOut recommendations, media upload, AI media enhancement controls, submit actions, then Live Preview.
 
 ## FLOQR AI Architecture
 
@@ -410,7 +413,7 @@ Test plan:
 - Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44 through v28.77 package marker checks run, including Gemini media editing backend, frontend, diagnostics, rules markers, diagnostics signal-cleanup markers, and optional participant query compatibility markers.
+- Click Run Package Install Diagnostics and confirm v28.44 through v28.78 package marker checks run, including Gemini media editing backend, frontend, diagnostics, rules markers, diagnostics signal-cleanup markers, optional participant query compatibility markers, and ShoutOut template/media layout markers.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
