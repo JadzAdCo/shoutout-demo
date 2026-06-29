@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.78 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.79 */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.78-template-media-layout";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.79-package-hygiene";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -566,6 +566,16 @@
         {label:"Media uploader before submit", file:"patron-app.js", includes:["placeMediaCard", "submitShoutoutBtn", "media-upload-card"]},
         {label:"AI media panel follows upload", file:"ai-media-service.js", includes:["placePanel", "mediaCard", "aiMediaPanel"]},
         {label:"Contained mobile media preview CSS", file:"styles.css", includes:["v28.78 ShoutOut template gallery and mobile media preview layout", "object-fit:contain", "max-height:42vh"]}
+      ]
+    },
+    {
+      version: "v28.79-package-hygiene",
+      title: "Package Hygiene Cleanup",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.79-package-hygiene"]},
+        {label:"README documents package hygiene", file:"README.md", includes:["v28.79 Package Hygiene Cleanup", "Future full packages should include only the live `README.md` and the current direct rollback note"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-79.md", includes:["FLOQR Rollback - v28.79 Package Hygiene", "This rollback does not change Firebase Auth"]},
+        {label:"Master Admin diagnostics cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=28.79-package-hygiene"]}
       ]
     }
   ];

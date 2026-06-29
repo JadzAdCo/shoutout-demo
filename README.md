@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.78 Template Gallery + Mobile Media Preview Layout Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.79 Package Hygiene Cleanup Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.78-template-media-layout
+https://jadzadco.github.io/shoutout-demo/?v=28.79-package-hygiene
 ```
 
 Current release highlights:
@@ -104,6 +104,7 @@ Current release highlights:
 - Adds v28.78 ShoutOut Template Gallery + Mobile Media Preview Layout. Initial ShoutOut template selection now shows only the official Traditional Black and White ShoutOut template until the patron searches or a contextual template hint is present.
 - Fixes mobile uploaded image/video previews so portrait photos, landscape photos, and videos fit inside the preview area with `object-fit: contain` and viewport-based max heights.
 - Keeps the editor flow in the intended order: template name, text inputs, AI ShoutOut recommendations, media upload, AI media enhancement controls, submit actions, then Live Preview.
+- Adds v28.79 Package Hygiene Cleanup. Future full packages should include only the live `README.md` and the current direct rollback note, not historical `README-V...`, `ROLLBACK-V...`, or `rollback-v...ps1` artifacts from older packages.
 
 ## FLOQR AI Architecture
 
@@ -413,7 +414,7 @@ Test plan:
 - Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44 through v28.78 package marker checks run, including Gemini media editing backend, frontend, diagnostics, rules markers, diagnostics signal-cleanup markers, optional participant query compatibility markers, and ShoutOut template/media layout markers.
+- Click Run Package Install Diagnostics and confirm v28.44 through v28.79 package marker checks run, including Gemini media editing backend, frontend, diagnostics, rules markers, diagnostics signal-cleanup markers, optional participant query compatibility markers, ShoutOut template/media layout markers, and package hygiene markers.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.
