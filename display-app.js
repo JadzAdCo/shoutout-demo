@@ -1,4 +1,4 @@
-/* display-app.js v19 */
+/* display-app.js v28.70 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -7,9 +7,41 @@
   if (!window.firebaseConfig) { byId("displayMain").textContent = "CONFIG ERROR"; byId("displaySub").textContent = "firebase-config.js missing"; return; }
   firebase.initializeApp(window.firebaseConfig);
   const db = firebase.firestore();
-  const locationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
-  const loc = window.SHOUTOUT_CLUB_LOCATIONS[locationId] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+  const requestedLocationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
+  let locationId = canonicalStaticLocationId(requestedLocationId);
+  let loc = getStaticLocation(locationId);
   const templates = window.SHOUTOUT_TEMPLATES || {};
+
+  function canonicalStaticLocationId(id = "") {
+    const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
+    const row = (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || {};
+    return String(row.canonicalLocationId || row.aliasOf || row.mergedInto || key).toLowerCase();
+  }
+
+  function getStaticLocation(id = "") {
+    const key = canonicalStaticLocationId(id);
+    return (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+  }
+
+  async function resolveDisplayLocationId(id = "") {
+    let key = canonicalStaticLocationId(id);
+    try {
+      const alias = await db.collection("clubLocationAliases").doc(key).get();
+      if (alias.exists && alias.data()?.canonicalLocationId) {
+        key = String(alias.data().canonicalLocationId).toLowerCase();
+      }
+    } catch (e) {}
+    try {
+      const doc = await db.collection("clubLocations").doc(key).get();
+      if (doc.exists) {
+        const data = doc.data() || {};
+        if (data.canonicalLocationId || data.aliasOf || data.mergedInto) {
+          key = String(data.canonicalLocationId || data.aliasOf || data.mergedInto).toLowerCase();
+        }
+      }
+    } catch (e) {}
+    return canonicalStaticLocationId(key);
+  }
 
   function cleanBoardText(value) {
     return String(value || "")
@@ -157,7 +189,9 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    locationId = await resolveDisplayLocationId(locationId);
+    loc = getStaticLocation(locationId);
     if (qs("main","")) {
       render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), mediaType: qs("mediaType",""), backgroundUrl: qs("backgroundUrl",""), backgroundColor: qs("backgroundColor",""), backgroundGradient: qs("backgroundGradient",""), locationName: loc.locationName });
       return;

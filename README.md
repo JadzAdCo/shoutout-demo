@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.69 Stale ShoutOut Cleanup Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.70 Duplicate Record Merge Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.69-stale-shoutout-cleanup
+https://jadzadco.github.io/shoutout-demo/?v=28.70-duplicate-record-merge
 ```
 
 Current release highlights:
@@ -74,6 +74,12 @@ Current release highlights:
 - Fixes clean crawl query generation so recognized cities use their real country/region and do not inherit broad defaults. Example: `Singapore comedy show tickets` now plans a Singapore/Singapore record with a clean crawl query such as `comedy show Singapore tickets`, not a Western Europe/France queue record.
 - Adds a dedicated Master Admin > Stale Record Cleanup tab. Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.
 - Stale cleanup now covers both AI discovery queue records and club ShoutOut queue records. ShoutOut cleanup soft-marks queue records as `status: "stale"` with `staleCleanupStatus: "stale-shoutout-cleared"` instead of deleting approved/live ShoutOut history.
+- Adds Master Admin > Duplicate Records to scan likely duplicate `clubLocations`, choose the correct primary record, and merge duplicate records into safe aliases.
+- Duplicate merge keeps the primary club active and marks duplicates as `status: "merged"`, `active: false`, `canonicalLocationId`, and `mergedInto` instead of deleting records.
+- Creates `clubLocationAliases/{duplicateId}` so old links, admin/display URLs, search records, events, ShoutOuts, and guest list references can resolve to the primary club.
+- Adds a known static Shôko Barcelona alias so `Shôko Barcelona Beach Club` resolves to `Shôko Barcelona` and the duplicate no longer appears as a separate active static listing.
+- Updates patron, club admin, and display routing to resolve club aliases before rendering public search, ShoutOut selection, admin queues, and LED/display live content.
+- Updates Firestore rules to `v28.70-duplicate-alias-rules` for the new alias collection. Publish `firestore.rules` after installing this package, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.
 
 ## FLOQR AI Architecture
 
@@ -95,6 +101,7 @@ Live in this package:
 - Deployable Firebase callable `aiExtractPublicSourceUrl` for server-side public page extraction.
 - Master Admin Diagnostics feature matrix, package checks, rules smoke test, and TXT export.
 - Master Admin > AI Crawling page for crawler controls, crawl activity reports, consolidated collected-record analytics, manual crawl queue seeding, and AI Crawler Profile Import.
+- Master Admin > Duplicate Records page for club duplicate diagnostics and safe merge-to-alias cleanup.
 - Master Admin Package Install Diagnostics grouped by package version.
 - Master Admin Firebase Rules Smoke Test with saved reports in `aiDiagnosticsReports`.
 - Master Admin Diagnostics TXT export for sharing failure reports and fix prompts.
@@ -207,6 +214,20 @@ The import workflow does not overwrite existing club profile values. Master Admi
 
 Automatic internet crawling runs in backend code using Firebase scheduled functions or Cloud Run. The package includes Firebase callable source extraction for public URL detail parsing. The scheduled crawler should validate official APIs and public source terms, handle robots.txt, deduplicate records, classify event/venue type, rate records from Super Admin criteria, and write only to `aiDiscoveryQueue`.
 
+## Master Admin Duplicate Records
+
+Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `Shôko Barcelona Beach Club` and `Shôko Barcelona`.
+
+- Click `Refresh Duplicate Scan` to find likely duplicate `clubLocations` by normalized club name, city, country, brand, website, and address.
+- Select the record that should remain as the primary club.
+- Click `Merge Other Records Into Selected Primary`.
+- FLOQR keeps the primary record active, adds `aliasLocationIds`, `aliasNames`, and search keywords to the primary, and marks the duplicate records as `status: "merged"` and `active: false`.
+- FLOQR writes `clubLocationAliases/{duplicateId}` with the canonical primary club id. Old patron, club admin, display, and record links can then resolve to the primary club instead of showing a duplicate.
+- The merge updates common related references in `events`, `shoutouts`, and `guestListRequests` where the duplicate id was stored, while preserving `previousLocationIds` for audit.
+- Public/patron search hides merged records. Master Admin can still see merged/deleted records in admin cleanup tools.
+
+This is a soft consolidation workflow. It does not hard-delete ShoutOut history, guest list history, profile ownership, audit logs, or club records.
+
 ## Public Profile Language
 
 Settings > My Profile now includes:
@@ -267,6 +288,8 @@ Master Admin > Diagnostics now also shows `Firebase Rules Smoke Test` with:
 Because browser code cannot read Firebase Console's deployed rules text directly, the live proof is the smoke test: it attempts the same signed-in reads, writes, query patterns, and uploads the app needs.
 
 The rules smoke test verifies signed-in allowed operations for authentication/profile save, public discovery reads, ShoutOut records, guest list records, Mingl/chat participant queries, AI diagnostics/discovery/search collections, template variants, notification preferences, and Storage media paths. It does not impersonate another user, so it cannot prove cross-user denial rules from the browser.
+
+For v28.70, Firestore rules must include `FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules` and the `clubLocationAliases/{aliasId}` rule. That alias collection lets Master Admin merge duplicate club records without deleting historical data.
 
 Plain meaning for common results:
 

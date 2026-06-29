@@ -1,9 +1,11 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.59-diagnostic-cleanup-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.70-duplicate-alias-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - clubLocationAliases read/write support for Master Admin duplicate record merge aliases
 // - users/{uid} self create/read/update support for onboarding and existing profiles
 // - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
@@ -102,6 +104,11 @@ service cloud.firestore {
     }
 
     match /clubLocations/{id} {
+      allow read: if true;
+      allow write: if signedIn();
+    }
+
+    match /clubLocationAliases/{aliasId} {
       allow read: if true;
       allow write: if signedIn();
     }

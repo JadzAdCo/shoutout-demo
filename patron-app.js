@@ -25,6 +25,7 @@
   let selectedTemplateVariant = null;
   let confirmationResult = null;
   let locations = {};
+  let locationAliases = {};
   let templates = {};
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
@@ -35,8 +36,20 @@
   let activeMinglRoomId = "";
   let templateVariants = {mine:[], community:[]};
 
-  function locationId() { return (selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc").toLowerCase(); }
-  function getLocation(id = locationId()) { return locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]; }
+  function isMergedLocation(loc = {}) {
+    const status = String(loc.status || "").toLowerCase();
+    return status === "merged" || status === "deleted" || !!loc.aliasOf || !!loc.mergedInto;
+  }
+  function canonicalLocationId(id = "") {
+    const key = String(id || "").toLowerCase();
+    const loc = locations[key] || window.SHOUTOUT_CLUB_LOCATIONS[key] || {};
+    return String(locationAliases[key]?.canonicalLocationId || loc.canonicalLocationId || loc.aliasOf || loc.mergedInto || key || "zebbies-garden-washington-dc").toLowerCase();
+  }
+  function locationId() { return canonicalLocationId(selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc"); }
+  function getLocation(id = locationId()) {
+    const canonical = canonicalLocationId(id);
+    return locations[canonical] || locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+  }
   function getTemplate(id = selectedTemplate) { return templates[id] || window.SHOUTOUT_TEMPLATES[id] || window.SHOUTOUT_TEMPLATES.neon; }
   function currentTemplateSupportsMedia() {
     const t = getTemplate();
@@ -176,19 +189,69 @@
     templateVariants = await window.FLOQRStudio.loadPatronTemplateVariants({db, uid:currentUser.uid});
     return templateVariants;
   }
+  async function loadLocationAliases() {
+    locationAliases = {};
+    try {
+      const snap = await db.collection("clubLocationAliases").get();
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (String(data.status || "active") === "active" && data.canonicalLocationId) {
+          locationAliases[doc.id.toLowerCase()] = {id:doc.id, ...data};
+        }
+      });
+    } catch(e) {}
+    Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, loc]) => {
+      if (loc.canonicalLocationId || loc.aliasOf || loc.mergedInto) {
+        locationAliases[id.toLowerCase()] = {
+          id,
+          aliasId:id,
+          canonicalLocationId:loc.canonicalLocationId || loc.aliasOf || loc.mergedInto,
+          aliasName:loc.locationName || loc.brandName || id,
+          status:"active"
+        };
+      }
+    });
+  }
+  function visibleLocationEntry([id, loc]) {
+    return loc && loc.active !== false && !isMergedLocation(loc) && String(loc.status || "active") !== "deleted";
+  }
   async function loadLocations() {
+    await loadLocationAliases();
     locations = {};
-    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (String(data.status || "active") !== "deleted") locations[doc.id] = {id:doc.id, ...data}; }); } catch(e) {}
-    if (Object.keys(locations).length === 0) locations = {...window.SHOUTOUT_CLUB_LOCATIONS};
+    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (visibleLocationEntry([doc.id, data])) locations[doc.id] = {id:doc.id, ...data}; else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) locationAliases[doc.id.toLowerCase()] = {id:doc.id, canonicalLocationId:data.canonicalLocationId || data.aliasOf || data.mergedInto, aliasName:data.locationName || data.brandName || doc.id, status:"active"}; }); } catch(e) {}
+    if (Object.keys(locations).length === 0) locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
   }
   async function loadEvents() {
     events = {...(window.SHOUTOUT_EVENTS || {})};
     try { const snap = await db.collection("events").where("active","==",true).get(); snap.forEach(doc => { const data = doc.data(); if (String(data.status || "active") !== "deleted") events[doc.id] = {id:doc.id, ...data}; }); } catch(e) {}
   }
+  async function resolveLocationAlias(id = "") {
+    const key = String(id || "").toLowerCase();
+    const known = canonicalLocationId(key);
+    if (known && known !== key) return known;
+    try {
+      const alias = await db.collection("clubLocationAliases").doc(key).get();
+      if (alias.exists && alias.data()?.canonicalLocationId) {
+        locationAliases[key] = {id:alias.id, ...alias.data()};
+        return String(alias.data().canonicalLocationId).toLowerCase();
+      }
+    } catch(e) {}
+    return key;
+  }
   async function loadLocationById(id) {
-    if (locations[id]) return locations[id];
-    try { const doc = await db.collection("clubLocations").doc(id).get(); if (doc.exists) { locations[id] = {id:doc.id, ...doc.data()}; return locations[id]; }} catch(e) {}
-    return window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+    const requested = String(id || "").toLowerCase();
+    const canonical = await resolveLocationAlias(requested);
+    if (locations[canonical]) return locations[canonical];
+    try {
+      const doc = await db.collection("clubLocations").doc(canonical).get();
+      if (doc.exists) {
+        const data = {id:doc.id, ...doc.data()};
+        if (isMergedLocation(data) && data.canonicalLocationId && data.canonicalLocationId !== canonical) return loadLocationById(data.canonicalLocationId);
+        locations[doc.id] = data;
+        return locations[doc.id];
+      }
+    } catch(e) {}
+    return window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[requested] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
   }
 
   function updateLoginUI(user) {
@@ -1107,8 +1170,8 @@
   }
 
   async function selectLocationForShoutOut(id) {
-    selectedLocationId = id;
-    const loc = await loadLocationById(id);
+    selectedLocationId = await resolveLocationAlias(id);
+    const loc = await loadLocationById(selectedLocationId);
     setText("selectedClubTitle", loc.locationName);
     setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
     selectedTemplate = "blackwhite";

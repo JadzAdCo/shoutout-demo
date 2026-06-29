@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.69 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.70 */
 (function () {
   "use strict";
 
@@ -27,9 +27,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.70-duplicate-alias-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.69-stale-shoutout-cleanup";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.70-duplicate-record-merge";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -161,6 +161,7 @@
     "messages",
     "inboxNotifications",
     "clubLocations",
+    "clubLocationAliases",
     "events",
     "templates",
     "minglConnections",
@@ -451,6 +452,22 @@
         {label:"Stale ShoutOut cleanup logic", file:"ai-diagnostics-service.js", includes:["shoutoutStaleReasons", "loadStaleShoutoutRows", "stale-shoutout-cleared"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.69-stale-shoutout-cleanup"]},
         {label:"README stale ShoutOut explanation", file:"README.md", includes:["stale ShoutOut", "more than 4 days"]}
+      ]
+    },
+    {
+      version: "v28.70-duplicate-record-merge",
+      title: "Duplicate Record Diagnostics + Merge",
+      checks: [
+        {label:"Duplicate records tab", file:"master-admin.html", includes:["data-panel=\"duplicateRecords\"", "Duplicate Records"]},
+        {label:"Duplicate merge service loaded", file:"master-admin.html", includes:["duplicate-record-service.js", "v=28.70-duplicate-record-merge"]},
+        {label:"Duplicate service merge logic", file:"duplicate-record-service.js", includes:["mergeDuplicateGroup", "clubLocationAliases", "aliasLocationIds", "mergedInto"]},
+        {label:"Patron alias resolver", file:"patron-app.js", includes:["canonicalLocationId", "resolveLocationAlias", "isMergedLocation"]},
+        {label:"Club admin alias resolver", file:"admin-app.js", includes:["resolveAdminLocationId", "clubLocationAliases", "refreshLocationShell"]},
+        {label:"Display alias resolver", file:"display-app.js", includes:["resolveDisplayLocationId", "clubLocationAliases", "canonicalStaticLocationId"]},
+        {label:"Static Shôko duplicate alias", file:"shared-data.js", includes:["shoko-barcelona-beach-club-spain", "canonicalLocationId:\"shoko-barcelona-spain\"", "aliasLocationIds"]},
+        {label:"Firestore alias rule", file:"firestore.rules", includes:["match /clubLocationAliases/{aliasId}", "allow read: if true"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.70-duplicate-record-merge"]},
+        {label:"README duplicate merge explanation", file:"README.md", includes:["Duplicate Records", "clubLocationAliases"]}
       ]
     }
   ];
@@ -1702,11 +1719,16 @@
           const missing = (check.includes || []).filter(token => !text.includes(token));
           const presentButForbidden = (check.notIncludes || []).filter(token => text.includes(token));
           const failed = missing.length || presentButForbidden.length;
+          const historicalCurrentMarker = failed
+            && check.label === "Current diagnostics package marker"
+            && pkg.version !== CURRENT_DIAGNOSTICS_PACKAGE_VERSION;
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
-            status: failed ? "Failed" : "Pass",
-            evidence: failed
+            status: historicalCurrentMarker ? "Soft Fail" : (failed ? "Failed" : "Pass"),
+            evidence: historicalCurrentMarker
+              ? `${check.file} now points to current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; historical package marker ${pkg.version} is superseded.`
+              : failed
               ? [
                   missing.length ? `${check.file} is missing: ${missing.join(", ")}` : "",
                   presentButForbidden.length ? `${check.file} still contains removed marker(s): ${presentButForbidden.join(", ")}` : ""
@@ -1928,6 +1950,7 @@
     await capture("Firestore: users collection read for Mingl/profile discovery", () => firestoreCollectionRead("users"));
     await capture("Firestore: clubs lifecycle", () => firestoreDocLifecycle("clubs", {name:"Diagnostics Club", status:"diagnostic"}, runId));
     await capture("Firestore: clubLocations lifecycle", () => firestoreDocLifecycle("clubLocations", {locationName:"Diagnostics Location", visibility:"public", status:"active"}, runId));
+    await capture("Firestore: clubLocationAliases lifecycle", () => firestoreDocLifecycle("clubLocationAliases", {aliasId:"diagnostic-alias", canonicalLocationId:"diagnostic-location", status:"active"}, runId));
     await capture("Firestore: events lifecycle", () => firestoreDocLifecycle("events", {title:"Diagnostics Event", active:true, status:"active"}, runId));
     await capture("Firestore: templates lifecycle", () => firestoreDocLifecycle("templates", {name:"Diagnostics Template", visibility:"public"}, runId));
     await capture("Firestore: shoutouts lifecycle", () => firestoreDocLifecycle("shoutouts", {
@@ -3611,6 +3634,7 @@
       ["Master Admin", "Soft delete/restore listings", hasDiscovery ? "Pass" : "Failed", "Soft delete hides deleted club/event listings from patron search/display."],
       ["Master Admin", "AI Crawling page", byId("aiCrawling") ? "Pass" : "Failed", "Crawler controls, consolidated reports, import JSON, and analytics are mounted on the AI Crawling tab."],
       ["Master Admin", "Stale record cleanup", byId("staleRecordCleanup") && byId("searchStaleRecordsBtn") ? "Pass" : "Failed", "Master Admin can search and soft-clear stale AI discovery and ShoutOut queue records."],
+      ["Master Admin", "Duplicate record diagnostics", byId("duplicateRecords") && window.FLOQRDuplicateRecords ? "Pass" : "Failed", "Master Admin can scan duplicate club records and merge duplicates into aliases."],
       ["Master Admin", "Diagnostics page", "Pass", "Feature matrix, package checks, export, and Firebase rules smoke tests are mounted under Master Admin settings."],
       ["Master Admin", "Package install diagnostics", byId("runPackageDiagnosticsBtn") ? "Pass" : "Failed", "Per-package feature marker checks are available after upload."],
       ["Master Admin", "Firebase rules smoke test", latestRulesReport ? (latestRulesReport.status === "Pass" ? "Pass" : "Failed") : "Soft Fail", latestRulesReport ? `Latest current-package rules smoke test status: ${latestRulesReport.status || "unknown"} at ${fmtDate(latestRulesReport.createdAt)}.` : latestAnyRulesReport ? `Latest saved rules smoke test is stale: ${latestAnyRulesReport.packageVersion || "unknown package"} at ${fmtDate(latestAnyRulesReport.createdAt)}. Run the rules smoke test for ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}.` : "Run the rules smoke test after publishing Firestore/Storage rules."]

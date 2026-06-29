@@ -1,5 +1,5 @@
 /*
-  shared-data.js v19
+  shared-data.js v28.70
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
@@ -86,6 +86,9 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   },
   "shoko-barcelona-spain": {
     brandName:"Shôko", locationName:"Shôko Barcelona", type:"club",
+    categories:["Clubs","Beach Clubs","Events","ShoutOut"],
+    aliasLocationIds:["shoko-barcelona-beach-club-spain"],
+    aliasNames:["Shôko Barcelona Beach Club"],
     country:"Spain", regionType:"Region", region:"Catalonia", city:"Barcelona",
     locationLabel:"Barcelona, Catalonia, Spain",
     brand:"SHÔKO BARCELONA x FLOQR",
@@ -372,6 +375,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   "shoko-barcelona-beach-club-spain": {
     brandName:"Shôko", locationName:"Shôko Barcelona Beach Club", type:"beach-club",
     categories:["Beach Clubs","Clubs","Events","ShoutOut"],
+    status:"merged", active:false, canonicalLocationId:"shoko-barcelona-spain", aliasOf:"shoko-barcelona-spain",
     country:"Spain", regionType:"Region", region:"Catalonia", city:"Barcelona",
     locationLabel:"Barcelona Beachfront, Catalonia, Spain",
     brand:"SHÔKO BEACH CLUB x FLOQR",
@@ -379,7 +383,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     genres:["Hip Hop","House","Reggaeton","R&B","Afro Beats"], artists:["Noriel","Resident DJs"],
     activityStatus:"Beachfront club / nightlife venue",
     activityDates:["Beachfront dining + late-night club programming","Thursday Noriel event seed"],
-    templates:["latin","hiphop","vip","neon"], active:true
+    templates:["latin","hiphop","vip","neon"]
   },
   "nammos-mykonos-greece": {
     brandName:"Nammos", locationName:"Nammos Mykonos", type:"beach-club",

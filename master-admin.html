@@ -57,6 +57,7 @@
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
         <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
+        <button class="admin-tab" data-panel="duplicateRecords" type="button">Duplicate Records</button>
         <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
       </nav>
 
@@ -296,6 +297,25 @@
         </div>
       </section>
 
+      <section id="duplicateRecords" class="admin-panel-section">
+        <div class="card">
+          <h2>Duplicate Records</h2>
+          <p class="sub small">Find club records that represent the same institution, choose a primary record, and merge duplicates into aliases. Merge is soft: the duplicate is marked `status: merged`, and `clubLocationAliases/{duplicateId}` points old links to the primary club.</p>
+          <div id="duplicateRecordSummary" class="report-block"></div>
+          <div class="profile-grid">
+            <label>Search duplicates<input id="duplicateRecordSearch" placeholder="Shoko, Barcelona, beach club, club id"/></label>
+            <label>Manual primary club id<input id="duplicatePrimaryId" placeholder="shoko-barcelona-spain"/></label>
+            <label>Manual duplicate club id<input id="duplicateAliasId" placeholder="shoko-barcelona-beach-club-spain"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshDuplicateRecordsBtn" type="button">Refresh Duplicate Diagnostics</button>
+            <button id="mergeManualDuplicateBtn" type="button">Merge Manual Pair</button>
+          </div>
+          <p id="duplicateRecordStatus" class="status"></p>
+          <div id="duplicateRecordResults" class="report-block"></div>
+        </div>
+      </section>
+
       <section id="diagnostics" class="admin-panel-section">
         <div class="card">
           <h2>Master Admin Settings - Diagnostics</h2>
@@ -337,13 +357,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.43-f"></script>
+<script src="./shared-data.js?v=28.70-duplicate-record-merge"></script>
 <script src="./ai-service.js?v=28.44-ai"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-discovery-service.js?v=28.69-stale-shoutout-cleanup"></script>
-<script src="./ai-diagnostics-service.js?v=28.69-stale-shoutout-cleanup"></script>
-<script src="./master-admin-app.js?v=28.69-stale-shoutout-cleanup"></script>
+<script src="./ai-discovery-service.js?v=28.70-duplicate-record-merge"></script>
+<script src="./ai-diagnostics-service.js?v=28.70-duplicate-record-merge"></script>
+<script src="./duplicate-record-service.js?v=28.70-duplicate-record-merge"></script>
+<script src="./master-admin-app.js?v=28.70-duplicate-record-merge"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

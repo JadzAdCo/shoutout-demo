@@ -1,4 +1,4 @@
-/* admin-app.js v24 - Club admin portal with analytics and reconciliation */
+/* admin-app.js v28.70 - Club admin portal with analytics and reconciliation */
 (function () {
   "use strict";
 
@@ -15,14 +15,54 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const locationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
+  let locationId = canonicalStaticLocationId(qs("location", qs("club", "zebbies-garden-washington-dc")));
   const profileImportDraftId = qs("profileImportDraft", "");
-  const loc = window.SHOUTOUT_CLUB_LOCATIONS?.[locationId] || { locationName: locationId, brand: locationId, genres: [], activityDates: [] };
+  let loc = getStaticLocation(locationId);
   let publicClubProfile = {...loc};
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+
+  function canonicalStaticLocationId(id = "") {
+    const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
+    const row = (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || {};
+    return String(row.canonicalLocationId || row.aliasOf || row.mergedInto || key).toLowerCase();
+  }
+
+  function getStaticLocation(id = "") {
+    const key = canonicalStaticLocationId(id);
+    return (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || { locationName: key, brand: key, genres: [], activityDates: [] };
+  }
+
+  async function resolveAdminLocationId(id = "") {
+    let key = canonicalStaticLocationId(id);
+    try {
+      const alias = await db.collection("clubLocationAliases").doc(key).get();
+      if (alias.exists && alias.data()?.canonicalLocationId) {
+        key = String(alias.data().canonicalLocationId).toLowerCase();
+      }
+    } catch (e) {}
+    try {
+      const doc = await db.collection("clubLocations").doc(key).get();
+      if (doc.exists) {
+        const data = doc.data() || {};
+        if (data.canonicalLocationId || data.aliasOf || data.mergedInto) {
+          key = String(data.canonicalLocationId || data.aliasOf || data.mergedInto).toLowerCase();
+        }
+      }
+    } catch (e) {}
+    return canonicalStaticLocationId(key);
+  }
+
+  function refreshLocationShell() {
+    loc = getStaticLocation(locationId);
+    setText("clubName", loc.locationName || locationId);
+    const displayLink = byId("displayLink");
+    if (displayLink) displayLink.href = `./display.html?location=${locationId}`;
+    const liveFrame = byId("liveFrame");
+    if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
+  }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -735,12 +775,11 @@
       <p class="sub small">CSV export buttons are placeholders for the next backend iteration.</p>`;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    locationId = await resolveAdminLocationId(locationId);
     setupTabs();
-    setText("clubName", loc.locationName || locationId);
     setText("adminStatus", "Admin app loaded. Sign in to continue.");
-    byId("displayLink").href = `./display.html?location=${locationId}`;
-    byId("liveFrame").src = `./display.html?location=${locationId}`;
+    refreshLocationShell();
 
     bind("adminGoogleLoginBtn", loginGoogle);
     bind("adminFacebookLoginBtn", loginFacebook);
