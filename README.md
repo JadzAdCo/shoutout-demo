@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.71 Duplicate Merge Diagnostics Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.72 Alias-Resilient Duplicate Merge Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.71-duplicate-merge-diagnostics
+https://jadzadco.github.io/shoutout-demo/?v=28.72-alias-resilient-merge
 ```
 
 Current release highlights:
@@ -85,6 +85,9 @@ Current release highlights:
 - The Duplicate Merge Diagnostic checks the primary club, duplicate club, `clubLocationAliases/{duplicateId}`, static fallback aliasing, and leftover references in `events`, `shoutouts`, and `guestListRequests`.
 - Fixes the stuck `Merging duplicate club records...` state by catching Firebase write failures and showing the exact failure reason.
 - Adds Master Admin click feedback so button/link clicks show a visible confirmation message while the feature-specific result loads.
+- Makes duplicate merge alias-resilient. FLOQR now writes the core duplicate merge to `clubLocations` first, then attempts `clubLocationAliases` and `aiIndex` as optional follow-up writes.
+- If deployed Firebase rules still block `clubLocationAliases`, the core duplicate merge can still pass: the duplicate club is marked `status: "merged"`, `active: false`, and points to `canonicalLocationId`.
+- Alias-document permission problems now show as a targeted Soft Fail after the core duplicate merge, with the fix: publish `firestore.rules` containing `FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules` or newer.
 
 ## FLOQR AI Architecture
 
@@ -228,6 +231,7 @@ Open Master Admin > Duplicate Records when two public club profiles represent th
 - Select the record that should remain as the primary club.
 - Click `Merge Other Records Into Selected Primary`.
 - Click `Run Merge Diagnostic` when you are unsure whether the merge completed. The report returns Pass, Soft Fail, or Failed with the specific reason.
+- If `Alias document ... permission-denied` appears, publish the package `firestore.rules` in Firebase Console. With v28.72, you can still retry the merge before publishing rules because the core merge no longer depends on the alias document write.
 - FLOQR keeps the primary record active, adds `aliasLocationIds`, `aliasNames`, and search keywords to the primary, and marks the duplicate records as `status: "merged"` and `active: false`.
 - FLOQR writes `clubLocationAliases/{duplicateId}` with the canonical primary club id. Old patron, club admin, display, and record links can then resolve to the primary club instead of showing a duplicate.
 - The merge updates common related references in `events`, `shoutouts`, and `guestListRequests` where the duplicate id was stored, while preserving `previousLocationIds` for audit.

@@ -1,4 +1,4 @@
-/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.71 */
+/* FLOQR Master Admin duplicate record diagnostics and safe club merge tools v28.72 */
 (function () {
   "use strict";
 
@@ -279,6 +279,7 @@
 
     for (const duplicateId of duplicateIds) {
       let duplicate = null;
+      let duplicateMerged = false;
       try {
         const duplicateSnap = await db.collection("clubLocations").doc(duplicateId).get();
         if (!duplicateSnap.exists) {
@@ -287,8 +288,8 @@
           duplicate = {id:duplicateSnap.id, ...duplicateSnap.data()};
           const canonical = String(duplicate.canonicalLocationId || duplicate.aliasOf || duplicate.mergedInto || "").toLowerCase();
           const status = String(duplicate.status || "").toLowerCase();
-          const merged = canonical === primaryId && (status === "merged" || duplicate.active === false);
-          addDiagnostic(rows, `Duplicate club ${duplicateId}`, merged ? "Pass" : "Failed", merged ? "Duplicate is marked merged/inactive and points to the primary club." : `Duplicate does not yet point cleanly to ${primaryId}. status=${duplicate.status || "-"}, active=${duplicate.active}, canonical=${canonical || "-"}.`);
+          duplicateMerged = canonical === primaryId && (status === "merged" || duplicate.active === false);
+          addDiagnostic(rows, `Duplicate club ${duplicateId}`, duplicateMerged ? "Pass" : "Failed", duplicateMerged ? "Duplicate is marked merged/inactive and points to the primary club." : `Duplicate does not yet point cleanly to ${primaryId}. status=${duplicate.status || "-"}, active=${duplicate.active}, canonical=${canonical || "-"}.`);
         }
       } catch (error) {
         addDiagnostic(rows, `Duplicate club ${duplicateId}`, "Failed", `Could not read duplicate club: ${formatError(error)}`);
@@ -297,14 +298,14 @@
       try {
         const aliasSnap = await db.collection("clubLocationAliases").doc(duplicateId).get();
         if (!aliasSnap.exists) {
-          addDiagnostic(rows, `Alias document ${duplicateId}`, "Failed", "clubLocationAliases document was not found. If merge just failed, publish v28.70+ firestore.rules and retry.");
+          addDiagnostic(rows, `Alias document ${duplicateId}`, duplicateMerged ? "Soft Fail" : "Failed", duplicateMerged ? "Alias document was not found, but the duplicate club doc now points to the primary. Publish firestore.rules v28.70+ to enable alias-document reads/writes for old links." : "clubLocationAliases document was not found. If merge just failed, publish v28.70+ firestore.rules and retry.");
         } else {
           const alias = aliasSnap.data() || {};
           const canonical = String(alias.canonicalLocationId || "").toLowerCase();
           addDiagnostic(rows, `Alias document ${duplicateId}`, canonical === primaryId ? "Pass" : "Failed", canonical === primaryId ? "Alias document points old links to the primary club." : `Alias points to ${canonical || "-"} instead of ${primaryId}.`);
         }
       } catch (error) {
-        addDiagnostic(rows, `Alias document ${duplicateId}`, "Failed", `Could not read alias document: ${formatError(error)}`);
+        addDiagnostic(rows, `Alias document ${duplicateId}`, duplicateMerged ? "Soft Fail" : "Failed", duplicateMerged ? `Alias document read is blocked (${formatError(error)}), but the duplicate club doc points to the primary. Publish firestore.rules v28.70+ to unlock alias-document diagnostics and old-link alias reads.` : `Could not read alias document: ${formatError(error)}`);
       }
 
       if (primary) {
@@ -330,7 +331,7 @@
     try {
       await db.collection("aiDiagnosticsReports").add({
         type:"duplicateMergeDiagnostic",
-        packageVersion:"v28.71-duplicate-merge-diagnostics",
+        packageVersion:"v28.72-alias-resilient-merge",
         status,
         primaryId,
         duplicateIds,
@@ -516,11 +517,11 @@
     if (!confirmed) return;
     setStatus("Merging duplicate club records...");
     try {
-      const batch = db.batch();
-      batch.set(db.collection("clubLocations").doc(primary.id), mergePayloadForPrimary(primary, duplicates), {merge:true});
+      const coreBatch = db.batch();
+      coreBatch.set(db.collection("clubLocations").doc(primary.id), mergePayloadForPrimary(primary, duplicates), {merge:true});
       duplicates.forEach(duplicate => {
         const aliasNames = unique([duplicate.locationName, duplicate.brandName, duplicate.id]);
-        batch.set(db.collection("clubLocations").doc(duplicate.id), {
+        coreBatch.set(db.collection("clubLocations").doc(duplicate.id), {
           status:"merged",
           active:false,
           aliasOf:primary.id,
@@ -533,7 +534,15 @@
           mergedByEmail:auth.currentUser?.email || "",
           updatedAt:nowField()
         }, {merge:true});
-        batch.set(db.collection("clubLocationAliases").doc(duplicate.id), {
+      });
+      await coreBatch.commit();
+
+      const optionalNotes = [];
+      try {
+        const aliasBatch = db.batch();
+        duplicates.forEach(duplicate => {
+          const aliasNames = unique([duplicate.locationName, duplicate.brandName, duplicate.id]);
+          aliasBatch.set(db.collection("clubLocationAliases").doc(duplicate.id), {
           aliasId:duplicate.id,
           aliasName:duplicate.locationName || duplicate.brandName || duplicate.id,
           aliasNames,
@@ -547,34 +556,49 @@
           updatedAt:nowField(),
           createdByUid:auth.currentUser?.uid || "",
           createdByEmail:auth.currentUser?.email || ""
-        }, {merge:true});
-      });
-      batch.set(db.collection("aiIndex").doc(`clubLocation_${primary.id}`), {
-        sourceType:"clubLocation",
-        sourceId:primary.id,
-        title:primary.locationName || primary.brandName || primary.id,
-        keywords:arrayUnion([primary.locationName, primary.brandName, primary.id, duplicates.flatMap(item => [item.id, item.locationName, item.brandName, item.type])]) || [],
-        aliasLocationIds:arrayUnion(duplicates.map(item => item.id)) || [],
-        aliasNames:arrayUnion(duplicates.flatMap(item => [item.locationName, item.brandName])) || [],
-        visibility:"public",
-        updatedAt:nowField(),
-        indexedAt:nowField()
-      }, {merge:true});
-      duplicates.forEach(duplicate => {
-        batch.set(db.collection("aiIndex").doc(`clubLocation_${duplicate.id}`), {
-          status:"merged",
+          }, {merge:true});
+        });
+        await aliasBatch.commit();
+        optionalNotes.push("alias documents written");
+      } catch (aliasError) {
+        console.warn("Alias document write skipped after core merge:", aliasError?.message || aliasError);
+        optionalNotes.push(`alias document write blocked: ${formatError(aliasError)}`);
+      }
+
+      try {
+        const indexBatch = db.batch();
+        indexBatch.set(db.collection("aiIndex").doc(`clubLocation_${primary.id}`), {
+          sourceType:"clubLocation",
+          sourceId:primary.id,
+          title:primary.locationName || primary.brandName || primary.id,
+          keywords:arrayUnion([primary.locationName, primary.brandName, primary.id, duplicates.flatMap(item => [item.id, item.locationName, item.brandName, item.type])]) || [],
+          aliasLocationIds:arrayUnion(duplicates.map(item => item.id)) || [],
+          aliasNames:arrayUnion(duplicates.flatMap(item => [item.locationName, item.brandName])) || [],
           visibility:"public",
-          aliasOf:primary.id,
-          canonicalLocationId:primary.id,
-          updatedAt:nowField()
+          updatedAt:nowField(),
+          indexedAt:nowField()
         }, {merge:true});
-      });
-      await batch.commit();
+        duplicates.forEach(duplicate => {
+          indexBatch.set(db.collection("aiIndex").doc(`clubLocation_${duplicate.id}`), {
+            status:"merged",
+            visibility:"public",
+            aliasOf:primary.id,
+            canonicalLocationId:primary.id,
+            updatedAt:nowField()
+          }, {merge:true});
+        });
+        await indexBatch.commit();
+        optionalNotes.push("AI index updated");
+      } catch (indexError) {
+        console.warn("AI index update skipped after core merge:", indexError?.message || indexError);
+        optionalNotes.push(`AI index update blocked: ${formatError(indexError)}`);
+      }
+
       let referencesUpdated = 0;
       for (const duplicate of duplicates) {
         referencesUpdated += await updateReferencesForAlias(duplicate, primary);
       }
-      setStatus(`Merge complete. ${duplicates.length} duplicate record(s) became aliases; ${referencesUpdated} related record reference(s) were updated. Running verification...`);
+      setStatus(`Core merge complete. ${duplicates.length} duplicate record(s) were marked merged; ${referencesUpdated} related record reference(s) were updated. ${optionalNotes.join("; ")}. Running verification...`);
       await runDuplicateMergeDiagnostic(primary.id, duplicates.map(item => item.id));
       await refreshDuplicateDiagnostics();
       if (window.FLOQRAIDiscovery?.loadListingDeleteTool) window.FLOQRAIDiscovery.loadListingDeleteTool();

@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.71 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.72 */
 (function () {
   "use strict";
 
@@ -29,7 +29,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.70-duplicate-alias-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.71-duplicate-merge-diagnostics";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.72-alias-resilient-merge";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -482,6 +482,17 @@
         {label:"Script cache bust", file:"master-admin.html", includes:["v=28.71-duplicate-merge-diagnostics", "duplicate-record-service.js"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.71-duplicate-merge-diagnostics"]},
         {label:"README merge diagnostic explanation", file:"README.md", includes:["Run Merge Diagnostic", "Duplicate Merge Diagnostic"]}
+      ]
+    },
+    {
+      version: "v28.72-alias-resilient-merge",
+      title: "Alias-Resilient Duplicate Merge",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.72-alias-resilient-merge"]},
+        {label:"Core merge separated from alias write", file:"duplicate-record-service.js", includes:["coreBatch", "aliasBatch", "Core merge complete"]},
+        {label:"Alias write blocked is non-core", file:"duplicate-record-service.js", includes:["alias document write blocked", "Alias document read is blocked", "Soft Fail"]},
+        {label:"Script cache bust", file:"master-admin.html", includes:["v=28.72-alias-resilient-merge", "duplicate-record-service.js"]},
+        {label:"README resilient merge note", file:"README.md", includes:["alias-resilient", "core duplicate merge"]}
       ]
     }
   ];
