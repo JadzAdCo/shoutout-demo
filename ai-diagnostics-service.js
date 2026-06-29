@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.65 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.66 */
 (function () {
   "use strict";
 
@@ -28,7 +28,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.59-diagnostic-cleanup-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.65-source-detail-extraction";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.66-search-results-guard";
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
   const DEFAULT_EVENT_TYPES = [
@@ -403,6 +403,17 @@
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.65-source-detail-extraction"]},
         {label:"README source extraction explanation", file:"README.md", includes:["Source Detail Extraction", "Eventbrite"]}
       ]
+    },
+    {
+      version: "v28.66-search-results-guard",
+      title: "Search Results Page Guard",
+      checks: [
+        {label:"Search results URL detector", file:"ai-diagnostics-service.js", includes:["isSearchResultsUrl", "searchQueryFromSourceUrl", "needs-final-event-source"]},
+        {label:"Save guard for broad search pages", file:"ai-diagnostics-service.js", includes:["This is a search results page", "Open one specific event or venue detail page"]},
+        {label:"Backend search results guard", file:"functions/ai-discovery-functions.js", includes:["isSearchResultsUrl", "searchResultsRecord", "needs-final-event-source"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.66-search-results-guard"]},
+        {label:"README search results explanation", file:"README.md", includes:["search-results page", "final event-detail URL"]}
+      ]
     }
   ];
 
@@ -666,6 +677,85 @@
     return host || "Public source";
   }
 
+  function isSearchResultsUrl(sourceUrl = "") {
+    try {
+      const url = new URL(sourceUrl);
+      const host = url.hostname.replace(/^www\./, "").toLowerCase();
+      const path = url.pathname.toLowerCase();
+      if (/google\./.test(host) && path.includes("/search")) return true;
+      if (/ticketmaster\./.test(host) && path.includes("/search")) return true;
+      if (/eventbrite\./.test(host) && /^\/d\//.test(path) && /\/events\/?$/.test(path)) return true;
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function searchQueryFromSourceUrl(sourceUrl = "") {
+    try {
+      const url = new URL(sourceUrl);
+      const q = url.searchParams.get("q") || url.searchParams.get("keyword") || "";
+      if (q) return q.replace(/\+/g, " ").trim();
+      const pathParts = url.pathname.split("/").filter(Boolean);
+      const dIndex = pathParts.indexOf("d");
+      if (dIndex >= 0) return decodeURIComponent(pathParts.slice(dIndex + 1).join(" ")).replace(/[-_]+/g, " ").trim();
+      return "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function searchResultsRecord(sourceUrl = "", sourceText = "") {
+    const query = searchQueryFromSourceUrl(sourceUrl) || "public event search";
+    const sourceName = sourceNameForUrl(sourceUrl);
+    const market = extractCityCountryFromSource(sourceUrl, sourceText || query);
+    return {
+      proposedType:"sourceSearchResults",
+      proposedTitle:`${sourceName} search results: ${query}`,
+      proposedDescription:"This is a search-results page, not a final event or venue detail page. Use it to find candidates, then open one specific event/venue page or paste copied event-card details before saving an approvable review record.",
+      proposedDate:"",
+      proposedTime:"",
+      proposedLocationName:"",
+      proposedAddress:"",
+      city:market.city,
+      stateRegion:market.stateRegion,
+      country:market.country,
+      officialWebsite:"",
+      website:"",
+      email:"",
+      telephone:"",
+      phone:"",
+      ticketUrl:"",
+      sourceUrl,
+      sourceName,
+      sourceSearchLinks:sourceUrl ? [{label:"Search results page", href:sourceUrl}] : [],
+      extractedImages:[],
+      extractedTags:["search-results-page", "follow-up-needed"],
+      categories:["search-results-page", "follow-up-needed"],
+      genres:detectGenresFromText(`${query} ${sourceText}`),
+      searchLanguage:market.language || "",
+      searchQuery:query,
+      aiSummary:"Search-results page detected. FLOQR will not approve this as a live listing until a final event/venue detail source is provided.",
+      aiConfidenceScore:0.4,
+      aiStarRating:2,
+      aiRatingReasons:[
+        "Broad search-results page detected",
+        "Final event/venue URL is required for address/date/time extraction",
+        "Open one specific result or use Ticketmaster/Eventbrite API detail data"
+      ],
+      duplicateCandidateIds:[],
+      status:"pendingReview",
+      discoveryMode:"source-results-follow-up",
+      extractionMethod:"search-results-page-guard",
+      sourcePageType:"searchResultsPage",
+      notApprovable:true,
+      missingDatapoints:["Final event/detail URL", "Name", "Address", "Date", "Time"],
+      crawlResultStatus:"needs-final-event-source",
+      createdAt:fieldValue(),
+      updatedAt:fieldValue()
+    };
+  }
+
   function titleCase(value = "") {
     return String(value || "").toLowerCase().replace(/\b[a-z]/g, char => char.toUpperCase()).replace(/\bDj\b/g, "DJ").replace(/\bEdm\b/g, "EDM");
   }
@@ -777,6 +867,7 @@
   }
 
   function extractSourceDetailsFromText(sourceUrl = "", sourceText = "") {
+    if (isSearchResultsUrl(sourceUrl)) return searchResultsRecord(sourceUrl, sourceText);
     const text = String(sourceText || "");
     const fromUrl = titleFromSourceUrl(sourceUrl);
     const titleLine = text.split(/\r?\n/).map(line => line.trim()).find(line => /show|club|lounge|party|tickets?|event/i.test(line) && line.length >= 8 && line.length <= 120);
@@ -2158,6 +2249,7 @@
       return;
     }
     const rows = [
+      ["Page type", record.sourcePageType === "searchResultsPage" ? "Search results page - follow-up required" : "Detail/source page"],
       ["Name", record.proposedTitle || "-"],
       ["Type", record.proposedType || "-"],
       ["Date", record.proposedDate || "-"],
@@ -2171,9 +2263,10 @@
     wrap.innerHTML = `${simpleRows(rows)}<div class="queue-item">
       <div class="message-envelope-head">
         <strong>${esc(record.proposedTitle || "Extracted source")}</strong>
-        ${statusBadge((record.missingDatapoints || []).length ? "Soft Fail" : "Pass")}
+        ${statusBadge(record.notApprovable ? "Failed" : (record.missingDatapoints || []).length ? "Soft Fail" : "Pass")}
       </div>
       <p>${esc(record.proposedDescription || record.aiSummary || "")}</p>
+      ${record.notApprovable ? `<p class="sub small"><strong>Next step:</strong> Open one specific event or venue detail page from these results, then paste that final URL and copied event-card details here.</p>` : ""}
       <p class="sub small">Categories: ${esc(joinList(record.categories) || "-")} | Genres/tags: ${esc(joinList(record.genres) || "-")}</p>
       ${record.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(record.sourceUrl)}">Open Source</a>` : ""}
     </div>`;
@@ -2224,6 +2317,11 @@
     if (!state.db) return;
     const record = state.lastExtractedSourceRecord || await extractSourceDetails();
     if (!record) return;
+    if (record.notApprovable || record.sourcePageType === "searchResultsPage") {
+      setText("diagnosticsStatus", "This is a search results page. Open one specific event or venue detail page, then paste that final URL/details before saving.");
+      renderSourceExtractionReport(record);
+      return;
+    }
     await state.db.collection("aiDiscoveryQueue").add({
       ...record,
       createdByUid: state.auth?.currentUser?.uid || "",
