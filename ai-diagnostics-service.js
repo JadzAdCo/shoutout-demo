@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, and rules guidance v28.73 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.74 */
 (function () {
   "use strict";
 
@@ -17,7 +17,8 @@
     lastStaleRecords: [],
     lastFeatures: [],
     lastPackageDiagnostics: [],
-    lastRulesSmokeResults: []
+    lastRulesSmokeResults: [],
+    lastGeminiMediaDiagnostic: null
   };
 
   const STATUS_COPY = {
@@ -27,9 +28,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.70-duplicate-alias-rules";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.73-canonical-merge-completion";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.74-gemini-media-editing";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -505,6 +506,21 @@
         {label:"Patron canonical duplicate resolver", file:"patron-app.js", includes:["clubLocations\").doc(key)", "canonicalLocationId", "locationAliases[key]"]},
         {label:"Script cache bust", file:"master-admin.html", includes:["v=28.73-canonical-merge-completion", "duplicate-record-service.js"]},
         {label:"README canonical completion note", file:"README.md", includes:["canonical duplicate document", "Complete / Repair Merge"]}
+      ]
+    },
+    {
+      version: "v28.74-gemini-media-editing",
+      title: "Gemini ShoutOut Media Editing",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.74-gemini-media-editing"]},
+        {label:"Gemini media callable backend", file:"functions/ai-discovery-functions.js", includes:["aiEnhanceShoutOutMedia", "GEMINI_API_KEY", "safeEnhancementPrompt"]},
+        {label:"Patron Gemini upload path", file:"ai-media-service.js", includes:["requestGeminiImageEnhancement", "httpsCallable", "enhancedMediaStoragePath"]},
+        {label:"Patron media metadata save", file:"patron-app.js", includes:["aiEnhancementProvider", "enhancedMediaStoragePath", "originalMediaStoragePath"]},
+        {label:"Admin approval Gemini pass-through", file:"admin-app.js", includes:["aiEnhancementProvider", "enhancedMediaStoragePath", "originalMediaStoragePath"]},
+        {label:"Functions SDK loaded on patron page", file:"index.html", includes:["firebase-functions-compat.js", "v=28.74-gemini-media-editing", "ai-media-service.js"]},
+        {label:"Gemini diagnostics callable check", file:"ai-diagnostics-service.js", includes:["runGeminiMediaDiagnostic", "aiEnhanceShoutOutMedia", "Gemini media editing callable"]},
+        {label:"Gemini media audit Firestore rule", file:"firestore.rules", includes:["v28.74-gemini-media-editing-rules", "match /aiMediaEdits/{id}", "ownsResourceUid"]},
+        {label:"Firebase Functions deploy config", file:"firebase.json", includes:["\"functions\"", "\"source\": \"functions\"", "\"runtime\": \"nodejs20\""]}
       ]
     }
   ];
@@ -1349,8 +1365,11 @@
     if (text.includes("no saved rules smoke test") || text.includes("run the rules smoke test")) {
       return "Click `Run Rules Smoke Test`. If it fails, click `Export Diagnostics TXT` and paste the exported fix prompt back into Codex.";
     }
+    if (text.includes("gemini media") || text.includes("aienhanceshoutoutmedia") || text.includes("gemini_api_key")) {
+      return "Deploy `functions/ai-discovery-functions.js` with the `aiEnhanceShoutOutMedia` callable, set the Firebase Functions secret `GEMINI_API_KEY`, then rerun Master Admin > Diagnostics.";
+    }
     if (text.includes("backend") || text.includes("cloud functions") || text.includes("scheduler") || text.includes("gemini")) {
-      return "This is expected until backend Firebase/AI services are configured. Leave it as TBI or schedule it as a future backend package.";
+      return "Deploy the Firebase Functions backend and required secrets/API credentials, then rerun the related Master Admin diagnostic.";
     }
     if (status === "TBI") {
       return "No emergency fix required. This means the feature is planned but not implemented yet; choose it for a future package when ready.";
@@ -1794,6 +1813,58 @@
       setText("diagnosticsStatus", failed ? `Package install diagnostics found ${failed} failed checks.` : "Package install diagnostics passed.");
     }
     return results;
+  }
+
+  async function runGeminiMediaDiagnostic(options = {}) {
+    const base = {
+      area:"ShoutOut",
+      feature:"Gemini media editing callable",
+      status:"Soft Fail",
+      evidence:"Gemini media editing callable has not been checked yet."
+    };
+    try {
+      if (!state.auth?.currentUser) {
+        return {...base, evidence:"No signed-in Master Admin user is available for the callable check."};
+      }
+      if (!window.firebase?.functions) {
+        return {...base, status:"Failed", evidence:"Firebase Functions SDK is not loaded on Master Admin."};
+      }
+      const region = window.FLOQR_AI_FUNCTIONS_REGION || "";
+      const functionName = window.FLOQR_AI_GEMINI_MEDIA_FUNCTION || "aiEnhanceShoutOutMedia";
+      const client = region ? firebase.app().functions(region) : firebase.app().functions();
+      const callable = client.httpsCallable(functionName);
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Gemini media callable diagnostic timed out.")), 12000));
+      const result = await Promise.race([callable({mode:"diagnostic"}), timeout]);
+      const data = result?.data || {};
+      if (data.status === "configured") {
+        return {
+          ...base,
+          status:"Pass",
+          evidence:`Gemini media editing callable is configured. Provider=${data.provider || "gemini"}; model=${data.model || window.FLOQR_AI_GEMINI_MEDIA_MODEL || "unknown"}.`
+        };
+      }
+      return {
+        ...base,
+        status:"Soft Fail",
+        evidence:data.message || "Gemini media callable responded but did not report configured status."
+      };
+    } catch (error) {
+      const message = error?.message || String(error);
+      const code = error?.code || "";
+      const missingFunction = /not found|not-found|functions\/not-found|404/i.test(`${code} ${message}`);
+      const missingSecret = /secret|GEMINI_API_KEY|not configured|failed-precondition/i.test(`${code} ${message}`);
+      return {
+        ...base,
+        status:"Soft Fail",
+        evidence:missingFunction
+          ? "Gemini media editing callable is not deployed yet. Deploy Firebase Functions with aiEnhanceShoutOutMedia, then rerun Diagnostics."
+          : missingSecret
+          ? `Gemini media editing callable is deployed but not configured: ${message}`
+          : `Gemini media editing callable check failed: ${message}`
+      };
+    } finally {
+      if (!options.silent) setText("diagnosticsStatus", "Gemini media diagnostic finished.");
+    }
   }
 
   function tinyPngBlob() {
@@ -3629,6 +3700,10 @@
     const latestAnyRulesReport = latestRulesSmokeReport(data);
     const hasSearch = !!window.floqrSearch;
     const hasDiscovery = !!window.FLOQRAIDiscovery;
+    const geminiMediaDiagnostic = state.lastGeminiMediaDiagnostic || {
+      status:"Soft Fail",
+      evidence:"Run Diagnostics after deploying Firebase Functions and setting the GEMINI_API_KEY secret."
+    };
 
     return [
       ["Authentication", "Firebase config", window.firebaseConfig ? "Pass" : "Failed", window.firebaseConfig ? "window.firebaseConfig present." : "Missing Firebase config."],
@@ -3641,7 +3716,7 @@
       ["ShoutOut", "Submission queue", collectionStatus(data, "shoutouts"), `${collectionCount(data, "shoutouts")} ShoutOut records scanned.`],
       ["ShoutOut", "Admin approval queue", collectionStatus(data, "shoutouts"), "Pending and approved ShoutOut records are readable for diagnostics."],
       ["ShoutOut", "LED display content", collectionStatus(data, "liveContent", true), `${collectionCount(data, "liveContent")} live display records scanned.`],
-      ["ShoutOut", "Media AI panel", "Soft Fail", "Browser filter/metadata fallback is implemented; live Gemini media editing/moderation remains backend-dependent."],
+      ["ShoutOut", "Media AI panel", geminiMediaDiagnostic.status, geminiMediaDiagnostic.status === "Pass" ? geminiMediaDiagnostic.evidence : `${geminiMediaDiagnostic.evidence} Static filter/trim fallback remains available without breaking ShoutOut.`],
       ["ShoutOut", "Improve My ShoutOut", hasSearch ? "Pass" : "Soft Fail", "Safe curated fallback should work when AI flags are false."],
       ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
       ["Mingl", "Mingl matching", collectionStatus(data, "minglConnections", true), `${collectionCount(data, "minglConnections")} Mingl connection records scanned.`],
@@ -3812,6 +3887,7 @@
       const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
       if (schedule) applyScheduleToControls(schedule);
       renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+      state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
       const features = buildFeatureDiagnostics(data);
       state.lastFeatures = features;
       state.lastSchedule = schedule || null;
@@ -3839,6 +3915,7 @@
     const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
     if (schedule) applyScheduleToControls(schedule);
     renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
+    state.lastGeminiMediaDiagnostic = await runGeminiMediaDiagnostic({silent:true});
     const features = buildFeatureDiagnostics(data);
     state.lastFeatures = features;
     state.lastSchedule = schedule || null;

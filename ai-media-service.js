@@ -1,8 +1,9 @@
-/* FLOQR ShoutOut media AI readiness: filters, safety metadata, first-7-second video trim. */
+/* FLOQR ShoutOut media AI readiness v28.74: Gemini callable image editing, filters, safety metadata, first-7-second video trim. */
 (function () {
   "use strict";
 
   const MAX_VIDEO_SECONDS = 7;
+  const GEMINI_MEDIA_TIMEOUT_MS = 45000;
   const FILTERS = {
     original: {label:"Use Original", css:"none", type:"none"},
     bright: {label:"Improve Lighting", css:"brightness(1.18) contrast(1.08)", type:"lighting"},
@@ -55,7 +56,7 @@
     panel.className = "ai-media-panel";
     panel.innerHTML = `
       <h2>AI Media Enhancement</h2>
-      <p class="sub small">AI-ready panel. Live Gemini/Firebase AI processing is disabled unless configured; browser filters are preview-only.</p>
+      <p class="sub small">Gemini photo editing runs through Firebase Functions when deployed. Browser filters remain the safe fallback.</p>
       <div class="ai-filter-row">
         ${Object.entries(FILTERS).map(([key, item]) => `<button type="button" data-ai-filter="${esc(key)}">${esc(item.label)}</button>`).join("")}
         <button type="button" data-ai-trim>Trim Video to 7 Seconds</button>
@@ -272,6 +273,71 @@
     });
   }
 
+  function functionsClient() {
+    if (!window.firebase?.app || !window.firebase?.functions) return null;
+    const region = window.FLOQR_AI_FUNCTIONS_REGION || "";
+    return region ? firebase.app().functions(region) : firebase.app().functions();
+  }
+
+  function withTimeout(promise, timeoutMs, label) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), timeoutMs))
+    ]);
+  }
+
+  async function requestGeminiImageEnhancement(uploadResult, referenceNumber) {
+    const file = selectedFile();
+    const selectedVersion = byId("aiSelectedMediaVersion")?.value || "original";
+    if (!file || !file.type.startsWith("image/") || selectedVersion !== "enhanced") return null;
+    if (!uploadResult?.mediaStoragePath) return null;
+    const client = functionsClient();
+    if (!client) {
+      safetyStatus = "flagged";
+      safetyNotes = "Gemini image editing unavailable: Firebase Functions SDK is not loaded.";
+      return null;
+    }
+    const functionName = window.FLOQR_AI_GEMINI_MEDIA_FUNCTION || "aiEnhanceShoutOutMedia";
+    const callable = client.httpsCallable(functionName);
+    setPanelStatus("Sending image to Gemini for enhancement...");
+    try {
+      const result = await withTimeout(callable({
+        mediaStoragePath:uploadResult.mediaStoragePath,
+        referenceNumber,
+        prompt:byId("aiEnhancementPrompt")?.value || FILTERS[selectedFilter]?.label || "Improve this ShoutOut image.",
+        enhancementType:byId("aiEnhancementType")?.value || FILTERS[selectedFilter]?.type || "image-edit"
+      }), GEMINI_MEDIA_TIMEOUT_MS, "Gemini image enhancement");
+      const data = result?.data || {};
+      if (data.status !== "enhanced" || !data.enhancedMediaUrl) {
+        throw new Error(data.message || "Gemini did not return an enhanced image URL.");
+      }
+      safetyStatus = data.aiMediaSafetyStatus || "passed";
+      safetyNotes = data.aiMediaSafetyNotes || "Gemini image edit completed.";
+      setPanelStatus("Gemini enhanced image ready. Enhanced version selected.");
+      return {
+        ...uploadResult,
+        mediaUrl:data.enhancedMediaUrl,
+        mediaType:"image",
+        mediaStoragePath:data.enhancedMediaStoragePath || uploadResult.mediaStoragePath,
+        originalMediaUrl:uploadResult.mediaUrl,
+        originalMediaStoragePath:uploadResult.mediaStoragePath,
+        enhancedMediaUrl:data.enhancedMediaUrl,
+        enhancedMediaStoragePath:data.enhancedMediaStoragePath || "",
+        selectedMediaVersion:"enhanced",
+        aiEnhancementApplied:true,
+        aiEnhancementProvider:data.provider || "gemini",
+        aiEnhancementModel:data.model || "",
+        aiMediaSafetyStatus:safetyStatus,
+        aiMediaSafetyNotes:safetyNotes
+      };
+    } catch (error) {
+      safetyStatus = "flagged";
+      safetyNotes = `Gemini image editing fallback used: ${error?.message || error}`;
+      setPanelStatus(safetyNotes);
+      return null;
+    }
+  }
+
   async function trimVideoToFirstSevenSeconds(file) {
     if (!file || !file.type.startsWith("video/") || !window.MediaRecorder) return null;
     const url = URL.createObjectURL(file);
@@ -385,15 +451,20 @@
     const meta = metadata();
     if (!result || !result.mediaUrl) return result;
     const trimmed = meta.selectedMediaVersion === "trimmed";
+    const enhanced = meta.selectedMediaVersion === "enhanced";
     return {
       ...result,
-      originalMediaUrl: trimmed ? (overrides.originalMediaUrl || "") : result.mediaUrl,
-      enhancedMediaUrl: meta.selectedMediaVersion === "enhanced" ? result.mediaUrl : "",
+      originalMediaUrl: result.originalMediaUrl || (trimmed ? (overrides.originalMediaUrl || "") : result.mediaUrl),
+      enhancedMediaUrl: result.enhancedMediaUrl || (enhanced ? result.mediaUrl : ""),
       trimmedMediaUrl: trimmed ? result.mediaUrl : "",
       selectedMediaVersion: meta.selectedMediaVersion,
       aiEnhancementApplied: meta.aiEnhancementApplied,
       aiEnhancementType: meta.aiEnhancementType,
       aiEnhancementPrompt: meta.aiEnhancementPrompt,
+      aiEnhancementProvider: result.aiEnhancementProvider || "",
+      aiEnhancementModel: result.aiEnhancementModel || "",
+      originalMediaStoragePath: result.originalMediaStoragePath || "",
+      enhancedMediaStoragePath: result.enhancedMediaStoragePath || "",
       originalDuration: meta.originalDuration,
       trimmedDuration: meta.trimmedDuration,
       trimStart: meta.trimStart,
@@ -433,6 +504,8 @@
         setPanelStatus(trimWarning);
       }
       const result = await original(referenceNumber);
+      const geminiResult = await requestGeminiImageEnhancement(result, referenceNumber);
+      if (geminiResult) return decorateResult(geminiResult);
       return decorateResult(result, {
         trimProcessingMode,
         trimWarning,

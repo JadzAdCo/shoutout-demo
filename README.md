@@ -1,11 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.73 Canonical Duplicate Merge Completion Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.74 Gemini Media Editing Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.73-canonical-merge-completion
+https://jadzadco.github.io/shoutout-demo/?v=28.74-gemini-media-editing
 ```
 
 Current release highlights:
@@ -91,6 +91,11 @@ Current release highlights:
 - Defines merge completion by the canonical duplicate document. Once `clubLocations/{duplicateId}` has `status: "merged"`, `active: false`, and `canonicalLocationId` pointing to the primary, the merge is complete even if `clubLocationAliases` is unavailable.
 - Adds a `Complete / Repair Merge Now` action directly inside the failed Duplicate Merge Diagnostic report.
 - Updates the patron resolver so old duplicate links can resolve by reading the duplicate `clubLocations/{duplicateId}` document directly when `clubLocationAliases` is blocked.
+- Adds deployable Gemini ShoutOut image editing through the Firebase callable `aiEnhanceShoutOutMedia`.
+- Adds patron-side Gemini enhancement after original photo upload. If Gemini succeeds, the enhanced image becomes the selected ShoutOut media; if Gemini is unavailable, FLOQR keeps the original media and saves the fallback reason.
+- Adds Master Admin Diagnostics callable probing for Gemini media editing. `ShoutOut: Media AI panel` now passes only when the callable is deployed and the `GEMINI_API_KEY` secret is available.
+- Updates Firestore rules to `v28.74-gemini-media-editing-rules` with owner-visible `aiMediaEdits` audit records.
+- Adds root `firebase.json` pointing Firebase CLI to the `functions/` folder with Node 20.
 
 ## FLOQR AI Architecture
 
@@ -107,6 +112,7 @@ Live in this package:
 - FLOQR Studio UI with safe background values.
 - ShoutOut copy improvement fallback.
 - ShoutOut media enhancement preview metadata and first-7-second video trim metadata.
+- Firebase callable `aiEnhanceShoutOutMedia` for live Gemini image editing when Functions and the `GEMINI_API_KEY` secret are deployed.
 - Super Admin discovery review and listing soft-delete UI on Master Admin > AI Crawling.
 - Source Detail Extraction for followed Eventbrite, Ticketmaster, resale, venue, and comedy pages.
 - Deployable Firebase callable `aiExtractPublicSourceUrl` for server-side public page extraction.
@@ -121,7 +127,7 @@ Live in this package:
 Requires Firebase AI / Gemini configuration for live generative AI:
 
 - Semantic AI search provider calls.
-- Gemini media understanding and moderation notes.
+- Gemini media understanding and moderation notes. The package includes `aiEnhanceShoutOutMedia`, but it does not pass Diagnostics until deployed with the `GEMINI_API_KEY` Firebase Functions secret.
 - AI background image generation/modification.
 - Scheduled crawler execution through Firebase Cloud Functions or Cloud Run. The source URL extractor function is included in `functions/` and can be deployed with Firebase Functions.
 - Backend video trimming with ffmpeg or approved AI/video processor for browsers that cannot create a client-side trim.
@@ -153,7 +159,9 @@ template-backgrounds/{uid}/{variantId}/generated/
 
 ## Media AI Workflow
 
-The ShoutOut editor has an AI Media Enhancement panel with browser-only filter previews: Bright, Contrast, Neon, VIP Gold, Club Ready, Black & White, and Warm. The original file is still uploaded for photos and videos that are already 7 seconds or shorter unless a future backend processor returns an enhanced asset.
+The ShoutOut editor has an AI Media Enhancement panel with browser filter previews: Bright, Contrast, Neon, VIP Gold, Club Ready, Black & White, and Warm. For photos, selecting `Use Enhanced` uploads the original image first, then calls the Firebase callable `aiEnhanceShoutOutMedia` when deployed. The callable verifies Firebase Auth, confirms the Storage path belongs to the signed-in user, sends the image to Gemini from the backend, stores the edited image under `enhanced/`, and returns `enhancedMediaUrl` plus provider/model metadata.
+
+If Gemini is not configured, FLOQR does not break the ShoutOut flow. It keeps the original media, saves the fallback reason in `aiMediaSafetyNotes`, and Diagnostics keeps `ShoutOut: Media AI panel` in Soft Fail until the backend callable and secret are live.
 
 Videos longer than 7 seconds are not blocked. The user is warned, FLOQR selects only the first 7 seconds, and the app attempts to create a trimmed browser-side WebM upload under the `trimmed/` path. If the browser cannot create the cut, the app still saves trim metadata and the display renderer loops only the first 7 seconds. Backend AI/video trimming should later replace this fallback for permanent server-side cuts.
 
@@ -170,6 +178,16 @@ shoutouts/{uid}/{referenceOrId}/trimmed/{fileName}
 ```
 
 Firestore ShoutOut records now support selected/original/enhanced/trimmed media fields, trim metadata, trim processing mode, enhancement metadata, safety status, and safety notes.
+
+Gemini setup:
+
+```bash
+cd functions
+firebase functions:secrets:set GEMINI_API_KEY
+firebase deploy --only functions:aiEnhanceShoutOutMedia
+```
+
+Also publish `firestore.rules` so `aiMediaEdits` owner-visible audit records are allowed. Frontend code must never contain the Gemini key.
 
 ## AI Discovery Workflow
 
@@ -370,6 +388,9 @@ Test plan:
 - Create a private ShoutOut template variant and confirm it appears only under My ShoutOut Templates.
 - Create a public variant and confirm it appears in Community Templates and Public Sharing.
 - Upload a photo and preview media filters.
+- Deploy `aiEnhanceShoutOutMedia` with `GEMINI_API_KEY`, then refresh Master Admin > Diagnostics and confirm `ShoutOut: Media AI panel` changes from Soft Fail to Pass.
+- Upload a photo, choose an enhancement, click `Use Enhanced`, submit, and confirm Firestore saves `enhancedMediaUrl`, `enhancedMediaStoragePath`, `aiEnhancementProvider: "gemini"`, and `selectedMediaVersion: "enhanced"`.
+- Confirm Firebase Storage contains the original image under `shoutouts/{uid}/{reference}/original/` and the Gemini image under `shoutouts/{uid}/{reference}/enhanced/`.
 - Try a video longer than 7 seconds and confirm the user is warned, the first 7 seconds are selected, trim metadata is saved, and the display loops only that first 7-second window.
 - Submit a text-only ShoutOut and a media ShoutOut.
 - Approve a ShoutOut from club admin and confirm selected media/background render on display.
@@ -382,7 +403,7 @@ Test plan:
 - Click `Save Extracted Review Record` and confirm the new record appears in the discovery queue.
 - Try approving a crawl review record with missing address/phone and confirm approval is blocked with a clear missing-datapoint message.
 - Open Master Admin > Diagnostics and confirm the feature matrix renders with Pass/Soft Fail/Failed/TBI counts.
-- Click Run Package Install Diagnostics and confirm v28.44, v28.45, v28.46, v28.47, v28.48, v28.49, v28.50, v28.51, v28.52, v28.53, v28.54, v28.55, v28.56, v28.57, v28.58, v28.59, v28.60, v28.61, v28.62, v28.63, v28.64, v28.65, v28.66, and v28.67 package marker checks run.
+- Click Run Package Install Diagnostics and confirm v28.44 through v28.74 package marker checks run, including Gemini media editing backend, frontend, diagnostics, and rules markers.
 - Click Run Rules Smoke Test and confirm temporary Firestore docs, participant queries, Storage images, and Storage video placeholders are created/read/cleaned up.
 - Confirm the Firebase Rules Smoke Test status panel shows the expected rules version and overall rules status.
 - Click Export Diagnostics TXT and confirm a `floqr-diagnostics-*.txt` file downloads with failure reasons and a `COPY/PASTE FIX PROMPT` section.

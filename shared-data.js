@@ -1,5 +1,5 @@
 /*
-  shared-data.js v28.70
+  shared-data.js v28.74
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
@@ -32,6 +32,9 @@ window.FLOQR_AI_PROVIDER = "firebase-ai-logic";
 window.FLOQR_AI_FALLBACK_MODE = "local-contextual-search";
 window.FLOQR_AI_STUDIO_ENABLED = false;
 window.FLOQR_AI_ASSISTANT_ENABLED = false;
+window.FLOQR_AI_FUNCTIONS_REGION = "us-central1";
+window.FLOQR_AI_GEMINI_MEDIA_FUNCTION = "aiEnhanceShoutOutMedia";
+window.FLOQR_AI_GEMINI_MEDIA_MODEL = "gemini-3.1-flash-image";
 
 window.SHOUTOUT_ADMIN_EMAILS = [
   "bans.don@gmail.com",

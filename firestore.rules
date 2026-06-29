@@ -1,11 +1,13 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.70-duplicate-alias-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.74-gemini-media-editing-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
 // - clubLocationAliases read/write support for Master Admin duplicate record merge aliases
+// - aiMediaEdits owner-visible audit records for Gemini ShoutOut image editing
 // - users/{uid} self create/read/update support for onboarding and existing profiles
 // - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
@@ -238,6 +240,11 @@ service cloud.firestore {
           resource.data.uid == request.auth.uid
           || resource.data.recipientUid == request.auth.uid
         );
+    }
+
+    match /aiMediaEdits/{id} {
+      allow read, update, delete: if ownsResourceUid();
+      allow create: if createsOwnUid();
     }
 
     match /aiDiscoverySources/{id} {
