@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Patron Portal v28.82-mingl-privacy-media -->
+  <!-- FLOQR Patron Portal v28.83-mobile-mingl-inbox -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css"/>
-  <link rel="stylesheet" href="./admin.css"/>
+  <link rel="stylesheet" href="./styles.css?v=28.83-mobile-mingl-inbox"/>
+  <link rel="stylesheet" href="./admin.css?v=28.83-mobile-mingl-inbox"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -15,7 +15,7 @@
     <header class="topbar">
       <div>
         <h1>My Profile and Settings</h1>
-        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, messages, and Mingl.</p>
+        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FLOQR Inbox, and Mingl.</p>
         <p id="portalSignedInAs" class="status">Not signed in</p>
         <p id="portalStatus" class="status">Loading patron portal...</p>
       </div>
@@ -46,14 +46,14 @@
         <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Media and Data Sharing</button>
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
-        <button class="admin-tab" data-panel="portalMessages" type="button">Messages</button>
+        <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
         <button class="admin-tab" data-panel="portalChats" type="button">Mingl</button>
       </nav>
 
       <section id="portalOverview" class="admin-panel-section active">
         <div class="metric-grid">
           <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
-          <div class="metric-card"><span>Messages</span><strong id="metricMessages">0/0</strong></div>
+          <div class="metric-card"><span>FLOQR Inbox</span><strong id="metricMessages">0/0</strong></div>
           <div class="metric-card"><span>Mingl</span><strong id="metricChats">0/0</strong></div>
           <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
         </div>
@@ -212,11 +212,11 @@
 
       <section id="portalMessages" class="admin-panel-section">
         <div class="card">
-          <h2>Inbox Rules</h2>
+          <h2>FLOQR Inbox Rules</h2>
           <div id="messagePolicySummary" class="policy-list"></div>
         </div>
         <div class="card" id="portalCompose">
-          <h2>Send Message</h2>
+          <h2>Send FLOQR Inbox Message</h2>
           <p id="composePolicyNote" class="sub small"></p>
           <div class="profile-grid">
             <label>Recipient Search<input id="composeRecipientSearch" placeholder="Search club admin, CSR, display name, or username"/></label>
@@ -229,7 +229,7 @@
           <label>Message<input id="composeBody" placeholder="Write your message..."/></label>
           <button id="sendMessageBtn" class="primary" type="button">Send Message</button>
         </div>
-        <div class="card"><h2>Messages <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
+        <div class="card"><h2>FLOQR Inbox <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
       </section>
 
       <section id="portalChats" class="admin-panel-section">
@@ -237,6 +237,7 @@
           <h2>Mingl Rules</h2>
           <div id="chatPolicySummary" class="policy-list"></div>
         </div>
+        <div class="card"><h2>Mingl Requests</h2><div id="portalMinglRequests" class="report-block"></div></div>
         <div class="card"><h2>Mingl <span id="chatCountLabel">(0/0)</span></h2><div id="myChats" class="report-block"></div></div>
         <div id="portalMinglChatPanel" class="card hidden">
           <h2 id="portalMinglChatTitle">Mingl Chat</h2>
@@ -261,9 +262,9 @@
           <h2>My Privacy</h2>
           <p class="sub small">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
           <div class="profile-grid">
-            <label><input id="privacyMarketing" type="checkbox"/> Marketing consent</label>
-            <label><input id="privacyAnalytics" type="checkbox"/> Analytics consent</label>
-            <label><input id="privacySharing" type="checkbox"/> Third-party data sharing consent</label>
+            <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
+            <label class="consent-checkbox"><input id="privacyAnalytics" type="checkbox"/><span>Analytics consent</span></label>
+            <label class="consent-checkbox"><input id="privacySharing" type="checkbox"/><span>Third-party data sharing consent</span></label>
           </div>
           <div class="card-subsection">
             <h3>Public Datapoints for Mingl and Matching</h3>
@@ -289,7 +290,7 @@
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./floqr-action-feedback.js?v=28.82-mingl-privacy-media"></script>
-<script src="./patron-portal-app.js?v=28.82-mingl-privacy-media"></script>
+<script src="./floqr-action-feedback.js?v=28.83-mobile-mingl-inbox"></script>
+<script src="./patron-portal-app.js?v=28.83-mobile-mingl-inbox"></script>
 </body>
 </html>

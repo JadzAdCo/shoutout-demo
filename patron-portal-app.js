@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.82-mingl-privacy-media */
+/* patron-portal-app.js v28.83-mobile-mingl-inbox */
 (function(){
   "use strict";
 
@@ -80,6 +80,7 @@
   let activeShoutoutEditId = "";
   let activePortalMinglRoomId = "";
   let portalMinglUnsubscribe = null;
+  let currentMinglConnections = [];
 
   const PUBLIC_MINGL_DATAPOINTS = [
     {key:"location", label:"City, state/region, and country"},
@@ -112,7 +113,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
     }
@@ -828,23 +829,147 @@
       const dbb = b.createdAt?.seconds || 0;
       return dbb - da;
     });
-    byId("myMessages").innerHTML = currentMessages.length ? currentMessages.map((x, index) => `<div class="queue-item message-envelope ${x.read ? "read" : "unread"}" data-message-index="${index}">
+    byId("myMessages").innerHTML = currentMessages.length ? currentMessages.map((x, index) => {
+      const connection = currentMinglConnections.find(item => (item.connectionId || item.id) === x.connectionId);
+      const canAcceptMingl = x.messageType === "mingl_request"
+        && x.recipientUid === user.uid
+        && x.connectionId
+        && (!connection || (connection.status !== "mutual" && (!connection.requestedTo || connection.requestedTo === user.uid)));
+      const alreadyMutual = x.messageType === "mingl_request" && connection?.status === "mutual";
+      return `<div class="queue-item message-envelope ${x.read ? "read" : "unread"}" data-message-index="${index}">
       <div class="message-envelope-head">
         <strong>${esc(x.subject)}</strong>
         <span>${esc(x.read ? "Read" : "Unread")}</span>
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}</div>
-    </div>`).join("") : "<p class='sub'>No messages yet.</p>";
+      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
+        ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox">Open Mingl Chat</a></p>` : ""}
+      </div>
+    </div>`;
+    }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
     document.querySelectorAll(".message-envelope").forEach(el => {
       el.addEventListener("click", () => openMessage(el, user));
     });
     document.querySelectorAll(".message-envelope a").forEach(a => a.addEventListener("click", event => event.stopPropagation()));
+    document.querySelectorAll(".accept-mingl-inbox-btn").forEach(button => {
+      button.addEventListener("click", event => {
+        event.stopPropagation();
+        acceptPortalMinglRequest(button.dataset.connectionId || "");
+      });
+    });
   }
 
   function pairId(a, b) {
     return [a, b].filter(Boolean).sort().join("_");
+  }
+
+  function fieldValue() {
+    return firebase.firestore.FieldValue.serverTimestamp();
+  }
+
+  function portalUserSummary(user, profile = currentProfile) {
+    return {
+      displayName: profile.displayName || user.displayName || user.email || "Patron",
+      photoURL: profile.photoURL || user.photoURL || ""
+    };
+  }
+
+  function requestOtherUid(connection = {}, user) {
+    return (connection.participants || []).find(uid => uid && uid !== user.uid) || connection.requesterUid || connection.targetUid || connection.requestedBy || connection.requestedTo || "";
+  }
+
+  async function getPortalMinglConnections(user, allUsers = [], queriedConnections = []) {
+    if (queriedConnections.length) return queriedConnections.filter(row => (row.participants || []).includes(user.uid));
+    const ids = allUsers
+      .map(profile => profile.uid || profile.id)
+      .filter(uid => uid && uid !== user.uid)
+      .slice(0, 250)
+      .map(uid => pairId(user.uid, uid));
+    const rows = [];
+    for (const id of ids) {
+      try {
+        const snap = await db.collection("minglConnections").doc(id).get();
+        if (snap.exists && (snap.data().participants || []).includes(user.uid)) rows.push({id:snap.id, ...snap.data()});
+      } catch(e) {}
+    }
+    return rows;
+  }
+
+  async function ensurePortalMinglChatRoom(connection = {}, user) {
+    const connectionId = connection.connectionId || connection.id || pairId(connection.requestedBy, connection.requestedTo);
+    const participants = connection.participants || [connection.requestedBy, connection.requestedTo].filter(Boolean);
+    const roomId = `mingl_${connectionId}`;
+    const summaries = {
+      ...(connection.userSummaries || {}),
+      [user.uid]: portalUserSummary(user)
+    };
+    await db.collection("chatRooms").doc(roomId).set({
+      id:roomId,
+      type:"mingl",
+      title:"Mingl Chat",
+      connectionId,
+      participants,
+      userSummaries:summaries,
+      lastMessage:"Friend or Mingl Request approved.",
+      unreadCounts:{},
+      updatedAt:fieldValue(),
+      createdAt:fieldValue()
+    }, {merge:true});
+    try {
+      await db.collection("chatMessages").add({
+        roomId,
+        roomType:"mingl",
+        messageType:"system",
+        connectionId,
+        participants,
+        senderUid:"system",
+        senderName:"System Message",
+        body:"Friend or Mingl Request approved. Both patrons can now Mingl in this chat.",
+        createdAt:fieldValue()
+      });
+    } catch(e) {}
+    return roomId;
+  }
+
+  async function acceptPortalMinglRequest(connectionId) {
+    const user = auth.currentUser;
+    if (!user || !connectionId) return;
+    return actionFeedback({
+      starting:"Approving Mingl request...",
+      wait:"We are approving this Friend or Mingl Request and opening Mingl Chat.",
+      success:"Mingl request approved",
+      redirecting:"Both patrons approved. Redirecting back to Mingl.",
+      returnTo:"Mingl"
+    }, async () => {
+      const ref = db.collection("minglConnections").doc(connectionId);
+      const snap = await ref.get();
+      if (!snap.exists) throw new Error("Mingl request was not found.");
+      const connection = {id:snap.id, ...snap.data()};
+      if (!(connection.participants || []).includes(user.uid)) throw new Error("You are not a participant on this Mingl request.");
+      await ref.set({
+        status:"mutual",
+        acceptedByUid:user.uid,
+        acceptedAt:fieldValue(),
+        updatedAt:fieldValue()
+      }, {merge:true});
+      const roomId = await ensurePortalMinglChatRoom({...connection, status:"mutual"}, user);
+      await db.collection("inboxNotifications").add({
+        type:"minglRequestAccepted",
+        title:"Friend or Mingl Request Approved",
+        subject:"Friend or Mingl Request Approved",
+        body:"Both patrons approved. Mingl Chat is now open.",
+        recipientUid:requestOtherUid(connection, user),
+        connectionId,
+        link:"./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox",
+        read:false,
+        createdAt:fieldValue()
+      });
+      await loadPortal(user);
+      const roomSnap = await db.collection("chatRooms").doc(roomId).get();
+      if (roomSnap.exists) openPortalMinglChat({id:roomSnap.id, ...roomSnap.data()});
+    });
   }
 
   async function getPortalMinglRooms(user, allUsers = [], queriedRooms = []) {
@@ -882,6 +1007,36 @@
       item.innerHTML = `<strong>${esc(other.displayName || room.title || "Mingl Chat")}</strong><span>${esc(room.lastMessage || "Open chat history")}</span><small>Unread: ${esc(room.unreadCounts?.[user.uid] || 0)}</small>`;
       item.addEventListener("click", () => openPortalMinglChat(room));
       wrap.appendChild(item);
+    });
+  }
+
+  function renderPortalMinglRequests(connections = [], user) {
+    const wrap = byId("portalMinglRequests");
+    if (!wrap) return;
+    const requests = connections
+      .filter(connection => connection.status !== "mutual")
+      .sort((a,b) => (b.updatedAt?.seconds || b.createdAt?.seconds || 0) - (a.updatedAt?.seconds || a.createdAt?.seconds || 0));
+    wrap.innerHTML = requests.length ? "" : "<p class='sub'>No pending Mingl requests.</p>";
+    requests.forEach(connection => {
+      const id = connection.connectionId || connection.id;
+      const otherUid = requestOtherUid(connection, user);
+      const other = connection.userSummaries?.[otherUid] || {};
+      const received = connection.requestedTo === user.uid;
+      const item = document.createElement("div");
+      item.className = "queue-item";
+      item.innerHTML = `<div class="message-envelope-head">
+        <strong>${esc(other.displayName || connection.requesterName || connection.targetName || "Mingl Member")}</strong>
+        <span>${esc(received ? "Received" : "Sent")}</span>
+      </div>
+      <p>${esc(received ? "Friend or Mingl Request received." : "Friend or Mingl Request sent. Waiting for the other patron to Mingl back.")}</p>
+      <small>${esc(fmtDate(connection.updatedAt || connection.createdAt))}</small>
+      <div class="queue-actions">
+        ${received ? `<button type="button" class="primary accept-mingl-request-btn" data-connection-id="${esc(id)}">Mingl Back</button>` : `<button type="button" disabled>Mingl Request Sent</button>`}
+      </div>`;
+      wrap.appendChild(item);
+    });
+    wrap.querySelectorAll(".accept-mingl-request-btn").forEach(button => {
+      button.addEventListener("click", () => acceptPortalMinglRequest(button.dataset.connectionId || ""));
     });
   }
 
@@ -1127,10 +1282,10 @@
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
     byId("messagePolicySummary").innerHTML = `<ul>
-      <li>System notifications are internal inbox messages and use <strong>System Message</strong> as the sender.</li>
-      <li>Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
+      <li>System notifications are internal FLOQR Inbox messages and use <strong>System Message</strong> as the sender.</li>
+      <li>FLOQR Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
       <li>Patrons can send internal support messages to Club Admins or club-designated Customer Service Representatives.</li>
-      <li>Patron-to-patron direct inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
+      <li>Patron-to-patron direct FLOQR Inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
       <li>Your current approved role set: <strong>${esc(roles.join(", "))}</strong>.</li>
     </ul>`;
     byId("chatPolicySummary").innerHTML = `<ul>
@@ -1168,15 +1323,17 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, allUsers, employeeDesignations] = await Promise.all([
+    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, allUsers, employeeDesignations] = await Promise.all([
       getCollectionSafe("shoutouts", x => x.submittedByUid === user.uid || x.submittedBy === user.email),
       getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
       getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
       getCollectionSafe("inboxNotifications", x => x.recipientUid === user.uid || x.recipientEmail === user.email),
       getParticipantCollectionSafe("chatRooms", user.uid),
+      getParticipantCollectionSafe("minglConnections", user.uid),
       getCollectionSafe("users"),
       getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false)
     ]);
+    currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
     const chats = await getPortalMinglRooms(user, allUsers, queriedChats);
     messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
     renderRecipientSearchResults();
@@ -1243,6 +1400,7 @@
     }
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
+    renderPortalMinglRequests(currentMinglConnections, user);
     renderPortalMinglChats(chats, user);
     byId("privacyReport").innerHTML = simpleRows([
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
@@ -1266,8 +1424,8 @@
       starting:"Sending message...",
       wait:"We are sending your message. Please wait a few seconds.",
       success:"Message sent",
-      redirecting:"Message sent, redirecting back to Messages.",
-      returnTo:"Messages"
+      redirecting:"Message sent, redirecting back to FLOQR Inbox.",
+      returnTo:"FLOQR Inbox"
     }, async () => {
     await db.collection("messages").add({
       messageType:selectedRecipient.recipientType === "club_csr" || selectedRecipient.recipientType === "club_admin" ? "patron_support" : "role_direct",

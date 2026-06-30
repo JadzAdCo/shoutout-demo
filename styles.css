@@ -101,6 +101,9 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .media-metadata-prompt label{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.35}
 .privacy-datapoint-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
 .privacy-datapoint-grid label{border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.16);padding:10px;display:flex;align-items:flex-start;gap:8px}
+.privacy-datapoint-grid input[type="checkbox"],.profile-grid .consent-checkbox input[type="checkbox"]{width:auto;min-width:24px;max-width:24px;height:24px;justify-self:start;margin:0;accent-color:#1597ff}
+.profile-grid .consent-checkbox{display:flex;align-items:center;gap:10px;min-height:54px}
+.profile-grid .consent-checkbox span,.privacy-datapoint-grid label span{min-width:0;overflow-wrap:anywhere}
 .card-subsection{margin-top:16px;border-top:1px solid rgba(255,255,255,.14);padding-top:14px}
 .card-subsection h3{margin:0 0 8px;font-size:20px}
 .public-profile-gallery-wrap{margin-top:16px;border:1px solid var(--line);border-radius:24px;background:rgba(0,0,0,.18);padding:18px}
@@ -147,7 +150,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-shared-row{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}.mingl-shared-row span{border:1px solid rgba(215,255,63,.34);border-radius:999px;color:var(--lime);padding:4px 8px;font-size:11px;font-weight:1000}
 .profile-datapoint-grid{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}
 .profile-datapoint{position:relative}.profile-datapoint summary{list-style:none;cursor:pointer;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.10);padding:7px 10px;font-size:12px;font-weight:1000}.profile-datapoint summary::-webkit-details-marker{display:none}
-.profile-datapoint div{position:absolute;z-index:5;min-width:190px;max-width:260px;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;border:1px solid var(--line);border-radius:14px;background:#12183a;padding:10px;box-shadow:0 14px 35px rgba(0,0,0,.38)}
+.profile-datapoint div{position:absolute;z-index:5;left:0;min-width:190px;max-width:min(260px,calc(100vw - 48px));display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;border:1px solid var(--line);border-radius:14px;background:#12183a;padding:10px;box-shadow:0 14px 35px rgba(0,0,0,.38)}
 .profile-datapoint span{border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:5px 8px;color:#fff;font-size:12px;font-weight:800;background:rgba(255,255,255,.08)}
 .mingl-chat-list{display:grid;gap:10px;margin-bottom:14px}.mingl-chat-item{width:100%;display:grid;text-align:left;gap:4px}.mingl-chat-item span{color:var(--muted);font-weight:700}
 .mingl-messages{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px}
@@ -165,7 +168,8 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .floqr-action-feedback.success .floqr-action-feedback-card{border-color:rgba(80,255,180,.5)}
 .floqr-action-feedback.failed .floqr-action-feedback-card{border-color:rgba(255,80,100,.55)}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}}
-@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px 1fr}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.profile-datapoint{position:static}.profile-datapoint[open]{flex-basis:100%}.profile-datapoint div{position:static;width:100%;min-width:0;max-width:100%;box-shadow:none}.mingl-person-card,.mingl-self-card{overflow:hidden}.mingl-nested-datapoints .profile-datapoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mingl-nested-datapoints .profile-datapoint summary{text-align:center}}
+@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
 
 /* FLOQR AI layer */
 textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);font-size:15px;min-height:120px}
@@ -266,3 +270,94 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 /* v28.80 location-aware ShoutOut and template AI media controls */
 .media-upload-card .button-row{margin:8px 0 2px}
 .media-upload-card #removeShoutoutMediaBtn{min-width:150px}
+
+/* v28.83 device category responsive shell: mobile, tablet, desktop */
+html{overflow-x:hidden}
+body{min-width:320px;overflow-x:hidden}
+img,video,iframe{max-width:100%}
+.app,.page,.card,.login-card,.club-option,.notice,.queue-item,.selected-summary,.receipt{min-width:0}
+input,select,textarea,button,.buttonlike{max-width:100%;min-width:0}
+label,.sub,.message-body,.queue-item,.selected-summary,.receipt,.club-option p{overflow-wrap:anywhere}
+.filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.button-row,.queue-actions,.manual-test-actions{align-items:center}
+.queue-actions button,.button-row button,.manual-test-actions button{white-space:normal}
+.report-block,.diagnostic-json{max-width:100%;overflow-wrap:anywhere}
+
+html.floqr-mobile-browser .app{width:100%;max-width:100%;padding:calc(env(safe-area-inset-top,0px) + 64px) 14px 24px}
+html.floqr-mobile-browser .topbar{display:grid;grid-template-columns:1fr;gap:12px}
+html.floqr-mobile-browser .topbar h1,
+html.floqr-mobile-browser .confirmation h1{font-size:clamp(34px,12vw,56px);line-height:.98;letter-spacing:0}
+html.floqr-mobile-browser .sub{font-size:15px;line-height:1.38}
+html.floqr-mobile-browser .card,
+html.floqr-mobile-browser .login-card,
+html.floqr-mobile-browser .club-option,
+html.floqr-mobile-browser .notice{padding:16px;border-radius:20px}
+html.floqr-mobile-browser .filters,
+html.floqr-mobile-browser .template-grid,
+html.floqr-mobile-browser .auth-grid,
+html.floqr-mobile-browser .club-grid,
+html.floqr-mobile-browser .profile-grid,
+html.floqr-mobile-browser .metric-grid,
+html.floqr-mobile-browser .profile-media-grid,
+html.floqr-mobile-browser .role-template-grid,
+html.floqr-mobile-browser .public-profile-gallery{grid-template-columns:1fr!important}
+html.floqr-mobile-browser .category-grid,
+html.floqr-mobile-browser .compact-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html.floqr-mobile-browser .button-row,
+html.floqr-mobile-browser .queue-actions,
+html.floqr-mobile-browser .manual-test-actions{display:grid;grid-template-columns:1fr;gap:9px}
+html.floqr-mobile-browser .button-row button,
+html.floqr-mobile-browser .queue-actions button,
+html.floqr-mobile-browser .manual-test-actions button,
+html.floqr-mobile-browser .buttonlike{width:100%;text-align:center}
+html.floqr-mobile-browser .mingl-person-card{grid-template-columns:74px minmax(0,1fr);gap:10px;padding:12px;overflow:hidden}
+html.floqr-mobile-browser .mingl-person-photo{width:74px;height:74px;border-radius:16px}
+html.floqr-mobile-browser .mingl-person-card h3{font-size:20px;line-height:1.1;overflow-wrap:anywhere}
+html.floqr-mobile-browser .mingl-self-card{grid-template-columns:74px minmax(0,1fr);gap:10px;overflow:hidden}
+html.floqr-mobile-browser .mingl-self-photo{width:74px;height:74px}
+html.floqr-mobile-browser .mingl-nested-datapoints .profile-datapoint-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+html.floqr-mobile-browser .profile-datapoint summary{width:100%;text-align:center}
+html.floqr-mobile-browser .profile-datapoint div{position:static;width:100%;max-width:100%;box-shadow:none}
+html.floqr-mobile-browser .privacy-datapoint-grid{grid-template-columns:1fr!important}
+html.floqr-mobile-browser .privacy-datapoint-grid label,
+html.floqr-mobile-browser .profile-grid .consent-checkbox{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center}
+html.floqr-mobile-browser .mingl-compose{grid-template-columns:1fr}
+html.floqr-mobile-browser .user-dropdown{max-width:calc(100vw - 24px)}
+
+html.floqr-tablet-browser .app{width:min(100%,980px);padding:calc(env(safe-area-inset-top,0px) + 24px) 22px 32px}
+html.floqr-tablet-browser .topbar{display:grid;grid-template-columns:1fr;gap:16px}
+html.floqr-tablet-browser .filters,
+html.floqr-tablet-browser .template-grid,
+html.floqr-tablet-browser .auth-grid,
+html.floqr-tablet-browser .club-grid,
+html.floqr-tablet-browser .profile-grid,
+html.floqr-tablet-browser .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+html.floqr-tablet-browser .composer,
+html.floqr-tablet-browser .template-layout,
+html.floqr-tablet-browser .mingl-layout{grid-template-columns:1fr}
+html.floqr-tablet-browser .card,
+html.floqr-tablet-browser .login-card,
+html.floqr-tablet-browser .club-option{border-radius:24px}
+
+html.floqr-desktop-browser .app{width:min(100%,1180px)}
+html.floqr-desktop-browser .club-grid{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+html.floqr-desktop-browser .profile-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+
+@media(max-width:640px){
+  .app{width:100%;max-width:100%;padding:calc(env(safe-area-inset-top,0px) + 64px) 14px 24px}
+  .topbar{display:grid;grid-template-columns:1fr;gap:12px}
+  .topbar h1,.confirmation h1{font-size:clamp(34px,12vw,56px);line-height:.98;letter-spacing:0}
+  .sub{font-size:15px;line-height:1.38}
+  .card,.login-card,.club-option,.notice{padding:16px;border-radius:20px}
+  .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:1fr!important}
+  .button-row,.queue-actions,.manual-test-actions{display:grid;grid-template-columns:1fr;gap:9px}
+  .button-row button,.queue-actions button,.manual-test-actions button,.buttonlike{width:100%;text-align:center}
+}
+
+@media(min-width:641px) and (max-width:1180px){
+  .app{width:min(100%,980px);padding:24px 22px 32px}
+  .topbar{display:grid;grid-template-columns:1fr;gap:16px}
+  .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .composer,.template-layout,.mingl-layout{grid-template-columns:1fr}
+}

@@ -1,4 +1,4 @@
-/* FLOQR action feedback overlay v28.82: reusable progress/success flash for user actions. */
+/* FLOQR action feedback overlay v28.83: reusable progress/success flash and device-mode marker. */
 (function () {
   "use strict";
 
@@ -18,6 +18,23 @@
     </div>`;
     document.body.appendChild(overlay);
     return overlay;
+  }
+
+  function markDeviceMode() {
+    const root = document.documentElement;
+    if (!root) return "desktop";
+    const width = Math.max(window.innerWidth || 0, root.clientWidth || 0);
+    const ua = navigator.userAgent || "";
+    const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const tabletUa = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    const phoneUa = /Mobi|Android|iPhone|iPod|Windows Phone/i.test(ua);
+    const mode = tabletUa || (coarse && width >= 700 && width <= 1180)
+      ? "tablet"
+      : (phoneUa || (coarse && width < 700) || width <= 640 ? "mobile" : "desktop");
+    root.dataset.floqrDevice = mode;
+    root.classList.remove("floqr-mobile-browser", "floqr-tablet-browser", "floqr-desktop-browser");
+    root.classList.add(`floqr-${mode}-browser`);
+    return mode;
   }
 
   function show(title, body, options = {}) {
@@ -52,5 +69,9 @@
     }
   }
 
-  window.FLOQRActionFeedback = {show, hide, run};
+  markDeviceMode();
+  window.addEventListener("resize", markDeviceMode, {passive:true});
+  window.addEventListener("orientationchange", markDeviceMode, {passive:true});
+
+  window.FLOQRActionFeedback = {show, hide, run, markDeviceMode};
 })();

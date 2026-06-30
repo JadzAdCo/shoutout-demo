@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.82 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.83 */
 (function () {
   "use strict";
 
@@ -31,7 +31,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.82-mingl-request-chat-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.82-mingl-privacy-media";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.83-mobile-mingl-inbox";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -629,10 +629,68 @@
         {label:"README documents v28.82", file:"README.md", includes:["v28.82 Mingl Requests, My Privacy, and Public Media Sharing", "Let's Mingl", "Public Media and Data Sharing"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-82.md", includes:["FLOQR Rollback - v28.82 Mingl Privacy Media", "This rollback does not delete user profile data"]}
       ]
+    },
+    {
+      version: "v28.83-mobile-mingl-inbox",
+      title: "Mobile Mingl Datapoints + FLOQR Inbox Requests",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.83-mobile-mingl-inbox"]},
+        {label:"Patron page cache-busted", file:"index.html", includes:["styles.css?v=28.83-mobile-mingl-inbox", "patron-app.js?v=28.83-mobile-mingl-inbox"]},
+        {label:"Matched Mingl cards use nested datapoints", file:"patron-app.js", includes:["mingl-nested-datapoints", "renderProfileDatapoints(profile", "FLOQR Inbox"], notIncludes:["profileSummaryText(profile) || \"Nightlife profile\""]},
+        {label:"Mobile datapoint panels are contained", file:"styles.css", includes:["profile-datapoint[open]", "mingl-nested-datapoints", "consent-checkbox", "max-width:min(260px,calc(100vw - 48px))"]},
+        {label:"Device mode marker for mobile/tablet/desktop", file:"floqr-action-feedback.js", includes:["markDeviceMode", "floqr-mobile-browser", "floqr-tablet-browser", "floqr-desktop-browser"]},
+        {label:"Shared responsive device category CSS", file:"styles.css", includes:["v28.83 device category responsive shell", "html.floqr-mobile-browser .app", "html.floqr-tablet-browser .app", "html.floqr-desktop-browser .app"]},
+        {label:"Admin responsive device category CSS", file:"admin.css", includes:["v28.83 admin/device responsive rules", "html.floqr-mobile-browser .admin-tabs", "html.floqr-tablet-browser .admin-grid", "html.floqr-desktop-browser .admin-tabs"]},
+        {label:"Patron portal labels FLOQR Inbox", file:"patron-portal.html", includes:["FLOQR Inbox", "portalMinglRequests", "v28.83-mobile-mingl-inbox"], notIncludes:[">Messages <span id=\"messageCountLabel\""]},
+        {label:"FLOQR Inbox can accept Mingl requests", file:"patron-portal-app.js", includes:["acceptPortalMinglRequest", "accept-mingl-inbox-btn", "Mingl Back", "inbox:\"portalMessages\""]},
+        {label:"Mingl page request cards", file:"patron-portal-app.js", includes:["renderPortalMinglRequests", "portalMinglRequests", "Friend or Mingl Request received"]},
+        {label:"README documents v28.83", file:"README.md", includes:["v28.83 Mobile Mingl Datapoints and FLOQR Inbox", "FLOQR Inbox", "Mingl Back"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-83.md", includes:["FLOQR Rollback - v28.83 Mobile Mingl Inbox", "This rollback does not delete user profile data"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"mobile-mingl-nested-datapoints",
+      area:"Mingl mobile public room",
+      feature:"Matched profiles show nested datapoint categories on mobile",
+      changed:"Matched Mingl cards no longer show a flat datapoint paragraph; they use the same clickable nested datapoint categories as the public profile.",
+      howToTest:"Open Mingl on an iPhone or mobile browser, view a matched public profile, tap Gender, Music, Travel, Food, or Location.",
+      expected:"The nested values open inside the profile card without floating off-screen or covering unrelated content."
+    },
+    {
+      id:"floqr-inbox-rename",
+      area:"My Profile and Settings",
+      feature:"Messages is renamed to FLOQR Inbox",
+      changed:"The patron portal tab, overview metric, Inbox rules card, message list heading, and profile menu now use FLOQR Inbox.",
+      howToTest:"Open My Profile and Settings from the profile menu and inspect the tabs, overview cards, and inbox page.",
+      expected:"User-facing labels say FLOQR Inbox instead of Messages."
+    },
+    {
+      id:"mingl-request-accept-inbox",
+      area:"FLOQR Inbox and Mingl requests",
+      feature:"Patron can Mingl Back from FLOQR Inbox or Mingl page",
+      changed:"Received Friend or Mingl Request messages expose a Mingl Back action in FLOQR Inbox, and pending requests also appear on the Mingl page.",
+      howToTest:"From one patron account send Let's Mingl. Sign in as the other patron, open FLOQR Inbox, click the message, then click Mingl Back. Repeat from My Profile and Settings > Mingl > Mingl Requests.",
+      expected:"The request becomes mutual, a Mingl Chat room opens, and both patrons can see/send chat messages."
+    },
+    {
+      id:"mobile-privacy-checkbox-layout",
+      area:"My Privacy mobile layout",
+      feature:"Public datapoint checkboxes fit on iPhone",
+      changed:"Consent and public datapoint checkbox labels now use mobile-safe sizing and wrapping.",
+      howToTest:"Open My Profile and Settings > My Privacy on an iPhone or narrow mobile viewport.",
+      expected:"Checkboxes and labels remain inside their cards with no label text pushed off-screen."
+    },
+    {
+      id:"device-category-responsive-layouts",
+      area:"Responsive device layouts",
+      feature:"FLOQR pages respond to mobile, tablet, and PC device categories",
+      changed:"The shared layout now marks mobile/tablet/desktop browser mode and applies matching layout rules for forms, cards, tabs, diagnostics, Mingl cards, and admin reports.",
+      howToTest:"Open the patron app, My Profile and Settings, Mingl, and Master Admin Diagnostics on a phone width, tablet width, and desktop width. On desktop Chrome, use DevTools device toolbar for iPhone, iPad/tablet, and responsive desktop widths.",
+      expected:"Phone pages are single-column with no horizontal scrolling, tablet pages use balanced one/two-column layouts, and PC pages use wider grids without oversized mobile spacing."
+    },
     {
       id:"mingl-lets-mingl-request",
       area:"Mingl public room",

@@ -95,6 +95,44 @@
 .media-preview-overlay span{display:block;margin-top:10px;font-size:clamp(18px,3vw,34px);letter-spacing:1px;text-transform:uppercase}
 .single-media-upload-note{font-size:12px;opacity:.8}
 
+/* v28.83 admin/device responsive rules */
+.admin-shell,.admin-panel-section,.report-table,.report-block,.queue-item,.manual-feature-test{min-width:0}
+.admin-tabs{max-width:100%}
+.admin-tab{white-space:normal;text-align:center}
+.profile-grid textarea,.ai-discovery-item textarea,#manualFeatureDiagnosticsOutput,#manualFeatureDiagnosticsPrompt{max-width:100%;min-width:0}
+html.floqr-mobile-browser .admin-shell{padding-left:14px;padding-right:14px}
+html.floqr-mobile-browser .admin-tabs{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding-bottom:8px;scroll-snap-type:x proximity}
+html.floqr-mobile-browser .admin-tab{flex:0 0 auto;max-width:76vw;scroll-snap-align:start}
+html.floqr-mobile-browser .admin-grid,
+html.floqr-mobile-browser .profile-grid,
+html.floqr-mobile-browser .media-template-grid,
+html.floqr-mobile-browser .metric-grid{grid-template-columns:1fr!important}
+html.floqr-mobile-browser .report-table div{display:grid;grid-template-columns:1fr;gap:4px}
+html.floqr-mobile-browser .report-table strong{text-align:left}
+html.floqr-mobile-browser .queue-item{padding:14px;border-radius:16px}
+html.floqr-mobile-browser .manual-test-choice{width:100%!important;justify-content:flex-start}
+html.floqr-tablet-browser .admin-shell{padding-left:22px;padding-right:22px}
+html.floqr-tablet-browser .admin-grid{grid-template-columns:1fr}
+html.floqr-tablet-browser .profile-grid,
+html.floqr-tablet-browser .media-template-grid,
+html.floqr-tablet-browser .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+html.floqr-desktop-browser .admin-tabs{overflow:visible}
+
+@media(max-width:640px){
+  .admin-tabs{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding-bottom:8px;scroll-snap-type:x proximity}
+  .admin-tab{flex:0 0 auto;max-width:76vw;scroll-snap-align:start}
+  .admin-grid,.profile-grid,.media-template-grid,.metric-grid{grid-template-columns:1fr!important}
+  .report-table div{display:grid;grid-template-columns:1fr;gap:4px}
+  .report-table strong{text-align:left}
+  .queue-item{padding:14px;border-radius:16px}
+  .manual-test-choice{width:100%!important;justify-content:flex-start}
+}
+
+@media(min-width:641px) and (max-width:1180px){
+  .admin-grid{grid-template-columns:1fr}
+  .profile-grid,.media-template-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 /* v28.8 shoutout club option force */
 .v28-8-shoutout-club-option{
   display:inline-flex!important;

@@ -1,15 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.82 Mingl Privacy Media Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.83 Mobile Mingl Inbox Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.82-mingl-privacy-media
+https://jadzadco.github.io/shoutout-demo/?v=28.83-mobile-mingl-inbox
 ```
 
 Current release highlights:
 
+- Adds v28.83 Mobile Mingl Datapoints and FLOQR Inbox fixes.
+- Matched public Mingl cards now use nested datapoint categories, matching the public profile behavior. The old flat paragraph of datapoints was removed from matched cards.
+- Mobile/tablet datapoint panels now open inside the card instead of floating off-screen on iPhone.
+- FLOQR now marks browser mode as mobile, tablet, or desktop with `data-floqr-device` and matching root classes so responsive fixes can target the right device family.
+- Adds device-specific responsive layout rules for mobile, tablet, and PC across patron pages, My Profile and Settings, Mingl, Master Admin Diagnostics, and admin report cards.
+- `Messages` is renamed to `FLOQR Inbox` in the patron portal tab, overview metric, message list heading, profile menu, and relevant action feedback.
+- Patrons can accept a received `Friend or Mingl Request` by clicking `Mingl Back` from FLOQR Inbox or from My Profile and Settings > Mingl > Mingl Requests.
+- My Privacy checkbox labels now stay inside their cards on mobile Safari/iPhone layouts.
+- Adds v28.83 package diagnostics and manual tests for mobile nested datapoints, responsive device categories, FLOQR Inbox rename, and Mingl Back acceptance.
+- Direct rollback note for this package is `ROLLBACK-V28-83.md`.
 - Adds v28.82 Mingl Requests, My Privacy, and Public Media Sharing.
 - Adds the `Let's Mingl` request flow in the public Mingl room. Matched public patrons can request to Mingl, and full Mingl Chat opens only after both parties approve.
 - Creates a `Friend or Mingl Request` notification/message/audit trail with timestamp, shared datapoint context, and requester location text when available.
@@ -22,7 +32,7 @@ Current release highlights:
 - Adds the shared `floqr-action-feedback.js` overlay for clear working/success/failure feedback on the new profile, privacy, media, messaging, Mingl, and diagnostics actions.
 - Updates Firestore rules to `v28.82-mingl-request-chat-rules` for Mingl audit records, system request messages, and owner message-edit support.
 - Adds Master Admin Diagnostics package checks and manual feature tests for the new Mingl, privacy, media, and action-confirmation behavior.
-- Direct rollback note for this package is `ROLLBACK-V28-82.md`. Historical rollback/readme artifacts should not be included in future full packages.
+- The prior v28.82 rollback note is superseded by the current direct rollback note. Historical rollback/readme artifacts should not be included in future full packages.
 - Adds v28.81 Manual Feature Test Diagnostics under Master Admin > Diagnostics.
 - Adds a checklist of implemented or changed user-facing features with plain-English test steps and expected results.
 - Master Admin can mark each manual test as `Succeed` or `Failed` and add a testing/failure note.
