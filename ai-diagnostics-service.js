@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.83 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.84 */
 (function () {
   "use strict";
 
@@ -31,7 +31,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.82-mingl-request-chat-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.83-mobile-mingl-inbox";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.84-shoutout-media-chat-grammar";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -647,10 +647,62 @@
         {label:"README documents v28.83", file:"README.md", includes:["v28.83 Mobile Mingl Datapoints and FLOQR Inbox", "FLOQR Inbox", "Mingl Back"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-83.md", includes:["FLOQR Rollback - v28.83 Mobile Mingl Inbox", "This rollback does not delete user profile data"]}
       ]
+    },
+    {
+      version: "v28.84-shoutout-media-chat-grammar",
+      title: "ShoutOut Media Repair + Mingl Chat Grammar",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.84-shoutout-media-chat-grammar"]},
+        {label:"Patron page cache-busted", file:"index.html", includes:["styles.css?v=28.84-shoutout-media-chat-grammar", "patron-app.js?v=28.84-shoutout-media-chat-grammar", "ai-media-service.js?v=28.84-shoutout-media-chat-grammar"]},
+        {label:"Explicit ShoutOut media upload card", file:"index.html", includes:["shoutoutMediaCard", "Upload Image or Video", "removeShoutoutMediaBtn", "videoTrimNotice"]},
+        {label:"Single media uploader repair", file:"patron-app.js", includes:["jadzEnsureSingleMediaUploader", "renderLiveMediaPreview", "Warning: this video is", "Trim Video to 7 Seconds"]},
+        {label:"Nested AI media enhancement filters", file:"ai-media-service.js", includes:["Ai Image/Video Enhancement", "aiMediaCommandMenu", "aiMediaFilterBubble", "Apply filter", "VIP Style", "Club Ready"]},
+        {label:"Media and chat responsive CSS", file:"styles.css", includes:["v28.84 ShoutOut media repair", "ai-media-command-menu", "v28.84 Mingl chat bubbles", "floqr-grammar-modal"]},
+        {label:"Language Settings tab", file:"patron-portal.html", includes:["Language Settings", "languageAiGrammarEnabled", "languageCorrectionMode", "portalMinglGrammarHint"]},
+        {label:"Public Mingl page loads grammar service", file:"index.html", includes:["ai-grammar-service.js?v=28.84-shoutout-media-chat-grammar", "minglChatStatus", "minglGrammarHint"]},
+        {label:"Draft-only grammar service", file:"ai-grammar-service.js", includes:["suggestGrammarCorrection", "localDetectPossibleTypos", "applyCorrectionToInput", "draft"]},
+        {label:"Portal Mingl chat sends without confirmation overlay", file:"patron-portal-app.js", includes:["appendPortalMinglBubble", "Start the conversation.", "showGrammarSuggestionModal", "saveLanguageSettings"], notIncludes:["redirecting:\"Mingl message sent"]},
+        {label:"Public Mingl chat sends without confirmation overlay", file:"patron-app.js", includes:["appendMinglBubble", "Start the conversation.", "showMinglGrammarSuggestion", "highlightMinglDraft"], notIncludes:["redirecting:\"Mingl message sent"]},
+        {label:"Gemini grammar callable scaffold", file:"functions/ai-discovery-functions.js", includes:["aiSuggestGrammarCorrection", "Grammar correction", "This draft is private"]},
+        {label:"README documents v28.84", file:"README.md", includes:["v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings", "Ai Image/Video Enhancement", "Language Settings"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-84.md", includes:["FLOQR Rollback - v28.84 ShoutOut Media Chat Grammar", "This rollback does not delete user profile data"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v28-84-shoutout-media-upload-card",
+      area:"ShoutOut media upload repair",
+      feature:"Media-capable templates show one Upload Image or Video card",
+      changed:"The ShoutOut editor now includes one explicit media upload card with Upload Image or Video, Remove file, preview, and video trim notice fields. The card is shown only for media-capable templates.",
+      howToTest:"Search/select a media-capable template such as birthday image/video, open the editor, and confirm the Upload Image or Video control, Remove file button, and preview area are visible. Then select Traditional Black and White and confirm the upload card is hidden.",
+      expected:"Media-capable templates show one upload card; text-only templates do not force media upload."
+    },
+    {
+      id:"v28-84-ai-media-filter-menu",
+      area:"ShoutOut Ai Image/Video Enhancement",
+      feature:"Nested enhancement command menu applies preview filters",
+      changed:"Ai Image/Video Enhancement now opens a nested command menu with Neon, VIP Style, Club Ready, B&W, Warm, and Original. Each command shows a temporary definition bubble and Apply filter persists the selected enhancement metadata.",
+      howToTest:"Upload an image to a media template, tap Ai Image/Video Enhancement, tap each nested command, watch the preview change and definition bubble appear, then tap Apply filter.",
+      expected:"Each command updates the media preview, shows a linked explanation bubble, and Apply filter keeps the selected command without breaking submission."
+    },
+    {
+      id:"v28-84-mingl-chat-bubbles",
+      area:"Mingl chat experience",
+      feature:"Mingl Chat behaves like a normal chat thread",
+      changed:"Mingl messages render as bubbles, current user bubbles align right, recipient/system bubbles align left/center, empty chats say Start the conversation, and Send no longer opens a confirmation overlay or redirect flow on the public Mingl page or My Profile and Settings.",
+      howToTest:"Open the public Mingl page or My Profile and Settings > Mingl, open a mutual Mingl chat, type a message, and tap Send.",
+      expected:"The message appears immediately as a bubble, the composer stays on the chat screen, and the thread scrolls to the newest message."
+    },
+    {
+      id:"v28-84-language-settings-grammar",
+      area:"Language Settings and chat grammar",
+      feature:"AI grammar and spelling behavior follows patron settings",
+      changed:"A Language Settings tab now saves grammar preferences to the user's profile. Fix Grammar appears for Mingl Chat only when enabled and uses draft-only Gemini/local correction with user approval unless auto-fix mode is selected.",
+      howToTest:"Open My Profile and Settings > Language Settings, enable AI Grammar & Spelling Assistance, save, return to Mingl Chat, type 'Hey.. are you gut?', tap Fix Grammar, approve the suggestion, then tap Send.",
+      expected:"The typo is highlighted, the correction modal appears, the corrected text replaces the draft only after approval, and the message sends only after tapping Send."
+    },
     {
       id:"mobile-mingl-nested-datapoints",
       area:"Mingl mobile public room",

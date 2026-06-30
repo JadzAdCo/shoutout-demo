@@ -919,8 +919,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.83-mobile-mingl-inbox",
-      minglLink:"./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox",
+      link:"./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar",
+      minglLink:"./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar",
       read:false,
       createdAt:now
     };
@@ -950,6 +950,7 @@
     const profile = await getUserProfile();
     const logo = byId("minglLandingLogo");
     if (logo) logo.src = minglLogoForProfile(profile || {});
+    updateMinglGrammarControls();
     showPage("minglLandingPage");
     await loadMingl();
   }
@@ -1158,6 +1159,98 @@
     });
   }
 
+  function minglLanguageSettings() {
+    const settings = cachedUserProfile?.languageSettings || {};
+    return {
+      aiGrammarEnabled: settings.aiGrammarEnabled === true,
+      correctionMode: settings.correctionMode || "approvalRequired",
+      highlightSpellingErrors: settings.highlightSpellingErrors !== false,
+      highlightGrammarSuggestions: settings.highlightGrammarSuggestions !== false,
+      preferredLanguage: settings.preferredLanguage || "auto",
+      tonePreference: settings.tonePreference || "keepTone"
+    };
+  }
+
+  function updateMinglGrammarControls() {
+    const settings = minglLanguageSettings();
+    const button = byId("improveMinglMessageBtn");
+    const hint = byId("minglGrammarHint");
+    if (button) button.classList.toggle("hidden", !settings.aiGrammarEnabled);
+    if (hint && !settings.aiGrammarEnabled) {
+      hint.textContent = "Enable grammar help in My Profile and Settings > Language Settings.";
+      hint.classList.add("hidden");
+    }
+  }
+
+  function highlightMinglDraft() {
+    const input = byId("minglMessageInput");
+    const hint = byId("minglGrammarHint");
+    if (!input) return;
+    const settings = minglLanguageSettings();
+    input.classList.remove("grammar-spelling-warning", "grammar-grammar-warning");
+    if (!settings.aiGrammarEnabled || !window.FLOQRGrammar?.localDetectPossibleTypos) {
+      if (hint) hint.classList.add("hidden");
+      return;
+    }
+    const issues = window.FLOQRGrammar.localDetectPossibleTypos(input.value || "", settings.preferredLanguage);
+    const hasSpelling = issues.some(issue => issue.type === "spelling");
+    const hasGrammar = issues.some(issue => issue.type === "grammar");
+    input.classList.toggle("grammar-spelling-warning", settings.highlightSpellingErrors && hasSpelling);
+    input.classList.toggle("grammar-grammar-warning", settings.highlightGrammarSuggestions && hasGrammar);
+    if (hint) {
+      hint.textContent = issues.length ? "Possible typo or grammar issue found. Tap Fix Grammar to review a suggestion." : "";
+      hint.classList.toggle("hidden", !issues.length);
+    }
+  }
+
+  function appendMinglBubble(message = {}) {
+    const wrap = byId("minglMessages");
+    if (!wrap) return null;
+    wrap.querySelector(".mingl-empty-state")?.remove();
+    const bubble = document.createElement("div");
+    bubble.className = `mingl-message ${message.mine ? "mine" : ""} ${message.system ? "system" : ""} ${message.pending ? "pending" : ""}`.trim();
+    if (message.id) bubble.dataset.messageId = message.id;
+    const label = message.system ? "System Message" : (message.mine ? "" : (message.senderName || "Member"));
+    bubble.innerHTML = `${label ? `<strong>${esc(label)}</strong>` : ""}<p>${esc(message.body || "")}</p><small>${esc(message.time || new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}))}${message.pending ? " - sending" : ""}</small>`;
+    wrap.appendChild(bubble);
+    wrap.scrollTop = wrap.scrollHeight;
+    return bubble;
+  }
+
+  function showMinglGrammarSuggestion(original, result, input) {
+    document.querySelector(".floqr-grammar-modal")?.remove();
+    const modal = document.createElement("div");
+    modal.className = "floqr-grammar-modal";
+    modal.innerHTML = `<div class="floqr-grammar-dialog" role="dialog" aria-modal="true" aria-label="Suggested Correction">
+      <h2>Suggested Correction</h2>
+      <div class="grammar-compare">
+        <div><strong>Original</strong><p>${esc(original)}</p></div>
+        <div><strong>Suggested</strong><p>${esc(result.correctedText || original)}</p></div>
+      </div>
+      <p class="sub">${esc(result.explanation || "Review the suggestion before replacing your draft.")}</p>
+      <div class="button-row">
+        <button class="primary" type="button" data-grammar-use>Use Suggestion</button>
+        <button type="button" data-grammar-keep>Keep Original</button>
+        <button type="button" data-grammar-edit>Edit Manually</button>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-grammar-use]")?.addEventListener("click", () => {
+      window.FLOQRGrammar?.applyCorrectionToInput?.(input, result.correctedText || original);
+      modal.remove();
+      highlightMinglDraft();
+      input?.focus();
+    });
+    modal.querySelector("[data-grammar-keep]")?.addEventListener("click", () => {
+      modal.remove();
+      input?.focus();
+    });
+    modal.querySelector("[data-grammar-edit]")?.addEventListener("click", () => {
+      modal.remove();
+      input?.focus();
+    });
+  }
+
   async function openMinglChat(connectionOrRoom) {
     const roomId = connectionOrRoom.id?.startsWith("mingl_") ? connectionOrRoom.id : `mingl_${connectionOrRoom.connectionId || connectionOrRoom.id}`;
     activeMinglRoomId = roomId;
@@ -1166,7 +1259,17 @@
     const roomDoc = await db.collection("chatRooms").doc(roomId).get();
     const room = roomDoc.exists ? {id:roomDoc.id, ...roomDoc.data()} : connectionOrRoom;
     const otherUid = (room.participants || []).find(uid => uid !== currentUser.uid);
-    setText("minglChatTitle", room.userSummaries?.[otherUid]?.displayName || "Mingl Chat");
+    const other = room.userSummaries?.[otherUid] || {};
+    const title = other.displayName || "Mingl Chat";
+    setText("minglChatTitle", title);
+    setText("minglChatStatus", "Mingl chat is open. Messages stay in this conversation.");
+    const avatar = byId("minglChatAvatar");
+    if (avatar) {
+      avatar.innerHTML = other.photoURL || other.profilePhotoUrl
+        ? `<img src="${esc(other.photoURL || other.profilePhotoUrl)}" alt="${esc(title)}">`
+        : esc(title.slice(0, 1).toUpperCase() || "M");
+    }
+    updateMinglGrammarControls();
     loadMinglMessages();
   }
 
@@ -1181,13 +1284,14 @@
     wrap.innerHTML = rows.length ? rows.map(msg => {
       const mine = msg.senderUid === currentUser.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
+      const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
       return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
-        <strong>${esc(system ? "System Message" : (msg.senderName || "Member"))}</strong>
+        ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
         <small>${esc(msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "")}${msg.edited ? " - edited" : ""}</small>
         ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-mingl-message="${esc(msg.id || "")}">Edit</button></div>` : ""}
       </div>`;
-    }).join("") : "<p class='sub'>No messages yet.</p>";
+    }).join("") : "<p class='mingl-empty-state'>Start the conversation.</p>";
     wrap.querySelectorAll("[data-edit-mingl-message]").forEach(button => {
       button.addEventListener("click", () => editMinglMessage(button.dataset.editMinglMessage));
     });
@@ -1212,15 +1316,9 @@
   }
 
   async function sendMinglMessage() {
-    const body = byId("minglMessageInput")?.value.trim();
+    const input = byId("minglMessageInput");
+    const body = input?.value.trim();
     if (!currentUser || !activeMinglRoomId || !body) return;
-    return (window.FLOQRActionFeedback?.run || ((messages, action) => action()))({
-      starting:"Sending Mingl message...",
-      wait:"We are sending your Mingl message. Please wait a few seconds.",
-      success:"Mingl message sent",
-      redirecting:"Mingl message sent, redirecting back to Mingl Chat.",
-      returnTo:"Mingl Chat"
-    }, async () => {
     const roomSnap = await db.collection("chatRooms").doc(activeMinglRoomId).get();
     if (!roomSnap.exists || !(roomSnap.data().participants || []).includes(currentUser.uid)) {
       setStatus("Mingl chat is available only after both patrons Mingl back.");
@@ -1229,25 +1327,32 @@
     const room = roomSnap.data();
     const unreadCounts = {...(room.unreadCounts || {})};
     (room.participants || []).forEach(uid => { if (uid !== currentUser.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
-    await db.collection("chatMessages").add({
-      roomId: activeMinglRoomId,
-      roomType: "mingl",
-      connectionId: room.connectionId || "",
-      participants: room.participants || [],
-      senderUid: currentUser.uid,
-      senderName: cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Member",
-      body,
-      edited:false,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await db.collection("chatRooms").doc(activeMinglRoomId).set({
-      lastMessage: body,
-      unreadCounts,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
-    byId("minglMessageInput").value = "";
-    await renderMinglChats();
-    });
+    if (input) input.value = "";
+    highlightMinglDraft();
+    const pending = appendMinglBubble({body, mine:true, pending:true});
+    try {
+      await db.collection("chatMessages").add({
+        roomId: activeMinglRoomId,
+        roomType: "mingl",
+        connectionId: room.connectionId || "",
+        participants: room.participants || [],
+        senderUid: currentUser.uid,
+        senderName: cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Member",
+        body,
+        edited:false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection("chatRooms").doc(activeMinglRoomId).set({
+        lastMessage: body,
+        unreadCounts,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      await renderMinglChats();
+    } catch(e) {
+      pending?.remove();
+      if (input) input.value = body;
+      setStatus(`Could not send Mingl message: ${e.message || e}`);
+    }
   }
 
   async function editMinglMessage(messageId) {
@@ -1268,20 +1373,39 @@
     const input = byId("minglMessageInput");
     const draft = input?.value.trim();
     if (!input || !draft) return;
-    if (window.FLOQRAIService?.suggestShoutOutText) {
-      try {
-        const result = await window.FLOQRAIService.suggestShoutOutText({mainText:draft, tone:"classy", eventType:"Mingl chat"});
-        input.value = result.mainText || result.answer || draft;
+    const settings = minglLanguageSettings();
+    if (!settings.aiGrammarEnabled) {
+      setText("minglGrammarHint", "Enable grammar help in My Profile and Settings > Language Settings.");
+      byId("minglGrammarHint")?.classList.remove("hidden");
+      return;
+    }
+    if (window.FLOQRGrammar?.suggestGrammarCorrection) {
+      const result = await window.FLOQRGrammar.suggestGrammarCorrection(draft, {
+        uid:currentUser?.uid || "",
+        product:"mingl",
+        inputType:"chat",
+        preferredLanguage:settings.preferredLanguage,
+        tonePreference:settings.tonePreference,
+        correctionMode:settings.correctionMode
+      });
+      const corrected = result?.correctedText || draft;
+      if (settings.correctionMode === "autoFixMinor" && Number(result?.confidence || 0) >= 0.7) {
+        window.FLOQRGrammar.applyCorrectionToInput(input, corrected);
+        highlightMinglDraft();
         return;
-      } catch(e) {}
+      }
+      showMinglGrammarSuggestion(draft, {...result, correctedText:corrected}, input);
+      return;
     }
     input.value = draft.replace(/\bi\b/g, "I").replace(/\s+/g, " ").trim();
+    highlightMinglDraft();
   }
 
   function insertMinglEmoji(emoji) {
     const input = byId("minglMessageInput");
     if (!input) return;
     input.value = `${input.value}${emoji}`;
+    highlightMinglDraft();
     input.focus();
   }
 
@@ -1655,7 +1779,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.83-mobile-mingl-inbox`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.84-shoutout-media-chat-grammar`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -1696,6 +1820,7 @@
       if (mediaType) mediaType.value = "";
       if (legacyUrl) legacyUrl.value = "";
     }
+    if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);
   }
 
   function goToEditor() {
@@ -1725,7 +1850,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.83-mobile-mingl-inbox";
+      portalLink.href = "./patron-portal.html?v=28.84-shoutout-media-chat-grammar";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -1738,14 +1863,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.83-mobile-mingl-inbox";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox";
+      chats.href = "./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -1817,6 +1942,14 @@
     byId("minglSearch")?.addEventListener("input", renderMinglPeople);
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);
+    byId("minglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    byId("minglMessageInput")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMinglMessage();
+      }
+    });
+    updateMinglGrammarControls();
     document.querySelectorAll("[data-mingl-emoji]").forEach(button => {
       button.addEventListener("click", () => insertMinglEmoji(button.dataset.minglEmoji || ""));
     });
@@ -1902,10 +2035,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.83-mobile-mingl-inbox">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.84-shoutout-media-chat-grammar">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.83-mobile-mingl-inbox">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.83-mobile-mingl-inbox">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.84-shoutout-media-chat-grammar">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -1948,7 +2081,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.83-mobile-mingl-inbox`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.84-shoutout-media-chat-grammar`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -2019,7 +2152,8 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const input=byId("shoutoutMediaUpload"), preview=byId("shoutoutMediaPreview");
     if(input) input.value="";
     if(preview){preview.classList.add("hidden");preview.innerHTML="";}
-    ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl"].forEach(id=>{const el=byId(id);if(el){el.value="";el.dispatchEvent(new Event("input",{bubbles:true}));}});
+    ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl","aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id=>{const el=byId(id);if(el){el.value=id==="aiTrimStart"?"0":"";el.dispatchEvent(new Event("input",{bubbles:true}));}});
+    const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
     const status=byId("uploadStatus"); if(status)status.textContent="Media removed.";
     if(window.FLOQRAIMedia?.resetSelection) window.FLOQRAIMedia.resetSelection();
     if(typeof window.updatePreview==="function") window.updatePreview();
@@ -2038,18 +2172,29 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
   }
   function ensureSingleMediaUploader(){
     const editor=findEditor(); if(!editor)return;
-    if(!templateAllowsMedia()){removeDuplicateMediaInputs();return;}
+    const existingCard=(byId("shoutoutMediaUpload")?.closest(".media-upload-card"))||byId("shoutoutMediaCard");
+    if(!templateAllowsMedia()){
+      removeDuplicateMediaInputs();
+      if(existingCard) existingCard.classList.add("hidden");
+      const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
+      return;
+    }
     removeDuplicateMediaInputs();
     hideLegacyPhotoInput();
     let input=byId("shoutoutMediaUpload");
-    let card=input?.closest(".media-upload-card");
+    let card=input?.closest(".media-upload-card")||byId("shoutoutMediaCard");
     if(!input){
       card=document.createElement("div");
-      card.className="card media-upload-card";
+      card.className="media-upload-card";
       card.innerHTML=`<h2>Media Upload</h2><p class="single-media-upload-note">Add media only when this template supports it.</p><label>${templateUploadLabel()}<input id="shoutoutMediaUpload" type="file" accept="${templateAcceptsMedia()}"></label><div class="button-row"><button id="removeShoutoutMediaBtn" type="button">Remove file</button></div><div id="shoutoutMediaPreview" class="media-preview-box hidden"></div><input id="shoutoutMediaUrl" type="hidden"><input id="shoutoutMediaType" type="hidden">`;
       placeMediaCard(card);
       input=byId("shoutoutMediaUpload");
     }
+    if(card) card.classList.remove("hidden");
+    const note=card?.querySelector(".single-media-upload-note");
+    if(note) note.textContent="Add an image or video for this media-capable template. Long videos warn and use only the first 7 seconds.";
+    const label=card?.querySelector(".file-upload-label")||input?.closest("label");
+    if(label&&label.firstChild) label.firstChild.textContent=`${templateUploadLabel()} `;
     if(card&&!byId("removeShoutoutMediaBtn")){
       const row=document.createElement("div");
       row.className="button-row";
@@ -2072,11 +2217,35 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const file=input&&input.files&&input.files[0];
     const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
     if(!file||!preview)return;
+    const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
     const url=URL.createObjectURL(file);
     const isVideo=file.type.startsWith("video/");
     const text=getCurrentText();
     preview.classList.remove("hidden");
     preview.innerHTML=`<div class="media-preview-stage">${isVideo?`<video src="${url}" autoplay muted loop playsinline controls></video>`:`<img src="${url}" alt="">`}<div class="media-preview-overlay"><strong>${esc(text.mainText||"YOUR SHOUTOUT")}</strong><span>${esc(text.subText||"LIVE ON THE DISPLAY")}</span></div></div><p class="sub small">${esc(file.name)} • ${isVideo?"Video":"Image"} preview</p>`;
+    if(isVideo){
+      const video=preview.querySelector("video");
+      video?.addEventListener("loadedmetadata",()=>{
+        const duration=Number(video.duration||0);
+        const trimEnd=Math.min(duration||7,7);
+        const original=byId("aiOriginalDuration"), trimmed=byId("aiTrimmedDuration"), start=byId("aiTrimStart"), end=byId("aiTrimEnd"), version=byId("aiSelectedMediaVersion"), type=byId("aiEnhancementType"), prompt=byId("aiEnhancementPrompt");
+        if(original)original.value=duration?String(duration):"";
+        if(start)start.value="0";
+        if(end)end.value=String(trimEnd);
+        if(duration>7){
+          if(trimmed)trimmed.value="7";
+          if(version)version.value="trimmed";
+          if(type)type.value="trim";
+          if(prompt)prompt.value="Trim Video to 7 Seconds";
+          if(notice)notice.textContent=`Warning: this video is ${duration.toFixed(1)} seconds. FLOQR will use only the first 7 seconds.`;
+          video.addEventListener("timeupdate",()=>{if(video.currentTime>=7){try{video.currentTime=0;}catch(e){} video.play?.().catch(()=>{});}});
+        }else{
+          if(trimmed)trimmed.value=duration?String(duration):"";
+          if(version)version.value="original";
+          if(notice)notice.textContent=duration?`Video duration ${duration.toFixed(1)}s. Ready.`:"Video ready.";
+        }
+      });
+    }
   }
   function refreshPreviewText(){
     const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
@@ -2125,6 +2294,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     return {mediaUrl,mediaType,mediaFileName:file.name,mediaStoragePath:storagePath,mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()};
   }
   window.jadzUploadSelectedShoutoutMedia=uploadSingleSelectedMedia;
+  window.jadzEnsureSingleMediaUploader=ensureSingleMediaUploader;
   window.jadzRefreshShoutoutMediaPreview=refreshPreviewText;
   document.addEventListener("DOMContentLoaded",()=>{
     patchAISuggestionButtons();

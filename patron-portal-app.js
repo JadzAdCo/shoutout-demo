@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.83-mobile-mingl-inbox */
+/* patron-portal-app.js v28.84-shoutout-media-chat-grammar */
 (function(){
   "use strict";
 
@@ -74,6 +74,7 @@
   const db = firebase.firestore();
   const storage = firebase.storage();
   let currentProfile = {};
+  let currentLanguageSettings = {};
   let currentMessages = [];
   let messageRecipients = [];
   let currentShoutouts = [];
@@ -113,7 +114,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
     }
@@ -146,6 +147,7 @@
   }
 
   function languageLabel(code) {
+    if (code === "auto") return "Auto-detect";
     return LANGUAGE_LABELS[code] || code || "Not selected";
   }
 
@@ -176,6 +178,82 @@
         : "ai-ready-not-live",
       publicProfileTranslationProviderMode: window.FLOQR_AI_ENABLED ? "firebase-ai-logic-ready" : "local-placeholder"
     };
+  }
+
+  function defaultLanguageSettings(profile = {}) {
+    return {
+      aiGrammarEnabled:!!profile.languageSettings?.aiGrammarEnabled,
+      correctionMode:profile.languageSettings?.correctionMode || "approvalRequired",
+      highlightSpellingErrors:profile.languageSettings?.highlightSpellingErrors !== false,
+      highlightGrammarSuggestions:profile.languageSettings?.highlightGrammarSuggestions !== false,
+      preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || "auto",
+      tonePreference:profile.languageSettings?.tonePreference || "keepTone"
+    };
+  }
+
+  function fillLanguageSettings(profile = {}) {
+    currentLanguageSettings = defaultLanguageSettings(profile);
+    const settings = currentLanguageSettings;
+    if (byId("languageAiGrammarEnabled")) byId("languageAiGrammarEnabled").checked = !!settings.aiGrammarEnabled;
+    const mode = settings.correctionMode || "approvalRequired";
+    document.querySelectorAll("input[name='languageCorrectionMode']").forEach(input => {
+      input.checked = input.value === mode;
+    });
+    if (byId("languageHighlightSpellingErrors")) byId("languageHighlightSpellingErrors").checked = !!settings.highlightSpellingErrors;
+    if (byId("languageHighlightGrammarSuggestions")) byId("languageHighlightGrammarSuggestions").checked = !!settings.highlightGrammarSuggestions;
+    if (byId("languagePreferredLanguage")) byId("languagePreferredLanguage").value = settings.preferredLanguage || "auto";
+    if (byId("languageTonePreference")) byId("languageTonePreference").value = settings.tonePreference || "keepTone";
+    renderLanguageSettingsReport(settings);
+    updateChatGrammarControls();
+  }
+
+  function selectedCorrectionMode() {
+    return document.querySelector("input[name='languageCorrectionMode']:checked")?.value || "approvalRequired";
+  }
+
+  function collectLanguageSettings() {
+    return {
+      aiGrammarEnabled:!!byId("languageAiGrammarEnabled")?.checked,
+      correctionMode:selectedCorrectionMode(),
+      highlightSpellingErrors:!!byId("languageHighlightSpellingErrors")?.checked,
+      highlightGrammarSuggestions:!!byId("languageHighlightGrammarSuggestions")?.checked,
+      preferredLanguage:byId("languagePreferredLanguage")?.value || "auto",
+      tonePreference:byId("languageTonePreference")?.value || "keepTone"
+    };
+  }
+
+  function renderLanguageSettingsReport(settings = currentLanguageSettings) {
+    const report = byId("languageSettingsReport");
+    if (!report) return;
+    report.innerHTML = simpleRows([
+      ["AI Grammar", settings.aiGrammarEnabled ? "Enabled" : "Disabled"],
+      ["Correction Mode", settings.correctionMode || "approvalRequired"],
+      ["Preferred Language", languageLabel(settings.preferredLanguage || "auto")],
+      ["Tone Preference", settings.tonePreference || "keepTone"],
+      ["Draft Privacy", "Draft text is processed only when you request correction and is not indexed."]
+    ]);
+  }
+
+  async function saveLanguageSettings() {
+    const user = auth.currentUser;
+    if (!user) return;
+    return actionFeedback({
+      starting:"Saving language settings...",
+      wait:"We are saving your grammar and spelling preferences.",
+      success:"Language settings saved",
+      redirecting:"Language settings saved, returning to Language Settings.",
+      returnTo:"Language Settings"
+    }, async () => {
+      const languageSettings = {
+        ...collectLanguageSettings(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      };
+      await db.collection("users").doc(user.uid).set({languageSettings}, {merge:true});
+      currentLanguageSettings = {...languageSettings};
+      renderLanguageSettingsReport(currentLanguageSettings);
+      updateChatGrammarControls();
+      setText("portalStatus", "Language settings saved.");
+    });
   }
 
   function getApprovedRoles(profile = currentProfile) {
@@ -328,6 +406,7 @@
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
     renderPrivacyDatapoints(profile);
+    fillLanguageSettings(profile);
   }
 
   function publicMinglDatapoints(profile = {}) {
@@ -845,7 +924,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -962,7 +1041,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.83-mobile-mingl-inbox",
+        link:"./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar",
         read:false,
         createdAt:fieldValue()
       });
@@ -1040,13 +1119,106 @@
     });
   }
 
+  function otherMinglUser(room = {}) {
+    const user = auth.currentUser;
+    const otherUid = (room.participants || []).find(uid => uid !== user?.uid);
+    return {
+      uid:otherUid || "",
+      summary:room.userSummaries?.[otherUid] || {}
+    };
+  }
+
+  function updateChatGrammarControls() {
+    const enabled = !!currentLanguageSettings.aiGrammarEnabled;
+    const button = byId("portalImproveMinglMessageBtn");
+    const hint = byId("portalMinglGrammarHint");
+    if (button) button.classList.toggle("hidden", !enabled);
+    if (hint && !enabled) {
+      hint.classList.add("hidden");
+      hint.textContent = "";
+    }
+    highlightMinglDraft();
+  }
+
+  function highlightMinglDraft() {
+    const input = byId("portalMinglMessageInput");
+    const hint = byId("portalMinglGrammarHint");
+    if (!input || !hint) return;
+    input.classList.remove("grammar-spelling-warning", "grammar-grammar-warning");
+    hint.classList.add("hidden");
+    hint.textContent = "";
+    if (!currentLanguageSettings.aiGrammarEnabled || !input.value.trim() || !window.FLOQRGrammar?.localDetectPossibleTypos) return;
+    const issues = window.FLOQRGrammar.localDetectPossibleTypos(input.value, currentLanguageSettings.preferredLanguage || "auto");
+    if (!issues.length) return;
+    const hasSpelling = issues.some(issue => issue.type === "spelling");
+    const hasGrammar = issues.some(issue => issue.type !== "spelling");
+    if (hasSpelling && currentLanguageSettings.highlightSpellingErrors) input.classList.add("grammar-spelling-warning");
+    if (hasGrammar && currentLanguageSettings.highlightGrammarSuggestions) input.classList.add("grammar-grammar-warning");
+    const summary = issues.slice(0, 3).map(issue => `${issue.original} -> ${issue.suggestion}`).join(", ");
+    hint.textContent = `Possible correction: ${summary}`;
+    hint.classList.remove("hidden");
+  }
+
+  function showGrammarSuggestionModal({original, suggested, explanation, provider}) {
+    return new Promise(resolve => {
+      const modal = document.createElement("div");
+      modal.className = "floqr-grammar-modal";
+      modal.innerHTML = `<div class="floqr-grammar-dialog">
+        <h2>Suggested Correction</h2>
+        <div class="grammar-compare">
+          <div><strong>Original</strong><p>${esc(original)}</p></div>
+          <div><strong>Suggested</strong><p>${esc(suggested)}</p></div>
+        </div>
+        <p class="sub small">${esc(explanation || "")}${provider ? ` (${esc(provider)})` : ""}</p>
+        <div class="button-row">
+          <button class="primary" type="button" data-grammar-choice="use">Use Suggestion</button>
+          <button type="button" data-grammar-choice="keep">Keep Original</button>
+          <button type="button" data-grammar-choice="edit">Edit Manually</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener("click", event => {
+        const button = event.target.closest("[data-grammar-choice]");
+        if (!button) return;
+        const choice = button.dataset.grammarChoice;
+        modal.remove();
+        resolve(choice);
+      });
+    });
+  }
+
+  function appendPortalMinglBubble(msg, user, pending = false) {
+    const wrap = byId("portalMinglMessages");
+    if (!wrap || !user) return;
+    const empty = wrap.querySelector(".mingl-empty-state");
+    if (empty) empty.remove();
+    const mine = msg.senderUid === user.uid;
+    const system = msg.senderUid === "system" || msg.messageType === "system";
+    const node = document.createElement("div");
+    node.className = `mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${pending ? "pending" : ""}`;
+    node.dataset.messageId = msg.id || "";
+    node.innerHTML = system
+      ? `<p>${esc(msg.body || "")}</p><small>${esc(pending ? "Sending..." : fmtDate(msg.createdAt))}</small>`
+      : `<p>${esc(msg.body || "")}</p><small>${esc(pending ? "Sending..." : fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}</small>${mine && !pending ? `<div class="mingl-message-actions"><button type="button" data-edit-portal-mingl="${esc(msg.id || "")}">Edit</button></div>` : ""}`;
+    wrap.appendChild(node);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
   async function openPortalMinglChat(room) {
     if (!room?.id) return;
     activePortalMinglRoomId = room.id;
     const panel = byId("portalMinglChatPanel");
     panel?.classList.remove("hidden");
-    const otherUid = (room.participants || []).find(uid => uid !== auth.currentUser?.uid);
-    setText("portalMinglChatTitle", room.userSummaries?.[otherUid]?.displayName || "Mingl Chat");
+    const other = otherMinglUser(room);
+    const displayName = other.summary.displayName || room.title || "Mingl Chat";
+    setText("portalMinglChatTitle", displayName);
+    setText("portalMinglChatStatus", "Mutual Mingl chat");
+    const avatar = byId("portalMinglChatAvatar");
+    if (avatar) {
+      const photo = other.summary.photoURL || other.summary.profilePhotoUrl || "";
+      avatar.innerHTML = photo ? `<img src="${esc(photo)}" alt="">` : esc(displayName.slice(0, 1).toUpperCase() || "M");
+    }
+    updateChatGrammarControls();
     subscribePortalMinglMessages();
     panel?.scrollIntoView({behavior:"smooth", block:"start"});
   }
@@ -1060,12 +1232,11 @@
       const mine = msg.senderUid === user.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
       return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
-        <strong>${esc(system ? "System Message" : (msg.senderName || "Member"))}</strong>
         <p>${esc(msg.body || "")}</p>
         <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}</small>
         ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-portal-mingl="${esc(msg.id || "")}">Edit</button></div>` : ""}
       </div>`;
-    }).join("") : "<p class='sub'>No messages yet.</p>";
+    }).join("") : "<p class='sub mingl-empty-state'>Start the conversation.</p>";
     wrap.querySelectorAll("[data-edit-portal-mingl]").forEach(button => {
       button.addEventListener("click", () => editPortalMinglMessage(button.dataset.editPortalMingl));
     });
@@ -1091,15 +1262,20 @@
 
   async function sendPortalMinglMessage() {
     const user = auth.currentUser;
-    const body = byId("portalMinglMessageInput")?.value.trim();
+    const input = byId("portalMinglMessageInput");
+    const body = input?.value.trim();
     if (!user || !activePortalMinglRoomId || !body) return;
-    return actionFeedback({
-      starting:"Sending Mingl message...",
-      wait:"We are sending your Mingl message. Please wait a few seconds.",
-      success:"Mingl message sent",
-      redirecting:"Mingl message sent, redirecting back to Mingl Chat.",
-      returnTo:"Mingl Chat"
-    }, async () => {
+    const tempId = `temp-${Date.now()}`;
+    input.value = "";
+    highlightMinglDraft();
+    appendPortalMinglBubble({
+      id:tempId,
+      senderUid:user.uid,
+      senderName:currentProfile.displayName || user.displayName || user.email || "Member",
+      body,
+      createdAt:new Date()
+    }, user, true);
+    try {
       const roomSnap = await db.collection("chatRooms").doc(activePortalMinglRoomId).get();
       if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
       const room = roomSnap.data();
@@ -1122,9 +1298,14 @@
         unreadCounts,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
-      byId("portalMinglMessageInput").value = "";
-      await loadPortal(user);
-    });
+      setText("portalStatus", "");
+    } catch (error) {
+      input.value = body;
+      setText("portalStatus", error?.message || "Mingl message could not be sent.");
+      const pending = byId("portalMinglMessages")?.querySelector(`[data-message-id='${tempId}']`);
+      if (pending) pending.remove();
+      highlightMinglDraft();
+    }
   }
 
   async function editPortalMinglMessage(messageId) {
@@ -1146,14 +1327,51 @@
     const input = byId("portalMinglMessageInput");
     const draft = input?.value.trim();
     if (!input || !draft) return;
-    if (window.FLOQRAIService?.suggestShoutOutText) {
-      try {
-        const result = await window.FLOQRAIService.suggestShoutOutText({mainText:draft, tone:"classy", eventType:"Mingl chat"});
-        input.value = result.mainText || result.answer || draft;
-        return;
-      } catch(e) {}
+    if (!currentLanguageSettings.aiGrammarEnabled) {
+      setText("portalStatus", "Turn on AI Grammar & Spelling Assistance in Language Settings first.");
+      return;
     }
-    input.value = draft.replace(/\bi\b/g, "I").replace(/\s+/g, " ").trim();
+    if (!window.FLOQRGrammar?.suggestGrammarCorrection) {
+      setText("portalStatus", "AI grammar correction is not available yet.");
+      return;
+    }
+    setText("portalStatus", "Checking draft grammar...");
+    const result = await window.FLOQRGrammar.suggestGrammarCorrection(draft, {
+      uid:auth.currentUser?.uid || "",
+      product:"mingl",
+      inputType:"chat",
+      preferredLanguage:currentLanguageSettings.preferredLanguage || "auto",
+      tonePreference:currentLanguageSettings.tonePreference || "keepTone",
+      correctionMode:currentLanguageSettings.correctionMode || "approvalRequired"
+    });
+    const suggestion = result.correctedText || draft;
+    if (suggestion === draft) {
+      setText("portalStatus", "No grammar change suggested.");
+      highlightMinglDraft();
+      return;
+    }
+    if (currentLanguageSettings.correctionMode === "autoFixMinor" && Number(result.confidence || 0) >= 0.7) {
+      window.FLOQRGrammar.applyCorrectionToInput(input, suggestion);
+      setText("portalStatus", "Minor typo fix applied. Tap Send when ready.");
+      highlightMinglDraft();
+      return;
+    }
+    const choice = await showGrammarSuggestionModal({
+      original:draft,
+      suggested:suggestion,
+      explanation:result.explanation || "",
+      provider:result.provider || ""
+    });
+    if (choice === "use") {
+      window.FLOQRGrammar.applyCorrectionToInput(input, suggestion);
+      setText("portalStatus", "Suggestion applied. Tap Send when ready.");
+    } else if (choice === "edit") {
+      input.focus();
+      setText("portalStatus", "Edit your draft, then tap Send when ready.");
+    } else {
+      setText("portalStatus", "Original draft kept.");
+    }
+    highlightMinglDraft();
   }
 
   function insertPortalEmoji(emoji) {
@@ -1465,6 +1683,7 @@
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
+    bind("saveLanguageSettingsBtn", saveLanguageSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
@@ -1479,6 +1698,27 @@
       byId("composeRecipientEmail").value = "";
       byId("composeRecipientLabel").value = "";
       renderRecipientSearchResults();
+    });
+    byId("portalMinglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    byId("portalMinglMessageInput")?.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendPortalMinglMessage();
+      }
+    });
+    ["languageAiGrammarEnabled","languageHighlightSpellingErrors","languageHighlightGrammarSuggestions","languagePreferredLanguage","languageTonePreference"].forEach(id => {
+      byId(id)?.addEventListener("change", () => {
+        currentLanguageSettings = collectLanguageSettings();
+        renderLanguageSettingsReport(currentLanguageSettings);
+        updateChatGrammarControls();
+      });
+    });
+    document.querySelectorAll("input[name='languageCorrectionMode']").forEach(input => {
+      input.addEventListener("change", () => {
+        currentLanguageSettings = collectLanguageSettings();
+        renderLanguageSettingsReport(currentLanguageSettings);
+        updateChatGrammarControls();
+      });
     });
     document.querySelectorAll("[data-portal-mingl-emoji]").forEach(button => {
       button.addEventListener("click", () => insertPortalEmoji(button.dataset.portalMinglEmoji || ""));

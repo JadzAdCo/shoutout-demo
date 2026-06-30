@@ -38,6 +38,7 @@ window.FLOQR_AI_GEMINI_MEDIA_FUNCTION = "aiEnhanceShoutOutMedia";
 window.FLOQR_AI_GEMINI_MEDIA_MODEL = "gemini-3.1-flash-image";
 window.FLOQR_AI_LOCATION_RANK_FUNCTION = "aiRankLocations";
 window.FLOQR_AI_SHOUTOUT_SUGGEST_FUNCTION = "aiSuggestShoutOut";
+window.FLOQR_AI_GRAMMAR_FUNCTION = "aiSuggestGrammarCorrection";
 window.FLOQR_OBSOLETE_LOCATION_IDS = ["heist-houston-tx", "heist-houston", "heist-houston-texas"];
 
 window.SHOUTOUT_ADMIN_EMAILS = [

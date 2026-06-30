@@ -1,15 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.83 Mobile Mingl Inbox Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.83-mobile-mingl-inbox
+https://jadzadco.github.io/shoutout-demo/?v=28.84-shoutout-media-chat-grammar
 ```
 
 Current release highlights:
 
+- Adds v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings fixes.
+- Repairs media-capable ShoutOut templates so the editor shows one clear `Upload Image or Video` card with preview, `Remove file`, AI media enhancement controls, and a visible video trim warning.
+- Long ShoutOut videos are not blocked. Patrons are warned and FLOQR uses the first 7 seconds through client trim where available, or first-7-second metadata/display fallback when browser trimming is unavailable.
+- Adds nested `Ai Image/Video Enhancement` commands: `Neon`, `VIP Style`, `Club Ready`, `B&W`, `Warm`, and `Original`. Each command previews immediately, shows a temporary definition bubble, and `Apply filter` saves the selected enhancement metadata.
+- Keeps Gemini image enhancement routed through Firebase Functions with no frontend API key. Browser filters remain the fallback preview path.
+- Updates Mingl Chat on both the public Mingl page and My Profile and Settings to behave like a normal chat thread: message bubbles, current user on the right, recipient/system messages left/center, `Start the conversation.` empty state, immediate pending bubble after Send, and no confirmation/redirect overlay after sending.
+- Adds `Language Settings` under My Profile and Settings with AI grammar/spelling assistance, correction mode, highlight options, preferred language, and tone preference.
+- Adds `ai-grammar-service.js` plus the Firebase callable scaffold `aiSuggestGrammarCorrection`. Grammar correction processes draft text only when the user taps `Fix Grammar`; private drafts are not indexed or stored unless the user sends the message.
+- Updates Master Admin Diagnostics package checks and manual feature tests for the ShoutOut upload card, nested AI media filters, Mingl chat bubbles, Language Settings, and grammar correction workflow.
+- Direct rollback note for this package is `ROLLBACK-V28-84.md`.
 - Adds v28.83 Mobile Mingl Datapoints and FLOQR Inbox fixes.
 - Matched public Mingl cards now use nested datapoint categories, matching the public profile behavior. The old flat paragraph of datapoints was removed from matched cards.
 - Mobile/tablet datapoint panels now open inside the card instead of floating off-screen on iPhone.
@@ -19,7 +29,7 @@ Current release highlights:
 - Patrons can accept a received `Friend or Mingl Request` by clicking `Mingl Back` from FLOQR Inbox or from My Profile and Settings > Mingl > Mingl Requests.
 - My Privacy checkbox labels now stay inside their cards on mobile Safari/iPhone layouts.
 - Adds v28.83 package diagnostics and manual tests for mobile nested datapoints, responsive device categories, FLOQR Inbox rename, and Mingl Back acceptance.
-- Direct rollback note for this package is `ROLLBACK-V28-83.md`.
+- The v28.83 rollback note is superseded by the current direct rollback note.
 - Adds v28.82 Mingl Requests, My Privacy, and Public Media Sharing.
 - Adds the `Let's Mingl` request flow in the public Mingl room. Matched public patrons can request to Mingl, and full Mingl Chat opens only after both parties approve.
 - Creates a `Friend or Mingl Request` notification/message/audit trail with timestamp, shared datapoint context, and requester location text when available.

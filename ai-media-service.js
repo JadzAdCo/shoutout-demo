@@ -1,18 +1,52 @@
-/* FLOQR ShoutOut media AI readiness v28.74: Gemini callable image editing, filters, safety metadata, first-7-second video trim. */
+/* FLOQR ShoutOut media AI readiness v28.84: Gemini callable image editing, nested filters, safety metadata, first-7-second video trim. */
 (function () {
   "use strict";
 
   const MAX_VIDEO_SECONDS = 7;
   const GEMINI_MEDIA_TIMEOUT_MS = 45000;
   const FILTERS = {
-    original: {label:"Use Original", css:"none", type:"none"},
-    bright: {label:"Improve Lighting", css:"brightness(1.18) contrast(1.08)", type:"lighting"},
-    contrast: {label:"Apply Filter", css:"contrast(1.2) saturate(1.08)", type:"filter"},
-    neon: {label:"Neon", css:"saturate(1.45) contrast(1.15) hue-rotate(12deg)", type:"neon"},
-    vip: {label:"Make VIP Style", css:"sepia(.2) saturate(1.25) contrast(1.12) brightness(1.06)", type:"vip"},
-    club: {label:"Make Club Ready", css:"brightness(1.08) contrast(1.18) saturate(1.3)", type:"filter"},
-    blackwhite: {label:"Black & White", css:"grayscale(1) contrast(1.18)", type:"filter"},
-    warm: {label:"Warm", css:"sepia(.18) saturate(1.18) brightness(1.05)", type:"filter"}
+    neon: {
+      label:"Neon",
+      css:"saturate(1.55) contrast(1.16) brightness(1.04) hue-rotate(10deg)",
+      type:"neon",
+      definition:"Bright nightclub color, stronger glow, and higher contrast for LED-friendly energy.",
+      prompt:"Create a vibrant neon nightlife enhancement with electric color, clear faces, and LED-safe contrast."
+    },
+    vip: {
+      label:"VIP Style",
+      css:"sepia(.20) saturate(1.24) contrast(1.14) brightness(1.06)",
+      type:"vip",
+      definition:"Warm luxury polish with black-and-gold richness for VIP table moments.",
+      prompt:"Create a refined VIP luxury enhancement with warm gold light, polished contrast, and natural skin tones."
+    },
+    club: {
+      label:"Club Ready",
+      css:"brightness(1.08) contrast(1.20) saturate(1.30)",
+      type:"club-ready",
+      definition:"Improves dark nightlife photos with punchier lighting and clearer contrast.",
+      prompt:"Make this ShoutOut media club-ready with improved low-light clarity, balanced contrast, and lively color."
+    },
+    blackwhite: {
+      label:"B&W",
+      css:"grayscale(1) contrast(1.20) brightness(1.03)",
+      type:"black-white",
+      definition:"Classic black-and-white treatment with stronger definition and clean highlights.",
+      prompt:"Create a classic black-and-white enhancement with crisp contrast and clean highlights."
+    },
+    warm: {
+      label:"Warm",
+      css:"sepia(.18) saturate(1.16) brightness(1.07)",
+      type:"warm",
+      definition:"Soft warm color and gentle brightness for flattering portraits and celebration media.",
+      prompt:"Create a warm flattering enhancement with soft golden light and natural skin tones."
+    },
+    original: {
+      label:"Original",
+      css:"none",
+      type:"none",
+      definition:"Keeps the uploaded image or video unchanged.",
+      prompt:"Use the original media without AI image/video enhancement."
+    }
   };
 
   const byId = id => document.getElementById(id);
@@ -61,6 +95,24 @@
     if (el) el.textContent = value || "";
   }
 
+  function showFilterBubble(key) {
+    const item = FILTERS[key] || FILTERS.original;
+    const bubble = byId("aiMediaFilterBubble");
+    if (!bubble) return;
+    bubble.textContent = item.definition || "";
+    bubble.classList.remove("hidden");
+    clearTimeout(showFilterBubble.timer);
+    showFilterBubble.timer = setTimeout(() => bubble.classList.add("hidden"), 3600);
+  }
+
+  function setActiveCommand(key) {
+    const panel = byId("aiMediaPanel");
+    if (!panel) return;
+    panel.querySelectorAll("[data-ai-filter]").forEach(button => {
+      button.classList.toggle("active", button.dataset.aiFilter === key);
+    });
+  }
+
   function setHidden(id, value) {
     const el = byId(id);
     if (el) el.value = value == null ? "" : String(value);
@@ -78,15 +130,16 @@
     panel.id = "aiMediaPanel";
     panel.className = "ai-media-panel";
     panel.innerHTML = `
-      <h2>AI Media Enhancement</h2>
-      <p class="sub small">Gemini photo editing runs through Firebase Functions when deployed. Browser filters remain the safe fallback.</p>
-      <div class="ai-filter-row">
+      <h2>Ai Image/Video Enhancement</h2>
+      <p class="sub small">Gemini image editing runs through Firebase Functions when deployed. Browser previews remain the safe fallback and keep the original upload intact unless Gemini returns an enhanced file.</p>
+      <button id="aiMediaEnhancementToggle" class="ai-media-enhancement-toggle" type="button" data-ai-enhancement-toggle aria-expanded="false">Ai Image/Video Enhancement</button>
+      <div id="aiMediaCommandMenu" class="ai-media-command-menu hidden">
         ${Object.entries(FILTERS).map(([key, item]) => `<button type="button" data-ai-filter="${esc(key)}">${esc(item.label)}</button>`).join("")}
-        <button type="button" data-ai-trim>Trim Video to 7 Seconds</button>
       </div>
+      <p id="aiMediaFilterBubble" class="ai-media-filter-bubble hidden"></p>
+      <button id="aiApplyFilterBtn" class="primary ai-apply-filter-btn" type="button" data-ai-apply-filter>Apply filter</button>
       <div class="button-row">
-        <button type="button" data-ai-version="original">Use Original</button>
-        <button type="button" data-ai-version="enhanced">Use Enhanced</button>
+        <button type="button" data-ai-trim>Trim Video to 7 Seconds</button>
       </div>
       <input id="aiSelectedMediaVersion" type="hidden" value="original"/>
       <input id="aiEnhancementType" type="hidden" value="none"/>
@@ -98,8 +151,15 @@
       <p id="aiMediaStatus" class="status"></p>`;
     placePanel(panel);
     panel.addEventListener("click", event => {
+      const toggleBtn = event.target.closest("[data-ai-enhancement-toggle]");
+      if (toggleBtn) {
+        const menu = byId("aiMediaCommandMenu");
+        const open = menu?.classList.toggle("hidden") === false;
+        toggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      }
       const filterBtn = event.target.closest("[data-ai-filter]");
       if (filterBtn) applyFilter(filterBtn.dataset.aiFilter);
+      if (event.target.closest("[data-ai-apply-filter]")) applySelectedFilter();
       const versionBtn = event.target.closest("[data-ai-version]");
       if (versionBtn) setSelectedVersion(versionBtn.dataset.aiVersion);
       if (event.target.closest("[data-ai-trim]")) trimVideoMetadataOnly();
@@ -130,6 +190,8 @@
     trimProcessingMode = options.mode || trimProcessingMode || "metadata-pending";
     trimWarning = options.warning || "This video is longer than 7 seconds. FLOQR will use only the first 7 seconds.";
     enforcePreviewTrimPlayback();
+    const notice = byId("videoTrimNotice");
+    if (notice) notice.textContent = trimWarning;
     setPanelStatus(trimWarning);
   }
 
@@ -137,18 +199,33 @@
     selectedFilter = FILTERS[key] ? key : "original";
     const media = previewMediaEl();
     if (media) media.style.filter = FILTERS[selectedFilter].css;
+    setActiveCommand(selectedFilter);
+    showFilterBubble(selectedFilter);
     if (isSelectedLongVideo()) {
       markTrimmed(currentDuration, {
-        prompt: `${FILTERS[selectedFilter].label}; Trim Video to 7 Seconds`,
+        prompt: `${FILTERS[selectedFilter].prompt || FILTERS[selectedFilter].label}; Trim Video to 7 Seconds`,
         notes: "Video exceeded 7 seconds; first 7 seconds selected for trim.",
         mode: trimProcessingMode || "metadata-pending"
       });
       return;
     }
     setHidden("aiEnhancementType", FILTERS[selectedFilter].type);
-    setHidden("aiEnhancementPrompt", FILTERS[selectedFilter].label);
+    setHidden("aiEnhancementPrompt", FILTERS[selectedFilter].prompt || FILTERS[selectedFilter].label);
     setHidden("aiSelectedMediaVersion", selectedFilter === "original" ? "original" : "enhanced");
-    setPanelStatus(selectedFilter === "original" ? "Original media selected." : `${FILTERS[selectedFilter].label} preview applied. The original file will be uploaded with enhancement metadata.`);
+    setPanelStatus(selectedFilter === "original" ? "Original media selected." : `${FILTERS[selectedFilter].label} preview applied. Tap Apply filter to keep this enhancement metadata for upload.`);
+  }
+
+  function applySelectedFilter() {
+    const file = selectedFile();
+    if (!file) {
+      setPanelStatus("Choose an image or video before applying a filter.");
+      return;
+    }
+    applyFilter(selectedFilter || "original");
+    const item = FILTERS[selectedFilter] || FILTERS.original;
+    setPanelStatus(selectedFilter === "original"
+      ? "Original selected. FLOQR will upload the media without enhancement metadata."
+      : `${item.label} applied. Gemini receives this enhancement prompt when image editing is configured; otherwise FLOQR saves the selected filter metadata.`);
   }
 
   function setSelectedVersion(version) {
@@ -228,6 +305,8 @@
             warning: `Warning: video is ${currentDuration.toFixed(1)} seconds. FLOQR will cut and use only the first 7 seconds.`
           });
         } else {
+          const notice = byId("videoTrimNotice");
+          if (notice) notice.textContent = `Video duration ${currentDuration.toFixed(1)}s. Ready.`;
           setPanelStatus(`Video duration ${currentDuration.toFixed(1)}s. Ready.`);
         }
       };
@@ -532,7 +611,7 @@
       return decorateResult(result, {
         trimProcessingMode,
         trimWarning,
-        originalMediaUploaded:!(file?.type?.startsWith("video/") && currentDuration > MAX_VIDEO_SECONDS)
+        originalMediaUploaded:true
       });
     };
   }
@@ -570,6 +649,10 @@
     ["aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id => setHidden(id, id === "aiTrimStart" ? 0 : ""));
     setHidden("aiSelectedMediaVersion", "original");
     setHidden("aiEnhancementType", "none");
+    setActiveCommand("original");
+    byId("aiMediaFilterBubble")?.classList.add("hidden");
+    const notice = byId("videoTrimNotice");
+    if (notice) notice.textContent = "";
     setPanelStatus("Media removed.");
   }
 

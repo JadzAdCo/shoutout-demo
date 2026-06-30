@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=28.83-mobile-mingl-inbox"/>
+  <link rel="stylesheet" href="./styles.css?v=28.84-shoutout-media-chat-grammar"/>
 </head>
 <body>
 
@@ -275,13 +275,20 @@
         <h2>Mingl Chat</h2>
         <div id="minglChatList" class="mingl-chat-list"></div>
         <div id="minglChatPanel" class="mingl-chat-panel hidden">
-          <h3 id="minglChatTitle">Chat</h3>
+          <div class="mingl-chat-header">
+            <div id="minglChatAvatar" class="mingl-chat-avatar">M</div>
+            <div>
+              <h3 id="minglChatTitle">Chat</h3>
+              <p id="minglChatStatus" class="sub small">Open a Mingl chat to begin.</p>
+            </div>
+          </div>
           <div id="minglMessages" class="mingl-messages"></div>
           <div class="mingl-compose">
             <input id="minglMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
             <button id="improveMinglMessageBtn" type="button">Fix Grammar</button>
             <button id="sendMinglMessageBtn" class="primary" type="button">Send</button>
           </div>
+          <p id="minglGrammarHint" class="grammar-hint hidden"></p>
           <div class="emoji-row" aria-label="Mingl emoji shortcuts">
             <button type="button" data-mingl-emoji="😊">😊</button>
             <button type="button" data-mingl-emoji="🔥">🔥</button>
@@ -383,7 +390,20 @@
           </label>
           <input id="subText" type="hidden" value=""/>
         </div>
-        <label id="shoutoutPhotoWrap" class="template-media-field">Upload Photo<input id="shoutoutPhoto" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+        <div id="shoutoutMediaCard" class="media-upload-card hidden">
+          <h2>Media Upload</h2>
+          <p class="single-media-upload-note">Add media only when this template supports image or video.</p>
+          <label class="file-upload-label">Upload Image or Video
+            <input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"/>
+          </label>
+          <div class="button-row">
+            <button id="removeShoutoutMediaBtn" type="button">Remove file</button>
+          </div>
+          <div id="shoutoutMediaPreview" class="media-preview-box hidden"></div>
+          <p id="videoTrimNotice" class="status"></p>
+          <input id="shoutoutMediaUrl" type="hidden"/>
+          <input id="shoutoutMediaType" type="hidden"/>
+        </div>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
         <label>ShoutOut tone
@@ -431,17 +451,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.80-location-template-ai"></script>
-<script src="./ai-service.js?v=28.80-location-template-ai"></script>
+<script src="./shared-data.js?v=28.84-shoutout-media-chat-grammar"></script>
+<script src="./ai-service.js?v=28.84-shoutout-media-chat-grammar"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-location-service.js?v=28.80-location-template-ai"></script>
+<script src="./ai-location-service.js?v=28.84-shoutout-media-chat-grammar"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./floqr-action-feedback.js?v=28.83-mobile-mingl-inbox"></script>
-<script src="./patron-app.js?v=28.83-mobile-mingl-inbox"></script>
+<script src="./floqr-action-feedback.js?v=28.84-shoutout-media-chat-grammar"></script>
+<script src="./ai-grammar-service.js?v=28.84-shoutout-media-chat-grammar"></script>
+<script src="./patron-app.js?v=28.84-shoutout-media-chat-grammar"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
-<script src="./ai-media-service.js?v=28.80-location-template-ai"></script>
+<script src="./ai-media-service.js?v=28.84-shoutout-media-chat-grammar"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>
