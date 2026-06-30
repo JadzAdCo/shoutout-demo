@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Patron Portal v28.43-f -->
+  <!-- FLOQR Patron Portal v28.82-mingl-privacy-media -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FLOQR Settings</title>
+  <title>My Profile and Settings</title>
   <link rel="stylesheet" href="./styles.css"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
@@ -14,9 +14,8 @@
   <section class="page active">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Settings</p>
-        <h1>FLOQR Settings</h1>
-        <p class="sub">My Profile, Privacy, AI Notification Preferences, My ShoutOut Templates, Public Sharing, ShoutOuts, guest lists, messages, and Mingl.</p>
+        <h1>My Profile and Settings</h1>
+        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, messages, and Mingl.</p>
         <p id="portalSignedInAs" class="status">Not signed in</p>
         <p id="portalStatus" class="status">Loading patron portal...</p>
       </div>
@@ -41,10 +40,10 @@
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
         <button class="admin-tab" data-panel="portalProfile" type="button">My Profile</button>
-        <button class="admin-tab" data-panel="portalPrivacy" type="button">Privacy</button>
+        <button class="admin-tab" data-panel="portalPrivacy" type="button">My Privacy</button>
         <button class="admin-tab" data-panel="portalAiNotifications" type="button">AI Notification Preferences</button>
         <button class="admin-tab" data-panel="portalTemplateVariants" type="button">My ShoutOut Templates</button>
-        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Sharing</button>
+        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Media and Data Sharing</button>
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">Messages</button>
@@ -148,14 +147,15 @@
 
       <section id="portalPublicProfile" class="admin-panel-section">
         <div class="card">
-          <h2>Public Sharing</h2>
-          <p class="sub small">Patron profiles support 10 media slots: 8 image slots and 2 short-video slots. Followers see only what your visibility setting allows.</p>
+          <h2>Public Media and Data Sharing</h2>
+          <p class="sub small">Patron profiles support 10 media slots: 8 image slots and 2 short-video slots. Uploads can be shared based on your public visibility and My Privacy choices.</p>
           <div id="profileTemplatePreview" class="profile-template-preview"></div>
         </div>
         <div class="card">
           <h2>Profile Media Slots</h2>
+          <p class="sub small">Captions are not used. If a photo contains location metadata, FLOQR can ask before adding that place to your travel datapoints.</p>
           <div id="profileMediaSlots" class="profile-media-grid"></div>
-          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Captions / Current Slots</button>
+          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Current Media Slots</button>
         </div>
         <div class="card">
           <h2>Profile Template Guide</h2>
@@ -238,15 +238,36 @@
           <div id="chatPolicySummary" class="policy-list"></div>
         </div>
         <div class="card"><h2>Mingl <span id="chatCountLabel">(0/0)</span></h2><div id="myChats" class="report-block"></div></div>
+        <div id="portalMinglChatPanel" class="card hidden">
+          <h2 id="portalMinglChatTitle">Mingl Chat</h2>
+          <div id="portalMinglMessages" class="mingl-messages"></div>
+          <div class="mingl-compose">
+            <input id="portalMinglMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
+            <button id="portalImproveMinglMessageBtn" type="button">Fix Grammar</button>
+            <button id="portalSendMinglMessageBtn" class="primary" type="button">Send</button>
+          </div>
+          <div class="emoji-row" aria-label="Mingl emoji shortcuts">
+            <button type="button" data-portal-mingl-emoji="😊">😊</button>
+            <button type="button" data-portal-mingl-emoji="🔥">🔥</button>
+            <button type="button" data-portal-mingl-emoji="🎉">🎉</button>
+            <button type="button" data-portal-mingl-emoji="❤️">❤️</button>
+            <button type="button" data-portal-mingl-emoji="😂">😂</button>
+          </div>
+        </div>
       </section>
 
       <section id="portalPrivacy" class="admin-panel-section">
         <div class="card">
-          <h2>Privacy / GDPR</h2>
+          <h2>My Privacy</h2>
+          <p class="sub small">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
           <div class="profile-grid">
             <label><input id="privacyMarketing" type="checkbox"/> Marketing consent</label>
             <label><input id="privacyAnalytics" type="checkbox"/> Analytics consent</label>
             <label><input id="privacySharing" type="checkbox"/> Third-party data sharing consent</label>
+          </div>
+          <div class="card-subsection">
+            <h3>Public Datapoints for Mingl and Matching</h3>
+            <div id="privacyDatapointChoices" class="privacy-datapoint-grid"></div>
           </div>
           <button id="savePrivacyBtn" class="primary" type="button">Save Privacy Preferences</button>
           <button id="exportDataBtn" type="button">Download My Data JSON</button>
@@ -268,6 +289,7 @@
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./patron-portal-app.js?v=28.43-f"></script>
+<script src="./floqr-action-feedback.js?v=28.82-mingl-privacy-media"></script>
+<script src="./patron-portal-app.js?v=28.82-mingl-privacy-media"></script>
 </body>
 </html>

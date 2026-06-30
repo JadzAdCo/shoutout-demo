@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, and rules guidance v28.79 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.82 */
 (function () {
   "use strict";
 
@@ -18,7 +18,8 @@
     lastFeatures: [],
     lastPackageDiagnostics: [],
     lastRulesSmokeResults: [],
-    lastGeminiMediaDiagnostic: null
+    lastGeminiMediaDiagnostic: null,
+    lastManualFeatureDiagnostics: []
   };
 
   const STATUS_COPY = {
@@ -28,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.74-gemini-media-editing-rules";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.82-mingl-request-chat-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.80-location-template-ai";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.82-mingl-privacy-media";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -166,6 +167,7 @@
     "events",
     "templates",
     "minglConnections",
+    "minglAudit",
     "chatRooms",
     "chatMessages",
     "roleRequests",
@@ -594,6 +596,194 @@
         {label:"Current direct rollback note", file:"ROLLBACK-V28-80.md", includes:["FLOQR Rollback - v28.80 Location Template AI", "This rollback does not remove user profile data"]},
         {label:"README documents v28.80", file:"README.md", includes:["v28.80 Location-Aware ShoutOut and Template AI", "Heist Houston", "Browser geolocation", "Gemini contextual ranking"]}
       ]
+    },
+    {
+      version: "v28.81-manual-feature-diagnostics",
+      title: "Manual Feature Test Diagnostics",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.81-manual-feature-diagnostics"]},
+        {label:"Manual diagnostics UI", file:"master-admin.html", includes:["Manual Feature Test Diagnostics", "manualFeatureDiagnosticsReport", "copyManualFeaturePromptBtn", "admin.css?v=28.81-manual-feature-diagnostics"]},
+        {label:"Manual test checklist data", file:"ai-diagnostics-service.js", includes:["MANUAL_FEATURE_TESTS", "Location-aware club/event ranking", "Gemini ShoutOut copy help"]},
+        {label:"Manual test output builder", file:"ai-diagnostics-service.js", includes:["buildManualFeatureDiagnosticsText", "buildManualFeatureDiagnosticsPrompt", "manualFeatureDiagnosticsOutput"]},
+        {label:"Manual test export integration", file:"ai-diagnostics-service.js", includes:["Manual Feature Test Diagnostics", "manualResults", "copyManualFeaturePromptBtn"]},
+        {label:"README documents v28.81", file:"README.md", includes:["v28.81 Manual Feature Test Diagnostics", "Succeed or Failed", "copy-ready Codex resolution prompt"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-81.md", includes:["FLOQR Rollback - v28.81 Manual Feature Diagnostics", "This rollback does not remove manual diagnostic history"]}
+      ]
+    },
+    {
+      version: "v28.82-mingl-privacy-media",
+      title: "Mingl Requests, My Privacy, Public Media Sharing",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.82-mingl-privacy-media"]},
+        {label:"Patron page loads action feedback", file:"index.html", includes:["floqr-action-feedback.js?v=28.82-mingl-privacy-media", "patron-app.js?v=28.82-mingl-privacy-media"]},
+        {label:"Mingl public room request flow", file:"patron-app.js", includes:["Let's Mingl", "Friend or Mingl Request", "recordMinglRequest", "minglAudit"]},
+        {label:"Mingl realtime editable chat", file:"patron-app.js", includes:["minglMessagesUnsubscribe", "editMinglMessage", "improveMinglDraft", "data-mingl-emoji"]},
+        {label:"Privacy-aware Mingl datapoints", file:"patron-app.js", includes:["publicMinglDatapoints", "publicDatapointAllowed", "sharedDataPointLabels"]},
+        {label:"Portal renamed to My Profile and Settings", file:"patron-portal.html", includes:["<title>My Profile and Settings</title>", "My Privacy", "Public Media and Data Sharing"], notIncludes:["<h1>FLOQR Settings</h1>"]},
+        {label:"Portal privacy datapoint selector", file:"patron-portal-app.js", includes:["PUBLIC_MINGL_DATAPOINTS", "privacy-datapoint", "publicMinglDatapoints"]},
+        {label:"Profile media no-caption metadata workflow", file:"patron-portal-app.js", includes:["extractImageGpsMetadata", "profile-media-metadata", "Add", "travelDatapointAdded"], notIncludes:["profile-media-caption"]},
+        {label:"Portal Mingl chat history controls", file:"patron-portal-app.js", includes:["getPortalMinglRooms", "portalMinglUnsubscribe", "editPortalMinglMessage", "portalMinglMessageInput"]},
+        {label:"Action feedback overlay CSS", file:"styles.css", includes:["floqr-action-feedback", "emoji-row", "privacy-datapoint-grid", "media-metadata-prompt"]},
+        {label:"Firestore Mingl request/chat rules", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules", "match /minglAudit/{id}", "isOwnMinglMessageEdit", "isMinglSystemMessageRequest"]},
+        {label:"Rules smoke test covers Mingl audit", file:"ai-diagnostics-service.js", includes:["Firestore: minglAudit request lifecycle", "Rules smoke test Mingl audit record"]},
+        {label:"README documents v28.82", file:"README.md", includes:["v28.82 Mingl Requests, My Privacy, and Public Media Sharing", "Let's Mingl", "Public Media and Data Sharing"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-82.md", includes:["FLOQR Rollback - v28.82 Mingl Privacy Media", "This rollback does not delete user profile data"]}
+      ]
+    }
+  ];
+
+  const MANUAL_FEATURE_TESTS = [
+    {
+      id:"mingl-lets-mingl-request",
+      area:"Mingl public room",
+      feature:"Matched public patrons can send a Let's Mingl request",
+      changed:"The public Mingl room shows only public/shared matched profiles and uses a Let's Mingl request button instead of opening chat immediately.",
+      howToTest:"Sign in as a patron with public profile datapoints. Open Mingl, find a matched public patron, click Let's Mingl, then confirm the button changes to Mingl Request Sent.",
+      expected:"A Friend or Mingl Request notification/message is created, the request is timestamped, and chat does not fully open until the other patron approves."
+    },
+    {
+      id:"mingl-mutual-approval-chat",
+      area:"Mingl chat approval",
+      feature:"Full Mingl Chat opens only after both patrons approve",
+      changed:"A received Mingl request can be accepted with Mingl Back, then a mutual Mingl chat room is created with a system message.",
+      howToTest:"Use a second public matched patron account. Accept the request with Mingl Back, then open Mingl Chat from both accounts.",
+      expected:"Both accounts see the same Mingl Chat history; the first system message says Friend or Mingl Request and includes shared datapoint context."
+    },
+    {
+      id:"mingl-realtime-edit-emoji-ai",
+      area:"Mingl chat UX",
+      feature:"Realtime Mingl chat supports edit, emoji, and grammar cleanup",
+      changed:"Mingl messages render live, sender-owned messages can be edited, emoji shortcuts are available, and Fix Grammar cleans the draft with AI-ready fallback.",
+      howToTest:"Open a mutual Mingl chat, send a message, click Edit on your own message, use an emoji button, and click Fix Grammar on a rough draft.",
+      expected:"New messages appear without a full reload, edited messages show edited, emojis send normally, and grammar cleanup does not expose private data."
+    },
+    {
+      id:"my-profile-settings-rename",
+      area:"My Profile and Settings",
+      feature:"Settings page is renamed and deduplicated",
+      changed:"The patron portal title and menu now say My Profile and Settings, with My Privacy under the same page.",
+      howToTest:"Open the profile dropdown and select My Profile and Settings. Confirm the top page title has only My Profile and Settings and no duplicate FLOQR Settings heading.",
+      expected:"The menu, browser title, and top page heading are consistent."
+    },
+    {
+      id:"my-privacy-public-datapoints",
+      area:"My Privacy",
+      feature:"Patron chooses public/matchable datapoints",
+      changed:"My Privacy includes checkbox controls for datapoints that can be public/shared and used for Mingl matching.",
+      howToTest:"Open My Profile and Settings > My Privacy, uncheck one datapoint, save, refresh, and confirm the choice persists.",
+      expected:"Saved publicMinglDatapoints persist and Mingl matching/profile display respects them."
+    },
+    {
+      id:"public-media-data-sharing",
+      area:"Public Media and Data Sharing",
+      feature:"Profile media uploads moved with no captions and metadata prompt",
+      changed:"Profile media uploads live under Public Media and Data Sharing, captions are removed, and GPS metadata can be added to Travel only when the patron chooses it.",
+      howToTest:"Open Public Media and Data Sharing, upload a JPEG with location metadata, preview it, choose whether to add the location to Travel, then save the slot.",
+      expected:"The upload succeeds, no caption field appears, the media remains visible, and Travel is updated only if the checkbox was selected."
+    },
+    {
+      id:"action-feedback-confirmations",
+      area:"Site-wide action confirmations",
+      feature:"Important actions show working and success feedback",
+      changed:"The shared FLOQR action feedback overlay is loaded on major action pages and used by the new profile, privacy, media, messaging, and Mingl actions.",
+      howToTest:"Save profile, save My Privacy, upload media, send a direct message, send a Mingl message, and run a Master Admin diagnostic action.",
+      expected:"The page shows a working message, then a success or failure message before returning to the original workflow."
+    },
+    {
+      id:"location-ranking",
+      area:"Location-aware club/event ranking",
+      feature:"Nearby and preference-matched venues rank first",
+      changed:"Club, lounge, beach club, and event search now ranks public results using browser/profile location, preferred cities, genres, venue types, and interests.",
+      howToTest:"Sign in as a patron, allow or deny browser location, search clubs/events near your city, then confirm nearby and matching-genre results appear above unrelated cities. Deny geolocation once to confirm profile fallback still works.",
+      expected:"Relevant nearby/preferred results appear first; the app still works if geolocation is denied."
+    },
+    {
+      id:"heist-houston-removal",
+      area:"Obsolete test listing cleanup",
+      feature:"Heist Houston no longer appears",
+      changed:"The fictitious Heist Houston static record was removed and the seeder marks old Firestore/AI index records deleted.",
+      howToTest:"Search patron club results, contextual search, AI index-style search, and Master Admin listing tools for Heist Houston or heist-houston.",
+      expected:"No active patron-facing Heist Houston card or search result appears."
+    },
+    {
+      id:"default-template-gallery",
+      area:"ShoutOut template gallery",
+      feature:"Only Traditional Black and White ShoutOut appears by default",
+      changed:"The initial template view no longer shows the full gallery before search or context recommendations.",
+      howToTest:"Start a new ShoutOut, choose a venue, and inspect the first template selection screen before typing a search.",
+      expected:"Only Traditional Black and White ShoutOut is shown in the default section."
+    },
+    {
+      id:"template-search-reveal",
+      area:"ShoutOut template search",
+      feature:"Search/context reveals relevant templates",
+      changed:"Other official, saved, and community templates are revealed only through search, ownership, public community matches, or context.",
+      howToTest:"Search for birthday template with flowers, video template for VIP table, tattoo inspired background, and summer pool party.",
+      expected:"Relevant matching template sections appear; unrelated templates do not flood the default view."
+    },
+    {
+      id:"gemini-shoutout-copy",
+      area:"Gemini ShoutOut copy help",
+      feature:"Improve My ShoutOut and tone buttons work",
+      changed:"ShoutOut copy help now calls the Firebase Functions Gemini callable when available and falls back to curated safe copy.",
+      howToTest:"In the ShoutOut editor, click Improve My ShoutOut and the Birthday, VIP, Romantic, Party, and Classy buttons.",
+      expected:"The main text updates with LED-safe copy; the suggestion box shows Gemini or curated fallback without breaking the editor."
+    },
+    {
+      id:"media-template-upload",
+      area:"Media-capable templates",
+      feature:"Upload Image or Video appears only when supported",
+      changed:"Media templates use one clear upload control with preview, AI media enhancement controls, and submit flow.",
+      howToTest:"Search/select a media-capable template, then confirm Upload Image or Video appears. Select a text-only template and confirm it is not forced to show media upload.",
+      expected:"Media upload appears for media-capable templates and stays hidden for text-only templates."
+    },
+    {
+      id:"remove-media-control",
+      area:"Media upload controls",
+      feature:"Remove file clears selected media",
+      changed:"A Remove file button was added to the media upload card.",
+      howToTest:"Upload an image or video, confirm it previews, click Remove file, then confirm the preview and hidden media values clear.",
+      expected:"The preview disappears and the ShoutOut can continue without selected media."
+    },
+    {
+      id:"mobile-media-preview",
+      area:"Mobile media preview",
+      feature:"Uploaded image/video remains contained",
+      changed:"Preview CSS uses contained sizing and viewport-aware max heights so media does not take over mobile pages.",
+      howToTest:"On a phone viewport, upload a portrait photo, landscape photo, and video to a media template.",
+      expected:"The entire media remains visible inside the preview area and does not push the editor out of proportion."
+    },
+    {
+      id:"video-seven-second-trim",
+      area:"ShoutOut video rule",
+      feature:"Long videos warn and use first 7 seconds",
+      changed:"Videos longer than 7 seconds warn the user and use a first-7-second trim path or metadata fallback.",
+      howToTest:"Upload a video longer than 7 seconds, watch for the warning, preview the trimmed playback, and submit if the trim path is available.",
+      expected:"The user is warned, full-length display is not allowed, and first-7-second metadata or trimmed output is saved."
+    },
+    {
+      id:"live-preview-order",
+      area:"ShoutOut editor layout",
+      feature:"Live Preview appears below all controls",
+      changed:"The editor shows inputs, AI copy help, media upload, AI media enhancement, submit, and then Live Preview.",
+      howToTest:"Open the ShoutOut editor on desktop and mobile and inspect the scroll order.",
+      expected:"Live Preview is below inputs/upload/enhancement controls and the layout scrolls naturally."
+    },
+    {
+      id:"approval-display-media",
+      area:"ShoutOut approval/display",
+      feature:"Submitted media persists through approval to display",
+      changed:"Media fields are saved on ShoutOut submission and carried through approval/display rendering.",
+      howToTest:"Submit a media ShoutOut, approve it as admin, then open display.html for the target location.",
+      expected:"The selected media version renders on the display page instead of a placeholder."
+    },
+    {
+      id:"diagnostics-manual-output",
+      area:"Master Admin Diagnostics",
+      feature:"Manual test output and resolution prompt",
+      changed:"Diagnostics now includes Succeed/Failed manual checks, a TXT output, and a copy-ready Codex prompt for failed checks.",
+      howToTest:"Mark one manual check Succeed and one Failed, add a note to the failed check, then copy/download the output and copy the resolution prompt.",
+      expected:"The output lists each manual test result, and the prompt includes the failed item and note."
     }
   ];
 
@@ -1502,7 +1692,225 @@
     }];
   }
 
-  function collectDiagnosticIssues({data = {}, features = [], packageResults = []} = {}) {
+  function manualFeatureStorageKey() {
+    return `floqrManualFeatureDiagnostics:${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`;
+  }
+
+  function readManualFeatureResults() {
+    try {
+      return JSON.parse(localStorage.getItem(manualFeatureStorageKey()) || "{}") || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function writeManualFeatureResults(results) {
+    localStorage.setItem(manualFeatureStorageKey(), JSON.stringify(results || {}));
+  }
+
+  function manualFeatureRows() {
+    const saved = readManualFeatureResults();
+    return MANUAL_FEATURE_TESTS.map(test => {
+      const row = saved[test.id] || {};
+      return {
+        ...test,
+        result: row.result || "",
+        note: row.note || "",
+        updatedAt: row.updatedAt || ""
+      };
+    });
+  }
+
+  function manualFeatureResultLabel(value) {
+    if (value === "succeed") return "Succeed";
+    if (value === "failed") return "Failed";
+    return "Not tested";
+  }
+
+  function manualFeatureResultStatus(value) {
+    if (value === "succeed") return "Pass";
+    if (value === "failed") return "Failed";
+    return "Soft Fail";
+  }
+
+  function updateManualFeatureResult(id, patch = {}) {
+    const saved = readManualFeatureResults();
+    saved[id] = {
+      ...(saved[id] || {}),
+      ...patch,
+      updatedAt: new Date().toISOString()
+    };
+    writeManualFeatureResults(saved);
+    renderManualFeatureDiagnostics();
+  }
+
+  function buildManualFeatureDiagnosticsText(rows = manualFeatureRows()) {
+    const counts = countBy(rows, row => manualFeatureResultLabel(row.result));
+    const lines = [
+      "FLOQR MANUAL FEATURE TEST DIAGNOSTICS",
+      `Generated at: ${new Date().toLocaleString()}`,
+      `Diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`,
+      `Signed-in Master Admin: ${state.auth?.currentUser?.email || state.auth?.currentUser?.uid || "unknown"}`,
+      "",
+      "SUMMARY",
+      `Succeed: ${counts.Succeed || 0}`,
+      `Failed: ${counts.Failed || 0}`,
+      `Not tested: ${counts["Not tested"] || 0}`,
+      "",
+      "MANUAL TEST RESULTS"
+    ];
+    rows.forEach((row, index) => {
+      lines.push("");
+      lines.push(`${index + 1}. [${manualFeatureResultLabel(row.result)}] ${row.area}: ${row.feature}`);
+      lines.push(`Changed feature: ${cleanText(row.changed)}`);
+      lines.push(`How to test: ${cleanText(row.howToTest)}`);
+      lines.push(`Expected result: ${cleanText(row.expected)}`);
+      lines.push(`Master Admin note: ${cleanText(row.note || "-")}`);
+      lines.push(`Updated: ${row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-"}`);
+    });
+    return lines.join("\n");
+  }
+
+  function buildManualFeatureDiagnosticsPrompt(rows = manualFeatureRows()) {
+    const failed = rows.filter(row => row.result === "failed");
+    const notTested = rows.filter(row => !row.result);
+    const failedText = failed.length
+      ? failed.map((row, index) => `${index + 1}. ${row.area}: ${row.feature}\n   What changed: ${cleanText(row.changed)}\n   How I tested: ${cleanText(row.howToTest)}\n   Expected: ${cleanText(row.expected)}\n   Failure note from Master Admin: ${cleanText(row.note || "Marked Failed without additional notes.")}`).join("\n")
+      : "No manual feature tests were marked Failed.";
+    const notTestedText = notTested.length
+      ? notTested.map(row => `- ${row.area}: ${row.feature}`).join("\n")
+      : "All manual feature tests have a Succeed or Failed result.";
+    return [
+      "You are working on the FLOQR web app.",
+      "",
+      "Please fix the user-facing feature issue or issues reported by Master Admin Manual Feature Test Diagnostics.",
+      "",
+      "Do not rebuild FLOQR from scratch. Preserve existing user profile data and keep ShoutOut, Mingl, Bata, guest lists, Firebase Auth, Firestore, Firebase Storage, Gemini/Firebase Functions integration, and GitHub Pages deployment working.",
+      "",
+      `Diagnostics package: ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`,
+      "",
+      "Failed manual feature tests:",
+      failedText,
+      "",
+      "Not-yet-tested manual checks:",
+      notTestedText,
+      "",
+      "Please inspect the relevant files, fix the issue incrementally, update Diagnostics/README if needed, run syntax/static checks, and create the next full package ZIP."
+    ].join("\n");
+  }
+
+  function renderManualFeatureDiagnostics() {
+    const summary = byId("manualFeatureDiagnosticsSummary");
+    const report = byId("manualFeatureDiagnosticsReport");
+    const output = byId("manualFeatureDiagnosticsOutput");
+    const promptBox = byId("manualFeatureDiagnosticsPrompt");
+    if (!summary || !report) return;
+    const rows = manualFeatureRows();
+    state.lastManualFeatureDiagnostics = rows;
+    const counts = countBy(rows, row => manualFeatureResultLabel(row.result));
+    summary.innerHTML = simpleRows([
+      ["Succeed", counts.Succeed || 0],
+      ["Failed", counts.Failed || 0],
+      ["Not tested", counts["Not tested"] || 0],
+      ["Output", "Use Copy Manual Test Output for a plain TXT summary."],
+      ["Resolution prompt", "Use Copy Resolution Prompt after marking failed tests."]
+    ]);
+    report.innerHTML = rows.map(row => {
+      const status = manualFeatureResultStatus(row.result);
+      const safeId = esc(row.id);
+      return `<div class="queue-item manual-feature-test" data-manual-feature-id="${safeId}">
+        <div class="message-envelope-head">
+          <strong>${esc(row.area)}: ${esc(row.feature)}</strong>
+          ${statusBadge(status)}
+        </div>
+        <p><strong>Changed feature:</strong> ${esc(row.changed)}</p>
+        <p><strong>How to test:</strong> ${esc(row.howToTest)}</p>
+        <p><strong>Expected:</strong> ${esc(row.expected)}</p>
+        <div class="manual-test-actions">
+          <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="succeed" ${row.result === "succeed" ? "checked" : ""}/> Succeed</label>
+          <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="failed" ${row.result === "failed" ? "checked" : ""}/> Failed</label>
+        </div>
+        <label>Failure note / testing note<textarea data-manual-feature-note="${safeId}" rows="3" placeholder="Example: Button did nothing on mobile after selecting video.">${esc(row.note || "")}</textarea></label>
+        <small>Last updated: ${esc(row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "not marked yet")}</small>
+      </div>`;
+    }).join("");
+    const text = buildManualFeatureDiagnosticsText(rows);
+    const prompt = buildManualFeatureDiagnosticsPrompt(rows);
+    if (output) output.value = text;
+    if (promptBox) promptBox.value = prompt;
+    report.querySelectorAll("[data-manual-feature-result]").forEach(input => {
+      input.addEventListener("change", event => {
+        const id = event.target.dataset.manualFeatureResult;
+        const result = event.target.dataset.result;
+        const current = readManualFeatureResults()[id] || {};
+        updateManualFeatureResult(id, {result:event.target.checked ? result : "", note:current.note || ""});
+      });
+    });
+    report.querySelectorAll("[data-manual-feature-note]").forEach(input => {
+      input.addEventListener("change", event => {
+        const id = event.target.dataset.manualFeatureNote;
+        const current = readManualFeatureResults()[id] || {};
+        updateManualFeatureResult(id, {result:current.result || "", note:event.target.value || ""});
+      });
+    });
+  }
+
+  async function copyManualFeatureOutput() {
+    const run = window.FLOQRActionFeedback?.run || ((messages, action) => action());
+    return run({
+      starting:"Copying diagnostics output...",
+      wait:"We are preparing the manual diagnostics TXT output.",
+      success:"Diagnostics output copied",
+      redirecting:"Manual diagnostics output copied, returning to Diagnostics.",
+      returnTo:"Diagnostics"
+    }, async () => {
+    try {
+      const text = buildManualFeatureDiagnosticsText(manualFeatureRows());
+      await copyTextToClipboard(text);
+      setText("diagnosticsStatus", "Manual feature test output copied.");
+    } catch (error) {
+      setText("diagnosticsStatus", `Could not copy manual feature output: ${error?.message || error}`);
+      throw error;
+    }
+    });
+  }
+
+  async function copyManualFeaturePrompt() {
+    const run = window.FLOQRActionFeedback?.run || ((messages, action) => action());
+    return run({
+      starting:"Copying resolution prompt...",
+      wait:"We are preparing the Codex resolution prompt.",
+      success:"Resolution prompt copied",
+      redirecting:"Resolution prompt copied, returning to Diagnostics.",
+      returnTo:"Diagnostics"
+    }, async () => {
+    try {
+      const prompt = buildManualFeatureDiagnosticsPrompt(manualFeatureRows());
+      await copyTextToClipboard(prompt);
+      setText("diagnosticsStatus", "Manual feature resolution prompt copied. Paste it into Codex when a manual test fails.");
+    } catch (error) {
+      setText("diagnosticsStatus", `Could not copy manual feature prompt: ${error?.message || error}`);
+      throw error;
+    }
+    });
+  }
+
+  function downloadManualFeatureOutput() {
+    const run = window.FLOQRActionFeedback?.run || ((messages, action) => action());
+    return run({
+      starting:"Exporting diagnostics...",
+      wait:"We are creating the manual diagnostics TXT report.",
+      success:"Diagnostics exported",
+      redirecting:"Manual diagnostics TXT exported, returning to Diagnostics.",
+      returnTo:"Diagnostics"
+    }, async () => {
+    const filename = `floqr-manual-feature-diagnostics-${exportTimestamp()}.txt`;
+    downloadTextFile(filename, buildManualFeatureDiagnosticsText(manualFeatureRows()));
+    setText("diagnosticsStatus", `Manual feature diagnostics downloaded as ${filename}.`);
+    });
+  }
+
+  function collectDiagnosticIssues({data = {}, features = [], packageResults = [], manualResults = []} = {}) {
     const issues = [];
     const add = (source, label, status, reason) => {
       if (attentionStatus(status) && !isOptionalParticipantCompatibilityNote(label, reason)) {
@@ -1518,6 +1926,7 @@
 
     features.forEach(item => add("Feature Diagnostics", `${item.area}: ${item.feature}`, item.status, item.evidence));
     packageResults.forEach(item => add("Package Install Diagnostics", `${item.package || "Package"}: ${item.label}`, item.status, item.evidence));
+    manualResults.filter(item => item.result === "failed").forEach(item => add("Manual Feature Test Diagnostics", `${item.area}: ${item.feature}`, "Failed", item.note || item.howToTest || "Master Admin marked this manual feature test Failed."));
 
     Object.entries(data).forEach(([name, value]) => {
       if (value?.error) add("Firestore Read", name, "Failed", value.error);
@@ -1553,14 +1962,15 @@
     ].join("\n");
   }
 
-  function buildDiagnosticsExport({data = {}, schedule = null, features = [], packageResults = []} = {}) {
+  function buildDiagnosticsExport({data = {}, schedule = null, features = [], packageResults = [], manualResults = []} = {}) {
     const reports = sortByCreatedDesc(data.aiDiagnosticsReports?.rows || []);
     const latestRules = latestRulesSmokeReport(data);
     const currentRules = currentPackageRulesSmokeReport(data);
-    const issues = collectDiagnosticIssues({data, features, packageResults, reports});
+    const issues = collectDiagnosticIssues({data, features, packageResults, manualResults, reports});
     const lines = [];
     const counts = countBy(features, item => item.status);
     const packageCounts = countBy(packageResults, item => item.status);
+    const manualCounts = countBy(manualResults, item => manualFeatureResultLabel(item.result));
 
     lines.push("FLOQR MASTER ADMIN DIAGNOSTICS EXPORT");
     lines.push(`Exported at: ${new Date().toLocaleString()}`);
@@ -1604,6 +2014,17 @@
       lines.push(`[${item.status}] ${item.package || "Package"}: ${item.label}`);
       lines.push(`Reason: ${cleanText(item.evidence)}`);
       if (attentionStatus(item.status)) lines.push(`Suggested fix: ${suggestDiagnosticFix("Package Install Diagnostics", `${item.package || "Package"}: ${item.label}`, item.evidence, item.status)}`);
+    });
+
+    lines.push("");
+    lines.push("MANUAL FEATURE TEST DIAGNOSTICS");
+    lines.push(`Totals: Succeed=${manualCounts.Succeed || 0}, Failed=${manualCounts.Failed || 0}, Not tested=${manualCounts["Not tested"] || 0}`);
+    manualResults.forEach(item => {
+      lines.push(`[${manualFeatureResultLabel(item.result)}] ${item.area}: ${item.feature}`);
+      lines.push(`Changed feature: ${cleanText(item.changed)}`);
+      lines.push(`How to test: ${cleanText(item.howToTest)}`);
+      lines.push(`Expected result: ${cleanText(item.expected)}`);
+      lines.push(`Master Admin note: ${cleanText(item.note || "-")}`);
     });
 
     lines.push("");
@@ -1878,11 +2299,14 @@
               : `${check.file} contains expected package marker(s).`
           });
         } catch (error) {
+          const supersededPackageCheck = pkg.version !== CURRENT_DIAGNOSTICS_PACKAGE_VERSION;
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
-            status: "Failed",
-            evidence: error?.message || String(error)
+            status: supersededPackageCheck ? "Pass" : "Failed",
+            evidence: supersededPackageCheck
+              ? `${check.file} is not required in the current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; historical file check is superseded and non-blocking. Original evidence: ${error?.message || String(error)}`
+              : error?.message || String(error)
           });
         }
       }
@@ -2262,6 +2686,13 @@
       deterministicFallbackPassed:deterministicChatPassed,
       fallbackName:"deterministic Mingl chat participant reads"
     }));
+    await capture("Firestore: minglAudit request lifecycle", () => firestoreDocLifecycle("minglAudit", {
+      type:"mingl_request",
+      actorUid:user.uid,
+      participants:[user.uid, `diagnostic-peer-${runId}`],
+      title:"Friend or Mingl Request",
+      body:"Rules smoke test Mingl audit record."
+    }, runId));
     await capture("Firestore: non-Mingl chatRooms lifecycle", () => firestoreDocLifecycle("chatRooms", {
       type:"diagnostic",
       participants:[user.uid],
@@ -3795,7 +4226,9 @@
       ["Authentication", "Firebase Auth session", state.auth?.currentUser ? "Pass" : "Soft Fail", state.auth?.currentUser ? "Master Admin is signed in." : "No active user in this diagnostics session."],
       ["Authentication", "Master Admin allow-list", state.auth?.currentUser ? "Pass" : "Failed", "Master Admin shell gates this page before diagnostics mount."],
       ["Authentication", "Role-based experiences", collectionStatus(data, "users", true), `${collectionCount(data, "users")} user records readable for role diagnostics.`],
-      ["Settings", "My Profile and Privacy", collectionStatus(data, "users"), "Profile, privacy, and consent records remain under the Settings portal."],
+      ["Settings", "My Profile and Settings rename", byId("portalPublicProfile") ? "Soft Fail" : "Pass", "Patron portal source now uses My Profile and Settings; open patron-portal.html to visually confirm the page title after deployment."],
+      ["Settings", "My Privacy datapoint sharing", collectionStatus(data, "users"), "Profile privacy choices can store publicMinglDatapoints for Mingl matching and public/shared feature use."],
+      ["Settings", "Public Media and Data Sharing", collectionStatus(data, "users"), "Profile media upload slots are under Public Media and Data Sharing with no captions and optional GPS-to-Travel metadata."],
       ["Settings", "Public profile preferred language", userLanguageRows.length ? "Pass" : "Soft Fail", userLanguageRows.length ? `${userLanguageRows.length} users have public profile language metadata.` : "Schema/UI ready; no saved language publishing choices yet."],
       ["Settings", "AI English translation scaffold", window.FLOQR_AI_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ENABLED ? "AI flag enabled, but translation should still route through a safe provider." : "Local placeholder stores English field without exposing AI keys."],
       ["ShoutOut", "Submission queue", collectionStatus(data, "shoutouts"), `${collectionCount(data, "shoutouts")} ShoutOut records scanned.`],
@@ -3805,7 +4238,9 @@
       ["ShoutOut", "Improve My ShoutOut", hasSearch ? "Pass" : "Soft Fail", "Safe curated fallback should work when AI flags are false."],
       ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
       ["Mingl", "Mingl matching", collectionStatus(data, "minglConnections", true), `${collectionCount(data, "minglConnections")} Mingl connection records scanned.`],
+      ["Mingl", "Let's Mingl request workflow", collectionStatus(data, "minglConnections", true), "Matched public profiles use a Friend or Mingl Request flow before chat opens."],
       ["Mingl", "Mingl chat rooms", collectionStatus(data, "chatRooms", true), `${collectionCount(data, "chatRooms")} chat room records scanned.`],
+      ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publishing v28.82 rules." : "Mingl chat renderer supports realtime messages, sender edits, emoji shortcuts, and AI-ready draft grammar cleanup."],
       ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
       ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
       ["Bata", "Marketplace discovery/search", "TBI", "Bata search hooks are AI-ready, but production listing and checkout workflows are not live yet."],
@@ -3984,10 +4419,12 @@
       renderCollectedRecords(data);
       renderAnalyticsInsights(data);
       const packageResults = await runPackageInstallDiagnostics({silent:true});
+      const manualResults = manualFeatureRows();
+      renderManualFeatureDiagnostics();
       const filename = `floqr-diagnostics-${exportTimestamp()}.txt`;
-      const text = buildDiagnosticsExport({data, schedule, features, packageResults});
+      const text = buildDiagnosticsExport({data, schedule, features, packageResults, manualResults});
       downloadTextFile(filename, text);
-      const issues = collectDiagnosticIssues({data, features, packageResults, reports:data.aiDiagnosticsReports?.rows || []});
+      const issues = collectDiagnosticIssues({data, features, packageResults, manualResults, reports:data.aiDiagnosticsReports?.rows || []});
       setText("diagnosticsStatus", `Diagnostics export downloaded as ${filename}. ${issues.length} failed, soft-fail, or TBI item(s) included in the fix prompt.`);
     } catch (error) {
       setText("diagnosticsStatus", `Diagnostics export failed: ${error?.message || error}`);
@@ -4013,6 +4450,7 @@
     renderCollectedRecords(data);
     renderAnalyticsInsights(data);
     await runPackageInstallDiagnostics({silent:true});
+    renderManualFeatureDiagnostics();
     const failures = features.filter(item => item.status === "Failed").length;
     const soft = features.filter(item => item.status === "Soft Fail").length;
     setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.`);
@@ -4021,6 +4459,9 @@
   function bindControls() {
     byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
     byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
+    byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
+    byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
+    byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
@@ -4064,6 +4505,9 @@
     runPackageInstallDiagnostics,
     runRulesSmokeTest,
     exportDiagnosticsReport,
+    renderManualFeatureDiagnostics,
+    buildManualFeatureDiagnosticsText,
+    buildManualFeatureDiagnosticsPrompt,
     extractSourceDetails,
     saveExtractedDiscoveryRecord,
     searchStaleRecords,

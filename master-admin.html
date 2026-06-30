@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css"/>
-  <link rel="stylesheet" href="./admin.css"/>
+  <link rel="stylesheet" href="./admin.css?v=28.82-mingl-privacy-media"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -334,6 +334,19 @@
           <div id="diagnosticsFeatureMatrix" class="report-block"></div>
         </div>
         <div class="card">
+          <h2>Manual Feature Test Diagnostics</h2>
+          <p class="sub small">Use this checklist after uploading a package. Automated diagnostics prove that files/rules are present; these checks confirm the user-facing feature actually works in the browser. Mark each implemented or changed feature Succeed or Failed, then copy the resolution prompt if anything fails.</p>
+          <div id="manualFeatureDiagnosticsSummary" class="report-block"></div>
+          <div id="manualFeatureDiagnosticsReport" class="report-block"></div>
+          <div class="queue-actions">
+            <button id="copyManualFeatureOutputBtn" type="button">Copy Manual Test Output</button>
+            <button id="downloadManualFeatureOutputBtn" type="button">Download Manual Test TXT</button>
+            <button id="copyManualFeaturePromptBtn" class="primary" type="button">Copy Resolution Prompt</button>
+          </div>
+          <label>Manual diagnostic output<textarea id="manualFeatureDiagnosticsOutput" rows="10" readonly></textarea></label>
+          <label>Prompt for Codex<textarea id="manualFeatureDiagnosticsPrompt" rows="10" readonly></textarea></label>
+        </div>
+        <div class="card">
           <h2>Package Install Diagnostics</h2>
           <p class="sub small">Checks feature markers added by each package after upload so Master Admin can confirm the installed files match the expected release behavior.</p>
           <button id="runPackageDiagnosticsBtn" type="button">Run Package Install Diagnostics</button>
@@ -365,7 +378,8 @@
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-discovery-service.js?v=28.74-gemini-media-editing"></script>
-<script src="./ai-diagnostics-service.js?v=28.80-location-template-ai"></script>
+<script src="./floqr-action-feedback.js?v=28.82-mingl-privacy-media"></script>
+<script src="./ai-diagnostics-service.js?v=28.82-mingl-privacy-media"></script>
 <script src="./duplicate-record-service.js?v=28.74-gemini-media-editing"></script>
 <script src="./master-admin-app.js?v=28.74-gemini-media-editing"></script>
 <script src="./notification-center.js?v=28.43-f"></script>

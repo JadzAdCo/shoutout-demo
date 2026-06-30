@@ -34,6 +34,7 @@
   let minglCandidates = [];
   let minglConnections = [];
   let activeMinglRoomId = "";
+  let minglMessagesUnsubscribe = null;
   let templateVariants = {mine:[], community:[]};
   let locationContextPromise = null;
 
@@ -770,13 +771,18 @@
 
   function publicProfileHaystack(profile) {
     return [
-      profile.displayName, profile.username, ...profileLocationParts(profile), profile.bio,
-      profile.nightlifeStyle, profile.lookingToMeet, profile.gender,
-      ...(profile.musicInterests || profile.favoriteGenres || []),
-      ...(profile.travelInterests || []),
-      ...(profile.hobbies || profile.generalHobbies || []),
-      ...(profile.foodChoices || []),
-      ...(profile.favoriteBeverages || [])
+      profile.displayName,
+      profile.username,
+      profile.publicProfileBioOriginal || profile.publicProfileBioEnglish || profile.bio,
+      ...(publicDatapointAllowed(profile, "location") ? profileLocationParts(profile) : []),
+      ...(publicDatapointAllowed(profile, "gender") ? [profile.gender] : []),
+      ...(publicDatapointAllowed(profile, "events") ? [profile.nightlifeStyle, ...(profile.nightlifeInterests || [])] : []),
+      ...(publicDatapointAllowed(profile, "meet") ? [profile.lookingToMeet] : []),
+      ...(publicDatapointAllowed(profile, "music") ? (profile.musicInterests || profile.favoriteGenres || []) : []),
+      ...(publicDatapointAllowed(profile, "travel") ? (profile.travelInterests || []) : []),
+      ...(publicDatapointAllowed(profile, "hobbies") ? (profile.hobbies || profile.generalHobbies || []) : []),
+      ...(publicDatapointAllowed(profile, "food") ? (profile.foodChoices || []) : []),
+      ...(publicDatapointAllowed(profile, "beverage") ? (profile.favoriteBeverages || []) : [])
     ].join(" ");
   }
 
@@ -807,21 +813,9 @@
   }
 
   function profileMatchScore(a = {}, b = {}) {
-    const checks = [
-      contextualValueEquals(a.city, b.city),
-      contextualValueEquals(profileStateRegion(a), profileStateRegion(b)),
-      contextualValueEquals(a.country, b.country),
-      contextualValueEquals(a.gender, b.gender),
-      valuesContextuallyOverlap(a.musicInterests || a.favoriteGenres, b.musicInterests || b.favoriteGenres),
-      valuesContextuallyOverlap(a.travelInterests, b.travelInterests),
-      valuesContextuallyOverlap(a.hobbies || a.generalHobbies, b.hobbies || b.generalHobbies),
-      valuesContextuallyOverlap(a.nightlifeInterests, b.nightlifeInterests),
-      contextualValueEquals(a.nightlifeStyle, b.nightlifeStyle),
-      valuesContextuallyOverlap(a.foodChoices, b.foodChoices),
-      valuesContextuallyOverlap(a.favoriteBeverages, b.favoriteBeverages),
-      contextualValueEquals(a.lookingToMeet, b.lookingToMeet)
-    ];
-    return checks.filter(Boolean).length;
+    return PROFILE_DATAPOINTS.filter(point => publicDatapointAllowed(a, point.key) && publicDatapointAllowed(b, point.key))
+      .filter(point => valuesContextuallyOverlap(point.get(a), point.get(b)) || contextualValueEquals(point.get(a), point.get(b)))
+      .length;
   }
 
   const PROFILE_DATAPOINTS = [
@@ -841,10 +835,21 @@
     return splitCSV(value).length ? splitCSV(value) : (value ? [String(value)] : []);
   }
 
+  function publicMinglDatapoints(profile = {}) {
+    if (Array.isArray(profile.publicMinglDatapoints) && profile.publicMinglDatapoints.length) {
+      return profile.publicMinglDatapoints;
+    }
+    return PROFILE_DATAPOINTS.map(point => point.key).concat("media");
+  }
+
+  function publicDatapointAllowed(profile = {}, key = "") {
+    return publicMinglDatapoints(profile).includes(key);
+  }
+
   function profileSearchHaystack(profile = {}) {
     return [
       publicProfileHaystack(profile),
-      ...PROFILE_DATAPOINTS.flatMap(point => dataPointValues(point.get(profile)))
+      ...PROFILE_DATAPOINTS.filter(point => publicDatapointAllowed(profile, point.key)).flatMap(point => dataPointValues(point.get(profile)))
     ].join(" ");
   }
 
@@ -856,12 +861,15 @@
   }
 
   function sharedDataPointLabels(a = {}, b = {}) {
-    return PROFILE_DATAPOINTS.filter(point => valuesContextuallyOverlap(point.get(a), point.get(b)) || contextualValueEquals(point.get(a), point.get(b))).map(point => point.label);
+    return PROFILE_DATAPOINTS
+      .filter(point => publicDatapointAllowed(a, point.key) && publicDatapointAllowed(b, point.key))
+      .filter(point => valuesContextuallyOverlap(point.get(a), point.get(b)) || contextualValueEquals(point.get(a), point.get(b)))
+      .map(point => point.label);
   }
 
   function isPublicMinglCandidate(profile = {}) {
     const visibility = String(profile.publicProfileVisibility || "").toLowerCase();
-    return visibility === "public" && !!profileMinglPhoto(profile) && profileMatchScore(cachedUserProfile || {}, profile) >= 3;
+    return visibility === "public" && publicDatapointAllowed(profile, "media") && !!profileMinglPhoto(profile) && profileMatchScore(cachedUserProfile || {}, profile) >= 3;
   }
 
   function profileMinglPhoto(profile = {}) {
@@ -892,6 +900,47 @@
       joinList(profile.favoriteBeverages)
     ].filter(Boolean);
     return parts.join(" - ");
+  }
+
+  function minglRequestBody(targetProfile = {}, sharedLabels = [], nextStatus = "pending") {
+    const actorName = cachedUserProfile?.displayName || currentUser?.displayName || currentUser?.email || "A FLOQR patron";
+    const targetName = targetProfile.displayName || targetProfile.username || "a FLOQR patron";
+    const action = nextStatus === "mutual" ? "accepted a Friend or Mingl Request with" : "sent a Friend or Mingl Request to";
+    const location = profileLocationParts(cachedUserProfile || {}).join(", ");
+    return [
+      `${actorName} ${action} ${targetName}.`,
+      sharedLabels.length ? `Shared datapoints: ${sharedLabels.join(", ")}.` : "Shared datapoints were matched by the Mingl algorithm.",
+      location ? `Requester profile location: ${location}.` : "",
+      "Both patrons must approve before full Mingl Chat opens."
+    ].filter(Boolean).join("\n");
+  }
+
+  async function recordMinglRequest({connectionId, targetUid, targetProfile, nextStatus, sharedLabels}) {
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const body = minglRequestBody(targetProfile, sharedLabels, nextStatus);
+    const base = {
+      title:"Friend or Mingl Request",
+      subject:"Friend or Mingl Request",
+      body,
+      connectionId,
+      requesterUid:currentUser.uid,
+      requesterEmail:currentUser.email || "",
+      requesterName:cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Patron",
+      targetUid,
+      targetName:targetProfile.displayName || targetProfile.username || "Mingl Member",
+      sharedDatapoints:sharedLabels,
+      requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
+      status:nextStatus,
+      read:false,
+      createdAt:now
+    };
+    const writes = [
+      db.collection("inboxNotifications").add({recipientUid:targetUid, recipientEmail:targetProfile.email || "", type:"minglRequest", ...base}),
+      db.collection("inboxNotifications").add({recipientUid:currentUser.uid, recipientEmail:currentUser.email || "", type:"minglRequestReceipt", ...base}),
+      db.collection("messages").add({messageType:"mingl_request", senderUid:"system", senderName:"System Message", recipientUid:targetUid, recipientEmail:targetProfile.email || "", ...base}),
+      db.collection("minglAudit").add({type:"mingl_request", actorUid:currentUser.uid, participants:[currentUser.uid, targetUid], ...base})
+    ];
+    await Promise.allSettled(writes);
   }
 
   function joinList(value) {
@@ -928,7 +977,7 @@
   }
 
   function renderProfileDatapoints(profile = {}, prefix = "profile") {
-    return `<div class="profile-datapoint-grid">${PROFILE_DATAPOINTS.map((point, index) => {
+    return `<div class="profile-datapoint-grid">${PROFILE_DATAPOINTS.filter(point => publicDatapointAllowed(profile, point.key)).map((point, index) => {
       const values = dataPointValues(point.get(profile));
       if (!values.length) return "";
       const id = `${prefix}-${point.key}-${index}`;
@@ -998,7 +1047,7 @@
       const photoUrl = profileMinglPhoto(profile);
       const card = document.createElement("div");
       card.className = "mingl-person-card";
-      const buttonText = status.state === "mutual" ? "Start Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back and Start Chat" : "Start Chat / Mingl";
+      const buttonText = status.state === "mutual" ? "Open Mingl Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back" : "Let's Mingl";
       const sharedLabels = sharedDataPointLabels(cachedUserProfile || {}, profile).slice(0, 5);
       card.innerHTML = `
         <div class="mingl-person-photo">${photoUrl ? `<img src="${esc(photoUrl)}" alt="${esc(profile.displayName || "Mingl profile")}">` : `<span>${esc((profile.displayName || profile.username || "M").slice(0,1).toUpperCase())}</span>`}</div>
@@ -1023,8 +1072,16 @@
       openMinglChat(status.connection);
       return;
     }
+    return (window.FLOQRActionFeedback?.run || ((messages, action) => action()))({
+      starting: status.state === "received" ? "Opening Mingl Chat..." : "Sending Let's Mingl request...",
+      wait: status.state === "received" ? "We are confirming the mutual Mingl approval." : "We are sending your Friend or Mingl Request.",
+      success: status.state === "received" ? "Mingl approved" : "Let's Mingl request sent",
+      redirecting: status.state === "received" ? "Both patrons approved. Opening Mingl Chat." : "Friend or Mingl Request sent, returning to Mingl.",
+      returnTo:"Mingl"
+    }, async () => {
     const id = pairId(currentUser.uid, targetUid);
     const connectionRef = db.collection("minglConnections").doc(id);
+    const sharedLabels = sharedDataPointLabels(cachedUserProfile || {}, profile).slice(0, 8);
     const summary = {
       [currentUser.uid]: {
         displayName: cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Patron",
@@ -1046,11 +1103,14 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
+    await recordMinglRequest({connectionId:id, targetUid, targetProfile:profile, nextStatus, sharedLabels});
     if (nextStatus === "mutual") {
-      await ensureMinglChatRoom(id, [currentUser.uid, targetUid], summary);
+      const roomId = await ensureMinglChatRoom(id, [currentUser.uid, targetUid], summary);
+      await addMinglSystemMessage(roomId, id, [currentUser.uid, targetUid], minglRequestBody(profile, sharedLabels, "mutual"));
     }
     setStatus(nextStatus === "mutual" ? "You both Mingled back. Chat is now open." : "Mingl request sent.");
     await loadMingl();
+    });
   }
 
   async function ensureMinglChatRoom(connectionId, participants, summaries) {
@@ -1068,6 +1128,24 @@
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
     return roomId;
+  }
+
+  async function addMinglSystemMessage(roomId, connectionId, participants, body) {
+    try {
+      await db.collection("chatMessages").add({
+        roomId,
+        roomType:"mingl",
+        messageType:"system",
+        connectionId,
+        participants,
+        senderUid:"system",
+        senderName:"System Message",
+        body,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e) {
+      console.warn("Could not write Mingl system message:", e.message);
+    }
   }
 
   async function renderMinglChats() {
@@ -1100,25 +1178,60 @@
     const room = roomDoc.exists ? {id:roomDoc.id, ...roomDoc.data()} : connectionOrRoom;
     const otherUid = (room.participants || []).find(uid => uid !== currentUser.uid);
     setText("minglChatTitle", room.userSummaries?.[otherUid]?.displayName || "Mingl Chat");
-    await loadMinglMessages();
+    loadMinglMessages();
   }
 
-  async function loadMinglMessages() {
+  function renderMinglMessages(rows = []) {
     const wrap = byId("minglMessages");
     if (!wrap || !activeMinglRoomId) return;
-    const rows = await getCollectionSafe("chatMessages", x => x.roomId === activeMinglRoomId, 1000);
     rows.sort((a,b) => {
       const at = a.createdAt?.seconds || 0;
       const bt = b.createdAt?.seconds || 0;
       return at - bt;
     });
-    wrap.innerHTML = rows.length ? rows.map(msg => `<div class="mingl-message ${msg.senderUid === currentUser.uid ? "mine" : ""}"><strong>${esc(msg.senderName || "Member")}</strong><p>${esc(msg.body || "")}</p><small>${esc(msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "")}</small></div>`).join("") : "<p class='sub'>No messages yet.</p>";
+    wrap.innerHTML = rows.length ? rows.map(msg => {
+      const mine = msg.senderUid === currentUser.uid;
+      const system = msg.senderUid === "system" || msg.messageType === "system";
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
+        <strong>${esc(system ? "System Message" : (msg.senderName || "Member"))}</strong>
+        <p>${esc(msg.body || "")}</p>
+        <small>${esc(msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "")}${msg.edited ? " - edited" : ""}</small>
+        ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-mingl-message="${esc(msg.id || "")}">Edit</button></div>` : ""}
+      </div>`;
+    }).join("") : "<p class='sub'>No messages yet.</p>";
+    wrap.querySelectorAll("[data-edit-mingl-message]").forEach(button => {
+      button.addEventListener("click", () => editMinglMessage(button.dataset.editMinglMessage));
+    });
     wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function loadMinglMessages() {
+    const wrap = byId("minglMessages");
+    if (!wrap || !activeMinglRoomId) return;
+    if (minglMessagesUnsubscribe) minglMessagesUnsubscribe();
+    wrap.innerHTML = "<p class='sub'>Loading Mingl messages...</p>";
+    try {
+      minglMessagesUnsubscribe = db.collection("chatMessages")
+        .where("roomId", "==", activeMinglRoomId)
+        .where("participants", "array-contains", currentUser.uid)
+        .onSnapshot(snap => renderMinglMessages(snap.docs.map(doc => ({id:doc.id, ...doc.data()}))), () => {
+          getCollectionSafe("chatMessages", x => x.roomId === activeMinglRoomId, 1000).then(renderMinglMessages);
+        });
+    } catch(e) {
+      getCollectionSafe("chatMessages", x => x.roomId === activeMinglRoomId, 1000).then(renderMinglMessages);
+    }
   }
 
   async function sendMinglMessage() {
     const body = byId("minglMessageInput")?.value.trim();
     if (!currentUser || !activeMinglRoomId || !body) return;
+    return (window.FLOQRActionFeedback?.run || ((messages, action) => action()))({
+      starting:"Sending Mingl message...",
+      wait:"We are sending your Mingl message. Please wait a few seconds.",
+      success:"Mingl message sent",
+      redirecting:"Mingl message sent, redirecting back to Mingl Chat.",
+      returnTo:"Mingl Chat"
+    }, async () => {
     const roomSnap = await db.collection("chatRooms").doc(activeMinglRoomId).get();
     if (!roomSnap.exists || !(roomSnap.data().participants || []).includes(currentUser.uid)) {
       setStatus("Mingl chat is available only after both patrons Mingl back.");
@@ -1135,6 +1248,7 @@
       senderUid: currentUser.uid,
       senderName: cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Member",
       body,
+      edited:false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     await db.collection("chatRooms").doc(activeMinglRoomId).set({
@@ -1143,8 +1257,43 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
     byId("minglMessageInput").value = "";
-    await loadMinglMessages();
     await renderMinglChats();
+    });
+  }
+
+  async function editMinglMessage(messageId) {
+    if (!currentUser || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
+    const next = prompt("Edit Mingl message", snap.data().body || "");
+    if (next == null || !next.trim()) return;
+    await db.collection("chatMessages").doc(messageId).set({
+      body:next.trim(),
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
+  async function improveMinglDraft() {
+    const input = byId("minglMessageInput");
+    const draft = input?.value.trim();
+    if (!input || !draft) return;
+    if (window.FLOQRAIService?.suggestShoutOutText) {
+      try {
+        const result = await window.FLOQRAIService.suggestShoutOutText({mainText:draft, tone:"classy", eventType:"Mingl chat"});
+        input.value = result.mainText || result.answer || draft;
+        return;
+      } catch(e) {}
+    }
+    input.value = draft.replace(/\bi\b/g, "I").replace(/\s+/g, " ").trim();
+  }
+
+  function insertMinglEmoji(emoji) {
+    const input = byId("minglMessageInput");
+    if (!input) return;
+    input.value = `${input.value}${emoji}`;
+    input.focus();
   }
 
   async function renderEventGrid() {
@@ -1517,7 +1666,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.43-f`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.82-mingl-privacy-media`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -1587,8 +1736,8 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.43-f";
-      portalLink.textContent = "Settings";
+      portalLink.href = "./patron-portal.html?v=28.82-mingl-privacy-media";
+      portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
       menu.insertBefore(portalLink, signOutButton);
@@ -1600,14 +1749,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=messages&v=28.43-f";
+      messages.href = "./patron-portal.html?tab=messages&v=28.82-mingl-privacy-media";
       messages.textContent = "Messages (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=chats&v=28.43-f";
+      chats.href = "./patron-portal.html?tab=chats&v=28.82-mingl-privacy-media";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -1678,6 +1827,10 @@
     bind("backToCategoriesFromMinglBtn", () => showPage("categoryPage"));
     byId("minglSearch")?.addEventListener("input", renderMinglPeople);
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
+    byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);
+    document.querySelectorAll("[data-mingl-emoji]").forEach(button => {
+      button.addEventListener("click", () => insertMinglEmoji(button.dataset.minglEmoji || ""));
+    });
     document.addEventListener("click", event => {
       if (event.target.closest(".profile-datapoint")) return;
       document.querySelectorAll(".profile-datapoint[open]").forEach(detail => detail.removeAttribute("open"));
@@ -1760,10 +1913,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.43-f">Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.82-mingl-privacy-media">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.43-f">Messages (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.43-f">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=28.82-mingl-privacy-media">Messages (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.82-mingl-privacy-media">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -1806,7 +1959,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.43-f`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.82-mingl-privacy-media`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

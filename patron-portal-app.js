@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.43-f */
+/* patron-portal-app.js v28.82-mingl-privacy-media */
 (function(){
   "use strict";
 
@@ -78,6 +78,26 @@
   let messageRecipients = [];
   let currentShoutouts = [];
   let activeShoutoutEditId = "";
+  let activePortalMinglRoomId = "";
+  let portalMinglUnsubscribe = null;
+
+  const PUBLIC_MINGL_DATAPOINTS = [
+    {key:"location", label:"City, state/region, and country"},
+    {key:"gender", label:"Gender"},
+    {key:"music", label:"Music interests"},
+    {key:"events", label:"Event and nightlife interests"},
+    {key:"travel", label:"Travel interests"},
+    {key:"hobbies", label:"General hobbies"},
+    {key:"food", label:"Food choices"},
+    {key:"beverage", label:"Favorite beverage choices"},
+    {key:"meet", label:"Looking to meet"},
+    {key:"media", label:"Public profile media"}
+  ];
+
+  function actionFeedback(messages, action) {
+    if (window.FLOQRActionFeedback?.run) return window.FLOQRActionFeedback.run(messages, action);
+    return action();
+  }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -92,7 +112,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", settings:"portalProfile", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
     }
@@ -306,11 +326,42 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
+    renderPrivacyDatapoints(profile);
+  }
+
+  function publicMinglDatapoints(profile = {}) {
+    if (Array.isArray(profile.publicMinglDatapoints) && profile.publicMinglDatapoints.length) {
+      return profile.publicMinglDatapoints;
+    }
+    return PUBLIC_MINGL_DATAPOINTS.map(point => point.key);
+  }
+
+  function renderPrivacyDatapoints(profile = {}) {
+    const wrap = byId("privacyDatapointChoices");
+    if (!wrap) return;
+    const selected = new Set(publicMinglDatapoints(profile));
+    wrap.innerHTML = PUBLIC_MINGL_DATAPOINTS.map(point => `<label>
+      <input class="privacy-datapoint" type="checkbox" value="${esc(point.key)}" ${selected.has(point.key) ? "checked" : ""}/>
+      <span>${esc(point.label)}</span>
+    </label>`).join("");
+  }
+
+  function selectedPrivacyDatapoints() {
+    return Array.from(document.querySelectorAll(".privacy-datapoint"))
+      .filter(input => input.checked)
+      .map(input => input.value);
   }
 
   async function saveProfile() {
     const user = auth.currentUser;
     if (!user) return;
+    return actionFeedback({
+      starting:"Saving profile...",
+      wait:"We are saving your profile. Please wait a few seconds.",
+      success:"Profile saved",
+      redirecting:"Profile save succeeded, redirecting back to My Profile.",
+      returnTo:"My Profile"
+    }, async () => {
     const preferredLanguage = byId("editLanguage").value;
     const originalBio = byId("editBio").value.trim();
     const englishBio = byId("editBioEnglish").value.trim();
@@ -344,6 +395,7 @@
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
     setText("portalStatus", "Profile updated.");
     await loadPortal(user);
+    });
   }
 
   function prepareProfileTranslation() {
@@ -368,31 +420,49 @@
   async function savePrivacy() {
     const user = auth.currentUser;
     if (!user) return;
+    return actionFeedback({
+      starting:"Saving privacy choices...",
+      wait:"We are saving your My Privacy selections. Please wait a few seconds.",
+      success:"Privacy choices saved",
+      redirecting:"My Privacy choices saved, redirecting back to My Privacy.",
+      returnTo:"My Privacy"
+    }, async () => {
     const prefs = {
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
+      publicMinglDatapoints: selectedPrivacyDatapoints(),
+      publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     await db.collection("users").doc(user.uid).set(prefs, {merge:true});
     await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...prefs, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
     setText("portalStatus", "Privacy preferences saved.");
     await loadPortal(user);
+    });
   }
 
   function downloadData() {
     const blob = new Blob([JSON.stringify(currentProfile, null, 2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "jadz-patron-data.json"; a.click();
+    a.href = url; a.download = "floqr-patron-data.json"; a.click();
     URL.revokeObjectURL(url);
   }
 
   async function requestDelete() {
     const user = auth.currentUser;
     if (!user || !confirm("Request deletion of your patron data?")) return;
+    return actionFeedback({
+      starting:"Submitting delete request...",
+      wait:"We are submitting your data delete request. Please wait a few seconds.",
+      success:"Delete request submitted",
+      redirecting:"Delete request submitted, redirecting back to My Privacy.",
+      returnTo:"My Privacy"
+    }, async () => {
     await db.collection("privacyConsents").add({type:"deleteRequest", uid:user.uid, email:user.email || "", requestedAt: firebase.firestore.FieldValue.serverTimestamp(), status:"pending"});
     setText("portalStatus", "Data delete request submitted.");
+    });
   }
 
   function mediaSlotDefaults(profile) {
@@ -400,7 +470,7 @@
     return Array.from({length:10}, (_, i) => {
       const previous = existing[i] || {};
       const type = i < 8 ? "image" : "video";
-      return {slot:i + 1, type, url:"", storagePath:"", caption:"", ...previous, type};
+      return {slot:i + 1, type, url:"", storagePath:"", metadata:null, travelDatapointAdded:false, ...previous, type};
     });
   }
 
@@ -414,6 +484,90 @@
     return `Media upload failed: ${error?.message || "Unknown error"}`;
   }
 
+  function rational(data, offset, littleEndian) {
+    const numerator = data.getUint32(offset, littleEndian);
+    const denominator = data.getUint32(offset + 4, littleEndian) || 1;
+    return numerator / denominator;
+  }
+
+  function readIfdTag(data, tiffStart, ifdOffset, tagId, littleEndian) {
+    if (!ifdOffset) return null;
+    const entryCount = data.getUint16(tiffStart + ifdOffset, littleEndian);
+    for (let i = 0; i < entryCount; i += 1) {
+      const entry = tiffStart + ifdOffset + 2 + (i * 12);
+      const tag = data.getUint16(entry, littleEndian);
+      if (tag !== tagId) continue;
+      return {
+        type:data.getUint16(entry + 2, littleEndian),
+        count:data.getUint32(entry + 4, littleEndian),
+        valueOffset:data.getUint32(entry + 8, littleEndian),
+        entry
+      };
+    }
+    return null;
+  }
+
+  function gpsTriplet(data, tiffStart, tag, littleEndian) {
+    if (!tag || tag.type !== 5 || tag.count < 3) return null;
+    const start = tiffStart + tag.valueOffset;
+    return rational(data, start, littleEndian) + (rational(data, start + 8, littleEndian) / 60) + (rational(data, start + 16, littleEndian) / 3600);
+  }
+
+  async function extractImageGpsMetadata(file) {
+    if (!file || !/^image\/jpe?g$/i.test(file.type || "")) return null;
+    const buffer = await file.arrayBuffer();
+    const data = new DataView(buffer);
+    if (data.getUint16(0) !== 0xffd8) return null;
+    let offset = 2;
+    while (offset < data.byteLength) {
+      const marker = data.getUint16(offset);
+      const size = data.getUint16(offset + 2);
+      if (marker === 0xffe1) {
+        const exifHeader = String.fromCharCode(...new Uint8Array(buffer, offset + 4, 4));
+        if (exifHeader !== "Exif") return null;
+        const tiffStart = offset + 10;
+        const littleEndian = data.getUint16(tiffStart) === 0x4949;
+        const firstIfd = data.getUint32(tiffStart + 4, littleEndian);
+        const gpsPointer = readIfdTag(data, tiffStart, firstIfd, 0x8825, littleEndian);
+        if (!gpsPointer) return null;
+        const gpsIfd = gpsPointer.valueOffset;
+        const latRefTag = readIfdTag(data, tiffStart, gpsIfd, 1, littleEndian);
+        const latTag = readIfdTag(data, tiffStart, gpsIfd, 2, littleEndian);
+        const lonRefTag = readIfdTag(data, tiffStart, gpsIfd, 3, littleEndian);
+        const lonTag = readIfdTag(data, tiffStart, gpsIfd, 4, littleEndian);
+        const readRef = tag => tag ? String.fromCharCode(data.getUint8(tag.entry + 8)) : "";
+        let latitude = gpsTriplet(data, tiffStart, latTag, littleEndian);
+        let longitude = gpsTriplet(data, tiffStart, lonTag, littleEndian);
+        if (!latitude || !longitude) return null;
+        if (readRef(latRefTag) === "S") latitude *= -1;
+        if (readRef(lonRefTag) === "W") longitude *= -1;
+        return {
+          latitude:Number(latitude.toFixed(6)),
+          longitude:Number(longitude.toFixed(6)),
+          source:"image-exif-gps",
+          label:`Photo location ${Number(latitude).toFixed(5)}, ${Number(longitude).toFixed(5)}`
+        };
+      }
+      offset += 2 + size;
+    }
+    return null;
+  }
+
+  function encodeMetadata(metadata) {
+    return metadata ? encodeURIComponent(JSON.stringify(metadata)) : "";
+  }
+
+  function decodeMetadata(value) {
+    try { return value ? JSON.parse(decodeURIComponent(value)) : null; }
+    catch(e) { return null; }
+  }
+
+  function appendTravelMetadata(currentValues, metadataItems) {
+    const values = new Set(splitCSV(currentValues));
+    metadataItems.filter(Boolean).forEach(item => values.add(item.label || `${item.latitude}, ${item.longitude}`));
+    return Array.from(values).join(", ");
+  }
+
   function renderMediaSlots(profile) {
     const wrap = byId("profileMediaSlots");
     if (!wrap) return;
@@ -422,12 +576,14 @@
       const accept = slot.type === "video" ? "video/mp4,video/webm,video/quicktime" : "image/jpeg,image/png,image/webp";
       const label = slot.type === "video" ? `Short Video ${slot.slot - 8}` : `Photo ${slot.slot}`;
       const preview = slot.url ? (slot.type === "video" ? `<video src="${esc(slot.url)}" muted loop playsinline></video>` : `<img src="${esc(slot.url)}" alt="${esc(label)}"/>`) : `<span>${esc(label)}</span>`;
+      const metadata = slot.metadata || null;
       return `<div class="profile-media-slot" data-slot="${slot.slot}">
         <div class="profile-media-preview">${preview}</div>
         <label>${esc(label)}<input class="profile-media-file" type="file" accept="${accept}"/></label>
-        <label>Caption<input class="profile-media-caption" value="${esc(slot.caption || "")}" maxlength="60"/></label>
         <input class="profile-media-url" type="hidden" value="${esc(slot.url || "")}"/>
         <input class="profile-media-path" type="hidden" value="${esc(slot.storagePath || "")}"/>
+        <input class="profile-media-metadata" type="hidden" value="${esc(encodeMetadata(metadata))}"/>
+        <div class="media-metadata-prompt ${metadata ? "" : "hidden"}">${metadata ? `<label><input class="profile-media-add-travel" type="checkbox" ${slot.travelDatapointAdded ? "checked" : ""}/> Add ${esc(metadata.label)} to my travel datapoints.</label>` : ""}</div>
         <button class="primary save-one-media-slot" type="button">Save This Slot</button>
       </div>`;
     }).join("");
@@ -438,9 +594,17 @@
   async function saveMediaSlots() {
     const user = auth.currentUser;
     if (!user) return;
+    return actionFeedback({
+      starting:"Uploading media...",
+      wait:"We are uploading your media. Please wait a few seconds.",
+      success:"Media upload succeeded",
+      redirecting:"Media upload succeeded, redirecting back to Public Media and Data Sharing.",
+      returnTo:"Public Media and Data Sharing"
+    }, async () => {
     try {
       const slotEls = Array.from(document.querySelectorAll(".profile-media-slot"));
       const slots = [];
+      const travelMetadata = [];
       setText("portalStatus", "Saving profile media...");
       for (const slotEl of slotEls) {
         const slot = Number(slotEl.dataset.slot);
@@ -448,6 +612,8 @@
         const file = slotEl.querySelector(".profile-media-file")?.files?.[0];
         let url = slotEl.querySelector(".profile-media-url")?.value || "";
         let storagePath = slotEl.querySelector(".profile-media-path")?.value || "";
+        const metadata = decodeMetadata(slotEl.querySelector(".profile-media-metadata")?.value || "");
+        const addTravel = !!slotEl.querySelector(".profile-media-add-travel")?.checked;
         if (file) {
           const folder = type === "video" ? "videos" : "images";
           const safeName = file.name.replace(/[^a-z0-9._-]/gi, "-").slice(-80);
@@ -461,22 +627,31 @@
           type,
           url,
           storagePath,
-          caption: slotEl.querySelector(".profile-media-caption")?.value.trim() || "",
+          metadata,
+          travelDatapointAdded:addTravel,
           updatedAt: new Date().toISOString()
         });
+        if (addTravel && metadata) travelMetadata.push(metadata);
       }
-      await db.collection("users").doc(user.uid).set({
+      const update = {
         profileMediaSlots: slots,
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge:true});
+      };
+      if (travelMetadata.length) {
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), travelMetadata));
+        byId("editTravelInterests").value = joinCSV(update.travelInterests);
+      }
+      await db.collection("users").doc(user.uid).set(update, {merge:true});
       setText("portalStatus", "Profile media saved.");
       await loadPortal(user);
     } catch(e) {
       setText("portalStatus", mediaUploadErrorMessage(e, user));
+      throw e;
     }
+    });
   }
 
-  function previewSelectedMedia(event) {
+  async function previewSelectedMedia(event) {
     const input = event.currentTarget;
     const file = input.files?.[0];
     const slotEl = input.closest(".profile-media-slot");
@@ -485,6 +660,23 @@
     const url = URL.createObjectURL(file);
     const isVideo = file.type.startsWith("video/");
     preview.innerHTML = isVideo ? `<video src="${url}" muted loop playsinline controls></video>` : `<img src="${url}" alt="Selected profile media"/>`;
+    const metadataWrap = slotEl.querySelector(".media-metadata-prompt");
+    const metadataInput = slotEl.querySelector(".profile-media-metadata");
+    if (!isVideo) {
+      const metadata = await extractImageGpsMetadata(file);
+      if (metadata && metadataWrap && metadataInput) {
+        metadataInput.value = encodeMetadata(metadata);
+        metadataWrap.classList.remove("hidden");
+        metadataWrap.innerHTML = `<label><input class="profile-media-add-travel" type="checkbox"/> Add ${esc(metadata.label)} to my travel datapoints.</label>`;
+        setText("portalStatus", "Preview ready. Photo location metadata found. Choose whether to add it to Travel before saving.");
+        return;
+      }
+    }
+    if (metadataInput) metadataInput.value = "";
+    if (metadataWrap) {
+      metadataWrap.classList.add("hidden");
+      metadataWrap.innerHTML = "";
+    }
     setText("portalStatus", "Preview ready. Save this slot to upload it.");
   }
 
@@ -497,13 +689,21 @@
     const slotIndex = Math.max(0, slotNumber - 1);
     const type = slotNumber <= 8 ? "image" : "video";
     const file = slotEl.querySelector(".profile-media-file")?.files?.[0];
-    const caption = slotEl.querySelector(".profile-media-caption")?.value.trim() || "";
+    const metadata = decodeMetadata(slotEl.querySelector(".profile-media-metadata")?.value || "");
+    const addTravel = !!slotEl.querySelector(".profile-media-add-travel")?.checked;
     let url = slotEl.querySelector(".profile-media-url")?.value || "";
     let storagePath = slotEl.querySelector(".profile-media-path")?.value || "";
     if (!file && !url) {
       setText("portalStatus", "Choose an image or video first, then save this slot.");
       return;
     }
+    return actionFeedback({
+      starting:"Uploading media...",
+      wait:`We are uploading media slot ${slotNumber}. Please wait a few seconds.`,
+      success:"Media upload succeeded",
+      redirecting:`Media slot ${slotNumber} upload succeeded, redirecting back to Public Media and Data Sharing.`,
+      returnTo:"Public Media and Data Sharing"
+    }, async () => {
     try {
       setText("portalStatus", `Saving slot ${slotNumber}...`);
       if (file) {
@@ -512,18 +712,25 @@
         storagePath = `profileMedia/${user.uid}/${folder}/slot-${slotNumber}-${Date.now()}-${safeName}`;
         const ref = storage.ref(storagePath);
         await ref.put(file, {contentType:file.type || (type === "video" ? "video/mp4" : "image/jpeg")});
-        url = await ref.getDownloadURL();
+          url = await ref.getDownloadURL();
       }
-      slots[slotIndex] = {slot:slotNumber, type, url, storagePath, caption, updatedAt:new Date().toISOString()};
-      await db.collection("users").doc(user.uid).set({
+      slots[slotIndex] = {slot:slotNumber, type, url, storagePath, metadata, travelDatapointAdded:addTravel, updatedAt:new Date().toISOString()};
+      const update = {
         profileMediaSlots: slots,
         profileMediaUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge:true});
+      };
+      if (addTravel && metadata) {
+        update.travelInterests = splitCSV(appendTravelMetadata(byId("editTravelInterests")?.value || joinCSV(currentProfile.travelInterests), [metadata]));
+        byId("editTravelInterests").value = joinCSV(update.travelInterests);
+      }
+      await db.collection("users").doc(user.uid).set(update, {merge:true});
       setText("portalStatus", `Profile media slot ${slotNumber} saved.`);
       await loadPortal(user);
     } catch(e) {
       setText("portalStatus", mediaUploadErrorMessage(e, user));
+      throw e;
     }
+    });
   }
 
   function chips(items) {
@@ -541,7 +748,7 @@
     const displayBio = publicProfileBio(profile, template);
     const gallery = media.length ? `<div class="public-profile-gallery">${media.map((item, index) => {
       const mediaEl = item.type === "video" ? `<video src="${esc(item.url)}" muted loop playsinline controls></video>` : `<img src="${esc(item.url)}" alt="Profile gallery ${index + 1}"/>`;
-      return `<figure>${mediaEl}<figcaption>${esc(item.caption || (item.type === "video" ? "Short video" : "Photo"))}</figcaption></figure>`;
+      return `<figure>${mediaEl}</figure>`;
     }).join("")}</div>` : `<p class="sub small">No public gallery media yet.</p>`;
     byId("profileTemplatePreview").innerHTML = `<article class="public-profile-card profile-${esc(profileType)}">
       <div class="public-profile-hero">${hero}</div>
@@ -634,6 +841,171 @@
       el.addEventListener("click", () => openMessage(el, user));
     });
     document.querySelectorAll(".message-envelope a").forEach(a => a.addEventListener("click", event => event.stopPropagation()));
+  }
+
+  function pairId(a, b) {
+    return [a, b].filter(Boolean).sort().join("_");
+  }
+
+  async function getPortalMinglRooms(user, allUsers = [], queriedRooms = []) {
+    if (queriedRooms.length) return queriedRooms.filter(room => room.type === "mingl");
+    const possibleConnections = allUsers
+      .map(profile => profile.uid || profile.id)
+      .filter(uid => uid && uid !== user.uid)
+      .slice(0, 250)
+      .map(uid => pairId(user.uid, uid));
+    const rooms = [];
+    for (const connectionId of possibleConnections) {
+      try {
+        const connectionSnap = await db.collection("minglConnections").doc(connectionId).get();
+        if (!connectionSnap.exists) continue;
+        const connection = {id:connectionSnap.id, ...connectionSnap.data()};
+        if (connection.status !== "mutual" || !(connection.participants || []).includes(user.uid)) continue;
+        const roomSnap = await db.collection("chatRooms").doc(`mingl_${connectionId}`).get();
+        if (roomSnap.exists) rooms.push({id:roomSnap.id, ...roomSnap.data()});
+      } catch(e) {}
+    }
+    return rooms;
+  }
+
+  function renderPortalMinglChats(chats, user) {
+    const wrap = byId("myChats");
+    if (!wrap) return;
+    wrap.innerHTML = chats.length ? "" : "<p class='sub'>No Mingl chats yet. Use the public Mingl room to send a Let's Mingl request, then both patrons must approve before chat opens.</p>";
+    chats.forEach((room, index) => {
+      const otherUid = (room.participants || []).find(uid => uid !== user.uid);
+      const other = room.userSummaries?.[otherUid] || {};
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "queue-item mingl-chat-item";
+      item.dataset.portalMinglIndex = String(index);
+      item.innerHTML = `<strong>${esc(other.displayName || room.title || "Mingl Chat")}</strong><span>${esc(room.lastMessage || "Open chat history")}</span><small>Unread: ${esc(room.unreadCounts?.[user.uid] || 0)}</small>`;
+      item.addEventListener("click", () => openPortalMinglChat(room));
+      wrap.appendChild(item);
+    });
+  }
+
+  async function openPortalMinglChat(room) {
+    if (!room?.id) return;
+    activePortalMinglRoomId = room.id;
+    const panel = byId("portalMinglChatPanel");
+    panel?.classList.remove("hidden");
+    const otherUid = (room.participants || []).find(uid => uid !== auth.currentUser?.uid);
+    setText("portalMinglChatTitle", room.userSummaries?.[otherUid]?.displayName || "Mingl Chat");
+    subscribePortalMinglMessages();
+    panel?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function renderPortalMinglMessages(rows) {
+    const user = auth.currentUser;
+    const wrap = byId("portalMinglMessages");
+    if (!wrap || !user) return;
+    const sorted = rows.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+    wrap.innerHTML = sorted.length ? sorted.map(msg => {
+      const mine = msg.senderUid === user.uid;
+      const system = msg.senderUid === "system" || msg.messageType === "system";
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
+        <strong>${esc(system ? "System Message" : (msg.senderName || "Member"))}</strong>
+        <p>${esc(msg.body || "")}</p>
+        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}</small>
+        ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-portal-mingl="${esc(msg.id || "")}">Edit</button></div>` : ""}
+      </div>`;
+    }).join("") : "<p class='sub'>No messages yet.</p>";
+    wrap.querySelectorAll("[data-edit-portal-mingl]").forEach(button => {
+      button.addEventListener("click", () => editPortalMinglMessage(button.dataset.editPortalMingl));
+    });
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function subscribePortalMinglMessages() {
+    const wrap = byId("portalMinglMessages");
+    if (!wrap || !activePortalMinglRoomId) return;
+    if (portalMinglUnsubscribe) portalMinglUnsubscribe();
+    wrap.innerHTML = "<p class='sub'>Loading Mingl messages...</p>";
+    try {
+      portalMinglUnsubscribe = db.collection("chatMessages")
+        .where("roomId", "==", activePortalMinglRoomId)
+        .where("participants", "array-contains", auth.currentUser.uid)
+        .onSnapshot(snap => renderPortalMinglMessages(snap.docs.map(doc => ({id:doc.id, ...doc.data()}))), () => {
+          getCollectionSafe("chatMessages", msg => msg.roomId === activePortalMinglRoomId).then(renderPortalMinglMessages);
+        });
+    } catch(e) {
+      getCollectionSafe("chatMessages", msg => msg.roomId === activePortalMinglRoomId).then(renderPortalMinglMessages);
+    }
+  }
+
+  async function sendPortalMinglMessage() {
+    const user = auth.currentUser;
+    const body = byId("portalMinglMessageInput")?.value.trim();
+    if (!user || !activePortalMinglRoomId || !body) return;
+    return actionFeedback({
+      starting:"Sending Mingl message...",
+      wait:"We are sending your Mingl message. Please wait a few seconds.",
+      success:"Mingl message sent",
+      redirecting:"Mingl message sent, redirecting back to Mingl Chat.",
+      returnTo:"Mingl Chat"
+    }, async () => {
+      const roomSnap = await db.collection("chatRooms").doc(activePortalMinglRoomId).get();
+      if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
+      const room = roomSnap.data();
+      if (!(room.participants || []).includes(user.uid)) throw new Error("Mingl chat is available only to approved participants.");
+      const unreadCounts = {...(room.unreadCounts || {})};
+      (room.participants || []).forEach(uid => { if (uid !== user.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
+      await db.collection("chatMessages").add({
+        roomId:activePortalMinglRoomId,
+        roomType:"mingl",
+        connectionId:room.connectionId || "",
+        participants:room.participants || [],
+        senderUid:user.uid,
+        senderName:currentProfile.displayName || user.displayName || user.email || "Member",
+        body,
+        edited:false,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection("chatRooms").doc(activePortalMinglRoomId).set({
+        lastMessage:body,
+        unreadCounts,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      byId("portalMinglMessageInput").value = "";
+      await loadPortal(user);
+    });
+  }
+
+  async function editPortalMinglMessage(messageId) {
+    const user = auth.currentUser;
+    if (!user || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== user.uid) return;
+    const next = prompt("Edit Mingl message", snap.data().body || "");
+    if (next == null || !next.trim()) return;
+    await db.collection("chatMessages").doc(messageId).set({
+      body:next.trim(),
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
+  async function improvePortalMinglDraft() {
+    const input = byId("portalMinglMessageInput");
+    const draft = input?.value.trim();
+    if (!input || !draft) return;
+    if (window.FLOQRAIService?.suggestShoutOutText) {
+      try {
+        const result = await window.FLOQRAIService.suggestShoutOutText({mainText:draft, tone:"classy", eventType:"Mingl chat"});
+        input.value = result.mainText || result.answer || draft;
+        return;
+      } catch(e) {}
+    }
+    input.value = draft.replace(/\bi\b/g, "I").replace(/\s+/g, " ").trim();
+  }
+
+  function insertPortalEmoji(emoji) {
+    const input = byId("portalMinglMessageInput");
+    if (!input) return;
+    input.value = `${input.value}${emoji}`;
+    input.focus();
   }
 
   function shoutoutModifyUrl(item) {
@@ -796,7 +1168,7 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    const [shoutouts, guestLists, directMessages, inboxNotifications, chats, allUsers, employeeDesignations] = await Promise.all([
+    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, allUsers, employeeDesignations] = await Promise.all([
       getCollectionSafe("shoutouts", x => x.submittedByUid === user.uid || x.submittedBy === user.email),
       getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
       getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
@@ -805,6 +1177,7 @@
       getCollectionSafe("users"),
       getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false)
     ]);
+    const chats = await getPortalMinglRooms(user, allUsers, queriedChats);
     messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
     renderRecipientSearchResults();
 
@@ -870,8 +1243,13 @@
     }
     byId("myGuestLists").innerHTML = guestLists.length ? guestLists.map(x => `<div class="queue-item"><strong>${esc(x.locationName || x.clubLocationId || "Guest List")}</strong><p>${esc(x.eventOrDay || "")} - Party of ${esc(x.partySize || 1)} - ${esc(x.status || "pending")}</p><small>Promoter: ${esc(x.promoterName || x.promoterId || "")}</small></div>`).join("") : "<p class='sub'>No guest list requests yet.</p>";
     renderMessages(messages, user);
-    byId("myChats").innerHTML = chats.length ? chats.map(x => `<div class="queue-item"><strong>${esc(x.title || "Mingl Chat")}</strong><p>${esc(x.lastMessage || "")}</p><small>Unread: ${esc(x.unreadCounts?.[user.uid] || 0)}</small></div>`).join("") : "<p class='sub'>No Mingl chats yet.</p>";
-    byId("privacyReport").innerHTML = simpleRows([["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"]]);
+    renderPortalMinglChats(chats, user);
+    byId("privacyReport").innerHTML = simpleRows([
+      ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
+      ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
+      ["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"],
+      ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]
+    ]);
   }
 
   async function sendPortalMessage() {
@@ -884,6 +1262,13 @@
     const subject = byId("composeSubject")?.value.trim() || "Message";
     const body = byId("composeBody")?.value.trim();
     if ((!recipientUid && !recipientEmail) || !selectedRecipient || !body) { setText("portalStatus", "Select an internal recipient from search and enter a message."); return; }
+    return actionFeedback({
+      starting:"Sending message...",
+      wait:"We are sending your message. Please wait a few seconds.",
+      success:"Message sent",
+      redirecting:"Message sent, redirecting back to Messages.",
+      returnTo:"Messages"
+    }, async () => {
     await db.collection("messages").add({
       messageType:selectedRecipient.recipientType === "club_csr" || selectedRecipient.recipientType === "club_admin" ? "patron_support" : "role_direct",
       senderUid:user.uid,
@@ -911,6 +1296,7 @@
     byId("composeRecipientEmail").value = "";
     byId("composeRecipientLabel").value = "";
     await loadPortal(user);
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -924,6 +1310,8 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
+    bind("portalSendMinglMessageBtn", sendPortalMinglMessage);
+    bind("portalImproveMinglMessageBtn", improvePortalMinglDraft);
     bind("saveShoutoutEditBtn", () => saveShoutoutEdit({resubmit:false}));
     bind("resubmitShoutoutEditBtn", () => saveShoutoutEdit({resubmit:true}));
     bind("cancelShoutoutEditBtn", cancelShoutoutEdit);
@@ -933,6 +1321,9 @@
       byId("composeRecipientEmail").value = "";
       byId("composeRecipientLabel").value = "";
       renderRecipientSearchResults();
+    });
+    document.querySelectorAll("[data-portal-mingl-emoji]").forEach(button => {
+      button.addEventListener("click", () => insertPortalEmoji(button.dataset.portalMinglEmoji || ""));
     });
 
     auth.onAuthStateChanged(user => {

@@ -95,8 +95,14 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .profile-media-grid,.role-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
 .profile-media-slot,.role-template-card{border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.18);padding:14px}
 .profile-media-preview{height:150px;border:1px dashed rgba(255,255,255,.25);border-radius:14px;background:rgba(0,0,0,.22);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-weight:900}
-.profile-media-preview img,.profile-media-preview video{width:100%;height:100%;object-fit:cover}
+.profile-media-preview img,.profile-media-preview video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;margin:auto}
 .profile-media-slot .save-one-media-slot{width:100%;margin-top:8px}
+.media-metadata-prompt{margin-top:10px;border:1px solid rgba(215,255,63,.28);border-radius:14px;background:rgba(215,255,63,.08);padding:10px;color:var(--text)}
+.media-metadata-prompt label{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.35}
+.privacy-datapoint-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.privacy-datapoint-grid label{border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.16);padding:10px;display:flex;align-items:flex-start;gap:8px}
+.card-subsection{margin-top:16px;border-top:1px solid rgba(255,255,255,.14);padding-top:14px}
+.card-subsection h3{margin:0 0 8px;font-size:20px}
 .public-profile-gallery-wrap{margin-top:16px;border:1px solid var(--line);border-radius:24px;background:rgba(0,0,0,.18);padding:18px}
 .public-profile-gallery-wrap h3{margin:0 0 12px;font-size:24px}
 .public-profile-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px}
@@ -146,10 +152,20 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-chat-list{display:grid;gap:10px;margin-bottom:14px}.mingl-chat-item{width:100%;display:grid;text-align:left;gap:4px}.mingl-chat-item span{color:var(--muted);font-weight:700}
 .mingl-messages{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px}
 .mingl-message{max-width:82%;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.08)}.mingl-message.mine{justify-self:end;background:linear-gradient(90deg,rgba(244,58,191,.34),rgba(38,216,255,.26))}
+.mingl-message.system{max-width:100%;justify-self:center;text-align:center;background:rgba(215,255,63,.09);border-color:rgba(215,255,63,.28)}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
-.mingl-compose{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px}
+.mingl-message-actions{display:flex;justify-content:flex-end;margin-top:6px}.mingl-message-actions button{padding:5px 9px;border-radius:999px;font-size:12px}
+.mingl-compose{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:10px}
+.emoji-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.emoji-row button{width:38px;height:38px;display:grid;place-items:center;padding:0;border-radius:999px;font-size:18px}
+.floqr-action-feedback{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:rgba(4,8,24,.72);backdrop-filter:blur(10px);padding:18px}
+.floqr-action-feedback.hidden{display:none}
+.floqr-action-feedback-card{width:min(420px,92vw);border:1px solid var(--line);border-radius:18px;background:rgba(10,14,34,.96);padding:22px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.floqr-action-feedback-card strong{display:block;font-size:24px}
+.floqr-action-feedback-card p{margin:10px 0 0;color:var(--muted)}
+.floqr-action-feedback.success .floqr-action-feedback-card{border-color:rgba(80,255,180,.5)}
+.floqr-action-feedback.failed .floqr-action-feedback-card{border-color:rgba(255,80,100,.55)}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}}
-@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px 1fr}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}}
+@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px 1fr}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
 
 /* FLOQR AI layer */
 textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);font-size:15px;min-height:120px}

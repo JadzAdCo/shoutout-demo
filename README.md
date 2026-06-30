@@ -1,15 +1,37 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.80 Location-Aware ShoutOut and Template AI Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.82 Mingl Privacy Media Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.80-location-template-ai
+https://jadzadco.github.io/shoutout-demo/?v=28.82-mingl-privacy-media
 ```
 
 Current release highlights:
 
+- Adds v28.82 Mingl Requests, My Privacy, and Public Media Sharing.
+- Adds the `Let's Mingl` request flow in the public Mingl room. Matched public patrons can request to Mingl, and full Mingl Chat opens only after both parties approve.
+- Creates a `Friend or Mingl Request` notification/message/audit trail with timestamp, shared datapoint context, and requester location text when available.
+- Adds realtime Mingl Chat rendering with sender-owned message editing, emoji shortcuts, and AI-ready spelling/grammar cleanup with local fallback.
+- Keeps deterministic Mingl participant reads as the supported safe path. The optional participant array query remains non-blocking and should not be used as a reason to loosen Firestore rules broadly.
+- Renames the patron portal to `My Profile and Settings` and removes the duplicate `Settings` / `FLOQR Settings` heading.
+- Moves Privacy under `My Profile and Settings` and renames it `My Privacy`.
+- Adds `publicMinglDatapoints` choices so patrons choose which datapoints can be public/shared and used for Mingl matching or other privacy-respecting features.
+- Adds `Public Media and Data Sharing` under My Profile and Settings. Profile media uploads live there, captions are removed, and optional GPS metadata from JPEG uploads can be added to Travel only when the patron chooses it.
+- Adds the shared `floqr-action-feedback.js` overlay for clear working/success/failure feedback on the new profile, privacy, media, messaging, Mingl, and diagnostics actions.
+- Updates Firestore rules to `v28.82-mingl-request-chat-rules` for Mingl audit records, system request messages, and owner message-edit support.
+- Adds Master Admin Diagnostics package checks and manual feature tests for the new Mingl, privacy, media, and action-confirmation behavior.
+- Direct rollback note for this package is `ROLLBACK-V28-82.md`. Historical rollback/readme artifacts should not be included in future full packages.
+- Adds v28.81 Manual Feature Test Diagnostics under Master Admin > Diagnostics.
+- Adds a checklist of implemented or changed user-facing features with plain-English test steps and expected results.
+- Master Admin can mark each manual test as `Succeed` or `Failed` and add a testing/failure note.
+- Plain-language result choices are Succeed or Failed so the person testing the package can record what actually happened.
+- Adds a live manual diagnostic TXT output that can be copied or downloaded.
+- Adds a copy-ready Codex resolution prompt that automatically includes failed manual checks and Master Admin notes.
+- Adds failed manual checks to the full `Export Diagnostics TXT` attention summary and COPY/PASTE FIX PROMPT.
+- Adds package install diagnostics for the manual feature checklist UI, output builder, and prompt builder.
+- Keeps package hygiene: the package root includes only the live `README.md` and the current direct rollback note.
 - Adds v28.80 Location-Aware ShoutOut and Template AI.
 - Adds `ai-location-service.js` with `getUserLocationContext(user)`, `rankLocationsForUser(locations, userContext)`, `geminiRankLocations(locations, userContext)`, and `localRankLocations(locations, userContext)`.
 - Browser geolocation is requested only as an optional ranking signal. If the patron denies geolocation, FLOQR falls back to the signed-in user's own profile/settings city, state/region, country, preferred cities, favorite genres, venue types, and interests.
@@ -34,7 +56,7 @@ Current release highlights:
 - Adds `floqrSearch(query, context)` with local contextual fallback for venue, event, Mingl, and ShoutOut template search.
 - Adds a flag-gated `Ask FLOQR` assistant shell after login when `FLOQR_AI_ASSISTANT_ENABLED` is true.
 - Adds Settings > AI Notification Preferences in the patron portal.
-- Renames the patron portal framing to Settings and adds My Profile, Privacy, AI Notification Preferences, My ShoutOut Templates, and Public Sharing surfaces.
+- Renames the patron portal framing to My Profile and Settings and adds My Profile, My Privacy, AI Notification Preferences, My ShoutOut Templates, Public Media and Data Sharing, and related account surfaces.
 - Adds patron-created ShoutOut template variants. Official/admin template layout stays locked; patrons can customize only the background.
 - Adds template gallery sections: Official FLOQR Templates, My Saved Templates, and Community Templates.
 - Adds FLOQR Studio / Design Background with AI UI. Live image generation is not configured yet, so it uses safe placeholder behavior and does not expose API keys.
@@ -471,7 +493,7 @@ Test plan:
 - Fixes `Modify ShoutOut` from Patron Portal > My ShoutOuts by adding an inline editor for pending ShoutOuts.
 - Existing ShoutOut modification links with `ref` or `id` now auto-open the pending ShoutOut editor.
 - Simplifies Mingl as a social playground landing page with the patron's main profile picture at the top.
-- Adds match cards that show public patron profile photos, shared-match chips, contextual search signals, and Start Chat / Mingl actions.
+- Adds match cards that show public patron profile photos, shared-match chips, contextual search signals, and `Let's Mingl` request actions.
 - Adds profile datapoint dropdown buttons for major public profile fields: gender, music, events, travel, hobbies, food, beverages, meeting interests, and location.
 - Adds a local contextual Mingl matching engine that recognizes synonyms such as girls/female, fast cars/cars/coupe, and Latina/Latin events.
 - Adds Club Admin employee / CSR designation tools.
@@ -579,7 +601,7 @@ Manual test checklist:
 14. Save a ShoutOut edit and confirm the pending ShoutOut list updates.
 15. Search Mingl with contextual text such as `girls interested in fast cars and Latina events`.
 16. Confirm Mingl shows the patron's main picture, match photos, shared-match chips, and datapoint dropdown buttons.
-17. Confirm `Start Chat / Mingl` sends a Mingl request, and `Start Chat` opens only when both patrons Mingl back.
+17. Confirm `Let's Mingl` sends a Friend or Mingl Request, and `Open Mingl Chat` appears only when both patrons Mingl back.
 18. Open Club Admin > Employee/Workers, search approved workers/affiliates, confirm role summaries and pending worker requests render, and designate a hospitality worker as CSR.
 19. Open Patron Portal > Messages and confirm Recipient Search lists Club Admin and CSR recipients, not a free-form email field.
 20. Send a patron support message to a Club Admin or CSR and confirm it appears as an internal message.

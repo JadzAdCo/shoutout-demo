@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.74-gemini-media-editing-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.82-mingl-request-chat-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
@@ -13,6 +14,7 @@ rules_version = '2';
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
 // - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
 // - explicit diagnostic-only delete support for temporary Mingl connection records
+// - Mingl request audit records, system request messages, and owner message-edit support
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -90,6 +92,24 @@ service cloud.firestore {
     function isNewMinglMessage() {
       return request.resource.data.keys().hasAny(["roomType"])
         && request.resource.data.roomType == "mingl";
+    }
+
+    function isMinglSystemMessageRequest() {
+      return isNewMinglMessage()
+        && request.resource.data.senderUid == "system"
+        && request.resource.data.messageType == "system"
+        && request.resource.data.participants is list
+        && request.auth.uid in request.resource.data.participants;
+    }
+
+    function isOwnMinglMessageEdit() {
+      return isExistingMinglMessage()
+        && resource.data.senderUid == request.auth.uid
+        && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.roomId == resource.data.roomId
+        && request.resource.data.roomType == resource.data.roomType
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["body", "edited", "editedAt", "updatedAt", "aiGrammarApplied"]);
     }
 
     match /users/{userId} {
@@ -313,6 +333,17 @@ service cloud.firestore {
       allow delete: if isDiagnosticParticipantResource();
     }
 
+    match /minglAudit/{id} {
+      allow create: if signedIn()
+        && request.resource.data.participants is list
+        && request.auth.uid in request.resource.data.participants;
+      allow read: if signedIn()
+        && resource.data.participants is list
+        && request.auth.uid in resource.data.participants;
+      allow update, delete: if signedIn()
+        && resource.data.actorUid == request.auth.uid;
+    }
+
     match /chatRooms/{roomId} {
       allow read: if signedIn()
         && (
@@ -360,7 +391,10 @@ service cloud.firestore {
         && (
           (
             isNewMinglMessage()
-            && request.auth.uid == request.resource.data.senderUid
+            && (
+              request.auth.uid == request.resource.data.senderUid ||
+              isMinglSystemMessageRequest()
+            )
             && request.resource.data.participants is list
             && request.auth.uid in request.resource.data.participants
             && exists(/databases/$(database)/documents/chatRooms/$(request.resource.data.roomId))
@@ -370,7 +404,13 @@ service cloud.firestore {
           ) ||
           !isNewMinglMessage()
         );
-      allow update, delete: if signedIn()
+      allow update: if signedIn()
+        && (
+          !isExistingMinglMessage() ||
+          isOwnMinglMessageEdit() ||
+          (isExistingMinglMessage() && isDiagnosticParticipantResource())
+        );
+      allow delete: if signedIn()
         && (
           !isExistingMinglMessage() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
