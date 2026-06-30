@@ -9,6 +9,7 @@ Included functions:
 - `aiExtractPublicSourceUrl`, which fetches a public source URL server-side, parses Eventbrite/Ticketmaster/venue metadata where available, extracts JSON-LD event data, and returns a structured `aiDiscoveryQueue`-ready record.
 - `aiEnhanceShoutOutMedia`, which checks Firebase Auth, verifies the requested Storage path is owned by the signed-in user, calls Gemini image editing with the server-side `GEMINI_API_KEY` secret, stores the enhanced image under `shoutouts/{uid}/{reference}/enhanced/`, and returns structured media metadata.
 - `aiSuggestShoutOut`, which uses Gemini text generation through the same server-side secret to return LED-safe ShoutOut copy, with curated fallback if Gemini is unavailable.
+- `aiSuggestGrammarCorrection`, which corrects user-requested draft text for chat/messages/profile copy through Gemini JSON output. Drafts are not indexed and are not stored by the function.
 - `aiRankLocations`, which ranks public club/event/location results using the signed-in user's own non-sensitive location and preference context, with deterministic fallback if Gemini is unavailable.
 - HTTPS callable AI/search placeholders for app integration points.
 
@@ -25,7 +26,7 @@ Run these commands from the package/repo root where `firebase.json` is located:
 ```bash
 firebase functions:secrets:get GEMINI_API_KEY --project shoutoutdemo-5b402
 npm.cmd --prefix functions install
-firebase deploy --only functions:aiEnhanceShoutOutMedia,functions:aiSuggestShoutOut,functions:aiRankLocations
+firebase deploy --only functions:aiEnhanceShoutOutMedia,functions:aiSuggestShoutOut,functions:aiSuggestGrammarCorrection,functions:aiRankLocations
 ```
 
 If `GEMINI_API_KEY` does not exist yet, set it before deployment:

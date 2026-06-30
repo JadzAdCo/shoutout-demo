@@ -533,6 +533,40 @@ function fallbackShoutOutSuggestion(data = {}) {
   };
 }
 
+function fallbackGrammarSuggestion(data = {}) {
+  const text = preserveProtectedTerms(String(data.text || "").slice(0, 1200));
+  const fixes = [
+    {from:/\bgut\b/gi, to:"good", type:"spelling"},
+    {from:/\bteh\b/gi, to:"the", type:"spelling"},
+    {from:/\byuo\b/gi, to:"you", type:"spelling"},
+    {from:/\bi\b/g, to:"I", type:"grammar"}
+  ];
+  let corrected = text;
+  const detectedIssues = [];
+  fixes.forEach(rule => {
+    const matches = corrected.match(rule.from) || [];
+    matches.forEach(match => detectedIssues.push({
+      original:match,
+      suggestion:rule.to,
+      type:rule.type,
+      confidence:0.82
+    }));
+    corrected = corrected.replace(rule.from, rule.to);
+  });
+  if (/\s{2,}/.test(corrected)) {
+    detectedIssues.push({original:"extra spaces", suggestion:"single spaces", type:"grammar", confidence:0.74});
+    corrected = corrected.replace(/\s{2,}/g, " ");
+  }
+  corrected = preserveProtectedTerms(corrected.trim());
+  return {
+    correctedText:corrected || text,
+    detectedIssues,
+    explanation:detectedIssues.length ? "Local fallback corrected likely typo or spacing issues." : "No obvious correction found.",
+    confidence:detectedIssues.length ? 0.78 : 0.5,
+    provider:"local-fallback"
+  };
+}
+
 function extractJsonObject(text = "") {
   const clean = String(text || "").trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```$/i, "").trim();
   try { return JSON.parse(clean); } catch (error) {}
@@ -834,6 +868,51 @@ exports.aiSuggestShoutOut = onCall({
     };
   } catch (error) {
     console.warn("Gemini ShoutOut suggestion fallback:", error.message);
+    return fallback;
+  }
+});
+
+exports.aiSuggestGrammarCorrection = onCall({
+  region:"us-central1",
+  secrets:[GEMINI_API_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const data = request.data || {};
+  const fallback = fallbackGrammarSuggestion(data);
+  if (!optionalGeminiSecretValue()) return fallback;
+  const text = preserveProtectedTerms(String(data.text || "").slice(0, 1200));
+  if (!text.trim()) return fallback;
+  const context = {
+    product:clampText(data.product || "mingl", 40),
+    inputType:clampText(data.inputType || "chat", 60),
+    preferredLanguage:clampText(data.preferredLanguage || "auto", 40),
+    tonePreference:clampText(data.tonePreference || "keepTone", 40),
+    correctionMode:clampText(data.correctionMode || "approvalRequired", 40)
+  };
+  const prompt = [
+    "You are FLOQR AI helping a signed-in user correct their own private draft text.",
+    "Return only JSON with keys: correctedText, detectedIssues, explanation, confidence.",
+    "detectedIssues must be an array of objects with original, suggestion, type, and confidence.",
+    "Preserve FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those protected terms.",
+    "Do not add new private facts. Keep the user's meaning and tone unless a tone preference is provided.",
+    "This draft is private and must not be treated as searchable or public content.",
+    `Context JSON: ${JSON.stringify(context)}`,
+    `Draft text: ${text}`
+  ].join("\n");
+  try {
+    const json = await callGeminiJson(prompt, "Grammar correction");
+    return {
+      correctedText:preserveProtectedTerms(String(json?.correctedText || fallback.correctedText || text).slice(0, 1200)),
+      detectedIssues:Array.isArray(json?.detectedIssues) ? json.detectedIssues.slice(0, 20) : fallback.detectedIssues,
+      explanation:clampText(json?.explanation || fallback.explanation, 500),
+      confidence:Math.max(0, Math.min(Number(json?.confidence || fallback.confidence || 0.5), 1)),
+      provider:"gemini",
+      model:GEMINI_TEXT_MODEL
+    };
+  } catch (error) {
+    console.warn("Gemini grammar correction fallback:", error.message);
     return fallback;
   }
 });
