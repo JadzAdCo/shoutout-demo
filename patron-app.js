@@ -37,6 +37,7 @@
   let minglMessagesUnsubscribe = null;
   let templateVariants = {mine:[], community:[]};
   let locationContextPromise = null;
+  let confirmationReturnTimer = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -919,8 +920,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar",
-      minglLink:"./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar",
+      link:"./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page",
+      minglLink:"./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page",
       read:false,
       createdAt:now
     };
@@ -1613,6 +1614,10 @@
       url.searchParams.set("template",payload.template||"neon");
       url.searchParams.set("media",payload.mediaUrl||"");
       url.searchParams.set("mediaType",payload.mediaType||"");
+      url.searchParams.set("selectedMediaVersion",payload.selectedMediaVersion||"");
+      url.searchParams.set("trimStart",payload.trimStart||"");
+      url.searchParams.set("trimEnd",payload.trimEnd||"");
+      url.searchParams.set("trimmedDuration",payload.trimmedDuration||"");
       url.searchParams.set("backgroundUrl",payload.backgroundUrl||"");
       url.searchParams.set("backgroundColor",payload.backgroundColor||"");
       url.searchParams.set("backgroundGradient",payload.backgroundGradient||"");
@@ -1622,9 +1627,47 @@
   function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`); updatePreview(); showPage("editorPage"); }
   function updatePreview() {
     const frame=byId("previewFrame");
-    const mediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
+    const mediaField = byId("shoutoutMediaUrl");
+    const mediaUrl = mediaField?.value.trim() || mediaField?.dataset.previewUrl || byId("mediaUrl")?.value.trim() || "";
     const mediaType = byId("shoutoutMediaType")?.value.trim() || "";
-    if(frame) frame.src=displayUrl({mainText:byId("mainText")?.value.trim()||"SHOUTOUT!", subText:byId("subText")?.value.trim()||"", mediaUrl, mediaType, template:selectedTemplate, backgroundUrl:selectedTemplateVariant?.backgroundUrl || "", backgroundColor:selectedTemplateVariant?.backgroundColor || "", backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""}, locationId());
+    if(frame) frame.src=displayUrl({
+      mainText:byId("mainText")?.value.trim()||"SHOUTOUT!",
+      subText:byId("subText")?.value.trim()||"",
+      mediaUrl,
+      mediaType,
+      selectedMediaVersion:byId("aiSelectedMediaVersion")?.value || "",
+      trimStart:byId("aiTrimStart")?.value || "",
+      trimEnd:byId("aiTrimEnd")?.value || "",
+      trimmedDuration:byId("aiTrimmedDuration")?.value || "",
+      template:selectedTemplate,
+      backgroundUrl:selectedTemplateVariant?.backgroundUrl || "",
+      backgroundColor:selectedTemplateVariant?.backgroundColor || "",
+      backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""
+    }, locationId());
+  }
+  window.updatePreview = updatePreview;
+
+  function returnToMainFromConfirmation() {
+    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    confirmationReturnTimer = null;
+    showPage("categoryPage");
+  }
+
+  function editSubmittedShoutout() {
+    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    confirmationReturnTimer = null;
+    setText("confirmationRedirectStatus", "");
+    goToEditor();
+  }
+
+  function showShoutoutConfirmation(payload, location, template) {
+    setText("confirmRef", payload.referenceNumber);
+    setText("confirmClub", location.locationName);
+    setText("confirmTemplate", template.name);
+    setText("confirmationRedirectStatus", "ShoutOut submitted. Returning to the main app in 8 seconds.");
+    showPage("confirmationPage");
+    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    confirmationReturnTimer = setTimeout(returnToMainFromConfirmation, 8000);
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -1779,11 +1822,11 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.84-shoutout-media-chat-grammar`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.85-shoutout-preview-confirmation-mingl-page`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
-      setText("confirmRef",payload.referenceNumber); setText("confirmClub",l.locationName); setText("confirmTemplate",t.name); showPage("confirmationPage");
+      showShoutoutConfirmation(payload, l, t);
     } catch(e) { status.textContent=e.message; }
   }
   function startAnother(){ selectedTemplateVariant=null; byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
@@ -1850,7 +1893,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.84-shoutout-media-chat-grammar";
+      portalLink.href = "./patron-portal.html?v=28.85-shoutout-preview-confirmation-mingl-page";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -1863,14 +1906,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar";
+      chats.href = "./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -1966,7 +2009,7 @@
     bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
     bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("backToEditorFromConfirmBtn", goToEditor); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("startAnotherBtn", startAnother); bind("chooseAnotherClubBtn", () => openCategory("shoutout"));
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("returnToMainAfterConfirmBtn", returnToMainFromConfirmation);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
@@ -1976,7 +2019,7 @@
     byId("includeAttribution")?.addEventListener("change", syncAttribution);
     byId("attributionChoice")?.addEventListener("change", syncAttribution);
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
-    ["mainText","mediaUrl"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
+    ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
 
   auth.onAuthStateChanged(user => {
@@ -2035,10 +2078,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.84-shoutout-media-chat-grammar">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.85-shoutout-preview-confirmation-mingl-page">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.84-shoutout-media-chat-grammar">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.84-shoutout-media-chat-grammar">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.85-shoutout-preview-confirmation-mingl-page">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2081,7 +2124,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.84-shoutout-media-chat-grammar`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.85-shoutout-preview-confirmation-mingl-page`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -2142,6 +2185,14 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
   function findSubTextInput(){return byId("subText")||byId("shoutoutSubText")||document.querySelector("input[name='subText']")||document.querySelector("textarea[name='subText']");}
   function findEditor(){return byId("editorPage")||byId("screenEditor")||document.querySelector("#editor,.editor-page,[data-screen='editor']");}
   function controlsCard(){return byId("editorPage")?.querySelector(".composer > .card:not(.preview)")||byId("editorPage")?.querySelector(".composer .card")||findEditor();}
+  function infoPopout(label,text,extraClass){
+    return `<details class="info-popout ${extraClass||""}"><summary>${esc(label)}</summary><div class="info-popout-bubble">${esc(text)}</div></details>`;
+  }
+  function setVideoNotice(text,label){
+    const notice=byId("videoTrimNotice");
+    if(!notice)return;
+    notice.innerHTML=text?infoPopout(label||"Video trim warning",text,"warning-popout"):"";
+  }
   function placeMediaCard(card){
     const host=controlsCard(); if(!host||!card)return;
     const panel=byId("aiMediaPanel"), submit=byId("submitShoutoutBtn"), status=byId("submitStatus");
@@ -2152,8 +2203,8 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const input=byId("shoutoutMediaUpload"), preview=byId("shoutoutMediaPreview");
     if(input) input.value="";
     if(preview){preview.classList.add("hidden");preview.innerHTML="";}
-    ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl","aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id=>{const el=byId(id);if(el){el.value=id==="aiTrimStart"?"0":"";el.dispatchEvent(new Event("input",{bubbles:true}));}});
-    const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
+    ["shoutoutMediaUrl","shoutoutMediaType","mediaUrl","aiSelectedMediaVersion","aiEnhancementType","aiEnhancementPrompt","aiOriginalDuration","aiTrimmedDuration","aiTrimStart","aiTrimEnd"].forEach(id=>{const el=byId(id);if(el){el.value=id==="aiTrimStart"?"0":"";if(id==="shoutoutMediaUrl")delete el.dataset.previewUrl;el.dispatchEvent(new Event("input",{bubbles:true}));}});
+    setVideoNotice("");
     const status=byId("uploadStatus"); if(status)status.textContent="Media removed.";
     if(window.FLOQRAIMedia?.resetSelection) window.FLOQRAIMedia.resetSelection();
     if(typeof window.updatePreview==="function") window.updatePreview();
@@ -2176,7 +2227,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     if(!templateAllowsMedia()){
       removeDuplicateMediaInputs();
       if(existingCard) existingCard.classList.add("hidden");
-      const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
+      setVideoNotice("");
       return;
     }
     removeDuplicateMediaInputs();
@@ -2217,12 +2268,17 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const file=input&&input.files&&input.files[0];
     const preview=byId("shoutoutMediaPreview")||byId("liveShoutoutPreview");
     if(!file||!preview)return;
-    const notice=byId("videoTrimNotice"); if(notice)notice.textContent="";
+    setVideoNotice("");
     const url=URL.createObjectURL(file);
     const isVideo=file.type.startsWith("video/");
     const text=getCurrentText();
+    const mediaUrlField=byId("shoutoutMediaUrl");
+    if(mediaUrlField)mediaUrlField.dataset.previewUrl=url;
+    const mediaTypeField=byId("shoutoutMediaType");
+    if(mediaTypeField)mediaTypeField.value=isVideo?"video":"image";
     preview.classList.remove("hidden");
-    preview.innerHTML=`<div class="media-preview-stage">${isVideo?`<video src="${url}" autoplay muted loop playsinline controls></video>`:`<img src="${url}" alt="">`}<div class="media-preview-overlay"><strong>${esc(text.mainText||"YOUR SHOUTOUT")}</strong><span>${esc(text.subText||"LIVE ON THE DISPLAY")}</span></div></div><p class="sub small">${esc(file.name)} • ${isVideo?"Video":"Image"} preview</p>`;
+    preview.innerHTML=`<div class="media-preview-stage">${isVideo?`<video src="${url}" autoplay muted loop playsinline controls></video>`:`<img src="${url}" alt="">`}<div class="media-preview-overlay"><strong>${esc(text.mainText||"YOUR SHOUTOUT")}</strong><span>${esc(text.subText||"LIVE ON THE DISPLAY")}</span></div></div>${infoPopout("Media details",`${file.name} - ${isVideo?"Video":"Image"} preview`,"media-details-popout")}`;
+    if(typeof window.updatePreview==="function") window.updatePreview();
     if(isVideo){
       const video=preview.querySelector("video");
       video?.addEventListener("loadedmetadata",()=>{
@@ -2237,13 +2293,14 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
           if(version)version.value="trimmed";
           if(type)type.value="trim";
           if(prompt)prompt.value="Trim Video to 7 Seconds";
-          if(notice)notice.textContent=`Warning: this video is ${duration.toFixed(1)} seconds. FLOQR will use only the first 7 seconds.`;
+          setVideoNotice(`Warning: this video is ${duration.toFixed(1)} seconds. FLOQR will cut and use only the first 7 seconds.`);
           video.addEventListener("timeupdate",()=>{if(video.currentTime>=7){try{video.currentTime=0;}catch(e){} video.play?.().catch(()=>{});}});
         }else{
           if(trimmed)trimmed.value=duration?String(duration):"";
           if(version)version.value="original";
-          if(notice)notice.textContent=duration?`Video duration ${duration.toFixed(1)}s. Ready.`:"Video ready.";
+          setVideoNotice(duration?`Video duration ${duration.toFixed(1)} seconds. Ready.`:"Video ready.","Video details");
         }
+        if(typeof window.updatePreview==="function") window.updatePreview();
       });
     }
   }

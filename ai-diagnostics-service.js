@@ -31,7 +31,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v28.82-mingl-request-chat-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.84-shoutout-media-chat-grammar";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.85-shoutout-preview-confirmation-mingl-page";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -667,10 +667,61 @@
         {label:"README documents v28.84", file:"README.md", includes:["v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings", "Ai Image/Video Enhancement", "Language Settings"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-84.md", includes:["FLOQR Rollback - v28.84 ShoutOut Media Chat Grammar", "This rollback does not delete user profile data"]}
       ]
+    },
+    {
+      version: "v28.85-shoutout-preview-confirmation-mingl-page",
+      title: "ShoutOut Preview, Confirmation Splash, and Mingl Page Polish",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.85-shoutout-preview-confirmation-mingl-page"]},
+        {label:"Patron page cache-busted", file:"index.html", includes:["styles.css?v=28.85-shoutout-preview-confirmation-mingl-page", "patron-app.js?v=28.85-shoutout-preview-confirmation-mingl-page", "ai-media-service.js?v=28.85-shoutout-preview-confirmation-mingl-page"]},
+        {label:"Live preview reads selected local media", file:"patron-app.js", includes:["dataset.previewUrl", "window.updatePreview = updatePreview", "selectedMediaVersion", "trimEnd"]},
+        {label:"Display preview receives trim metadata", file:"display-app.js", includes:["selectedMediaVersion", "trimStart", "trimEnd", "trimmedDuration"]},
+        {label:"Media helper text uses popout bubbles", file:"patron-app.js", includes:["infoPopout(\"Media details\"", "setVideoNotice", "Video trim warning"]},
+        {label:"AI media explanation uses popout bubble", file:"ai-media-service.js", includes:["How AI enhancement works", "infoPopout", "setVideoNotice"]},
+        {label:"Confirmation page has two splash actions", file:"index.html", includes:["editSubmittedShoutoutBtn", "returnToMainAfterConfirmBtn", "confirmationRedirectStatus"], notIncludes:["startAnotherBtn", "chooseAnotherClubBtn", "logoutBtn6"]},
+        {label:"Confirmation splash auto-returns", file:"patron-app.js", includes:["showShoutoutConfirmation", "confirmationReturnTimer", "returnToMainFromConfirmation", "editSubmittedShoutout"]},
+        {label:"Mingl chat has separate portal page", file:"patron-portal.html", includes:["portalMinglChatPage", "backToMinglDashboardBtn", "minglRulesDetails", "minglRequestsSummaryButton"]},
+        {label:"Mingl requests summarize recent statuses", file:"patron-portal-app.js", includes:["updateMinglRequestSummary", "shouldShowMinglRequest", "Mingl/Follow Back", "10 * 24 * 60 * 60 * 1000"]},
+        {label:"Popout and Mingl dashboard CSS", file:"styles.css", includes:["info-popout", "info-popout-bubble", "mingl-action-details", "portalMinglChatPage"]},
+        {label:"README documents v28.85", file:"README.md", includes:["v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page", "Edit ShoutOut", "Mingl Requests"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-85.md", includes:["FLOQR Rollback - v28.85 ShoutOut Preview Confirmation Mingl Page", "This rollback does not delete user profile data"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v28-85-media-helper-popouts",
+      area:"ShoutOut media editor",
+      feature:"Media details, video warning, and AI explanation use popout bubbles",
+      changed:"Long helper copy under the uploaded media preview and Ai Image/Video Enhancement panel now appears behind compact popout buttons instead of taking over the mobile editor.",
+      howToTest:"Open a media-capable ShoutOut template on mobile, upload a video longer than 7 seconds, then tap Media details, Video trim warning, and How AI enhancement works.",
+      expected:"Each item opens a compact bubble with the full explanation and the editor remains easy to scroll."
+    },
+    {
+      id:"v28-85-live-preview-selected-media",
+      area:"ShoutOut live preview",
+      feature:"Live Preview shows the selected image/video before submission",
+      changed:"The editor now passes the local selected media preview URL and trim metadata into the display iframe, while submit still uploads and saves the real Firebase Storage URL.",
+      howToTest:"Select a media-capable ShoutOut template, upload a portrait image, landscape image, or video, then scroll to Live Preview.",
+      expected:"Live Preview shows the selected media inside the actual ShoutOut board instead of the IMAGE / VIDEO placeholder."
+    },
+    {
+      id:"v28-85-confirmation-two-button-splash",
+      area:"ShoutOut confirmation",
+      feature:"Confirmation page is a two-action splash page",
+      changed:"The confirmation page now has only Edit ShoutOut and Back to main app. It auto-returns to the main category/search screen after a short pause.",
+      howToTest:"Submit a ShoutOut and inspect the confirmation page.",
+      expected:"Only two action buttons appear. Edit ShoutOut returns to the editor, and Back to main app returns to the screen with Events, Throw a ShoutOut, and Mingl."
+    },
+    {
+      id:"v28-85-mingl-separate-page-requests",
+      area:"Mingl portal",
+      feature:"Mingl Chat is separate and Mingl Rules/Requests are nested buttons",
+      changed:"The Mingl tab now shows minimalist nested buttons for Mingl Rules and Mingl Requests. Mutual chats open in a separate Mingl Chat page. Requests show recent 10-day activity plus unresolved follow-back items.",
+      howToTest:"Open My Profile and Settings > Mingl, tap Mingl Rules, tap Mingl Requests, then open a mutual Mingl chat.",
+      expected:"Rules and requests expand only when tapped, the request button summarizes status, and chat opens on its own page with a Back to Mingl button."
+    },
     {
       id:"v28-84-shoutout-media-upload-card",
       area:"ShoutOut media upload repair",

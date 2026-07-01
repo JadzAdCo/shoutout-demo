@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.84-shoutout-media-chat-grammar */
+/* patron-portal-app.js v28.85-shoutout-preview-confirmation-mingl-page */
 (function(){
   "use strict";
 
@@ -103,20 +103,24 @@
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
+  function showPortalPanel(panelId, tabPanelId = "") {
+    document.querySelectorAll(".admin-tab").forEach(btn => btn.classList.toggle("active", !!tabPanelId && btn.dataset.panel === tabPanelId));
+    document.querySelectorAll(".admin-panel-section").forEach(section => section.classList.remove("active"));
+    byId(panelId)?.classList.add("active");
+  }
+
   function setupTabs() {
     document.querySelectorAll(".admin-tab").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".admin-tab").forEach(x => x.classList.remove("active"));
-        document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
-        btn.classList.add("active");
-        byId(btn.dataset.panel)?.classList.add("active");
+        showPortalPanel(btn.dataset.panel, btn.dataset.panel);
       });
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", "mingl-chat":"portalMinglChatPage", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
+      else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
     }
   }
 
@@ -924,7 +928,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1041,7 +1045,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.84-shoutout-media-chat-grammar",
+        link:"./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page",
         read:false,
         createdAt:fieldValue()
       });
@@ -1089,28 +1093,71 @@
     });
   }
 
+  function firestoreTimeMs(value) {
+    if (!value) return 0;
+    if (value.toDate) return value.toDate().getTime();
+    if (value.seconds) return value.seconds * 1000;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function minglRequestStatus(connection = {}, user = {}) {
+    const status = String(connection.status || "pending").toLowerCase();
+    if (["mutual", "approved", "accepted"].includes(status)) return "Accepted";
+    if (["denied", "rejected", "declined"].includes(status)) return "Denied";
+    if (connection.requestedTo === user.uid) return "Mingl/Follow Back";
+    return "Sent";
+  }
+
+  function shouldShowMinglRequest(connection = {}) {
+    const status = String(connection.status || "pending").toLowerCase();
+    const unresolved = !["mutual", "approved", "accepted", "denied", "rejected", "declined"].includes(status);
+    const updatedMs = firestoreTimeMs(connection.updatedAt || connection.createdAt);
+    const recent = updatedMs && updatedMs >= Date.now() - (10 * 24 * 60 * 60 * 1000);
+    return unresolved || recent;
+  }
+
+  function updateMinglRequestSummary(requests = [], user = {}) {
+    const summary = byId("minglRequestsSummaryButton");
+    if (!summary) return;
+    const counts = requests.reduce((acc, connection) => {
+      const label = minglRequestStatus(connection, user);
+      acc[label] = (acc[label] || 0) + 1;
+      return acc;
+    }, {});
+    if (counts["Mingl/Follow Back"]) summary.textContent = `Mingl Requests: Mingl/Follow Back (${counts["Mingl/Follow Back"]})`;
+    else if (counts.Sent) summary.textContent = `Mingl Requests: Sent (${counts.Sent})`;
+    else if (counts.Accepted) summary.textContent = `Mingl Requests: Accepted (${counts.Accepted})`;
+    else if (counts.Denied) summary.textContent = `Mingl Requests: Denied (${counts.Denied})`;
+    else summary.textContent = "Mingl Requests: No recent requests";
+  }
+
   function renderPortalMinglRequests(connections = [], user) {
     const wrap = byId("portalMinglRequests");
     if (!wrap) return;
     const requests = connections
-      .filter(connection => connection.status !== "mutual")
+      .filter(shouldShowMinglRequest)
       .sort((a,b) => (b.updatedAt?.seconds || b.createdAt?.seconds || 0) - (a.updatedAt?.seconds || a.createdAt?.seconds || 0));
-    wrap.innerHTML = requests.length ? "" : "<p class='sub'>No pending Mingl requests.</p>";
+    updateMinglRequestSummary(requests, user);
+    wrap.innerHTML = requests.length ? "" : "<p class='sub'>No Mingl requests from the last 10 days and no unresolved requests.</p>";
     requests.forEach(connection => {
       const id = connection.connectionId || connection.id;
       const otherUid = requestOtherUid(connection, user);
       const other = connection.userSummaries?.[otherUid] || {};
       const received = connection.requestedTo === user.uid;
+      const statusLabel = minglRequestStatus(connection, user);
+      const personLabel = received ? "From" : "Sent to";
       const item = document.createElement("div");
       item.className = "queue-item";
       item.innerHTML = `<div class="message-envelope-head">
         <strong>${esc(other.displayName || connection.requesterName || connection.targetName || "Mingl Member")}</strong>
-        <span>${esc(received ? "Received" : "Sent")}</span>
+        <span>${esc(statusLabel)}</span>
       </div>
-      <p>${esc(received ? "Friend or Mingl Request received." : "Friend or Mingl Request sent. Waiting for the other patron to Mingl back.")}</p>
-      <small>${esc(fmtDate(connection.updatedAt || connection.createdAt))}</small>
+      <p>${esc(personLabel)}: ${esc(other.displayName || connection.requesterName || connection.targetName || "Mingl Member")}</p>
+      <p>${esc(statusLabel === "Mingl/Follow Back" ? "Friend or Mingl Request received. Mingl back to open chat." : statusLabel === "Sent" ? "Friend or Mingl Request sent. Waiting for the other patron to Mingl back." : `Friend or Mingl Request status: ${statusLabel}.`)}</p>
+      <small>Time: ${esc(fmtDate(connection.updatedAt || connection.createdAt))}</small>
       <div class="queue-actions">
-        ${received ? `<button type="button" class="primary accept-mingl-request-btn" data-connection-id="${esc(id)}">Mingl Back</button>` : `<button type="button" disabled>Mingl Request Sent</button>`}
+        ${statusLabel === "Mingl/Follow Back" ? `<button type="button" class="primary accept-mingl-request-btn" data-connection-id="${esc(id)}">Mingl/Follow Back</button>` : `<button type="button" disabled>${esc(statusLabel)}</button>`}
       </div>`;
       wrap.appendChild(item);
     });
@@ -1207,6 +1254,7 @@
   async function openPortalMinglChat(room) {
     if (!room?.id) return;
     activePortalMinglRoomId = room.id;
+    showPortalPanel("portalMinglChatPage", "portalChats");
     const panel = byId("portalMinglChatPanel");
     panel?.classList.remove("hidden");
     const other = otherMinglUser(room);
@@ -1220,7 +1268,11 @@
     }
     updateChatGrammarControls();
     subscribePortalMinglMessages();
-    panel?.scrollIntoView({behavior:"smooth", block:"start"});
+    byId("portalMinglChatPage")?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function backToMinglDashboard() {
+    showPortalPanel("portalChats", "portalChats");
   }
 
   function renderPortalMinglMessages(rows) {
@@ -1689,6 +1741,7 @@
     bind("sendMessageBtn", sendPortalMessage);
     bind("portalSendMinglMessageBtn", sendPortalMinglMessage);
     bind("portalImproveMinglMessageBtn", improvePortalMinglDraft);
+    bind("backToMinglDashboardBtn", backToMinglDashboard);
     bind("saveShoutoutEditBtn", () => saveShoutoutEdit({resubmit:false}));
     bind("resubmitShoutoutEditBtn", () => saveShoutoutEdit({resubmit:true}));
     bind("cancelShoutoutEditBtn", cancelShoutoutEdit);

@@ -321,6 +321,42 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 }
 .ai-apply-filter-btn{margin:4px 0 8px;width:100%}
 #videoTrimNotice{margin:10px 0 0}
+.info-popout{position:relative;display:inline-block;margin:8px 0}
+.info-popout summary{
+  list-style:none;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  padding:8px 13px;
+  color:#fff;
+  font-weight:1000;
+  font-size:13px;
+}
+.info-popout summary::-webkit-details-marker{display:none}
+.info-popout-bubble{
+  position:absolute;
+  z-index:12;
+  left:0;
+  top:calc(100% + 8px);
+  min-width:220px;
+  max-width:min(330px,calc(100vw - 42px));
+  border:1px solid rgba(215,255,90,.34);
+  border-radius:16px;
+  background:#12183a;
+  color:#fff;
+  padding:12px;
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+  font-size:13px;
+  font-weight:800;
+  line-height:1.35;
+}
+.warning-popout summary{border-color:rgba(215,255,63,.46);background:rgba(215,255,63,.12);color:var(--lime)}
+.media-details-popout summary,.ai-media-help-popout summary{background:rgba(38,216,255,.12);border-color:rgba(38,216,255,.34)}
 
 /* v28.84 Mingl chat bubbles and grammar settings */
 .mingl-chat-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -346,6 +382,34 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 .grammar-compare div{border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.18);padding:12px}
 .grammar-compare p{white-space:pre-wrap;color:#fff}
 @media(max-width:640px){.grammar-compare{grid-template-columns:1fr}.mingl-messages{max-height:56vh}.mingl-message{max-width:90%}}
+
+/* v28.85 ShoutOut preview and Mingl dashboard polish */
+.mingl-control-grid{display:grid;gap:12px}
+.mingl-action-details{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(0,0,0,.16);
+  overflow:hidden;
+}
+.mingl-action-details summary{
+  list-style:none;
+  cursor:pointer;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px 15px;
+  font-weight:1000;
+  background:linear-gradient(90deg,rgba(244,58,191,.18),rgba(38,216,255,.12));
+}
+.mingl-action-details summary::-webkit-details-marker{display:none}
+.mingl-action-details summary:after{content:"+";font-size:20px}
+.mingl-action-details[open] summary:after{content:"-"}
+.mingl-action-details .policy-list,
+.mingl-action-details .report-block{padding:12px}
+#portalMinglChatPage.active{display:block}
+#backToMinglDashboardBtn{margin-bottom:12px}
 
 /* v28.83 device category responsive shell: mobile, tablet, desktop */
 html{overflow-x:hidden}
@@ -399,6 +463,9 @@ html.floqr-mobile-browser .privacy-datapoint-grid label,
 html.floqr-mobile-browser .profile-grid .consent-checkbox{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center}
 html.floqr-mobile-browser .mingl-compose{grid-template-columns:1fr}
 html.floqr-mobile-browser .user-dropdown{max-width:calc(100vw - 24px)}
+html.floqr-mobile-browser .info-popout{display:block}
+html.floqr-mobile-browser .info-popout summary{width:100%}
+html.floqr-mobile-browser .info-popout-bubble{position:static;min-width:0;max-width:100%;margin-top:8px;box-shadow:none}
 
 html.floqr-tablet-browser .app{width:min(100%,980px);padding:calc(env(safe-area-inset-top,0px) + 24px) 22px 32px}
 html.floqr-tablet-browser .topbar{display:grid;grid-template-columns:1fr;gap:16px}

@@ -193,7 +193,21 @@
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
     if (qs("main","")) {
-      render({ mainText: qs("main"), subText: qs("sub"), template: qs("template","neon"), mediaUrl: qs("media",""), mediaType: qs("mediaType",""), backgroundUrl: qs("backgroundUrl",""), backgroundColor: qs("backgroundColor",""), backgroundGradient: qs("backgroundGradient",""), locationName: loc.locationName });
+      render({
+        mainText: qs("main"),
+        subText: qs("sub"),
+        template: qs("template","neon"),
+        mediaUrl: qs("media",""),
+        mediaType: qs("mediaType",""),
+        selectedMediaVersion: qs("selectedMediaVersion",""),
+        trimStart: qs("trimStart",""),
+        trimEnd: qs("trimEnd",""),
+        trimmedDuration: qs("trimmedDuration",""),
+        backgroundUrl: qs("backgroundUrl",""),
+        backgroundColor: qs("backgroundColor",""),
+        backgroundGradient: qs("backgroundGradient",""),
+        locationName: loc.locationName
+      });
       return;
     }
     db.collection("liveContent").doc(locationId).onSnapshot(doc => {

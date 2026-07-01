@@ -95,6 +95,15 @@
     if (el) el.textContent = value || "";
   }
 
+  function infoPopout(label, text, extraClass = "") {
+    return `<details class="info-popout ${extraClass}"><summary>${esc(label)}</summary><div class="info-popout-bubble">${esc(text)}</div></details>`;
+  }
+
+  function setVideoNotice(value, label = "Video trim warning") {
+    const notice = byId("videoTrimNotice");
+    if (notice) notice.innerHTML = value ? infoPopout(label, value, "warning-popout") : "";
+  }
+
   function showFilterBubble(key) {
     const item = FILTERS[key] || FILTERS.original;
     const bubble = byId("aiMediaFilterBubble");
@@ -131,7 +140,7 @@
     panel.className = "ai-media-panel";
     panel.innerHTML = `
       <h2>Ai Image/Video Enhancement</h2>
-      <p class="sub small">Gemini image editing runs through Firebase Functions when deployed. Browser previews remain the safe fallback and keep the original upload intact unless Gemini returns an enhanced file.</p>
+      ${infoPopout("How AI enhancement works", "Gemini image editing runs through Firebase Functions when deployed. Browser previews remain the safe fallback and keep the original upload intact unless Gemini returns an enhanced file.", "ai-media-help-popout")}
       <button id="aiMediaEnhancementToggle" class="ai-media-enhancement-toggle" type="button" data-ai-enhancement-toggle aria-expanded="false">Ai Image/Video Enhancement</button>
       <div id="aiMediaCommandMenu" class="ai-media-command-menu hidden">
         ${Object.entries(FILTERS).map(([key, item]) => `<button type="button" data-ai-filter="${esc(key)}">${esc(item.label)}</button>`).join("")}
@@ -190,8 +199,7 @@
     trimProcessingMode = options.mode || trimProcessingMode || "metadata-pending";
     trimWarning = options.warning || "This video is longer than 7 seconds. FLOQR will use only the first 7 seconds.";
     enforcePreviewTrimPlayback();
-    const notice = byId("videoTrimNotice");
-    if (notice) notice.textContent = trimWarning;
+    setVideoNotice(trimWarning);
     setPanelStatus(trimWarning);
   }
 
@@ -305,8 +313,7 @@
             warning: `Warning: video is ${currentDuration.toFixed(1)} seconds. FLOQR will cut and use only the first 7 seconds.`
           });
         } else {
-          const notice = byId("videoTrimNotice");
-          if (notice) notice.textContent = `Video duration ${currentDuration.toFixed(1)}s. Ready.`;
+          setVideoNotice(`Video duration ${currentDuration.toFixed(1)} seconds. Ready.`, "Video details");
           setPanelStatus(`Video duration ${currentDuration.toFixed(1)}s. Ready.`);
         }
       };
@@ -651,8 +658,7 @@
     setHidden("aiEnhancementType", "none");
     setActiveCommand("original");
     byId("aiMediaFilterBubble")?.classList.add("hidden");
-    const notice = byId("videoTrimNotice");
-    if (notice) notice.textContent = "";
+    setVideoNotice("");
     setPanelStatus("Media removed.");
   }
 

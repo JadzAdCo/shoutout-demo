@@ -1,15 +1,23 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.84-shoutout-media-chat-grammar
+https://jadzadco.github.io/shoutout-demo/?v=28.85-shoutout-preview-confirmation-mingl-page
 ```
 
 Current release highlights:
 
+- Adds v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page fixes.
+- ShoutOut media helper text now uses compact popout bubbles: Media details, Video trim warning, and How AI enhancement works.
+- Live Preview now receives the selected local image/video preview URL before submission and renders it inside the actual ShoutOut display board. Submission still uploads and saves Firebase Storage URLs.
+- Long video preview metadata is passed into the display iframe so the preview and final ShoutOut representation both respect the first-7-seconds rule.
+- The ShoutOut confirmation screen is now a two-action splash page with `Edit ShoutOut` and `Back to main app`; it auto-returns to the main app/category screen after a short pause.
+- My Profile and Settings > Mingl now uses a minimalist dashboard. `Mingl Rules` and `Mingl Requests` are nested buttons, request details show recent 10-day activity plus unresolved requests, and mutual Mingl Chat opens on a separate page with a Back to Mingl button.
+- Updates Master Admin Diagnostics package checks and manual feature tests for the ShoutOut preview, popout helper text, confirmation splash, and separate Mingl Chat page.
+- Direct rollback note for this package is `ROLLBACK-V28-85.md`.
 - Adds v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings fixes.
 - Repairs media-capable ShoutOut templates so the editor shows one clear `Upload Image or Video` card with preview, `Remove file`, AI media enhancement controls, and a visible video trim warning.
 - Long ShoutOut videos are not blocked. Patrons are warned and FLOQR uses the first 7 seconds through client trim where available, or first-7-second metadata/display fallback when browser trimming is unavailable.
@@ -19,7 +27,7 @@ Current release highlights:
 - Adds `Language Settings` under My Profile and Settings with AI grammar/spelling assistance, correction mode, highlight options, preferred language, and tone preference.
 - Adds `ai-grammar-service.js` plus the Firebase callable scaffold `aiSuggestGrammarCorrection`. Grammar correction processes draft text only when the user taps `Fix Grammar`; private drafts are not indexed or stored unless the user sends the message.
 - Updates Master Admin Diagnostics package checks and manual feature tests for the ShoutOut upload card, nested AI media filters, Mingl chat bubbles, Language Settings, and grammar correction workflow.
-- Direct rollback note for this package is `ROLLBACK-V28-84.md`.
+- The v28.84 rollback note is superseded by the current direct rollback note.
 - Adds v28.83 Mobile Mingl Datapoints and FLOQR Inbox fixes.
 - Matched public Mingl cards now use nested datapoint categories, matching the public profile behavior. The old flat paragraph of datapoints was removed from matched cards.
 - Mobile/tablet datapoint panels now open inside the card instead of floating off-screen on iPhone.
