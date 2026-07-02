@@ -35,9 +35,12 @@
   let minglConnections = [];
   let activeMinglRoomId = "";
   let minglMessagesUnsubscribe = null;
+  let minglAttachmentFile = null;
   let templateVariants = {mine:[], community:[]};
   let locationContextPromise = null;
   let confirmationReturnTimer = null;
+  let personalizedSuggestionTimer = null;
+  let pastShoutoutMemoryPromise = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -920,8 +923,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page",
-      minglLink:"./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page",
+      link:"./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations",
+      minglLink:"./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations",
       read:false,
       createdAt:now
     };
@@ -954,6 +957,19 @@
     updateMinglGrammarControls();
     showPage("minglLandingPage");
     await loadMingl();
+  }
+
+  function focusMinglPeopleSearch() {
+    const search = byId("minglSearch");
+    search?.scrollIntoView({behavior:"smooth", block:"center"});
+    setTimeout(() => search?.focus(), 180);
+  }
+
+  function openMinglChatShortcut() {
+    const panel = byId("minglChatPanel");
+    const list = byId("minglChatList");
+    if (panel && !panel.classList.contains("hidden")) panel.scrollIntoView({behavior:"smooth", block:"start"});
+    else list?.scrollIntoView({behavior:"smooth", block:"start"});
   }
 
   async function loadMingl() {
@@ -1212,7 +1228,7 @@
     bubble.className = `mingl-message ${message.mine ? "mine" : ""} ${message.system ? "system" : ""} ${message.pending ? "pending" : ""}`.trim();
     if (message.id) bubble.dataset.messageId = message.id;
     const label = message.system ? "System Message" : (message.mine ? "" : (message.senderName || "Member"));
-    bubble.innerHTML = `${label ? `<strong>${esc(label)}</strong>` : ""}<p>${esc(message.body || "")}</p><small>${esc(message.time || new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}))}${message.pending ? " - sending" : ""}</small>`;
+    bubble.innerHTML = `${label ? `<strong>${esc(label)}</strong>` : ""}<p>${esc(message.body || "")}</p>${minglMessageMediaHtml(message)}<small>${esc(message.time || new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}))}${message.pending ? " - sending" : ""}</small>`;
     wrap.appendChild(bubble);
     wrap.scrollTop = wrap.scrollHeight;
     return bubble;
@@ -1274,9 +1290,184 @@
     loadMinglMessages();
   }
 
+  function minglMessageAnimationClass(type = "") {
+    const key = String(type || "").toLowerCase();
+    if (key === "bounce") return "animate-bounce";
+    if (key === "explode") return "animate-explode";
+    if (key === "graffiti") return "animate-graffiti";
+    return "";
+  }
+
+  function minglMessageMediaHtml(msg = {}) {
+    if (!msg.mediaUrl) return "";
+    const fileName = esc(msg.mediaFileName || "Shared picture");
+    return `<figure class="mingl-message-media"><img src="${esc(msg.mediaUrl)}" alt="${fileName}" loading="lazy"><figcaption>${fileName}</figcaption></figure>`;
+  }
+
+  function safeStorageFileName(name = "image") {
+    return String(name || "image").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-90) || "image";
+  }
+
+  function clearMinglAttachment() {
+    minglAttachmentFile = null;
+    const input = byId("minglImageInput");
+    const preview = byId("minglAttachmentPreview");
+    if (input) input.value = "";
+    if (preview) {
+      preview.classList.add("hidden");
+      preview.innerHTML = "";
+    }
+  }
+
+  function renderMinglAttachmentPreview() {
+    const input = byId("minglImageInput");
+    const preview = byId("minglAttachmentPreview");
+    minglAttachmentFile = input?.files?.[0] || null;
+    if (!preview) return;
+    if (!minglAttachmentFile) {
+      preview.classList.add("hidden");
+      preview.innerHTML = "";
+      return;
+    }
+    if (!/^image\//.test(minglAttachmentFile.type)) {
+      setStatus("Mingl chat picture sharing accepts image files only.");
+      clearMinglAttachment();
+      return;
+    }
+    const url = URL.createObjectURL(minglAttachmentFile);
+    preview.classList.remove("hidden");
+    preview.innerHTML = `<img src="${esc(url)}" alt=""><div><strong>${esc(minglAttachmentFile.name)}</strong><button type="button" data-clear-mingl-attachment>Remove Picture</button></div>`;
+    preview.querySelector("[data-clear-mingl-attachment]")?.addEventListener("click", clearMinglAttachment);
+  }
+
+  async function uploadMinglAttachment(roomId, file) {
+    if (!file) return {};
+    if (!storage) throw new Error("Firebase Storage is not initialized for Mingl pictures.");
+    if (!/^image\//.test(file.type)) throw new Error("Mingl chat picture sharing accepts image files only.");
+    if (file.size > 8 * 1024 * 1024) throw new Error("Mingl chat pictures must be 8MB or smaller.");
+    const path = `mingl-chat/${currentUser.uid}/${roomId}/${Date.now()}-${safeStorageFileName(file.name)}`;
+    const snap = await storage.ref().child(path).put(file, {contentType:file.type, customMetadata:{uploadedBy:currentUser.uid, roomId}});
+    return {
+      mediaUrl: await snap.ref.getDownloadURL(),
+      mediaType: "image",
+      mediaFileName: file.name,
+      mediaStoragePath: path
+    };
+  }
+
+  async function updateOwnMinglMessage(messageId, patch) {
+    if (!currentUser || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
+    await db.collection("chatMessages").doc(messageId).set({
+      ...patch,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
+  async function autoCorrectMinglMessage(messageId) {
+    if (!currentUser || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
+    const original = snap.data().body || "";
+    if (!original.trim()) return;
+    let corrected = original;
+    if (window.FLOQRGrammar?.suggestGrammarCorrection) {
+      const result = await window.FLOQRGrammar.suggestGrammarCorrection(original, {
+        uid:currentUser.uid,
+        product:"mingl",
+        inputType:"sent-message",
+        correctionMode:"autoFixMinor"
+      });
+      corrected = result.correctedText || original;
+    } else {
+      corrected = original.replace(/\s+/g, " ").trim();
+    }
+    if (corrected !== original) {
+      await updateOwnMinglMessage(messageId, {
+        body:corrected,
+        edited:true,
+        aiGrammarApplied:true,
+        editedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  }
+
+  async function animateMinglMessage(messageId, animationType) {
+    await updateOwnMinglMessage(messageId, {
+      animationType,
+      animatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function unsendMinglMessage(messageId) {
+    await updateOwnMinglMessage(messageId, {
+      body:"Message unsent.",
+      unsent:true,
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function markMinglDeleteAfterRead(messageId) {
+    await updateOwnMinglMessage(messageId, {
+      deleteAfterRead:true,
+      deleteAfterReadSetAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  function expireReadOnceMinglMessages(rows = []) {
+    if (!currentUser) return;
+    rows.filter(msg => msg.id && msg.deleteAfterRead === true && msg.deletedAfterRead !== true && msg.senderUid !== currentUser.uid && (msg.participants || []).includes(currentUser.uid)).forEach(msg => {
+      db.collection("chatMessages").doc(msg.id).set({
+        body:"Message deleted after read.",
+        deletedAfterRead:true,
+        expiredByUid:currentUser.uid,
+        expiredAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true}).catch(error => console.warn("Delete-after-read expiry skipped:", error.message));
+    });
+  }
+
+  function showMinglMessageActions(messageId, anchor) {
+    if (!messageId) return;
+    document.querySelector(".mingl-message-action-popout")?.remove();
+    const popout = document.createElement("div");
+    popout.className = "mingl-message-action-popout";
+    popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
+      <button type="button" data-action="bounce">Bounce</button>
+      <button type="button" data-action="explode">Explode</button>
+      <button type="button" data-action="graffiti">Throw Graffiti</button>
+      <button type="button" data-action="edit">Edit</button>
+      <button type="button" data-action="autocorrect">Auto Correct</button>
+      <button type="button" data-action="deleteAfterRead">Delete after read</button>
+      <button type="button" data-action="unsend">Unsend</button>
+    </div>`;
+    document.body.appendChild(popout);
+    const rect = anchor?.getBoundingClientRect?.() || {left:24, top:160, bottom:180};
+    popout.style.left = `${Math.min(Math.max(12, rect.left), window.innerWidth - 280)}px`;
+    popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 260)}px`;
+    popout.addEventListener("click", async event => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      popout.remove();
+      try {
+        if (action === "edit") await editMinglMessage(messageId);
+        else if (action === "autocorrect") await autoCorrectMinglMessage(messageId);
+        else if (action === "unsend") await unsendMinglMessage(messageId);
+        else if (action === "deleteAfterRead") await markMinglDeleteAfterRead(messageId);
+        else await animateMinglMessage(messageId, action);
+      } catch (error) {
+        setStatus(`Mingl message action failed: ${error.message || error}`);
+      }
+    });
+  }
+
   function renderMinglMessages(rows = []) {
     const wrap = byId("minglMessages");
     if (!wrap || !activeMinglRoomId) return;
+    expireReadOnceMinglMessages(rows);
     rows.sort((a,b) => {
       const at = a.createdAt?.seconds || 0;
       const bt = b.createdAt?.seconds || 0;
@@ -1286,15 +1477,23 @@
       const mine = msg.senderUid === currentUser.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
       const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
+      const actionHint = mine && !system ? " Tap for actions." : "";
+      const deletedNote = msg.deleteAfterRead ? " - delete after read" : "";
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${minglMessageAnimationClass(msg.animationType)}" data-message-id="${esc(msg.id || "")}" ${mine && !system ? 'tabindex="0" data-own-message="1"' : ""}>
         ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
-        <small>${esc(msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "")}${msg.edited ? " - edited" : ""}</small>
-        ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-mingl-message="${esc(msg.id || "")}">Edit</button></div>` : ""}
+        ${minglMessageMediaHtml(msg)}
+        <small>${esc(msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "")}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${deletedNote}${actionHint}</small>
       </div>`;
     }).join("") : "<p class='mingl-empty-state'>Start the conversation.</p>";
-    wrap.querySelectorAll("[data-edit-mingl-message]").forEach(button => {
-      button.addEventListener("click", () => editMinglMessage(button.dataset.editMinglMessage));
+    wrap.querySelectorAll("[data-own-message]").forEach(node => {
+      node.addEventListener("click", () => showMinglMessageActions(node.dataset.messageId, node));
+      node.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          showMinglMessageActions(node.dataset.messageId, node);
+        }
+      });
     });
     wrap.scrollTop = wrap.scrollHeight;
   }
@@ -1319,7 +1518,8 @@
   async function sendMinglMessage() {
     const input = byId("minglMessageInput");
     const body = input?.value.trim();
-    if (!currentUser || !activeMinglRoomId || !body) return;
+    const attachmentFile = minglAttachmentFile || byId("minglImageInput")?.files?.[0] || null;
+    if (!currentUser || !activeMinglRoomId || (!body && !attachmentFile)) return;
     const roomSnap = await db.collection("chatRooms").doc(activeMinglRoomId).get();
     if (!roomSnap.exists || !(roomSnap.data().participants || []).includes(currentUser.uid)) {
       setStatus("Mingl chat is available only after both patrons Mingl back.");
@@ -1328,10 +1528,14 @@
     const room = roomSnap.data();
     const unreadCounts = {...(room.unreadCounts || {})};
     (room.participants || []).forEach(uid => { if (uid !== currentUser.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
-    if (input) input.value = "";
-    highlightMinglDraft();
-    const pending = appendMinglBubble({body, mine:true, pending:true});
+    let mediaPayload = {};
+    let pending = null;
     try {
+      if (attachmentFile) mediaPayload = await uploadMinglAttachment(activeMinglRoomId, attachmentFile);
+      if (input) input.value = "";
+      clearMinglAttachment();
+      highlightMinglDraft();
+      pending = appendMinglBubble({body:body || "Shared a picture.", mine:true, pending:true, mediaUrl:mediaPayload.mediaUrl, mediaFileName:mediaPayload.mediaFileName});
       await db.collection("chatMessages").add({
         roomId: activeMinglRoomId,
         roomType: "mingl",
@@ -1339,12 +1543,13 @@
         participants: room.participants || [],
         senderUid: currentUser.uid,
         senderName: cachedUserProfile?.displayName || currentUser.displayName || currentUser.email || "Member",
-        body,
+        body: body || "Shared a picture.",
+        ...mediaPayload,
         edited:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection("chatRooms").doc(activeMinglRoomId).set({
-        lastMessage: body,
+        lastMessage: body || "Shared a picture.",
         unreadCounts,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
@@ -1352,6 +1557,7 @@
     } catch(e) {
       pending?.remove();
       if (input) input.value = body;
+      minglAttachmentFile = attachmentFile;
       setStatus(`Could not send Mingl message: ${e.message || e}`);
     }
   }
@@ -1630,7 +1836,7 @@
     const mediaField = byId("shoutoutMediaUrl");
     const mediaUrl = mediaField?.value.trim() || mediaField?.dataset.previewUrl || byId("mediaUrl")?.value.trim() || "";
     const mediaType = byId("shoutoutMediaType")?.value.trim() || "";
-    if(frame) frame.src=displayUrl({
+    const previewPayload = {
       mainText:byId("mainText")?.value.trim()||"SHOUTOUT!",
       subText:byId("subText")?.value.trim()||"",
       mediaUrl,
@@ -1643,7 +1849,14 @@
       backgroundUrl:selectedTemplateVariant?.backgroundUrl || "",
       backgroundColor:selectedTemplateVariant?.backgroundColor || "",
       backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""
-    }, locationId());
+    };
+    if(frame) {
+      frame.onload = () => {
+        try { frame.contentWindow?.renderShoutOutDisplay?.(previewPayload); } catch (error) {}
+      };
+      frame.src=displayUrl(previewPayload, locationId());
+      try { frame.contentWindow?.renderShoutOutDisplay?.(previewPayload); } catch (error) {}
+    }
   }
   window.updatePreview = updatePreview;
 
@@ -1651,6 +1864,20 @@
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
     confirmationReturnTimer = null;
     showPage("categoryPage");
+  }
+
+  function goToMinglFromConfirmation() {
+    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    confirmationReturnTimer = null;
+    setText("confirmationRedirectStatus", "Opening Mingl...");
+    showMinglLanding();
+  }
+
+  function goToBataFromConfirmation() {
+    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    confirmationReturnTimer = null;
+    showPage("categoryPage");
+    setStatus("Bata marketplace entry point is ready; live listings remain controlled by Bata rollout settings.");
   }
 
   function editSubmittedShoutout() {
@@ -1664,10 +1891,10 @@
     setText("confirmRef", payload.referenceNumber);
     setText("confirmClub", location.locationName);
     setText("confirmTemplate", template.name);
-    setText("confirmationRedirectStatus", "ShoutOut submitted. Returning to the main app in 8 seconds.");
+    setText("confirmationRedirectStatus", "ShoutOut submitted. Choose Edit ShoutOut, Mingl, or Bata.");
     showPage("confirmationPage");
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = setTimeout(returnToMainFromConfirmation, 8000);
+    confirmationReturnTimer = null;
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -1706,7 +1933,136 @@
     return uploadShoutoutPhoto(referenceNumber);
   }
 
+  function splitSuggestionValues(value) {
+    if (Array.isArray(value)) return value.flatMap(splitSuggestionValues);
+    if (value && typeof value === "object") return Object.values(value).flatMap(splitSuggestionValues);
+    return String(value || "").split(/[,;|/]+/).map(x => x.trim()).filter(Boolean);
+  }
+
+  function profileSuggestionSignals() {
+    const profile = cachedUserProfile || {};
+    return {
+      displayName:profile.displayName || currentUser?.displayName || "",
+      city:profile.city || profile.locationCity || "",
+      country:profile.country || "",
+      interests:unique(splitSuggestionValues([profile.interests, profile.hobbies, profile.musicGenres, profile.favoriteMusic, profile.eventInterests, profile.favoriteBeverages, profile.travelInterests, profile.favoriteVenueTypes])).slice(0, 12)
+    };
+  }
+
+  async function getPastShoutOutMemory() {
+    if (!currentUser) return [];
+    if (!pastShoutoutMemoryPromise) {
+      pastShoutoutMemoryPromise = (async () => {
+        try {
+          const rows = await getCollectionSafe("shoutouts", item => item.submittedByUid === currentUser.uid || item.submittedBy === safeUser(), 60);
+          return rows.slice(0, 12).map(item => ({
+            mainText:item.mainText || "",
+            subText:item.subText || "",
+            tone:item.tone || item.aiTone || "",
+            template:item.templateName || item.template || "",
+            location:item.locationName || item.clubName || ""
+          }));
+        } catch (error) {
+          return [];
+        }
+      })();
+    }
+    return pastShoutoutMemoryPromise;
+  }
+
+  function buildFallbackPersonalizedSuggestions(context = {}) {
+    const tone = String(context.tone || "party").toLowerCase();
+    const main = String(context.mainText || "").trim();
+    const sub = String(context.subText || "").trim();
+    const profile = context.profileSignals || {};
+    const name = (profile.displayName || "").split(/\s+/)[0] || "";
+    const venue = getLocation()?.locationName || "tonight";
+    const interests = (profile.interests || []).slice(0, 3).join(", ");
+    const past = (context.pastShoutouts || []).find(item => item.mainText || item.subText) || {};
+    const occasion = /birthday|bday/i.test(`${main} ${sub} ${tone}`) ? "birthday" : /romantic|love/i.test(tone) ? "romantic" : /graduation|grad/i.test(tone) ? "graduation" : /vip|classy/i.test(tone) ? "vip" : "party";
+    const seed = main || past.mainText || (occasion === "birthday" ? `HAPPY BIRTHDAY${name ? ` ${name.toUpperCase()}` : ""}!` : occasion === "graduation" ? "CONGRATS GRAD!" : occasion === "romantic" ? "LOVE IS IN THE ROOM" : "BIG ShoutOut TONIGHT!");
+    const linesByOccasion = {
+      birthday:[seed, `BIRTHDAY ENERGY FOR ${name ? name.toUpperCase() : "THE STAR"}!`, "MAKE THIS BIRTHDAY UNFORGETTABLE!", "VIP BIRTHDAY MOMENT!", "TONIGHT BELONGS TO THE BIRTHDAY STAR!"],
+      romantic:[seed, "LOVE, LIGHTS, AND A PERFECT NIGHT", "A ROMANTIC ShoutOut FOR TWO", "THIS MOMENT IS ALL LOVE", "SOFT LIGHTS. BIG LOVE."],
+      graduation:[seed, "THE FUTURE STARTS TONIGHT!", "CONGRATS ON THE BIG WIN!", "GRADUATION ENERGY ALL NIGHT", "NEXT LEVEL STARTS NOW!"],
+      vip:[seed, "VIP MOMENT. VIP ENERGY.", "THE TABLE EVERYONE SEES TONIGHT", "LUXURY ENERGY ALL NIGHT", "MAKE ROOM FOR VIP"],
+      party:[seed, "BIG ShoutOut ENERGY ALL NIGHT", "TONIGHT BELONGS TO THIS CREW", "LOUD NIGHT. BRIGHT MOMENT.", "FLOQR PUT THIS ON THE BOARD"]
+    };
+    const subBase = sub || (interests ? `${interests} at ${venue}` : `Live at ${venue}`);
+    return (linesByOccasion[occasion] || linesByOccasion.party).map((line, index) => ({
+      mainText:String(line).replace(/\s+/g, " ").slice(0, Number(byId("mainText")?.maxLength || 36)),
+      subText:index === 0 ? subBase : index === 1 ? "LED-ready and public-display safe." : "Celebrate loud. Keep it classy.",
+      providerMode:window.FLOQR_AI_ENABLED ? "gemini-contextual-or-fallback" : "local-personalized-fallback"
+    }));
+  }
+
+  async function buildPersonalizedShoutOutSuggestions(toneOverride = "") {
+    const context = {
+      mainText:byId("mainText")?.value || "",
+      subText:byId("subText")?.value || "",
+      templateId:selectedTemplate,
+      clubLocationId:locationId(),
+      eventType:getLocation()?.type || "",
+      tone:toneOverride || byId("shoutoutTone")?.value || "party",
+      mainLimit:Number(byId("mainText")?.maxLength || 36),
+      subLimit:Number(byId("subText")?.maxLength || 60),
+      profileSignals:profileSuggestionSignals(),
+      pastShoutouts:await getPastShoutOutMemory()
+    };
+    const fallback = buildFallbackPersonalizedSuggestions(context);
+    try {
+      const ai = window.floqrSuggestShoutOutAsync ? await window.floqrSuggestShoutOutAsync(context) : null;
+      const first = ai ? [{...fallback[0], ...ai}] : [];
+      const seen = new Set();
+      return [...first, ...fallback].filter(item => {
+        const key = `${item.mainText || item.main}|${item.subText || item.sub}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).slice(0, 5);
+    } catch (error) {
+      return fallback.slice(0, 5);
+    }
+  }
+
+  function applySuggestionItem(item = {}) {
+    const mainInput = byId("mainText");
+    if (mainInput) mainInput.value = String(item.mainText || item.main || "").slice(0, Number(mainInput.maxLength || 36));
+    const subInput = byId("subText");
+    if (subInput && item.subText && !byId("includeAttribution")?.checked) subInput.value = String(item.subText || "").slice(0, Number(subInput.maxLength || 60));
+    syncAttribution();
+    const box = byId("shoutoutSuggestionBox");
+    if (box) {
+      box.classList.remove("hidden");
+      box.innerHTML = `<strong>Improve My ShoutOut</strong><p>${esc(item.mainText || item.main || "")} - ${esc(item.subText || item.sub || "")}</p><small>${esc(item.providerMode || item.provider || "contextual")}</small>`;
+    }
+    updatePreview();
+  }
+
+  async function refreshPersonalizedShoutOutRecommendations(options = {}) {
+    const list = byId("aiSuggestionList");
+    if (!list) return;
+    list.innerHTML = "<p class='sub small'>Building personalized ShoutOut ideas...</p>";
+    const suggestions = await buildPersonalizedShoutOutSuggestions(options.toneOverride || "");
+    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-ai-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")}</small></button>`).join("") : "<p class='sub small'>Type a message or choose a tone to generate suggestions.</p>";
+    list.querySelectorAll("[data-ai-suggestion-index]").forEach(button => {
+      button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.aiSuggestionIndex)]));
+    });
+    if (options.applyFirst && suggestions[0]) applySuggestionItem(suggestions[0]);
+  }
+
+  function schedulePersonalizedShoutOutRecommendations() {
+    if (personalizedSuggestionTimer) clearTimeout(personalizedSuggestionTimer);
+    personalizedSuggestionTimer = setTimeout(() => refreshPersonalizedShoutOutRecommendations(), 500);
+  }
+  window.refreshPersonalizedShoutOutRecommendations = refreshPersonalizedShoutOutRecommendations;
+
   async function applyAiSuggestion(toneOverride = "") {
+    await refreshPersonalizedShoutOutRecommendations({
+      applyFirst:true,
+      toneOverride:typeof toneOverride === "string" ? toneOverride : ""
+    });
+    return;
     const requestedTone = typeof toneOverride === "string" ? toneOverride : "";
     const fallbackSuggestion = () => window.floqrSuggestShoutOut ? window.floqrSuggestShoutOut({
       mainText:byId("mainText")?.value || "",
@@ -1822,7 +2178,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.85-shoutout-preview-confirmation-mingl-page`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.86-mingl-actions-ai-recommendations`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -1893,7 +2249,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.85-shoutout-preview-confirmation-mingl-page";
+      portalLink.href = "./patron-portal.html?v=28.86-mingl-actions-ai-recommendations";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -1906,14 +2262,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page";
+      chats.href = "./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2009,16 +2365,19 @@
     bind("joinGuestListBtn", () => openCategoryAfterAd("club-action:join-guest-list"));
     bind("payVipEntryBtn", () => openCategoryAfterAd("club-action:pay-vip-entry"));
     bind("payEventEntryBtn", () => openCategoryAfterAd("club-action:pay-event-entry"));
-    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("returnToMainAfterConfirmBtn", returnToMainFromConfirmation);
+    bind("payStdEntryBtn", () => openCategoryAfterAd("club-action:pay-std-entry")); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBataBtn", goToBataFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
     bind("skipAdBtn", skipAdSplash);
     bind("saveProfileBtn", saveProfile);
     byId("templateSearch")?.addEventListener("input", renderTemplates);
-    byId("includeAttribution")?.addEventListener("change", syncAttribution);
-    byId("attributionChoice")?.addEventListener("change", syncAttribution);
+    byId("minglImageInput")?.addEventListener("change", renderMinglAttachmentPreview);
+    byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("shoutoutTone")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
+    ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
 
@@ -2078,10 +2437,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.85-shoutout-preview-confirmation-mingl-page">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.86-mingl-actions-ai-recommendations">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.85-shoutout-preview-confirmation-mingl-page">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.85-shoutout-preview-confirmation-mingl-page">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.86-mingl-actions-ai-recommendations">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2124,7 +2483,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.85-shoutout-preview-confirmation-mingl-page`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.86-mingl-actions-ai-recommendations`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
@@ -2163,10 +2522,8 @@ function ensureTemplates(){
 }
 function ensureSuggestions(){
  const host=editorHost(); if(!host||byId("aiSuggestionsBox"))return;
- const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><p class="sub small">Gemini runs through Firebase Functions when enabled; curated suggestions remain available as fallback.</p><div id="aiSuggestionList"></div>`; host.appendChild(box);
- const samples=["Happy Birthday! VIP energy all night.","Big ShoutOut to the table making the night unforgettable.","Bottle service vibes. Celebrate loud.","Tonight belongs to the birthday star.","Luxury entrance. Big celebration. Bigger memories."];
- byId("aiSuggestionList").innerHTML=samples.map(s=>`<button type="button" class="ghost ai-suggestion">${esc(s)}</button>`).join("");
- byId("aiSuggestionList").onclick=e=>{const b=e.target.closest(".ai-suggestion"); if(!b)return; const inp=byId("mainText")||byId("shoutoutText")||document.querySelector("textarea"); if(inp)inp.value=b.textContent;};
+ const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><details class="info-popout ai-recommendation-popout"><summary>How recommendations work</summary><div class="info-popout-bubble">FLOQR uses your own profile, selected tone, current ShoutOut draft, selected template, venue context, and your past ShoutOuts to build LED-safe suggestions. Gemini runs through Firebase Functions when available; otherwise FLOQR uses a local contextual fallback.</div></details><div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose a tone to generate personalized ideas.</p></div>`; host.appendChild(box);
+ if(typeof window.refreshPersonalizedShoutOutRecommendations==="function") window.refreshPersonalizedShoutOutRecommendations();
 }
 window.jadzUploadSelectedShoutoutMedia=uploadSelectedMedia;
 document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},1000);setInterval(()=>{ensureTemplates();ensureMediaEditor();ensureSuggestions();},2500);});
@@ -2317,6 +2674,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     document.addEventListener("click",function(e){
       const btn=e.target.closest(".ai-suggestion,[data-ai-suggestion]");
       if(!btn)return;
+      if(btn.classList.contains("personalized-ai-suggestion"))return;
       const input=findTextInput();
       if(input){
         input.value=btn.textContent.trim();
@@ -2348,7 +2706,29 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     const mediaUrlInput=byId("shoutoutMediaUrl"), mediaTypeInput=byId("shoutoutMediaType");
     if(mediaUrlInput)mediaUrlInput.value=mediaUrl;
     if(mediaTypeInput)mediaTypeInput.value=mediaType;
-    return {mediaUrl,mediaType,mediaFileName:file.name,mediaStoragePath:storagePath,mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    const duration = byId("aiOriginalDuration")?.value || "";
+    const trimmedDuration = byId("aiTrimmedDuration")?.value || "";
+    const trimStart = byId("aiTrimStart")?.value || "";
+    const trimEnd = byId("aiTrimEnd")?.value || "";
+    const selectedMediaVersion = byId("aiSelectedMediaVersion")?.value || (mediaType==="video" && Number(duration)>7 ? "trimmed" : "original");
+    return {
+      mediaUrl,
+      mediaType,
+      mediaFileName:file.name,
+      mediaStoragePath:storagePath,
+      originalMediaUrl:mediaUrl,
+      selectedMediaVersion,
+      aiEnhancementApplied:selectedMediaVersion==="trimmed",
+      aiEnhancementType:selectedMediaVersion==="trimmed" ? "trim" : "none",
+      aiEnhancementPrompt:selectedMediaVersion==="trimmed" ? "Trim Video to 7 Seconds" : "",
+      originalDuration:duration ? Number(duration) : null,
+      trimmedDuration:trimmedDuration ? Number(trimmedDuration) : null,
+      trimStart:trimStart ? Number(trimStart) : 0,
+      trimEnd:trimEnd ? Number(trimEnd) : null,
+      trimProcessingMode:selectedMediaVersion==="trimmed" ? "metadata-first-seven-seconds" : "",
+      trimWarning:selectedMediaVersion==="trimmed" ? "FLOQR will cut and use only the first 7 seconds." : "",
+      mediaUploadedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
   }
   window.jadzUploadSelectedShoutoutMedia=uploadSingleSelectedMedia;
   window.jadzEnsureSingleMediaUploader=ensureSingleMediaUploader;

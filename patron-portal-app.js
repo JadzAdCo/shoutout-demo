@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.85-shoutout-preview-confirmation-mingl-page */
+/* patron-portal-app.js v28.86-mingl-actions-ai-recommendations */
 (function(){
   "use strict";
 
@@ -82,6 +82,7 @@
   let activePortalMinglRoomId = "";
   let portalMinglUnsubscribe = null;
   let currentMinglConnections = [];
+  let portalMinglAttachmentFile = null;
 
   const PUBLIC_MINGL_DATAPOINTS = [
     {key:"location", label:"City, state/region, and country"},
@@ -928,7 +929,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1045,7 +1046,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.85-shoutout-preview-confirmation-mingl-page",
+        link:"./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations",
         read:false,
         createdAt:fieldValue()
       });
@@ -1234,6 +1235,182 @@
     });
   }
 
+  function safeStorageFileName(name = "image") {
+    return String(name || "image").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-90) || "image";
+  }
+
+  function portalMinglAnimationClass(type = "") {
+    const key = String(type || "").toLowerCase();
+    if (key === "bounce") return "animate-bounce";
+    if (key === "explode") return "animate-explode";
+    if (key === "graffiti") return "animate-graffiti";
+    return "";
+  }
+
+  function portalMinglMediaHtml(msg = {}) {
+    if (!msg.mediaUrl) return "";
+    const label = esc(msg.mediaFileName || "Shared picture");
+    return `<figure class="mingl-message-media"><img src="${esc(msg.mediaUrl)}" alt="${label}" loading="lazy"><figcaption>${label}</figcaption></figure>`;
+  }
+
+  function clearPortalMinglAttachment() {
+    portalMinglAttachmentFile = null;
+    const input = byId("portalMinglImageInput");
+    const preview = byId("portalMinglAttachmentPreview");
+    if (input) input.value = "";
+    if (preview) {
+      preview.classList.add("hidden");
+      preview.innerHTML = "";
+    }
+  }
+
+  function renderPortalMinglAttachmentPreview() {
+    const input = byId("portalMinglImageInput");
+    const preview = byId("portalMinglAttachmentPreview");
+    portalMinglAttachmentFile = input?.files?.[0] || null;
+    if (!preview) return;
+    if (!portalMinglAttachmentFile) {
+      preview.classList.add("hidden");
+      preview.innerHTML = "";
+      return;
+    }
+    if (!/^image\//.test(portalMinglAttachmentFile.type)) {
+      setText("portalStatus", "Mingl chat picture sharing accepts image files only.");
+      clearPortalMinglAttachment();
+      return;
+    }
+    const url = URL.createObjectURL(portalMinglAttachmentFile);
+    preview.classList.remove("hidden");
+    preview.innerHTML = `<img src="${esc(url)}" alt=""><div><strong>${esc(portalMinglAttachmentFile.name)}</strong><button type="button" data-clear-portal-mingl-attachment>Remove Picture</button></div>`;
+    preview.querySelector("[data-clear-portal-mingl-attachment]")?.addEventListener("click", clearPortalMinglAttachment);
+  }
+
+  async function uploadPortalMinglImage(roomId, file) {
+    if (!file) return {};
+    if (!/^image\//.test(file.type)) throw new Error("Mingl chat picture sharing accepts image files only.");
+    if (file.size > 8 * 1024 * 1024) throw new Error("Mingl chat pictures must be 8MB or smaller.");
+    const user = auth.currentUser;
+    if (!user) throw new Error("Sign in before sharing a picture.");
+    const path = `mingl-chat/${user.uid}/${roomId}/${Date.now()}-${safeStorageFileName(file.name)}`;
+    const snap = await storage.ref().child(path).put(file, {contentType:file.type, customMetadata:{uploadedBy:user.uid, roomId}});
+    return {
+      mediaUrl:await snap.ref.getDownloadURL(),
+      mediaType:"image",
+      mediaFileName:file.name,
+      mediaStoragePath:path
+    };
+  }
+
+  async function updateOwnPortalMinglMessage(messageId, patch) {
+    const user = auth.currentUser;
+    if (!user || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== user.uid) return;
+    await db.collection("chatMessages").doc(messageId).set({
+      ...patch,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
+  async function autoCorrectPortalMinglMessage(messageId) {
+    const user = auth.currentUser;
+    if (!user || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== user.uid) return;
+    const original = snap.data().body || "";
+    if (!original.trim()) return;
+    const result = window.FLOQRGrammar?.suggestGrammarCorrection
+      ? await window.FLOQRGrammar.suggestGrammarCorrection(original, {uid:user.uid, product:"mingl", inputType:"sent-message", correctionMode:"autoFixMinor"})
+      : {correctedText:original.replace(/\s+/g, " ").trim()};
+    const corrected = result.correctedText || original;
+    if (corrected !== original) {
+      await updateOwnPortalMinglMessage(messageId, {
+        body:corrected,
+        edited:true,
+        aiGrammarApplied:true,
+        editedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  }
+
+  async function showPortalMinglMessageActions(messageId, anchor) {
+    if (!messageId) return;
+    document.querySelector(".mingl-message-action-popout")?.remove();
+    const popout = document.createElement("div");
+    popout.className = "mingl-message-action-popout";
+    popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
+      <button type="button" data-action="bounce">Bounce</button>
+      <button type="button" data-action="explode">Explode</button>
+      <button type="button" data-action="graffiti">Throw Graffiti</button>
+      <button type="button" data-action="edit">Edit</button>
+      <button type="button" data-action="autocorrect">Auto Correct</button>
+      <button type="button" data-action="deleteAfterRead">Delete after read</button>
+      <button type="button" data-action="unsend">Unsend</button>
+    </div>`;
+    document.body.appendChild(popout);
+    const rect = anchor?.getBoundingClientRect?.() || {left:24, bottom:160};
+    popout.style.left = `${Math.min(Math.max(12, rect.left), window.innerWidth - 280)}px`;
+    popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 260)}px`;
+    popout.addEventListener("click", async event => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      popout.remove();
+      try {
+        if (action === "edit") await editPortalMinglMessage(messageId);
+        else if (action === "autocorrect") await autoCorrectPortalMinglMessage(messageId);
+        else if (action === "unsend") await updateOwnPortalMinglMessage(messageId, {body:"Message unsent.", unsent:true, edited:true, editedAt:firebase.firestore.FieldValue.serverTimestamp()});
+        else if (action === "deleteAfterRead") await updateOwnPortalMinglMessage(messageId, {deleteAfterRead:true, deleteAfterReadSetAt:firebase.firestore.FieldValue.serverTimestamp()});
+        else await updateOwnPortalMinglMessage(messageId, {animationType:action, animatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      } catch (error) {
+        setText("portalStatus", error?.message || "Mingl message action failed.");
+      }
+    });
+  }
+
+  function expireReadOncePortalMinglMessages(rows = []) {
+    const user = auth.currentUser;
+    if (!user) return;
+    rows.filter(msg => msg.id && msg.deleteAfterRead === true && msg.deletedAfterRead !== true && msg.senderUid !== user.uid && (msg.participants || []).includes(user.uid)).forEach(msg => {
+      db.collection("chatMessages").doc(msg.id).set({
+        body:"Message deleted after read.",
+        deletedAfterRead:true,
+        expiredByUid:user.uid,
+        expiredAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true}).catch(error => console.warn("Portal delete-after-read expiry skipped:", error.message));
+    });
+  }
+
+  async function uploadPortalMinglBackground() {
+    const user = auth.currentUser;
+    const file = byId("portalMinglBackgroundInput")?.files?.[0];
+    if (!user || !activePortalMinglRoomId || !file) return;
+    try {
+      if (!/^image\//.test(file.type)) throw new Error("Chat background must be an image.");
+      if (file.size > 8 * 1024 * 1024) throw new Error("Chat background must be 8MB or smaller.");
+      const path = `mingl-chat-backgrounds/${user.uid}/${activePortalMinglRoomId}/${Date.now()}-${safeStorageFileName(file.name)}`;
+      const snap = await storage.ref().child(path).put(file, {contentType:file.type, customMetadata:{uploadedBy:user.uid, roomId:activePortalMinglRoomId}});
+      const url = await snap.ref.getDownloadURL();
+      await db.collection("chatRooms").doc(activePortalMinglRoomId).set({
+        memberBackgrounds:{[user.uid]:url},
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      applyPortalMinglBackground(url);
+      setText("portalStatus", "Mingl chat background updated.");
+    } catch (error) {
+      setText("portalStatus", error?.message || "Could not update Mingl chat background.");
+    }
+  }
+
+  function applyPortalMinglBackground(url = "") {
+    const wrap = byId("portalMinglMessages");
+    if (!wrap) return;
+    wrap.style.backgroundImage = url ? `linear-gradient(rgba(7,12,32,.68),rgba(7,12,32,.82)), url("${String(url).replace(/"/g, "%22")}")` : "";
+    wrap.style.backgroundSize = url ? "cover" : "";
+    wrap.style.backgroundPosition = url ? "center" : "";
+  }
+
   function appendPortalMinglBubble(msg, user, pending = false) {
     const wrap = byId("portalMinglMessages");
     if (!wrap || !user) return;
@@ -1242,13 +1419,18 @@
     const mine = msg.senderUid === user.uid;
     const system = msg.senderUid === "system" || msg.messageType === "system";
     const node = document.createElement("div");
-    node.className = `mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${pending ? "pending" : ""}`;
+    node.className = `mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${pending ? "pending" : ""} ${portalMinglAnimationClass(msg.animationType)}`;
     node.dataset.messageId = msg.id || "";
+    if (mine && !system && !pending) {
+      node.tabIndex = 0;
+      node.dataset.ownMessage = "1";
+    }
     node.innerHTML = system
       ? `<p>${esc(msg.body || "")}</p><small>${esc(pending ? "Sending..." : fmtDate(msg.createdAt))}</small>`
-      : `<p>${esc(msg.body || "")}</p><small>${esc(pending ? "Sending..." : fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}</small>${mine && !pending ? `<div class="mingl-message-actions"><button type="button" data-edit-portal-mingl="${esc(msg.id || "")}">Edit</button></div>` : ""}`;
+      : `<p>${esc(msg.body || "")}</p>${portalMinglMediaHtml(msg)}<small>${esc(pending ? "Sending..." : fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${msg.deleteAfterRead ? " - delete after read" : ""}${mine && !pending ? " - tap for actions" : ""}</small>`;
     wrap.appendChild(node);
     wrap.scrollTop = wrap.scrollHeight;
+    return node;
   }
 
   async function openPortalMinglChat(room) {
@@ -1266,6 +1448,8 @@
       const photo = other.summary.photoURL || other.summary.profilePhotoUrl || "";
       avatar.innerHTML = photo ? `<img src="${esc(photo)}" alt="">` : esc(displayName.slice(0, 1).toUpperCase() || "M");
     }
+    applyPortalMinglBackground(room.memberBackgrounds?.[auth.currentUser?.uid] || "");
+    clearPortalMinglAttachment();
     updateChatGrammarControls();
     subscribePortalMinglMessages();
     byId("portalMinglChatPage")?.scrollIntoView({behavior:"smooth", block:"start"});
@@ -1279,18 +1463,25 @@
     const user = auth.currentUser;
     const wrap = byId("portalMinglMessages");
     if (!wrap || !user) return;
+    expireReadOncePortalMinglMessages(rows);
     const sorted = rows.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
     wrap.innerHTML = sorted.length ? sorted.map(msg => {
       const mine = msg.senderUid === user.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}">
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${portalMinglAnimationClass(msg.animationType)}" data-message-id="${esc(msg.id || "")}" ${mine && !system ? 'tabindex="0" data-own-message="1"' : ""}>
         <p>${esc(msg.body || "")}</p>
-        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}</small>
-        ${mine && !system ? `<div class="mingl-message-actions"><button type="button" data-edit-portal-mingl="${esc(msg.id || "")}">Edit</button></div>` : ""}
+        ${portalMinglMediaHtml(msg)}
+        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${msg.deleteAfterRead ? " - delete after read" : ""}${mine && !system ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='sub mingl-empty-state'>Start the conversation.</p>";
-    wrap.querySelectorAll("[data-edit-portal-mingl]").forEach(button => {
-      button.addEventListener("click", () => editPortalMinglMessage(button.dataset.editPortalMingl));
+    wrap.querySelectorAll("[data-own-message]").forEach(node => {
+      node.addEventListener("click", () => showPortalMinglMessageActions(node.dataset.messageId, node));
+      node.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          showPortalMinglMessageActions(node.dataset.messageId, node);
+        }
+      });
     });
     wrap.scrollTop = wrap.scrollHeight;
   }
@@ -1316,17 +1507,11 @@
     const user = auth.currentUser;
     const input = byId("portalMinglMessageInput");
     const body = input?.value.trim();
-    if (!user || !activePortalMinglRoomId || !body) return;
+    const attachmentFile = portalMinglAttachmentFile || byId("portalMinglImageInput")?.files?.[0] || null;
+    if (!user || !activePortalMinglRoomId || (!body && !attachmentFile)) return;
     const tempId = `temp-${Date.now()}`;
-    input.value = "";
-    highlightMinglDraft();
-    appendPortalMinglBubble({
-      id:tempId,
-      senderUid:user.uid,
-      senderName:currentProfile.displayName || user.displayName || user.email || "Member",
-      body,
-      createdAt:new Date()
-    }, user, true);
+    let mediaPayload = {};
+    let pending = null;
     try {
       const roomSnap = await db.collection("chatRooms").doc(activePortalMinglRoomId).get();
       if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
@@ -1334,6 +1519,18 @@
       if (!(room.participants || []).includes(user.uid)) throw new Error("Mingl chat is available only to approved participants.");
       const unreadCounts = {...(room.unreadCounts || {})};
       (room.participants || []).forEach(uid => { if (uid !== user.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
+      if (attachmentFile) mediaPayload = await uploadPortalMinglImage(activePortalMinglRoomId, attachmentFile);
+      input.value = "";
+      clearPortalMinglAttachment();
+      highlightMinglDraft();
+      pending = appendPortalMinglBubble({
+        id:tempId,
+        senderUid:user.uid,
+        senderName:currentProfile.displayName || user.displayName || user.email || "Member",
+        body:body || "Shared a picture.",
+        createdAt:new Date(),
+        ...mediaPayload
+      }, user, true);
       await db.collection("chatMessages").add({
         roomId:activePortalMinglRoomId,
         roomType:"mingl",
@@ -1341,20 +1538,21 @@
         participants:room.participants || [],
         senderUid:user.uid,
         senderName:currentProfile.displayName || user.displayName || user.email || "Member",
-        body,
+        body:body || "Shared a picture.",
+        ...mediaPayload,
         edited:false,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection("chatRooms").doc(activePortalMinglRoomId).set({
-        lastMessage:body,
+        lastMessage:body || "Shared a picture.",
         unreadCounts,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
       setText("portalStatus", "");
     } catch (error) {
       input.value = body;
+      portalMinglAttachmentFile = attachmentFile;
       setText("portalStatus", error?.message || "Mingl message could not be sent.");
-      const pending = byId("portalMinglMessages")?.querySelector(`[data-message-id='${tempId}']`);
       if (pending) pending.remove();
       highlightMinglDraft();
     }
@@ -1742,6 +1940,7 @@
     bind("portalSendMinglMessageBtn", sendPortalMinglMessage);
     bind("portalImproveMinglMessageBtn", improvePortalMinglDraft);
     bind("backToMinglDashboardBtn", backToMinglDashboard);
+    bind("portalClearMinglImageBtn", clearPortalMinglAttachment);
     bind("saveShoutoutEditBtn", () => saveShoutoutEdit({resubmit:false}));
     bind("resubmitShoutoutEditBtn", () => saveShoutoutEdit({resubmit:true}));
     bind("cancelShoutoutEditBtn", cancelShoutoutEdit);
@@ -1753,6 +1952,8 @@
       renderRecipientSearchResults();
     });
     byId("portalMinglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
+    byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();

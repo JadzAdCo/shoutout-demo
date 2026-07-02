@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.82-mingl-request-chat-rules";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.59-storage-lifecycle-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.85-shoutout-preview-confirmation-mingl-page";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.86-mingl-message-action-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.86-mingl-chat-media-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.86-mingl-actions-ai-recommendations";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -683,13 +683,83 @@
         {label:"Mingl chat has separate portal page", file:"patron-portal.html", includes:["portalMinglChatPage", "backToMinglDashboardBtn", "minglRulesDetails", "minglRequestsSummaryButton"]},
         {label:"Mingl requests summarize recent statuses", file:"patron-portal-app.js", includes:["updateMinglRequestSummary", "shouldShowMinglRequest", "Mingl/Follow Back", "10 * 24 * 60 * 60 * 1000"]},
         {label:"Popout and Mingl dashboard CSS", file:"styles.css", includes:["info-popout", "info-popout-bubble", "mingl-action-details", "portalMinglChatPage"]},
-        {label:"README documents v28.85", file:"README.md", includes:["v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page", "Edit ShoutOut", "Mingl Requests"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V28-85.md", includes:["FLOQR Rollback - v28.85 ShoutOut Preview Confirmation Mingl Page", "This rollback does not delete user profile data"]}
+        {label:"README documents v28.85 as superseded history", file:"README.md", includes:["v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page", "v28.85 rollback note is superseded"]}
+      ]
+    },
+    {
+      version: "v28.86-mingl-actions-ai-recommendations",
+      title: "Mingl Message Actions, Chat Media, and Personalized ShoutOut AI",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.86-mingl-actions-ai-recommendations"]},
+        {label:"Patron page cache-busted", file:"index.html", includes:["styles.css?v=28.86-mingl-actions-ai-recommendations", "patron-app.js?v=28.86-mingl-actions-ai-recommendations", "confirmGoMinglBtn", "minglQuickChatBtn"]},
+        {label:"Mingl hero quick action buttons", file:"index.html", includes:["minglQuickChatBtn", "minglQuickSearchBtn", "Search for People", "<svg viewBox=\"0 0 24 24\""]},
+        {label:"Dynamic personalized ShoutOut recommendations", file:"patron-app.js", includes:["refreshPersonalizedShoutOutRecommendations", "getPastShoutOutMemory", "profileSuggestionSignals", "local-personalized-fallback"], notIncludes:["Happy Birthday! VIP energy all night.\",\"Big ShoutOut to the table"]},
+        {label:"Gemini ShoutOut context payload", file:"ai-service.js", includes:["profileSignals", "pastShoutouts"]},
+        {label:"Gemini function prompt uses context", file:"functions/ai-discovery-functions.js", includes:["User-owned profile signals JSON", "User-owned past ShoutOut examples JSON", "Do not reveal private details"]},
+        {label:"Live preview direct iframe render hook", file:"patron-app.js", includes:["renderShoutOutDisplay", "previewPayload", "dataset.previewUrl"]},
+        {label:"Display app exposes render hook", file:"display-app.js", includes:["window.renderShoutOutDisplay = render"]},
+        {label:"Confirmation actions route to Edit ShoutOut, Mingl, and Bata", file:"index.html", includes:["editSubmittedShoutoutBtn", "confirmGoMinglBtn", "confirmGoBataBtn"], notIncludes:["startAnotherBtn", "chooseAnotherClubBtn", "logoutBtn6"]},
+        {label:"Public Mingl chat message action popout", file:"patron-app.js", includes:["showMinglMessageActions", "Throw Graffiti", "Delete after read", "uploadMinglAttachment", "expireReadOnceMinglMessages"]},
+        {label:"Portal Mingl chat media and background tools", file:"patron-portal.html", includes:["portalMinglBackgroundInput", "portalMinglImageInput", "portalClearMinglImageBtn"]},
+        {label:"Portal Mingl message action popout", file:"patron-portal-app.js", includes:["showPortalMinglMessageActions", "uploadPortalMinglBackground", "uploadPortalMinglImage", "expireReadOncePortalMinglMessages"]},
+        {label:"Mingl chat action and attachment CSS", file:"styles.css", includes:["mingl-message-action-popout", "mingl-message-media", "mingl-quick-actions", "personalized-ai-suggestion"]},
+        {label:"Firestore rules allow sender-only message action metadata", file:"firestore.rules", includes:["v28.86-mingl-message-action-rules", "animationType", "deleteAfterRead", "isMinglDeleteAfterReadExpiry"]},
+        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.86-mingl-chat-media-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v28.86", file:"README.md", includes:["v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI", "Mingl chat pictures", "personalized ShoutOut recommendations"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-86.md", includes:["FLOQR Rollback - v28.86 Mingl Actions AI Recommendations", "This rollback does not delete user profile data"]}
       ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v28-86-mingl-quick-actions",
+      area:"Mingl public page",
+      feature:"Mingl hero uses Chat and Search for People icon buttons",
+      changed:"The old explanatory line was replaced with two shortcut buttons: Chat and Search for People.",
+      howToTest:"Open the public Mingl page on mobile. Tap Search for People and confirm the search box receives focus. Tap Chat and confirm the chat list or open chat area scrolls into view.",
+      expected:"No selectable paragraph appears. The two icon buttons route users to search and chat areas."
+    },
+    {
+      id:"v28-86-personalized-shoutout-ai",
+      area:"ShoutOut recommendations",
+      feature:"ShoutOut AI recommendations are dynamic and personalized",
+      changed:"Recommendation chips now rebuild from the current draft, selected tone, selected template, venue context, the signed-in user's own profile signals, and the user's own past ShoutOuts. Gemini receives this context through Firebase Functions when deployed; local fallback is contextual.",
+      howToTest:"Open a ShoutOut editor, type a birthday or VIP draft, change the tone, and wait one second. Then click Improve My ShoutOut.",
+      expected:"Suggestions update based on the draft/tone and no longer show the fixed old canned list."
+    },
+    {
+      id:"v28-86-live-preview-actual-media",
+      area:"ShoutOut live preview",
+      feature:"Live Preview renders selected local image/video inside the actual board",
+      changed:"The editor now sends the selected media preview URL and trim metadata to the display iframe and calls the display renderer directly after iframe load.",
+      howToTest:"Select a media-capable ShoutOut template, upload an image or video, then scroll to Live Preview.",
+      expected:"The uploaded media appears inside the ShoutOut board instead of IMAGE / VIDEO placeholder."
+    },
+    {
+      id:"v28-86-confirmation-actions",
+      area:"ShoutOut confirmation",
+      feature:"Confirmation uses Edit ShoutOut, Mingl, and Bata actions",
+      changed:"The confirmation splash removed Create another ShoutOut, Choose another location, and Sign out. It now provides Edit ShoutOut, Mingl, and Bata.",
+      howToTest:"Submit a ShoutOut and inspect the confirmation page.",
+      expected:"Only the new product/action buttons appear. Edit returns to the editor, Mingl opens the Mingl page, and Bata returns to the main product entry point."
+    },
+    {
+      id:"v28-86-mingl-message-popout-actions",
+      area:"Mingl chat",
+      feature:"Sent Mingl messages open action popout on tap/click",
+      changed:"The persistent Edit button was removed. Tapping/clicking your own sent message opens actions for Bounce, Explode, Throw Graffiti, Edit, Auto Correct, Delete after read, and Unsend.",
+      howToTest:"Open a mutual Mingl chat, send a message, then tap/click your own sent bubble.",
+      expected:"The action popout appears and the selected action updates the message without exposing buttons on every bubble. Delete after read soft-expires after the recipient opens the thread."
+    },
+    {
+      id:"v28-86-mingl-chat-pictures-backgrounds",
+      area:"Mingl chat media",
+      feature:"Mingl chat supports shared pictures and per-chat background image",
+      changed:"Public and portal Mingl chat composers can share a picture. The portal Mingl chat page also lets the patron set a chat background image for that conversation.",
+      howToTest:"Open a mutual Mingl chat, choose a picture, send it, then set a chat background from My Profile and Settings > Mingl Chat.",
+      expected:"The picture appears in the chat bubble and the selected background applies to that individual chat. If Storage rules are not deployed, the error clearly says the upload failed."
+    },
     {
       id:"v28-85-media-helper-popouts",
       area:"ShoutOut media editor",
@@ -709,10 +779,10 @@
     {
       id:"v28-85-confirmation-two-button-splash",
       area:"ShoutOut confirmation",
-      feature:"Confirmation page is a two-action splash page",
-      changed:"The confirmation page now has only Edit ShoutOut and Back to main app. It auto-returns to the main category/search screen after a short pause.",
+      feature:"Confirmation page v28.85 behavior is superseded",
+      changed:"The former v28.85 Edit ShoutOut / Back to main app behavior is superseded by v28.86's Edit ShoutOut, Mingl, and Bata action set.",
       howToTest:"Submit a ShoutOut and inspect the confirmation page.",
-      expected:"Only two action buttons appear. Edit ShoutOut returns to the editor, and Back to main app returns to the screen with Events, Throw a ShoutOut, and Mingl."
+      expected:"Use the v28.86 confirmation test as the current acceptance check."
     },
     {
       id:"v28-85-mingl-separate-page-requests",
@@ -2875,6 +2945,8 @@
     await capture("Storage: shoutouts trimmed video path", () => storageLifecycleWithBlob(`shoutouts/${user.uid}/${runId}/trimmed/rules-smoke-test.mp4`, tinyVideoBlob(), "video/mp4"));
     await capture("Storage: profileMedia image path", () => storageLifecycle(`profileMedia/${user.uid}/images/rules-smoke-test.png`));
     await capture("Storage: profileMedia video path", () => storageLifecycleWithBlob(`profileMedia/${user.uid}/videos/rules-smoke-test.mp4`, tinyVideoBlob(), "video/mp4"));
+    await capture("Storage: mingl-chat image path", () => storageLifecycle(`mingl-chat/${user.uid}/${runId}/rules-smoke-test.png`));
+    await capture("Storage: mingl-chat-backgrounds image path", () => storageLifecycle(`mingl-chat-backgrounds/${user.uid}/${runId}/rules-smoke-test.png`));
   }
 
   async function saveRulesSmokeReport(results, overallStatus) {

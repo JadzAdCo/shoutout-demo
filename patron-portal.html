@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Patron Portal v28.85-shoutout-preview-confirmation-mingl-page -->
+  <!-- FLOQR Patron Portal v28.86-mingl-actions-ai-recommendations -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=28.85-shoutout-preview-confirmation-mingl-page"/>
-  <link rel="stylesheet" href="./admin.css?v=28.85-shoutout-preview-confirmation-mingl-page"/>
+  <link rel="stylesheet" href="./styles.css?v=28.86-mingl-actions-ai-recommendations"/>
+  <link rel="stylesheet" href="./admin.css?v=28.86-mingl-actions-ai-recommendations"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -261,6 +261,14 @@
               <p id="portalMinglChatStatus" class="sub small">Mutual Mingl chat</p>
             </div>
           </div>
+          <div class="mingl-chat-tools">
+            <label class="chat-file-button" for="portalMinglBackgroundInput">Chat Background</label>
+            <input id="portalMinglBackgroundInput" class="visually-hidden-file" type="file" accept="image/*"/>
+            <label class="chat-file-button" for="portalMinglImageInput">Share Picture</label>
+            <input id="portalMinglImageInput" class="visually-hidden-file" type="file" accept="image/*"/>
+            <button id="portalClearMinglImageBtn" type="button">Remove Picture</button>
+          </div>
+          <div id="portalMinglAttachmentPreview" class="mingl-attachment-preview hidden"></div>
           <div id="portalMinglMessages" class="mingl-messages"></div>
           <p id="portalMinglGrammarHint" class="grammar-hint hidden"></p>
           <div class="mingl-compose">
@@ -352,14 +360,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.85-shoutout-preview-confirmation-mingl-page"></script>
-<script src="./ai-service.js?v=28.85-shoutout-preview-confirmation-mingl-page"></script>
+<script src="./shared-data.js?v=28.86-mingl-actions-ai-recommendations"></script>
+<script src="./ai-service.js?v=28.86-mingl-actions-ai-recommendations"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./ai-grammar-service.js?v=28.85-shoutout-preview-confirmation-mingl-page"></script>
-<script src="./floqr-action-feedback.js?v=28.85-shoutout-preview-confirmation-mingl-page"></script>
-<script src="./patron-portal-app.js?v=28.85-shoutout-preview-confirmation-mingl-page"></script>
+<script src="./ai-grammar-service.js?v=28.86-mingl-actions-ai-recommendations"></script>
+<script src="./floqr-action-feedback.js?v=28.86-mingl-actions-ai-recommendations"></script>
+<script src="./patron-portal-app.js?v=28.86-mingl-actions-ai-recommendations"></script>
 </body>
 </html>

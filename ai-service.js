@@ -307,7 +307,9 @@
         eventType:String(inputs.eventType || "").slice(0, 80),
         tone:String(inputs.tone || "party").slice(0, 40),
         mainLimit:Number(inputs.mainLimit || 36),
-        subLimit:Number(inputs.subLimit || 60)
+        subLimit:Number(inputs.subLimit || 60),
+        profileSignals:inputs.profileSignals || {},
+        pastShoutouts:Array.isArray(inputs.pastShoutouts) ? inputs.pastShoutouts.slice(0, 12) : []
       });
       const data = response?.data || {};
       if (!data.mainText && !data.subText) throw new Error("AI suggestion response was empty.");

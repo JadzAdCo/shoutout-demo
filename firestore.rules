@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.82-mingl-request-chat-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.86-mingl-message-action-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
@@ -14,7 +15,7 @@ rules_version = '2';
 // - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
 // - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
 // - explicit diagnostic-only delete support for temporary Mingl connection records
-// - Mingl request audit records, system request messages, and owner message-edit support
+// - Mingl request audit records, system request messages, and sender-only message edit/action metadata support
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -109,7 +110,39 @@ service cloud.firestore {
         && request.resource.data.roomId == resource.data.roomId
         && request.resource.data.roomType == resource.data.roomType
         && request.resource.data.participants == resource.data.participants
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["body", "edited", "editedAt", "updatedAt", "aiGrammarApplied"]);
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "body",
+          "edited",
+          "editedAt",
+          "updatedAt",
+          "aiGrammarApplied",
+          "animationType",
+          "animatedAt",
+          "unsent",
+          "deleteAfterRead",
+          "deleteAfterReadSetAt"
+        ]);
+    }
+
+    function isMinglDeleteAfterReadExpiry() {
+      return isExistingMinglMessage()
+        && resource.data.deleteAfterRead == true
+        && resource.data.deletedAfterRead != true
+        && resource.data.participants is list
+        && request.auth.uid in resource.data.participants
+        && resource.data.senderUid != request.auth.uid
+        && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.roomId == resource.data.roomId
+        && request.resource.data.roomType == resource.data.roomType
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.body == "Message deleted after read."
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "body",
+          "deletedAfterRead",
+          "expiredAt",
+          "expiredByUid",
+          "updatedAt"
+        ]);
     }
 
     match /users/{userId} {
@@ -408,6 +441,7 @@ service cloud.firestore {
         && (
           !isExistingMinglMessage() ||
           isOwnMinglMessageEdit() ||
+          isMinglDeleteAfterReadExpiry() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );
       allow delete: if signedIn()

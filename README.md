@@ -1,23 +1,34 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.85-shoutout-preview-confirmation-mingl-page
+https://jadzadco.github.io/shoutout-demo/?v=28.86-mingl-actions-ai-recommendations
 ```
 
 Current release highlights:
 
+- Adds v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI fixes.
+- The public Mingl hero now replaces the old explanatory sentence with two icon buttons: `Chat` and `Search for People`.
+- Personalized ShoutOut recommendations are now live/contextual. They rebuild from the current draft, selected tone, selected template, venue context, the signed-in user's own profile signals, and the user's own past ShoutOuts. Gemini receives this context through Firebase Functions when deployed; local personalized fallback remains available.
+- Live Preview now also calls the display iframe renderer directly after load so selected image/video media appears inside the actual ShoutOut board instead of remaining as an `IMAGE / VIDEO` placeholder.
+- ShoutOut confirmation now shows `Edit ShoutOut`, `Mingl`, and `Bata` actions. The old `Create another ShoutOut`, `Choose another location`, and `Sign out` actions are not used on the confirmation splash.
+- Mingl sent-message actions now open from tapping/clicking a sent message bubble. Actions include `Bounce`, `Explode`, `Throw Graffiti`, `Edit`, `Auto Correct`, `Delete after read`, and `Unsend`; the old always-visible `Edit` button is removed. `Delete after read` soft-expires after the recipient opens the thread.
+- Mingl chat pictures can be shared from public Mingl chat and My Profile and Settings > Mingl Chat. My Profile and Settings also supports a per-chat background image for the current patron.
+- Updates Firestore rules to `v28.86-mingl-message-action-rules` for sender-only message action metadata.
+- Updates Storage rules to `v28.86-mingl-chat-media-rules` for `mingl-chat/{uid}/{roomId}/...` and `mingl-chat-backgrounds/{uid}/{roomId}/...`.
+- Updates Master Admin Diagnostics package checks, storage smoke tests, and manual feature tests for the v28.86 changes.
+- Direct rollback note for this package is `ROLLBACK-V28-86.md`.
 - Adds v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page fixes.
 - ShoutOut media helper text now uses compact popout bubbles: Media details, Video trim warning, and How AI enhancement works.
 - Live Preview now receives the selected local image/video preview URL before submission and renders it inside the actual ShoutOut display board. Submission still uploads and saves Firebase Storage URLs.
 - Long video preview metadata is passed into the display iframe so the preview and final ShoutOut representation both respect the first-7-seconds rule.
-- The ShoutOut confirmation screen is now a two-action splash page with `Edit ShoutOut` and `Back to main app`; it auto-returns to the main app/category screen after a short pause.
+- The earlier v28.85 two-action confirmation splash is superseded by the v28.86 `Edit ShoutOut`, `Mingl`, and `Bata` action set.
 - My Profile and Settings > Mingl now uses a minimalist dashboard. `Mingl Rules` and `Mingl Requests` are nested buttons, request details show recent 10-day activity plus unresolved requests, and mutual Mingl Chat opens on a separate page with a Back to Mingl button.
 - Updates Master Admin Diagnostics package checks and manual feature tests for the ShoutOut preview, popout helper text, confirmation splash, and separate Mingl Chat page.
-- Direct rollback note for this package is `ROLLBACK-V28-85.md`.
+- The v28.85 rollback note is superseded by the current direct rollback note.
 - Adds v28.84 ShoutOut Media, Mingl Chat, and Grammar Settings fixes.
 - Repairs media-capable ShoutOut templates so the editor shows one clear `Upload Image or Video` card with preview, `Remove file`, AI media enhancement controls, and a visible video trim warning.
 - Long ShoutOut videos are not blocked. Patrons are warned and FLOQR uses the first 7 seconds through client trim where available, or first-7-second metadata/display fallback when browser trimming is unavailable.
@@ -116,7 +127,7 @@ Current release highlights:
 - Uses scoped reads for protected collections in Diagnostics instead of broad collection reads that Firebase rules should deny.
 - Fixes the older v28.53 package marker check so it no longer fails on wording that was intentionally simplified later.
 - Updates Firestore rules to `v28.59-diagnostic-cleanup-rules` so temporary `diagnosticRunId` Mingl connection records can be deleted by their participant during the rules smoke test.
-- Updates Storage rules to `v28.59-storage-lifecycle-rules` so uploads still require owner, size, and file-type checks while deletes use an explicit owner delete rule.
+- Updates Storage rules to `v28.86-mingl-chat-media-rules` so uploads still require owner, size, and file-type checks while deletes use an explicit owner delete rule, including Mingl chat image/background paths.
 - Adds step-level rules smoke-test evidence so failed Mingl/chat checks identify create/read/update/delete, and failed Storage checks identify upload/download/delete.
 - Clarifies `Firestore: minglConnections participant query compatibility` as an optional compatibility check. If the deterministic Mingl participant lifecycle passes but the array-contains participant query is denied, Diagnostics now reports a non-blocking Soft Fail: `Optional participant query blocked; fallback participant document reads passed.`
 - Keeps Firestore rules strict for Mingl. Do not loosen Firestore rules broadly or allow all signed-in users to list `minglConnections` just to make the optional query pass.
@@ -370,8 +381,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.59-diagnostic-cleanup-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.86-mingl-message-action-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -379,8 +390,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.59-storage-lifecycle-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.86-mingl-chat-media-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.86-mingl-chat-media-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

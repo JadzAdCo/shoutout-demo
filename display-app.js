@@ -188,6 +188,7 @@
       byId("displaySub").textContent = subText;
     }
   }
+  window.renderShoutOutDisplay = render;
 
   document.addEventListener("DOMContentLoaded", async () => {
     locationId = await resolveDisplayLocationId(locationId);
