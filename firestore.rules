@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.86-mingl-message-action-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.87-mingl-read-receipt-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.87-mingl-read-receipt-rules or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.70-duplicate-alias-rules
@@ -16,6 +17,7 @@ rules_version = '2';
 // - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
 // - explicit diagnostic-only delete support for temporary Mingl connection records
 // - Mingl request audit records, system request messages, and sender-only message edit/action metadata support
+// - Mingl read receipts so participants can mark incoming messages read without broad chat access
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -141,6 +143,25 @@ service cloud.firestore {
           "deletedAfterRead",
           "expiredAt",
           "expiredByUid",
+          "updatedAt"
+        ]);
+    }
+
+    function isMinglReadReceiptUpdate() {
+      return isExistingMinglMessage()
+        && resource.data.participants is list
+        && request.auth.uid in resource.data.participants
+        && resource.data.senderUid != request.auth.uid
+        && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.roomId == resource.data.roomId
+        && request.resource.data.roomType == resource.data.roomType
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.readBy is map
+        && request.resource.data.readAtBy is map
+        && request.resource.data.readBy[request.auth.uid] == true
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "readBy",
+          "readAtBy",
           "updatedAt"
         ]);
     }
@@ -441,6 +462,7 @@ service cloud.firestore {
         && (
           !isExistingMinglMessage() ||
           isOwnMinglMessageEdit() ||
+          isMinglReadReceiptUpdate() ||
           isMinglDeleteAfterReadExpiry() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );

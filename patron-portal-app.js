@@ -929,7 +929,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.87-mingl-chat-diagnostics">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1046,7 +1046,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations",
+        link:"./patron-portal.html?tab=mingl&v=28.87-mingl-chat-diagnostics",
         read:false,
         createdAt:fieldValue()
       });
@@ -1248,9 +1248,49 @@
   }
 
   function portalMinglMediaHtml(msg = {}) {
-    if (!msg.mediaUrl) return "";
+    if (!msg.mediaUrl || msg.unsent) return "";
     const label = esc(msg.mediaFileName || "Shared picture");
     return `<figure class="mingl-message-media"><img src="${esc(msg.mediaUrl)}" alt="${label}" loading="lazy"><figcaption>${label}</figcaption></figure>`;
+  }
+
+  function portalMinglMessageReadByOther(msg = {}) {
+    const user = auth.currentUser;
+    if (!user || msg.senderUid !== user.uid) return false;
+    const readBy = msg.readBy || {};
+    return (msg.participants || []).some(uid => uid && uid !== user.uid && readBy[uid] === true);
+  }
+
+  function portalMinglReadReceiptHtml(msg = {}, mine = false) {
+    if (!mine || msg.senderUid === "system" || msg.messageType === "system" || msg.unsent) return "";
+    return portalMinglMessageReadByOther(msg)
+      ? ` <span class="mingl-read-receipt" title="Read by recipient">👍 Read</span>`
+      : ` <span class="mingl-read-receipt unread" title="Not read yet">Sent</span>`;
+  }
+
+  function markPortalMinglMessagesRead(rows = []) {
+    const user = auth.currentUser;
+    if (!user || !activePortalMinglRoomId) return;
+    const unreadIncoming = rows.filter(msg => (
+      msg.id &&
+      msg.senderUid &&
+      msg.senderUid !== user.uid &&
+      msg.senderUid !== "system" &&
+      (msg.participants || []).includes(user.uid) &&
+      !(msg.readBy || {})[user.uid]
+    ));
+    if (!unreadIncoming.length) return;
+    unreadIncoming.forEach(msg => {
+      db.collection("chatMessages").doc(msg.id).set({
+        readBy:{[user.uid]:true},
+        readAtBy:{[user.uid]:firebase.firestore.FieldValue.serverTimestamp()},
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true}).catch(error => console.warn("Portal Mingl read receipt skipped:", error.message));
+    });
+    db.collection("chatRooms").doc(activePortalMinglRoomId).set({
+      unreadCounts:{[user.uid]:0},
+      lastReadAtBy:{[user.uid]:firebase.firestore.FieldValue.serverTimestamp()},
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true}).catch(error => console.warn("Portal Mingl unread reset skipped:", error.message));
   }
 
   function clearPortalMinglAttachment() {
@@ -1333,9 +1373,34 @@
     }
   }
 
+  async function unsendPortalMinglMessage(messageId) {
+    const user = auth.currentUser;
+    if (!user || !messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== user.uid) return;
+    if (portalMinglMessageReadByOther({id:snap.id, ...snap.data()})) {
+      setText("portalStatus", "This Mingl message has already been read and cannot be unsent.");
+      return;
+    }
+    await updateOwnPortalMinglMessage(messageId, {
+      body:"Message unsent.",
+      unsent:true,
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
   async function showPortalMinglMessageActions(messageId, anchor) {
     if (!messageId) return;
     document.querySelector(".mingl-message-action-popout")?.remove();
+    let message = null;
+    try {
+      const snap = await db.collection("chatMessages").doc(messageId).get();
+      message = snap.exists ? {id:snap.id, ...snap.data()} : null;
+    } catch (error) {}
+    const readByRecipient = message ? portalMinglMessageReadByOther(message) : false;
+    const unsendDisabled = readByRecipient || message?.unsent === true;
+    const unsendTitle = message?.unsent ? "Message already unsent" : readByRecipient ? "Recipient has already read this message" : "Unsend while unread";
     const popout = document.createElement("div");
     popout.className = "mingl-message-action-popout";
     popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
@@ -1345,7 +1410,8 @@
       <button type="button" data-action="edit">Edit</button>
       <button type="button" data-action="autocorrect">Auto Correct</button>
       <button type="button" data-action="deleteAfterRead">Delete after read</button>
-      <button type="button" data-action="unsend">Unsend</button>
+      <button type="button" data-action="unsend" ${unsendDisabled ? "disabled" : ""} title="${esc(unsendTitle)}">Unsend</button>
+      ${readByRecipient ? `<small class="mingl-action-note">Recipient has read this message, so Unsend is locked.</small>` : ""}
     </div>`;
     document.body.appendChild(popout);
     const rect = anchor?.getBoundingClientRect?.() || {left:24, bottom:160};
@@ -1353,13 +1419,13 @@
     popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 260)}px`;
     popout.addEventListener("click", async event => {
       const button = event.target.closest("[data-action]");
-      if (!button) return;
+      if (!button || button.disabled) return;
       const action = button.dataset.action;
       popout.remove();
       try {
         if (action === "edit") await editPortalMinglMessage(messageId);
         else if (action === "autocorrect") await autoCorrectPortalMinglMessage(messageId);
-        else if (action === "unsend") await updateOwnPortalMinglMessage(messageId, {body:"Message unsent.", unsent:true, edited:true, editedAt:firebase.firestore.FieldValue.serverTimestamp()});
+        else if (action === "unsend") await unsendPortalMinglMessage(messageId);
         else if (action === "deleteAfterRead") await updateOwnPortalMinglMessage(messageId, {deleteAfterRead:true, deleteAfterReadSetAt:firebase.firestore.FieldValue.serverTimestamp()});
         else await updateOwnPortalMinglMessage(messageId, {animationType:action, animatedAt:firebase.firestore.FieldValue.serverTimestamp()});
       } catch (error) {
@@ -1464,14 +1530,15 @@
     const wrap = byId("portalMinglMessages");
     if (!wrap || !user) return;
     expireReadOncePortalMinglMessages(rows);
+    markPortalMinglMessagesRead(rows);
     const sorted = rows.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
     wrap.innerHTML = sorted.length ? sorted.map(msg => {
       const mine = msg.senderUid === user.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${portalMinglAnimationClass(msg.animationType)}" data-message-id="${esc(msg.id || "")}" ${mine && !system ? 'tabindex="0" data-own-message="1"' : ""}>
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${msg.unsent ? "unsent" : ""} ${portalMinglAnimationClass(msg.animationType)}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'tabindex="0" data-own-message="1"' : ""}>
         <p>${esc(msg.body || "")}</p>
         ${portalMinglMediaHtml(msg)}
-        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${msg.deleteAfterRead ? " - delete after read" : ""}${mine && !system ? " - tap for actions" : ""}</small>
+        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${msg.deleteAfterRead ? " - delete after read" : ""}${portalMinglReadReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='sub mingl-empty-state'>Start the conversation.</p>";
     wrap.querySelectorAll("[data-own-message]").forEach(node => {

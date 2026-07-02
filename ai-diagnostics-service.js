@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.84 */
+/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.87 */
 (function () {
   "use strict";
 
@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.86-mingl-message-action-rules";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.87-mingl-read-receipt-rules";
   const EXPECTED_STORAGE_RULES_VERSION = "v28.86-mingl-chat-media-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.86-mingl-actions-ai-recommendations";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.87-mingl-chat-diagnostics";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -708,10 +708,60 @@
         {label:"README documents v28.86", file:"README.md", includes:["v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI", "Mingl chat pictures", "personalized ShoutOut recommendations"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-86.md", includes:["FLOQR Rollback - v28.86 Mingl Actions AI Recommendations", "This rollback does not delete user profile data"]}
       ]
+    },
+    {
+      version: "v28.87-mingl-chat-diagnostics",
+      title: "Mingl Chat Read Receipts and Diagnostics Rerun",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.87-mingl-chat-diagnostics"]},
+        {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
+        {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
+        {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.87-mingl-chat-diagnostics", "patron-app.js?v=28.87-mingl-chat-diagnostics"]},
+        {label:"Portal Mingl page cache-busted", file:"patron-portal.html", includes:["styles.css?v=28.87-mingl-chat-diagnostics", "patron-portal-app.js?v=28.87-mingl-chat-diagnostics"]},
+        {label:"Public Mingl composer/read receipts", file:"patron-app.js", includes:["markMinglMessagesRead", "minglReadReceiptHtml", "This Mingl message has already been read and cannot be unsent"]},
+        {label:"Portal Mingl composer/read receipts", file:"patron-portal-app.js", includes:["markPortalMinglMessagesRead", "portalMinglReadReceiptHtml", "unsendPortalMinglMessage"]},
+        {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-read-receipt", "mingl-action-note"]},
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.87-mingl-read-receipt-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"README documents v28.87", file:"README.md", includes:["v28.87 Mingl Chat Diagnostics", "zero live Mingl records is not treated as a feature failure"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-87.md", includes:["FLOQR Rollback - v28.87 Mingl Chat Diagnostics", "This rollback does not delete user profile data"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v28-87-run-feature-diagnostics-button",
+      area:"Master Admin Diagnostics",
+      feature:"Manual Run Diagnostics reruns feature scans",
+      changed:"A clear Run Diagnostics button now reruns installed-feature diagnostics, refreshes the Mingl scan, and saves a featureDiagnostics report to aiDiagnosticsReports.",
+      howToTest:"Open Master Admin > Diagnostics and click Run Diagnostics. Confirm the status changes while running, the feature matrix refreshes, and Export Diagnostics TXT reflects the latest run.",
+      expected:"Diagnostics rerun without leaving the page. A current feature scan is shown, and the result can be exported for Codex troubleshooting."
+    },
+    {
+      id:"v28-87-mingl-empty-data-diagnostics",
+      area:"Mingl diagnostics",
+      feature:"Zero live Mingl records is not treated as a feature failure",
+      changed:"Mingl matching/request/chat diagnostics now distinguish installed workflow health from live data coverage. Empty minglConnections or chatRooms are informational when no Firestore error exists.",
+      howToTest:"Run Diagnostics on a project with no readable Mingl connections or chat rooms, then create a Let's Mingl request/chat and run it again.",
+      expected:"Before live data exists, Mingl matching and chat diagnostics explain that no records were found yet instead of showing a blocking soft fail. After test data exists, scanned counts update."
+    },
+    {
+      id:"v28-87-mingl-chat-composer-visible",
+      area:"Mingl chat",
+      feature:"Mingl Chat shows the text input and send controls on mobile",
+      changed:"The Mingl composer is sticky inside the chat panel, sits below the emoji row, and remains visible after messages load on public Mingl and My Profile and Settings > Mingl Chat.",
+      howToTest:"Open a mutual Mingl chat on a phone. Scroll through the chat and confirm the Write a Mingl message input, Picture/Share Picture control, Fix Grammar, and Send button are visible and usable.",
+      expected:"The message input is visible without leaving the chat page, and sending a message updates the thread."
+    },
+    {
+      id:"v28-87-mingl-read-receipts-unsend",
+      area:"Mingl chat",
+      feature:"Read marker and unread-only Unsend",
+      changed:"Incoming messages are marked read for the viewing patron. Sent messages show a small thumbs-up Read marker after the recipient opens the chat. Unsend remains available only while the message has not been read.",
+      howToTest:"Send a Mingl message from one account, view it from the recipient account, then return to the sender account. Tap the sent bubble and inspect the action popout.",
+      expected:"The sent message shows a Read marker. The Unsend action is locked after the recipient reads it, but remains available before read."
+    },
     {
       id:"v28-86-mingl-quick-actions",
       area:"Mingl public page",
@@ -3023,6 +3073,34 @@
     return results;
   }
 
+  async function saveFeatureDiagnosticsReport(features = []) {
+    if (!state.db) return {status:"Soft Fail", evidence:"Firestore unavailable; feature diagnostics report was not saved."};
+    try {
+      const user = state.auth?.currentUser || {};
+      const failed = features.filter(item => item.status === "Failed").length;
+      const soft = features.filter(item => item.status === "Soft Fail").length;
+      const tbi = features.filter(item => item.status === "TBI").length;
+      const overallStatus = failed ? "Failed" : (soft || tbi) ? "Soft Fail" : "Pass";
+      await state.db.collection("aiDiagnosticsReports").add({
+        type:"featureDiagnostics",
+        packageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
+        status:overallStatus,
+        summary:{pass:features.filter(item => item.status === "Pass").length, softFail:soft, failed, tbi},
+        results:features.map(item => ({
+          label:`${item.area}: ${item.feature}`,
+          status:item.status,
+          evidence:item.evidence || ""
+        })),
+        createdByUid:user.uid || "",
+        createdByEmail:user.email || "",
+        createdAt:fieldValue()
+      });
+      return {status:"Pass", evidence:"Feature diagnostics report saved to aiDiagnosticsReports."};
+    } catch (error) {
+      return {status:"Soft Fail", evidence:`Feature diagnostics ran, but report save failed: ${error?.message || error}`};
+    }
+  }
+
   async function scopedQueryRows(name, buildQuery, limit = 750) {
     const snap = await buildQuery(state.db.collection(name)).limit(limit).get();
     return snap.docs.map(doc => ({id: doc.id, _collection: name, ...doc.data()}));
@@ -3959,6 +4037,42 @@
     return "Pass";
   }
 
+  function collectionNote(data, name) {
+    return data[name]?.note || "";
+  }
+
+  function minglFeatureStatus(data, name) {
+    return collectionError(data, name) ? "Failed" : "Pass";
+  }
+
+  function minglEmptyScanIntro(name, singularLabel) {
+    if (name === "minglConnections") return "No live Mingl connection records found yet.";
+    if (name === "chatRooms") return "No live Mingl chat room records found yet.";
+    return `No live ${singularLabel} records found yet.`;
+  }
+
+  function minglScanEvidence(data, name, singularLabel, pluralLabel) {
+    const count = collectionCount(data, name);
+    const note = collectionNote(data, name);
+    if (collectionError(data, name)) {
+      return `${pluralLabel} diagnostic scan failed: ${collectionError(data, name)}.`;
+    }
+    if (count > 0) {
+      return `${count} ${count === 1 ? singularLabel : pluralLabel} scanned. Click Run Diagnostics again after sending or accepting new Mingl requests to refresh the count.`;
+    }
+    if (normalized(note).includes("participant query blocked")) {
+      return `${minglEmptyScanIntro(name, singularLabel)} Optional participant query blocked; deterministic participant document reads remain the supported safe path. This is not a feature failure and does not require broad Firestore list permission. Create or accept a Mingl request, then click Run Diagnostics to rescan.`;
+    }
+    return `${minglEmptyScanIntro(name, singularLabel)} The installed workflow is ready; create or accept a Mingl request, then click Run Diagnostics to scan the new records.`;
+  }
+
+  function minglRequestWorkflowEvidence(data) {
+    if (collectionError(data, "minglConnections")) {
+      return `Friend or Mingl Request workflow scan failed: ${collectionError(data, "minglConnections")}.`;
+    }
+    return "Matched public profiles use a Friend or Mingl Request flow before chat opens. This is the expected privacy behavior: chat opens only after bidirectional approval, and empty live data is not treated as a workflow failure.";
+  }
+
   function hasOwnField(row = {}, key) {
     return Object.prototype.hasOwnProperty.call(row, key);
   }
@@ -4470,10 +4584,10 @@
       ["ShoutOut", "Media AI panel", geminiMediaDiagnostic.status, geminiMediaDiagnostic.status === "Pass" ? geminiMediaDiagnostic.evidence : `${geminiMediaDiagnostic.evidence} Static filter/trim fallback remains available without breaking ShoutOut.`],
       ["ShoutOut", "Improve My ShoutOut", hasSearch ? "Pass" : "Soft Fail", "Safe curated fallback should work when AI flags are false."],
       ["Guest Lists", "Guest list routing", collectionStatus(data, "guestListRequests", true), `${collectionCount(data, "guestListRequests")} guest list requests scanned.`],
-      ["Mingl", "Mingl matching", collectionStatus(data, "minglConnections", true), `${collectionCount(data, "minglConnections")} Mingl connection records scanned.`],
-      ["Mingl", "Let's Mingl request workflow", collectionStatus(data, "minglConnections", true), "Matched public profiles use a Friend or Mingl Request flow before chat opens."],
-      ["Mingl", "Mingl chat rooms", collectionStatus(data, "chatRooms", true), `${collectionCount(data, "chatRooms")} chat room records scanned.`],
-      ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publishing v28.82 rules." : "Mingl chat renderer supports realtime messages, sender edits, emoji shortcuts, and AI-ready draft grammar cleanup."],
+      ["Mingl", "Mingl matching", minglFeatureStatus(data, "minglConnections"), minglScanEvidence(data, "minglConnections", "Mingl connection", "Mingl connection records")],
+      ["Mingl", "Let's Mingl request workflow", minglFeatureStatus(data, "minglConnections"), minglRequestWorkflowEvidence(data)],
+      ["Mingl", "Mingl chat rooms", minglFeatureStatus(data, "chatRooms"), minglScanEvidence(data, "chatRooms", "Mingl chat room", "Mingl chat room records")],
+      ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publishing current rules." : "Mingl chat renderer supports visible compose input, realtime messages, sender edits/actions, unread-only Unsend, read receipts, emoji shortcuts, picture sharing, and AI-ready draft grammar cleanup."],
       ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
       ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
       ["Bata", "Marketplace discovery/search", "TBI", "Bata search hooks are AI-ready, but production listing and checkout workflows are not live yet."],
@@ -4664,9 +4778,9 @@
     }
   }
 
-  async function refreshDiagnostics() {
+  async function refreshDiagnostics(options = {}) {
     if (!state.db) return;
-    setText("diagnosticsStatus", "Refreshing diagnostics...");
+    setText("diagnosticsStatus", options.statusMessage || "Refreshing diagnostics...");
     const [data, schedule] = await Promise.all([loadDiagnosticsData(), readScheduleSafe()]);
     if (schedule) applyScheduleToControls(schedule);
     renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
@@ -4686,11 +4800,26 @@
     renderManualFeatureDiagnostics();
     const failures = features.filter(item => item.status === "Failed").length;
     const soft = features.filter(item => item.status === "Soft Fail").length;
-    setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.`);
+    const saved = options.saveFeatureReport ? await saveFeatureDiagnosticsReport(features) : null;
+    const savedText = saved ? ` ${saved.evidence}` : "";
+    setText("diagnosticsStatus", `Diagnostics refreshed. ${failures} failed and ${soft} soft-fail items found.${savedText}`);
+    return {data, schedule, features, saved};
+  }
+
+  async function runFeatureDiagnostics() {
+    if (!state.db) {
+      setText("diagnosticsStatus", "Run Diagnostics failed because Firestore is unavailable.");
+      return null;
+    }
+    return refreshDiagnostics({
+      saveFeatureReport:true,
+      statusMessage:"Running feature diagnostics..."
+    });
   }
 
   function bindControls() {
     byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
+    byId("runFeatureDiagnosticsBtn")?.addEventListener("click", runFeatureDiagnostics);
     byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
     byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
     byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
@@ -4735,6 +4864,7 @@
   window.FLOQRDiagnostics = {
     mount,
     refreshDiagnostics,
+    runFeatureDiagnostics,
     runPackageInstallDiagnostics,
     runRulesSmokeTest,
     exportDiagnosticsReport,

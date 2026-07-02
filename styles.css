@@ -153,12 +153,20 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .profile-datapoint div{position:absolute;z-index:5;left:0;min-width:190px;max-width:min(260px,calc(100vw - 48px));display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;border:1px solid var(--line);border-radius:14px;background:#12183a;padding:10px;box-shadow:0 14px 35px rgba(0,0,0,.38)}
 .profile-datapoint span{border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:5px 8px;color:#fff;font-size:12px;font-weight:800;background:rgba(255,255,255,.08)}
 .mingl-chat-list{display:grid;gap:10px;margin-bottom:14px}.mingl-chat-item{width:100%;display:grid;text-align:left;gap:4px}.mingl-chat-item span{color:var(--muted);font-weight:700}
-.mingl-messages{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px}
+.mingl-chat-panel,#portalMinglChatPanel{display:flex;flex-direction:column;gap:10px}
+.mingl-chat-panel.hidden,#portalMinglChatPanel.hidden{display:none!important}
+.mingl-messages{max-height:min(46vh,420px);overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px;overscroll-behavior:contain}
 .mingl-message{max-width:82%;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.08)}.mingl-message.mine{justify-self:end;background:linear-gradient(90deg,rgba(244,58,191,.34),rgba(38,216,255,.26))}
 .mingl-message.system{max-width:100%;justify-self:center;text-align:center;background:rgba(215,255,63,.09);border-color:rgba(215,255,63,.28)}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
 .mingl-message-actions{display:flex;justify-content:flex-end;margin-top:6px}.mingl-message-actions button{padding:5px 9px;border-radius:999px;font-size:12px}
-.mingl-compose{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:10px}
+.mingl-compose{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;margin-top:10px;position:sticky;bottom:0;z-index:4;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(8,12,32,.96);box-shadow:0 -12px 30px rgba(0,0,0,.22);padding:10px}
+.mingl-compose input{min-width:0}
+#minglMessages,#portalMinglMessages{order:20}
+#minglAttachmentPreview,#portalMinglAttachmentPreview{order:30}
+#minglGrammarHint,#portalMinglGrammarHint{order:40}
+#minglChatPanel .emoji-row,#portalMinglChatPanel .emoji-row{order:50}
+#minglChatPanel .mingl-compose,#portalMinglChatPanel .mingl-compose{order:60}
 .mingl-quick-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .icon-action-button{display:inline-flex;align-items:center;gap:9px;min-height:46px}
 .icon-action-button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
@@ -175,6 +183,11 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-message-action-popout{position:fixed;z-index:10004}
 .mingl-message-action-menu{width:min(270px,calc(100vw - 24px));display:grid;gap:7px;border:1px solid var(--line);border-radius:18px;background:rgba(10,14,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.56);padding:10px}
 .mingl-message-action-menu button{width:100%;padding:10px 12px;border-radius:12px;text-align:left}
+.mingl-message-action-menu button:disabled{opacity:.48;cursor:not-allowed}
+.mingl-action-note{color:var(--muted);font-weight:800;line-height:1.3}
+.mingl-read-receipt{display:inline-flex;align-items:center;gap:4px;margin-left:4px;color:var(--lime);font-weight:1000}
+.mingl-read-receipt.unread{color:var(--muted)}
+.mingl-message.unsent{opacity:.78;font-style:italic}
 .mingl-message.animate-bounce{animation:minglBounce .8s ease}
 .mingl-message.animate-explode{animation:minglExplode .75s ease}
 .mingl-message.animate-graffiti{box-shadow:0 0 0 2px rgba(244,58,191,.4),0 0 26px rgba(38,216,255,.34)}
@@ -508,6 +521,14 @@ html.floqr-tablet-browser .login-card,
 html.floqr-tablet-browser .club-option{border-radius:24px}
 
 html.floqr-desktop-browser .app{width:min(100%,1180px)}
+
+/* v28.87 Mingl chat composer and read receipts */
+@media(max-width:640px){
+  .mingl-chat-panel,#portalMinglChatPanel{max-height:none}
+  .mingl-messages{max-height:42vh;min-height:220px}
+  .mingl-compose{grid-template-columns:1fr;align-items:stretch}
+  .mingl-compose input,.mingl-compose button,.mingl-compose .chat-file-button{width:100%}
+}
 html.floqr-desktop-browser .club-grid{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
 html.floqr-desktop-browser .profile-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}

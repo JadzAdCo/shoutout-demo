@@ -1,15 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.87 Mingl Chat Diagnostics Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.86-mingl-actions-ai-recommendations
+https://jadzadco.github.io/shoutout-demo/?v=28.87-mingl-chat-diagnostics
 ```
 
 Current release highlights:
 
+- Adds v28.87 Mingl Chat Diagnostics fixes.
+- Public Mingl Chat and My Profile and Settings > Mingl Chat now keep the text input, picture control, Fix Grammar, and Send controls visible on mobile.
+- Sent Mingl message actions still open by tapping/clicking the sent bubble, and `Unsend` is available only before the recipient reads the message.
+- Incoming Mingl messages are marked as read for the viewing patron. Sent messages show a small thumbs-up `Read` marker after the recipient opens the chat.
+- Updates Firestore rules to `v28.87-mingl-read-receipt-rules` so participants can write their own read-receipt metadata without broad chat access.
+- Master Admin > Diagnostics now has a clear `Run Diagnostics` button for rerunning feature diagnostics and saving a fresh `featureDiagnostics` record to `aiDiagnosticsReports`.
+- Mingl feature diagnostics now separate installed workflow health from live Firestore data coverage: zero live Mingl records is not treated as a feature failure when no Firestore error exists.
+- `Mingl matching`, `Let's Mingl request workflow`, and `Mingl chat rooms` now explain whether no records were found yet, whether an optional participant query was blocked, and when to create/accept a Mingl request before rerunning diagnostics.
+- The live Firebase rules proof remains `Run Rules Smoke Test`. If the latest current-package rules smoke test shows a failed result, publish the package `firestore.rules` and `storage.rules` in Firebase Console, then rerun that smoke test separately from `Run Diagnostics`.
+- Direct rollback note for this package is `ROLLBACK-V28-87.md`.
 - Adds v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI fixes.
 - The public Mingl hero now replaces the old explanatory sentence with two icon buttons: `Chat` and `Search for People`.
 - Personalized ShoutOut recommendations are now live/contextual. They rebuild from the current draft, selected tone, selected template, venue context, the signed-in user's own profile signals, and the user's own past ShoutOuts. Gemini receives this context through Firebase Functions when deployed; local personalized fallback remains available.
@@ -20,7 +30,7 @@ Current release highlights:
 - Updates Firestore rules to `v28.86-mingl-message-action-rules` for sender-only message action metadata.
 - Updates Storage rules to `v28.86-mingl-chat-media-rules` for `mingl-chat/{uid}/{roomId}/...` and `mingl-chat-backgrounds/{uid}/{roomId}/...`.
 - Updates Master Admin Diagnostics package checks, storage smoke tests, and manual feature tests for the v28.86 changes.
-- Direct rollback note for this package is `ROLLBACK-V28-86.md`.
+- The v28.86 rollback note is superseded by the current direct rollback note.
 - Adds v28.85 ShoutOut Preview, Confirmation Splash, and Mingl Page fixes.
 - ShoutOut media helper text now uses compact popout bubbles: Media details, Video trim warning, and How AI enhancement works.
 - Live Preview now receives the selected local image/video preview URL before submission and renders it inside the actual ShoutOut display board. Submission still uploads and saves Firebase Storage URLs.
@@ -381,8 +391,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.86-mingl-message-action-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.87-mingl-read-receipt-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.87-mingl-read-receipt-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
