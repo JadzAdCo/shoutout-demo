@@ -512,6 +512,9 @@ function fallbackShoutOutSuggestion(data = {}) {
   const tone = normalized(data.tone || "party");
   const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
   const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
+  const profile = data.profileSignals && typeof data.profileSignals === "object" ? data.profileSignals : {};
+  const interests = Array.isArray(profile.interests) ? profile.interests.slice(0, 3).join(", ") : "";
+  const past = Array.isArray(data.pastShoutouts) ? data.pastShoutouts.find(item => item && (item.mainText || item.subText)) : null;
   const options = [
     {tone:"vip", mainText:"VIP ShoutOut IN THE BUILDING", subText:"Luxury energy all night."},
     {tone:"funny", mainText:"BIG ShoutOut TO THE TABLE", subText:"They came to celebrate."},
@@ -523,9 +526,10 @@ function fallbackShoutOutSuggestion(data = {}) {
     {tone:"graduation", mainText:"CONGRATS GRAD", subText:"The future starts tonight."}
   ];
   const picked = options.find(item => tone.includes(item.tone)) || options[5];
+  const contextSub = interests ? `${interests} energy.` : past?.subText || picked.subText;
   return {
-    mainText:preserveProtectedTerms(clampText(data.mainText || picked.mainText, mainLimit)),
-    subText:preserveProtectedTerms(clampText(picked.subText, subLimit)),
+    mainText:preserveProtectedTerms(clampText(data.mainText || past?.mainText || picked.mainText, mainLimit)),
+    subText:preserveProtectedTerms(clampText(data.subText || contextSub, subLimit)),
     tone:picked.tone,
     provider:"curated-fallback",
     providerMode:"curated-fallback",
@@ -842,6 +846,21 @@ exports.aiSuggestShoutOut = onCall({
   if (!optionalGeminiSecretValue()) return fallback;
   const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
   const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
+  const profileSignals = data.profileSignals && typeof data.profileSignals === "object" ? {
+    displayName:clampText(data.profileSignals.displayName || "", 40),
+    city:clampText(data.profileSignals.city || "", 60),
+    country:clampText(data.profileSignals.country || "", 60),
+    interests:Array.isArray(data.profileSignals.interests) ? data.profileSignals.interests.slice(0, 8).map(item => clampText(item, 40)) : []
+  } : {};
+  const pastShoutouts = Array.isArray(data.pastShoutouts)
+    ? data.pastShoutouts.slice(0, 6).map(item => ({
+      mainText:clampText(item?.mainText || "", 70),
+      subText:clampText(item?.subText || "", 90),
+      tone:clampText(item?.tone || "", 30),
+      template:clampText(item?.template || "", 50),
+      location:clampText(item?.location || "", 70)
+    }))
+    : [];
   const prompt = [
     "You are FLOQR AI helping write public LED-safe ShoutOut copy.",
     "Return only JSON with keys: mainText, subText, tone, safetyStatus.",
@@ -853,7 +872,10 @@ exports.aiSuggestShoutOut = onCall({
     `Current main text: ${clampText(data.mainText || "", 120)}`,
     `Current sub text: ${clampText(data.subText || "", 120)}`,
     `Template id: ${clampText(data.templateId || "", 80)}`,
-    `Venue/event type: ${clampText(data.eventType || "", 80)}`
+    `Venue/event type: ${clampText(data.eventType || "", 80)}`,
+    `User-owned profile signals JSON: ${JSON.stringify(profileSignals)}`,
+    `User-owned past ShoutOut examples JSON: ${JSON.stringify(pastShoutouts)}`,
+    "Use these profile and past ShoutOut signals only for tone and style. Do not reveal private details."
   ].join("\n");
   try {
     const json = await callGeminiJson(prompt, "ShoutOut suggestion");
