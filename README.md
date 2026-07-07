@@ -1,16 +1,21 @@
-﻿# CURRENT PACKAGE: FLOQR ShoutOut v28.93 Mingl Chat Legacy Recovery Package
+﻿# CURRENT PACKAGE: FLOQR ShoutOut v28.94 Mingl Chat Consent Actions Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.93-mingl-chat-legacy-recovery
+https://jadzadco.github.io/shoutout-demo/?v=28.94-mingl-chat-consent-actions
 ```
 
 Current release highlights:
 
-- Adds v28.93 Mingl Chat Legacy Recovery fixes.
+- Adds v28.94 Mingl Chat Consent Actions fixes.
+- Shared Mingl chat background requests now create a real consent card for the other patron with `Approve Background` and `Keep Mine Private`.
+- The composer `+` action menu retracts after a command runs or a media/background picker opens.
+- Emoji shortcuts in the `Text Action` section render as actual emoji symbols.
+- Tapping one of your sent Mingl messages opens message commands: `Unsend`, `AutoFix`, `Edit`, `Bounce`, `Explode`, `Scroll`, and `Disappear`.
+- Adds standalone Mingl Chat text animations for `Bounce`, `Explode`, `Scroll`, and `Disappear`.
 - Forces the standalone Mingl Chat script to rebuild old cached/partially uploaded composer markup into the requested clean layout: message box, Send, and a right-side `+` action popout.
 - Firestore rules now allow participants to read older Mingl connection records that only stored `requestedBy` / `requestedTo`, so legacy accepted chats can be found and rebuilt.
 - Restores older accepted Mingl conversations on the standalone Mingl Chat page by reading mutual `minglConnections`, normalizing missing/legacy `chatRooms`, and accepting older Mingl room markers such as `mingl_...` room IDs.
@@ -29,8 +34,8 @@ Current release highlights:
 - Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
 - Club admins can reset the currently live display back to that club location's default ShoutOut.
 - Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
-- Firestore and Storage rule headers now carry the v28.92 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-93.md`.
+- Firestore and Storage rule headers now carry the v28.94 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-94.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
@@ -41,7 +46,7 @@ Current release highlights:
 - Mingl chat background changes now remain local to the requesting patron until the other patron approves the shared background request.
 - Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
 - Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
-- Firestore and Storage rule headers now carry the v28.88 package version so Master Admin diagnostics and Firebase Console checks match this package.
+- Historical note: v28.88 also carried matching Firestore and Storage rule headers for that package.
 - That package's direct rollback note is `ROLLBACK-V28-88.md`.
 - Adds v28.87 Mingl Chat Diagnostics fixes.
 - Public Mingl Chat and My Profile and Settings > Mingl Chat now keep the text input, picture control, Fix Grammar, and Send controls visible on mobile.
@@ -424,8 +429,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.94-mingl-chat-consent-actions-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.94-mingl-chat-consent-actions-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -433,8 +438,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.93-mingl-chat-legacy-recovery-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.93-mingl-chat-legacy-recovery-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.94-mingl-chat-consent-actions-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.94-mingl-chat-consent-actions-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

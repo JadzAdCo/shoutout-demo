@@ -1,4 +1,4 @@
-﻿/* mingl-chat-app.js v28.93-mingl-chat-legacy-recovery */
+﻿/* mingl-chat-app.js v28.94-mingl-chat-consent-actions */
 (function(){
   "use strict";
 
@@ -133,11 +133,23 @@
     });
     byId("minglStandaloneSelectDraftBtn")?.addEventListener("click", () => byId("minglStandaloneMessageInput")?.select());
     document.querySelectorAll("[data-mingl-emoji-code]").forEach(button => {
+      const code = Number(button.dataset.minglEmojiCode || 0);
+      if (code) button.textContent = String.fromCodePoint(code);
       button.addEventListener("click", () => {
-        const code = Number(button.dataset.minglEmojiCode || 0);
         insertEmoji(code ? String.fromCodePoint(code) : "");
       });
     });
+    document.querySelector(".mingl-compose-menu-panel")?.addEventListener("click", event => {
+      const target = event.target;
+      if (target?.tagName === "BUTTON" || target?.tagName === "LABEL") {
+        setTimeout(closeComposeMenu, 80);
+      }
+    });
+  }
+
+  function closeComposeMenu() {
+    const menu = byId("minglStandaloneActionMenu");
+    if (menu) menu.open = false;
   }
 
   function insertEmoji(emoji) {
@@ -174,18 +186,76 @@
     wrap.innerHTML = rows.length ? rows.map(msg => {
       const mine = msg.senderUid === currentUser.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
+      const backgroundConsent = msg.messageType === "backgroundConsent";
       const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${messageAnimationClass(msg.animationType)} ${msg.unsent ? "unsent" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
         ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
         ${mediaHtml(msg)}
+        ${backgroundConsent ? backgroundConsentHtml(msg) : ""}
         <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${readReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='mingl-empty-state'>Start the conversation.</p>";
     wrap.querySelectorAll("[data-own-message='1']").forEach(node => {
       node.addEventListener("click", () => showMessageActions(node.dataset.messageId, node));
     });
+    wrap.querySelectorAll("[data-background-consent]").forEach(button => {
+      button.addEventListener("click", () => respondToBackgroundConsent(button.dataset.backgroundConsent, button.dataset.response));
+    });
     wrap.scrollTop = wrap.scrollHeight;
+    setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 80);
+  }
+
+  function messageAnimationClass(type = "") {
+    if (type === "bounce") return "animate-bounce";
+    if (type === "explode") return "animate-explode";
+    if (type === "scroll") return "animate-scroll";
+    if (type === "disappear") return "animate-disappear";
+    return "";
+  }
+
+  function backgroundConsentHtml(msg = {}) {
+    const status = msg.backgroundConsentStatus || "pending";
+    if (status !== "pending") return `<div class="mingl-consent-status">Background ${esc(status)}.</div>`;
+    if (msg.backgroundTargetUid !== currentUser.uid) return `<div class="mingl-consent-status">Waiting for the other patron to approve the shared background.</div>`;
+    return `<div class="mingl-consent-actions">
+      <button type="button" class="primary" data-background-consent="${esc(msg.id || "")}" data-response="approved">Approve Background</button>
+      <button type="button" data-background-consent="${esc(msg.id || "")}" data-response="declined">Keep Mine Private</button>
+    </div>`;
+  }
+
+  async function respondToBackgroundConsent(messageId, response) {
+    if (!messageId || !["approved","declined"].includes(response)) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists) return;
+    const msg = {id:snap.id, ...snap.data()};
+    if (msg.backgroundTargetUid !== currentUser.uid) {
+      setText("minglChatStatus", "Only the requested patron can answer this background request.");
+      return;
+    }
+    await db.collection("chatMessages").doc(messageId).set({
+      backgroundConsentStatus:response,
+      responseByUid:currentUser.uid,
+      respondedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    if (response === "approved" && msg.backgroundUrl && activeRoomId) {
+      await db.collection("chatRooms").doc(activeRoomId).set({
+        sharedBackgroundUrl:msg.backgroundUrl,
+        backgroundConsentPending:false,
+        backgroundConsentApprovedBy:currentUser.uid,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      applyBackground(msg.backgroundUrl);
+    }
+    if (response === "declined" && activeRoomId) {
+      await db.collection("chatRooms").doc(activeRoomId).set({
+        backgroundConsentPending:false,
+        backgroundConsentDeclinedBy:currentUser.uid,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }
+    setText("minglChatStatus", response === "approved" ? "Shared background approved." : "Shared background declined. The other patron keeps it locally.");
   }
 
   function subscribeMessages() {
@@ -343,6 +413,7 @@
       return clearAttachment();
     }
     const url = URL.createObjectURL(attachmentFile);
+    closeComposeMenu();
     preview.classList.remove("hidden");
     const thumb = attachmentFile.type.startsWith("video/")
       ? `<video src="${esc(url)}" muted playsinline preload="metadata"></video>`
@@ -425,6 +496,16 @@
     }, {merge:true});
   }
 
+  async function patchOwnMessage(messageId, patch) {
+    if (!messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) throw new Error("Only your own Mingl messages can be changed.");
+    await db.collection("chatMessages").doc(messageId).set({
+      ...patch,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
   async function editMessage(messageId) {
     const snap = await db.collection("chatMessages").doc(messageId).get();
     if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
@@ -455,6 +536,30 @@
     }
   }
 
+  async function unsendMessage(messageId) {
+    await patchOwnMessage(messageId, {
+      body:"Message unsent.",
+      unsent:true,
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function animateMessage(messageId, animationType) {
+    await patchOwnMessage(messageId, {
+      animationType,
+      animatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function disappearMessage(messageId) {
+    await patchOwnMessage(messageId, {
+      animationType:"disappear",
+      deleteAfterRead:true,
+      deleteAfterReadSetAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
   function showMessageActions(messageId, anchor) {
     document.querySelector(".mingl-message-action-popout")?.remove();
     const rect = anchor.getBoundingClientRect();
@@ -464,9 +569,14 @@
     popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 220)}px`;
     popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
       <strong>Edit</strong>
-      <button type="button" data-action="edit">Edit Message</button>
-      <strong>Correct Grammar/Spelling</strong>
-      <button type="button" data-action="correct">Correct This Message</button>
+      <button type="button" data-action="unsend">Unsend</button>
+      <button type="button" data-action="correct">AutoFix</button>
+      <button type="button" data-action="edit">Edit</button>
+      <strong>Text Animation</strong>
+      <button type="button" data-action="bounce">Bounce</button>
+      <button type="button" data-action="explode">Explode</button>
+      <button type="button" data-action="scroll">Scroll</button>
+      <button type="button" data-action="disappear">Disappear</button>
     </div>`;
     document.body.appendChild(popout);
     popout.addEventListener("click", async event => {
@@ -474,7 +584,10 @@
       if (!action) return;
       try {
         if (action === "edit") await editMessage(messageId);
-        if (action === "correct") await correctMessage(messageId);
+        else if (action === "correct") await correctMessage(messageId);
+        else if (action === "unsend") await unsendMessage(messageId);
+        else if (action === "disappear") await disappearMessage(messageId);
+        else await animateMessage(messageId, action);
       } catch(e) {
         setText("minglChatStatus", e.message || String(e));
       }
@@ -546,13 +659,18 @@
         backgroundConsentUrl:url,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
+      const participants = rooms.find(room => room.id === activeRoomId)?.participants || [currentUser.uid];
+      const targetUid = participants.find(uid => uid !== currentUser.uid) || "";
       await db.collection("chatMessages").add({
         roomId:activeRoomId,
         roomType:"mingl",
-        participants:rooms.find(room => room.id === activeRoomId)?.participants || [currentUser.uid],
+        participants,
         senderUid:"system",
         senderName:"System Message",
-        messageType:"system",
+        messageType:"backgroundConsent",
+        backgroundTargetUid:targetUid,
+        backgroundUrl:url,
+        backgroundConsentStatus:"pending",
         body:`${currentProfile.displayName || currentUser.displayName || "A patron"} wants to change the shared Mingl chat background. The background stays local until the other patron consents.`,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -579,7 +697,10 @@
     byId("minglChatMicrosoftLoginBtn")?.addEventListener("click", loginMicrosoft);
     byId("minglStandaloneSendBtn")?.addEventListener("click", sendMessage);
     byId("minglStandaloneImageInput")?.addEventListener("change", renderAttachmentPreview);
-    byId("minglStandaloneBackgroundInput")?.addEventListener("change", uploadBackground);
+    byId("minglStandaloneBackgroundInput")?.addEventListener("change", event => {
+      closeComposeMenu();
+      uploadBackground(event);
+    });
     document.querySelectorAll("[data-mingl-emoji]").forEach(button => {
       button.addEventListener("click", () => insertEmoji(button.dataset.minglEmoji || ""));
     });

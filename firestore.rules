@@ -1,7 +1,7 @@
 ﻿rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.94-mingl-chat-consent-actions-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.94-mingl-chat-consent-actions-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -107,7 +107,7 @@ service cloud.firestore {
     function isMinglSystemMessageRequest() {
       return isNewMinglMessage()
         && request.resource.data.senderUid == "system"
-        && request.resource.data.messageType == "system"
+        && request.resource.data.messageType in ["system", "backgroundConsent"]
         && request.resource.data.participants is list
         && request.auth.uid in request.resource.data.participants;
     }
