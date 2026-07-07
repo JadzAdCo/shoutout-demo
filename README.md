@@ -1,19 +1,20 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.95 Mingl Chat Popout Consent Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.96 Mingl Main Chat Card Removal Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.95-mingl-chat-popout-consent
+https://jadzadco.github.io/shoutout-demo/?v=28.96-mingl-main-chat-card-removal
 ```
 
 Current release highlights:
 
-- Adds v28.95 Mingl Chat Popout Consent fixes.
+- Adds v28.96 Mingl Main Chat Card Removal fixes.
+- Removes the visible `Mingl Chat` card/frame from the main Mingl landing page. Chat access remains through the top `Chat` shortcut and the dedicated `mingl-chat.html` page.
 - Mingl Chat now opens a selected patron conversation as a focused popout instead of dropping the chat window below the list on mobile.
 - The selected chat popout includes a close button and no longer auto-opens the first room before the patron chooses a conversation.
-- Main Mingl page no longer renders the extra embedded chat frame; it keeps discovery, matching, Mingl requests, and the link to the dedicated Mingl Chat page.
+- Main Mingl page no longer renders the extra embedded chat frame or the extra `Mingl Chat` card; it keeps discovery, matching, Mingl requests, and the top shortcut to the dedicated Mingl Chat page.
 - Shared-background system messages now explicitly tell the receiving patron to tap `Approve Background` or `Keep Mine Private`.
 - Shared Mingl chat background requests now create a real consent card for the other patron with `Approve Background` and `Keep Mine Private`.
 - The composer `+` action menu retracts after a command runs or a media/background picker opens.
@@ -38,8 +39,8 @@ Current release highlights:
 - Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
 - Club admins can reset the currently live display back to that club location's default ShoutOut.
 - Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
-- Firestore and Storage rule headers now carry the v28.95 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-95.md`.
+- Firestore and Storage rule headers now carry the v28.96 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-96.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
@@ -433,8 +434,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.95-mingl-chat-popout-consent-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.95-mingl-chat-popout-consent-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.96-mingl-main-chat-card-removal-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.96-mingl-main-chat-card-removal-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -442,8 +443,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.95-mingl-chat-popout-consent-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.95-mingl-chat-popout-consent-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.96-mingl-main-chat-card-removal-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.96-mingl-main-chat-card-removal-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

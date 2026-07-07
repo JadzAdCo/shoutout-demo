@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.95-mingl-chat-popout-consent */
+/* patron-portal-app.js v28.96-mingl-main-chat-card-removal */
 (function(){
   "use strict";
 
@@ -175,7 +175,7 @@
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
       if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({v:"28.95-mingl-chat-popout-consent"});
+        const params = new URLSearchParams({v:"28.96-mingl-main-chat-card-removal"});
         const room = new URL(window.location.href).searchParams.get("room");
         if (room) params.set("room", room);
         window.location.href = `./mingl-chat.html?${params.toString()}`;
@@ -1061,7 +1061,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.95-mingl-chat-popout-consent">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.96-mingl-main-chat-card-removal">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1178,7 +1178,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:`./mingl-chat.html?room=${roomId}&v=28.95-mingl-chat-popout-consent`,
+        link:`./mingl-chat.html?room=${roomId}&v=28.96-mingl-main-chat-card-removal`,
         read:false,
         createdAt:fieldValue()
       });

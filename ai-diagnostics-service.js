@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.95-mingl-chat-popout-consent-rules";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.95-mingl-chat-popout-consent-storage-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.95-mingl-chat-popout-consent";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.96-mingl-main-chat-card-removal-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.96-mingl-main-chat-card-removal-storage-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.96-mingl-main-chat-card-removal";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -704,25 +704,25 @@
         {label:"Portal Mingl message action popout", file:"patron-portal-app.js", includes:["showPortalMinglMessageActions", "uploadPortalMinglBackground", "uploadPortalMinglImage", "expireReadOncePortalMinglMessages"]},
         {label:"Mingl chat action and attachment CSS", file:"styles.css", includes:["mingl-message-action-popout", "mingl-message-media", "mingl-quick-actions", "personalized-ai-suggestion"]},
         {label:"Firestore rules allow sender-only message action metadata", file:"firestore.rules", includes:["v28.86-mingl-message-action-rules", "animationType", "deleteAfterRead", "isMinglDeleteAfterReadExpiry"]},
-        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.95-mingl-chat-popout-consent-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.96-mingl-main-chat-card-removal-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
         {label:"README documents v28.86", file:"README.md", includes:["v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI", "Mingl chat pictures", "personalized ShoutOut recommendations"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-86.md", includes:["FLOQR Rollback - v28.86 Mingl Actions AI Recommendations", "This rollback does not delete user profile data"]}
       ]
     },
     {
-      version: "v28.95-mingl-chat-popout-consent",
-      title: "Mingl Chat Popout Consent",
+      version: "v28.96-mingl-main-chat-card-removal",
+      title: "Mingl Main Chat Card Removal",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.95-mingl-chat-popout-consent"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.96-mingl-main-chat-card-removal"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
-        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.95-mingl-chat-popout-consent", "patron-app.js?v=28.95-mingl-chat-popout-consent"]},
-        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=28.95-mingl-chat-popout-consent"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.96-mingl-main-chat-card-removal", "patron-app.js?v=28.96-mingl-main-chat-card-removal"]},
+        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=28.96-mingl-main-chat-card-removal"]},
         {label:"Shared helper popouts script installed", file:"helper-popouts.js", includes:["FLOQRHelperPopouts", "MutationObserver", "p.sub.small"]},
         {label:"Main Mingl Requests panel installed", file:"index.html", includes:["minglRequestsList", "Mingl Requests", "help-popout"]},
         {label:"Main Mingl Requests renderer installed", file:"patron-app.js", includes:["renderMinglRequests", "minglRequestsList", "Mingl Back"]},
-        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=28.95-mingl-chat-popout-consent", "mingl-chat-app.js?v=28.95-mingl-chat-popout-consent"]},
+        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=28.96-mingl-main-chat-card-removal", "mingl-chat-app.js?v=28.96-mingl-main-chat-card-removal"]},
         {label:"Standalone Mingl selected chat popout installed", file:"mingl-chat.html", includes:["minglStandaloneChatCard", "mingl-chat-popout", "minglStandaloneCloseChatBtn"]},
         {label:"Portal Mingl old tabs redirect", file:"patron-portal-app.js", includes:["mingl-chat.html", "chats","mingl-chat"]},
         {label:"Mingl routes to standalone chat", file:"patron-app.js", includes:["portalChatUrl", "mingl-chat.html", "window.location.href = portalChatUrl(roomId)"]},
@@ -732,7 +732,7 @@
         {label:"Shared background consent card installed", file:"mingl-chat-app.js", includes:["backgroundConsentHtml", "respondToBackgroundConsent", "Approve Background", "Keep Mine Private"]},
         {label:"Shared background consent directive installed", file:"mingl-chat-app.js", includes:["Tap Approve Background", "Waiting for the other patron", "Keep Mine Private"]},
         {label:"Standalone chat waits for patron selection", file:"mingl-chat-app.js", includes:["closeRoom", "minglStandaloneChatCard", "if (requested && rooms.some"]},
-        {label:"Main Mingl page extra chat frame removed", file:"index.html", includes:["Open Mingl Chat", "minglRequestsList"], notIncludes:["id=\"minglChatPanel\"", "id=\"minglChatList\""]},
+        {label:"Main Mingl page extra chat card/frame removed", file:"index.html", includes:["minglRequestsList", "minglPeopleGrid"], notIncludes:["id=\"minglChatPanel\"", "id=\"minglChatList\"", "<h2>Mingl Chat</h2>", "Open Mingl Chat"]},
         {label:"Composer actions retract after command", file:"mingl-chat-app.js", includes:["closeComposeMenu", "setTimeout(closeComposeMenu", "data-mingl-emoji-code"]},
         {label:"Sent message commands and animations installed", file:"mingl-chat-app.js", includes:["Unsend", "AutoFix", "Bounce", "Explode", "Scroll", "Disappear", "animateMessage"]},
         {label:"Mingl text animation CSS installed", file:"styles.css", includes:["animate-bounce", "animate-explode", "animate-scroll", "animate-disappear"]},
@@ -742,10 +742,10 @@
         {label:"Club admin display default reset logic", file:"admin-app.js", includes:["resetDisplayToClubDefault", "clubDefaultReset", "resetDisplayDefaultBtn"]},
         {label:"Club admin display default reset button", file:"admin.html", includes:["resetDisplayDefaultBtn", "Reset Display to Club Default"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-compose-menu", "height-input-row"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.95-mingl-chat-popout-consent-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
-        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v28.95-mingl-chat-popout-consent-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
-        {label:"README documents v28.95", file:"README.md", includes:["v28.95 Mingl Chat Popout Consent", "focused popout", "Approve Background", "extra embedded chat frame"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V28-95.md", includes:["FLOQR Rollback - v28.95 Mingl Chat Popout Consent", "This rollback does not delete user profile data"]}
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.96-mingl-main-chat-card-removal-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v28.96-mingl-main-chat-card-removal-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v28.96", file:"README.md", includes:["v28.96 Mingl Main Chat Card Removal", "Removes the visible `Mingl Chat` card", "focused popout", "Approve Background"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-96.md", includes:["FLOQR Rollback - v28.96 Mingl Main Chat Card Removal", "This rollback does not delete user profile data"]}
       ]
     }
   ];
