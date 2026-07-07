@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.87-mingl-read-receipt-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.87-mingl-read-receipt-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules

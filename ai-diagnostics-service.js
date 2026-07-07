@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.87-mingl-read-receipt-rules";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.86-mingl-chat-media-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.87-mingl-chat-diagnostics";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.88-mingl-grammar-profile-datapoints-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.88-mingl-grammar-profile-datapoints-storage-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.88-mingl-grammar-profile-datapoints";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -704,16 +704,16 @@
         {label:"Portal Mingl message action popout", file:"patron-portal-app.js", includes:["showPortalMinglMessageActions", "uploadPortalMinglBackground", "uploadPortalMinglImage", "expireReadOncePortalMinglMessages"]},
         {label:"Mingl chat action and attachment CSS", file:"styles.css", includes:["mingl-message-action-popout", "mingl-message-media", "mingl-quick-actions", "personalized-ai-suggestion"]},
         {label:"Firestore rules allow sender-only message action metadata", file:"firestore.rules", includes:["v28.86-mingl-message-action-rules", "animationType", "deleteAfterRead", "isMinglDeleteAfterReadExpiry"]},
-        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.86-mingl-chat-media-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.88-mingl-grammar-profile-datapoints-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
         {label:"README documents v28.86", file:"README.md", includes:["v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI", "Mingl chat pictures", "personalized ShoutOut recommendations"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-86.md", includes:["FLOQR Rollback - v28.86 Mingl Actions AI Recommendations", "This rollback does not delete user profile data"]}
       ]
     },
     {
-      version: "v28.87-mingl-chat-diagnostics",
+      version: "v28.88-mingl-grammar-profile-datapoints",
       title: "Mingl Chat Read Receipts and Diagnostics Rerun",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.87-mingl-chat-diagnostics"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.88-mingl-grammar-profile-datapoints"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
@@ -722,7 +722,7 @@
         {label:"Public Mingl composer/read receipts", file:"patron-app.js", includes:["markMinglMessagesRead", "minglReadReceiptHtml", "This Mingl message has already been read and cannot be unsent"]},
         {label:"Portal Mingl composer/read receipts", file:"patron-portal-app.js", includes:["markPortalMinglMessagesRead", "portalMinglReadReceiptHtml", "unsendPortalMinglMessage"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-read-receipt", "mingl-action-note"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.87-mingl-read-receipt-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.88-mingl-grammar-profile-datapoints-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
         {label:"README documents v28.87", file:"README.md", includes:["v28.87 Mingl Chat Diagnostics", "zero live Mingl records is not treated as a feature failure"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-87.md", includes:["FLOQR Rollback - v28.87 Mingl Chat Diagnostics", "This rollback does not delete user profile data"]}
       ]

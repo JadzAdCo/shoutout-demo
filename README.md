@@ -20,6 +20,7 @@ Current release highlights:
 - Mingl chat background changes now remain local to the requesting patron until the other patron approves the shared background request.
 - Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
 - Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
+- Firestore and Storage rule headers now carry the v28.88 package version so Master Admin diagnostics and Firebase Console checks match this package.
 - Direct rollback note for this package is `ROLLBACK-V28-88.md`.
 - Adds v28.87 Mingl Chat Diagnostics fixes.
 - Public Mingl Chat and My Profile and Settings > Mingl Chat now keep the text input, picture control, Fix Grammar, and Send controls visible on mobile.
@@ -148,7 +149,7 @@ Current release highlights:
 - Uses scoped reads for protected collections in Diagnostics instead of broad collection reads that Firebase rules should deny.
 - Fixes the older v28.53 package marker check so it no longer fails on wording that was intentionally simplified later.
 - Updates Firestore rules to `v28.59-diagnostic-cleanup-rules` so temporary `diagnosticRunId` Mingl connection records can be deleted by their participant during the rules smoke test.
-- Updates Storage rules to `v28.86-mingl-chat-media-rules` so uploads still require owner, size, and file-type checks while deletes use an explicit owner delete rule, including Mingl chat image/background paths.
+- Updates Storage rules to `v28.88-mingl-grammar-profile-datapoints-storage-rules` so uploads still require owner, size, and file-type checks while deletes use an explicit owner delete rule, including Mingl chat image/background paths.
 - Adds step-level rules smoke-test evidence so failed Mingl/chat checks identify create/read/update/delete, and failed Storage checks identify upload/download/delete.
 - Clarifies `Firestore: minglConnections participant query compatibility` as an optional compatibility check. If the deterministic Mingl participant lifecycle passes but the array-contains participant query is denied, Diagnostics now reports a non-blocking Soft Fail: `Optional participant query blocked; fallback participant document reads passed.`
 - Keeps Firestore rules strict for Mingl. Do not loosen Firestore rules broadly or allow all signed-in users to list `minglConnections` just to make the optional query pass.
@@ -402,8 +403,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.87-mingl-read-receipt-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.87-mingl-read-receipt-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -411,8 +412,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.86-mingl-chat-media-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.86-mingl-chat-media-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.
