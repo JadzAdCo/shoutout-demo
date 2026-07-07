@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.89-mingl-chat-height-template-tags-rules";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.89-mingl-chat-height-template-tags-storage-rules";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.89-mingl-chat-height-template-tags";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.91-helper-popouts-mingl-requests-rules";
+  const EXPECTED_STORAGE_RULES_VERSION = "v28.91-helper-popouts-mingl-requests-storage-rules";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.91-helper-popouts-mingl-requests";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -704,32 +704,38 @@
         {label:"Portal Mingl message action popout", file:"patron-portal-app.js", includes:["showPortalMinglMessageActions", "uploadPortalMinglBackground", "uploadPortalMinglImage", "expireReadOncePortalMinglMessages"]},
         {label:"Mingl chat action and attachment CSS", file:"styles.css", includes:["mingl-message-action-popout", "mingl-message-media", "mingl-quick-actions", "personalized-ai-suggestion"]},
         {label:"Firestore rules allow sender-only message action metadata", file:"firestore.rules", includes:["v28.86-mingl-message-action-rules", "animationType", "deleteAfterRead", "isMinglDeleteAfterReadExpiry"]},
-        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.89-mingl-chat-height-template-tags-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"Storage rules allow Mingl chat media paths", file:"storage.rules", includes:["v28.91-helper-popouts-mingl-requests-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
         {label:"README documents v28.86", file:"README.md", includes:["v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI", "Mingl chat pictures", "personalized ShoutOut recommendations"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V28-86.md", includes:["FLOQR Rollback - v28.86 Mingl Actions AI Recommendations", "This rollback does not delete user profile data"]}
       ]
     },
     {
-      version: "v28.89-mingl-chat-height-template-tags",
-      title: "Mingl Chat Height and Template Tags",
+      version: "v28.91-helper-popouts-mingl-requests",
+      title: "Helper Popouts and Mingl Requests",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.89-mingl-chat-height-template-tags"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.91-helper-popouts-mingl-requests"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
-        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.89-mingl-chat-height-template-tags", "patron-app.js?v=28.89-mingl-chat-height-template-tags"]},
-        {label:"Portal Mingl page cache-busted", file:"patron-portal.html", includes:["styles.css?v=28.89-mingl-chat-height-template-tags", "patron-portal-app.js?v=28.89-mingl-chat-height-template-tags"]},
-        {label:"Mingl routes to single portal chat", file:"patron-app.js", includes:["portalChatUrl", "tab:\"chats\"", "window.location.href = portalChatUrl(roomId)"]},
-        {label:"Portal Mingl picture composer uses plus button", file:"patron-portal.html", includes:["chat-plus-button", "portalMinglImageInput", "portalImproveMinglMessageBtn"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.91-helper-popouts-mingl-requests", "patron-app.js?v=28.91-helper-popouts-mingl-requests"]},
+        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=28.91-helper-popouts-mingl-requests"]},
+        {label:"Shared helper popouts script installed", file:"helper-popouts.js", includes:["FLOQRHelperPopouts", "MutationObserver", "p.sub.small"]},
+        {label:"Main Mingl Requests panel installed", file:"index.html", includes:["minglRequestsList", "Mingl Requests", "help-popout"]},
+        {label:"Main Mingl Requests renderer installed", file:"patron-app.js", includes:["renderMinglRequests", "minglRequestsList", "Mingl Back"]},
+        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=28.91-helper-popouts-mingl-requests", "mingl-chat-app.js?v=28.91-helper-popouts-mingl-requests"]},
+        {label:"Portal Mingl old tabs redirect", file:"patron-portal-app.js", includes:["mingl-chat.html", "chats","mingl-chat"]},
+        {label:"Mingl routes to standalone chat", file:"patron-app.js", includes:["portalChatUrl", "mingl-chat.html", "window.location.href = portalChatUrl(roomId)"]},
+        {label:"Standalone Mingl picture composer uses plus button", file:"mingl-chat.html", includes:["chat-plus-button", "minglStandaloneImageInput", "minglStandaloneImproveBtn"]},
+        {label:"Standalone Mingl Chat logic installed", file:"mingl-chat-app.js", includes:["sendMessage", "uploadImage", "improveDraft", "uploadBackground"]},
         {label:"Height unit profile logic", file:"patron-portal-app.js", includes:["preferredHeightUnit", "editHeightUnit", "heightDisplay"]},
         {label:"Template tags participate in search", file:"patron-app.js", includes:["templateSearchText", "t.tags", "tag-row"]},
         {label:"Club admin display default reset logic", file:"admin-app.js", includes:["resetDisplayToClubDefault", "clubDefaultReset", "resetDisplayDefaultBtn"]},
         {label:"Club admin display default reset button", file:"admin.html", includes:["resetDisplayDefaultBtn", "Reset Display to Club Default"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "chat-plus-button", "height-input-row"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.89-mingl-chat-height-template-tags-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
-        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v28.89-mingl-chat-height-template-tags-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
-        {label:"README documents v28.89", file:"README.md", includes:["v28.89 Mingl Chat Height and Template Tags", "single Mingl Chat inbox"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V28-89.md", includes:["FLOQR Rollback - v28.89 Mingl Chat Height and Template Tags", "This rollback does not delete user profile data"]}
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.91-helper-popouts-mingl-requests-rules", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v28.91-helper-popouts-mingl-requests-storage-rules", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v28.91", file:"README.md", includes:["v28.91 Helper Popouts and Mingl Requests", "helper-popouts.js"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V28-91.md", includes:["FLOQR Rollback - v28.91 Helper Popouts and Mingl Requests", "This rollback does not delete user profile data"]}
       ]
     }
   ];

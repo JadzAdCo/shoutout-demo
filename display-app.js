@@ -1,4 +1,4 @@
-/* display-app.js v28.89-mingl-chat-height-template-tags */
+/* display-app.js v28.91-helper-popouts-mingl-requests */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);

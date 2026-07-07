@@ -1,25 +1,30 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.89 Mingl Chat Height and Template Tags Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.91 Helper Popouts and Mingl Requests Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.89-mingl-chat-height-template-tags
+https://jadzadco.github.io/shoutout-demo/?v=28.91-helper-popouts-mingl-requests
 ```
 
 Current release highlights:
 
-- Adds v28.89 Mingl Chat Height and Template Tags fixes.
+- Adds v28.91 Helper Popouts and Mingl Requests fixes.
+- Mingl Requests remain on the main Mingl page, separate from the standalone Mingl Chat inbox.
+- Repeated helper/instruction text across app pages now collapses behind compact `?` help popouts. The shared `helper-popouts.js` also watches dynamically rendered helper text.
+- The highlighted Mingl Requests description is now hidden until the patron taps the `?` popout.
+- Mingl Chat now has its own page: `mingl-chat.html`. The main Mingl page links directly to it, mutual Mingl request links open it, and old `patron-portal.html?tab=chats`, `?tab=mingl`, and `?tab=mingl-chat` URLs redirect to it.
+- Patron Profile and Settings no longer presents Mingl Chat as an internal settings panel. It keeps a link to the standalone Mingl Chat page only.
 - Fixes the v28.88 Package Install Diagnostics cache-bust mismatch where the current diagnostics still looked for `styles.css?v=28.87-mingl-chat-diagnostics`, `patron-app.js?v=28.87-mingl-chat-diagnostics`, and `patron-portal-app.js?v=28.87-mingl-chat-diagnostics`.
-- Mingl now uses one canonical chat inbox in Patron Portal. The public Mingl page remains for discovery and matching, then routes chat into `patron-portal.html?tab=chats`.
+- Mingl uses one canonical chat inbox on the standalone page. The public Mingl page remains for discovery and matching, then routes chat into `mingl-chat.html`.
 - Mingl chat picture sending uses a plus button inside the chat composer. If Storage rules are not deployed, the upload error clearly names the `mingl-chat/{uid}/{roomId}` Storage path.
 - Manual `Fix Grammar` now runs when clicked without requiring the language settings toggle first. Gemini/Firebase Functions remains first, and patron personal corrections remain the local fallback.
 - Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
 - Club admins can reset the currently live display back to that club location's default ShoutOut.
 - Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
-- Firestore and Storage rule headers now carry the v28.89 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-89.md`.
+- Firestore and Storage rule headers now carry the v28.91 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-91.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
@@ -413,8 +418,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.89-mingl-chat-height-template-tags-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.89-mingl-chat-height-template-tags-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.91-helper-popouts-mingl-requests-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.91-helper-popouts-mingl-requests-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -422,8 +427,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.91-helper-popouts-mingl-requests-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.91-helper-popouts-mingl-requests-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

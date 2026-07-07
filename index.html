@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=28.89-mingl-chat-height-template-tags"/>
+  <link rel="stylesheet" href="./styles.css?v=28.91-helper-popouts-mingl-requests"/>
 </head>
 <body>
 
@@ -284,16 +284,36 @@
     <div class="mingl-layout">
       <div class="card mingl-discovery-card">
         <div id="minglSelfCard" class="mingl-self-card"></div>
-        <h2>Mingl Social Playground</h2>
-        <p class="sub small">Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.</p>
+        <div class="section-title-row">
+          <h2>Mingl Social Playground</h2>
+          <details class="help-popout">
+            <summary aria-label="About Mingl search">?</summary>
+            <div>Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.</div>
+          </details>
+        </div>
         <input id="minglSearch" class="search" placeholder="Try: girls interested in fast cars and Latina events"/>
         <div id="minglPeopleGrid" class="mingl-people-grid"></div>
       </div>
       <div class="card">
-        <h2>Mingl Chat</h2>
-        <p class="sub small">Mingl has one chat inbox. Open it from My Profile and Settings after both patrons Mingl back.</p>
+        <div class="section-title-row">
+          <h2>Mingl Chat</h2>
+          <details class="help-popout">
+            <summary aria-label="About Mingl Chat">?</summary>
+            <div>Mingl has one chat inbox on its own page after both patrons Mingl back.</div>
+          </details>
+        </div>
         <div id="minglChatList" class="mingl-chat-list"></div>
-        <a class="buttonlike primary" href="./patron-portal.html?tab=chats&v=28.89-mingl-chat-height-template-tags">Open Mingl Chat</a>
+        <a class="buttonlike primary" href="./mingl-chat.html?v=28.91-helper-popouts-mingl-requests">Open Mingl Chat</a>
+      </div>
+      <div class="card mingl-requests-card">
+        <div class="section-title-row">
+          <h2>Mingl Requests</h2>
+          <details class="help-popout">
+            <summary aria-label="About Mingl Requests">?</summary>
+            <div>Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.</div>
+          </details>
+        </div>
+        <div id="minglRequestsList" class="mingl-chat-list"></div>
         <div id="minglChatPanel" class="mingl-chat-panel hidden" aria-hidden="true" hidden>
           <div class="mingl-chat-header">
             <div id="minglChatAvatar" class="mingl-chat-avatar">M</div>
@@ -474,18 +494,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.89-mingl-chat-height-template-tags"></script>
-<script src="./ai-service.js?v=28.89-mingl-chat-height-template-tags"></script>
+<script src="./shared-data.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./ai-service.js?v=28.91-helper-popouts-mingl-requests"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-location-service.js?v=28.89-mingl-chat-height-template-tags"></script>
+<script src="./ai-location-service.js?v=28.91-helper-popouts-mingl-requests"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./floqr-action-feedback.js?v=28.89-mingl-chat-height-template-tags"></script>
-<script src="./ai-grammar-service.js?v=28.89-mingl-chat-height-template-tags"></script>
-<script src="./patron-app.js?v=28.89-mingl-chat-height-template-tags"></script>
+<script src="./floqr-action-feedback.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./ai-grammar-service.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./helper-popouts.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./patron-app.js?v=28.91-helper-popouts-mingl-requests"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
-<script src="./ai-media-service.js?v=28.89-mingl-chat-height-template-tags"></script>
+<script src="./ai-media-service.js?v=28.91-helper-popouts-mingl-requests"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

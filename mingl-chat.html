@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR Mingl Chat v28.91-helper-popouts-mingl-requests -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mingl Chat</title>
+  <link rel="stylesheet" href="./styles.css?v=28.91-helper-popouts-mingl-requests"/>
+  <link rel="stylesheet" href="./admin.css?v=28.91-helper-popouts-mingl-requests"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <a class="global-back-btn buttonlike" href="./?v=28.91-helper-popouts-mingl-requests">&larr; Back to Mingl</a>
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MINGL / CHAT</p>
+        <h1>Mingl Chat</h1>
+        <p class="sub">Chat opens after both patrons Mingl back.</p>
+        <p id="minglChatSignedInAs" class="status">Checking sign-in...</p>
+        <p id="minglChatStatus" class="status"></p>
+      </div>
+    </header>
+
+    <div id="minglChatLogin" class="card hidden">
+      <h2>Sign in</h2>
+      <p class="sub small">Sign in to open your Mingl chats.</p>
+      <button id="minglChatGoogleLoginBtn" class="auth-btn" type="button">Continue with Google</button>
+      <button id="minglChatMicrosoftLoginBtn" class="auth-btn" type="button">Continue with Microsoft</button>
+    </div>
+
+    <div id="minglChatShell" class="mingl-layout hidden">
+      <div class="card">
+        <h2>Chats <span id="minglStandaloneCount">(0/0)</span></h2>
+        <div id="minglStandaloneList" class="mingl-chat-list"></div>
+      </div>
+      <div class="card">
+        <div class="mingl-chat-header">
+          <div id="minglStandaloneAvatar" class="mingl-chat-avatar">M</div>
+          <div>
+            <h2 id="minglStandaloneTitle">Select a Mingl Chat</h2>
+            <p id="minglStandaloneRoomStatus" class="sub small">Choose a mutual chat from the list.</p>
+          </div>
+        </div>
+        <div class="mingl-chat-tools">
+          <label class="chat-file-button" for="minglStandaloneBackgroundInput">Chat Background</label>
+          <input id="minglStandaloneBackgroundInput" class="visually-hidden-file" type="file" accept="image/*"/>
+          <input id="minglStandaloneImageInput" class="visually-hidden-file" type="file" accept="image/*"/>
+          <button id="minglStandaloneClearImageBtn" type="button">Remove Picture</button>
+        </div>
+        <div id="minglStandaloneAttachmentPreview" class="mingl-attachment-preview hidden"></div>
+        <div id="minglStandaloneMessages" class="mingl-messages"></div>
+        <p id="minglStandaloneGrammarHint" class="grammar-hint hidden"></p>
+        <div class="mingl-compose">
+          <label class="chat-plus-button" for="minglStandaloneImageInput" title="Send picture" aria-label="Send picture">+</label>
+          <input id="minglStandaloneMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
+          <button id="minglStandaloneImproveBtn" type="button">Fix Grammar</button>
+          <button id="minglStandaloneSendBtn" class="primary" type="button">Send</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./shared-data.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./ai-grammar-service.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./helper-popouts.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="./mingl-chat-app.js?v=28.91-helper-popouts-mingl-requests"></script>
+</body>
+</html>

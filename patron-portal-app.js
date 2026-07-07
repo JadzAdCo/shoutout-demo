@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.89-mingl-chat-height-template-tags */
+/* patron-portal-app.js v28.91-helper-popouts-mingl-requests */
 (function(){
   "use strict";
 
@@ -167,14 +167,21 @@
   }
 
   function setupTabs() {
-    document.querySelectorAll(".admin-tab").forEach(btn => {
+    document.querySelectorAll(".admin-tab[data-panel]").forEach(btn => {
       btn.addEventListener("click", () => {
         showPortalPanel(btn.dataset.panel, btn.dataset.panel);
       });
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", "mingl-chat":"portalMinglChatPage", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      if (["chats","mingl","mingl-chat"].includes(tab)) {
+        const params = new URLSearchParams({v:"28.91-helper-popouts-mingl-requests"});
+        const room = new URL(window.location.href).searchParams.get("room");
+        if (room) params.set("room", room);
+        window.location.href = `./mingl-chat.html?${params.toString()}`;
+        return;
+      }
+      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
@@ -1054,7 +1061,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=chats&room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.89-mingl-chat-height-template-tags">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.91-helper-popouts-mingl-requests">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1171,7 +1178,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:`./patron-portal.html?tab=chats&room=${roomId}&v=28.89-mingl-chat-height-template-tags`,
+        link:`./mingl-chat.html?room=${roomId}&v=28.91-helper-popouts-mingl-requests`,
         read:false,
         createdAt:fieldValue()
       });

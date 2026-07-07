@@ -1,4 +1,4 @@
-/* master-admin-app.js v28.89-mingl-chat-height-template-tags
+/* master-admin-app.js v28.91-helper-popouts-mingl-requests
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -220,14 +220,14 @@
   function clubAdminUrl(id = "") {
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
-    url.searchParams.set("v", "28.89-mingl-chat-height-template-tags");
+    url.searchParams.set("v", "28.91-helper-popouts-mingl-requests");
     return url.toString();
   }
 
   function displayUrl(id = "") {
     const url = new URL("./display.html", window.location.href);
     url.searchParams.set("location", id);
-    url.searchParams.set("v", "28.89-mingl-chat-height-template-tags");
+    url.searchParams.set("v", "28.91-helper-popouts-mingl-requests");
     return url.toString();
   }
 
