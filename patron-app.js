@@ -372,6 +372,15 @@
     return message;
   }
 
+  function minglUploadErrorMessage(error) {
+    const code = error?.code || "";
+    const message = error?.message || String(error || "Unknown error");
+    if (code === "storage/unauthorized" || /unauthorized|permission|storage rules/i.test(message)) {
+      return "Mingl picture upload failed because Firebase Storage rules are blocking mingl-chat/{uid}/{roomId}. Publish this package's storage.rules, then try the picture again.";
+    }
+    return message;
+  }
+
   function preserveExistingProfileData(updates, existing = {}) {
     const protectedUpdates = {...updates};
     Object.entries(protectedUpdates).forEach(([key, value]) => {
@@ -414,6 +423,7 @@
         ageRange: byId("profileAgeRange").value,
         gender: byId("profileGender")?.value || "",
         height: byId("profileHeight")?.value.trim() || "",
+        heightUnit: byId("profileHeightUnit")?.value || preferredHeightUnit(byId("profileCountry")?.value || ""),
         favoriteGenres: splitCSV(byId("profileGenres").value),
         nightlifeInterests: splitCSV(byId("profileInterests").value),
         musicInterests: splitCSV(byId("profileGenres").value),
@@ -826,7 +836,7 @@
 
   const PROFILE_DATAPOINTS = [
     {key:"gender", label:"Gender", get:p => p.gender},
-    {key:"height", label:"Height", get:p => p.height},
+    {key:"height", label:"Height", get:p => heightDisplay(p) || p.height},
     {key:"music", label:"Music", get:p => p.musicInterests || p.favoriteGenres},
     {key:"events", label:"Events", get:p => p.nightlifeInterests || p.nightlifeStyle},
     {key:"travel", label:"Travel", get:p => p.travelInterests},
@@ -926,8 +936,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints",
-      minglLink:"./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints",
+      link:"./patron-portal.html?tab=inbox&v=28.89-mingl-chat-height-template-tags",
+      minglLink:"./patron-portal.html?tab=mingl&v=28.89-mingl-chat-height-template-tags",
       read:false,
       createdAt:now
     };
@@ -942,6 +952,36 @@
 
   function joinList(value) {
     return Array.isArray(value) ? value.slice(0, 4).join(", ") : String(value || "");
+  }
+
+  function countryUsesFeetInches(country = "") {
+    const value = String(country || "").trim().toLowerCase();
+    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "canada", "ca"].includes(value);
+  }
+
+  function preferredHeightUnit(country = "") {
+    return countryUsesFeetInches(country) ? "ftin" : "m";
+  }
+
+  function applyProfileHeightUnit(force = false) {
+    const unit = byId("profileHeightUnit");
+    const height = byId("profileHeight");
+    if (!unit || !height) return;
+    if (force || !unit.dataset.userSelected) unit.value = preferredHeightUnit(byId("profileCountry")?.value || "");
+    height.placeholder = unit.value === "ftin" ? "5'10\"" : "1.78";
+  }
+
+  function heightDisplay(profile = {}) {
+    const value = String(profile.height || "").trim();
+    if (!value) return "";
+    const unit = profile.heightUnit || preferredHeightUnit(profile.country);
+    return unit === "m" ? `${value} m` : value;
+  }
+
+  function portalChatUrl(roomId = "") {
+    const params = new URLSearchParams({tab:"chats", v:"28.89-mingl-chat-height-template-tags"});
+    if (roomId) params.set("room", roomId);
+    return `./patron-portal.html?${params.toString()}`;
   }
 
   async function showShoutoutLanding() {
@@ -969,10 +1009,7 @@
   }
 
   function openMinglChatShortcut() {
-    const panel = byId("minglChatPanel");
-    const list = byId("minglChatList");
-    if (panel && !panel.classList.contains("hidden")) panel.scrollIntoView({behavior:"smooth", block:"start"});
-    else list?.scrollIntoView({behavior:"smooth", block:"start"});
+    window.location.href = portalChatUrl();
   }
 
   async function loadMingl() {
@@ -1273,6 +1310,8 @@
 
   async function openMinglChat(connectionOrRoom) {
     const roomId = connectionOrRoom.id?.startsWith("mingl_") ? connectionOrRoom.id : `mingl_${connectionOrRoom.connectionId || connectionOrRoom.id}`;
+    window.location.href = portalChatUrl(roomId);
+    return;
     activeMinglRoomId = roomId;
     const panel = byId("minglChatPanel");
     panel?.classList.remove("hidden");
@@ -1616,7 +1655,7 @@
       pending?.remove();
       if (input) input.value = body;
       minglAttachmentFile = attachmentFile;
-      setStatus(`Could not send Mingl message: ${e.message || e}`);
+      setStatus(`Could not send Mingl message: ${minglUploadErrorMessage(e)}`);
     }
   }
 
@@ -1639,11 +1678,6 @@
     const draft = input?.value.trim();
     if (!input || !draft) return;
     const settings = minglLanguageSettings();
-    if (!settings.aiGrammarEnabled) {
-      setText("minglGrammarHint", "Enable grammar help in My Profile and Settings > Language Settings.");
-      byId("minglGrammarHint")?.classList.remove("hidden");
-      return;
-    }
     if (window.FLOQRGrammar?.suggestGrammarCorrection) {
       const result = await window.FLOQRGrammar.suggestGrammarCorrection(draft, {
         uid:currentUser?.uid || "",
@@ -1746,7 +1780,7 @@
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
   function templateSearchText(t) {
-    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
   function templateContextQuery() {
     const explicitContext = window.FLOQR_TEMPLATE_CONTEXT_QUERY || document.body?.dataset?.templateContextQuery || "";
@@ -1781,6 +1815,7 @@
       <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
       <div class="name">${esc(template.name)}</div>
       <div class="tag">${esc(template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>
+      <div class="tag-row">${(template.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>
         <button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>
@@ -2236,7 +2271,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.88-mingl-grammar-profile-datapoints`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.89-mingl-chat-height-template-tags`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -2307,7 +2342,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.88-mingl-grammar-profile-datapoints";
+      portalLink.href = "./patron-portal.html?v=28.89-mingl-chat-height-template-tags";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -2320,14 +2355,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.89-mingl-chat-height-template-tags";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints";
+      chats.href = "./patron-portal.html?tab=mingl&v=28.89-mingl-chat-height-template-tags";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2397,6 +2432,13 @@
     bind("startShoutoutFlowBtn", () => openCategory("shoutout"));
     bind("backToCategoriesFromMinglBtn", () => showPage("categoryPage"));
     byId("minglSearch")?.addEventListener("input", renderMinglPeople);
+    byId("profileCountry")?.addEventListener("change", () => applyProfileHeightUnit());
+    byId("profileCountry")?.addEventListener("input", () => applyProfileHeightUnit());
+    byId("profileHeightUnit")?.addEventListener("change", event => {
+      event.currentTarget.dataset.userSelected = "true";
+      applyProfileHeightUnit(true);
+    });
+    applyProfileHeightUnit();
     byId("sendMinglMessageBtn")?.addEventListener("click", sendMinglMessage);
     byId("improveMinglMessageBtn")?.addEventListener("click", improveMinglDraft);
     byId("minglMessageInput")?.addEventListener("input", highlightMinglDraft);
@@ -2495,10 +2537,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.88-mingl-grammar-profile-datapoints">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.89-mingl-chat-height-template-tags">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.88-mingl-grammar-profile-datapoints">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.89-mingl-chat-height-template-tags">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.89-mingl-chat-height-template-tags">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2541,7 +2583,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.88-mingl-grammar-profile-datapoints`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.89-mingl-chat-height-template-tags`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

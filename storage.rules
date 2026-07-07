@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
 // Required media paths:

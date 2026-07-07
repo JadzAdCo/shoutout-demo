@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.88-mingl-grammar-profile-datapoints */
+/* patron-portal-app.js v28.89-mingl-chat-height-template-tags */
 (function(){
   "use strict";
 
@@ -35,6 +35,39 @@
     const d = value.toDate ? value.toDate() : value.seconds ? new Date(value.seconds * 1000) : new Date(value);
     return isNaN(d) ? "-" : d.toLocaleString();
   };
+
+  function countryUsesFeetInches(country = "") {
+    const value = String(country || "").trim().toLowerCase();
+    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america", "canada", "ca"].includes(value);
+  }
+
+  function preferredHeightUnit(country = "") {
+    return countryUsesFeetInches(country) ? "ftin" : "m";
+  }
+
+  function applyEditHeightUnit(force = false) {
+    const unit = byId("editHeightUnit");
+    const height = byId("editHeight");
+    if (!unit || !height) return;
+    if (force || !unit.dataset.userSelected) unit.value = preferredHeightUnit(byId("editCountry")?.value || "");
+    height.placeholder = unit.value === "ftin" ? "5'10\"" : "1.78";
+  }
+
+  function heightDisplay(profile = {}) {
+    const value = String(profile.height || "").trim();
+    if (!value) return "";
+    const unit = profile.heightUnit || preferredHeightUnit(profile.country);
+    return unit === "m" ? `${value} m` : value;
+  }
+
+  function minglUploadErrorMessage(error) {
+    const code = error?.code || "";
+    const message = error?.message || String(error || "Unknown error");
+    if (code === "storage/unauthorized" || /unauthorized|permission|storage rules/i.test(message)) {
+      return "Mingl picture upload failed because Firebase Storage rules are blocking mingl-chat/{uid}/{roomId}. Publish this package's storage.rules, then try the picture again.";
+    }
+    return message;
+  }
 
   const ROLE_LABELS = {
     patron: "Patron",
@@ -480,6 +513,8 @@
     byId("editLanguage").value = profile.preferredLanguage || "";
     byId("editGender").value = profile.gender || "";
     byId("editHeight").value = profile.height || "";
+    if (byId("editHeightUnit")) byId("editHeightUnit").value = profile.heightUnit || preferredHeightUnit(profile.country || "");
+    applyEditHeightUnit(true);
     byId("editInstagram").value = profile.instagramHandle || "";
     byId("editX").value = profile.xHandle || "";
     byId("editProfileType").value = profile.publicProfileType || "patron";
@@ -548,6 +583,7 @@
       preferredLanguage,
       gender: byId("editGender").value,
       height: byId("editHeight").value.trim(),
+      heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
       instagramHandle: byId("editInstagram").value.trim(),
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
@@ -929,7 +965,7 @@
         <p class="eyebrow">${esc(ROLE_LABELS[profileType] || "Patron")} Profile - ${esc(displayLanguage)}</p>
         <h3>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</h3>
         <p>${esc(displayBio)}</p>
-        <div class="profile-section"><strong>Height</strong><p>${esc(profile.height || "Not added yet.")}</p></div>
+        <div class="profile-section"><strong>Height</strong><p>${esc(heightDisplay(profile) || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
         <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
@@ -1018,7 +1054,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=chats&room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.89-mingl-chat-height-template-tags">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1135,7 +1171,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints",
+        link:`./patron-portal.html?tab=chats&room=${roomId}&v=28.89-mingl-chat-height-template-tags`,
         read:false,
         createdAt:fieldValue()
       });
@@ -1816,7 +1852,7 @@
     } catch (error) {
       input.value = body;
       portalMinglAttachmentFile = attachmentFile;
-      setText("portalStatus", error?.message || "Mingl message could not be sent.");
+      setText("portalStatus", minglUploadErrorMessage(error) || "Mingl message could not be sent.");
       if (pending) pending.remove();
       highlightMinglDraft();
     }
@@ -1841,10 +1877,6 @@
     const input = byId("portalMinglMessageInput");
     const draft = input?.value.trim();
     if (!input || !draft) return;
-    if (!currentLanguageSettings.aiGrammarEnabled) {
-      setText("portalStatus", "Turn on AI Grammar & Spelling Assistance in Language Settings first.");
-      return;
-    }
     if (!window.FLOQRGrammar?.suggestGrammarCorrection) {
       setText("portalStatus", "AI grammar correction is not available yet.");
       return;
@@ -2102,6 +2134,7 @@
       ["City", profile.city || "-"],
       ["Country", profile.country || "-"],
       ["Gender", profile.gender || "-"],
+      ["Height", heightDisplay(profile) || "-"],
       ["Food Choices", joinCSV(profile.foodChoices) || "-"],
       ["Favorite Beverages", joinCSV(profile.favoriteBeverages) || "-"],
       ["Preferred Language", profile.preferredLanguage || "-"],
@@ -2148,6 +2181,12 @@
     renderMessages(messages, user);
     renderPortalMinglRequests(currentMinglConnections, user);
     renderPortalMinglChats(chats, user);
+    const requestedRoom = params.get("room");
+    if (requestedRoom && !activePortalMinglRoomId) {
+      const room = chats.find(x => x.id === requestedRoom);
+      if (room) openPortalMinglChat(room);
+      else setText("portalStatus", "Requested Mingl Chat was not found or is not available for this account.");
+    }
     byId("privacyReport").innerHTML = simpleRows([
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
       ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
@@ -2230,6 +2269,12 @@
       renderRecipientSearchResults();
     });
     byId("portalMinglMessageInput")?.addEventListener("input", highlightMinglDraft);
+    byId("editCountry")?.addEventListener("change", () => applyEditHeightUnit());
+    byId("editCountry")?.addEventListener("input", () => applyEditHeightUnit());
+    byId("editHeightUnit")?.addEventListener("change", event => {
+      event.currentTarget.dataset.userSelected = "true";
+      applyEditHeightUnit(true);
+    });
     byId("portalMinglImageInput")?.addEventListener("change", renderPortalMinglAttachmentPreview);
     byId("portalMinglBackgroundInput")?.addEventListener("change", uploadPortalMinglBackground);
     byId("portalMinglMessageInput")?.addEventListener("keydown", event => {

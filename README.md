@@ -1,15 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.88 Mingl Grammar + Profile Datapoints Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.89 Mingl Chat Height and Template Tags Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.88-mingl-grammar-profile-datapoints
+https://jadzadco.github.io/shoutout-demo/?v=28.89-mingl-chat-height-template-tags
 ```
 
 Current release highlights:
 
+- Adds v28.89 Mingl Chat Height and Template Tags fixes.
+- Fixes the v28.88 Package Install Diagnostics cache-bust mismatch where the current diagnostics still looked for `styles.css?v=28.87-mingl-chat-diagnostics`, `patron-app.js?v=28.87-mingl-chat-diagnostics`, and `patron-portal-app.js?v=28.87-mingl-chat-diagnostics`.
+- Mingl now uses one canonical chat inbox in Patron Portal. The public Mingl page remains for discovery and matching, then routes chat into `patron-portal.html?tab=chats`.
+- Mingl chat picture sending uses a plus button inside the chat composer. If Storage rules are not deployed, the upload error clearly names the `mingl-chat/{uid}/{roomId}` Storage path.
+- Manual `Fix Grammar` now runs when clicked without requiring the language settings toggle first. Gemini/Firebase Functions remains first, and patron personal corrections remain the local fallback.
+- Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
+- Club admins can reset the currently live display back to that club location's default ShoutOut.
+- Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
+- Firestore and Storage rule headers now carry the v28.89 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-89.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
@@ -21,7 +31,7 @@ Current release highlights:
 - Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
 - Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
 - Firestore and Storage rule headers now carry the v28.88 package version so Master Admin diagnostics and Firebase Console checks match this package.
-- Direct rollback note for this package is `ROLLBACK-V28-88.md`.
+- That package's direct rollback note is `ROLLBACK-V28-88.md`.
 - Adds v28.87 Mingl Chat Diagnostics fixes.
 - Public Mingl Chat and My Profile and Settings > Mingl Chat now keep the text input, picture control, Fix Grammar, and Send controls visible on mobile.
 - Sent Mingl message actions still open by tapping/clicking the sent bubble, and `Unsend` is available only before the recipient reads the message.
@@ -31,7 +41,7 @@ Current release highlights:
 - Mingl feature diagnostics now separate installed workflow health from live Firestore data coverage: zero live Mingl records is not treated as a feature failure when no Firestore error exists.
 - `Mingl matching`, `Let's Mingl request workflow`, and `Mingl chat rooms` now explain whether no records were found yet, whether an optional participant query was blocked, and when to create/accept a Mingl request before rerunning diagnostics.
 - The live Firebase rules proof remains `Run Rules Smoke Test`. If the latest current-package rules smoke test shows a failed result, publish the package `firestore.rules` and `storage.rules` in Firebase Console, then rerun that smoke test separately from `Run Diagnostics`.
-- Direct rollback note for this package is `ROLLBACK-V28-87.md`.
+- That package's direct rollback note is `ROLLBACK-V28-87.md`.
 - Adds v28.86 Mingl Actions, Chat Media, and Personalized ShoutOut AI fixes.
 - The public Mingl hero now replaces the old explanatory sentence with two icon buttons: `Chat` and `Search for People`.
 - Personalized ShoutOut recommendations are now live/contextual. They rebuild from the current draft, selected tone, selected template, venue context, the signed-in user's own profile signals, and the user's own past ShoutOuts. Gemini receives this context through Firebase Functions when deployed; local personalized fallback remains available.
@@ -403,8 +413,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.88-mingl-grammar-profile-datapoints-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.89-mingl-chat-height-template-tags-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.89-mingl-chat-height-template-tags-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -412,8 +422,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.88-mingl-grammar-profile-datapoints-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.89-mingl-chat-height-template-tags-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

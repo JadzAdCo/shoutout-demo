@@ -47,17 +47,17 @@ window.SHOUTOUT_ADMIN_EMAILS = [
 ];
 
 window.SHOUTOUT_TEMPLATES = {
-  neon: { id: "neon", name: "Neon ShoutOut", scope: "Shared", className: "neon" },
-  birthday: { id: "birthday", name: "Birthday Glow", scope: "Shared", className: "neon" },
-  vip: { id: "vip", name: "VIP Table", scope: "Shared", className: "gold" },
-  bottle: { id: "bottle", name: "Bottle Service", scope: "Club", className: "fire" },
-  gold: { id: "gold", name: "Gold Celebration", scope: "Shared", className: "gold" },
-  ice: { id: "ice", name: "Ice Blue", scope: "Club", className: "ice" },
-  fire: { id: "fire", name: "Fire Night", scope: "Club", className: "fire" },
-  latin: { id: "latin", name: "Latin Night", scope: "Club", className: "gold" },
-  hiphop: { id: "hiphop", name: "Hip Hop Night", scope: "Club", className: "fire" },
-  afrohouse: { id: "afrohouse", name: "Afro House / Amapiano", scope: "Shared", className: "gold" },
-  edm: { id: "edm", name: "EDM / House", scope: "Shared", className: "ice" }
+  neon: { id: "neon", name: "Neon ShoutOut", scope: "Shared", className: "neon", tags:["neon","nightclub","general","live display","party","glow"] },
+  birthday: { id: "birthday", name: "Birthday Glow", scope: "Shared", className: "neon", tags:["birthday","happy birthday","flowers","celebration","cake","party"] },
+  vip: { id: "vip", name: "VIP Table", scope: "Shared", className: "gold", tags:["vip","table","bottle service","luxury","reservation","premium"] },
+  bottle: { id: "bottle", name: "Bottle Service", scope: "Club", className: "fire", tags:["bottle","champagne","vip","table","celebration"] },
+  gold: { id: "gold", name: "Gold Celebration", scope: "Shared", className: "gold", tags:["gold","luxury","anniversary","celebration","premium"] },
+  ice: { id: "ice", name: "Ice Blue", scope: "Club", className: "ice", tags:["ice","blue","cool","pool","summer","beach"] },
+  fire: { id: "fire", name: "Fire Night", scope: "Club", className: "fire", tags:["fire","hot","tattoo","ink","urban","night"] },
+  latin: { id: "latin", name: "Latin Night", scope: "Club", className: "gold", tags:["latin","reggaeton","salsa","bachata","dance"] },
+  hiphop: { id: "hiphop", name: "Hip Hop Night", scope: "Club", className: "fire", tags:["hip hop","hiphop","rap","trap","urban","tattoo"] },
+  afrohouse: { id: "afrohouse", name: "Afro House / Amapiano", scope: "Shared", className: "gold", tags:["afro house","afrohouse","amapiano","afrobeats","dance"] },
+  edm: { id: "edm", name: "EDM / House", scope: "Shared", className: "ice", tags:["edm","house","deep house","tech house","dance"] }
 };
 
 window.SHOUTOUT_CLUB_LOCATIONS = {
@@ -557,20 +557,20 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', description:'Classic marquee lightbox with bold black letters.' },
-  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.' },
-  anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.' },
-  engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.' },
-  fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.' },
-  summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal' },
-  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts.' },
-  champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP' },
-  beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach' },
-  graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone' },
-  wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone' },
-  sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle' },
-  luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP' },
-  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business' }
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', description:'Classic marquee lightbox with bold black letters.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media"] },
+  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
+  anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
+  engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
+  fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
+  summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal', tags:["summer","pool party","beach","cabana","day party","vacation"] },
+  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride"] },
+  champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP', tags:["champagne","bottle","vip","toast","celebration","luxury"] },
+  beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach', tags:["beach","pool","summer","cabana","day party","vacation"] },
+  graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', tags:["graduation","grad","school","college","achievement"] },
+  wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone', tags:["wedding","marriage","love","bride","groom","celebration"] },
+  sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', tags:["sports","game night","team","championship","watch party"] },
+  luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
+  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] }
 });
 
 window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate'];

@@ -1,4 +1,4 @@
-/* display-app.js v28.88-mingl-grammar-profile-datapoints */
+/* display-app.js v28.89-mingl-chat-height-template-tags */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);

@@ -160,7 +160,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-message.system{max-width:100%;justify-self:center;text-align:center;background:rgba(215,255,63,.09);border-color:rgba(215,255,63,.28)}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
 .mingl-message-actions{display:flex;justify-content:flex-end;margin-top:6px}.mingl-message-actions button{padding:5px 9px;border-radius:999px;font-size:12px}
-.mingl-compose{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;margin-top:10px;position:sticky;bottom:0;z-index:4;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(8,12,32,.96);box-shadow:0 -12px 30px rgba(0,0,0,.22);padding:10px}
+.mingl-compose{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;margin-top:10px;position:sticky;bottom:0;z-index:4;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(8,12,32,.96);box-shadow:0 -12px 30px rgba(0,0,0,.22);padding:10px}
 .mingl-compose input{min-width:0}
 #minglMessages,#portalMinglMessages{order:20}
 #minglAttachmentPreview,#portalMinglAttachmentPreview{order:30}
@@ -171,6 +171,10 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .icon-action-button{display:inline-flex;align-items:center;gap:9px;min-height:46px}
 .icon-action-button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .chat-file-button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.09);padding:10px 14px;font-weight:1000;cursor:pointer;text-align:center}
+.chat-plus-button{display:inline-flex;align-items:center;justify-content:center;width:48px;min-height:46px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.10);color:#fff;font-size:28px;font-weight:1000;line-height:1;cursor:pointer}
+.chat-plus-button:hover{background:rgba(255,255,255,.16)}
+.height-input-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
+.height-input-row input,.height-input-row select{width:100%}
 .visually-hidden-file{position:absolute!important;width:1px;height:1px;opacity:0;pointer-events:none}
 .mingl-chat-tools{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px}
 .mingl-attachment-preview{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.08);padding:10px;margin:10px 0}

@@ -626,6 +626,49 @@
     loadReports();
   }
 
+  async function resetDisplayToClubDefault() {
+    const user = auth.currentUser;
+    if (!user) {
+      setText("adminStatus", "Please sign in first.");
+      return;
+    }
+    const main = loc.defaultMain || `USE SHOUT OUT @ ${loc.locationName || locationId}`;
+    const payload = {
+      location: locationId,
+      clubLocationId: locationId,
+      locationName: loc.locationName || locationId,
+      brandName: loc.brandName || loc.locationName || locationId,
+      template: (loc.templates || [])[0] || "neon",
+      templateName: "Club Default",
+      mainText: main,
+      subText: loc.defaultSub || "",
+      mediaUrl: "",
+      mediaType: "",
+      mediaFileName: "",
+      mediaStoragePath: "",
+      status: "default",
+      source: "clubDefaultReset",
+      resetByUid: user.uid || "",
+      resetByEmail: safeUser(user),
+      resetAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("liveContent").doc(locationId).set(payload, {merge:false});
+    try {
+      await db.collection("shoutoutAudit").add({
+        action:"reset-display-to-club-default",
+        clubLocationId:locationId,
+        actorUid:user.uid || "",
+        actorEmail:safeUser(user),
+        mainText:main,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e) {}
+    setText("adminStatus", `Display reset to club default: ${main}`);
+    refreshLocationShell();
+    loadReports();
+  }
+
   async function reject(id) {
     const snap = await db.collection("shoutouts").doc(id).get();
     const item = snap.exists ? snap.data() : {};
@@ -790,6 +833,7 @@
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
     byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
 
     auth.getRedirectResult().then(result => {
