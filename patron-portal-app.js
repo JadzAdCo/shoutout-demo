@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.86-mingl-actions-ai-recommendations */
+/* patron-portal-app.js v28.88-mingl-grammar-profile-datapoints */
 (function(){
   "use strict";
 
@@ -7,6 +7,28 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const splitCSV = value => String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   const joinCSV = value => Array.isArray(value) ? value.join(", ") : String(value || "");
+  function parsePersonalCorrections(value = "") {
+    const seen = new Set();
+    return String(value || "")
+      .split(/\r?\n|,/)
+      .map(line => {
+        const match = line.match(/^\s*(.+?)\s*(?:->|=>|:)\s*(.+?)\s*$/);
+        return match ? {from:match[1].trim(), to:match[2].trim()} : null;
+      })
+      .filter(Boolean)
+      .filter(row => row.from && row.to && row.from.toLowerCase() !== row.to.toLowerCase())
+      .filter(row => {
+        const key = row.from.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 120);
+  }
+  const formatPersonalCorrections = rows => (Array.isArray(rows) ? rows : [])
+    .map(row => `${row.from || ""} -> ${row.to || ""}`.trim())
+    .filter(line => line !== "->")
+    .join("\n");
   const linkify = value => esc(value).replace(/(https?:\/\/[^\s<]+|\.\/[^\s<]+)/g, match => `<a href="${match}" class="message-inline-link">${match}</a>`);
   const fmtDate = value => {
     if (!value) return "-";
@@ -87,6 +109,7 @@
   const PUBLIC_MINGL_DATAPOINTS = [
     {key:"location", label:"City, state/region, and country"},
     {key:"gender", label:"Gender"},
+    {key:"height", label:"Height"},
     {key:"music", label:"Music interests"},
     {key:"events", label:"Event and nightlife interests"},
     {key:"travel", label:"Travel interests"},
@@ -118,7 +141,7 @@
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
-      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", "mingl-chat":"portalMinglChatPage", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", chats:"portalChats", mingl:"portalChats", "mingl-chat":"portalMinglChatPage", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
@@ -192,7 +215,9 @@
       highlightSpellingErrors:profile.languageSettings?.highlightSpellingErrors !== false,
       highlightGrammarSuggestions:profile.languageSettings?.highlightGrammarSuggestions !== false,
       preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || "auto",
-      tonePreference:profile.languageSettings?.tonePreference || "keepTone"
+      tonePreference:profile.languageSettings?.tonePreference || "keepTone",
+      personalDictionary:Array.isArray(profile.languageSettings?.personalDictionary) ? profile.languageSettings.personalDictionary : [],
+      personalCorrections:Array.isArray(profile.languageSettings?.personalCorrections) ? profile.languageSettings.personalCorrections : []
     };
   }
 
@@ -208,6 +233,8 @@
     if (byId("languageHighlightGrammarSuggestions")) byId("languageHighlightGrammarSuggestions").checked = !!settings.highlightGrammarSuggestions;
     if (byId("languagePreferredLanguage")) byId("languagePreferredLanguage").value = settings.preferredLanguage || "auto";
     if (byId("languageTonePreference")) byId("languageTonePreference").value = settings.tonePreference || "keepTone";
+    if (byId("languagePersonalDictionary")) byId("languagePersonalDictionary").value = (settings.personalDictionary || []).join(", ");
+    if (byId("languagePersonalCorrections")) byId("languagePersonalCorrections").value = formatPersonalCorrections(settings.personalCorrections || []);
     renderLanguageSettingsReport(settings);
     updateChatGrammarControls();
   }
@@ -223,7 +250,9 @@
       highlightSpellingErrors:!!byId("languageHighlightSpellingErrors")?.checked,
       highlightGrammarSuggestions:!!byId("languageHighlightGrammarSuggestions")?.checked,
       preferredLanguage:byId("languagePreferredLanguage")?.value || "auto",
-      tonePreference:byId("languageTonePreference")?.value || "keepTone"
+      tonePreference:byId("languageTonePreference")?.value || "keepTone",
+      personalDictionary:splitCSV(byId("languagePersonalDictionary")?.value || "").slice(0, 120),
+      personalCorrections:parsePersonalCorrections(byId("languagePersonalCorrections")?.value || "")
     };
   }
 
@@ -235,8 +264,65 @@
       ["Correction Mode", settings.correctionMode || "approvalRequired"],
       ["Preferred Language", languageLabel(settings.preferredLanguage || "auto")],
       ["Tone Preference", settings.tonePreference || "keepTone"],
+      ["My Word List", `${(settings.personalDictionary || []).length} saved words`],
+      ["My Personal Corrections", `${(settings.personalCorrections || []).length} saved typo fixes`],
       ["Draft Privacy", "Draft text is processed only when you request correction and is not indexed."]
     ]);
+  }
+
+  async function addPersonalDictionaryWord(word = "") {
+    const user = auth.currentUser;
+    const clean = String(word || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+    if (!user || !clean) return false;
+    const existing = splitCSV(byId("languagePersonalDictionary")?.value || "").concat(currentLanguageSettings.personalDictionary || []);
+    const seen = new Set();
+    const personalDictionary = existing.concat(clean)
+      .map(item => String(item || "").trim())
+      .filter(Boolean)
+      .filter(item => {
+        const key = item.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 120);
+    currentLanguageSettings = {...currentLanguageSettings, personalDictionary};
+    if (byId("languagePersonalDictionary")) byId("languagePersonalDictionary").value = personalDictionary.join(", ");
+    renderLanguageSettingsReport(currentLanguageSettings);
+    await db.collection("users").doc(user.uid).set({
+      languageSettings:{
+        ...currentLanguageSettings,
+        personalDictionary,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }
+    }, {merge:true});
+    return true;
+  }
+
+  async function addPersonalCorrection(from = "", to = "") {
+    const user = auth.currentUser;
+    const cleanFrom = String(from || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+    const cleanTo = String(to || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+    if (!user || !cleanFrom || !cleanTo || cleanFrom.toLowerCase() === cleanTo.toLowerCase()) return false;
+    const existing = parsePersonalCorrections(byId("languagePersonalCorrections")?.value || "")
+      .concat(currentLanguageSettings.personalCorrections || []);
+    const map = new Map();
+    existing.forEach(row => {
+      if (row?.from && row?.to) map.set(String(row.from).toLowerCase(), {from:row.from, to:row.to});
+    });
+    map.set(cleanFrom.toLowerCase(), {from:cleanFrom, to:cleanTo});
+    const personalCorrections = Array.from(map.values()).slice(0, 120);
+    currentLanguageSettings = {...currentLanguageSettings, personalCorrections};
+    if (byId("languagePersonalCorrections")) byId("languagePersonalCorrections").value = formatPersonalCorrections(personalCorrections);
+    renderLanguageSettingsReport(currentLanguageSettings);
+    await db.collection("users").doc(user.uid).set({
+      languageSettings:{
+        ...currentLanguageSettings,
+        personalCorrections,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }
+    }, {merge:true});
+    return true;
   }
 
   async function saveLanguageSettings() {
@@ -393,6 +479,7 @@
     byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
     byId("editGender").value = profile.gender || "";
+    byId("editHeight").value = profile.height || "";
     byId("editInstagram").value = profile.instagramHandle || "";
     byId("editX").value = profile.xHandle || "";
     byId("editProfileType").value = profile.publicProfileType || "patron";
@@ -460,6 +547,7 @@
       country: byId("editCountry").value.trim(),
       preferredLanguage,
       gender: byId("editGender").value,
+      height: byId("editHeight").value.trim(),
       instagramHandle: byId("editInstagram").value.trim(),
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
@@ -841,6 +929,7 @@
         <p class="eyebrow">${esc(ROLE_LABELS[profileType] || "Patron")} Profile - ${esc(displayLanguage)}</p>
         <h3>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</h3>
         <p>${esc(displayBio)}</p>
+        <div class="profile-section"><strong>Height</strong><p>${esc(profile.height || "Not added yet.")}</p></div>
         <div class="profile-section"><strong>Music</strong>${chips(profile.musicInterests || profile.favoriteGenres)}</div>
         <div class="profile-section"><strong>Travel</strong>${chips(profile.travelInterests)}</div>
         <div class="profile-section"><strong>Hobbies</strong>${chips(profile.hobbies || profile.generalHobbies)}</div>
@@ -929,7 +1018,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.87-mingl-chat-diagnostics">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1046,7 +1135,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:"./patron-portal.html?tab=mingl&v=28.87-mingl-chat-diagnostics",
+        link:"./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints",
         read:false,
         createdAt:fieldValue()
       });
@@ -1196,7 +1285,10 @@
     hint.classList.add("hidden");
     hint.textContent = "";
     if (!currentLanguageSettings.aiGrammarEnabled || !input.value.trim() || !window.FLOQRGrammar?.localDetectPossibleTypos) return;
-    const issues = window.FLOQRGrammar.localDetectPossibleTypos(input.value, currentLanguageSettings.preferredLanguage || "auto");
+    const issues = window.FLOQRGrammar.localDetectPossibleTypos(input.value, currentLanguageSettings.preferredLanguage || "auto", {
+      personalDictionary:currentLanguageSettings.personalDictionary || [],
+      personalCorrections:currentLanguageSettings.personalCorrections || []
+    });
     if (!issues.length) return;
     const hasSpelling = issues.some(issue => issue.type === "spelling");
     const hasGrammar = issues.some(issue => issue.type !== "spelling");
@@ -1207,8 +1299,29 @@
     hint.classList.remove("hidden");
   }
 
+  function firstChangedPair(original = "", suggested = "") {
+    const originalTokens = String(original || "").match(/[A-Za-z0-9@#'_-]+/g) || [];
+    const suggestedTokens = String(suggested || "").match(/[A-Za-z0-9@#'_-]+/g) || [];
+    for (let i = 0; i < originalTokens.length; i++) {
+      if ((originalTokens[i] || "").toLowerCase() !== (suggestedTokens[i] || "").toLowerCase()) return {from:originalTokens[i] || "", to:suggestedTokens[i] || ""};
+    }
+    return {from:originalTokens[0] || "", to:suggestedTokens[0] || ""};
+  }
+
+  function firstChangedToken(original = "", suggested = "") {
+    const originalTokens = String(original || "").match(/[\p{L}\p{N}@#'’_-]+/gu) || [];
+    const suggestedTokens = String(suggested || "").match(/[\p{L}\p{N}@#'’_-]+/gu) || [];
+    for (let i = 0; i < originalTokens.length; i++) {
+      if ((originalTokens[i] || "").toLowerCase() !== (suggestedTokens[i] || "").toLowerCase()) return originalTokens[i];
+    }
+    return originalTokens[0] || "";
+  }
+
   function showGrammarSuggestionModal({original, suggested, explanation, provider}) {
     return new Promise(resolve => {
+      const correctionCandidate = firstChangedPair(original, suggested);
+      const wordCandidate = correctionCandidate.from;
+      const correctionTo = correctionCandidate.to;
       const modal = document.createElement("div");
       modal.className = "floqr-grammar-modal";
       modal.innerHTML = `<div class="floqr-grammar-dialog">
@@ -1221,6 +1334,8 @@
         <div class="button-row">
           <button class="primary" type="button" data-grammar-choice="use">Use Suggestion</button>
           <button type="button" data-grammar-choice="keep">Keep Original</button>
+          ${wordCandidate ? `<button type="button" data-grammar-choice="add-word" data-word="${esc(wordCandidate)}">Add "${esc(wordCandidate)}" to My Word List</button>` : ""}
+          ${wordCandidate && correctionTo ? `<button type="button" data-grammar-choice="add-correction" data-from="${esc(wordCandidate)}" data-to="${esc(correctionTo)}">Save "${esc(wordCandidate)} -> ${esc(correctionTo)}"</button>` : ""}
           <button type="button" data-grammar-choice="edit">Edit Manually</button>
         </div>
       </div>`;
@@ -1229,8 +1344,11 @@
         const button = event.target.closest("[data-grammar-choice]");
         if (!button) return;
         const choice = button.dataset.grammarChoice;
+        const word = button.dataset.word || "";
+        const from = button.dataset.from || "";
+        const to = button.dataset.to || "";
         modal.remove();
-        resolve(choice);
+        resolve({choice, word, from, to});
       });
     });
   }
@@ -1360,7 +1478,14 @@
     const original = snap.data().body || "";
     if (!original.trim()) return;
     const result = window.FLOQRGrammar?.suggestGrammarCorrection
-      ? await window.FLOQRGrammar.suggestGrammarCorrection(original, {uid:user.uid, product:"mingl", inputType:"sent-message", correctionMode:"autoFixMinor"})
+      ? await window.FLOQRGrammar.suggestGrammarCorrection(original, {
+        uid:user.uid,
+        product:"mingl",
+        inputType:"sent-message",
+        correctionMode:"autoFixMinor",
+        personalDictionary:currentLanguageSettings.personalDictionary || [],
+        personalCorrections:currentLanguageSettings.personalCorrections || []
+      })
       : {correctedText:original.replace(/\s+/g, " ").trim()};
     const corrected = result.correctedText || original;
     if (corrected !== original) {
@@ -1455,6 +1580,11 @@
     try {
       if (!/^image\//.test(file.type)) throw new Error("Chat background must be an image.");
       if (file.size > 8 * 1024 * 1024) throw new Error("Chat background must be 8MB or smaller.");
+      const roomSnap = await db.collection("chatRooms").doc(activePortalMinglRoomId).get();
+      if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
+      const room = {id:roomSnap.id, ...roomSnap.data()};
+      if (!(room.participants || []).includes(user.uid)) throw new Error("Mingl chat is available only to approved participants.");
+      const otherUid = (room.participants || []).find(uid => uid !== user.uid) || "";
       const path = `mingl-chat-backgrounds/${user.uid}/${activePortalMinglRoomId}/${Date.now()}-${safeStorageFileName(file.name)}`;
       const snap = await storage.ref().child(path).put(file, {contentType:file.type, customMetadata:{uploadedBy:user.uid, roomId:activePortalMinglRoomId}});
       const url = await snap.ref.getDownloadURL();
@@ -1462,8 +1592,26 @@
         memberBackgrounds:{[user.uid]:url},
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
+      if (otherUid) {
+        const requesterName = currentProfile.displayName || user.displayName || user.email || "A Mingl member";
+        await db.collection("chatMessages").add({
+          roomId:activePortalMinglRoomId,
+          roomType:"mingl",
+          connectionId:room.connectionId || "",
+          participants:room.participants || [],
+          senderUid:"system",
+          senderName:"System Message",
+          messageType:"backgroundConsent",
+          body:`${requesterName} wishes to change your mutual chat background. Please approve or decline the shared background.`,
+          backgroundUrl:url,
+          backgroundRequestedByUid:user.uid,
+          backgroundTargetUid:otherUid,
+          backgroundConsentStatus:"pending",
+          createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
       applyPortalMinglBackground(url);
-      setText("portalStatus", "Mingl chat background updated.");
+      setText("portalStatus", otherUid ? "Your chat background was updated. The other patron was asked to consent before it becomes shared." : "Mingl chat background updated.");
     } catch (error) {
       setText("portalStatus", error?.message || "Could not update Mingl chat background.");
     }
@@ -1514,7 +1662,7 @@
       const photo = other.summary.photoURL || other.summary.profilePhotoUrl || "";
       avatar.innerHTML = photo ? `<img src="${esc(photo)}" alt="">` : esc(displayName.slice(0, 1).toUpperCase() || "M");
     }
-    applyPortalMinglBackground(room.memberBackgrounds?.[auth.currentUser?.uid] || "");
+    applyPortalMinglBackground(room.memberBackgrounds?.[auth.currentUser?.uid] || room.sharedBackgroundUrl || "");
     clearPortalMinglAttachment();
     updateChatGrammarControls();
     subscribePortalMinglMessages();
@@ -1535,9 +1683,13 @@
     wrap.innerHTML = sorted.length ? sorted.map(msg => {
       const mine = msg.senderUid === user.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
+      const backgroundConsentActions = msg.messageType === "backgroundConsent" && msg.backgroundTargetUid === user.uid && (msg.backgroundConsentStatus || "pending") === "pending"
+        ? `<div class="queue-actions background-consent-actions"><button class="primary" type="button" data-bg-consent="approve" data-message-id="${esc(msg.id || "")}">Approve Background</button><button type="button" data-bg-consent="decline" data-message-id="${esc(msg.id || "")}">Keep My Background</button></div>`
+        : "";
       return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${msg.unsent ? "unsent" : ""} ${portalMinglAnimationClass(msg.animationType)}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'tabindex="0" data-own-message="1"' : ""}>
         <p>${esc(msg.body || "")}</p>
         ${portalMinglMediaHtml(msg)}
+        ${backgroundConsentActions}
         <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.unsent ? " - unsent" : ""}${msg.deleteAfterRead ? " - delete after read" : ""}${portalMinglReadReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='sub mingl-empty-state'>Start the conversation.</p>";
@@ -1550,7 +1702,52 @@
         }
       });
     });
+    wrap.querySelectorAll("[data-bg-consent]").forEach(button => {
+      button.addEventListener("click", () => respondToPortalMinglBackgroundConsent(button.dataset.messageId || "", button.dataset.bgConsent === "approve"));
+    });
     wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  async function respondToPortalMinglBackgroundConsent(messageId, approved) {
+    const user = auth.currentUser;
+    if (!user || !activePortalMinglRoomId || !messageId) return;
+    try {
+      const messageRef = db.collection("chatMessages").doc(messageId);
+      const snap = await messageRef.get();
+      if (!snap.exists) throw new Error("Background request was not found.");
+      const msg = snap.data();
+      if (msg.backgroundTargetUid !== user.uid) throw new Error("Only the requested patron can respond to this background request.");
+      await messageRef.set({
+        backgroundConsentStatus:approved ? "approved" : "declined",
+        responseByUid:user.uid,
+        respondedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      const roomSnap = await db.collection("chatRooms").doc(activePortalMinglRoomId).get();
+      const room = roomSnap.exists ? roomSnap.data() : {};
+      if (approved && msg.backgroundUrl) {
+        await db.collection("chatRooms").doc(activePortalMinglRoomId).set({
+          sharedBackgroundUrl:msg.backgroundUrl,
+          memberBackgrounds:{[user.uid]:msg.backgroundUrl},
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge:true});
+        applyPortalMinglBackground(msg.backgroundUrl);
+      }
+      await db.collection("chatMessages").add({
+        roomId:activePortalMinglRoomId,
+        roomType:"mingl",
+        connectionId:room.connectionId || msg.connectionId || "",
+        participants:msg.participants || room.participants || [],
+        senderUid:"system",
+        senderName:"System Message",
+        messageType:"system",
+        body:approved ? "Shared chat background approved." : "Shared chat background declined. Each patron will keep their own chat background.",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      setText("portalStatus", approved ? "Shared Mingl chat background approved." : "Shared background declined. Your side stays unchanged.");
+    } catch (error) {
+      setText("portalStatus", error?.message || "Could not update background consent.");
+    }
   }
 
   function subscribePortalMinglMessages() {
@@ -1659,11 +1856,15 @@
       inputType:"chat",
       preferredLanguage:currentLanguageSettings.preferredLanguage || "auto",
       tonePreference:currentLanguageSettings.tonePreference || "keepTone",
-      correctionMode:currentLanguageSettings.correctionMode || "approvalRequired"
+      correctionMode:currentLanguageSettings.correctionMode || "approvalRequired",
+      personalDictionary:currentLanguageSettings.personalDictionary || [],
+      personalCorrections:currentLanguageSettings.personalCorrections || []
     });
     const suggestion = result.correctedText || draft;
     if (suggestion === draft) {
-      setText("portalStatus", "No grammar change suggested.");
+      setText("portalStatus", result.provider === "gemini-unavailable" || result.provider === "personal-fallback"
+        ? "Gemini grammar correction is unavailable. FLOQR only used your saved personal corrections and Word List."
+        : "No grammar change suggested.");
       highlightMinglDraft();
       return;
     }
@@ -1673,15 +1874,25 @@
       highlightMinglDraft();
       return;
     }
-    const choice = await showGrammarSuggestionModal({
+    const decision = await showGrammarSuggestionModal({
       original:draft,
       suggested:suggestion,
       explanation:result.explanation || "",
       provider:result.provider || ""
     });
+    const choice = typeof decision === "string" ? decision : decision?.choice;
     if (choice === "use") {
       window.FLOQRGrammar.applyCorrectionToInput(input, suggestion);
       setText("portalStatus", "Suggestion applied. Tap Send when ready.");
+    } else if (choice === "add-word") {
+      const added = await addPersonalDictionaryWord(decision?.word || firstChangedToken(draft, suggestion));
+      setText("portalStatus", added ? "Word added to My Word List. Original draft kept." : "Could not add word to My Word List.");
+      input.focus();
+    } else if (choice === "add-correction") {
+      const pair = decision?.from && decision?.to ? decision : firstChangedPair(draft, suggestion);
+      const added = await addPersonalCorrection(pair.from, pair.to);
+      setText("portalStatus", added ? "Personal correction saved. It will be used when this typo appears again." : "Could not save personal correction.");
+      input.focus();
     } else if (choice === "edit") {
       input.focus();
       setText("portalStatus", "Edit your draft, then tap Send when ready.");
@@ -2027,7 +2238,7 @@
         sendPortalMinglMessage();
       }
     });
-    ["languageAiGrammarEnabled","languageHighlightSpellingErrors","languageHighlightGrammarSuggestions","languagePreferredLanguage","languageTonePreference"].forEach(id => {
+    ["languageAiGrammarEnabled","languageHighlightSpellingErrors","languageHighlightGrammarSuggestions","languagePreferredLanguage","languageTonePreference","languagePersonalDictionary","languagePersonalCorrections"].forEach(id => {
       byId(id)?.addEventListener("change", () => {
         currentLanguageSettings = collectLanguageSettings();
         renderLanguageSettingsReport(currentLanguageSettings);

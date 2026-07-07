@@ -166,6 +166,22 @@ service cloud.firestore {
         ]);
     }
 
+    function isMinglBackgroundConsentUpdate() {
+      return isExistingMinglMessage()
+        && resource.data.messageType == "backgroundConsent"
+        && resource.data.backgroundTargetUid == request.auth.uid
+        && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.roomId == resource.data.roomId
+        && request.resource.data.roomType == resource.data.roomType
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "backgroundConsentStatus",
+          "responseByUid",
+          "respondedAt",
+          "updatedAt"
+        ]);
+    }
+
     match /users/{userId} {
       allow create: if isSelf(userId);
       allow read: if signedIn();
@@ -463,6 +479,7 @@ service cloud.firestore {
           !isExistingMinglMessage() ||
           isOwnMinglMessageEdit() ||
           isMinglReadReceiptUpdate() ||
+          isMinglBackgroundConsentUpdate() ||
           isMinglDeleteAfterReadExpiry() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );

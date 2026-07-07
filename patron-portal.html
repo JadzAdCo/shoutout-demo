@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Patron Portal v28.86-mingl-actions-ai-recommendations -->
+  <!-- FLOQR Patron Portal v28.88-mingl-grammar-profile-datapoints -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=28.87-mingl-chat-diagnostics"/>
-  <link rel="stylesheet" href="./admin.css?v=28.86-mingl-actions-ai-recommendations"/>
+  <link rel="stylesheet" href="./styles.css?v=28.88-mingl-grammar-profile-datapoints"/>
+  <link rel="stylesheet" href="./admin.css?v=28.88-mingl-grammar-profile-datapoints"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -48,7 +48,8 @@
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
-        <button class="admin-tab" data-panel="portalChats" type="button">Mingl</button>
+        <button class="admin-tab" data-panel="portalChats" type="button">Mingl Chat</button>
+        <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
       </nav>
 
       <section id="portalOverview" class="admin-panel-section active">
@@ -108,6 +109,7 @@
                 <option value="self-described">Self-described</option>
               </select>
             </label>
+            <label>Height <input id="editHeight" placeholder="5'10&quot;, 178 cm, or prefer not to say"/></label>
             <label>Instagram Handle <input id="editInstagram"/></label>
             <label>X Handle <input id="editX"/></label>
             <label>Public Profile Type
@@ -234,21 +236,17 @@
       </section>
 
       <section id="portalChats" class="admin-panel-section">
+        <div class="card"><h2>Mingl Chat <span id="chatCountLabel">(0/0)</span></h2><p class="sub small">Open a mutual Mingl chat in its own page.</p><div id="myChats" class="report-block"></div></div>
         <div class="card mingl-dashboard-card">
-          <h2>Mingl</h2>
-          <p class="sub small">Review rules, check recent requests, then open a mutual Mingl chat.</p>
+          <h2>Mingl Requests</h2>
+          <p class="sub small">Sent and received Friend or Mingl Requests appear here after the chat list.</p>
           <div class="mingl-control-grid">
-            <details id="minglRulesDetails" class="mingl-action-details">
-              <summary>Mingl Rules</summary>
-              <div id="chatPolicySummary" class="policy-list"></div>
-            </details>
             <details id="minglRequestsDetails" class="mingl-action-details">
               <summary id="minglRequestsSummaryButton">Mingl Requests</summary>
               <div id="portalMinglRequests" class="report-block"></div>
             </details>
           </div>
         </div>
-        <div class="card"><h2>Mingl Chat <span id="chatCountLabel">(0/0)</span></h2><p class="sub small">Open a mutual Mingl chat in its own page.</p><div id="myChats" class="report-block"></div></div>
       </section>
 
       <section id="portalMinglChatPage" class="admin-panel-section">
@@ -258,7 +256,7 @@
             <div id="portalMinglChatAvatar" class="mingl-chat-avatar">M</div>
             <div>
               <h2 id="portalMinglChatTitle">Mingl Chat</h2>
-              <p id="portalMinglChatStatus" class="sub small">Mutual Mingl chat</p>
+              <p id="portalMinglChatStatus" class="sub small hidden"></p>
             </div>
           </div>
           <div class="mingl-chat-tools">
@@ -326,9 +324,51 @@
                 <option value="formal">Formal</option>
               </select>
             </label>
+            <label>My Word List
+              <textarea id="languagePersonalDictionary" rows="3" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
+            </label>
+            <label>My Personal Corrections
+              <textarea id="languagePersonalCorrections" rows="4" placeholder="watz -> what's&#10;weakend -> weekend"></textarea>
+            </label>
           </div>
           <button id="saveLanguageSettingsBtn" class="primary" type="button">Save Language Settings</button>
           <div id="languageSettingsReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="portalHelp" class="admin-panel-section">
+        <div class="card">
+          <h2>Help</h2>
+          <p class="sub small">Help content is grouped by FLOQR feature so working pages stay clean.</p>
+          <div class="help-section-grid">
+            <details class="mingl-action-details" open>
+              <summary>Mingl</summary>
+              <div id="chatPolicySummary" class="policy-list"></div>
+              <div class="help-copy">
+                <p>Mingl is the social discovery area for public patron profiles and shared interests.</p>
+                <p>Mingl Chat opens only after both patrons agree to Mingl with each other.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>ShoutOut</summary>
+              <div class="help-copy">
+                <p>Use ShoutOut to find venues, choose a template, add supported media, and submit live display content for approval.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>Bata</summary>
+              <div class="help-copy">
+                <p>Bata is the future merch, style, and product discovery area connected to FLOQR events and creators.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>Fix Grammar</summary>
+              <div class="help-copy">
+                <p>Fix Grammar calls Gemini through Firebase Functions first. If Gemini is unavailable, FLOQR only applies your saved personal correction pairs and preserves your Word List.</p>
+                <p>My Word List protects names, slang, handles, and preferred spellings. My Personal Corrections handles repeated typos like watz -> what's. FLOQR does not run a generalized local typo dictionary.</p>
+              </div>
+            </details>
+          </div>
         </div>
       </section>
 
@@ -360,14 +400,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./ai-service.js?v=28.86-mingl-actions-ai-recommendations"></script>
+<script src="./shared-data.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./ai-grammar-service.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./floqr-action-feedback.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./patron-portal-app.js?v=28.87-mingl-chat-diagnostics"></script>
+<script src="./ai-grammar-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./floqr-action-feedback.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./patron-portal-app.js?v=28.88-mingl-grammar-profile-datapoints"></script>
 </body>
 </html>

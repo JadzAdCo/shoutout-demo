@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v24 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v28.88-mingl-grammar-profile-datapoints -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=28.87-mingl-chat-diagnostics"/>
-  <link rel="stylesheet" href="./admin.css?v=28.86-mingl-actions-ai-recommendations"/>
+  <link rel="stylesheet" href="./styles.css?v=28.88-mingl-grammar-profile-datapoints"/>
+  <link rel="stylesheet" href="./admin.css?v=28.88-mingl-grammar-profile-datapoints"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -49,6 +49,7 @@
       </div>
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
+        <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club Admin URLs</button>
         <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
@@ -72,6 +73,14 @@
         <div class="admin-grid">
           <div class="card"><h2>Top Locations</h2><div id="topLocationsReport" class="report-block"></div></div>
           <div class="card"><h2>Audience Intelligence</h2><div id="networkAudienceReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="clubAdminUrls" class="admin-panel-section">
+        <div class="card">
+          <h2>Club Admin Portal URLs</h2>
+          <p class="sub small">Open or copy the direct admin portal URL for each club/location. These URLs use the location id in `admin.html?location=`.</p>
+          <div id="clubAdminUrlList" class="report-block"></div>
         </div>
       </section>
 
@@ -374,15 +383,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./ai-service.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./ai-index-service.js?v=28.44-ai"></script>
-<script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-discovery-service.js?v=28.74-gemini-media-editing"></script>
-<script src="./floqr-action-feedback.js?v=28.86-mingl-actions-ai-recommendations"></script>
-<script src="./ai-diagnostics-service.js?v=28.87-mingl-chat-diagnostics"></script>
-<script src="./duplicate-record-service.js?v=28.74-gemini-media-editing"></script>
-<script src="./master-admin-app.js?v=28.74-gemini-media-editing"></script>
+<script src="./shared-data.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-index-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-search-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-discovery-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./floqr-action-feedback.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./ai-diagnostics-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./duplicate-record-service.js?v=28.88-mingl-grammar-profile-datapoints"></script>
+<script src="./master-admin-app.js?v=28.88-mingl-grammar-profile-datapoints"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

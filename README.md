@@ -1,15 +1,26 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.87 Mingl Chat Diagnostics Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.88 Mingl Grammar + Profile Datapoints Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.87-mingl-chat-diagnostics
+https://jadzadco.github.io/shoutout-demo/?v=28.88-mingl-grammar-profile-datapoints
 ```
 
 Current release highlights:
 
+- Adds v28.88 Mingl grammar and profile datapoint fixes.
+- `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
+- Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
+- Gemini correction prompts now allow a patron to use the suggestion, keep the original, add the changed word to My Word List, or save the correction pair for repeated future typos.
+- Adds `Height` as a user profile datapoint on first-time profile setup, Patron Portal profile editing, public profile preview, privacy datapoint selection, and Mingl contextual matching/search.
+- Adds Master Admin > Club Admin URLs with direct `admin.html?location=...` and `display.html?location=...` links for each club/location.
+- Fixes idle ShoutOut display fallback text so a non-Zebbies location with stale/default live content shows its own venue default, such as `USE SHOUT OUT @ SHÔKO` or `USE SHOUT OUT @ JOSEPHINE`.
+- Mingl chat background changes now remain local to the requesting patron until the other patron approves the shared background request.
+- Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
+- Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
+- Direct rollback note for this package is `ROLLBACK-V28-88.md`.
 - Adds v28.87 Mingl Chat Diagnostics fixes.
 - Public Mingl Chat and My Profile and Settings > Mingl Chat now keep the text input, picture control, Fix Grammar, and Send controls visible on mobile.
 - Sent Mingl message actions still open by tapping/clicking the sent bubble, and `Unsend` is available only before the recipient reads the message.

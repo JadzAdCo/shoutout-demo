@@ -1,4 +1,4 @@
-/* display-app.js v28.73 */
+/* display-app.js v28.88-mingl-grammar-profile-datapoints */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -153,7 +153,12 @@
     }
     else if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) canvas.style.background = backgroundGradient;
     else if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) canvas.style.background = backgroundColor;
-    const mainText = data.mainText || t.defaultMain || loc.defaultMain || "USE SHOUT OUT";
+    const staleZebbiesDefault = value => {
+      const text = String(value || "").toUpperCase().replace(/\s+/g, " ").trim();
+      return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
+    };
+    const locationDefaultMain = loc.defaultMain || (loc.brandName ? `USE SHOUT OUT @ ${String(loc.brandName).toUpperCase()}` : "USE SHOUT OUT");
+    const mainText = (!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText;
     const subText = data.subText || t.defaultSub || "";
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");

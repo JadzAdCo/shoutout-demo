@@ -1,58 +1,66 @@
-/* FLOQR AI grammar service v28.84: draft-only grammar/spelling help, Gemini callable when configured. */
+/* FLOQR AI grammar service v28.88: draft-only grammar/spelling help, Gemini callable when configured. */
 (function () {
   "use strict";
 
   const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "Bata"];
-  const COMMON_FIXES = [
-    {pattern:/\bgut\b/gi, replacement:"good", type:"spelling", label:"gut"},
-    {pattern:/\bteh\b/gi, replacement:"the", type:"spelling", label:"teh"},
-    {pattern:/\byuo\b/gi, replacement:"you", type:"spelling", label:"yuo"},
-    {pattern:/\bwanna\b/gi, replacement:"want to", type:"grammar", label:"wanna"},
-    {pattern:/\bi\b/g, replacement:"I", type:"grammar", label:"i"}
-  ];
+  function personalWords(context = {}) {
+    return Array.isArray(context.personalDictionary)
+      ? context.personalDictionary.map(word => String(word || "").trim()).filter(Boolean).slice(0, 120)
+      : [];
+  }
 
-  function preserveProtectedTerms(value = "") {
+  function personalCorrections(context = {}) {
+    const rows = Array.isArray(context.personalCorrections) ? context.personalCorrections : [];
+    return rows.map(row => ({
+      from:String(row?.from || "").trim(),
+      to:String(row?.to || "").trim()
+    })).filter(row => row.from && row.to).slice(0, 120);
+  }
+
+  function preserveProtectedTerms(value = "", extraTerms = []) {
     let out = String(value || "");
-    PROTECTED_TERMS.forEach(term => {
-      out = out.replace(new RegExp(term, "ig"), term);
+    [...PROTECTED_TERMS, ...extraTerms].filter(Boolean).forEach(term => {
+      const escaped = String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      out = out.replace(new RegExp(`\\b${escaped}\\b`, "ig"), term);
     });
     return out;
   }
 
-  function localDetectPossibleTypos(text, language = "auto") {
-    const value = String(text || "");
-    const issues = [];
-    COMMON_FIXES.forEach(rule => {
-      const matches = value.match(rule.pattern) || [];
-      matches.forEach(match => {
-        issues.push({
-          original:match,
-          suggestion:match.replace(rule.pattern, rule.replacement),
-          type:rule.type,
-          confidence:0.82
-        });
-      });
-    });
-    if (/\s{2,}/.test(value)) {
-      issues.push({original:"extra spaces", suggestion:"single spaces", type:"grammar", confidence:0.74});
-    }
-    if (/[!?.,]{3,}/.test(value)) {
-      issues.push({original:"repeated punctuation", suggestion:"clean punctuation", type:"grammar", confidence:0.68});
-    }
-    return issues.map(item => ({...item, language}));
+  function isPersonalWord(value, terms = []) {
+    const clean = String(value || "").trim().toLowerCase();
+    return !!clean && terms.some(term => String(term || "").trim().toLowerCase() === clean);
   }
 
-  function localCorrect(text) {
+  function localDetectPossibleTypos(text, language = "auto", options = {}) {
+    const value = String(text || "");
+    const dictionary = personalWords(options);
+    return personalCorrections(options).flatMap(row => {
+      if (isPersonalWord(row.from, dictionary)) return [];
+      const escaped = row.from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const pattern = new RegExp(`\\b${escaped}\\b`, "ig");
+      const matches = value.match(pattern) || [];
+      return matches.map(match => ({
+        original:match,
+        suggestion:row.to,
+        type:"personal-correction",
+        confidence:0.96,
+        language
+      }));
+    });
+  }
+
+  function localCorrect(text, options = {}) {
+    const dictionary = personalWords(options);
     let corrected = String(text || "");
-    COMMON_FIXES.forEach(rule => {
-      corrected = corrected.replace(rule.pattern, match => {
-        if (rule.replacement === "I") return "I";
-        if (/^[A-Z]/.test(match)) return rule.replacement.charAt(0).toUpperCase() + rule.replacement.slice(1);
-        return rule.replacement;
+    personalCorrections(options).forEach(row => {
+      if (isPersonalWord(row.from, dictionary)) return;
+      const escaped = row.from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      corrected = corrected.replace(new RegExp(`\\b${escaped}\\b`, "ig"), match => {
+        if (/^[A-Z]/.test(match)) return row.to.charAt(0).toUpperCase() + row.to.slice(1);
+        return row.to;
       });
     });
-    corrected = corrected.replace(/\s{2,}/g, " ").replace(/([!?.,]){3,}/g, "$1").trim();
-    return preserveProtectedTerms(corrected);
+    return preserveProtectedTerms(corrected, dictionary);
   }
 
   function functionsClient() {
@@ -62,14 +70,18 @@
   }
 
   async function suggestGrammarCorrection(text, context = {}) {
-    const draft = preserveProtectedTerms(String(text || "").slice(0, 1200));
-    const fallbackIssues = localDetectPossibleTypos(draft, context.preferredLanguage || "auto");
+    const dictionary = personalWords(context);
+    const corrections = personalCorrections(context);
+    const draft = preserveProtectedTerms(String(text || "").slice(0, 1200), dictionary);
+    const fallbackIssues = localDetectPossibleTypos(draft, context.preferredLanguage || "auto", {personalDictionary:dictionary, personalCorrections:corrections});
     const fallback = {
-      correctedText:localCorrect(draft),
+      correctedText:localCorrect(draft, {personalDictionary:dictionary, personalCorrections:corrections}),
       detectedIssues:fallbackIssues,
-      explanation:fallbackIssues.length ? "Local draft cleanup found likely spelling or grammar issues." : "No obvious local issues found.",
-      confidence:fallbackIssues.length ? 0.78 : 0.5,
-      provider:"local-fallback"
+      explanation:fallbackIssues.length
+        ? "Gemini grammar correction is unavailable. FLOQR applied only your saved personal corrections and preserved your word list."
+        : "Gemini grammar correction is unavailable. No generalized local correction was applied; your personal word list is preserved.",
+      confidence:fallbackIssues.length ? 0.96 : 0,
+      provider:fallbackIssues.length ? "personal-fallback" : "gemini-unavailable"
     };
     const client = functionsClient();
     if (!draft || !client) return fallback;
@@ -81,12 +93,14 @@
         inputType:String(context.inputType || "chat").slice(0, 60),
         preferredLanguage:String(context.preferredLanguage || "auto").slice(0, 40),
         tonePreference:String(context.tonePreference || "keepTone").slice(0, 40),
-        correctionMode:String(context.correctionMode || "approvalRequired").slice(0, 40)
+        correctionMode:String(context.correctionMode || "approvalRequired").slice(0, 40),
+        personalDictionary:dictionary,
+        personalCorrections:corrections
       });
       const data = response?.data || {};
       if (!data.correctedText) return fallback;
       return {
-        correctedText:preserveProtectedTerms(String(data.correctedText || draft).slice(0, 1200)),
+        correctedText:preserveProtectedTerms(String(data.correctedText || draft).slice(0, 1200), dictionary),
         detectedIssues:Array.isArray(data.detectedIssues) ? data.detectedIssues.slice(0, 20) : fallbackIssues,
         explanation:String(data.explanation || fallback.explanation).slice(0, 500),
         confidence:Number(data.confidence || fallback.confidence),

@@ -1,4 +1,4 @@
-/* master-admin-app.js v28.71
+/* master-admin-app.js v28.88-mingl-grammar-profile-datapoints
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -213,6 +213,46 @@
     return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v]) => `${k} (${v})`).join(", ") || "Not enough data yet";
   }
 
+  function locationName(row = {}) {
+    return row.locationName || row.clubName || row.brandName || row.name || row.id || "Unknown location";
+  }
+
+  function clubAdminUrl(id = "") {
+    const url = new URL("./admin.html", window.location.href);
+    url.searchParams.set("location", id);
+    url.searchParams.set("v", "28.88-mingl-grammar-profile-datapoints");
+    return url.toString();
+  }
+
+  function displayUrl(id = "") {
+    const url = new URL("./display.html", window.location.href);
+    url.searchParams.set("location", id);
+    url.searchParams.set("v", "28.88-mingl-grammar-profile-datapoints");
+    return url.toString();
+  }
+
+  function renderClubAdminUrls(locationRows = []) {
+    const wrap = byId("clubAdminUrlList");
+    if (!wrap) return;
+    const rows = locationRows
+      .filter(row => row && row.id)
+      .sort((a,b) => locationName(a).localeCompare(locationName(b)));
+    wrap.innerHTML = rows.length ? rows.map(row => {
+      const admin = clubAdminUrl(row.id);
+      const display = displayUrl(row.id);
+      const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
+      return `<div class="queue-item">
+        <div class="message-envelope-head">
+          <strong>${esc(locationName(row))}</strong>
+          <span>${esc(row.id)}</span>
+        </div>
+        <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
+        <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
+        <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
+      </div>`;
+    }).join("") : "<p class='sub'>No club locations found yet.</p>";
+  }
+
   function splitCSV(value) {
     if (Array.isArray(value)) return value.filter(Boolean).map(String);
     return String(value || "").split(/[,;|/]+/).map(x => x.trim()).filter(Boolean);
@@ -371,6 +411,8 @@
       ["Marketing opt-ins", users.filter(u => u.marketingConsent).length.toLocaleString()],
       ["Analytics opt-ins", users.filter(u => u.analyticsConsent).length.toLocaleString()]
     ]);
+
+    renderClubAdminUrls(locationRows);
 
     byId("networkMusicReport").innerHTML = simpleRows([
       ["Top genres", topList(genreCounts, 8)],

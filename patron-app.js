@@ -413,6 +413,7 @@
         city: byId("profileCity").value.trim(),
         ageRange: byId("profileAgeRange").value,
         gender: byId("profileGender")?.value || "",
+        height: byId("profileHeight")?.value.trim() || "",
         favoriteGenres: splitCSV(byId("profileGenres").value),
         nightlifeInterests: splitCSV(byId("profileInterests").value),
         musicInterests: splitCSV(byId("profileGenres").value),
@@ -780,6 +781,7 @@
       profile.publicProfileBioOriginal || profile.publicProfileBioEnglish || profile.bio,
       ...(publicDatapointAllowed(profile, "location") ? profileLocationParts(profile) : []),
       ...(publicDatapointAllowed(profile, "gender") ? [profile.gender] : []),
+      ...(publicDatapointAllowed(profile, "height") ? [profile.height] : []),
       ...(publicDatapointAllowed(profile, "events") ? [profile.nightlifeStyle, ...(profile.nightlifeInterests || [])] : []),
       ...(publicDatapointAllowed(profile, "meet") ? [profile.lookingToMeet] : []),
       ...(publicDatapointAllowed(profile, "music") ? (profile.musicInterests || profile.favoriteGenres || []) : []),
@@ -824,6 +826,7 @@
 
   const PROFILE_DATAPOINTS = [
     {key:"gender", label:"Gender", get:p => p.gender},
+    {key:"height", label:"Height", get:p => p.height},
     {key:"music", label:"Music", get:p => p.musicInterests || p.favoriteGenres},
     {key:"events", label:"Events", get:p => p.nightlifeInterests || p.nightlifeStyle},
     {key:"travel", label:"Travel", get:p => p.travelInterests},
@@ -923,8 +926,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations",
-      minglLink:"./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations",
+      link:"./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints",
+      minglLink:"./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints",
       read:false,
       createdAt:now
     };
@@ -2233,7 +2236,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.86-mingl-actions-ai-recommendations`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.88-mingl-grammar-profile-datapoints`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -2304,7 +2307,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.86-mingl-actions-ai-recommendations";
+      portalLink.href = "./patron-portal.html?v=28.88-mingl-grammar-profile-datapoints";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -2317,14 +2320,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./patron-portal.html?tab=mingl&v=28.86-mingl-actions-ai-recommendations";
+      chats.href = "./patron-portal.html?tab=mingl&v=28.88-mingl-grammar-profile-datapoints";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2492,10 +2495,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.86-mingl-actions-ai-recommendations">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.88-mingl-grammar-profile-datapoints">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.86-mingl-actions-ai-recommendations">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.86-mingl-actions-ai-recommendations">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.88-mingl-grammar-profile-datapoints">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=chats&v=28.88-mingl-grammar-profile-datapoints">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2538,7 +2541,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.86-mingl-actions-ai-recommendations`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.88-mingl-grammar-profile-datapoints`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
