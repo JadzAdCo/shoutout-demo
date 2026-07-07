@@ -1,4 +1,4 @@
-﻿/* mingl-chat-app.js v28.94-mingl-chat-consent-actions */
+/* mingl-chat-app.js v28.95-mingl-chat-popout-consent */
 (function(){
   "use strict";
 
@@ -217,8 +217,9 @@
   function backgroundConsentHtml(msg = {}) {
     const status = msg.backgroundConsentStatus || "pending";
     if (status !== "pending") return `<div class="mingl-consent-status">Background ${esc(status)}.</div>`;
-    if (msg.backgroundTargetUid !== currentUser.uid) return `<div class="mingl-consent-status">Waiting for the other patron to approve the shared background.</div>`;
+    if (msg.backgroundTargetUid !== currentUser.uid) return `<div class="mingl-consent-status">Waiting for the other patron to approve the shared background. They will see Approve Background or Keep Mine Private inside this system message.</div>`;
     return `<div class="mingl-consent-actions">
+      <p>Tap Approve Background to share this chat background, or keep your current background private.</p>
       <button type="button" class="primary" data-background-consent="${esc(msg.id || "")}" data-response="approved">Approve Background</button>
       <button type="button" data-background-consent="${esc(msg.id || "")}" data-response="declined">Keep Mine Private</button>
     </div>`;
@@ -313,6 +314,11 @@
     const room = rooms.find(x => x.id === roomId);
     if (!room) return;
     activeRoomId = roomId;
+    const chatCard = byId("minglStandaloneChatCard");
+    if (chatCard) {
+      chatCard.classList.remove("hidden");
+      chatCard.setAttribute("aria-hidden", "false");
+    }
     const other = otherSummary(room);
     const title = other.displayName || room.title || "Mingl Chat";
     setText("minglStandaloneTitle", title);
@@ -326,6 +332,26 @@
     applyBackground(room.localBackgrounds?.[currentUser.uid] || room.sharedBackgroundUrl || "");
     renderRooms();
     subscribeMessages();
+    chatCard?.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  function closeRoom() {
+    activeRoomId = "";
+    if (unsubscribeMessages) {
+      unsubscribeMessages();
+      unsubscribeMessages = null;
+    }
+    const chatCard = byId("minglStandaloneChatCard");
+    if (chatCard) {
+      chatCard.classList.add("hidden");
+      chatCard.setAttribute("aria-hidden", "true");
+    }
+    const wrap = byId("minglStandaloneMessages");
+    if (wrap) wrap.innerHTML = "";
+    clearAttachment();
+    setText("minglStandaloneTitle", "Select a Mingl Chat");
+    setText("minglStandaloneRoomStatus", "Choose a mutual chat from the list.");
+    renderRooms();
   }
 
   async function loadConnections() {
@@ -388,7 +414,6 @@
     renderRooms();
     const requested = qs("room");
     if (requested && rooms.some(room => room.id === requested)) openRoom(requested);
-    else if (rooms[0]) openRoom(rooms[0].id);
   }
 
   function clearAttachment() {
@@ -671,7 +696,7 @@
         backgroundTargetUid:targetUid,
         backgroundUrl:url,
         backgroundConsentStatus:"pending",
-        body:`${currentProfile.displayName || currentUser.displayName || "A patron"} wants to change the shared Mingl chat background. The background stays local until the other patron consents.`,
+        body:`${currentProfile.displayName || currentUser.displayName || "A patron"} wants to change the shared Mingl chat background. Tap Approve Background to use it for both patrons, or Keep Mine Private to leave it only on their side.`,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
       applyBackground(url);
@@ -695,6 +720,7 @@
     bindComposerActions();
     byId("minglChatGoogleLoginBtn")?.addEventListener("click", loginGoogle);
     byId("minglChatMicrosoftLoginBtn")?.addEventListener("click", loginMicrosoft);
+    byId("minglStandaloneCloseChatBtn")?.addEventListener("click", closeRoom);
     byId("minglStandaloneSendBtn")?.addEventListener("click", sendMessage);
     byId("minglStandaloneImageInput")?.addEventListener("change", renderAttachmentPreview);
     byId("minglStandaloneBackgroundInput")?.addEventListener("change", event => {

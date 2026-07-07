@@ -1,7 +1,7 @@
-﻿rules_version = '2';
+rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.94-mingl-chat-consent-actions-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.94-mingl-chat-consent-actions-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.95-mingl-chat-popout-consent-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.95-mingl-chat-popout-consent-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules

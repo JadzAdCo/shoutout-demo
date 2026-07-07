@@ -1,7 +1,7 @@
-﻿rules_version = '2';
+rules_version = '2';
 
-// FLOQR STORAGE RULES VERSION: v28.94-mingl-chat-consent-actions-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.94-mingl-chat-consent-actions-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.95-mingl-chat-popout-consent-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.95-mingl-chat-popout-consent-storage-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
 // Required media paths:

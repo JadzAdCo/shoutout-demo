@@ -1,16 +1,16 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Mingl Chat v28.94-mingl-chat-consent-actions -->
+  <!-- FLOQR Mingl Chat v28.95-mingl-chat-popout-consent -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mingl Chat</title>
-  <link rel="stylesheet" href="./styles.css?v=28.94-mingl-chat-consent-actions"/>
-  <link rel="stylesheet" href="./admin.css?v=28.94-mingl-chat-consent-actions"/>
+  <link rel="stylesheet" href="./styles.css?v=28.95-mingl-chat-popout-consent"/>
+  <link rel="stylesheet" href="./admin.css?v=28.95-mingl-chat-popout-consent"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a class="global-back-btn buttonlike" href="./?v=28.94-mingl-chat-consent-actions">&larr; Back to Mingl</a>
+  <a class="global-back-btn buttonlike" href="./?v=28.95-mingl-chat-popout-consent">&larr; Back to Mingl</a>
   <section class="page active">
     <header class="topbar">
       <div>
@@ -30,7 +30,7 @@
     </div>
 
     <div id="minglChatShell" class="mingl-layout hidden">
-      <div class="card">
+      <div id="minglStandaloneChatCard" class="card mingl-chat-popout hidden" aria-hidden="true">
         <h2>Chats <span id="minglStandaloneCount">(0/0)</span></h2>
         <div id="minglStandaloneList" class="mingl-chat-list"></div>
       </div>
@@ -41,6 +41,7 @@
             <h2 id="minglStandaloneTitle">Select a Mingl Chat</h2>
             <p id="minglStandaloneRoomStatus" class="sub small">Choose a mutual chat from the list.</p>
           </div>
+          <button id="minglStandaloneCloseChatBtn" class="mingl-chat-close" type="button" aria-label="Close Mingl chat">&times;</button>
         </div>
         <input id="minglStandaloneBackgroundInput" class="visually-hidden-file" type="file" accept="image/*"/>
         <input id="minglStandaloneImageInput" class="visually-hidden-file" type="file" accept="image/*,video/*"/>
@@ -83,10 +84,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=28.94-mingl-chat-consent-actions"></script>
-<script src="./shared-data.js?v=28.94-mingl-chat-consent-actions"></script>
-<script src="./ai-grammar-service.js?v=28.94-mingl-chat-consent-actions"></script>
-<script src="./helper-popouts.js?v=28.94-mingl-chat-consent-actions"></script>
-<script src="./mingl-chat-app.js?v=28.94-mingl-chat-consent-actions"></script>
+<script src="./firebase-config.js?v=28.95-mingl-chat-popout-consent"></script>
+<script src="./shared-data.js?v=28.95-mingl-chat-popout-consent"></script>
+<script src="./ai-grammar-service.js?v=28.95-mingl-chat-popout-consent"></script>
+<script src="./helper-popouts.js?v=28.95-mingl-chat-popout-consent"></script>
+<script src="./mingl-chat-app.js?v=28.95-mingl-chat-popout-consent"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿/* patron-portal-app.js v28.94-mingl-chat-consent-actions */
+/* patron-portal-app.js v28.95-mingl-chat-popout-consent */
 (function(){
   "use strict";
 
@@ -175,7 +175,7 @@
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
       if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({v:"28.94-mingl-chat-consent-actions"});
+        const params = new URLSearchParams({v:"28.95-mingl-chat-popout-consent"});
         const room = new URL(window.location.href).searchParams.get("room");
         if (room) params.set("room", room);
         window.location.href = `./mingl-chat.html?${params.toString()}`;
@@ -312,7 +312,7 @@
 
   async function addPersonalDictionaryWord(word = "") {
     const user = auth.currentUser;
-    const clean = String(word || "").trim().replace(/^["'â€œâ€â€˜â€™]+|["'â€œâ€â€˜â€™]+$/g, "");
+    const clean = String(word || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
     if (!user || !clean) return false;
     const existing = splitCSV(byId("languagePersonalDictionary")?.value || "").concat(currentLanguageSettings.personalDictionary || []);
     const seen = new Set();
@@ -341,8 +341,8 @@
 
   async function addPersonalCorrection(from = "", to = "") {
     const user = auth.currentUser;
-    const cleanFrom = String(from || "").trim().replace(/^["'â€œâ€â€˜â€™]+|["'â€œâ€â€˜â€™]+$/g, "");
-    const cleanTo = String(to || "").trim().replace(/^["'â€œâ€â€˜â€™]+|["'â€œâ€â€˜â€™]+$/g, "");
+    const cleanFrom = String(from || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+    const cleanTo = String(to || "").trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
     if (!user || !cleanFrom || !cleanTo || cleanFrom.toLowerCase() === cleanTo.toLowerCase()) return false;
     const existing = parsePersonalCorrections(byId("languagePersonalCorrections")?.value || "")
       .concat(currentLanguageSettings.personalCorrections || []);
@@ -1061,7 +1061,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.94-mingl-chat-consent-actions">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.95-mingl-chat-popout-consent">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1178,7 +1178,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:`./mingl-chat.html?room=${roomId}&v=28.94-mingl-chat-consent-actions`,
+        link:`./mingl-chat.html?room=${roomId}&v=28.95-mingl-chat-popout-consent`,
         read:false,
         createdAt:fieldValue()
       });
@@ -1352,8 +1352,8 @@
   }
 
   function firstChangedToken(original = "", suggested = "") {
-    const originalTokens = String(original || "").match(/[\p{L}\p{N}@#'â€™_-]+/gu) || [];
-    const suggestedTokens = String(suggested || "").match(/[\p{L}\p{N}@#'â€™_-]+/gu) || [];
+    const originalTokens = String(original || "").match(/[\p{L}\p{N}@#'’_-]+/gu) || [];
+    const suggestedTokens = String(suggested || "").match(/[\p{L}\p{N}@#'’_-]+/gu) || [];
     for (let i = 0; i < originalTokens.length; i++) {
       if ((originalTokens[i] || "").toLowerCase() !== (suggestedTokens[i] || "").toLowerCase()) return originalTokens[i];
     }
@@ -1424,7 +1424,7 @@
   function portalMinglReadReceiptHtml(msg = {}, mine = false) {
     if (!mine || msg.senderUid === "system" || msg.messageType === "system" || msg.unsent) return "";
     return portalMinglMessageReadByOther(msg)
-      ? ` <span class="mingl-read-receipt" title="Read by recipient">ðŸ‘ Read</span>`
+      ? ` <span class="mingl-read-receipt" title="Read by recipient">👍 Read</span>`
       : ` <span class="mingl-read-receipt unread" title="Not read yet">Sent</span>`;
   }
 

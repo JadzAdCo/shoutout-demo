@@ -162,9 +162,11 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .profile-datapoint div{position:absolute;z-index:5;left:0;min-width:190px;max-width:min(260px,calc(100vw - 48px));display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;border:1px solid var(--line);border-radius:14px;background:#12183a;padding:10px;box-shadow:0 14px 35px rgba(0,0,0,.38)}
 .profile-datapoint span{border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:5px 8px;color:#fff;font-size:12px;font-weight:800;background:rgba(255,255,255,.08)}
 .mingl-chat-list{display:grid;gap:10px;margin-bottom:14px}.mingl-chat-item{width:100%;display:grid;text-align:left;gap:4px}.mingl-chat-item span{color:var(--muted);font-weight:700}
-.mingl-chat-panel,#portalMinglChatPanel{display:flex;flex-direction:column;gap:10px}
-.mingl-chat-panel.hidden,#portalMinglChatPanel.hidden{display:none!important}
-.mingl-messages{max-height:min(46vh,420px);overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px;overscroll-behavior:contain}
+.mingl-chat-panel,#portalMinglChatPanel,.mingl-chat-popout{display:flex;flex-direction:column;gap:10px}
+.mingl-chat-panel.hidden,#portalMinglChatPanel.hidden,.mingl-chat-popout.hidden{display:none!important}
+.mingl-chat-popout{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:hidden;box-shadow:0 24px 90px rgba(0,0,0,.38)}
+.mingl-chat-close{margin-left:auto;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;padding:0;font-size:26px;line-height:1}
+.mingl-messages{max-height:min(56vh,560px);overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2);padding:12px;display:grid;gap:10px;overscroll-behavior:contain}
 .mingl-message{max-width:82%;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.08)}.mingl-message.mine{justify-self:end;background:linear-gradient(90deg,rgba(244,58,191,.34),rgba(38,216,255,.26))}
 .mingl-message.system{max-width:100%;justify-self:center;text-align:center;background:rgba(215,255,63,.09);border-color:rgba(215,255,63,.28)}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
@@ -219,6 +221,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 @keyframes minglScroll{0%{transform:translateX(-18px);opacity:.4}45%{transform:translateX(10px);opacity:1}100%{transform:translateX(0);opacity:1}}
 @keyframes minglDisappear{0%{opacity:1;transform:scale(1)}70%{opacity:.22;transform:scale(.96)}100%{opacity:.62;transform:scale(1)}}
 .mingl-consent-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.mingl-consent-actions p{grid-column:1/-1;margin:0;color:#fff;font-weight:800}
 .mingl-consent-actions button{padding:10px;border-radius:12px}
 .mingl-consent-status{margin-top:8px;color:var(--lime);font-weight:900}
 .dynamic-recommendation-list{display:grid;gap:9px;margin-top:10px}
@@ -233,7 +236,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .floqr-action-feedback-card p{margin:10px 0 0;color:var(--muted)}
 .floqr-action-feedback.success .floqr-action-feedback-card{border-color:rgba(80,255,180,.5)}
 .floqr-action-feedback.failed .floqr-action-feedback-card{border-color:rgba(255,80,100,.55)}
-@media(max-width:900px){.mingl-layout{grid-template-columns:1fr}}
+@media(max-width:900px){.mingl-layout{grid-template-columns:1fr}.mingl-chat-popout{position:fixed;inset:10px;z-index:10020;max-height:none;overflow:auto;border-radius:22px}.mingl-chat-popout .mingl-messages{max-height:calc(100vh - 230px)}}
 @media(max-width:760px){.profile-datapoint{position:static}.profile-datapoint[open]{flex-basis:100%}.profile-datapoint div{position:static;width:100%;min-width:0;max-width:100%;box-shadow:none}.mingl-person-card,.mingl-self-card{overflow:hidden}.mingl-nested-datapoints .profile-datapoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mingl-nested-datapoints .profile-datapoint summary{text-align:center}}
 @media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
 
