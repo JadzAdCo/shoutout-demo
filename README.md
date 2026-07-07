@@ -1,16 +1,22 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.91 Helper Popouts and Mingl Requests Package
+﻿# CURRENT PACKAGE: FLOQR ShoutOut v28.93 Mingl Chat Legacy Recovery Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.91-helper-popouts-mingl-requests
+https://jadzadco.github.io/shoutout-demo/?v=28.93-mingl-chat-legacy-recovery
 ```
 
 Current release highlights:
 
-- Adds v28.91 Helper Popouts and Mingl Requests fixes.
+- Adds v28.93 Mingl Chat Legacy Recovery fixes.
+- Forces the standalone Mingl Chat script to rebuild old cached/partially uploaded composer markup into the requested clean layout: message box, Send, and a right-side `+` action popout.
+- Firestore rules now allow participants to read older Mingl connection records that only stored `requestedBy` / `requestedTo`, so legacy accepted chats can be found and rebuilt.
+- Restores older accepted Mingl conversations on the standalone Mingl Chat page by reading mutual `minglConnections`, normalizing missing/legacy `chatRooms`, and accepting older Mingl room markers such as `mingl_...` room IDs.
+- Replaces the visible chat tool row with a compact action popout on the right side of the message input. Commands are nested under `Text Action`, `Add Photo/Video`, `Edit`, and `Chat Background`.
+- `Correct Grammar/Spelling` remains executable from the nested `Text Action` section, and sent-message actions now also offer nested `Edit` and `Correct Grammar/Spelling` options when tapping your own bubble.
+- Mingl Chat media upload now supports both pictures and videos. Uploaded videos render in the message bubble with native controls.
 - Mingl Requests remain on the main Mingl page, separate from the standalone Mingl Chat inbox.
 - Repeated helper/instruction text across app pages now collapses behind compact `?` help popouts. The shared `helper-popouts.js` also watches dynamically rendered helper text.
 - The highlighted Mingl Requests description is now hidden until the patron taps the `?` popout.
@@ -18,20 +24,20 @@ Current release highlights:
 - Patron Profile and Settings no longer presents Mingl Chat as an internal settings panel. It keeps a link to the standalone Mingl Chat page only.
 - Fixes the v28.88 Package Install Diagnostics cache-bust mismatch where the current diagnostics still looked for `styles.css?v=28.87-mingl-chat-diagnostics`, `patron-app.js?v=28.87-mingl-chat-diagnostics`, and `patron-portal-app.js?v=28.87-mingl-chat-diagnostics`.
 - Mingl uses one canonical chat inbox on the standalone page. The public Mingl page remains for discovery and matching, then routes chat into `mingl-chat.html`.
-- Mingl chat picture sending uses a plus button inside the chat composer. If Storage rules are not deployed, the upload error clearly names the `mingl-chat/{uid}/{roomId}` Storage path.
+- Mingl chat media sending uses the composer action popout. If Storage rules are not deployed, the upload error clearly names the `mingl-chat/{uid}/{roomId}` Storage path.
 - Manual `Fix Grammar` now runs when clicked without requiring the language settings toggle first. Gemini/Firebase Functions remains first, and patron personal corrections remain the local fallback.
 - Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
 - Club admins can reset the currently live display back to that club location's default ShoutOut.
 - Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
-- Firestore and Storage rule headers now carry the v28.91 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-91.md`.
+- Firestore and Storage rule headers now carry the v28.92 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-93.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
 - Gemini correction prompts now allow a patron to use the suggestion, keep the original, add the changed word to My Word List, or save the correction pair for repeated future typos.
 - Adds `Height` as a user profile datapoint on first-time profile setup, Patron Portal profile editing, public profile preview, privacy datapoint selection, and Mingl contextual matching/search.
 - Adds Master Admin > Club Admin URLs with direct `admin.html?location=...` and `display.html?location=...` links for each club/location.
-- Fixes idle ShoutOut display fallback text so a non-Zebbies location with stale/default live content shows its own venue default, such as `USE SHOUT OUT @ SHÔKO` or `USE SHOUT OUT @ JOSEPHINE`.
+- Fixes idle ShoutOut display fallback text so a non-Zebbies location with stale/default live content shows its own venue default, such as `USE SHOUT OUT @ SHÃ”KO` or `USE SHOUT OUT @ JOSEPHINE`.
 - Mingl chat background changes now remain local to the requesting patron until the other patron approves the shared background request.
 - Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
 - Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
@@ -191,7 +197,7 @@ Current release highlights:
 - Adds Master Admin > Duplicate Records to scan likely duplicate `clubLocations`, choose the correct primary record, and merge duplicate records into safe aliases.
 - Duplicate merge keeps the primary club active and marks duplicates as `status: "merged"`, `active: false`, `canonicalLocationId`, and `mergedInto` instead of deleting records.
 - Creates `clubLocationAliases/{duplicateId}` so old links, admin/display URLs, search records, events, ShoutOuts, and guest list references can resolve to the primary club.
-- Adds a known static Shôko Barcelona alias so `Shôko Barcelona Beach Club` resolves to `Shôko Barcelona` and the duplicate no longer appears as a separate active static listing.
+- Adds a known static ShÃ´ko Barcelona alias so `ShÃ´ko Barcelona Beach Club` resolves to `ShÃ´ko Barcelona` and the duplicate no longer appears as a separate active static listing.
 - Updates patron, club admin, and display routing to resolve club aliases before rendering public search, ShoutOut selection, admin queues, and LED/display live content.
 - Updates Firestore rules to `v28.70-duplicate-alias-rules` for the new alias collection. Publish `firestore.rules` after installing this package, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.
 - Adds `Run Merge Diagnostic` on Master Admin > Duplicate Records so Master Admin can verify whether a merge actually completed.
@@ -370,7 +376,7 @@ Automatic internet crawling runs in backend code using Firebase scheduled functi
 
 ## Master Admin Duplicate Records
 
-Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `Shôko Barcelona Beach Club` and `Shôko Barcelona`.
+Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `ShÃ´ko Barcelona Beach Club` and `ShÃ´ko Barcelona`.
 
 - Click `Refresh Duplicate Scan` to find likely duplicate `clubLocations` by normalized club name, city, country, brand, website, and address.
 - The scan summary shows whether the list came from live Firestore or failed back to static alias evidence. If it says `Live Firestore: clubLocations`, the records are not hardcoded.
@@ -418,8 +424,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.91-helper-popouts-mingl-requests-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.91-helper-popouts-mingl-requests-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -427,8 +433,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.91-helper-popouts-mingl-requests-storage-rules
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.91-helper-popouts-mingl-requests-storage-rules or newer
+// FLOQR STORAGE RULES VERSION: v28.93-mingl-chat-legacy-recovery-storage-rules
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.93-mingl-chat-legacy-recovery-storage-rules or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.
@@ -1632,7 +1638,7 @@ Guest List - Zebbies DC:
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-Guest List - Shôko Barcelona:
+Guest List - ShÃ´ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -1764,13 +1770,13 @@ match /friendRequests/{id} {
 
 ## Test URLs
 
-Guest List — Zebbies Garden DC:
+Guest List â€” Zebbies Garden DC:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-Guest List — Shôko Barcelona:
+Guest List â€” ShÃ´ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -1782,7 +1788,7 @@ Promoter Admin:
 https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.8
 ```
 
-Club Admin — Zebbies Garden DC:
+Club Admin â€” Zebbies Garden DC:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.8
@@ -1870,7 +1876,7 @@ admin.html?location=zebbies-garden-washington-dc&v=28.8
 3. Open `Guest Lists / Promoters` tab.
 4. Confirm guest list totals appear for Zebbies only.
 5. Confirm promoter performance appears.
-6. Confirm Shôko or Christie records do not appear on Zebbies admin.
+6. Confirm ShÃ´ko or Christie records do not appear on Zebbies admin.
 
 ## E. Promoter Admin Test
 
@@ -1987,7 +1993,7 @@ Zebbies Garden DC:
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-Shôko Barcelona:
+ShÃ´ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -2147,7 +2153,7 @@ https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden
 2. Upload all files to GitHub repo root.
 3. Replace existing files.
 4. Commit: `Upload v28.4 inbox chat and service isolation`
-5. Wait 1–3 minutes.
+5. Wait 1â€“3 minutes.
 6. Test in Incognito or hard refresh.
 
 ## Test URLs
@@ -2261,7 +2267,7 @@ match /shoutoutRecommendations/{id} {
 2. Upload all files to GitHub repo root.
 3. Replace existing files.
 4. Commit: `Upload v28.5 media video templates`.
-5. Wait 1–3 minutes.
+5. Wait 1â€“3 minutes.
 6. Test in Incognito.
 
 ## Test URLs
@@ -2314,7 +2320,7 @@ https://jadzadco.github.io/shoutout-demo/?v=28.8
 ```
 
 
-# v28.8 Hard Fix — ShoutOut Button on Club Options
+# v28.8 Hard Fix â€” ShoutOut Button on Club Options
 
 Fixes missing `Throw a ShoutOut` button on the Club Options screen.
 
@@ -2335,7 +2341,7 @@ v28.8 hardcoded club option ShoutOut insertion
 
 ---
 
-# v28.9 Codex Release — Clean Club Options + Contextual Search
+# v28.9 Codex Release â€” Clean Club Options + Contextual Search
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-9-codex-contextual-search-full-package.zip`
@@ -2538,7 +2544,7 @@ Location-aware ranking
 
 ---
 
-# v28.10 Codex Release — Search Display Cleanup
+# v28.10 Codex Release â€” Search Display Cleanup
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-10-contextual-search-ui-cleanup-full-package.zip`
@@ -2700,7 +2706,7 @@ No database rollback is needed unless live test submissions were created manuall
 
 ---
 
-# v28.11 Codex Release — Template Preview Cleanup
+# v28.11 Codex Release â€” Template Preview Cleanup
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-11-template-preview-cleanup-full-package.zip`
@@ -2857,7 +2863,7 @@ No database rollback is needed unless live test submissions were created manuall
 
 ---
 
-# v28.12 Codex Release — Avatar Dropdown Link Color Fix
+# v28.12 Codex Release â€” Avatar Dropdown Link Color Fix
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-12-avatar-dropdown-link-color-full-package.zip`
@@ -3373,9 +3379,9 @@ shoutoutwepp,vers-28.24-f-full-package.zip
 
 ## What Changed
 
-- Removed the duplicated generic `← Back` button.
-- Standardized workflow back buttons as page-specific `← Back to ...` controls.
-- Added clearer workflow labels such as `Screen 3B — Club / Search` and `Screen 4 — Club / Select ShoutOut Template`.
+- Removed the duplicated generic `â† Back` button.
+- Standardized workflow back buttons as page-specific `â† Back to ...` controls.
+- Added clearer workflow labels such as `Screen 3B â€” Club / Search` and `Screen 4 â€” Club / Select ShoutOut Template`.
 - Removed the bottom Messages / Chats / Notifications bar.
 - Merged notifications into Messages counts and the Messages tab.
 - Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.24-f` fix release.

@@ -1,7 +1,7 @@
-rules_version = '2';
+﻿rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v28.91-helper-popouts-mingl-requests-rules
-// EXPECTED DEPLOYED RULES VERSION: v28.91-helper-popouts-mingl-requests-rules or newer
+// FLOQR FIRESTORE RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules
+// EXPECTED DEPLOYED RULES VERSION: v28.93-mingl-chat-legacy-recovery-rules or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -76,7 +76,14 @@ service cloud.firestore {
       return signedIn()
         && exists(/databases/$(database)/documents/minglConnections/$(connectionId))
         && get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.status == "mutual"
-        && request.auth.uid in get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.participants;
+        && (
+          (
+            get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.participants is list
+            && request.auth.uid in get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.participants
+          ) ||
+          get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.requestedBy == request.auth.uid ||
+          get(/databases/$(database)/documents/minglConnections/$(connectionId)).data.requestedTo == request.auth.uid
+        );
     }
 
     function isExistingMinglRoom() {
@@ -390,7 +397,14 @@ service cloud.firestore {
     }
 
     match /minglConnections/{connectionId} {
-      allow read: if isParticipant();
+      allow read: if isParticipant()
+        || (
+          signedIn()
+          && (
+            resource.data.requestedBy == request.auth.uid ||
+            resource.data.requestedTo == request.auth.uid
+          )
+        );
       allow create: if isNewParticipant()
         && request.resource.data.participants.size() == 2
         && request.auth.uid == request.resource.data.requestedBy;

@@ -1,4 +1,4 @@
-/* mingl-chat-app.js v28.91-helper-popouts-mingl-requests */
+﻿/* mingl-chat-app.js v28.93-mingl-chat-legacy-recovery */
 (function(){
   "use strict";
 
@@ -70,10 +70,93 @@
     return room.userSummaries?.[otherUid] || {};
   }
 
+  function isMinglRoom(room = {}) {
+    return room.type === "mingl" || room.roomType === "mingl" || String(room.id || "").startsWith("mingl_") || !!room.connectionId;
+  }
+
+  function normalizedParticipants(row = {}) {
+    const direct = row.participants || row.members || row.memberUids || row.userIds || [];
+    if (direct.length) return direct;
+    return [row.requestedBy, row.requestedTo, row.senderUid, row.receiverUid].filter(Boolean);
+  }
+
+  function roomIdForConnection(connection = {}) {
+    return `mingl_${connection.connectionId || connection.id || pairId(...normalizedParticipants(connection).slice(0, 2))}`;
+  }
+
+  function ensureCleanComposer() {
+    const composer = document.querySelector(".mingl-compose");
+    if (!composer || composer.dataset.floqrCleanComposer === "1") return;
+    const input = byId("minglStandaloneMessageInput");
+    const send = byId("minglStandaloneSendBtn");
+    if (!input || !send) return;
+    document.querySelector(".mingl-chat-tools")?.remove();
+    byId("minglStandaloneImproveBtn")?.remove();
+    document.querySelector(".chat-plus-button")?.remove();
+    composer.classList.add("mingl-compose-clean");
+    composer.innerHTML = "";
+    composer.appendChild(input);
+    composer.appendChild(send);
+    const menu = document.createElement("details");
+    menu.id = "minglStandaloneActionMenu";
+    menu.className = "mingl-compose-menu";
+    menu.innerHTML = `<summary aria-label="Mingl message actions">+</summary>
+      <div class="mingl-compose-menu-panel">
+        <strong>Text Action</strong>
+        <button id="minglStandaloneImproveBtn" type="button">Correct Grammar/Spelling</button>
+        <div class="emoji-row compact-emoji-row" aria-label="Mingl emoji shortcuts">
+          <button type="button" data-mingl-emoji-code="128522">Smile</button>
+          <button type="button" data-mingl-emoji-code="128293">Fire</button>
+          <button type="button" data-mingl-emoji-code="127881">Party</button>
+          <button type="button" data-mingl-emoji-code="10084">Heart</button>
+          <button type="button" data-mingl-emoji-code="128514">Laugh</button>
+        </div>
+        <strong>Add Photo/Video</strong>
+        <label class="chat-file-button" for="minglStandaloneImageInput">Choose Photo/Video</label>
+        <button id="minglStandaloneClearImageBtn" type="button">Remove Photo/Video</button>
+        <strong>Edit</strong>
+        <button id="minglStandaloneSelectDraftBtn" type="button">Select Draft Text</button>
+        <button id="minglStandaloneClearDraftBtn" type="button">Clear Draft</button>
+        <strong>Chat Background</strong>
+        <label class="chat-file-button" for="minglStandaloneBackgroundInput">Change Background</label>
+      </div>`;
+    composer.appendChild(menu);
+    composer.dataset.floqrCleanComposer = "1";
+  }
+
+  function bindComposerActions() {
+    byId("minglStandaloneImproveBtn")?.addEventListener("click", improveDraft);
+    byId("minglStandaloneClearImageBtn")?.addEventListener("click", clearAttachment);
+    byId("minglStandaloneClearDraftBtn")?.addEventListener("click", () => {
+      const input = byId("minglStandaloneMessageInput");
+      if (input) input.value = "";
+    });
+    byId("minglStandaloneSelectDraftBtn")?.addEventListener("click", () => byId("minglStandaloneMessageInput")?.select());
+    document.querySelectorAll("[data-mingl-emoji-code]").forEach(button => {
+      button.addEventListener("click", () => {
+        const code = Number(button.dataset.minglEmojiCode || 0);
+        insertEmoji(code ? String.fromCodePoint(code) : "");
+      });
+    });
+  }
+
+  function insertEmoji(emoji) {
+    const input = byId("minglStandaloneMessageInput");
+    if (!input || !emoji) return;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    input.value = `${input.value.slice(0, start)}${emoji}${input.value.slice(end)}`;
+    input.focus();
+    input.setSelectionRange(start + emoji.length, start + emoji.length);
+  }
+
   function mediaHtml(msg = {}) {
     if (!msg.mediaUrl || msg.unsent) return "";
-    const fileName = esc(msg.mediaFileName || "Shared picture");
-    return `<figure class="mingl-message-media"><img src="${esc(msg.mediaUrl)}" alt="${fileName}" loading="lazy"><figcaption>${fileName}</figcaption></figure>`;
+    const fileName = esc(msg.mediaFileName || (msg.mediaType === "video" ? "Shared video" : "Shared picture"));
+    const media = msg.mediaType === "video"
+      ? `<video src="${esc(msg.mediaUrl)}" controls playsinline preload="metadata"></video>`
+      : `<img src="${esc(msg.mediaUrl)}" alt="${fileName}" loading="lazy">`;
+    return `<figure class="mingl-message-media">${media}<figcaption>${fileName}</figcaption></figure>`;
   }
 
   function readReceiptHtml(msg = {}, mine = false) {
@@ -92,13 +175,16 @@
       const mine = msg.senderUid === currentUser.uid;
       const system = msg.senderUid === "system" || msg.messageType === "system";
       const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}">
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
         ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
         ${mediaHtml(msg)}
-        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${readReceiptHtml(msg, mine)}</small>
+        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${readReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='mingl-empty-state'>Start the conversation.</p>";
+    wrap.querySelectorAll("[data-own-message='1']").forEach(node => {
+      node.addEventListener("click", () => showMessageActions(node.dataset.messageId, node));
+    });
     wrap.scrollTop = wrap.scrollHeight;
   }
 
@@ -172,13 +258,63 @@
     subscribeMessages();
   }
 
+  async function loadConnections() {
+    const users = await getCollectionSafe("users");
+    const fallbackConnectionIds = users
+      .map(profile => profile.uid || profile.id)
+      .filter(uid => uid && uid !== currentUser.uid)
+      .map(uid => pairId(currentUser.uid, uid));
+    let rows = await getParticipantCollectionSafe("minglConnections", currentUser.uid, 1000, fallbackConnectionIds);
+    if (!rows.length) {
+      const requestedBy = await db.collection("minglConnections").where("requestedBy", "==", currentUser.uid).limit(1000).get().then(snap => snap.docs.map(doc => ({id:doc.id, ...doc.data()}))).catch(() => []);
+      const requestedTo = await db.collection("minglConnections").where("requestedTo", "==", currentUser.uid).limit(1000).get().then(snap => snap.docs.map(doc => ({id:doc.id, ...doc.data()}))).catch(() => []);
+      rows = [...requestedBy, ...requestedTo];
+    }
+    const byIdMap = new Map();
+    rows.forEach(row => byIdMap.set(row.id || row.connectionId || pairId(...normalizedParticipants(row).slice(0, 2)), row));
+    return [...byIdMap.values()];
+  }
+
+  async function ensureRoomFromConnection(connection = {}) {
+    const participants = normalizedParticipants(connection);
+    if (!participants.includes(currentUser.uid) || String(connection.status || "").toLowerCase() !== "mutual") return null;
+    const roomId = roomIdForConnection(connection);
+    const payload = {
+      id: roomId,
+      type: "mingl",
+      title: "Mingl Chat",
+      connectionId: connection.connectionId || connection.id || "",
+      participants,
+      userSummaries: connection.userSummaries || {},
+      unreadCounts: {},
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    try {
+      await db.collection("chatRooms").doc(roomId).set(payload, {merge:true});
+    } catch(e) {
+      console.warn("Could not normalize Mingl room:", e.message);
+    }
+    return {id:roomId, ...payload};
+  }
+
   async function loadRooms() {
     const users = await getCollectionSafe("users");
     const fallbackIds = users
       .map(profile => profile.uid || profile.id)
       .filter(uid => uid && uid !== currentUser.uid)
       .map(uid => `mingl_${pairId(currentUser.uid, uid)}`);
-    rooms = (await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, fallbackIds)).filter(room => room.type === "mingl");
+    const existingRooms = (await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, fallbackIds))
+      .map(room => ({...room, participants:normalizedParticipants(room)}))
+      .filter(room => normalizedParticipants(room).includes(currentUser.uid) && isMinglRoom(room));
+    const connections = await loadConnections();
+    const createdRooms = [];
+    for (const connection of connections) {
+      const row = await ensureRoomFromConnection(connection);
+      if (row) createdRooms.push(row);
+    }
+    const byRoom = new Map();
+    [...existingRooms, ...createdRooms].forEach(room => byRoom.set(room.id, {...room, participants:normalizedParticipants(room)}));
+    rooms = [...byRoom.values()];
     renderRooms();
     const requested = qs("room");
     if (requested && rooms.some(room => room.id === requested)) openRoom(requested);
@@ -202,13 +338,16 @@
     attachmentFile = input?.files?.[0] || null;
     if (!preview) return;
     if (!attachmentFile) return clearAttachment();
-    if (!/^image\//.test(attachmentFile.type)) {
-      setText("minglChatStatus", "Mingl chat picture sharing accepts image files only.");
+    if (!/^(image|video)\//.test(attachmentFile.type)) {
+      setText("minglChatStatus", "Mingl chat media accepts image or video files only.");
       return clearAttachment();
     }
     const url = URL.createObjectURL(attachmentFile);
     preview.classList.remove("hidden");
-    preview.innerHTML = `<img src="${esc(url)}" alt=""><div><strong>${esc(attachmentFile.name)}</strong><button type="button" data-clear-mingl-attachment>Remove Picture</button></div>`;
+    const thumb = attachmentFile.type.startsWith("video/")
+      ? `<video src="${esc(url)}" muted playsinline preload="metadata"></video>`
+      : `<img src="${esc(url)}" alt="">`;
+    preview.innerHTML = `${thumb}<div><strong>${esc(attachmentFile.name)}</strong><button type="button" data-clear-mingl-attachment>Remove Photo/Video</button></div>`;
     preview.querySelector("[data-clear-mingl-attachment]")?.addEventListener("click", clearAttachment);
   }
 
@@ -216,20 +355,21 @@
     const code = error?.code || "";
     const message = error?.message || String(error || "Unknown error");
     if (code === "storage/unauthorized" || /unauthorized|permission|storage rules/i.test(message)) {
-      return "Mingl picture upload failed because Firebase Storage rules are blocking mingl-chat/{uid}/{roomId}. Publish this package's storage.rules, then try the picture again.";
+      return "Mingl media upload failed because Firebase Storage rules are blocking mingl-chat/{uid}/{roomId}. Publish this package's storage.rules, then try again.";
     }
     return message;
   }
 
-  async function uploadImage(roomId, file) {
+  async function uploadMedia(roomId, file) {
     if (!file) return {};
-    if (!/^image\//.test(file.type)) throw new Error("Mingl chat picture sharing accepts image files only.");
-    if (file.size > 8 * 1024 * 1024) throw new Error("Mingl chat pictures must be 8MB or smaller.");
+    if (!/^(image|video)\//.test(file.type)) throw new Error("Mingl chat media accepts image or video files only.");
+    const max = file.type.startsWith("video/") ? 30 * 1024 * 1024 : 8 * 1024 * 1024;
+    if (file.size > max) throw new Error(file.type.startsWith("video/") ? "Mingl chat videos must be 30MB or smaller." : "Mingl chat pictures must be 8MB or smaller.");
     const path = `mingl-chat/${currentUser.uid}/${roomId}/${Date.now()}-${safeStorageFileName(file.name)}`;
     const snap = await storage.ref().child(path).put(file, {contentType:file.type, customMetadata:{uploadedBy:currentUser.uid, roomId}});
     return {
       mediaUrl: await snap.ref.getDownloadURL(),
-      mediaType: "image",
+      mediaType: file.type.startsWith("video/") ? "video" : "image",
       mediaFileName: file.name,
       mediaStoragePath: path
     };
@@ -245,7 +385,7 @@
       if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
       const room = roomSnap.data();
       if (!(room.participants || []).includes(currentUser.uid)) throw new Error("Mingl chat is available only to approved participants.");
-      const mediaPayload = file ? await uploadImage(activeRoomId, file) : {};
+      const mediaPayload = file ? await uploadMedia(activeRoomId, file) : {};
       const unreadCounts = {...(room.unreadCounts || {})};
       (room.participants || []).forEach(uid => { if (uid !== currentUser.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
       input.value = "";
@@ -257,13 +397,13 @@
         participants:room.participants || [],
         senderUid:currentUser.uid,
         senderName:currentProfile.displayName || currentUser.displayName || currentUser.email || "Member",
-        body:body || "Shared a picture.",
+        body:body || (mediaPayload.mediaType === "video" ? "Shared a video." : "Shared a picture."),
         ...mediaPayload,
         edited:false,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection("chatRooms").doc(activeRoomId).set({
-        lastMessage:body || "Shared a picture.",
+        lastMessage:body || (mediaPayload.mediaType === "video" ? "Shared a video." : "Shared a picture."),
         unreadCounts,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
@@ -271,6 +411,83 @@
     } catch(e) {
       setText("minglChatStatus", uploadErrorMessage(e));
     }
+  }
+
+  async function updateOwnMessage(messageId, patch) {
+    if (!messageId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) throw new Error("Only your own Mingl messages can be edited.");
+    await db.collection("chatMessages").doc(messageId).set({
+      ...patch,
+      edited:true,
+      editedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }
+
+  async function editMessage(messageId) {
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
+    const next = prompt("Edit Mingl message", snap.data().body || "");
+    if (next === null) return;
+    await updateOwnMessage(messageId, {body:next.trim()});
+  }
+
+  async function correctMessage(messageId) {
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
+    const body = snap.data().body || "";
+    if (!body.trim() || !window.FLOQRGrammar?.suggestGrammarCorrection) return;
+    const settings = currentProfile.languageSettings || {};
+    const result = await window.FLOQRGrammar.suggestGrammarCorrection(body, {
+      uid:currentUser.uid,
+      product:"mingl",
+      inputType:"chat-edit",
+      preferredLanguage:settings.preferredLanguage || "auto",
+      tonePreference:settings.tonePreference || "keepTone",
+      correctionMode:settings.correctionMode || "approvalRequired",
+      personalDictionary:settings.personalDictionary || [],
+      personalCorrections:settings.personalCorrections || []
+    });
+    const suggestion = result.correctedText || body;
+    if (suggestion !== body && confirm(`Use this correction?\n\n${suggestion}`)) {
+      await updateOwnMessage(messageId, {body:suggestion});
+    }
+  }
+
+  function showMessageActions(messageId, anchor) {
+    document.querySelector(".mingl-message-action-popout")?.remove();
+    const rect = anchor.getBoundingClientRect();
+    const popout = document.createElement("div");
+    popout.className = "mingl-message-action-popout";
+    popout.style.left = `${Math.min(rect.left, window.innerWidth - 292)}px`;
+    popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 220)}px`;
+    popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
+      <strong>Edit</strong>
+      <button type="button" data-action="edit">Edit Message</button>
+      <strong>Correct Grammar/Spelling</strong>
+      <button type="button" data-action="correct">Correct This Message</button>
+    </div>`;
+    document.body.appendChild(popout);
+    popout.addEventListener("click", async event => {
+      const action = event.target?.dataset?.action;
+      if (!action) return;
+      try {
+        if (action === "edit") await editMessage(messageId);
+        if (action === "correct") await correctMessage(messageId);
+      } catch(e) {
+        setText("minglChatStatus", e.message || String(e));
+      }
+      popout.remove();
+    });
+    setTimeout(() => {
+      document.addEventListener("click", function close(event) {
+        if (!popout.contains(event.target) && event.target !== anchor) {
+          popout.remove();
+          document.removeEventListener("click", close);
+        }
+      });
+    }, 0);
   }
 
   async function improveDraft() {
@@ -356,13 +573,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    ensureCleanComposer();
+    bindComposerActions();
     byId("minglChatGoogleLoginBtn")?.addEventListener("click", loginGoogle);
     byId("minglChatMicrosoftLoginBtn")?.addEventListener("click", loginMicrosoft);
     byId("minglStandaloneSendBtn")?.addEventListener("click", sendMessage);
-    byId("minglStandaloneImproveBtn")?.addEventListener("click", improveDraft);
     byId("minglStandaloneImageInput")?.addEventListener("change", renderAttachmentPreview);
-    byId("minglStandaloneClearImageBtn")?.addEventListener("click", clearAttachment);
     byId("minglStandaloneBackgroundInput")?.addEventListener("change", uploadBackground);
+    document.querySelectorAll("[data-mingl-emoji]").forEach(button => {
+      button.addEventListener("click", () => insertEmoji(button.dataset.minglEmoji || ""));
+    });
     byId("minglStandaloneMessageInput")?.addEventListener("keydown", event => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();

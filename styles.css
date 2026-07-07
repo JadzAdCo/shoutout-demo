@@ -170,6 +170,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-message p{margin:5px 0;white-space:pre-wrap}.mingl-message small{color:var(--muted)}
 .mingl-message-actions{display:flex;justify-content:flex-end;margin-top:6px}.mingl-message-actions button{padding:5px 9px;border-radius:999px;font-size:12px}
 .mingl-compose{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;margin-top:10px;position:sticky;bottom:0;z-index:4;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(8,12,32,.96);box-shadow:0 -12px 30px rgba(0,0,0,.22);padding:10px}
+.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto;align-items:center;border-radius:24px;background:rgba(7,10,24,.97)}
 .mingl-compose input{min-width:0}
 #minglMessages,#portalMinglMessages{order:20}
 #minglAttachmentPreview,#portalMinglAttachmentPreview{order:30}
@@ -182,16 +183,23 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .chat-file-button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.09);padding:10px 14px;font-weight:1000;cursor:pointer;text-align:center}
 .chat-plus-button{display:inline-flex;align-items:center;justify-content:center;width:48px;min-height:46px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.10);color:#fff;font-size:28px;font-weight:1000;line-height:1;cursor:pointer}
 .chat-plus-button:hover{background:rgba(255,255,255,.16)}
+.mingl-compose-menu{position:relative}
+.mingl-compose-menu summary{list-style:none;width:50px;height:50px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;font-size:30px;font-weight:1000;cursor:pointer}
+.mingl-compose-menu summary::-webkit-details-marker{display:none}
+.mingl-compose-menu-panel{position:absolute;right:0;bottom:58px;z-index:30;width:min(300px,calc(100vw - 36px));display:grid;gap:8px;border:1px solid var(--line);border-radius:18px;background:rgba(8,12,32,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:12px}
+.mingl-compose-menu-panel strong{color:var(--lime);font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin-top:4px}
+.mingl-compose-menu-panel button,.mingl-compose-menu-panel .chat-file-button{width:100%;min-height:42px;text-align:left;justify-content:flex-start}
+.compact-emoji-row{margin:0}.compact-emoji-row button{width:38px!important;height:38px!important;text-align:center!important;justify-content:center!important}
 .height-input-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
 .height-input-row input,.height-input-row select{width:100%}
 .visually-hidden-file{position:absolute!important;width:1px;height:1px;opacity:0;pointer-events:none}
 .mingl-chat-tools{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px}
 .mingl-attachment-preview{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.08);padding:10px;margin:10px 0}
 .mingl-attachment-preview.hidden{display:none}
-.mingl-attachment-preview img{width:76px;height:76px;border-radius:12px;object-fit:cover}
+.mingl-attachment-preview img,.mingl-attachment-preview video{width:76px;height:76px;border-radius:12px;object-fit:cover}
 .mingl-attachment-preview strong{display:block;overflow-wrap:anywhere}
 .mingl-message-media{margin:8px 0 4px}
-.mingl-message-media img{max-width:min(240px,70vw);max-height:260px;object-fit:contain;border-radius:14px;display:block}
+.mingl-message-media img,.mingl-message-media video{max-width:min(240px,70vw);max-height:260px;object-fit:contain;border-radius:14px;display:block}
 .mingl-message-media figcaption{font-size:11px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
 .mingl-message-action-popout{position:fixed;z-index:10004}
 .mingl-message-action-menu{width:min(270px,calc(100vw - 24px));display:grid;gap:7px;border:1px solid var(--line);border-radius:18px;background:rgba(10,14,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.56);padding:10px}
@@ -220,7 +228,7 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .floqr-action-feedback.failed .floqr-action-feedback-card{border-color:rgba(255,80,100,.55)}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}}
 @media(max-width:760px){.profile-datapoint{position:static}.profile-datapoint[open]{flex-basis:100%}.profile-datapoint div{position:static;width:100%;min-width:0;max-width:100%;box-shadow:none}.mingl-person-card,.mingl-self-card{overflow:hidden}.mingl-nested-datapoints .profile-datapoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mingl-nested-datapoints .profile-datapoint summary{text-align:center}}
-@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
 
 /* FLOQR AI layer */
 textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);font-size:15px;min-height:120px}
@@ -540,7 +548,12 @@ html.floqr-desktop-browser .app{width:min(100%,1180px)}
   .mingl-chat-panel,#portalMinglChatPanel{max-height:none}
   .mingl-messages{max-height:42vh;min-height:220px}
   .mingl-compose{grid-template-columns:1fr;align-items:stretch}
+  .mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}
   .mingl-compose input,.mingl-compose button,.mingl-compose .chat-file-button{width:100%}
+  .mingl-compose-clean input{width:100%}
+  .mingl-compose-clean>button{width:auto}
+  .mingl-compose-menu summary{width:48px}
+  .mingl-compose-menu-panel button,.mingl-compose-menu-panel .chat-file-button{width:100%}
 }
 html.floqr-desktop-browser .club-grid{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
 html.floqr-desktop-browser .profile-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}

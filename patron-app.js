@@ -1,4 +1,4 @@
-/* patron-app.js v28.4 */
+﻿/* patron-app.js v28.4 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -936,8 +936,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.91-helper-popouts-mingl-requests",
-      minglLink:"./mingl-chat.html?v=28.91-helper-popouts-mingl-requests",
+      link:"./patron-portal.html?tab=inbox&v=28.93-mingl-chat-legacy-recovery",
+      minglLink:"./mingl-chat.html?v=28.93-mingl-chat-legacy-recovery",
       read:false,
       createdAt:now
     };
@@ -979,7 +979,7 @@
   }
 
   function portalChatUrl(roomId = "") {
-    const params = new URLSearchParams({v:"28.91-helper-popouts-mingl-requests"});
+    const params = new URLSearchParams({v:"28.93-mingl-chat-legacy-recovery"});
     if (roomId) params.set("room", roomId);
     return `./mingl-chat.html?${params.toString()}`;
   }
@@ -1383,7 +1383,7 @@
   function minglReadReceiptHtml(msg = {}, mine = false) {
     if (!mine || msg.senderUid === "system" || msg.messageType === "system" || msg.unsent) return "";
     return minglMessageReadByOther(msg)
-      ? ` <span class="mingl-read-receipt" title="Read by recipient">👍 Read</span>`
+      ? ` <span class="mingl-read-receipt" title="Read by recipient">ðŸ‘ Read</span>`
       : ` <span class="mingl-read-receipt unread" title="Not read yet">Sent</span>`;
   }
 
@@ -1753,7 +1753,7 @@
       const loc = getLocation(e.locationId);
       const card = document.createElement("div");
       card.className = "club-option";
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} • ${esc(e.city)}, ${esc(e.country)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc((e.genres||[]).join(" • "))}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button">Buy Ticket / ShoutOut</button>`;
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} â€¢ ${esc(e.city)}, ${esc(e.country)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc((e.genres||[]).join(" â€¢ "))}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button">Buy Ticket / ShoutOut</button>`;
       card.querySelector("button").addEventListener("click", () => {
         const msg = "Ticket checkout will be connected in the next payment integration. For now, you can throw a ShoutOut at this event location.";
         alert(msg);
@@ -1789,7 +1789,7 @@
     matches.forEach(([id,l]) => {
       const card = document.createElement("div");
       card.className = "club-option";
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button>`;
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" â€¢ "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });
@@ -1799,7 +1799,7 @@
     selectedLocationId = await resolveLocationAlias(id);
     const loc = await loadLocationById(selectedLocationId);
     setText("selectedClubTitle", loc.locationName);
-    setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
+    setText("selectedClubMeta", `${loc.locationLabel} â€¢ ${(loc.genres||[]).join(" / ")}`);
     selectedTemplate = "blackwhite";
     selectedTemplateVariant = null;
     await loadTemplateVariants();
@@ -2220,7 +2220,7 @@
       updatePreview();
       return;
     }
-    if (box) { box.classList.remove("hidden"); box.innerHTML = `<strong>AI Suggestion</strong><p>${esc(item.main)} — ${esc(item.sub)}</p>`; }
+    if (box) { box.classList.remove("hidden"); box.innerHTML = `<strong>AI Suggestion</strong><p>${esc(item.main)} â€” ${esc(item.sub)}</p>`; }
     updatePreview();
   }
 
@@ -2234,7 +2234,7 @@
       const rows = [];
       snap.forEach(doc => rows.push({id:doc.id, ...doc.data()}));
       if (!rows.length) { box.innerHTML = "<p>No previous ShoutOuts found yet.</p>"; return; }
-      box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||"")}</button>`).join("");
+      box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} â€” ${esc(s.subText||"")}</button>`).join("");
       box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
         const s = rows[Number(btn.dataset.i)];
         const mainInput = byId("mainText");
@@ -2299,7 +2299,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.91-helper-popouts-mingl-requests`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.93-mingl-chat-legacy-recovery`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -2370,7 +2370,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.91-helper-popouts-mingl-requests";
+      portalLink.href = "./patron-portal.html?v=28.93-mingl-chat-legacy-recovery";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -2383,14 +2383,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.91-helper-popouts-mingl-requests";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.93-mingl-chat-legacy-recovery";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./mingl-chat.html?v=28.91-helper-popouts-mingl-requests";
+      chats.href = "./mingl-chat.html?v=28.93-mingl-chat-legacy-recovery";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2565,10 +2565,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.91-helper-popouts-mingl-requests">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.93-mingl-chat-legacy-recovery">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.91-helper-popouts-mingl-requests">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html?v=28.91-helper-popouts-mingl-requests">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.93-mingl-chat-legacy-recovery">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./mingl-chat.html?v=28.93-mingl-chat-legacy-recovery">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2611,7 +2611,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.91-helper-popouts-mingl-requests`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.93-mingl-chat-legacy-recovery`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 
