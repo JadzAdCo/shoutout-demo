@@ -67,6 +67,10 @@
 .manual-test-choice{display:inline-flex!important;align-items:center;gap:8px;width:auto!important;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.08);padding:8px 12px;font-weight:1000}
 .manual-test-choice input{width:auto!important;margin:0}
 #manualFeatureDiagnosticsOutput,#manualFeatureDiagnosticsPrompt{min-height:220px;font-size:12px;line-height:1.45}
+.diagnostic-archive{margin-top:14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.06);padding:10px}
+.diagnostic-archive summary{cursor:pointer;font-weight:1000;color:var(--lime);list-style:none}
+.diagnostic-archive summary::-webkit-details-marker{display:none}
+.diagnostic-archive-list{display:grid;gap:10px;margin-top:10px;max-height:420px;overflow:auto;padding-right:4px}
 
 /* v28.5 media templates */
 .media-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}

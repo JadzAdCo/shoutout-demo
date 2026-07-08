@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Mingl Chat v28.96-mingl-main-chat-card-removal -->
+  <!-- FLOQR Mingl Chat v28.98 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mingl Chat</title>
-  <link rel="stylesheet" href="./styles.css?v=28.96-mingl-main-chat-card-removal"/>
-  <link rel="stylesheet" href="./admin.css?v=28.96-mingl-main-chat-card-removal"/>
+  <link rel="stylesheet" href="./styles.css?v=28.98"/>
+  <link rel="stylesheet" href="./admin.css?v=28.98"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a class="global-back-btn buttonlike" href="./?v=28.96-mingl-main-chat-card-removal">&larr; Back to Mingl</a>
+  <a class="global-back-btn buttonlike" href="./?v=28.98">&larr; Back to Mingl</a>
   <section class="page active">
     <header class="topbar">
       <div>
@@ -30,11 +30,11 @@
     </div>
 
     <div id="minglChatShell" class="mingl-layout hidden">
-      <div id="minglStandaloneChatCard" class="card mingl-chat-popout hidden" aria-hidden="true">
+      <div class="card mingl-chat-list-card">
         <h2>Chats <span id="minglStandaloneCount">(0/0)</span></h2>
         <div id="minglStandaloneList" class="mingl-chat-list"></div>
       </div>
-      <div class="card">
+      <div id="minglStandaloneChatCard" class="card mingl-chat-popout hidden" aria-hidden="true">
         <div class="mingl-chat-header">
           <div id="minglStandaloneAvatar" class="mingl-chat-avatar">M</div>
           <div>
@@ -84,10 +84,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=28.96-mingl-main-chat-card-removal"></script>
-<script src="./shared-data.js?v=28.96-mingl-main-chat-card-removal"></script>
-<script src="./ai-grammar-service.js?v=28.96-mingl-main-chat-card-removal"></script>
-<script src="./helper-popouts.js?v=28.96-mingl-main-chat-card-removal"></script>
-<script src="./mingl-chat-app.js?v=28.96-mingl-main-chat-card-removal"></script>
+<script src="./firebase-config.js?v=28.98"></script>
+<script src="./shared-data.js?v=28.98"></script>
+<script src="./ai-grammar-service.js?v=28.98"></script>
+<script src="./helper-popouts.js?v=28.98"></script>
+<script src="./mingl-chat-app.js?v=28.98"></script>
 </body>
 </html>

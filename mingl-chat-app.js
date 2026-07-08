@@ -1,4 +1,4 @@
-/* mingl-chat-app.js v28.96-mingl-main-chat-card-removal */
+/* mingl-chat-app.js v28.98 */
 (function(){
   "use strict";
 

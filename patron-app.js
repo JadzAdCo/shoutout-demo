@@ -936,8 +936,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=28.96-mingl-main-chat-card-removal",
-      minglLink:"./mingl-chat.html?v=28.96-mingl-main-chat-card-removal",
+      link:"./patron-portal.html?tab=inbox&v=28.98",
+      minglLink:"./mingl-chat.html?v=28.98",
       read:false,
       createdAt:now
     };
@@ -979,7 +979,7 @@
   }
 
   function portalChatUrl(roomId = "") {
-    const params = new URLSearchParams({v:"28.96-mingl-main-chat-card-removal"});
+    const params = new URLSearchParams({v:"28.98"});
     if (roomId) params.set("room", roomId);
     return `./mingl-chat.html?${params.toString()}`;
   }
@@ -1230,9 +1230,25 @@
       const state = connectionStatusFor(otherUid).state;
       const item = document.createElement("div");
       item.className = "queue-item mingl-request-item";
-      const label = state === "received" ? "Received" : state === "sent" ? "Sent" : "Pending";
+      const label = state === "received"
+        ? "Received request"
+        : state === "sent"
+          ? "Sent request"
+          : "Pending request";
+      const detail = state === "received"
+        ? "This patron wants to Mingl with you. Tap Mingl Back to approve."
+        : state === "sent"
+          ? "Waiting for this patron to Mingl back."
+          : "Friend or Mingl Request is pending.";
       const action = state === "received" ? `<button class="primary" type="button">Mingl Back</button>` : state === "mutual" ? `<button class="primary" type="button">Open Mingl Chat</button>` : "";
-      item.innerHTML = `<strong>${esc(profile.displayName || profile.username || "Mingl Member")}</strong><span>${esc(label)} Friend or Mingl Request</span><small>${esc((connection.sharedDatapoints || []).slice(0,4).join(", "))}</small>${action}`;
+      const shared = (connection.sharedDatapoints || []).slice(0,4).filter(Boolean);
+      item.innerHTML = `<div class="mingl-request-copy">
+        <strong>${esc(profile.displayName || profile.username || "Mingl Member")}</strong>
+        <span>${esc(label)}</span>
+        <small>${esc(detail)}</small>
+        ${shared.length ? `<small class="mingl-request-shared">Shared: ${esc(shared.join(", "))}</small>` : ""}
+      </div>
+      ${action ? `<div class="mingl-request-actions">${action}</div>` : ""}`;
       const button = item.querySelector("button");
       if (button) {
         button.addEventListener("click", () => {
@@ -2299,7 +2315,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.96-mingl-main-chat-card-removal`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=28.98`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -2370,7 +2386,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=28.96-mingl-main-chat-card-removal";
+      portalLink.href = "./patron-portal.html?v=28.98";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -2383,14 +2399,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=28.96-mingl-main-chat-card-removal";
+      messages.href = "./patron-portal.html?tab=inbox&v=28.98";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./mingl-chat.html?v=28.96-mingl-main-chat-card-removal";
+      chats.href = "./mingl-chat.html?v=28.98";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2565,10 +2581,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=28.96-mingl-main-chat-card-removal">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=28.98">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.96-mingl-main-chat-card-removal">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html?v=28.96-mingl-main-chat-card-removal">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=28.98">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./mingl-chat.html?v=28.98">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2611,7 +2627,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.96-mingl-main-chat-card-removal`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=28.98`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

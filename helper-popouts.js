@@ -1,4 +1,4 @@
-/* helper-popouts.js v28.91-helper-popouts-mingl-requests */
+/* helper-popouts.js v28.98 */
 (function(){
   "use strict";
 
@@ -36,8 +36,31 @@
     root.querySelectorAll?.("p.sub.small, p.helper-text, .helper-text").forEach(convert);
   }
 
+  function closeOtherPopouts(active = null) {
+    document.querySelectorAll("details.help-popout[open]").forEach(details => {
+      if (details !== active) details.open = false;
+    });
+  }
+
+  function bindDismissBehavior() {
+    document.addEventListener("click", event => {
+      const openHelp = event.target.closest?.("details.help-popout");
+      if (!openHelp) {
+        closeOtherPopouts(null);
+        return;
+      }
+      if (event.target.closest("summary")) {
+        setTimeout(() => closeOtherPopouts(openHelp.open ? openHelp : null), 0);
+      }
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeOtherPopouts(null);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     convertAll(document);
+    bindDismissBehavior();
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
