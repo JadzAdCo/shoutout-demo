@@ -1,15 +1,26 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.99 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.00 Full Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.99
+https://jadzadco.github.io/shoutout-demo/?v=29.00
 ```
 
 Current release highlights:
 
+- Adds v29.00 Mingl Chat Latency and Diagnostics Archive fixes.
+- Mingl Chat filters diagnostic/demo chat rooms such as `Diagnostics Peer` and placeholder `Mingl Chat` from the patron-facing chat list.
+- Mingl Chat renders participant chat rooms first, then checks older Mingl connections, reducing the blank `0/0` loading period.
+- Mingl Chat shows clear loading/ready status while rooms are being checked.
+- Mingl Chat action popout is constrained inside the selected chat window and scrolls when commands exceed the visible space.
+- Package diagnostic checks can now be archived after they pass.
+- Package diagnostic archives store when the test ran, when it was archived, package/check labels, status, and evidence.
+- Package diagnostic archives can be downloaded as CSV from Master Admin > Diagnostics.
+- The archive button now gives visible working/done/error status through the diagnostics status line.
+- Firestore and Storage rule headers now carry the v29.00 package version.
+- Direct rollback note for this package is `ROLLBACK-V29-00.md`; older rollback/readme history is bundled in the included rollback history ZIP.
 - Adds v28.99 targeted ad campaign management and ShoutOut splash targeting.
 - Adds separate demo ad campaigns for Cuisine Bantu, Puff Club, and Lima DC with their own media, copy, Canva source links, targeting tags, campaign datapoints, and analytics metadata.
 - Adds Master Admin > Ad Campaign Management so admins can review and edit target tags, campaign datapoints, and optional required target groups.
@@ -18,8 +29,8 @@ Current release highlights:
 - Adds `ad-campaign-preview-v28.99.html` for reviewing the current campaign creatives.
 - Fixes the ShoutOut landing logo to use the official `images/shoutout-logo.png`.
 - Adds manual diagnostics archive controls and crawl contact CSV/export controls.
-- Firestore and Storage rule headers now carry the v28.99 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-99.md`; older rollback/readme history is bundled in the included rollback history ZIP.
+- Historical note: v28.99 Firestore and Storage rule headers carried the v28.99 package version.
+- Historical note: v28.99 direct rollback note was `ROLLBACK-V28-99.md`.
 - Adds v28.98 Mingl Chat List Diagnostics Archive fixes.
 - Restores the visible Mingl Chat room list by keeping the room list card separate from the selected-chat popout.
 - Master Admin Feature Diagnostics now keeps Failed, Soft Fail, and TBI checks visible while archiving passed checks behind `View Archived Passed Diagnostics`.
@@ -448,8 +459,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.99
-// EXPECTED DEPLOYED RULES VERSION: v28.99 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.00
+// EXPECTED DEPLOYED RULES VERSION: v29.00 or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -457,8 +468,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.99
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.99 or newer
+// FLOQR STORAGE RULES VERSION: v29.00
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v29.00 or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

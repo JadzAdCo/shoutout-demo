@@ -196,7 +196,9 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 .mingl-compose-menu{position:relative}
 .mingl-compose-menu summary{list-style:none;width:50px;height:50px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;font-size:30px;font-weight:1000;cursor:pointer}
 .mingl-compose-menu summary::-webkit-details-marker{display:none}
-.mingl-compose-menu-panel{position:absolute;right:0;bottom:58px;z-index:30;width:min(300px,calc(100vw - 36px));display:grid;gap:8px;border:1px solid var(--line);border-radius:18px;background:rgba(8,12,32,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:12px}
+.mingl-compose-menu-panel{position:absolute;right:0;bottom:58px;z-index:30;width:min(300px,calc(100vw - 36px));max-height:min(68vh,560px);overflow:auto;display:grid;gap:8px;border:1px solid var(--line);border-radius:18px;background:rgba(8,12,32,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:12px}
+.mingl-chat-popout .mingl-compose-menu-panel{width:min(280px,calc(100vw - 48px));max-width:calc(100vw - 48px);right:0;bottom:58px}
+html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:min(280px,calc(100vw - 72px))}
 .mingl-compose-menu-panel strong{color:var(--lime);font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin-top:4px}
 .mingl-compose-menu-panel button,.mingl-compose-menu-panel .chat-file-button{width:100%;min-height:42px;text-align:left;justify-content:flex-start}
 .compact-emoji-row{margin:0}.compact-emoji-row button{width:38px!important;height:38px!important;text-align:center!important;justify-content:center!important}
@@ -571,6 +573,7 @@ html.floqr-desktop-browser .app{width:min(100%,1180px)}
   .mingl-compose-clean input{width:100%}
   .mingl-compose-clean>button{width:auto}
   .mingl-compose-menu summary{width:48px}
+  .mingl-compose-menu-panel{right:0;left:auto;width:min(280px,calc(100vw - 36px));max-height:52vh}
   .mingl-compose-menu-panel button,.mingl-compose-menu-panel .chat-file-button{width:100%}
 }
 html.floqr-desktop-browser .club-grid{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}

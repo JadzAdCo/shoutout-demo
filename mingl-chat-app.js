@@ -1,4 +1,4 @@
-/* mingl-chat-app.js v28.98 */
+/* mingl-chat-app.js v29.00 */
 (function(){
   "use strict";
 
@@ -19,6 +19,7 @@
   let activeRoomId = "";
   let unsubscribeMessages = null;
   let attachmentFile = null;
+  const HIDDEN_ROOM_NAMES = new Set(["diagnostics peer", "mingl chat"]);
 
   function fmtDate(value) {
     if (!value) return "";
@@ -68,6 +69,50 @@
   function otherSummary(room = {}) {
     const otherUid = (room.participants || []).find(uid => uid !== currentUser?.uid);
     return room.userSummaries?.[otherUid] || {};
+  }
+
+  function otherUid(room = {}) {
+    return (room.participants || []).find(uid => uid !== currentUser?.uid) || "";
+  }
+
+  function visibleRoomName(room = {}) {
+    const other = otherSummary(room);
+    return String(other.displayName || other.name || room.title || "").trim();
+  }
+
+  function isVisiblePatronRoom(room = {}) {
+    const participants = normalizedParticipants(room);
+    if (!participants.includes(currentUser?.uid) || participants.length < 2 || !isMinglRoom(room)) return false;
+    const name = visibleRoomName({...room, participants}).toLowerCase();
+    if (!name || HIDDEN_ROOM_NAMES.has(name)) return false;
+    if (/diagnostic|test peer|package install/i.test(name)) return false;
+    return true;
+  }
+
+  async function summaryForUid(uid) {
+    if (!uid) return {};
+    try {
+      const snap = await db.collection("users").doc(uid).get();
+      if (!snap.exists) return {};
+      const user = snap.data() || {};
+      return {
+        uid,
+        displayName:user.displayName || user.publicName || user.username || user.email || "Member",
+        photoURL:user.photoURL || user.profilePhotoUrl || user.mainPhotoUrl || ""
+      };
+    } catch(e) {
+      return {};
+    }
+  }
+
+  async function hydrateRoomSummary(room = {}) {
+    const participants = normalizedParticipants(room);
+    const normalized = {...room, participants, userSummaries:{...(room.userSummaries || {})}};
+    const other = participants.find(uid => uid !== currentUser?.uid);
+    if (other && !normalized.userSummaries[other]?.displayName) {
+      normalized.userSummaries[other] = await summaryForUid(other);
+    }
+    return normalized;
   }
 
   function isMinglRoom(room = {}) {
@@ -355,12 +400,7 @@
   }
 
   async function loadConnections() {
-    const users = await getCollectionSafe("users");
-    const fallbackConnectionIds = users
-      .map(profile => profile.uid || profile.id)
-      .filter(uid => uid && uid !== currentUser.uid)
-      .map(uid => pairId(currentUser.uid, uid));
-    let rows = await getParticipantCollectionSafe("minglConnections", currentUser.uid, 1000, fallbackConnectionIds);
+    let rows = await getParticipantCollectionSafe("minglConnections", currentUser.uid, 1000, []);
     if (!rows.length) {
       const requestedBy = await db.collection("minglConnections").where("requestedBy", "==", currentUser.uid).limit(1000).get().then(snap => snap.docs.map(doc => ({id:doc.id, ...doc.data()}))).catch(() => []);
       const requestedTo = await db.collection("minglConnections").where("requestedTo", "==", currentUser.uid).limit(1000).get().then(snap => snap.docs.map(doc => ({id:doc.id, ...doc.data()}))).catch(() => []);
@@ -375,13 +415,18 @@
     const participants = normalizedParticipants(connection);
     if (!participants.includes(currentUser.uid) || String(connection.status || "").toLowerCase() !== "mutual") return null;
     const roomId = roomIdForConnection(connection);
+    const userSummaries = {...(connection.userSummaries || {})};
+    const other = participants.find(uid => uid !== currentUser.uid);
+    if (other && !userSummaries[other]?.displayName) {
+      userSummaries[other] = await summaryForUid(other);
+    }
     const payload = {
       id: roomId,
       type: "mingl",
       title: "Mingl Chat",
       connectionId: connection.connectionId || connection.id || "",
       participants,
-      userSummaries: connection.userSummaries || {},
+      userSummaries,
       unreadCounts: {},
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -394,26 +439,32 @@
   }
 
   async function loadRooms() {
-    const users = await getCollectionSafe("users");
-    const fallbackIds = users
-      .map(profile => profile.uid || profile.id)
-      .filter(uid => uid && uid !== currentUser.uid)
-      .map(uid => `mingl_${pairId(currentUser.uid, uid)}`);
-    const existingRooms = (await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, fallbackIds))
-      .map(room => ({...room, participants:normalizedParticipants(room)}))
-      .filter(room => normalizedParticipants(room).includes(currentUser.uid) && isMinglRoom(room));
+    setText("minglChatStatus", "Loading Mingl chats...");
+    const rawRooms = await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, []);
+    const existingRooms = [];
+    for (const room of rawRooms) {
+      const hydrated = await hydrateRoomSummary(room);
+      if (isVisiblePatronRoom(hydrated)) existingRooms.push(hydrated);
+    }
+    rooms = existingRooms;
+    renderRooms();
+    setText("minglChatStatus", existingRooms.length ? "Mingl chats loaded. Checking older connections..." : "Checking older Mingl connections...");
     const connections = await loadConnections();
     const createdRooms = [];
     for (const connection of connections) {
       const row = await ensureRoomFromConnection(connection);
-      if (row) createdRooms.push(row);
+      if (row && isVisiblePatronRoom(row)) createdRooms.push(row);
     }
     const byRoom = new Map();
-    [...existingRooms, ...createdRooms].forEach(room => byRoom.set(room.id, {...room, participants:normalizedParticipants(room)}));
-    rooms = [...byRoom.values()];
+    [...existingRooms, ...createdRooms].forEach(room => {
+      const normalized = {...room, participants:normalizedParticipants(room)};
+      if (isVisiblePatronRoom(normalized)) byRoom.set(room.id, normalized);
+    });
+    rooms = [...byRoom.values()].sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
     renderRooms();
     const requested = qs("room");
     if (requested && rooms.some(room => room.id === requested)) openRoom(requested);
+    setText("minglChatStatus", rooms.length ? "Mingl chats ready." : "No mutual Mingl chats found yet.");
   }
 
   function clearAttachment() {

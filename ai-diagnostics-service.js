@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v28.98";
-  const EXPECTED_STORAGE_RULES_VERSION = "v28.98";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v28.98";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.00";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.00";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.00";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -710,23 +710,24 @@
       ]
     },
     {
-      version: "v28.98",
-      title: "Mingl Chat List Diagnostics Archive",
+      version: "v29.00",
+      title: "Mingl Chat Latency and Diagnostics Archive",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.98"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.00"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
-        {label:"Master Admin diagnostics cache-busted", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=28.98", "admin.css?v=28.98"]},
+        {label:"Package diagnostics archive controls", file:"master-admin.html", includes:["archivePassedPackageDiagnosticsBtn", "downloadPackageDiagnosticsArchiveCsvBtn", "packageDiagnosticsArchiveReport"]},
+        {label:"Package diagnostics archive logic", file:"ai-diagnostics-service.js", includes:["archivePassedPackageDiagnostics", "downloadPackageDiagnosticsArchiveCsv", "floqrPackageDiagnosticsArchive"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
-        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=28.98", "patron-app.js?v=28.98"]},
-        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=28.98"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=29.00", "patron-app.js?v=29.00"]},
+        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=29.00"]},
         {label:"Shared helper popouts script installed", file:"helper-popouts.js", includes:["FLOQRHelperPopouts", "MutationObserver", "p.sub.small"]},
         {label:"Main Mingl Requests panel installed", file:"index.html", includes:["minglRequestsList", "Mingl Requests", "help-popout"]},
         {label:"Main Mingl Requests renderer installed", file:"patron-app.js", includes:["renderMinglRequests", "minglRequestsList", "Mingl Back"]},
         {label:"Main Mingl Requests readable row formatting", file:"patron-app.js", includes:["mingl-request-copy", "Received request", "Sent request", "Waiting for this patron to Mingl back"]},
         {label:"Main Mingl Requests readable CSS", file:"styles.css", includes:["mingl-request-item", "mingl-request-copy", "mingl-request-shared", "mingl-request-actions"]},
         {label:"Help popouts close on outside click", file:"helper-popouts.js", includes:["closeOtherPopouts", "bindDismissBehavior", "details.help-popout[open]", "Escape"]},
-        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=28.98", "mingl-chat-app.js?v=28.98"]},
+        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=29.00", "mingl-chat-app.js?v=29.00"]},
         {label:"Standalone Mingl Chat list card visible", file:"mingl-chat.html", includes:["mingl-chat-list-card", "minglStandaloneList", "minglStandaloneChatCard"], notIncludes:["id=\"minglStandaloneChatCard\" class=\"card mingl-chat-popout hidden\" aria-hidden=\"true\">\n        <h2>Chats"]},
         {label:"Feature diagnostics pass archive installed", file:"ai-diagnostics-service.js", includes:["diagnostic-archive", "View Archived Passed Diagnostics", "visible = features.filter", "archived = features.filter"]},
         {label:"Feature diagnostics archive CSS installed", file:"admin.css", includes:["diagnostic-archive", "diagnostic-archive-list", "max-height:420px"]},
@@ -735,6 +736,7 @@
         {label:"Mingl routes to standalone chat", file:"patron-app.js", includes:["portalChatUrl", "mingl-chat.html", "window.location.href = portalChatUrl(roomId)"]},
         {label:"Standalone Mingl composer uses nested action menu", file:"mingl-chat.html", includes:["mingl-compose-menu", "Add Photo/Video", "Correct Grammar/Spelling", "minglStandaloneImageInput"]},
         {label:"Standalone Mingl Chat logic installed", file:"mingl-chat-app.js", includes:["sendMessage", "uploadMedia", "improveDraft", "uploadBackground", "ensureRoomFromConnection"]},
+        {label:"Standalone Mingl Chat fast list and hidden diagnostics rooms", file:"mingl-chat-app.js", includes:["HIDDEN_ROOM_NAMES", "hydrateRoomSummary", "Loading Mingl chats"]},
         {label:"Standalone Mingl composer force-upgrades old markup", file:"mingl-chat-app.js", includes:["ensureCleanComposer", "Text Action", "Add Photo/Video", "Chat Background"]},
         {label:"Shared background consent card installed", file:"mingl-chat-app.js", includes:["backgroundConsentHtml", "respondToBackgroundConsent", "Approve Background", "Keep Mine Private"]},
         {label:"Shared background consent directive installed", file:"mingl-chat-app.js", includes:["Tap Approve Background", "Waiting for the other patron", "Keep Mine Private"]},
@@ -749,10 +751,10 @@
         {label:"Club admin display default reset logic", file:"admin-app.js", includes:["resetDisplayToClubDefault", "clubDefaultReset", "resetDisplayDefaultBtn"]},
         {label:"Club admin display default reset button", file:"admin.html", includes:["resetDisplayDefaultBtn", "Reset Display to Club Default"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-compose-menu", "height-input-row"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v28.98", "isMinglReadReceiptUpdate", "readAtBy"]},
-        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v28.98", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
-        {label:"README documents v28.98", file:"README.md", includes:["v28.98 Mingl Chat List Diagnostics Archive", "Restores the visible Mingl Chat room list", "View Archived Passed Diagnostics"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V28-98.md", includes:["FLOQR Rollback - v28.98 Mingl Chat List Diagnostics Archive", "This rollback does not delete user profile data"]}
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v29.00", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v29.00", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v29.00", file:"README.md", includes:["v29.00 Mingl Chat Latency and Diagnostics Archive", "Package diagnostic checks can be archived", "Mingl Chat filters diagnostic/demo chat rooms"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V29-00.md", includes:["FLOQR Rollback - v29.00", "This rollback does not delete user profile data"]}
       ]
     }
   ];
@@ -2020,6 +2022,10 @@
     return `floqrManualFeatureArchive:${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`;
   }
 
+  function packageDiagnosticsArchiveStorageKey() {
+    return `floqrPackageDiagnosticsArchive:${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`;
+  }
+
   function readManualFeatureResults() {
     try {
       return JSON.parse(localStorage.getItem(manualFeatureStorageKey()) || "{}") || {};
@@ -2042,6 +2048,18 @@
 
   function writeManualFeatureArchive(rows = []) {
     localStorage.setItem(manualFeatureArchiveStorageKey(), JSON.stringify(rows || []));
+  }
+
+  function readPackageDiagnosticsArchive() {
+    try {
+      return JSON.parse(localStorage.getItem(packageDiagnosticsArchiveStorageKey()) || "[]") || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function writePackageDiagnosticsArchive(rows = []) {
+    localStorage.setItem(packageDiagnosticsArchiveStorageKey(), JSON.stringify(rows || []));
   }
 
   function archivedManualFeatureIds() {
@@ -2173,6 +2191,88 @@
     report.querySelectorAll("[data-restore-manual-feature]").forEach(button => {
       button.addEventListener("click", () => restoreArchivedManualFeature(button.dataset.restoreManualFeature));
     });
+  }
+
+  function packageArchiveKey(row = {}) {
+    return [row.package || "", row.label || "", row.status || ""].join("::");
+  }
+
+  async function archivePassedPackageDiagnostics() {
+    try {
+      setText("diagnosticsStatus", "Archiving passed package diagnostic checks...");
+      let rows = state.lastPackageDiagnostics || [];
+      if (!rows.length) {
+        rows = await runPackageInstallDiagnostics({silent:true});
+      }
+      const passed = rows.filter(row => row.status === "Pass");
+      if (!passed.length) {
+        setText("diagnosticsStatus", "No passed package diagnostics are available to archive.");
+        return;
+      }
+      const archive = readPackageDiagnosticsArchive();
+      const byKey = new Map(archive.map(row => [packageArchiveKey(row), row]));
+      const archivedAt = new Date().toISOString();
+      passed.forEach(row => byKey.set(packageArchiveKey(row), {
+        ...row,
+        archivedAt,
+        ranAt:archivedAt,
+        archivePackageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION
+      }));
+      const next = Array.from(byKey.values());
+      writePackageDiagnosticsArchive(next);
+      renderPackageDiagnosticsArchives();
+      setText("diagnosticsStatus", `Archived ${passed.length} passed package diagnostic check(s). Open Diagnostic Archives or download the CSV.`);
+    } catch (error) {
+      setText("diagnosticsStatus", `Package diagnostics archive failed: ${error?.message || error}`);
+    }
+  }
+
+  function buildPackageDiagnosticsArchiveCsv(rows = readPackageDiagnosticsArchive()) {
+    const headers = ["Archived At", "Ran At", "Package Version", "Package", "Check", "Status", "Evidence"];
+    const lines = [headers.map(csvCell).join(",")];
+    rows.forEach(row => lines.push([
+      row.archivedAt ? new Date(row.archivedAt).toLocaleString() : "",
+      row.ranAt ? new Date(row.ranAt).toLocaleString() : "",
+      row.archivePackageVersion || CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
+      row.package || "",
+      row.label || "",
+      row.status || "",
+      row.evidence || ""
+    ].map(csvCell).join(",")));
+    return lines.join("\r\n");
+  }
+
+  function downloadPackageDiagnosticsArchiveCsv() {
+    const rows = readPackageDiagnosticsArchive();
+    if (!rows.length) {
+      setText("diagnosticsStatus", "No archived package diagnostics are available to download yet.");
+      return;
+    }
+    const filename = `floqr-package-diagnostics-archive-${exportTimestamp()}.csv`;
+    downloadTextFile(filename, buildPackageDiagnosticsArchiveCsv(rows));
+    setText("diagnosticsStatus", `Package diagnostics archive downloaded as ${filename}.`);
+  }
+
+  function renderPackageDiagnosticsArchives() {
+    const summary = byId("packageDiagnosticsArchiveSummary");
+    const report = byId("packageDiagnosticsArchiveReport");
+    if (!summary || !report) return;
+    const archive = readPackageDiagnosticsArchive().slice().sort((a,b) => String(b.archivedAt || "").localeCompare(String(a.archivedAt || "")));
+    const counts = countBy(archive, row => row.status || "Unknown");
+    summary.innerHTML = simpleRows([
+      ["Archived package checks", archive.length],
+      ["Pass", counts.Pass || 0],
+      ["Package", CURRENT_DIAGNOSTICS_PACKAGE_VERSION],
+      ["Export", "Use Download Package Archive CSV from Diagnostics"]
+    ]);
+    report.innerHTML = archive.length ? archive.slice(0, 80).map(row => `<div class="queue-item">
+      <div class="message-envelope-head">
+        <strong>${esc(row.package || "Package diagnostics")}: ${esc(row.label || "Check")}</strong>
+        ${statusBadge(row.status || "Pass")}
+      </div>
+      <p>${esc(row.evidence || "")}</p>
+      <p><strong>Ran:</strong> ${esc(row.ranAt ? new Date(row.ranAt).toLocaleString() : "-")} | <strong>Archived:</strong> ${esc(row.archivedAt ? new Date(row.archivedAt).toLocaleString() : "-")}</p>
+    </div>`).join("") : "<p class='sub'>No package diagnostic checks have been archived yet.</p>";
   }
 
   function buildManualFeatureDiagnosticsText(rows = manualFeatureRows()) {
@@ -2708,6 +2808,7 @@
     if (!options.silent) setText("diagnosticsStatus", "Running package install diagnostics...");
     const cache = new Map();
     const results = [];
+    const ranAt = new Date().toISOString();
     for (const pkg of PACKAGE_INSTALL_CHECKS) {
       for (const check of pkg.checks) {
         try {
@@ -2719,6 +2820,7 @@
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
+            ranAt,
             status: supersededPackageCheck ? "Pass" : (failed ? "Failed" : "Pass"),
             evidence: supersededPackageCheck
               ? `${check.file} now points to current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; this historical package marker check is superseded and non-blocking. Original evidence: ${[
@@ -2737,6 +2839,7 @@
           results.push({
             package: `${pkg.version} ${pkg.title}`,
             label: check.label,
+            ranAt,
             status: supersededPackageCheck ? "Pass" : "Failed",
             evidence: supersededPackageCheck
               ? `${check.file} is not required in the current package ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}; historical file check is superseded and non-blocking. Original evidence: ${error?.message || String(error)}`
@@ -5079,6 +5182,8 @@
     byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
     byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
+    byId("archivePassedPackageDiagnosticsBtn")?.addEventListener("click", archivePassedPackageDiagnostics);
+    byId("downloadPackageDiagnosticsArchiveCsvBtn")?.addEventListener("click", downloadPackageDiagnosticsArchiveCsv);
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
@@ -5117,6 +5222,7 @@
     renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
     renderSourceExtractionReport();
     renderCrawlContactExport();
+    renderPackageDiagnosticsArchives();
     await refreshDiagnostics();
   }
 
@@ -5128,6 +5234,7 @@
     runRulesSmokeTest,
     exportDiagnosticsReport,
     renderManualFeatureDiagnostics,
+    renderPackageDiagnosticsArchives,
     renderManualFeatureArchives,
     buildManualFeatureDiagnosticsText,
     buildManualFeatureDiagnosticsPrompt,
