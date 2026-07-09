@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.00";
-  const EXPECTED_STORAGE_RULES_VERSION = "v29.00";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.00";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.01";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.01";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.01";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -710,24 +710,24 @@
       ]
     },
     {
-      version: "v29.00",
+      version: "v29.01",
       title: "Mingl Chat Latency and Diagnostics Archive",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.00"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.01"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
         {label:"Package diagnostics archive controls", file:"master-admin.html", includes:["archivePassedPackageDiagnosticsBtn", "downloadPackageDiagnosticsArchiveCsvBtn", "packageDiagnosticsArchiveReport"]},
         {label:"Package diagnostics archive logic", file:"ai-diagnostics-service.js", includes:["archivePassedPackageDiagnostics", "downloadPackageDiagnosticsArchiveCsv", "floqrPackageDiagnosticsArchive"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
-        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=29.00", "patron-app.js?v=29.00"]},
-        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=29.00"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=29.01", "patron-app.js?v=29.01"]},
+        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=29.01"]},
         {label:"Shared helper popouts script installed", file:"helper-popouts.js", includes:["FLOQRHelperPopouts", "MutationObserver", "p.sub.small"]},
         {label:"Main Mingl Requests panel installed", file:"index.html", includes:["minglRequestsList", "Mingl Requests", "help-popout"]},
         {label:"Main Mingl Requests renderer installed", file:"patron-app.js", includes:["renderMinglRequests", "minglRequestsList", "Mingl Back"]},
         {label:"Main Mingl Requests readable row formatting", file:"patron-app.js", includes:["mingl-request-copy", "Received request", "Sent request", "Waiting for this patron to Mingl back"]},
         {label:"Main Mingl Requests readable CSS", file:"styles.css", includes:["mingl-request-item", "mingl-request-copy", "mingl-request-shared", "mingl-request-actions"]},
         {label:"Help popouts close on outside click", file:"helper-popouts.js", includes:["closeOtherPopouts", "bindDismissBehavior", "details.help-popout[open]", "Escape"]},
-        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=29.00", "mingl-chat-app.js?v=29.00"]},
+        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=29.01", "mingl-chat-app.js?v=29.01"]},
         {label:"Standalone Mingl Chat list card visible", file:"mingl-chat.html", includes:["mingl-chat-list-card", "minglStandaloneList", "minglStandaloneChatCard"], notIncludes:["id=\"minglStandaloneChatCard\" class=\"card mingl-chat-popout hidden\" aria-hidden=\"true\">\n        <h2>Chats"]},
         {label:"Feature diagnostics pass archive installed", file:"ai-diagnostics-service.js", includes:["diagnostic-archive", "View Archived Passed Diagnostics", "visible = features.filter", "archived = features.filter"]},
         {label:"Feature diagnostics archive CSS installed", file:"admin.css", includes:["diagnostic-archive", "diagnostic-archive-list", "max-height:420px"]},
@@ -751,10 +751,16 @@
         {label:"Club admin display default reset logic", file:"admin-app.js", includes:["resetDisplayToClubDefault", "clubDefaultReset", "resetDisplayDefaultBtn"]},
         {label:"Club admin display default reset button", file:"admin.html", includes:["resetDisplayDefaultBtn", "Reset Display to Club Default"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-compose-menu", "height-input-row"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v29.00", "isMinglReadReceiptUpdate", "readAtBy"]},
-        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v29.00", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
-        {label:"README documents v29.00", file:"README.md", includes:["v29.00 Mingl Chat Latency and Diagnostics Archive", "Package diagnostic checks can be archived", "Mingl Chat filters diagnostic/demo chat rooms"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V29-00.md", includes:["FLOQR Rollback - v29.00", "This rollback does not delete user profile data"]}
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v29.01", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v29.01", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v29.01", file:"README.md", includes:["v29.01 Mingl Chat Latency and Diagnostics Archive", "Club / Promoter Onboarding", "Guest list campaigns"]},
+        {label:"Master Admin onboarding tab installed", file:"master-admin.html", includes:["clubOnboarding", "Bulk Club CSV Onboarding", "Promoter Onboarding"]},
+        {label:"Master Admin onboarding logic installed", file:"master-admin-app.js", includes:["saveClubOnboarding", "parseCsv", "promoterOnboardingRecords"]},
+        {label:"Club Admin media and guest campaign UI installed", file:"admin.html", includes:["Venue Media", "guestCampaignType", "Elect Patron for Role"]},
+        {label:"Club Admin media and guest campaign logic installed", file:"admin-app.js", includes:["uploadClubMedia", "guestListCampaigns", "electClubRole"]},
+        {label:"Venue onboarding rules installed", file:"firestore.rules", includes:["clubOnboardingRecords", "promoterOnboardingRecords", "guestListCampaigns", "clubMedia"]},
+        {label:"Venue media storage rules installed", file:"storage.rules", includes:["clubMedia/{clubLocationId}", "request.resource.contentType.matches('video/.*')"]},
+        {label:"Current direct rollback note", file:"ROLLBACK-V29-01.md", includes:["FLOQR Rollback - v29.01", "This rollback does not delete user profile data"]}
       ]
     }
   ];

@@ -1,4 +1,4 @@
-/* admin-app.js v28.70 - Club admin portal with analytics and reconciliation */
+/* admin-app.js v29.01 - Club admin portal with onboarding media, roles, and guest list campaigns */
 (function () {
   "use strict";
 
@@ -8,12 +8,14 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
+  const CURRENT_VERSION = "29.01";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
   firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const storage = firebase.storage ? firebase.storage() : null;
 
   let locationId = canonicalStaticLocationId(qs("location", qs("club", "zebbies-garden-washington-dc")));
   const profileImportDraftId = qs("profileImportDraft", "");
@@ -23,6 +25,8 @@
   const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+  let clubMedia = [];
+  let guestListCampaigns = [];
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -139,6 +143,7 @@
     if (byId("clubProfileX")) byId("clubProfileX").value = socials.x || "";
     if (byId("clubProfileTiktok")) byId("clubProfileTiktok").value = socials.tiktok || "";
     if (byId("clubProfileFacebook")) byId("clubProfileFacebook").value = socials.facebook || "";
+    if (byId("clubProfileGenres")) byId("clubProfileGenres").value = (publicClubProfile.genres || loc.genres || []).join(", ");
     if (byId("clubPublicProfileReport")) {
       byId("clubPublicProfileReport").innerHTML = simpleRows([
         ["Search visibility", publicClubProfile.visibility || "public"],
@@ -162,6 +167,7 @@
         tiktok:byId("clubProfileTiktok")?.value.trim() || "",
         facebook:byId("clubProfileFacebook")?.value.trim() || ""
       },
+      genres: splitCSV(byId("clubProfileGenres")?.value || ""),
       visibility:"public",
       publicProfileType:"club",
       subscriptionRequiredForPublicProfileEdits:true,
@@ -173,7 +179,7 @@
         publicClubProfile.country || loc.country,
         byId("clubProfileAddress")?.value.trim() || "",
         byId("clubProfileWebsite")?.value.trim() || ""
-      ].filter(Boolean),
+      ].concat(splitCSV(byId("clubProfileGenres")?.value || "")).filter(Boolean),
       updatedByUid:auth.currentUser?.uid || "",
       updatedByEmail:safeUser(auth.currentUser),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -299,6 +305,103 @@
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
 
+  function splitCSV(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String);
+    return String(value || "").split(/[,;|/]+/).map(x => x.trim()).filter(Boolean);
+  }
+
+  function cleanFileName(name = "") {
+    return String(name || "media").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/-+/g, "-").slice(0, 80);
+  }
+
+  function mediaKind(file) {
+    const type = String(file?.type || "");
+    if (type.startsWith("video/")) return "video";
+    return "image";
+  }
+
+  async function uploadClubMedia(file, slotType) {
+    if (!storage) throw new Error("Firebase Storage SDK is not loaded.");
+    if (!file) throw new Error("Choose a media file first.");
+    const kind = mediaKind(file);
+    const path = `clubMedia/${locationId}/${slotType}/${Date.now()}-${cleanFileName(file.name)}`;
+    const ref = storage.ref(path);
+    await ref.put(file, {contentType:file.type || (kind === "video" ? "video/mp4" : "image/jpeg")});
+    const url = await ref.getDownloadURL();
+    const payload = {
+      clubLocationId: locationId,
+      locationName: publicClubProfile.locationName || loc.locationName || locationId,
+      slotType,
+      mediaType: kind,
+      mediaUrl: url,
+      mediaStoragePath: path,
+      mediaFileName: file.name || "",
+      title: byId("clubMediaTitle")?.value.trim() || "",
+      relatedDjs: splitCSV(byId("clubMediaDjs")?.value || ""),
+      relatedPromoters: splitCSV(byId("clubMediaPromoters")?.value || ""),
+      maxVideoSeconds: kind === "video" ? 15 : null,
+      uploadedByUid: auth.currentUser?.uid || "",
+      uploadedByEmail: safeUser(auth.currentUser),
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const id = slotType === "main" ? `${locationId}_main` : `${locationId}_${Date.now()}`;
+    await db.collection("clubMedia").doc(id).set(payload, {merge: slotType === "main"});
+    await db.collection("clubLocations").doc(locationId).set({
+      mainMediaUrl: slotType === "main" ? url : publicClubProfile.mainMediaUrl || "",
+      mainMediaType: slotType === "main" ? kind : publicClubProfile.mainMediaType || "",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    setText("adminStatus", slotType === "main" ? "Main venue media uploaded." : "Gallery media uploaded.");
+    await loadClubMedia();
+  }
+
+  async function uploadMainMedia() {
+    try {
+      await uploadClubMedia(byId("clubMainMediaFile")?.files?.[0], "main");
+    } catch (e) {
+      setText("adminStatus", `Media upload failed: ${e.message || e}`);
+    }
+  }
+
+  async function uploadGalleryMedia() {
+    try {
+      const file = byId("clubGalleryMediaFile")?.files?.[0];
+      const kind = mediaKind(file);
+      const existing = clubMedia.filter(x => x.slotType === "gallery" && x.mediaType === kind);
+      if (kind === "image" && existing.length >= 5) throw new Error("This club already has 5 public gallery images.");
+      if (kind === "video" && existing.length >= 5) throw new Error("This club already has 5 public marketing videos.");
+      await uploadClubMedia(file, "gallery");
+    } catch (e) {
+      setText("adminStatus", `Gallery upload failed: ${e.message || e}`);
+    }
+  }
+
+  function renderClubMedia() {
+    const wrap = byId("clubMediaReport");
+    if (!wrap) return;
+    const main = clubMedia.find(x => x.slotType === "main");
+    const images = clubMedia.filter(x => x.slotType === "gallery" && x.mediaType === "image");
+    const videos = clubMedia.filter(x => x.slotType === "gallery" && x.mediaType === "video");
+    wrap.innerHTML = `
+      ${simpleRows([
+        ["Main media", main ? `${main.mediaType} uploaded` : "Not uploaded"],
+        ["Public images", `${images.length}/5`],
+        ["Marketing videos", `${videos.length}/5`],
+        ["Video policy", "15 seconds max; related DJs/promoters saved as pop-out datapoints"]
+      ])}
+      ${clubMedia.map(item => `<div class="queue-item">
+        <strong>${esc(item.title || item.mediaFileName || item.slotType)}</strong>
+        <p>${esc(item.slotType)} - ${esc(item.mediaType)}${item.maxVideoSeconds ? " - 15 sec max" : ""}</p>
+        <small>DJs: ${esc((item.relatedDjs || []).join(", ") || "-")} | Promoters: ${esc((item.relatedPromoters || []).join(", ") || "-")}</small>
+      </div>`).join("")}`;
+  }
+
+  async function loadClubMedia() {
+    clubMedia = (await getCollectionSafe("clubMedia", 200)).filter(x => x.clubLocationId === locationId);
+    renderClubMedia();
+  }
+
   function normalizeSearchText(value) {
     return String(value || "")
       .normalize("NFD")
@@ -419,6 +522,47 @@
     await loadEmployeeDesignations();
   }
 
+  async function electClubRole() {
+    const query = byId("roleElectionSearch")?.value || "";
+    const role = byId("roleElectionRole")?.value || "Club Admin";
+    const match = adminUsers.find(profile => contextualTextMatch(query, [
+      profile.displayName, profile.fullName, profile.username, profile.email
+    ].join(" ")));
+    if (!match || !(match.uid || match.id)) {
+      setText("adminStatus", "No patron matched the role election search. The person must be a patron first.");
+      return;
+    }
+    const uid = match.uid || match.id;
+    const payload = {
+      clubLocationId: locationId,
+      clubLocationName: loc.locationName || locationId,
+      workerUid: uid,
+      workerEmail: match.email || "",
+      workerName: match.displayName || match.fullName || match.username || match.email || "Club worker",
+      workerUsername: match.username || "",
+      workerRoles: firebase.firestore.FieldValue.arrayUnion(role),
+      roleElectionType: role,
+      promoterCompany: byId("roleElectionCompany")?.value.trim() || "",
+      independentPromoter: !!byId("roleElectionIndependentPromoter")?.checked,
+      electedByUid: auth.currentUser?.uid || "",
+      electedByEmail: safeUser(auth.currentUser),
+      status: "elected",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set(payload, {merge:true});
+    try {
+      await db.collection("users").doc(uid).set({
+        approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
+        approvedLocations: firebase.firestore.FieldValue.arrayUnion(locationId),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    } catch (e) {
+      console.warn("Role election saved, but user profile mirror was not updated:", e.message);
+    }
+    setText("adminStatus", `${payload.workerName} elected as ${role} for this club.`);
+    await loadEmployeeDesignations();
+  }
+
   function renderEmployeeDesignations() {
     const candidateWrap = byId("employeeCandidates");
     const csrWrap = byId("csrList");
@@ -498,6 +642,90 @@
     adminUsers = users;
     adminDesignations = designations.filter(x => x.clubLocationId === locationId);
     renderEmployeeDesignations();
+  }
+
+  function guestCampaignPayload() {
+    return {
+      clubLocationId: locationId,
+      locationName: publicClubProfile.locationName || loc.locationName || locationId,
+      campaignName: byId("guestCampaignName")?.value.trim() || "",
+      eventType: byId("guestCampaignType")?.value || "Free Admission",
+      eventDate: byId("guestCampaignDate")?.value || "",
+      capacity: Number(byId("guestCampaignCapacity")?.value || 0),
+      promoterName: byId("guestCampaignPromoter")?.value.trim() || "",
+      actionUrl: byId("guestCampaignUrl")?.value.trim() || "",
+      description: byId("guestCampaignDescription")?.value.trim() || "",
+      status: "enabled",
+      active: true,
+      eligibleMembers: "floqr-patrons-only",
+      createdByUid: auth.currentUser?.uid || "",
+      createdByEmail: safeUser(auth.currentUser),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  async function createGuestCampaign() {
+    try {
+      const active = guestListCampaigns.filter(x => x.active !== false && x.status !== "archived");
+      if (active.length >= 6) throw new Error("This club already has 6 active guest list campaigns. Disable or archive one first.");
+      const payload = guestCampaignPayload();
+      if (!payload.campaignName) throw new Error("Campaign name is required.");
+      await db.collection("guestListCampaigns").add(payload);
+      setText("adminStatus", "Guest list campaign created.");
+      await loadGuestListCampaigns();
+    } catch (e) {
+      setText("adminStatus", `Guest list campaign failed: ${e.message || e}`);
+    }
+  }
+
+  async function setGuestCampaignState(id, status) {
+    const active = status === "enabled";
+    await db.collection("guestListCampaigns").doc(id).set({
+      status,
+      active,
+      archived: status === "archived",
+      updatedByUid: auth.currentUser?.uid || "",
+      updatedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    setText("adminStatus", `Guest list campaign ${status}.`);
+    await loadGuestListCampaigns();
+  }
+
+  function renderGuestListCampaigns() {
+    const wrap = byId("guestCampaignReport");
+    if (!wrap) return;
+    const active = guestListCampaigns.filter(x => x.status !== "archived");
+    wrap.innerHTML = `
+      ${simpleRows([
+        ["Active / disabled campaigns", `${active.length}/6`],
+        ["Archived reusable campaigns", guestListCampaigns.filter(x => x.status === "archived").length],
+        ["Patron eligibility", "Only FLOQR Patrons can join"]
+      ])}
+      ${guestListCampaigns.map(item => `<div class="queue-item">
+        <div class="message-envelope-head">
+          <strong>${esc(item.campaignName || "Guest list campaign")}</strong>
+          <span>${esc(item.status || "enabled")}</span>
+        </div>
+        <p>${esc(item.eventType || "")}${item.eventDate ? ` - ${esc(item.eventDate)}` : ""}</p>
+        <small>${esc(item.description || "")}</small>
+        <div class="queue-actions">
+          <button type="button" data-id="${esc(item.id)}" data-status="enabled">Enable</button>
+          <button type="button" data-id="${esc(item.id)}" data-status="disabled">Disable</button>
+          <button type="button" data-id="${esc(item.id)}" data-status="archived">Archive</button>
+        </div>
+      </div>`).join("")}`;
+    wrap.querySelectorAll("button[data-id][data-status]").forEach(btn => {
+      btn.addEventListener("click", () => setGuestCampaignState(btn.dataset.id, btn.dataset.status));
+    });
+  }
+
+  async function loadGuestListCampaigns() {
+    guestListCampaigns = (await getCollectionSafe("guestListCampaigns", 300))
+      .filter(x => x.clubLocationId === locationId)
+      .sort((a,b) => String(b.createdAt?.seconds || "").localeCompare(String(a.createdAt?.seconds || "")));
+    renderGuestListCampaigns();
   }
 
   function renderQueue() {
@@ -801,7 +1029,8 @@
       byId("clubGuestListReport").innerHTML = clubGuestLists.length ? simpleRows([
         ["Total guest list requests", clubGuestLists.length.toLocaleString()],
         ["Total referred guests", clubGuestLists.reduce((s,x) => s + Number(x.totalGuestCount || x.partySize || 0), 0).toLocaleString()],
-        ["Pending requests", clubGuestLists.filter(x => (x.status || "pending") === "pending").length.toLocaleString()]
+        ["Pending requests", clubGuestLists.filter(x => (x.status || "pending") === "pending").length.toLocaleString()],
+        ["Enabled campaigns", guestListCampaigns.filter(x => x.status === "enabled").length.toLocaleString()]
       ]) : "<p class='sub'>No guest list requests yet.</p>";
     }
 
@@ -834,6 +1063,10 @@
     bind("adminLogoutBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
+    bind("uploadClubMainMediaBtn", uploadMainMedia);
+    bind("uploadClubGalleryMediaBtn", uploadGalleryMedia);
+    bind("electClubRoleBtn", electClubRole);
+    bind("createGuestCampaignBtn", createGuestCampaign);
     byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
 
     auth.getRedirectResult().then(result => {
@@ -863,6 +1096,8 @@
       renderQueue();
       loadClubPublicProfile().then(loadReports);
       loadEmployeeDesignations();
+      loadClubMedia();
+      loadGuestListCampaigns().then(loadReports);
     });
   });
 })();

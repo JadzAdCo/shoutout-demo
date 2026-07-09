@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.00
-// EXPECTED DEPLOYED RULES VERSION: v29.00 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.01
+// EXPECTED DEPLOYED RULES VERSION: v29.01 or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -18,6 +18,7 @@ rules_version = '2';
 // - explicit diagnostic-only delete support for temporary Mingl connection records
 // - Mingl request audit records, system request messages, and sender-only message edit/action metadata support
 // - Mingl read receipts so participants can mark incoming messages read without broad chat access
+// - clubOnboardingRecords, promoterOnboardingRecords, clubMedia, and guestListCampaigns for venue onboarding
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -235,6 +236,24 @@ service cloud.firestore {
     match /guestListRequests/{id} {
       allow create: if signedIn();
       allow read, update, delete: if signedIn();
+    }
+
+    match /guestListCampaigns/{id} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /clubOnboardingRecords/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /promoterOnboardingRecords/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /clubMedia/{id} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
     }
 
     match /messages/{id} {

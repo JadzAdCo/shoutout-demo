@@ -1,4 +1,4 @@
-/* master-admin-app.js v28.91-helper-popouts-mingl-requests
+/* master-admin-app.js v29.01
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,6 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
+  const CURRENT_VERSION = "29.01";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -220,15 +221,242 @@
   function clubAdminUrl(id = "") {
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
-    url.searchParams.set("v", "28.91-helper-popouts-mingl-requests");
+    url.searchParams.set("v", CURRENT_VERSION);
     return url.toString();
   }
 
   function displayUrl(id = "") {
     const url = new URL("./display.html", window.location.href);
     url.searchParams.set("location", id);
-    url.searchParams.set("v", "28.91-helper-popouts-mingl-requests");
+    url.searchParams.set("v", CURRENT_VERSION);
     return url.toString();
+  }
+
+  function slugify(value = "") {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || `club-${Date.now()}`;
+  }
+
+  function addressParts(fullAddress = "") {
+    const parts = String(fullAddress || "").split(",").map(x => x.trim()).filter(Boolean);
+    const city = parts.length >= 2 ? parts[parts.length - 3] || parts[parts.length - 2] : "";
+    const regionZip = parts.length >= 2 ? parts[parts.length - 2] : "";
+    const country = parts.length >= 1 ? parts[parts.length - 1] : "";
+    const region = (regionZip.match(/[A-Za-z]{2,}/) || [""])[0];
+    return {city, region, country: country || "United States"};
+  }
+
+  function clubOnboardingPayload(input = {}) {
+    const name = String(input.clubName || input["Club Name"] || "").trim();
+    const fullAddress = String(input.fullAddress || input["Full Address"] || input.address || "").trim();
+    const inferred = addressParts(fullAddress);
+    const id = slugify(`${name}-${inferred.city || input.city || ""}-${inferred.region || input.region || ""}`);
+    const genres = splitCSV(input.genres || input["Music Genres"] || input.musicGenres);
+    return {
+      id,
+      clubId: id,
+      locationName: name,
+      clubName: name,
+      brandName: name,
+      fullAddress,
+      address: fullAddress,
+      city: input.city || inferred.city || "",
+      region: input.region || input.state || inferred.region || "",
+      country: input.country || inferred.country || "United States",
+      telephone: String(input.telephone || input.phone || input["Telephone #"] || "").trim(),
+      officialWebsite: String(input.website || input.Website || "").trim(),
+      email: String(input.email || input["Customer Email"] || "").trim(),
+      socialMediaHandles: {
+        instagram: String(input.instagram || input.Instagram || "").trim(),
+        facebook: String(input.facebook || input.Facebook || "").trim(),
+        x: String(input.x || input.X || "").trim(),
+        tiktok: String(input.tiktok || input["Tic Tok"] || input.TikTok || input.Tiktok || "").trim()
+      },
+      genres,
+      publicProfileType: "club",
+      visibility: "public",
+      services: ["shoutout", "guestList"],
+      maxGuestListCampaigns: 6,
+      mediaPolicy: {
+        maxMainMedia: 1,
+        maxPublicImages: 5,
+        maxPublicVideos: 5,
+        maxMarketingVideoSeconds: 15
+      },
+      masterAdminUids: auth.currentUser?.uid ? [auth.currentUser.uid] : [],
+      adminEmails: [safeUser(auth.currentUser)].filter(x => x && x !== "unknown"),
+      onboardingSource: "master-admin",
+      onboardingVersion: `v${CURRENT_VERSION}`,
+      updatedByUid: auth.currentUser?.uid || "",
+      updatedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  function readClubOnboardingForm() {
+    return clubOnboardingPayload({
+      clubName: byId("clubOnboardName")?.value,
+      fullAddress: byId("clubOnboardAddress")?.value,
+      telephone: byId("clubOnboardPhone")?.value,
+      website: byId("clubOnboardWebsite")?.value,
+      email: byId("clubOnboardEmail")?.value,
+      instagram: byId("clubOnboardInstagram")?.value,
+      facebook: byId("clubOnboardFacebook")?.value,
+      x: byId("clubOnboardX")?.value,
+      tiktok: byId("clubOnboardTiktok")?.value,
+      genres: byId("clubOnboardGenres")?.value
+    });
+  }
+
+  async function saveClubOnboarding(payload) {
+    if (!payload.locationName) throw new Error("Club Name is required.");
+    await db.collection("clubLocations").doc(payload.id).set(payload, {merge:true});
+    await db.collection("clubs").doc(payload.id).set({
+      clubId: payload.id,
+      clubName: payload.clubName,
+      brandName: payload.brandName,
+      primaryLocationId: payload.id,
+      adminEmails: payload.adminEmails,
+      masterAdminUids: payload.masterAdminUids,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    await db.collection("clubOnboardingRecords").doc(payload.id).set({
+      ...payload,
+      adminPortalUrl: clubAdminUrl(payload.id),
+      displayUrl: displayUrl(payload.id),
+      status: "created"
+    }, {merge:true});
+    if (window.FLOQRAIIndex) {
+      const indexRecord = window.FLOQRAIIndex.clubLocationIndexRecord(payload.id, payload);
+      await window.FLOQRAIIndex.upsertAiIndex(db, `clubLocation_${payload.id}`, indexRecord);
+    }
+    return payload;
+  }
+
+  function renderOnboardingResult(payload, targetId = "clubOnboardingPreview") {
+    const wrap = byId(targetId);
+    if (!wrap) return;
+    wrap.innerHTML = `<div class="queue-item">
+      <strong>${esc(payload.locationName)}</strong>
+      <p>${esc(payload.fullAddress || "")}</p>
+      <p><strong>Club Location ID:</strong> ${esc(payload.id)}</p>
+      <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
+      <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
+    </div>`;
+  }
+
+  async function createClubFromForm() {
+    try {
+      setText("clubOnboardingStatus", "Creating club venue...");
+      const payload = readClubOnboardingForm();
+      await saveClubOnboarding(payload);
+      renderOnboardingResult(payload);
+      setText("clubOnboardingStatus", `Created ${payload.locationName}.`);
+      await loadNetworkReports();
+    } catch (e) {
+      setText("clubOnboardingStatus", `Club onboarding failed: ${e.message || e}`);
+    }
+  }
+
+  function parseCsv(text = "") {
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let quoted = false;
+    for (let i = 0; i < text.length; i += 1) {
+      const ch = text[i];
+      const next = text[i + 1];
+      if (quoted && ch === '"' && next === '"') { cell += '"'; i += 1; continue; }
+      if (ch === '"') { quoted = !quoted; continue; }
+      if (!quoted && ch === ",") { row.push(cell); cell = ""; continue; }
+      if (!quoted && (ch === "\n" || ch === "\r")) {
+        if (ch === "\r" && next === "\n") i += 1;
+        row.push(cell);
+        if (row.some(x => String(x).trim())) rows.push(row);
+        row = [];
+        cell = "";
+        continue;
+      }
+      cell += ch;
+    }
+    row.push(cell);
+    if (row.some(x => String(x).trim())) rows.push(row);
+    if (!rows.length) return [];
+    const headers = rows.shift().map(x => x.trim());
+    return rows.map(values => Object.fromEntries(headers.map((h, i) => [h, values[i] || ""])));
+  }
+
+  let previewedClubCsvRows = [];
+
+  async function previewClubCsv() {
+    const file = byId("clubOnboardingCsvFile")?.files?.[0];
+    const report = byId("clubOnboardingCsvReport");
+    if (!file || !report) return;
+    const text = await file.text();
+    previewedClubCsvRows = parseCsv(text).map(clubOnboardingPayload);
+    report.innerHTML = previewedClubCsvRows.length ? previewedClubCsvRows.map(row => `<div class="queue-item">
+      <strong>${esc(row.locationName || "Unnamed club")}</strong>
+      <p>${esc(row.fullAddress || "")}</p>
+      <small>${esc(row.id)} - ${esc((row.genres || []).join(", "))}</small>
+    </div>`).join("") : "<p class='sub'>No importable club rows found.</p>";
+  }
+
+  async function importClubCsv() {
+    const report = byId("clubOnboardingCsvReport");
+    if (!previewedClubCsvRows.length) await previewClubCsv();
+    if (!previewedClubCsvRows.length) return;
+    setText("clubOnboardingStatus", `Importing ${previewedClubCsvRows.length} club(s)...`);
+    const imported = [];
+    for (const row of previewedClubCsvRows) {
+      imported.push(await saveClubOnboarding(row));
+    }
+    if (report) {
+      report.innerHTML = imported.map(row => `<div class="queue-item">
+        <strong>${esc(row.locationName)}</strong>
+        <p>Created: <a class="message-inline-link" href="${esc(clubAdminUrl(row.id))}">${esc(clubAdminUrl(row.id))}</a></p>
+      </div>`).join("");
+    }
+    setText("clubOnboardingStatus", `Imported ${imported.length} club(s).`);
+    await loadNetworkReports();
+  }
+
+  async function createPromoterOnboarding() {
+    const identity = String(byId("promoterOnboardIdentity")?.value || "").trim();
+    const name = String(byId("promoterOnboardName")?.value || "").trim();
+    const clubId = String(byId("promoterOnboardClubId")?.value || "").trim();
+    const payload = {
+      promoterName: name,
+      patronIdentity: identity,
+      promoterCompany: String(byId("promoterOnboardCompany")?.value || "").trim(),
+      independentPromoter: !!byId("promoterOnboardIndependent")?.checked,
+      affiliatedClubLocationId: clubId,
+      roleType: "Promoter",
+      status: "pending-patron-match",
+      createdByUid: auth.currentUser?.uid || "",
+      createdByEmail: safeUser(auth.currentUser),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (!name || !identity) {
+      byId("promoterOnboardingReport").innerHTML = "<p class='status'>Promoter name and patron email/username are required.</p>";
+      return;
+    }
+    const docId = slugify(`${identity}-${clubId || name}`);
+    await db.collection("promoterOnboardingRecords").doc(docId).set(payload, {merge:true});
+    byId("promoterOnboardingReport").innerHTML = simpleRows([
+      ["Promoter", name],
+      ["Patron identity", identity],
+      ["Affiliated club", clubId || "Not assigned yet"],
+      ["Status", "Created; match this record to an existing patron before role activation"]
+    ]);
   }
 
   function renderClubAdminUrls(locationRows = []) {
@@ -519,6 +747,10 @@
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
     bind("masterLogoutBtn", logout);
     bind("masterPanelLogoutBtn", logout);
+    bind("createClubOnboardingBtn", createClubFromForm);
+    bind("previewClubOnboardingCsvBtn", previewClubCsv);
+    bind("importClubOnboardingCsvBtn", importClubCsv);
+    bind("createPromoterOnboardingBtn", createPromoterOnboarding);
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);

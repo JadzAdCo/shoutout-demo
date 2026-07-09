@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Club Admin Portal v24 -->
+  <!-- FLOQR ShoutOut Club Admin Portal v29.01 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=28.91-helper-popouts-mingl-requests"/>
-  <link rel="stylesheet" href="./admin.css?v=28.91-helper-popouts-mingl-requests"/>
+  <link rel="stylesheet" href="./styles.css?v=29.01"/>
+  <link rel="stylesheet" href="./admin.css?v=29.01"/>
 </head>
 <body>
 <main id="adminPage" class="app admin-shell">
@@ -85,9 +85,26 @@
             <label>X<input id="clubProfileX" placeholder="@club"/></label>
             <label>TikTok<input id="clubProfileTiktok" placeholder="@club"/></label>
             <label>Facebook<input id="clubProfileFacebook" placeholder="facebook.com/club"/></label>
+            <label>Music Genres<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
           </div>
           <button id="saveClubPublicProfileBtn" class="primary" type="button">Save Public Profile</button>
           <div id="clubPublicProfileReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Venue Media</h2>
+          <p class="sub small">One main media item is allowed. Public profile media is capped at 5 images and 5 marketing videos. Marketing videos should be 15 seconds or shorter.</p>
+          <div class="profile-grid">
+            <label>Main Media<input id="clubMainMediaFile" type="file" accept="image/*,video/*"/></label>
+            <label>Public Gallery Media<input id="clubGalleryMediaFile" type="file" accept="image/*,video/*"/></label>
+            <label>Media Title<input id="clubMediaTitle" placeholder="Saturday Latin Night"/></label>
+            <label>Related DJs<input id="clubMediaDjs" placeholder="DJ names or usernames"/></label>
+            <label>Related Promoters / Groups<input id="clubMediaPromoters" placeholder="Promoter or promotion group"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="uploadClubMainMediaBtn" type="button">Upload Main Media</button>
+            <button id="uploadClubGalleryMediaBtn" type="button">Add Gallery Media</button>
+          </div>
+          <div id="clubMediaReport" class="report-block"></div>
         </div>
       </section>
 
@@ -130,6 +147,25 @@
       </section>
 
       <section id="panelGuestLists" class="admin-panel-section">
+        <div class="card">
+          <h2>Guest List Campaigns</h2>
+          <p class="sub small">Create up to 6 active guest list campaigns. Campaigns can be disabled, archived, and reused for similar nights.</p>
+          <div class="profile-grid">
+            <label>Campaign Name<input id="guestCampaignName" placeholder="Friday Latin Night Guest List"/></label>
+            <label>Event Type<select id="guestCampaignType">
+              <option value="Free Admission">Free Admission</option>
+              <option value="Free Admission with RSVP">Free Admission with RSVP</option>
+              <option value="Ticketted">Ticketted</option>
+            </select></label>
+            <label>Event Date<input id="guestCampaignDate" type="date"/></label>
+            <label>Capacity<input id="guestCampaignCapacity" type="number" min="1" placeholder="150"/></label>
+            <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
+            <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
+          </div>
+          <label>Description<textarea id="guestCampaignDescription" rows="3" placeholder="Guest list notes, dress code, cutoff time, and arrival requirements."></textarea></label>
+          <button id="createGuestCampaignBtn" class="primary" type="button">Create Guest List Campaign</button>
+          <div id="guestCampaignReport" class="report-block"></div>
+        </div>
         <div class="admin-grid">
           <div class="card"><h2>Guest List Requests</h2><div id="clubGuestListReport" class="report-block"></div></div>
           <div class="card"><h2>Promoter Performance</h2><div id="clubPromoterReport" class="report-block"></div></div>
@@ -140,6 +176,18 @@
           <h2>Employee / Worker Network</h2>
           <p class="sub small">View club admins, resident and visiting DJs, affiliated promoters, promoting companies, waiters, waitresses, bottle girls, and designated customer service representatives for this club location.</p>
           <label>Search workers / affiliates<input id="employeeSearch" placeholder="Search display name, username, email, role, company, or location"/></label>
+          <div class="profile-grid">
+            <label>Elect Patron for Role<input id="roleElectionSearch" placeholder="Search patron display name, username, or email"/></label>
+            <label>Role<select id="roleElectionRole">
+              <option>Club Admin</option>
+              <option>DJ</option>
+              <option>Promoter</option>
+              <option>Waiter / Waitress / Bottle Girl</option>
+            </select></label>
+            <label>Promotion Company<input id="roleElectionCompany" placeholder="Required only for promoter company affiliation"/></label>
+            <label><input id="roleElectionIndependentPromoter" type="checkbox"/> Independent promoter</label>
+          </div>
+          <button id="electClubRoleBtn" type="button">Elect Selected Patron Role</button>
           <div id="employeeCandidates" class="report-block"></div>
         </div>
         <div class="admin-grid">
@@ -169,7 +217,7 @@
             <span>SMS template: Guest-list reminder</span>
             <span>Internal message: VIP offer</span>
           </div>
-          <p><a href="./role-profiles.html?v=28.43-f">Open role/profile landing pages</a></p>
+          <p><a href="./role-profiles.html?v=29.01">Open role/profile landing pages</a></p>
         </div>
       </section>
       <section id="panelReconciliation" class="admin-panel-section">
@@ -193,13 +241,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./shared-data.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./ai-service.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./ai-index-service.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./floqr-action-feedback.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./helper-popouts.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./admin-app.js?v=28.91-helper-popouts-mingl-requests"></script>
-<script src="./notification-center.js?v=28.91-helper-popouts-mingl-requests"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="./firebase-config.js?v=29.01"></script>
+<script src="./shared-data.js?v=29.01"></script>
+<script src="./ai-service.js?v=29.01"></script>
+<script src="./ai-index-service.js?v=29.01"></script>
+<script src="./floqr-action-feedback.js?v=29.01"></script>
+<script src="./helper-popouts.js?v=29.01"></script>
+<script src="./admin-app.js?v=29.01"></script>
+<script src="./notification-center.js?v=29.01"></script>
 </body>
 </html>

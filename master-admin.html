@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v29.00 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v29.01 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.00"/>
-  <link rel="stylesheet" href="./admin.css?v=29.00"/>
+  <link rel="stylesheet" href="./styles.css?v=29.01"/>
+  <link rel="stylesheet" href="./admin.css?v=29.01"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -50,6 +50,7 @@
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
         <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club Admin URLs</button>
+        <button class="admin-tab" data-panel="clubOnboarding" type="button">Club / Promoter Onboarding</button>
         <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
@@ -83,6 +84,51 @@
           <h2>Club Admin Portal URLs</h2>
           <p class="sub small">Open or copy the direct admin portal URL for each club/location. These URLs use the location id in `admin.html?location=`.</p>
           <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="clubOnboarding" class="admin-panel-section">
+        <div class="card">
+          <h2>Club Onboarding</h2>
+          <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team.</p>
+          <div class="profile-grid">
+            <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
+            <label>Full Address<input id="clubOnboardAddress" placeholder="1411 K St NW, Washington, DC 20005"/></label>
+            <label><span class="field-icon">TEL</span> Telephone #<input id="clubOnboardPhone" placeholder="+1 202 789 2800"/></label>
+            <label><span class="field-icon">WEB</span> Website<input id="clubOnboardWebsite" placeholder="https://example.com"/></label>
+            <label><span class="field-icon">MAIL</span> Customer Email<input id="clubOnboardEmail" placeholder="info@example.com"/></label>
+            <label><span class="field-icon">IG</span> Instagram<input id="clubOnboardInstagram" placeholder="@club"/></label>
+            <label><span class="field-icon">FB</span> Facebook<input id="clubOnboardFacebook" placeholder="facebook.com/club"/></label>
+            <label><span class="field-icon">X</span> X<input id="clubOnboardX" placeholder="@club"/></label>
+            <label><span class="field-icon">TT</span> TikTok<input id="clubOnboardTiktok" placeholder="@club"/></label>
+            <label>Music Genres<input id="clubOnboardGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+          </div>
+          <button id="createClubOnboardingBtn" class="primary" type="button">Create Club Venue</button>
+          <p id="clubOnboardingStatus" class="status"></p>
+          <div id="clubOnboardingPreview" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Bulk Club CSV Onboarding</h2>
+          <p class="sub small">CSV headers: Club Name, Full Address, Telephone #, Website, Customer Email, Instagram, Facebook, X, Tic Tok, Music Genres.</p>
+          <label>CSV file<input id="clubOnboardingCsvFile" type="file" accept=".csv,text/csv"/></label>
+          <div class="queue-actions">
+            <button id="previewClubOnboardingCsvBtn" type="button">Preview CSV</button>
+            <button id="importClubOnboardingCsvBtn" class="primary" type="button">Import Previewed Clubs</button>
+          </div>
+          <div id="clubOnboardingCsvReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promoter Onboarding</h2>
+          <p class="sub small">Promoters must be patrons before they can be assigned to a club. A promoter can be independent or connected to a promotion company.</p>
+          <div class="profile-grid">
+            <label>Promoter Display Name<input id="promoterOnboardName" placeholder="Promoter name"/></label>
+            <label>Patron Email / Username<input id="promoterOnboardIdentity" placeholder="patron@example.com or @username"/></label>
+            <label>Promotion Company<input id="promoterOnboardCompany" placeholder="Company name, or leave blank"/></label>
+            <label>Affiliated Club Location ID<input id="promoterOnboardClubId" placeholder="lima-twist-washington-dc"/></label>
+          </div>
+          <label><input id="promoterOnboardIndependent" type="checkbox"/> Independent promoter</label>
+          <button id="createPromoterOnboardingBtn" class="primary" type="button">Create Promoter Onboarding Record</button>
+          <div id="promoterOnboardingReport" class="report-block"></div>
         </div>
       </section>
 
@@ -417,18 +463,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=29.00"></script>
-<script src="./ai-service.js?v=29.00"></script>
-<script src="./ai-index-service.js?v=29.00"></script>
-<script src="./ai-search-service.js?v=29.00"></script>
-<script src="./ai-discovery-service.js?v=29.00"></script>
-<script src="./floqr-action-feedback.js?v=29.00"></script>
-<script src="./helper-popouts.js?v=29.00"></script>
-<script src="./ad-campaigns.js?v=29.00"></script>
-<script src="./ai-diagnostics-service.js?v=29.00"></script>
-<script src="./duplicate-record-service.js?v=29.00"></script>
-<script src="./master-admin-app.js?v=29.00"></script>
-<script src="./notification-center.js?v=28.43-f"></script>
+<script src="./firebase-config.js?v=29.01"></script>
+<script src="./shared-data.js?v=29.01"></script>
+<script src="./ai-service.js?v=29.01"></script>
+<script src="./ai-index-service.js?v=29.01"></script>
+<script src="./ai-search-service.js?v=29.01"></script>
+<script src="./ai-discovery-service.js?v=29.01"></script>
+<script src="./floqr-action-feedback.js?v=29.01"></script>
+<script src="./helper-popouts.js?v=29.01"></script>
+<script src="./ad-campaigns.js?v=29.01"></script>
+<script src="./ai-diagnostics-service.js?v=29.01"></script>
+<script src="./duplicate-record-service.js?v=29.01"></script>
+<script src="./master-admin-app.js?v=29.01"></script>
+<script src="./notification-center.js?v=29.01"></script>
 </body>
 </html>
