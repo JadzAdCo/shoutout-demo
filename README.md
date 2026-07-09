@@ -1,16 +1,31 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.01 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.02 Full Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.01
+https://jadzadco.github.io/shoutout-demo/?v=29.02
 ```
 
 Current release highlights:
 
-- Adds v29.01 Mingl Chat Latency and Diagnostics Archive fixes.
+- Adds v29.02 ShoutOut recommendation, grammar dictionary discovery, and location-ranking test fixes.
+- ShoutOut recommendations now use recommendation style, event/audience context, venue genres, profile signals, and past ShoutOuts as guidance without inserting visible `Tone:` or `Style:` wording into patron text.
+- ShoutOut templates now expose safe display caps; the editor trims AI/manual text to the selected template's main and attribution/subtext character limits.
+- The ShoutOut editor now includes an Event / audience context selector for Birthday, VIP/Table, R&B, Afrobeats, Latin/Reggaeton, Romantic, Graduation, and General Party.
+- Patron Portal > Language Settings now shows exactly how to test personal dictionary corrections such as `watz -> what's` and `weakend -> weekend`.
+- Club/event search now shows a visible ranking status line explaining whether nearby/profile location plus preferences are being used.
+- Mingl Chat composer now keeps Correct Grammar/Spelling under Edit, removes low-value draft selection helpers, and keeps emoji shortcuts only as dynamic emoji actions.
+- Mingl emoji actions now send lightweight animated reactions: heart pulse, confetti pop, fire lift, laugh pop, and smile pop before settling as normal emoji messages.
+
+v29.02 focused manual tests:
+
+1. ShoutOut recommendations: open a ShoutOut editor, select a template, choose a Recommendation style and Event / audience context, type a draft, wait one second, then click `Improve My ShoutOut`. Confirm suggestions change by style/context and do not insert literal `Tone:` or `Style:` labels into the message.
+2. Template caps: switch between Traditional Black & White and any media template. Confirm the `Template display cap` line changes and long AI/manual text is trimmed before preview/submission.
+3. Personal dictionary grammar: open Patron Portal > Language Settings, add `watz -> what's` and `weakend -> weekend` under My Personal Corrections, save, open Mingl Chat, type those words, then use Correct Grammar/Spelling. Gemini is tried first; if unavailable, only your saved corrections are applied.
+4. Location-aware ranking: sign in as a patron with city/state/country and music preferences, search clubs or events near that city, then allow browser location once and deny it once. Confirm the ranking status line remains visible and matching nearby/preferred venues appear above unrelated cities.
+
 - Adds Master Admin > Club / Promoter Onboarding for single-club creation, CSV club imports, and promoter onboarding records.
 - New club onboarding writes `clubLocations`, `clubs`, and `clubOnboardingRecords`, then exposes the new club admin portal URL.
 - Club Admin now supports venue media policy controls: 1 main media item, 5 public images, and 5 marketing videos with DJ/promoter datapoints.
@@ -24,8 +39,8 @@ Current release highlights:
 - Package diagnostic archives store when the test ran, when it was archived, package/check labels, status, and evidence.
 - Package diagnostic archives can be downloaded as CSV from Master Admin > Diagnostics.
 - The archive button now gives visible working/done/error status through the diagnostics status line.
-- Firestore and Storage rule headers now carry the v29.01 package version.
-- Direct rollback note for this package is `ROLLBACK-V29-01.md`; older rollback/readme history is bundled in the included rollback history ZIP.
+- Firestore and Storage rule headers now carry the v29.02 package version.
+- Direct rollback note for this package is `ROLLBACK-V29-02.md`; older rollback/readme history is bundled in the included rollback history ZIP.
 - Adds v28.99 targeted ad campaign management and ShoutOut splash targeting.
 - Adds separate demo ad campaigns for Cuisine Bantu, Puff Club, and Lima DC with their own media, copy, Canva source links, targeting tags, campaign datapoints, and analytics metadata.
 - Adds Master Admin > Ad Campaign Management so admins can review and edit target tags, campaign datapoints, and optional required target groups.
@@ -48,14 +63,14 @@ Current release highlights:
 - Shared-background system messages now explicitly tell the receiving patron to tap `Approve Background` or `Keep Mine Private`.
 - Shared Mingl chat background requests now create a real consent card for the other patron with `Approve Background` and `Keep Mine Private`.
 - The composer `+` action menu retracts after a command runs or a media/background picker opens.
-- Emoji shortcuts in the `Text Action` section render as actual emoji symbols.
+- Emoji shortcuts in the `Emoji Actions` section render as actual emoji symbols and send dynamic reaction effects.
 - Tapping one of your sent Mingl messages opens message commands: `Unsend`, `AutoFix`, `Edit`, `Bounce`, `Explode`, `Scroll`, and `Disappear`.
 - Adds standalone Mingl Chat text animations for `Bounce`, `Explode`, `Scroll`, and `Disappear`.
 - Forces the standalone Mingl Chat script to rebuild old cached/partially uploaded composer markup into the requested clean layout: message box, Send, and a right-side `+` action popout.
 - Firestore rules now allow participants to read older Mingl connection records that only stored `requestedBy` / `requestedTo`, so legacy accepted chats can be found and rebuilt.
 - Restores older accepted Mingl conversations on the standalone Mingl Chat page by reading mutual `minglConnections`, normalizing missing/legacy `chatRooms`, and accepting older Mingl room markers such as `mingl_...` room IDs.
-- Replaces the visible chat tool row with a compact action popout on the right side of the message input. Commands are nested under `Text Action`, `Add Photo/Video`, `Edit`, and `Chat Background`.
-- `Correct Grammar/Spelling` remains executable from the nested `Text Action` section, and sent-message actions now also offer nested `Edit` and `Correct Grammar/Spelling` options when tapping your own bubble.
+- Replaces the visible chat tool row with a compact action popout on the right side of the message input. Commands are nested under `Emoji Actions`, `Add Photo/Video`, `Edit`, and `Chat Background`.
+- `Correct Grammar/Spelling` is executable from the nested `Edit` section, and sent-message actions still offer `Unsend`, `AutoFix`, `Edit`, `Bounce`, `Explode`, `Scroll`, and `Disappear` when tapping your own bubble.
 - Mingl Chat media upload now supports both pictures and videos. Uploaded videos render in the message bubble with native controls.
 - Mingl Requests remain on the main Mingl page, separate from the standalone Mingl Chat inbox.
 - Repeated helper/instruction text across app pages now collapses behind compact `?` help popouts. The shared `helper-popouts.js` also watches dynamically rendered helper text.
@@ -464,8 +479,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v29.01
-// EXPECTED DEPLOYED RULES VERSION: v29.01 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.02
+// EXPECTED DEPLOYED RULES VERSION: v29.02 or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -473,8 +488,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v29.01
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v29.01 or newer
+// FLOQR STORAGE RULES VERSION: v29.02
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v29.02 or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

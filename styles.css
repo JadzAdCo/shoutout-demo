@@ -239,6 +239,18 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .personalized-ai-suggestion strong,.personalized-ai-suggestion span,.personalized-ai-suggestion small{display:block;overflow-wrap:anywhere}
 .confirmation-actions{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 .emoji-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.emoji-row button{width:38px;height:38px;display:grid;place-items:center;padding:0;border-radius:999px;font-size:18px}
+.mingl-message[class*="emoji-effect-"]{position:relative;overflow:visible}
+.mingl-message[class*="emoji-effect-"]::after{position:absolute;inset:auto 8px 8px auto;z-index:2;pointer-events:none;font-size:54px;line-height:1;opacity:0;filter:drop-shadow(0 0 14px rgba(255,255,255,.45))}
+.mingl-message.emoji-effect-heart::after{content:"❤";color:#ff5fb7;animation:mingl-heart-pop 1.45s ease-out}
+.mingl-message.emoji-effect-confetti::after{content:"🎉";animation:mingl-confetti-pop 1.55s ease-out}
+.mingl-message.emoji-effect-fire::after{content:"🔥";animation:mingl-fire-pop 1.35s ease-out}
+.mingl-message.emoji-effect-laugh::after{content:"😂";animation:mingl-laugh-pop 1.25s ease-out}
+.mingl-message.emoji-effect-smile::after{content:"😊";animation:mingl-smile-pop 1.2s ease-out}
+@keyframes mingl-heart-pop{0%{transform:scale(.35);opacity:0}20%{transform:scale(1.8);opacity:.42}42%{transform:scale(1.15);opacity:.35}65%{transform:scale(1.55);opacity:.25}100%{transform:scale(.85) translateY(-28px);opacity:0}}
+@keyframes mingl-confetti-pop{0%{transform:scale(.35) rotate(-18deg);opacity:0}20%{transform:scale(1.85) rotate(12deg);opacity:.44}55%{transform:scale(1.15) translate(-20px,-34px) rotate(-8deg);opacity:.28}100%{transform:scale(.7) translate(26px,-70px) rotate(24deg);opacity:0}}
+@keyframes mingl-fire-pop{0%{transform:scale(.45) translateY(18px);opacity:0}25%{transform:scale(1.55) translateY(-10px);opacity:.4}55%{transform:scale(1.05) translateY(-28px);opacity:.28}100%{transform:scale(.75) translateY(-54px);opacity:0}}
+@keyframes mingl-laugh-pop{0%{transform:scale(.4) rotate(-8deg);opacity:0}24%{transform:scale(1.55) rotate(10deg);opacity:.4}48%{transform:scale(1.2) rotate(-8deg);opacity:.3}100%{transform:scale(.8) rotate(0) translateY(-38px);opacity:0}}
+@keyframes mingl-smile-pop{0%{transform:scale(.4);opacity:0}25%{transform:scale(1.45);opacity:.34}100%{transform:scale(.9) translateY(-32px);opacity:0}}
 .floqr-action-feedback{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:rgba(4,8,24,.72);backdrop-filter:blur(10px);padding:18px}
 .floqr-action-feedback.hidden{display:none}
 .floqr-action-feedback-card{width:min(420px,92vw);border:1px solid var(--line);border-radius:18px;background:rgba(10,14,34,.96);padding:22px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.55)}

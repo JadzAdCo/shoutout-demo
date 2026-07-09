@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Patron Portal v29.01 -->
+  <!-- FLOQR ShoutOut Patron Portal v29.02 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.01"/>
+  <link rel="stylesheet" href="./styles.css?v=29.02"/>
 </head>
 <body>
 
@@ -246,7 +246,7 @@
         <p class="eyebrow">Screen 2A - ShoutOut Landing</p>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/shoutout-logo.png?v=29.01" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <img src="./images/shoutout-logo.png?v=29.02" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
         <h1>Throw a ShoutOut</h1>
@@ -356,6 +356,7 @@
     </header>
     <div class="card">
       <input id="locationSearch" class="search" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
+      <p id="locationRankingStatus" class="sub small">Search results rank by nearby/profile location, preferred cities, music genres, venue type, and interests.</p>
     </div>
     <div id="locationGrid" class="club-grid"></div>
   </section>
@@ -385,6 +386,7 @@
       <div class="card">
         <h2>Message</h2>
         <label>Main message<input id="mainText" maxlength="36" value="HAPPY BIRTHDAY MAYA!"/></label>
+        <p id="templateCharacterCapHint" class="sub small">Template display cap: choose a template to see the safe character limit.</p>
         <div class="attribution-controls">
           <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Post my name or handle</span></label>
           <label id="attributionChoiceWrap" class="hidden">Show as
@@ -412,7 +414,7 @@
         </div>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
-        <label>ShoutOut tone
+        <label>Recommendation style
           <select id="shoutoutTone">
             <option value="party">Party</option>
             <option value="vip">VIP</option>
@@ -422,6 +424,19 @@
             <option value="classy">Classy</option>
             <option value="corporate">Corporate</option>
             <option value="graduation">Graduation</option>
+          </select>
+        </label>
+        <label>Event / audience context
+          <select id="shoutoutEventType">
+            <option value="">Auto-detect from venue and draft</option>
+            <option value="birthday">Birthday</option>
+            <option value="vip-table">VIP / Table</option>
+            <option value="rnb">R&amp;B night</option>
+            <option value="afrobeats">Afrobeats night</option>
+            <option value="latin-reggaeton">Latin / Reggaeton night</option>
+            <option value="romantic">Romantic / couples</option>
+            <option value="graduation">Graduation</option>
+            <option value="general-party">General party</option>
           </select>
         </label>
         <div class="button-row">
@@ -456,21 +471,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.01"></script>
-<script src="./shared-data.js?v=29.01"></script>
-<script src="./ai-service.js?v=29.01"></script>
+<script src="./firebase-config.js?v=29.02"></script>
+<script src="./shared-data.js?v=29.02"></script>
+<script src="./ai-service.js?v=29.02"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-location-service.js?v=29.01"></script>
+<script src="./ai-location-service.js?v=29.02"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
-<script src="./floqr-action-feedback.js?v=29.01"></script>
-<script src="./ai-grammar-service.js?v=29.01"></script>
-<script src="./helper-popouts.js?v=29.01"></script>
-<script src="./ad-campaigns.js?v=29.01"></script>
-<script src="./patron-app.js?v=29.01"></script>
+<script src="./floqr-action-feedback.js?v=29.02"></script>
+<script src="./ai-grammar-service.js?v=29.02"></script>
+<script src="./helper-popouts.js?v=29.02"></script>
+<script src="./ad-campaigns.js?v=29.02"></script>
+<script src="./patron-app.js?v=29.02"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
-<script src="./ai-media-service.js?v=29.01"></script>
-<script src="./notification-center.js?v=29.01"></script>
+<script src="./ai-media-service.js?v=29.02"></script>
+<script src="./notification-center.js?v=29.02"></script>
 </body>
 </html>

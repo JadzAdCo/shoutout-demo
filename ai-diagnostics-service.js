@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.01";
-  const EXPECTED_STORAGE_RULES_VERSION = "v29.01";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.01";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.02";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.02";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.02";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -710,24 +710,24 @@
       ]
     },
     {
-      version: "v29.01",
-      title: "Mingl Chat Latency and Diagnostics Archive",
+      version: "v29.02",
+      title: "ShoutOut Recommendations, Grammar Dictionary, and Location Ranking",
       checks: [
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.01"]},
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.02"]},
         {label:"Manual Run Diagnostics button", file:"master-admin.html", includes:["runFeatureDiagnosticsBtn", "Run Diagnostics"]},
-        {label:"Package diagnostics archive controls", file:"master-admin.html", includes:["archivePassedPackageDiagnosticsBtn", "downloadPackageDiagnosticsArchiveCsvBtn", "packageDiagnosticsArchiveReport"]},
-        {label:"Package diagnostics archive logic", file:"ai-diagnostics-service.js", includes:["archivePassedPackageDiagnostics", "downloadPackageDiagnosticsArchiveCsv", "floqrPackageDiagnosticsArchive"]},
+        {label:"Package diagnostics archive controls", file:"master-admin.html", includes:["archivePassedPackageDiagnosticsBtn", "downloadPackageDiagnosticsArchiveCsvBtn", "diagnosticsArchiveStatus", "packageDiagnosticsArchiveReport"]},
+        {label:"Package diagnostics archive logic", file:"ai-diagnostics-service.js", includes:["archivePassedPackageDiagnostics", "downloadPackageDiagnosticsArchiveCsv", "floqrPackageDiagnosticsArchive", "Done: archived"]},
         {label:"Feature diagnostics report persistence", file:"ai-diagnostics-service.js", includes:["saveFeatureDiagnosticsReport", "type:\"featureDiagnostics\"", "Feature diagnostics report saved"]},
         {label:"Mingl empty-data diagnostic is non-blocking", file:"ai-diagnostics-service.js", includes:["minglFeatureStatus", "No live Mingl connection records found yet", "Optional participant query blocked"]},
-        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=29.01", "patron-app.js?v=29.01"]},
-        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=29.01"]},
+        {label:"Public Mingl page cache-busted", file:"index.html", includes:["styles.css?v=29.02", "patron-app.js?v=29.02"]},
+        {label:"Shared helper popouts loaded on public app", file:"index.html", includes:["helper-popouts.js?v=29.02"]},
         {label:"Shared helper popouts script installed", file:"helper-popouts.js", includes:["FLOQRHelperPopouts", "MutationObserver", "p.sub.small"]},
         {label:"Main Mingl Requests panel installed", file:"index.html", includes:["minglRequestsList", "Mingl Requests", "help-popout"]},
         {label:"Main Mingl Requests renderer installed", file:"patron-app.js", includes:["renderMinglRequests", "minglRequestsList", "Mingl Back"]},
         {label:"Main Mingl Requests readable row formatting", file:"patron-app.js", includes:["mingl-request-copy", "Received request", "Sent request", "Waiting for this patron to Mingl back"]},
         {label:"Main Mingl Requests readable CSS", file:"styles.css", includes:["mingl-request-item", "mingl-request-copy", "mingl-request-shared", "mingl-request-actions"]},
         {label:"Help popouts close on outside click", file:"helper-popouts.js", includes:["closeOtherPopouts", "bindDismissBehavior", "details.help-popout[open]", "Escape"]},
-        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=29.01", "mingl-chat-app.js?v=29.01"]},
+        {label:"Standalone Mingl Chat page cache-busted", file:"mingl-chat.html", includes:["styles.css?v=29.02", "mingl-chat-app.js?v=29.02"]},
         {label:"Standalone Mingl Chat list card visible", file:"mingl-chat.html", includes:["mingl-chat-list-card", "minglStandaloneList", "minglStandaloneChatCard"], notIncludes:["id=\"minglStandaloneChatCard\" class=\"card mingl-chat-popout hidden\" aria-hidden=\"true\">\n        <h2>Chats"]},
         {label:"Feature diagnostics pass archive installed", file:"ai-diagnostics-service.js", includes:["diagnostic-archive", "View Archived Passed Diagnostics", "visible = features.filter", "archived = features.filter"]},
         {label:"Feature diagnostics archive CSS installed", file:"admin.css", includes:["diagnostic-archive", "diagnostic-archive-list", "max-height:420px"]},
@@ -737,7 +737,7 @@
         {label:"Standalone Mingl composer uses nested action menu", file:"mingl-chat.html", includes:["mingl-compose-menu", "Add Photo/Video", "Correct Grammar/Spelling", "minglStandaloneImageInput"]},
         {label:"Standalone Mingl Chat logic installed", file:"mingl-chat-app.js", includes:["sendMessage", "uploadMedia", "improveDraft", "uploadBackground", "ensureRoomFromConnection"]},
         {label:"Standalone Mingl Chat fast list and hidden diagnostics rooms", file:"mingl-chat-app.js", includes:["HIDDEN_ROOM_NAMES", "hydrateRoomSummary", "Loading Mingl chats"]},
-        {label:"Standalone Mingl composer force-upgrades old markup", file:"mingl-chat-app.js", includes:["ensureCleanComposer", "Text Action", "Add Photo/Video", "Chat Background"]},
+        {label:"Standalone Mingl composer force-upgrades old markup", file:"mingl-chat-app.js", includes:["ensureCleanComposer", "Emoji Actions", "Add Photo/Video", "Correct Grammar/Spelling", "Chat Background"]},
         {label:"Shared background consent card installed", file:"mingl-chat-app.js", includes:["backgroundConsentHtml", "respondToBackgroundConsent", "Approve Background", "Keep Mine Private"]},
         {label:"Shared background consent directive installed", file:"mingl-chat-app.js", includes:["Tap Approve Background", "Waiting for the other patron", "Keep Mine Private"]},
         {label:"Standalone chat waits for patron selection", file:"mingl-chat-app.js", includes:["closeRoom", "minglStandaloneChatCard", "if (requested && rooms.some"]},
@@ -745,22 +745,32 @@
         {label:"Composer actions retract after command", file:"mingl-chat-app.js", includes:["closeComposeMenu", "setTimeout(closeComposeMenu", "data-mingl-emoji-code"]},
         {label:"Sent message commands and animations installed", file:"mingl-chat-app.js", includes:["Unsend", "AutoFix", "Bounce", "Explode", "Scroll", "Disappear", "animateMessage"]},
         {label:"Mingl text animation CSS installed", file:"styles.css", includes:["animate-bounce", "animate-explode", "animate-scroll", "animate-disappear"]},
+        {label:"Mingl emoji reaction effects installed", file:"mingl-chat-app.js", includes:["sendEmojiAction", "emojiEffectClass", "emojiEffect"]},
+        {label:"Mingl emoji reaction CSS installed", file:"styles.css", includes:["emoji-effect-heart", "emoji-effect-confetti", "mingl-heart-pop", "mingl-confetti-pop"]},
+        {label:"Mingl composer popout closes on outside click", file:"mingl-chat-app.js", includes:["bindGlobalPopoutDismissal", "Escape", "!menu.contains(event.target)"]},
         {label:"Firestore rules allow legacy Mingl connection reads", file:"firestore.rules", includes:["resource.data.requestedBy == request.auth.uid", "resource.data.requestedTo == request.auth.uid"]},
         {label:"Height unit profile logic", file:"patron-portal-app.js", includes:["preferredHeightUnit", "editHeightUnit", "heightDisplay"]},
         {label:"Template tags participate in search", file:"patron-app.js", includes:["templateSearchText", "t.tags", "tag-row"]},
         {label:"Club admin display default reset logic", file:"admin-app.js", includes:["resetDisplayToClubDefault", "clubDefaultReset", "resetDisplayDefaultBtn"]},
         {label:"Club admin display default reset button", file:"admin.html", includes:["resetDisplayDefaultBtn", "Reset Display to Club Default"]},
         {label:"Mingl composer visible CSS", file:"styles.css", includes:["position:sticky", "mingl-compose-menu", "height-input-row"]},
-        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v29.01", "isMinglReadReceiptUpdate", "readAtBy"]},
-        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v29.01", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
-        {label:"README documents v29.01", file:"README.md", includes:["v29.01 Mingl Chat Latency and Diagnostics Archive", "Club / Promoter Onboarding", "Guest list campaigns"]},
+        {label:"Firestore rules allow read receipts", file:"firestore.rules", includes:["v29.02", "isMinglReadReceiptUpdate", "readAtBy"]},
+        {label:"Storage rules allow Mingl media", file:"storage.rules", includes:["v29.02", "match /mingl-chat/{userId}/{roomId}", "match /mingl-chat-backgrounds/{userId}/{roomId}"]},
+        {label:"README documents v29.02", file:"README.md", includes:["v29.02 ShoutOut recommendation", "Personal dictionary grammar", "Location-aware ranking"]},
+        {label:"ShoutOut event context selector installed", file:"index.html", includes:["shoutoutEventType", "Event / audience context", "R&amp;B night", "Afrobeats night"]},
+        {label:"ShoutOut template character caps installed", file:"patron-app.js", includes:["templateDisplayCaps", "templateCharacterCapHint", "fitTemplateText"]},
+        {label:"ShoutOut recommendations avoid visible tone labels", file:"patron-app.js", includes:["cleanRecommendationText", "Tone:", "Style:"]},
+        {label:"AI fallback uses event and venue context", file:"ai-service.js", includes:["venueGenres", "displayCaps", "Do not prefix output with Tone"]},
+        {label:"Personal dictionary test guidance installed", file:"patron-portal.html", includes:["watz -> what's", "weakend -> weekend", "Correct Grammar/Spelling"]},
+        {label:"Location ranking status installed", file:"index.html", includes:["locationRankingStatus", "preferred cities, music genres"]},
+        {label:"Location ranking status renderer installed", file:"patron-app.js", includes:["locationRankingStatus", "Deny browser location to confirm profile fallback"]},
         {label:"Master Admin onboarding tab installed", file:"master-admin.html", includes:["clubOnboarding", "Bulk Club CSV Onboarding", "Promoter Onboarding"]},
         {label:"Master Admin onboarding logic installed", file:"master-admin-app.js", includes:["saveClubOnboarding", "parseCsv", "promoterOnboardingRecords"]},
         {label:"Club Admin media and guest campaign UI installed", file:"admin.html", includes:["Venue Media", "guestCampaignType", "Elect Patron for Role"]},
         {label:"Club Admin media and guest campaign logic installed", file:"admin-app.js", includes:["uploadClubMedia", "guestListCampaigns", "electClubRole"]},
         {label:"Venue onboarding rules installed", file:"firestore.rules", includes:["clubOnboardingRecords", "promoterOnboardingRecords", "guestListCampaigns", "clubMedia"]},
         {label:"Venue media storage rules installed", file:"storage.rules", includes:["clubMedia/{clubLocationId}", "request.resource.contentType.matches('video/.*')"]},
-        {label:"Current direct rollback note", file:"ROLLBACK-V29-01.md", includes:["FLOQR Rollback - v29.01", "This rollback does not delete user profile data"]}
+        {label:"Current direct rollback note", file:"ROLLBACK-V29-02.md", includes:["FLOQR Rollback - v29.02", "This rollback does not delete user profile data"]}
       ]
     }
   ];
@@ -2110,10 +2120,16 @@
   }
 
   async function archivePassedManualFeatureTests() {
+    const button = byId("archivePassedManualFeatureTestsBtn");
+    if (button) button.disabled = true;
+    setText("diagnosticsArchiveStatus", "Archiving passed manual feature tests...");
+    setText("diagnosticsStatus", "Archiving passed manual feature tests...");
     const saved = readManualFeatureResults();
     const rows = manualFeatureRows({includeArchived:true}).filter(row => row.result === "succeed");
     if (!rows.length) {
       setText("diagnosticsStatus", "No passed manual feature tests are available to archive.");
+      setText("diagnosticsArchiveStatus", "No passed manual feature tests are available to archive.");
+      if (button) button.disabled = false;
       return;
     }
     const existing = readManualFeatureArchive();
@@ -2155,6 +2171,8 @@
     renderManualFeatureDiagnostics();
     renderManualFeatureArchives();
     setText("diagnosticsStatus", `Archived ${rows.length} passed manual feature test(s).`);
+    setText("diagnosticsArchiveStatus", `Done: archived ${rows.length} passed manual feature test(s).`);
+    if (button) button.disabled = false;
   }
 
   function restoreArchivedManualFeature(id) {
@@ -2204,8 +2222,11 @@
   }
 
   async function archivePassedPackageDiagnostics() {
+    const button = byId("archivePassedPackageDiagnosticsBtn");
     try {
+      if (button) button.disabled = true;
       setText("diagnosticsStatus", "Archiving passed package diagnostic checks...");
+      setText("diagnosticsArchiveStatus", "Archiving passed package diagnostic checks...");
       let rows = state.lastPackageDiagnostics || [];
       if (!rows.length) {
         rows = await runPackageInstallDiagnostics({silent:true});
@@ -2213,6 +2234,7 @@
       const passed = rows.filter(row => row.status === "Pass");
       if (!passed.length) {
         setText("diagnosticsStatus", "No passed package diagnostics are available to archive.");
+        setText("diagnosticsArchiveStatus", "No passed package diagnostics are available to archive.");
         return;
       }
       const archive = readPackageDiagnosticsArchive();
@@ -2228,8 +2250,12 @@
       writePackageDiagnosticsArchive(next);
       renderPackageDiagnosticsArchives();
       setText("diagnosticsStatus", `Archived ${passed.length} passed package diagnostic check(s). Open Diagnostic Archives or download the CSV.`);
+      setText("diagnosticsArchiveStatus", `Done: archived ${passed.length} passed package diagnostic check(s).`);
     } catch (error) {
       setText("diagnosticsStatus", `Package diagnostics archive failed: ${error?.message || error}`);
+      setText("diagnosticsArchiveStatus", `Archive failed: ${error?.message || error}`);
+    } finally {
+      if (button) button.disabled = false;
     }
   }
 

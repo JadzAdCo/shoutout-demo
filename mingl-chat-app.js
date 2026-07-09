@@ -1,4 +1,4 @@
-/* mingl-chat-app.js v29.00 */
+/* mingl-chat-app.js v29.02 */
 (function(){
   "use strict";
 
@@ -147,21 +147,19 @@
     menu.className = "mingl-compose-menu";
     menu.innerHTML = `<summary aria-label="Mingl message actions">+</summary>
       <div class="mingl-compose-menu-panel">
-        <strong>Text Action</strong>
-        <button id="minglStandaloneImproveBtn" type="button">Correct Grammar/Spelling</button>
+        <strong>Emoji Actions</strong>
         <div class="emoji-row compact-emoji-row" aria-label="Mingl emoji shortcuts">
-          <button type="button" data-mingl-emoji-code="128522">Smile</button>
-          <button type="button" data-mingl-emoji-code="128293">Fire</button>
-          <button type="button" data-mingl-emoji-code="127881">Party</button>
-          <button type="button" data-mingl-emoji-code="10084">Heart</button>
-          <button type="button" data-mingl-emoji-code="128514">Laugh</button>
+          <button type="button" data-mingl-emoji-code="128522" data-mingl-emoji-effect="smile">Smile</button>
+          <button type="button" data-mingl-emoji-code="128293" data-mingl-emoji-effect="fire">Fire</button>
+          <button type="button" data-mingl-emoji-code="127881" data-mingl-emoji-effect="confetti">Party</button>
+          <button type="button" data-mingl-emoji-code="10084" data-mingl-emoji-effect="heart">Heart</button>
+          <button type="button" data-mingl-emoji-code="128514" data-mingl-emoji-effect="laugh">Laugh</button>
         </div>
         <strong>Add Photo/Video</strong>
         <label class="chat-file-button" for="minglStandaloneImageInput">Choose Photo/Video</label>
         <button id="minglStandaloneClearImageBtn" type="button">Remove Photo/Video</button>
         <strong>Edit</strong>
-        <button id="minglStandaloneSelectDraftBtn" type="button">Select Draft Text</button>
-        <button id="minglStandaloneClearDraftBtn" type="button">Clear Draft</button>
+        <button id="minglStandaloneImproveBtn" type="button">Correct Grammar/Spelling</button>
         <strong>Chat Background</strong>
         <label class="chat-file-button" for="minglStandaloneBackgroundInput">Change Background</label>
       </div>`;
@@ -172,16 +170,11 @@
   function bindComposerActions() {
     byId("minglStandaloneImproveBtn")?.addEventListener("click", improveDraft);
     byId("minglStandaloneClearImageBtn")?.addEventListener("click", clearAttachment);
-    byId("minglStandaloneClearDraftBtn")?.addEventListener("click", () => {
-      const input = byId("minglStandaloneMessageInput");
-      if (input) input.value = "";
-    });
-    byId("minglStandaloneSelectDraftBtn")?.addEventListener("click", () => byId("minglStandaloneMessageInput")?.select());
     document.querySelectorAll("[data-mingl-emoji-code]").forEach(button => {
       const code = Number(button.dataset.minglEmojiCode || 0);
       if (code) button.textContent = String.fromCodePoint(code);
       button.addEventListener("click", () => {
-        insertEmoji(code ? String.fromCodePoint(code) : "");
+        sendEmojiAction(code ? String.fromCodePoint(code) : "", button.dataset.minglEmojiEffect || "emoji");
       });
     });
     document.querySelector(".mingl-compose-menu-panel")?.addEventListener("click", event => {
@@ -197,6 +190,16 @@
     if (menu) menu.open = false;
   }
 
+  function bindGlobalPopoutDismissal() {
+    document.addEventListener("click", event => {
+      const menu = byId("minglStandaloneActionMenu");
+      if (menu?.open && !menu.contains(event.target)) closeComposeMenu();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeComposeMenu();
+    });
+  }
+
   function insertEmoji(emoji) {
     const input = byId("minglStandaloneMessageInput");
     if (!input || !emoji) return;
@@ -205,6 +208,15 @@
     input.value = `${input.value.slice(0, start)}${emoji}${input.value.slice(end)}`;
     input.focus();
     input.setSelectionRange(start + emoji.length, start + emoji.length);
+  }
+
+  async function sendEmojiAction(emoji, effect = "emoji") {
+    if (!emoji) return;
+    if (!activeRoomId) {
+      insertEmoji(emoji);
+      return;
+    }
+    await sendMessage({bodyOverride:emoji, emojiEffect:effect});
   }
 
   function mediaHtml(msg = {}) {
@@ -233,7 +245,7 @@
       const system = msg.senderUid === "system" || msg.messageType === "system";
       const backgroundConsent = msg.messageType === "backgroundConsent";
       const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${messageAnimationClass(msg.animationType)} ${msg.unsent ? "unsent" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${messageAnimationClass(msg.animationType)} ${emojiEffectClass(msg.emojiEffect)} ${msg.unsent ? "unsent" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
         ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
         ${mediaHtml(msg)}
@@ -256,6 +268,15 @@
     if (type === "explode") return "animate-explode";
     if (type === "scroll") return "animate-scroll";
     if (type === "disappear") return "animate-disappear";
+    return "";
+  }
+
+  function emojiEffectClass(type = "") {
+    if (type === "heart") return "emoji-effect-heart";
+    if (type === "confetti") return "emoji-effect-confetti";
+    if (type === "fire") return "emoji-effect-fire";
+    if (type === "laugh") return "emoji-effect-laugh";
+    if (type === "smile") return "emoji-effect-smile";
     return "";
   }
 
@@ -522,9 +543,10 @@
     };
   }
 
-  async function sendMessage() {
+  async function sendMessage(options = {}) {
     const input = byId("minglStandaloneMessageInput");
-    const body = input?.value.trim();
+    const usedBodyOverride = typeof options.bodyOverride === "string";
+    const body = usedBodyOverride ? options.bodyOverride : input?.value.trim();
     const file = attachmentFile || byId("minglStandaloneImageInput")?.files?.[0] || null;
     if (!activeRoomId || (!body && !file)) return;
     try {
@@ -535,7 +557,7 @@
       const mediaPayload = file ? await uploadMedia(activeRoomId, file) : {};
       const unreadCounts = {...(room.unreadCounts || {})};
       (room.participants || []).forEach(uid => { if (uid !== currentUser.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });
-      input.value = "";
+      if (!usedBodyOverride && input) input.value = "";
       clearAttachment();
       await db.collection("chatMessages").add({
         roomId:activeRoomId,
@@ -545,6 +567,7 @@
         senderUid:currentUser.uid,
         senderName:currentProfile.displayName || currentUser.displayName || currentUser.email || "Member",
         body:body || (mediaPayload.mediaType === "video" ? "Shared a video." : "Shared a picture."),
+        emojiEffect:options.emojiEffect || "",
         ...mediaPayload,
         edited:false,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -769,6 +792,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     ensureCleanComposer();
     bindComposerActions();
+    bindGlobalPopoutDismissal();
     byId("minglChatGoogleLoginBtn")?.addEventListener("click", loginGoogle);
     byId("minglChatMicrosoftLoginBtn")?.addEventListener("click", loginMicrosoft);
     byId("minglStandaloneCloseChatBtn")?.addEventListener("click", closeRoom);

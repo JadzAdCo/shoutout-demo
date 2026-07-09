@@ -936,8 +936,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=29.01",
-      minglLink:"./mingl-chat.html?v=29.01",
+      link:"./patron-portal.html?tab=inbox&v=29.02",
+      minglLink:"./mingl-chat.html?v=29.02",
       read:false,
       createdAt:now
     };
@@ -979,7 +979,7 @@
   }
 
   function portalChatUrl(roomId = "") {
-    const params = new URLSearchParams({v:"29.01"});
+    const params = new URLSearchParams({v:"29.02"});
     if (roomId) params.set("room", roomId);
     return `./mingl-chat.html?${params.toString()}`;
   }
@@ -1761,6 +1761,7 @@
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
+    setText("locationRankingStatus", `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`);
     const matches = ranked
       .map(record => [record.id, record.data || events[record.id]])
       .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)));
@@ -1789,6 +1790,7 @@
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
+    setText("locationRankingStatus", `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`);
     const matches = ranked.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
       if (!l) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
@@ -2107,6 +2109,52 @@
     return pastShoutoutMemoryPromise;
   }
 
+  function templateDisplayCaps(template = getTemplate()) {
+    const t = template || {};
+    const cap = t.displayCaps || t.characterCaps || {};
+    const isClassic = (t.id || selectedTemplate) === "blackwhite";
+    const supportsMedia = !!(t.supportsImage || t.supportsVideo);
+    const main = Number(cap.mainText || cap.main || (isClassic ? 36 : supportsMedia ? 48 : 60));
+    const sub = Number(cap.subText || cap.sub || (isClassic ? 24 : supportsMedia ? 42 : 60));
+    const total = Number(cap.total || (main + sub));
+    return { main, sub, total };
+  }
+
+  function cleanRecommendationText(value = "") {
+    return String(value || "")
+      .replace(/\b(?:tone|style)\s*:\s*[a-z0-9 /-]+\b/ig, "")
+      .replace(/^\s*(?:tone|style)\s*[-:]\s*/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function fitTemplateText(value = "", type = "main") {
+    const caps = templateDisplayCaps();
+    const limit = Number(type === "sub" ? caps.sub : caps.main);
+    return cleanRecommendationText(value).slice(0, limit);
+  }
+
+  function updateTemplateCharacterCapHint() {
+    const hint = byId("templateCharacterCapHint");
+    if (!hint) return;
+    const caps = templateDisplayCaps();
+    const t = getTemplate();
+    hint.textContent = `Template display cap: main ${caps.main} chars, attribution/subtext ${caps.sub} chars. Recommendations are trimmed to fit ${t.name || "this template"}.`;
+  }
+
+  function suggestionEventContext() {
+    const selected = byId("shoutoutEventType")?.value || "";
+    const loc = getLocation() || {};
+    const text = `${byId("mainText")?.value || ""} ${byId("subText")?.value || ""}`.toLowerCase();
+    if (selected) return selected;
+    if (/birthday|bday/.test(text)) return "birthday";
+    if (/vip|table|bottle/.test(text)) return "vip-table";
+    if (/(r&b|rnb|soul)/.test(text) || (loc.genres || []).some(g => /r&b|rnb|soul/i.test(g))) return "rnb";
+    if (/afro|afrobeats|fufu/.test(text) || (loc.genres || []).some(g => /afro/i.test(g))) return "afrobeats";
+    if (/latin|reggaeton|salsa|bachata/.test(text) || (loc.genres || []).some(g => /latin|reggaeton|salsa|bachata/i.test(g))) return "latin-reggaeton";
+    return loc.type || "general-party";
+  }
+
   function buildFallbackPersonalizedSuggestions(context = {}) {
     const tone = String(context.tone || "party").toLowerCase();
     const main = String(context.mainText || "").trim();
@@ -2114,12 +2162,17 @@
     const profile = context.profileSignals || {};
     const name = (profile.displayName || "").split(/\s+/)[0] || "";
     const venue = getLocation()?.locationName || "tonight";
+    const genres = (getLocation()?.genres || []).join(" ");
+    const eventType = String(context.eventType || suggestionEventContext()).toLowerCase();
     const interests = (profile.interests || []).slice(0, 3).join(", ");
     const past = (context.pastShoutouts || []).find(item => item.mainText || item.subText) || {};
-    const occasion = /birthday|bday/i.test(`${main} ${sub} ${tone}`) ? "birthday" : /romantic|love/i.test(tone) ? "romantic" : /graduation|grad/i.test(tone) ? "graduation" : /vip|classy/i.test(tone) ? "vip" : "party";
+    const occasion = /birthday|bday/i.test(`${main} ${sub} ${eventType}`) ? "birthday" : /r&b|rnb|soul/.test(`${eventType} ${genres}`.toLowerCase()) ? "rnb" : /afro|fufu/.test(`${main} ${sub} ${eventType} ${genres}`.toLowerCase()) ? "afrobeats" : /latin|reggaeton|salsa|bachata/.test(`${eventType} ${genres}`.toLowerCase()) ? "latin" : /romantic|love/i.test(`${tone} ${eventType}`) ? "romantic" : /graduation|grad/i.test(`${tone} ${eventType}`) ? "graduation" : /vip|classy|table/i.test(`${tone} ${eventType}`) ? "vip" : "party";
     const seed = main || past.mainText || (occasion === "birthday" ? `HAPPY BIRTHDAY${name ? ` ${name.toUpperCase()}` : ""}!` : occasion === "graduation" ? "CONGRATS GRAD!" : occasion === "romantic" ? "LOVE IS IN THE ROOM" : "BIG ShoutOut TONIGHT!");
     const linesByOccasion = {
       birthday:[seed, `BIRTHDAY ENERGY FOR ${name ? name.toUpperCase() : "THE STAR"}!`, "MAKE THIS BIRTHDAY UNFORGETTABLE!", "VIP BIRTHDAY MOMENT!", "TONIGHT BELONGS TO THE BIRTHDAY STAR!"],
+      rnb:[seed, "SLOW GROOVE. BIG MOOD.", "R&B LIGHTS FOR THE TABLE", "LOVE SONGS AND VIP MOMENTS", "THIS GROOVE IS OURS"],
+      afrobeats:[seed, "AFROBEATS ENERGY ALL NIGHT", "FUFU, FRIENDS, AND BIG VIBES", "THE RHYTHM HAS ARRIVED", "FROM THE TABLE TO THE DANCE FLOOR"],
+      latin:[seed, "LATIN HEAT ON THE FLOOR", "REGGAETON NIGHT. BIG ENERGY.", "SALSA STEPS AND VIP LIGHTS", "THIS NIGHT MOVES WITH US"],
       romantic:[seed, "LOVE, LIGHTS, AND A PERFECT NIGHT", "A ROMANTIC ShoutOut FOR TWO", "THIS MOMENT IS ALL LOVE", "SOFT LIGHTS. BIG LOVE."],
       graduation:[seed, "THE FUTURE STARTS TONIGHT!", "CONGRATS ON THE BIG WIN!", "GRADUATION ENERGY ALL NIGHT", "NEXT LEVEL STARTS NOW!"],
       vip:[seed, "VIP MOMENT. VIP ENERGY.", "THE TABLE EVERYONE SEES TONIGHT", "LUXURY ENERGY ALL NIGHT", "MAKE ROOM FOR VIP"],
@@ -2127,22 +2180,25 @@
     };
     const subBase = sub || (interests ? `${interests} at ${venue}` : `Live at ${venue}`);
     return (linesByOccasion[occasion] || linesByOccasion.party).map((line, index) => ({
-      mainText:String(line).replace(/\s+/g, " ").slice(0, Number(byId("mainText")?.maxLength || 36)),
-      subText:index === 0 ? subBase : index === 1 ? "LED-ready and public-display safe." : "Celebrate loud. Keep it classy.",
+      mainText:fitTemplateText(line, "main"),
+      subText:fitTemplateText(index === 0 ? subBase : index === 1 ? `${venue} audience match` : "Celebrate loud. Keep it classy.", "sub"),
       providerMode:window.FLOQR_AI_ENABLED ? "gemini-contextual-or-fallback" : "local-personalized-fallback"
     }));
   }
 
   async function buildPersonalizedShoutOutSuggestions(toneOverride = "") {
+    const caps = templateDisplayCaps();
     const context = {
       mainText:byId("mainText")?.value || "",
       subText:byId("subText")?.value || "",
       templateId:selectedTemplate,
       clubLocationId:locationId(),
-      eventType:getLocation()?.type || "",
+      eventType:suggestionEventContext(),
       tone:toneOverride || byId("shoutoutTone")?.value || "party",
-      mainLimit:Number(byId("mainText")?.maxLength || 36),
-      subLimit:Number(byId("subText")?.maxLength || 60),
+      mainLimit:caps.main,
+      subLimit:caps.sub,
+      displayCaps:caps,
+      venueGenres:getLocation()?.genres || [],
       profileSignals:profileSuggestionSignals(),
       pastShoutouts:await getPastShoutOutMemory()
     };
@@ -2152,7 +2208,9 @@
       const first = ai ? [{...fallback[0], ...ai}] : [];
       const seen = new Set();
       return [...first, ...fallback].filter(item => {
-        const key = `${item.mainText || item.main}|${item.subText || item.sub}`;
+        item.mainText = fitTemplateText(item.mainText || item.main || "", "main");
+        item.subText = fitTemplateText(item.subText || item.sub || "", "sub");
+        const key = `${item.mainText}|${item.subText}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
@@ -2164,9 +2222,9 @@
 
   function applySuggestionItem(item = {}) {
     const mainInput = byId("mainText");
-    if (mainInput) mainInput.value = String(item.mainText || item.main || "").slice(0, Number(mainInput.maxLength || 36));
+    if (mainInput) mainInput.value = fitTemplateText(item.mainText || item.main || "", "main");
     const subInput = byId("subText");
-    if (subInput && item.subText && !byId("includeAttribution")?.checked) subInput.value = String(item.subText || "").slice(0, Number(subInput.maxLength || 60));
+    if (subInput && item.subText && !byId("includeAttribution")?.checked) subInput.value = fitTemplateText(item.subText || "", "sub");
     syncAttribution();
     const box = byId("shoutoutSuggestionBox");
     if (box) {
@@ -2181,7 +2239,7 @@
     if (!list) return;
     list.innerHTML = "<p class='sub small'>Building personalized ShoutOut ideas...</p>";
     const suggestions = await buildPersonalizedShoutOutSuggestions(options.toneOverride || "");
-    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-ai-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")}</small></button>`).join("") : "<p class='sub small'>Type a message or choose a tone to generate suggestions.</p>";
+    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-ai-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")} - ${esc(suggestionEventContext())}</small></button>`).join("") : "<p class='sub small'>Type a message or choose a recommendation style/event context to generate suggestions.</p>";
     list.querySelectorAll("[data-ai-suggestion-index]").forEach(button => {
       button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.aiSuggestionIndex)]));
     });
@@ -2315,7 +2373,7 @@
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
-      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.01`;
+      payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.02`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
@@ -2329,11 +2387,17 @@
     const allowsMedia = currentTemplateSupportsMedia();
     const accepts = currentTemplateAccepts();
     const mainInput = byId("mainText");
+    const caps = templateDisplayCaps(t);
     if (mainInput) {
-      const isClassic = (t.id || selectedTemplate) === "blackwhite";
-      mainInput.maxLength = isClassic ? 36 : 60;
+      mainInput.maxLength = caps.main;
       if (mainInput.value.length > mainInput.maxLength) mainInput.value = mainInput.value.slice(0, mainInput.maxLength);
     }
+    const subInput = byId("subText");
+    if (subInput) {
+      subInput.maxLength = caps.sub;
+      if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
+    }
+    updateTemplateCharacterCapHint();
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
     const photoWrap = byId("shoutoutPhotoWrap");
@@ -2386,7 +2450,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = "./patron-portal.html?v=29.01";
+      portalLink.href = "./patron-portal.html?v=29.02";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -2399,14 +2463,14 @@
       menu.insertBefore(level, signOutButton);
 
       const messages = document.createElement("a");
-      messages.href = "./patron-portal.html?tab=inbox&v=29.01";
+      messages.href = "./patron-portal.html?tab=inbox&v=29.02";
       messages.textContent = "FLOQR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = "./mingl-chat.html?v=29.01";
+      chats.href = "./mingl-chat.html?v=29.02";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -2520,6 +2584,7 @@
     byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("shoutoutTone")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
+    byId("shoutoutEventType")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
@@ -2581,10 +2646,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="./patron-portal.html?v=29.01">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?v=29.02">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=29.01">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html?v=29.01">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=inbox&v=29.02">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="./mingl-chat.html?v=29.02">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
@@ -2627,7 +2692,7 @@ function currentLoc(){return window.selectedLocationId||window.locationId?.()||q
 window.getEnabledServicesForLocation=function(id){return (window.SHOUTOUT_LOCATION_SERVICES||{})[id]||window.SHOUTOUT_DEFAULT_LOCATION_SERVICES||["shoutout","guestList"];};
 window.openServiceForLocation=function(service,id){id=id||currentLoc();if(service==="guestList"){let u=new URL("./guest-list.html",location.href);u.searchParams.set("location",id);u.searchParams.set("v","28.3");let pr=qs("promoter");if(pr)u.searchParams.set("promoter",pr);location.href=u.toString();return;} if(service!=="shoutout"){alert(((window.SHOUTOUT_SERVICE_LABELS||{})[service]||service)+" is not yet enabled in this demo workflow.");}};
 async function note(payload){try{let u=firebase.auth().currentUser;if(!u)return;await firebase.firestore().collection("inboxNotifications").add({recipientUid:u.uid,recipientEmail:u.email||"",read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),...payload});}catch(e){}}
-window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=29.01`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
+window.createShoutOutSubmissionNotification=async function(s){const link=s.modifyLink||`./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(s.referenceNumber||"")}&v=29.02`;await note({type:"shoutoutSubmitted",title:"ShoutOut Submitted",body:`Your ShoutOut was submitted for ${s.locationName||s.clubName||s.clubLocationId||"the selected venue"}.\n\nModify ShoutOut: ${link}`,referenceNumber:s.referenceNumber||"",shoutoutId:s.shoutoutId||"",clubLocationId:s.clubLocationId||s.location||currentLoc(),status:s.status||"pending",link});};
 document.addEventListener("click",function(e){let b=e.target.closest("[data-service]");if(b){e.preventDefault();e.stopPropagation();window.openServiceForLocation(b.dataset.service,currentLoc());return;}let el=e.target.closest("button,a,[role='button']");if(!el)return;let t=String(el.textContent||el.getAttribute("aria-label")||"").toLowerCase();if(t.includes("guest list")||t.includes("join guest"))window.__jadzActionMode="guest-list";if(window.__jadzActionMode==="guest-list"&&t.trim()==="continue"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.openServiceForLocation("guestList",currentLoc());}},true);
 })();
 

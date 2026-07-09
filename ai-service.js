@@ -258,24 +258,35 @@
     const tone = normalizeQuery(inputs.tone || "party");
     const main = String(inputs.mainText || "").trim();
     const template = normalizeQuery(inputs.templateId || "");
+    const eventType = normalizeQuery(inputs.eventType || "");
+    const genres = normalizeQuery([inputs.venueGenres, inputs.genres].flat().filter(Boolean).join(" "));
+    const profileText = normalizeQuery(Object.values(inputs.profileSignals || {}).flat().join(" "));
+    const context = `${main} ${tone} ${template} ${eventType} ${genres} ${profileText}`;
     const pool = [
-      {tone:"vip", main:"VIP ShoutOut IN THE BUILDING", sub:"Luxury energy all night."},
-      {tone:"funny", main:"BIG ShoutOut TO THE TABLE", sub:"They came to celebrate."},
-      {tone:"romantic", main:"LOVE IS IN THE ROOM", sub:"A perfect night for two."},
-      {tone:"birthday", main:"HAPPY BIRTHDAY", sub:"Your ShoutOut moment is live."},
-      {tone:"classy", main:"TONIGHT IS YOUR NIGHT", sub:"Elegant, bright, unforgettable."},
-      {tone:"party", main:"THE PARTY STARTS HERE", sub:"Big ShoutOut energy."},
-      {tone:"corporate", main:"WELCOME TO THE CELEBRATION", sub:"A polished ShoutOut moment."},
-      {tone:"graduation", main:"CONGRATS GRAD", sub:"The future starts tonight."}
+      {key:"afrobeats", main:"AFROBEATS ENERGY ALL NIGHT", sub:"Rhythm, friends, and big vibes."},
+      {key:"rnb", main:"SLOW GROOVE. BIG MOOD.", sub:"Smooth lights for the room."},
+      {key:"latin", main:"REGGAETON NIGHT. BIG ENERGY.", sub:"Latin heat on the floor."},
+      {key:"vip", main:"VIP MOMENT. VIP ENERGY.", sub:"Luxury energy all night."},
+      {key:"romantic", main:"LOVE IS IN THE ROOM", sub:"A perfect night for two."},
+      {key:"birthday", main:"HAPPY BIRTHDAY", sub:"Your ShoutOut moment is live."},
+      {key:"graduation", main:"CONGRATS GRAD", sub:"The future starts tonight."},
+      {key:"party", main:"THE PARTY STARTS HERE", sub:"Big ShoutOut energy."}
     ];
-    const picked = pool.find(item => tone.includes(item.tone)) || pool.find(item => template.includes(item.tone)) || pool[5];
+    const picked =
+      (/afro|fufu/.test(context) && pool[0]) ||
+      (/(r&b|rnb|soul)/.test(context) && pool[1]) ||
+      (/(latin|reggaeton|salsa|bachata)/.test(context) && pool[2]) ||
+      pool.find(item => context.includes(item.key)) ||
+      pool[7];
     const limit = Number(inputs.mainLimit || 36);
-    const mainText = restoreProtectedTerms((main || picked.main).replace(/[^a-zA-Z0-9 @!?.'-]/g, " ").replace(/\s+/g, " ").trim()).slice(0, limit);
+    const cleanMain = (main || picked.main).replace(/\b(?:tone|style)\s*:\s*[a-z0-9 /-]+\b/ig, "").replace(/[^a-zA-Z0-9 @!?.'-]/g, " ").replace(/\s+/g, " ").trim();
+    const mainText = restoreProtectedTerms(cleanMain).slice(0, limit);
     const subText = restoreProtectedTerms(picked.sub).slice(0, Number(inputs.subLimit || 60));
     return {
       mainText,
       subText,
-      tone: picked.tone,
+      tone,
+      eventType: picked.key,
       providerMode: AI_FLAGS.enabled() ? "ai-ready" : "curated-fallback",
       safetyStatus: "passed"
     };
@@ -305,9 +316,12 @@
         templateId:String(inputs.templateId || "").slice(0, 80),
         clubLocationId:String(inputs.clubLocationId || "").slice(0, 120),
         eventType:String(inputs.eventType || "").slice(0, 80),
+        venueGenres:Array.isArray(inputs.venueGenres) ? inputs.venueGenres.slice(0, 12) : [],
         tone:String(inputs.tone || "party").slice(0, 40),
         mainLimit:Number(inputs.mainLimit || 36),
         subLimit:Number(inputs.subLimit || 60),
+        displayCaps:inputs.displayCaps || {},
+        instruction:"Use tone, event type, venue genres, profile signals, and past ShoutOuts as guidance only. Do not prefix output with Tone:, Style:, Event:, or labels. Keep mainText within mainLimit and subText within subLimit.",
         profileSignals:inputs.profileSignals || {},
         pastShoutouts:Array.isArray(inputs.pastShoutouts) ? inputs.pastShoutouts.slice(0, 12) : []
       });
