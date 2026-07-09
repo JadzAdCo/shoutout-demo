@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v28.98 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v28.99 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=28.98"/>
-  <link rel="stylesheet" href="./admin.css?v=28.98"/>
+  <link rel="stylesheet" href="./styles.css?v=28.99"/>
+  <link rel="stylesheet" href="./admin.css?v=28.99"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -53,6 +53,7 @@
         <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
+        <button class="admin-tab" data-panel="adCampaignManagement" type="button">Ad Campaign Management</button>
         <button class="admin-tab" data-panel="patronDiagnostics" type="button">Patron Diagnostics</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
@@ -61,6 +62,7 @@
         <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
         <button class="admin-tab" data-panel="duplicateRecords" type="button">Duplicate Records</button>
         <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
+        <button class="admin-tab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
       </nav>
 
       <section id="networkDashboard" class="admin-panel-section active">
@@ -103,6 +105,15 @@
         <div class="card">
           <h2>Advertiser Intelligence</h2>
           <div id="networkAdReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="adCampaignManagement" class="admin-panel-section">
+        <div class="card">
+          <h2>Ad Campaign Management</h2>
+          <p class="sub small">Manage campaign copy, targeted patron datapoints, campaign tags, preview status, and estimated audience matches. Saved target-tag edits are local preview overrides until Firestore campaign persistence is approved.</p>
+          <div id="adCampaignManagementSummary" class="report-block"></div>
+          <div id="adCampaignManagementList" class="report-block"></div>
         </div>
       </section>
 
@@ -217,6 +228,15 @@
               </div>
             </div>
           </details>
+        </div>
+        <div class="card">
+          <h2>Crawl Contact Export</h2>
+          <p class="sub small">Formatted club and event crawl contacts for review and CSV download.</p>
+          <div class="queue-actions">
+            <button id="downloadCrawlContactsCsvBtn" type="button">Download Crawl Contacts CSV</button>
+            <button id="testGeminiSourceExtractorBtn" type="button">Test Gemini Source Extractor</button>
+          </div>
+          <div id="crawlContactExportReport" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Source Detail Extraction</h2>
@@ -351,6 +371,7 @@
           <div class="queue-actions">
             <button id="copyManualFeatureOutputBtn" type="button">Copy Manual Test Output</button>
             <button id="downloadManualFeatureOutputBtn" type="button">Download Manual Test TXT</button>
+            <button id="archivePassedManualFeatureTestsBtn" type="button">Archive Passed Tests</button>
             <button id="copyManualFeaturePromptBtn" class="primary" type="button">Copy Resolution Prompt</button>
           </div>
           <label>Manual diagnostic output<textarea id="manualFeatureDiagnosticsOutput" rows="10" readonly></textarea></label>
@@ -373,6 +394,15 @@
           <div id="rulesSmokeTestReport" class="report-block"></div>
         </div>
       </section>
+
+      <section id="diagnosticArchives" class="admin-panel-section">
+        <div class="card">
+          <h2>Diagnostic Archives</h2>
+          <p class="sub small">Archived manual feature tests that previously passed. Use Restore if a feature needs to be retested in the active checklist.</p>
+          <div id="manualFeatureArchiveSummary" class="report-block"></div>
+          <div id="manualFeatureArchiveReport" class="report-block"></div>
+        </div>
+      </section>
     </div>
   </section>
 </main>
@@ -383,16 +413,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./shared-data.js?v=28.98"></script>
-<script src="./ai-service.js?v=28.98"></script>
-<script src="./ai-index-service.js?v=28.98"></script>
-<script src="./ai-search-service.js?v=28.98"></script>
-<script src="./ai-discovery-service.js?v=28.98"></script>
-<script src="./floqr-action-feedback.js?v=28.98"></script>
-<script src="./helper-popouts.js?v=28.98"></script>
-<script src="./ai-diagnostics-service.js?v=28.98"></script>
-<script src="./duplicate-record-service.js?v=28.98"></script>
-<script src="./master-admin-app.js?v=28.98"></script>
+<script src="./shared-data.js?v=28.99"></script>
+<script src="./ai-service.js?v=28.99"></script>
+<script src="./ai-index-service.js?v=28.99"></script>
+<script src="./ai-search-service.js?v=28.99"></script>
+<script src="./ai-discovery-service.js?v=28.99"></script>
+<script src="./floqr-action-feedback.js?v=28.99"></script>
+<script src="./helper-popouts.js?v=28.99"></script>
+<script src="./ad-campaigns.js?v=28.99"></script>
+<script src="./ai-diagnostics-service.js?v=28.99"></script>
+<script src="./duplicate-record-service.js?v=28.99"></script>
+<script src="./master-admin-app.js?v=28.99"></script>
 <script src="./notification-center.js?v=28.43-f"></script>
 </body>
 </html>

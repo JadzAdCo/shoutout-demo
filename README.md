@@ -1,15 +1,25 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v28.98 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v28.99 Full Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=28.98
+https://jadzadco.github.io/shoutout-demo/?v=28.99
 ```
 
 Current release highlights:
 
+- Adds v28.99 targeted ad campaign management and ShoutOut splash targeting.
+- Adds separate demo ad campaigns for Cuisine Bantu, Puff Club, and Lima DC with their own media, copy, Canva source links, targeting tags, campaign datapoints, and analytics metadata.
+- Adds Master Admin > Ad Campaign Management so admins can review and edit target tags, campaign datapoints, and optional required target groups.
+- ShoutOut and club action splash ads now select eligible campaigns by patron datapoints instead of forcing one highest-scored ad forever.
+- Campaign location targeting is optional and only enforced when a campaign explicitly defines required target groups.
+- Adds `ad-campaign-preview-v28.99.html` for reviewing the current campaign creatives.
+- Fixes the ShoutOut landing logo to use the official `images/shoutout-logo.png`.
+- Adds manual diagnostics archive controls and crawl contact CSV/export controls.
+- Firestore and Storage rule headers now carry the v28.99 package version.
+- Direct rollback note for this package is `ROLLBACK-V28-99.md`; older rollback/readme history is bundled in the included rollback history ZIP.
 - Adds v28.98 Mingl Chat List Diagnostics Archive fixes.
 - Restores the visible Mingl Chat room list by keeping the room list card separate from the selected-chat popout.
 - Master Admin Feature Diagnostics now keeps Failed, Soft Fail, and TBI checks visible while archiving passed checks behind `View Archived Passed Diagnostics`.
@@ -43,8 +53,8 @@ Current release highlights:
 - Height now stores a `heightUnit` datapoint. U.S. and Canada profiles default to `ft/in`; all other countries default to meters, with an editable unit dropdown.
 - Club admins can reset the currently live display back to that club location's default ShoutOut.
 - Official ShoutOut templates now have searchable `tags`, allowing contextual searches like birthday flowers, VIP table video, tattoo/ink, summer pool party, Ferrari, Lamborghini, fast cars, coupe, and luxury ride.
-- Firestore and Storage rule headers now carry the v28.98 package version.
-- Direct rollback note for this package is `ROLLBACK-V28-98.md`.
+- Historical note: v28.98 Firestore and Storage rule headers carried the v28.98 package version.
+- Historical note: v28.98 direct rollback note was `ROLLBACK-V28-98.md`.
 - Adds v28.88 Mingl grammar and profile datapoint fixes.
 - `Fix Grammar` calls Gemini through Firebase Functions first. If Gemini is unavailable, the browser only applies the patron's saved personal correction pairs and preserves the patron's My Word List. There is no generalized local typo dictionary.
 - Adds editable `My Word List` and `My Personal Corrections` under Patron Portal > Language Settings. Patrons can save repeated typos such as `watz -> what's` or protect names, handles, slang, and preferred spellings.
@@ -438,8 +448,8 @@ Post-install rules testing:
 The top of `firestore.rules` should show:
 
 ```js
-// FLOQR FIRESTORE RULES VERSION: v28.98
-// EXPECTED DEPLOYED RULES VERSION: v28.98 or newer
+// FLOQR FIRESTORE RULES VERSION: v28.99
+// EXPECTED DEPLOYED RULES VERSION: v28.99 or newer
 ```
 
 If Firebase Console does not show that note near the top of the rules editor, the deployed Firestore rules are not updated to this package.
@@ -447,8 +457,8 @@ If Firebase Console does not show that note near the top of the rules editor, th
 The top of `storage.rules` should show:
 
 ```js
-// FLOQR STORAGE RULES VERSION: v28.98
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.98 or newer
+// FLOQR STORAGE RULES VERSION: v28.99
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v28.99 or newer
 ```
 
 If Firebase Console Storage Rules does not show that note near the top, the deployed Storage rules are not updated to this package.

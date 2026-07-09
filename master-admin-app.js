@@ -370,6 +370,28 @@
       </div>`).join("") : "<p class='sub'>No patron pairs have 2 or more matching datapoints yet.</p>";
   }
 
+  function renderAdCampaignManagement(users = []) {
+    const summary = byId("adCampaignManagementSummary");
+    const list = byId("adCampaignManagementList");
+    if (!summary || !list) return;
+    if (!window.FLOQRAdCampaigns) {
+      summary.innerHTML = "<p class='sub'>Ad campaign registry did not load.</p>";
+      list.innerHTML = "";
+      return;
+    }
+    const patrons = users.filter(isPatronProfile);
+    const campaigns = window.FLOQRAdCampaigns.campaigns();
+    const analytics = window.FLOQRAdCampaigns.campaignAnalytics(patrons);
+    summary.innerHTML = simpleRows([
+      ["Campaigns in pool", campaigns.length.toLocaleString()],
+      ["Preview campaigns", campaigns.filter(item => item.status === "preview").length.toLocaleString()],
+      ["Needs verification", campaigns.filter(item => item.status === "needs-verification").length.toLocaleString()],
+      ["Patron profiles scanned", patrons.length.toLocaleString()],
+      ["Top campaign match", analytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"]
+    ]);
+    window.FLOQRAdCampaigns.renderAdminCampaignManager("adCampaignManagementList", patrons);
+  }
+
   async function loadNetworkReports() {
     const [users, shoutouts, liveDocs, locations, events, guestLists] = await Promise.all([
       getCollectionSafe("users"),
@@ -437,6 +459,7 @@
     ]);
 
     renderPatronDiagnostics(users);
+    renderAdCampaignManagement(users);
 
     const gross = revenue + Math.round(impressions / 1000 * 25);
     const platformShare = Math.round(gross * 0.35);

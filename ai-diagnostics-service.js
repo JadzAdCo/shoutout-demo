@@ -1749,6 +1749,17 @@
       "";
   }
 
+  function destinationSocials(item = {}) {
+    const publicSocials = item.profileImport?.publicProfile?.socialMediaHandles || {};
+    const socials = item.socialMediaHandles || item.socialHandles || {};
+    return {
+      facebook: publicSocials.facebook || socials.facebook || item.facebookHandle || "",
+      instagram: publicSocials.instagram || socials.instagram || item.instagramHandle || "",
+      x: publicSocials.x || publicSocials.twitter || socials.x || socials.twitter || item.xHandle || item.twitterHandle || "",
+      tiktok: publicSocials.tiktok || socials.tiktok || item.tiktokHandle || item.ticTokHandle || ""
+    };
+  }
+
   function destinationDescription(item = {}) {
     return item.proposedDescription ||
       item.description ||
@@ -2005,6 +2016,10 @@
     return `floqrManualFeatureDiagnostics:${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`;
   }
 
+  function manualFeatureArchiveStorageKey() {
+    return `floqrManualFeatureArchive:${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`;
+  }
+
   function readManualFeatureResults() {
     try {
       return JSON.parse(localStorage.getItem(manualFeatureStorageKey()) || "{}") || {};
@@ -2017,9 +2032,26 @@
     localStorage.setItem(manualFeatureStorageKey(), JSON.stringify(results || {}));
   }
 
-  function manualFeatureRows() {
+  function readManualFeatureArchive() {
+    try {
+      return JSON.parse(localStorage.getItem(manualFeatureArchiveStorageKey()) || "[]") || [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function writeManualFeatureArchive(rows = []) {
+    localStorage.setItem(manualFeatureArchiveStorageKey(), JSON.stringify(rows || []));
+  }
+
+  function archivedManualFeatureIds() {
+    return new Set(readManualFeatureArchive().map(row => row.id).filter(Boolean));
+  }
+
+  function manualFeatureRows(options = {}) {
     const saved = readManualFeatureResults();
-    return MANUAL_FEATURE_TESTS.map(test => {
+    const archivedIds = options.includeArchived ? new Set() : archivedManualFeatureIds();
+    return MANUAL_FEATURE_TESTS.filter(test => !archivedIds.has(test.id)).map(test => {
       const row = saved[test.id] || {};
       return {
         ...test,
@@ -2051,6 +2083,96 @@
     };
     writeManualFeatureResults(saved);
     renderManualFeatureDiagnostics();
+  }
+
+  async function archivePassedManualFeatureTests() {
+    const saved = readManualFeatureResults();
+    const rows = manualFeatureRows({includeArchived:true}).filter(row => row.result === "succeed");
+    if (!rows.length) {
+      setText("diagnosticsStatus", "No passed manual feature tests are available to archive.");
+      return;
+    }
+    const existing = readManualFeatureArchive();
+    const byId = new Map(existing.map(row => [row.id, row]));
+    const archivedAt = new Date().toISOString();
+    rows.forEach(row => byId.set(row.id, {
+      ...row,
+      archivedAt,
+      archivePackageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION
+    }));
+    writeManualFeatureArchive(Array.from(byId.values()));
+    rows.forEach(row => {
+      delete saved[row.id];
+    });
+    writeManualFeatureResults(saved);
+    if (state.db) {
+      try {
+        const user = state.auth?.currentUser || {};
+        await state.db.collection("aiDiagnosticsReports").add({
+          type:"manualFeatureArchive",
+          packageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
+          status:"Pass",
+          archivedCount:rows.length,
+          results:rows.map(row => ({
+            id:row.id,
+            area:row.area,
+            feature:row.feature,
+            status:"Pass",
+            evidence:row.expected || row.howToTest || ""
+          })),
+          createdByUid:user.uid || "",
+          createdByEmail:user.email || "",
+          createdAt:fieldValue()
+        });
+      } catch (error) {
+        console.warn("Manual feature archive report save failed:", error?.message || error);
+      }
+    }
+    renderManualFeatureDiagnostics();
+    renderManualFeatureArchives();
+    setText("diagnosticsStatus", `Archived ${rows.length} passed manual feature test(s).`);
+  }
+
+  function restoreArchivedManualFeature(id) {
+    const archive = readManualFeatureArchive();
+    const row = archive.find(item => item.id === id);
+    if (!row) return;
+    const saved = readManualFeatureResults();
+    saved[id] = {
+      result:"succeed",
+      note:row.note || "",
+      updatedAt:new Date().toISOString()
+    };
+    writeManualFeatureResults(saved);
+    writeManualFeatureArchive(archive.filter(item => item.id !== id));
+    renderManualFeatureDiagnostics();
+    renderManualFeatureArchives();
+    setText("diagnosticsStatus", "Archived manual feature test restored to the active checklist.");
+  }
+
+  function renderManualFeatureArchives() {
+    const summary = byId("manualFeatureArchiveSummary");
+    const report = byId("manualFeatureArchiveReport");
+    if (!summary || !report) return;
+    const archive = readManualFeatureArchive().slice().sort((a, b) => String(b.archivedAt || "").localeCompare(String(a.archivedAt || "")));
+    summary.innerHTML = simpleRows([
+      ["Archived passed tests", archive.length],
+      ["Package", CURRENT_DIAGNOSTICS_PACKAGE_VERSION],
+      ["Storage", "Local browser archive plus Firestore aiDiagnosticsReports when available"]
+    ]);
+    report.innerHTML = archive.length ? archive.map(row => `<div class="queue-item manual-feature-archive-item">
+      <div class="message-envelope-head">
+        <strong>${esc(row.area)}: ${esc(row.feature)}</strong>
+        ${statusBadge("Pass")}
+      </div>
+      <p><strong>Expected:</strong> ${esc(row.expected || "-")}</p>
+      <p><strong>Archived:</strong> ${esc(row.archivedAt ? new Date(row.archivedAt).toLocaleString() : "-")}</p>
+      ${row.note ? `<p><strong>Note:</strong> ${esc(row.note)}</p>` : ""}
+      <button type="button" data-restore-manual-feature="${esc(row.id)}">Restore to Active Checklist</button>
+    </div>`).join("") : "<p class='sub'>No passed manual tests have been archived yet.</p>";
+    report.querySelectorAll("[data-restore-manual-feature]").forEach(button => {
+      button.addEventListener("click", () => restoreArchivedManualFeature(button.dataset.restoreManualFeature));
+    });
   }
 
   function buildManualFeatureDiagnosticsText(rows = manualFeatureRows()) {
@@ -2117,10 +2239,12 @@
     const rows = manualFeatureRows();
     state.lastManualFeatureDiagnostics = rows;
     const counts = countBy(rows, row => manualFeatureResultLabel(row.result));
+    const archivedCount = readManualFeatureArchive().length;
     summary.innerHTML = simpleRows([
       ["Succeed", counts.Succeed || 0],
       ["Failed", counts.Failed || 0],
       ["Not tested", counts["Not tested"] || 0],
+      ["Archived passed", archivedCount],
       ["Output", "Use Copy Manual Test Output for a plain TXT summary."],
       ["Resolution prompt", "Use Copy Resolution Prompt after marking failed tests."]
     ]);
@@ -2147,6 +2271,7 @@
     const prompt = buildManualFeatureDiagnosticsPrompt(rows);
     if (output) output.value = text;
     if (promptBox) promptBox.value = prompt;
+    renderManualFeatureArchives();
     report.querySelectorAll("[data-manual-feature-result]").forEach(input => {
       input.addEventListener("change", event => {
         const id = event.target.dataset.manualFeatureResult;
@@ -4718,6 +4843,95 @@
     </div>`).join("") : "<p class='sub'>No collected discovery records yet. Create crawl review records from the plain-English input to seed the queue.</p>";
   }
 
+  function firstFilled(values = []) {
+    return values.map(value => String(value || "").trim()).find(Boolean) || "";
+  }
+
+  function crawlContactRows(data = state.lastData || {}) {
+    const queue = data.aiDiscoveryQueue?.rows || [];
+    const groups = consolidateCrawlRecords(queue);
+    return groups.map(group => {
+      const socials = group.items.map(item => destinationSocials(item));
+      return {
+        clubName: group.name || "",
+        address: group.canonicalAddress || firstFilled(group.items.map(destinationAddress)),
+        phoneNumber: firstFilled(group.phoneList.length ? group.phoneList : group.items.map(destinationPhone)),
+        facebookHandle: firstFilled(socials.map(item => item.facebook)),
+        instagramHandle: firstFilled(socials.map(item => item.instagram)),
+        xHandle: firstFilled(socials.map(item => item.x)),
+        ticTokHandle: firstFilled(socials.map(item => item.tiktok))
+      };
+    }).filter(row => row.clubName || row.address || row.phoneNumber || row.facebookHandle || row.instagramHandle || row.xHandle || row.ticTokHandle);
+  }
+
+  function csvCell(value) {
+    const text = String(value ?? "");
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function buildCrawlContactsCsv(rows = crawlContactRows()) {
+    const headers = ["Club Name", "Address", "Phone Number", "Facebook Handle", "Instagram Handle", "X Handle", "Tic Tok Handle"];
+    const lines = [headers.map(csvCell).join(",")];
+    rows.forEach(row => {
+      lines.push([
+        row.clubName,
+        row.address,
+        row.phoneNumber,
+        row.facebookHandle,
+        row.instagramHandle,
+        row.xHandle,
+        row.ticTokHandle
+      ].map(csvCell).join(","));
+    });
+    return lines.join("\r\n");
+  }
+
+  function renderCrawlContactExport(data = state.lastData || {}) {
+    const wrap = byId("crawlContactExportReport");
+    if (!wrap) return;
+    const rows = crawlContactRows(data);
+    const extractorStatus = state.lastSourceExtractorStatus || {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Not tested in this browser session yet."};
+    const summary = simpleRows([
+      ["CSV rows ready", rows.length.toLocaleString()],
+      ["CSV columns", "Club Name, Address, Phone Number, Facebook Handle, Instagram Handle, X Handle, Tic Tok Handle"],
+      [extractorStatus.label, `${extractorStatus.status}: ${extractorStatus.evidence}`]
+    ]);
+    const table = rows.length ? `<div class="crawl-contact-table">
+      <div class="crawl-contact-row crawl-contact-head">
+        <strong>Club Name</strong><strong>Address</strong><strong>Phone Number</strong><strong>Facebook Handle</strong><strong>Instagram Handle</strong><strong>X Handle</strong><strong>Tic Tok Handle</strong>
+      </div>
+      ${rows.slice(0, 50).map(row => `<div class="crawl-contact-row">
+        <span>${esc(row.clubName)}</span>
+        <span>${esc(row.address)}</span>
+        <span>${esc(row.phoneNumber)}</span>
+        <span>${esc(row.facebookHandle)}</span>
+        <span>${esc(row.instagramHandle)}</span>
+        <span>${esc(row.xHandle)}</span>
+        <span>${esc(row.ticTokHandle)}</span>
+      </div>`).join("")}
+    </div>` : "<p class='sub'>No crawl contact rows are ready yet. Run a crawl or save extracted source details first.</p>";
+    wrap.innerHTML = `${summary}${table}`;
+  }
+
+  function downloadCrawlContactsCsv() {
+    const rows = crawlContactRows();
+    const filename = `floqr-crawl-contacts-${exportTimestamp()}.csv`;
+    downloadTextFile(filename, buildCrawlContactsCsv(rows));
+    setText("diagnosticsStatus", `Crawl contacts CSV downloaded as ${filename}.`);
+  }
+
+  async function testGeminiSourceExtractor() {
+    setText("diagnosticsStatus", "Testing Gemini/source extractor callable...");
+    const sampleUrl = "https://example.com/floqr-diagnostic-club";
+    const sampleText = "FLOQR Diagnostic Club\n123 Test Street\nWashington, DC\nPhone: +1 202 555 0100\nInstagram: @floqrtest";
+    const record = await tryBackendSourceExtraction(sampleUrl, sampleText);
+    state.lastSourceExtractorStatus = record
+      ? {label:"Gemini/source extractor", status:"Pass", evidence:"Firebase callable aiExtractPublicSourceUrl returned structured data."}
+      : {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Callable was unavailable or timed out; local source extraction fallback remains available."};
+    renderCrawlContactExport();
+    setText("diagnosticsStatus", `${state.lastSourceExtractorStatus.label}: ${state.lastSourceExtractorStatus.evidence}`);
+  }
+
   function renderAnalyticsInsights(data) {
     const queue = data.aiDiscoveryQueue?.rows || [];
     const runs = data.aiCrawlRuns?.rows || [];
@@ -4800,6 +5014,7 @@
       renderAiCrawlingSummary(data, schedule);
       renderClubProfileDiagnostics(data);
       renderCrawlActivity(data, schedule);
+      renderCrawlContactExport(data);
       renderCollectedRecords(data);
       renderAnalyticsInsights(data);
       const packageResults = await runPackageInstallDiagnostics({silent:true});
@@ -4831,6 +5046,7 @@
     renderSourceExtractionReport();
     renderClubProfileDiagnostics(data);
     renderCrawlActivity(data, schedule);
+    renderCrawlContactExport(data);
     renderCollectedRecords(data);
     renderAnalyticsInsights(data);
     await runPackageInstallDiagnostics({silent:true});
@@ -4860,6 +5076,7 @@
     byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
     byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
     byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
+    byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
     byId("copyManualFeaturePromptBtn")?.addEventListener("click", copyManualFeaturePrompt);
     byId("runPackageDiagnosticsBtn")?.addEventListener("click", () => runPackageInstallDiagnostics());
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
@@ -4875,6 +5092,10 @@
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
     byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
     byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);
+    byId("downloadCrawlContactsCsvBtn")?.addEventListener("click", downloadCrawlContactsCsv);
+    byId("testGeminiSourceExtractorBtn")?.addEventListener("click", () => testGeminiSourceExtractor().catch(error => {
+      setText("diagnosticsStatus", `Gemini/source extractor test failed: ${error?.message || error}`);
+    }));
   }
 
   async function mount(options = {}) {
@@ -4895,6 +5116,7 @@
     if (schedule) applyScheduleToControls(schedule);
     renderCrawlSearchPlan(schedule?.criteria?.structuredPlan || buildCrawlSearchPlan(readCriteriaFromControls()));
     renderSourceExtractionReport();
+    renderCrawlContactExport();
     await refreshDiagnostics();
   }
 
@@ -4906,8 +5128,12 @@
     runRulesSmokeTest,
     exportDiagnosticsReport,
     renderManualFeatureDiagnostics,
+    renderManualFeatureArchives,
     buildManualFeatureDiagnosticsText,
     buildManualFeatureDiagnosticsPrompt,
+    downloadCrawlContactsCsv,
+    renderCrawlContactExport,
+    testGeminiSourceExtractor,
     extractSourceDetails,
     saveExtractedDiscoveryRecord,
     searchStaleRecords,
