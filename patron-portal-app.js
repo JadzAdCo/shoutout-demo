@@ -137,6 +137,8 @@
   let activePortalMinglRoomId = "";
   let portalMinglUnsubscribe = null;
   let currentMinglConnections = [];
+  let currentMinglFriendRows = [];
+  let currentPortalUsers = [];
   let portalMinglAttachmentFile = null;
 
   const PUBLIC_MINGL_DATAPOINTS = [
@@ -256,6 +258,7 @@
       highlightGrammarSuggestions:profile.languageSettings?.highlightGrammarSuggestions !== false,
       preferredLanguage:profile.languageSettings?.preferredLanguage || profile.preferredLanguage || "auto",
       tonePreference:profile.languageSettings?.tonePreference || "keepTone",
+      emojiSkinTone:profile.languageSettings?.emojiSkinTone || "yellow",
       personalDictionary:Array.isArray(profile.languageSettings?.personalDictionary) ? profile.languageSettings.personalDictionary : [],
       personalCorrections:Array.isArray(profile.languageSettings?.personalCorrections) ? profile.languageSettings.personalCorrections : []
     };
@@ -273,6 +276,7 @@
     if (byId("languageHighlightGrammarSuggestions")) byId("languageHighlightGrammarSuggestions").checked = !!settings.highlightGrammarSuggestions;
     if (byId("languagePreferredLanguage")) byId("languagePreferredLanguage").value = settings.preferredLanguage || "auto";
     if (byId("languageTonePreference")) byId("languageTonePreference").value = settings.tonePreference || "keepTone";
+    if (byId("languageEmojiSkinTone")) byId("languageEmojiSkinTone").value = settings.emojiSkinTone || "yellow";
     if (byId("languagePersonalDictionary")) byId("languagePersonalDictionary").value = (settings.personalDictionary || []).join(", ");
     if (byId("languagePersonalCorrections")) byId("languagePersonalCorrections").value = formatPersonalCorrections(settings.personalCorrections || []);
     renderLanguageSettingsReport(settings);
@@ -291,6 +295,7 @@
       highlightGrammarSuggestions:!!byId("languageHighlightGrammarSuggestions")?.checked,
       preferredLanguage:byId("languagePreferredLanguage")?.value || "auto",
       tonePreference:byId("languageTonePreference")?.value || "keepTone",
+      emojiSkinTone:byId("languageEmojiSkinTone")?.value || "yellow",
       personalDictionary:splitCSV(byId("languagePersonalDictionary")?.value || "").slice(0, 120),
       personalCorrections:parsePersonalCorrections(byId("languagePersonalCorrections")?.value || "")
     };
@@ -304,6 +309,7 @@
       ["Correction Mode", settings.correctionMode || "approvalRequired"],
       ["Preferred Language", languageLabel(settings.preferredLanguage || "auto")],
       ["Tone Preference", settings.tonePreference || "keepTone"],
+      ["Emoji Skin Tone", settings.emojiSkinTone || "yellow"],
       ["My Word List", `${(settings.personalDictionary || []).length} saved words`],
       ["My Personal Corrections", `${(settings.personalCorrections || []).length} saved typo fixes`],
       ["Draft Privacy", "Draft text is processed only when you request correction and is not indexed."]
@@ -522,6 +528,8 @@
     byId("editHeight").value = profile.height || "";
     if (byId("editHeightUnit")) byId("editHeightUnit").value = profile.heightUnit || preferredHeightUnit(profile.country || "");
     applyEditHeightUnit(true);
+    if (byId("editBirthMonth")) byId("editBirthMonth").value = profile.birthMonth || "";
+    if (byId("editBirthDay")) byId("editBirthDay").value = profile.birthDay || "";
     byId("editInstagram").value = profile.instagramHandle || "";
     byId("editX").value = profile.xHandle || "";
     byId("editProfileType").value = profile.publicProfileType || "patron";
@@ -539,6 +547,8 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
+    if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
+    if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
   }
@@ -566,6 +576,60 @@
       .map(input => input.value);
   }
 
+  function renderMinglFriendSettings(allUsers = []) {
+    const wrap = byId("minglFriendManagementReport");
+    if (!wrap) return;
+    const settings = currentProfile.minglFriendSettings || {};
+    const userByUid = new Map((allUsers || []).map(profile => [profile.uid || profile.id, profile]));
+    currentMinglFriendRows = (currentMinglConnections || [])
+      .filter(connection => String(connection.status || "").toLowerCase() === "mutual")
+      .map(connection => {
+        const uid = (connection.participants || []).find(item => item !== auth.currentUser?.uid) || connection.requestedBy || connection.requestedTo || "";
+        const profile = userByUid.get(uid) || connection.userSummaries?.[uid] || {};
+        return {uid, profile, settings:settings[uid] || {}};
+      })
+      .filter(row => row.uid);
+    const query = String(byId("minglFriendSearchInput")?.value || "").trim().toLowerCase();
+    const rows = currentMinglFriendRows.filter(row => {
+      const haystack = `${row.profile.displayName || ""} ${row.profile.username || ""} ${row.profile.email || ""}`.toLowerCase();
+      return !query || haystack.includes(query);
+    });
+    wrap.innerHTML = rows.length ? rows.map(row => {
+      const name = row.profile.displayName || row.profile.username || row.profile.email || "Mingl Friend";
+      return `<div class="queue-item mingl-friend-settings-row" data-friend-uid="${esc(row.uid)}">
+        <strong>${esc(name)}</strong>
+        <small>${esc(row.profile.username ? `@${row.profile.username}` : row.profile.email || "Mutual Mingl friend")}</small>
+        <label><input type="checkbox" data-friend-setting="closeFriend" ${row.settings.closeFriend ? "checked" : ""}/> Close friend</label>
+        <label><input type="checkbox" data-friend-setting="excludeViewing" ${row.settings.excludeViewing ? "checked" : ""}/> Exclude from viewing</label>
+        <label><input type="checkbox" data-friend-setting="excludeContacting" ${row.settings.excludeContacting ? "checked" : ""}/> Exclude from contacting</label>
+        <label><input type="checkbox" data-friend-setting="onlyDisappearingMessages" ${row.settings.onlyDisappearingMessages ? "checked" : ""}/> Only send disappearing messages</label>
+      </div>`;
+    }).join("") : "<p class='sub'>No mutual Mingl friends matched this search yet.</p>";
+  }
+
+  async function saveMinglFriendSettings() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const next = {...(currentProfile.minglFriendSettings || {})};
+    document.querySelectorAll(".mingl-friend-settings-row").forEach(row => {
+      const uid = row.dataset.friendUid;
+      if (!uid) return;
+      next[uid] = {
+        closeFriend:!!row.querySelector("[data-friend-setting='closeFriend']")?.checked,
+        excludeViewing:!!row.querySelector("[data-friend-setting='excludeViewing']")?.checked,
+        excludeContacting:!!row.querySelector("[data-friend-setting='excludeContacting']")?.checked,
+        onlyDisappearingMessages:!!row.querySelector("[data-friend-setting='onlyDisappearingMessages']")?.checked,
+        updatedAt:new Date().toISOString()
+      };
+    });
+    await db.collection("users").doc(user.uid).set({
+      minglFriendSettings:next,
+      minglFriendSettingsUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    currentProfile.minglFriendSettings = next;
+    setText("portalStatus", "Mingl friend settings saved.");
+  }
+
   async function saveProfile() {
     const user = auth.currentUser;
     if (!user) return;
@@ -591,6 +655,8 @@
       gender: byId("editGender").value,
       height: byId("editHeight").value.trim(),
       heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
+      birthMonth: byId("editBirthMonth")?.value || "",
+      birthDay: byId("editBirthDay")?.value || "",
       instagramHandle: byId("editInstagram").value.trim(),
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
@@ -647,6 +713,8 @@
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
+      birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
+      birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2119,7 +2187,9 @@
       getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false)
     ]);
     currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
+    currentPortalUsers = allUsers;
     const chats = await getPortalMinglRooms(user, allUsers, queriedChats);
+    renderMinglFriendSettings(allUsers);
     messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
     renderRecipientSearchResults();
 
@@ -2258,6 +2328,7 @@
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
     bind("saveLanguageSettingsBtn", saveLanguageSettings);
+    bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("sendMessageBtn", sendPortalMessage);
@@ -2290,7 +2361,8 @@
         sendPortalMinglMessage();
       }
     });
-    ["languageAiGrammarEnabled","languageHighlightSpellingErrors","languageHighlightGrammarSuggestions","languagePreferredLanguage","languageTonePreference","languagePersonalDictionary","languagePersonalCorrections"].forEach(id => {
+    byId("minglFriendSearchInput")?.addEventListener("input", () => renderMinglFriendSettings(currentPortalUsers));
+    ["languageAiGrammarEnabled","languageHighlightSpellingErrors","languageHighlightGrammarSuggestions","languagePreferredLanguage","languageTonePreference","languageEmojiSkinTone","languagePersonalDictionary","languagePersonalCorrections"].forEach(id => {
       byId(id)?.addEventListener("change", () => {
         currentLanguageSettings = collectLanguageSettings();
         renderLanguageSettingsReport(currentLanguageSettings);

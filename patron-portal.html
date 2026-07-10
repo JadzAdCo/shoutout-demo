@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=28.98"/>
+  <link rel="stylesheet" href="./styles.css?v=29.03"/>
   <link rel="stylesheet" href="./admin.css?v=28.98"/>
 </head>
 <body>
@@ -48,6 +48,7 @@
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
+        <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
         <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=28.98">Mingl Chat</a>
         <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
       </nav>
@@ -118,6 +119,15 @@
                 </select>
               </div>
             </label>
+            <label>Birthday Month
+              <select id="editBirthMonth">
+                <option value="">Month</option>
+                <option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+              </select>
+            </label>
+            <label>Birthday Day <input id="editBirthDay" type="number" min="1" max="31" placeholder="Day only"/></label>
             <label>Instagram Handle <input id="editInstagram"/></label>
             <label>X Handle <input id="editX"/></label>
             <label>Public Profile Type
@@ -332,6 +342,13 @@
                 <option value="formal">Formal</option>
               </select>
             </label>
+            <label>Emoji Skin Tone
+              <select id="languageEmojiSkinTone">
+                <option value="yellow">Yellow/default</option>
+                <option value="light-brown">Light brown</option>
+                <option value="dark-brown">Dark brown</option>
+              </select>
+            </label>
             <label>My Word List
               <textarea id="languagePersonalDictionary" rows="3" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
             </label>
@@ -389,6 +406,14 @@
             <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
             <label class="consent-checkbox"><input id="privacyAnalytics" type="checkbox"/><span>Analytics consent</span></label>
             <label class="consent-checkbox"><input id="privacySharing" type="checkbox"/><span>Third-party data sharing consent</span></label>
+            <label class="consent-checkbox"><input id="privacyBirthdayNotifyOthers" type="checkbox"/><span>Allow FLOQR system birthday notifications to people I choose</span></label>
+            <label>Receive Birthday Notifications
+              <select id="privacyBirthdayNotificationScope">
+                <option value="none">Do not notify me</option>
+                <option value="following">People I follow / Mingl with</option>
+                <option value="closeFriends">Close friends only</option>
+              </select>
+            </label>
           </div>
           <div class="card-subsection">
             <h3>Public Datapoints for Mingl and Matching</h3>
@@ -400,6 +425,15 @@
           <div id="privacyReport" class="report-block"></div>
         </div>
       </section>
+      <section id="portalMinglFriends" class="admin-panel-section">
+        <div class="card">
+          <h2>Manage Mingl Friends</h2>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Manage mutual Mingl friends. Mark close friends, exclude someone from viewing or contacting you, or require only disappearing messages with that person.</div></details>
+          <input id="minglFriendSearchInput" class="search" placeholder="Search Mingl friends by name, username, or email"/>
+          <div id="minglFriendManagementReport" class="report-block"></div>
+          <button id="saveMinglFriendSettingsBtn" class="primary" type="button">Save Mingl Friend Settings</button>
+        </div>
+      </section>
     </div>
   </section>
 </main>
@@ -409,6 +443,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
+<script src="./global-profile-status.js?v=29.03"></script>
 <script src="./shared-data.js?v=28.98"></script>
 <script src="./ai-service.js?v=28.98"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
@@ -418,6 +453,6 @@
 <script src="./ai-grammar-service.js?v=28.98"></script>
 <script src="./floqr-action-feedback.js?v=28.98"></script>
 <script src="./helper-popouts.js?v=28.98"></script>
-<script src="./patron-portal-app.js?v=28.98"></script>
+<script src="./patron-portal-app.js?v=29.03"></script>
 </body>
 </html>

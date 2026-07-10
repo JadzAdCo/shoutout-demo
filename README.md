@@ -1,14 +1,40 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.02 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.03 Full Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.02
+https://jadzadco.github.io/shoutout-demo/?v=29.03
 ```
 
 Current release highlights:
+
+- Adds v29.03 ShoutOut editor layout, preview modal, Mingl Requests status, profile status, birthday/privacy, and Mingl friend settings updates.
+- ShoutOut editor now keeps the Message card first, places `Preview ShoutOut` directly inside the Message section, opens preview in a modal, and auto-closes preview after 5 seconds.
+- ShoutOut recommendations are now grouped into `AI Recommendations`, `Trending ShoutOuts`, and `Generic ShoutOuts`, with helper copy behind compact `?` popouts.
+- Mingl Requests now separate `Sent Mingl/Friend Request` from `Received Mingl/Friend Request`.
+- Mingl Requests now show a right-side `(sent/received)` status button. Clicking it opens a request-type summary popout; clicking elsewhere closes it.
+- Patron Profile now includes birthday month/day only, with no birth year.
+- My Privacy now includes birthday notification choices for allowing system birthday notifications and selecting who can trigger birthday notifications.
+- Patron Portal now includes `Manage Mingl Friends` for close friends, exclude from viewing, exclude from contacting, and only disappearing messages.
+- Language Settings now includes emoji skin tone preference for FLOQR-provided human-style emoji actions.
+- Mingl Chat message edit now opens an inline mini editor instead of the browser prompt.
+- Mingl Chat message actions now include forward, do-not-forward, and immediate disappearing message options.
+- The top-right signed-in profile status pill is now injected on main user/admin/backend pages, excluding display output pages.
+- Firestore and Storage rule headers now carry the v29.03 package version. No new rule behavior is required for these UI/data-field changes under the current authenticated-user rule model.
+- Direct rollback note for this package is `ROLLBACK-V29-03.md`; older rollback/readme history is bundled in the included rollback history ZIP.
+
+v29.03 focused manual tests:
+
+1. ShoutOut editor: open a ShoutOut editor, confirm `Preview ShoutOut` appears inside the Message card, click it, confirm the modal preview renders, closes via Close, and auto-closes after about 5 seconds.
+2. Recommendations: confirm AI, Trending, and Generic recommendation sections appear below Message and helper copy appears only via `?` popouts.
+3. Mingl Requests: send or view Mingl requests, confirm the list is grouped into Sent and Received, and click the `(sent/received)` status to view the summary popout.
+4. Patron Profile: save birthday month/day only, then reload Patron Portal and confirm values persist.
+5. My Privacy: save birthday notification settings and confirm they persist.
+6. Manage Mingl Friends: open the tab, search mutual Mingl friends, set close friend/exclusion/disappearing-message choices, save, and reload.
+7. Mingl Chat: tap your sent message, choose Edit, confirm inline mini editor appears instead of a browser prompt. Test forward, do-not-forward, and disappearing actions.
+8. Profile status: confirm the top-right profile status pill appears on the main app, Patron Portal, Mingl Chat, Master Admin, Venue Admin, Guest List, Promoter Admin, and Role Request pages, but not on the Xibo display page.
 
 - Adds v29.02 ShoutOut recommendation, grammar dictionary discovery, and location-ranking test fixes.
 - ShoutOut recommendations now use recommendation style, event/audience context, venue genres, profile signals, and past ShoutOuts as guidance without inserting visible `Tone:` or `Style:` wording into patron text.

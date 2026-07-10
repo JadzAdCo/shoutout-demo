@@ -154,6 +154,17 @@
           <button type="button" data-mingl-emoji-code="127881" data-mingl-emoji-effect="confetti">Party</button>
           <button type="button" data-mingl-emoji-code="10084" data-mingl-emoji-effect="heart">Heart</button>
           <button type="button" data-mingl-emoji-code="128514" data-mingl-emoji-effect="laugh">Laugh</button>
+          <button type="button" id="minglMoreEmojiActionsBtn" class="emoji-more-btn">+</button>
+        </div>
+        <div id="minglAdvancedEmojiActions" class="emoji-row compact-emoji-row hidden" aria-label="More Mingl emoji actions">
+          <button type="button" data-mingl-emoji-value="💙" data-mingl-emoji-effect="heart-blue">Blue heart</button>
+          <button type="button" data-mingl-emoji-value="❤️" data-mingl-emoji-effect="heart-red">Red heart</button>
+          <button type="button" data-mingl-emoji-value="💗" data-mingl-emoji-effect="heart-pink">Pink heart</button>
+          <button type="button" data-mingl-emoji-value="💔" data-mingl-emoji-effect="broken-heart">Broken heart</button>
+          <button type="button" data-mingl-emoji-value="🌹" data-mingl-emoji-effect="rose-red">Red rose</button>
+          <button type="button" data-mingl-emoji-value="🤍🌹" data-mingl-emoji-effect="rose-white">White rose</button>
+          <button type="button" data-mingl-emoji-value="💙🌹" data-mingl-emoji-effect="rose-blue">Blue rose</button>
+          <button type="button" data-mingl-emoji-human="middle-finger" data-mingl-emoji-effect="middle-finger">Middle finger</button>
         </div>
         <strong>Add Photo/Video</strong>
         <label class="chat-file-button" for="minglStandaloneImageInput">Choose Photo/Video</label>
@@ -170,11 +181,20 @@
   function bindComposerActions() {
     byId("minglStandaloneImproveBtn")?.addEventListener("click", improveDraft);
     byId("minglStandaloneClearImageBtn")?.addEventListener("click", clearAttachment);
-    document.querySelectorAll("[data-mingl-emoji-code]").forEach(button => {
+    byId("minglMoreEmojiActionsBtn")?.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      byId("minglAdvancedEmojiActions")?.classList.toggle("hidden");
+    });
+    document.querySelectorAll("[data-mingl-emoji-code],[data-mingl-emoji-value],[data-mingl-emoji-human]").forEach(button => {
       const code = Number(button.dataset.minglEmojiCode || 0);
-      if (code) button.textContent = String.fromCodePoint(code);
+      const emoji = emojiForButton(button, code);
+      if (emoji) {
+        button.textContent = emoji;
+        button.title = button.getAttribute("aria-label") || button.dataset.minglEmojiEffect || "Emoji action";
+      }
       button.addEventListener("click", () => {
-        sendEmojiAction(code ? String.fromCodePoint(code) : "", button.dataset.minglEmojiEffect || "emoji");
+        sendEmojiAction(emojiForButton(button, code), button.dataset.minglEmojiEffect || "emoji");
       });
     });
     document.querySelector(".mingl-compose-menu-panel")?.addEventListener("click", event => {
@@ -208,6 +228,20 @@
     input.value = `${input.value.slice(0, start)}${emoji}${input.value.slice(end)}`;
     input.focus();
     input.setSelectionRange(start + emoji.length, start + emoji.length);
+  }
+
+  function emojiSkinModifier() {
+    const tone = currentProfile?.languageSettings?.emojiSkinTone || "yellow";
+    if (tone === "light-brown") return "\u{1F3FD}";
+    if (tone === "dark-brown") return "\u{1F3FF}";
+    return "";
+  }
+
+  function emojiForButton(button, code = 0) {
+    if (!button) return "";
+    if (button.dataset.minglEmojiHuman === "middle-finger") return `🖕${emojiSkinModifier()}`;
+    if (button.dataset.minglEmojiValue) return button.dataset.minglEmojiValue;
+    return code ? String.fromCodePoint(code) : "";
   }
 
   async function sendEmojiAction(emoji, effect = "emoji") {
@@ -245,12 +279,13 @@
       const system = msg.senderUid === "system" || msg.messageType === "system";
       const backgroundConsent = msg.messageType === "backgroundConsent";
       const label = system ? "System Message" : (mine ? "" : (msg.senderName || "Member"));
-      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${messageAnimationClass(msg.animationType)} ${emojiEffectClass(msg.emojiEffect)} ${msg.unsent ? "unsent" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
+      const emojiClass = shouldAnimateEmoji(msg) ? emojiEffectClass(msg.emojiEffect) : "";
+      return `<div class="mingl-message ${mine ? "mine" : ""} ${system ? "system" : ""} ${messageAnimationClass(msg.animationType)} ${emojiClass} ${msg.unsent ? "unsent" : ""} ${msg.doNotForward ? "no-forward" : ""}" data-message-id="${esc(msg.id || "")}" ${mine && !system && !msg.unsent ? 'data-own-message="1"' : ""}>
         ${label ? `<strong>${esc(label)}</strong>` : ""}
         <p>${esc(msg.body || "")}</p>
         ${mediaHtml(msg)}
         ${backgroundConsent ? backgroundConsentHtml(msg) : ""}
-        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${readReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
+        <small>${esc(fmtDate(msg.createdAt))}${msg.edited ? " - edited" : ""}${msg.doNotForward ? " - do not forward" : ""}${msg.deleteAfterRead ? " - disappearing" : ""}${readReceiptHtml(msg, mine)}${mine && !system && !msg.unsent ? " - tap for actions" : ""}</small>
       </div>`;
     }).join("") : "<p class='mingl-empty-state'>Start the conversation.</p>";
     wrap.querySelectorAll("[data-own-message='1']").forEach(node => {
@@ -272,12 +307,28 @@
   }
 
   function emojiEffectClass(type = "") {
+    if (!type) return "";
     if (type === "heart") return "emoji-effect-heart";
+    if (type === "heart-blue") return "emoji-effect-heart emoji-effect-heart-blue";
+    if (type === "heart-red") return "emoji-effect-heart emoji-effect-heart-red";
+    if (type === "heart-pink") return "emoji-effect-heart emoji-effect-heart-pink";
+    if (type === "broken-heart") return "emoji-effect-broken-heart";
     if (type === "confetti") return "emoji-effect-confetti";
     if (type === "fire") return "emoji-effect-fire";
     if (type === "laugh") return "emoji-effect-laugh";
     if (type === "smile") return "emoji-effect-smile";
+    if (type === "rose-red") return "emoji-effect-rose emoji-effect-rose-red";
+    if (type === "rose-white") return "emoji-effect-rose emoji-effect-rose-white";
+    if (type === "rose-blue") return "emoji-effect-rose emoji-effect-rose-blue";
+    if (type === "middle-finger") return "emoji-effect-middle-finger";
     return "";
+  }
+
+  function shouldAnimateEmoji(msg = {}) {
+    if (!msg.emojiEffect || msg.unsent) return false;
+    const value = msg.createdAt?.toDate ? msg.createdAt.toDate() : msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000) : null;
+    if (!value) return true;
+    return Date.now() - value.getTime() < 7000;
   }
 
   function backgroundConsentHtml(msg = {}) {
@@ -605,12 +656,51 @@
     }, {merge:true});
   }
 
-  async function editMessage(messageId) {
+  function removeMessageActionPopouts() {
+    document.querySelector(".mingl-message-action-popout")?.remove();
+    document.querySelector(".mingl-inline-edit-popout")?.remove();
+    document.querySelector(".mingl-forward-popout")?.remove();
+  }
+
+  function placeFloatingPopout(popout, anchor, width = 320) {
+    const rect = anchor.getBoundingClientRect();
+    popout.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 12))}px`;
+    popout.style.top = `${Math.max(8, Math.min(rect.bottom + 8, window.innerHeight - 260))}px`;
+  }
+
+  async function editMessage(messageId, anchor) {
     const snap = await db.collection("chatMessages").doc(messageId).get();
     if (!snap.exists || snap.data().senderUid !== currentUser.uid) return;
-    const next = prompt("Edit Mingl message", snap.data().body || "");
-    if (next === null) return;
-    await updateOwnMessage(messageId, {body:next.trim()});
+    removeMessageActionPopouts();
+    const popout = document.createElement("div");
+    popout.className = "mingl-inline-edit-popout";
+    popout.innerHTML = `<div class="mingl-inline-edit-card">
+      <strong>Edit Mingl Message</strong>
+      <textarea id="minglInlineEditText" rows="3">${esc(snap.data().body || "")}</textarea>
+      <div class="button-row">
+        <button type="button" data-inline-edit-save>Save</button>
+        <button type="button" data-inline-edit-cancel>Cancel</button>
+      </div>
+    </div>`;
+    document.body.appendChild(popout);
+    placeFloatingPopout(popout, anchor || byId("minglStandaloneChatCard") || document.body, 340);
+    const textarea = popout.querySelector("#minglInlineEditText");
+    textarea?.focus();
+    textarea?.select();
+    popout.querySelector("[data-inline-edit-cancel]")?.addEventListener("click", () => popout.remove());
+    popout.querySelector("[data-inline-edit-save]")?.addEventListener("click", async () => {
+      const next = textarea?.value.trim() || "";
+      await updateOwnMessage(messageId, {body:next});
+      popout.remove();
+    });
+    setTimeout(() => {
+      document.addEventListener("click", function close(event) {
+        if (!popout.contains(event.target) && event.target !== anchor) {
+          popout.remove();
+          document.removeEventListener("click", close);
+        }
+      });
+    }, 0);
   }
 
   async function correctMessage(messageId) {
@@ -659,33 +749,103 @@
     });
   }
 
+  async function makeDisappearImmediately(messageId) {
+    await patchOwnMessage(messageId, {
+      animationType:"disappear",
+      deleteAfterRead:true,
+      deleteImmediately:true,
+      hiddenAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function markDoNotForward(messageId) {
+    await patchOwnMessage(messageId, {
+      doNotForward:true,
+      doNotForwardSetAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function forwardMessage(messageId, targetRoomId) {
+    if (!messageId || !targetRoomId) return;
+    const snap = await db.collection("chatMessages").doc(messageId).get();
+    if (!snap.exists) return;
+    const msg = snap.data();
+    if (msg.doNotForward) {
+      setText("minglChatStatus", "This message is marked do not forward.");
+      return;
+    }
+    const roomSnap = await db.collection("chatRooms").doc(targetRoomId).get();
+    if (!roomSnap.exists || !(roomSnap.data().participants || []).includes(currentUser.uid)) return;
+    const room = roomSnap.data();
+    await db.collection("chatMessages").add({
+      roomId:targetRoomId,
+      roomType:"mingl",
+      participants:room.participants || [],
+      senderUid:currentUser.uid,
+      senderName:currentProfile.displayName || currentUser.displayName || currentUser.email || "Member",
+      body:msg.body || "Forwarded Mingl message.",
+      mediaUrl:msg.mediaUrl || "",
+      mediaType:msg.mediaType || "",
+      mediaFileName:msg.mediaFileName || "",
+      forwardedFrom:messageId,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    setText("minglChatStatus", "Message forwarded.");
+  }
+
+  function showForwardBubble(messageId, anchor) {
+    removeMessageActionPopouts();
+    const popout = document.createElement("div");
+    popout.className = "mingl-forward-popout";
+    const choices = rooms.filter(room => room.id !== activeRoomId).slice(0, 8);
+    popout.innerHTML = `<div class="mingl-forward-card">
+      <strong>Forward To</strong>
+      ${choices.length ? choices.map(room => {
+        const other = otherSummary(room);
+        return `<button type="button" data-forward-room="${esc(room.id)}">${esc(other.displayName || room.title || "Mingl Chat")}</button>`;
+      }).join("") : "<p class='sub small'>No other Mingl chats available.</p>"}
+    </div>`;
+    document.body.appendChild(popout);
+    placeFloatingPopout(popout, anchor || byId("minglStandaloneChatCard") || document.body, 320);
+    popout.querySelectorAll("[data-forward-room]").forEach(button => {
+      button.addEventListener("click", async () => {
+        await forwardMessage(messageId, button.dataset.forwardRoom);
+        popout.remove();
+      });
+    });
+  }
+
   function showMessageActions(messageId, anchor) {
-    document.querySelector(".mingl-message-action-popout")?.remove();
-    const rect = anchor.getBoundingClientRect();
+    removeMessageActionPopouts();
     const popout = document.createElement("div");
     popout.className = "mingl-message-action-popout";
-    popout.style.left = `${Math.min(rect.left, window.innerWidth - 292)}px`;
-    popout.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 220)}px`;
+    placeFloatingPopout(popout, anchor, 292);
     popout.innerHTML = `<div class="mingl-message-action-menu" role="menu" aria-label="Mingl message actions">
       <strong>Edit</strong>
       <button type="button" data-action="unsend">Unsend</button>
       <button type="button" data-action="correct">AutoFix</button>
       <button type="button" data-action="edit">Edit</button>
+      <button type="button" data-action="no-forward">Do Not Forward</button>
+      <button type="button" data-action="forward">Forward</button>
       <strong>Text Animation</strong>
       <button type="button" data-action="bounce">Bounce</button>
       <button type="button" data-action="explode">Explode</button>
       <button type="button" data-action="scroll">Scroll</button>
       <button type="button" data-action="disappear">Disappear</button>
+      <button type="button" data-action="disappear-now">Make Disappearing Immediately</button>
     </div>`;
     document.body.appendChild(popout);
     popout.addEventListener("click", async event => {
       const action = event.target?.dataset?.action;
       if (!action) return;
       try {
-        if (action === "edit") await editMessage(messageId);
+        if (action === "edit") { await editMessage(messageId, event.target); return; }
         else if (action === "correct") await correctMessage(messageId);
         else if (action === "unsend") await unsendMessage(messageId);
+        else if (action === "no-forward") await markDoNotForward(messageId);
+        else if (action === "forward") { showForwardBubble(messageId, event.target); return; }
         else if (action === "disappear") await disappearMessage(messageId);
+        else if (action === "disappear-now") await makeDisappearImmediately(messageId);
         else await animateMessage(messageId, action);
       } catch(e) {
         setText("minglChatStatus", e.message || String(e));

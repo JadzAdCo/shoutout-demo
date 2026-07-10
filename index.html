@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.02"/>
+  <link rel="stylesheet" href="./styles.css?v=29.03"/>
 </head>
 <body>
 
@@ -296,12 +296,16 @@
       </div>
       <div class="card mingl-requests-card">
         <div class="section-title-row">
-          <h2>Mingl Requests</h2>
-          <details class="help-popout">
+          <div class="section-title-inline">
+            <h2>Mingl Requests</h2>
+            <details class="help-popout">
             <summary aria-label="About Mingl Requests">?</summary>
             <div>Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.</div>
-          </details>
+            </details>
+          </div>
+          <button id="minglRequestStatusBtn" class="mingl-request-status-btn" type="button" aria-label="Mingl request status">(0/0)</button>
         </div>
+        <div id="minglRequestStatusPopout" class="mingl-request-status-popout hidden" aria-live="polite"></div>
         <div id="minglRequestsList" class="mingl-chat-list"></div>
       </div>
     </div>
@@ -414,6 +418,18 @@
         </div>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
+        <div class="button-row">
+          <button id="previewShoutoutBtn" type="button">Preview ShoutOut</button>
+        </div>
+        <p class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
+        <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
+        <p id="submitStatus" class="status"></p>
+      </div>
+      <div class="card shoutout-recommendations-card">
+        <div class="section-heading-row">
+          <h2>ShoutOut Recommendations</h2>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Recommendations are grouped by AI context, platform trends, and generic occasion ideas. FLOQR uses your draft, venue, event/audience context, selected template, profile datapoints, and your own past ShoutOuts when available.</div></details>
+        </div>
         <label>Recommendation style
           <select id="shoutoutTone">
             <option value="party">Party</option>
@@ -441,18 +457,34 @@
         </label>
         <div class="button-row">
           <button id="aiSuggestBtn" type="button">Improve My ShoutOut</button>
-          <button type="button" data-ai-tone="birthday">Birthday</button>
-          <button type="button" data-ai-tone="vip">VIP</button>
-          <button type="button" data-ai-tone="romantic">Romantic</button>
-          <button type="button" data-ai-tone="party">Party</button>
-          <button type="button" data-ai-tone="classy">Classy</button>
           <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
         </div>
+        <div class="recommendation-group">
+          <h3>AI Recommendations</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Personalized recommendations are built from venue context, event/audience type, template limits, your profile datapoints, and your current draft.</div></details>
+          <div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose recommendation context to generate personalized ideas.</p></div>
+        </div>
+        <div class="recommendation-group">
+          <h3>Trending ShoutOuts</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Trending ShoutOuts are phrases patrons commonly select from recommendations. Live analytics can replace these local examples when production tracking is enabled.</div></details>
+          <div id="trendingSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
+        <div class="recommendation-group">
+          <h3>Generic ShoutOuts</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Generic suggestions cover birthdays, anniversaries, holidays, guest-list moments, and other common occasions using available profile and calendar context.</div></details>
+          <div id="genericSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
         <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
-        <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
-        <p id="submitStatus" class="status"></p>
       </div>
-      <div class="card preview"><h2>Live Preview</h2><iframe id="previewFrame"></iframe></div>
+    </div>
+    <div id="shoutoutPreviewModal" class="shoutout-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="shoutoutPreviewTitle">
+      <div class="shoutout-preview-dialog">
+        <div class="section-heading-row">
+          <h2 id="shoutoutPreviewTitle">Preview ShoutOut</h2>
+          <button id="closeShoutoutPreviewBtn" type="button" aria-label="Close preview">Close</button>
+        </div>
+        <iframe id="previewFrame" title="ShoutOut preview"></iframe>
+      </div>
     </div>
   </section>
 
@@ -472,6 +504,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.02"></script>
+<script src="./global-profile-status.js?v=29.03"></script>
 <script src="./shared-data.js?v=29.02"></script>
 <script src="./ai-service.js?v=29.02"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
@@ -483,7 +516,7 @@
 <script src="./ai-grammar-service.js?v=29.02"></script>
 <script src="./helper-popouts.js?v=29.02"></script>
 <script src="./ad-campaigns.js?v=29.02"></script>
-<script src="./patron-app.js?v=29.02"></script>
+<script src="./patron-app.js?v=29.03"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
 <script src="./ai-media-service.js?v=29.02"></script>
 <script src="./notification-center.js?v=29.02"></script>

@@ -1223,8 +1223,28 @@
     const rows = minglConnections
       .filter(connection => ["pending","sent","received"].includes(String(connection.status || "pending").toLowerCase()))
       .sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+    const sentRows = rows.filter(connection => connectionStatusFor((connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedTo || connection.requestedBy || "").state === "sent");
+    const receivedRows = rows.filter(connection => connectionStatusFor((connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedTo || connection.requestedBy || "").state === "received");
+    const statusBtn = byId("minglRequestStatusBtn");
+    if (statusBtn) statusBtn.textContent = `(${sentRows.length}/${receivedRows.length})`;
+    renderMinglRequestStatusPopout(sentRows, receivedRows);
     wrap.innerHTML = rows.length ? "" : "<p class='sub'>No pending Mingl requests.</p>";
-    rows.forEach(connection => {
+    const sections = [
+      {title:"Sent Mingl/Friend Request", rows:sentRows, empty:"No sent requests waiting for a Mingl back."},
+      {title:"Received Mingl/Friend Request", rows:receivedRows, empty:"No received requests waiting on you."}
+    ];
+    sections.forEach(section => {
+      if (!section.rows.length) return;
+      const heading = document.createElement("h3");
+      heading.className = "mingl-request-section-title";
+      heading.textContent = section.title;
+      wrap.appendChild(heading);
+      section.rows.forEach(connection => renderMinglRequestItem(wrap, connection));
+    });
+    if (!sentRows.length && !receivedRows.length && rows.length) rows.forEach(connection => renderMinglRequestItem(wrap, connection));
+  }
+
+  function renderMinglRequestItem(wrap, connection) {
       const otherUid = (connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedTo || connection.requestedBy || "";
       const profile = minglCandidates.find(x => (x.uid || x.id) === otherUid) || connection.userSummaries?.[otherUid] || {};
       const state = connectionStatusFor(otherUid).state;
@@ -1257,7 +1277,20 @@
         });
       }
       wrap.appendChild(item);
-    });
+  }
+
+  function renderMinglRequestStatusPopout(sentRows = [], receivedRows = []) {
+    const popout = byId("minglRequestStatusPopout");
+    if (!popout) return;
+    const itemName = connection => {
+      const otherUid = (connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedTo || connection.requestedBy || "";
+      const profile = minglCandidates.find(x => (x.uid || x.id) === otherUid) || connection.userSummaries?.[otherUid] || {};
+      return profile.displayName || profile.username || "Mingl Member";
+    };
+    popout.innerHTML = `<div class="mingl-request-status-grid">
+      <section><strong>Sent Mingl/Friend Request</strong><p>${sentRows.length} waiting for Mingl back.</p>${sentRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || "<span>None</span>"}</section>
+      <section><strong>Received Mingl/Friend Request</strong><p>${receivedRows.length} waiting for you.</p>${receivedRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || "<span>None</span>"}</section>
+    </div>`;
   }
 
   function minglLanguageSettings() {
@@ -1999,6 +2032,28 @@
   }
   window.updatePreview = updatePreview;
 
+  let shoutoutPreviewTimer = null;
+  function closeShoutoutPreviewModal() {
+    const modal = byId("shoutoutPreviewModal");
+    if (shoutoutPreviewTimer) clearTimeout(shoutoutPreviewTimer);
+    shoutoutPreviewTimer = null;
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function openShoutoutPreviewModal() {
+    const modal = byId("shoutoutPreviewModal");
+    if (!modal) return;
+    updatePreview();
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+    byId("closeShoutoutPreviewBtn")?.focus?.();
+    if (shoutoutPreviewTimer) clearTimeout(shoutoutPreviewTimer);
+    shoutoutPreviewTimer = setTimeout(closeShoutoutPreviewModal, 5000);
+  }
+
   function returnToMainFromConfirmation() {
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
     confirmationReturnTimer = null;
@@ -2234,15 +2289,47 @@
     updatePreview();
   }
 
+  function renderSuggestionButtons(targetId, suggestions = [], emptyText = "") {
+    const list = byId(targetId);
+    if (!list) return;
+    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-suggestion-target="${esc(targetId)}" data-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")}</small></button>`).join("") : `<p class='sub small'>${esc(emptyText)}</p>`;
+    list.querySelectorAll("[data-suggestion-index]").forEach(button => {
+      button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.suggestionIndex)]));
+    });
+  }
+
+  function buildTrendingShoutOutSuggestions() {
+    const venue = getLocation()?.locationName || "tonight";
+    return [
+      {mainText:fitTemplateText("VIP ENERGY ALL NIGHT", "main"), subText:fitTemplateText(`Trending at ${venue}`, "sub"), providerMode:"trending"},
+      {mainText:fitTemplateText("THIS CREW RUNS TONIGHT", "main"), subText:fitTemplateText("Selected by patrons", "sub"), providerMode:"trending"},
+      {mainText:fitTemplateText("BIG MOMENT. BIG LIGHTS.", "main"), subText:fitTemplateText("Popular recommendation", "sub"), providerMode:"trending"}
+    ];
+  }
+
+  function buildGenericShoutOutSuggestions() {
+    const now = new Date();
+    const monthDay = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const profile = cachedUserProfile || {};
+    const birthMonth = String(profile.birthMonth || "").padStart(2, "0");
+    const birthDay = String(profile.birthDay || "").padStart(2, "0");
+    const isBirthday = birthMonth && birthDay && `${birthMonth}-${birthDay}` === monthDay;
+    const items = [
+      {mainText:fitTemplateText(isBirthday ? "HAPPY BIRTHDAY TO ME!" : "BIG ShoutOut TONIGHT!", "main"), subText:fitTemplateText(isBirthday ? "Birthday energy activated" : "Live on FLOQR", "sub"), providerMode:isBirthday ? "birthday context" : "generic"},
+      {mainText:fitTemplateText("CELEBRATE THIS MOMENT", "main"), subText:fitTemplateText("Friends, lights, memories", "sub"), providerMode:"generic"},
+      {mainText:fitTemplateText("TONIGHT IS OUR NIGHT", "main"), subText:fitTemplateText("Make it unforgettable", "sub"), providerMode:"generic"}
+    ];
+    return items;
+  }
+
   async function refreshPersonalizedShoutOutRecommendations(options = {}) {
     const list = byId("aiSuggestionList");
     if (!list) return;
     list.innerHTML = "<p class='sub small'>Building personalized ShoutOut ideas...</p>";
     const suggestions = await buildPersonalizedShoutOutSuggestions(options.toneOverride || "");
-    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-ai-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")} - ${esc(suggestionEventContext())}</small></button>`).join("") : "<p class='sub small'>Type a message or choose a recommendation style/event context to generate suggestions.</p>";
-    list.querySelectorAll("[data-ai-suggestion-index]").forEach(button => {
-      button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.aiSuggestionIndex)]));
-    });
+    renderSuggestionButtons("aiSuggestionList", suggestions.map(item => ({...item, providerMode:`${item.providerMode || item.provider || "contextual"} - ${suggestionEventContext()}`})), "Type a message or choose recommendation context to generate suggestions.");
+    renderSuggestionButtons("trendingSuggestionList", buildTrendingShoutOutSuggestions(), "Trending ShoutOuts will appear after patrons begin selecting recommendations.");
+    renderSuggestionButtons("genericSuggestionList", buildGenericShoutOutSuggestions(), "Generic occasion ideas will appear here.");
     if (options.applyFirst && suggestions[0]) applySuggestionItem(suggestions[0]);
   }
 
@@ -2560,7 +2647,14 @@
     document.querySelectorAll("[data-mingl-emoji]").forEach(button => {
       button.addEventListener("click", () => insertMinglEmoji(button.dataset.minglEmoji || ""));
     });
+    byId("minglRequestStatusBtn")?.addEventListener("click", event => {
+      event.stopPropagation();
+      byId("minglRequestStatusPopout")?.classList.toggle("hidden");
+    });
     document.addEventListener("click", event => {
+      if (!event.target.closest("#minglRequestStatusPopout") && !event.target.closest("#minglRequestStatusBtn")) {
+        byId("minglRequestStatusPopout")?.classList.add("hidden");
+      }
       if (event.target.closest(".profile-datapoint")) return;
       document.querySelectorAll(".profile-datapoint[open]").forEach(detail => detail.removeAttribute("open"));
     });
@@ -2573,7 +2667,7 @@
     bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list")));
     bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry")));
     bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry")));
-    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBataBtn", goToBataFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
+    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBataBtn", goToBataFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
@@ -2585,6 +2679,12 @@
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("shoutoutTone")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     byId("shoutoutEventType")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
+    byId("shoutoutPreviewModal")?.addEventListener("click", event => {
+      if (event.target?.id === "shoutoutPreviewModal") closeShoutoutPreviewModal();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeShoutoutPreviewModal();
+    });
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
@@ -2730,7 +2830,7 @@ function ensureTemplates(){
  wrap.addEventListener("click",e=>{const c=e.target.closest("[data-template-id]"); if(!c)return; wrap.querySelectorAll(".selected").forEach(x=>x.classList.remove("selected")); c.classList.add("selected"); window.selectedTemplate=c.dataset.templateId;});
 }
 function ensureSuggestions(){
- const host=editorHost(); if(!host||byId("aiSuggestionsBox"))return;
+ const host=editorHost(); if(!host||byId("aiSuggestionsBox")||byId("aiSuggestionList"))return;
  const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><details class="info-popout ai-recommendation-popout"><summary>How recommendations work</summary><div class="info-popout-bubble">FLOQR uses your own profile, selected tone, current ShoutOut draft, selected template, venue context, and your past ShoutOuts to build LED-safe suggestions. Gemini runs through Firebase Functions when available; otherwise FLOQR uses a local contextual fallback.</div></details><div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose a tone to generate personalized ideas.</p></div>`; host.appendChild(box);
  if(typeof window.refreshPersonalizedShoutOutRecommendations==="function") window.refreshPersonalizedShoutOutRecommendations();
 }

@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mingl Chat</title>
-  <link rel="stylesheet" href="./styles.css?v=29.02"/>
+  <link rel="stylesheet" href="./styles.css?v=29.03"/>
   <link rel="stylesheet" href="./admin.css?v=29.02"/>
 </head>
 <body>
@@ -61,6 +61,17 @@
                 <button type="button" data-mingl-emoji-code="127881" data-mingl-emoji-effect="confetti">Party</button>
                 <button type="button" data-mingl-emoji-code="10084" data-mingl-emoji-effect="heart">Heart</button>
                 <button type="button" data-mingl-emoji-code="128514" data-mingl-emoji-effect="laugh">Laugh</button>
+                <button type="button" id="minglMoreEmojiActionsBtn" class="emoji-more-btn">+</button>
+              </div>
+              <div id="minglAdvancedEmojiActions" class="emoji-row compact-emoji-row hidden" aria-label="More Mingl emoji actions">
+                <button type="button" data-mingl-emoji-value="💙" data-mingl-emoji-effect="heart-blue">Blue heart</button>
+                <button type="button" data-mingl-emoji-value="❤️" data-mingl-emoji-effect="heart-red">Red heart</button>
+                <button type="button" data-mingl-emoji-value="💗" data-mingl-emoji-effect="heart-pink">Pink heart</button>
+                <button type="button" data-mingl-emoji-value="💔" data-mingl-emoji-effect="broken-heart">Broken heart</button>
+                <button type="button" data-mingl-emoji-value="🌹" data-mingl-emoji-effect="rose-red">Red rose</button>
+                <button type="button" data-mingl-emoji-value="🤍🌹" data-mingl-emoji-effect="rose-white">White rose</button>
+                <button type="button" data-mingl-emoji-value="💙🌹" data-mingl-emoji-effect="rose-blue">Blue rose</button>
+                <button type="button" data-mingl-emoji-human="middle-finger" data-mingl-emoji-effect="middle-finger">Middle finger</button>
               </div>
               <strong>Add Photo/Video</strong>
               <label class="chat-file-button" for="minglStandaloneImageInput">Choose Photo/Video</label>
@@ -83,9 +94,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.02"></script>
+<script src="./global-profile-status.js?v=29.03"></script>
 <script src="./shared-data.js?v=29.02"></script>
 <script src="./ai-grammar-service.js?v=29.02"></script>
 <script src="./helper-popouts.js?v=29.02"></script>
-<script src="./mingl-chat-app.js?v=29.02"></script>
+<script src="./mingl-chat-app.js?v=29.03"></script>
 </body>
 </html>
