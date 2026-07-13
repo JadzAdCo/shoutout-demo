@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.02";
-  const EXPECTED_STORAGE_RULES_VERSION = "v29.02";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.02";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.04";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.04";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.04";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -772,10 +772,64 @@
         {label:"Venue media storage rules installed", file:"storage.rules", includes:["clubMedia/{clubLocationId}", "request.resource.contentType.matches('video/.*')"]},
         {label:"Current direct rollback note", file:"ROLLBACK-V29-02.md", includes:["FLOQR Rollback - v29.02", "This rollback does not delete user profile data"]}
       ]
+    },
+    {
+      version: "v29.04",
+      title: "Club Public Pages, Required Profiles, Faster Inbox, and Mingl Request Decisions",
+      checks: [
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v29.04"]},
+        {label:"Patron-facing club profile page", file:"club-profile.html", includes:["Upcoming Events", "Featured Service Staff", "Promotion Groups", "clubProfilePersonModal"]},
+        {label:"Club profile Firestore renderer", file:"club-profile-app.js", includes:["loadClubProfile", "publicProfileSections", "featuredDjs", "profileCompleted !== true"]},
+        {label:"Venue Command Center public profile controls", file:"admin.html", includes:["View Public Club Page", "clubProfilePublished", "clubProfileFeaturedDjs", "data-club-section"]},
+        {label:"Venue Command Center saves public profile configuration", file:"admin-app.js", includes:["publicProfileSections", "parsePeopleLines", "publicProfilePublished", "club-profile.html?location=", "uploadClubLogo"]},
+        {label:"Club cards link to public profiles", file:"patron-app.js", includes:["club-profile.html?location=", "View Club"]},
+        {label:"Required profile access guard", file:"profile-access-guard.js", includes:["profileCompleted !== true", "returnTo", "Checking your FLOQR profile"]},
+        {label:"Main login safely resumes protected deep links", file:"patron-app.js", includes:["pendingReturnTo", "safeReturnTo", "window.location.href = returnUrl"]},
+        {label:"Inbox uses scoped Firestore queries", file:"patron-portal-app.js", includes:["queryCollectionSafe", "getUserScopedRows", "Loading your FLOQR Inbox", "directory tools in the background"]},
+        {label:"Reusable feedback has manual close", file:"floqr-action-feedback.js", includes:["Close Window", "floqrActionFeedbackClose", "hideAfterMs || 2200"]},
+        {label:"Mingl friend settings show feedback", file:"patron-portal-app.js", includes:["Saving Mingl friend settings", "Mingl friend settings saved", "Manage Mingl Friends"]},
+        {label:"Mingl page supports accept and deny", file:"patron-app.js", includes:["Accept Mingl", "denyMinglRequest", "data-mingl-action=\"deny\""]},
+        {label:"Inbox and portal Mingl requests support deny", file:"patron-portal-app.js", includes:["denyPortalMinglRequest", "deny-mingl-inbox-btn", "deny-mingl-request-btn"]},
+        {label:"Current rule version markers", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v29.04", "EXPECTED DEPLOYED RULES VERSION: v29.04"]},
+        {label:"Current storage version markers", file:"storage.rules", includes:["FLOQR STORAGE RULES VERSION: v29.04", "EXPECTED DEPLOYED STORAGE RULES VERSION: v29.04"]},
+        {label:"Current rollback note", file:"ROLLBACK-V29-04.md", includes:["FLOQR Rollback - v29.04", "ShoutOut-wepApp.v29.03.zip"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-04-club-public-page",
+      area:"Club Public Profile",
+      feature:"Patron-facing club page and Venue Command Center controls",
+      changed:"Club owners can publish a logo, hero content, contact/social details, venue facts, events, featured DJs, service staff, promotion groups, and gallery sections.",
+      howToTest:"Open Venue Command Center > Club Public Profile, save section choices, then open View Public Club Page. Tap a featured person card and close the popout.",
+      expected:"The club page reflects the saved visibility choices and the person popout opens and closes without leaving the page."
+    },
+    {
+      id:"v29-04-required-profile-guard",
+      area:"Authentication",
+      feature:"Profile completion required for deep links",
+      changed:"Protected FLOQR pages redirect signed-in users without a completed users/{uid} profile to profile creation before continuing.",
+      howToTest:"Use a new account and open a direct club, inbox, Mingl Chat, guest-list, or admin URL. Sign in and attempt to continue without saving a profile.",
+      expected:"Profile creation appears first. After saving, FLOQR resumes the original safe same-site URL."
+    },
+    {
+      id:"v29-04-fast-inbox",
+      area:"FLOQR Inbox",
+      feature:"Scoped and progressive inbox loading",
+      changed:"Inbox data uses user-scoped Firestore queries and renders before the optional user/employee directory finishes loading.",
+      howToTest:"Open Patron Portal > FLOQR Inbox with an account that has messages and observe the loading status and time to first message list.",
+      expected:"Inbox messages and counts appear promptly; recipient directory tools finish in the background."
+    },
+    {
+      id:"v29-04-mingl-decisions-feedback",
+      area:"Mingl",
+      feature:"Accept/Deny request decisions and visible save acknowledgement",
+      changed:"Received Mingl requests expose Accept Mingl and Deny in Mingl and Inbox. Manage Mingl Friends uses the reusable result popout with automatic and manual close.",
+      howToTest:"Receive a Mingl request, verify both buttons in Mingl and Inbox, decide the request, then save Manage Mingl Friends settings.",
+      expected:"The decision synchronizes through Mingl request status and the save command shows a visible Close Window acknowledgement."
+    },
     {
       id:"v28-87-run-feature-diagnostics-button",
       area:"Master Admin Diagnostics",

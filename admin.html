@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Club Admin Portal v29.02 -->
+  <!-- FLOQR Venue Command Center v29.04 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.03"/>
+  <link rel="stylesheet" href="./styles.css?v=29.04"/>
   <link rel="stylesheet" href="./admin.css?v=29.02"/>
 </head>
 <body>
@@ -75,8 +75,15 @@
       <section id="panelPublicProfile" class="admin-panel-section">
         <div class="card">
           <h2>Club Public Profile</h2>
-          <p class="sub small">Public club profile fields appear in FLOQR search. Editing is intended for subscribed club owners/admins after ownership is confirmed.</p>
+          <p class="sub small">Manage the patron-facing club page and FLOQR search profile. Only sections enabled below appear publicly.</p>
+          <div class="queue-actions">
+            <a id="clubPublicProfileLink" class="buttonlike" target="_blank" href="#">View Public Club Page</a>
+            <button id="copyClubPublicProfileLinkBtn" type="button">Copy Public Page Link</button>
+          </div>
           <div class="profile-grid">
+            <label>Club logo URL<input id="clubProfileLogoUrl" placeholder="https://.../club-logo.png"/></label>
+            <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
+            <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
             <label>Address<input id="clubProfileAddress" placeholder="Street address"/></label>
             <label>Official website<input id="clubProfileWebsite" placeholder="https://example.com"/></label>
             <label>Email<input id="clubProfileEmail" placeholder="info@example.com"/></label>
@@ -86,6 +93,32 @@
             <label>TikTok<input id="clubProfileTiktok" placeholder="@club"/></label>
             <label>Facebook<input id="clubProfileFacebook" placeholder="facebook.com/club"/></label>
             <label>Music Genres<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+            <label>Venue hours<input id="clubProfileHours" placeholder="Thu–Sat, 10 PM–3 AM"/></label>
+            <label>Age policy<input id="clubProfileAgePolicy" placeholder="21+ with valid ID"/></label>
+            <label>Dress code<input id="clubProfileDressCode" placeholder="Upscale nightlife attire"/></label>
+            <label>Amenities<input id="clubProfileAmenities" placeholder="VIP tables, coat check, outdoor garden"/></label>
+            <label>FLOQR services<input id="clubProfileServices" placeholder="ShoutOut, Guest List, VIP Reservation"/></label>
+          </div>
+          <div class="card nested-card">
+            <h3>Featured people & promotion groups</h3>
+            <p class="sub small">One entry per line: <strong>Name | Role | Short bio | Photo URL | Instagram</strong>. Patron pages use compact cards and open details in a popout.</p>
+            <label>Featured DJs<textarea id="clubProfileFeaturedDjs" rows="4" placeholder="DJ Nova | Resident DJ | Afrobeats and Hip Hop | https://... | @djnovaa"></textarea></label>
+            <label>Featured waiters / waitresses / bottle service<textarea id="clubProfileFeaturedStaff" rows="4" placeholder="Ava | Bottle Service | VIP host | https://... | @ava"></textarea></label>
+            <label>Promotion groups<textarea id="clubProfilePromotionGroups" rows="4" placeholder="District Nights | Promotion Group | Thursday event partner | https://... | @districtnights"></textarea></label>
+          </div>
+          <div class="card nested-card">
+            <h3>Public page controls</h3>
+            <div class="privacy-datapoint-grid club-profile-section-controls">
+              <label><input id="clubProfilePublished" type="checkbox" checked/> Publish club page</label>
+              <label><input data-club-section="about" type="checkbox" checked/> About and venue facts</label>
+              <label><input data-club-section="contact" type="checkbox" checked/> Contact and social media</label>
+              <label><input data-club-section="upcomingEvents" type="checkbox" checked/> Upcoming events</label>
+              <label><input data-club-section="pastEvents" type="checkbox" checked/> Past events</label>
+              <label><input data-club-section="featuredDjs" type="checkbox" checked/> Featured DJs</label>
+              <label><input data-club-section="featuredStaff" type="checkbox" checked/> Featured service staff</label>
+              <label><input data-club-section="promotionGroups" type="checkbox" checked/> Promotion groups</label>
+              <label><input data-club-section="gallery" type="checkbox" checked/> Public gallery</label>
+            </div>
           </div>
           <button id="saveClubPublicProfileBtn" class="primary" type="button">Save Public Profile</button>
           <div id="clubPublicProfileReport" class="report-block"></div>
@@ -94,6 +127,7 @@
           <h2>Venue Media</h2>
           <p class="sub small">One main media item is allowed. Public profile media is capped at 5 images and 5 marketing videos. Marketing videos should be 15 seconds or shorter.</p>
           <div class="profile-grid">
+            <label>Club Logo<input id="clubLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml"/></label>
             <label>Main Media<input id="clubMainMediaFile" type="file" accept="image/*,video/*"/></label>
             <label>Public Gallery Media<input id="clubGalleryMediaFile" type="file" accept="image/*,video/*"/></label>
             <label>Media Title<input id="clubMediaTitle" placeholder="Saturday Latin Night"/></label>
@@ -101,6 +135,7 @@
             <label>Related Promoters / Groups<input id="clubMediaPromoters" placeholder="Promoter or promotion group"/></label>
           </div>
           <div class="queue-actions">
+            <button id="uploadClubLogoBtn" type="button">Upload Club Logo</button>
             <button id="uploadClubMainMediaBtn" type="button">Upload Main Media</button>
             <button id="uploadClubGalleryMediaBtn" type="button">Add Gallery Media</button>
           </div>
@@ -246,10 +281,11 @@
 <script src="./global-profile-status.js?v=29.03"></script>
 <script src="./shared-data.js?v=29.02"></script>
 <script src="./ai-service.js?v=29.02"></script>
-<script src="./ai-index-service.js?v=29.02"></script>
-<script src="./floqr-action-feedback.js?v=29.02"></script>
+<script src="./ai-index-service.js?v=29.04"></script>
+<script src="./floqr-action-feedback.js?v=29.04"></script>
 <script src="./helper-popouts.js?v=29.02"></script>
-<script src="./admin-app.js?v=29.02"></script>
+<script src="./admin-app.js?v=29.04"></script>
 <script src="./notification-center.js?v=29.02"></script>
+<script src="./profile-access-guard.js?v=29.04"></script>
 </body>
 </html>

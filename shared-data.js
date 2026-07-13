@@ -580,6 +580,28 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]));
   loc.visibility = loc.visibility || "public";
   loc.publicProfileType = "club";
+  loc.publicProfilePublished = loc.publicProfilePublished !== false;
+  loc.tagline = loc.tagline || `${loc.locationName || loc.brandName || "FLOQR venue"} on FLOQR`;
+  loc.description = loc.description || `Explore ${loc.locationName || loc.brandName || "this venue"}, upcoming nightlife experiences, featured talent, guest-list options, and live ShoutOut services on FLOQR.`;
+  loc.logoUrl = loc.logoUrl || "";
+  loc.hours = loc.hours || "";
+  loc.agePolicy = loc.agePolicy || "";
+  loc.dressCode = loc.dressCode || "";
+  loc.amenities = loc.amenities || [];
+  loc.publicServices = loc.publicServices || ["ShoutOut", "Guest List / RSVP"];
+  loc.featuredDjs = loc.featuredDjs || (loc.artists || []).map(name => ({name, role:"Featured DJ", bio:`Featured at ${loc.locationName || loc.brandName || "this FLOQR venue"}.`}));
+  loc.featuredStaff = loc.featuredStaff || [];
+  loc.promotionGroups = loc.promotionGroups || [];
+  loc.publicProfileSections = loc.publicProfileSections || {
+    about:true,
+    contact:true,
+    upcomingEvents:true,
+    pastEvents:true,
+    featuredDjs:true,
+    featuredStaff:true,
+    promotionGroups:true,
+    gallery:true
+  };
   loc.clubOwnershipStatus = loc.clubOwnershipStatus || "unclaimed";
   loc.subscriptionRequiredForPublicProfileEdits = true;
   loc.address = loc.address || "";

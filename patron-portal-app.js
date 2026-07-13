@@ -177,7 +177,7 @@
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
       if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({v:"28.98"});
+        const params = new URLSearchParams({v:"29.04"});
         const room = new URL(window.location.href).searchParams.get("room");
         if (room) params.set("room", room);
         window.location.href = `./mingl-chat.html?${params.toString()}`;
@@ -210,6 +210,28 @@
       const snap = await db.collection(name).where("participants", "array-contains", uid).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
     } catch(e) { return []; }
+  }
+
+  async function queryCollectionSafe(name, field, value, limit=150) {
+    if (!value) return [];
+    try {
+      const snap = await db.collection(name).where(field, "==", value).limit(limit).get();
+      return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
+    } catch (e) { return []; }
+  }
+
+  function uniqueRows(rows = []) {
+    const map = new Map();
+    rows.flat().forEach(row => {
+      if (!row) return;
+      map.set(`${row._collection || "row"}:${row.id || row.referenceNumber || JSON.stringify(row)}`, row);
+    });
+    return Array.from(map.values());
+  }
+
+  async function getUserScopedRows(name, user, fields, limit=150) {
+    const queries = fields.map(([field, source]) => queryCollectionSafe(name, field, source === "email" ? user.email : user.uid, limit));
+    return uniqueRows(await Promise.all(queries));
   }
 
   function simpleRows(rows) {
@@ -610,6 +632,13 @@
   async function saveMinglFriendSettings() {
     const user = auth.currentUser;
     if (!user) return;
+    return actionFeedback({
+      starting:"Saving Mingl friend settings…",
+      wait:"FLOQR is applying your viewing, contact and disappearing-message preferences.",
+      success:"Mingl friend settings saved",
+      redirecting:"Your Mingl friend preferences are now active.",
+      returnTo:"Manage Mingl Friends"
+    }, async () => {
     const next = {...(currentProfile.minglFriendSettings || {})};
     document.querySelectorAll(".mingl-friend-settings-row").forEach(row => {
       const uid = row.dataset.friendUid;
@@ -628,6 +657,7 @@
     }, {merge:true});
     currentProfile.minglFriendSettings = next;
     setText("portalStatus", "Mingl friend settings saved.");
+    });
   }
 
   async function saveProfile() {
@@ -1128,8 +1158,8 @@
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
-        ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Mingl Back</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=28.98">Open Mingl Chat</a></p>` : ""}
+        ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=29.04">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1141,6 +1171,12 @@
       button.addEventListener("click", event => {
         event.stopPropagation();
         acceptPortalMinglRequest(button.dataset.connectionId || "");
+      });
+    });
+    document.querySelectorAll(".deny-mingl-inbox-btn").forEach(button => {
+      button.addEventListener("click", event => {
+        event.stopPropagation();
+        denyPortalMinglRequest(button.dataset.connectionId || "");
       });
     });
   }
@@ -1246,13 +1282,52 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:`./mingl-chat.html?room=${roomId}&v=28.98`,
+        link:`./mingl-chat.html?room=${roomId}&v=29.04`,
         read:false,
         createdAt:fieldValue()
       });
       await loadPortal(user);
       const roomSnap = await db.collection("chatRooms").doc(roomId).get();
       if (roomSnap.exists) openPortalMinglChat({id:roomSnap.id, ...roomSnap.data()});
+    });
+  }
+
+  async function denyPortalMinglRequest(connectionId) {
+    const user = auth.currentUser;
+    if (!user || !connectionId) return;
+    return actionFeedback({
+      starting:"Declining Mingl request…",
+      wait:"FLOQR is updating this Friend or Mingl Request.",
+      success:"Mingl request declined",
+      redirecting:"The request status is updated in both patrons’ Mingl activity.",
+      returnTo:"Mingl Requests"
+    }, async () => {
+      const ref = db.collection("minglConnections").doc(connectionId);
+      const snap = await ref.get();
+      if (!snap.exists) throw new Error("Mingl request was not found.");
+      const connection = {id:snap.id, ...snap.data()};
+      if (!(connection.participants || []).includes(user.uid)) throw new Error("You are not a participant on this Mingl request.");
+      if (connection.requestedTo && connection.requestedTo !== user.uid) throw new Error("Only the receiving patron can deny this request.");
+      await ref.set({
+        status:"denied",
+        deniedByUid:user.uid,
+        deniedAt:fieldValue(),
+        updatedAt:fieldValue()
+      }, {merge:true});
+      const requesterUid = connection.requestedBy || requestOtherUid(connection, user);
+      if (requesterUid) {
+        await db.collection("inboxNotifications").add({
+          type:"minglRequestDenied",
+          title:"Friend or Mingl Request Update",
+          subject:"Friend or Mingl Request Update",
+          body:`${currentProfile.displayName || user.displayName || "A FLOQR patron"} declined the Friend or Mingl Request.`,
+          recipientUid:requesterUid,
+          connectionId,
+          read:false,
+          createdAt:fieldValue()
+        });
+      }
+      await loadPortal(user);
     });
   }
 
@@ -1358,12 +1433,15 @@
       <p>${esc(statusLabel === "Mingl/Follow Back" ? "Friend or Mingl Request received. Mingl back to open chat." : statusLabel === "Sent" ? "Friend or Mingl Request sent. Waiting for the other patron to Mingl back." : `Friend or Mingl Request status: ${statusLabel}.`)}</p>
       <small>Time: ${esc(fmtDate(connection.updatedAt || connection.createdAt))}</small>
       <div class="queue-actions">
-        ${statusLabel === "Mingl/Follow Back" ? `<button type="button" class="primary accept-mingl-request-btn" data-connection-id="${esc(id)}">Mingl/Follow Back</button>` : `<button type="button" disabled>${esc(statusLabel)}</button>`}
+        ${statusLabel === "Mingl/Follow Back" ? `<button type="button" class="primary accept-mingl-request-btn" data-connection-id="${esc(id)}">Accept Mingl</button><button type="button" class="deny-mingl-request-btn" data-connection-id="${esc(id)}">Deny</button>` : `<button type="button" disabled>${esc(statusLabel)}</button>`}
       </div>`;
       wrap.appendChild(item);
     });
     wrap.querySelectorAll(".accept-mingl-request-btn").forEach(button => {
       button.addEventListener("click", () => acceptPortalMinglRequest(button.dataset.connectionId || ""));
+    });
+    wrap.querySelectorAll(".deny-mingl-request-btn").forEach(button => {
+      button.addEventListener("click", () => denyPortalMinglRequest(button.dataset.connectionId || ""));
     });
   }
 
@@ -2176,22 +2254,20 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, allUsers, employeeDesignations] = await Promise.all([
-      getCollectionSafe("shoutouts", x => x.submittedByUid === user.uid || x.submittedBy === user.email),
-      getCollectionSafe("guestListRequests", x => x.submittedByUid === user.uid || x.guestEmail === user.email),
-      getCollectionSafe("messages", x => x.recipientUid === user.uid || x.senderUid === user.uid || x.recipientEmail === user.email || x.senderEmail === user.email),
-      getCollectionSafe("inboxNotifications", x => x.recipientUid === user.uid || x.recipientEmail === user.email),
+    setText("portalStatus", "Loading your FLOQR Inbox…");
+    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections] = await Promise.all([
+      getUserScopedRows("shoutouts", user, [["submittedByUid","uid"],["submittedBy","email"]]),
+      getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
+      getUserScopedRows("messages", user, [["recipientUid","uid"],["senderUid","uid"],["recipientEmail","email"],["senderEmail","email"]]),
+      getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]]),
       getParticipantCollectionSafe("chatRooms", user.uid),
-      getParticipantCollectionSafe("minglConnections", user.uid),
-      getCollectionSafe("users"),
-      getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false)
+      getParticipantCollectionSafe("minglConnections", user.uid)
     ]);
-    currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
-    currentPortalUsers = allUsers;
-    const chats = await getPortalMinglRooms(user, allUsers, queriedChats);
-    renderMinglFriendSettings(allUsers);
-    messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
-    renderRecipientSearchResults();
+    currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
+    currentPortalUsers = [];
+    const chats = await getPortalMinglRooms(user, [], queriedChats);
+    renderMinglFriendSettings([]);
+    messageRecipients = [];
 
     const messages = [
       ...directMessages,
@@ -2258,6 +2334,23 @@
     renderMessages(messages, user);
     renderPortalMinglRequests(currentMinglConnections, user);
     renderPortalMinglChats(chats, user);
+    setText("portalStatus", "FLOQR Inbox ready. Loading directory tools in the background…");
+    Promise.all([
+      getCollectionSafe("users", null, 500),
+      getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false, 300)
+    ]).then(async ([allUsers, employeeDesignations]) => {
+      currentPortalUsers = allUsers;
+      if (!currentMinglConnections.length) currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
+      renderMinglFriendSettings(allUsers);
+      renderPortalMinglRequests(currentMinglConnections, user);
+      if (!queriedChats.length) {
+        const legacyChats = await getPortalMinglRooms(user, allUsers, queriedChats);
+        renderPortalMinglChats(legacyChats, user);
+      }
+      messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
+      renderRecipientSearchResults();
+      setText("portalStatus", "FLOQR Inbox and directory tools are ready.");
+    }).catch(() => setText("portalStatus", "FLOQR Inbox is ready. Some directory tools may still be loading."));
     const requestedRoom = params.get("room");
     if (requestedRoom && !activePortalMinglRoomId) {
       const room = chats.find(x => x.id === requestedRoom);

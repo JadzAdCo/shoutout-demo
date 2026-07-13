@@ -1,4 +1,4 @@
-/* patron-app.js v28.4 */
+/* patron-app.js v29.04 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -29,6 +29,7 @@
   let templates = {};
   let events = {};
   let pendingDirectLocation = qs("location", qs("club", ""));
+  let pendingReturnTo = qs("returnTo", "");
   let cachedUserProfile = null;
   let lastProfileReadError = null;
   let minglCandidates = [];
@@ -68,6 +69,17 @@
     return "";
   }
   function safeUser() { return (currentUser?.email || currentUser?.phoneNumber || "unknown").toLowerCase(); }
+  function safeReturnTo(value = "") {
+    if (!value) return "";
+    try {
+      const target = new URL(value, window.location.href);
+      if (target.origin !== window.location.origin) return "";
+      const basePath = window.location.pathname.slice(0, window.location.pathname.lastIndexOf("/") + 1);
+      if (!target.pathname.startsWith(basePath)) return "";
+      if (/(?:^|\/)display\.html$/i.test(target.pathname)) return "";
+      return target.toString();
+    } catch (e) { return ""; }
+  }
   async function userLocationContext() {
     if (!window.FLOQRLocationAI || !currentUser) {
       return {uid:currentUser?.uid || "", locationSource:"unknown", preferredGenres:[], preferredVenueTypes:[], preferredCities:[], interests:[]};
@@ -462,6 +474,12 @@
   }
 
   async function continueToMainCategories() {
+    const returnUrl = safeReturnTo(pendingReturnTo);
+    if (returnUrl) {
+      pendingReturnTo = "";
+      window.location.href = returnUrl;
+      return;
+    }
     showPage("categoryPage");
     if (pendingDirectLocation) {
       openCategory("shoutout");
@@ -936,8 +954,8 @@
       sharedDatapoints:sharedLabels,
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
-      link:"./patron-portal.html?tab=inbox&v=29.02",
-      minglLink:"./mingl-chat.html?v=29.02",
+      link:"./patron-portal.html?tab=inbox&v=29.04",
+      minglLink:"./mingl-chat.html?v=29.04",
       read:false,
       createdAt:now
     };
@@ -979,7 +997,7 @@
   }
 
   function portalChatUrl(roomId = "") {
-    const params = new URLSearchParams({v:"29.02"});
+    const params = new URLSearchParams({v:"29.04"});
     if (roomId) params.set("room", roomId);
     return `./mingl-chat.html?${params.toString()}`;
   }
@@ -1161,6 +1179,48 @@
     });
   }
 
+  async function denyMinglRequest(connection, profile = {}) {
+    const connectionId = connection?.connectionId || connection?.id;
+    if (!currentUser || !connectionId) return;
+    return (window.FLOQRActionFeedback?.run || ((messages, action) => action()))({
+      starting:"Declining Mingl request…",
+      wait:"FLOQR is updating this Friend or Mingl Request.",
+      success:"Mingl request declined",
+      redirecting:"The request status has been updated.",
+      returnTo:"Mingl"
+    }, async () => {
+      const ref = db.collection("minglConnections").doc(connectionId);
+      await ref.set({
+        status:"denied",
+        deniedByUid:currentUser.uid,
+        deniedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      const otherUid = (connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedBy || "";
+      if (otherUid) {
+        await db.collection("inboxNotifications").add({
+          type:"minglRequestDenied",
+          title:"Friend or Mingl Request Update",
+          subject:"Friend or Mingl Request Update",
+          body:`${cachedUserProfile?.displayName || currentUser.displayName || "A FLOQR patron"} declined the Friend or Mingl Request.`,
+          recipientUid:otherUid,
+          connectionId,
+          read:false,
+          createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      await db.collection("minglAudit").add({
+        type:"mingl_request_denied",
+        actorUid:currentUser.uid,
+        participants:connection.participants || [currentUser.uid, otherUid].filter(Boolean),
+        connectionId,
+        targetName:profile.displayName || profile.username || "Mingl Member",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await loadMingl();
+    });
+  }
+
   async function ensureMinglChatRoom(connectionId, participants, summaries) {
     const roomId = `mingl_${connectionId}`;
     await db.collection("chatRooms").doc(roomId).set({
@@ -1260,7 +1320,9 @@
         : state === "sent"
           ? "Waiting for this patron to Mingl back."
           : "Friend or Mingl Request is pending.";
-      const action = state === "received" ? `<button class="primary" type="button">Mingl Back</button>` : state === "mutual" ? `<button class="primary" type="button">Open Mingl Chat</button>` : "";
+      const action = state === "received"
+        ? `<button class="primary" data-mingl-action="accept" type="button">Accept Mingl</button><button data-mingl-action="deny" type="button">Deny</button>`
+        : state === "mutual" ? `<button class="primary" data-mingl-action="open" type="button">Open Mingl Chat</button>` : "";
       const shared = (connection.sharedDatapoints || []).slice(0,4).filter(Boolean);
       item.innerHTML = `<div class="mingl-request-copy">
         <strong>${esc(profile.displayName || profile.username || "Mingl Member")}</strong>
@@ -1269,13 +1331,9 @@
         ${shared.length ? `<small class="mingl-request-shared">Shared: ${esc(shared.join(", "))}</small>` : ""}
       </div>
       ${action ? `<div class="mingl-request-actions">${action}</div>` : ""}`;
-      const button = item.querySelector("button");
-      if (button) {
-        button.addEventListener("click", () => {
-          if (state === "mutual") openMinglChat(connection);
-          else handleMinglAction({...profile, uid:otherUid});
-        });
-      }
+      item.querySelector("[data-mingl-action='accept']")?.addEventListener("click", () => handleMinglAction({...profile, uid:otherUid}));
+      item.querySelector("[data-mingl-action='deny']")?.addEventListener("click", () => denyMinglRequest(connection, profile));
+      item.querySelector("[data-mingl-action='open']")?.addEventListener("click", () => openMinglChat(connection));
       wrap.appendChild(item);
   }
 
@@ -1840,7 +1898,7 @@
     matches.forEach(([id,l]) => {
       const card = document.createElement("div");
       card.className = "club-option";
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button>`;
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.04">View Club</a><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button></div>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });

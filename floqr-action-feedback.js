@@ -1,4 +1,4 @@
-/* FLOQR action feedback overlay v28.83: reusable progress/success flash and device-mode marker. */
+/* FLOQR action feedback overlay v29.04: reusable progress/result popout with manual close. */
 (function () {
   "use strict";
 
@@ -12,11 +12,15 @@
     overlay = document.createElement("div");
     overlay.id = "floqrActionFeedbackOverlay";
     overlay.className = "floqr-action-feedback hidden";
-    overlay.innerHTML = `<div class="floqr-action-feedback-card">
+    overlay.setAttribute("role", "status");
+    overlay.setAttribute("aria-live", "polite");
+    overlay.innerHTML = `<div class="floqr-action-feedback-card" role="dialog" aria-modal="true" aria-labelledby="floqrActionFeedbackTitle">
       <strong id="floqrActionFeedbackTitle">Working...</strong>
       <p id="floqrActionFeedbackBody">Please wait.</p>
+      <button id="floqrActionFeedbackClose" type="button">Close Window</button>
     </div>`;
     document.body.appendChild(overlay);
+    document.getElementById("floqrActionFeedbackClose")?.addEventListener("click", () => hide());
     return overlay;
   }
 
@@ -60,11 +64,11 @@
     try {
       const result = await action();
       show(messages.success || "Action succeeded", messages.redirecting || `Success. Returning to ${returnTo}.`, {status:"success"});
-      hide(Number(messages.hideAfterMs || 1300));
+      hide(Number(messages.hideAfterMs || 2200));
       return result;
     } catch (error) {
       show(messages.failed || "Action failed", error?.message || String(error), {status:"failed"});
-      hide(Number(messages.failHideAfterMs || 3500));
+      hide(Number(messages.failHideAfterMs || 5500));
       throw error;
     }
   }

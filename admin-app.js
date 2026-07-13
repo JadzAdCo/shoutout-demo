@@ -1,4 +1,4 @@
-/* admin-app.js v29.01 - Club admin portal with onboarding media, roles, and guest list campaigns */
+/* admin-app.js v29.04 - Venue Command Center and owner-managed public club profiles */
 (function () {
   "use strict";
 
@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.01";
+  const CURRENT_VERSION = "29.04";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -66,9 +66,40 @@
     if (displayLink) displayLink.href = `./display.html?location=${locationId}`;
     const liveFrame = byId("liveFrame");
     if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
+    const publicLink = byId("clubPublicProfileLink");
+    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.04`;
   }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
+
+  function actionFeedback(messages, action) {
+    return window.FLOQRActionFeedback?.run ? window.FLOQRActionFeedback.run(messages, action) : action();
+  }
+
+  function publicProfileUrl() {
+    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.04`, window.location.href).toString();
+  }
+
+  function parsePeopleLines(value, fallbackRole) {
+    return String(value || "").split(/\r?\n/).map(line => {
+      const [name, role, bio, photoUrl, instagram] = line.split("|").map(item => String(item || "").trim());
+      return {name, role:role || fallbackRole, bio, photoUrl, instagram};
+    }).filter(item => item.name);
+  }
+
+  function peopleLines(rows = []) {
+    return (Array.isArray(rows) ? rows : []).map(item => typeof item === "string"
+      ? item
+      : [item.name || item.displayName, item.role || item.title, item.bio || item.description, item.photoUrl || item.imageUrl, item.instagram || item.instagramHandle].map(value => String(value || "").trim()).join(" | ")
+    ).join("\n");
+  }
+
+  function publicSectionSettings() {
+    return Array.from(document.querySelectorAll("[data-club-section]")).reduce((result, input) => {
+      result[input.dataset.clubSection] = !!input.checked;
+      return result;
+    }, {});
+  }
 
   function setInputIfMissing(id, value) {
     const el = byId(id);
@@ -136,6 +167,9 @@
     }
     const socials = publicClubProfile.socialMediaHandles || publicClubProfile.socialHandles || {};
     if (byId("clubProfileAddress")) byId("clubProfileAddress").value = publicClubProfile.address || "";
+    if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
+    if (byId("clubProfileTagline")) byId("clubProfileTagline").value = publicClubProfile.tagline || publicClubProfile.publicTagline || "";
+    if (byId("clubProfileDescription")) byId("clubProfileDescription").value = publicClubProfile.description || publicClubProfile.publicDescription || publicClubProfile.about || "";
     if (byId("clubProfileWebsite")) byId("clubProfileWebsite").value = publicClubProfile.officialWebsite || publicClubProfile.website || "";
     if (byId("clubProfileEmail")) byId("clubProfileEmail").value = publicClubProfile.email || "";
     if (byId("clubProfileTelephone")) byId("clubProfileTelephone").value = publicClubProfile.telephone || publicClubProfile.phone || "";
@@ -144,19 +178,43 @@
     if (byId("clubProfileTiktok")) byId("clubProfileTiktok").value = socials.tiktok || "";
     if (byId("clubProfileFacebook")) byId("clubProfileFacebook").value = socials.facebook || "";
     if (byId("clubProfileGenres")) byId("clubProfileGenres").value = (publicClubProfile.genres || loc.genres || []).join(", ");
+    if (byId("clubProfileHours")) byId("clubProfileHours").value = publicClubProfile.hours || publicClubProfile.operatingHours || "";
+    if (byId("clubProfileAgePolicy")) byId("clubProfileAgePolicy").value = publicClubProfile.agePolicy || "";
+    if (byId("clubProfileDressCode")) byId("clubProfileDressCode").value = publicClubProfile.dressCode || "";
+    if (byId("clubProfileAmenities")) byId("clubProfileAmenities").value = (publicClubProfile.amenities || []).join(", ");
+    if (byId("clubProfileServices")) byId("clubProfileServices").value = (publicClubProfile.publicServices || publicClubProfile.services || []).join(", ");
+    if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
+    if (byId("clubProfileFeaturedStaff")) byId("clubProfileFeaturedStaff").value = peopleLines(publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff);
+    if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
+    if (byId("clubProfilePublished")) byId("clubProfilePublished").checked = publicClubProfile.publicProfilePublished !== false;
+    const sectionSettings = publicClubProfile.publicProfileSections || {};
+    document.querySelectorAll("[data-club-section]").forEach(input => {
+      input.checked = sectionSettings[input.dataset.clubSection] === undefined ? true : sectionSettings[input.dataset.clubSection] !== false;
+    });
     if (byId("clubPublicProfileReport")) {
       byId("clubPublicProfileReport").innerHTML = simpleRows([
         ["Search visibility", publicClubProfile.visibility || "public"],
         ["Ownership status", publicClubProfile.clubOwnershipStatus || "unclaimed"],
         ["Subscription required for edits", publicClubProfile.subscriptionRequiredForPublicProfileEdits === false ? "No" : "Yes"],
         ["AI index", "Public profile fields only"]
+        ,["Public page", publicProfileUrl()]
       ]);
     }
     await loadProfileImportDraft();
   }
 
   async function saveClubPublicProfile() {
+    return actionFeedback({
+      starting:"Saving club public profile…",
+      wait:"FLOQR is publishing the venue profile and owner visibility choices.",
+      success:"Club public profile saved",
+      redirecting:"The public page and FLOQR search profile are updated.",
+      returnTo:"Venue Command Center"
+    }, async () => {
     const payload = {
+      logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
+      tagline:byId("clubProfileTagline")?.value.trim() || "",
+      description:byId("clubProfileDescription")?.value.trim() || "",
       address:byId("clubProfileAddress")?.value.trim() || "",
       officialWebsite:byId("clubProfileWebsite")?.value.trim() || "",
       email:byId("clubProfileEmail")?.value.trim() || "",
@@ -168,6 +226,16 @@
         facebook:byId("clubProfileFacebook")?.value.trim() || ""
       },
       genres: splitCSV(byId("clubProfileGenres")?.value || ""),
+      hours:byId("clubProfileHours")?.value.trim() || "",
+      agePolicy:byId("clubProfileAgePolicy")?.value.trim() || "",
+      dressCode:byId("clubProfileDressCode")?.value.trim() || "",
+      amenities:splitCSV(byId("clubProfileAmenities")?.value || ""),
+      publicServices:splitCSV(byId("clubProfileServices")?.value || ""),
+      featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
+      featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
+      promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
+      publicProfileSections:publicSectionSettings(),
+      publicProfilePublished:!!byId("clubProfilePublished")?.checked,
       visibility:"public",
       publicProfileType:"club",
       subscriptionRequiredForPublicProfileEdits:true,
@@ -192,6 +260,7 @@
     }
     setText("adminStatus", "Club public profile saved.");
     await loadClubPublicProfile();
+    });
   }
 
   function adminAuthErrorMessage(e) {
@@ -318,6 +387,32 @@
     const type = String(file?.type || "");
     if (type.startsWith("video/")) return "video";
     return "image";
+  }
+
+  async function uploadClubLogo() {
+    return actionFeedback({
+      starting:"Uploading club logo…",
+      wait:"FLOQR is saving the logo for the public club page.",
+      success:"Club logo uploaded",
+      redirecting:"The logo is now available on the public profile.",
+      returnTo:"Club Public Profile"
+    }, async () => {
+      const file = byId("clubLogoFile")?.files?.[0];
+      if (!storage) throw new Error("Firebase Storage SDK is not loaded.");
+      if (!file || !String(file.type || "").startsWith("image/")) throw new Error("Choose an image file for the club logo.");
+      const path = `clubMedia/${locationId}/logo/${Date.now()}-${cleanFileName(file.name)}`;
+      const ref = storage.ref(path);
+      await ref.put(file, {contentType:file.type || "image/png"});
+      const url = await ref.getDownloadURL();
+      await db.collection("clubLocations").doc(locationId).set({
+        logoUrl:url,
+        logoStoragePath:path,
+        updatedByUid:auth.currentUser?.uid || "",
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      publicClubProfile.logoUrl = url;
+      if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = url;
+    });
   }
 
   async function uploadClubMedia(file, slotType) {
@@ -1062,8 +1157,14 @@
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("copyClubPublicProfileLinkBtn", async () => {
+      await navigator.clipboard?.writeText(publicProfileUrl());
+      window.FLOQRActionFeedback?.show("Club page link copied", "The patron-facing FLOQR club profile URL is ready to share.", {status:"success"});
+      window.FLOQRActionFeedback?.hide(2200);
+    });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
     bind("uploadClubMainMediaBtn", uploadMainMedia);
+    bind("uploadClubLogoBtn", uploadClubLogo);
     bind("uploadClubGalleryMediaBtn", uploadGalleryMedia);
     bind("electClubRoleBtn", electClubRole);
     bind("createGuestCampaignBtn", createGuestCampaign);

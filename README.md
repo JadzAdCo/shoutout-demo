@@ -1,14 +1,39 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.03 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.04 Full Package
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.03
+https://jadzadco.github.io/shoutout-demo/?v=29.04
 ```
 
 Current release highlights:
+
+- Adds v29.04 patron-facing club public pages at `club-profile.html?location={clubLocationId}`.
+- Club pages use a minimal hero-and-sections layout for the club logo, main media, description, location, genres, hours, age policy, dress code, amenities, FLOQR services, contact information, social media, gallery, upcoming events, past events, featured DJs, featured waiters/waitresses/bottle service, and promotion groups.
+- Featured DJs, service staff, and promotion groups open compact profile popouts instead of expanding the main page.
+- Venue Command Center > Club Public Profile now controls public page content, featured people, promotion groups, publish status, and section-by-section visibility.
+- FLOQR club search result cards now include `View Club` links alongside the existing ShoutOut/select action.
+- Protected patron, Mingl Chat, guest-list, club admin, promoter admin, role request, and Master Admin pages now run a required-profile guard. Signed-in users without `users/{uid}.profileCompleted === true` return to profile creation before the original safe same-site link resumes.
+- FLOQR Inbox now loads user-owned messages, notifications, ShoutOuts, guest-list requests, chats, and Mingl connections through scoped Firestore queries. The optional users/employee directory loads after the Inbox renders.
+- Reusable FLOQR command acknowledgement now includes an automatically closing result popout plus a manual `Close Window` button.
+- `Save Mingl Friend Settings` now uses the command acknowledgement popout.
+- Received Mingl requests now include `Accept Mingl` and `Deny` actions on the main Mingl page, Patron Portal Mingl Requests, and actionable Inbox request messages.
+- Firestore and Storage rule headers now carry the v29.04 package version. The new club public-profile fields use the existing `clubLocations` and `clubMedia` rules; no new rule behavior is required.
+- Direct rollback note for this package is `ROLLBACK-V29-04.md`; the previous known-good full package is `ShoutOut-wepApp.v29.03.zip`.
+
+v29.04 focused manual tests:
+
+1. Venue Command Center: open Club Public Profile, enter club copy and featured people, change section visibility, save, and confirm the acknowledgement includes `Close Window`.
+2. Public club page: open `club-profile.html?location=zebbies-garden-washington-dc&v=29.04` as a completed patron. Confirm hero, club actions, event sections, and visible owner-controlled sections render.
+3. Talent popouts: tap a featured DJ, waiter/waitress/bottle-service member, and promotion group. Confirm each opens a compact popout and both close controls work.
+4. Required profile: use a new account to open a direct club, Inbox, Mingl Chat, guest-list, or admin link. Confirm profile creation cannot be bypassed and the original link resumes only after the profile saves.
+5. Inbox speed: open Patron Portal > FLOQR Inbox and confirm messages/counts render before the optional user directory finishes loading.
+6. Mingl friend settings: save settings and confirm the visible success popout auto-closes and also provides `Close Window`.
+7. Mingl requests: receive a request and confirm `Accept Mingl` and `Deny` appear in Mingl, Patron Portal Mingl Requests, and the Inbox request message.
+8. Request synchronization: accept one test request and deny another. Confirm the request status updates for both patrons and chat opens only for the accepted request.
+9. Master Admin: run Package Install Diagnostics and Rules Smoke Test for v29.04.
 
 - Adds v29.03 ShoutOut editor layout, preview modal, Mingl Requests status, profile status, birthday/privacy, and Mingl friend settings updates.
 - ShoutOut editor now keeps the Message card first, places `Preview ShoutOut` directly inside the Message section, opens preview in a modal, and auto-closes preview after 5 seconds.

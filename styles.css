@@ -291,8 +291,56 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .floqr-action-feedback-card{width:min(420px,92vw);border:1px solid var(--line);border-radius:18px;background:rgba(10,14,34,.96);padding:22px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.55)}
 .floqr-action-feedback-card strong{display:block;font-size:24px}
 .floqr-action-feedback-card p{margin:10px 0 0;color:var(--muted)}
+.floqr-action-feedback-card button{margin-top:18px;min-width:150px}
 .floqr-action-feedback.success .floqr-action-feedback-card{border-color:rgba(80,255,180,.5)}
 .floqr-action-feedback.failed .floqr-action-feedback-card{border-color:rgba(255,80,100,.55)}
+
+/* Patron-facing FLOQR club public profile v29.04 */
+.club-profile-body{background:#050713;color:#f7f8ff;min-height:100vh}
+.club-profile-shell{width:min(1120px,100%);margin:0 auto;padding:16px clamp(14px,3vw,34px) 56px}
+.club-profile-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:4px 0 18px}
+.club-profile-brand img{display:block;width:118px;max-height:42px;object-fit:contain}
+.club-profile-nav-actions,.club-profile-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.club-profile-loading{margin-top:12vh;text-align:center}
+.club-profile-hero{position:relative;min-height:460px;border:1px solid rgba(255,255,255,.13);border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#1c2250,#080a18);box-shadow:0 28px 90px rgba(0,0,0,.42)}
+.club-profile-hero-media,.club-profile-hero-media img,.club-profile-hero-media video,.club-profile-hero-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.club-profile-hero-fallback{background:radial-gradient(circle at 78% 12%,rgba(116,232,255,.38),transparent 34%),radial-gradient(circle at 15% 70%,rgba(208,73,255,.34),transparent 37%),linear-gradient(135deg,#11193f,#070914)}
+.club-profile-hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,5,14,.12),rgba(3,5,14,.92) 87%)}
+.club-profile-hero-copy{position:absolute;left:clamp(22px,5vw,54px);right:clamp(22px,5vw,54px);bottom:36px;z-index:2}
+.club-profile-logo{width:84px;height:84px;border-radius:22px;display:grid;place-items:center;overflow:hidden;background:rgba(7,10,24,.86);border:1px solid rgba(255,255,255,.28);box-shadow:0 14px 34px rgba(0,0,0,.36);font-size:38px;font-weight:900}
+.club-profile-logo img{width:100%;height:100%;object-fit:contain}
+.club-profile-hero h1{font-size:clamp(40px,7vw,76px);line-height:.98;margin:10px 0 8px;letter-spacing:-.045em}
+.club-profile-tagline{font-size:clamp(18px,2.5vw,25px);max-width:700px;margin:0 0 10px}
+.club-profile-location{color:rgba(255,255,255,.75);margin:0 0 12px}
+.club-profile-actions{position:sticky;top:8px;z-index:20;margin:14px 0 28px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(8,10,24,.86);backdrop-filter:blur(16px)}
+.club-profile-section{margin:28px 0}
+.club-profile-section.card{padding:clamp(20px,4vw,36px)}
+.club-profile-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
+.club-profile-section-head h2{font-size:clamp(27px,4vw,42px);margin:0}
+.club-profile-section-head .eyebrow{margin:0 0 5px}
+.club-profile-description{font-size:clamp(17px,2vw,21px);line-height:1.65;max-width:850px;color:rgba(255,255,255,.82)}
+.club-profile-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:20px}
+.club-profile-facts>div{border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;background:rgba(255,255,255,.035)}
+.club-profile-facts span,.club-profile-facts strong{display:block}.club-profile-facts span{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.club-profile-facts strong{margin-top:5px}
+.club-profile-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.club-event-card,.club-promoter-card{overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:rgba(255,255,255,.035);text-align:left;color:inherit}
+.club-event-card img{width:100%;height:160px;object-fit:cover}.club-event-card>div{padding:16px}.club-event-card h3{font-size:21px;margin:5px 0}.club-event-card small{color:var(--muted)}
+.club-event-card.past{opacity:.76}.club-promoter-card{padding:18px;display:grid;gap:6px}.club-promoter-card strong{font-size:20px}.club-promoter-card small{color:var(--muted);line-height:1.4}
+.club-profile-talent-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.club-person-card{display:grid;justify-items:center;gap:7px;min-height:180px;padding:18px 12px;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:rgba(255,255,255,.035);color:inherit;text-align:center}
+.club-person-card:hover,.club-promoter-card:hover{border-color:rgba(126,231,255,.52);transform:translateY(-2px)}
+.club-person-card-photo,.club-person-photo{display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#4b63ff,#d948ff);font-weight:900}
+.club-person-card-photo{width:84px;height:84px;font-size:28px}.club-person-card-photo img,.club-person-photo img{width:100%;height:100%;object-fit:cover}
+.club-person-card small{color:var(--muted)}
+.club-profile-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.club-profile-gallery figure{margin:0;position:relative;overflow:hidden;border-radius:18px;min-height:220px;background:#0d1023}.club-profile-gallery img,.club-profile-gallery video{width:100%;height:100%;min-height:220px;object-fit:cover}.club-profile-gallery figcaption{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border-radius:10px;background:rgba(4,6,16,.75)}
+.club-profile-history{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:18px}.club-profile-history summary{cursor:pointer;font-weight:800;font-size:21px}.club-profile-history[open] summary{margin-bottom:18px}
+.club-profile-contact{display:grid;gap:12px}.club-profile-contact p{display:flex;gap:15px;align-items:baseline;margin:0}.club-profile-contact p strong{min-width:110px}.club-profile-contact p span,.club-profile-contact p a{color:var(--muted)}
+.club-person-modal{position:fixed;inset:0;z-index:11000;display:grid;place-items:center;padding:18px;background:rgba(2,4,12,.82);backdrop-filter:blur(12px)}
+.club-person-modal.hidden{display:none}.club-person-modal-card{position:relative;width:min(430px,94vw);padding:30px;border:1px solid rgba(255,255,255,.16);border-radius:24px;background:#0b0e22;text-align:center;box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.club-person-close{position:absolute;right:12px;top:10px;width:40px;height:40px;border-radius:50%;font-size:24px;padding:0}.club-person-photo{width:118px;height:118px;margin:0 auto 16px;font-size:40px}.club-person-modal-card h2{font-size:32px;margin:4px 0 10px}.club-person-modal-card .button-row{justify-content:center;margin:18px 0}
+@media(max-width:640px){.club-profile-shell{padding-inline:10px}.club-profile-nav{align-items:flex-start}.club-profile-nav-actions .buttonlike{display:none}.club-profile-hero{min-height:520px;border-radius:22px}.club-profile-actions{display:grid;grid-template-columns:1fr 1fr}.club-profile-actions a{text-align:center}.club-profile-section-head{align-items:flex-start;flex-direction:column}.club-profile-contact p{display:grid;gap:3px}.club-profile-contact p strong{min-width:0}}
+.floqr-profile-access-blocker{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:20px;background:#050713;color:#fff;text-align:center}.floqr-profile-access-blocker>div{width:min(440px,92vw);padding:28px;border:1px solid rgba(255,255,255,.15);border-radius:22px;background:#0c1027;box-shadow:0 30px 100px rgba(0,0,0,.58)}.floqr-profile-access-blocker strong{display:block;font-size:24px}.floqr-profile-access-blocker p{color:var(--muted);line-height:1.55}
+.profile-grid-wide{grid-column:1/-1}.nested-card{margin:16px 0;background:rgba(255,255,255,.025)}.nested-card>label{display:grid;gap:7px;margin:12px 0}.nested-card textarea{width:100%}.club-profile-section-controls{margin-top:8px}
 @media(max-width:900px){.mingl-layout{grid-template-columns:1fr}.mingl-chat-popout{position:fixed;inset:10px;z-index:10020;max-height:none;overflow:auto;border-radius:22px}.mingl-chat-popout .mingl-messages{max-height:calc(100vh - 230px)}}
 @media(max-width:760px){.profile-datapoint{position:static}.profile-datapoint[open]{flex-basis:100%}.profile-datapoint div{position:static;width:100%;min-width:0;max-width:100%;box-shadow:none}.mingl-person-card,.mingl-self-card{overflow:hidden}.mingl-nested-datapoints .profile-datapoint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.mingl-nested-datapoints .profile-datapoint summary{text-align:center}}
 @media(max-width:520px){.product-parent-logo{width:min(170px,48vw);max-height:58px}.product-brand-stack{gap:2px;margin-top:0}.product-logo.shoutout-hero-logo{width:min(300px,80vw);max-height:170px}.shoutout-product-page .topbar h1{font-size:clamp(38px,13vw,58px);line-height:.96}.shoutout-product-page .product-action-row{grid-template-columns:1fr}.product-logo.mingl-hero-logo{width:min(540px,96vw);height:150px;margin:-14px 0 -2px;object-position:left center}.mingl-self-card{grid-template-columns:76px 1fr}.mingl-self-photo{width:76px;height:76px}.mingl-person-card{grid-template-columns:84px minmax(0,1fr);gap:10px}.mingl-person-card h3{font-size:20px;line-height:1.08}.mingl-person-photo{width:84px;height:84px}.mingl-compose{grid-template-columns:1fr}.mingl-compose-clean{grid-template-columns:minmax(0,1fr) auto auto}.profile-media-preview{height:180px}.privacy-datapoint-grid{grid-template-columns:1fr}}
