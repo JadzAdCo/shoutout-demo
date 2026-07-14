@@ -4,7 +4,11 @@ This folder contains deployable Firebase Functions for FLOQR AI crawling and sou
 
 Included functions:
 
-- Scheduled public-source discovery crawl 4-6 times per day. It extracts records from configured public source URLs and skips generic API documentation/manual-source placeholders instead of publishing fake listings.
+- `requestEmailOtp` and `verifyEmailOtp`: SendGrid-delivered, eight-character alphanumeric email codes with server-side HMAC hashes, five-minute expiry, resend throttling, attempt limits, one-time use, and Firebase custom-token sign-in.
+- `assignClubAdmin`: Master Admin-only registered-patron assignment to a specific `clubLocations` record.
+- `scheduledAiDiscoveryCrawl`: a 15-minute dispatcher that honors saved per-day run times and IANA timezone settings, claims each local run slot once, crawls approved sources, and optionally runs localized Google Places Text Search jobs.
+
+- Scheduled public-source discovery crawl at the times selected in Master Admin. It extracts records from configured public source URLs and skips generic API documentation/manual-source placeholders instead of publishing fake listings.
 - Search-results guard. Google/Ticketmaster/Eventbrite directory pages are not saved as approvable discovery records; the crawler must use a final event/venue detail URL or official API detail data.
 - `aiExtractPublicSourceUrl`, which fetches a public source URL server-side, parses Eventbrite/Ticketmaster/venue metadata where available, extracts JSON-LD event data, and returns a structured `aiDiscoveryQueue`-ready record.
 - `aiEnhanceShoutOutMedia`, which checks Firebase Auth, verifies the requested Storage path is owned by the signed-in user, calls Gemini image editing with the server-side `GEMINI_API_KEY` secret, stores the enhanced image under `shoutouts/{uid}/{reference}/enhanced/`, and returns structured media metadata.

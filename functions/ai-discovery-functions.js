@@ -7,6 +7,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {defineSecret} = require("firebase-functions/params");
 
 admin.initializeApp();
@@ -14,6 +15,12 @@ admin.initializeApp();
 const db = admin.firestore();
 const MAX_SOURCE_BYTES = 750000;
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
+const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
+const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
+const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+  .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-2.5-flash";
 const MAX_GEMINI_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -426,7 +433,7 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
   return record;
 }
 
-async function crawlPublicEventSources() {
+async function crawlPublicEventSources(criteria = {}) {
   const sources = await db.collection("aiDiscoverySources").where("enabled", "==", true).get();
   const discovered = [];
   for (const doc of sources.docs) {
@@ -442,13 +449,181 @@ async function crawlPublicEventSources() {
         sourceName:source.sourceName || sourceNameForUrl(sourceUrl),
         sourceConfigId:source.id,
         allowedCategories:source.allowedCategories || DEFAULT_ALLOWED_CATEGORIES,
-        markets:source.markets || DEFAULT_DISCOVERY_MARKETS
+        markets:source.markets || DEFAULT_DISCOVERY_MARKETS,
+        crawlCriteria:criteria
       });
     } catch (error) {
       console.warn(`Skipping source ${sourceUrl}:`, error.message);
     }
   }
-  return discovered;
+  const places = await discoverPlacesForCriteria(criteria);
+  const seen = new Set();
+  return [...discovered, ...places].filter(record => {
+    const key = normalized(`${record.proposedTitle}|${record.proposedAddress}|${record.telephone}`);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function optionalPlacesKey() {
+  try { return GOOGLE_PLACES_API_KEY.value() || process.env.GOOGLE_PLACES_API_KEY || ""; }
+  catch (error) { return process.env.GOOGLE_PLACES_API_KEY || ""; }
+}
+
+function languageCode(value = "") {
+  const map = {english:"en", spanish:"es", german:"de", french:"fr", italian:"it", portuguese:"pt", dutch:"nl", arabic:"ar", turkish:"tr", chinese:"zh", thai:"th", catalan:"ca"};
+  return map[normalized(value)] || "en";
+}
+
+async function searchGooglePlaces(job, apiKey) {
+  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method:"POST",
+    headers:{
+      "content-type":"application/json",
+      "x-goog-api-key":apiKey,
+      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types"
+    },
+    body:JSON.stringify({textQuery:String(job.query || "").slice(0, 500), languageCode:languageCode(job.language), maxResultCount:20})
+  });
+  if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
+  const payload = await response.json();
+  return (payload.places || []).map(place => ({
+    proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
+    proposedTitle:place.displayName?.text || "Discovered nightlife venue",
+    proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+    proposedLocationName:place.displayName?.text || "",
+    proposedAddress:place.formattedAddress || "",
+    city:job.city || "",
+    stateRegion:job.stateRegion || "",
+    country:job.country || "",
+    telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+    phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+    officialWebsite:place.websiteUri || place.googleMapsUri || "",
+    website:place.websiteUri || place.googleMapsUri || "",
+    sourceUrl:place.googleMapsUri || place.websiteUri || "",
+    sourceName:"Google Places API",
+    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+    categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
+    genres:job.genre ? [job.genre] : [],
+    searchQuery:job.query || "",
+    searchLanguage:job.language || "",
+    aiSummary:"Localized venue discovery candidate. Master Admin must verify public contact and social details before onboarding.",
+    aiConfidenceScore:0.86,
+    aiStarRating:4,
+    aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
+    missingDatapoints:["Social media handles"],
+    status:"pendingReview",
+    discoveryMode:"localized-places-search",
+    extractionMethod:"google-places-text-search"
+  }));
+}
+
+async function discoverPlacesForCriteria(criteria = {}) {
+  const apiKey = optionalPlacesKey();
+  const jobs = Array.isArray(criteria.structuredPlan?.jobs) ? criteria.structuredPlan.jobs.slice(0, 25) : [];
+  if (!apiKey || !jobs.length) return [];
+  const records = [];
+  for (const job of jobs) {
+    try { records.push(...await searchGooglePlaces(job, apiKey)); }
+    catch (error) { console.warn(`Places job skipped (${job.query || "query"}):`, error.message); }
+  }
+  return records;
+}
+
+function emailOtpSecret() {
+  const value = EMAIL_OTP_PEPPER.value() || process.env.EMAIL_OTP_PEPPER || "";
+  if (!value) throw new HttpsError("failed-precondition", "Email OTP is not configured. Set EMAIL_OTP_PEPPER and SENDGRID_API_KEY.");
+  return value;
+}
+
+function normalizeEmail(value = "") {
+  const email = String(value || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpsError("invalid-argument", "Enter a valid email address.");
+  return email;
+}
+
+function otpHash(email, code) {
+  return crypto.createHmac("sha256", emailOtpSecret()).update(`${email}:${String(code).toUpperCase()}`).digest("hex");
+}
+
+function createOtpCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from(crypto.randomBytes(8), byte => alphabet[byte % alphabet.length]).join("");
+}
+
+async function sendEmailOtp(email, code) {
+  const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
+  if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method:"POST",
+    headers:{authorization:`Bearer ${key}`, "content-type":"application/json"},
+    body:JSON.stringify({
+      personalizations:[{to:[{email}]}],
+      from:{email:EMAIL_OTP_FROM, name:"FLOQR"},
+      subject:"Your FLOQR sign-in code",
+      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 5 minutes. If you did not request this code, ignore this email.`}]
+    })
+  });
+  if (!response.ok) throw new HttpsError("internal", `Email provider returned HTTP ${response.status}.`);
+}
+
+async function assertMasterAdmin(request) {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Master Admin sign-in is required.");
+  const email = String(request.auth.token?.email || "").toLowerCase();
+  if (MASTER_ADMIN_EMAILS.includes(email) || request.auth.token?.masterAdmin === true) return;
+  const record = await db.collection("users").doc(request.auth.uid).get();
+  const data = record.exists ? record.data() || {} : {};
+  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return;
+  throw new HttpsError("permission-denied", "Master Admin access is required.");
+}
+
+function scheduleLocalParts(date, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:timeZone || "UTC", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", hourCycle:"h23"
+  }).formatToParts(date).reduce((out, part) => ({...out, [part.type]:part.value}), {});
+  return {date:`${parts.year}-${parts.month}-${parts.day}`, time:`${parts.hour}:${parts.minute}`};
+}
+
+function scheduleIsDue(schedule = {}, now = new Date()) {
+  const local = scheduleLocalParts(now, schedule.timeZone || "UTC");
+  const hours = Array.isArray(schedule.scheduleHours) && schedule.scheduleHours.length
+    ? schedule.scheduleHours
+    : [schedule.primaryTime || "02:00"];
+  const due = hours.some(value => {
+    const target = String(value || "").slice(0, 5);
+    const [h, m] = target.split(":").map(Number);
+    const [nh, nm] = local.time.split(":").map(Number);
+    return Number.isFinite(h) && Number.isFinite(m) && Math.abs((nh * 60 + nm) - (h * 60 + m)) < 15;
+  });
+  return {due, local, slot:`${local.date}_${hours.find(value => {
+    const [h, m] = String(value).split(":").map(Number);
+    const [nh, nm] = local.time.split(":").map(Number);
+    return Math.abs((nh * 60 + nm) - (h * 60 + m)) < 15;
+  }) || local.time}`};
+}
+
+async function runScheduledCrawl(scheduleDoc, now = new Date()) {
+  const schedule = {id:scheduleDoc.id, ...scheduleDoc.data()};
+  if (schedule.enabled === false) return null;
+  const timing = scheduleIsDue(schedule, now);
+  if (!timing.due) return null;
+  const claimId = `${schedule.id}_${timing.slot}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const claim = db.collection("aiCrawlRuns").doc(claimId);
+  try {
+    await claim.create({scheduleId:schedule.id, status:"running", localSlot:timing.slot, timeZone:schedule.timeZone || "UTC", startedAt:admin.firestore.FieldValue.serverTimestamp()});
+  } catch (error) {
+    return null;
+  }
+  try {
+    const records = await crawlPublicEventSources(schedule.criteria || schedule);
+    for (const record of records) await writeDiscoveryQueueItem(await classifyDiscoveryRecord(record));
+    await claim.set({status:"completed", resultCount:records.length, completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    return records.length;
+  } catch (error) {
+    await claim.set({status:"failed", error:String(error.message || error).slice(0, 1000), completedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    throw error;
+  }
 }
 
 async function classifyDiscoveryRecord(record) {
@@ -737,16 +912,80 @@ async function uploadEnhancedGeminiImage({bucket, outputPath, buffer, contentTyp
   return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(outputPath)}?alt=media&token=${encodeURIComponent(token)}`;
 }
 
-exports.scheduledAiDiscoveryCrawl = functions.pubsub
-  .schedule("every 4 hours")
-  .onRun(async () => {
-    const records = await crawlPublicEventSources();
-    for (const record of records) {
-      const classified = await classifyDiscoveryRecord(record);
-      await writeDiscoveryQueueItem(classified);
-    }
-    return null;
+exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", timeZone:"UTC", region:"us-central1", secrets:[GOOGLE_PLACES_API_KEY]}, async () => {
+  const schedules = await db.collection("aiCrawlerSchedules").where("enabled", "==", true).get();
+  for (const schedule of schedules.docs) await runScheduledCrawl(schedule);
+  return null;
+});
+
+exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {
+  const email = normalizeEmail(request.data?.email);
+  const challengeId = crypto.createHash("sha256").update(email).digest("hex");
+  const ref = db.collection("emailOtpChallenges").doc(challengeId);
+  const previous = await ref.get();
+  const previousData = previous.exists ? previous.data() || {} : {};
+  const lastRequestedMs = previousData.requestedAt?.toMillis?.() || 0;
+  if (Date.now() - lastRequestedMs < 60000) throw new HttpsError("resource-exhausted", "Wait one minute before requesting another code.");
+  const code = createOtpCode();
+  await ref.set({
+    email, codeHash:otpHash(email, code), attempts:0, used:false,
+    requestedAt:admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 5 * 60 * 1000)
   });
+  await sendEmailOtp(email, code);
+  return {challengeId, expiresInSeconds:300, delivery:"email"};
+});
+
+exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {
+  const email = normalizeEmail(request.data?.email);
+  const challengeId = String(request.data?.challengeId || "");
+  const code = String(request.data?.code || "").trim().toUpperCase();
+  if (!challengeId || !/^[A-Z2-9]{8}$/.test(code)) throw new HttpsError("invalid-argument", "Enter the 8-character email code.");
+  const ref = db.collection("emailOtpChallenges").doc(challengeId);
+  const token = await db.runTransaction(async transaction => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists) throw new HttpsError("not-found", "The sign-in code was not found. Request a new code.");
+    const data = snap.data() || {};
+    if (data.email !== email || data.used) throw new HttpsError("permission-denied", "This code cannot be used.");
+    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
+    if (Number(data.attempts || 0) >= 5) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
+    if (!crypto.timingSafeEqual(Buffer.from(data.codeHash, "hex"), Buffer.from(otpHash(email, code), "hex"))) {
+      transaction.update(ref, {attempts:admin.firestore.FieldValue.increment(1)});
+      throw new HttpsError("permission-denied", "The email code is incorrect.");
+    }
+    transaction.update(ref, {used:true, verifiedAt:admin.firestore.FieldValue.serverTimestamp()});
+    return true;
+  });
+  if (!token) throw new HttpsError("internal", "Email verification failed.");
+  let user;
+  try { user = await admin.auth().getUserByEmail(email); }
+  catch (error) {
+    if (error.code !== "auth/user-not-found") throw error;
+    user = await admin.auth().createUser({email, emailVerified:true});
+  }
+  if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified:true});
+  return {customToken:await admin.auth().createCustomToken(user.uid, {emailOtp:true}), expiresInSeconds:300};
+});
+
+exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
+  await assertMasterAdmin(request);
+  const clubId = String(request.data?.clubId || request.data?.clubLocationId || "").trim();
+  const patronUid = String(request.data?.patronUid || "").trim();
+  if (!clubId || !patronUid) throw new HttpsError("invalid-argument", "clubId and patronUid are required.");
+  const [clubSnap, userSnap] = await Promise.all([db.collection("clubLocations").doc(clubId).get(), db.collection("users").doc(patronUid).get()]);
+  if (!clubSnap.exists) throw new HttpsError("not-found", "The selected club was not found.");
+  if (!userSnap.exists) throw new HttpsError("failed-precondition", "The club admin must first register as a FLOQR patron.");
+  const patron = userSnap.data() || {};
+  if (patron.profileCompleted !== true) throw new HttpsError("failed-precondition", "The selected patron must complete patron registration first.");
+  const email = String(patron.email || "").toLowerCase();
+  const assignmentId = `${clubId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const batch = db.batch();
+  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubLocations").doc(clubId), {adminUids:admin.firestore.FieldValue.arrayUnion(patronUid), adminEmails:admin.firestore.FieldValue.arrayUnion(email), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  await batch.commit();
+  return {assignmentId, clubId, patronUid, patronEmail:email, status:"active"};
+});
 
 exports.aiSearch = functions.https.onCall(async (data, context) => {
   if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Sign in required.");
