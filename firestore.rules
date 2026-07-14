@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.06
-// EXPECTED DEPLOYED RULES VERSION: v29.06 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.07
+// EXPECTED DEPLOYED RULES VERSION: v29.07 or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -19,6 +19,7 @@ rules_version = '2';
 // - Mingl request audit records, system request messages, and sender-only message edit/action metadata support
 // - Mingl read receipts so participants can mark incoming messages read without broad chat access
 // - clubOnboardingRecords, promoterOnboardingRecords, clubMedia, and guestListCampaigns for venue onboarding
+// - commerce, paid service orders, entity follows, role permissions/activity, staffing requests, campaigns, and Pickup simulations
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -250,6 +251,47 @@ service cloud.firestore {
     match /guestListCampaigns/{id} {
       allow read: if true;
       allow create, update, delete: if signedIn();
+    }
+
+    match /commerceProducts/{id} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /serviceOrders/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /entityFollows/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /audienceCampaigns/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /pickupRequests/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /clubRolePolicies/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /clubRoleActivity/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /clubNotificationSettings/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /workerAssociationRequests/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    match /clubAdminNotifications/{id} {
+      allow read, create, update, delete: if signedIn();
     }
 
     match /clubOnboardingRecords/{id} {

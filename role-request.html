@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Request Admin / DJ / Promoter Access</title>
-  <link rel="stylesheet" href="./styles.css?v=29.04"/>
+  <title>Request Club Service Access</title>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
 <body>
@@ -15,7 +15,7 @@
       <div>
         <p class="eyebrow">Role Request</p>
         <h1>Request additional access</h1>
-        <p class="sub">All users start as regular patrons. Request Club Admin, DJ, or Promoter access here.</p>
+        <p class="sub">All users start as patrons. Elect yourself as a service member and request association with one or more clubs.</p>
         <p id="roleSignedInAs" class="status">Not signed in</p>
         <p id="roleStatus" class="status">Loading...</p>
       </div>
@@ -31,8 +31,12 @@
             <option value="clubAdmin">Club Admin</option>
             <option value="dj">DJ</option>
             <option value="promoter">Promoter</option>
+            <option value="hospitality">Waitress / Bottle Girl / Waiter</option>
+            <option value="bartender">Bartender / Barman</option>
+            <option value="mediaCreator">Videographer / Camera Operator</option>
           </select>
         </label>
+        <label>Service specialty<select id="serviceSubtype"><option value="">Select if applicable</option><option>Waitress</option><option>Bottle Girl</option><option>Waiter</option><option>Bartender / Barman</option><option>Videographer</option><option>Camera Operator</option><option>Photographer</option><option>Customer Service Representative</option><option>Independent Promoter</option><option>Promotion Company Member</option><option>Resident DJ</option><option>Visiting DJ</option></select></label>
         <label>Public / Company / DJ Name<input id="publicName" placeholder="DJ Nova, ABC Promotions, etc."/></label>
         <label>Instagram<input id="instagram"/></label>
         <label>Phone<input id="phone"/></label>
@@ -42,7 +46,8 @@
         <select id="relatedLocations" multiple size="8"></select>
       </label>
       <label>Notes<textarea id="roleNotes" placeholder="Explain your role, clubs, events, promoter company, residency, or admin relationship."></textarea></label>
-      <button id="submitRoleRequestBtn" class="primary" type="button">Submit Request</button>
+      <p class="sub small">Each selected club receives an in-app association request. Push, email, or paid SMS delivery follows that club’s notification settings.</p>
+      <button id="submitRoleRequestBtn" class="primary" type="button">Submit Club Association Request</button>
     </div>
   </section>
 </main>
@@ -51,9 +56,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=28.43-f"></script>
 <script src="./global-profile-status.js?v=29.03"></script>
-<script src="./shared-data.js?v=28.80-location-template-ai"></script>
+<script src="./shared-data.js?v=29.07"></script>
 <script src="./floqr-action-feedback.js?v=29.04"></script>
-<script src="./role-request-app.js?v=28.43-f"></script>
+<script src="./role-request-app.js?v=29.07"></script>
 <script src="./profile-access-guard.js?v=29.04"></script>
 </body>
 </html>

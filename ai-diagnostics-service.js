@@ -4698,8 +4698,14 @@
 
   function publicSourceProfileFromRow(row = {}) {
     const socials = row.socialMediaHandles || row.socialHandles || {};
+    const streetAddress = row.streetAddress || row.addressLine1 || "";
+    const stateRegion = row.stateRegion || row.region || row.state || "";
+    const country = row.country || "";
+    const fullAddress = row.fullAddress || row.address || row.proposedAddress || [streetAddress, row.city, stateRegion, row.postalCode, country].filter(Boolean).join(", ");
     return {
-      address: row.address || row.proposedAddress || "",
+      streetAddress,
+      address: fullAddress,
+      fullAddress,
       officialWebsite: row.officialWebsite || row.website || "",
       email: row.email || "",
       telephone: row.telephone || row.phone || "",
@@ -4710,8 +4716,10 @@
         facebook: socials.facebook || ""
       },
       city: row.city || "",
-      stateRegion: row.stateRegion || row.region || row.state || "",
-      country: row.country || "",
+      stateRegion,
+      postalCode: row.postalCode || row.zipCode || row.zip || "",
+      country,
+      locationLabel: window.FLOQRAddress?.publicLocation?.({city:row.city, stateRegion, country}) || [row.city, stateRegion || country].filter(Boolean).join(", "),
       sourceUrl: row.sourceUrl || "",
       sourceName: row.sourceName || "AI crawler public source",
       sourceLanguage: row.searchLanguage || row.language || "",
@@ -4846,7 +4854,9 @@
       aiConfidenceScore: Number(draft.aiConfidenceScore || 0),
       aiStarRating: Number(draft.aiStarRating || 0),
       publicProfile: {
+        streetAddress: publicProfile.streetAddress || publicProfile.addressLine1 || "",
         address: publicProfile.address || "",
+        fullAddress: publicProfile.fullAddress || publicProfile.address || "",
         officialWebsite: publicProfile.officialWebsite || publicProfile.website || "",
         email: publicProfile.email || "",
         telephone: publicProfile.telephone || publicProfile.phone || "",
@@ -4858,7 +4868,9 @@
         },
         city: publicProfile.city || "",
         stateRegion: publicProfile.stateRegion || publicProfile.region || "",
+        postalCode: publicProfile.postalCode || publicProfile.zipCode || "",
         country: publicProfile.country || "",
+        locationLabel: publicProfile.locationLabel || window.FLOQRAddress?.publicLocation?.(publicProfile) || [publicProfile.city, publicProfile.stateRegion || publicProfile.country].filter(Boolean).join(", "),
         sourceUrl: publicProfile.sourceUrl || draft.sourceUrl || "",
         sourceName: publicProfile.sourceName || draft.sourceName || "AI crawler public source",
         sourceLanguage: publicProfile.sourceLanguage || "",
@@ -4878,7 +4890,7 @@
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", targetId);
     url.searchParams.set("profileImportDraft", draftId);
-    url.searchParams.set("v", "28.61-crawler-profile-import");
+    url.searchParams.set("v", "29.07-crawler-profile-import");
     return url.href;
   }
 
@@ -4906,9 +4918,13 @@
         proposedDescription: draft.aiSummary,
         proposedLocationName: draft.proposedLocationName || draft.displayName,
         proposedAddress: draft.publicProfile.address || "",
+        streetAddress: draft.publicProfile.streetAddress || "",
+        fullAddress: draft.publicProfile.fullAddress || draft.publicProfile.address || "",
         city: draft.publicProfile.city || "",
         stateRegion: draft.publicProfile.stateRegion || "",
+        postalCode: draft.publicProfile.postalCode || "",
         country: draft.publicProfile.country || "",
+        locationLabel: draft.publicProfile.locationLabel || "",
         sourceUrl: draft.sourceUrl || draft.publicProfile.sourceUrl || "",
         sourceName: draft.sourceName || draft.publicProfile.sourceName || "AI crawler public source",
         extractedTags: draft.publicProfile.tags || [],

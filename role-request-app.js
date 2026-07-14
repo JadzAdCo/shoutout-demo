@@ -1,4 +1,4 @@
-/* role-request-app.js v28.13 */
+/* role-request-app.js v29.07 - service membership and club association requests */
 (function () {
   "use strict";
 
@@ -40,17 +40,27 @@
 
     const roleType = valueOf("requestType");
     const publicName = valueOf("publicName");
+    const serviceSubtype = valueOf("serviceSubtype");
     const instagram = valueOf("instagram");
     const phone = valueOf("phone");
     const website = valueOf("website");
     const notes = valueOf("roleNotes");
     const relatedLocations = getSelectedLocations();
+    if (!roleType || !publicName) {
+      setText("roleStatus", "Role and public name are required.");
+      return;
+    }
+    if (!relatedLocations.length) {
+      setText("roleStatus", "Select at least one club for the association request.");
+      return;
+    }
 
     const request = {
       uid: user.uid,
       email: user.email || "",
       roleType,
       publicName,
+      serviceSubtype,
       instagram,
       phone,
       website,
@@ -62,6 +72,41 @@
 
     await db.collection("roleRequests").add(request);
 
+    const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
+    const batch = db.batch();
+    relatedLocations.forEach(clubLocationId => {
+      const associationRef = db.collection("workerAssociationRequests").doc();
+      batch.set(associationRef, {
+        ...request,
+        clubLocationId,
+        roleLabel:roleLabels[roleType] || roleType,
+        workerUid:user.uid,
+        status:"pending",
+        requestedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const notificationRef = db.collection("clubAdminNotifications").doc();
+      batch.set(notificationRef, {
+        type:"workerAssociationRequest",
+        clubLocationId,
+        workerAssociationRequestId:associationRef.id,
+        workerUid:user.uid,
+        workerName:publicName || user.displayName || user.email || "FLOQR patron",
+        roleLabel:roleLabels[roleType] || roleType,
+        serviceSubtype,
+        status:"unread",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    batch.set(db.collection("users").doc(user.uid), {
+      serviceMember:roleType !== "clubAdmin",
+      requestedRoles:firebase.firestore.FieldValue.arrayUnion(roleLabels[roleType] || roleType),
+      requestedClubLocationIds:relatedLocations,
+      publicProfileType:roleType === "hospitality" || roleType === "bartender" ? "hospitality" : roleType,
+      serviceSubtype,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    await batch.commit();
+
     if (roleType === "dj") {
       await db.collection("djProfiles").doc(user.uid).set(request, { merge: true });
     }
@@ -69,7 +114,7 @@
       await db.collection("promoterProfiles").doc(user.uid).set(request, { merge: true });
     }
 
-    setText("roleStatus", "Request submitted for approval.");
+    setText("roleStatus", `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
   }
 
   document.addEventListener("DOMContentLoaded", () => {

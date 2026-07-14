@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Commerce</title>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/><link rel="stylesheet" href="./admin.css?v=29.07"/>
+</head>
+<body>
+<main class="app admin-shell commerce-shell">
+  <a class="global-back-btn buttonlike" href="./?v=29.07">&larr; Back to FLOQR</a>
+  <section class="page active">
+    <header class="topbar commerce-hero">
+      <div><p class="eyebrow">FLOQR Commerce</p><h1 id="commerceStoreName">Marketplace</h1><p class="sub">Shop apparel, photography, video, paintings, artwork, fashion, jewelry, and more from FLOQR members and entities.</p><p id="commerceStatus" class="status">Loading store...</p></div>
+      <div class="card commerce-payment-card"><strong>Secure checkout</strong><p class="sub small">Apple Pay and credit/debit cards are presented through Stripe Checkout when available on the patron's device.</p></div>
+    </header>
+    <div id="commerceLogin" class="card"><h2>Sign in to shop</h2><button id="commerceGoogleLoginBtn" type="button">Continue with Google</button></div>
+    <div id="commercePanel" class="hidden">
+      <section class="card"><div class="commerce-toolbar">
+        <label>Search products<input id="commerceSearch" placeholder="T-shirts, photos, videos, paintings, jewelry"/></label>
+        <label>Category<select id="commerceCategory"><option value="">All categories</option><option>Apparel</option><option>Photography</option><option>Video</option><option>Artwork</option><option>Fashion</option><option>Jewelry</option><option>Accessories</option><option>Other</option></select></label>
+      </div></section>
+      <section id="commerceProductGrid" class="commerce-product-grid"></section>
+      <section id="commerceSellerPanel" class="card hidden">
+        <p class="eyebrow">Seller tools</p><h2>Add a product or media license</h2>
+        <p class="sub small">Videographers and camera operators should use a watermarked or low-resolution preview. Paid digital delivery is tracked as fulfillment and released by the seller after purchase.</p>
+        <div class="profile-grid">
+          <label>Product name<input id="commerceProductName"/></label>
+          <label>Category<select id="commerceProductCategory"><option>Apparel</option><option>Photography</option><option>Video</option><option>Artwork</option><option>Fashion</option><option>Jewelry</option><option>Accessories</option><option>Other</option></select></label>
+          <label>Product type<select id="commerceProductType"><option value="physical">Physical product</option><option value="photoLicense">Digital photo license</option><option value="videoLicense">Digital video license</option></select></label>
+          <label>Price (USD)<input id="commerceProductPrice" type="number" min="0.50" step="0.01"/></label>
+          <label>Available licenses / inventory<input id="commerceProductInventory" type="number" min="0" value="1"/></label>
+          <label>Preview type<select id="commerceProductPreviewType"><option value="image">Image / watermarked photo</option><option value="video">Video preview</option></select></label>
+          <label class="profile-grid-wide">Preview media URL<input id="commerceProductImage" type="url" placeholder="Use a watermarked or low-resolution sales preview"/></label>
+          <label>Media license<select id="commerceProductLicense"><option value="personal">Personal use</option><option value="editorial">Editorial use</option><option value="commercial">Commercial use</option><option value="exclusive">Exclusive rights</option></select></label>
+          <label class="profile-grid-wide">Description<textarea id="commerceProductDescription" rows="3"></textarea></label>
+          <label><input id="commerceProductShipping" type="checkbox" checked/> Requires shipping</label>
+        </div>
+        <button id="commerceSaveProductBtn" class="primary" type="button">Publish Product</button>
+        <div id="commerceSellerReport" class="report-block"></div>
+        <h3>Sales and fulfillment</h3>
+        <div id="commerceOrdersReport" class="report-block"><p class="sub">Paid sales will appear here with invoice and delivery status.</p></div>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.07"></script><script src="./shared-data.js?v=29.07"></script><script src="./payment-service.js?v=29.07"></script><script src="./commerce-app.js?v=29.07"></script><script src="./profile-access-guard.js?v=29.07"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* admin-app.js v29.06 - Venue Command Center, template-background permissions, consolidated media editing, assigned admins, and display formats */
+/* admin-app.js v29.07 - Venue Command Center, normalized addresses, commerce, guest-list distribution, staffing, and REP */
 (function () {
   "use strict";
 
@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.06";
+  const CURRENT_VERSION = "29.07";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -25,6 +25,7 @@
   const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+  let workerAssociationRequests = [];
   let clubMedia = [];
   let clubMediaEditTargetId = "";
   let clubMediaPreviewFile = null;
@@ -76,7 +77,7 @@
     const liveFrame = byId("liveFrame");
     if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
     const publicLink = byId("clubPublicProfileLink");
-    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.06`;
+    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.07`;
   }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -86,7 +87,7 @@
   }
 
   function publicProfileUrl() {
-    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.06`, window.location.href).toString();
+    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.07`, window.location.href).toString();
   }
 
   function parsePeopleLines(value, fallbackRole) {
@@ -119,7 +120,11 @@
   function applyProfileImportDraftToForm(draft = {}, source = {}) {
     const profile = draft.publicProfile || {};
     const socials = profile.socialMediaHandles || {};
-    setInputIfMissing("clubProfileAddress", profile.address);
+    setInputIfMissing("clubProfileStreetAddress", profile.streetAddress || profile.addressLine1 || profile.address);
+    setInputIfMissing("clubProfileCity", profile.city);
+    setInputIfMissing("clubProfileRegion", profile.stateRegion || profile.region || profile.state);
+    setInputIfMissing("clubProfilePostalCode", profile.postalCode || profile.zipCode);
+    setInputIfMissing("clubProfileCountry", profile.country);
     setInputIfMissing("clubProfileWebsite", profile.officialWebsite || profile.website);
     setInputIfMissing("clubProfileEmail", profile.email);
     setInputIfMissing("clubProfileTelephone", profile.telephone || profile.phone);
@@ -175,7 +180,11 @@
       publicClubProfile = {...loc};
     }
     const socials = publicClubProfile.socialMediaHandles || publicClubProfile.socialHandles || {};
-    if (byId("clubProfileAddress")) byId("clubProfileAddress").value = publicClubProfile.address || "";
+    if (byId("clubProfileStreetAddress")) byId("clubProfileStreetAddress").value = publicClubProfile.streetAddress || publicClubProfile.addressLine1 || (publicClubProfile.fullAddress ? "" : publicClubProfile.address) || "";
+    if (byId("clubProfileCity")) byId("clubProfileCity").value = publicClubProfile.city || loc.city || "";
+    if (byId("clubProfileRegion")) byId("clubProfileRegion").value = publicClubProfile.stateRegion || publicClubProfile.region || loc.region || "";
+    if (byId("clubProfilePostalCode")) byId("clubProfilePostalCode").value = publicClubProfile.postalCode || publicClubProfile.zipCode || "";
+    if (byId("clubProfileCountry")) byId("clubProfileCountry").value = publicClubProfile.country || loc.country || "";
     if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
     if (byId("clubProfileTagline")) byId("clubProfileTagline").value = publicClubProfile.tagline || publicClubProfile.publicTagline || "";
     if (byId("clubProfileDescription")) byId("clubProfileDescription").value = publicClubProfile.description || publicClubProfile.publicDescription || publicClubProfile.about || "";
@@ -192,6 +201,9 @@
     if (byId("clubProfileDressCode")) byId("clubProfileDressCode").value = publicClubProfile.dressCode || "";
     if (byId("clubProfileAmenities")) byId("clubProfileAmenities").value = (publicClubProfile.amenities || []).join(", ");
     if (byId("clubProfileServices")) byId("clubProfileServices").value = (publicClubProfile.publicServices || publicClubProfile.services || []).join(", ");
+    if (byId("clubCommerceEnabled")) byId("clubCommerceEnabled").checked = !!publicClubProfile.commerceEnabled;
+    if (byId("clubCommerceStoreName")) byId("clubCommerceStoreName").value = publicClubProfile.commerceStoreName || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`;
+    if (byId("clubStripeConnectAccountId")) byId("clubStripeConnectAccountId").value = publicClubProfile.stripeConnectAccountId || "";
     if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
     if (byId("clubProfileFeaturedStaff")) byId("clubProfileFeaturedStaff").value = peopleLines(publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff);
     if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
@@ -231,11 +243,29 @@
     const primaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubPrimaryDisplayFormat")?.value)
       ? byId("clubPrimaryDisplayFormat").value
       : displayScreenFormatIds[0];
+    const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || "";
+    const city = byId("clubProfileCity")?.value.trim() || "";
+    const stateRegion = byId("clubProfileRegion")?.value.trim() || "";
+    const postalCode = byId("clubProfilePostalCode")?.value.trim() || "";
+    const country = byId("clubProfileCountry")?.value.trim() || "";
+    if (!streetAddress || !city || !stateRegion || !country) throw new Error("Street address, city, state/region, and country are required.");
+    const addressRecord = {streetAddress, city, stateRegion, postalCode, country};
+    const fullAddress = window.FLOQRAddress?.fullAddress(addressRecord) || [streetAddress, city, stateRegion, postalCode, country].filter(Boolean).join(", ");
+    const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
       description:byId("clubProfileDescription")?.value.trim() || "",
-      address:byId("clubProfileAddress")?.value.trim() || "",
+      streetAddress,
+      addressLine1:streetAddress,
+      city,
+      region:stateRegion,
+      stateRegion,
+      postalCode,
+      country,
+      fullAddress,
+      address:fullAddress,
+      locationLabel,
       officialWebsite:byId("clubProfileWebsite")?.value.trim() || "",
       email:byId("clubProfileEmail")?.value.trim() || "",
       telephone:byId("clubProfileTelephone")?.value.trim() || "",
@@ -251,6 +281,9 @@
       dressCode:byId("clubProfileDressCode")?.value.trim() || "",
       amenities:splitCSV(byId("clubProfileAmenities")?.value || ""),
       publicServices:splitCSV(byId("clubProfileServices")?.value || ""),
+      commerceEnabled:!!byId("clubCommerceEnabled")?.checked,
+      commerceStoreName:byId("clubCommerceStoreName")?.value.trim() || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`,
+      stripeConnectAccountId:byId("clubStripeConnectAccountId")?.value.trim() || "",
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
       featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
@@ -266,9 +299,10 @@
       publicSearchKeywords:[
         publicClubProfile.locationName || loc.locationName,
         publicClubProfile.brandName || loc.brandName,
-        publicClubProfile.city || loc.city,
-        publicClubProfile.country || loc.country,
-        byId("clubProfileAddress")?.value.trim() || "",
+        city,
+        stateRegion,
+        country,
+        fullAddress,
         byId("clubProfileWebsite")?.value.trim() || ""
       ].concat(splitCSV(byId("clubProfileGenres")?.value || "")).filter(Boolean),
       updatedByUid:auth.currentUser?.uid || "",
@@ -566,7 +600,10 @@
     try {
       const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
       const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
-      return assignment.exists && String(assignment.data()?.status || "active") === "active";
+      if (assignment.exists && String(assignment.data()?.status || "active") === "active") return true;
+      const designation = await db.collection("clubEmployeeDesignations").doc(assignmentId).get();
+      const permissions = designation.exists ? designation.data()?.rolePermissions || [] : [];
+      return designation.exists && designation.data()?.status !== "rejected" && permissions.some(permission => ["manageGuestLists","postPublicContent","manageCommerce","customerSupport"].includes(permission));
     } catch (error) {
       return false;
     }
@@ -1045,6 +1082,8 @@
       if (x.includes("promoter")) roles.add("Promoter");
       if (x.includes("dj")) roles.add("DJ");
       if (x.includes("waiter") || x.includes("waitress") || x.includes("bottle") || x.includes("hospitality")) roles.add("Waiter / Waitress / Bottle Girl");
+      if (x.includes("bartender") || x.includes("barman")) roles.add("Bartender / Barman");
+      if (/videographer|camera operator|cameraman|camera man|photographer|cinematographer/.test(x)) roles.add("Videographer / Camera Operator");
     });
     return Array.from(roles);
   }
@@ -1058,7 +1097,7 @@
       role === "Club Admin" ||
       role === "Promoter" ||
       role === "DJ" ||
-      role === "Waiter / Waitress / Bottle Girl"
+      role === "Waiter / Waitress / Bottle Girl" || role === "Bartender / Barman" || role === "Videographer / Camera Operator"
     ));
   }
 
@@ -1214,6 +1253,7 @@
       ["DJs / visiting DJs", roleCounts.get("DJ") || 0],
       ["Promoters / companies", roleCounts.get("Promoter") || 0],
       ["Waiters / waitresses / bottle girls", roleCounts.get("Waiter / Waitress / Bottle Girl") || 0],
+      ["Videographers / camera operators", roleCounts.get("Videographer / Camera Operator") || 0],
       ["Designated CSRs", adminDesignations.filter(x => x.isCSR !== false).length]
     ]);
     byId("workerRoleReport").innerHTML = workers.length ? workers.slice(0, 12).map(profile => {
@@ -1225,12 +1265,14 @@
       </div>`;
     }).join("") : "<p class='sub'>Search or approve role members to populate role groups.</p>";
 
-    const pending = adminUsers.filter(profile => isClubWorkerOrAffiliate(profile) && hasPendingWorkerRequest(profile));
-    byId("pendingWorkerRequests").innerHTML = pending.length ? pending.map(profile => `<div class="queue-item">
-      <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Worker request")}</strong>
-      <p>${esc(approvedRoles(profile).join(", ") || "Requested worker role")}</p>
-      <small>${esc(profile.email || profile.username || "")}</small>
+    const pending = workerAssociationRequests.filter(request => String(request.status || "pending").toLowerCase() === "pending");
+    byId("pendingWorkerRequests").innerHTML = pending.length ? pending.map(request => `<div class="queue-item">
+      <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
+      <p>${esc(request.roleLabel || request.roleType || "Requested worker role")}${request.serviceSubtype ? ` - ${esc(request.serviceSubtype)}` : ""}</p>
+      <small>${esc(request.email || request.instagram || "")}</small>
+      <div class="queue-actions"><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="approved">Approve</button><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="rejected">Reject</button></div>
     </div>`).join("") : "<p class='sub'>No pending worker requests for this club location yet.</p>";
+    byId("pendingWorkerRequests").querySelectorAll("[data-worker-request]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerRequest, button.dataset.workerStatus)));
 
     const active = adminDesignations.filter(x => x.isCSR !== false);
     csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">
@@ -1248,13 +1290,46 @@
   }
 
   async function loadEmployeeDesignations() {
-    const [users, designations] = await Promise.all([
+    const [users, designations, requests] = await Promise.all([
       getCollectionSafe("users"),
-      getCollectionSafe("clubEmployeeDesignations")
+      getCollectionSafe("clubEmployeeDesignations"),
+      getCollectionSafe("workerAssociationRequests")
     ]);
     adminUsers = users;
     adminDesignations = designations.filter(x => x.clubLocationId === locationId);
+    workerAssociationRequests = requests.filter(x => x.clubLocationId === locationId);
+    const teamOptions = byId("guestSupportingTeamOptions");
+    if (teamOptions) teamOptions.innerHTML = adminDesignations.filter(item => String(item.status || "approved") === "approved").map(item => {
+      const name = item.workerName || item.workerUsername || item.workerEmail || "Approved team member";
+      const role = item.roleElectionType || (item.workerRoles || [])[0] || "Club worker";
+      return `<option value="${esc(name)}">${esc(role)}</option>`;
+    }).join("");
     renderEmployeeDesignations();
+  }
+
+  function workerRoleLabel(request = {}) {
+    const type = String(request.roleType || "").toLowerCase();
+    if (type === "clubadmin") return "Club Admin";
+    if (type === "dj") return "DJ";
+    if (type === "promoter") return "Promoter";
+    if (type === "bartender") return "Bartender / Barman";
+    if (type === "mediacreator") return "Videographer / Camera Operator";
+    return request.serviceSubtype || "Waiter / Waitress / Bottle Girl";
+  }
+
+  async function setWorkerAssociationRequest(requestId, status) {
+    const request = workerAssociationRequests.find(item => item.id === requestId);
+    if (!request) return;
+    const role = workerRoleLabel(request);
+    if (status === "approved") {
+      const uid = request.uid || request.workerUid;
+      await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:request.email || "", workerName:request.publicName || request.displayName || request.email || "Club worker", workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      await db.collection("users").doc(uid).set({approvedRoles:firebase.firestore.FieldValue.arrayUnion(role), approvedLocations:firebase.firestore.FieldValue.arrayUnion(locationId), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      await db.collection("inboxNotifications").add({recipientUid:uid, type:"workerAssociation", title:"Club association approved", body:`${loc.locationName || locationId} approved your ${role} association.`, clubLocationId:locationId, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+    await db.collection("workerAssociationRequests").doc(requestId).set({status, reviewedByUid:auth.currentUser?.uid || "", reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    setText("adminStatus", `Worker association ${status}.`);
+    await loadEmployeeDesignations();
   }
 
   function guestCampaignPayload() {
@@ -1268,6 +1343,11 @@
       promoterName: byId("guestCampaignPromoter")?.value.trim() || "",
       actionUrl: byId("guestCampaignUrl")?.value.trim() || "",
       description: byId("guestCampaignDescription")?.value.trim() || "",
+      theme:byId("guestCampaignTheme")?.value || "midnight",
+      mainImageUrl:byId("guestCampaignImage")?.value.trim() || "",
+      supportingTeam:splitCSV(byId("guestCampaignSupportingTeam")?.value || ""),
+      audienceMode:byId("guestCampaignAudience")?.value || "followers",
+      targetUserCount:Number(byId("guestCampaignTargetCount")?.value || 0),
       status: "enabled",
       active: true,
       eligibleMembers: "floqr-patrons-only",
@@ -1284,8 +1364,26 @@
       if (active.length >= 6) throw new Error("This club already has 6 active guest list campaigns. Disable or archive one first.");
       const payload = guestCampaignPayload();
       if (!payload.campaignName) throw new Error("Campaign name is required.");
-      await db.collection("guestListCampaigns").add(payload);
-      setText("adminStatus", "Guest list campaign created.");
+      const designation = adminDesignations.find(item => (item.workerUid || item.uid) === auth.currentUser?.uid);
+      if (designation && !String(designation.roleElectionType || "").toLowerCase().includes("club admin")) {
+        const policySnap = await db.collection("clubRolePolicies").doc(locationId).get().catch(() => null);
+        const policy = policySnap?.exists ? policySnap.data()?.roles?.[designation.roleElectionType] || {} : {};
+        if (designation.requireApproval !== false && policy.requireApproval !== false) {
+          await db.collection("clubRoleActivity").add({clubLocationId:locationId, actionType:"guestListCampaign", payload, submittedByUid:auth.currentUser.uid, submittedByRole:designation.roleElectionType || "Club worker", status:"pendingApproval", createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+          setText("adminStatus", "Guest list campaign submitted for Club Admin approval.");
+          return;
+        }
+      }
+      if (payload.audienceMode === "targetedFloqr") {
+        if (payload.targetUserCount < 1) throw new Error("Enter the number of targeted FloqR patrons.");
+        const checkoutCampaign = {...payload, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+        await window.FLOQRPayments.startCheckout({orderType:"targetedGuestList", payload:{clubLocationId:locationId, campaign:checkoutCampaign, targetUserCount:payload.targetUserCount}, status:message => setText("adminStatus", message)});
+        return;
+      }
+      const campaignRef = await db.collection("guestListCampaigns").add(payload);
+      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.07`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
+      await campaignRef.set({publishedAt:firebase.firestore.FieldValue.serverTimestamp(), deliveredCount:result.deliveredCount || 0}, {merge:true});
+      setText("adminStatus", `Guest list campaign submitted to ${result.deliveredCount || 0} club follower(s).`);
       await loadGuestListCampaigns();
     } catch (e) {
       setText("adminStatus", `Guest list campaign failed: ${e.message || e}`);
@@ -1696,6 +1794,7 @@
     byId("clubMediaFilter")?.addEventListener("change", renderClubMediaInputPreview);
     byId("clubMediaTrimStart")?.addEventListener("input", renderClubMediaInputPreview);
     byId("clubMediaTrimEnd")?.addEventListener("input", renderClubMediaInputPreview);
+    byId("guestCampaignAudience")?.addEventListener("change", event => byId("guestCampaignTargetCountLabel")?.classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));
     updateClubMediaTrimVisibility();
 
     auth.getRedirectResult().then(result => {

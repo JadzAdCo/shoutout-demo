@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v29.05 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v29.07 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.06"/>
-  <link rel="stylesheet" href="./admin.css?v=29.06"/>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -59,6 +59,7 @@
         <button class="admin-tab" data-panel="patronDiagnostics" type="button">Patron Diagnostics</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
+        <button class="admin-tab" data-panel="servicesCommerce" type="button">Services & Commerce</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
         <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
@@ -91,14 +92,14 @@
       <section id="clubOnboarding" class="admin-panel-section">
         <div class="card">
           <h2>Entity Onboarding and Club Admin Assignment</h2>
-          <p class="sub small">Search imported or discovered clubs, select an existing patron, and activate that patron as a club admin. Club admins must have a completed FLOQR patron profile before assignment.</p>
+          <p class="sub small">Search or choose an imported/discovered club, then select a completed patron who explicitly elected an eligible service role: waiter/waitress, bottle service, promoter, DJ, bartender/barman, or videographer/camera operator.</p>
           <div class="profile-grid">
-            <label>Search clubs<input id="entityClubSearch" placeholder="Lima Twist, Washington, club ID, address, or source"/></label>
-            <label>Search registered patrons<input id="entityPatronSearch" placeholder="Name, username, email, or patron UID"/></label>
+            <label>Select club entity<input id="entityClubSearch" list="entityClubOptions" autocomplete="off" placeholder="Search by club, city, ID, or address"/><datalist id="entityClubOptions"></datalist></label>
+            <label>Eligible service patron<input id="entityPatronSearch" list="entityPatronOptions" autocomplete="off" placeholder="Search elected service members only"/><datalist id="entityPatronOptions"></datalist></label>
           </div>
           <div class="entity-onboarding-grid">
             <div><h3>1. Select an entity</h3><div id="entityClubResults" class="report-block"></div></div>
-            <div><h3>2. Select a patron</h3><div id="entityPatronResults" class="report-block"></div></div>
+            <div><h3>2. Select an eligible service patron</h3><div id="entityPatronResults" class="report-block"></div></div>
           </div>
           <div id="entityAssignmentSummary" class="report-block"></div>
           <button id="assignEntityClubAdminBtn" class="primary" type="button" disabled>Assign Selected Patron as Club Admin</button>
@@ -109,7 +110,11 @@
           <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team.</p>
           <div class="profile-grid">
             <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
-            <label>Full Address<input id="clubOnboardAddress" placeholder="1411 K St NW, Washington, DC 20005"/></label>
+            <label>Street address<input id="clubOnboardStreetAddress" autocomplete="address-line1" placeholder="1411 K St NW" required/></label>
+            <label>City<input id="clubOnboardCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>State / region<input id="clubOnboardRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
+            <label>Postal code<input id="clubOnboardPostalCode" autocomplete="postal-code" placeholder="20005"/></label>
+            <label>Country<input id="clubOnboardCountry" autocomplete="country-name" value="United States" required/></label>
             <label><span class="field-icon">TEL</span> Telephone #<input id="clubOnboardPhone" placeholder="+1 202 789 2800"/></label>
             <label><span class="field-icon">WEB</span> Website<input id="clubOnboardWebsite" placeholder="https://example.com"/></label>
             <label><span class="field-icon">MAIL</span> Customer Email<input id="clubOnboardEmail" placeholder="info@example.com"/></label>
@@ -187,6 +192,12 @@
           <label>Search templates<input id="templateManagementSearch" placeholder="Name, ID, tag, screen size, category"/></label>
           <div id="templateManagementList" class="report-block"></div>
         </div>
+      </section>
+
+      <section id="servicesCommerce" class="admin-panel-section">
+        <div class="metric-grid"><div class="metric-card"><span>Paid Services</span><strong id="serviceOrderCount">0</strong></div><div class="metric-card"><span>Gross Revenue</span><strong id="serviceGrossRevenue">$0</strong></div><div class="metric-card"><span>FloqR Share</span><strong id="serviceFloqrShare">$0</strong></div><div class="metric-card"><span>Seller / Club Payable</span><strong id="serviceEntityPayable">$0</strong></div></div>
+        <div class="card"><h2>Service Orders, Invoices & Shipping</h2><p class="sub small">Track ShoutOuts, targeted distribution, SMS services, and Commerce orders through payment and fulfillment.</p><div id="serviceOrdersReport" class="report-block"></div></div>
+        <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
       </section>
 
       <section id="allQueues" class="admin-panel-section">
@@ -350,7 +361,7 @@
             <button id="saveClubProfileImportDraftsBtn" class="primary" type="button">Save Import Drafts</button>
             <button id="backfillClubProfileFieldsBtn" type="button">Backfill Missing Field Keys</button>
           </div>
-          <label>Crawler JSON<textarea id="clubProfileImportJson" rows="10"></textarea></label>
+          <details class="admin-detail json-disclosure"><summary>View generated crawler data</summary><label>Crawler JSON<textarea id="clubProfileImportJson" rows="10"></textarea></label></details>
           <div id="clubProfileDiagnosticsReport" class="report-block"></div>
         </div>
         <div class="card">
@@ -495,14 +506,16 @@
   </section>
 </main>
 
+<div id="templateViewModal" class="club-person-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templateViewName"><div class="club-person-modal-card template-view-card"><button id="templateViewCloseBtn" class="club-person-close" type="button" aria-label="Close template">&times;</button><p class="eyebrow">Template preview</p><h2 id="templateViewName">Template</h2><div id="templateViewPreview" class="template-view-preview"></div><div id="templateViewDetails" class="report-block"></div><button id="templateViewCloseWindowBtn" type="button">Close Window</button></div></div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.05"></script>
+<script src="./firebase-config.js?v=29.07"></script>
 <script src="./global-profile-status.js?v=29.05"></script>
-<script src="./shared-data.js?v=29.06"></script>
+<script src="./shared-data.js?v=29.07"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=29.05"></script>
 <script src="./ai-search-service.js?v=29.05"></script>
@@ -512,7 +525,9 @@
 <script src="./ad-campaigns.js?v=29.05"></script>
 <script src="./ai-diagnostics-service.js?v=29.06"></script>
 <script src="./duplicate-record-service.js?v=29.05"></script>
-<script src="./master-admin-app.js?v=29.06"></script>
+<script src="./payment-service.js?v=29.07"></script>
+<script src="./master-admin-app.js?v=29.07"></script>
+<script src="./master-services-extension.js?v=29.07"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>
 </body>

@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.06
+/* master-admin-app.js v29.07
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.06";
+  const CURRENT_VERSION = "29.07";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -260,7 +260,15 @@
 
   function clubOnboardingPayload(input = {}) {
     const name = String(input.clubName || input["Club Name"] || "").trim();
-    const fullAddress = String(input.fullAddress || input["Full Address"] || input.address || "").trim();
+    const suppliedFullAddress = String(input.fullAddress || input["Full Address"] || input.address || "").trim();
+    const supplied = {
+      streetAddress:String(input.streetAddress || input.addressLine1 || "").trim(),
+      city:String(input.city || "").trim(),
+      stateRegion:String(input.stateRegion || input.region || input.state || "").trim(),
+      postalCode:String(input.postalCode || input.zipCode || "").trim(),
+      country:String(input.country || "").trim()
+    };
+    const fullAddress = suppliedFullAddress || (window.FLOQRAddress?.fullAddress(supplied) || [supplied.streetAddress, supplied.city, supplied.stateRegion, supplied.postalCode, supplied.country].filter(Boolean).join(", "));
     const inferred = addressParts(fullAddress);
     const id = slugify(`${name}-${inferred.city || input.city || ""}-${inferred.region || input.region || ""}`);
     const genres = splitCSV(input.genres || input["Music Genres"] || input.musicGenres);
@@ -273,11 +281,16 @@
       locationName: name,
       clubName: name,
       brandName: name,
+      streetAddress:supplied.streetAddress || (suppliedFullAddress ? fullAddress.split(",")[0].trim() : ""),
+      addressLine1:supplied.streetAddress || (suppliedFullAddress ? fullAddress.split(",")[0].trim() : ""),
       fullAddress,
       address: fullAddress,
-      city: input.city || inferred.city || "",
-      region: input.region || input.state || inferred.region || "",
-      country: input.country || inferred.country || "United States",
+      city: supplied.city || inferred.city || "",
+      region: supplied.stateRegion || inferred.region || "",
+      stateRegion:supplied.stateRegion || inferred.region || "",
+      postalCode:supplied.postalCode,
+      country: supplied.country || inferred.country || "United States",
+      locationLabel:window.FLOQRAddress?.publicLocation({city:supplied.city || inferred.city || "", stateRegion:supplied.stateRegion || inferred.region || "", country:supplied.country || inferred.country || "United States"}) || "",
       telephone: String(input.telephone || input.phone || input["Telephone #"] || "").trim(),
       officialWebsite: String(input.website || input.Website || "").trim(),
       email: String(input.email || input["Customer Email"] || "").trim(),
@@ -314,7 +327,11 @@
   function readClubOnboardingForm() {
     return clubOnboardingPayload({
       clubName: byId("clubOnboardName")?.value,
-      fullAddress: byId("clubOnboardAddress")?.value,
+      streetAddress:byId("clubOnboardStreetAddress")?.value,
+      city:byId("clubOnboardCity")?.value,
+      stateRegion:byId("clubOnboardRegion")?.value,
+      postalCode:byId("clubOnboardPostalCode")?.value,
+      country:byId("clubOnboardCountry")?.value,
       telephone: byId("clubOnboardPhone")?.value,
       website: byId("clubOnboardWebsite")?.value,
       email: byId("clubOnboardEmail")?.value,
@@ -329,6 +346,7 @@
 
   async function saveClubOnboarding(payload) {
     if (!payload.locationName) throw new Error("Club Name is required.");
+    if (!payload.streetAddress || !payload.city || !payload.region || !payload.country) throw new Error("Street address, city, state/region, and country are required.");
     await db.collection("clubLocations").doc(payload.id).set(payload, {merge:true});
     await db.collection("clubs").doc(payload.id).set({
       clubId: payload.id,
@@ -488,33 +506,65 @@
   }
 
   function patronSearchText(row = {}) {
-    return [row.uid, row.id, row.displayName, row.username, row.email, row.phoneNumber].filter(Boolean).join(" ").toLowerCase();
+    return [row.uid, row.id, row.displayName, row.username, row.email, row.phoneNumber, ...eligibleServiceRoles(row)].filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function eligibleServiceRoles(row = {}) {
+    const sources = [
+      ...(Array.isArray(row.requestedRoles) ? row.requestedRoles : []),
+      ...(Array.isArray(row.electedRoles) ? row.electedRoles : []),
+      ...(Array.isArray(row.approvedRoles) ? row.approvedRoles : []),
+      row.requestedRole,
+      row.electedRole,
+      row.serviceSubtype,
+      row.publicProfileType,
+      row.roleType,
+      row.role
+    ].filter(Boolean).map(value => String(value).toLowerCase());
+    const roles = [];
+    const add = role => { if (!roles.includes(role)) roles.push(role); };
+    sources.forEach(value => {
+      if (value.includes("promoter")) add("Promoter");
+      if (/\bdj\b|disc jockey/.test(value)) add("DJ");
+      if (/waiter|waitress|hospitality/.test(value)) add("Waiter / Waitress");
+      if (/bottle/.test(value)) add("Bottle Service");
+      if (/bartender|barman|bar man/.test(value)) add("Bartender / Barman");
+      if (/videographer|camera operator|cameraman|camera man|photographer|cinematographer|media ?creator/.test(value)) add("Videographer / Camera Operator");
+    });
+    return roles;
   }
 
   function updateEntityAssignmentSummary() {
     const wrap = byId("entityAssignmentSummary");
     const club = networkLocations.find(row => row.id === selectedEntityClubId);
     const patron = networkUsers.find(row => (row.uid || row.id) === selectedEntityPatronUid);
+    const roles = patron ? eligibleServiceRoles(patron) : [];
     if (wrap) wrap.innerHTML = simpleRows([
       ["Selected entity", club ? `${locationName(club)} (${club.id})` : "Choose a club"],
-      ["Selected patron", patron ? `${patron.displayName || patron.username || patron.email || patron.uid || patron.id} (${patron.email || patron.uid || patron.id})` : "Choose a completed patron profile"],
-      ["Activation", club && patron ? "Ready to assign Club Admin portal access" : "Waiting for both selections"]
+      ["Selected patron", patron ? `${patron.displayName || patron.username || patron.email || patron.uid || patron.id} (${patron.email || patron.uid || patron.id})` : "Choose an eligible service patron"],
+      ["Elected service role", roles.join(", ") || "No eligible role elected"],
+      ["Activation", club && patron && roles.length ? "Ready to assign Club Admin portal access" : "Waiting for an entity and eligible patron"]
     ]);
-    if (byId("assignEntityClubAdminBtn")) byId("assignEntityClubAdminBtn").disabled = !(club && patron && patron.profileCompleted === true);
+    if (byId("assignEntityClubAdminBtn")) byId("assignEntityClubAdminBtn").disabled = !(club && patron && patron.profileCompleted === true && roles.length);
   }
 
   function renderEntityClubResults() {
     const wrap = byId("entityClubResults");
     if (!wrap) return;
     const query = String(byId("entityClubSearch")?.value || "").trim().toLowerCase();
-    const rows = networkLocations.filter(row => !query || entitySearchText(row).includes(query)).slice(0, 80);
+    const exact = networkLocations.find(row => String(row.id).toLowerCase() === query || locationName(row).toLowerCase() === query);
+    if (exact) selectedEntityClubId = exact.id;
+    const options = byId("entityClubOptions");
+    if (options) options.innerHTML = networkLocations.slice().sort((a,b) => locationName(a).localeCompare(locationName(b))).map(row => `<option value="${esc(row.id)}">${esc(`${locationName(row)} - ${window.FLOQRAddress?.publicLocation?.(row) || [row.city, row.country].filter(Boolean).join(", ")}`)}</option>`).join("");
+    const rows = query ? networkLocations.filter(row => entitySearchText(row).includes(query)).slice(0, 16) : networkLocations.filter(row => row.id === selectedEntityClubId);
     wrap.innerHTML = rows.length ? rows.map(row => `<button class="entity-result-card ${row.id === selectedEntityClubId ? "selected" : ""}" type="button" data-entity-club-id="${esc(row.id)}">
       <strong>${esc(locationName(row))}</strong>
       <span>${esc([row.city, row.region, row.country].filter(Boolean).join(", ") || row.address || row.fullAddress || row.id)}</span>
       <small>${esc(row.onboardingSource || row.discoveryMode || "FLOQR clubLocations")}</small>
-    </button>`).join("") : "<p class='sub'>No matching imported or discovered club was found.</p>";
+    </button>`).join("") : `<p class='sub'>${query ? "No matching imported or discovered club was found." : "Type to search or choose a club from the dropdown."}</p>`;
     wrap.querySelectorAll("[data-entity-club-id]").forEach(button => button.addEventListener("click", () => {
       selectedEntityClubId = button.dataset.entityClubId || "";
+      byId("entityClubSearch").value = selectedEntityClubId;
       renderEntityClubResults();
       updateEntityAssignmentSummary();
     }));
@@ -524,18 +574,25 @@
     const wrap = byId("entityPatronResults");
     if (!wrap) return;
     const query = String(byId("entityPatronSearch")?.value || "").trim().toLowerCase();
-    const rows = networkUsers.filter(row => !query || patronSearchText(row).includes(query)).slice(0, 80);
+    const eligible = networkUsers.filter(row => eligibleServiceRoles(row).length);
+    const exact = eligible.find(row => String(row.uid || row.id).toLowerCase() === query || String(row.email || "").toLowerCase() === query || String(row.username || "").toLowerCase() === query);
+    if (exact) selectedEntityPatronUid = exact.uid || exact.id;
+    const options = byId("entityPatronOptions");
+    if (options) options.innerHTML = eligible.slice().sort((a,b) => String(a.displayName || a.email || "").localeCompare(String(b.displayName || b.email || ""))).map(row => `<option value="${esc(row.uid || row.id)}">${esc(`${row.displayName || row.username || row.email || row.uid || row.id} - ${eligibleServiceRoles(row).join(", ")}`)}</option>`).join("");
+    const rows = query ? eligible.filter(row => patronSearchText(row).includes(query)).slice(0, 16) : eligible.filter(row => (row.uid || row.id) === selectedEntityPatronUid);
     wrap.innerHTML = rows.length ? rows.map(row => {
       const uid = row.uid || row.id;
       const complete = row.profileCompleted === true;
       return `<button class="entity-result-card ${uid === selectedEntityPatronUid ? "selected" : ""}" type="button" data-entity-patron-uid="${esc(uid)}" ${complete ? "" : "disabled"}>
         <strong>${esc(row.displayName || row.username || row.email || uid)}</strong>
         <span>${esc(row.email || row.phoneNumber || uid)}</span>
+        <span>${esc(eligibleServiceRoles(row).join(", "))}</span>
         <small>${complete ? "Completed patron profile — eligible" : "Profile incomplete — not eligible"}</small>
       </button>`;
-    }).join("") : "<p class='sub'>No matching registered patron was found.</p>";
+    }).join("") : `<p class='sub'>${query ? "No matching elected service patron was found." : "Type to search or choose an elected service patron from the dropdown."}</p>`;
     wrap.querySelectorAll("[data-entity-patron-uid]").forEach(button => button.addEventListener("click", () => {
       selectedEntityPatronUid = button.dataset.entityPatronUid || "";
+      byId("entityPatronSearch").value = selectedEntityPatronUid;
       renderEntityPatronResults();
       updateEntityAssignmentSummary();
     }));
@@ -544,8 +601,8 @@
   async function assignSelectedEntityClubAdmin() {
     const club = networkLocations.find(row => row.id === selectedEntityClubId);
     const patron = networkUsers.find(row => (row.uid || row.id) === selectedEntityPatronUid);
-    if (!club || !patron || patron.profileCompleted !== true) {
-      setText("entityOnboardingStatus", "Select one club and one patron with a completed profile.");
+    if (!club || !patron || patron.profileCompleted !== true || !eligibleServiceRoles(patron).length) {
+      setText("entityOnboardingStatus", "Select one club and one completed patron who elected an eligible service role, including videographer/camera operator when applicable.");
       return;
     }
     const uid = patron.uid || patron.id;
@@ -589,6 +646,7 @@
         patronUid:uid,
         patronEmail:email,
         patronDisplayName:patron.displayName || patron.username || email || uid,
+        electedServiceRoles:eligibleServiceRoles(patron),
         role:"Club Admin",
         status:"active",
         assignedByUid:auth.currentUser?.uid || "",
@@ -657,11 +715,12 @@
     const query = String(byId("templateManagementSearch")?.value || "").trim().toLowerCase();
     const rows = Object.values(managedTemplates).filter(template => !query || [template.id, template.name, template.category, template.description, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query)).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
     wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
-      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(template.status || "active")}</span></div>
+      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
       <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
-      <div class="queue-actions"><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Restore" : "Deactivate"}</button></div>
+      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
+    wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
     wrap.querySelectorAll("[data-template-edit]").forEach(button => button.addEventListener("click", () => fillManagedTemplateForm(managedTemplates[button.dataset.templateEdit] || {})));
     wrap.querySelectorAll("[data-template-toggle]").forEach(button => button.addEventListener("click", async () => {
       const template = managedTemplates[button.dataset.templateToggle] || {};
@@ -670,6 +729,27 @@
       setText("templateManagementStatus", `${template.name || template.id} is now ${status}.`);
       await loadManagedTemplates();
     }));
+  }
+
+  function closeManagedTemplateView() { byId("templateViewModal")?.classList.add("hidden"); }
+
+  function viewManagedTemplate(template = {}) {
+    byId("templateViewName").textContent = template.name || template.id || "Template";
+    const safeClass = /^[a-z0-9_-]+$/i.test(template.className || "") ? template.className : "neon";
+    byId("templateViewPreview").className = `template-view-preview ${safeClass}`;
+    byId("templateViewPreview").innerHTML = `<strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "FLOQR")}</span>`;
+    byId("templateViewDetails").innerHTML = simpleRows([
+      ["Template ID", template.id || "-"],
+      ["Status", template.status === "deleted" ? "deactivated" : "active"],
+      ["Category", template.category || "-"],
+      ["Description", template.description || "No description"],
+      ["Tags", (template.tags || []).join(", ") || "-"],
+      ["Media", template.supportsMedia || template.supportsImage || template.supportsVideo ? "Image/video enabled" : "Text only"],
+      ["Text limits", `${template.lineCount || 3} lines / ${template.maxCharactersPerLine || 15} per line / ${template.maxMainCharacters || 45} total`],
+      ["Screens", (template.screenFormatIds || []).join(", ") || "Not tagged"],
+      ["Background", template.backgroundEditable === false ? "Locked" : "Editable"]
+    ]);
+    byId("templateViewModal").classList.remove("hidden");
   }
 
   async function saveManagedTemplate() {
@@ -699,7 +779,7 @@
       lineCount,
       maxCharactersPerLine,
       screenFormatIds,
-      status:"active",
+      status:managedTemplates[id]?.status || "active",
       scope:"Shared",
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedByUid:auth.currentUser?.uid || "",
@@ -1022,6 +1102,9 @@
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
     bind("saveManagedTemplateBtn", saveManagedTemplate);
     bind("clearManagedTemplateBtn", clearManagedTemplateForm);
+    bind("templateViewCloseBtn", closeManagedTemplateView);
+    bind("templateViewCloseWindowBtn", closeManagedTemplateView);
+    byId("templateViewModal")?.addEventListener("click", event => { if (event.target === byId("templateViewModal")) closeManagedTemplateView(); });
     byId("entityClubSearch")?.addEventListener("input", renderEntityClubResults);
     byId("entityPatronSearch")?.addEventListener("input", renderEntityPatronResults);
     byId("templateManagementSearch")?.addEventListener("input", renderTemplateManagement);

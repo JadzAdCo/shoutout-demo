@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Patron Portal v28.98 -->
+  <!-- FLOQR Patron Portal v29.07 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.05"/>
-  <link rel="stylesheet" href="./admin.css?v=28.98"/>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -47,9 +47,12 @@
         <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Media and Data Sharing</button>
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
+        <button class="admin-tab" data-panel="portalPaidServices" type="button">Paid Services & Orders</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
         <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
         <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=28.98">Mingl Chat</a>
+        <a class="admin-tab-link buttonlike" href="./services.html?v=29.07">Follow Services</a>
+        <a class="admin-tab-link buttonlike" id="portalCommerceLink" href="./commerce.html?v=29.07">Commerce Site</a>
         <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
       </nav>
 
@@ -64,6 +67,7 @@
           <h2>Profile Summary</h2>
           <div id="profileSummary" class="report-block"></div>
           <p><a href="./role-request.html?v=28.43-f">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
+          <p><a href="./services.html?v=29.07">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
         </div>
       </section>
 
@@ -76,6 +80,7 @@
             <label>Last Name <input id="editLastName"/></label>
             <label>Display Name <input id="editDisplayName"/></label>
             <label>Phone Number <input id="editPhone"/></label>
+            <label>Taxi pickup address <input id="editTaxiPickupAddress" autocomplete="street-address" placeholder="Used privately by Pickup"/></label>
             <label>City <input id="editCity"/></label>
             <label>Country <input id="editCountry"/></label>
             <label>Preferred Language
@@ -160,6 +165,9 @@
             <label>Looking To Meet <input id="editLookingToMeet" placeholder="Friends, event crew, travelers, music lovers"/></label>
             <label>Profile Bio <input id="editBio" maxlength="180" placeholder="A short intro shown to followers"/></label>
             <label>English Bio Translation <input id="editBioEnglish" maxlength="180" placeholder="English version for public profile search"/></label>
+            <label><input id="editCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
+            <label>Commerce store name <input id="editCommerceStoreName" placeholder="My FLOQR Shop"/></label>
+            <label>Stripe connected account ID <input id="editStripeConnectAccountId" placeholder="acct_..."/></label>
           </div>
           <button id="prepareProfileTranslationBtn" type="button">Prepare English Translation</button>
           <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
@@ -229,6 +237,7 @@
         </div>
         <div class="card"><h2>My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
       </section>
+      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and Commerce orders.</p><div id="paidServicesReport" class="report-block"></div></div></section>
 
       <section id="portalGuestLists" class="admin-panel-section">
         <div class="card"><h2>My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
@@ -456,7 +465,7 @@
 <script src="./ai-grammar-service.js?v=28.98"></script>
   <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=28.98"></script>
-  <script src="./patron-portal-app.js?v=29.05"></script>
+<script src="./patron-portal-app.js?v=29.07"></script>
   <script src="./profile-access-guard.js?v=29.05"></script>
 </body>
 </html>

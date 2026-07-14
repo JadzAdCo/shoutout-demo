@@ -1,5 +1,5 @@
 /*
-  shared-data.js v29.05
+  shared-data.js v29.07
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
@@ -66,7 +66,8 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   "zebbies-garden-washington-dc": {
     brandName:"Zebbies Garden", locationName:"Zebbies Garden DC", type:"club",
     country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
-    locationLabel:"Washington, District of Columbia, United States",
+    streetAddress:"1223 Connecticut Avenue NW", postalCode:"20036",
+    locationLabel:"Washington, District of Columbia",
     brand:"ZEBBIES GARDEN DC x FLOQR",
     defaultMain:"USE SHOUT OUT @ ZEBBIES DC", defaultSub:"",
     genres:["Hip Hop","Afro Beats","EDM","International"], artists:["DJ Nova"],
@@ -592,6 +593,26 @@ Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
   template.backgroundEditable = template.backgroundEditable !== false;
 });
 
+window.FLOQRAddress = {
+  isUnitedStates(record = {}) {
+    return /^(us|usa|u\.s\.|u\.s\.a\.|united states|united states of america)$/i.test(String(record.country || "").trim());
+  },
+  publicLocation(record = {}) {
+    const city = record.city || "";
+    const region = record.stateRegion || record.region || record.state || "";
+    const country = record.country || "";
+    return this.isUnitedStates(record)
+      ? [city, region].filter(Boolean).join(", ")
+      : [city, country].filter(Boolean).join(", ");
+  },
+  fullAddress(record = {}) {
+    if (record.fullAddress) return String(record.fullAddress);
+    const street = record.streetAddress || record.addressLine1 || record.address || "";
+    const region = record.stateRegion || record.region || record.state || "";
+    return [street, record.city, region, record.postalCode, record.country].filter(Boolean).join(", ");
+  }
+};
+
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];
   loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]));
@@ -624,7 +645,10 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   loc.displayScreenFormatIds = Array.from(new Set(loc.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
   loc.primaryDisplayScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds[0] || "led-96x48";
   loc.patronTemplateBackgroundEditingEnabled = loc.patronTemplateBackgroundEditingEnabled !== false;
-  loc.address = loc.address || "";
+  loc.streetAddress = loc.streetAddress || loc.addressLine1 || "";
+  loc.fullAddress = loc.fullAddress || window.FLOQRAddress.fullAddress(loc);
+  loc.address = loc.fullAddress || loc.address || "";
+  loc.locationLabel = window.FLOQRAddress.publicLocation(loc) || loc.locationLabel || "";
   loc.officialWebsite = loc.officialWebsite || loc.website || "";
   loc.email = loc.email || "";
   loc.telephone = loc.telephone || loc.phone || "";
@@ -649,7 +673,7 @@ window.FLOQR_AI_DISCOVERY_PARTNERS = {
   eventDiscoveryApis: ["Ticketmaster Discovery API", "Eventbrite API"],
   ticketResalePartnerTypes: ["official resale partner", "affiliate ticketing partner", "distribution partner"],
   categories: ["nightclub", "lounge", "beachClub", "brunchParty", "poolParty", "summerParty", "djEvent", "promoterEvent", "comedyShow"],
-  taxiHailingPartnerMode: "third-party-integration-planned"
+  taxiHailingPartnerMode: "tesla-robotaxi-simulation-and-official-app-handoff"
 };
 
 window.SHOUTOUT_AI_SUGGESTIONS = [

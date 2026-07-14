@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.06 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.07 Full Package
+
+v29.07 adds normalized club/event addresses and short public locations; collapsible crawler JSON; public/search Genres; Pickup Robotaxi simulation with four booking modes; entity Commerce with Stripe Checkout and licensed photo/video sales; paid/free guest-list distribution; role-capacity service following and campaigns; videographer/camera-operator service membership; REP permissions and approval workflow; guest-list themes, main images, and Supporting Team; staffing association approvals; paid-service invoices, shipping/digital delivery, and analytics; and Master Admin template View/Edit/Activate/Deactivate controls.
+
+Pickup is explicitly a simulation: it makes no charge, dispatches no vehicle, and uses fictional map, vehicle, safety-contact, charge/range, distance, fare, and ETA data. The proposed future provider contract is documented in `TESLA-ROBOTAXI-SIMULATION-API.md`.
 
 v29.06 adds controlled ShoutOut background customization and a consolidated Club Public Profile media manager. Master Admin marks each template background as editable or locked. Club Admin can enable or disable patron customization per venue and can create club-only background variants. Patrons may use every original compatible template, see club-approved backgrounds, and customize only when both the template and club permit it. Club Admin now uses one photo/video input to add, edit, replace, reorder, promote, filter, trim, or delete public-profile media. Video playback windows are adjustable and capped at 15 seconds. Template layout, text positions, media placeholders, character limits, and screen-format tags remain protected.
 
@@ -6,14 +10,14 @@ v29.05 adds Firebase smoke-test progress and export diagnostics, Master Admin en
 
 The default Traditional Black and White ShoutOut now declares and enforces three lines, 15 characters per line, and 45 visible characters total. The same template metadata model can define limits for new templates.
 
-Deployment and authentication setup: see `DEPLOYMENT-V29-06.md`. Rollback instructions: see `ROLLBACK-V29-06.md`.
+Deployment and authentication setup: see `DEPLOYMENT-V29-07.md`. Rollback instructions: see `ROLLBACK-V29-07.md`.
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.06
+https://jadzadco.github.io/shoutout-demo/?v=29.07
 ```
 
 Current release highlights:
@@ -89,7 +93,7 @@ v29.02 focused manual tests:
 - New club onboarding writes `clubLocations`, `clubs`, and `clubOnboardingRecords`, then exposes the new club admin portal URL.
 - Club Admin now supports venue media policy controls: 1 main media item, 5 public images, and 5 marketing videos with DJ/promoter datapoints.
 - Club Admin now supports role election scaffolding for Club Admin, DJ, Promoter, and Waiter / Waitress / Bottle Girl, with patrons as the required worker source.
-- Club Admin now supports up to 6 guest list campaigns, enable/disable controls, archive/reuse status, and event type choices for Free Admission, Free Admission with RSVP, or Ticketted.
+- Club Admin now supports up to 6 guest list campaigns, enable/disable controls, archive/reuse status, and event type choices for Free Admission, Free Admission with RSVP, or Ticketed.
 - Mingl Chat filters diagnostic/demo chat rooms such as `Diagnostics Peer` and placeholder `Mingl Chat` from the patron-facing chat list.
 - Mingl Chat renders participant chat rooms first, then checks older Mingl connections, reducing the blank `0/0` loading period.
 - Mingl Chat shows clear loading/ready status while rooms are being checked.

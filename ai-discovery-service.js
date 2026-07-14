@@ -171,8 +171,10 @@
       proposedTime:item.proposedTime || "",
       proposedLocationName:item.proposedLocationName || "",
       proposedAddress:item.proposedAddress || item.address || "",
+      streetAddress:item.streetAddress || item.addressLine1 || String(item.proposedAddress || item.address || "").split(",")[0].trim(),
       city:item.city || "",
       stateRegion:item.stateRegion || item.region || "",
+      postalCode:item.postalCode || item.zipCode || "",
       country:item.country || "",
       telephone:item.telephone || item.phone || "",
       officialWebsite:item.officialWebsite || item.website || "",
@@ -207,12 +209,13 @@
   }
 
   function queueCard(item, index) {
+    item = {...parsedDataFallback(item), ...item};
     const missing = missingDatapoints(item);
     return `<div class="queue-item ai-discovery-item" data-queue-index="${index}">
       <div class="club-option-head">
         <div>
           <strong>${esc(item.proposedTitle || item.proposedLocationName || "Untitled discovery")}</strong>
-          <p>${esc(recordKind(item))} - ${esc(item.city || "")}${item.country ? `, ${esc(item.country)}` : ""}</p>
+          <p>${esc(recordKind(item))} - ${esc(window.FLOQRAddress?.publicLocation(item) || [item.city, item.country].filter(Boolean).join(", "))}</p>
         </div>
         <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
       </div>
@@ -228,12 +231,13 @@
         ${queueField(item, "proposedDate", "Date")}
         ${queueField(item, "proposedTime", "Time")}
         ${queueField(item, "proposedLocationName", "Location name")}
-        ${queueField(item, "proposedAddress", "Address", true)}
+        ${queueField(item, "streetAddress", "Street address", true)}
         ${queueField(item, "phone", "Phone")}
         ${queueField(item, "website", "Official website")}
         ${queueField(item, "email", "Email")}
         ${queueField(item, "city", "City")}
         ${queueField(item, "stateRegion", "State / region")}
+        ${queueField(item, "postalCode", "Postal code")}
         ${queueField(item, "country", "Country")}
         ${queueField(item, "categories", "Categories", true)}
         ${queueField(item, "genres", "Genres", true)}
@@ -273,6 +277,11 @@
       }
     });
     next.missingDatapoints = missingDatapoints(next);
+    const addressRecord = {streetAddress:next.streetAddress || next.proposedAddress || "", city:next.city || "", stateRegion:next.stateRegion || "", postalCode:next.postalCode || "", country:next.country || ""};
+    next.streetAddress = addressRecord.streetAddress;
+    next.proposedAddress = window.FLOQRAddress?.fullAddress(addressRecord) || [addressRecord.streetAddress, addressRecord.city, addressRecord.stateRegion, addressRecord.postalCode, addressRecord.country].filter(Boolean).join(", ");
+    next.fullAddress = next.proposedAddress;
+    next.locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [addressRecord.city, addressRecord.country].filter(Boolean).join(", ");
     next.crawlResultStatus = next.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     return next;
   }
@@ -307,13 +316,17 @@
       stateRegion:edited.stateRegion || "",
       city:edited.city || "",
       address:edited.proposedAddress || "",
+      streetAddress:edited.streetAddress || edited.proposedAddress || "",
+      addressLine1:edited.streetAddress || edited.proposedAddress || "",
+      fullAddress:edited.fullAddress || edited.proposedAddress || "",
+      postalCode:edited.postalCode || "",
       officialWebsite:edited.officialWebsite || "",
       website:edited.officialWebsite || "",
       email:edited.email || "",
       telephone:edited.telephone || "",
       phone:edited.telephone || "",
       socialMediaHandles:edited.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
-      locationLabel:[edited.city, edited.stateRegion, edited.country].filter(Boolean).join(", "),
+      locationLabel:window.FLOQRAddress?.publicLocation(edited) || [edited.city, edited.country].filter(Boolean).join(", "),
       activityStatus:"Approved from AI discovery",
       active:true,
       status:"active",
@@ -335,6 +348,10 @@
       locationName:edited.proposedLocationName || "",
       description:edited.proposedDescription || edited.aiSummary || "",
       address:edited.proposedAddress || "",
+      streetAddress:edited.streetAddress || edited.proposedAddress || "",
+      addressLine1:edited.streetAddress || edited.proposedAddress || "",
+      fullAddress:edited.fullAddress || edited.proposedAddress || "",
+      postalCode:edited.postalCode || "",
       city:edited.city || "",
       region:edited.stateRegion || "",
       stateRegion:edited.stateRegion || "",

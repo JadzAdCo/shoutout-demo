@@ -1,4 +1,4 @@
-/* FLOQR patron-facing Club Public Profile v29.06 */
+/* FLOQR patron-facing Club Public Profile v29.07 */
 (function () {
   "use strict";
 
@@ -11,6 +11,7 @@
   const db = firebase.firestore(app);
   let locationId = requestedLocationId;
   let club = {};
+  let currentUser = null;
 
   function safeExternal(value = "") {
     const text = String(value || "").trim();
@@ -26,7 +27,7 @@
   }
 
   function redirectForAccess(reason) {
-    const query = new URLSearchParams({v:"29.06", returnTo:appReturnPath(), profileRequired:reason});
+    const query = new URLSearchParams({v:"29.07", returnTo:appReturnPath(), profileRequired:reason});
     window.location.replace(`./?${query.toString()}`);
   }
 
@@ -129,16 +130,21 @@
     byId("clubProfileName").textContent = name;
     byId("clubProfileType").textContent = club.venueType || club.type || "FLOQR Venue";
     byId("clubProfileTagline").textContent = club.tagline || club.publicTagline || "";
-    byId("clubProfileLocation").textContent = [club.locationLabel || club.address, club.city, club.region, club.country].filter(Boolean).join(" · ");
+    byId("clubProfileLocation").textContent = window.FLOQRAddress?.publicLocation(club) || club.locationLabel || [club.city, club.country].filter(Boolean).join(", ");
     byId("clubProfileGenres").innerHTML = (club.genres || []).slice(0,8).map(value => `<span>${esc(value)}</span>`).join("");
     document.title = `${name} | FLOQR`;
   }
 
   function renderActions() {
-    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.06`;
-    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.06`;
-    const address = club.address || [club.locationLabel, club.city, club.region, club.country].filter(Boolean).join(", ");
+    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.07`;
+    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    const address = window.FLOQRAddress?.fullAddress(club) || club.fullAddress || club.address || [club.city, club.region, club.country].filter(Boolean).join(", ");
     byId("clubDirectionsLink").href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    byId("clubPickupLink").href = `./pickup.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    if (club.commerceEnabled) {
+      byId("clubCommerceLink").href = `./commerce.html?club=${encodeURIComponent(locationId)}&v=29.07`;
+      byId("clubCommerceLink").classList.remove("hidden");
+    } else byId("clubCommerceLink").classList.add("hidden");
     const website = safeExternal(club.officialWebsite || club.website);
     if (website) {
       byId("clubWebsiteLink").href = website;
@@ -252,7 +258,7 @@
     const phone = club.telephone || club.phone || "";
     const email = club.email || "";
     byId("clubProfileContact").innerHTML = `
-      ${club.address ? `<p><strong>Address</strong><span>${esc(club.address)}</span></p>` : ""}
+      ${(window.FLOQRAddress?.fullAddress(club) || club.address) ? `<p><strong>Address</strong><span>${esc(window.FLOQRAddress?.fullAddress(club) || club.address)}</span></p>` : ""}
       ${phone ? `<p><strong>Telephone</strong><a href="tel:${esc(phone)}">${esc(phone)}</a></p>` : ""}
       ${email ? `<p><strong>Email</strong><a href="mailto:${esc(email)}">${esc(email)}</a></p>` : ""}
       <div class="button-row">${socialLink("Instagram", socials.instagram, "https://instagram.com/")}${socialLink("TikTok", socials.tiktok, "https://tiktok.com/@")}${socialLink("Facebook", socials.facebook, "https://facebook.com/")}${socialLink("X", socials.x || socials.twitter, "https://x.com/")}</div>`;
@@ -260,6 +266,25 @@
   }
 
   function closePerson() { byId("clubProfilePersonModal")?.classList.add("hidden"); }
+
+  function clubFollowId(uid = "") { return `${locationId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_"); }
+
+  async function refreshClubFollow() {
+    if (!currentUser || !byId("clubFollowBtn")) return;
+    const snap = await db.collection("entityFollows").doc(clubFollowId(currentUser.uid)).get().catch(() => null);
+    byId("clubFollowBtn").textContent = snap?.exists && snap.data()?.active !== false ? "Following Club" : "Follow Club";
+  }
+
+  async function toggleClubFollow() {
+    if (!currentUser) return;
+    const ref = db.collection("entityFollows").doc(clubFollowId(currentUser.uid));
+    const snap = await ref.get();
+    const active = !(snap.exists && snap.data()?.active !== false);
+    const payload = {entityId:locationId, entityType:"club", entityName:club.locationName || club.brandName || locationId, followerUid:currentUser.uid, followerEmail:currentUser.email || "", active, updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if (!snap.exists) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    await ref.set(payload, {merge:true});
+    await refreshClubFollow();
+  }
 
   async function loadClubProfile() {
     club = await resolveLocation(locationId);
@@ -284,18 +309,21 @@
     window.FLOQRActionFeedback?.show("Club link copied", "Share this FLOQR club profile with another patron.", {status:"success"});
     window.FLOQRActionFeedback?.hide(2200);
   });
+  byId("clubFollowBtn")?.addEventListener("click", toggleClubFollow);
   byId("clubPersonCloseBtn")?.addEventListener("click", closePerson);
   byId("clubPersonCloseWindowBtn")?.addEventListener("click", closePerson);
   byId("clubProfilePersonModal")?.addEventListener("click", event => { if (event.target === byId("clubProfilePersonModal")) closePerson(); });
 
   auth.onAuthStateChanged(async user => {
     if (!user) { redirectForAccess("sign-in"); return; }
+    currentUser = user;
     try {
       const profileSnap = await db.collection("users").doc(user.uid).get();
       if (!profileSnap.exists || profileSnap.data()?.profileCompleted !== true) { redirectForAccess("create-profile"); return; }
       await loadClubProfile();
+      await refreshClubFollow();
     } catch (error) {
-      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.06">Return to FLOQR</a></p>`;
+      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.07">Return to FLOQR</a></p>`;
     }
   });
 })();

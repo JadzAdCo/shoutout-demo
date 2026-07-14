@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Venue Command Center v29.05 -->
+  <!-- FLOQR Venue Command Center v29.07 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.06"/>
-  <link rel="stylesheet" href="./admin.css?v=29.06"/>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
 </head>
 <body>
 <main id="adminPage" class="app admin-shell">
@@ -60,6 +60,7 @@
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
         <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
+        <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
         <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
         <button class="admin-tab" data-panel="panelReports" type="button">Reports</button>
       </nav>
@@ -97,7 +98,11 @@
             <label>Club logo URL<input id="clubProfileLogoUrl" placeholder="https://.../club-logo.png"/></label>
             <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
             <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
-            <label>Address<input id="clubProfileAddress" placeholder="Street address"/></label>
+            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="1223 Connecticut Avenue NW" required/></label>
+            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
+            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="20036"/></label>
+            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="United States" required/></label>
             <label>Official website<input id="clubProfileWebsite" placeholder="https://example.com"/></label>
             <label>Email<input id="clubProfileEmail" placeholder="info@example.com"/></label>
             <label>Telephone<input id="clubProfileTelephone" placeholder="+1 202 555 0123"/></label>
@@ -105,12 +110,15 @@
             <label>X<input id="clubProfileX" placeholder="@club"/></label>
             <label>TikTok<input id="clubProfileTiktok" placeholder="@club"/></label>
             <label>Facebook<input id="clubProfileFacebook" placeholder="facebook.com/club"/></label>
-            <label>Music Genres<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+            <label>Genres (public and search)<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
             <label>Venue hours<input id="clubProfileHours" placeholder="Thu–Sat, 10 PM–3 AM"/></label>
             <label>Age policy<input id="clubProfileAgePolicy" placeholder="21+ with valid ID"/></label>
             <label>Dress code<input id="clubProfileDressCode" placeholder="Upscale nightlife attire"/></label>
             <label>Amenities<input id="clubProfileAmenities" placeholder="VIP tables, coat check, outdoor garden"/></label>
             <label>FLOQR services<input id="clubProfileServices" placeholder="ShoutOut, Guest List, VIP Reservation"/></label>
+            <label><input id="clubCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
+            <label>Commerce store name<input id="clubCommerceStoreName" placeholder="Zebbies Garden Shop"/></label>
+            <label>Stripe connected account ID<input id="clubStripeConnectAccountId" placeholder="acct_..."/></label>
           </div>
           <div class="card nested-card">
             <h3>FLOQR display screens</h3>
@@ -240,21 +248,37 @@
             <label>Event Type<select id="guestCampaignType">
               <option value="Free Admission">Free Admission</option>
               <option value="Free Admission with RSVP">Free Admission with RSVP</option>
-              <option value="Ticketted">Ticketted</option>
+              <option value="Ticketed">Ticketed</option>
             </select></label>
             <label>Event Date<input id="guestCampaignDate" type="date"/></label>
             <label>Capacity<input id="guestCampaignCapacity" type="number" min="1" placeholder="150"/></label>
             <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
             <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
+            <label>Guest-list theme<select id="guestCampaignTheme"><option value="midnight">Midnight</option><option value="garden">Garden</option><option value="neon">Neon</option><option value="gold">VIP Gold</option><option value="minimal">Minimal</option></select></label>
+            <label>Main image URL<input id="guestCampaignImage" placeholder="DJ, promoter, waitress, bartender, or event image"/></label>
+            <label>Supporting Team<input id="guestCampaignSupportingTeam" list="guestSupportingTeamOptions" placeholder="Search approved DJ, promoter, waitress, bottle girl, or bartender"/><datalist id="guestSupportingTeamOptions"></datalist></label>
+            <label>Audience<select id="guestCampaignAudience"><option value="followers">Club followers (no distribution charge)</option><option value="targetedFloqr">Targeted FloqR ($0.10/user)</option></select></label>
+            <label id="guestCampaignTargetCountLabel" class="hidden">Targeted patrons<input id="guestCampaignTargetCount" type="number" min="1" value="100"/></label>
           </div>
           <label>Description<textarea id="guestCampaignDescription" rows="3" placeholder="Guest list notes, dress code, cutoff time, and arrival requirements."></textarea></label>
-          <button id="createGuestCampaignBtn" class="primary" type="button">Create Guest List Campaign</button>
+          <button id="createGuestCampaignBtn" class="primary" type="button">Submit Guest List Campaign</button>
           <div id="guestCampaignReport" class="report-block"></div>
         </div>
         <div class="admin-grid">
           <div class="card"><h2>Guest List Requests</h2><div id="clubGuestListReport" class="report-block"></div></div>
           <div class="card"><h2>Promoter Performance</h2><div id="clubPromoterReport" class="report-block"></div></div>
         </div>
+      </section>
+      <section id="panelRep" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">REP</p><h2>Role Activity & Permission</h2>
+          <p class="sub">Assign duties to onboarded club workers and choose whether Club Admin approval is required before they post on behalf of the club.</p>
+          <div id="repRolePolicies" class="report-block"></div>
+          <button id="saveRepPoliciesBtn" class="primary" type="button">Save REP Policies</button>
+          <p id="repStatus" class="status"></p>
+        </div>
+        <div class="card"><h2>Pending Role Activity</h2><p class="sub small">Approve or reject guest lists, public posts, and campaigns submitted on behalf of this club.</p><div id="repPendingActivity" class="report-block"></div></div>
+        <div class="card"><h2>Club Admin Notifications</h2><div class="privacy-datapoint-grid"><label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label><label><input id="repNotifyPush" type="checkbox"/> Push notification</label><label><input id="repNotifyEmail" type="checkbox"/> Email</label><label><input id="repNotifySms" type="checkbox"/> SMS ($10 service charge)</label></div><button id="saveRepNotificationsBtn" type="button">Save Notification Choices</button></div>
       </section>
       <section id="panelEmployees" class="admin-panel-section">
         <div class="card">
@@ -268,6 +292,8 @@
               <option>DJ</option>
               <option>Promoter</option>
               <option>Waiter / Waitress / Bottle Girl</option>
+              <option>Bartender / Barman</option>
+              <option>Videographer / Camera Operator</option>
             </select></label>
             <label>Promotion Company<input id="roleElectionCompany" placeholder="Required only for promoter company affiliation"/></label>
             <label><input id="roleElectionIndependentPromoter" type="checkbox"/> Independent promoter</label>
@@ -327,15 +353,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=29.05"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.07"></script>
 <script src="./global-profile-status.js?v=29.05"></script>
-<script src="./shared-data.js?v=29.06"></script>
+<script src="./shared-data.js?v=29.07"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=29.05"></script>
 <script src="./ai-template-studio.js?v=29.06"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
-<script src="./admin-app.js?v=29.06"></script>
+<script src="./payment-service.js?v=29.07"></script>
+<script src="./admin-app.js?v=29.07"></script>
+<script src="./admin-rep-extension.js?v=29.07"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>
 </body>

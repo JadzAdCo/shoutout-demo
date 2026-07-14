@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Pickup Robotaxi Simulation | FLOQR</title>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
+</head>
+<body>
+  <main class="app admin-shell pickup-shell">
+    <a class="global-back-btn buttonlike" id="pickupBackLink" href="./?v=29.07">&larr; Back</a>
+    <section class="page active">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Pickup &middot; Robotaxi concept</p>
+          <h1>Hail a Ride to the Club</h1>
+          <p class="sub">Your destination is filled from the club's verified address.</p>
+          <p id="pickupStatus" class="status" aria-live="polite">Loading Pickup...</p>
+        </div>
+      </header>
+
+      <div class="simulation-banner" role="note">
+        <strong>Simulation only</strong>
+        <span>No payment is charged, no vehicle is dispatched, and all vehicle, safety-person, route, and arrival data is fictional.</span>
+      </div>
+
+      <div id="pickupLogin" class="card"><button id="pickupGoogleLoginBtn" type="button">Continue with Google</button></div>
+      <div id="pickupPanel" class="hidden pickup-layout">
+        <section class="card pickup-map-card" aria-label="Simulated ride map">
+          <div class="section-title-row"><div><p class="eyebrow">Fictitious live map</p><h2>Nearby vehicle</h2></div><span class="live-pill">SIMULATED LIVE</span></div>
+          <div id="pickupMap" class="pickup-map" aria-label="Fictional map showing vehicle, pickup, and destination">
+            <div class="map-street street-one"></div><div class="map-street street-two"></div><div class="map-street street-three"></div>
+            <div class="map-route"></div>
+            <div id="vehiclePin" class="map-pin vehicle-pin" title="Simulated Robotaxi"><span>RX</span></div>
+            <div class="map-pin origin-pin" title="Pickup"><span>A</span></div>
+            <div class="map-pin destination-pin" title="Destination"><span>B</span></div>
+            <span class="map-label vehicle-label">Robotaxi</span><span class="map-label origin-label">You</span><span class="map-label destination-label">Club</span>
+          </div>
+          <a id="pickupGoogleMapLink" class="text-link" target="_blank" rel="noopener" href="https://www.google.com/maps">View the real address route in Google Maps</a>
+        </section>
+
+        <section class="card">
+          <div class="section-title-row"><div><p class="eyebrow">Assigned vehicle</p><h2 id="pickupVehicleName">Tesla Model Y Robotaxi</h2></div><strong id="pickupEta" class="eta-badge">6 min</strong></div>
+          <div class="pickup-fact-grid">
+            <div><span>Vehicle tag</span><strong id="pickupVehicleTag">FLOQR-RX27</strong></div>
+            <div><span>Color</span><strong id="pickupVehicleColor">Deep Blue Metallic</strong></div>
+            <div><span>Charge</span><strong id="pickupVehicleCharge">84%</strong></div>
+            <div><span>Distance to you</span><strong id="pickupVehicleDistance">1.8 mi</strong></div>
+            <div><span>Current location</span><strong id="pickupVehicleLocation">17th St &amp; K St NW</strong></div>
+            <div><span>Trip time</span><strong id="pickupTripEta">14 min</strong></div>
+            <div><span>Driving mode</span><strong id="pickupDriver">Autonomous driving system</strong></div>
+            <div><span>Remote safety contact</span><strong id="pickupSafetySpecialist">Aurora M. (simulated)</strong></div>
+            <div><span>Seats</span><strong id="pickupSeats">4</strong></div>
+            <div><span>Estimated range</span><strong id="pickupRange">239 mi</strong></div>
+          </div>
+        </section>
+
+        <section class="card pickup-request-card">
+          <h2>Confirm your route</h2>
+          <fieldset class="pickup-mode-picker">
+            <legend>Hail service</legend>
+            <label><input type="radio" name="pickupMode" value="onDemand" checked/><span><strong>On-demand</strong><small>Request the nearest simulated vehicle now.</small></span></label>
+            <label><input type="radio" name="pickupMode" value="scheduled"/><span><strong>Scheduled</strong><small>Reserve a simulated pickup date and time.</small></span></label>
+            <label><input type="radio" name="pickupMode" value="forAnother"/><span><strong>For a Flocker</strong><small>Book a ride for another FLOQR patron.</small></span></label>
+            <label><input type="radio" name="pickupMode" value="shared"/><span><strong>Shared</strong><small>Add up to three Flockers with optional separate drop-offs.</small></span></label>
+          </fieldset>
+          <div id="pickupScheduledFields" class="profile-grid hidden">
+            <label>Pickup date<input id="pickupScheduledDate" type="date"/></label>
+            <label>Pickup time<input id="pickupScheduledTime" type="time"/></label>
+          </div>
+          <div id="pickupFloqFields" class="hidden floq-ride-panel">
+            <div id="pickupForAnotherFields" class="profile-grid">
+              <label>FLOQR patron username or email<input id="pickupRecipient" placeholder="Search or enter a Flocker"/></label>
+              <label>Who pays?
+                <select id="pickupForAnotherPayment"><option value="organizer">I pay</option><option value="recipient">Recipient pays</option><option value="requestApproval">Ask recipient to approve and pay</option></select>
+              </label>
+            </div>
+            <div id="pickupSharedFields" class="hidden">
+              <p class="sub small">Add up to three Flockers. Each companion may have a different drop-off.</p>
+              <div class="companion-grid">
+                <label>Flocker 1<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 1<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                <label>Flocker 2<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 2<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                <label>Flocker 3<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 3<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+              </div>
+              <label>Payment arrangement
+                <select id="pickupSharedPayment"><option value="organizer">Organizer pays the full mock fare</option><option value="splitEvenly">Split the mock fare evenly</option><option value="individualLegs">Each rider pays their route leg</option></select>
+              </label>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <label>Taxi pickup address<input id="pickupAddress" autocomplete="street-address"/></label>
+            <label>Destination<input id="pickupDestination" readonly/></label>
+          </div>
+          <div class="mock-fare-row"><span>Mock fare estimate<br/><small id="pickupPaymentPlan">Organizer pays</small></span><strong id="pickupMockFare">$18.40</strong></div>
+          <button id="pickupRequestBtn" class="primary" type="button">Pay Mock Fare &amp; Request Pickup</button>
+          <p class="sub small">This prototype records a simulated request in FLOQR. It does not call a Tesla booking endpoint or process a real payment.</p>
+          <div id="pickupResult" class="report-block" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="pickupRideModal" class="modal-shell hidden" role="dialog" aria-modal="true" aria-labelledby="pickupRideTitle">
+    <div class="modal-card ride-status-popout">
+      <div class="section-title-row"><div><p class="eyebrow">SIMULATED RIDE STATUS</p><h2 id="pickupRideTitle">Mock payment approved</h2></div><button id="pickupRideClose" class="icon-button" type="button" aria-label="Close ride status">&times;</button></div>
+      <p id="pickupRideStage" class="ride-stage">Assigning your vehicle...</p>
+      <div class="ride-progress" aria-hidden="true"><span id="pickupRideProgress"></span></div>
+      <div id="pickupRideDetails" class="pickup-fact-grid compact"></div>
+      <p class="simulation-footnote">Prototype only. No charge was made and no vehicle was dispatched.</p>
+      <div class="action-row"><button id="pickupRideCancel" type="button">Cancel Simulation</button><a id="pickupTeslaOfficialLink" class="buttonlike" target="_blank" rel="noopener" href="https://www.tesla.com/robotaxi">Tesla Robotaxi information</a></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+  <script src="./firebase-config.js?v=29.07"></script>
+  <script src="./shared-data.js?v=29.07"></script>
+  <script src="./payment-service.js?v=29.07"></script>
+  <script src="./pickup-app.js?v=29.07"></script>
+  <script src="./profile-access-guard.js?v=29.07"></script>
+</body>
+</html>

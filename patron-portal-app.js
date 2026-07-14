@@ -1,4 +1,4 @@
-/* patron-portal-app.js v28.98 */
+/* patron-portal-app.js v29.07 */
 (function(){
   "use strict";
 
@@ -544,6 +544,7 @@
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
     byId("editPhone").value = profile.phone || user.phoneNumber || "";
+    if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("editCity").value = profile.city || "";
     byId("editCountry").value = profile.country || "";
     byId("editLanguage").value = profile.preferredLanguage || "";
@@ -567,6 +568,9 @@
     byId("editLookingToMeet").value = profile.lookingToMeet || "";
     byId("editBio").value = profile.publicProfileBioOriginal || profile.bio || "";
     byId("editBioEnglish").value = profile.publicProfileBioEnglish || profile.bioEnglish || "";
+    if (byId("editCommerceEnabled")) byId("editCommerceEnabled").checked = !!profile.commerceEnabled;
+    if (byId("editCommerceStoreName")) byId("editCommerceStoreName").value = profile.commerceStoreName || `${profile.displayName || user.displayName || "My"} Shop`;
+    if (byId("editStripeConnectAccountId")) byId("editStripeConnectAccountId").value = profile.stripeConnectAccountId || "";
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
@@ -680,6 +684,7 @@
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
       phone: byId("editPhone").value.trim(),
+      taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
       preferredLanguage,
@@ -701,6 +706,9 @@
       nightlifeStyle: byId("editNightlifeStyle").value.trim(),
       lookingToMeet: byId("editLookingToMeet").value.trim(),
       bio: originalBio,
+      commerceEnabled:!!byId("editCommerceEnabled")?.checked,
+      commerceStoreName:byId("editCommerceStoreName")?.value.trim() || `${byId("editDisplayName").value.trim() || "My"} Shop`,
+      stripeConnectAccountId:byId("editStripeConnectAccountId")?.value.trim() || "",
       ...translationState,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -2354,13 +2362,14 @@
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
     setText("portalStatus", "Loading your FLOQR Inbox…");
-    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections] = await Promise.all([
+    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
       getUserScopedRows("shoutouts", user, [["submittedByUid","uid"],["submittedBy","email"]]),
       getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
       getUserScopedRows("messages", user, [["recipientUid","uid"],["senderUid","uid"],["recipientEmail","email"],["senderEmail","email"]]),
       getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]]),
       getParticipantCollectionSafe("chatRooms", user.uid),
-      getParticipantCollectionSafe("minglConnections", user.uid)
+      getParticipantCollectionSafe("minglConnections", user.uid),
+      getCollectionSafe("serviceOrders", row => row.ownerUid === user.uid, 300)
     ]);
     currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
     currentPortalUsers = [];
@@ -2396,6 +2405,8 @@
       ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],
       ["Visibility", profile.publicProfileVisibility || "followers"]
     ]);
+    if (byId("portalCommerceLink")) byId("portalCommerceLink").href = `./commerce.html?seller=${encodeURIComponent(user.uid)}&v=29.07`;
+    if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or Commerce orders yet.</p>";
 
     currentShoutouts = shoutouts;
     byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map((x, index) => {
