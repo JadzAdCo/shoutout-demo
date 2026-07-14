@@ -1,11 +1,17 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.04 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.05 Full Package
+
+v29.05 adds Firebase smoke-test progress and export diagnostics, Master Admin entity onboarding and registered-patron club-admin assignment, localized scheduled venue discovery, template and display-format management, a repaired packaged ShoutOut logo, no-crop media framing, custom-email five-minute OTP sign-in, Club Admin SMS MFA enrollment/challenge handling, and one-control multi-file Mingl profile media ordering.
+
+The default Traditional Black and White ShoutOut now declares and enforces three lines, 15 characters per line, and 45 visible characters total. The same template metadata model can define limits for new templates.
+
+Deployment and authentication setup: see `DEPLOYMENT-V29-05.md`. Rollback instructions: see `ROLLBACK-V29-05.md`.
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.04
+https://jadzadco.github.io/shoutout-demo/?v=29.05
 ```
 
 Current release highlights:

@@ -1,9 +1,10 @@
 /*
-  shared-data.js v28.74
+  shared-data.js v29.05
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
 window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
+  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
@@ -42,6 +43,7 @@ window.FLOQR_AI_GRAMMAR_FUNCTION = "aiSuggestGrammarCorrection";
 window.FLOQR_OBSOLETE_LOCATION_IDS = ["heist-houston-tx", "heist-houston", "heist-houston-texas"];
 
 window.SHOUTOUT_ADMIN_EMAILS = [
+  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
@@ -441,6 +443,7 @@ window.SHOUTOUT_EVENTS = {
   Remove this exception in production.
 */
 window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS = [
+  "bands.don@gmail.com",
   "bans.don@gmail.com"
 ];
 
@@ -557,7 +560,7 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', description:'Classic marquee lightbox with bold black letters.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:15, description:'Classic marquee lightbox with three centered lines, up to 15 characters per line and 45 characters total.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total"] },
   birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
@@ -574,6 +577,19 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
 });
 
 window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate'];
+
+window.FLOQR_DISPLAY_FORMATS = {
+  "led-96x48": {id:"led-96x48", label:"96 x 48 cm", widthCm:96, heightCm:48, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["96x48cm","624x312","2:1"]},
+  "led-64x48": {id:"led-64x48", label:"64 x 48 cm", widthCm:64, heightCm:48, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["64x48cm","416x312","4:3"]},
+  "led-64x32": {id:"led-64x32", label:"64 x 32 cm", widthCm:64, heightCm:32, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["64x32cm","416x208","2:1"]}
+};
+window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = Object.keys(window.FLOQR_DISPLAY_FORMATS);
+
+Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
+  template.screenFormatIds = Array.from(new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
+  template.tags = Array.from(new Set([...(template.tags || []), ...template.screenFormatIds.flatMap(id => window.FLOQR_DISPLAY_FORMATS[id]?.tags || [])]));
+  template.status = template.status || "active";
+});
 
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];
@@ -604,6 +620,8 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   };
   loc.clubOwnershipStatus = loc.clubOwnershipStatus || "unclaimed";
   loc.subscriptionRequiredForPublicProfileEdits = true;
+  loc.displayScreenFormatIds = Array.from(new Set(loc.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
+  loc.primaryDisplayScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds[0] || "led-96x48";
   loc.address = loc.address || "";
   loc.officialWebsite = loc.officialWebsite || loc.website || "";
   loc.email = loc.email || "";

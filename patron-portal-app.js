@@ -140,6 +140,7 @@
   let currentMinglFriendRows = [];
   let currentPortalUsers = [];
   let portalMinglAttachmentFile = null;
+  let profileMediaDraft = [];
 
   const PUBLIC_MINGL_DATAPOINTS = [
     {key:"location", label:"City, state/region, and country"},
@@ -1044,6 +1045,104 @@
       setText("portalStatus", mediaUploadErrorMessage(e, user));
       throw e;
     }
+    });
+  }
+
+  function renderProfileMediaDraft() {
+    const wrap = byId("profileMediaSlots");
+    if (!wrap) return;
+    wrap.innerHTML = profileMediaDraft.length ? profileMediaDraft.map((item, index) => {
+      const preview = item.type === "video"
+        ? `<video src="${esc(item.previewUrl || item.url || "")}" muted loop playsinline controls></video>`
+        : `<img src="${esc(item.previewUrl || item.url || "")}" alt="Profile media ${index + 1}"/>`;
+      return `<div class="profile-media-slot profile-media-order-card" data-media-index="${index}">
+        <div class="profile-media-preview">${preview}</div>
+        <strong>${index === 0 ? "Hero media" : `Position ${index + 1}`}</strong>
+        <span class="sub small">${esc(item.file?.name || item.fileName || item.type)}</span>
+        <div class="button-row">
+          <button type="button" data-media-move="up" ${index === 0 ? "disabled" : ""}>Move up</button>
+          <button type="button" data-media-move="down" ${index === profileMediaDraft.length - 1 ? "disabled" : ""}>Move down</button>
+          <button type="button" data-media-remove>Remove</button>
+        </div>
+      </div>`;
+    }).join("") : `<p class="sub small">No profile media selected yet.</p>`;
+    wrap.querySelectorAll("[data-media-move]").forEach(button => button.addEventListener("click", () => {
+      const index = Number(button.closest("[data-media-index]").dataset.mediaIndex);
+      const next = button.dataset.mediaMove === "up" ? index - 1 : index + 1;
+      if (next < 0 || next >= profileMediaDraft.length) return;
+      [profileMediaDraft[index], profileMediaDraft[next]] = [profileMediaDraft[next], profileMediaDraft[index]];
+      renderProfileMediaDraft();
+    }));
+    wrap.querySelectorAll("[data-media-remove]").forEach(button => button.addEventListener("click", () => {
+      const index = Number(button.closest("[data-media-index]").dataset.mediaIndex);
+      const removed = profileMediaDraft.splice(index, 1)[0];
+      if (removed?.previewUrl?.startsWith("blob:")) URL.revokeObjectURL(removed.previewUrl);
+      renderProfileMediaDraft();
+    }));
+  }
+
+  function renderMediaSlots(profile) {
+    profileMediaDraft.forEach(item => { if (item.previewUrl?.startsWith("blob:")) URL.revokeObjectURL(item.previewUrl); });
+    profileMediaDraft = (Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots : [])
+      .filter(item => item?.url).sort((a, b) => Number(a.order || a.slot || 0) - Number(b.order || b.slot || 0))
+      .map(item => ({...item, existing:true, previewUrl:item.url}));
+    renderProfileMediaDraft();
+    const input = byId("profileMediaBatchInput");
+    if (input) {
+      input.value = "";
+      input.onchange = event => {
+        const files = Array.from(event.currentTarget.files || []);
+        const proposed = [...profileMediaDraft, ...files.map(file => ({file, fileName:file.name, type:file.type.startsWith("video/") ? "video" : "image", previewUrl:URL.createObjectURL(file)}))];
+        const images = proposed.filter(item => item.type === "image").length;
+        const videos = proposed.filter(item => item.type === "video").length;
+        if (images > 8 || videos > 2 || proposed.length > 10) {
+          files.forEach(file => { const match = proposed.find(item => item.file === file); if (match?.previewUrl) URL.revokeObjectURL(match.previewUrl); });
+          setText("portalStatus", "Profile media supports a maximum of 8 images and 2 short videos (10 total).");
+          event.currentTarget.value = "";
+          return;
+        }
+        profileMediaDraft = proposed;
+        event.currentTarget.value = "";
+        renderProfileMediaDraft();
+      };
+    }
+  }
+
+  async function saveMediaSlots() {
+    const user = auth.currentUser;
+    if (!user) return;
+    return actionFeedback({
+      starting:"Uploading profile media...",
+      wait:"FLOQR is uploading the selected files and saving their order.",
+      success:"Profile media saved",
+      redirecting:"Your public-profile media order is updated.",
+      returnTo:"Public Media and Data Sharing"
+    }, async () => {
+      try {
+        const saved = [];
+        for (let index = 0; index < profileMediaDraft.length; index += 1) {
+          const item = profileMediaDraft[index];
+          let url = item.url || "";
+          let storagePath = item.storagePath || "";
+          let metadata = item.metadata || null;
+          if (item.file) {
+            const folder = item.type === "video" ? "videos" : "images";
+            const safeName = item.file.name.replace(/[^a-z0-9._-]/gi, "-").slice(-80);
+            storagePath = `profileMedia/${user.uid}/${folder}/order-${index + 1}-${Date.now()}-${safeName}`;
+            const ref = storage.ref(storagePath);
+            await ref.put(item.file, {contentType:item.file.type || (item.type === "video" ? "video/mp4" : "image/jpeg")});
+            url = await ref.getDownloadURL();
+            if (item.type === "image") metadata = await extractImageGpsMetadata(item.file);
+          }
+          saved.push({slot:index + 1, order:index + 1, type:item.type, url, storagePath, fileName:item.fileName || "", metadata, travelDatapointAdded:!!item.travelDatapointAdded, updatedAt:new Date().toISOString()});
+        }
+        await db.collection("users").doc(user.uid).set({profileMediaSlots:saved, profileMediaUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+        setText("portalStatus", "Profile media and display order saved.");
+        await loadPortal(user);
+      } catch (error) {
+        setText("portalStatus", mediaUploadErrorMessage(error, user));
+        throw error;
+      }
     });
   }
 

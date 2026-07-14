@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.04
-// EXPECTED DEPLOYED RULES VERSION: v29.04 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.05
+// EXPECTED DEPLOYED RULES VERSION: v29.05 or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -211,6 +211,15 @@ service cloud.firestore {
     match /clubLocationAliases/{aliasId} {
       allow read: if true;
       allow write: if signedIn();
+    }
+
+    match /clubAdminAssignments/{assignmentId} {
+      allow read, write: if signedIn();
+    }
+
+    // OTP challenges contain hashes and rate-limit data; clients never read or write them.
+    match /emailOtpChallenges/{challengeId} {
+      allow read, write: if false;
     }
 
     match /events/{id} {

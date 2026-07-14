@@ -1,4 +1,4 @@
-/* admin-app.js v29.04 - Venue Command Center and owner-managed public club profiles */
+/* admin-app.js v29.05 - Venue Command Center, assigned admins, and display formats */
 (function () {
   "use strict";
 
@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.04";
+  const CURRENT_VERSION = "29.05";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -27,6 +27,10 @@
   let adminDesignations = [];
   let clubMedia = [];
   let guestListCampaigns = [];
+  let adminMfaResolver = null;
+  let adminMfaVerificationId = "";
+  let adminMfaEnrollmentSession = null;
+  let adminMfaRecaptcha = null;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -191,6 +195,11 @@
     document.querySelectorAll("[data-club-section]").forEach(input => {
       input.checked = sectionSettings[input.dataset.clubSection] === undefined ? true : sectionSettings[input.dataset.clubSection] !== false;
     });
+    const displayFormats = new Set(publicClubProfile.displayScreenFormatIds || ["led-96x48"]);
+    document.querySelectorAll("[data-club-display-format]").forEach(input => {
+      input.checked = displayFormats.has(input.dataset.clubDisplayFormat);
+    });
+    if (byId("clubPrimaryDisplayFormat")) byId("clubPrimaryDisplayFormat").value = publicClubProfile.primaryDisplayScreenFormatId || [...displayFormats][0] || "led-96x48";
     if (byId("clubPublicProfileReport")) {
       byId("clubPublicProfileReport").innerHTML = simpleRows([
         ["Search visibility", publicClubProfile.visibility || "public"],
@@ -211,6 +220,11 @@
       redirecting:"The public page and FLOQR search profile are updated.",
       returnTo:"Venue Command Center"
     }, async () => {
+    const displayScreenFormatIds = Array.from(document.querySelectorAll("[data-club-display-format]:checked")).map(input => input.dataset.clubDisplayFormat);
+    if (!displayScreenFormatIds.length) throw new Error("Select at least one FLOQR display screen format.");
+    const primaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubPrimaryDisplayFormat")?.value)
+      ? byId("clubPrimaryDisplayFormat").value
+      : displayScreenFormatIds[0];
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -234,6 +248,8 @@
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
       featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
+      displayScreenFormatIds,
+      primaryDisplayScreenFormatId,
       publicProfileSections:publicSectionSettings(),
       publicProfilePublished:!!byId("clubProfilePublished")?.checked,
       visibility:"public",
@@ -301,11 +317,79 @@
     return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
   }
 
+  function showAdminMfaPanel(message = "") {
+    byId("adminLogin")?.classList.add("hidden");
+    byId("adminPanel")?.classList.add("hidden");
+    byId("adminMfaPanel")?.classList.remove("hidden");
+    setText("adminMfaStatus", message || (adminMfaResolver ? "Send a code to your enrolled mobile phone." : "Enroll the Club Admin mobile phone to continue."));
+  }
+
+  function adminMfaVerifier() {
+    if (adminMfaRecaptcha) return adminMfaRecaptcha;
+    adminMfaRecaptcha = new firebase.auth.RecaptchaVerifier("admin-mfa-recaptcha", {size:"normal"});
+    return adminMfaRecaptcha;
+  }
+
+  function handleAdminMfaRequired(error) {
+    if (error?.code !== "auth/multi-factor-auth-required" || !error.resolver) return false;
+    adminMfaResolver = error.resolver;
+    adminMfaEnrollmentSession = null;
+    showAdminMfaPanel("This Club Admin account requires its enrolled SMS second factor. Send the verification code to continue.");
+    return true;
+  }
+
+  async function sendAdminMfaCode() {
+    try {
+      setText("adminMfaStatus", "Preparing SMS verification...");
+      const provider = new firebase.auth.PhoneAuthProvider();
+      if (adminMfaResolver) {
+        const hint = adminMfaResolver.hints?.find(item => item.factorId === firebase.auth.PhoneMultiFactorGenerator.FACTOR_ID) || adminMfaResolver.hints?.[0];
+        if (!hint) throw new Error("No enrolled mobile factor was found for this account.");
+        adminMfaVerificationId = await provider.verifyPhoneNumber({multiFactorHint:hint, session:adminMfaResolver.session}, adminMfaVerifier());
+      } else {
+        const user = auth.currentUser;
+        if (!user) throw new Error("Sign in with the Club Admin account first.");
+        const phoneNumber = String(byId("adminMfaPhone")?.value || "").trim();
+        if (!/^\+[1-9]\d{7,14}$/.test(phoneNumber)) throw new Error("Enter the mobile number in international format, such as +12025550123.");
+        adminMfaEnrollmentSession = await user.multiFactor.getSession();
+        adminMfaVerificationId = await provider.verifyPhoneNumber({phoneNumber, session:adminMfaEnrollmentSession}, adminMfaVerifier());
+      }
+      setText("adminMfaStatus", "SMS code sent. Enter the six-digit code, then Verify and Continue.");
+      byId("adminMfaCode")?.focus();
+    } catch (error) {
+      setText("adminMfaStatus", `${error.code || "mfa-error"}: ${error.message || error}`);
+      adminMfaRecaptcha?.clear?.();
+      adminMfaRecaptcha = null;
+    }
+  }
+
+  async function verifyAdminMfaCode() {
+    try {
+      const code = String(byId("adminMfaCode")?.value || "").trim();
+      if (!adminMfaVerificationId || !/^\d{6}$/.test(code)) throw new Error("Enter the six-digit SMS verification code.");
+      const credential = firebase.auth.PhoneAuthProvider.credential(adminMfaVerificationId, code);
+      const assertion = firebase.auth.PhoneMultiFactorGenerator.assertion(credential);
+      if (adminMfaResolver) {
+        await adminMfaResolver.resolveSignIn(assertion);
+        adminMfaResolver = null;
+      } else {
+        await auth.currentUser.multiFactor.enroll(assertion, "Club Admin Mobile");
+      }
+      adminMfaVerificationId = "";
+      byId("adminMfaPanel")?.classList.add("hidden");
+      setText("adminStatus", "Club Admin mobile verification completed.");
+      window.location.reload();
+    } catch (error) {
+      setText("adminMfaStatus", `${error.code || "mfa-error"}: ${error.message || error}`);
+    }
+  }
+
   async function signInWithPopupThenRedirect(provider, statusId, label) {
     try {
       setText(statusId, `Opening ${label} sign-in...`);
       await auth.signInWithPopup(provider);
     } catch (e) {
+      if (handleAdminMfaRequired(e)) return;
       if (isPopupIssue(e)) {
         try {
           setText(statusId, `${label} popup was blocked or closed. Redirecting instead...`);
@@ -342,6 +426,7 @@
       setText("adminStatus", "Opening Google sign-in...");
       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
     } catch(e) {
+      if (handleAdminMfaRequired(e)) return;
       setText("adminStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
@@ -350,6 +435,7 @@
       setText("adminStatus", "Opening Facebook sign-in...");
       await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
     } catch(e) {
+      if (handleAdminMfaRequired(e)) return;
       setText("adminStatus", `${e.code || "error"}: ${e.message}`);
     }
   }
@@ -358,6 +444,25 @@
     await signInWithPopupThenRedirect(p, "adminStatus", "Microsoft");
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
+
+  async function hasClubAdminAccess(user) {
+    if (!user) return false;
+    const email = safeUser(user);
+    if (MASTER_ADMIN_EMAILS.includes(email) || CLUB_ADMIN_EMAILS.includes(email)) return true;
+    try {
+      const locationSnap = await db.collection("clubLocations").doc(locationId).get();
+      const locationData = locationSnap.exists ? locationSnap.data() || {} : {};
+      if ((locationData.adminUids || []).includes(user.uid)) return true;
+      if ((locationData.adminEmails || []).map(value => String(value).toLowerCase()).includes(email)) return true;
+    } catch (error) {}
+    try {
+      const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
+      return assignment.exists && String(assignment.data()?.status || "active") === "active";
+    } catch (error) {
+      return false;
+    }
+  }
 
   function setupTabs() {
     document.querySelectorAll(".admin-tab").forEach(btn => {
@@ -1156,6 +1261,9 @@
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+    bind("adminMfaSendBtn", sendAdminMfaCode);
+    bind("adminMfaVerifyBtn", verifyAdminMfaCode);
+    bind("adminMfaCancelBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
     bind("copyClubPublicProfileLinkBtn", async () => {
       await navigator.clipboard?.writeText(publicProfileUrl());
@@ -1172,26 +1280,34 @@
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("adminStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
-    }).catch(e => setText("adminStatus", adminAuthErrorMessage(e)));
+    }).catch(e => { if (!handleAdminMfaRequired(e)) setText("adminStatus", adminAuthErrorMessage(e)); });
 
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async user => {
       const email = safeUser(user);
       setText("adminSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
 
       if (!user) {
-        byId("adminLogin").classList.remove("hidden");
+        byId("adminLogin").classList.toggle("hidden", !!adminMfaResolver);
         byId("adminPanel").classList.add("hidden");
+        if (adminMfaResolver) showAdminMfaPanel();
         return;
       }
 
-      if (!CLUB_ADMIN_EMAILS.includes(email) && !MASTER_ADMIN_EMAILS.includes(email)) {
+      if (!(await hasClubAdminAccess(user))) {
         byId("adminLogin").classList.remove("hidden");
         byId("adminPanel").classList.add("hidden");
-        setText("adminStatus", `Signed in as ${email}, but this email is not listed as an admin.`);
+        setText("adminStatus", `Signed in as ${email}, but this patron is not assigned as an admin for ${locationId}.`);
+        return;
+      }
+
+      const isMasterAdmin = MASTER_ADMIN_EMAILS.includes(email);
+      if (!isMasterAdmin && !(user.multiFactor?.enrolledFactors || []).length) {
+        showAdminMfaPanel("First-time Club Admin setup: enroll the patron's mobile phone as the required SMS second factor.");
         return;
       }
 
       byId("adminLogin").classList.add("hidden");
+      byId("adminMfaPanel")?.classList.add("hidden");
       byId("adminPanel").classList.remove("hidden");
       setText("adminStatus", "Club admin verified.");
       renderQueue();

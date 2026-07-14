@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Venue Command Center v29.04 -->
+  <!-- FLOQR Venue Command Center v29.05 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.04"/>
-  <link rel="stylesheet" href="./admin.css?v=29.02"/>
+  <link rel="stylesheet" href="./styles.css?v=29.05"/>
+  <link rel="stylesheet" href="./admin.css?v=29.05"/>
 </head>
 <body>
 <main id="adminPage" class="app admin-shell">
@@ -36,6 +36,18 @@
         <button id="adminFacebookLoginBtn" type="button">Admin Facebook Login</button>
       </div>
       <button id="adminLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+    </div>
+
+    <div id="adminMfaPanel" class="card hidden">
+      <h2>Club Admin Mobile Verification</h2>
+      <p class="sub">Club Admin accounts require an enrolled mobile phone as a second factor. Enter the phone in international format, receive the SMS code, and verify it before opening the Venue Command Center.</p>
+      <div class="profile-grid">
+        <label>Club Admin mobile number<input id="adminMfaPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
+        <label>SMS verification code<input id="adminMfaCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"/></label>
+      </div>
+      <div id="admin-mfa-recaptcha"></div>
+      <div class="queue-actions"><button id="adminMfaSendBtn" type="button">Send Mobile Verification Code</button><button id="adminMfaVerifyBtn" class="primary" type="button">Verify and Continue</button><button id="adminMfaCancelBtn" type="button">Sign out</button></div>
+      <p id="adminMfaStatus" class="status"></p>
     </div>
 
     <div id="adminPanel" class="hidden">
@@ -98,6 +110,16 @@
             <label>Dress code<input id="clubProfileDressCode" placeholder="Upscale nightlife attire"/></label>
             <label>Amenities<input id="clubProfileAmenities" placeholder="VIP tables, coat check, outdoor garden"/></label>
             <label>FLOQR services<input id="clubProfileServices" placeholder="ShoutOut, Guest List, VIP Reservation"/></label>
+          </div>
+          <div class="card nested-card">
+            <h3>FLOQR display screens</h3>
+            <p class="sub small">Select the screen formats installed at this venue. Patrons will only see compatible ShoutOut templates, and previews will use the selected screen's aspect ratio.</p>
+            <div class="privacy-datapoint-grid">
+              <label><input data-club-display-format="led-96x48" type="checkbox"/> 96 x 48 cm — 624 x 312</label>
+              <label><input data-club-display-format="led-64x48" type="checkbox"/> 64 x 48 cm — 416 x 312</label>
+              <label><input data-club-display-format="led-64x32" type="checkbox"/> 64 x 32 cm — 416 x 208</label>
+            </div>
+            <label>Primary preview screen<select id="clubPrimaryDisplayFormat"><option value="led-96x48">96 x 48 cm — 624 x 312</option><option value="led-64x48">64 x 48 cm — 416 x 312</option><option value="led-64x32">64 x 32 cm — 416 x 208</option></select></label>
           </div>
           <div class="card nested-card">
             <h3>Featured people & promotion groups</h3>
@@ -277,15 +299,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
-<script src="./firebase-config.js?v=29.02"></script>
-<script src="./global-profile-status.js?v=29.03"></script>
-<script src="./shared-data.js?v=29.02"></script>
-<script src="./ai-service.js?v=29.02"></script>
-<script src="./ai-index-service.js?v=29.04"></script>
-<script src="./floqr-action-feedback.js?v=29.04"></script>
-<script src="./helper-popouts.js?v=29.02"></script>
-<script src="./admin-app.js?v=29.04"></script>
-<script src="./notification-center.js?v=29.02"></script>
-<script src="./profile-access-guard.js?v=29.04"></script>
+<script src="./firebase-config.js?v=29.05"></script>
+<script src="./global-profile-status.js?v=29.05"></script>
+<script src="./shared-data.js?v=29.05"></script>
+<script src="./ai-service.js?v=29.05"></script>
+<script src="./ai-index-service.js?v=29.05"></script>
+<script src="./floqr-action-feedback.js?v=29.05"></script>
+<script src="./helper-popouts.js?v=29.05"></script>
+<script src="./admin-app.js?v=29.05"></script>
+<script src="./notification-center.js?v=29.05"></script>
+<script src="./profile-access-guard.js?v=29.05"></script>
 </body>
 </html>

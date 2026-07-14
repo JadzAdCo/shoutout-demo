@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.04"/>
+  <link rel="stylesheet" href="./styles.css?v=29.05"/>
   <link rel="stylesheet" href="./admin.css?v=28.98"/>
 </head>
 <body>
@@ -169,14 +169,17 @@
       <section id="portalPublicProfile" class="admin-panel-section">
         <div class="card">
           <h2>Public Media and Data Sharing</h2>
-          <p class="sub small">Patron profiles support 10 media slots: 8 image slots and 2 short-video slots. Uploads can be shared based on your public visibility and My Privacy choices.</p>
+          <p class="sub small">Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.</p>
           <div id="profileTemplatePreview" class="profile-template-preview"></div>
         </div>
         <div class="card">
-          <h2>Profile Media Slots</h2>
-          <p class="sub small">Captions are not used. If a photo contains location metadata, FLOQR can ask before adding that place to your travel datapoints.</p>
+          <h2>Profile Media</h2>
+          <p class="sub small">Use the single upload control to select multiple files. Move items up or down to control their public-profile order; the first item becomes the hero media.</p>
+          <label>Choose profile media
+            <input id="profileMediaBatchInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple/>
+          </label>
           <div id="profileMediaSlots" class="profile-media-grid"></div>
-          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Current Media Slots</button>
+          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Media and Order</button>
         </div>
         <div class="card">
           <h2>Profile Template Guide</h2>
@@ -451,9 +454,9 @@
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
 <script src="./ai-template-studio.js?v=28.44-ai"></script>
 <script src="./ai-grammar-service.js?v=28.98"></script>
-  <script src="./floqr-action-feedback.js?v=29.04"></script>
+  <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=28.98"></script>
-  <script src="./patron-portal-app.js?v=29.04"></script>
-  <script src="./profile-access-guard.js?v=29.04"></script>
+  <script src="./patron-portal-app.js?v=29.05"></script>
+  <script src="./profile-access-guard.js?v=29.05"></script>
 </body>
 </html>

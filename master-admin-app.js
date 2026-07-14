@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.01
+/* master-admin-app.js v29.05
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.01";
+  const CURRENT_VERSION = "29.05";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -22,6 +22,12 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
   const storage = firebase.storage ? firebase.storage() : null;
+  const functions = firebase.functions ? firebase.functions() : null;
+  let networkUsers = [];
+  let networkLocations = [];
+  let selectedEntityClubId = "";
+  let selectedEntityPatronUid = "";
+  let managedTemplates = {};
 
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
   const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com", "microsoft.com"]).map(x => String(x).toLowerCase());
@@ -258,6 +264,9 @@
     const inferred = addressParts(fullAddress);
     const id = slugify(`${name}-${inferred.city || input.city || ""}-${inferred.region || input.region || ""}`);
     const genres = splitCSV(input.genres || input["Music Genres"] || input.musicGenres);
+    const displayScreenFormatIds = Array.isArray(input.displayScreenFormatIds)
+      ? input.displayScreenFormatIds
+      : Array.from(document.querySelectorAll("[data-onboard-screen-format]:checked")).map(el => el.dataset.onboardScreenFormat);
     return {
       id,
       clubId: id,
@@ -279,6 +288,8 @@
         tiktok: String(input.tiktok || input["Tic Tok"] || input.TikTok || input.Tiktok || "").trim()
       },
       genres,
+      displayScreenFormatIds: displayScreenFormatIds.length ? displayScreenFormatIds : ["led-96x48"],
+      primaryDisplayScreenFormatId: displayScreenFormatIds[0] || "led-96x48",
       publicProfileType: "club",
       visibility: "public",
       services: ["shoutout", "guestList"],
@@ -311,7 +322,8 @@
       facebook: byId("clubOnboardFacebook")?.value,
       x: byId("clubOnboardX")?.value,
       tiktok: byId("clubOnboardTiktok")?.value,
-      genres: byId("clubOnboardGenres")?.value
+      genres: byId("clubOnboardGenres")?.value,
+      displayScreenFormatIds: Array.from(document.querySelectorAll("[data-onboard-screen-format]:checked")).map(el => el.dataset.onboardScreenFormat)
     });
   }
 
@@ -457,6 +469,243 @@
       ["Affiliated club", clubId || "Not assigned yet"],
       ["Status", "Created; match this record to an existing patron before role activation"]
     ]);
+  }
+
+  function entitySearchText(row = {}) {
+    return [
+      row.id,
+      row.locationName,
+      row.clubName,
+      row.brandName,
+      row.address,
+      row.fullAddress,
+      row.city,
+      row.region,
+      row.country,
+      row.onboardingSource,
+      row.discoveryMode
+    ].filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function patronSearchText(row = {}) {
+    return [row.uid, row.id, row.displayName, row.username, row.email, row.phoneNumber].filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function updateEntityAssignmentSummary() {
+    const wrap = byId("entityAssignmentSummary");
+    const club = networkLocations.find(row => row.id === selectedEntityClubId);
+    const patron = networkUsers.find(row => (row.uid || row.id) === selectedEntityPatronUid);
+    if (wrap) wrap.innerHTML = simpleRows([
+      ["Selected entity", club ? `${locationName(club)} (${club.id})` : "Choose a club"],
+      ["Selected patron", patron ? `${patron.displayName || patron.username || patron.email || patron.uid || patron.id} (${patron.email || patron.uid || patron.id})` : "Choose a completed patron profile"],
+      ["Activation", club && patron ? "Ready to assign Club Admin portal access" : "Waiting for both selections"]
+    ]);
+    if (byId("assignEntityClubAdminBtn")) byId("assignEntityClubAdminBtn").disabled = !(club && patron && patron.profileCompleted === true);
+  }
+
+  function renderEntityClubResults() {
+    const wrap = byId("entityClubResults");
+    if (!wrap) return;
+    const query = String(byId("entityClubSearch")?.value || "").trim().toLowerCase();
+    const rows = networkLocations.filter(row => !query || entitySearchText(row).includes(query)).slice(0, 80);
+    wrap.innerHTML = rows.length ? rows.map(row => `<button class="entity-result-card ${row.id === selectedEntityClubId ? "selected" : ""}" type="button" data-entity-club-id="${esc(row.id)}">
+      <strong>${esc(locationName(row))}</strong>
+      <span>${esc([row.city, row.region, row.country].filter(Boolean).join(", ") || row.address || row.fullAddress || row.id)}</span>
+      <small>${esc(row.onboardingSource || row.discoveryMode || "FLOQR clubLocations")}</small>
+    </button>`).join("") : "<p class='sub'>No matching imported or discovered club was found.</p>";
+    wrap.querySelectorAll("[data-entity-club-id]").forEach(button => button.addEventListener("click", () => {
+      selectedEntityClubId = button.dataset.entityClubId || "";
+      renderEntityClubResults();
+      updateEntityAssignmentSummary();
+    }));
+  }
+
+  function renderEntityPatronResults() {
+    const wrap = byId("entityPatronResults");
+    if (!wrap) return;
+    const query = String(byId("entityPatronSearch")?.value || "").trim().toLowerCase();
+    const rows = networkUsers.filter(row => !query || patronSearchText(row).includes(query)).slice(0, 80);
+    wrap.innerHTML = rows.length ? rows.map(row => {
+      const uid = row.uid || row.id;
+      const complete = row.profileCompleted === true;
+      return `<button class="entity-result-card ${uid === selectedEntityPatronUid ? "selected" : ""}" type="button" data-entity-patron-uid="${esc(uid)}" ${complete ? "" : "disabled"}>
+        <strong>${esc(row.displayName || row.username || row.email || uid)}</strong>
+        <span>${esc(row.email || row.phoneNumber || uid)}</span>
+        <small>${complete ? "Completed patron profile — eligible" : "Profile incomplete — not eligible"}</small>
+      </button>`;
+    }).join("") : "<p class='sub'>No matching registered patron was found.</p>";
+    wrap.querySelectorAll("[data-entity-patron-uid]").forEach(button => button.addEventListener("click", () => {
+      selectedEntityPatronUid = button.dataset.entityPatronUid || "";
+      renderEntityPatronResults();
+      updateEntityAssignmentSummary();
+    }));
+  }
+
+  async function assignSelectedEntityClubAdmin() {
+    const club = networkLocations.find(row => row.id === selectedEntityClubId);
+    const patron = networkUsers.find(row => (row.uid || row.id) === selectedEntityPatronUid);
+    if (!club || !patron || patron.profileCompleted !== true) {
+      setText("entityOnboardingStatus", "Select one club and one patron with a completed profile.");
+      return;
+    }
+    const uid = patron.uid || patron.id;
+    const email = String(patron.email || "").toLowerCase();
+    setText("entityOnboardingStatus", `Assigning ${patron.displayName || email || uid} to ${locationName(club)}...`);
+    if (club.sourceCollection && club.sourceCollection !== "clubLocations") {
+      await db.collection("clubLocations").doc(club.id).set({
+        locationName:locationName(club),
+        brandName:club.brandName || club.proposedTitle || locationName(club),
+        address:club.address || club.proposedAddress || "",
+        city:club.city || "",
+        region:club.region || club.stateRegion || "",
+        country:club.country || "",
+        telephone:club.telephone || club.phone || "",
+        officialWebsite:club.officialWebsite || club.website || club.sourceUrl || "",
+        socialMediaHandles:club.socialMediaHandles || {},
+        onboardingSource:club.sourceCollection,
+        sourceRecordId:club.sourceRecordId || "",
+        active:true,
+        status:"active",
+        displayScreenFormatIds:club.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"],
+        primaryDisplayScreenFormatId:club.primaryDisplayScreenFormatId || "led-96x48",
+        createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }
+    let backendActivated = false;
+    if (functions) {
+      try {
+        const result = await functions.httpsCallable("assignClubAdmin")({clubId:club.id, clubLocationId:club.id, patronUid:uid});
+        backendActivated = result?.data?.status === "active";
+      } catch (error) {
+        console.warn("assignClubAdmin callable unavailable; using assignment-record fallback:", error?.message || error);
+      }
+    }
+    if (!backendActivated) {
+      const assignmentId = `${club.id}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const assignment = {
+        clubLocationId:club.id,
+        clubLocationName:locationName(club),
+        patronUid:uid,
+        patronEmail:email,
+        patronDisplayName:patron.displayName || patron.username || email || uid,
+        role:"Club Admin",
+        status:"active",
+        assignedByUid:auth.currentUser?.uid || "",
+        assignedByEmail:safeUser(auth.currentUser),
+        assignedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      };
+      await db.collection("clubAdminAssignments").doc(assignmentId).set(assignment, {merge:true});
+      await db.collection("clubLocations").doc(club.id).set({
+        adminUids:firebase.firestore.FieldValue.arrayUnion(uid),
+        adminEmails:email ? firebase.firestore.FieldValue.arrayUnion(email) : (club.adminEmails || []),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      await db.collection("clubs").doc(club.id).set({
+        adminUids:firebase.firestore.FieldValue.arrayUnion(uid),
+        adminEmails:email ? firebase.firestore.FieldValue.arrayUnion(email) : [],
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }
+    setText("entityOnboardingStatus", `${patron.displayName || email || uid} now has Club Admin access to ${locationName(club)}. ${backendActivated ? "The patron profile and venue records were synchronized by the backend." : "The assignment record is active; deploy assignClubAdmin to synchronize custom claims/profile role fields."}`);
+    updateEntityAssignmentSummary();
+  }
+
+  function managedTemplateScreenIds() {
+    return Array.from(document.querySelectorAll("[data-template-screen-format]:checked")).map(el => el.dataset.templateScreenFormat);
+  }
+
+  function clearManagedTemplateForm() {
+    ["templateManageId","templateManageName","templateManageCategory","templateManageTags","templateManageDescription"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+    if (byId("templateManageClass")) byId("templateManageClass").value = "neon";
+    if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = "45";
+    if (byId("templateManageLineCount")) byId("templateManageLineCount").value = "3";
+    if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = "15";
+    if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = false;
+    document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = true; });
+  }
+
+  function fillManagedTemplateForm(template = {}) {
+    if (byId("templateManageId")) byId("templateManageId").value = template.id || "";
+    if (byId("templateManageName")) byId("templateManageName").value = template.name || "";
+    if (byId("templateManageClass")) byId("templateManageClass").value = template.className || "neon";
+    if (byId("templateManageCategory")) byId("templateManageCategory").value = template.category || "";
+    if (byId("templateManageTags")) byId("templateManageTags").value = (template.tags || []).join(", ");
+    if (byId("templateManageDescription")) byId("templateManageDescription").value = template.description || "";
+    if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = template.maxMainCharacters || 45;
+    if (byId("templateManageLineCount")) byId("templateManageLineCount").value = template.lineCount || 3;
+    if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = template.maxCharactersPerLine || 15;
+    if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = !!(template.supportsMedia || template.supportsImage || template.supportsVideo);
+    const formats = new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || []);
+    document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = formats.has(el.dataset.templateScreenFormat); });
+    byId("templateManageId")?.scrollIntoView?.({behavior:"smooth", block:"center"});
+  }
+
+  async function loadManagedTemplates() {
+    managedTemplates = Object.fromEntries(Object.entries(window.SHOUTOUT_TEMPLATES || {}).map(([id, data]) => [id, {id, source:"package", ...data}]));
+    const rows = await getCollectionSafe("templates", 500);
+    rows.forEach(row => { managedTemplates[row.id] = {...managedTemplates[row.id], ...row, id:row.id, source:"Firestore"}; });
+    renderTemplateManagement();
+  }
+
+  function renderTemplateManagement() {
+    const wrap = byId("templateManagementList");
+    if (!wrap) return;
+    const query = String(byId("templateManagementSearch")?.value || "").trim().toLowerCase();
+    const rows = Object.values(managedTemplates).filter(template => !query || [template.id, template.name, template.category, template.description, ...(template.tags || []), ...(template.screenFormatIds || [])].join(" ").toLowerCase().includes(query)).sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+    wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
+      <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(template.status || "active")}</span></div>
+      <p>${esc(template.description || "No description")}</p>
+      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")}</small>
+      <div class="queue-actions"><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Restore" : "Deactivate"}</button></div>
+    </div>`).join("") || "<p class='sub'>No templates matched.</p>";
+    wrap.querySelectorAll("[data-template-edit]").forEach(button => button.addEventListener("click", () => fillManagedTemplateForm(managedTemplates[button.dataset.templateEdit] || {})));
+    wrap.querySelectorAll("[data-template-toggle]").forEach(button => button.addEventListener("click", async () => {
+      const template = managedTemplates[button.dataset.templateToggle] || {};
+      const status = template.status === "deleted" ? "active" : "deleted";
+      await db.collection("templates").doc(button.dataset.templateToggle).set({status, updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedByUid:auth.currentUser?.uid || ""}, {merge:true});
+      setText("templateManagementStatus", `${template.name || template.id} is now ${status}.`);
+      await loadManagedTemplates();
+    }));
+  }
+
+  async function saveManagedTemplate() {
+    const id = slugify(byId("templateManageId")?.value || byId("templateManageName")?.value || "");
+    const name = String(byId("templateManageName")?.value || "").trim();
+    if (!id || !name) { setText("templateManagementStatus", "Template ID and name are required."); return; }
+    const supportsMedia = !!byId("templateManageSupportsMedia")?.checked;
+    const screenFormatIds = managedTemplateScreenIds();
+    if (!screenFormatIds.length) { setText("templateManagementStatus", "Select at least one compatible screen format."); return; }
+    const lineCount = Math.max(1, Number(byId("templateManageLineCount")?.value || 3));
+    const maxCharactersPerLine = Math.max(1, Number(byId("templateManageLineLimit")?.value || 15));
+    const requestedTotal = Math.max(1, Number(byId("templateManageMainLimit")?.value || (lineCount * maxCharactersPerLine)));
+    const maxMainCharacters = Math.min(requestedTotal, lineCount * maxCharactersPerLine);
+    const payload = {
+      id,
+      name,
+      className:byId("templateManageClass")?.value || "neon",
+      category:String(byId("templateManageCategory")?.value || "").trim(),
+      tags:splitCSV(byId("templateManageTags")?.value),
+      description:String(byId("templateManageDescription")?.value || "").trim(),
+      supportsMedia,
+      supportsImage:supportsMedia,
+      supportsVideo:supportsMedia,
+      mediaMode:supportsMedia ? "Image/video placeholder" : "No image/video",
+      maxMainCharacters,
+      lineCount,
+      maxCharactersPerLine,
+      screenFormatIds,
+      status:"active",
+      scope:"Shared",
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedByUid:auth.currentUser?.uid || "",
+      updatedByEmail:safeUser(auth.currentUser)
+    };
+    await db.collection("templates").doc(id).set(payload, {merge:true});
+    setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} total characters, and ${screenFormatIds.length} screen format tag(s).`);
+    await loadManagedTemplates();
+    fillManagedTemplateForm(managedTemplates[id] || payload);
   }
 
   function renderClubAdminUrls(locationRows = []) {
@@ -621,17 +870,33 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, events, guestLists] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("clubLocations"),
       getCollectionSafe("events"),
-      getCollectionSafe("guestListRequests")
+      getCollectionSafe("guestListRequests"),
+      getCollectionSafe("clubOnboardingRecords"),
+      getCollectionSafe("aiDiscoveryQueue")
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
-    const locationRows = locations.length ? locations : fallbackLocations;
+    const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => [row.id, row]));
+    onboardingRecords.forEach(row => {
+      const id = slugify(row.clubLocationId || row.id || row.clubName || row.locationName || "imported-club");
+      if (!locationMap.has(id)) locationMap.set(id, {...row, id, sourceCollection:"clubOnboardingRecords", sourceRecordId:row.id, onboardingSource:row.onboardingSource || "CSV/manual onboarding"});
+    });
+    discoveryRecords.filter(row => /club|lounge|bar|venue|nightclub/i.test(`${row.proposedType || ""} ${(row.categories || []).join(" ")}`)).forEach(row => {
+      const id = slugify(`${row.proposedTitle || row.proposedLocationName || "discovered-club"}-${row.city || row.country || row.id}`);
+      if (!locationMap.has(id)) locationMap.set(id, {...row, id, locationName:row.proposedTitle || row.proposedLocationName, address:row.proposedAddress || row.address || "", sourceCollection:"aiDiscoveryQueue", sourceRecordId:row.id, onboardingSource:"AI crawl discovery"});
+    });
+    const locationRows = Array.from(locationMap.values());
+    networkUsers = users.map(row => ({...row, uid:row.uid || row.id}));
+    networkLocations = locationRows;
+    renderEntityClubResults();
+    renderEntityPatronResults();
+    updateEntityAssignmentSummary();
     const pending = shoutouts.filter(x => (x.status || "pending") === "pending");
     const revenue = pending.length * 10 + liveDocs.length * 25;
     const impressions = Math.max(10000, locationRows.length * 1250 + pending.length * 50);
@@ -751,6 +1016,12 @@
     bind("previewClubOnboardingCsvBtn", previewClubCsv);
     bind("importClubOnboardingCsvBtn", importClubCsv);
     bind("createPromoterOnboardingBtn", createPromoterOnboarding);
+    bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
+    bind("saveManagedTemplateBtn", saveManagedTemplate);
+    bind("clearManagedTemplateBtn", clearManagedTemplateForm);
+    byId("entityClubSearch")?.addEventListener("input", renderEntityClubResults);
+    byId("entityPatronSearch")?.addEventListener("input", renderEntityPatronResults);
+    byId("templateManagementSearch")?.addEventListener("input", renderTemplateManagement);
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -779,6 +1050,7 @@
       setText("masterStatus", check.reason);
       setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
+      loadManagedTemplates();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
       if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
       if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});

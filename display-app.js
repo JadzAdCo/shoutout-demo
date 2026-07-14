@@ -1,4 +1,4 @@
-/* display-app.js v28.91-helper-popouts-mingl-requests */
+/* display-app.js v29.05 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -87,10 +87,10 @@
 
   function classicBoardRows(mainText, subText) {
     const maxRows = 3;
-    const maxChars = 12;
+    const maxChars = 15;
     const attribution = glyphSlice(cleanBoardText(subText), 0, maxChars);
     const availableRows = attribution ? 2 : maxRows;
-    const words = glyphSlice(cleanBoardText(mainText), 0, 36).split(" ").filter(Boolean);
+    const words = glyphSlice(cleanBoardText(mainText), 0, maxChars * availableRows).split(" ").filter(Boolean);
     const rows = [];
 
     if (words[0] === "HAPPY" && words[1] === "BIRTHDAY") {
@@ -172,6 +172,8 @@
       if (mediaUrl) {
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
+        const mediaElement = mediaSlot.querySelector("img,video");
+        if (mediaElement) mediaElement.style.objectFit = data.mediaFit === "cover" ? "cover" : "contain";
         if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
@@ -205,6 +207,8 @@
         template: qs("template","neon"),
         mediaUrl: qs("media",""),
         mediaType: qs("mediaType",""),
+        mediaFit: qs("mediaFit","contain"),
+        screenFormatId: qs("screenFormatId",""),
         selectedMediaVersion: qs("selectedMediaVersion",""),
         trimStart: qs("trimStart",""),
         trimEnd: qs("trimEnd",""),

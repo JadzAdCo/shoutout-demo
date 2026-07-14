@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler controls, TXT export, Gemini media checks, rules guidance, and manual feature tests v28.87 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.05 */
 (function () {
   "use strict";
 
@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.04";
-  const EXPECTED_STORAGE_RULES_VERSION = "v29.04";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.04";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.05";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.05";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.05";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -794,6 +794,25 @@
         {label:"Current storage version markers", file:"storage.rules", includes:["FLOQR STORAGE RULES VERSION: v29.04", "EXPECTED DEPLOYED STORAGE RULES VERSION: v29.04"]},
         {label:"Current rollback note", file:"ROLLBACK-V29-04.md", includes:["FLOQR Rollback - v29.04", "ShoutOut-wepApp.v29.03.zip"]}
       ]
+    },
+    {
+      version:"v29.05",
+      title:"Diagnostics, Entity Onboarding, Localized Crawler, Display Templates, OTP, and MFA",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.05\"", "rulesSmokeTestProgress", "downloadRulesSmokeJsonBtn"]},
+        {label:"Entity onboarding and registered patron assignment", file:"master-admin.html", includes:["entityClubSearch", "entityPatronSearch", "assignEntityClubAdminBtn"]},
+        {label:"Entity assignment callable", file:"functions/ai-discovery-functions.js", includes:["exports.assignClubAdmin", "clubAdminAssignments", "must first register as a FLOQR patron"]},
+        {label:"Template screen metadata", file:"shared-data.js", includes:["FLOQR_DISPLAY_FORMATS", "624", "416", "maxCharactersPerLine:15", "maxMainCharacters:45"]},
+        {label:"Template management UI", file:"master-admin.html", includes:["templateManagement", "templateManageLineLimit", "data-template-screen-format"]},
+        {label:"No-crop media and optional fill", file:"display-app.js", includes:["data.mediaFit === \"cover\"", "\"contain\""]},
+        {label:"Custom-email OTP UI", file:"index.html", includes:["Continue with your own Email", "requestEmailOtpBtn", "verifyEmailOtpBtn"]},
+        {label:"Five-minute email OTP backend", file:"functions/ai-discovery-functions.js", includes:["exports.requestEmailOtp", "exports.verifyEmailOtp", "5 * 60 * 1000"]},
+        {label:"Club Admin SMS MFA", file:"admin-app.js", includes:["PhoneMultiFactorGenerator", "multi-factor-auth-required", "Club Admin Mobile"]},
+        {label:"Single multi-file profile media ordering", file:"patron-portal.html", includes:["profileMediaBatchInput", "multiple", "Save Media and Order"]},
+        {label:"Dynamic timezone crawler dispatcher", file:"functions/ai-discovery-functions.js", includes:["every 15 minutes", "scheduleIsDue", "GOOGLE_PLACES_API_KEY"]},
+        {label:"Current rule version markers", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v29.05", "clubAdminAssignments", "emailOtpChallenges"]},
+        {label:"Current rollback and deployment docs", file:"ROLLBACK-V29-05.md", includes:["FLOQR Rollback - v29.05", "ShoutOut-wepApp.v29.04.zip"]}
+      ]
     }
   ];
 
@@ -1382,26 +1401,28 @@
     );
     const cities = uniqueByNormalized([
       ...markets.map(market => market.city),
-      ...(hasNaturalSignal ? [] : (criteria.cities || []))
+      ...(criteria.cities || [])
     ]);
     const countries = uniqueByNormalized([
       ...detectedCountries,
-      ...(hasNaturalSignal ? [] : (criteria.countries || [])),
+      ...(criteria.countries || []),
       ...markets.map(market => market.country)
     ]);
     const genres = uniqueByNormalized([
       ...detectedGenres,
-      ...(hasNaturalSignal ? [] : (criteria.genres || []))
+      ...(criteria.genres || [])
     ]);
     const eventTypes = uniqueByNormalized([
       ...detectedEventTypes,
-      ...(hasNaturalSignal ? [] : (criteria.eventTypes || []))
+      ...(criteria.eventTypes || [])
     ]);
     const fallbackMarkets = cities.length ? cities.map(city => marketForCityName(city)).filter(Boolean) : markets;
-    const languages = inferLanguages(fallbackMarkets, countries, hasNaturalSignal ? [] : (criteria.languages || []));
-    const finalCities = cities.length ? cities : ["Dubai", "Istanbul", "Singapore", "Shanghai"];
+    const languages = inferLanguages(fallbackMarkets, countries, criteria.languages || []);
+    const countryCities = countries.flatMap(country => KNOWN_MARKETS.filter(market => normalized(market.country) === normalized(country)).map(market => market.city));
+    const finalCities = uniqueByNormalized(cities.length ? cities : (countryCities.length ? countryCities : ["Dubai", "Istanbul", "Singapore", "Shanghai"]));
     const finalEventTypes = eventTypes.length ? eventTypes : ["nightclub"];
     const explicitGenres = genres.length ? genres : [""];
+    const languageStrategy = criteria.languageStrategy || "nativePlusEnglish";
     const jobs = [];
     finalCities.forEach(city => {
       const market = marketForCityName(city);
@@ -1409,17 +1430,22 @@
         finalEventTypes.forEach(eventType => {
           const genre = genreInput || defaultGenreForEventType(eventType);
           const country = market?.country || (countries.length === 1 ? countries[0] : "");
-          const language = market?.language || languages[0] || "";
-          jobs.push({
-            city,
-            country,
-            stateRegion: market?.region || "",
-            language,
-            genre,
-            eventType,
-            query: crawlQueryForJob({eventType, genre, city, country}),
-            requiredDatapoints: requiredDatapointLabels(eventType)
-          });
+          const nativeLanguages = splitList(market?.language || COUNTRY_LANGUAGES[normalized(country)] || "");
+          const jobLanguages = languageStrategy === "selectedOnly"
+            ? (criteria.languages || [])
+            : languageStrategy === "nativeOnly"
+              ? nativeLanguages
+              : uniqueByNormalized([...nativeLanguages, "English", ...(criteria.languages || [])]);
+          (jobLanguages.length ? jobLanguages : ["local language"]).forEach(language => jobs.push({
+              city,
+              country,
+              stateRegion: market?.region || "",
+              language,
+              genre,
+              eventType,
+              query: searchPhraseFromParts([crawlQueryForJob({eventType, genre, city, country}), language && language !== "local language" ? `in ${language}` : ""]),
+              requiredDatapoints: requiredDatapointLabels(eventType)
+            }));
         });
       });
     });
@@ -1431,8 +1457,9 @@
       genres: finalGenres,
       eventTypes: finalEventTypes,
       languages,
+      languageStrategy,
       jobCount: jobs.length,
-      jobs: jobs.slice(0, 80),
+      jobs: jobs.slice(0, 160),
       parser: "local-contextual-crawl-parser",
       note: "Plain-English input expanded into city x genre x event-type crawl/search jobs."
     };
@@ -1818,6 +1845,15 @@
     return item.profileImport?.publicProfile?.telephone ||
       item.telephone ||
       item.phone ||
+      "";
+  }
+
+  function destinationWebsite(item = {}) {
+    return item.profileImport?.publicProfile?.officialWebsite ||
+      item.officialWebsite ||
+      item.website ||
+      item.sourceUrl ||
+      item.ticketUrl ||
       "";
   }
 
@@ -3363,14 +3399,65 @@
     }
   }
 
+  function renderRulesSmokeResults() {
+    const filter = byId("rulesSmokeTestFilter")?.value || "all";
+    const rows = filter === "all" ? state.lastRulesSmokeResults : state.lastRulesSmokeResults.filter(item => item.status === filter);
+    renderCheckCards("rulesSmokeTestReport", rows);
+  }
+
+  function rulesSmokeFailureDiagnostics() {
+    const failures = state.lastRulesSmokeResults.filter(item => item.status === "Failed" || item.status === "Soft Fail");
+    return [
+      `FLOQR Firebase Smoke Test Diagnostics — ${CURRENT_DIAGNOSTICS_PACKAGE_VERSION}`,
+      `Generated: ${new Date().toISOString()}`,
+      `Expected Firestore rules: ${EXPECTED_FIRESTORE_RULES_VERSION}`,
+      `Expected Storage rules: ${EXPECTED_STORAGE_RULES_VERSION}`,
+      "",
+      ...(failures.length ? failures.flatMap((item, index) => [
+        `${index + 1}. [${item.status}] ${item.label}`,
+        `Evidence: ${item.evidence || "No evidence recorded."}`,
+        `Suggested fix: ${suggestDiagnosticFix("Firebase Rules Smoke Test", item.label, item.evidence, item.status)}`,
+        ""
+      ]) : ["No failures or soft failures were recorded in the most recent browser session."])
+    ].join("\n");
+  }
+
+  async function copyRulesSmokeFailures() {
+    await copyTextToClipboard(rulesSmokeFailureDiagnostics());
+    setText("diagnosticsStatus", "Firebase smoke-test failure diagnostics copied.");
+  }
+
+  function downloadRulesSmokeJson() {
+    const payload = {
+      type:"rulesSmokeTest",
+      packageVersion:CURRENT_DIAGNOSTICS_PACKAGE_VERSION,
+      expectedFirestoreRulesVersion:EXPECTED_FIRESTORE_RULES_VERSION,
+      expectedStorageRulesVersion:EXPECTED_STORAGE_RULES_VERSION,
+      generatedAt:new Date().toISOString(),
+      summary:{
+        total:state.lastRulesSmokeResults.length,
+        pass:state.lastRulesSmokeResults.filter(item => item.status === "Pass").length,
+        softFail:state.lastRulesSmokeResults.filter(item => item.status === "Soft Fail").length,
+        failed:state.lastRulesSmokeResults.filter(item => item.status === "Failed").length
+      },
+      results:state.lastRulesSmokeResults
+    };
+    downloadTextFile(`floqr-firebase-smoke-test-${exportTimestamp()}.json`, JSON.stringify(payload, null, 2));
+    setText("diagnosticsStatus", "Firebase smoke-test JSON downloaded.");
+  }
+
   async function runRulesSmokeTest() {
     const user = state.auth?.currentUser;
     if (!user) {
       setText("diagnosticsStatus", "Sign in as Master Admin before running rules smoke tests.");
       return [];
     }
-    setText("diagnosticsStatus", "Running Firebase rules smoke test...");
+    const startedAt = Date.now();
+    setText("diagnosticsStatus", "Running Firebase rules smoke test with live step diagnostics...");
     const runId = `diagnostic-${user.uid.slice(0, 8)}-${Date.now()}`;
+    const progress = byId("rulesSmokeTestProgress");
+    if (progress) { progress.classList.remove("hidden"); progress.value = 3; }
+    if (byId("rulesSmokeTestRunMeta")) byId("rulesSmokeTestRunMeta").innerHTML = simpleRows([["Run ID", runId], ["Started", new Date(startedAt).toLocaleString()], ["Signed-in tester", user.email || user.uid], ["Current phase", "Core Firestore rules"]]);
     const results = [];
     async function capture(label, fn) {
       try {
@@ -3395,8 +3482,14 @@
     }
 
     await runCoreFirestoreRuleTests(capture, runId, user);
+    if (progress) progress.value = 35;
+    if (byId("rulesSmokeTestRunMeta")) byId("rulesSmokeTestRunMeta").innerHTML = simpleRows([["Run ID", runId], ["Started", new Date(startedAt).toLocaleString()], ["Signed-in tester", user.email || user.uid], ["Current phase", "AI, crawler, diagnostics, and template rules"]]);
     await runAiFirestoreRuleTests(capture, runId, user);
+    if (progress) progress.value = 62;
+    if (byId("rulesSmokeTestRunMeta")) byId("rulesSmokeTestRunMeta").innerHTML = simpleRows([["Run ID", runId], ["Started", new Date(startedAt).toLocaleString()], ["Signed-in tester", user.email || user.uid], ["Current phase", "Mingl and chat compatibility"]]);
     await runMinglChatRuleTests(capture, runId, user);
+    if (progress) progress.value = 82;
+    if (byId("rulesSmokeTestRunMeta")) byId("rulesSmokeTestRunMeta").innerHTML = simpleRows([["Run ID", runId], ["Started", new Date(startedAt).toLocaleString()], ["Signed-in tester", user.email || user.uid], ["Current phase", "Firebase Storage paths"]]);
     await runStorageRuleTests(capture, runId, user);
     state.lastRulesSmokeResults = results;
 
@@ -3408,7 +3501,16 @@
       ["Overall", overallStatus],
       ["Scope", "Tests signed-in allowed operations; it does not impersonate another user."]
     ]);
-    renderCheckCards("rulesSmokeTestReport", results);
+    renderRulesSmokeResults();
+    const durationMs = Date.now() - startedAt;
+    if (progress) progress.value = 100;
+    if (byId("rulesSmokeTestRunMeta")) byId("rulesSmokeTestRunMeta").innerHTML = simpleRows([
+      ["Run ID", runId],
+      ["Completed", new Date().toLocaleString()],
+      ["Duration", `${(durationMs / 1000).toFixed(1)} seconds`],
+      ["Checks", `${results.length} total / ${failed} failed / ${results.filter(item => item.status === "Soft Fail").length} soft fail`],
+      ["Diagnostics capability", "Filter results, copy failure evidence, download JSON, or export the full diagnostics TXT"]
+    ]);
     await refreshDiagnostics();
     await renderRulesVersionStatus(state.lastData);
     setText("diagnosticsStatus", failed ? `Rules smoke test found ${failed} failed checks.` : "Rules smoke test passed and report was saved.");
@@ -3585,23 +3687,60 @@
       byId("crawlMarketLanguageCriteria").value = DEFAULT_MARKET_LANGUAGE_PLAN.join("\n");
     }
     if (byId("crawlScheduleHours") && !byId("crawlScheduleHours").value) {
-      byId("crawlScheduleHours").value = "00:00, 04:00, 08:00, 12:00, 16:00, 20:00";
+      byId("crawlScheduleHours").value = "00:00, 06:00, 12:00, 18:00";
     }
+  }
+
+  function selectedControlValues(id) {
+    const control = byId(id);
+    if (!control) return [];
+    if (control.tagName === "SELECT" && control.multiple) {
+      return Array.from(control.selectedOptions).map(option => option.value).filter(Boolean);
+    }
+    return splitList(control.value);
+  }
+
+  function applyValuesToControl(id, values = []) {
+    const control = byId(id);
+    if (!control) return;
+    const list = Array.isArray(values) ? values.map(String) : splitList(values);
+    if (control.tagName === "SELECT" && control.multiple) {
+      const wanted = new Set(list.map(normalized));
+      Array.from(control.options).forEach(option => { option.selected = wanted.has(normalized(option.value)); });
+      return;
+    }
+    control.value = joinList(list);
+  }
+
+  function scheduleHoursFromControls() {
+    const primary = String(byId("crawlPrimaryTime")?.value || "00:00");
+    const runs = Math.max(1, Math.min(6, Number(byId("crawlRunsPerDay")?.value || 4)));
+    const [hour, minute] = primary.split(":").map(Number);
+    const startMinutes = ((Number.isFinite(hour) ? hour : 0) * 60) + (Number.isFinite(minute) ? minute : 0);
+    const interval = Math.floor(1440 / runs);
+    return Array.from({length:runs}, (_, index) => {
+      const total = (startMinutes + (index * interval)) % 1440;
+      return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+    });
   }
 
   function applyScheduleToControls(schedule = {}) {
     if (!schedule) return;
     if (byId("crawlFrequency")) byId("crawlFrequency").value = schedule.frequency || "every4Hours";
     if (byId("crawlScheduleHours")) byId("crawlScheduleHours").value = joinList(schedule.scheduleHours) || byId("crawlScheduleHours").value;
+    if (byId("crawlPrimaryTime")) byId("crawlPrimaryTime").value = schedule.primaryTime || schedule.scheduleHours?.[0] || "00:00";
+    if (byId("crawlRunsPerDay")) byId("crawlRunsPerDay").value = String(schedule.runsPerDay || schedule.scheduleHours?.length || 4);
+    if (byId("crawlTimeZone")) byId("crawlTimeZone").value = schedule.timeZone || "America/New_York";
     const criteria = schedule.criteria || {};
     if (criteria.naturalLanguage && byId("crawlNaturalLanguageInput")) byId("crawlNaturalLanguageInput").value = criteria.naturalLanguage;
     if (criteria.search && byId("crawlSearchCriteria")) byId("crawlSearchCriteria").value = criteria.search;
-    if (criteria.genres && byId("crawlGenreCriteria")) byId("crawlGenreCriteria").value = joinList(criteria.genres);
-    if (criteria.languages && byId("crawlLanguageCriteria")) byId("crawlLanguageCriteria").value = joinList(criteria.languages);
+    if (criteria.genres) applyValuesToControl("crawlGenreCriteria", criteria.genres);
+    if (criteria.languages) applyValuesToControl("crawlLanguageCriteria", criteria.languages);
     if (criteria.cities && byId("crawlCityCriteria")) byId("crawlCityCriteria").value = joinList(criteria.cities);
     if (criteria.regions && byId("crawlRegionCriteria")) byId("crawlRegionCriteria").value = joinList(criteria.regions);
-    if (criteria.countries && byId("crawlCountryCriteria")) byId("crawlCountryCriteria").value = joinList(criteria.countries);
-    if (criteria.eventTypes && byId("crawlEventTypeCriteria")) byId("crawlEventTypeCriteria").value = joinList(criteria.eventTypes);
+    if (criteria.countries) applyValuesToControl("crawlCountryCriteria", criteria.countries);
+    if (criteria.eventTypes) applyValuesToControl("crawlEventTypeCriteria", criteria.eventTypes);
+    if (byId("crawlLanguageStrategy")) byId("crawlLanguageStrategy").value = criteria.languageStrategy || "nativePlusEnglish";
     if (criteria.marketLanguagePlan && byId("crawlMarketLanguageCriteria")) {
       byId("crawlMarketLanguageCriteria").value = Array.isArray(criteria.marketLanguagePlan)
         ? criteria.marketLanguagePlan.join("\n")
@@ -3613,12 +3752,13 @@
     return {
       naturalLanguage: byId("crawlNaturalLanguageInput")?.value.trim() || "",
       search: byId("crawlSearchCriteria")?.value.trim() || "",
-      genres: splitList(byId("crawlGenreCriteria")?.value),
-      languages: splitList(byId("crawlLanguageCriteria")?.value),
+      genres: selectedControlValues("crawlGenreCriteria"),
+      languages: selectedControlValues("crawlLanguageCriteria"),
       cities: splitList(byId("crawlCityCriteria")?.value),
       regions: splitList(byId("crawlRegionCriteria")?.value),
-      countries: splitList(byId("crawlCountryCriteria")?.value),
-      eventTypes: splitList(byId("crawlEventTypeCriteria")?.value),
+      countries: selectedControlValues("crawlCountryCriteria"),
+      eventTypes: selectedControlValues("crawlEventTypeCriteria"),
+      languageStrategy:byId("crawlLanguageStrategy")?.value || "nativePlusEnglish",
       marketLanguagePlan: splitList(byId("crawlMarketLanguageCriteria")?.value)
     };
   }
@@ -3626,10 +3766,15 @@
   function readScheduleFromControls() {
     const criteria = readCriteriaFromControls();
     const plan = buildCrawlSearchPlan(criteria);
+    const scheduleHours = scheduleHoursFromControls();
+    if (byId("crawlScheduleHours")) byId("crawlScheduleHours").value = scheduleHours.join(", ");
     return {
-      enabled: byId("crawlFrequency")?.value !== "manualOnly",
-      frequency: byId("crawlFrequency")?.value || "every4Hours",
-      scheduleHours: splitList(byId("crawlScheduleHours")?.value),
+      enabled: true,
+      frequency: `${scheduleHours.length}TimesDaily`,
+      primaryTime:byId("crawlPrimaryTime")?.value || "00:00",
+      timeZone:byId("crawlTimeZone")?.value || "America/New_York",
+      runsPerDay:scheduleHours.length,
+      scheduleHours,
       criteria: {
         ...criteria,
         structuredPlan: plan
@@ -3646,7 +3791,7 @@
     setText("diagnosticsStatus", "Saving crawler schedule and search criteria...");
     await state.db.collection("aiCrawlerSchedules").doc("default").set(schedule, {merge: true});
     if (!options.silent) {
-      setText("diagnosticsStatus", "Crawler schedule saved. Backend Cloud Scheduler deployment is still required for automatic internet crawling.");
+      setText("diagnosticsStatus", `Crawler schedule saved for ${schedule.scheduleHours.join(", ")} in ${schedule.timeZone}. Deploy scheduledAiDiscoveryCrawl once to activate the 24-hour processing engine.`);
       await refreshDiagnostics();
     }
     return schedule;
@@ -3662,7 +3807,9 @@
       ["Cities", joinList(plan.cities)],
       ["Genres", joinList(plan.genres)],
       ["Record types", joinList(plan.eventTypes)],
-      ["Languages", joinList(plan.languages) || "Market default"]
+      ["Languages", joinList(plan.languages) || "Market default"],
+      ["Language strategy", plan.languageStrategy === "nativePlusEnglish" ? "Native market language + English" : plan.languageStrategy === "nativeOnly" ? "Native market language only" : "Selected languages only"],
+      ["Required result fields", "Name, address, telephone, website, and social media handles"]
     ];
     const jobsHtml = plan.jobs.length ? plan.jobs.slice(0, 24).map((job, index) => `<div class="queue-item">
       <div class="message-envelope-head">
@@ -5045,12 +5192,13 @@
         clubName: group.name || "",
         address: group.canonicalAddress || firstFilled(group.items.map(destinationAddress)),
         phoneNumber: firstFilled(group.phoneList.length ? group.phoneList : group.items.map(destinationPhone)),
+        website:firstFilled(group.items.map(destinationWebsite)),
         facebookHandle: firstFilled(socials.map(item => item.facebook)),
         instagramHandle: firstFilled(socials.map(item => item.instagram)),
         xHandle: firstFilled(socials.map(item => item.x)),
         ticTokHandle: firstFilled(socials.map(item => item.tiktok))
       };
-    }).filter(row => row.clubName || row.address || row.phoneNumber || row.facebookHandle || row.instagramHandle || row.xHandle || row.ticTokHandle);
+    }).filter(row => row.clubName || row.address || row.phoneNumber || row.website || row.facebookHandle || row.instagramHandle || row.xHandle || row.ticTokHandle);
   }
 
   function csvCell(value) {
@@ -5059,13 +5207,14 @@
   }
 
   function buildCrawlContactsCsv(rows = crawlContactRows()) {
-    const headers = ["Club Name", "Address", "Phone Number", "Facebook Handle", "Instagram Handle", "X Handle", "Tic Tok Handle"];
+    const headers = ["Club/Event/Concert/Lounge Name", "Address", "Telephone #", "Website", "Facebook Handle", "Instagram Handle", "X Handle", "TikTok Handle"];
     const lines = [headers.map(csvCell).join(",")];
     rows.forEach(row => {
       lines.push([
         row.clubName,
         row.address,
         row.phoneNumber,
+        row.website,
         row.facebookHandle,
         row.instagramHandle,
         row.xHandle,
@@ -5082,17 +5231,18 @@
     const extractorStatus = state.lastSourceExtractorStatus || {label:"Gemini/source extractor", status:"Soft Fail", evidence:"Not tested in this browser session yet."};
     const summary = simpleRows([
       ["CSV rows ready", rows.length.toLocaleString()],
-      ["CSV columns", "Club Name, Address, Phone Number, Facebook Handle, Instagram Handle, X Handle, Tic Tok Handle"],
+      ["CSV columns", "Club/Event/Concert/Lounge Name, Address, Telephone #, Website, Facebook Handle, Instagram Handle, X Handle, TikTok Handle"],
       [extractorStatus.label, `${extractorStatus.status}: ${extractorStatus.evidence}`]
     ]);
     const table = rows.length ? `<div class="crawl-contact-table">
       <div class="crawl-contact-row crawl-contact-head">
-        <strong>Club Name</strong><strong>Address</strong><strong>Phone Number</strong><strong>Facebook Handle</strong><strong>Instagram Handle</strong><strong>X Handle</strong><strong>Tic Tok Handle</strong>
+        <strong>Name</strong><strong>Address</strong><strong>Telephone #</strong><strong>Website</strong><strong>Facebook</strong><strong>Instagram</strong><strong>X</strong><strong>TikTok</strong>
       </div>
       ${rows.slice(0, 50).map(row => `<div class="crawl-contact-row">
         <span>${esc(row.clubName)}</span>
         <span>${esc(row.address)}</span>
         <span>${esc(row.phoneNumber)}</span>
+        <span>${esc(row.website)}</span>
         <span>${esc(row.facebookHandle)}</span>
         <span>${esc(row.instagramHandle)}</span>
         <span>${esc(row.xHandle)}</span>
@@ -5173,6 +5323,8 @@
       ["Address conflicts", addressConflicts.length.toLocaleString()],
       ["Profile import drafts", profileDrafts.length.toLocaleString()],
       ["Crawl schedule", schedule?.frequency || "Not saved"],
+      ["Daily run times", schedule?.scheduleHours?.join(", ") || "Not saved"],
+      ["Schedule time zone", schedule?.timeZone || "Not saved"],
       ["Publishing rule", "Crawl results stay in review until required datapoints are complete and Master Admin approves them."]
     ]);
   }
@@ -5271,6 +5423,9 @@
     byId("archivePassedPackageDiagnosticsBtn")?.addEventListener("click", archivePassedPackageDiagnostics);
     byId("downloadPackageDiagnosticsArchiveCsvBtn")?.addEventListener("click", downloadPackageDiagnosticsArchiveCsv);
     byId("runRulesSmokeTestBtn")?.addEventListener("click", runRulesSmokeTest);
+    byId("rulesSmokeTestFilter")?.addEventListener("change", renderRulesSmokeResults);
+    byId("copyRulesSmokeFailuresBtn")?.addEventListener("click", copyRulesSmokeFailures);
+    byId("downloadRulesSmokeJsonBtn")?.addEventListener("click", downloadRulesSmokeJson);
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);

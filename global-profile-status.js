@@ -1,4 +1,4 @@
-/* global-profile-status.js v29.03 */
+/* global-profile-status.js v29.05 */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
@@ -14,7 +14,7 @@
     shell = document.createElement("div");
     shell.id = "floqrGlobalProfileStatus";
     shell.className = "user-menu floqr-global-profile-status";
-    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">⋮</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
+    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">•••</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
     document.body.appendChild(shell);
     return shell;
   }
@@ -65,6 +65,8 @@
   }
   function init(){
     if (!window.firebase?.auth) return;
+    // The patron landing page owns its richer profile menu; avoid stacking a second global button on top of it.
+    if (document.getElementById("userMenu")) return;
     const shell = ensureShell();
     shell.querySelector("#floqrGlobalProfileBtn")?.addEventListener("click", event => {
       event.stopPropagation();

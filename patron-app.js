@@ -1,4 +1,4 @@
-/* patron-app.js v29.04 */
+/* patron-app.js v29.05 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -18,10 +18,12 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
   const storage = firebase.storage ? firebase.storage() : null;
+  const functions = firebase.app().functions("us-central1");
 
   let currentUser = null;
   let selectedLocationId = null;
   let selectedTemplate = "blackwhite";
+  let selectedScreenFormatId = "led-96x48";
   let selectedTemplateVariant = null;
   let confirmationResult = null;
   let locations = {};
@@ -42,6 +44,9 @@
   let confirmationReturnTimer = null;
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
+  let emailOtpChallengeId = "";
+  let emailOtpExpiresAt = 0;
+  let emailOtpTimer = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -563,6 +568,48 @@
         }
       }
       setStatus(microsoftAuthErrorMessage(e));
+    }
+  }
+  function showEmailOtpPanel() {
+    byId("emailOtpPanel")?.classList.toggle("hidden");
+    byId("emailOtpAddress")?.focus();
+  }
+  function updateEmailOtpCountdown() {
+    const status = byId("emailOtpStatus");
+    if (!status || !emailOtpExpiresAt) return;
+    const seconds = Math.max(0, Math.ceil((emailOtpExpiresAt - Date.now()) / 1000));
+    status.textContent = seconds ? `Code sent. Expires in ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}.` : "This code expired. Request a new one.";
+    if (!seconds && emailOtpTimer) { clearInterval(emailOtpTimer); emailOtpTimer = null; }
+  }
+  async function requestEmailOtp() {
+    const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
+    if (!functions) { setText("emailOtpStatus", "Firebase Functions is unavailable on this page."); return; }
+    try {
+      setText("emailOtpStatus", "Sending your secure sign-in code...");
+      const response = await functions.httpsCallable("requestEmailOtp")({email});
+      emailOtpChallengeId = response.data?.challengeId || "";
+      emailOtpExpiresAt = Date.now() + Number(response.data?.expiresInSeconds || 300) * 1000;
+      clearInterval(emailOtpTimer);
+      emailOtpTimer = setInterval(updateEmailOtpCountdown, 1000);
+      updateEmailOtpCountdown();
+      byId("emailOtpCode")?.focus();
+    } catch (error) {
+      setText("emailOtpStatus", error?.message || "The email code could not be sent.");
+    }
+  }
+  async function verifyEmailOtp() {
+    const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
+    const code = String(byId("emailOtpCode")?.value || "").trim().toUpperCase();
+    if (!functions || !emailOtpChallengeId) { setText("emailOtpStatus", "Request a new code first."); return; }
+    try {
+      setText("emailOtpStatus", "Verifying code...");
+      const response = await functions.httpsCallable("verifyEmailOtp")({email, code, challengeId:emailOtpChallengeId});
+      await auth.signInWithCustomToken(response.data.customToken);
+      clearInterval(emailOtpTimer);
+      emailOtpTimer = null;
+      setText("emailOtpStatus", "Email verified. You are signed in.");
+    } catch (error) {
+      setText("emailOtpStatus", error?.message || "The email code could not be verified.");
     }
   }
   async function logout() { await auth.signOut(); window.location.href = "./"; }
@@ -1910,6 +1957,7 @@
     setText("selectedClubTitle", loc.locationName);
     setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
     selectedTemplate = "blackwhite";
+    selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
     selectedTemplateVariant = null;
     await loadTemplateVariants();
     if (byId("templateSearch")) byId("templateSearch").value = "";
@@ -1975,8 +2023,10 @@
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const discoveryQuery = query || templateContextQuery();
+    const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
-    const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}));
+    const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
+      .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id)));
     const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active");
     const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid);
     if (!discoveryQuery) {
@@ -2050,6 +2100,8 @@
       url.searchParams.set("template",payload.template||"neon");
       url.searchParams.set("media",payload.mediaUrl||"");
       url.searchParams.set("mediaType",payload.mediaType||"");
+      url.searchParams.set("mediaFit",payload.mediaFit||"contain");
+      url.searchParams.set("screenFormatId",payload.screenFormatId||"");
       url.searchParams.set("selectedMediaVersion",payload.selectedMediaVersion||"");
       url.searchParams.set("trimStart",payload.trimStart||"");
       url.searchParams.set("trimEnd",payload.trimEnd||"");
@@ -2071,6 +2123,8 @@
       subText:byId("subText")?.value.trim()||"",
       mediaUrl,
       mediaType,
+      mediaFit:byId("shoutoutMediaFit")?.value || "contain",
+      screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId,
       selectedMediaVersion:byId("aiSelectedMediaVersion")?.value || "",
       trimStart:byId("aiTrimStart")?.value || "",
       trimEnd:byId("aiTrimEnd")?.value || "",
@@ -2081,6 +2135,11 @@
       backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""
     };
     if(frame) {
+      const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
+      if (format) {
+        frame.style.aspectRatio = `${format.pixelWidth} / ${format.pixelHeight}`;
+        frame.style.height = "auto";
+      }
       frame.onload = () => {
         try { frame.contentWindow?.renderShoutOutDisplay?.(previewPayload); } catch (error) {}
       };
@@ -2227,10 +2286,10 @@
     const cap = t.displayCaps || t.characterCaps || {};
     const isClassic = (t.id || selectedTemplate) === "blackwhite";
     const supportsMedia = !!(t.supportsImage || t.supportsVideo);
-    const main = Number(cap.mainText || cap.main || (isClassic ? 36 : supportsMedia ? 48 : 60));
-    const sub = Number(cap.subText || cap.sub || (isClassic ? 24 : supportsMedia ? 42 : 60));
-    const total = Number(cap.total || (main + sub));
-    return { main, sub, total };
+    const main = Number(t.maxMainCharacters || cap.mainText || cap.main || (isClassic ? 45 : supportsMedia ? 48 : 60));
+    const sub = Number(t.maxSubCharacters || cap.subText || cap.sub || (isClassic ? 15 : supportsMedia ? 42 : 60));
+    const total = Number(t.maxMainCharacters || cap.total || (main + sub));
+    return { main, sub, total, lineCount:Number(t.lineCount || 1), perLine:Number(t.maxCharactersPerLine || main) };
   }
 
   function cleanRecommendationText(value = "") {
@@ -2244,7 +2303,26 @@
   function fitTemplateText(value = "", type = "main") {
     const caps = templateDisplayCaps();
     const limit = Number(type === "sub" ? caps.sub : caps.main);
-    return cleanRecommendationText(value).slice(0, limit);
+    const cleaned = cleanRecommendationText(value);
+    if (type !== "main" || caps.lineCount <= 1) return cleaned.slice(0, limit);
+    const visibleLimit = byId("subText")?.value ? Math.min(limit, caps.perLine * Math.max(1, caps.lineCount - 1)) : limit;
+    const words = cleaned.slice(0, visibleLimit).split(/\s+/).filter(Boolean);
+    const rows = [];
+    let line = "";
+    words.forEach(word => {
+      const chunks = [];
+      for (let i = 0; i < word.length; i += caps.perLine) chunks.push(word.slice(i, i + caps.perLine));
+      chunks.forEach(chunk => {
+        const next = line ? `${line} ${chunk}` : chunk;
+        if (next.length <= caps.perLine) line = next;
+        else {
+          if (line && rows.length < caps.lineCount) rows.push(line);
+          line = chunk;
+        }
+      });
+    });
+    if (line && rows.length < caps.lineCount) rows.push(line);
+    return rows.slice(0, caps.lineCount).join("\n");
   }
 
   function updateTemplateCharacterCapHint() {
@@ -2252,7 +2330,9 @@
     if (!hint) return;
     const caps = templateDisplayCaps();
     const t = getTemplate();
-    hint.textContent = `Template display cap: main ${caps.main} chars, attribution/subtext ${caps.sub} chars. Recommendations are trimmed to fit ${t.name || "this template"}.`;
+    hint.textContent = caps.lineCount > 1
+      ? `Template display cap: ${caps.lineCount} lines × ${caps.perLine} characters = ${caps.total} characters total. Words wrap automatically.`
+      : `Template display cap: main ${caps.main} chars, attribution/subtext ${caps.sub} chars. Recommendations are trimmed to fit ${t.name || "this template"}.`;
   }
 
   function suggestionEventContext() {
@@ -2481,6 +2561,7 @@
       const mediaPayload = currentTemplateSupportsMedia() ? {
         mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
+        mediaFit:byId("shoutoutMediaFit")?.value || "contain",
         mediaFileName: uploadedMedia.mediaFileName || "",
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
         originalMediaStoragePath: uploadedMedia.originalMediaStoragePath || "",
@@ -2515,7 +2596,7 @@
         backgroundGradient:selectedTemplateVariant.backgroundGradient || "",
         backgroundStoragePath:selectedTemplateVariant.backgroundStoragePath || ""
       } : {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, ...variantPayload, mainText:byId("mainText").value.trim()||"SHOUTOUT!", subText:byId("subText").value.trim()||"", ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
       payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.02`;
@@ -2534,8 +2615,8 @@
     const mainInput = byId("mainText");
     const caps = templateDisplayCaps(t);
     if (mainInput) {
-      mainInput.maxLength = caps.main;
-      if (mainInput.value.length > mainInput.maxLength) mainInput.value = mainInput.value.slice(0, mainInput.maxLength);
+      mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
+      mainInput.value = fitTemplateText(mainInput.value, "main");
     }
     const subInput = byId("subText");
     if (subInput) {
@@ -2570,6 +2651,13 @@
 
   function goToEditor() {
     const l=getLocation(), t=getTemplate();
+    const screenSelect = byId("shoutoutScreenFormat");
+    if (screenSelect) {
+      const available = l.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+      screenSelect.innerHTML = available.map(id => { const format = window.FLOQR_DISPLAY_FORMATS?.[id] || {label:id,pixelWidth:"?",pixelHeight:"?"}; return `<option value="${esc(id)}">${esc(format.label)} — ${esc(format.pixelWidth)} × ${esc(format.pixelHeight)} px</option>`; }).join("");
+      selectedScreenFormatId = available.includes(selectedScreenFormatId) ? selectedScreenFormatId : (l.primaryDisplayScreenFormatId || available[0]);
+      screenSelect.value = selectedScreenFormatId;
+    }
     setText("editorClubTitle", l.locationName);
     setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
     updateMediaEditorForTemplate();
@@ -2674,7 +2762,7 @@
       if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
     }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
-    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
+    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", showMinglLanding);
@@ -2745,7 +2833,9 @@
     });
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
-    ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
+    byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; });
+    byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updatePreview(); });
+    ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
   });
 
   auth.onAuthStateChanged(user => {

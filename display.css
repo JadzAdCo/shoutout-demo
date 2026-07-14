@@ -17,3 +17,6 @@
 .classic-bw.classic-board-template #displayMain.classic-bw-board{left:10.5%!important;right:10.5%!important;top:30%!important;bottom:10%!important;padding:clamp(10px,1.35vw,20px) clamp(14px,1.8vw,28px)!important}
 .classic-bw.classic-board-template .classic-board-lines b{font-size:var(--fit-size,clamp(40px,7.4vw,106px))!important;line-height:.84!important;letter-spacing:.018em!important;color:#111318!important;font-weight:1000!important;text-shadow:0 2px 0 #6d6d6d,2px 4px 0 rgba(0,0,0,.23),0 8px 10px rgba(0,0,0,.20)!important}
 @media(max-width:760px){.classic-bw.classic-board-template .display-center:after{inset:27% 8% 8%!important}.classic-bw.classic-board-template #displayMain.classic-bw-board{left:10%!important;right:10%!important;top:31%!important;bottom:11%!important;padding:7px 10px!important}.classic-bw.classic-board-template .classic-board-lines b{font-size:var(--fit-size,clamp(28px,11.5vw,62px))!important;letter-spacing:.01em!important}}
+
+/* v29.05: preserve the complete patron image unless the patron explicitly chooses fill/crop. */
+.media-slot img,.media-slot video{object-fit:contain;background:#02030a}
