@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.05
+/* master-admin-app.js v29.06
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.05";
+  const CURRENT_VERSION = "29.06";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -623,6 +623,7 @@
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = "3";
     if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = "15";
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = false;
+    if (byId("templateManageBackgroundEditable")) byId("templateManageBackgroundEditable").checked = true;
     document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = true; });
   }
 
@@ -637,6 +638,7 @@
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = template.lineCount || 3;
     if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = template.maxCharactersPerLine || 15;
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = !!(template.supportsMedia || template.supportsImage || template.supportsVideo);
+    if (byId("templateManageBackgroundEditable")) byId("templateManageBackgroundEditable").checked = template.backgroundEditable !== false;
     const formats = new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || []);
     document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = formats.has(el.dataset.templateScreenFormat); });
     byId("templateManageId")?.scrollIntoView?.({behavior:"smooth", block:"center"});
@@ -657,7 +659,7 @@
     wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${esc(template.status || "active")}</span></div>
       <p>${esc(template.description || "No description")}</p>
-      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")}</small>
+      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
       <div class="queue-actions"><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Restore" : "Deactivate"}</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-edit]").forEach(button => button.addEventListener("click", () => fillManagedTemplateForm(managedTemplates[button.dataset.templateEdit] || {})));
@@ -691,6 +693,7 @@
       supportsMedia,
       supportsImage:supportsMedia,
       supportsVideo:supportsMedia,
+      backgroundEditable:byId("templateManageBackgroundEditable")?.checked !== false,
       mediaMode:supportsMedia ? "Image/video placeholder" : "No image/video",
       maxMainCharacters,
       lineCount,
@@ -703,7 +706,7 @@
       updatedByEmail:safeUser(auth.currentUser)
     };
     await db.collection("templates").doc(id).set(payload, {merge:true});
-    setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} total characters, and ${screenFormatIds.length} screen format tag(s).`);
+    setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} total characters, ${screenFormatIds.length} screen format tag(s), and a ${payload.backgroundEditable ? "customizable" : "locked"} background.`);
     await loadManagedTemplates();
     fillManagedTemplateForm(managedTemplates[id] || payload);
   }

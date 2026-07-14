@@ -137,6 +137,26 @@ html.floqr-desktop-browser .admin-tabs{overflow:visible}
   .profile-grid,.media-template-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
+/* v29.06 club template background permissions and curated variants */
+.club-template-policy-card .consent-line{max-width:880px}
+.club-template-background-grid{margin-top:16px}
+.club-template-background-grid .template{display:flex;flex-direction:column;gap:9px;min-height:260px}
+.club-template-background-grid .template button{margin-top:auto}
+.club-template-background-grid .template button:disabled{cursor:not-allowed;opacity:.58}
+.club-template-variant-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(150px,240px);gap:12px;align-items:center}
+.club-template-variant-row .message-envelope-head,.club-template-variant-row small,.club-template-variant-row .queue-actions{grid-column:1}
+.club-template-variant-swatch{grid-column:2;grid-row:1 / span 3;min-height:96px;border:1px solid var(--line);border-radius:16px;background:#070a18 center/cover no-repeat}
+@media(max-width:720px){.club-template-variant-row{grid-template-columns:1fr}.club-template-variant-swatch{grid-column:1;grid-row:auto}}
+
+/* v29.06 consolidated public-profile media manager */
+.club-media-manager-row{display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:16px;align-items:center}
+.club-media-manager-preview{display:block;width:100%;height:160px;object-fit:contain;border:1px solid var(--line);border-radius:16px;background:#02030a}
+.club-media-manager-row p{margin:6px 0}.club-media-manager-row small{display:block;line-height:1.45}
+.club-media-input-preview{display:grid;gap:10px;margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2)}
+.club-media-input-preview .club-media-manager-preview{width:min(100%,560px);height:auto;max-height:340px;margin:auto}
+.club-media-input-preview small{text-align:center;color:var(--muted);font-weight:800}
+@media(max-width:720px){.club-media-manager-row{grid-template-columns:1fr}.club-media-manager-preview{height:auto;max-height:260px}}
+
 /* v28.8 shoutout club option force */
 .v28-8-shoutout-club-option{
   display:inline-flex!important;

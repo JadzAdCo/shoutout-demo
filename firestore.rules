@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.05
-// EXPECTED DEPLOYED RULES VERSION: v29.05 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.06
+// EXPECTED DEPLOYED RULES VERSION: v29.06 or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -13,7 +13,7 @@ rules_version = '2';
 // - aiMediaEdits owner-visible audit records for Gemini ShoutOut image editing
 // - users/{uid} self create/read/update support for onboarding and existing profiles
 // - aiCrawlRuns, aiCrawlerSchedules, aiDiagnosticsReports for Master Admin Diagnostics
-// - aiIndex, AI notification/preferences, assistant, template variant, prompt history, Mingl, and chat rule blocks
+// - aiIndex, AI notification/preferences, assistant, patron/club template variant, prompt history, Mingl, and chat rule blocks
 // - diagnosticRunId-scoped cleanup for temporary Mingl/chat rules smoke-test documents
 // - explicit diagnostic-only delete support for temporary Mingl connection records
 // - Mingl request audit records, system request messages, and sender-only message edit/action metadata support
@@ -417,6 +417,17 @@ service cloud.firestore {
 
       allow update, delete: if signedIn()
         && resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /clubTemplateVariants/{variantId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.variantScope == "club"
+        && request.resource.data.clubLocationId is string;
+
+      allow update, delete: if signedIn();
     }
 
     match /aiTemplatePromptHistory/{id} {

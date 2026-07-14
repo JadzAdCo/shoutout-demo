@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.05"/>
-  <link rel="stylesheet" href="./admin.css?v=29.05"/>
+  <link rel="stylesheet" href="./styles.css?v=29.06"/>
+  <link rel="stylesheet" href="./admin.css?v=29.06"/>
 </head>
 <body>
 <main id="adminPage" class="app admin-shell">
@@ -54,6 +54,7 @@
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
         <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
+        <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button">Template Backgrounds</button>
         <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
         <button class="admin-tab" data-panel="panelAnalytics" type="button">Analytics</button>
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
@@ -147,21 +148,48 @@
         </div>
         <div class="card">
           <h2>Venue Media</h2>
-          <p class="sub small">One main media item is allowed. Public profile media is capped at 5 images and 5 marketing videos. Marketing videos should be 15 seconds or shorter.</p>
+          <p class="sub small">Use this one uploader for the club logo, main public-profile media, or gallery photos and videos. Gallery uploads may contain several files at once. Marketing videos should be 15 seconds or shorter.</p>
           <div class="profile-grid">
-            <label>Club Logo<input id="clubLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml"/></label>
-            <label>Main Media<input id="clubMainMediaFile" type="file" accept="image/*,video/*"/></label>
-            <label>Public Gallery Media<input id="clubGalleryMediaFile" type="file" accept="image/*,video/*"/></label>
+            <label>Where should it appear?<select id="clubMediaPlacement"><option value="gallery">Public gallery</option><option value="main">Main profile media</option><option value="logo">Club logo (image only)</option></select></label>
+            <label class="profile-grid-wide">Upload photos or videos<input id="clubMediaUnifiedFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,video/mp4,video/webm,video/quicktime" multiple/></label>
             <label>Media Title<input id="clubMediaTitle" placeholder="Saturday Latin Night"/></label>
             <label>Related DJs<input id="clubMediaDjs" placeholder="DJ names or usernames"/></label>
             <label>Related Promoters / Groups<input id="clubMediaPromoters" placeholder="Promoter or promotion group"/></label>
+            <label>Media filter<select id="clubMediaFilter"><option value="none">None</option><option value="vibrant">Vibrant</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="monochrome">Monochrome</option><option value="contrast">High contrast</option></select></label>
+            <label data-club-video-trim>Video trim start (seconds)<input id="clubMediaTrimStart" type="number" min="0" step="0.1" value="0"/></label>
+            <label data-club-video-trim>Video trim end (seconds)<input id="clubMediaTrimEnd" type="number" min="0.1" step="0.1" value="15"/></label>
           </div>
+          <p id="clubMediaEditorStatus" class="sub small">Choose a placement and one or more files. Replacing an item uses this same uploader; a new file is optional when editing only its details.</p>
+          <div id="clubMediaInputPreview" class="club-media-input-preview hidden"></div>
           <div class="queue-actions">
-            <button id="uploadClubLogoBtn" type="button">Upload Club Logo</button>
-            <button id="uploadClubMainMediaBtn" type="button">Upload Main Media</button>
-            <button id="uploadClubGalleryMediaBtn" type="button">Add Gallery Media</button>
+            <button id="saveClubMediaBtn" class="primary" type="button">Add Media</button>
+            <button id="cancelClubMediaEditBtn" class="hidden" type="button">Cancel Edit</button>
           </div>
           <div id="clubMediaReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="panelTemplateBackgrounds" class="admin-panel-section">
+        <div class="card club-template-policy-card">
+          <p class="eyebrow">Club policy</p>
+          <h2>Template Background Permissions</h2>
+          <p class="sub">Choose whether patrons can personalize editable template backgrounds at this club. Patrons can always use the original approved templates, and layouts, text positions, media slots, character limits, and screen tags remain locked.</p>
+          <label class="consent-line"><input id="patronTemplateBackgroundEditingEnabled" type="checkbox" checked/> <span><strong>Allow patrons to customize editable backgrounds</strong><br/><small>Turn this off to hide patron background-editing actions and patron/community background variants for this club.</small></span></label>
+          <button id="saveClubTemplatePolicyBtn" class="primary" type="button">Save Background Permission</button>
+          <p id="clubTemplatePolicyStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Club-curated designs</p>
+          <h2>Customize a Template for This Club</h2>
+          <p class="sub small">Club admins may create club-only background variants from templates marked editable by Master Admin. A locked template can still be used in its original form.</p>
+          <label>Search templates<input id="clubTemplateBackgroundSearch" placeholder="Birthday, VIP, neon, image, sports..."/></label>
+          <div id="clubTemplateBackgroundList" class="template-grid club-template-background-grid"></div>
+          <p id="clubTemplateBackgroundStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Saved Club Backgrounds</h2>
+          <p class="sub small">These club-approved background variants appear in the patron template selector for this venue.</p>
+          <div id="clubTemplateVariantList" class="report-block"></div>
         </div>
       </section>
 
@@ -301,12 +329,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="./firebase-config.js?v=29.05"></script>
 <script src="./global-profile-status.js?v=29.05"></script>
-<script src="./shared-data.js?v=29.05"></script>
+<script src="./shared-data.js?v=29.06"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=29.05"></script>
+<script src="./ai-template-studio.js?v=29.06"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
-<script src="./admin-app.js?v=29.05"></script>
+<script src="./admin-app.js?v=29.06"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>
 </body>

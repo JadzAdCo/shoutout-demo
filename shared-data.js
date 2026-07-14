@@ -560,13 +560,13 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:15, description:'Classic marquee lightbox with three centered lines, up to 15 characters per line and 45 characters total.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:15, description:'Classic marquee lightbox with three centered lines, up to 15 characters per line and 45 characters total. Its physical-sign background is locked by default.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","background locked"] },
   birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
   fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
   summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal', tags:["summer","pool party","beach","cabana","day party","vacation"] },
-  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride"] },
+  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts. Its illustration is locked by default.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride","background locked"] },
   champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP', tags:["champagne","bottle","vip","toast","celebration","luxury"] },
   beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach', tags:["beach","pool","summer","cabana","day party","vacation"] },
   graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', tags:["graduation","grad","school","college","achievement"] },
@@ -589,6 +589,7 @@ Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
   template.screenFormatIds = Array.from(new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
   template.tags = Array.from(new Set([...(template.tags || []), ...template.screenFormatIds.flatMap(id => window.FLOQR_DISPLAY_FORMATS[id]?.tags || [])]));
   template.status = template.status || "active";
+  template.backgroundEditable = template.backgroundEditable !== false;
 });
 
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
@@ -622,6 +623,7 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   loc.subscriptionRequiredForPublicProfileEdits = true;
   loc.displayScreenFormatIds = Array.from(new Set(loc.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
   loc.primaryDisplayScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds[0] || "led-96x48";
+  loc.patronTemplateBackgroundEditingEnabled = loc.patronTemplateBackgroundEditingEnabled !== false;
   loc.address = loc.address || "";
   loc.officialWebsite = loc.officialWebsite || loc.website || "";
   loc.email = loc.email || "";

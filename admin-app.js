@@ -1,4 +1,4 @@
-/* admin-app.js v29.05 - Venue Command Center, assigned admins, and display formats */
+/* admin-app.js v29.06 - Venue Command Center, template-background permissions, consolidated media editing, assigned admins, and display formats */
 (function () {
   "use strict";
 
@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.05";
+  const CURRENT_VERSION = "29.06";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -26,6 +26,11 @@
   let adminUsers = [];
   let adminDesignations = [];
   let clubMedia = [];
+  let clubMediaEditTargetId = "";
+  let clubMediaPreviewFile = null;
+  let clubMediaPreviewObjectUrl = "";
+  let clubTemplates = {};
+  let clubTemplateVariants = [];
   let guestListCampaigns = [];
   let adminMfaResolver = null;
   let adminMfaVerificationId = "";
@@ -71,7 +76,7 @@
     const liveFrame = byId("liveFrame");
     if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
     const publicLink = byId("clubPublicProfileLink");
-    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.04`;
+    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.06`;
   }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -81,7 +86,7 @@
   }
 
   function publicProfileUrl() {
-    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.04`, window.location.href).toString();
+    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.06`, window.location.href).toString();
   }
 
   function parsePeopleLines(value, fallbackRole) {
@@ -200,6 +205,7 @@
       input.checked = displayFormats.has(input.dataset.clubDisplayFormat);
     });
     if (byId("clubPrimaryDisplayFormat")) byId("clubPrimaryDisplayFormat").value = publicClubProfile.primaryDisplayScreenFormatId || [...displayFormats][0] || "led-96x48";
+    if (byId("patronTemplateBackgroundEditingEnabled")) byId("patronTemplateBackgroundEditingEnabled").checked = publicClubProfile.patronTemplateBackgroundEditingEnabled !== false;
     if (byId("clubPublicProfileReport")) {
       byId("clubPublicProfileReport").innerHTML = simpleRows([
         ["Search visibility", publicClubProfile.visibility || "public"],
@@ -250,6 +256,7 @@
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
       displayScreenFormatIds,
       primaryDisplayScreenFormatId,
+      patronTemplateBackgroundEditingEnabled:byId("patronTemplateBackgroundEditingEnabled")?.checked !== false,
       publicProfileSections:publicSectionSettings(),
       publicProfilePublished:!!byId("clubProfilePublished")?.checked,
       visibility:"public",
@@ -277,6 +284,107 @@
     setText("adminStatus", "Club public profile saved.");
     await loadClubPublicProfile();
     });
+  }
+
+  function templateBackgroundSearchText(template = {}) {
+    return [template.id, template.name, template.category, template.description, ...(template.tags || [])].join(" ").toLowerCase();
+  }
+
+  function renderClubTemplateBackgrounds() {
+    const wrap = byId("clubTemplateBackgroundList");
+    if (!wrap) return;
+    const query = String(byId("clubTemplateBackgroundSearch")?.value || "").trim().toLowerCase();
+    const formats = publicClubProfile.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const rows = Object.values(clubTemplates)
+      .filter(template => String(template.status || "active") === "active")
+      .filter(template => (template.screenFormatIds || formats).some(id => formats.includes(id)))
+      .filter(template => !query || templateBackgroundSearchText(template).includes(query))
+      .sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+    wrap.innerHTML = rows.map(template => {
+      const editable = template.backgroundEditable !== false;
+      const count = clubTemplateVariants.filter(variant => variant.baseTemplateId === template.id && String(variant.status || "active") === "active").length;
+      return `<article class="template ${esc(template.className || "neon")}">
+        <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
+        <div class="name">${esc(template.name || template.id)}</div>
+        <div class="tag">${editable ? "Editable background" : "Background locked by Master Admin"}</div>
+        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span></div>
+        ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
+      </article>`;
+    }).join("") || '<p class="sub">No compatible templates matched.</p>';
+    wrap.querySelectorAll("[data-club-template-customize]").forEach(button => button.addEventListener("click", () => openClubTemplateStudio(button.dataset.clubTemplateCustomize)));
+  }
+
+  function renderClubTemplateVariants() {
+    const wrap = byId("clubTemplateVariantList");
+    if (!wrap) return;
+    const rows = clubTemplateVariants.filter(item => String(item.status || "active") === "active");
+    wrap.innerHTML = rows.map(item => {
+      const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(item) : "";
+      return `<div class="queue-item club-template-variant-row">
+        <div class="message-envelope-head"><strong>${esc(item.variantName || "Club Background")}</strong><span>${esc(item.baseTemplateName || item.baseTemplateId || "Template")}</span></div>
+        <div class="club-template-variant-swatch" style="${esc(style)}"></div>
+        <small>Club-only • created by ${esc(item.ownerDisplayName || "Club Admin")}</small>
+        <div class="queue-actions"><button type="button" data-club-variant-deactivate="${esc(item.id)}">Deactivate</button></div>
+      </div>`;
+    }).join("") || '<p class="sub">No club-specific backgrounds have been saved yet.</p>';
+    wrap.querySelectorAll("[data-club-variant-deactivate]").forEach(button => button.addEventListener("click", async () => {
+      await db.collection("clubTemplateVariants").doc(button.dataset.clubVariantDeactivate).set({status:"deleted", updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedByUid:auth.currentUser?.uid || ""}, {merge:true});
+      setText("clubTemplateBackgroundStatus", "Club background deactivated.");
+      await loadClubTemplateControls();
+    }));
+  }
+
+  async function loadClubTemplateControls() {
+    clubTemplates = Object.fromEntries(Object.entries(window.SHOUTOUT_TEMPLATES || {}).map(([id, data]) => [id, {id, ...data}]));
+    try {
+      const snap = await db.collection("templates").limit(500).get();
+      snap.forEach(doc => { clubTemplates[doc.id] = {...clubTemplates[doc.id], id:doc.id, ...doc.data()}; });
+    } catch (error) {}
+    clubTemplateVariants = window.FLOQRStudio?.loadClubTemplateVariants
+      ? await window.FLOQRStudio.loadClubTemplateVariants({db, clubLocationId:locationId})
+      : [];
+    if (byId("patronTemplateBackgroundEditingEnabled")) byId("patronTemplateBackgroundEditingEnabled").checked = publicClubProfile.patronTemplateBackgroundEditingEnabled !== false;
+    renderClubTemplateBackgrounds();
+    renderClubTemplateVariants();
+  }
+
+  async function openClubTemplateStudio(templateId) {
+    const template = clubTemplates[templateId];
+    if (!template || template.backgroundEditable === false) {
+      setText("clubTemplateBackgroundStatus", "This template background is locked by Master Admin.");
+      return;
+    }
+    if (!window.FLOQRStudio) {
+      setText("clubTemplateBackgroundStatus", "The background editor did not load. Refresh the page and try again.");
+      return;
+    }
+    await window.FLOQRStudio.openFloqrTemplateStudio({
+      db,
+      storage,
+      currentUser:auth.currentUser,
+      baseTemplateId:template.id,
+      baseTemplate:template,
+      variantScope:"club",
+      clubLocationId:locationId,
+      onSaved:async () => {
+        setText("clubTemplateBackgroundStatus", `${template.name || template.id} club background saved.`);
+        await loadClubTemplateControls();
+      }
+    });
+  }
+
+  async function saveClubTemplatePolicy() {
+    const enabled = byId("patronTemplateBackgroundEditingEnabled")?.checked !== false;
+    await db.collection("clubLocations").doc(locationId).set({
+      patronTemplateBackgroundEditingEnabled:enabled,
+      templateBackgroundPolicyUpdatedByUid:auth.currentUser?.uid || "",
+      templateBackgroundPolicyUpdatedByEmail:safeUser(auth.currentUser),
+      templateBackgroundPolicyUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    publicClubProfile.patronTemplateBackgroundEditingEnabled = enabled;
+    setText("clubTemplatePolicyStatus", enabled
+      ? "Patrons may customize backgrounds on templates marked editable."
+      : "Patron background customization is disabled. Original and club-curated templates remain available.");
   }
 
   function adminAuthErrorMessage(e) {
@@ -577,24 +685,329 @@
     }
   }
 
+  const CLUB_MEDIA_FILTERS = new Set(["none", "vibrant", "warm", "cool", "monochrome", "contrast"]);
+
+  function safeClubMediaFilter(value) {
+    const key = String(value || "none").toLowerCase();
+    return CLUB_MEDIA_FILTERS.has(key) ? key : "none";
+  }
+
+  function clubMediaOrder(item = {}) {
+    if (Number.isFinite(Number(item.galleryOrder))) return Number(item.galleryOrder);
+    return Number(item.uploadedAt?.toMillis?.() || item.updatedAt?.toMillis?.() || 0);
+  }
+
+  function clubVideoTrimPayload(kind, originalDuration = null) {
+    if (kind !== "video") return {trimStart:null, trimEnd:null, trimmedDuration:null, maxVideoSeconds:null};
+    const trimStart = Math.max(0, Number(byId("clubMediaTrimStart")?.value || 0));
+    const trimEnd = Math.max(0, Number(byId("clubMediaTrimEnd")?.value || 15));
+    if (!(trimEnd > trimStart)) throw new Error("Video trim end must be greater than the trim start.");
+    if (trimEnd - trimStart > 15.0001) throw new Error("A club video clip can be no longer than 15 seconds. Shorten the trim window.");
+    if (Number(originalDuration) > 0 && trimStart >= Number(originalDuration)) throw new Error(`Video trim start must be before the source ends at ${Number(originalDuration).toFixed(1)} seconds.`);
+    if (Number(originalDuration) > 0 && trimEnd > Number(originalDuration) + .05) throw new Error(`Video trim end cannot exceed the source duration of ${Number(originalDuration).toFixed(1)} seconds.`);
+    return {trimStart, trimEnd, trimmedDuration:Number((trimEnd - trimStart).toFixed(2)), maxVideoSeconds:15, originalDuration:Number(originalDuration) || null};
+  }
+
+  function clubMediaMetadata(kind, originalDuration = null) {
+    return {
+      title:byId("clubMediaTitle")?.value.trim() || "",
+      relatedDjs:splitCSV(byId("clubMediaDjs")?.value || ""),
+      relatedPromoters:splitCSV(byId("clubMediaPromoters")?.value || ""),
+      mediaFilter:safeClubMediaFilter(byId("clubMediaFilter")?.value),
+      ...clubVideoTrimPayload(kind, originalDuration),
+      updatedByUid:auth.currentUser?.uid || "",
+      updatedByEmail:safeUser(auth.currentUser),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+  }
+
+  async function uploadUnifiedClubMediaFile(file, slotType) {
+    if (!storage) throw new Error("Firebase Storage SDK is not loaded.");
+    if (!file || !/^(image|video)\//.test(String(file.type || ""))) throw new Error("Choose an image or video file.");
+    const kind = mediaKind(file);
+    if (slotType === "logo" && kind !== "image") throw new Error("The club logo must be an image. Videos are supported for main and gallery media.");
+    const path = `clubMedia/${locationId}/${slotType}/${Date.now()}-${cleanFileName(file.name)}`;
+    const ref = storage.ref(path);
+    await ref.put(file, {contentType:file.type || (kind === "video" ? "video/mp4" : "image/jpeg")});
+    return {mediaType:kind, mediaUrl:await ref.getDownloadURL(), mediaStoragePath:path, mediaFileName:file.name || ""};
+  }
+
+  function readClubVideoDuration(file) {
+    if (!file || mediaKind(file) !== "video") return Promise.resolve(null);
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      const url = URL.createObjectURL(file);
+      const done = value => { URL.revokeObjectURL(url); video.removeAttribute("src"); resolve(value); };
+      video.preload = "metadata";
+      video.onloadedmetadata = () => done(Number(video.duration) || null);
+      video.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`Could not read the duration of ${file.name || "the selected video"}.`)); };
+      video.src = url;
+    });
+  }
+
+  function updateClubMediaTrimVisibility() {
+    const target = clubMedia.find(item => item.id === clubMediaEditTargetId);
+    const files = Array.from(byId("clubMediaUnifiedFiles")?.files || []);
+    const hasVideo = files.some(file => mediaKind(file) === "video") || (!files.length && target?.mediaType === "video");
+    document.querySelectorAll("[data-club-video-trim]").forEach(el => el.classList.toggle("hidden", !hasVideo || byId("clubMediaPlacement")?.value === "logo"));
+    renderClubMediaInputPreview();
+  }
+
+  function releaseClubMediaPreviewUrl() {
+    if (clubMediaPreviewObjectUrl) URL.revokeObjectURL(clubMediaPreviewObjectUrl);
+    clubMediaPreviewObjectUrl = "";
+    clubMediaPreviewFile = null;
+  }
+
+  function renderClubMediaInputPreview() {
+    const wrap = byId("clubMediaInputPreview");
+    if (!wrap) return;
+    const target = clubMedia.find(item => item.id === clubMediaEditTargetId);
+    const files = Array.from(byId("clubMediaUnifiedFiles")?.files || []);
+    const file = files[0] || null;
+    if (file && file !== clubMediaPreviewFile) {
+      releaseClubMediaPreviewUrl();
+      clubMediaPreviewFile = file;
+      clubMediaPreviewObjectUrl = URL.createObjectURL(file);
+    }
+    if (!file && clubMediaPreviewFile) releaseClubMediaPreviewUrl();
+    const mediaUrl = file ? clubMediaPreviewObjectUrl : target?.mediaUrl || "";
+    const mediaType = file ? mediaKind(file) : target?.mediaType || "";
+    if (!mediaUrl) { wrap.classList.add("hidden"); wrap.innerHTML = ""; return; }
+    const trimStart = Math.max(0, Number(byId("clubMediaTrimStart")?.value || target?.trimStart || 0));
+    const requestedEnd = Number(byId("clubMediaTrimEnd")?.value || target?.trimEnd || trimStart + 15);
+    const trimEnd = Math.min(trimStart + 15, Math.max(trimStart + .1, requestedEnd));
+    const preview = {mediaUrl, mediaType, mediaFilter:safeClubMediaFilter(byId("clubMediaFilter")?.value || target?.mediaFilter), trimStart, trimEnd, title:target?.title || file?.name || "Media preview"};
+    wrap.innerHTML = `<strong>Editor Preview</strong>${clubMediaPreview(preview)}<small>${mediaType === "video" ? `Playback window ${trimStart}s–${trimEnd}s (${(trimEnd - trimStart).toFixed(1)} seconds)` : "Image preview"}${files.length > 1 ? ` • plus ${files.length - 1} more selected file(s)` : ""}</small>`;
+    wrap.classList.remove("hidden");
+    enforceClubMediaPreviewTrims();
+  }
+
+  function resetClubMediaEditor(message = "Choose a placement and one or more files.") {
+    clubMediaEditTargetId = "";
+    if (byId("clubMediaPlacement")) { byId("clubMediaPlacement").disabled = false; byId("clubMediaPlacement").value = "gallery"; }
+    if (byId("clubMediaUnifiedFiles")) byId("clubMediaUnifiedFiles").value = "";
+    releaseClubMediaPreviewUrl();
+    ["clubMediaTitle", "clubMediaDjs", "clubMediaPromoters"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+    if (byId("clubMediaFilter")) byId("clubMediaFilter").value = "none";
+    if (byId("clubMediaTrimStart")) byId("clubMediaTrimStart").value = "0";
+    if (byId("clubMediaTrimEnd")) byId("clubMediaTrimEnd").value = "15";
+    if (byId("saveClubMediaBtn")) byId("saveClubMediaBtn").textContent = "Add Media";
+    byId("cancelClubMediaEditBtn")?.classList.add("hidden");
+    setText("clubMediaEditorStatus", message);
+    updateClubMediaTrimVisibility();
+  }
+
+  function editClubMediaItem(id) {
+    const item = clubMedia.find(row => row.id === id);
+    if (!item) return;
+    clubMediaEditTargetId = id;
+    if (byId("clubMediaPlacement")) { byId("clubMediaPlacement").value = item.slotType || "gallery"; byId("clubMediaPlacement").disabled = true; }
+    if (byId("clubMediaTitle")) byId("clubMediaTitle").value = item.title || "";
+    if (byId("clubMediaDjs")) byId("clubMediaDjs").value = (item.relatedDjs || []).join(", ");
+    if (byId("clubMediaPromoters")) byId("clubMediaPromoters").value = (item.relatedPromoters || []).join(", ");
+    if (byId("clubMediaFilter")) byId("clubMediaFilter").value = safeClubMediaFilter(item.mediaFilter);
+    if (byId("clubMediaTrimStart")) byId("clubMediaTrimStart").value = String(item.trimStart ?? 0);
+    if (byId("clubMediaTrimEnd")) byId("clubMediaTrimEnd").value = String(item.trimEnd ?? Math.min(15, Number(item.originalDuration || 15)));
+    if (byId("clubMediaUnifiedFiles")) byId("clubMediaUnifiedFiles").value = "";
+    if (byId("saveClubMediaBtn")) byId("saveClubMediaBtn").textContent = "Save Media Changes";
+    byId("cancelClubMediaEditBtn")?.classList.remove("hidden");
+    setText("clubMediaEditorStatus", `Editing ${item.title || item.mediaFileName || item.slotType}. Choose one new file only if you want to replace the upload.`);
+    updateClubMediaTrimVisibility();
+    byId("clubMediaUnifiedFiles")?.focus?.();
+  }
+
+  async function removeStoredClubMedia(path) {
+    if (!storage || !path) return;
+    try { await storage.ref(path).delete(); } catch (error) {}
+  }
+
+  async function clearClubLocationMedia(slotType) {
+    const isLogo = slotType === "logo";
+    const path = isLogo ? publicClubProfile.logoStoragePath : publicClubProfile.mainMediaStoragePath;
+    const payload = isLogo
+      ? {logoUrl:"", logoStoragePath:""}
+      : {mainMediaUrl:"", mainMediaType:"", mainMediaStoragePath:"", mainMediaFilter:"none", mainMediaTrimStart:null, mainMediaTrimEnd:null};
+    await db.collection("clubLocations").doc(locationId).set({...payload, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    Object.assign(publicClubProfile, payload);
+    if (isLogo && byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = "";
+    await removeStoredClubMedia(path);
+  }
+
+  async function deleteClubMediaItem(id) {
+    const item = clubMedia.find(row => row.id === id);
+    if (!item || !window.confirm(`Delete ${item.title || item.mediaFileName || "this media item"}?`)) return;
+    await db.collection("clubMedia").doc(id).delete();
+    if (item.slotType === "main" || item.slotType === "logo") await clearClubLocationMedia(item.slotType);
+    await removeStoredClubMedia(item.mediaStoragePath);
+    resetClubMediaEditor("Media deleted.");
+    await loadClubMedia();
+  }
+
+  async function setClubMediaAsMain(id) {
+    const selected = clubMedia.find(row => row.id === id);
+    if (!selected) return;
+    const gallery = clubMedia.filter(row => row.slotType === "gallery").sort((a,b) => clubMediaOrder(a) - clubMediaOrder(b));
+    const batch = db.batch();
+    clubMedia.filter(row => row.slotType === "main" && row.id !== id).forEach((row, index) => {
+      batch.set(db.collection("clubMedia").doc(row.id), {slotType:"gallery", galleryOrder:gallery.length + index, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    });
+    batch.set(db.collection("clubMedia").doc(id), {slotType:"main", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    batch.set(db.collection("clubLocations").doc(locationId), {
+      mainMediaUrl:selected.mediaUrl || "",
+      mainMediaType:selected.mediaType || "image",
+      mainMediaStoragePath:selected.mediaStoragePath || "",
+      mainMediaFilter:safeClubMediaFilter(selected.mediaFilter),
+      mainMediaTrimStart:selected.trimStart ?? null,
+      mainMediaTrimEnd:selected.trimEnd ?? null,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    await batch.commit();
+    Object.assign(publicClubProfile, {mainMediaUrl:selected.mediaUrl || "", mainMediaType:selected.mediaType || "image"});
+    setText("clubMediaEditorStatus", "Main profile media changed.");
+    await loadClubMedia();
+  }
+
+  async function moveClubGalleryMedia(id, direction) {
+    const gallery = clubMedia.filter(row => row.slotType === "gallery").sort((a,b) => clubMediaOrder(a) - clubMediaOrder(b));
+    const index = gallery.findIndex(row => row.id === id);
+    const nextIndex = index + direction;
+    if (index < 0 || nextIndex < 0 || nextIndex >= gallery.length) return;
+    [gallery[index], gallery[nextIndex]] = [gallery[nextIndex], gallery[index]];
+    const batch = db.batch();
+    gallery.forEach((row, order) => batch.set(db.collection("clubMedia").doc(row.id), {galleryOrder:order, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true}));
+    await batch.commit();
+    await loadClubMedia();
+  }
+
+  async function saveClubMedia() {
+    const status = byId("clubMediaEditorStatus");
+    try {
+      const placement = byId("clubMediaPlacement")?.value || "gallery";
+      const files = Array.from(byId("clubMediaUnifiedFiles")?.files || []);
+      if (clubMediaEditTargetId) {
+        const item = clubMedia.find(row => row.id === clubMediaEditTargetId);
+        if (!item) throw new Error("The media item being edited no longer exists.");
+        if (files.length > 1) throw new Error("Choose only one replacement file while editing an existing item.");
+        const originalDuration = files[0] ? await readClubVideoDuration(files[0]) : item.originalDuration || null;
+        const kind = files[0] ? mediaKind(files[0]) : item.mediaType || "image";
+        const metadata = clubMediaMetadata(kind, originalDuration);
+        const upload = files[0] ? await uploadUnifiedClubMediaFile(files[0], item.slotType) : {};
+        const payload = {...metadata, ...upload};
+        await db.collection("clubMedia").doc(item.id).set(payload, {merge:true});
+        if (item.slotType === "main") await db.collection("clubLocations").doc(locationId).set({
+          mainMediaUrl:upload.mediaUrl || item.mediaUrl || "", mainMediaType:kind,
+          mainMediaStoragePath:upload.mediaStoragePath || item.mediaStoragePath || "",
+          mainMediaFilter:payload.mediaFilter, mainMediaTrimStart:payload.trimStart, mainMediaTrimEnd:payload.trimEnd,
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge:true});
+        if (item.slotType === "logo") await db.collection("clubLocations").doc(locationId).set({logoUrl:upload.mediaUrl || item.mediaUrl || "", logoStoragePath:upload.mediaStoragePath || item.mediaStoragePath || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+        if (upload.mediaStoragePath && item.mediaStoragePath !== upload.mediaStoragePath) await removeStoredClubMedia(item.mediaStoragePath);
+        resetClubMediaEditor("Media changes saved.");
+        await loadClubPublicProfile();
+        await loadClubMedia();
+        return;
+      }
+      if (!files.length) throw new Error("Choose at least one photo or video.");
+      if ((placement === "logo" || placement === "main") && files.length !== 1) throw new Error(`${placement === "logo" ? "Club logo" : "Main media"} accepts one file at a time.`);
+      const newKinds = files.map(mediaKind);
+      if (placement === "logo" && newKinds.some(kind => kind !== "image")) throw new Error("Club logo accepts images only.");
+      if (placement === "gallery") {
+        const existingImages = clubMedia.filter(row => row.slotType === "gallery" && row.mediaType === "image").length;
+        const existingVideos = clubMedia.filter(row => row.slotType === "gallery" && row.mediaType === "video").length;
+        if (existingImages + newKinds.filter(kind => kind === "image").length > 5) throw new Error("Public gallery allows up to 5 images.");
+        if (existingVideos + newKinds.filter(kind => kind === "video").length > 5) throw new Error("Public gallery allows up to 5 videos.");
+      }
+      const baseOrder = Math.max(-1, ...clubMedia.filter(row => row.slotType === "gallery").map(clubMediaOrder)) + 1;
+      for (let index = 0; index < files.length; index += 1) {
+        const originalDuration = await readClubVideoDuration(files[index]);
+        const metadata = clubMediaMetadata(mediaKind(files[index]), originalDuration);
+        const upload = await uploadUnifiedClubMediaFile(files[index], placement);
+        const payload = {
+          clubLocationId:locationId,
+          locationName:publicClubProfile.locationName || loc.locationName || locationId,
+          slotType:placement,
+          ...upload,
+          ...metadata,
+          galleryOrder:placement === "gallery" ? baseOrder + index : null,
+          uploadedByUid:auth.currentUser?.uid || "",
+          uploadedByEmail:safeUser(auth.currentUser),
+          uploadedAt:firebase.firestore.FieldValue.serverTimestamp()
+        };
+        const existing = clubMedia.find(row => row.slotType === placement);
+        const id = placement === "gallery" ? `${locationId}_${Date.now()}_${index}` : (existing?.id || `${locationId}_${placement}`);
+        await db.collection("clubMedia").doc(id).set(payload, {merge:placement !== "gallery"});
+        if (existing && placement !== "gallery" && existing.mediaStoragePath !== upload.mediaStoragePath) await removeStoredClubMedia(existing.mediaStoragePath);
+        if (placement === "main") await db.collection("clubLocations").doc(locationId).set({mainMediaUrl:upload.mediaUrl, mainMediaType:upload.mediaType, mainMediaStoragePath:upload.mediaStoragePath, mainMediaFilter:payload.mediaFilter, mainMediaTrimStart:payload.trimStart, mainMediaTrimEnd:payload.trimEnd, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+        if (placement === "logo") await db.collection("clubLocations").doc(locationId).set({logoUrl:upload.mediaUrl, logoStoragePath:upload.mediaStoragePath, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      }
+      resetClubMediaEditor(`${files.length} media item${files.length === 1 ? "" : "s"} saved.`);
+      await loadClubPublicProfile();
+      await loadClubMedia();
+    } catch (error) {
+      if (status) status.textContent = `Media save failed: ${error.message || error}`;
+    }
+  }
+
+  function clubMediaPreview(item = {}) {
+    const cls = `club-media-filter-${safeClubMediaFilter(item.mediaFilter)}`;
+    if (item.mediaType === "video") return `<video class="club-media-manager-preview ${cls}" src="${esc(item.mediaUrl || "")}" controls muted playsinline data-club-trim-start="${esc(item.trimStart ?? 0)}" data-club-trim-end="${esc(item.trimEnd ?? 15)}"></video>`;
+    return `<img class="club-media-manager-preview ${cls}" src="${esc(item.mediaUrl || "")}" alt="${esc(item.title || "Club media")}"/>`;
+  }
+
+  function enforceClubMediaPreviewTrims() {
+    document.querySelectorAll("#clubMediaReport video[data-club-trim-end], #clubMediaInputPreview video[data-club-trim-end]").forEach(video => {
+      const start = Math.max(0, Number(video.dataset.clubTrimStart || 0));
+      const end = Math.max(start + .1, Number(video.dataset.clubTrimEnd || start + 15));
+      video.addEventListener("loadedmetadata", () => { try { video.currentTime = Math.min(start, Math.max(0, video.duration - .05)); } catch (error) {} });
+      video.addEventListener("timeupdate", () => { if (video.currentTime >= end) { video.pause(); try { video.currentTime = start; } catch (error) {} } });
+    });
+  }
+
   function renderClubMedia() {
     const wrap = byId("clubMediaReport");
     if (!wrap) return;
     const main = clubMedia.find(x => x.slotType === "main");
-    const images = clubMedia.filter(x => x.slotType === "gallery" && x.mediaType === "image");
-    const videos = clubMedia.filter(x => x.slotType === "gallery" && x.mediaType === "video");
+    const logo = clubMedia.find(x => x.slotType === "logo");
+    const gallery = clubMedia.filter(x => x.slotType === "gallery").sort((a,b) => clubMediaOrder(a) - clubMediaOrder(b));
+    const images = gallery.filter(x => x.mediaType === "image");
+    const videos = gallery.filter(x => x.mediaType === "video");
+    const rows = [logo, main, ...gallery].filter(Boolean);
     wrap.innerHTML = `
       ${simpleRows([
-        ["Main media", main ? `${main.mediaType} uploaded` : "Not uploaded"],
+        ["Club logo", logo || publicClubProfile.logoUrl ? "Published" : "Not uploaded"],
+        ["Main media", main || publicClubProfile.mainMediaUrl ? `${main?.mediaType || publicClubProfile.mainMediaType || "image"} published` : "Not uploaded"],
         ["Public images", `${images.length}/5`],
-        ["Marketing videos", `${videos.length}/5`],
-        ["Video policy", "15 seconds max; related DJs/promoters saved as pop-out datapoints"]
+        ["Public videos", `${videos.length}/5`],
+        ["Video clip policy", "Trimmed playback window: up to 15 seconds"]
       ])}
-      ${clubMedia.map(item => `<div class="queue-item">
-        <strong>${esc(item.title || item.mediaFileName || item.slotType)}</strong>
-        <p>${esc(item.slotType)} - ${esc(item.mediaType)}${item.maxVideoSeconds ? " - 15 sec max" : ""}</p>
+      ${!logo && publicClubProfile.logoUrl ? `<div class="queue-item club-media-manager-row"><img class="club-media-manager-preview" src="${esc(publicClubProfile.logoUrl)}" alt="Current club logo"/><div><strong>Current Club Logo</strong><p>Legacy logo record</p><div class="queue-actions"><button type="button" data-club-replace-legacy="logo">Replace</button><button type="button" data-club-delete-legacy="logo">Delete</button></div></div></div>` : ""}
+      ${!main && publicClubProfile.mainMediaUrl ? `<div class="queue-item club-media-manager-row">${clubMediaPreview({mediaUrl:publicClubProfile.mainMediaUrl,mediaType:publicClubProfile.mainMediaType,mediaFilter:publicClubProfile.mainMediaFilter,trimStart:publicClubProfile.mainMediaTrimStart,trimEnd:publicClubProfile.mainMediaTrimEnd,title:"Current main media"})}<div><strong>Current Main Media</strong><p>Legacy main-media record</p><div class="queue-actions"><button type="button" data-club-replace-legacy="main">Replace</button><button type="button" data-club-delete-legacy="main">Delete</button></div></div></div>` : ""}
+      ${rows.map((item, index) => `<div class="queue-item club-media-manager-row">
+        ${clubMediaPreview(item)}
+        <div><strong>${esc(item.title || item.mediaFileName || item.slotType)}</strong>
+        <p>${esc(item.slotType)} • ${esc(item.mediaType)} • filter: ${esc(safeClubMediaFilter(item.mediaFilter))}${item.mediaType === "video" ? ` • ${esc(item.trimStart ?? 0)}s–${esc(item.trimEnd ?? 15)}s (${esc(item.trimmedDuration ?? 15)}s max clip)` : ""}</p>
         <small>DJs: ${esc((item.relatedDjs || []).join(", ") || "-")} | Promoters: ${esc((item.relatedPromoters || []).join(", ") || "-")}</small>
-      </div>`).join("")}`;
+        <div class="queue-actions"><button type="button" data-club-media-edit="${esc(item.id)}">Edit / Replace</button>${item.slotType === "gallery" ? `<button type="button" data-club-media-main="${esc(item.id)}">Set as Main</button><button type="button" data-club-media-up="${esc(item.id)}" ${index === (logo ? 1 : 0) + (main ? 1 : 0) ? "disabled" : ""}>Move Up</button><button type="button" data-club-media-down="${esc(item.id)}">Move Down</button>` : ""}<button type="button" data-club-media-delete="${esc(item.id)}">Delete</button></div></div>
+      </div>`).join("") || '<p class="sub">No managed club media has been added yet.</p>'}`;
+    wrap.querySelectorAll("[data-club-media-edit]").forEach(button => button.addEventListener("click", () => editClubMediaItem(button.dataset.clubMediaEdit)));
+    wrap.querySelectorAll("[data-club-media-delete]").forEach(button => button.addEventListener("click", () => deleteClubMediaItem(button.dataset.clubMediaDelete)));
+    wrap.querySelectorAll("[data-club-media-main]").forEach(button => button.addEventListener("click", () => setClubMediaAsMain(button.dataset.clubMediaMain)));
+    wrap.querySelectorAll("[data-club-media-up]").forEach(button => button.addEventListener("click", () => moveClubGalleryMedia(button.dataset.clubMediaUp, -1)));
+    wrap.querySelectorAll("[data-club-media-down]").forEach(button => button.addEventListener("click", () => moveClubGalleryMedia(button.dataset.clubMediaDown, 1)));
+    wrap.querySelectorAll("[data-club-replace-legacy]").forEach(button => button.addEventListener("click", () => {
+      if (byId("clubMediaPlacement")) byId("clubMediaPlacement").value = button.dataset.clubReplaceLegacy;
+      setText("clubMediaEditorStatus", `Choose one new ${button.dataset.clubReplaceLegacy === "logo" ? "image" : "photo or video"} above, then click Add Media to replace the current ${button.dataset.clubReplaceLegacy}.`);
+      updateClubMediaTrimVisibility();
+      byId("clubMediaUnifiedFiles")?.focus?.();
+    }));
+    wrap.querySelectorAll("[data-club-delete-legacy]").forEach(button => button.addEventListener("click", async () => {
+      if (!window.confirm(`Delete the current club ${button.dataset.clubDeleteLegacy}?`)) return;
+      await clearClubLocationMedia(button.dataset.clubDeleteLegacy);
+      await loadClubPublicProfile();
+      await loadClubMedia();
+    }));
+    enforceClubMediaPreviewTrims();
   }
 
   async function loadClubMedia() {
@@ -1265,18 +1678,25 @@
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("saveClubTemplatePolicyBtn", saveClubTemplatePolicy);
     bind("copyClubPublicProfileLinkBtn", async () => {
       await navigator.clipboard?.writeText(publicProfileUrl());
       window.FLOQRActionFeedback?.show("Club page link copied", "The patron-facing FLOQR club profile URL is ready to share.", {status:"success"});
       window.FLOQRActionFeedback?.hide(2200);
     });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
-    bind("uploadClubMainMediaBtn", uploadMainMedia);
-    bind("uploadClubLogoBtn", uploadClubLogo);
-    bind("uploadClubGalleryMediaBtn", uploadGalleryMedia);
+    bind("saveClubMediaBtn", saveClubMedia);
+    bind("cancelClubMediaEditBtn", () => resetClubMediaEditor("Media edit cancelled."));
     bind("electClubRoleBtn", electClubRole);
     bind("createGuestCampaignBtn", createGuestCampaign);
     byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
+    byId("clubTemplateBackgroundSearch")?.addEventListener("input", renderClubTemplateBackgrounds);
+    byId("clubMediaUnifiedFiles")?.addEventListener("change", updateClubMediaTrimVisibility);
+    byId("clubMediaPlacement")?.addEventListener("change", updateClubMediaTrimVisibility);
+    byId("clubMediaFilter")?.addEventListener("change", renderClubMediaInputPreview);
+    byId("clubMediaTrimStart")?.addEventListener("input", renderClubMediaInputPreview);
+    byId("clubMediaTrimEnd")?.addEventListener("input", renderClubMediaInputPreview);
+    updateClubMediaTrimVisibility();
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("adminStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -1311,7 +1731,9 @@
       byId("adminPanel").classList.remove("hidden");
       setText("adminStatus", "Club admin verified.");
       renderQueue();
-      loadClubPublicProfile().then(loadReports);
+      loadClubPublicProfile().then(async () => {
+        await Promise.all([loadReports(), loadClubTemplateControls()]);
+      });
       loadEmployeeDesignations();
       loadClubMedia();
       loadGuestListCampaigns().then(loadReports);

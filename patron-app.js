@@ -39,7 +39,7 @@
   let activeMinglRoomId = "";
   let minglMessagesUnsubscribe = null;
   let minglAttachmentFile = null;
-  let templateVariants = {mine:[], community:[]};
+  let templateVariants = {mine:[], community:[], club:[]};
   let locationContextPromise = null;
   let confirmationReturnTimer = null;
   let personalizedSuggestionTimer = null;
@@ -222,10 +222,12 @@
   }
   async function loadTemplateVariants() {
     if (!window.FLOQRStudio || !currentUser) {
-      templateVariants = {mine:[], community:[]};
+      templateVariants = {mine:[], community:[], club:[]};
       return templateVariants;
     }
-    templateVariants = await window.FLOQRStudio.loadPatronTemplateVariants({db, uid:currentUser.uid});
+    const patronVariants = await window.FLOQRStudio.loadPatronTemplateVariants({db, uid:currentUser.uid});
+    const clubVariants = await window.FLOQRStudio.loadClubTemplateVariants({db, clubLocationId:locationId()});
+    templateVariants = {...patronVariants, club:clubVariants};
     return templateVariants;
   }
   async function loadLocationAliases() {
@@ -1945,7 +1947,7 @@
     matches.forEach(([id,l]) => {
       const card = document.createElement("div");
       card.className = "club-option";
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.04">View Club</a><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button></div>`;
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.06">View Club</a><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button></div>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });
@@ -1974,7 +1976,24 @@
   function variantSearchText(variant = {}) {
     return `${variant.variantName || ""} ${variant.baseTemplateName || ""} ${variant.ownerDisplayName || ""} ${(variant.tags||[]).join(" ")} ${(variant.searchKeywords||[]).join(" ")} ${variant.promptShared ? variant.aiPrompt || "" : ""}`.toLowerCase();
   }
+  function clubAllowsPatronBackgroundEditing() {
+    return getLocation()?.patronTemplateBackgroundEditingEnabled !== false;
+  }
+  function templateBackgroundCanBeCustomized(template = {}) {
+    return clubAllowsPatronBackgroundEditing() && template.backgroundEditable !== false;
+  }
+  function patronVariantAllowedAtClub(variant = {}) {
+    return clubAllowsPatronBackgroundEditing() && getTemplate(variant.baseTemplateId || "blackwhite").backgroundEditable !== false;
+  }
   async function openStudioForTemplate(template) {
+    if (!clubAllowsPatronBackgroundEditing()) {
+      alert("This club has disabled patron background customization. You can still use the original and club-curated templates.");
+      return;
+    }
+    if (template.backgroundEditable === false) {
+      alert("This template background is locked. You can still use its original approved design.");
+      return;
+    }
     if (!window.FLOQRStudio) {
       alert("FLOQR Studio is not loaded.");
       return;
@@ -1996,6 +2015,7 @@
   }
   function templateCard(template, options = {}) {
     const selected = !selectedTemplateVariant && template.id === selectedTemplate;
+    const canCustomize = templateBackgroundCanBeCustomized(template);
     return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}">
       <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
       <div class="name">${esc(template.name)}</div>
@@ -2003,18 +2023,18 @@
       <div class="tag-row">${(template.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>
-        <button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>
+        ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>` : `<span class="template-background-lock">${template.backgroundEditable === false ? "Background locked" : "Club customization off"}</span>`}
       </div>
     </div>`;
   }
-  function variantCard(variant = {}, isMine = false) {
+  function variantCard(variant = {}, scope = "community") {
     const base = getTemplate(variant.baseTemplateId || "blackwhite");
     const selected = selectedTemplateVariant && (selectedTemplateVariant.id || selectedTemplateVariant.variantId) === (variant.id || variant.variantId);
     const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(variant) : "";
     return `<div class="template ${esc(base.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
       <div class="template-mini-preview" style="${esc(style)}"><strong>${esc(base.defaultMain || "SHOUTOUT")}</strong><span>${esc(variant.variantName || base.category || "")}</span></div>
       <div class="name">${esc(variant.variantName || "Saved Background")}</div>
-      <div class="tag">${esc(variant.baseTemplateName || base.name)}${isMine ? " - Mine" : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
+      <div class="tag">${esc(variant.baseTemplateName || base.name)}${scope === "mine" ? " - Mine" : scope === "club" ? " - Club approved" : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
       <div class="tag-row">${(variant.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <button type="button" data-variant-open="${esc(variant.id || variant.variantId || "")}">Use Template</button>
     </div>`;
@@ -2027,24 +2047,37 @@
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id)));
-    const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active");
-    const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid);
+    const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");
+    const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active" && patronVariantAllowedAtClub(x));
+    const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid && patronVariantAllowedAtClub(x));
+    const allVariants = [...club, ...mine, ...community];
     if (!discoveryQuery) {
       const defaultRecord = official.find(record => record.id === "blackwhite") || official[0];
-      grid.innerHTML = `<section class="template-section template-section-default"><h3>Default Template</h3><div class="template-grid">${templateCard(defaultRecord.data)}</div></section>`;
+      const remainingOfficial = official.filter(record => record !== defaultRecord);
+      grid.innerHTML = `
+        <section class="template-section template-section-default"><h3>Default Template</h3><div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : '<div class="empty">No default template is available.</div>'}</div></section>
+        ${club.length ? `<section class="template-section"><h3>Club-Approved Backgrounds</h3><p class="sub small">Customized by this club's admins.</p><div class="template-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
+        <section class="template-section"><h3>Official FLOQR Templates</h3><div class="template-grid">${remainingOfficial.map(record => templateCard(record.data)).join("") || '<div class="empty">No additional official templates are available.</div>'}</div></section>
+        ${clubAllowsPatronBackgroundEditing() && mine.length ? `<section class="template-section"><h3>My Saved Backgrounds</h3><div class="template-grid">${mine.map(variant => variantCard(variant, "mine")).join("")}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() && community.length ? `<section class="template-section"><h3>Community Backgrounds</h3><div class="template-grid">${community.map(variant => variantCard(variant, "community")).join("")}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization. Original and club-approved templates remain available.</p>'}`;
     } else {
-      const [officialRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
+      const [officialRecords, clubRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
         window.floqrSearch(discoveryQuery, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
+        window.floqrSearch(discoveryQuery, {records:club.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"club", ownerUid:x.ownerUid, type:"clubTemplateVariant", sourceType:"clubTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
         window.floqrSearch(discoveryQuery, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
         window.floqrSearch(discoveryQuery, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
-      ]) : [official.filter(record => record.searchText.includes(discoveryQuery)), mine.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), community.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x}))];
+      ]) : [official.filter(record => record.searchText.includes(discoveryQuery)), club.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), mine.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), community.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x}))];
       const officialHtml = officialRecords.map(record => templateCard(record.data)).join("");
-      const mineHtml = mineRecords.map(record => variantCard(record.data, true)).join("") || '<div class="empty">No saved templates matched.</div>';
-      const communityHtml = communityRecords.map(record => variantCard(record.data, false)).join("") || '<div class="empty">No public community templates matched.</div>';
+      const clubHtml = clubRecords.map(record => variantCard(record.data, "club")).join("");
+      const mineHtml = mineRecords.map(record => variantCard(record.data, "mine")).join("");
+      const communityHtml = communityRecords.map(record => variantCard(record.data, "community")).join("");
       grid.innerHTML = `
         <section class="template-section"><h3>Matching Official FLOQR Templates</h3><div class="template-grid">${officialHtml || '<div class="empty">No official templates matched.</div>'}</div></section>
-        <section class="template-section"><h3>My Saved Templates</h3><div class="template-grid">${mineHtml}</div></section>
-        <section class="template-section"><h3>Community Templates</h3><div class="template-grid">${communityHtml}</div></section>`;
+        ${clubHtml ? `<section class="template-section"><h3>Matching Club-Approved Backgrounds</h3><div class="template-grid">${clubHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() && mineHtml ? `<section class="template-section"><h3>My Matching Backgrounds</h3><div class="template-grid">${mineHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() && communityHtml ? `<section class="template-section"><h3>Matching Community Backgrounds</h3><div class="template-grid">${communityHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization.</p>'}`;
     }
     grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
@@ -2060,7 +2093,7 @@
     }));
     grid.querySelectorAll("[data-variant-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
-      const variant = [...mine, ...community].find(x => (x.id || x.variantId) === btn.dataset.variantOpen);
+      const variant = allVariants.find(x => (x.id || x.variantId) === btn.dataset.variantOpen);
       if (!variant) return;
       selectedTemplate = variant.baseTemplateId || "blackwhite";
       selectedTemplateVariant = variant;
@@ -2074,7 +2107,7 @@
           selectedTemplate = item.dataset.templateId;
           selectedTemplateVariant = null;
         } else if (item.dataset.variantId) {
-          const variant = [...mine, ...community].find(x => (x.id || x.variantId) === item.dataset.variantId);
+          const variant = allVariants.find(x => (x.id || x.variantId) === item.dataset.variantId);
           selectedTemplate = variant?.baseTemplateId || "blackwhite";
           selectedTemplateVariant = variant || null;
         }
@@ -2088,7 +2121,8 @@
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !currentTemplateSupportsMedia());
     const variant = selectedTemplateVariant;
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
+    const backgroundLabel = variant?.variantScope === "club" ? "Club-approved background" : t.backgroundEditable === false ? "Background locked" : clubAllowsPatronBackgroundEditing() ? "Background editable" : "Original background only";
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span><span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {
@@ -2594,7 +2628,9 @@
         backgroundUrl:selectedTemplateVariant.backgroundUrl || "",
         backgroundColor:selectedTemplateVariant.backgroundColor || "",
         backgroundGradient:selectedTemplateVariant.backgroundGradient || "",
-        backgroundStoragePath:selectedTemplateVariant.backgroundStoragePath || ""
+        backgroundStoragePath:selectedTemplateVariant.backgroundStoragePath || "",
+        templateVariantScope:selectedTemplateVariant.variantScope || "patron",
+        backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const shoutoutRef = await db.collection("shoutouts").add(payload);

@@ -1,4 +1,4 @@
-/* FLOQR patron-facing Club Public Profile v29.04 */
+/* FLOQR patron-facing Club Public Profile v29.06 */
 (function () {
   "use strict";
 
@@ -26,7 +26,7 @@
   }
 
   function redirectForAccess(reason) {
-    const query = new URLSearchParams({v:"29.04", returnTo:appReturnPath(), profileRequired:reason});
+    const query = new URLSearchParams({v:"29.06", returnTo:appReturnPath(), profileRequired:reason});
     window.location.replace(`./?${query.toString()}`);
   }
 
@@ -90,18 +90,40 @@
     } catch (e) { return []; }
   }
 
-  function mediaMarkup(url, type, alt) {
+  function safeMediaFilter(value) {
+    const key = String(value || "none").toLowerCase();
+    return ["none", "vibrant", "warm", "cool", "monochrome", "contrast"].includes(key) ? key : "none";
+  }
+
+  function mediaMarkup(url, type, alt, options = {}) {
     if (!url) return "";
-    if (String(type).toLowerCase() === "video") return `<video src="${esc(url)}" autoplay muted loop playsinline aria-label="${esc(alt)}"></video>`;
-    return `<img src="${esc(url)}" alt="${esc(alt)}"/>`;
+    const filterClass = `club-media-filter-${safeMediaFilter(options.mediaFilter)}`;
+    if (String(type).toLowerCase() === "video") return `<video class="${filterClass}" src="${esc(url)}" autoplay muted loop playsinline aria-label="${esc(alt)}" data-club-trim-start="${esc(options.trimStart ?? 0)}" data-club-trim-end="${esc(options.trimEnd ?? 15)}"></video>`;
+    return `<img class="${filterClass}" src="${esc(url)}" alt="${esc(alt)}"/>`;
+  }
+
+  function enforceClubVideoTrims(root = document) {
+    root.querySelectorAll("video[data-club-trim-end]").forEach(video => {
+      const start = Math.max(0, Number(video.dataset.clubTrimStart || 0));
+      const end = Math.min(start + 15, Math.max(start + .1, Number(video.dataset.clubTrimEnd || start + 15)));
+      const restart = () => {
+        try { video.currentTime = Math.min(start, Math.max(0, (video.duration || start + .1) - .05)); } catch (error) {}
+        video.play?.().catch(() => {});
+      };
+      video.addEventListener("loadedmetadata", restart);
+      video.addEventListener("timeupdate", () => { if (video.currentTime >= end) restart(); });
+      video.addEventListener("ended", restart);
+    });
   }
 
   function renderHero(media = []) {
     const name = club.locationName || club.brandName || "FLOQR Venue";
     const main = media.find(item => item.slotType === "main") || {};
-    const mainUrl = club.mainMediaUrl || main.mediaUrl || club.mainImageUrl || "";
-    const mainType = club.mainMediaType || main.mediaType || "image";
-    byId("clubProfileHeroMedia").innerHTML = mainUrl ? mediaMarkup(mainUrl, mainType, `${name} main venue media`) : '<div class="club-profile-hero-fallback"></div>';
+    const mainUrl = main.mediaUrl || club.mainMediaUrl || club.mainImageUrl || "";
+    const mainType = main.mediaType || club.mainMediaType || "image";
+    const mainOptions = main.mediaUrl ? main : {mediaFilter:club.mainMediaFilter, trimStart:club.mainMediaTrimStart, trimEnd:club.mainMediaTrimEnd};
+    byId("clubProfileHeroMedia").innerHTML = mainUrl ? mediaMarkup(mainUrl, mainType, `${name} main venue media`, mainOptions) : '<div class="club-profile-hero-fallback"></div>';
+    enforceClubVideoTrims(byId("clubProfileHeroMedia"));
     const logoUrl = club.logoUrl || club.clubLogoUrl || club.brandLogoUrl || "";
     byId("clubProfileLogo").innerHTML = logoUrl ? `<img src="${esc(logoUrl)}" alt="${esc(name)} logo"/>` : `<span>${esc(name.slice(0,1).toUpperCase())}</span>`;
     byId("clubProfileName").textContent = name;
@@ -113,8 +135,8 @@
   }
 
   function renderActions() {
-    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.04`;
-    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.04`;
+    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.06`;
+    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.06`;
     const address = club.address || [club.locationLabel, club.city, club.region, club.country].filter(Boolean).join(", ");
     byId("clubDirectionsLink").href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
     const website = safeExternal(club.officialWebsite || club.website);
@@ -213,8 +235,9 @@
   }
 
   function renderGallery(media) {
-    const gallery = media.filter(item => item.slotType === "gallery").slice(0,10);
-    byId("clubProfileGallery").innerHTML = gallery.length ? gallery.map(item => `<figure>${mediaMarkup(item.mediaUrl, item.mediaType, item.title || "Club gallery media")}${item.title ? `<figcaption>${esc(item.title)}</figcaption>` : ""}</figure>`).join("") : '<p class="sub">No public gallery media has been published.</p>';
+    const gallery = media.filter(item => item.slotType === "gallery").sort((a,b) => Number(a.galleryOrder ?? 0) - Number(b.galleryOrder ?? 0)).slice(0,10);
+    byId("clubProfileGallery").innerHTML = gallery.length ? gallery.map(item => `<figure>${mediaMarkup(item.mediaUrl, item.mediaType, item.title || "Club gallery media", item)}${item.title ? `<figcaption>${esc(item.title)}</figcaption>` : ""}</figure>`).join("") : '<p class="sub">No public gallery media has been published.</p>';
+    enforceClubVideoTrims(byId("clubProfileGallery"));
     toggleSection("clubGallerySection", sectionEnabled("gallery") && gallery.length);
   }
 
@@ -272,7 +295,7 @@
       if (!profileSnap.exists || profileSnap.data()?.profileCompleted !== true) { redirectForAccess("create-profile"); return; }
       await loadClubProfile();
     } catch (error) {
-      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.04">Return to FLOQR</a></p>`;
+      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.06">Return to FLOQR</a></p>`;
     }
   });
 })();

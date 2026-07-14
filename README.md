@@ -1,17 +1,19 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.05 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.06 Full Package
+
+v29.06 adds controlled ShoutOut background customization and a consolidated Club Public Profile media manager. Master Admin marks each template background as editable or locked. Club Admin can enable or disable patron customization per venue and can create club-only background variants. Patrons may use every original compatible template, see club-approved backgrounds, and customize only when both the template and club permit it. Club Admin now uses one photo/video input to add, edit, replace, reorder, promote, filter, trim, or delete public-profile media. Video playback windows are adjustable and capped at 15 seconds. Template layout, text positions, media placeholders, character limits, and screen-format tags remain protected.
 
 v29.05 adds Firebase smoke-test progress and export diagnostics, Master Admin entity onboarding and registered-patron club-admin assignment, localized scheduled venue discovery, template and display-format management, a repaired packaged ShoutOut logo, no-crop media framing, custom-email five-minute OTP sign-in, Club Admin SMS MFA enrollment/challenge handling, and one-control multi-file Mingl profile media ordering.
 
 The default Traditional Black and White ShoutOut now declares and enforces three lines, 15 characters per line, and 45 visible characters total. The same template metadata model can define limits for new templates.
 
-Deployment and authentication setup: see `DEPLOYMENT-V29-05.md`. Rollback instructions: see `ROLLBACK-V29-05.md`.
+Deployment and authentication setup: see `DEPLOYMENT-V29-06.md`. Rollback instructions: see `ROLLBACK-V29-06.md`.
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.05
+https://jadzadco.github.io/shoutout-demo/?v=29.06
 ```
 
 Current release highlights:

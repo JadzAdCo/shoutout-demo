@@ -51,6 +51,17 @@
     return out;
   }
 
+  async function loadClubTemplateVariants({db, clubLocationId} = {}) {
+    if (!db || !clubLocationId) return [];
+    try {
+      const snap = await db.collection("clubTemplateVariants").where("clubLocationId", "==", clubLocationId).limit(100).get();
+      return snap.docs.map(doc => ({id:doc.id, ...doc.data()})).filter(item => String(item.status || "active") === "active");
+    } catch (error) {
+      console.warn("Could not load club template backgrounds:", error.message);
+      return [];
+    }
+  }
+
   function variantBackgroundStyle(variant = {}) {
     if (variant.backgroundType === "image" || variant.backgroundType === "ai-generated") {
       return variant.backgroundUrl ? `background-image:url('${String(variant.backgroundUrl).replace(/'/g, "%27")}')` : "";
@@ -142,22 +153,27 @@
     }
     const baseTemplate = options.baseTemplate || {};
     const baseTemplateId = options.baseTemplateId || baseTemplate.id || "blackwhite";
+    if (baseTemplate.backgroundEditable === false) {
+      alert("This template's background is locked. Choose a background-editable template or ask a Master Admin to unlock it.");
+      return;
+    }
+    const isClubVariant = options.variantScope === "club";
+    const collectionName = isClubVariant ? "clubTemplateVariants" : "patronTemplateVariants";
     const modal = ensureModal();
     modal.__baseTemplate = baseTemplate;
     modal.innerHTML = `
       <div class="floqr-studio-dialog">
         <div class="floqr-studio-head">
-          <div><p class="eyebrow">FLOQR Studio</p><h2>Customize Background</h2></div>
+          <div><p class="eyebrow">FLOQR Studio</p><h2>${esc(isClubVariant ? "Customize Club Background" : "Customize Background")}</h2></div>
           <button id="studioCloseBtn" type="button" aria-label="Close FLOQR Studio">x</button>
         </div>
-        <p class="sub small">Official template layout, text position, media placeholders, animation timing, and display format stay locked. Patrons can change only the background.</p>
+        <p class="sub small">Official template layout, text position, media placeholders, animation timing, character limits, and display format stay locked. Only the background can change.</p>
         <div class="floqr-studio-grid">
           <div>
             <label>Variant name<input id="studioVariantName" maxlength="80" value="${esc(baseTemplate.name || "My ShoutOut Background")}"/></label>
             <label>Visibility
               <select id="studioVisibility">
-                <option value="private">Private</option>
-                <option value="public">Shared/Public</option>
+                ${isClubVariant ? '<option value="club">This club only</option>' : '<option value="private">Private</option><option value="public">Shared/Public</option>'}
               </select>
             </label>
             <label>Background type
@@ -179,7 +195,7 @@
             <label class="consent-line"><input id="studioPromptShared" type="checkbox"/> <span>Share prompt publicly if this variant is public</span></label>
             <div class="button-row">
               <button id="studioAiDesignBtn" type="button">Design Background with AI</button>
-              <button id="studioSaveBtn" class="primary" type="button">Save Template Variant</button>
+              <button id="studioSaveBtn" class="primary" type="button">${esc(isClubVariant ? "Save Club Background" : "Save Template Variant")}</button>
             </div>
             <p id="studioStatus" class="status"></p>
           </div>
@@ -197,7 +213,7 @@
     modal.querySelector("#studioAiDesignBtn")?.addEventListener("click", () => applyAiPlaceholder(modal));
     modal.querySelector("#studioSaveBtn")?.addEventListener("click", async () => {
       try {
-        const variantRef = services.db.collection("patronTemplateVariants").doc();
+        const variantRef = services.db.collection(collectionName).doc();
         const bg = selectedBackground(modal);
         const file = modal.querySelector("#studioBackgroundFile")?.files?.[0];
         const upload = bg.backgroundType === "image" ? await uploadBackground(services.storage, user, variantRef.id, file, "uploaded") : {};
@@ -208,6 +224,9 @@
         const payload = {
           ownerUid:user.uid,
           ownerDisplayName:user.displayName || user.email || "FLOQR Member",
+          ownerRole:isClubVariant ? "clubAdmin" : "patron",
+          variantScope:isClubVariant ? "club" : "patron",
+          clubLocationId:isClubVariant ? String(options.clubLocationId || "") : "",
           baseTemplateId,
           baseTemplateName:baseTemplate.name || baseTemplateId,
           variantName:modal.querySelector("#studioVariantName")?.value.trim() || `${baseTemplate.name || "ShoutOut"} Background`,
@@ -218,8 +237,8 @@
           backgroundGradient:bg.backgroundGradient || "",
           aiPrompt:prompt,
           promptShared,
-          visibility,
-          isPublicProfileItem:visibility === "public",
+          visibility:isClubVariant ? "club" : visibility,
+          isPublicProfileItem:!isClubVariant && visibility === "public",
           tags,
           searchKeywords:[...tags, baseTemplate.name || baseTemplateId, promptShared ? prompt : ""].filter(Boolean),
           status:"active",
@@ -241,8 +260,8 @@
           const indexRecord = window.FLOQRAIIndex.templateVariantIndexRecord({id:variantRef.id, ...payload});
           await window.FLOQRAIIndex.upsertAiIndex(services.db, `publicTemplateVariant_${variantRef.id}`, indexRecord);
         }
-        modal.querySelector("#studioStatus").textContent = "Template variant saved.";
-        await loadPatronTemplateVariants({db:services.db, uid:user.uid});
+        modal.querySelector("#studioStatus").textContent = isClubVariant ? "Club template background saved." : "Template variant saved.";
+        if (!isClubVariant) await loadPatronTemplateVariants({db:services.db, uid:user.uid});
         if (typeof options.onSaved === "function") options.onSaved({id:variantRef.id, ...payload});
       } catch(e) {
         modal.querySelector("#studioStatus").textContent = e.message;
@@ -255,6 +274,7 @@
     SAFE_GRADIENTS,
     openFloqrTemplateStudio,
     loadPatronTemplateVariants,
+    loadClubTemplateVariants,
     variantBackgroundStyle,
     previewHtml
   };

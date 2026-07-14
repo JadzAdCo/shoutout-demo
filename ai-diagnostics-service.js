@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.05 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.06 */
 (function () {
   "use strict";
 
@@ -29,9 +29,9 @@
     TBI: "To be implemented"
   };
 
-  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.05";
-  const EXPECTED_STORAGE_RULES_VERSION = "v29.05";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.05";
+  const EXPECTED_FIRESTORE_RULES_VERSION = "v29.06";
+  const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.06";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -812,6 +812,22 @@
         {label:"Dynamic timezone crawler dispatcher", file:"functions/ai-discovery-functions.js", includes:["every 15 minutes", "scheduleIsDue", "GOOGLE_PLACES_API_KEY"]},
         {label:"Current rule version markers", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v29.05", "clubAdminAssignments", "emailOtpChallenges"]},
         {label:"Current rollback and deployment docs", file:"ROLLBACK-V29-05.md", includes:["FLOQR Rollback - v29.05", "ShoutOut-wepApp.v29.04.zip"]}
+      ]
+    },
+    {
+      version:"v29.06",
+      title:"Club and Patron Template Background Permissions",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.06\""]},
+        {label:"Template background lock metadata", file:"shared-data.js", includes:["backgroundEditable:false", "patronTemplateBackgroundEditingEnabled"]},
+        {label:"Master Admin background editability", file:"master-admin.html", includes:["templateManageBackgroundEditable", "Background can be customized"]},
+        {label:"Club Admin permission and editor", file:"admin.html", includes:["panelTemplateBackgrounds", "patronTemplateBackgroundEditingEnabled", "Customize a Template for This Club"]},
+        {label:"Patron permission enforcement", file:"patron-app.js", includes:["clubAllowsPatronBackgroundEditing", "templateBackgroundCanBeCustomized", "Club-Approved Backgrounds"]},
+        {label:"Consolidated club photo/video manager", file:"admin.html", includes:["clubMediaUnifiedFiles", "Upload photos or videos", "clubMediaTrimStart", "clubMediaFilter"]},
+        {label:"Club media edit, replace, order, filter, trim, and delete", file:"admin-app.js", includes:["saveClubMedia", "editClubMediaItem", "moveClubGalleryMedia", "deleteClubMediaItem", "A club video clip can be no longer than 15 seconds"]},
+        {label:"Public club profile enforces trim and filters", file:"club-profile-app.js", includes:["enforceClubVideoTrims", "club-media-filter-", "data-club-trim-end"]},
+        {label:"Club background variants rule", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v29.06", "clubTemplateVariants"]},
+        {label:"Current rollback and deployment docs", file:"ROLLBACK-V29-06.md", includes:["FLOQR Rollback - v29.06", "ShoutOut-wepApp.v29.05.zip"]}
       ]
     }
   ];

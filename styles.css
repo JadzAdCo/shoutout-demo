@@ -692,3 +692,13 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
   .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .composer,.template-layout,.mingl-layout{grid-template-columns:1fr}
 }
+
+/* v29.06 template background permission states */
+.template-background-lock{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(0,0,0,.24);font-size:12px;font-weight:900;color:var(--muted)}
+.template-background-policy-note{margin:18px 0;padding:14px 16px;border:1px solid rgba(223,255,90,.35);border-radius:16px;background:rgba(223,255,90,.08);color:var(--text);font-weight:800}
+.club-media-filter-none{filter:none}
+.club-media-filter-vibrant{filter:saturate(1.45) contrast(1.08)}
+.club-media-filter-warm{filter:sepia(.2) saturate(1.25) hue-rotate(-8deg) brightness(1.04)}
+.club-media-filter-cool{filter:saturate(1.1) hue-rotate(12deg) contrast(1.05)}
+.club-media-filter-monochrome{filter:grayscale(1) contrast(1.08)}
+.club-media-filter-contrast{filter:contrast(1.35) saturate(1.08)}
