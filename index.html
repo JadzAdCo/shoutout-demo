@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Patron Portal v29.05 -->
+  <!-- FLOQR ShoutOut Patron Portal v29.08.2 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./styles.css?v=29.08.2"/>
 </head>
 <body>
 
@@ -405,13 +405,13 @@
     <div class="composer">
       <div class="card">
         <h2>Message</h2>
-        <label>Main message<textarea id="mainText" rows="3" maxlength="47">HAPPY BIRTHDAY MAYA!</textarea></label>
+        <label>Main message<textarea id="mainText" rows="3" maxlength="47" placeholder="Enter ShoutOut Here"></textarea></label>
         <p id="templateCharacterCapHint" class="sub small">Template display cap: choose a template to see the safe character limit.</p>
         <label>Club display screen
           <select id="shoutoutScreenFormat"></select>
         </label>
         <div class="attribution-controls">
-          <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Post my name or handle</span></label>
+          <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Show my name or social handle in the animated identity rail</span></label>
           <label id="attributionChoiceWrap" class="hidden">Show as
             <select id="attributionChoice">
               <option value="displayName">Display name</option>
@@ -420,6 +420,7 @@
             </select>
           </label>
           <input id="subText" type="hidden" value=""/>
+          <small class="sub small">Optional. The template keeps the same spacing either way; the identity rail bursts away during playback.</small>
         </div>
         <div id="shoutoutMediaCard" class="media-upload-card hidden">
           <h2>Media Upload</h2>
@@ -438,12 +439,55 @@
           <input id="shoutoutMediaUrl" type="hidden"/>
           <input id="shoutoutMediaType" type="hidden"/>
         </div>
+        <div id="footballTeamIntroCard" class="football-team-editor hidden">
+          <div class="section-heading-row">
+            <div>
+              <p class="eyebrow">Zebbies advanced template</p>
+              <h2>Build the four-player lineup</h2>
+            </div>
+            <strong class="football-template-price">$30</strong>
+          </div>
+          <p class="sub small">Upload exactly four authorized photos. FLOQR produces a reusable 20-second, fictional American-football stadium introduction sized to the panel selected above.</p>
+          <div class="football-player-upload-grid">
+            <article class="football-player-upload" data-football-slot="1">
+              <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
+              <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName1" data-football-team-name data-slot="1" type="text" maxlength="24" value="PLAYER 1"/></label>
+              <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="2">
+              <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
+              <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName2" data-football-team-name data-slot="2" type="text" maxlength="24" value="PLAYER 2"/></label>
+              <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="3">
+              <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
+              <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName3" data-football-team-name data-slot="3" type="text" maxlength="24" value="PLAYER 3"/></label>
+              <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="4">
+              <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
+              <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName4" data-football-team-name data-slot="4" type="text" maxlength="24" value="PLAYER 4"/></label>
+              <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
+            </article>
+          </div>
+          <label class="football-stadium-message-label">Large stadium message
+            <textarea id="footballTeamMessage" rows="3" maxlength="60">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
+          </label>
+          <p class="sub small">The display wraps this into no more than three high-contrast lines (about 20 characters per line) for long-distance P1.25 viewing.</p>
+          <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Optionally ask Gemini to create generic stadium-ready portraits (originals remain the fallback; no real team logos are added).</span></label>
+          <label class="consent-line football-photo-consent"><input id="footballPhotoConsent" type="checkbox"/> <span>I confirm that I have permission from all four people to upload and display these photos.</span></label>
+          <p id="footballTeamStatus" class="status"></p>
+        </div>
         <input id="mediaUrl" type="hidden"/>
         <p id="uploadStatus" class="status"></p>
         <div class="button-row">
           <button id="previewShoutoutBtn" type="button">Preview ShoutOut</button>
         </div>
-        <p class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
+        <p id="previewDurationHint" class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
         <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
         <p id="submitStatus" class="status"></p>
       </div>
@@ -527,7 +571,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.05"></script>
 <script src="./global-profile-status.js?v=29.05.1"></script>
-<script src="./shared-data.js?v=29.07"></script>
+<script src="./shared-data.js?v=29.08.2"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
@@ -539,7 +583,7 @@
 <script src="./helper-popouts.js?v=29.05"></script>
 <script src="./ad-campaigns.js?v=29.05"></script>
 <script src="./payment-service.js?v=29.07"></script>
-<script src="./patron-app.js?v=29.07"></script>
+<script src="./patron-app.js?v=29.08.2"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
 <script src="./ai-media-service.js?v=29.05"></script>
 <script src="./notification-center.js?v=29.05"></script>

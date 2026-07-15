@@ -1,5 +1,5 @@
 /*
-  shared-data.js v29.07
+  shared-data.js v29.08.2
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
@@ -73,7 +73,10 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     genres:["Hip Hop","Afro Beats","EDM","International"], artists:["DJ Nova"],
     activityStatus:"Active demo location",
     activityDates:["Monday Hip Hop","Wednesday EDM","Friday Afro Beats","Saturday International"],
-    templates:["birthday","vip","bottle","neon"], active:true
+    templates:["birthday","vip","bottle","neon","zebbiesFootballTeamIntro"],
+    displayScreenFormatIds:["p125-96x48","p125-64x48","p125-64x32","led-96x48","led-64x48","led-64x32"],
+    primaryDisplayScreenFormatId:"p125-96x48",
+    active:true
   },
   "heist-washington-dc": {
     brandName:"Heist", locationName:"Heist Washington DC", type:"club",
@@ -561,7 +564,7 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:15, description:'Classic marquee lightbox with three centered lines, up to 15 characters per line and 45 characters total. Its physical-sign background is locked by default.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","background locked"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR SHOUTOUT so the composition never shifts.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background locked"] },
   birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
@@ -573,6 +576,31 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', tags:["graduation","grad","school","college","achievement"] },
   wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone', tags:["wedding","marriage","love","bride","groom","celebration"] },
   sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', tags:["sports","game night","team","championship","watch party"] },
+  zebbiesFootballTeamIntro: {
+    id:'zebbiesFootballTeamIntro',
+    name:'Zebbies 4-Player Football Intro',
+    scope:'Club',
+    venueIds:['zebbies-garden-washington-dc'],
+    className:'football-team-intro',
+    category:'Sports',
+    mediaMode:'4 patron photos + 20-second animation',
+    supportsMedia:false,
+    supportsTeamMedia:true,
+    backgroundEditable:false,
+    layout:'football-team-intro',
+    teamMemberSlots:4,
+    durationSeconds:20,
+    priceCents:3000,
+    priceLabel:'$30',
+    screenFormatIds:['p125-96x48','p125-64x48','p125-64x32','led-96x48','led-64x48','led-64x32'],
+    preferredP125FormatIds:['p125-96x48','p125-64x48','p125-64x32'],
+    defaultMain:'ZEBBIES ALL-STARS',
+    defaultSub:'GAME NIGHT LINEUP',
+    maxMainCharacters:36,
+    maxSubCharacters:36,
+    description:'A Zebbies-only, 20-second American football game-introduction sequence. Add exactly four authorized patron photos; each player gets a cinematic reveal followed by the full lineup.',
+    tags:["zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","game night","collaboration","ai image treatment","$30"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] }
 });
@@ -580,6 +608,9 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
 window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate'];
 
 window.FLOQR_DISPLAY_FORMATS = {
+  "p125-96x48": {id:"p125-96x48", label:"P1.25 - 96 x 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.25, pixelWidth:768, pixelHeight:384, aspectRatio:"2 / 1", tags:["P1.25","96x48cm","768x384","2:1","7 meter visibility"]},
+  "p125-64x48": {id:"p125-64x48", label:"P1.25 - 64 x 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.25, pixelWidth:512, pixelHeight:384, aspectRatio:"4 / 3", tags:["P1.25","64x48cm","512x384","4:3","7 meter visibility"]},
+  "p125-64x32": {id:"p125-64x32", label:"P1.25 - 64 x 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.25, pixelWidth:512, pixelHeight:256, aspectRatio:"2 / 1", tags:["P1.25","64x32cm","512x256","2:1","7 meter visibility"]},
   "led-96x48": {id:"led-96x48", label:"96 x 48 cm", widthCm:96, heightCm:48, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["96x48cm","624x312","2:1"]},
   "led-64x48": {id:"led-64x48", label:"64 x 48 cm", widthCm:64, heightCm:48, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["64x48cm","416x312","4:3"]},
   "led-64x32": {id:"led-64x32", label:"64 x 32 cm", widthCm:64, heightCm:32, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["64x32cm","416x208","2:1"]}
@@ -591,6 +622,9 @@ Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
   template.tags = Array.from(new Set([...(template.tags || []), ...template.screenFormatIds.flatMap(id => window.FLOQR_DISPLAY_FORMATS[id]?.tags || [])]));
   template.status = template.status || "active";
   template.backgroundEditable = template.backgroundEditable !== false;
+  template.maxSubCharacters = Number.isFinite(Number(template.maxSubCharacters)) ? Number(template.maxSubCharacters) : 60;
+  template.mainTextSizePercent = Number.isFinite(Number(template.mainTextSizePercent)) ? Number(template.mainTextSizePercent) : 16;
+  template.subTextSizePercent = Number.isFinite(Number(template.subTextSizePercent)) ? Number(template.subTextSizePercent) : 6;
 });
 
 window.FLOQRAddress = {

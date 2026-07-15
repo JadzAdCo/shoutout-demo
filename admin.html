@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR Venue Command Center v29.07 -->
+  <!-- FLOQR Venue Command Center v29.08.2 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
@@ -118,7 +118,15 @@
             <label>FLOQR services<input id="clubProfileServices" placeholder="ShoutOut, Guest List, VIP Reservation"/></label>
             <label><input id="clubCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
             <label>Commerce store name<input id="clubCommerceStoreName" placeholder="Zebbies Garden Shop"/></label>
-            <label>Stripe connected account ID<input id="clubStripeConnectAccountId" placeholder="acct_..."/></label>
+            <div class="card nested-card profile-grid-wide">
+              <h3>Stripe payouts</h3>
+              <p id="clubStripeConnectStatus" class="sub small">Checking payout onboarding statusâ€¦</p>
+              <div class="queue-actions">
+                <button id="clubStripeConnectBtn" type="button">Start Stripe payout onboarding</button>
+                <button id="clubStripeConnectRefreshBtn" type="button">Refresh payout status</button>
+              </div>
+              <p class="sub small">FLOQR creates and binds the Stripe recipient account securely. Club admins never paste an <code>acct_...</code> value into the browser.</p>
+            </div>
           </div>
           <div class="card nested-card">
             <h3>FLOQR display screens</h3>
@@ -362,8 +370,8 @@
 <script src="./ai-template-studio.js?v=29.06"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
-<script src="./payment-service.js?v=29.07"></script>
-<script src="./admin-app.js?v=29.07"></script>
+<script src="./payment-service.js?v=29.08"></script>
+<script src="./admin-app.js?v=29.08.2"></script>
 <script src="./admin-rep-extension.js?v=29.07"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>

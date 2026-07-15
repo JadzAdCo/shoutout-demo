@@ -1,4 +1,4 @@
-/* admin-app.js v29.07 - Venue Command Center, normalized addresses, commerce, guest-list distribution, staffing, and REP */
+/* admin-app.js v29.08.2 - Venue Command Center, trusted Stripe onboarding, commerce, guest-list distribution, staffing, and REP */
 (function () {
   "use strict";
 
@@ -37,6 +37,7 @@
   let adminMfaVerificationId = "";
   let adminMfaEnrollmentSession = null;
   let adminMfaRecaptcha = null;
+  let clubConnectRefreshHandled = false;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -203,7 +204,6 @@
     if (byId("clubProfileServices")) byId("clubProfileServices").value = (publicClubProfile.publicServices || publicClubProfile.services || []).join(", ");
     if (byId("clubCommerceEnabled")) byId("clubCommerceEnabled").checked = !!publicClubProfile.commerceEnabled;
     if (byId("clubCommerceStoreName")) byId("clubCommerceStoreName").value = publicClubProfile.commerceStoreName || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`;
-    if (byId("clubStripeConnectAccountId")) byId("clubStripeConnectAccountId").value = publicClubProfile.stripeConnectAccountId || "";
     if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
     if (byId("clubProfileFeaturedStaff")) byId("clubProfileFeaturedStaff").value = peopleLines(publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff);
     if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
@@ -228,6 +228,54 @@
       ]);
     }
     await loadProfileImportDraft();
+  }
+
+  function connectStatusMessage(result = {}) {
+    if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;
+    if (!result.connected || result.capabilityStatus === "not-started") return "Stripe payout onboarding has not started.";
+    const due = Number(result.requirementsDue || 0);
+    return `Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""}`;
+  }
+
+  async function refreshClubConnectStatus() {
+    const statusEl = byId("clubStripeConnectStatus");
+    const button = byId("clubStripeConnectBtn");
+    try {
+      if (!window.FLOQRPayments?.getConnectStatus) throw new Error("Stripe Connect controls are not loaded.");
+      const result = await window.FLOQRPayments.getConnectStatus({
+        entityType:"club",
+        entityId:locationId,
+        status:value => { if (statusEl) statusEl.textContent = value; }
+      });
+      if (statusEl) statusEl.textContent = connectStatusMessage(result);
+      if (button) button.textContent = result.connected ? "Continue / manage Stripe onboarding" : "Start Stripe payout onboarding";
+      return result;
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+      return null;
+    }
+  }
+
+  async function startClubConnectOnboarding() {
+    const statusEl = byId("clubStripeConnectStatus");
+    try {
+      await window.FLOQRPayments.startConnectOnboarding({
+        entityType:"club",
+        entityId:locationId,
+        status:value => { if (statusEl) statusEl.textContent = value; }
+      });
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+    }
+  }
+
+  async function handleClubConnectReturn() {
+    const result = await refreshClubConnectStatus();
+    if (qs("connect") === "refresh" && !clubConnectRefreshHandled) {
+      clubConnectRefreshHandled = true;
+      await startClubConnectOnboarding();
+    }
+    return result;
   }
 
   async function saveClubPublicProfile() {
@@ -283,7 +331,6 @@
       publicServices:splitCSV(byId("clubProfileServices")?.value || ""),
       commerceEnabled:!!byId("clubCommerceEnabled")?.checked,
       commerceStoreName:byId("clubCommerceStoreName")?.value.trim() || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`,
-      stripeConnectAccountId:byId("clubStripeConnectAccountId")?.value.trim() || "",
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
       featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
@@ -559,6 +606,9 @@
       url.searchParams.set("backgroundUrl", item.backgroundUrl || "");
       url.searchParams.set("backgroundColor", item.backgroundColor || "");
       url.searchParams.set("backgroundGradient", item.backgroundGradient || "");
+      url.searchParams.set("screenFormatId", item.screenFormatId || "");
+      if (Array.isArray(item.teamMembers) && item.teamMembers.length) url.searchParams.set("teamMembers", JSON.stringify(item.teamMembers));
+      if (item.stadiumMessage) url.searchParams.set("stadiumMessage", item.stadiumMessage);
     }
     return url.href;
   }
@@ -1510,6 +1560,7 @@
   }
 
   async function approve(id, item) {
+    const defaultMain = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
       clubLocationId: locationId,
@@ -1544,6 +1595,13 @@
       aiMediaSafetyStatus: item.aiMediaSafetyStatus || "notChecked",
       aiMediaSafetyNotes: item.aiMediaSafetyNotes || "",
       mediaUploadedAt: item.mediaUploadedAt || null,
+      teamMembers: Array.isArray(item.teamMembers) ? item.teamMembers.slice(0, 4) : [],
+      animationDurationSeconds: item.template === "zebbiesFootballTeamIntro" ? 20 : (item.animationDurationSeconds || null),
+      collaborationMode: item.collaborationMode || "",
+      stadiumMessage: item.template === "zebbiesFootballTeamIntro" ? String(item.stadiumMessage || "TONIGHT, WE TAKE THE FIELD TOGETHER").slice(0, 60) : "",
+      photoPermissionConfirmed: item.photoPermissionConfirmed === true,
+      priceCents: item.template === "zebbiesFootballTeamIntro" ? 3000 : (item.priceCents || null),
+      screenFormatId: item.screenFormatId || loc.primaryDisplayScreenFormatId || "led-96x48",
       templateVariantId: item.templateVariantId || "",
       templateVariantName: item.templateVariantName || "",
       lockedBaseTemplateId: item.lockedBaseTemplateId || "",
@@ -1553,6 +1611,8 @@
       backgroundGradient: item.backgroundGradient || "",
       backgroundStoragePath: item.backgroundStoragePath || "",
       status: "approved",
+      displayDurationSeconds: 600,
+      defaultMain,
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
       referenceNumber: item.referenceNumber || "",
@@ -1571,14 +1631,14 @@
       setText("adminStatus", "Please sign in first.");
       return;
     }
-    const main = loc.defaultMain || `USE SHOUT OUT @ ${loc.locationName || locationId}`;
+    const main = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
     const payload = {
       location: locationId,
       clubLocationId: locationId,
       locationName: loc.locationName || locationId,
       brandName: loc.brandName || loc.locationName || locationId,
-      template: (loc.templates || [])[0] || "neon",
-      templateName: "Club Default",
+      template: "blackwhite",
+      templateName: "Traditional Black and White ShoutOut",
       mainText: main,
       subText: loc.defaultSub || "",
       mediaUrl: "",
@@ -1776,6 +1836,8 @@
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("clubStripeConnectBtn", startClubConnectOnboarding);
+    bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
     bind("saveClubTemplatePolicyBtn", saveClubTemplatePolicy);
     bind("copyClubPublicProfileLinkBtn", async () => {
       await navigator.clipboard?.writeText(publicProfileUrl());
@@ -1831,7 +1893,7 @@
       setText("adminStatus", "Club admin verified.");
       renderQueue();
       loadClubPublicProfile().then(async () => {
-        await Promise.all([loadReports(), loadClubTemplateControls()]);
+        await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);
       });
       loadEmployeeDesignations();
       loadClubMedia();

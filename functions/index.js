@@ -1,1 +1,4 @@
-module.exports = require("./ai-discovery-functions");
+module.exports = {
+  ...require("./ai-discovery-functions"),
+  ...require("./commerce-functions")
+};

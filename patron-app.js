@@ -1,4 +1,4 @@
-/* patron-app.js v29.07 */
+/* patron-app.js v29.08.1 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -12,6 +12,8 @@
   const qs = (name, fallback = "") => new URL(window.location.href).searchParams.get(name) || fallback;
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const unique = items => [...new Set(items.filter(Boolean))].sort();
+  const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
+  const FOOTBALL_TEAM_MEMBER_COUNT = 4;
 
   if (!window.firebaseConfig) { setStatus("firebase-config.js missing window.firebaseConfig."); return; }
   firebase.initializeApp(window.firebaseConfig);
@@ -72,6 +74,146 @@
     if (t.supportsVideo || t.supportsMedia) return "image/*,video/mp4,video/quicktime,video/webm";
     if (t.supportsImage) return "image/*";
     return "";
+  }
+  function isFootballTeamIntro(templateId = selectedTemplate) {
+    return String(templateId || "") === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
+  }
+  function footballTeamDraftMembers() {
+    return Array.from({length:FOOTBALL_TEAM_MEMBER_COUNT}, (_, index) => {
+      const slot = index + 1;
+      const input = byId(`footballTeamPhoto${slot}`);
+      return {
+        slot,
+        name:String(byId(`footballTeamName${slot}`)?.value || `PLAYER ${slot}`).trim().slice(0, 24) || `PLAYER ${slot}`,
+        position:String(byId(`footballTeamPosition${slot}`)?.value || "Team Member").trim().slice(0, 24),
+        file:input?.files?.[0] || null,
+        mediaUrl:input?.dataset.previewUrl || "",
+        originalMediaUrl:input?.dataset.previewUrl || "",
+        selectedMediaVersion:"original"
+      };
+    });
+  }
+  function resetFootballTeamEditor() {
+    for (let slot = 1; slot <= FOOTBALL_TEAM_MEMBER_COUNT; slot += 1) {
+      const input = byId(`footballTeamPhoto${slot}`);
+      if (input?.dataset.previewUrl) URL.revokeObjectURL(input.dataset.previewUrl);
+      if (input) {
+        input.value = "";
+        delete input.dataset.previewUrl;
+      }
+      const preview = byId(`footballTeamPreview${slot}`);
+      if (preview) preview.innerHTML = `<span>${slot}</span>`;
+    }
+    if (byId("footballAiTreatment")) byId("footballAiTreatment").checked = false;
+    if (byId("footballPhotoConsent")) byId("footballPhotoConsent").checked = false;
+    if (byId("footballTeamMessage")) byId("footballTeamMessage").value = "TONIGHT, WE TAKE THE FIELD TOGETHER";
+    setText("footballTeamStatus", "");
+  }
+  function renderFootballTeamPhotoPreview(input) {
+    const slot = Number(input?.dataset.slot || 0);
+    const file = input?.files?.[0];
+    if (!slot || !file) return;
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) {
+      input.value = "";
+      setText("footballTeamStatus", `Player ${slot}: choose a JPG, PNG, or WEBP image.`);
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      input.value = "";
+      setText("footballTeamStatus", `Player ${slot}: the image must be 10 MB or smaller.`);
+      return;
+    }
+    if (input.dataset.previewUrl) URL.revokeObjectURL(input.dataset.previewUrl);
+    input.dataset.previewUrl = URL.createObjectURL(file);
+    const preview = byId(`footballTeamPreview${slot}`);
+    if (preview) preview.innerHTML = `<img src="${esc(input.dataset.previewUrl)}" alt="Player ${slot} preview">`;
+    setText("footballTeamStatus", `${footballTeamDraftMembers().filter(member => member.file).length} of 4 photos ready.`);
+    updatePreview();
+  }
+  function bindFootballTeamEditor() {
+    document.querySelectorAll("[data-football-team-photo]").forEach(input => input.addEventListener("change", () => renderFootballTeamPhotoPreview(input)));
+    document.querySelectorAll("[data-football-team-name],[data-football-team-position]").forEach(input => input.addEventListener("input", updatePreview));
+    byId("footballTeamMessage")?.addEventListener("input", updatePreview);
+  }
+  async function uploadFootballTeamMembers(referenceNumber) {
+    if (!storage) throw new Error("Firebase Storage is not initialized.");
+    if (!byId("footballPhotoConsent")?.checked) throw new Error("Confirm that you have permission to use all four photos.");
+    const drafts = footballTeamDraftMembers();
+    if (drafts.some(member => !member.file)) throw new Error("Upload all four player photos before checkout.");
+    drafts.forEach(member => {
+      if (!/^image\/(jpeg|png|webp)$/i.test(member.file.type)) throw new Error(`Player ${member.slot}: only JPG, PNG, and WEBP images are allowed.`);
+      if (member.file.size > 10 * 1024 * 1024) throw new Error(`Player ${member.slot}: the image must be 10 MB or smaller.`);
+    });
+
+    const originals = [];
+    for (const member of drafts) {
+      setText("footballTeamStatus", `Uploading player ${member.slot} of 4...`);
+      const safeName = `${member.slot}-${member.file.name}`.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120);
+      const mediaStoragePath = `shoutouts/${currentUser.uid}/${referenceNumber}/original/team/${Date.now()}-${safeName}`;
+      const ref = storage.ref().child(mediaStoragePath);
+      const snap = await ref.put(member.file, {
+        contentType:member.file.type,
+        customMetadata:{uploadedBy:currentUser.uid, referenceNumber, footballTeamSlot:String(member.slot)}
+      });
+      const mediaUrl = await snap.ref.getDownloadURL();
+      originals.push({
+        slot:member.slot,
+        name:member.name,
+        position:member.position,
+        mediaUrl,
+        originalMediaUrl:mediaUrl,
+        enhancedMediaUrl:"",
+        mediaStoragePath,
+        originalMediaStoragePath:mediaStoragePath,
+        enhancedMediaStoragePath:"",
+        selectedMediaVersion:"original",
+        aiEnhancementApplied:false,
+        aiEnhancementProvider:"",
+        aiEnhancementModel:"",
+        aiMediaSafetyStatus:"notChecked",
+        aiMediaSafetyNotes:"",
+        mediaFileName:member.file.name
+      });
+    }
+
+    if (!byId("footballAiTreatment")?.checked) {
+      setText("footballTeamStatus", "Four original photos uploaded. Opening $30 checkout...");
+      return originals;
+    }
+
+    setText("footballTeamStatus", "Gemini is preparing four stadium-ready portraits. Originals remain available if an edit fails...");
+    const callable = functions.httpsCallable(window.FLOQR_AI_GEMINI_MEDIA_FUNCTION || "aiEnhanceShoutOutMedia");
+    let fallbackCount = 0;
+    const enhanced = await Promise.all(originals.map(async member => {
+      try {
+        const response = await callable({
+          mediaStoragePath:member.originalMediaStoragePath,
+          referenceNumber,
+          enhancementType:"fictional-football-stadium-portrait",
+          prompt:"Create a cinematic American-football stadium player portrait for a public LED display. Preserve this person's recognizable identity and natural face. Use a generic dark green and gold uniform with no real team, league, sponsor, or school logos; add no text or watermark; keep the face visible and use high-contrast stadium lighting."
+        });
+        const data = response?.data || {};
+        if (data.status !== "enhanced" || !data.enhancedMediaUrl) throw new Error("No enhanced image returned.");
+        return {
+          ...member,
+          mediaUrl:data.enhancedMediaUrl,
+          enhancedMediaUrl:data.enhancedMediaUrl,
+          mediaStoragePath:data.enhancedMediaStoragePath || member.mediaStoragePath,
+          enhancedMediaStoragePath:data.enhancedMediaStoragePath || "",
+          selectedMediaVersion:"enhanced",
+          aiEnhancementApplied:true,
+          aiEnhancementProvider:data.provider || "gemini",
+          aiEnhancementModel:data.model || "",
+          aiMediaSafetyStatus:data.aiMediaSafetyStatus || "passed",
+          aiMediaSafetyNotes:data.aiMediaSafetyNotes || "Gemini stadium portrait completed."
+        };
+      } catch (error) {
+        fallbackCount += 1;
+        return {...member, aiMediaSafetyStatus:"fallback", aiMediaSafetyNotes:`Original retained: ${String(error?.message || error).slice(0, 180)}`};
+      }
+    }));
+    setText("footballTeamStatus", fallbackCount ? `${4 - fallbackCount} Gemini portrait(s) ready; ${fallbackCount} original photo(s) retained. Opening $30 checkout...` : "Four Gemini portraits ready. Opening $30 checkout...");
+    return enhanced;
   }
   function safeUser() { return (currentUser?.email || currentUser?.phoneNumber || "unknown").toLowerCase(); }
   function safeReturnTo(value = "") {
@@ -2022,7 +2164,7 @@
       <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
       <div class="name">${esc(template.name)}</div>
       <div class="tag">${esc(template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>
-      <div class="tag-row">${(template.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${(template.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>
         ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>` : `<span class="template-background-lock">${template.backgroundEditable === false ? "Background locked" : "Club customization off"}</span>`}
@@ -2046,7 +2188,8 @@
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const discoveryQuery = query || templateContextQuery();
     const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
-    const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
+    const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
+    const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...venueSpecificIds, ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id)));
     const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");
@@ -2124,7 +2267,7 @@
     document.body.classList.toggle("template-media-unavailable", !currentTemplateSupportsMedia());
     const variant = selectedTemplateVariant;
     const backgroundLabel = variant?.variantScope === "club" ? "Club-approved background" : t.backgroundEditable === false ? "Background locked" : clubAllowsPatronBackgroundEditing() ? "Background editable" : "Original background only";
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span><span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {
@@ -2145,6 +2288,8 @@
       url.searchParams.set("backgroundUrl",payload.backgroundUrl||"");
       url.searchParams.set("backgroundColor",payload.backgroundColor||"");
       url.searchParams.set("backgroundGradient",payload.backgroundGradient||"");
+      if (Array.isArray(payload.teamMembers) && payload.teamMembers.length) url.searchParams.set("teamMembers", JSON.stringify(payload.teamMembers));
+      if (payload.stadiumMessage) url.searchParams.set("stadiumMessage", payload.stadiumMessage);
     }
     return url.href;
   }
@@ -2168,7 +2313,10 @@
       template:selectedTemplate,
       backgroundUrl:selectedTemplateVariant?.backgroundUrl || "",
       backgroundColor:selectedTemplateVariant?.backgroundColor || "",
-      backgroundGradient:selectedTemplateVariant?.backgroundGradient || ""
+      backgroundGradient:selectedTemplateVariant?.backgroundGradient || "",
+      teamMembers:isFootballTeamIntro() ? footballTeamDraftMembers() : [],
+      animationDurationSeconds:isFootballTeamIntro() ? 20 : null,
+      stadiumMessage:isFootballTeamIntro() ? String(byId("footballTeamMessage")?.value || "").trim().slice(0, 60) : ""
     };
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
@@ -2204,7 +2352,7 @@
     modal.setAttribute("aria-hidden", "false");
     byId("closeShoutoutPreviewBtn")?.focus?.();
     if (shoutoutPreviewTimer) clearTimeout(shoutoutPreviewTimer);
-    shoutoutPreviewTimer = setTimeout(closeShoutoutPreviewModal, 5000);
+    shoutoutPreviewTimer = setTimeout(closeShoutoutPreviewModal, isFootballTeamIntro() ? 20000 : 5000);
   }
 
   function returnToMainFromConfirmation() {
@@ -2321,9 +2469,9 @@
     const t = template || {};
     const cap = t.displayCaps || t.characterCaps || {};
     const isClassic = (t.id || selectedTemplate) === "blackwhite";
-    const supportsMedia = !!(t.supportsImage || t.supportsVideo);
+    const supportsMedia = !!(t.supportsMedia || t.supportsImage || t.supportsVideo);
     const main = Number(t.maxMainCharacters || cap.mainText || cap.main || (isClassic ? 45 : supportsMedia ? 48 : 60));
-    const sub = Number(t.maxSubCharacters || cap.subText || cap.sub || (isClassic ? 15 : supportsMedia ? 42 : 60));
+    const sub = Number(t.maxSubCharacters ?? cap.subText ?? cap.sub ?? (isClassic ? 15 : supportsMedia ? 42 : 60));
     const total = Number(t.maxMainCharacters || cap.total || (main + sub));
     return { main, sub, total, lineCount:Number(t.lineCount || 1), perLine:Number(t.maxCharactersPerLine || main) };
   }
@@ -2590,11 +2738,39 @@
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
       const l=getLocation(), t=getTemplate();
+      const footballIntro = isFootballTeamIntro();
+      if (footballIntro && locationId() !== "zebbies-garden-washington-dc") throw new Error("This advanced football template is available only at Zebbies Garden DC.");
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
-      const uploadedMedia = currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
+      const footballTeamMembers = footballIntro ? await uploadFootballTeamMembers(referenceNumber) : [];
+      const uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
       const existingMediaUrl = byId("shoutoutMediaUrl")?.value.trim() || byId("mediaUrl")?.value.trim() || "";
       const existingMediaType = byId("shoutoutMediaType")?.value.trim() || "";
-      const mediaPayload = currentTemplateSupportsMedia() ? {
+      const mediaPayload = footballIntro ? {
+        mediaUrl:footballTeamMembers[0]?.mediaUrl || "",
+        mediaType:"team-intro",
+        mediaFit:"cover",
+        mediaFileName:"four-player-lineup",
+        mediaStoragePath:footballTeamMembers[0]?.mediaStoragePath || "",
+        originalMediaStoragePath:footballTeamMembers[0]?.originalMediaStoragePath || "",
+        enhancedMediaStoragePath:footballTeamMembers[0]?.enhancedMediaStoragePath || "",
+        originalMediaUrl:footballTeamMembers[0]?.originalMediaUrl || "",
+        enhancedMediaUrl:footballTeamMembers[0]?.enhancedMediaUrl || "",
+        selectedMediaVersion:footballTeamMembers.some(member => member.selectedMediaVersion === "enhanced") ? "enhanced" : "original",
+        aiEnhancementApplied:footballTeamMembers.some(member => member.aiEnhancementApplied),
+        aiEnhancementType:byId("footballAiTreatment")?.checked ? "fictional-football-stadium-portrait" : "none",
+        aiEnhancementProvider:footballTeamMembers.some(member => member.aiEnhancementProvider === "gemini") ? "gemini" : "",
+        aiEnhancementModel:footballTeamMembers.find(member => member.aiEnhancementModel)?.aiEnhancementModel || "",
+        aiMediaSafetyStatus:footballTeamMembers.every(member => member.aiMediaSafetyStatus === "passed") ? "passed" : "original-fallback-allowed",
+        aiMediaSafetyNotes:"Each roster image remains subject to club approval.",
+        originalMediaUploaded:true,
+        teamMembers:footballTeamMembers,
+        animationDurationSeconds:20,
+        collaborationMode:"four-person-roster",
+        stadiumMessage:String(byId("footballTeamMessage")?.value || "TONIGHT, WE TAKE THE FIELD TOGETHER").trim().slice(0, 60),
+        photoPermissionConfirmed:true,
+        priceCents:3000,
+        mediaUploadedAt:null
+      } : currentTemplateSupportsMedia() ? {
         mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
         mediaFit:byId("shoutoutMediaFit")?.value || "contain",
@@ -2634,11 +2810,11 @@
         templateVariantScope:selectedTemplateVariant.variantScope || "patron",
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, maxMainCharacters:Number(t.maxMainCharacters || 60), maxSubCharacters:Number(t.maxSubCharacters ?? 60), lineCount:Number(t.lineCount || 1), maxCharactersPerLine:Number(t.maxCharactersPerLine || t.maxMainCharacters || 60), mainTextSizePercent:Number(t.mainTextSizePercent || 16), subTextSizePercent:Number(t.subTextSizePercent || 6), ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       if (selectedTemplate !== "blackwhite") {
         const checkoutPayload = {...payload, submittedAt:null, mediaUploadedAt:null};
         const videoEnabled = payload.mediaType === "video";
-        status.textContent = videoEnabled ? "Video-enabled ShoutOut: $30 checkout required." : "Picture-enabled ShoutOut: $20 checkout required.";
+        status.textContent = footballIntro ? "Zebbies four-player football intro: $30 checkout required." : videoEnabled ? "Video-enabled ShoutOut: $30 checkout required." : "Picture-enabled ShoutOut: $20 checkout required.";
         await window.FLOQRPayments.startCheckout({orderType:"shoutout", payload:{clubLocationId:locationId(), shoutout:checkoutPayload, videoEnabled}, status:message => { status.textContent = message; }});
         return;
       }
@@ -2651,16 +2827,18 @@
       showShoutoutConfirmation(payload, l, t);
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
+    const footballIntro = isFootballTeamIntro(t.id || selectedTemplate);
     const allowsMedia = currentTemplateSupportsMedia();
     const accepts = currentTemplateAccepts();
     const mainInput = byId("mainText");
     const caps = templateDisplayCaps(t);
     if (mainInput) {
       mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
+      if (footballIntro && (!mainInput.value.trim() || mainInput.value.trim() === "HAPPY BIRTHDAY MAYA!")) mainInput.value = t.defaultMain || "ZEBBIES ALL-STARS";
       mainInput.value = fitTemplateText(mainInput.value, "main");
     }
     const subInput = byId("subText");
@@ -2671,6 +2849,9 @@
     updateTemplateCharacterCapHint();
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
+    byId("footballTeamIntroCard")?.classList.toggle("hidden", !footballIntro);
+    if (byId("submitShoutoutBtn")) byId("submitShoutoutBtn").textContent = footballIntro ? "Continue to $30 Stripe Checkout" : "Submit for Approval";
+    if (byId("previewDurationHint")) byId("previewDurationHint").textContent = footballIntro ? "Preview plays the complete 20-second stadium introduction." : "Preview opens in a popout and closes automatically after 5 seconds.";
     const photoWrap = byId("shoutoutPhotoWrap");
     const photoInput = byId("shoutoutPhoto");
     if (photoWrap) photoWrap.classList.toggle("hidden", !allowsMedia);
@@ -2684,7 +2865,7 @@
       mediaInput.accept = accepts;
       if (!allowsMedia) mediaInput.value = "";
     }
-    if (mediaCard) mediaCard.classList.toggle("hidden", !allowsMedia);
+    if (mediaCard) mediaCard.classList.toggle("hidden", footballIntro || !allowsMedia);
     const mediaUrl = byId("shoutoutMediaUrl"), mediaType = byId("shoutoutMediaType"), legacyUrl = byId("mediaUrl");
     if (!allowsMedia) {
       if (mediaUrl) mediaUrl.value = "";
@@ -2698,9 +2879,17 @@
     const l=getLocation(), t=getTemplate();
     const screenSelect = byId("shoutoutScreenFormat");
     if (screenSelect) {
-      const available = l.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+      const venueFormats = l.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+      const p125Formats = isFootballTeamIntro(t.id) ? (t.preferredP125FormatIds || []).filter(id => {
+        const candidate = window.FLOQR_DISPLAY_FORMATS?.[id];
+        return candidate && venueFormats.some(venueId => {
+          const venueFormat = window.FLOQR_DISPLAY_FORMATS?.[venueId];
+          return venueFormat && venueFormat.widthCm === candidate.widthCm && venueFormat.heightCm === candidate.heightCm;
+        });
+      }) : [];
+      const available = Array.from(new Set([...p125Formats, ...venueFormats]));
       screenSelect.innerHTML = available.map(id => { const format = window.FLOQR_DISPLAY_FORMATS?.[id] || {label:id,pixelWidth:"?",pixelHeight:"?"}; return `<option value="${esc(id)}">${esc(format.label)} — ${esc(format.pixelWidth)} × ${esc(format.pixelHeight)} px</option>`; }).join("");
-      selectedScreenFormatId = available.includes(selectedScreenFormatId) ? selectedScreenFormatId : (l.primaryDisplayScreenFormatId || available[0]);
+      selectedScreenFormatId = isFootballTeamIntro(t.id) && p125Formats.length ? p125Formats[0] : available.includes(selectedScreenFormatId) ? selectedScreenFormatId : (l.primaryDisplayScreenFormatId || available[0]);
       screenSelect.value = selectedScreenFormatId;
     }
     setText("editorClubTitle", l.locationName);
@@ -2881,6 +3070,7 @@
     byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; });
     byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updatePreview(); });
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
+    bindFootballTeamEditor();
   });
 
   auth.onAuthStateChanged(user => {
@@ -3073,7 +3263,7 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     if(legacy) legacy.classList.add("hidden");
   }
   function removeDuplicateMediaInputs(){
-    const fileInputs=Array.from(document.querySelectorAll("input[type='file']")).filter(i=>/image|photo|video|media|upload/i.test(((i.closest("label")||{}).textContent||"")+" "+(i.id||"")+" "+(i.name||"")));
+    const fileInputs=Array.from(document.querySelectorAll("input[type='file']")).filter(i=>!i.matches("[data-football-team-photo]")&&/image|photo|video|media|upload/i.test(((i.closest("label")||{}).textContent||"")+" "+(i.id||"")+" "+(i.name||"")));
     if(fileInputs.length<=1)return;
     let keep=byId("shoutoutMediaUpload")||fileInputs[0];
     keep.id="shoutoutMediaUpload";

@@ -1,4 +1,8 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.07 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.08.2 Full Package
+
+Stripe implementation planning and test-mode deployment: see `STRIPE-INTEGRATION-PLAN.md` and `STRIPE-DEPLOYMENT.md`. v29.08 adds trusted Accounts v2 recipient onboarding, backend-only club/member bindings, transfer-capability checks before destination charges, removal of manual `acct_...` browser fields, seller-scoped products, private order access, transactional inventory holds, refund/dispute webhook tracking, protected webhook/account records, and focused Connect/rules tests. Do not enable live marketplace payments until the merchant-of-record, fee, authenticated refund/transfer-reversal, and tax gates in the plan are complete.
+
+v29.07.1 is a backward-compatible template-management patch. Master Admin now provides `View`, display-aware `Preview`, `Edit`, and status-dependent `Activate`/`Deactivate` actions in Available Templates; the edit form can preview unsaved changes; and previews switch among the supported physical display types at their correct aspect ratios and pixel dimensions. Admins can set the main-message total, lines, characters per line, subtext/attribution limit, main text size, and subtext size. Text sizes are stored as a percentage of display height, included in patron submissions, and enforced by the live display renderer.
 
 v29.07 adds normalized club/event addresses and short public locations; collapsible crawler JSON; public/search Genres; Pickup Robotaxi simulation with four booking modes; entity Commerce with Stripe Checkout and licensed photo/video sales; paid/free guest-list distribution; role-capacity service following and campaigns; videographer/camera-operator service membership; REP permissions and approval workflow; guest-list themes, main images, and Supporting Team; staffing association approvals; paid-service invoices, shipping/digital delivery, and analytics; and Master Admin template View/Edit/Activate/Deactivate controls.
 
@@ -10,14 +14,14 @@ v29.05 adds Firebase smoke-test progress and export diagnostics, Master Admin en
 
 The default Traditional Black and White ShoutOut now declares and enforces three lines, 15 characters per line, and 45 visible characters total. The same template metadata model can define limits for new templates.
 
-Deployment and authentication setup: see `DEPLOYMENT-V29-07.md`. Rollback instructions: see `ROLLBACK-V29-07.md`.
+Deployment and authentication setup: see `DEPLOYMENT-V29-08.md`. Rollback instructions: see `ROLLBACK-V29-08.md`.
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
 Current live test URL after upload:
 
 ```text
-https://jadzadco.github.io/shoutout-demo/?v=29.07
+https://jadzadco.github.io/shoutout-demo/?v=29.08.2
 ```
 
 Current release highlights:

@@ -20,3 +20,168 @@
 
 /* v29.05: preserve the complete patron image unless the patron explicitly chooses fill/crop. */
 .media-slot img,.media-slot video{object-fit:contain;background:#02030a}
+
+/* v29.07.1: preserve administrator-defined main-message line breaks. */
+#displayMain{white-space:pre-line}
+
+/* v29.08.1: self-contained 20-second Zebbies four-player football intro */
+.display-canvas.football-team-intro{background:#020a08;animation:none;isolation:isolate}
+.football-team-intro-layout{width:100vw!important;height:100vh!important;max-width:none!important;padding:0!important;overflow:hidden}
+.football-team-intro-layout>#displayMain,.football-team-intro-layout>#displaySub{display:none!important}
+.football-team-intro-layout .media-slot{display:block;width:100%;height:100%}
+.football-intro-stage{position:relative;width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% -20%,rgba(255,245,169,.32),transparent 38%),linear-gradient(180deg,#071713 0 55%,#0c3f28 56% 100%);font-family:Impact,"Arial Narrow",Inter,Arial,sans-serif;text-transform:uppercase}
+.football-intro-stage:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.78),transparent 23%,transparent 77%,rgba(0,0,0,.78)),repeating-linear-gradient(90deg,transparent 0 9.8%,rgba(255,255,255,.07) 10% 10.2%);pointer-events:none;z-index:2}
+.football-stadium-lights{position:absolute;z-index:3;top:2.5%;left:8%;right:8%;display:flex;justify-content:space-between;filter:drop-shadow(0 0 18px #fff7a0)}
+.football-stadium-lights i{width:7.5%;aspect-ratio:3/1;border-radius:50%;background:#fffbe1;box-shadow:0 0 18px #fff,0 0 48px rgba(255,246,151,.84)}
+.football-field-lines{position:absolute;left:-8%;right:-8%;bottom:-22%;height:67%;border:4px solid rgba(255,255,255,.46);transform:perspective(520px) rotateX(57deg);transform-origin:bottom;background:repeating-linear-gradient(90deg,transparent 0 9.6%,rgba(255,255,255,.34) 9.8% 10.1%),repeating-linear-gradient(0deg,transparent 0 19%,rgba(255,255,255,.27) 19.4% 20%)}
+.football-opening{position:absolute;z-index:6;inset:16% 8% 15%;display:grid;place-content:center;gap:1.5vh;text-align:center;animation:footballOpening 20s linear infinite}
+.football-opening span{font:900 clamp(18px,2.4vw,46px)/1 Inter,Arial,sans-serif;letter-spacing:.35em;color:#dfff5a}
+.football-opening strong{font-size:clamp(64px,10vw,190px);line-height:.82;color:#fff;text-shadow:0 5px 0 #947100,0 0 38px rgba(223,255,90,.55)}
+.football-opening small{font:900 clamp(20px,3vw,58px)/1 Inter,Arial,sans-serif;letter-spacing:.18em;color:#fff4b2}
+.football-player-reveals{position:absolute;z-index:5;inset:8% 6% 8%}
+.football-player-reveal{position:absolute;inset:0;display:grid;grid-template-columns:48% 1fr;align-items:center;gap:4%;opacity:0;transform:translateX(9%) scale(.94)}
+.football-player-portrait{position:relative;width:100%;height:86%;overflow:hidden;border:clamp(5px,.7vw,12px) solid #dfff5a;border-radius:4px 44px 4px 44px;background:linear-gradient(145deg,#1b5e38,#06110d);box-shadow:18px 20px 0 rgba(1,6,4,.74),0 0 60px rgba(223,255,90,.3)}
+.football-player-portrait img{width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:contrast(1.08) saturate(1.08)}
+.football-player-initials{display:grid;place-items:center;width:100%;height:100%;font-size:clamp(70px,14vw,240px);color:#dfff5a}
+.football-player-number{position:absolute;z-index:7;left:42%;top:5%;font-size:clamp(58px,9vw,170px);line-height:1;color:rgba(223,255,90,.2);transform:skew(-8deg)}
+.football-player-copy{position:relative;z-index:6;display:grid;gap:1.4vh;text-align:left}
+.football-player-copy span{font:1000 clamp(17px,2.1vw,40px)/1 Inter,Arial,sans-serif;letter-spacing:.2em;color:#dfff5a}
+.football-player-copy strong{font-size:clamp(60px,8.6vw,165px);line-height:.82;color:#fff;overflow-wrap:anywhere;text-shadow:0 5px 0 #5c4700}
+.football-player-copy small{font:1000 clamp(22px,3.1vw,60px)/1 Inter,Arial,sans-serif;color:#fff4ae}
+.football-player-1{animation:footballPlayerOne 20s linear infinite}.football-player-2{animation:footballPlayerTwo 20s linear infinite}.football-player-3{animation:footballPlayerThree 20s linear infinite}.football-player-4{animation:footballPlayerFour 20s linear infinite}
+.football-stadium-message{position:absolute;z-index:8;inset:8% 5% 9%;display:grid;place-content:center;gap:3vh;opacity:0;text-align:center;animation:footballStadiumMessage 20s linear infinite}.football-stadium-message:before{content:"";position:absolute;inset:0;border:clamp(5px,.8vw,13px) solid #dfff5a;background:rgba(0,12,8,.9);box-shadow:inset 0 0 70px rgba(223,255,90,.12),0 0 55px rgba(223,255,90,.24);z-index:-1}.football-stadium-message>span{font:1000 clamp(15px,1.9vw,36px)/1 Inter,Arial,sans-serif;letter-spacing:.28em;color:#dfff5a}.football-stadium-message>div{display:grid;gap:.3vh}.football-stadium-message b{display:block;font-size:clamp(44px,7.4vw,142px);line-height:.88;letter-spacing:.01em;color:#fff;text-shadow:0 4px 0 #5e4800,0 0 26px rgba(255,255,255,.24);white-space:nowrap}
+.football-stadium-message.football-message-lines-3 b{font-size:clamp(40px,6.8vw,130px)}
+.football-final-lineup{position:absolute;z-index:7;inset:5% 4% 7%;display:grid;grid-template-rows:auto 1fr;gap:2vh;opacity:0;animation:footballFinalLineup 20s linear infinite}
+.football-final-lineup header{display:flex;align-items:end;justify-content:space-between;gap:3vw;border-bottom:4px solid #dfff5a;padding-bottom:1.2vh;text-align:left}
+.football-final-lineup header span{font:1000 clamp(18px,2.2vw,42px)/1 Inter,Arial,sans-serif;letter-spacing:.16em;color:#dfff5a}.football-final-lineup header strong{font-size:clamp(38px,5.6vw,104px);line-height:.82;color:#fff}
+.football-final-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.2vw;min-height:0}
+.football-final-grid article{position:relative;display:grid;grid-template-rows:1fr auto auto;min-width:0;overflow:hidden;border:3px solid rgba(223,255,90,.82);background:rgba(0,12,8,.88);text-align:left}
+.football-final-photo{min-height:0;overflow:hidden;background:#123522}.football-final-photo img{width:100%;height:100%;object-fit:cover;object-position:center 25%}.football-final-photo .football-player-initials{font-size:clamp(42px,8vw,130px)}
+.football-final-grid b{padding:.7vh .7vw 0;font-size:clamp(19px,2.3vw,44px);line-height:.9;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.football-final-grid small{padding:.5vh .7vw 1vh;font:900 clamp(11px,1.15vw,22px)/1 Inter,Arial,sans-serif;color:#dfff5a}.football-final-grid em{position:absolute;right:.5vw;top:.5vh;font-style:normal;font-size:clamp(34px,4vw,76px);color:rgba(255,255,255,.42);text-shadow:0 2px 8px #000}
+.football-intro-progress{position:absolute;z-index:10;left:0;bottom:0;width:100%;height:1.2vh;transform-origin:left;background:#dfff5a;box-shadow:0 0 18px #dfff5a;animation:footballProgress 20s linear infinite}
+.football-intro-stage:not(.football-team-ready) .football-opening{animation:none!important;opacity:1!important;transform:scale(1)!important}
+.football-intro-stage:not(.football-team-ready) .football-player-reveal,.football-intro-stage:not(.football-team-ready) .football-stadium-message,.football-intro-stage:not(.football-team-ready) .football-final-lineup,.football-intro-stage:not(.football-team-ready) .football-intro-progress{animation-play-state:paused!important}
+.football-intro-stage.football-team-ready .football-opening,.football-intro-stage.football-team-ready .football-player-reveal,.football-intro-stage.football-team-ready .football-stadium-message,.football-intro-stage.football-team-ready .football-final-lineup,.football-intro-stage.football-team-ready .football-intro-progress{animation-play-state:running}
+@keyframes footballOpening{0%,1%{opacity:0;transform:scale(.86)}3%,10%{opacity:1;transform:scale(1)}12%,100%{opacity:0;transform:scale(1.08)}}
+@keyframes footballPlayerOne{0%,11%{opacity:0;transform:translateX(9%) scale(.94)}13%,21%{opacity:1;transform:translateX(0) scale(1)}23%,100%{opacity:0;transform:translateX(-7%) scale(1.02)}}
+@keyframes footballPlayerTwo{0%,22%{opacity:0;transform:translateX(9%) scale(.94)}24%,32%{opacity:1;transform:translateX(0) scale(1)}34%,100%{opacity:0;transform:translateX(-7%) scale(1.02)}}
+@keyframes footballPlayerThree{0%,33%{opacity:0;transform:translateX(9%) scale(.94)}35%,43%{opacity:1;transform:translateX(0) scale(1)}45%,100%{opacity:0;transform:translateX(-7%) scale(1.02)}}
+@keyframes footballPlayerFour{0%,44%{opacity:0;transform:translateX(9%) scale(.94)}46%,54%{opacity:1;transform:translateX(0) scale(1)}56%,100%{opacity:0;transform:translateX(-7%) scale(1.02)}}
+@keyframes footballStadiumMessage{0%,57%{opacity:0;transform:scale(.94)}60%,75%{opacity:1;transform:scale(1)}78%,100%{opacity:0;transform:scale(1.03)}}
+@keyframes footballFinalLineup{0%,78%{opacity:0;transform:scale(.96)}81%,97%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.02)}}
+@keyframes footballProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-aspect-ratio:3/2){.football-player-reveal{grid-template-columns:1fr;grid-template-rows:58% 1fr;gap:2vh}.football-player-portrait{width:72%;height:100%;justify-self:center}.football-player-number{left:70%;top:2%}.football-player-copy{text-align:center}.football-player-copy strong{font-size:clamp(52px,9vw,120px)}.football-final-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.football-final-lineup header strong{font-size:clamp(26px,4.5vw,58px)}}
+
+/* v29.08.2 review: global Traditional Black & White layout with a fixed identity rail. */
+.classic-bw.classic-board-template .display-center:after{
+  inset:18% 8.5% 29%!important;
+  border-width:clamp(4px,.7vw,9px)!important;
+  border-radius:clamp(14px,2.4vw,32px)!important;
+}
+.classic-bw.classic-board-template #displayMain.classic-bw-board{
+  left:10.5%!important;
+  right:10.5%!important;
+  top:21.5%!important;
+  bottom:32.5%!important;
+  padding:clamp(7px,1.1vw,16px) clamp(10px,1.6vw,24px)!important;
+  display:grid!important;
+  align-items:center!important;
+}
+.classic-bw.classic-board-template .classic-board-lines{
+  grid-template-rows:repeat(var(--board-lines,1),minmax(0,1fr))!important;
+  align-content:center!important;
+}
+.classic-bw.classic-board-template .classic-board-lines b{min-height:0!important}
+.classic-bw #displaySub.classic-bw-identity{
+  position:absolute!important;
+  z-index:4!important;
+  left:17%!important;
+  right:17%!important;
+  top:75%!important;
+  height:11.5%!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:visible!important;
+  color:#fff!important;
+  font-family:Inter,"Arial Black",Arial,sans-serif!important;
+  text-transform:uppercase!important;
+}
+.classic-identity-shell{
+  position:relative;
+  width:100%;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(7px,1.4vw,22px);
+  padding:clamp(3px,.7vh,9px) clamp(12px,2.2vw,34px);
+  border:clamp(2px,.38vw,6px) solid #fff;
+  border-radius:999px;
+  background:linear-gradient(90deg,#050505 0 18%,#ec111a 18% 82%,#050505 82% 100%);
+  box-shadow:0 0 0 clamp(2px,.35vw,5px) #ed111a,0 0 clamp(12px,2vw,30px) rgba(245,17,28,.72);
+  white-space:nowrap;
+  animation:classicIdentityShellBurst 20s cubic-bezier(.2,.8,.2,1) infinite;
+}
+.classic-identity-shell small{
+  flex:0 0 auto;
+  color:#fff;
+  font:1000 clamp(7px,1.25vw,19px)/1 Inter,Arial,sans-serif;
+  letter-spacing:.18em;
+  opacity:.82;
+}
+.classic-identity-shell strong{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#fff;
+  font:1000 clamp(13px,3.15vw,42px)/.9 Impact,"Arial Black",Arial,sans-serif;
+  letter-spacing:.055em;
+  text-shadow:0 2px 0 #1b1b1b,0 0 12px rgba(255,255,255,.3);
+}
+.classic-bw-identity.uses-brand-fallback .classic-identity-shell strong{letter-spacing:.09em}
+.classic-identity-particles{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:1px;
+  height:1px;
+  pointer-events:none;
+}
+.classic-identity-particles i{
+  --dx:0px;
+  --dy:0px;
+  position:absolute;
+  left:0;
+  top:0;
+  width:clamp(4px,.8vw,12px);
+  height:clamp(3px,.5vw,8px);
+  border-radius:2px;
+  background:#fff;
+  box-shadow:0 0 8px #fff;
+  opacity:0;
+  animation:classicIdentityParticle 20s ease-out infinite;
+}
+.classic-identity-particles i:nth-child(3n){background:#ef111a;box-shadow:0 0 9px #ef111a}
+.classic-identity-particles i:nth-child(4n){background:#101114;box-shadow:0 0 8px rgba(0,0,0,.7)}
+.classic-identity-particles i:nth-child(1){--dx:-30vw;--dy:-10vh}.classic-identity-particles i:nth-child(2){--dx:-24vw;--dy:9vh}.classic-identity-particles i:nth-child(3){--dx:-18vw;--dy:-17vh}.classic-identity-particles i:nth-child(4){--dx:-10vw;--dy:14vh}.classic-identity-particles i:nth-child(5){--dx:-5vw;--dy:-12vh}.classic-identity-particles i:nth-child(6){--dx:7vw;--dy:16vh}.classic-identity-particles i:nth-child(7){--dx:13vw;--dy:-15vh}.classic-identity-particles i:nth-child(8){--dx:19vw;--dy:11vh}.classic-identity-particles i:nth-child(9){--dx:25vw;--dy:-8vh}.classic-identity-particles i:nth-child(10){--dx:31vw;--dy:7vh}.classic-identity-particles i:nth-child(11){--dx:-15vw;--dy:2vh}.classic-identity-particles i:nth-child(12){--dx:16vw;--dy:-2vh}
+@keyframes classicIdentityShellBurst{
+  0%,24%{opacity:1;transform:scale(1);filter:blur(0)}
+  27%{opacity:1;transform:scale(1.055);filter:brightness(1.35)}
+  33%,100%{opacity:0;transform:scale(1.42);filter:blur(8px)}
+}
+@keyframes classicIdentityParticle{
+  0%,25%{opacity:0;transform:translate(0,0) rotate(0deg) scale(.5)}
+  27%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  36%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(390deg) scale(.15)}
+}
+@media(max-width:560px){
+  .classic-bw #displaySub.classic-bw-identity{left:13%!important;right:13%!important}
+  .classic-identity-shell{gap:6px;padding:2px 10px}
+  .classic-identity-shell small{letter-spacing:.1em}
+}
+@media(prefers-reduced-motion:reduce){
+  .classic-identity-shell,.classic-identity-particles i{animation:none!important}
+}

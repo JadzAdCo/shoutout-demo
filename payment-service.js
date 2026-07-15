@@ -1,4 +1,4 @@
-/* FLOQR Stripe Checkout, follower campaigns, and Pickup client bridge v29.07. */
+/* FLOQR Stripe Checkout, Connect onboarding, follower campaigns, and Pickup client bridge v29.08. */
 (function () {
   "use strict";
 
@@ -24,6 +24,26 @@
     return result;
   }
 
+  async function getConnectStatus({entityType, entityId, status} = {}) {
+    requireUser();
+    if (!entityType || !entityId) throw new Error("Choose a FLOQR seller or club before checking payout status.");
+    status?.("Checking Stripe payout readinessâ€¦");
+    const response = await callable("getFloqrConnectStatus")({entityType, entityId});
+    return response?.data || {};
+  }
+
+  async function startConnectOnboarding({entityType, entityId, status} = {}) {
+    requireUser();
+    if (!entityType || !entityId) throw new Error("Choose a FLOQR seller or club before starting payout onboarding.");
+    status?.("Opening secure Stripe payout onboardingâ€¦");
+    const returnBase = new URL(".", window.location.href).href;
+    const response = await callable("createFloqrConnectOnboardingLink")({entityType, entityId, returnBase});
+    const result = response?.data || {};
+    if (!result.onboardingUrl || !/^https:\/\//i.test(result.onboardingUrl)) throw new Error("Stripe did not return a secure payout-onboarding link.");
+    window.location.assign(result.onboardingUrl);
+    return result;
+  }
+
   async function publishFollowerCampaign({entityId, campaign = {}, status} = {}) {
     requireUser();
     status?.("Publishing to followers…");
@@ -37,5 +57,5 @@
     return response?.data || {};
   }
 
-  window.FLOQRPayments = {startCheckout, publishFollowerCampaign, requestTeslaPickup};
+  window.FLOQRPayments = {getConnectStatus, startCheckout, startConnectOnboarding, publishFollowerCampaign, requestTeslaPickup};
 })();
