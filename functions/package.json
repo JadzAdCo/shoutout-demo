@@ -1,13 +1,13 @@
 {
   "name": "floqr-ai-functions",
-  "version": "29.9.1",
+  "version": "29.9.2",
   "private": true,
   "main": "index.js",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test stripe-connect-core.test.js firestore-rules.test.js commerce-invariants.test.js recommendation-library.test.js auth-entry-ui.test.js"
+    "test": "node --test stripe-connect-core.test.js firestore-rules.test.js commerce-invariants.test.js recommendation-library.test.js auth-entry-ui.test.js payment-service.test.js"
   },
   "dependencies": {
     "firebase-admin": "13.10.0",

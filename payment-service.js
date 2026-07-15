@@ -1,10 +1,12 @@
-/* FLOQR Stripe Checkout, Connect onboarding, follower campaigns, and Pickup client bridge v29.08. */
+/* FLOQR Stripe Checkout, Connect onboarding, follower campaigns, and Pickup client bridge v29.09.2. */
 (function () {
   "use strict";
 
   function callable(name) {
-    if (!window.firebase?.functions) throw new Error("Firebase Functions is not loaded on this page.");
-    return firebase.functions("us-central1").httpsCallable(name);
+    if (!window.firebase?.app) throw new Error("Firebase is not loaded on this page.");
+    const app = firebase.app();
+    if (!app?.functions) throw new Error("Firebase Functions is not loaded on this page.");
+    return app.functions("us-central1").httpsCallable(name);
   }
 
   function requireUser() {
