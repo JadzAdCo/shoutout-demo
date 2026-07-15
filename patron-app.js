@@ -1,4 +1,4 @@
-/* patron-app.js v29.08.1 */
+/* patron-app.js v29.09.1 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -46,6 +46,8 @@
   let confirmationReturnTimer = null;
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
+  let approvedRecommendationLibrary = [];
+  let approvedRecommendationLibraryPromise = null;
   let emailOtpChallengeId = "";
   let emailOtpExpiresAt = 0;
   let emailOtpTimer = null;
@@ -79,12 +81,14 @@
     return String(templateId || "") === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
   }
   function footballTeamDraftMembers() {
+    const caps = templateDisplayCaps(getTemplate(FOOTBALL_TEAM_INTRO_TEMPLATE_ID));
+    const nameLimit = Math.max(1, Number(caps.maxPlayerNameCharacters || 14));
     return Array.from({length:FOOTBALL_TEAM_MEMBER_COUNT}, (_, index) => {
       const slot = index + 1;
       const input = byId(`footballTeamPhoto${slot}`);
       return {
         slot,
-        name:String(byId(`footballTeamName${slot}`)?.value || `PLAYER ${slot}`).trim().slice(0, 24) || `PLAYER ${slot}`,
+        name:String(byId(`footballTeamName${slot}`)?.value || `PLAYER ${slot}`).trim().slice(0, nameLimit) || `PLAYER ${slot}`,
         position:String(byId(`footballTeamPosition${slot}`)?.value || "Team Member").trim().slice(0, 24),
         file:input?.files?.[0] || null,
         mediaUrl:input?.dataset.previewUrl || "",
@@ -360,7 +364,13 @@
 
   async function loadTemplates() {
     templates = {...window.SHOUTOUT_TEMPLATES};
-    try { const snap = await db.collection("templates").get(); snap.forEach(doc => templates[doc.id] = {id:doc.id, ...doc.data()}); } catch(e) {}
+    try {
+      const snap = await db.collection("templates").get();
+      snap.forEach(doc => {
+        const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
+        templates[doc.id] = {...packaged, id:doc.id, ...doc.data(), backgroundEditable:Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
+      });
+    } catch(e) {}
   }
   async function loadTemplateVariants() {
     if (!window.FLOQRStudio || !currentUser) {
@@ -502,7 +512,8 @@
   function syncAttribution() {
     const enabled = !!byId("includeAttribution")?.checked;
     byId("attributionChoiceWrap")?.classList.toggle("hidden", !enabled);
-    if (byId("subText")) byId("subText").value = currentAttributionValue();
+    if (byId("subText")) byId("subText").value = fitTemplateText(currentAttributionValue(), "sub");
+    if (typeof updateTemplateCharacterCapHint === "function") updateTemplateCharacterCapHint();
     updatePreview();
   }
 
@@ -716,8 +727,20 @@
     }
   }
   function showEmailOtpPanel() {
-    byId("emailOtpPanel")?.classList.toggle("hidden");
-    byId("emailOtpAddress")?.focus();
+    const panel = byId("emailOtpPanel");
+    const button = byId("showEmailOtpBtn");
+    if (!panel || !button) return;
+    const willOpen = panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !willOpen);
+    panel.setAttribute("aria-hidden", String(!willOpen));
+    button.classList.toggle("email-selected", willOpen);
+    button.setAttribute("aria-expanded", String(willOpen));
+    button.setAttribute("aria-pressed", String(willOpen));
+    button.textContent = willOpen ? "Email sign-in selected" : "Continue with your own Email";
+    if (willOpen && !emailOtpChallengeId) {
+      setText("emailOtpStatus", "Email sign-in selected. Enter your email address to receive a secure code.");
+    }
+    if (willOpen) byId("emailOtpAddress")?.focus();
   }
   function updateEmailOtpCountdown() {
     const status = byId("emailOtpStatus");
@@ -2160,11 +2183,13 @@
   function templateCard(template, options = {}) {
     const selected = !selectedTemplateVariant && template.id === selectedTemplate;
     const canCustomize = templateBackgroundCanBeCustomized(template);
+    const venueFormats = getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
+    const supportedFormats = window.FLOQRTextLayout?.supportedFormatIds?.(template, venueFormats) || venueFormats;
     return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}">
       <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
       <div class="name">${esc(template.name)}</div>
       <div class="tag">${esc(template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>
-      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${(template.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${supportedFormats.length}/${venueFormats.length} display sizes</span>${(template.tags || []).slice(0,3).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>
         ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>` : `<span class="template-background-lock">${template.backgroundEditable === false ? "Background locked" : "Club customization off"}</span>`}
@@ -2191,7 +2216,7 @@
     const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
     const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...venueSpecificIds, ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
-      .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id)));
+      .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id) && window.FLOQRTextLayout?.resolve?.(record.data, id)?.supported !== false));
     const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");
     const mine = (templateVariants.mine || []).filter(x => String(x.status || "active") === "active" && patronVariantAllowedAtClub(x));
     const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid && patronVariantAllowedAtClub(x));
@@ -2266,8 +2291,11 @@
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !currentTemplateSupportsMedia());
     const variant = selectedTemplateVariant;
+    const venueFormats = getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
+    const supportedFormats = window.FLOQRTextLayout?.supportedFormatIds?.(t, venueFormats) || venueFormats;
+    const textCompatibility = `${supportedFormats.length} of ${venueFormats.length} venue display sizes supported; the exact text limit updates after you choose the display.`;
     const backgroundLabel = variant?.variantScope === "club" ? "Club-approved background" : t.backgroundEditable === false ? "Background locked" : clubAllowsPatronBackgroundEditing() ? "Background editable" : "Original background only";
-    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
+    byId("selectedTemplateSummary").innerHTML = `<h3>${esc(variant?.variantName || t.name)}</h3><p>${esc(variant ? `Locked official layout: ${variant.baseTemplateName || t.name}. Background customized by ${variant.ownerDisplayName || "you"}.` : (t.description || "Template selected."))}</p><p class="sub small">${esc(textCompatibility)}</p><div class="badge-row"><span>${esc(t.category || "Shared")}</span><span>${esc(t.mediaMode || (t.supportsMedia ? "Image/video placeholder" : "No image/video"))}</span>${t.priceCents ? `<span>${esc(t.priceLabel || `$${(Number(t.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${esc(backgroundLabel)}</span>${variant ? `<span>${esc(variant.visibility || "private")}</span>` : ""}</div>`;
     updateMediaEditorForTemplate();
   }
   function displayUrl(payload, id=locationId()) {
@@ -2299,9 +2327,10 @@
     const mediaField = byId("shoutoutMediaUrl");
     const mediaUrl = mediaField?.value.trim() || mediaField?.dataset.previewUrl || byId("mediaUrl")?.value.trim() || "";
     const mediaType = byId("shoutoutMediaType")?.value.trim() || "";
+    const textCaps = templateDisplayCaps();
     const previewPayload = {
-      mainText:byId("mainText")?.value.trim()||"SHOUTOUT!",
-      subText:byId("subText")?.value.trim()||"",
+      mainText:fitTemplateText(byId("mainText")?.value.trim()||"SHOUTOUT!", "main"),
+      subText:fitTemplateText(byId("subText")?.value.trim()||"", "sub"),
       mediaUrl,
       mediaType,
       mediaFit:byId("shoutoutMediaFit")?.value || "contain",
@@ -2311,12 +2340,19 @@
       trimEnd:byId("aiTrimEnd")?.value || "",
       trimmedDuration:byId("aiTrimmedDuration")?.value || "",
       template:selectedTemplate,
+      textLayoutVersion:window.FLOQRTextLayout?.version || "",
+      maxMainCharacters:textCaps.main,
+      maxSubCharacters:textCaps.sub,
+      lineCount:textCaps.lineCount,
+      maxCharactersPerLine:textCaps.perLine,
+      mainTextSizePercent:textCaps.mainTextSizePercent,
+      subTextSizePercent:textCaps.subTextSizePercent,
       backgroundUrl:selectedTemplateVariant?.backgroundUrl || "",
       backgroundColor:selectedTemplateVariant?.backgroundColor || "",
       backgroundGradient:selectedTemplateVariant?.backgroundGradient || "",
       teamMembers:isFootballTeamIntro() ? footballTeamDraftMembers() : [],
       animationDurationSeconds:isFootballTeamIntro() ? 20 : null,
-      stadiumMessage:isFootballTeamIntro() ? String(byId("footballTeamMessage")?.value || "").trim().slice(0, 60) : ""
+      stadiumMessage:isFootballTeamIntro() ? String(byId("footballTeamMessage")?.value || "").trim().slice(0, Number(textCaps.maxStadiumCharacters || 54)) : ""
     };
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
@@ -2467,13 +2503,16 @@
 
   function templateDisplayCaps(template = getTemplate()) {
     const t = template || {};
+    const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || getLocation()?.primaryDisplayScreenFormatId || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48";
+    const resolved = window.FLOQRTextLayout?.resolve?.(t, formatId);
+    if (resolved) return resolved;
     const cap = t.displayCaps || t.characterCaps || {};
     const isClassic = (t.id || selectedTemplate) === "blackwhite";
     const supportsMedia = !!(t.supportsMedia || t.supportsImage || t.supportsVideo);
     const main = Number(t.maxMainCharacters || cap.mainText || cap.main || (isClassic ? 45 : supportsMedia ? 48 : 60));
     const sub = Number(t.maxSubCharacters ?? cap.subText ?? cap.sub ?? (isClassic ? 15 : supportsMedia ? 42 : 60));
     const total = Number(t.maxMainCharacters || cap.total || (main + sub));
-    return { main, sub, total, lineCount:Number(t.lineCount || 1), perLine:Number(t.maxCharactersPerLine || main) };
+    return { supported:true, main, sub, total, lineCount:Number(t.lineCount || 1), perLine:Number(t.maxCharactersPerLine || main), maxMainCharacters:main, maxSubCharacters:sub, maxCharactersPerLine:Number(t.maxCharactersPerLine || main), mainTextSizePercent:Number(t.mainTextSizePercent || 20.8), subTextSizePercent:Number(t.subTextSizePercent || 7.8), formatId };
   }
 
   function cleanRecommendationText(value = "") {
@@ -2488,9 +2527,12 @@
     const caps = templateDisplayCaps();
     const limit = Number(type === "sub" ? caps.sub : caps.main);
     const cleaned = cleanRecommendationText(value);
+    if (caps.supported === false || limit <= 0) return "";
     if (type !== "main" || caps.lineCount <= 1) return cleaned.slice(0, limit);
-    const visibleLimit = byId("subText")?.value ? Math.min(limit, caps.perLine * Math.max(1, caps.lineCount - 1)) : limit;
-    const words = cleaned.slice(0, visibleLimit).split(/\s+/).filter(Boolean);
+    const availableLines = caps.lineCount;
+    const visibleLimit = Math.min(limit, caps.perLine * availableLines);
+    const sourceLimit = visibleLimit + Math.max(0, availableLines - 1);
+    const words = cleaned.slice(0, sourceLimit).split(/\s+/).filter(Boolean);
     const rows = [];
     let line = "";
     words.forEach(word => {
@@ -2514,9 +2556,15 @@
     if (!hint) return;
     const caps = templateDisplayCaps();
     const t = getTemplate();
-    hint.textContent = caps.lineCount > 1
-      ? `Template display cap: ${caps.lineCount} lines × ${caps.perLine} characters = ${caps.total} characters total. Words wrap automatically.`
-      : `Template display cap: main ${caps.main} chars, attribution/subtext ${caps.sub} chars. Recommendations are trimmed to fit ${t.name || "this template"}.`;
+    const format = window.FLOQR_DISPLAY_FORMATS?.[caps.formatId] || {};
+    const visibleCount = Array.from(String(byId("mainText")?.value || "").replace(/\r?\n/g, "")).length;
+    if (caps.supported === false) {
+      hint.textContent = `${format.label || caps.formatId}: not recommended for ${t.name || "this template"}. ${caps.advice || "Choose another display size."}`;
+      hint.classList.add("text-limit-warning");
+      return;
+    }
+    hint.classList.remove("text-limit-warning");
+    hint.textContent = `${format.label || caps.formatId}: ${visibleCount}/${caps.main} visible main-message characters. Use up to ${caps.lineCount} line${caps.lineCount === 1 ? "" : "s"}, about ${caps.perLine} characters per line; attribution/subtext allows ${caps.sub}. Words wrap automatically and recommendations use the same limits. Minimum planned letter height: ${caps.minimumFontPixels || "reviewed"} px.`;
   }
 
   function suggestionEventContext() {
@@ -2614,7 +2662,8 @@
   function renderSuggestionButtons(targetId, suggestions = [], emptyText = "") {
     const list = byId(targetId);
     if (!list) return;
-    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-suggestion-target="${esc(targetId)}" data-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")}</small></button>`).join("") : `<p class='sub small'>${esc(emptyText)}</p>`;
+    const caps = templateDisplayCaps();
+    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-suggestion-target="${esc(targetId)}" data-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")} - fits ${caps.lineCount} x ${caps.perLine}, ${caps.main} max</small></button>`).join("") : `<p class='sub small'>${esc(emptyText)}</p>`;
     list.querySelectorAll("[data-suggestion-index]").forEach(button => {
       button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.suggestionIndex)]));
     });
@@ -2627,6 +2676,44 @@
       {mainText:fitTemplateText("THIS CREW RUNS TONIGHT", "main"), subText:fitTemplateText("Selected by patrons", "sub"), providerMode:"trending"},
       {mainText:fitTemplateText("BIG MOMENT. BIG LIGHTS.", "main"), subText:fitTemplateText("Popular recommendation", "sub"), providerMode:"trending"}
     ];
+  }
+
+  async function loadApprovedRecommendationLibrary() {
+    if (!approvedRecommendationLibraryPromise) {
+      approvedRecommendationLibraryPromise = getCollectionSafe(
+        "shoutoutRecommendations",
+        item => String(item.status || "").toLowerCase() === "approved" && !!String(item.mainText || item.main || "").trim(),
+        250
+      ).then(rows => {
+        approvedRecommendationLibrary = rows;
+        return rows;
+      }).catch(() => {
+        approvedRecommendationLibrary = [];
+        return [];
+      });
+    }
+    return approvedRecommendationLibraryPromise;
+  }
+
+  function buildApprovedShoutOutSuggestions() {
+    const eventType = String(suggestionEventContext() || "").toLowerCase();
+    const venueGenres = (getLocation()?.genres || []).join(" ").toLowerCase();
+    const wantsRnb = /r&b|rnb|hip hop|hiphop/.test(`${eventType} ${venueGenres}`);
+    const wantsAfrobeats = /afro|amapiano/.test(`${eventType} ${venueGenres}`);
+    const prioritized = approvedRecommendationLibrary
+      .map(item => ({
+        ...item,
+        relevance:item.genre === "rnb-hiphop" && wantsRnb ? 2 : item.genre === "afrobeats" && wantsAfrobeats ? 2 : 1
+      }))
+      .sort((a,b) => b.relevance - a.relevance || String(a.sourceArtist || "").localeCompare(String(b.sourceArtist || "")) || String(a.mainText || "").localeCompare(String(b.mainText || "")));
+    return prioritized.slice(0, 6).map(item => ({
+      mainText:fitTemplateText(item.mainText || item.main || "", "main"),
+      subText:fitTemplateText(item.subText || item.sub || "", "sub"),
+      providerMode:`Master Admin approved${item.genre ? ` ${item.genre}` : ""}`,
+      recommendationId:item.id || "",
+      sourceArtist:item.sourceArtist || "",
+      sourceTrack:item.sourceTrack || ""
+    })).filter(item => item.mainText);
   }
 
   function buildGenericShoutOutSuggestions() {
@@ -2647,10 +2734,20 @@
   async function refreshPersonalizedShoutOutRecommendations(options = {}) {
     const list = byId("aiSuggestionList");
     if (!list) return;
+    const caps = templateDisplayCaps();
+    if (caps.supported === false) {
+      renderSuggestionButtons("aiSuggestionList", [], "Choose a supported display size to receive recommendations.");
+      renderSuggestionButtons("trendingSuggestionList", [], "This template and display combination is not recommended.");
+      renderSuggestionButtons("genericSuggestionList", [], "Select another display size.");
+      return;
+    }
     list.innerHTML = "<p class='sub small'>Building personalized ShoutOut ideas...</p>";
-    const suggestions = await buildPersonalizedShoutOutSuggestions(options.toneOverride || "");
+    const [suggestions] = await Promise.all([
+      buildPersonalizedShoutOutSuggestions(options.toneOverride || ""),
+      loadApprovedRecommendationLibrary()
+    ]);
     renderSuggestionButtons("aiSuggestionList", suggestions.map(item => ({...item, providerMode:`${item.providerMode || item.provider || "contextual"} - ${suggestionEventContext()}`})), "Type a message or choose recommendation context to generate suggestions.");
-    renderSuggestionButtons("trendingSuggestionList", buildTrendingShoutOutSuggestions(), "Trending ShoutOuts will appear after patrons begin selecting recommendations.");
+    renderSuggestionButtons("trendingSuggestionList", [...buildApprovedShoutOutSuggestions(), ...buildTrendingShoutOutSuggestions()].slice(0, 8), "Master Admin-approved and trending ShoutOuts will appear here.");
     renderSuggestionButtons("genericSuggestionList", buildGenericShoutOutSuggestions(), "Generic occasion ideas will appear here.");
     if (options.applyFirst && suggestions[0]) applySuggestionItem(suggestions[0]);
   }
@@ -2694,7 +2791,7 @@
     const pool = window.SHOUTOUT_AI_SUGGESTIONS || [];
     const item = suggestion || pool[Math.floor(Math.random() * pool.length)] || {main:"SHOUTOUT!", sub:"VIP vibes tonight."};
     const mainInput = byId("mainText");
-    if (mainInput) mainInput.value = String(item.mainText || item.main || "").slice(0, Number(mainInput.maxLength || 36));
+    if (mainInput) mainInput.value = fitTemplateText(item.mainText || item.main || "", "main");
     syncAttribution();
     const box = byId("shoutoutSuggestionBox");
     if (box) {
@@ -2721,7 +2818,7 @@
       box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
         const s = rows[Number(btn.dataset.i)];
         const mainInput = byId("mainText");
-        if (mainInput) mainInput.value = String(s.mainText || "").slice(0, Number(mainInput.maxLength || 36));
+        if (mainInput) mainInput.value = fitTemplateText(s.mainText || "", "main");
         if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText;
         syncAttribution();
         if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
@@ -2738,6 +2835,8 @@
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
       const l=getLocation(), t=getTemplate();
+      const caps = templateDisplayCaps(t);
+      if (caps.supported === false) throw new Error(caps.advice || "Choose a supported display size for this template.");
       const footballIntro = isFootballTeamIntro();
       if (footballIntro && locationId() !== "zebbies-garden-washington-dc") throw new Error("This advanced football template is available only at Zebbies Garden DC.");
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
@@ -2766,7 +2865,7 @@
         teamMembers:footballTeamMembers,
         animationDurationSeconds:20,
         collaborationMode:"four-person-roster",
-        stadiumMessage:String(byId("footballTeamMessage")?.value || "TONIGHT, WE TAKE THE FIELD TOGETHER").trim().slice(0, 60),
+        stadiumMessage:String(byId("footballTeamMessage")?.value || "TONIGHT, WE TAKE THE FIELD TOGETHER").trim().slice(0, Number(caps.maxStadiumCharacters || 54)),
         photoPermissionConfirmed:true,
         priceCents:3000,
         mediaUploadedAt:null
@@ -2810,7 +2909,7 @@
         templateVariantScope:selectedTemplateVariant.variantScope || "patron",
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, maxMainCharacters:Number(t.maxMainCharacters || 60), maxSubCharacters:Number(t.maxSubCharacters ?? 60), lineCount:Number(t.lineCount || 1), maxCharactersPerLine:Number(t.maxCharactersPerLine || t.maxMainCharacters || 60), mainTextSizePercent:Number(t.mainTextSizePercent || 16), subTextSizePercent:Number(t.subTextSizePercent || 6), ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       if (selectedTemplate !== "blackwhite") {
         const checkoutPayload = {...payload, submittedAt:null, mediaUploadedAt:null};
         const videoEnabled = payload.mediaType === "video";
@@ -2822,12 +2921,12 @@
       payload.shoutoutId = shoutoutRef.id;
       payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.02`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-      try { await db.collection("shoutoutRecommendations").add({source:"submission", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
+      try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
     } catch(e) { status.textContent=e.message; }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value="HAPPY BIRTHDAY MAYA!"; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -2838,7 +2937,9 @@
     const caps = templateDisplayCaps(t);
     if (mainInput) {
       mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
-      if (footballIntro && (!mainInput.value.trim() || mainInput.value.trim() === "HAPPY BIRTHDAY MAYA!")) mainInput.value = t.defaultMain || "ZEBBIES ALL-STARS";
+      mainInput.rows = Math.max(2, caps.lineCount || 2);
+      mainInput.placeholder = caps.supported === false ? "Choose a supported display size" : `Enter ShoutOut Here - maximum ${caps.main} visible characters`;
+      if (footballIntro && !mainInput.value.trim()) mainInput.value = t.defaultMain || "ZEBBIES ALL-STARS";
       mainInput.value = fitTemplateText(mainInput.value, "main");
     }
     const subInput = byId("subText");
@@ -2846,11 +2947,24 @@
       subInput.maxLength = caps.sub;
       if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
     }
+    document.querySelectorAll("[data-football-team-name]").forEach(input => {
+      input.maxLength = Math.max(1, Number(caps.maxPlayerNameCharacters || 14));
+      if (input.value.length > input.maxLength) input.value = input.value.slice(0, input.maxLength);
+    });
+    const stadiumInput = byId("footballTeamMessage");
+    if (stadiumInput) {
+      stadiumInput.maxLength = Math.max(1, Number(caps.maxStadiumCharacters || 54));
+      if (stadiumInput.value.length > stadiumInput.maxLength) stadiumInput.value = stadiumInput.value.slice(0, stadiumInput.maxLength);
+    }
+    if (byId("footballTextCapHint") && footballIntro) byId("footballTextCapHint").textContent = `For this display: ${caps.stadiumLineCount || 3} stadium-message lines, about ${caps.stadiumCharactersPerLine || 18} characters per line, ${caps.maxStadiumCharacters || 54} total; player names up to ${caps.maxPlayerNameCharacters || 14} characters.`;
     updateTemplateCharacterCapHint();
     document.body.dataset.selectedTemplate = t.id || selectedTemplate;
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
     byId("footballTeamIntroCard")?.classList.toggle("hidden", !footballIntro);
-    if (byId("submitShoutoutBtn")) byId("submitShoutoutBtn").textContent = footballIntro ? "Continue to $30 Stripe Checkout" : "Submit for Approval";
+    if (byId("submitShoutoutBtn")) {
+      byId("submitShoutoutBtn").textContent = footballIntro ? "Continue to $30 Stripe Checkout" : "Submit for Approval";
+      byId("submitShoutoutBtn").disabled = caps.supported === false;
+    }
     if (byId("previewDurationHint")) byId("previewDurationHint").textContent = footballIntro ? "Preview plays the complete 20-second stadium introduction." : "Preview opens in a popout and closes automatically after 5 seconds.";
     const photoWrap = byId("shoutoutPhotoWrap");
     const photoInput = byId("shoutoutPhoto");
@@ -2875,23 +2989,28 @@
     if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);
   }
 
+  function configureTemplateScreenFormats(screenSelect, template, location) {
+    const venueFormats = location.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const templateFormats = template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || venueFormats;
+    const preferred = isFootballTeamIntro(template.id) ? (template.preferredP125FormatIds || []) : [];
+    const available = Array.from(new Set([...preferred, ...venueFormats])).filter(id => venueFormats.includes(id) && templateFormats.includes(id));
+    const supported = available.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
+    screenSelect.innerHTML = available.map(id => {
+      const format = window.FLOQR_DISPLAY_FORMATS?.[id] || {label:id,pixelWidth:"?",pixelHeight:"?"};
+      const caps = window.FLOQRTextLayout?.resolve?.(template, id);
+      const disabled = caps?.supported === false;
+      const suffix = disabled ? " - not suitable for this template" : ` - ${caps?.lineCount || 1} lines / ${caps?.main || template.maxMainCharacters || 60} characters`;
+      return `<option value="${esc(id)}"${disabled ? " disabled" : ""}>${esc(format.label)} - ${esc(format.pixelWidth)} x ${esc(format.pixelHeight)} px${esc(suffix)}</option>`;
+    }).join("");
+    selectedScreenFormatId = supported.includes(selectedScreenFormatId) ? selectedScreenFormatId : supported.includes(location.primaryDisplayScreenFormatId) ? location.primaryDisplayScreenFormatId : supported[0] || available[0];
+    screenSelect.value = selectedScreenFormatId;
+    screenSelect.disabled = !supported.length;
+  }
+
   function goToEditor() {
     const l=getLocation(), t=getTemplate();
     const screenSelect = byId("shoutoutScreenFormat");
-    if (screenSelect) {
-      const venueFormats = l.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
-      const p125Formats = isFootballTeamIntro(t.id) ? (t.preferredP125FormatIds || []).filter(id => {
-        const candidate = window.FLOQR_DISPLAY_FORMATS?.[id];
-        return candidate && venueFormats.some(venueId => {
-          const venueFormat = window.FLOQR_DISPLAY_FORMATS?.[venueId];
-          return venueFormat && venueFormat.widthCm === candidate.widthCm && venueFormat.heightCm === candidate.heightCm;
-        });
-      }) : [];
-      const available = Array.from(new Set([...p125Formats, ...venueFormats]));
-      screenSelect.innerHTML = available.map(id => { const format = window.FLOQR_DISPLAY_FORMATS?.[id] || {label:id,pixelWidth:"?",pixelHeight:"?"}; return `<option value="${esc(id)}">${esc(format.label)} — ${esc(format.pixelWidth)} × ${esc(format.pixelHeight)} px</option>`; }).join("");
-      selectedScreenFormatId = isFootballTeamIntro(t.id) && p125Formats.length ? p125Formats[0] : available.includes(selectedScreenFormatId) ? selectedScreenFormatId : (l.primaryDisplayScreenFormatId || available[0]);
-      screenSelect.value = selectedScreenFormatId;
-    }
+    if (screenSelect) configureTemplateScreenFormats(screenSelect, t, l);
     setText("editorClubTitle", l.locationName);
     setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
     updateMediaEditorForTemplate();
@@ -3067,8 +3186,8 @@
     });
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
-    byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; });
-    byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updatePreview(); });
+    byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; updateTemplateCharacterCapHint(); });
+    byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updateMediaEditorForTemplate(); schedulePersonalizedShoutOutRecommendations(); updatePreview(); });
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
     bindFootballTeamEditor();
   });

@@ -94,20 +94,31 @@
     if (line && rows.length < maxRows) rows.push(line);
   }
 
-  function classicBoardRows(mainText) {
-    const maxRows = 3;
-    const maxChars = 15;
-    const words = glyphSlice(cleanBoardText(mainText), 0, maxChars * maxRows).split(" ").filter(Boolean);
+  function displayTextRows(mainText, caps = {}) {
+    const maxRows = Math.max(1, Number(caps.lineCount || 1));
+    const maxChars = Math.max(1, Number(caps.maxCharactersPerLine || caps.perLine || caps.maxMainCharacters || 60));
     const rows = [];
 
-    if (words[0] === "HAPPY" && words[1] === "BIRTHDAY") {
-      rows.push("HAPPY", "BIRTHDAY");
-      pushWrapped(rows, words.slice(2), maxRows, maxChars);
-    } else {
+    const prepared = glyphSlice(String(mainText || "")
+      .normalize("NFC")
+      .toUpperCase()
+      .replace(/\r\n?/g, "\n")
+      .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " "), 0, maxChars * maxRows + maxRows - 1);
+    prepared.split(/\n+/).forEach(sourceLine => {
+      if (rows.length >= maxRows) return;
+      const words = sourceLine.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
       pushWrapped(rows, words, maxRows, maxChars);
-    }
+    });
 
     return (rows.length ? rows : ["SHOUTOUT"]).slice(0, maxRows);
+  }
+
+  function classicBoardRows(mainText, caps = {}) {
+    return displayTextRows(mainText, {
+      lineCount:Number(caps.lineCount || 3),
+      maxCharactersPerLine:Number(caps.maxCharactersPerLine || caps.perLine || 15),
+      maxMainCharacters:Number(caps.maxMainCharacters || caps.main || 45)
+    });
   }
 
   function classicIdentityPresentation(subText) {
@@ -162,8 +173,7 @@
   }
 
   function classicFitStyle(row, rows, textSizePercent = 16) {
-    const longest = Math.max(...rows.map(x => glyphLen(x)), 1);
-    const rowLen = Math.max(glyphLen(row), longest);
+    const rowLen = Math.max(glyphLen(row), 1);
     const scale = Math.min(1.5, Math.max(.5, Number(textSizePercent || 16) / 16));
     const maxPx = Math.round((rowLen <= 5 ? 118 : rowLen <= 8 ? 106 : rowLen <= 10 ? 96 : rowLen <= 12 ? 88 : rowLen <= 16 ? 72 : 58) * scale);
     const vw = ((rowLen <= 8 ? 8.6 : rowLen <= 12 ? 7.4 : rowLen <= 16 ? 6.2 : 5.2) * scale).toFixed(2);
@@ -187,11 +197,12 @@
     video.addEventListener("timeupdate", loopTrim);
   }
 
-  function normalizedFootballTeamMembers(data = {}) {
+  function normalizedFootballTeamMembers(data = {}, textCaps = {}) {
     const source = Array.isArray(data.teamMembers) ? data.teamMembers : [];
+    const nameLimit = Math.max(1, Number(textCaps.maxPlayerNameCharacters || 14));
     return Array.from({length:4}, (_, index) => {
       const member = source[index] || {};
-      const name = String(member.name || `PLAYER ${index + 1}`).trim().slice(0, 24) || `PLAYER ${index + 1}`;
+      const name = String(member.name || `PLAYER ${index + 1}`).trim().slice(0, nameLimit) || `PLAYER ${index + 1}`;
       return {
         slot:index + 1,
         name,
@@ -202,11 +213,14 @@
     });
   }
 
-  function footballStadiumMessageRows(value = "") {
-    const clean = glyphSlice(cleanBoardText(value || "TONIGHT, WE TAKE THE FIELD TOGETHER"), 0, 60);
+  function footballStadiumMessageRows(value = "", textCaps = {}) {
+    const maxRows = Math.max(1, Number(textCaps.stadiumLineCount || 3));
+    const perLine = Math.max(1, Number(textCaps.stadiumCharactersPerLine || 18));
+    const total = Math.max(1, Number(textCaps.maxStadiumCharacters || maxRows * perLine));
+    const clean = glyphSlice(cleanBoardText(value || "TONIGHT, WE TAKE THE FIELD TOGETHER"), 0, total);
     const rows = [];
-    pushWrapped(rows, clean.split(" ").filter(Boolean), 3, 20);
-    return rows.slice(0, 3);
+    pushWrapped(rows, clean.split(" ").filter(Boolean), maxRows, perLine);
+    return rows.slice(0, maxRows);
   }
 
   async function cacheBackedFootballMediaUrl(url) {
@@ -260,9 +274,10 @@
     stage.classList.add("football-team-ready");
   }
 
-  function renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data}) {
-    const members = normalizedFootballTeamMembers(data);
-    const stadiumMessageRows = footballStadiumMessageRows(data.stadiumMessage);
+  function renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps}) {
+    const members = normalizedFootballTeamMembers(data, textCaps);
+    const stadiumMessageRows = footballStadiumMessageRows(data.stadiumMessage, textCaps);
+    const openingRows = displayTextRows(mainText || "ZEBBIES ALL-STARS", textCaps);
     canvas.classList.add("football-team-intro");
     center.className = "display-center football-team-intro-layout";
     mediaSlot.classList.remove("hidden");
@@ -275,7 +290,7 @@
         <div class="football-field-lines" aria-hidden="true"></div>
         <div class="football-opening">
           <span>ZEBBIES GARDEN PRESENTS</span>
-          <strong>${esc(mainText || "ZEBBIES ALL-STARS")}</strong>
+          <strong>${openingRows.map(row => esc(row)).join("<br>")}</strong>
           <small>${esc(subText || "GAME NIGHT LINEUP")}</small>
         </div>
         <div class="football-player-reveals">
@@ -290,7 +305,7 @@
           <div>${stadiumMessageRows.map(row => `<b>${esc(row)}</b>`).join("")}</div>
         </div>
         <div class="football-final-lineup">
-          <header><span>ZEBBIES ALL-STARS</span><strong>${esc(mainText || "GAME NIGHT LINEUP")}</strong></header>
+          <header><span>ZEBBIES ALL-STARS</span><strong>${openingRows.map(row => esc(row)).join("<br>")}</strong></header>
           <div class="football-final-grid">${members.map((member, index) => `<article>
             <div class="football-final-photo">${playerImage(member)}</div>
             <b>${esc(member.name)}</b><small>${esc(member.position)}</small><em>0${index + 1}</em>
@@ -307,19 +322,34 @@
     const templateId = data.template || "neon";
     const baseTemplate = templates[templateId] || templates.neon || {};
     const t = {...baseTemplate, className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
-    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite";
+    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw";
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
-    const mainSize = Math.min(40, Math.max(4, Number(data.mainTextSizePercent || t.mainTextSizePercent || 16)));
-    const subSize = Math.min(20, Math.max(2, Number(data.subTextSizePercent || t.subTextSizePercent || 6)));
-    const mainLimit = Math.max(1, Number(data.maxMainCharacters || t.maxMainCharacters || 60));
-    const subLimit = Math.max(0, Number(data.maxSubCharacters ?? t.maxSubCharacters ?? 60));
+    const screenFormatId = String(data.screenFormatId || loc.primaryDisplayScreenFormatId || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48");
+    const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
+      supported:true,
+      lineCount:Number(data.lineCount || t.lineCount || 1),
+      maxCharactersPerLine:Number(data.maxCharactersPerLine || t.maxCharactersPerLine || data.maxMainCharacters || t.maxMainCharacters || 60),
+      maxMainCharacters:Number(data.maxMainCharacters || t.maxMainCharacters || 60),
+      maxSubCharacters:Number(data.maxSubCharacters ?? t.maxSubCharacters ?? 60),
+      mainTextSizePercent:Number(data.mainTextSizePercent || t.mainTextSizePercent || 20.8),
+      subTextSizePercent:Number(data.subTextSizePercent || t.subTextSizePercent || 7.8)
+    };
+    const mainSize = Math.min(40, Math.max(4, Number(textCaps.mainTextSizePercent || 20.8)));
+    const subSize = Math.min(20, Math.max(2, Number(textCaps.subTextSizePercent || 7.8)));
+    const mainLimit = Math.max(1, Number(textCaps.maxMainCharacters || textCaps.main || 60));
+    const subLimit = Math.max(0, Number(textCaps.maxSubCharacters ?? textCaps.sub ?? 60));
     const canvas = byId("displayCanvas");
     canvas.className = "display-canvas";
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
     if (isClassicBoard) canvas.classList.add("classic-board-template");
+    canvas.dataset.templateId = templateId;
+    canvas.dataset.screenFormatId = screenFormatId;
+    canvas.dataset.textProfile = textCaps.profileId || "custom";
     const backgroundUrl = data.backgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
     const backgroundGradient = data.backgroundGradient || "";
+    const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
+    canvas.classList.toggle("custom-background-active", hasCustomBackground);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
     canvas.style.backgroundSize = "";
@@ -336,7 +366,8 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
-    const mainText = String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText).slice(0, mainLimit);
+    const mainSource = String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
+    const mainText = mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
     const subText = String(data.subText || t.defaultSub || "").slice(0, subLimit);
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
@@ -344,8 +375,16 @@
     if (center) center.className = "display-center";
     byId("displayMain").className = "";
     byId("displaySub").className = "";
+    if (textCaps.supported === false) {
+      if (center) center.classList.add("unsupported-text-layout");
+      byId("displayMain").textContent = "DISPLAY SIZE NOT SUPPORTED";
+      byId("displaySub").textContent = textCaps.advice || "Choose another display size for this template.";
+      mediaSlot.classList.add("hidden");
+      mediaSlot.innerHTML = "";
+      return;
+    }
     if (isFootballTeamIntro && center && mediaSlot) {
-      renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data});
+      renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps});
       return;
     }
     const mediaUrl = data.mediaUrl || "";
@@ -370,7 +409,7 @@
       mediaSlot.innerHTML = "";
     }
     if (isClassicBoard) {
-      const rows = classicBoardRows(mainText);
+      const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("classic-bw-board");
       byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
@@ -381,7 +420,9 @@
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");
-      byId("displayMain").textContent = mainText;
+      const rows = displayTextRows(mainText, textCaps);
+      byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
+      byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
       byId("displaySub").textContent = subText;
     }
   }

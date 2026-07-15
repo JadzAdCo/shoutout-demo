@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.07
+/* master-admin-app.js v29.09.0
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.07";
+  const CURRENT_VERSION = "29.09.0";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -28,6 +28,8 @@
   let selectedEntityClubId = "";
   let selectedEntityPatronUid = "";
   let managedTemplates = {};
+  let managedTemplatePreview = null;
+  let recommendationRecords = [];
 
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
   const ALLOWED_PROVIDERS = (window.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com", "microsoft.com"]).map(x => String(x).toLowerCase());
@@ -674,14 +676,27 @@
     return Array.from(document.querySelectorAll("[data-template-screen-format]:checked")).map(el => el.dataset.templateScreenFormat);
   }
 
+  function templateNumber(value, fallback, minimum, maximum) {
+    const parsed = Number(value);
+    return Math.min(maximum, Math.max(minimum, Number.isFinite(parsed) ? parsed : fallback));
+  }
+
   function clearManagedTemplateForm() {
     ["templateManageId","templateManageName","templateManageCategory","templateManageTags","templateManageDescription"].forEach(id => { if (byId(id)) byId(id).value = ""; });
     if (byId("templateManageClass")) byId("templateManageClass").value = "neon";
     if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = "45";
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = "3";
     if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = "15";
+    if (byId("templateManageSubLimit")) byId("templateManageSubLimit").value = "60";
+    if (byId("templateManageMainTextSize")) byId("templateManageMainTextSize").value = "16";
+    if (byId("templateManageSubTextSize")) byId("templateManageSubTextSize").value = "6";
+    if (byId("templateManagePreviewMain")) byId("templateManagePreviewMain").value = "SHOUTOUT";
+    if (byId("templateManagePreviewSub")) byId("templateManagePreviewSub").value = "FLOQR";
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = false;
-    if (byId("templateManageBackgroundEditable")) byId("templateManageBackgroundEditable").checked = true;
+    if (byId("templateManageBackgroundEditable")) {
+      byId("templateManageBackgroundEditable").checked = true;
+      byId("templateManageBackgroundEditable").disabled = false;
+    }
     document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = true; });
   }
 
@@ -695,8 +710,17 @@
     if (byId("templateManageMainLimit")) byId("templateManageMainLimit").value = template.maxMainCharacters || 45;
     if (byId("templateManageLineCount")) byId("templateManageLineCount").value = template.lineCount || 3;
     if (byId("templateManageLineLimit")) byId("templateManageLineLimit").value = template.maxCharactersPerLine || 15;
+    if (byId("templateManageSubLimit")) byId("templateManageSubLimit").value = template.maxSubCharacters ?? 60;
+    if (byId("templateManageMainTextSize")) byId("templateManageMainTextSize").value = template.mainTextSizePercent || 20.8;
+    if (byId("templateManageSubTextSize")) byId("templateManageSubTextSize").value = template.subTextSizePercent || 7.8;
+    if (byId("templateManagePreviewMain")) byId("templateManagePreviewMain").value = template.defaultMain || "SHOUTOUT";
+    if (byId("templateManagePreviewSub")) byId("templateManagePreviewSub").value = template.defaultSub || template.category || "FLOQR";
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = !!(template.supportsMedia || template.supportsImage || template.supportsVideo);
-    if (byId("templateManageBackgroundEditable")) byId("templateManageBackgroundEditable").checked = template.backgroundEditable !== false;
+    if (byId("templateManageBackgroundEditable")) {
+      const isPublishedTemplate = !!window.SHOUTOUT_TEMPLATES?.[template.id];
+      byId("templateManageBackgroundEditable").checked = isPublishedTemplate || template.backgroundEditable !== false;
+      byId("templateManageBackgroundEditable").disabled = isPublishedTemplate;
+    }
     const formats = new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || []);
     document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = formats.has(el.dataset.templateScreenFormat); });
     byId("templateManageId")?.scrollIntoView?.({behavior:"smooth", block:"center"});
@@ -705,7 +729,10 @@
   async function loadManagedTemplates() {
     managedTemplates = Object.fromEntries(Object.entries(window.SHOUTOUT_TEMPLATES || {}).map(([id, data]) => [id, {id, source:"package", ...data}]));
     const rows = await getCollectionSafe("templates", 500);
-    rows.forEach(row => { managedTemplates[row.id] = {...managedTemplates[row.id], ...row, id:row.id, source:"Firestore"}; });
+    rows.forEach(row => {
+      const packaged = window.SHOUTOUT_TEMPLATES?.[row.id];
+      managedTemplates[row.id] = {...managedTemplates[row.id], ...row, id:row.id, source:"Firestore", backgroundEditable:packaged ? true : row.backgroundEditable !== false};
+    });
     renderTemplateManagement();
   }
 
@@ -718,9 +745,10 @@
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
       <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
-      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button></div>
+      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
+    wrap.querySelectorAll("[data-template-preview]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templatePreview] || {})));
     wrap.querySelectorAll("[data-template-edit]").forEach(button => button.addEventListener("click", () => fillManagedTemplateForm(managedTemplates[button.dataset.templateEdit] || {})));
     wrap.querySelectorAll("[data-template-toggle]").forEach(button => button.addEventListener("click", async () => {
       const template = managedTemplates[button.dataset.templateToggle] || {};
@@ -733,22 +761,106 @@
 
   function closeManagedTemplateView() { byId("templateViewModal")?.classList.add("hidden"); }
 
-  function viewManagedTemplate(template = {}) {
-    byId("templateViewName").textContent = template.name || template.id || "Template";
+  function currentManagedTemplateDraft() {
+    const id = slugify(byId("templateManageId")?.value || byId("templateManageName")?.value || "unsaved-template");
+    const lineCount = Math.round(templateNumber(byId("templateManageLineCount")?.value, 3, 1, 8));
+    const maxCharactersPerLine = Math.round(templateNumber(byId("templateManageLineLimit")?.value, 15, 1, 160));
+    const requestedTotal = Math.round(templateNumber(byId("templateManageMainLimit")?.value, lineCount * maxCharactersPerLine, 1, 1000));
+    const screenFormatIds = managedTemplateScreenIds();
+    return {
+      id,
+      name:String(byId("templateManageName")?.value || "Unsaved Template").trim() || "Unsaved Template",
+      className:byId("templateManageClass")?.value || "neon",
+      category:String(byId("templateManageCategory")?.value || "").trim(),
+      tags:splitCSV(byId("templateManageTags")?.value),
+      description:String(byId("templateManageDescription")?.value || "").trim(),
+      supportsMedia:!!byId("templateManageSupportsMedia")?.checked,
+      backgroundEditable:window.SHOUTOUT_TEMPLATES?.[id] ? true : byId("templateManageBackgroundEditable")?.checked !== false,
+      defaultMain:String(byId("templateManagePreviewMain")?.value || "SHOUTOUT").trim(),
+      defaultSub:String(byId("templateManagePreviewSub")?.value || "FLOQR").trim(),
+      maxMainCharacters:Math.min(requestedTotal, lineCount * maxCharactersPerLine),
+      maxSubCharacters:Math.round(templateNumber(byId("templateManageSubLimit")?.value, 60, 0, 1000)),
+      lineCount,
+      maxCharactersPerLine,
+      mainTextSizePercent:templateNumber(byId("templateManageMainTextSize")?.value, 20.8, 4, 40),
+      subTextSizePercent:templateNumber(byId("templateManageSubTextSize")?.value, 7.8, 2, 20),
+      screenFormatIds:screenFormatIds.length ? screenFormatIds : [...(window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [])],
+      status:managedTemplates[id]?.status || "active"
+    };
+  }
+
+  function managedTemplateFormats(template = {}) {
+    const formats = window.FLOQR_DISPLAY_FORMATS || {};
+    const ids = template.screenFormatIds?.length ? template.screenFormatIds : (window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || Object.keys(formats));
+    const selected = ids.map(id => formats[id]).filter(Boolean);
+    return selected.length ? selected : Object.values(formats);
+  }
+
+  function managedTemplatePreviewLines(template = {}) {
+    const maxLines = Math.round(templateNumber(template.lineCount, 3, 1, 8));
+    const perLine = Math.round(templateNumber(template.maxCharactersPerLine, 15, 1, 160));
+    const total = Math.round(templateNumber(template.maxMainCharacters, maxLines * perLine, 1, maxLines * perLine));
+    const source = String(template.defaultMain || "SHOUTOUT").replace(/\s+/g, " ").trim().slice(0, total);
+    const words = source.split(" ").filter(Boolean);
+    const lines = [];
+    let line = "";
+    words.forEach(word => {
+      let remaining = word;
+      while (remaining.length > perLine && lines.length < maxLines) {
+        if (line) { lines.push(line); line = ""; }
+        if (lines.length < maxLines) lines.push(remaining.slice(0, perLine));
+        remaining = remaining.slice(perLine);
+      }
+      if (!remaining || lines.length >= maxLines) return;
+      const candidate = line ? `${line} ${remaining}` : remaining;
+      if (candidate.length <= perLine) line = candidate;
+      else { lines.push(line); line = remaining; }
+    });
+    if (line && lines.length < maxLines) lines.push(line);
+    return lines.length ? lines.slice(0, maxLines) : ["SHOUTOUT"];
+  }
+
+  function renderManagedTemplateDisplay() {
+    const template = managedTemplatePreview || {};
+    const formats = managedTemplateFormats(template);
+    const format = formats.find(item => item.id === byId("templatePreviewDisplayType")?.value) || formats[0];
+    if (!format) return;
     const safeClass = /^[a-z0-9_-]+$/i.test(template.className || "") ? template.className : "neon";
-    byId("templateViewPreview").className = `template-view-preview ${safeClass}`;
-    byId("templateViewPreview").innerHTML = `<strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "FLOQR")}</span>`;
+    const mainSize = templateNumber(template.mainTextSizePercent, 20.8, 4, 40);
+    const subSize = templateNumber(template.subTextSizePercent, 7.8, 2, 20);
+    const maxSub = Math.round(templateNumber(template.maxSubCharacters, 60, 0, 1000));
+    const subtext = String(template.defaultSub || template.category || "FLOQR").slice(0, maxSub);
+    const preview = byId("templateViewPreview");
+    const device = byId("templatePreviewDevice");
+    device.style.aspectRatio = format.aspectRatio || `${format.pixelWidth} / ${format.pixelHeight}`;
+    device.style.setProperty("--preview-aspect", format.pixelWidth / format.pixelHeight);
+    device.setAttribute("aria-label", `${format.label} display preview at ${format.pixelWidth} by ${format.pixelHeight} pixels`);
+    preview.className = `template-view-preview ${safeClass} ${template.supportsMedia ? "has-media" : "text-only"}`;
+    preview.style.setProperty("--preview-main-size", mainSize);
+    preview.style.setProperty("--preview-sub-size", subSize);
+    preview.innerHTML = `<div class="template-preview-pixel-grid" aria-hidden="true"></div><div class="template-preview-content"><div class="template-preview-main">${managedTemplatePreviewLines(template).map(line => `<span>${esc(line)}</span>`).join("")}</div><div class="template-preview-sub">${esc(subtext)}</div></div>${template.supportsMedia ? '<div class="template-preview-media"><strong>MEDIA</strong><span>image / video area</span></div>' : ""}`;
+    setText("templatePreviewDisplayMeta", `${format.label} physical display • ${format.pixelWidth} × ${format.pixelHeight} px • ${String(format.aspectRatio || "").replace(/\s/g, "")}`);
     byId("templateViewDetails").innerHTML = simpleRows([
       ["Template ID", template.id || "-"],
       ["Status", template.status === "deleted" ? "deactivated" : "active"],
+      ["Selected display", `${format.label} / ${format.pixelWidth} × ${format.pixelHeight} px`],
       ["Category", template.category || "-"],
       ["Description", template.description || "No description"],
       ["Tags", (template.tags || []).join(", ") || "-"],
       ["Media", template.supportsMedia || template.supportsImage || template.supportsVideo ? "Image/video enabled" : "Text only"],
-      ["Text limits", `${template.lineCount || 3} lines / ${template.maxCharactersPerLine || 15} per line / ${template.maxMainCharacters || 45} total`],
-      ["Screens", (template.screenFormatIds || []).join(", ") || "Not tagged"],
+      ["Text limits", `${template.lineCount || 3} main lines / ${template.maxCharactersPerLine || 15} per line / ${template.maxMainCharacters || 45} main total / ${template.maxSubCharacters ?? 60} subtext`],
+      ["Text sizing", `${mainSize}% main / ${subSize}% subtext (relative to display height)`],
+      ["Compatible displays", (template.screenFormatIds || []).join(", ") || "Not tagged"],
       ["Background", template.backgroundEditable === false ? "Locked" : "Editable"]
     ]);
+  }
+
+  function viewManagedTemplate(template = {}) {
+    managedTemplatePreview = template;
+    byId("templateViewName").textContent = template.name || template.id || "Template";
+    const formats = managedTemplateFormats(template);
+    byId("templatePreviewDisplayType").innerHTML = formats.map(format => `<option value="${esc(format.id)}">${esc(format.label)} — ${format.pixelWidth} × ${format.pixelHeight} px</option>`).join("");
+    renderManagedTemplateDisplay();
     byId("templateViewModal").classList.remove("hidden");
   }
 
@@ -759,10 +871,13 @@
     const supportsMedia = !!byId("templateManageSupportsMedia")?.checked;
     const screenFormatIds = managedTemplateScreenIds();
     if (!screenFormatIds.length) { setText("templateManagementStatus", "Select at least one compatible screen format."); return; }
-    const lineCount = Math.max(1, Number(byId("templateManageLineCount")?.value || 3));
-    const maxCharactersPerLine = Math.max(1, Number(byId("templateManageLineLimit")?.value || 15));
-    const requestedTotal = Math.max(1, Number(byId("templateManageMainLimit")?.value || (lineCount * maxCharactersPerLine)));
+    const lineCount = Math.round(templateNumber(byId("templateManageLineCount")?.value, 3, 1, 8));
+    const maxCharactersPerLine = Math.round(templateNumber(byId("templateManageLineLimit")?.value, 15, 1, 160));
+    const requestedTotal = Math.round(templateNumber(byId("templateManageMainLimit")?.value, lineCount * maxCharactersPerLine, 1, 1000));
     const maxMainCharacters = Math.min(requestedTotal, lineCount * maxCharactersPerLine);
+    const maxSubCharacters = Math.round(templateNumber(byId("templateManageSubLimit")?.value, 60, 0, 1000));
+    const mainTextSizePercent = templateNumber(byId("templateManageMainTextSize")?.value, 20.8, 4, 40);
+    const subTextSizePercent = templateNumber(byId("templateManageSubTextSize")?.value, 7.8, 2, 20);
     const payload = {
       id,
       name,
@@ -773,11 +888,16 @@
       supportsMedia,
       supportsImage:supportsMedia,
       supportsVideo:supportsMedia,
-      backgroundEditable:byId("templateManageBackgroundEditable")?.checked !== false,
+      backgroundEditable:window.SHOUTOUT_TEMPLATES?.[id] ? true : byId("templateManageBackgroundEditable")?.checked !== false,
       mediaMode:supportsMedia ? "Image/video placeholder" : "No image/video",
       maxMainCharacters,
+      maxSubCharacters,
       lineCount,
       maxCharactersPerLine,
+      mainTextSizePercent,
+      subTextSizePercent,
+      defaultMain:String(byId("templateManagePreviewMain")?.value || "SHOUTOUT").trim(),
+      defaultSub:String(byId("templateManagePreviewSub")?.value || "FLOQR").trim(),
       screenFormatIds,
       status:managedTemplates[id]?.status || "active",
       scope:"Shared",
@@ -786,9 +906,96 @@
       updatedByEmail:safeUser(auth.currentUser)
     };
     await db.collection("templates").doc(id).set(payload, {merge:true});
-    setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} total characters, ${screenFormatIds.length} screen format tag(s), and a ${payload.backgroundEditable ? "customizable" : "locked"} background.`);
+    setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} main and ${maxSubCharacters} subtext characters, ${mainTextSizePercent}%/${subTextSizePercent}% text sizing, ${screenFormatIds.length} display type(s), and a ${payload.backgroundEditable ? "customizable" : "locked"} background.`);
     await loadManagedTemplates();
     fillManagedTemplateForm(managedTemplates[id] || payload);
+  }
+
+  function recommendationStatus(record = {}) {
+    const status = String(record.status || record.approvalStatus || "pending").toLowerCase();
+    return ["pending", "approved", "rejected"].includes(status) ? status : "pending";
+  }
+
+  async function loadRecommendationModeration() {
+    const packaged = (window.FLOQR_RECOMMENDATION_SEED_QUEUE || []).map(item => ({...item, sourceRecord:"package"}));
+    const stored = await getCollectionSafe("shoutoutRecommendations", 1000);
+    const records = new Map(packaged.map(item => [item.id, item]));
+    stored.forEach(item => records.set(item.id, {...records.get(item.id), ...item, id:item.id, sourceRecord:"Firestore"}));
+    recommendationRecords = Array.from(records.values()).map(item => ({...item, status:recommendationStatus(item)}));
+    renderRecommendationModeration();
+  }
+
+  function renderRecommendationModeration() {
+    const list = byId("recommendationModerationList");
+    if (!list) return;
+    const pending = recommendationRecords.filter(item => recommendationStatus(item) === "pending");
+    const approved = recommendationRecords.filter(item => recommendationStatus(item) === "approved");
+    const rejected = recommendationRecords.filter(item => recommendationStatus(item) === "rejected");
+    setText("recommendationPendingCount", pending.length.toLocaleString());
+    setText("recommendationApprovedCount", approved.length.toLocaleString());
+    setText("recommendationRejectedCount", rejected.length.toLocaleString());
+    setText("recommendationRightsCount", recommendationRecords.filter(item => item.rightsStatus === "original-non-lyrical").length.toLocaleString());
+
+    const selectedStatus = byId("recommendationStatusFilter")?.value || "pending";
+    const query = String(byId("recommendationModerationSearch")?.value || "").trim().toLowerCase();
+    const visible = recommendationRecords
+      .filter(item => selectedStatus === "all" || recommendationStatus(item) === selectedStatus)
+      .filter(item => !query || [item.mainText, item.subText, item.genre, item.tone, item.sourceArtist, item.sourceTrack, item.sourceNote].join(" ").toLowerCase().includes(query))
+      .sort((a,b) => `${a.sourceArtist || ""} ${a.sourceTrack || ""} ${a.mainText || ""}`.localeCompare(`${b.sourceArtist || ""} ${b.sourceTrack || ""} ${b.mainText || ""}`));
+
+    list.innerHTML = visible.map(item => {
+      const status = recommendationStatus(item);
+      const mainText = String(item.mainText || item.main || "").trim();
+      const subText = String(item.subText || item.sub || "").trim();
+      const source = [item.sourceArtist, item.sourceTrack].filter(Boolean).join(" — ") || item.source || "Patron submission";
+      const rights = item.rightsNote || (item.rightsStatus === "original-non-lyrical" ? "Original wording; no lyrics stored." : "Copyright/originality review required.");
+      return `<div class="queue-item recommendation-review-row">
+        <div class="message-envelope-head"><strong>${esc(mainText || "Untitled recommendation")}</strong><span>${esc(status)}</span></div>
+        <p>${esc(subText)}</p>
+        <small>${esc(source)} | ${esc(item.genre || "general")} | ${esc(item.tone || "general")} | ${mainText.length} main / ${subText.length} sub characters</small>
+        <p class="sub small">${esc(rights)}${item.sourceNote ? ` ${esc(item.sourceNote)}` : ""}</p>
+        <div class="queue-actions">
+          <button type="button" data-recommendation-id="${esc(item.id)}" data-recommendation-status="approved" ${status === "approved" ? "disabled" : ""}>Approve</button>
+          <button type="button" data-recommendation-id="${esc(item.id)}" data-recommendation-status="rejected" ${status === "rejected" ? "disabled" : ""}>Reject</button>
+          <button type="button" data-recommendation-id="${esc(item.id)}" data-recommendation-status="pending" ${status === "pending" ? "disabled" : ""}>Return to Unapproved</button>
+        </div>
+      </div>`;
+    }).join("") || "<p class='sub'>No recommendations match this review view.</p>";
+
+    setText("recommendationModerationStatus", `${visible.length} shown. Only approved recommendations are available on the patron ShoutOut screen.`);
+    list.querySelectorAll("[data-recommendation-id][data-recommendation-status]").forEach(button => {
+      button.addEventListener("click", () => reviewRecommendation(button.dataset.recommendationId, button.dataset.recommendationStatus));
+    });
+  }
+
+  async function reviewRecommendation(id, status) {
+    const record = recommendationRecords.find(item => item.id === id);
+    if (!record || !["pending", "approved", "rejected"].includes(status)) return;
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const payload = {
+      mainText:String(record.mainText || record.main || "").trim(),
+      subText:String(record.subText || record.sub || "").trim(),
+      genre:String(record.genre || "general"),
+      tone:String(record.tone || "general"),
+      source:String(record.source || "admin-review"),
+      sourceType:String(record.sourceType || "admin-reviewed"),
+      sourceArtist:String(record.sourceArtist || ""),
+      sourceTrack:String(record.sourceTrack || ""),
+      sourceNote:String(record.sourceNote || ""),
+      rightsStatus:String(record.rightsStatus || "review-required"),
+      rightsNote:String(record.rightsNote || "Copyright/originality review required."),
+      seedVersion:String(record.seedVersion || ""),
+      status,
+      reviewedAt:now,
+      reviewedByUid:auth.currentUser?.uid || "",
+      reviewedByEmail:safeUser(auth.currentUser),
+      approvedAt:status === "approved" ? now : null,
+      rejectedAt:status === "rejected" ? now : null
+    };
+    setText("recommendationModerationStatus", `Saving ${status} review for ${payload.mainText || id}...`);
+    await db.collection("shoutoutRecommendations").doc(id).set(payload, {merge:true});
+    await loadRecommendationModeration();
+    setText("recommendationModerationStatus", `${payload.mainText || id} is now ${status}.`);
   }
 
   function renderClubAdminUrls(locationRows = []) {
@@ -1100,14 +1307,18 @@
     bind("importClubOnboardingCsvBtn", importClubCsv);
     bind("createPromoterOnboardingBtn", createPromoterOnboarding);
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
+    bind("previewManagedTemplateBtn", () => viewManagedTemplate(currentManagedTemplateDraft()));
     bind("saveManagedTemplateBtn", saveManagedTemplate);
     bind("clearManagedTemplateBtn", clearManagedTemplateForm);
     bind("templateViewCloseBtn", closeManagedTemplateView);
     bind("templateViewCloseWindowBtn", closeManagedTemplateView);
     byId("templateViewModal")?.addEventListener("click", event => { if (event.target === byId("templateViewModal")) closeManagedTemplateView(); });
+    byId("templatePreviewDisplayType")?.addEventListener("change", renderManagedTemplateDisplay);
     byId("entityClubSearch")?.addEventListener("input", renderEntityClubResults);
     byId("entityPatronSearch")?.addEventListener("input", renderEntityPatronResults);
     byId("templateManagementSearch")?.addEventListener("input", renderTemplateManagement);
+    byId("recommendationStatusFilter")?.addEventListener("change", renderRecommendationModeration);
+    byId("recommendationModerationSearch")?.addEventListener("input", renderRecommendationModeration);
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -1137,6 +1348,7 @@
       setText("masterPanelSecurityStatus", check.reason);
       loadNetworkReports();
       loadManagedTemplates();
+      loadRecommendationModeration();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
       if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
       if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});

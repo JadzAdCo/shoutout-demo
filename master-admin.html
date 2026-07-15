@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v29.07 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v29.09.0 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.07"/>
-  <link rel="stylesheet" href="./admin.css?v=29.07"/>
+  <link rel="stylesheet" href="./styles.css?v=29.08.4"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07.1"/>
 </head>
 <body>
 <main id="masterAdminPage" class="app admin-shell">
@@ -52,6 +52,7 @@
         <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club Admin URLs</button>
         <button class="admin-tab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
         <button class="admin-tab" data-panel="templateManagement" type="button">Template Management</button>
+        <button class="admin-tab" data-panel="recommendationModeration" type="button">Unapproved Recommendations</button>
         <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
         <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
@@ -172,25 +173,56 @@
             <label>Visual class<select id="templateManageClass"><option value="neon">Neon</option><option value="gold">Gold</option><option value="ice">Ice</option><option value="fire">Fire</option><option value="classic-bw">Black & White</option><option value="celebration-media">Split Media</option></select></label>
             <label>Category<input id="templateManageCategory" placeholder="Milestone"/></label>
             <label>Tags<input id="templateManageTags" placeholder="birthday, celebration, photo"/></label>
-            <label>Main text total limit<input id="templateManageMainLimit" type="number" min="1" value="45"/></label>
-            <label>Maximum lines<input id="templateManageLineCount" type="number" min="1" max="8" value="3"/></label>
-            <label>Characters per line<input id="templateManageLineLimit" type="number" min="1" value="15"/></label>
+            <label>Main message total limit<input id="templateManageMainLimit" type="number" min="1" value="45"/></label>
+            <label>Maximum main-message lines<input id="templateManageLineCount" type="number" min="1" max="8" value="3"/></label>
+            <label>Characters per main-message line<input id="templateManageLineLimit" type="number" min="1" value="15"/></label>
+            <label>Subtext / attribution limit<input id="templateManageSubLimit" type="number" min="0" value="60"/></label>
+            <label>Main text size (% of display height)<input id="templateManageMainTextSize" type="number" min="4" max="40" step="0.1" value="20.8"/></label>
+            <label>Subtext size (% of display height)<input id="templateManageSubTextSize" type="number" min="2" max="20" step="0.1" value="7.8"/></label>
+            <label>Preview main text<input id="templateManagePreviewMain" value="SHOUTOUT" placeholder="SHOUTOUT"/></label>
+            <label>Preview subtext<input id="templateManagePreviewSub" value="FLOQR" placeholder="FLOQR"/></label>
           </div>
           <div class="privacy-datapoint-grid">
             <label><input id="templateManageSupportsMedia" type="checkbox"/> Supports image/video</label>
-            <label><input id="templateManageBackgroundEditable" type="checkbox" checked/> Background can be customized</label>
+            <label><input id="templateManageBackgroundEditable" type="checkbox" checked/> Background can be customized (required for published templates)</label>
             <label><input data-template-screen-format="led-96x48" type="checkbox" checked/> 96 x 48 cm — 624 x 312</label>
             <label><input data-template-screen-format="led-64x48" type="checkbox" checked/> 64 x 48 cm — 416 x 312</label>
             <label><input data-template-screen-format="led-64x32" type="checkbox" checked/> 64 x 32 cm — 416 x 208</label>
           </div>
           <label>Description<textarea id="templateManageDescription" rows="3"></textarea></label>
-          <div class="queue-actions"><button id="saveManagedTemplateBtn" class="primary" type="button">Save Template</button><button id="clearManagedTemplateBtn" type="button">Clear Form</button></div>
+          <div class="queue-actions"><button id="previewManagedTemplateBtn" type="button">Preview Template</button><button id="saveManagedTemplateBtn" class="primary" type="button">Save Template</button><button id="clearManagedTemplateBtn" type="button">Clear Form</button></div>
           <p id="templateManagementStatus" class="status"></p>
         </div>
         <div class="card">
           <h2>Available Templates</h2>
           <label>Search templates<input id="templateManagementSearch" placeholder="Name, ID, tag, screen size, category"/></label>
           <div id="templateManagementList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="recommendationModeration" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Unapproved</span><strong id="recommendationPendingCount">0</strong></div>
+          <div class="metric-card"><span>Approved</span><strong id="recommendationApprovedCount">0</strong></div>
+          <div class="metric-card"><span>Rejected</span><strong id="recommendationRejectedCount">0</strong></div>
+          <div class="metric-card"><span>Original / Non-Lyrical</span><strong id="recommendationRightsCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2>ShoutOut Recommendation Approval Queue</h2>
+          <p class="sub small">Recommendations remain invisible to patrons until a Master Admin approves them. Music may supply creative direction, but stored wording must be original and must not reproduce song lyrics.</p>
+          <div class="profile-grid">
+            <label>Review status
+              <select id="recommendationStatusFilter">
+                <option value="pending">Unapproved</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Search recommendations<input id="recommendationModerationSearch" placeholder="Artist, track, genre, tone, or message"/></label>
+          </div>
+          <p id="recommendationModerationStatus" class="status">Loading recommendation queue...</p>
+          <div id="recommendationModerationList" class="report-block"></div>
         </div>
       </section>
 
@@ -506,16 +538,32 @@
   </section>
 </main>
 
-<div id="templateViewModal" class="club-person-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templateViewName"><div class="club-person-modal-card template-view-card"><button id="templateViewCloseBtn" class="club-person-close" type="button" aria-label="Close template">&times;</button><p class="eyebrow">Template preview</p><h2 id="templateViewName">Template</h2><div id="templateViewPreview" class="template-view-preview"></div><div id="templateViewDetails" class="report-block"></div><button id="templateViewCloseWindowBtn" type="button">Close Window</button></div></div>
+<div id="templateViewModal" class="club-person-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templateViewName">
+  <div class="club-person-modal-card template-view-card">
+    <button id="templateViewCloseBtn" class="club-person-close" type="button" aria-label="Close template preview">&times;</button>
+    <p class="eyebrow">Display-aware template preview</p>
+    <h2 id="templateViewName">Template</h2>
+    <div class="profile-grid template-preview-controls">
+      <label>Display type<select id="templatePreviewDisplayType"></select></label>
+      <div id="templatePreviewDisplayMeta" class="template-preview-display-meta"></div>
+    </div>
+    <div id="templatePreviewDevice" class="template-preview-device">
+      <div id="templateViewPreview" class="template-view-preview"></div>
+    </div>
+    <p class="sub small">Scaled LED simulation. Layout and aspect ratio match the selected display type; final color and brightness depend on the physical display.</p>
+    <div id="templateViewDetails" class="report-block"></div>
+    <button id="templateViewCloseWindowBtn" type="button">Close Window</button>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.07"></script>
+<script src="./firebase-config.js?v=29.07.1"></script>
 <script src="./global-profile-status.js?v=29.05"></script>
-<script src="./shared-data.js?v=29.07"></script>
+<script src="./shared-data.js?v=29.09.0"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=29.05"></script>
 <script src="./ai-search-service.js?v=29.05"></script>
@@ -526,7 +574,7 @@
 <script src="./ai-diagnostics-service.js?v=29.06"></script>
 <script src="./duplicate-record-service.js?v=29.05"></script>
 <script src="./payment-service.js?v=29.07"></script>
-<script src="./master-admin-app.js?v=29.07"></script>
+<script src="./master-admin-app.js?v=29.09.0"></script>
 <script src="./master-services-extension.js?v=29.07"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>

@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Patron Portal v29.08.2 -->
+  <!-- FLOQR ShoutOut Patron Portal v29.09.1 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.08.2"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.1"/>
 </head>
 <body>
 
@@ -58,17 +58,17 @@
           <button id="microsoftLoginBtn" class="signin microsoft" type="button"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
           <button id="facebookLoginBtn" class="signin facebook" type="button"><span class="icon fb-icon">f</span>Continue with Facebook</button>
 
-          <button id="showEmailOtpBtn" class="signin email" type="button">Continue with your own Email</button>
-          <div id="emailOtpPanel" class="sms-otp-panel hidden">
+          <button id="showEmailOtpBtn" class="signin email" type="button" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false">Continue with your own Email</button>
+          <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
             <label>Email address
               <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
             </label>
             <div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 5-minute code</button></div>
-            <label>8-character code
+            <label>Enter 8-character code
               <input id="emailOtpCode" maxlength="8" autocomplete="one-time-code" placeholder="AB7K9M2Q"/>
             </label>
             <button id="verifyEmailOtpBtn" class="primary full" type="button">Verify and Continue</button>
-            <p id="emailOtpStatus" class="status">Codes expire 5 minutes after delivery.</p>
+            <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 5 minutes after delivery.</p>
           </div>
 
           <div class="divider"><span>Or use One Time Password (OTP) via SMS</span></div>
@@ -406,7 +406,7 @@
       <div class="card">
         <h2>Message</h2>
         <label>Main message<textarea id="mainText" rows="3" maxlength="47" placeholder="Enter ShoutOut Here"></textarea></label>
-        <p id="templateCharacterCapHint" class="sub small">Template display cap: choose a template to see the safe character limit.</p>
+        <p id="templateCharacterCapHint" class="sub small" aria-live="polite">Choose a template and display to see its safe line and character limits.</p>
         <label>Club display screen
           <select id="shoutoutScreenFormat"></select>
         </label>
@@ -452,32 +452,32 @@
             <article class="football-player-upload" data-football-slot="1">
               <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
               <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName1" data-football-team-name data-slot="1" type="text" maxlength="24" value="PLAYER 1"/></label>
+              <label>Introduction name<input id="footballTeamName1" data-football-team-name data-slot="1" type="text" maxlength="14" value="PLAYER 1"/></label>
               <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="2">
               <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
               <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName2" data-football-team-name data-slot="2" type="text" maxlength="24" value="PLAYER 2"/></label>
+              <label>Introduction name<input id="footballTeamName2" data-football-team-name data-slot="2" type="text" maxlength="14" value="PLAYER 2"/></label>
               <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="3">
               <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
               <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName3" data-football-team-name data-slot="3" type="text" maxlength="24" value="PLAYER 3"/></label>
+              <label>Introduction name<input id="footballTeamName3" data-football-team-name data-slot="3" type="text" maxlength="14" value="PLAYER 3"/></label>
               <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="4">
               <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
               <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName4" data-football-team-name data-slot="4" type="text" maxlength="24" value="PLAYER 4"/></label>
+              <label>Introduction name<input id="footballTeamName4" data-football-team-name data-slot="4" type="text" maxlength="14" value="PLAYER 4"/></label>
               <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
             </article>
           </div>
           <label class="football-stadium-message-label">Large stadium message
-            <textarea id="footballTeamMessage" rows="3" maxlength="60">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
+            <textarea id="footballTeamMessage" rows="3" maxlength="54">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
           </label>
-          <p class="sub small">The display wraps this into no more than three high-contrast lines (about 20 characters per line) for long-distance P1.25 viewing.</p>
+          <p id="footballTextCapHint" class="sub small" aria-live="polite">Choose a supported display to see stadium-message and player-name limits.</p>
           <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Optionally ask Gemini to create generic stadium-ready portraits (originals remain the fallback; no real team logos are added).</span></label>
           <label class="consent-line football-photo-consent"><input id="footballPhotoConsent" type="checkbox"/> <span>I confirm that I have permission from all four people to upload and display these photos.</span></label>
           <p id="footballTeamStatus" class="status"></p>
@@ -494,7 +494,7 @@
       <div class="card shoutout-recommendations-card">
         <div class="section-heading-row">
           <h2>ShoutOut Recommendations</h2>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Recommendations are grouped by AI context, platform trends, and generic occasion ideas. FLOQR uses your draft, venue, event/audience context, selected template, profile datapoints, and your own past ShoutOuts when available.</div></details>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Recommendations are grouped by AI context, platform trends, and generic occasion ideas. Every recommendation is rewritten to respect the selected template and display's line count, per-line allowance, and total visible-character limit.</div></details>
         </div>
         <label>Recommendation style
           <select id="shoutoutTone">
@@ -571,19 +571,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.05"></script>
 <script src="./global-profile-status.js?v=29.05.1"></script>
-<script src="./shared-data.js?v=29.08.2"></script>
+<script src="./shared-data.js?v=29.09.0"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
 <script src="./ai-location-service.js?v=29.05"></script>
 <script src="./ai-notification-service.js?v=28.44-ai"></script>
-<script src="./ai-template-studio.js?v=29.06"></script>
+<script src="./ai-template-studio.js?v=29.09.0"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./ai-grammar-service.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
 <script src="./ad-campaigns.js?v=29.05"></script>
 <script src="./payment-service.js?v=29.07"></script>
-<script src="./patron-app.js?v=29.08.2"></script>
+<script src="./patron-app.js?v=29.09.1"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
 <script src="./ai-media-service.js?v=29.05"></script>
 <script src="./notification-center.js?v=29.05"></script>

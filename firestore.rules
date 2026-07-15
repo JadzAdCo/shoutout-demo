@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.07
-// EXPECTED DEPLOYED RULES VERSION: v29.07 or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09-recommendation-moderation
+// EXPECTED DEPLOYED RULES VERSION: v29.09-recommendation-moderation or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -20,6 +20,7 @@ rules_version = '2';
 // - Mingl read receipts so participants can mark incoming messages read without broad chat access
 // - clubOnboardingRecords, promoterOnboardingRecords, clubMedia, and guestListCampaigns for venue onboarding
 // - commerce, paid service orders, entity follows, role permissions/activity, staffing requests, campaigns, and Pickup simulations
+// - backend-only Stripe Accounts v2 bindings, seller-scoped products, and owner/seller/admin order access
 // If Firebase Console does not show this note near the top, Firestore rules are not updated to this package.
 
 service cloud.firestore {
@@ -30,6 +31,184 @@ service cloud.firestore {
 
     function isSelf(userId) {
       return signedIn() && request.auth.uid == userId;
+    }
+
+    function isMasterAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.masterAdmin == true
+          || request.auth.token.email in [
+            "bands.don@gmail.com",
+            "bans.don@gmail.com",
+            "don.b@jadzholdings.com"
+          ]
+        );
+    }
+
+    function isClubManager(clubId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/clubLocations/$(clubId))
+        && (
+          isMasterAdmin()
+          || (
+            get(/databases/$(database)/documents/clubLocations/$(clubId)).data.adminUids is list
+            && request.auth.uid in get(/databases/$(database)/documents/clubLocations/$(clubId)).data.adminUids
+          )
+          || (
+            get(/databases/$(database)/documents/clubLocations/$(clubId)).data.masterAdminUids is list
+            && request.auth.uid in get(/databases/$(database)/documents/clubLocations/$(clubId)).data.masterAdminUids
+          )
+          || (
+            request.auth.token.email is string
+            && get(/databases/$(database)/documents/clubLocations/$(clubId)).data.adminEmails is list
+            && request.auth.token.email in get(/databases/$(database)/documents/clubLocations/$(clubId)).data.adminEmails
+          )
+          || (
+            exists(/databases/$(database)/documents/clubAdminAssignments/$(clubId + "_" + request.auth.uid))
+            && get(/databases/$(database)/documents/clubAdminAssignments/$(clubId + "_" + request.auth.uid)).data.status == "active"
+          )
+        );
+    }
+
+    function hasBackendOnlyIdentityFields(data) {
+      return data.keys().hasAny([
+        "masterAdmin",
+        "roles",
+        "approvedRoles",
+        "approvedLocations",
+        "stripeConnectAccountId",
+        "stripeConnectStatus",
+        "stripeConnectCapabilityStatus",
+        "stripeConnectLivemode",
+        "stripeConnectUpdatedAt"
+      ]);
+    }
+
+    function preservesBackendOnlyIdentityFields() {
+      return !request.resource.data.diff(resource.data).changedKeys().hasAny([
+        "masterAdmin",
+        "roles",
+        "approvedRoles",
+        "approvedLocations",
+        "stripeConnectAccountId",
+        "stripeConnectStatus",
+        "stripeConnectCapabilityStatus",
+        "stripeConnectLivemode",
+        "stripeConnectUpdatedAt"
+      ]);
+    }
+
+    function preservesStripeBindingFields() {
+      return !request.resource.data.diff(resource.data).changedKeys().hasAny([
+        "stripeConnectAccountId",
+        "stripeConnectStatus",
+        "stripeConnectCapabilityStatus",
+        "stripeConnectLivemode",
+        "stripeConnectUpdatedAt"
+      ]);
+    }
+
+    function validNewCommerceProduct() {
+      return signedIn()
+        && request.resource.data.sellerUid == request.auth.uid
+        && request.resource.data.sellerEntityId is string
+        && (
+          request.resource.data.sellerEntityId == request.auth.uid
+          || (
+            request.resource.data.sellerEntityType == "club"
+            && isClubManager(request.resource.data.sellerEntityId)
+          )
+        )
+        && !request.resource.data.keys().hasAny(["stripeConnectAccountId", "connectedAccountId", "paymentStatus"])
+        && request.resource.data.keys().hasOnly([
+          "sellerEntityId",
+          "sellerEntityType",
+          "sellerUid",
+          "sellerName",
+          "name",
+          "category",
+          "productType",
+          "previewMediaType",
+          "mediaLicense",
+          "priceCents",
+          "inventory",
+          "imageUrl",
+          "description",
+          "requiresShipping",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ]);
+    }
+
+    function isCommerceProductManager() {
+      return signedIn()
+        && (
+          isMasterAdmin()
+          || resource.data.sellerUid == request.auth.uid
+          || resource.data.sellerEntityId == request.auth.uid
+          || (
+            resource.data.sellerEntityType == "club"
+            && isClubManager(resource.data.sellerEntityId)
+          )
+        );
+    }
+
+    function isCommerceProductUpdate() {
+      return isCommerceProductManager()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "sellerName",
+          "name",
+          "category",
+          "productType",
+          "previewMediaType",
+          "mediaLicense",
+          "priceCents",
+          "inventory",
+          "imageUrl",
+          "description",
+          "requiresShipping",
+          "active",
+          "updatedAt"
+        ]);
+    }
+
+    function isServiceOrderReader() {
+      return signedIn()
+        && (
+          isMasterAdmin()
+          || (
+            resource.data.keys().hasAny(["ownerUid"])
+            && resource.data.ownerUid == request.auth.uid
+          )
+          || (
+            resource.data.keys().hasAny(["sellerUid"])
+            && resource.data.sellerUid == request.auth.uid
+          )
+          || (
+            resource.data.keys().hasAny(["sellerEntityId"])
+            && resource.data.sellerEntityId == request.auth.uid
+          )
+          || (
+            resource.data.sellerEntityType == "club"
+            && resource.data.sellerEntityId is string
+            && isClubManager(resource.data.sellerEntityId)
+          )
+        );
+    }
+
+    function isMasterFulfillmentUpdate() {
+      return isMasterAdmin()
+        && request.resource.data.updatedByUid == request.auth.uid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "shippingStatus",
+          "fulfillmentStatus",
+          "shippingCarrier",
+          "trackingNumber",
+          "trackingUrl",
+          "updatedByUid",
+          "updatedAt"
+        ]);
     }
 
     function createsOwnUid() {
@@ -192,9 +371,11 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow create: if isSelf(userId);
+      allow create: if isSelf(userId)
+        && !hasBackendOnlyIdentityFields(request.resource.data);
       allow read: if signedIn();
-      allow update: if isSelf(userId);
+      allow update: if isSelf(userId)
+        && preservesBackendOnlyIdentityFields();
       allow delete: if isParticipant()
         && isDiagnosticResource();
     }
@@ -206,7 +387,17 @@ service cloud.firestore {
 
     match /clubLocations/{id} {
       allow read: if true;
-      allow write: if signedIn();
+      allow create: if isMasterAdmin()
+        && !request.resource.data.keys().hasAny([
+          "stripeConnectAccountId",
+          "stripeConnectStatus",
+          "stripeConnectCapabilityStatus",
+          "stripeConnectLivemode",
+          "stripeConnectUpdatedAt"
+        ]);
+      allow update: if (isMasterAdmin() || isClubManager(id))
+        && preservesStripeBindingFields();
+      allow delete: if isMasterAdmin();
     }
 
     match /clubLocationAliases/{aliasId} {
@@ -215,7 +406,34 @@ service cloud.firestore {
     }
 
     match /clubAdminAssignments/{assignmentId} {
-      allow read, write: if signedIn();
+      allow read: if isMasterAdmin()
+        || resource.data.patronUid == request.auth.uid
+        || (
+          resource.data.clubLocationId is string
+          && isClubManager(resource.data.clubLocationId)
+        )
+        || (
+          resource.data.clubId is string
+          && isClubManager(resource.data.clubId)
+        );
+      allow create: if isMasterAdmin()
+        || (
+          request.resource.data.clubLocationId is string
+          && isClubManager(request.resource.data.clubLocationId)
+        )
+        || (
+          request.resource.data.clubId is string
+          && isClubManager(request.resource.data.clubId)
+        );
+      allow update, delete: if isMasterAdmin()
+        || (
+          resource.data.clubLocationId is string
+          && isClubManager(resource.data.clubLocationId)
+        )
+        || (
+          resource.data.clubId is string
+          && isClubManager(resource.data.clubId)
+        );
     }
 
     // OTP challenges contain hashes and rate-limit data; clients never read or write them.
@@ -230,11 +448,46 @@ service cloud.firestore {
 
     match /templates/{id} {
       allow read: if true;
-      allow write: if signedIn();
+      allow write: if isMasterAdmin();
+    }
+
+    function validPatronShoutoutCreate() {
+      return signedIn()
+        && request.resource.data.keys().hasAll([
+          'template', 'screenFormatId', 'mainText', 'subText', 'submittedByUid',
+          'maxMainCharacters', 'maxSubCharacters', 'lineCount', 'maxCharactersPerLine'
+        ])
+        && request.resource.data.template == 'blackwhite'
+        && request.resource.data.submittedByUid == request.auth.uid
+        && request.resource.data.mainText is string
+        && request.resource.data.subText is string
+        && request.resource.data.lineCount == 3
+        && (
+          ((request.resource.data.screenFormatId == 'p125-96x48' || request.resource.data.screenFormatId == 'led-96x48')
+            && request.resource.data.mainText.size() <= 47
+            && request.resource.data.subText.size() <= 20
+            && request.resource.data.maxMainCharacters == 45
+            && request.resource.data.maxCharactersPerLine == 15)
+          || (request.resource.data.screenFormatId == 'p125-64x32'
+            && request.resource.data.mainText.size() <= 44
+            && request.resource.data.subText.size() <= 18
+            && request.resource.data.maxMainCharacters == 42
+            && request.resource.data.maxCharactersPerLine == 14)
+          || ((request.resource.data.screenFormatId == 'p125-64x48' || request.resource.data.screenFormatId == 'led-64x48')
+            && request.resource.data.mainText.size() <= 38
+            && request.resource.data.subText.size() <= 18
+            && request.resource.data.maxMainCharacters == 36
+            && request.resource.data.maxCharactersPerLine == 12)
+          || (request.resource.data.screenFormatId == 'led-64x32'
+            && request.resource.data.mainText.size() <= 38
+            && request.resource.data.subText.size() <= 16
+            && request.resource.data.maxMainCharacters == 36
+            && request.resource.data.maxCharactersPerLine == 12)
+        );
     }
 
     match /shoutouts/{id} {
-      allow create: if signedIn();
+      allow create: if validPatronShoutoutCreate();
       allow read, update, delete: if signedIn();
     }
 
@@ -255,11 +508,24 @@ service cloud.firestore {
 
     match /commerceProducts/{id} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow create: if validNewCommerceProduct();
+      allow update: if isCommerceProductUpdate();
+      allow delete: if isCommerceProductManager();
     }
 
     match /serviceOrders/{id} {
-      allow read, create, update, delete: if signedIn();
+      allow read: if isServiceOrderReader();
+      allow create, delete: if false;
+      allow update: if isMasterFulfillmentUpdate();
+    }
+
+    // Stripe account IDs, capability state, and webhook claims are backend-only.
+    match /stripeConnectAccounts/{id} {
+      allow read, write: if false;
+    }
+
+    match /stripeWebhookEvents/{id} {
+      allow read, write: if false;
     }
 
     match /entityFollows/{id} {
@@ -369,7 +635,21 @@ service cloud.firestore {
     }
 
     match /shoutoutRecommendations/{id} {
-      allow create, read, update, delete: if signedIn();
+      allow read: if isMasterAdmin()
+        || (
+          signedIn()
+          && (
+            resource.data.status == "approved"
+            || resource.data.uid == request.auth.uid
+          )
+        );
+      allow create: if isMasterAdmin()
+        || (
+          signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.status == "pending"
+        );
+      allow update, delete: if isMasterAdmin();
     }
 
     match /aiIndex/{id} {

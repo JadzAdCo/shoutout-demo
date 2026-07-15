@@ -72,17 +72,20 @@
 @keyframes footballProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(max-aspect-ratio:3/2){.football-player-reveal{grid-template-columns:1fr;grid-template-rows:58% 1fr;gap:2vh}.football-player-portrait{width:72%;height:100%;justify-self:center}.football-player-number{left:70%;top:2%}.football-player-copy{text-align:center}.football-player-copy strong{font-size:clamp(52px,9vw,120px)}.football-final-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.football-final-lineup header strong{font-size:clamp(26px,4.5vw,58px)}}
 
-/* v29.08.2 review: global Traditional Black & White layout with a fixed identity rail. */
+/* v29.08.3 maximum-text preview: another 12.5% taller board centered above the lowered rail. */
+.classic-bw.classic-board-template .display-center:before{
+  inset:clamp(5px,.7vw,10px) clamp(18px,2.8vw,38px)!important;
+}
 .classic-bw.classic-board-template .display-center:after{
-  inset:18% 8.5% 29%!important;
+  inset:6.2% 7.5% 22.94%!important;
   border-width:clamp(4px,.7vw,9px)!important;
   border-radius:clamp(14px,2.4vw,32px)!important;
 }
 .classic-bw.classic-board-template #displayMain.classic-bw-board{
-  left:10.5%!important;
-  right:10.5%!important;
-  top:21.5%!important;
-  bottom:32.5%!important;
+  left:9%!important;
+  right:9%!important;
+  top:10.9%!important;
+  bottom:27.62%!important;
   padding:clamp(7px,1.1vw,16px) clamp(10px,1.6vw,24px)!important;
   display:grid!important;
   align-items:center!important;
@@ -95,10 +98,10 @@
 .classic-bw #displaySub.classic-bw-identity{
   position:absolute!important;
   z-index:4!important;
-  left:17%!important;
-  right:17%!important;
-  top:75%!important;
-  height:11.5%!important;
+  left:15.5%!important;
+  right:15.5%!important;
+  top:82%!important;
+  height:12%!important;
   margin:0!important;
   padding:0!important;
   display:grid!important;
@@ -185,3 +188,28 @@
 @media(prefers-reduced-motion:reduce){
   .classic-identity-shell,.classic-identity-particles i{animation:none!important}
 }
+
+/* v29.08.4: 30% larger, display-aware message text. */
+.display-message-lines{
+  display:grid;
+  grid-template-rows:repeat(var(--display-message-lines,1),auto);
+  align-content:center;
+  justify-items:center;
+  gap:.04em;
+  width:100%;
+}
+.display-message-lines span{display:block;max-width:100%;white-space:nowrap}
+.display-message-lines-2{--display-message-lines:2}
+.display-message-lines-3{--display-message-lines:3}
+.split-media-layout .display-message-lines{line-height:.88}
+.unsupported-text-layout{display:grid!important;place-content:center!important;gap:3vh!important}
+.unsupported-text-layout #displayMain{font-size:clamp(34px,7vw,96px)!important}
+.unsupported-text-layout #displaySub{display:block!important;font-size:clamp(18px,2.4vw,34px)!important;max-width:84%;margin:auto}
+.football-opening strong{font-size:clamp(83px,13vw,247px)}
+.football-stadium-message b{font-size:clamp(57px,9.62vw,185px)}
+.football-stadium-message.football-message-lines-3 b{font-size:clamp(52px,8.84vw,169px)}
+.football-final-lineup header strong{font-size:clamp(49px,7.28vw,135px)}
+
+/* v29.09.0: patron backgrounds replace the scene while protected template layers stay intact. */
+.display-canvas.custom-background-active.classic-bw .display-center{background:inherit!important}
+.display-canvas.custom-background-active.football-team-intro .football-intro-stage{background:inherit!important}

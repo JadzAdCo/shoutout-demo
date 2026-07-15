@@ -1,5 +1,5 @@
 /*
-  shared-data.js v29.08.2
+  shared-data.js v29.09.0
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
@@ -564,13 +564,13 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR SHOUTOUT so the composition never shifts.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background locked"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR SHOUTOUT so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
   birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
   fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
   summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal', tags:["summer","pool party","beach","cabana","day party","vacation"] },
-  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:false, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired background for luxury ride or car meet ShoutOuts. Its illustration is locked by default.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride","background locked"] },
+  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired layout for luxury ride or car meet ShoutOuts. Patrons may replace its background while the car silhouette, text geometry, and readability limits remain locked.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride","background editable","locked layout"] },
   champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP', tags:["champagne","bottle","vip","toast","celebration","luxury"] },
   beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach', tags:["beach","pool","summer","cabana","day party","vacation"] },
   graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', tags:["graduation","grad","school","college","achievement"] },
@@ -586,7 +586,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     mediaMode:'4 patron photos + 20-second animation',
     supportsMedia:false,
     supportsTeamMedia:true,
-    backgroundEditable:false,
+    backgroundEditable:true,
     layout:'football-team-intro',
     teamMemberSlots:4,
     durationSeconds:20,
@@ -598,8 +598,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultSub:'GAME NIGHT LINEUP',
     maxMainCharacters:36,
     maxSubCharacters:36,
-    description:'A Zebbies-only, 20-second American football game-introduction sequence. Add exactly four authorized patron photos; each player gets a cinematic reveal followed by the full lineup.',
-    tags:["zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","game night","collaboration","ai image treatment","$30"]
+    description:'A Zebbies-only, 20-second American football game-introduction sequence. Add exactly four authorized patron photos; each player gets a cinematic reveal followed by the full lineup. Patrons may change the stadium background while the field, player frames, text geometry, and 20-second timing stay locked.',
+    tags:["zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","game night","collaboration","ai image treatment","$30","background editable","locked layout"]
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] }
@@ -617,14 +617,118 @@ window.FLOQR_DISPLAY_FORMATS = {
 };
 window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = Object.keys(window.FLOQR_DISPLAY_FORMATS);
 
+/* v29.08.4: display-aware text contracts. Limits are readability ceilings, not targets. */
+window.FLOQR_TEMPLATE_TEXT_PROFILES = {
+  full: {
+    label:"Full-screen message",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:72},
+      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:22,minimumFontPixels:72},
+      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:24,minimumFontPixels:48},
+      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:58},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:22,minimumFontPixels:58},
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:20,minimumFontPixels:38}
+    }
+  },
+  classicBoard: {
+    label:"Three-line classic board",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:62},
+      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:18,minimumFontPixels:56},
+      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:44},
+      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:18,minimumFontPixels:46},
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:16,minimumFontPixels:34}
+    }
+  },
+  splitMedia: {
+    label:"Media and message split",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:54},
+      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:58},
+      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."},
+      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:44},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:46},
+      "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."}
+    }
+  },
+  car: {
+    label:"Illustrated car message",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:22,minimumFontPixels:72},
+      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:18,minimumFontPixels:72},
+      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:48},
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:22,minimumFontPixels:58},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:18,minimumFontPixels:58},
+      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:16,minimumFontPixels:38}
+    }
+  },
+  footballIntro: {
+    label:"Four-player football introduction",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:72},
+      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:68},
+      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Use a 96 x 48 cm or 64 x 48 cm display. Four portraits, names, positions, and the stadium message are too dense for a 64 x 32 cm panel."},
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:58},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:54},
+      "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Use a 96 x 48 cm or 64 x 48 cm display. Four portraits, names, positions, and the stadium message are too dense for a 64 x 32 cm panel."}
+    }
+  }
+};
+
+window.FLOQRTextLayout = {
+  version:"29.08.4",
+  profileId(template = {}) {
+    const id = String(template.id || "");
+    if (id === "blackwhite" || template.className === "classic-bw") return "classicBoard";
+    if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
+    if (id === "car" || template.className === "car") return "car";
+    if (template.layout === "split-media") return "splitMedia";
+    return String(template.textProfileId || "full");
+  },
+  resolve(templateOrId = {}, formatId = "") {
+    const template = typeof templateOrId === "string" ? (window.SHOUTOUT_TEMPLATES?.[templateOrId] || {id:templateOrId}) : (templateOrId || {});
+    const resolvedFormatId = String(formatId || template.screenFormatIds?.[0] || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48");
+    const profileId = this.profileId(template);
+    const profile = window.FLOQR_TEMPLATE_TEXT_PROFILES[profileId] || window.FLOQR_TEMPLATE_TEXT_PROFILES.full;
+    const rule = profile.formats[resolvedFormatId] || {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"This template has no reviewed text layout for the selected display."};
+    return {
+      ...rule,
+      templateId:String(template.id || ""),
+      templateName:String(template.name || template.id || "Template"),
+      formatId:resolvedFormatId,
+      formatLabel:String(window.FLOQR_DISPLAY_FORMATS?.[resolvedFormatId]?.label || resolvedFormatId),
+      profileId,
+      profileLabel:profile.label,
+      mainTextSizePercent:20.8,
+      subTextSizePercent:7.8,
+      main:Number(rule.maxMainCharacters || 0),
+      sub:Number(rule.maxSubCharacters || 0),
+      total:Number(rule.maxMainCharacters || 0),
+      perLine:Number(rule.maxCharactersPerLine || 0),
+      textScale:1.3
+    };
+  },
+  supportedFormatIds(templateOrId = {}, candidates = window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || []) {
+    return candidates.filter(formatId => this.resolve(templateOrId, formatId).supported);
+  }
+};
+
 Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
   template.screenFormatIds = Array.from(new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
+  template.textProfileId = window.FLOQRTextLayout.profileId(template);
+  template.textLayoutVersion = window.FLOQRTextLayout.version;
+  template.textCompatibleScreenFormatIds = window.FLOQRTextLayout.supportedFormatIds(template, template.screenFormatIds);
+  const primaryTextRule = window.FLOQRTextLayout.resolve(template, template.textCompatibleScreenFormatIds[0] || template.screenFormatIds[0]);
+  template.maxMainCharacters = primaryTextRule.main;
+  template.maxSubCharacters = primaryTextRule.sub;
+  template.lineCount = primaryTextRule.lineCount;
+  template.maxCharactersPerLine = primaryTextRule.perLine;
   template.tags = Array.from(new Set([...(template.tags || []), ...template.screenFormatIds.flatMap(id => window.FLOQR_DISPLAY_FORMATS[id]?.tags || [])]));
   template.status = template.status || "active";
   template.backgroundEditable = template.backgroundEditable !== false;
-  template.maxSubCharacters = Number.isFinite(Number(template.maxSubCharacters)) ? Number(template.maxSubCharacters) : 60;
-  template.mainTextSizePercent = Number.isFinite(Number(template.mainTextSizePercent)) ? Number(template.mainTextSizePercent) : 16;
-  template.subTextSizePercent = Number.isFinite(Number(template.subTextSizePercent)) ? Number(template.subTextSizePercent) : 6;
+  template.mainTextSizePercent = primaryTextRule.mainTextSizePercent;
+  template.subTextSizePercent = primaryTextRule.subTextSizePercent;
 });
 
 window.FLOQRAddress = {
@@ -709,6 +813,54 @@ window.FLOQR_AI_DISCOVERY_PARTNERS = {
   categories: ["nightclub", "lounge", "beachClub", "brunchParty", "poolParty", "summerParty", "djEvent", "promoterEvent", "comedyShow"],
   taxiHailingPartnerMode: "tesla-robotaxi-simulation-and-official-app-handoff"
 };
+
+/* v29.09.0: original, non-lyrical music-inspired recommendations awaiting Master Admin review. */
+window.FLOQR_RECOMMENDATION_SEED_QUEUE = [
+  {id:"music-ruger-bae-bae-01",mainText:"MY BAE OWNS TONIGHT",subText:"AFRO LOVE",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-02",mainText:"LOVE SET THE VIBE",subText:"BAE BAE ENERGY",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-03",mainText:"BAE CAME TO SHINE",subText:"SWEET NIGHT",genre:"afrobeats",tone:"celebration",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-04",mainText:"OUR LOVE RUNS DEEP",subText:"TWO HEARTS",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-05",mainText:"TWO HEARTS ONE VIBE",subText:"LOVE IN MOTION",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-06",mainText:"MY PERSON MY PEACE",subText:"ONLY US",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-07",mainText:"LOVE LOOKS GOOD HERE",subText:"DATE NIGHT",genre:"afrobeats",tone:"romantic",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+  {id:"music-ruger-bae-bae-08",mainText:"BAE LIGHTS THE ROOM",subText:"GLOW TOGETHER",genre:"afrobeats",tone:"celebration",sourceArtist:"Ruger & BNXN",sourceTrack:"Bae Bae"},
+
+  {id:"music-usher-club-01",mainText:"YEAH WE OWN TONIGHT",subText:"CLUB CLASSIC",genre:"rnb-hiphop",tone:"party",sourceArtist:"Usher",sourceTrack:"Yeah!"},
+  {id:"music-usher-club-02",mainText:"CLUB LOVE ALL NIGHT",subText:"RNB ENERGY",genre:"rnb-hiphop",tone:"romantic",sourceArtist:"Usher",sourceTrack:"Love in This Club"},
+  {id:"music-usher-club-03",mainText:"DJ RUN IT BACK",subText:"DANCE AGAIN",genre:"rnb-hiphop",tone:"party",sourceArtist:"Usher",sourceTrack:"DJ Got Us Fallin' in Love"},
+  {id:"music-usher-club-04",mainText:"THIS DANCE IS OURS",subText:"LIGHTS UP",genre:"rnb-hiphop",tone:"party",sourceArtist:"Usher",sourceTrack:"DJ Got Us Fallin' in Love"},
+  {id:"music-usher-club-05",mainText:"CAUGHT IN THE VIBE",subText:"SMOOTH NIGHT",genre:"rnb-hiphop",tone:"party",sourceArtist:"Usher",sourceTrack:"Caught Up"},
+  {id:"music-usher-club-06",mainText:"LOOK AT US TONIGHT",subText:"BIG MOMENT",genre:"rnb-hiphop",tone:"celebration",sourceArtist:"Usher",sourceTrack:"OMG"},
+  {id:"music-usher-club-07",mainText:"WE MOVE OUR WAY",subText:"MAIN STAGE",genre:"rnb-hiphop",tone:"confident",sourceArtist:"Usher",sourceTrack:"My Way"},
+  {id:"music-usher-club-08",mainText:"ONE MORE DANCE",subText:"ALL TOGETHER",genre:"rnb-hiphop",tone:"party",sourceArtist:"Usher",sourceTrack:"DJ Got Us Fallin' in Love"},
+
+  {id:"music-wizkid-ikebe-01",mainText:"HER VIBE OWNS HERE",subText:"STAR ENERGY",genre:"afrobeats",tone:"confident",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-02",mainText:"RHYTHM ALL NIGHT",subText:"AFRO SWAY",genre:"afrobeats",tone:"party",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-03",mainText:"STAR ENERGY ONLY",subText:"BIG WIZ VIBE",genre:"afrobeats",tone:"confident",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-04",mainText:"SHE MOVES WE CHEER",subText:"DANCE FLOOR",genre:"afrobeats",tone:"celebration",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-05",mainText:"BIG VIBE NO APOLOGY",subText:"OWN THE ROOM",genre:"afrobeats",tone:"confident",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-06",mainText:"RHYTHM MADE FOR US",subText:"SWEET MOTION",genre:"afrobeats",tone:"romantic",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-07",mainText:"FINE VIBE FRONT ROW",subText:"AFRO STAR",genre:"afrobeats",tone:"confident",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+  {id:"music-wizkid-ikebe-08",mainText:"WE SWAY TILL LATE",subText:"NIGHT RHYTHM",genre:"afrobeats",tone:"party",sourceArtist:"Wizkid",sourceTrack:"Psycho (Kcee feat. Wizkid)"},
+
+  {id:"music-davido-unavailable-01",mainText:"PEACE OVER PRESSURE",subText:"UNBOTHERED",genre:"afrobeats",tone:"confident",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-02",mainText:"NO DRAMA JUST VIBES",subText:"DANCE MODE",genre:"afrobeats",tone:"party",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-03",mainText:"BLESSED NOT STRESSED",subText:"GOOD ENERGY",genre:"afrobeats",tone:"confident",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-04",mainText:"OFFLINE ON THE FLOOR",subText:"PHONE DOWN",genre:"afrobeats",tone:"party",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-05",mainText:"BUSY MAKING MEMORIES",subText:"LIVE TONIGHT",genre:"afrobeats",tone:"celebration",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-06",mainText:"NO CALLS JUST DANCE",subText:"WE OUTSIDE",genre:"afrobeats",tone:"party",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-07",mainText:"MY PEACE COMES FIRST",subText:"GOOD LIFE",genre:"afrobeats",tone:"confident",sourceArtist:"Davido",sourceTrack:"Unavailable"},
+  {id:"music-davido-unavailable-08",mainText:"UNBOTHERED ALL NIGHT",subText:"NO DISTRACTIONS",genre:"afrobeats",tone:"confident",sourceArtist:"Davido",sourceTrack:"Unavailable"}
+].map(item => ({
+  ...item,
+  status:"pending",
+  source:"editorial-music-inspiration",
+  sourceType:"music-inspired-original",
+  rightsStatus:"original-non-lyrical",
+  rightsNote:"Original FLOQR wording; no song lyrics are stored.",
+  sourceNote:item.sourceArtist === "Wizkid" ? "User referenced this theme as Ikebe; exact track attribution requires Master Admin confirmation." : "Song themes used only as creative direction.",
+  seedVersion:"29.09.0"
+}));
 
 window.SHOUTOUT_AI_SUGGESTIONS = [
   {category:'birthday', main:'HAPPY BIRTHDAY!', sub:'VIP vibes all night long.'},
