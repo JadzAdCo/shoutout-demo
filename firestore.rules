@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09-recommendation-moderation
-// EXPECTED DEPLOYED RULES VERSION: v29.09-recommendation-moderation or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
+// EXPECTED DEPLOYED RULES VERSION: v29.09.4-app-logging or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09-recommendation-moderation
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -517,6 +518,22 @@ service cloud.firestore {
       allow read: if isServiceOrderReader();
       allow create, delete: if false;
       allow update: if isMasterFulfillmentUpdate();
+    }
+
+    // Operational application logs for Master Admin Logging.
+    match /appLogs/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll(['level', 'category', 'message', 'uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.level in ['debug', 'info', 'warn', 'error']
+        && request.resource.data.category is string
+        && request.resource.data.category.size() <= 80
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000;
+      allow read: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow update: if false;
+      allow delete: if isMasterAdmin();
     }
 
     // Stripe account IDs, capability state, and webhook claims are backend-only.

@@ -117,6 +117,7 @@
         document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
         btn.classList.add("active");
         byId(btn.dataset.panel)?.classList.add("active");
+        if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
       });
     });
   }
@@ -133,6 +134,7 @@
         : `Clicked action: ${label}. Waiting for the feature-specific result message...`;
       setText("masterActionFeedback", message);
       if (target.closest("#diagnostics")) setText("diagnosticsStatus", message);
+      if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
@@ -1352,6 +1354,13 @@
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
       if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
       if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});
+      if (window.FLOQRAppLogging) window.FLOQRLog?.write?.({
+        level: "info",
+        category: "admin",
+        action: "master_admin_session",
+        message: "Master Admin portal session started",
+        source: "master-admin"
+      });
     });
   });
 })();

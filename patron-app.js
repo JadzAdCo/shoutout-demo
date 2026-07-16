@@ -2551,6 +2551,29 @@
     return rows.slice(0, caps.lineCount).join("\n");
   }
 
+  // Live typing must NOT run fitTemplateText: it trims and re-wraps, which deletes
+  // spaces (and mid-word typing) on every keystroke. Only clamp raw length here.
+  function clampMainTextWhileTyping(value = "") {
+    const caps = templateDisplayCaps();
+    if (caps.supported === false) return String(value || "");
+    const maxRaw = Number(caps.main || 0) + Math.max(0, Number(caps.lineCount || 1) - 1);
+    if (maxRaw <= 0) return String(value || "");
+    return String(value || "").slice(0, maxRaw);
+  }
+
+  function applyFittedMainText(input) {
+    if (!input) return;
+    const selectionStart = input.selectionStart;
+    const selectionEnd = input.selectionEnd;
+    const fitted = fitTemplateText(input.value, "main");
+    if (input.value === fitted) return;
+    input.value = fitted;
+    if (typeof selectionStart === "number" && typeof selectionEnd === "number") {
+      const cursor = Math.min(fitted.length, selectionStart);
+      try { input.setSelectionRange(cursor, Math.min(fitted.length, selectionEnd)); } catch (_) {}
+    }
+  }
+
   function updateTemplateCharacterCapHint() {
     const hint = byId("templateCharacterCapHint");
     if (!hint) return;
@@ -2831,6 +2854,7 @@
 
   async function submitShoutout() {
     const status=byId("submitStatus");
+    const correlationId = window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`;
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
@@ -2839,6 +2863,31 @@
       if (caps.supported === false) throw new Error(caps.advice || "Choose a supported display size for this template.");
       const footballIntro = isFootballTeamIntro();
       if (footballIntro && locationId() !== "zebbies-garden-washington-dc") throw new Error("This advanced football template is available only at Zebbies Garden DC.");
+      if (selectedTemplate !== "blackwhite" && window.FLOQRPayments?.getClubCheckoutReadiness) {
+        status.textContent = "Checking whether this club can accept paid ShoutOuts…";
+        const readiness = await window.FLOQRPayments.getClubCheckoutReadiness({
+          clubLocationId: locationId(),
+          status: message => { status.textContent = message; }
+        });
+        if (!readiness?.ready) {
+          throw new Error(readiness?.message || "This club has not finished Stripe payout onboarding, so paid ShoutOuts cannot start yet.");
+        }
+      }
+      if (window.FLOQRLog) {
+        window.FLOQRLog.write({
+          level: "info",
+          category: "shoutout",
+          action: "submit_start",
+          message: `Submitting ${selectedTemplate || "shoutout"} for ${locationId()}`,
+          correlationId,
+          details: {
+            template: selectedTemplate,
+            locationId: locationId(),
+            screenFormatId: caps.formatId || selectedScreenFormatId,
+            footballIntro: !!footballIntro
+          }
+        });
+      }
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
       const footballTeamMembers = footballIntro ? await uploadFootballTeamMembers(referenceNumber) : [];
       const uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
@@ -2924,7 +2973,21 @@
       try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
-    } catch(e) { status.textContent=e.message; }
+    } catch(e) {
+      status.textContent=e.message;
+      if (window.FLOQRLog) {
+        window.FLOQRLog.fromError(e, {
+          category: "shoutout",
+          action: "submit_failed",
+          correlationId,
+          details: {
+            template: selectedTemplate,
+            locationId: selectedLocationId || locationId?.() || "",
+            screenFormatId: selectedScreenFormatId || ""
+          }
+        });
+      }
+    }
   }
   function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
@@ -3186,7 +3249,16 @@
     });
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
-    byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; updateTemplateCharacterCapHint(); });
+    byId("mainText")?.addEventListener("input", event => {
+      const next = clampMainTextWhileTyping(event.currentTarget.value);
+      if (event.currentTarget.value !== next) event.currentTarget.value = next;
+      updateTemplateCharacterCapHint();
+    });
+    byId("mainText")?.addEventListener("blur", event => {
+      applyFittedMainText(event.currentTarget);
+      updateTemplateCharacterCapHint();
+      updatePreview();
+    });
     byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updateMediaEditorForTemplate(); schedulePersonalizedShoutOutRecommendations(); updatePreview(); });
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
     bindFootballTeamEditor();

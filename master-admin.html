@@ -61,6 +61,7 @@
         <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
         <button class="admin-tab" data-panel="servicesCommerce" type="button">Services & Commerce</button>
+        <button class="admin-tab" data-panel="appLogging" type="button">Logging</button>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
         <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
@@ -230,6 +231,49 @@
         <div class="metric-grid"><div class="metric-card"><span>Paid Services</span><strong id="serviceOrderCount">0</strong></div><div class="metric-card"><span>Gross Revenue</span><strong id="serviceGrossRevenue">$0</strong></div><div class="metric-card"><span>FloqR Share</span><strong id="serviceFloqrShare">$0</strong></div><div class="metric-card"><span>Seller / Club Payable</span><strong id="serviceEntityPayable">$0</strong></div></div>
         <div class="card"><h2>Service Orders, Invoices & Shipping</h2><p class="sub small">Track ShoutOuts, targeted distribution, SMS services, and Commerce orders through payment and fulfillment.</p><div id="serviceOrdersReport" class="report-block"></div></div>
         <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
+      </section>
+
+      <section id="appLogging" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible Logs</span><strong id="appLogCount">0</strong></div>
+          <div class="metric-card"><span>Errors in View</span><strong id="appLogErrorCount">0</strong></div>
+          <div class="metric-card"><span>Unpaid Checkouts</span><strong id="unpaidCheckoutCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2>Application Logging</h2>
+          <p class="sub small">Client and Cloud Functions write operational events here: auth, ShoutOut submit, Stripe checkout, Connect readiness, media uploads, and cancellations. Use this when a patron reports a failed paid ShoutOut.</p>
+          <div class="profile-grid">
+            <label>Level
+              <select id="appLogLevelFilter">
+                <option value="">All levels</option>
+                <option value="error">error</option>
+                <option value="warn">warn</option>
+                <option value="info">info</option>
+                <option value="debug">debug</option>
+              </select>
+            </label>
+            <label>Category contains<input id="appLogCategoryFilter" placeholder="checkout, stripe, shoutout, auth"/></label>
+            <label>Search<input id="appLogSearch" placeholder="message, email, correlation id"/></label>
+          </div>
+          <div class="button-row">
+            <button id="appLogRefreshBtn" type="button">Refresh Logs</button>
+            <button id="checkZebbiesConnectBtn" type="button">Check Zebbies Connect</button>
+            <button id="clearUnpaidCheckoutsBtn" class="ghost" type="button">Clear All Unpaid Checkouts</button>
+          </div>
+          <p id="appLoggingStatus" class="status">Open this tab while signed in as Master Admin.</p>
+          <div id="zebbiesConnectReadiness" class="report-block"></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Recent Log Events</h2>
+            <div id="appLogList" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Unpaid / Stuck Stripe Checkouts</h2>
+            <p class="sub small">Cancels open Stripe Checkout sessions when possible and marks FLOQR service orders as checkout-cancelled.</p>
+            <div id="unpaidCheckoutList" class="report-block"></div>
+          </div>
+        </div>
       </section>
 
       <section id="allQueues" class="admin-panel-section">
@@ -573,9 +617,11 @@
 <script src="./ad-campaigns.js?v=29.05"></script>
 <script src="./ai-diagnostics-service.js?v=29.06"></script>
 <script src="./duplicate-record-service.js?v=29.05"></script>
-<script src="./payment-service.js?v=29.09.2"></script>
-<script src="./master-admin-app.js?v=29.09.0"></script>
+<script src="./floqr-logger.js?v=29.09.4"></script>
+<script src="./payment-service.js?v=29.09.4"></script>
+<script src="./master-admin-app.js?v=29.09.4"></script>
 <script src="./master-services-extension.js?v=29.07"></script>
+<script src="./master-logging-extension.js?v=29.09.4"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>
 </body>
