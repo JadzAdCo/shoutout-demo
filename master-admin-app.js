@@ -118,6 +118,7 @@
         btn.classList.add("active");
         byId(btn.dataset.panel)?.classList.add("active");
         if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
+        if (btn.dataset.panel === "networkReconciliation") loadNetworkPaymentLedger();
       });
     });
   }
@@ -1161,6 +1162,72 @@
     window.FLOQRAdCampaigns.renderAdminCampaignManager("adCampaignManagementList", patrons);
   }
 
+  async function loadNetworkPaymentLedger() {
+    const statusEl = byId("networkReconStatus");
+    const listEl = byId("networkReconList");
+    if (!listEl) return;
+    if (statusEl) statusEl.textContent = "Loading FloqR payment ledger…";
+    try {
+      let rows = [];
+      try {
+        const snap = await db.collection("paymentLedger").orderBy("paidAt", "desc").limit(250).get();
+        rows = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (_) {
+        const orderSnap = await db.collection("serviceOrders").where("paymentStatus", "==", "paid").limit(250).get();
+        rows = orderSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(row => row.orderType === "shoutout");
+      }
+      const grossCents = rows.reduce((sum, row) => sum + Number(row.amountCents || 0), 0);
+      const clubCents = rows.reduce((sum, row) => sum + Number(row.clubShareCents ?? row.venueShareCents ?? 0), 0);
+      const floqrCents = rows.reduce((sum, row) => sum + Number(row.floqrShareCents || 0), 0);
+      if (byId("netReconGross")) byId("netReconGross").textContent = money(grossCents);
+      if (byId("netReconClubShare")) byId("netReconClubShare").textContent = money(clubCents);
+      if (byId("netReconFloqrShare")) byId("netReconFloqrShare").textContent = money(floqrCents);
+      if (byId("netReconCount")) byId("netReconCount").textContent = String(rows.length);
+      const testCount = rows.filter(row => row.isTestPayment || row.environment === "test" || row.testPaymentMarker).length;
+      listEl.innerHTML = rows.length
+        ? rows.map(row => {
+            const isTest = row.isTestPayment || row.environment === "test" || row.testPaymentMarker;
+            const testBadge = isTest ? " · TEST" : "";
+            return `<article class="queue-item">
+            <div class="message-envelope-head"><strong>${esc(row.itemName || "Paid ShoutOut")}</strong><span>${esc(row.clubLocationId || "-")}${isTest ? " · <strong>TEST</strong>" : ""}</span></div>
+            <p>${esc(row.invoiceNumber || row.id)} · Gross ${money(row.amountCents)} · Club ${money(row.clubShareCents ?? row.venueShareCents)} · FloqR ${money(row.floqrShareCents)}</p>
+            <small>${esc(row.settlementStatus || row.paymentStatus || "paid")}${testBadge} · ${esc(row.paymentModel || "floqr-platform")}</small>
+          </article>`;
+          }).join("")
+        : `<p class="sub">No priced FloqR ShoutOut payments recorded yet.</p>`;
+      if (statusEl) {
+        statusEl.textContent = testCount
+          ? `Loaded ${rows.length} ledger entr${rows.length === 1 ? "y" : "ies"} (${testCount} TEST-marked).`
+          : `Loaded ${rows.length} ledger entr${rows.length === 1 ? "y" : "ies"}.`;
+      }
+    } catch (error) {
+      listEl.innerHTML = `<p class="sub">${esc(error.message || "Ledger load failed.")}</p>`;
+      if (statusEl) statusEl.textContent = error.message || "Ledger load failed.";
+    }
+  }
+
+  async function purgeNetworkTestPayments() {
+    const statusEl = byId("networkReconStatus");
+    if (!window.FLOQRPayments?.purgeTestPayments) {
+      if (statusEl) statusEl.textContent = "Test payment purge is unavailable.";
+      return;
+    }
+    if (!confirm("Permanently delete all Stripe TEST-marked payment ledger rows, related paid shoutouts, and test service orders? This cannot be undone.")) return;
+    if (statusEl) statusEl.textContent = "Deleting Stripe test payments…";
+    try {
+      const result = await window.FLOQRPayments.purgeTestPayments({});
+      const deleted = result.deleted || {};
+      if (statusEl) {
+        statusEl.textContent = `Deleted test payments — ledger ${deleted.paymentLedger || 0}, orders ${deleted.serviceOrders || 0}, shoutouts ${deleted.shoutouts || 0}.`;
+      }
+      await loadNetworkPaymentLedger();
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error.message || "Test payment purge failed.";
+    }
+  }
+
   async function loadNetworkReports() {
     const [users, shoutouts, liveDocs, locations, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
       getCollectionSafe("users"),
@@ -1246,17 +1313,13 @@
     renderPatronDiagnostics(users);
     renderAdCampaignManagement(users);
 
-    const gross = revenue + Math.round(impressions / 1000 * 25);
-    const platformShare = Math.round(gross * 0.35);
-    const venueShare = gross - platformShare;
-
     byId("networkReconReport").innerHTML = simpleRows([
-      ["Estimated gross revenue", money(gross)],
-      ["Estimated FLOQR platform share", money(platformShare)],
-      ["Estimated venue payouts", money(venueShare)],
-      ["Locations requiring payout", locationRows.length.toLocaleString()],
-      ["Reconciliation status", "Prototype — connect payment processor ledger later"]
+      ["Payment model", "Patron pays FloqR Stripe; clubs accrue 20% of priced ShoutOuts"],
+      ["Priced template today", "Zebbies 4-Player Football Intro ($30)"],
+      ["Free ShoutOut templates", "Not charged; not in payment ledger"],
+      ["Club Stripe Connect", "Optional — club subscription / Commerce only"]
     ]);
+    loadNetworkPaymentLedger();
 
     byId("ticketPartnerReport").innerHTML = `
       ${simpleRows([
@@ -1309,6 +1372,8 @@
     bind("importClubOnboardingCsvBtn", importClubCsv);
     bind("createPromoterOnboardingBtn", createPromoterOnboarding);
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
+    bind("refreshNetworkReconBtn", loadNetworkPaymentLedger);
+    bind("purgeTestPaymentsReconBtn", purgeNetworkTestPayments);
     bind("previewManagedTemplateBtn", () => viewManagedTemplate(currentManagedTemplateDraft()));
     bind("saveManagedTemplateBtn", saveManagedTemplate);
     bind("clearManagedTemplateBtn", clearManagedTemplateForm);

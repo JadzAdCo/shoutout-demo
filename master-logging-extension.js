@@ -1,4 +1,4 @@
-/* FLOQR Master Admin Logging + unpaid Stripe checkout cleanup v29.09.4 */
+/* FLOQR Master Admin Logging + unpaid / test Stripe payment cleanup v29.09.5 */
 (function () {
   "use strict";
 
@@ -58,12 +58,17 @@
     const box = byId("unpaidCheckoutList");
     if (!box) return;
     byId("unpaidCheckoutCount").textContent = String(unpaidOrders.length);
-    box.innerHTML = unpaidOrders.length ? unpaidOrders.map(order => `<article class="queue-item">
-      <div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "Order")}</strong><span>${esc(order.status || order.paymentStatus || "unpaid")}</span></div>
+    box.innerHTML = unpaidOrders.length ? unpaidOrders.map(order => {
+      const testBadge = order.isTestPayment || order.environment === "test" || order.testPaymentMarker
+        ? ` · <strong>TEST</strong>`
+        : "";
+      return `<article class="queue-item">
+      <div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "Order")}</strong><span>${esc(order.status || order.paymentStatus || "unpaid")}${testBadge}</span></div>
       <p>${esc(order.invoiceNumber || order.id)} · ${money(order.amountCents)}</p>
       <small>${esc(order.ownerEmail || order.ownerUid || "-")} · club ${esc(order.clubLocationId || "-")} · created ${esc(ts(order.createdAt))}</small>
       <button type="button" class="ghost" data-cancel-order="${esc(order.id)}">Cancel / clear this checkout</button>
-    </article>`).join("") : `<p class="sub">No unpaid checkout sessions found.</p>`;
+    </article>`;
+    }).join("") : `<p class="sub">No unpaid checkout sessions found.</p>`;
     box.querySelectorAll("[data-cancel-order]").forEach(button => {
       button.addEventListener("click", () => cancelOne(button.dataset.cancelOrder));
     });
@@ -122,32 +127,50 @@
     }
   }
 
+  async function purgeTestPayments() {
+    if (!window.FLOQRPayments?.purgeTestPayments) return;
+    if (!confirm("Permanently delete all Stripe TEST-marked payment ledger rows, related paid shoutouts, and test service orders? This cannot be undone.")) return;
+    setStatus("Deleting Stripe test payments…");
+    try {
+      const result = await window.FLOQRPayments.purgeTestPayments({});
+      const deleted = result.deleted || {};
+      setStatus(`Deleted test payments — ledger ${deleted.paymentLedger || 0}, orders ${deleted.serviceOrders || 0}, shoutouts ${deleted.shoutouts || 0}.`);
+      await loadUnpaid();
+      await loadLogs();
+    } catch (error) {
+      setStatus(error.message || "Test payment purge failed.");
+    }
+  }
+
   async function checkZebbiesConnect() {
+    const box = byId("zebbiesConnectReadiness");
+    if (box) {
+      box.innerHTML = `<p class="sub"><strong>Paid ShoutOuts do not require club Stripe Connect.</strong> Patron football / priced ShoutOuts are charged to FloqR’s Stripe account. This club earns a tracked 20% share under Account Reconciliation. Club Stripe onboarding is only for club subscription or club-billed Commerce products.</p>`;
+    }
     if (!window.FLOQRPayments?.getClubCheckoutReadiness) {
-      setStatus("Checkout readiness API is not loaded.");
+      setStatus("Optional club-billed Connect check unavailable.");
       return;
     }
-    setStatus("Checking Zebbies Stripe payout readiness…");
+    setStatus("Checking optional Zebbies club-billed Stripe status…");
     try {
       const result = await window.FLOQRPayments.getClubCheckoutReadiness({ clubLocationId: "zebbies-garden-washington-dc" });
-      const box = byId("zebbiesConnectReadiness");
       if (box) {
-        box.innerHTML = result.ready
-          ? `<p class="sub">Zebbies Garden DC payouts are ready (${esc(result.capabilityStatus || "active")}). Football paid ShoutOuts can proceed.</p>`
-          : `<p class="sub">Zebbies Garden DC is <strong>not</strong> ready for paid ShoutOuts. ${esc(result.message || "Complete Stripe Connect onboarding in Club Admin.")}</p>`;
+        box.innerHTML += result.ready
+          ? `<p class="sub">Optional club Stripe Connect for Zebbies is ready (${esc(result.capabilityStatus || "active")}) for club-billed products only.</p>`
+          : `<p class="sub">Optional club Stripe Connect for Zebbies is not configured. That does <strong>not</strong> block FloqR-priced ShoutOuts such as the $30 football intro.</p>`;
       }
-      setStatus(result.ready ? "Zebbies Connect is ready." : "Zebbies Connect is not ready.");
+      setStatus(result.ready ? "Optional club Connect ready (not required for ShoutOuts)." : "Club Connect not configured — ShoutOuts still use FloqR Stripe.");
       if (window.FLOQRLog) {
         window.FLOQRLog.write({
-          level: result.ready ? "info" : "warn",
+          level: "info",
           category: "stripe",
           action: "zebbies_connect_check",
-          message: result.ready ? "Zebbies Connect ready" : (result.message || "Zebbies Connect not ready"),
-          details: result
+          message: "Club Connect is optional for ShoutOuts; FloqR platform charges apply",
+          details: { ...result, shoutoutPaymentModel: "floqr-platform" }
         });
       }
     } catch (error) {
-      setStatus(error.message || "Connect check failed.");
+      setStatus(error.message || "Optional Connect check failed.");
     }
   }
 
@@ -157,6 +180,7 @@
     byId("appLogCategoryFilter")?.addEventListener("input", renderLogs);
     byId("appLogSearch")?.addEventListener("input", renderLogs);
     byId("clearUnpaidCheckoutsBtn")?.addEventListener("click", clearAllUnpaid);
+    byId("purgeTestPaymentsLoggingBtn")?.addEventListener("click", purgeTestPayments);
     byId("checkZebbiesConnectBtn")?.addEventListener("click", checkZebbiesConnect);
   }
 

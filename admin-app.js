@@ -231,10 +231,10 @@
   }
 
   function connectStatusMessage(result = {}) {
-    if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;
-    if (!result.connected || result.capabilityStatus === "not-started") return "Stripe payout onboarding has not started.";
+    if (result.transfersReady) return `Club Stripe ready for club-billed products (${result.livemode ? "live mode" : "test mode"}). Patron ShoutOuts still charge FloqR.`;
+    if (!result.connected || result.capabilityStatus === "not-started") return "Club Stripe onboarding has not started (optional — only for club subscription / Commerce).";
     const due = Number(result.requirementsDue || 0);
-    return `Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""}`;
+    return `Club Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""} Not required for patron ShoutOuts.`;
   }
 
   async function refreshClubConnectStatus() {
@@ -248,7 +248,7 @@
         status:value => { if (statusEl) statusEl.textContent = value; }
       });
       if (statusEl) statusEl.textContent = connectStatusMessage(result);
-      if (button) button.textContent = result.connected ? "Continue / manage Stripe onboarding" : "Start Stripe payout onboarding";
+    if (button) button.textContent = result.connected ? "Continue / manage club Stripe" : "Start club Stripe onboarding";
       return result;
     } catch (error) {
       if (statusEl) statusEl.textContent = error?.message || String(error);
@@ -666,6 +666,7 @@
         document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
         btn.classList.add("active");
         byId(btn.dataset.panel)?.classList.add("active");
+        if (btn.dataset.panel === "panelReconciliation") loadClubPaymentLedger();
       });
     });
   }
@@ -1559,8 +1560,44 @@
     try { await db.collection("shoutoutAudit").add({shoutoutId:id, action, clubLocationId:item.clubLocationId||locationId, referenceNumber:item.referenceNumber||"", actorUid:auth.currentUser?.uid||"", actorEmail:safeUser(auth.currentUser), createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
   }
 
+  function adminShoutoutTextCaps(item = {}) {
+    const template = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {id:item.template || item.templateId || "blackwhite", className:item.templateClassName || ""};
+    const formatId = item.screenFormatId || loc.primaryDisplayScreenFormatId || "led-96x48";
+    return window.FLOQRTextLayout?.resolve?.(template, formatId) || {
+      supported:true,
+      formatId,
+      main:Number(item.maxMainCharacters || 45),
+      sub:Number(item.maxSubCharacters ?? 20),
+      lineCount:Number(item.lineCount || 3),
+      perLine:Number(item.maxCharactersPerLine || 15),
+      mainTextSizePercent:Number(item.mainTextSizePercent || 20.8),
+      subTextSizePercent:Number(item.subTextSizePercent || 7.8)
+    };
+  }
+
+  function fitAdminShoutoutText(value = "", caps = {}, type = "main") {
+    const limit = Math.max(0, Number(type === "sub" ? caps.sub : caps.main));
+    const cleaned = String(value || "").replace(/\s+/g, " ").trim();
+    if (type === "sub" || caps.lineCount <= 1) return cleaned.slice(0, limit);
+    const rows = [];
+    let row = "";
+    cleaned.slice(0, limit + caps.lineCount - 1).split(/\s+/).filter(Boolean).forEach(word => {
+      const chunks = [];
+      for (let index = 0; index < word.length; index += caps.perLine) chunks.push(word.slice(index, index + caps.perLine));
+      chunks.forEach(chunk => {
+        const next = row ? `${row} ${chunk}` : chunk;
+        if (next.length <= caps.perLine) row = next;
+        else if (rows.length < caps.lineCount) { rows.push(row); row = chunk; }
+      });
+    });
+    if (row && rows.length < caps.lineCount) rows.push(row);
+    return rows.slice(0, caps.lineCount).join("\n");
+  }
+
   async function approve(id, item) {
     const defaultMain = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const textCaps = adminShoutoutTextCaps(item);
+    if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
       clubLocationId: locationId,
@@ -1568,8 +1605,17 @@
       brandName: item.brandName || loc.brandName,
       template: item.template || "neon",
       templateName: item.templateName || "",
-      mainText: item.mainText || "SHOUTOUT!",
-      subText: item.subText || "",
+      mainText: fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
+      subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub"),
+      textLayoutVersion:window.FLOQRTextLayout?.version || "",
+      textProfileId:textCaps.profileId || item.textProfileId || "full",
+      maxMainCharacters:textCaps.main,
+      maxSubCharacters:textCaps.sub,
+      lineCount:textCaps.lineCount,
+      maxCharactersPerLine:textCaps.perLine,
+      minimumFontPixels:textCaps.minimumFontPixels || 0,
+      mainTextSizePercent:textCaps.mainTextSizePercent || 20.8,
+      subTextSizePercent:textCaps.subTextSizePercent || 7.8,
       mediaUrl: item.mediaUrl || "",
       mediaType: item.mediaType || "",
       mediaFileName: item.mediaFileName || "",
@@ -1598,7 +1644,7 @@
       teamMembers: Array.isArray(item.teamMembers) ? item.teamMembers.slice(0, 4) : [],
       animationDurationSeconds: item.template === "zebbiesFootballTeamIntro" ? 20 : (item.animationDurationSeconds || null),
       collaborationMode: item.collaborationMode || "",
-      stadiumMessage: item.template === "zebbiesFootballTeamIntro" ? String(item.stadiumMessage || "TONIGHT, WE TAKE THE FIELD TOGETHER").slice(0, 60) : "",
+      stadiumMessage: item.template === "zebbiesFootballTeamIntro" ? String(item.stadiumMessage || "TONIGHT, WE TAKE THE FIELD TOGETHER").slice(0, Number(textCaps.maxStadiumCharacters || 54)) : "",
       photoPermissionConfirmed: item.photoPermissionConfirmed === true,
       priceCents: item.template === "zebbiesFootballTeamIntro" ? 3000 : (item.priceCents || null),
       screenFormatId: item.screenFormatId || loc.primaryDisplayScreenFormatId || "led-96x48",
@@ -1632,6 +1678,8 @@
       return;
     }
     const main = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const screenFormatId = loc.primaryDisplayScreenFormatId || "led-96x48";
+    const textCaps = window.FLOQRTextLayout?.resolve?.(window.SHOUTOUT_TEMPLATES?.blackwhite || {id:"blackwhite", className:"classic-bw"}, screenFormatId) || {main:45,sub:20,lineCount:3,perLine:15,mainTextSizePercent:20.8,subTextSizePercent:7.8};
     const payload = {
       location: locationId,
       clubLocationId: locationId,
@@ -1639,8 +1687,18 @@
       brandName: loc.brandName || loc.locationName || locationId,
       template: "blackwhite",
       templateName: "Traditional Black and White ShoutOut",
-      mainText: main,
+      mainText: fitAdminShoutoutText(main, textCaps, "main"),
       subText: loc.defaultSub || "",
+      screenFormatId,
+      textLayoutVersion:window.FLOQRTextLayout?.version || "",
+      textProfileId:"classicBoard",
+      maxMainCharacters:textCaps.main,
+      maxSubCharacters:textCaps.sub,
+      lineCount:textCaps.lineCount,
+      maxCharactersPerLine:textCaps.perLine,
+      minimumFontPixels:textCaps.minimumFontPixels || 0,
+      mainTextSizePercent:textCaps.mainTextSizePercent || 20.8,
+      subTextSizePercent:textCaps.subTextSizePercent || 7.8,
       mediaUrl: "",
       mediaType: "",
       mediaFileName: "",
@@ -1774,19 +1832,17 @@
       ["Local sponsors", "Restaurants, hookah lounges, promoters"]
     ]);
 
-    const platformFee = Math.round(estimatedShoutOutRevenue * 0.20);
-    const venueShare = estimatedShoutOutRevenue - platformFee;
     const adShare = Math.round(adImpressions / 1000 * 25);
 
-    byId("reconciliationReport").innerHTML = simpleRows([
-      ["Estimated ShoutOut gross", money(estimatedShoutOutRevenue)],
-      ["FLOQR platform fee estimate", money(platformFee)],
-      ["Venue ShoutOut share estimate", money(venueShare)],
-      ["Estimated local ad share", money(adShare)],
-      ["Pending payout", money(venueShare + adShare)],
-      ["Reconciliation status", "Prototype — connect Stripe/Square/PayPal later"]
-    ]);
-
+    // Prototype estimates remain as a fallback summary; live FloqR ledger is loaded separately.
+    if (byId("reconciliationSummary")) {
+      byId("reconciliationSummary").innerHTML = simpleRows([
+        ["Payment model", "Patron pays FloqR; club accrues 20% of priced ShoutOuts"],
+        ["Currently priced template", "Zebbies 4-Player Football Intro ($30)"],
+        ["Free templates", "Traditional Black & White and other unpriced templates"],
+        ["Estimated local ad share (prototype)", money(adShare)]
+      ]);
+    }
 
     const promoterCounts = {};
     clubGuestLists.forEach(x => {
@@ -1820,6 +1876,61 @@
         <button type="button">Download Reconciliation CSV</button>
       </div>
       <p class="sub small">CSV export buttons are placeholders for the next backend iteration.</p>`;
+
+    await loadClubPaymentLedger();
+  }
+
+  function ledgerTimestamp(value) {
+    if (!value) return "-";
+    if (typeof value.toDate === "function") return value.toDate().toLocaleString();
+    if (value.seconds) return new Date(value.seconds * 1000).toLocaleString();
+    return String(value);
+  }
+
+  async function loadClubPaymentLedger() {
+    const statusEl = byId("reconciliationStatus");
+    const listEl = byId("reconciliationReport");
+    if (!listEl) return;
+    if (statusEl) statusEl.textContent = "Loading FloqR payment ledger…";
+    try {
+      let rows = [];
+      try {
+        const snap = await db.collection("paymentLedger").where("clubLocationId", "==", locationId).limit(200).get();
+        rows = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (_) {
+        const orderSnap = await db.collection("serviceOrders").where("clubLocationId", "==", locationId).limit(200).get();
+        rows = orderSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(row => row.paymentStatus === "paid" && row.orderType === "shoutout")
+          .map(row => ({
+            ...row,
+            clubShareCents: row.clubShareCents ?? row.venueShareCents ?? 0,
+            settlementStatus: row.settlementStatus || "accrued-pending-payout"
+          }));
+      }
+      rows.sort((a, b) => Number(b.paidAt?.seconds || b.createdAt?.seconds || 0) - Number(a.paidAt?.seconds || a.createdAt?.seconds || 0));
+      const gross = rows.reduce((sum, row) => sum + Number(row.amountCents || 0), 0);
+      const clubShare = rows.reduce((sum, row) => sum + Number(row.clubShareCents ?? row.venueShareCents ?? 0), 0);
+      const floqrShare = rows.reduce((sum, row) => sum + Number(row.floqrShareCents || 0), 0);
+      if (byId("reconGross")) byId("reconGross").textContent = money(gross);
+      if (byId("reconClubShare")) byId("reconClubShare").textContent = money(clubShare);
+      if (byId("reconFloqrShare")) byId("reconFloqrShare").textContent = money(floqrShare);
+      if (byId("reconEntryCount")) byId("reconEntryCount").textContent = String(rows.length);
+      listEl.innerHTML = rows.length
+        ? rows.map(row => {
+            const isTest = row.isTestPayment || row.environment === "test" || row.testPaymentMarker;
+            return `<article class="queue-item">
+            <div class="message-envelope-head"><strong>${esc(row.itemName || row.orderType || "Paid ShoutOut")}</strong><span>${esc(row.settlementStatus || row.paymentStatus || "paid")}${isTest ? " · <strong>TEST</strong>" : ""}</span></div>
+            <p>${esc(row.invoiceNumber || row.orderId || row.id)} · Gross ${money(row.amountCents)} · Club 20% ${money(row.clubShareCents ?? row.venueShareCents)} · FloqR ${money(row.floqrShareCents)}</p>
+            <small>${esc(row.customerEmail || row.ownerUid || "-")} · ${esc(ledgerTimestamp(row.paidAt || row.createdAt))} · ${esc(row.paymentModel || "floqr-platform")}${isTest ? " · TEST" : ""}</small>
+          </article>`;
+          }).join("")
+        : `<p class="sub">No paid FloqR ShoutOut ledger entries for this club yet. Free templates do not appear here.</p>`;
+      if (statusEl) statusEl.textContent = `Loaded ${rows.length} payment ledger entr${rows.length === 1 ? "y" : "ies"}.`;
+    } catch (error) {
+      listEl.innerHTML = `<p class="sub">${esc(error.message || "Could not load payment ledger.")}</p>`;
+      if (statusEl) statusEl.textContent = error.message || "Ledger load failed.";
+    }
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
@@ -1838,6 +1949,7 @@
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
     bind("clubStripeConnectBtn", startClubConnectOnboarding);
     bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
+    bind("refreshReconciliationBtn", loadClubPaymentLedger);
     bind("saveClubTemplatePolicyBtn", saveClubTemplatePolicy);
     bind("copyClubPublicProfileLinkBtn", async () => {
       await navigator.clipboard?.writeText(publicProfileUrl());

@@ -257,8 +257,9 @@
           </div>
           <div class="button-row">
             <button id="appLogRefreshBtn" type="button">Refresh Logs</button>
-            <button id="checkZebbiesConnectBtn" type="button">Check Zebbies Connect</button>
+            <button id="checkZebbiesConnectBtn" type="button">Check optional club Connect</button>
             <button id="clearUnpaidCheckoutsBtn" class="ghost" type="button">Clear All Unpaid Checkouts</button>
+            <button id="purgeTestPaymentsLoggingBtn" class="ghost" type="button">Delete Stripe test payments</button>
           </div>
           <p id="appLoggingStatus" class="status">Open this tab while signed in as Master Admin.</p>
           <div id="zebbiesConnectReadiness" class="report-block"></div>
@@ -327,9 +328,22 @@
         <div class="card"><h2>Network Promoter Data</h2><div id="promoterNetworkReport" class="report-block"></div></div>
       </section>
       <section id="networkReconciliation" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Paid ShoutOut Gross</span><strong id="netReconGross">$0</strong></div>
+          <div class="metric-card"><span>Club Shares (20%)</span><strong id="netReconClubShare">$0</strong></div>
+          <div class="metric-card"><span>FloqR Share (80%)</span><strong id="netReconFloqrShare">$0</strong></div>
+          <div class="metric-card"><span>Ledger Entries</span><strong id="netReconCount">0</strong></div>
+        </div>
         <div class="card">
           <h2>Network Account Reconciliation</h2>
+          <p class="sub small">FloqR-charged priced ShoutOuts (currently the $30 Zebbies football intro). Clubs accrue 20%; free templates are not listed. Stripe is currently non-live — test payments are marked <code>isTestPayment</code> for later deletion.</p>
+          <div class="button-row">
+            <button id="refreshNetworkReconBtn" type="button">Refresh FloqR Ledger</button>
+            <button id="purgeTestPaymentsReconBtn" class="ghost" type="button">Delete Stripe test payments</button>
+          </div>
+          <p id="networkReconStatus" class="status">Open this tab while signed in as Master Admin. Test-marked ledger rows show a TEST badge.</p>
           <div id="networkReconReport" class="report-block"></div>
+          <div id="networkReconList" class="report-block"></div>
         </div>
       </section>
 
@@ -617,11 +631,11 @@
 <script src="./ad-campaigns.js?v=29.05"></script>
 <script src="./ai-diagnostics-service.js?v=29.06"></script>
 <script src="./duplicate-record-service.js?v=29.05"></script>
-<script src="./floqr-logger.js?v=29.09.4"></script>
-<script src="./payment-service.js?v=29.09.4"></script>
-<script src="./master-admin-app.js?v=29.09.4"></script>
+<script src="./floqr-logger.js?v=29.09.5"></script>
+<script src="./payment-service.js?v=29.09.5"></script>
+<script src="./master-admin-app.js?v=29.09.5"></script>
 <script src="./master-services-extension.js?v=29.07"></script>
-<script src="./master-logging-extension.js?v=29.09.4"></script>
+<script src="./master-logging-extension.js?v=29.09.5"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>
 </body>

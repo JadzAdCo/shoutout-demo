@@ -138,6 +138,17 @@
     }
   }
 
+  async function purgeTestPayments(options = {}) {
+    requireUser();
+    try {
+      const response = await callable("purgeFloqrTestPayments")(options || {});
+      await logClient("info", "purge_test_payments", "Requested purge of Stripe test payments", response?.data || {});
+      return response?.data || {};
+    } catch (error) {
+      throw unwrapCallableError(error);
+    }
+  }
+
   async function publishFollowerCampaign({entityId, campaign = {}, status} = {}) {
     requireUser();
     status?.("Publishing to followers…");
@@ -166,6 +177,7 @@
     startConnectOnboarding,
     cancelCheckoutOrder,
     clearUnpaidCheckouts,
+    purgeTestPayments,
     publishFollowerCampaign,
     requestTeslaPickup
   };
