@@ -23,8 +23,14 @@ test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients"
   assert.doesNotMatch(backend, /payment_method_types/);
   assert.match(backend, /v2\.core\.accounts\.retrieve/);
   assert.match(backend, /trustedConnectRecipient/);
-  assert.match(backend, /application_fee_amount = summary\.floqrShareCents/);
+  assert.match(backend, /paymentModel:"floqr-platform"/);
+  assert.match(backend, /SHOUTOUT_CLUB_SHARE_PERCENT = 20/);
+  assert.match(backend, /This ShoutOut template does not require checkout/);
+  assert.match(backend, /type !== "shoutout"/);
   assert.match(backend, /assignment\.data\(\)\?\.status, 40\)\.toLowerCase\(\) === "active"/);
+  assert.match(backend, /function testPaymentFields/);
+  assert.match(backend, /exports\.purgeFloqrTestPayments/);
+  assert.match(backend, /isTestPayment/);
 });
 
 test("Commerce inventory is reserved before Checkout and released safely", () => {
@@ -59,9 +65,11 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
   assert.match(displayApp, /renderFootballTeamIntro/);
   assert.match(displayApp, /footballStadiumMessageRows/);
   assert.match(displayCss, /footballFinalLineup 20s linear infinite/);
-  assert.match(backend, /const amountCents = footballTeamIntro \|\| video \? 3000 : 2000/);
+  assert.match(backend, /const pricedAmountCents = footballTeamIntro/);
   assert.match(backend, /normalizeFootballTeamMembers/);
   assert.match(backend, /members\.length !== 4/);
+  assert.match(patronApp, /priceCents > 0/);
+  assert.match(patronApp, /Continue to \$30 FloqR Checkout/);
 });
 
 test("Traditional Black and White keeps a global fixed identity rail", () => {

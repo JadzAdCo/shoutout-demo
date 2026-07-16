@@ -51,6 +51,40 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
+const SHOUTOUT_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
+const SHOUTOUT_CLUB_SHARE_PERCENT = 20;
+const UNPAID_CLEARABLE_STATUSES = new Set(["checkout-created", "checkout-failed", "checkout-expired", "payment-failed"]);
+
+async function writeAppLog(entry = {}) {
+  try {
+    await db.collection("appLogs").add({
+      level:text(entry.level || "info", 20) || "info",
+      category:text(entry.category || "functions", 80) || "functions",
+      action:text(entry.action || "", 120),
+      message:text(entry.message || "No message", 2000) || "No message",
+      details:entry.details && typeof entry.details === "object" ? entry.details : null,
+      correlationId:text(entry.correlationId || "", 80),
+      sessionId:text(entry.sessionId || "", 80),
+      uid:text(entry.uid || "system", 120) || "system",
+      email:text(entry.email || "", 200),
+      href:text(entry.href || "", 500),
+      userAgent:text(entry.userAgent || "firebase-functions", 300),
+      appVersion:text(entry.appVersion || "29.09.4", 40),
+      source:text(entry.source || "functions", 40) || "functions",
+      createdAt:admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error("appLogs write failed", error?.message || error);
+  }
+}
+
+function callableErrorFields(error) {
+  return {
+    code:error?.code || "",
+    message:error?.message || String(error || ""),
+    httpErrorCode:error?.httpErrorCode?.status || null
+  };
+}
 
 function stripeClient() {
   const key = STRIPE_SECRET_KEY.value();
@@ -61,6 +95,24 @@ function stripeClient() {
     timeout:20000,
     appInfo:{name:"FLOQR", version:"29.08.4", url:DEFAULT_ORIGIN}
   });
+}
+
+function isStripeTestMode() {
+  const key = String(STRIPE_SECRET_KEY.value() || "");
+  return /^sk_test_/i.test(key) || !/^sk_live_/i.test(key);
+}
+
+function testPaymentFields(session = null, existing = {}) {
+  const livemode = typeof session?.livemode === "boolean"
+    ? session.livemode
+    : (typeof existing.stripeLivemode === "boolean" ? existing.stripeLivemode : !isStripeTestMode());
+  const isTestPayment = livemode === false || existing.isTestPayment === true || isStripeTestMode();
+  return {
+    isTestPayment,
+    stripeLivemode:livemode === true,
+    testPaymentMarker:isTestPayment ? "stripe-test" : "",
+    environment:isTestPayment ? "test" : "live"
+  };
 }
 
 function text(value = "", max = 500) {
@@ -451,29 +503,32 @@ exports.createFloqrConnectOnboardingLink = onCall({
   return {...status, onboardingUrl:link.url};
 });
 
-async function describeOrder(type, payload = {}) {
+  async function describeOrder(type, payload = {}) {
   if (type === "shoutout") {
     const shoutout = payload.shoutout || {};
     const templateId = text(shoutout.template || shoutout.templateId, 80);
-    const isDefault = ["blackwhite", "classic-black-white"].includes(templateId);
-    if (isDefault) throw new HttpsError("failed-precondition", "The default ShoutOut does not require checkout.");
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
-    const video = text(shoutout.mediaType, 20).toLowerCase() === "video" || payload.videoEnabled === true;
-    const amountCents = footballTeamIntro || video ? 3000 : 2000;
-    const split = moneyParts(amountCents, 40);
+    const pricedAmountCents = footballTeamIntro
+      ? 3000
+      : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+    if (!pricedAmountCents) {
+      throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
+    }
+    // Patron pays FloqR only. Clubs accrue a tracked share for reconciliation (not an instant Connect transfer).
+    const split = moneyParts(pricedAmountCents, SHOUTOUT_CLUB_SHARE_PERCENT);
     const clubId = text(shoutout.clubLocationId || shoutout.location || payload.clubLocationId, 120);
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && clubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
-    const recipient = await trustedConnectRecipient("club", clubId);
     return {
-      amountCents,
-      itemName:footballTeamIntro ? "Zebbies four-player football intro ShoutOut" : video ? "FLOQR video-enabled ShoutOut" : "FLOQR picture-enabled ShoutOut",
-      description:"Payment is required before the ShoutOut enters the club approval queue.",
+      amountCents:pricedAmountCents,
+      itemName:footballTeamIntro ? "Zebbies four-player football intro ShoutOut" : "FLOQR paid ShoutOut",
+      description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
+      clubShareCents:split.venueShare,
       floqrShareCents:split.floqrShare,
-      connectedAccountId:recipient.accountId,
-      connectedAccountBindingId:recipient.bindingId,
-      connectedAccountCapabilityStatus:recipient.capabilityStatus,
+      clubSharePercent:SHOUTOUT_CLUB_SHARE_PERCENT,
+      paymentModel:"floqr-platform",
+      settlementStatus:"accrued-pending-payout",
       clubLocationId:clubId
     };
   }
@@ -628,61 +683,325 @@ exports.createFloqrCheckoutSession = onCall({
   timeoutSeconds:30,
   memory:"256MiB"
 }, async request => {
-  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const correlationId = text(request.data?.correlationId, 80) || `chk_${Date.now().toString(36)}`;
   const type = text(request.data?.orderType, 80);
-  const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
-  const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
-  if (type === "audienceCampaign") await requirePublisher(text(payload.entityId, 160), request.auth);
-  if (["targetedGuestList", "smsNotifications"].includes(type)) await requirePublisher(text(payload.clubLocationId, 160), request.auth);
-  const summary = await describeOrder(type, payload);
-  const orderRef = db.collection("serviceOrders").doc();
-  const returnBase = safeReturnBase(request);
-  const now = admin.firestore.FieldValue.serverTimestamp();
-  const order = {
-    orderType:type,
-    ownerUid:request.auth.uid,
-    ownerEmail:text(request.auth.token?.email, 200),
-    status:"checkout-created",
-    paymentStatus:"unpaid",
-    currency:"usd",
-    ...summary,
-    payload,
-    invoiceNumber:`FLOQR-${new Date().toISOString().slice(0,10).replace(/-/g, "")}-${orderRef.id.slice(0,8).toUpperCase()}`,
-    shippingStatus:type === "commerce" && summary.requiresShipping ? "awaiting-payment" : type === "commerce" && summary.productType !== "physical" ? "digital-delivery-pending" : "not-required",
-    createdAt:now,
-    updatedAt:now
+  const logBase = {
+    category:"checkout",
+    correlationId,
+    uid:request.auth?.uid || "",
+    email:request.auth?.token?.email || "",
+    details:{orderType:type}
   };
-  await createOrderWithInventoryReservation(orderRef, order);
-
-  const params = {
-    mode:"payment",
-    success_url:`${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:`${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
-    client_reference_id:orderRef.id,
-    metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid},
-    billing_address_collection:"auto",
-    payment_intent_data:{metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid}},
-    line_items:[stripeLineItem(order)]
-  };
-  if (order.ownerEmail) params.customer_email = order.ownerEmail;
-  if (type === "commerce" && summary.requiresShipping) {
-    params.shipping_address_collection = {allowed_countries:["US", "CA", "GB", "FR", "DE", "ES", "IT", "NL", "PT"]};
-  }
-  if (type === "commerce") params.expires_at = Math.floor(Date.now() / 1000) + COMMERCE_RESERVATION_SECONDS;
-  if (summary.connectedAccountId) {
-    params.payment_intent_data.transfer_data = {destination:summary.connectedAccountId};
-    if (type === "shoutout") params.payment_intent_data.application_fee_amount = summary.floqrShareCents;
-  }
-  let session;
   try {
-    session = await stripeClient().checkout.sessions.create(params, {idempotencyKey:`floqr-checkout-${orderRef.id}`});
+    if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+    const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
+    const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
+    if (type === "audienceCampaign") await requirePublisher(text(payload.entityId, 160), request.auth);
+    if (["targetedGuestList", "smsNotifications"].includes(type)) await requirePublisher(text(payload.clubLocationId, 160), request.auth);
+    const summary = await describeOrder(type, payload);
+    const orderRef = db.collection("serviceOrders").doc();
+    const returnBase = safeReturnBase(request);
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const testFields = testPaymentFields(null, {});
+    const order = {
+      orderType:type,
+      ownerUid:request.auth.uid,
+      ownerEmail:text(request.auth.token?.email, 200),
+      status:"checkout-created",
+      paymentStatus:"unpaid",
+      currency:"usd",
+      ...summary,
+      ...testFields,
+      payload,
+      correlationId,
+      invoiceNumber:`FLOQR-${new Date().toISOString().slice(0,10).replace(/-/g, "")}-${orderRef.id.slice(0,8).toUpperCase()}`,
+      shippingStatus:type === "commerce" && summary.requiresShipping ? "awaiting-payment" : type === "commerce" && summary.productType !== "physical" ? "digital-delivery-pending" : "not-required",
+      createdAt:now,
+      updatedAt:now
+    };
+    await createOrderWithInventoryReservation(orderRef, order);
+
+    const params = {
+      mode:"payment",
+      success_url:`${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:`${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
+      client_reference_id:orderRef.id,
+      metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId},
+      billing_address_collection:"auto",
+      payment_intent_data:{metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId}},
+      line_items:[stripeLineItem(order)]
+    };
+    if (order.ownerEmail) params.customer_email = order.ownerEmail;
+    if (type === "commerce" && summary.requiresShipping) {
+      params.shipping_address_collection = {allowed_countries:["US", "CA", "GB", "FR", "DE", "ES", "IT", "NL", "PT"]};
+    }
+    if (type === "commerce" || type === "shoutout") {
+      params.expires_at = Math.floor(Date.now() / 1000) + (type === "commerce" ? COMMERCE_RESERVATION_SECONDS : SHOUTOUT_CHECKOUT_EXPIRY_SECONDS);
+    }
+    if (summary.connectedAccountId) {
+      // Connect destination charges remain for Commerce / seller-billed products only — never for patron ShoutOuts.
+      params.payment_intent_data.transfer_data = {destination:summary.connectedAccountId};
+      if (type !== "shoutout" && Number(summary.floqrShareCents || 0) > 0) {
+        params.payment_intent_data.application_fee_amount = summary.floqrShareCents;
+      }
+    }
+    let session;
+    try {
+      session = await stripeClient().checkout.sessions.create(params, {idempotencyKey:`floqr-checkout-${orderRef.id}`});
+    } catch (error) {
+      if (type === "commerce") await releaseCommerceInventoryReservation(orderRef.id, "checkout-session-create-failed");
+      await orderRef.set({
+        status:"checkout-failed",
+        checkoutErrorCode:text(error?.code || error?.type || "stripe_error", 80),
+        checkoutErrorMessage:text(error?.message || "stripe_error", 500),
+        updatedAt:admin.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      await writeAppLog({
+        ...logBase,
+        level:"error",
+        action:"stripe_session_create_failed",
+        message:error?.message || "Stripe could not create checkout.",
+        details:{...logBase.details, orderId:orderRef.id, ...callableErrorFields(error), stripeCode:error?.code || error?.type || ""}
+      });
+      throw new HttpsError("internal", "Stripe could not create checkout. Please try again.");
+    }
+    await orderRef.set({stripeCheckoutSessionId:session.id, checkoutUrl:session.url, updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    await writeAppLog({
+      ...logBase,
+      level:"info",
+      action:"checkout_session_created",
+      message:`Checkout session created for ${summary.itemName || type}`,
+      details:{...logBase.details, orderId:orderRef.id, amountCents:summary.amountCents, clubLocationId:summary.clubLocationId || "", template:text(payload?.shoutout?.template, 80)}
+    });
+    return {orderId:orderRef.id, checkoutUrl:session.url, amountCents:summary.amountCents, currency:"usd", correlationId};
   } catch (error) {
-    if (type === "commerce") await releaseCommerceInventoryReservation(orderRef.id, "checkout-session-create-failed");
-    await orderRef.set({status:"checkout-failed", checkoutErrorCode:text(error?.code || error?.type || "stripe_error", 80), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
-    throw new HttpsError("internal", "Stripe could not create checkout. Please try again.");
+    if (!(error instanceof HttpsError)) {
+      await writeAppLog({
+        ...logBase,
+        level:"error",
+        action:"checkout_unexpected_failure",
+        message:error?.message || "Unexpected checkout failure",
+        details:{...logBase.details, ...callableErrorFields(error)}
+      });
+      throw new HttpsError("internal", "Checkout failed unexpectedly. Please try again.");
+    }
+    await writeAppLog({
+      ...logBase,
+      level:"error",
+      action:"checkout_rejected",
+      message:error.message,
+      details:{...logBase.details, ...callableErrorFields(error), template:text(request.data?.payload?.shoutout?.template, 80), clubLocationId:text(request.data?.payload?.clubLocationId || request.data?.payload?.shoutout?.clubLocationId, 120)}
+    });
+    throw error;
   }
-  await orderRef.set({stripeCheckoutSessionId:session.id, checkoutUrl:session.url, updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
-  return {orderId:orderRef.id, checkoutUrl:session.url, amountCents:summary.amountCents, currency:"usd"};
+});
+
+async function cancelUnpaidOrder(orderId, authContext, reason = "cancelled") {
+  const id = text(orderId, 120);
+  if (!id) throw new HttpsError("invalid-argument", "An order id is required.");
+  const ref = db.collection("serviceOrders").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Checkout order was not found.");
+  const order = snap.data() || {};
+  const master = await isMasterAdminAuth(authContext);
+  if (!master && order.ownerUid !== authContext.uid) throw new HttpsError("permission-denied", "You can only cancel your own unpaid checkout.");
+  if (order.paymentStatus === "paid") throw new HttpsError("failed-precondition", "Paid orders cannot be cancelled from this tool.");
+  if (!UNPAID_CLEARABLE_STATUSES.has(String(order.status || ""))) {
+    throw new HttpsError("failed-precondition", `Order status ${order.status || "unknown"} cannot be cleared.`);
+  }
+  const sessionId = text(order.stripeCheckoutSessionId, 200);
+  let stripeExpired = false;
+  if (sessionId) {
+    try {
+      await stripeClient().checkout.sessions.expire(sessionId);
+      stripeExpired = true;
+    } catch (error) {
+      // Already expired/completed sessions are fine to clear locally.
+      console.warn("Stripe session expire skipped", {orderId:id, code:error?.code || error?.type || ""});
+    }
+  }
+  if (order.orderType === "commerce" && order.inventoryReserved && !order.inventoryCommitted) {
+    await releaseCommerceInventoryReservation(id, reason);
+  }
+  await ref.set({
+    status:"checkout-cancelled",
+    paymentStatus:"unpaid",
+    cancelledAt:admin.firestore.FieldValue.serverTimestamp(),
+    cancelledByUid:authContext.uid || "",
+    cancelReason:text(reason, 120),
+    stripeSessionExpired:stripeExpired,
+    updatedAt:admin.firestore.FieldValue.serverTimestamp()
+  }, {merge:true});
+  await writeAppLog({
+    level:"info",
+    category:"checkout",
+    action:"checkout_cancelled",
+    message:`Cancelled unpaid checkout ${id}`,
+    uid:authContext.uid || "",
+    email:authContext.token?.email || "",
+    details:{orderId:id, orderType:order.orderType || "", reason, stripeExpired, previousStatus:order.status || ""}
+  });
+  return {orderId:id, cancelled:true, stripeExpired};
+}
+
+exports.getFloqrClubCheckoutReadiness = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const clubLocationId = text(request.data?.clubLocationId, 120);
+  if (!clubLocationId) throw new HttpsError("invalid-argument", "A club is required.");
+  try {
+    const recipient = await trustedConnectRecipient("club", clubLocationId);
+    await writeAppLog({
+      level:"info",
+      category:"stripe",
+      action:"club_checkout_readiness",
+      message:`Club ${clubLocationId} is ready for paid checkout`,
+      uid:request.auth.uid,
+      email:request.auth.token?.email || "",
+      details:{clubLocationId, capabilityStatus:recipient.capabilityStatus, transfersReady:true}
+    });
+    return {
+      ready:true,
+      transfersReady:true,
+      capabilityStatus:recipient.capabilityStatus,
+      livemode:!!recipient.livemode,
+      clubLocationId
+    };
+  } catch (error) {
+    const message = error?.message || "Club payouts are not ready.";
+    await writeAppLog({
+      level:"warn",
+      category:"stripe",
+      action:"club_checkout_not_ready",
+      message,
+      uid:request.auth.uid,
+      email:request.auth.token?.email || "",
+      details:{clubLocationId, ...callableErrorFields(error)}
+    });
+    return {
+      ready:false,
+      transfersReady:false,
+      capabilityStatus:"unavailable",
+      clubLocationId,
+      message,
+      code:error?.code || "failed-precondition"
+    };
+  }
+});
+
+exports.cancelFloqrCheckoutOrder = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  return cancelUnpaidOrder(request.data?.orderId, request.auth, text(request.data?.reason, 120) || "user-cancelled");
+});
+
+exports.clearUnpaidFloqrCheckouts = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:120,
+  memory:"512MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  if (!await isMasterAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master admin access is required.");
+  const snap = await db.collection("serviceOrders").where("paymentStatus", "==", "unpaid").limit(200).get();
+  let cleared = 0;
+  let skipped = 0;
+  const errors = [];
+  for (const doc of snap.docs) {
+    const order = doc.data() || {};
+    if (!UNPAID_CLEARABLE_STATUSES.has(String(order.status || ""))) {
+      skipped += 1;
+      continue;
+    }
+    try {
+      await cancelUnpaidOrder(doc.id, request.auth, "master-admin-clear");
+      cleared += 1;
+    } catch (error) {
+      skipped += 1;
+      errors.push({orderId:doc.id, message:error?.message || String(error)});
+    }
+  }
+  await writeAppLog({
+    level:"info",
+    category:"checkout",
+    action:"bulk_clear_unpaid",
+    message:`Master admin cleared ${cleared} unpaid checkout(s)`,
+    uid:request.auth.uid,
+    email:request.auth.token?.email || "",
+    details:{cleared, skipped, errorCount:errors.length, errors:errors.slice(0, 20)}
+  });
+  return {cleared, skipped, errors:errors.slice(0, 20)};
+});
+
+exports.purgeFloqrTestPayments = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:120,
+  memory:"512MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  if (!await isMasterAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master admin access is required.");
+
+  const deleted = {paymentLedger:0, serviceOrders:0, shoutouts:0};
+  const errors = [];
+  const removedOrderIds = new Set();
+
+  const ledgerSnap = await db.collection("paymentLedger").where("isTestPayment", "==", true).limit(300).get();
+  for (const doc of ledgerSnap.docs) {
+    try {
+      const row = doc.data() || {};
+      await doc.ref.delete();
+      deleted.paymentLedger += 1;
+      if (row.fulfilledRecordId) {
+        try {
+          await db.collection("shoutouts").doc(row.fulfilledRecordId).delete();
+          deleted.shoutouts += 1;
+        } catch (error) {
+          errors.push({type:"shoutout", id:row.fulfilledRecordId, message:error?.message || String(error)});
+        }
+      }
+      try {
+        await db.collection("serviceOrders").doc(doc.id).delete();
+        removedOrderIds.add(doc.id);
+        deleted.serviceOrders += 1;
+      } catch (error) {
+        errors.push({type:"serviceOrder", id:doc.id, message:error?.message || String(error)});
+      }
+    } catch (error) {
+      errors.push({type:"paymentLedger", id:doc.id, message:error?.message || String(error)});
+    }
+  }
+
+  // Also clear unpaid/failed test checkouts that never reached the ledger.
+  const unpaidSnap = await db.collection("serviceOrders").where("isTestPayment", "==", true).limit(300).get();
+  for (const doc of unpaidSnap.docs) {
+    if (removedOrderIds.has(doc.id)) continue;
+    try {
+      await doc.ref.delete();
+      deleted.serviceOrders += 1;
+    } catch (error) {
+      errors.push({type:"serviceOrder", id:doc.id, message:error?.message || String(error)});
+    }
+  }
+
+  await writeAppLog({
+    level:"info",
+    category:"checkout",
+    action:"purge_test_payments",
+    message:`Master admin purged Stripe test payments`,
+    uid:request.auth.uid,
+    email:request.auth.token?.email || "",
+    details:{deleted, errorCount:errors.length, errors:errors.slice(0, 20)}
+  });
+  return {deleted, errors:errors.slice(0, 20)};
 });
 
 async function finalizePaidOrder(orderId, session) {
@@ -693,6 +1012,7 @@ async function finalizePaidOrder(orderId, session) {
   if (order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true) return;
   const paidAt = order.paidAt || admin.firestore.FieldValue.serverTimestamp();
   const shipping = session?.shipping_details || session?.collected_information?.shipping_details || null;
+  const testFields = testPaymentFields(session, order);
   await ref.set({
     status:"paid",
     paymentStatus:"paid",
@@ -702,24 +1022,60 @@ async function finalizePaidOrder(orderId, session) {
     stripePaymentIntentId:session?.payment_intent || "",
     customerEmail:session?.customer_details?.email || order.ownerEmail || "",
     shippingDetails:shipping || null,
-    shippingStatus:order.orderType === "commerce" && order.requiresShipping ? "paid-awaiting-fulfillment" : order.shippingStatus
+    shippingStatus:order.orderType === "commerce" && order.requiresShipping ? "paid-awaiting-fulfillment" : order.shippingStatus,
+    ...testFields
   }, {merge:true});
 
   if (order.orderType === "shoutout" && order.payload?.shoutout) {
     const shoutout = {...order.payload.shoutout};
     const shoutoutRef = db.collection("shoutouts").doc(`stripe_${orderId}`);
+    const clubShareCents = Number(order.clubShareCents ?? order.venueShareCents ?? 0);
+    const floqrShareCents = Number(order.floqrShareCents || 0);
     await shoutoutRef.set({
       ...shoutout,
       status:"pending",
       paymentRequired:true,
       paymentStatus:"paid",
+      paymentModel:order.paymentModel || "floqr-platform",
       serviceOrderId:orderId,
       invoiceNumber:order.invoiceNumber || "",
-      venueShareCents:order.venueShareCents || 0,
-      floqrShareCents:order.floqrShareCents || 0,
-      submittedAt:paidAt
+      venueShareCents:clubShareCents,
+      clubShareCents,
+      floqrShareCents,
+      clubSharePercent:Number(order.clubSharePercent || SHOUTOUT_CLUB_SHARE_PERCENT),
+      submittedAt:paidAt,
+      ...testFields
     }, {merge:true});
-    await ref.set({fulfilledRecordId:shoutoutRef.id, fulfillmentStatus:"submitted-for-club-approval"}, {merge:true});
+    await ref.set({
+      fulfilledRecordId:shoutoutRef.id,
+      fulfillmentStatus:"submitted-for-club-approval",
+      clubShareCents,
+      settlementStatus:order.settlementStatus || "accrued-pending-payout"
+    }, {merge:true});
+    await db.collection("paymentLedger").doc(orderId).set({
+      orderId,
+      orderType:"shoutout",
+      paymentModel:order.paymentModel || "floqr-platform",
+      clubLocationId:text(order.clubLocationId || shoutout.clubLocationId || shoutout.location, 120),
+      ownerUid:text(order.ownerUid, 120),
+      customerEmail:text(order.customerEmail || order.ownerEmail, 200),
+      invoiceNumber:text(order.invoiceNumber, 80),
+      itemName:text(order.itemName, 160),
+      amountCents:Number(order.amountCents || 0),
+      clubShareCents,
+      floqrShareCents,
+      clubSharePercent:Number(order.clubSharePercent || SHOUTOUT_CLUB_SHARE_PERCENT),
+      currency:text(order.currency || "usd", 8) || "usd",
+      paymentStatus:"paid",
+      settlementStatus:order.settlementStatus || "accrued-pending-payout",
+      fulfilledRecordId:shoutoutRef.id,
+      stripeCheckoutSessionId:text(session?.id || order.stripeCheckoutSessionId, 200),
+      stripePaymentIntentId:text(session?.payment_intent || order.stripePaymentIntentId, 200),
+      paidAt,
+      createdAt:paidAt,
+      updatedAt:paidAt,
+      ...testFields
+    }, {merge:true});
   }
 
   if (order.orderType === "targetedGuestList" && order.payload?.campaign) {

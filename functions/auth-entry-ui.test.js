@@ -25,3 +25,18 @@ test("email verification explicitly prompts for the eight-character code", () =>
   assert.match(html, /<label>Enter 8-character code\s*<input id="emailOtpCode" maxlength="8"/);
   assert.match(html, /id="emailOtpStatus"[^>]+aria-live="polite"/);
 });
+
+test("main message typing preserves spaces instead of live-fitting on every keystroke", () => {
+  const app = readReleaseFile("patron-app.js");
+  const html = readReleaseFile("index.html");
+
+  assert.match(app, /function clampMainTextWhileTyping/);
+  assert.match(app, /Live typing must NOT run fitTemplateText/);
+  assert.match(app, /clampMainTextWhileTyping\(event\.currentTarget\.value\)/);
+  assert.match(app, /addEventListener\("blur"/);
+  assert.doesNotMatch(
+    app,
+    /byId\("mainText"\)\?\.addEventListener\("input", event => \{ const fitted = fitTemplateText\(event\.currentTarget\.value, "main"\)/
+  );
+  assert.match(html, /patron-app\.js\?v=29\.09\.5/);
+});

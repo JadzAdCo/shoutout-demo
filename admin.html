@@ -119,13 +119,13 @@
             <label><input id="clubCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
             <label>Commerce store name<input id="clubCommerceStoreName" placeholder="Zebbies Garden Shop"/></label>
             <div class="card nested-card profile-grid-wide">
-              <h3>Stripe payouts</h3>
-              <p id="clubStripeConnectStatus" class="sub small">Checking payout onboarding statusâ€¦</p>
+              <h3>Stripe for club-billed products</h3>
+              <p id="clubStripeConnectStatus" class="sub small">Optional — only for club subscription and club Commerce sales.</p>
               <div class="queue-actions">
-                <button id="clubStripeConnectBtn" type="button">Start Stripe payout onboarding</button>
-                <button id="clubStripeConnectRefreshBtn" type="button">Refresh payout status</button>
+                <button id="clubStripeConnectBtn" type="button">Start club Stripe onboarding</button>
+                <button id="clubStripeConnectRefreshBtn" type="button">Refresh club Stripe status</button>
               </div>
-              <p class="sub small">FLOQR creates and binds the Stripe recipient account securely. Club admins never paste an <code>acct_...</code> value into the browser.</p>
+              <p class="sub small">Patron ShoutOuts are charged to <strong>FloqR</strong>, not this club’s Stripe account. This club earns a tracked <strong>20% share</strong> of paid ShoutOuts under Account Reconciliation. Use club Stripe onboarding only for club subscription billing or club-sold Commerce products.</p>
             </div>
           </div>
           <div class="card nested-card">
@@ -340,9 +340,20 @@
         </div>
       </section>
       <section id="panelReconciliation" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Paid ShoutOut Gross</span><strong id="reconGross">$0</strong></div>
+          <div class="metric-card"><span>Club Share (20%)</span><strong id="reconClubShare">$0</strong></div>
+          <div class="metric-card"><span>FloqR Share (80%)</span><strong id="reconFloqrShare">$0</strong></div>
+          <div class="metric-card"><span>Accrued Entries</span><strong id="reconEntryCount">0</strong></div>
+        </div>
         <div class="card">
           <h2>Account Reconciliation</h2>
-          <p class="sub small">Prototype report for payouts, platform fees, ad revenue share, and ShoutOut activity.</p>
+          <p class="sub small">Patron paid ShoutOuts are charged to FloqR. This club’s 20% share is tracked here for settlement. Future FloqR payments for this venue also appear in this ledger.</p>
+          <div class="button-row">
+            <button id="refreshReconciliationBtn" type="button">Refresh Ledger</button>
+          </div>
+          <p id="reconciliationStatus" class="status"></p>
+          <div id="reconciliationSummary" class="report-block"></div>
           <div id="reconciliationReport" class="report-block"></div>
         </div>
       </section>
@@ -370,8 +381,9 @@
 <script src="./ai-template-studio.js?v=29.06"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
-<script src="./payment-service.js?v=29.09.2"></script>
-<script src="./admin-app.js?v=29.08.4"></script>
+<script src="./floqr-logger.js?v=29.09.5"></script>
+<script src="./payment-service.js?v=29.09.5"></script>
+<script src="./admin-app.js?v=29.09.5"></script>
 <script src="./admin-rep-extension.js?v=29.07"></script>
 <script src="./notification-center.js?v=29.05"></script>
 <script src="./profile-access-guard.js?v=29.05"></script>

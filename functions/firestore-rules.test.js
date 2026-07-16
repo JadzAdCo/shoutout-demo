@@ -47,10 +47,11 @@ test("service orders cannot be created or deleted by browser clients", () => {
 
 test("browser-created ShoutOuts use the reviewed Black and White display limits", () => {
   const block = blockFor("/shoutouts/{id}");
-  assert.match(block, /allow create: if validPatronShoutoutCreate\(\);/);
+  assert.match(block, /allow create: if validPatronShoutoutCreate\(\) \|\| validFreePatronShoutoutCreate\(\);/);
   assert.match(rules, /request\.resource\.data\.template == 'blackwhite'/);
   assert.match(rules, /request\.resource\.data\.maxCharactersPerLine == 15/);
   assert.match(rules, /request\.resource\.data\.screenFormatId == 'led-64x32'/);
+  assert.match(rules, /validFreePatronShoutoutCreate/);
 });
 
 test("commerce products use seller-scoped creation and updates", () => {
@@ -64,7 +65,7 @@ test("identity and club updates preserve backend Stripe fields", () => {
   assert.match(blockFor("/users/{userId}"), /preservesBackendOnlyIdentityFields\(\)/);
   assert.match(blockFor("/clubLocations/{id}"), /preservesStripeBindingFields\(\)/);
   assert.match(rules, /clubAdminAssignments.*status == "active"/s);
-  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09-recommendation-moderation/);
+  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.5-floqr-platform-payments/);
 });
 
 test("recommendation moderation is Master Admin controlled", () => {

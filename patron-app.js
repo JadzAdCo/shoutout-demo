@@ -2551,6 +2551,29 @@
     return rows.slice(0, caps.lineCount).join("\n");
   }
 
+  // Live typing must NOT run fitTemplateText: it trims and re-wraps, which deletes
+  // spaces (and mid-word typing) on every keystroke. Only clamp raw length here.
+  function clampMainTextWhileTyping(value = "") {
+    const caps = templateDisplayCaps();
+    if (caps.supported === false) return String(value || "");
+    const maxRaw = Number(caps.main || 0) + Math.max(0, Number(caps.lineCount || 1) - 1);
+    if (maxRaw <= 0) return String(value || "");
+    return String(value || "").slice(0, maxRaw);
+  }
+
+  function applyFittedMainText(input) {
+    if (!input) return;
+    const selectionStart = input.selectionStart;
+    const selectionEnd = input.selectionEnd;
+    const fitted = fitTemplateText(input.value, "main");
+    if (input.value === fitted) return;
+    input.value = fitted;
+    if (typeof selectionStart === "number" && typeof selectionEnd === "number") {
+      const cursor = Math.min(fitted.length, selectionStart);
+      try { input.setSelectionRange(cursor, Math.min(fitted.length, selectionEnd)); } catch (_) {}
+    }
+  }
+
   function updateTemplateCharacterCapHint() {
     const hint = byId("templateCharacterCapHint");
     if (!hint) return;
@@ -2831,6 +2854,7 @@
 
   async function submitShoutout() {
     const status=byId("submitStatus");
+    const correlationId = window.FLOQRLog?.correlationId?.("so") || `so_${Date.now().toString(36)}`;
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
@@ -2839,6 +2863,22 @@
       if (caps.supported === false) throw new Error(caps.advice || "Choose a supported display size for this template.");
       const footballIntro = isFootballTeamIntro();
       if (footballIntro && locationId() !== "zebbies-garden-washington-dc") throw new Error("This advanced football template is available only at Zebbies Garden DC.");
+      if (window.FLOQRLog) {
+        window.FLOQRLog.write({
+          level: "info",
+          category: "shoutout",
+          action: "submit_start",
+          message: `Submitting ${selectedTemplate || "shoutout"} for ${locationId()}`,
+          correlationId,
+          details: {
+            template: selectedTemplate,
+            locationId: locationId(),
+            screenFormatId: caps.formatId || selectedScreenFormatId,
+            footballIntro: !!footballIntro,
+            paymentModel: Number(t.priceCents || 0) > 0 ? "floqr-platform" : "free"
+          }
+        });
+      }
       const referenceNumber = `SO-${Date.now().toString().slice(-7)}`;
       const footballTeamMembers = footballIntro ? await uploadFootballTeamMembers(referenceNumber) : [];
       const uploadedMedia = !footballIntro && currentTemplateSupportsMedia() ? await uploadShoutoutMedia(referenceNumber) : {};
@@ -2910,11 +2950,13 @@
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
       const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
-      if (selectedTemplate !== "blackwhite") {
-        const checkoutPayload = {...payload, submittedAt:null, mediaUploadedAt:null};
-        const videoEnabled = payload.mediaType === "video";
-        status.textContent = footballIntro ? "Zebbies four-player football intro: $30 checkout required." : videoEnabled ? "Video-enabled ShoutOut: $30 checkout required." : "Picture-enabled ShoutOut: $20 checkout required.";
-        await window.FLOQRPayments.startCheckout({orderType:"shoutout", payload:{clubLocationId:locationId(), shoutout:checkoutPayload, videoEnabled}, status:message => { status.textContent = message; }});
+      const priceCents = Math.max(0, Math.round(Number(t.priceCents || mediaPayload.priceCents || 0)));
+      if (priceCents > 0) {
+        const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
+        status.textContent = footballIntro
+          ? `Zebbies four-player football intro: $${(priceCents / 100).toFixed(0)} FloqR checkout required.`
+          : `Paid ShoutOut: $${(priceCents / 100).toFixed(2)} FloqR checkout required.`;
+        await window.FLOQRPayments.startCheckout({orderType:"shoutout", payload:{clubLocationId:locationId(), shoutout:checkoutPayload, priceCents}, status:message => { status.textContent = message; }});
         return;
       }
       const shoutoutRef = await db.collection("shoutouts").add(payload);
@@ -2924,7 +2966,21 @@
       try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
-    } catch(e) { status.textContent=e.message; }
+    } catch(e) {
+      status.textContent=e.message;
+      if (window.FLOQRLog) {
+        window.FLOQRLog.fromError(e, {
+          category: "shoutout",
+          action: "submit_failed",
+          correlationId,
+          details: {
+            template: selectedTemplate,
+            locationId: selectedLocationId || locationId?.() || "",
+            screenFormatId: selectedScreenFormatId || ""
+          }
+        });
+      }
+    }
   }
   function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
@@ -2962,7 +3018,12 @@
     document.body.classList.toggle("template-media-unavailable", !allowsMedia);
     byId("footballTeamIntroCard")?.classList.toggle("hidden", !footballIntro);
     if (byId("submitShoutoutBtn")) {
-      byId("submitShoutoutBtn").textContent = footballIntro ? "Continue to $30 Stripe Checkout" : "Submit for Approval";
+      const priced = Math.max(0, Math.round(Number(t.priceCents || 0))) > 0;
+      byId("submitShoutoutBtn").textContent = footballIntro
+        ? "Continue to $30 FloqR Checkout"
+        : priced
+          ? `Continue to $${(Number(t.priceCents) / 100).toFixed(2)} FloqR Checkout`
+          : "Submit for Approval";
       byId("submitShoutoutBtn").disabled = caps.supported === false;
     }
     if (byId("previewDurationHint")) byId("previewDurationHint").textContent = footballIntro ? "Preview plays the complete 20-second stadium introduction." : "Preview opens in a popout and closes automatically after 5 seconds.";
@@ -3186,7 +3247,16 @@
     });
     document.addEventListener("click", closeUserDropdownOnOutsideClick);
     ["mainText","subText"].forEach(id => byId(id)?.addEventListener("input", schedulePersonalizedShoutOutRecommendations));
-    byId("mainText")?.addEventListener("input", event => { const fitted = fitTemplateText(event.currentTarget.value, "main"); if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted; updateTemplateCharacterCapHint(); });
+    byId("mainText")?.addEventListener("input", event => {
+      const next = clampMainTextWhileTyping(event.currentTarget.value);
+      if (event.currentTarget.value !== next) event.currentTarget.value = next;
+      updateTemplateCharacterCapHint();
+    });
+    byId("mainText")?.addEventListener("blur", event => {
+      applyFittedMainText(event.currentTarget);
+      updateTemplateCharacterCapHint();
+      updatePreview();
+    });
     byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updateMediaEditorForTemplate(); schedulePersonalizedShoutOutRecommendations(); updatePreview(); });
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
     bindFootballTeamEditor();

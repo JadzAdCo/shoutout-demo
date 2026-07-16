@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09-recommendation-moderation
-// EXPECTED DEPLOYED RULES VERSION: v29.09-recommendation-moderation or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
+// EXPECTED DEPLOYED RULES VERSION: v29.09.5-floqr-platform-payments or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.74-gemini-media-editing-rules
@@ -193,6 +194,10 @@ service cloud.firestore {
             resource.data.sellerEntityType == "club"
             && resource.data.sellerEntityId is string
             && isClubManager(resource.data.sellerEntityId)
+          )
+          || (
+            resource.data.clubLocationId is string
+            && isClubManager(resource.data.clubLocationId)
           )
         );
     }
@@ -486,8 +491,20 @@ service cloud.firestore {
         );
     }
 
+    // Free (no priceCents) templates other than Traditional B&W and paid football.
+    function validFreePatronShoutoutCreate() {
+      return signedIn()
+        && request.resource.data.keys().hasAll(['template', 'mainText', 'submittedByUid'])
+        && request.resource.data.template is string
+        && request.resource.data.template != 'blackwhite'
+        && request.resource.data.template != 'zebbiesFootballTeamIntro'
+        && request.resource.data.submittedByUid == request.auth.uid
+        && request.resource.data.mainText is string
+        && request.resource.data.mainText.size() <= 120;
+    }
+
     match /shoutouts/{id} {
-      allow create: if validPatronShoutoutCreate();
+      allow create: if validPatronShoutoutCreate() || validFreePatronShoutoutCreate();
       allow read, update, delete: if signedIn();
     }
 
@@ -517,6 +534,32 @@ service cloud.firestore {
       allow read: if isServiceOrderReader();
       allow create, delete: if false;
       allow update: if isMasterFulfillmentUpdate();
+    }
+
+    // Operational application logs for Master Admin Logging.
+    match /appLogs/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll(['level', 'category', 'message', 'uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.level in ['debug', 'info', 'warn', 'error']
+        && request.resource.data.category is string
+        && request.resource.data.category.size() <= 80
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000;
+      allow read: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid);
+      allow update: if false;
+      allow delete: if isMasterAdmin();
+    }
+
+    // FloqR platform payment ledger (ShoutOut and future FloqR-sold services). Backend writes only.
+    match /paymentLedger/{id} {
+      allow read: if isMasterAdmin()
+        || (
+          resource.data.clubLocationId is string
+          && isClubManager(resource.data.clubLocationId)
+        );
+      allow create, update, delete: if false;
     }
 
     // Stripe account IDs, capability state, and webhook claims are backend-only.
