@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Lima DC FLOQR advertisement draft">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#18051f"/>
+      <stop offset=".52" stop-color="#33125f"/>
+      <stop offset="1" stop-color="#094b66"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop stop-color="#ff2fa7"/>
+      <stop offset=".48" stop-color="#ffcc4d"/>
+      <stop offset="1" stop-color="#1fe8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="520" rx="48" fill="url(#bg)"/>
+  <path d="M0 395c108-93 208-124 302-94 102 33 190 22 264-33 94-70 206-73 334-10v262H0Z" fill="#030814" opacity=".42"/>
+  <rect x="70" y="70" width="760" height="380" rx="42" fill="#071029" opacity=".58" stroke="url(#accent)" stroke-width="3"/>
+  <text x="450" y="166" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="98" font-weight="900" text-anchor="middle">LIMA DC</text>
+  <text x="450" y="223" fill="#dfff5a" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" text-anchor="middle">DC NIGHTLIFE</text>
+  <g fill="none" stroke="url(#accent)" stroke-width="13" stroke-linecap="round">
+    <path d="M250 319c45-63 94-63 139 0s94 63 139 0 94-63 139 0"/>
+    <path d="M318 362h264"/>
+  </g>
+  <text x="450" y="417" fill="#f6f7ff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="middle">Latin nights, VIP tables, DC club energy</text>
+  <text x="450" y="456" fill="#bfc7eb" font-family="Arial, Helvetica, sans-serif" font-size="22" text-anchor="middle">Washington DC nightlife, Latin music, VIP and lounge moments</text>
+  <text x="450" y="486" fill="#ffffff" opacity=".62" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="middle">demo ad campaign</text>
+</svg>

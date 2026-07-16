@@ -1,0 +1,114 @@
+rules_version = '2';
+
+// FLOQR STORAGE RULES VERSION: v29.06
+// EXPECTED DEPLOYED STORAGE RULES VERSION: v29.06 or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
+// Required media paths:
+// - shoutouts/{uid}/... for original, enhanced, and trimmed ShoutOut media
+// - profileMedia/{uid}/images/... and profileMedia/{uid}/videos/...
+// - template-backgrounds/{uid}/{variantId}/... for patron template background media
+// - mingl-chat/{uid}/{roomId}/... for owner-uploaded Mingl chat pictures/videos
+// - mingl-chat-backgrounds/{uid}/{roomId}/... for owner-uploaded per-chat background images
+// - clubMedia/{clubLocationId}/... for club logos, public profile media, main media, and marketing gallery
+// - explicit owner delete support so Diagnostics can upload/read/delete smoke-test media
+// If Firebase Console Storage Rules does not show this note near the top, Storage rules are not updated to this package.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /shoutouts/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 30 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /profileMedia/{userId}/images/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /profileMedia/{userId}/videos/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 60 * 1024 * 1024
+        && request.resource.contentType.matches('video/.*');
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /template-backgrounds/{userId}/{variantId}/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 30 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /mingl-chat/{userId}/{roomId}/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 30 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /mingl-chat-backgrounds/{userId}/{roomId}/{allPaths=**} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /clubMedia/{clubLocationId}/{allPaths=**} {
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+        && request.resource.size < 60 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
+
+      allow delete: if request.auth != null;
+    }
+  }
+}

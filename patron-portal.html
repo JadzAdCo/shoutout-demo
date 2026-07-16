@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR Patron Portal v29.07 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>My Profile and Settings</title>
+  <link rel="stylesheet" href="./styles.css?v=29.08.4"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <a class="global-back-btn buttonlike" href="./?v=28.43-f">&larr; Back to main app</a>
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <h1>My Profile and Settings</h1>
+        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FLOQR Inbox, and Mingl.</p>
+        <p id="portalSignedInAs" class="status">Not signed in</p>
+        <p id="portalStatus" class="status">Loading patron portal...</p>
+      </div>
+    </header>
+
+    <div id="portalLogin" class="card">
+      <h2>Sign in</h2>
+      <p class="sub">Sign in to view and update your patron profile.</p>
+      <button id="portalGoogleLoginBtn" type="button">Continue with Google</button>
+    </div>
+
+    <div id="portalPanel" class="hidden">
+      <div class="card account-status-card">
+        <div>
+          <p class="eyebrow">Account</p>
+          <strong id="portalAccountName">&mdash;</strong>
+          <p id="portalAccountEmail" class="sub small">&mdash;</p>
+        </div>
+        <button id="portalLogoutBtn" class="ghost" type="button">Sign out</button>
+      </div>
+
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
+        <button class="admin-tab" data-panel="portalProfile" type="button">My Profile</button>
+        <button class="admin-tab" data-panel="portalPrivacy" type="button">My Privacy</button>
+        <button class="admin-tab" data-panel="portalLanguageSettings" type="button">Language Settings</button>
+        <button class="admin-tab" data-panel="portalAiNotifications" type="button">AI Notification Preferences</button>
+        <button class="admin-tab" data-panel="portalTemplateVariants" type="button">My ShoutOut Templates</button>
+        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Media and Data Sharing</button>
+        <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
+        <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
+        <button class="admin-tab" data-panel="portalPaidServices" type="button">Paid Services & Orders</button>
+        <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
+        <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
+        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=28.98">Mingl Chat</a>
+        <a class="admin-tab-link buttonlike" href="./services.html?v=29.07">Follow Services</a>
+        <a class="admin-tab-link buttonlike" id="portalCommerceLink" href="./commerce.html?v=29.07">Commerce Site</a>
+        <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
+      </nav>
+
+      <section id="portalOverview" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
+          <div class="metric-card"><span>FLOQR Inbox</span><strong id="metricMessages">0/0</strong></div>
+          <div class="metric-card"><span>Mingl</span><strong id="metricChats">0/0</strong></div>
+          <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
+        </div>
+        <div class="card">
+          <h2>Profile Summary</h2>
+          <div id="profileSummary" class="report-block"></div>
+          <p><a href="./role-request.html?v=28.43-f">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
+          <p><a href="./services.html?v=29.07">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
+        </div>
+      </section>
+
+      <section id="portalProfile" class="admin-panel-section">
+        <div class="card">
+          <h2>Edit Profile</h2>
+          <p class="sub small">Use legal first and last name for guest lists where ID checks are required.</p>
+          <div class="profile-grid">
+            <label>First Name <input id="editFirstName"/></label>
+            <label>Last Name <input id="editLastName"/></label>
+            <label>Display Name <input id="editDisplayName"/></label>
+            <label>Phone Number <input id="editPhone"/></label>
+            <label>Taxi pickup address <input id="editTaxiPickupAddress" autocomplete="street-address" placeholder="Used privately by Pickup"/></label>
+            <label>City <input id="editCity"/></label>
+            <label>Country <input id="editCountry"/></label>
+            <label>Preferred Language
+              <select id="editLanguage">
+                <option value="">Select language</option>
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="it">Italian</option>
+                <option value="de">German</option>
+                <option value="el">Greek</option>
+                <option value="pt">Portuguese</option>
+                <option value="nl">Dutch</option>
+                <option value="sv">Swedish</option>
+                <option value="da">Danish</option>
+                <option value="no">Norwegian</option>
+                <option value="fi">Finnish</option>
+                <option value="is">Icelandic</option>
+                <option value="ar">Arabic</option>
+                <option value="tr">Turkish</option>
+                <option value="zh">Chinese</option>
+                <option value="th">Thai</option>
+                <option value="ms">Malay</option>
+              </select>
+            </label>
+            <label>Gender
+              <select id="editGender">
+                <option value="">Prefer not to say</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="nonbinary">Non-binary</option>
+                <option value="self-described">Self-described</option>
+              </select>
+            </label>
+            <label>Height
+              <div class="height-input-row">
+                <input id="editHeight" placeholder="5'10&quot; or 1.78"/>
+                <select id="editHeightUnit" aria-label="Height unit">
+                  <option value="ftin">ft/in</option>
+                  <option value="m">m</option>
+                </select>
+              </div>
+            </label>
+            <label>Birthday Month
+              <select id="editBirthMonth">
+                <option value="">Month</option>
+                <option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+              </select>
+            </label>
+            <label>Birthday Day <input id="editBirthDay" type="number" min="1" max="31" placeholder="Day only"/></label>
+            <label>Instagram Handle <input id="editInstagram"/></label>
+            <label>X Handle <input id="editX"/></label>
+            <label>Public Profile Type
+              <select id="editProfileType">
+                <option value="patron">Patron</option>
+                <option value="promoter">Promoter</option>
+                <option value="dj">DJ</option>
+                <option value="hospitality">Waiter / Waitress / Bottle Girl</option>
+              </select>
+            </label>
+            <label>Public Profile Visibility
+              <select id="editProfileVisibility">
+                <option value="followers">Followers only</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+            </label>
+            <label>Public Profile Language
+              <select id="editPublicProfileLanguageMode">
+                <option value="preferred">Preferred/original language</option>
+                <option value="english">English version</option>
+              </select>
+            </label>
+            <label>Music Interests <input id="editMusicInterests" placeholder="Hip Hop, Afro House, EDM"/></label>
+            <label>Travel Interests <input id="editTravelInterests" placeholder="Barcelona, Miami, beach trips"/></label>
+            <label>General Hobbies <input id="editHobbies" placeholder="Dining, dancing, fashion, fitness"/></label>
+            <label>Food Choices <input id="editFoodChoices" placeholder="Sushi, tapas, steakhouse"/></label>
+            <label>Favorite Beverage Choices <input id="editFavoriteBeverages" placeholder="Champagne, tequila, mocktails"/></label>
+            <label>Favorite Nightlife Style <input id="editNightlifeStyle" placeholder="Lounges, clubs, rooftops, live music"/></label>
+            <label>Looking To Meet <input id="editLookingToMeet" placeholder="Friends, event crew, travelers, music lovers"/></label>
+            <label>Profile Bio <input id="editBio" maxlength="180" placeholder="A short intro shown to followers"/></label>
+            <label>English Bio Translation <input id="editBioEnglish" maxlength="180" placeholder="English version for public profile search"/></label>
+            <label><input id="editCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
+            <label>Commerce store name <input id="editCommerceStoreName" placeholder="My FLOQR Shop"/></label>
+            <div class="card nested-card profile-grid-wide">
+              <h3>Stripe payouts</h3>
+              <p id="memberStripeConnectStatus" class="sub small">Checking payout onboarding statusâ€¦</p>
+              <div class="queue-actions">
+                <button id="memberStripeConnectBtn" type="button">Start Stripe payout onboarding</button>
+                <button id="memberStripeConnectRefreshBtn" type="button">Refresh payout status</button>
+              </div>
+              <p class="sub small">FLOQR creates and binds your recipient account securely. Never paste a Stripe secret or connected-account ID into your profile.</p>
+            </div>
+          </div>
+          <button id="prepareProfileTranslationBtn" type="button">Prepare English Translation</button>
+          <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
+        </div>
+      </section>
+
+      <section id="portalPublicProfile" class="admin-panel-section">
+        <div class="card">
+          <h2>Public Media and Data Sharing</h2>
+          <p class="sub small">Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.</p>
+          <div id="profileTemplatePreview" class="profile-template-preview"></div>
+        </div>
+        <div class="card">
+          <h2>Profile Media</h2>
+          <p class="sub small">Use the single upload control to select multiple files. Move items up or down to control their public-profile order; the first item becomes the hero media.</p>
+          <label>Choose profile media
+            <input id="profileMediaBatchInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple/>
+          </label>
+          <div id="profileMediaSlots" class="profile-media-grid"></div>
+          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Media and Order</button>
+        </div>
+        <div class="card">
+          <h2>Profile Template Guide</h2>
+          <div id="roleTemplateGuide" class="role-template-grid"></div>
+        </div>
+      </section>
+
+      <section id="portalAiNotifications" class="admin-panel-section">
+        <div id="aiNotificationPreferencesMount"></div>
+      </section>
+
+      <section id="portalTemplateVariants" class="admin-panel-section">
+        <div class="card">
+          <h2>My ShoutOut Templates</h2>
+          <p class="sub small">Saved variants use locked official/admin template layouts. Only background values can be customized.</p>
+          <div id="myTemplateVariants" class="template-grid"></div>
+        </div>
+        <div class="card">
+          <h2>Community Templates</h2>
+          <p class="sub small">Public variants are searchable and can appear on public profiles when shared.</p>
+          <div id="communityTemplateVariants" class="template-grid"></div>
+        </div>
+      </section>
+
+      <section id="portalShoutouts" class="admin-panel-section">
+        <div id="shoutoutEditCard" class="card hidden">
+          <h2>Modify ShoutOut</h2>
+          <p id="shoutoutEditStatus" class="sub small"></p>
+          <div class="profile-grid">
+            <label>Main message<input id="editShoutoutMain" maxlength="47"/></label>
+            <label>Sub message<input id="editShoutoutSub" maxlength="20"/></label>
+          </div>
+          <p id="editShoutoutTextHint" class="sub small" aria-live="polite"></p>
+          <div class="queue-actions">
+            <button id="saveShoutoutEditBtn" class="primary" type="button">Save ShoutOut Changes</button>
+            <button id="resubmitShoutoutEditBtn" class="primary" type="button">Resubmit for Approval</button>
+            <button id="cancelShoutoutEditBtn" type="button">Cancel</button>
+          </div>
+        </div>
+        <div id="shoutoutDiagnosticCard" class="card hidden">
+          <h2>ShoutOut Diagnostic</h2>
+          <p class="sub small">Searches pending ShoutOuts, live display content, inbox notifications, and audit records for this reference.</p>
+          <div class="profile-grid">
+            <label>Reference or ID<input id="diagnosticShoutoutRef" placeholder="SO-0000000 or document id"/></label>
+            <button id="runShoutoutDiagnosticBtn" class="primary" type="button">Run Diagnostic</button>
+          </div>
+          <div id="shoutoutDiagnosticReport" class="report-block"></div>
+        </div>
+        <div class="card"><h2>My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
+      </section>
+      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and Commerce orders.</p><div id="paidServicesReport" class="report-block"></div></div></section>
+
+      <section id="portalGuestLists" class="admin-panel-section">
+        <div class="card"><h2>My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
+      </section>
+
+      <section id="portalMessages" class="admin-panel-section">
+        <div class="card">
+          <h2>FLOQR Inbox Rules</h2>
+          <div id="messagePolicySummary" class="policy-list"></div>
+        </div>
+        <div class="card" id="portalCompose">
+          <h2>Send FLOQR Inbox Message</h2>
+          <p id="composePolicyNote" class="sub small"></p>
+          <div class="profile-grid">
+            <label>Recipient Search<input id="composeRecipientSearch" placeholder="Search club admin, CSR, display name, or username"/></label>
+            <label>Subject<input id="composeSubject" placeholder="Subject"/></label>
+          </div>
+          <input id="composeRecipientUid" type="hidden"/>
+          <input id="composeRecipientEmail" type="hidden"/>
+          <input id="composeRecipientLabel" type="hidden"/>
+          <div id="recipientSearchResults" class="recipient-search-results"></div>
+          <label>Message<input id="composeBody" placeholder="Write your message..."/></label>
+          <button id="sendMessageBtn" class="primary" type="button">Send Message</button>
+        </div>
+        <div class="card"><h2>FLOQR Inbox <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
+      </section>
+
+      <section id="portalChats" class="admin-panel-section hidden" aria-hidden="true">
+        <div class="card"><h2>Mingl Chat <span id="chatCountLabel">(0/0)</span></h2><p class="sub small">Open a mutual Mingl chat in its own page.</p><div id="myChats" class="report-block"></div></div>
+        <div class="card mingl-dashboard-card">
+          <h2>Mingl Requests</h2>
+          <p class="sub small">Sent and received Friend or Mingl Requests appear here after the chat list.</p>
+          <div class="mingl-control-grid">
+            <details id="minglRequestsDetails" class="mingl-action-details">
+              <summary id="minglRequestsSummaryButton">Mingl Requests</summary>
+              <div id="portalMinglRequests" class="report-block"></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="portalMinglChatPage" class="admin-panel-section hidden" aria-hidden="true">
+        <button id="backToMinglDashboardBtn" type="button">Back to Mingl</button>
+        <div id="portalMinglChatPanel" class="card hidden">
+          <div class="mingl-chat-header">
+            <div id="portalMinglChatAvatar" class="mingl-chat-avatar">M</div>
+            <div>
+              <h2 id="portalMinglChatTitle">Mingl Chat</h2>
+              <p id="portalMinglChatStatus" class="sub small hidden"></p>
+            </div>
+          </div>
+          <div class="mingl-chat-tools">
+            <label class="chat-file-button" for="portalMinglBackgroundInput">Chat Background</label>
+            <input id="portalMinglBackgroundInput" class="visually-hidden-file" type="file" accept="image/*"/>
+            <input id="portalMinglImageInput" class="visually-hidden-file" type="file" accept="image/*"/>
+            <button id="portalClearMinglImageBtn" type="button">Remove Picture</button>
+          </div>
+          <div id="portalMinglAttachmentPreview" class="mingl-attachment-preview hidden"></div>
+          <div id="portalMinglMessages" class="mingl-messages"></div>
+          <p id="portalMinglGrammarHint" class="grammar-hint hidden"></p>
+          <div class="mingl-compose">
+            <label class="chat-plus-button" for="portalMinglImageInput" title="Send picture" aria-label="Send picture">+</label>
+            <input id="portalMinglMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
+            <button id="portalImproveMinglMessageBtn" type="button">Fix Grammar</button>
+            <button id="portalSendMinglMessageBtn" class="primary" type="button">Send</button>
+          </div>
+          <div class="emoji-row" aria-label="Mingl emoji shortcuts">
+            <button type="button" data-portal-mingl-emoji="😊">😊</button>
+            <button type="button" data-portal-mingl-emoji="🔥">🔥</button>
+            <button type="button" data-portal-mingl-emoji="🎉">🎉</button>
+            <button type="button" data-portal-mingl-emoji="❤️">❤️</button>
+            <button type="button" data-portal-mingl-emoji="😂">😂</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="portalLanguageSettings" class="admin-panel-section">
+        <div class="card">
+          <h2>Language Settings</h2>
+          <p class="sub small">Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future Bata descriptions.</p>
+          <label class="consent-checkbox">
+            <input id="languageAiGrammarEnabled" type="checkbox"/>
+            <span>Enable grammar and spelling check before sending messages, chats, ShoutOuts, profile updates, and other text inputs.</span>
+          </label>
+          <div class="card-subsection">
+            <h3>Correction Mode</h3>
+            <div class="language-radio-grid">
+              <label><input type="radio" name="languageCorrectionMode" value="suggestionsOnly"/> <span>Show suggestions only</span></label>
+              <label><input type="radio" name="languageCorrectionMode" value="approvalRequired"/> <span>Require approval before replacing my text</span></label>
+              <label><input type="radio" name="languageCorrectionMode" value="autoFixMinor"/> <span>Auto-fix minor typos only</span></label>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <label class="consent-checkbox"><input id="languageHighlightSpellingErrors" type="checkbox"/><span>Highlight possible spelling errors in red before correction</span></label>
+            <label class="consent-checkbox"><input id="languageHighlightGrammarSuggestions" type="checkbox"/><span>Highlight grammar suggestions in yellow or underline</span></label>
+            <label>Preferred Language
+              <select id="languagePreferredLanguage">
+                <option value="auto">Auto-detect</option>
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+              </select>
+            </label>
+            <label>Tone Preference
+              <select id="languageTonePreference">
+                <option value="keepTone">Keep my tone</option>
+                <option value="friendly">Friendly</option>
+                <option value="professional">Professional</option>
+                <option value="flirty">Flirty</option>
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+              </select>
+            </label>
+            <label>Emoji Skin Tone
+              <select id="languageEmojiSkinTone">
+                <option value="yellow">Yellow/default</option>
+                <option value="light-brown">Light brown</option>
+                <option value="dark-brown">Dark brown</option>
+              </select>
+            </label>
+            <label>My Word List
+              <textarea id="languagePersonalDictionary" rows="3" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
+            </label>
+            <label>My Personal Corrections
+              <textarea id="languagePersonalCorrections" rows="4" placeholder="watz -> what's&#10;weakend -> weekend"></textarea>
+            </label>
+          </div>
+          <p class="sub small">To test: add `watz -> what's` and `weakend -> weekend`, save, open Mingl Chat, type those words, then use Correct Grammar/Spelling. Gemini is tried first; if unavailable, only your saved personal corrections are applied.</p>
+          <button id="saveLanguageSettingsBtn" class="primary" type="button">Save Language Settings</button>
+          <div id="languageSettingsReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="portalHelp" class="admin-panel-section">
+        <div class="card">
+          <h2>Help</h2>
+          <p class="sub small">Help content is grouped by FLOQR feature so working pages stay clean.</p>
+          <div class="help-section-grid">
+            <details class="mingl-action-details" open>
+              <summary>Mingl</summary>
+              <div id="chatPolicySummary" class="policy-list"></div>
+              <div class="help-copy">
+                <p>Mingl is the social discovery area for public patron profiles and shared interests.</p>
+                <p>Mingl Chat opens only after both patrons agree to Mingl with each other.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>ShoutOut</summary>
+              <div class="help-copy">
+                <p>Use ShoutOut to find venues, choose a template, add supported media, and submit live display content for approval.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>Bata</summary>
+              <div class="help-copy">
+                <p>Bata is the future merch, style, and product discovery area connected to FLOQR events and creators.</p>
+              </div>
+            </details>
+            <details class="mingl-action-details">
+              <summary>Fix Grammar</summary>
+              <div class="help-copy">
+                <p>Fix Grammar calls Gemini through Firebase Functions first. If Gemini is unavailable, FLOQR only applies your saved personal correction pairs and preserves your Word List.</p>
+                <p>My Word List protects names, slang, handles, and preferred spellings. My Personal Corrections handles repeated typos like watz -> what's. FLOQR does not run a generalized local typo dictionary.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="portalPrivacy" class="admin-panel-section">
+        <div class="card">
+          <h2>My Privacy</h2>
+          <p class="sub small">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
+          <div class="profile-grid">
+            <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
+            <label class="consent-checkbox"><input id="privacyAnalytics" type="checkbox"/><span>Analytics consent</span></label>
+            <label class="consent-checkbox"><input id="privacySharing" type="checkbox"/><span>Third-party data sharing consent</span></label>
+            <label class="consent-checkbox"><input id="privacyBirthdayNotifyOthers" type="checkbox"/><span>Allow FLOQR system birthday notifications to people I choose</span></label>
+            <label>Receive Birthday Notifications
+              <select id="privacyBirthdayNotificationScope">
+                <option value="none">Do not notify me</option>
+                <option value="following">People I follow / Mingl with</option>
+                <option value="closeFriends">Close friends only</option>
+              </select>
+            </label>
+          </div>
+          <div class="card-subsection">
+            <h3>Public Datapoints for Mingl and Matching</h3>
+            <div id="privacyDatapointChoices" class="privacy-datapoint-grid"></div>
+          </div>
+          <button id="savePrivacyBtn" class="primary" type="button">Save Privacy Preferences</button>
+          <button id="exportDataBtn" type="button">Download My Data JSON</button>
+          <button id="deleteDataBtn" class="ghost" type="button">Request Data Delete</button>
+          <div id="privacyReport" class="report-block"></div>
+        </div>
+      </section>
+      <section id="portalMinglFriends" class="admin-panel-section">
+        <div class="card">
+          <h2>Manage Mingl Friends</h2>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Manage mutual Mingl friends. Mark close friends, exclude someone from viewing or contacting you, or require only disappearing messages with that person.</div></details>
+          <input id="minglFriendSearchInput" class="search" placeholder="Search Mingl friends by name, username, or email"/>
+          <div id="minglFriendManagementReport" class="report-block"></div>
+          <button id="saveMinglFriendSettingsBtn" class="primary" type="button">Save Mingl Friend Settings</button>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=28.43-f"></script>
+<script src="./global-profile-status.js?v=29.03"></script>
+<script src="./shared-data.js?v=29.09.0"></script>
+<script src="./ai-service.js?v=28.98"></script>
+<script src="./ai-index-service.js?v=28.44-ai"></script>
+<script src="./ai-search-service.js?v=28.44-ai"></script>
+<script src="./ai-notification-service.js?v=28.44-ai"></script>
+<script src="./ai-template-studio.js?v=29.09.0"></script>
+<script src="./ai-grammar-service.js?v=28.98"></script>
+  <script src="./floqr-action-feedback.js?v=29.05"></script>
+<script src="./helper-popouts.js?v=28.98"></script>
+<script src="./payment-service.js?v=29.09.2"></script>
+<script src="./patron-portal-app.js?v=29.08.4"></script>
+  <script src="./profile-access-guard.js?v=29.05"></script>
+</body>
+</html>

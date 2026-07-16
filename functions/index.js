@@ -1,0 +1,4 @@
+module.exports = {
+  ...require("./ai-discovery-functions"),
+  ...require("./commerce-functions")
+};

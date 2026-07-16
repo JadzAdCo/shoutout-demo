@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Ad Campaign Preview v28.99</title>
+  <link rel="stylesheet" href="./styles.css?v=28.98"/>
+  <style>
+    body { min-height:100vh; padding:32px; }
+    .preview-shell { max-width:1180px; margin:0 auto; }
+    .preview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
+    .preview-card img { width:100%; border-radius:8px; border:1px solid rgba(255,255,255,.18); background:#050819; }
+    .preview-card textarea { width:100%; min-height:84px; }
+    .setup-grid { display:grid; gap:8px; }
+    .setup-grid div { display:flex; justify-content:space-between; gap:12px; border:1px solid rgba(255,255,255,.14); border-radius:8px; padding:10px 12px; }
+  </style>
+</head>
+<body>
+  <main class="preview-shell">
+    <a href="./index.html?v=28.99">&larr; Back to app</a>
+    <p class="eyebrow">FLOQR Ad Campaign Preview - v28.99</p>
+    <h1>Campaigns Pending Approval</h1>
+    <p class="sub">These are preview campaign assets and targeting rules. They are not final until Master Admin approves the package.</p>
+    <div id="previewGrid" class="preview-grid"></div>
+  </main>
+
+  <script src="./ad-campaigns.js?v=28.99"></script>
+  <script>
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+    const campaigns = window.FLOQRAdCampaigns.campaigns().filter(item => ["cuisine-bantu-rowlett", "puff-club", "lima-dc-draft"].includes(item.id));
+    document.getElementById("previewGrid").innerHTML = campaigns.map(campaign => `
+      <article class="card preview-card">
+        <img src="${esc(campaign.image)}" alt="${esc(campaign.title)} campaign preview"/>
+        <h2>${esc(campaign.title)}</h2>
+        <p class="eyebrow">${esc(campaign.badge)}</p>
+        <p>${esc(campaign.body)}</p>
+        ${campaign.demoLabel ? `<p><strong>${esc(campaign.demoLabel)}</strong></p>` : ""}
+        <p><strong>CTA:</strong> ${esc(campaign.callToAction || "Learn more")}</p>
+        <p><strong>Status:</strong> ${esc(campaign.status)}</p>
+        <p><strong>Source:</strong> ${campaign.sourceUrl ? `<a href="${esc(campaign.sourceUrl)}" target="_blank" rel="noopener">${esc(campaign.sourceUrl)}</a>` : "Needs official verification"}</p>
+        <label>Target tags / datapoints<textarea readonly>${esc((campaign.targetTags || []).join(", "))}</textarea></label>
+        <p><strong>AI matching:</strong> ${esc(campaign.aiTargetingPrompt || "Use tag overlap against patron datapoints.")}</p>
+        ${campaign.setupInfo ? `<div class="setup-grid">
+          <div><strong>Name</strong><span>${esc(campaign.setupInfo.name)}</span></div>
+          <div><strong>Address</strong><span>${esc(campaign.setupInfo.address)}</span></div>
+          <div><strong>Telephone</strong><span>${esc(campaign.setupInfo.phone)}</span></div>
+          <div><strong>Instagram</strong><span>${esc(campaign.setupInfo.instagramHandle)}</span></div>
+          <div><strong>Facebook</strong><span>${esc(campaign.setupInfo.facebookHandle)}</span></div>
+          <div><strong>X</strong><span>${esc(campaign.setupInfo.xHandle)}</span></div>
+          <div><strong>TikTok</strong><span>${esc(campaign.setupInfo.tiktokHandle)}</span></div>
+        </div>` : ""}
+      </article>
+    `).join("");
+  </script>
+</body>
+</html>

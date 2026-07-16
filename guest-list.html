@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Join Guest List</title><link rel="stylesheet" href="./styles.css?v=29.07"/><link rel="stylesheet" href="./admin.css?v=29.07"/></head>
+<body data-guest-theme="midnight"><main class="app admin-shell guest-list-shell"><section class="page active">
+<header class="topbar"><div><p class="eyebrow">Guest List</p><h1>Join Guest List</h1><p class="sub">Enter legal names exactly as they appear on government-issued ID.</p><p id="guestSignedInAs" class="status">Not signed in</p><p id="guestStatus" class="status">Loading guest list app...</p></div></header>
+<div id="guestLogin" class="card"><h2>Sign in first</h2><button id="guestGoogleLoginBtn" type="button">Continue with Google</button></div>
+<div id="guestCampaignHero" class="guest-campaign-hero hidden"><img id="guestCampaignHeroImage" alt="Guest list event"/><div><p class="eyebrow">Guest List</p><h2 id="guestCampaignHeroTitle"></h2><p id="guestCampaignHeroDescription" class="sub"></p><div id="guestCampaignSupportingTeam" class="badge-row"></div></div></div>
+<div id="guestFormCard" class="card hidden"><h2>Guest List Request</h2><div class="profile-grid">
+<label>Club / Location *<select id="guestLocation"></select></label>
+<label>Guest List Campaign / Event *<select id="guestEventOrDay"><option value="">Select campaign/event</option></select></label>
+<label>Promoter / Promoting Group *<select id="guestPromoter"></select></label>
+<label>Legal First Name *<input id="guestFirstName"/></label><label>Legal Last Name *<input id="guestLastName"/></label>
+<label>Phone Number<input id="guestPhone"/></label><label>Email<input id="guestEmail"/></label>
+<label>Party Size *<input id="guestPartySize" type="number" min="1" max="50" value="1"/></label></div>
+<label class="compact-label"><input id="legalNameConfirmed" type="checkbox"/> I confirm the legal first and last name entered match the government-issued ID that will be presented at entry.</label>
+<h3>Additional Guests</h3><div id="additionalGuests"></div><button id="addGuestBtn" type="button">Add Guest</button>
+<label>Notes<input id="guestNotes"/></label><button id="submitGuestListBtn" class="primary" type="button">Submit Guest List Request</button><button id="guestLogoutBtn" class="ghost" type="button">Sign out</button></div>
+<div id="guestReceipt" class="card hidden"><h2>Guest list submitted</h2><div id="guestReceiptBody" class="report-block"></div></div>
+</section></main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=29.07"></script><script src="./global-profile-status.js?v=29.03"></script><script src="./shared-data.js?v=29.07"></script><script src="./floqr-action-feedback.js?v=29.07"></script><script src="./guest-list-app.js?v=29.07"></script>
+<script src="./notification-center.js?v=28.43-f"></script>
+<script src="./profile-access-guard.js?v=29.04"></script>
+</body></html>

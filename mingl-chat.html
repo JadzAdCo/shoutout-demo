@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR Mingl Chat v29.02 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mingl Chat</title>
+  <link rel="stylesheet" href="./styles.css?v=29.04"/>
+  <link rel="stylesheet" href="./admin.css?v=29.02"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <a class="global-back-btn buttonlike" href="./?v=29.02">&larr; Back to Mingl</a>
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MINGL / CHAT</p>
+        <h1>Mingl Chat</h1>
+        <p class="sub">Chat opens after both patrons Mingl back.</p>
+        <p id="minglChatSignedInAs" class="status">Checking sign-in...</p>
+        <p id="minglChatStatus" class="status"></p>
+      </div>
+    </header>
+
+    <div id="minglChatLogin" class="card hidden">
+      <h2>Sign in</h2>
+      <p class="sub small">Sign in to open your Mingl chats.</p>
+      <button id="minglChatGoogleLoginBtn" class="auth-btn" type="button">Continue with Google</button>
+      <button id="minglChatMicrosoftLoginBtn" class="auth-btn" type="button">Continue with Microsoft</button>
+    </div>
+
+    <div id="minglChatShell" class="mingl-layout hidden">
+      <div class="card mingl-chat-list-card">
+        <h2>Chats <span id="minglStandaloneCount">(0/0)</span></h2>
+        <div id="minglStandaloneList" class="mingl-chat-list"></div>
+      </div>
+      <div id="minglStandaloneChatCard" class="card mingl-chat-popout hidden" aria-hidden="true">
+        <div class="mingl-chat-header">
+          <div id="minglStandaloneAvatar" class="mingl-chat-avatar">M</div>
+          <div>
+            <h2 id="minglStandaloneTitle">Select a Mingl Chat</h2>
+            <p id="minglStandaloneRoomStatus" class="sub small">Choose a mutual chat from the list.</p>
+          </div>
+          <button id="minglStandaloneCloseChatBtn" class="mingl-chat-close" type="button" aria-label="Close Mingl chat">&times;</button>
+        </div>
+        <input id="minglStandaloneBackgroundInput" class="visually-hidden-file" type="file" accept="image/*"/>
+        <input id="minglStandaloneImageInput" class="visually-hidden-file" type="file" accept="image/*,video/*"/>
+        <div id="minglStandaloneAttachmentPreview" class="mingl-attachment-preview hidden"></div>
+        <div id="minglStandaloneMessages" class="mingl-messages"></div>
+        <p id="minglStandaloneGrammarHint" class="grammar-hint hidden"></p>
+        <div class="mingl-compose mingl-compose-clean">
+          <input id="minglStandaloneMessageInput" maxlength="600" placeholder="Write a Mingl message..."/>
+          <button id="minglStandaloneSendBtn" class="primary" type="button">Send</button>
+          <details id="minglStandaloneActionMenu" class="mingl-compose-menu">
+            <summary aria-label="Mingl message actions">+</summary>
+            <div class="mingl-compose-menu-panel">
+              <strong>Emoji Actions</strong>
+              <div class="emoji-row compact-emoji-row" aria-label="Mingl emoji shortcuts">
+                <button type="button" data-mingl-emoji-code="128522" data-mingl-emoji-effect="smile">Smile</button>
+                <button type="button" data-mingl-emoji-code="128293" data-mingl-emoji-effect="fire">Fire</button>
+                <button type="button" data-mingl-emoji-code="127881" data-mingl-emoji-effect="confetti">Party</button>
+                <button type="button" data-mingl-emoji-code="10084" data-mingl-emoji-effect="heart">Heart</button>
+                <button type="button" data-mingl-emoji-code="128514" data-mingl-emoji-effect="laugh">Laugh</button>
+                <button type="button" id="minglMoreEmojiActionsBtn" class="emoji-more-btn">+</button>
+              </div>
+              <div id="minglAdvancedEmojiActions" class="emoji-row compact-emoji-row hidden" aria-label="More Mingl emoji actions">
+                <button type="button" data-mingl-emoji-value="💙" data-mingl-emoji-effect="heart-blue">Blue heart</button>
+                <button type="button" data-mingl-emoji-value="❤️" data-mingl-emoji-effect="heart-red">Red heart</button>
+                <button type="button" data-mingl-emoji-value="💗" data-mingl-emoji-effect="heart-pink">Pink heart</button>
+                <button type="button" data-mingl-emoji-value="💔" data-mingl-emoji-effect="broken-heart">Broken heart</button>
+                <button type="button" data-mingl-emoji-value="🌹" data-mingl-emoji-effect="rose-red">Red rose</button>
+                <button type="button" data-mingl-emoji-value="🤍🌹" data-mingl-emoji-effect="rose-white">White rose</button>
+                <button type="button" data-mingl-emoji-value="💙🌹" data-mingl-emoji-effect="rose-blue">Blue rose</button>
+                <button type="button" data-mingl-emoji-human="middle-finger" data-mingl-emoji-effect="middle-finger">Middle finger</button>
+              </div>
+              <strong>Add Photo/Video</strong>
+              <label class="chat-file-button" for="minglStandaloneImageInput">Choose Photo/Video</label>
+              <button id="minglStandaloneClearImageBtn" type="button">Remove Photo/Video</button>
+              <strong>Edit</strong>
+              <button id="minglStandaloneImproveBtn" type="button">Correct Grammar/Spelling</button>
+              <strong>Chat Background</strong>
+              <label class="chat-file-button" for="minglStandaloneBackgroundInput">Change Background</label>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.02"></script>
+<script src="./global-profile-status.js?v=29.03"></script>
+<script src="./shared-data.js?v=29.02"></script>
+<script src="./ai-grammar-service.js?v=29.02"></script>
+<script src="./helper-popouts.js?v=29.02"></script>
+<script src="./mingl-chat-app.js?v=29.03"></script>
+<script src="./profile-access-guard.js?v=29.04"></script>
+</body>
+</html>

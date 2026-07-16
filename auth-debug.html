@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Auth Debug</title>
+  <link rel="stylesheet" href="./styles.css"/>
+  <link rel="stylesheet" href="./admin.css"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">FLOQR Auth Debug</p>
+        <h1>Authentication Test</h1>
+        <p class="sub">This page tests Firebase sign-in only. It does not apply Master Admin or Club Admin role checks.</p>
+        <p id="debugStatus" class="status">Loading auth debug...</p>
+      </div>
+    </header>
+    <div class="card">
+      <h2>Test Sign-In Providers</h2>
+      <div class="auth-grid">
+        <button id="debugGoogle" type="button">Google Popup Test</button>
+        <button id="debugMicrosoft" type="button">Microsoft Popup Test</button>
+        <button id="debugLogout" type="button">Sign out</button>
+      </div>
+      <div id="debugOutput" class="report-block"></div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="./firebase-config.js?v=28.43-f"></script>
+<script src="./auth-debug.js?v=28.43-f"></script>
+</body>
+</html>

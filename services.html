@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Follow FLOQR Services</title>
+  <link rel="stylesheet" href="./styles.css?v=29.07"/><link rel="stylesheet" href="./admin.css?v=29.07"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <a class="global-back-btn buttonlike" href="./?v=29.07">&larr; Back to FLOQR</a>
+  <section class="page active">
+    <header class="topbar"><div><p class="eyebrow">FLOQR Services</p><h1>Follow a Service</h1><p class="sub">Follow promoters, DJs, waitresses, bottle girls, bartenders, videographers, camera operators, and other approved service members in their role capacity.</p><p id="serviceStatus" class="status">Loading...</p></div></header>
+    <div id="serviceLogin" class="card"><button id="serviceGoogleLoginBtn" type="button">Continue with Google</button></div>
+    <div id="servicePanel" class="hidden">
+      <section class="card"><div class="profile-grid"><label>Search services<input id="serviceSearch" placeholder="Name, role, club, city, genre"/></label><label>Role<select id="serviceRoleFilter"><option value="">All roles</option><option value="promoter">Promoters</option><option value="dj">DJs</option><option value="hospitality">Waitresses / Bottle Girls / Bartenders</option><option value="mediaCreator">Videographers / Camera Operators</option></select></label></div></section>
+      <section id="serviceDirectory" class="service-directory"></section>
+      <section id="serviceCampaignPanel" class="card hidden">
+        <p class="eyebrow">Service advertising</p><h2>Reach Patrons</h2><p class="sub small">Post to your followers for free, or use targeted FloqR at $0.10 per patron.</p>
+        <div class="profile-grid">
+          <label>Role capacity<select id="serviceCampaignRole"></select></label>
+          <label>Campaign title<input id="serviceCampaignTitle"/></label>
+          <label>Audience<select id="serviceCampaignAudience"><option value="followers">My followers (no distribution charge)</option><option value="targetedFloqr">Targeted FloqR ($0.10/user)</option></select></label>
+          <label class="profile-grid-wide">Message<textarea id="serviceCampaignBody" rows="3"></textarea></label>
+          <label id="serviceTargetCountLabel" class="hidden">Target patrons<input id="serviceTargetCount" type="number" min="1" value="100"/></label>
+          <label>Campaign link<input id="serviceCampaignLink" type="url" placeholder="https://example.com"/></label>
+        </div>
+        <button id="servicePublishCampaignBtn" class="primary" type="button">Publish Campaign</button><div id="serviceCampaignReport" class="report-block"></div>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.07"></script><script src="./payment-service.js?v=29.09.2"></script><script src="./services-app.js?v=29.07"></script><script src="./profile-access-guard.js?v=29.07"></script>
+</body>
+</html>

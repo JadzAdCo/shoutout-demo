@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR ShoutOut Master Admin Portal v29.09.0 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Master Admin</title>
+  <link rel="stylesheet" href="./styles.css?v=29.08.4"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07.1"/>
+</head>
+<body>
+<main id="masterAdminPage" class="app admin-shell">
+  <section class="page active">
+    <header class="topbar admin-topbar">
+      <div>
+        <p class="eyebrow">FLOQR Master Admin</p>
+        <h1>Network Intelligence Center</h1>
+        <p class="sub">Master admins can view all venues, all ShoutOut queues, all reports, advertiser data, reconciliation summaries, and network-level analytics.</p>
+        <p id="masterSignedInAs" class="status">Not signed in</p>
+        <p id="masterStatus" class="status">Loading master admin app...</p>
+      </div>
+      <div class="card admin-club-card">
+        <p class="eyebrow">Network View</p>
+        <h2>All Locations</h2>
+        <p class="sub small">FLOQR internal use only.</p>
+      </div>
+    </header>
+
+    <div id="masterLogin" class="card">
+      <h2>Master admin sign-in</h2>
+      <p class="sub">Master admin access is controlled by <strong>SHOUTOUT_MASTER_ADMIN_EMAILS</strong>. Domain enforcement is disabled during development.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Master Admin login uses the same popup configuration as the patron page for Google and Microsoft. Use auth-debug.html if Microsoft still fails.</p>
+      <div class="auth-grid">
+        <button id="masterGoogleLoginBtn" type="button">Master Google Login</button>
+        <button id="masterMicrosoftLoginBtn" type="button">Master Microsoft Login</button>
+      </div>
+      <button id="masterLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+    </div>
+
+    <div id="masterPanel" class="hidden">
+      <div id="masterAccountStatusCard" class="card account-status-card">
+        <div>
+          <p class="eyebrow">Account Status</p>
+          <strong id="masterPanelSignedInAs">Signed in</strong>
+          <p id="masterPanelSecurityStatus" class="sub small">Security status pending...</p>
+          <p id="masterActionFeedback" class="sub small">No admin action clicked yet.</p>
+        </div>
+        <button id="masterPanelLogoutBtn" class="ghost" type="button">Sign out</button>
+      </div>
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
+        <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club Admin URLs</button>
+        <button class="admin-tab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
+        <button class="admin-tab" data-panel="templateManagement" type="button">Template Management</button>
+        <button class="admin-tab" data-panel="recommendationModeration" type="button">Unapproved Recommendations</button>
+        <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
+        <button class="admin-tab" data-panel="allReports" type="button">All Reports</button>
+        <button class="admin-tab" data-panel="advertiserReports" type="button">Advertiser Reports</button>
+        <button class="admin-tab" data-panel="adCampaignManagement" type="button">Ad Campaign Management</button>
+        <button class="admin-tab" data-panel="patronDiagnostics" type="button">Patron Diagnostics</button>
+        <button class="admin-tab" data-panel="promoterNetwork" type="button">Promoters</button>
+        <button class="admin-tab" data-panel="networkReconciliation" type="button">Network Reconciliation</button>
+        <button class="admin-tab" data-panel="servicesCommerce" type="button">Services & Commerce</button>
+        <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
+        <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
+        <button class="admin-tab" data-panel="staleRecordCleanup" type="button">Stale Record Cleanup</button>
+        <button class="admin-tab" data-panel="duplicateRecords" type="button">Duplicate Records</button>
+        <button class="admin-tab" data-panel="diagnostics" type="button">Diagnostics</button>
+        <button class="admin-tab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
+      </nav>
+
+      <section id="networkDashboard" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Total Locations</span><strong id="netLocations">0</strong></div>
+          <div class="metric-card"><span>Total Users</span><strong id="netUsers">0</strong></div>
+          <div class="metric-card"><span>All Pending ShoutOuts</span><strong id="netPending">0</strong></div>
+          <div class="metric-card"><span>Estimated Network Revenue</span><strong id="netRevenue">$0</strong></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card"><h2>Top Locations</h2><div id="topLocationsReport" class="report-block"></div></div>
+          <div class="card"><h2>Audience Intelligence</h2><div id="networkAudienceReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="clubAdminUrls" class="admin-panel-section">
+        <div class="card">
+          <h2>Club Admin Portal URLs</h2>
+          <p class="sub small">Open or copy the direct admin portal URL for each club/location. These URLs use the location id in `admin.html?location=`.</p>
+          <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="clubOnboarding" class="admin-panel-section">
+        <div class="card">
+          <h2>Entity Onboarding and Club Admin Assignment</h2>
+          <p class="sub small">Search or choose an imported/discovered club, then select a completed patron who explicitly elected an eligible service role: waiter/waitress, bottle service, promoter, DJ, bartender/barman, or videographer/camera operator.</p>
+          <div class="profile-grid">
+            <label>Select club entity<input id="entityClubSearch" list="entityClubOptions" autocomplete="off" placeholder="Search by club, city, ID, or address"/><datalist id="entityClubOptions"></datalist></label>
+            <label>Eligible service patron<input id="entityPatronSearch" list="entityPatronOptions" autocomplete="off" placeholder="Search elected service members only"/><datalist id="entityPatronOptions"></datalist></label>
+          </div>
+          <div class="entity-onboarding-grid">
+            <div><h3>1. Select an entity</h3><div id="entityClubResults" class="report-block"></div></div>
+            <div><h3>2. Select an eligible service patron</h3><div id="entityPatronResults" class="report-block"></div></div>
+          </div>
+          <div id="entityAssignmentSummary" class="report-block"></div>
+          <button id="assignEntityClubAdminBtn" class="primary" type="button" disabled>Assign Selected Patron as Club Admin</button>
+          <p id="entityOnboardingStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Club Onboarding</h2>
+          <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team.</p>
+          <div class="profile-grid">
+            <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
+            <label>Street address<input id="clubOnboardStreetAddress" autocomplete="address-line1" placeholder="1411 K St NW" required/></label>
+            <label>City<input id="clubOnboardCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>State / region<input id="clubOnboardRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
+            <label>Postal code<input id="clubOnboardPostalCode" autocomplete="postal-code" placeholder="20005"/></label>
+            <label>Country<input id="clubOnboardCountry" autocomplete="country-name" value="United States" required/></label>
+            <label><span class="field-icon">TEL</span> Telephone #<input id="clubOnboardPhone" placeholder="+1 202 789 2800"/></label>
+            <label><span class="field-icon">WEB</span> Website<input id="clubOnboardWebsite" placeholder="https://example.com"/></label>
+            <label><span class="field-icon">MAIL</span> Customer Email<input id="clubOnboardEmail" placeholder="info@example.com"/></label>
+            <label><span class="field-icon">IG</span> Instagram<input id="clubOnboardInstagram" placeholder="@club"/></label>
+            <label><span class="field-icon">FB</span> Facebook<input id="clubOnboardFacebook" placeholder="facebook.com/club"/></label>
+            <label><span class="field-icon">X</span> X<input id="clubOnboardX" placeholder="@club"/></label>
+            <label><span class="field-icon">TT</span> TikTok<input id="clubOnboardTiktok" placeholder="@club"/></label>
+            <label>Music Genres<input id="clubOnboardGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+          </div>
+          <fieldset class="screen-format-fieldset">
+            <legend>Club display screens</legend>
+            <p class="sub small">Select every FLOQR display format installed at this venue. Patrons will only see templates compatible with at least one selected screen.</p>
+            <div class="privacy-datapoint-grid">
+              <label><input data-onboard-screen-format="led-96x48" type="checkbox" checked/> 96 x 48 cm — 624 x 312</label>
+              <label><input data-onboard-screen-format="led-64x48" type="checkbox"/> 64 x 48 cm — 416 x 312</label>
+              <label><input data-onboard-screen-format="led-64x32" type="checkbox"/> 64 x 32 cm — 416 x 208</label>
+            </div>
+          </fieldset>
+          <button id="createClubOnboardingBtn" class="primary" type="button">Create Club Venue</button>
+          <p id="clubOnboardingStatus" class="status"></p>
+          <div id="clubOnboardingPreview" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Bulk Club CSV Onboarding</h2>
+          <p class="sub small">CSV headers: Club Name, Full Address, Telephone #, Website, Customer Email, Instagram, Facebook, X, Tic Tok, Music Genres.</p>
+          <label>CSV file<input id="clubOnboardingCsvFile" type="file" accept=".csv,text/csv"/></label>
+          <div class="queue-actions">
+            <button id="previewClubOnboardingCsvBtn" type="button">Preview CSV</button>
+            <button id="importClubOnboardingCsvBtn" class="primary" type="button">Import Previewed Clubs</button>
+          </div>
+          <div id="clubOnboardingCsvReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promoter Onboarding</h2>
+          <p class="sub small">Promoters must be patrons before they can be assigned to a club. A promoter can be independent or connected to a promotion company.</p>
+          <div class="profile-grid">
+            <label>Promoter Display Name<input id="promoterOnboardName" placeholder="Promoter name"/></label>
+            <label>Patron Email / Username<input id="promoterOnboardIdentity" placeholder="patron@example.com or @username"/></label>
+            <label>Promotion Company<input id="promoterOnboardCompany" placeholder="Company name, or leave blank"/></label>
+            <label>Affiliated Club Location ID<input id="promoterOnboardClubId" placeholder="lima-twist-washington-dc"/></label>
+          </div>
+          <label><input id="promoterOnboardIndependent" type="checkbox"/> Independent promoter</label>
+          <button id="createPromoterOnboardingBtn" class="primary" type="button">Create Promoter Onboarding Record</button>
+          <div id="promoterOnboardingReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="templateManagement" class="admin-panel-section">
+        <div class="card">
+          <h2>ShoutOut Template Management</h2>
+          <p class="sub small">Create or edit official template metadata, tags, media support, character limits, and compatible screen formats. Deactivated templates are hidden from patrons without deleting historical ShoutOut records.</p>
+          <div class="profile-grid">
+            <label>Template ID<input id="templateManageId" placeholder="birthday-wide"/></label>
+            <label>Template name<input id="templateManageName" placeholder="Birthday Wide"/></label>
+            <label>Visual class<select id="templateManageClass"><option value="neon">Neon</option><option value="gold">Gold</option><option value="ice">Ice</option><option value="fire">Fire</option><option value="classic-bw">Black & White</option><option value="celebration-media">Split Media</option></select></label>
+            <label>Category<input id="templateManageCategory" placeholder="Milestone"/></label>
+            <label>Tags<input id="templateManageTags" placeholder="birthday, celebration, photo"/></label>
+            <label>Main message total limit<input id="templateManageMainLimit" type="number" min="1" value="45"/></label>
+            <label>Maximum main-message lines<input id="templateManageLineCount" type="number" min="1" max="8" value="3"/></label>
+            <label>Characters per main-message line<input id="templateManageLineLimit" type="number" min="1" value="15"/></label>
+            <label>Subtext / attribution limit<input id="templateManageSubLimit" type="number" min="0" value="60"/></label>
+            <label>Main text size (% of display height)<input id="templateManageMainTextSize" type="number" min="4" max="40" step="0.1" value="20.8"/></label>
+            <label>Subtext size (% of display height)<input id="templateManageSubTextSize" type="number" min="2" max="20" step="0.1" value="7.8"/></label>
+            <label>Preview main text<input id="templateManagePreviewMain" value="SHOUTOUT" placeholder="SHOUTOUT"/></label>
+            <label>Preview subtext<input id="templateManagePreviewSub" value="FLOQR" placeholder="FLOQR"/></label>
+          </div>
+          <div class="privacy-datapoint-grid">
+            <label><input id="templateManageSupportsMedia" type="checkbox"/> Supports image/video</label>
+            <label><input id="templateManageBackgroundEditable" type="checkbox" checked/> Background can be customized (required for published templates)</label>
+            <label><input data-template-screen-format="led-96x48" type="checkbox" checked/> 96 x 48 cm — 624 x 312</label>
+            <label><input data-template-screen-format="led-64x48" type="checkbox" checked/> 64 x 48 cm — 416 x 312</label>
+            <label><input data-template-screen-format="led-64x32" type="checkbox" checked/> 64 x 32 cm — 416 x 208</label>
+          </div>
+          <label>Description<textarea id="templateManageDescription" rows="3"></textarea></label>
+          <div class="queue-actions"><button id="previewManagedTemplateBtn" type="button">Preview Template</button><button id="saveManagedTemplateBtn" class="primary" type="button">Save Template</button><button id="clearManagedTemplateBtn" type="button">Clear Form</button></div>
+          <p id="templateManagementStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Available Templates</h2>
+          <label>Search templates<input id="templateManagementSearch" placeholder="Name, ID, tag, screen size, category"/></label>
+          <div id="templateManagementList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="recommendationModeration" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Unapproved</span><strong id="recommendationPendingCount">0</strong></div>
+          <div class="metric-card"><span>Approved</span><strong id="recommendationApprovedCount">0</strong></div>
+          <div class="metric-card"><span>Rejected</span><strong id="recommendationRejectedCount">0</strong></div>
+          <div class="metric-card"><span>Original / Non-Lyrical</span><strong id="recommendationRightsCount">0</strong></div>
+        </div>
+        <div class="card">
+          <h2>ShoutOut Recommendation Approval Queue</h2>
+          <p class="sub small">Recommendations remain invisible to patrons until a Master Admin approves them. Music may supply creative direction, but stored wording must be original and must not reproduce song lyrics.</p>
+          <div class="profile-grid">
+            <label>Review status
+              <select id="recommendationStatusFilter">
+                <option value="pending">Unapproved</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>Search recommendations<input id="recommendationModerationSearch" placeholder="Artist, track, genre, tone, or message"/></label>
+          </div>
+          <p id="recommendationModerationStatus" class="status">Loading recommendation queue...</p>
+          <div id="recommendationModerationList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="servicesCommerce" class="admin-panel-section">
+        <div class="metric-grid"><div class="metric-card"><span>Paid Services</span><strong id="serviceOrderCount">0</strong></div><div class="metric-card"><span>Gross Revenue</span><strong id="serviceGrossRevenue">$0</strong></div><div class="metric-card"><span>FloqR Share</span><strong id="serviceFloqrShare">$0</strong></div><div class="metric-card"><span>Seller / Club Payable</span><strong id="serviceEntityPayable">$0</strong></div></div>
+        <div class="card"><h2>Service Orders, Invoices & Shipping</h2><p class="sub small">Track ShoutOuts, targeted distribution, SMS services, and Commerce orders through payment and fulfillment.</p><div id="serviceOrdersReport" class="report-block"></div></div>
+        <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
+      </section>
+
+      <section id="allQueues" class="admin-panel-section">
+        <div class="card">
+          <h2>All Pending ShoutOut Queues</h2>
+          <p class="sub small">Master admins see every location's queue.</p>
+          <div id="allQueueList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="allReports" class="admin-panel-section">
+        <div class="admin-grid">
+          <div class="card"><h2>Music Demand</h2><div id="networkMusicReport" class="report-block"></div></div>
+          <div class="card"><h2>Events / Ticketing</h2><div id="networkEventReport" class="report-block"></div></div>
+        </div>
+      </section>
+
+      <section id="advertiserReports" class="admin-panel-section">
+        <div class="card">
+          <h2>Advertiser Intelligence</h2>
+          <div id="networkAdReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="adCampaignManagement" class="admin-panel-section">
+        <div class="card">
+          <h2>Ad Campaign Management</h2>
+          <p class="sub small">Manage campaign copy, targeted patron datapoints, campaign tags, preview status, and estimated audience matches. Saved target-tag edits are local preview overrides until Firestore campaign persistence is approved.</p>
+          <div id="adCampaignManagementSummary" class="report-block"></div>
+          <div id="adCampaignManagementList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="patronDiagnostics" class="admin-panel-section">
+        <div class="card">
+          <h2>Patron Datapoint Diagnostic</h2>
+          <p class="sub small">Internal Master Admin view of patron profile datapoints used for Mingl matching and audience diagnostics.</p>
+          <div id="patronDatapointSummary" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Patrons With 2+ Common Datapoints</h2>
+          <div id="patronOverlapReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>All Patron Datapoints</h2>
+          <div id="patronDatapointTable" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="promoterNetwork" class="admin-panel-section">
+        <div class="card"><h2>Network Promoter Data</h2><div id="promoterNetworkReport" class="report-block"></div></div>
+      </section>
+      <section id="networkReconciliation" class="admin-panel-section">
+        <div class="card">
+          <h2>Network Account Reconciliation</h2>
+          <div id="networkReconReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="partnerIntegrations" class="admin-panel-section">
+        <div class="card">
+          <h2>Ticketing Partner Opportunities</h2>
+          <div id="ticketPartnerReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="aiCrawling" class="admin-panel-section">
+        <div class="card">
+          <h2>AI Crawling</h2>
+          <p class="sub small">Configure public-source crawling, review discovered records, consolidate duplicate destinations, and prepare JSON imports for Master Admin or Club Admin review.</p>
+          <div id="aiCrawlingSummary" class="report-block"></div>
+          <div id="aiDiscoverySummary" class="report-block"></div>
+          <p id="aiDiscoveryStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Rating Criteria</h2>
+          <p class="sub small">Super Admin criteria guide AI confidence and 1-5 star ratings.</p>
+          <label>Weights JSON<textarea id="aiDiscoveryCriteriaJson" rows="7"></textarea></label>
+          <label>Notes<input id="aiDiscoveryCriteriaNotes"/></label>
+          <button id="saveAiDiscoveryCriteriaBtn" class="primary" type="button">Save Criteria</button>
+        </div>
+        <div class="card">
+          <h2>Review Discovery Queue</h2>
+          <div class="profile-grid">
+            <label>Status
+              <select id="aiDiscoveryStatusFilter">
+                <option value="pendingReview">Pending Review</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="deleted">Deleted</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>City<input id="aiDiscoveryCityFilter" placeholder="Barcelona, Washington, Miami"/></label>
+          </div>
+          <button id="aiDiscoveryRefreshBtn" type="button">Refresh Discovery Queue</button>
+          <div id="aiDiscoveryQueueList" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Delete / Restore Listings</h2>
+          <p class="sub small">Soft delete hides clubs and events from patron searches without deleting ShoutOut history, guest list history, or audit logs.</p>
+          <div class="profile-grid">
+            <label>Search listings<input id="listingDeleteSearch" placeholder="Venue, event, city, country"/></label>
+            <label class="consent-line"><input id="listingIncludeDeleted" type="checkbox"/> Include deleted listings</label>
+          </div>
+          <div id="listingDeleteResults" class="report-block"></div>
+        </div>
+        <div class="card crawler-engine-card">
+          <h2>Nightlife Discovery Engine</h2>
+          <p class="sub small">Schedule repeatable public-source discovery in each market's native language plus English. All results remain in Master Admin review until required contact fields are verified.</p>
+          <div class="profile-grid">
+            <label>First daily run (24-hour time)<input id="crawlPrimaryTime" type="time" value="00:00"/></label>
+            <label>Time zone<select id="crawlTimeZone"><option value="America/New_York">America/New_York</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="Europe/Paris">Europe/Paris</option><option value="Europe/Berlin">Europe/Berlin</option><option value="Europe/Madrid">Europe/Madrid</option><option value="Africa/Lagos">Africa/Lagos</option><option value="Asia/Dubai">Asia/Dubai</option><option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Tokyo">Asia/Tokyo</option></select></label>
+            <label>Runs per day<select id="crawlRunsPerDay"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option><option value="6">6</option></select></label>
+            <label>Language strategy<select id="crawlLanguageStrategy"><option value="nativePlusEnglish">Native market language + English</option><option value="nativeOnly">Native market language only</option><option value="selectedOnly">Only selected languages</option></select></label>
+            <label>Search languages<select id="crawlLanguageCriteria" multiple size="7"><option>English</option><option>Spanish</option><option>German</option><option>French</option><option>Italian</option><option>Portuguese</option><option>Dutch</option><option>Arabic</option><option>Turkish</option><option>Chinese</option><option>Thai</option><option>Catalan</option></select></label>
+            <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
+            <label>Music genres<select id="crawlGenreCriteria" multiple size="7"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option></select></label>
+            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="7"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="day club">Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option></select></label>
+            <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington"/></label>
+          </div>
+          <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs and ticketed concerts in Germany and Spain, using native-language sources plus English sources."></textarea></label>
+          <input id="crawlSearchCriteria" type="hidden" value="nightlife venues, concerts, events and official ticket sources"/>
+          <input id="crawlRegionCriteria" type="hidden"/>
+          <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
+          <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
+          <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
+          <div class="queue-actions"><button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button><button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button><button id="runManualCrawlBtn" type="button">Run Now / Create Review Records</button></div>
+          <p class="sub small"><strong>Expected downloadable output:</strong> Club/Event/Concert/Lounge Name, Address, Telephone #, Website, and Social Media Handles.</p>
+          <div id="crawlSearchPlanReport" class="report-block"></div>
+          <details class="admin-detail">
+            <summary>How the multilingual algorithm works</summary>
+            <p class="sub small">FLOQR expands each market into separate native-language and English queries, keeps the language and source URL on every record, normalizes duplicate venues across languages, and requires a final official venue or event-detail page before approval. Search-result pages are evidence sources, not publishable records.</p>
+          </details>
+        </div>
+        <div class="card">
+          <h2>Crawl Contact Export</h2>
+          <p class="sub small">Formatted club and event crawl contacts for review and CSV download.</p>
+          <div class="queue-actions">
+            <button id="downloadCrawlContactsCsvBtn" type="button">Download Crawl Contacts CSV</button>
+            <button id="testGeminiSourceExtractorBtn" type="button">Test Gemini Source Extractor</button>
+          </div>
+          <div id="crawlContactExportReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Source Detail Extraction</h2>
+          <p class="sub small">Use this after opening one specific Eventbrite, Ticketmaster, resale, venue, or comedy detail page. Broad search-results pages are treated as follow-up pages and cannot be saved as live review records.</p>
+          <label>Source URL<input id="sourceExtractUrl" placeholder="https://www.eventbrite.sg/e/... or a final Ticketmaster event URL"/></label>
+          <label>Copied source page details<textarea id="sourceExtractText" rows="7" placeholder="Paste visible event or venue details from the source page, including title, date, time, address, phone, website, ticket URL, and description."></textarea></label>
+          <div class="queue-actions">
+            <button id="extractSourceDetailsBtn" type="button">Extract Source Details</button>
+            <button id="saveExtractedDiscoveryBtn" class="primary" type="button">Save Extracted Review Record</button>
+          </div>
+          <div id="sourceExtractionReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>AI Crawler Profile Import</h2>
+          <p class="sub small">Formats crawler-discovered public club and event destination data as reviewable JSON. Master Admin can import drafts or send a Club Admin import link.</p>
+          <div class="queue-actions">
+            <button id="generateClubProfileJsonBtn" type="button">Generate Crawler JSON</button>
+            <button id="saveClubProfileImportDraftsBtn" class="primary" type="button">Save Import Drafts</button>
+            <button id="backfillClubProfileFieldsBtn" type="button">Backfill Missing Field Keys</button>
+          </div>
+          <details class="admin-detail json-disclosure"><summary>View generated crawler data</summary><label>Crawler JSON<textarea id="clubProfileImportJson" rows="10"></textarea></label></details>
+          <div id="clubProfileDiagnosticsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Crawl Activity Report</h2>
+          <div id="crawlActivityReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Consolidated Discovery Records</h2>
+          <p class="sub small">Groups matching clubs/events together and flags address conflicts before anything is approved or imported.</p>
+          <div id="crawlCollectedRecordsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Collected Data Analytics</h2>
+          <div id="crawlAnalyticsInsights" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="staleRecordCleanup" class="admin-panel-section">
+        <div class="card">
+          <h2>Stale Record Cleanup</h2>
+          <p class="sub small">Search stale AI discovery queue records and stale club ShoutOut queue records, review why FLOQR considers them stale, and remove them from active review.</p>
+          <div class="profile-grid">
+            <label>Search stale records<input id="staleRecordSearchInput" placeholder="Singapore, old location, club name, reference number, rules version, source URL"/></label>
+            <label>Record source
+              <select id="staleRecordSourceFilter">
+                <option value="all">AI discovery + ShoutOut queues</option>
+                <option value="aiDiscoveryQueue">AI discovery queue records</option>
+                <option value="shoutouts">ShoutOut queue records</option>
+              </select>
+            </label>
+            <label>Status
+              <select id="staleRecordStatusFilter">
+                <option value="active">Active stale records</option>
+                <option value="removed">Already removed</option>
+                <option value="all">All stale records</option>
+              </select>
+            </label>
+            <label>Older than days<input id="staleRecordAgeDays" type="number" min="1" value="4"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="searchStaleRecordsBtn" type="button">Search Stale Records</button>
+            <button id="removeSelectedStaleRecordsBtn" type="button">Remove Selected</button>
+            <button id="removeAllFoundStaleRecordsBtn" type="button">Remove All Found</button>
+            <button id="clearCachedCrawlsBtn" type="button">Remove All Active Stale Records</button>
+          </div>
+          <p class="sub small">A stale record is a queue record older than 4 days, a record that references old Firestore/Storage rules, or a record that points to an old/unknown location. Remove means soft-clear: discovery records get `stale-cache-cleared`; ShoutOut queue records get `stale-shoutout-cleared`. Approved listings, live display content, user profiles, guest lists, and audit history are not changed.</p>
+          <p id="staleRecordCleanupStatus" class="status"></p>
+          <div id="staleRecordCleanupResults" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="duplicateRecords" class="admin-panel-section">
+        <div class="card">
+          <h2>Duplicate Records</h2>
+          <p class="sub small">Find live Firestore club records that represent the same institution, choose a primary record, and complete/repair the merge. Completion means the duplicate clubLocation points to the primary with canonical fields; the separate alias collection is optional.</p>
+          <div id="duplicateRecordSummary" class="report-block"></div>
+          <div class="profile-grid">
+            <label>Search duplicates<input id="duplicateRecordSearch" placeholder="Shoko, Barcelona, beach club, club id"/></label>
+            <label>Manual primary club id<input id="duplicatePrimaryId" placeholder="shoko-barcelona-spain"/></label>
+            <label>Manual duplicate club id<input id="duplicateAliasId" placeholder="shoko-barcelona-beach-club-spain"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshDuplicateRecordsBtn" type="button">Refresh Duplicate Diagnostics</button>
+            <button id="mergeManualDuplicateBtn" type="button">Complete / Repair Manual Pair</button>
+            <button id="runDuplicateMergeDiagnosticBtn" type="button">Run Merge Diagnostic</button>
+          </div>
+          <p id="duplicateRecordStatus" class="status"></p>
+          <div id="duplicateMergeDiagnosticReport" class="report-block"></div>
+          <div id="duplicateRecordResults" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="diagnostics" class="admin-panel-section">
+        <div class="card">
+          <h2>Master Admin Settings - Diagnostics</h2>
+          <p class="sub small">System-wide health, feature status, package checks, and Firebase rules compatibility. AI crawling controls live on the AI Crawling tab.</p>
+          <div id="diagnosticsSummary" class="report-block"></div>
+          <button id="runFeatureDiagnosticsBtn" class="primary" type="button">Run Diagnostics</button>
+          <button id="diagnosticsRefreshBtn" type="button">Refresh Diagnostics</button>
+          <button id="exportDiagnosticsTxtBtn" type="button">Export Diagnostics TXT</button>
+          <p id="diagnosticsStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Feature Diagnostics</h2>
+          <p class="sub small">Statuses: Pass, Soft Fail, Failed, and TBI. Soft Fail means the feature is present and safe, but has missing optional data, a fallback mode, or a non-blocking setup gap.</p>
+          <div id="diagnosticsFeatureMatrix" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Manual Feature Test Diagnostics</h2>
+          <p class="sub small">Use this checklist after uploading a package. Automated diagnostics prove that files/rules are present; these checks confirm the user-facing feature actually works in the browser. Mark each implemented or changed feature Succeed or Failed, then copy the resolution prompt if anything fails.</p>
+          <div id="manualFeatureDiagnosticsSummary" class="report-block"></div>
+          <div id="manualFeatureDiagnosticsReport" class="report-block"></div>
+          <div class="queue-actions">
+            <button id="copyManualFeatureOutputBtn" type="button">Copy Manual Test Output</button>
+            <button id="downloadManualFeatureOutputBtn" type="button">Download Manual Test TXT</button>
+            <button id="archivePassedManualFeatureTestsBtn" type="button">Archive Passed Tests</button>
+            <button id="copyManualFeaturePromptBtn" class="primary" type="button">Copy Resolution Prompt</button>
+          </div>
+          <label>Manual diagnostic output<textarea id="manualFeatureDiagnosticsOutput" rows="10" readonly></textarea></label>
+          <label>Prompt for Codex<textarea id="manualFeatureDiagnosticsPrompt" rows="10" readonly></textarea></label>
+        </div>
+        <div class="card">
+          <h2>Package Install Diagnostics</h2>
+          <p class="sub small">Checks feature markers added by each package after upload so Master Admin can confirm the installed files match the expected release behavior.</p>
+          <button id="runPackageDiagnosticsBtn" type="button">Run Package Install Diagnostics</button>
+          <button id="archivePassedPackageDiagnosticsBtn" type="button">Archive Passed Package Checks</button>
+          <button id="downloadPackageDiagnosticsArchiveCsvBtn" type="button">Download Package Archive CSV</button>
+          <p id="diagnosticsArchiveStatus" class="status"></p>
+          <div id="packageInstallDiagnosticsSummary" class="report-block"></div>
+          <div id="packageInstallDiagnosticsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Firebase Rules Smoke Test</h2>
+          <p class="sub small">Runs live Firestore, Mingl/chat query, and Storage checks against Firebase. A package rules note can pass while the live deployed Firebase rules still fail if the rules were not published in Firebase Console.</p>
+          <div id="rulesVersionStatus" class="report-block"></div>
+          <p class="sub small">Use this section this way: publish firestore.rules and storage.rules, click Run Rules Smoke Test, then use the suggested fixes or Export Diagnostics TXT if anything fails.</p>
+          <button id="runRulesSmokeTestBtn" class="primary" type="button">Run Rules Smoke Test</button>
+          <progress id="rulesSmokeTestProgress" class="hidden" max="100" value="0"></progress>
+          <div id="rulesSmokeTestRunMeta" class="report-block"></div>
+          <div class="queue-actions">
+            <label>Show<select id="rulesSmokeTestFilter"><option value="all">All checks</option><option value="Failed">Failures only</option><option value="Pass">Passed only</option><option value="Soft Fail">Soft fails only</option></select></label>
+            <button id="copyRulesSmokeFailuresBtn" type="button">Copy Failure Diagnostics</button>
+            <button id="downloadRulesSmokeJsonBtn" type="button">Download Smoke Test JSON</button>
+          </div>
+          <div id="rulesSmokeTestSummary" class="report-block"></div>
+          <div id="rulesSmokeTestReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="diagnosticArchives" class="admin-panel-section">
+        <div class="card">
+          <h2>Diagnostic Archives</h2>
+          <p class="sub small">Archived manual feature tests and package install checks that previously passed. Use Restore if a manual feature needs to be retested in the active checklist.</p>
+          <div id="manualFeatureArchiveSummary" class="report-block"></div>
+          <div id="manualFeatureArchiveReport" class="report-block"></div>
+          <h2>Package Diagnostic Archives</h2>
+          <div id="packageDiagnosticsArchiveSummary" class="report-block"></div>
+          <div id="packageDiagnosticsArchiveReport" class="report-block"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="templateViewModal" class="club-person-modal hidden" role="dialog" aria-modal="true" aria-labelledby="templateViewName">
+  <div class="club-person-modal-card template-view-card">
+    <button id="templateViewCloseBtn" class="club-person-close" type="button" aria-label="Close template preview">&times;</button>
+    <p class="eyebrow">Display-aware template preview</p>
+    <h2 id="templateViewName">Template</h2>
+    <div class="profile-grid template-preview-controls">
+      <label>Display type<select id="templatePreviewDisplayType"></select></label>
+      <div id="templatePreviewDisplayMeta" class="template-preview-display-meta"></div>
+    </div>
+    <div id="templatePreviewDevice" class="template-preview-device">
+      <div id="templateViewPreview" class="template-view-preview"></div>
+    </div>
+    <p class="sub small">Scaled LED simulation. Layout and aspect ratio match the selected display type; final color and brightness depend on the physical display.</p>
+    <div id="templateViewDetails" class="report-block"></div>
+    <button id="templateViewCloseWindowBtn" type="button">Close Window</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.07.1"></script>
+<script src="./global-profile-status.js?v=29.05"></script>
+<script src="./shared-data.js?v=29.09.0"></script>
+<script src="./ai-service.js?v=29.05"></script>
+<script src="./ai-index-service.js?v=29.05"></script>
+<script src="./ai-search-service.js?v=29.05"></script>
+<script src="./ai-discovery-service.js?v=29.05"></script>
+<script src="./floqr-action-feedback.js?v=29.05"></script>
+<script src="./helper-popouts.js?v=29.05"></script>
+<script src="./ad-campaigns.js?v=29.05"></script>
+<script src="./ai-diagnostics-service.js?v=29.06"></script>
+<script src="./duplicate-record-service.js?v=29.05"></script>
+<script src="./payment-service.js?v=29.09.2"></script>
+<script src="./master-admin-app.js?v=29.09.0"></script>
+<script src="./master-services-extension.js?v=29.07"></script>
+<script src="./notification-center.js?v=29.05"></script>
+<script src="./profile-access-guard.js?v=29.05"></script>
+</body>
+</html>

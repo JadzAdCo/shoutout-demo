@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR Venue Command Center v29.08.2 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Club Admin</title>
+  <link rel="stylesheet" href="./styles.css?v=29.08.4"/>
+  <link rel="stylesheet" href="./admin.css?v=29.07"/>
+</head>
+<body>
+<main id="adminPage" class="app admin-shell">
+  <section class="page active">
+    <header class="topbar admin-topbar">
+      <div>
+        <p class="eyebrow">FLOQR Club Admin</p>
+        <h1>Venue Command Center</h1>
+        <p class="sub">Approve ShoutOuts, review venue performance, and reconcile account activity for this location.</p>
+        <p id="adminSignedInAs" class="status">Not signed in</p>
+        <p id="adminStatus" class="status">Loading admin app...</p>
+      </div>
+      <div class="card admin-club-card">
+        <p class="eyebrow">Location View</p>
+        <h2 id="clubName">Loading...</h2>
+        <p class="sub small">Club admins only see the selected location.</p>
+      </div>
+    </header>
+
+    <div id="adminLogin" class="card">
+      <h2>Club admin sign-in</h2>
+      <p class="sub">Sign in using an approved admin email. Master admins should use <strong>master-admin.html</strong>.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Admin login uses the same popup configuration as the patron page. Use auth-debug.html if Microsoft still fails.</p>
+      <div class="auth-grid">
+        <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
+        <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
+        <button id="adminFacebookLoginBtn" type="button">Admin Facebook Login</button>
+      </div>
+      <button id="adminLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+    </div>
+
+    <div id="adminMfaPanel" class="card hidden">
+      <h2>Club Admin Mobile Verification</h2>
+      <p class="sub">Club Admin accounts require an enrolled mobile phone as a second factor. Enter the phone in international format, receive the SMS code, and verify it before opening the Venue Command Center.</p>
+      <div class="profile-grid">
+        <label>Club Admin mobile number<input id="adminMfaPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
+        <label>SMS verification code<input id="adminMfaCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"/></label>
+      </div>
+      <div id="admin-mfa-recaptcha"></div>
+      <div class="queue-actions"><button id="adminMfaSendBtn" type="button">Send Mobile Verification Code</button><button id="adminMfaVerifyBtn" class="primary" type="button">Verify and Continue</button><button id="adminMfaCancelBtn" type="button">Sign out</button></div>
+      <p id="adminMfaStatus" class="status"></p>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+      <nav class="admin-tabs">
+        <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
+        <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
+        <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button">Template Backgrounds</button>
+        <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
+        <button class="admin-tab" data-panel="panelAnalytics" type="button">Analytics</button>
+        <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
+        <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
+        <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
+        <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
+        <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
+        <button class="admin-tab" data-panel="panelReports" type="button">Reports</button>
+      </nav>
+
+      <section id="panelDashboard" class="admin-panel-section active">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Pending ShoutOuts</span><strong id="metricPending">0</strong></div>
+          <div class="metric-card"><span>Live ShoutOut</span><strong id="metricLive">0</strong></div>
+          <div class="metric-card"><span>Estimated ShoutOut Revenue</span><strong id="metricRevenue">$0</strong></div>
+          <div class="metric-card"><span>Ad Impressions</span><strong id="metricAdImpressions">0</strong></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Venue Summary</h2>
+            <div id="venueSummary" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Currently Live</h2>
+            <iframe id="liveFrame" class="admin-preview"></iframe>
+            <p><a id="displayLink" target="_blank" href="#">Open Display Page</a></p>
+            <button id="resetDisplayDefaultBtn" type="button">Reset Display to Club Default</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="panelPublicProfile" class="admin-panel-section">
+        <div class="card">
+          <h2>Club Public Profile</h2>
+          <p class="sub small">Manage the patron-facing club page and FLOQR search profile. Only sections enabled below appear publicly.</p>
+          <div class="queue-actions">
+            <a id="clubPublicProfileLink" class="buttonlike" target="_blank" href="#">View Public Club Page</a>
+            <button id="copyClubPublicProfileLinkBtn" type="button">Copy Public Page Link</button>
+          </div>
+          <div class="profile-grid">
+            <label>Club logo URL<input id="clubProfileLogoUrl" placeholder="https://.../club-logo.png"/></label>
+            <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
+            <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
+            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="1223 Connecticut Avenue NW" required/></label>
+            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="Washington" required/></label>
+            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
+            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="20036"/></label>
+            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="United States" required/></label>
+            <label>Official website<input id="clubProfileWebsite" placeholder="https://example.com"/></label>
+            <label>Email<input id="clubProfileEmail" placeholder="info@example.com"/></label>
+            <label>Telephone<input id="clubProfileTelephone" placeholder="+1 202 555 0123"/></label>
+            <label>Instagram<input id="clubProfileInstagram" placeholder="@club"/></label>
+            <label>X<input id="clubProfileX" placeholder="@club"/></label>
+            <label>TikTok<input id="clubProfileTiktok" placeholder="@club"/></label>
+            <label>Facebook<input id="clubProfileFacebook" placeholder="facebook.com/club"/></label>
+            <label>Genres (public and search)<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
+            <label>Venue hours<input id="clubProfileHours" placeholder="Thu–Sat, 10 PM–3 AM"/></label>
+            <label>Age policy<input id="clubProfileAgePolicy" placeholder="21+ with valid ID"/></label>
+            <label>Dress code<input id="clubProfileDressCode" placeholder="Upscale nightlife attire"/></label>
+            <label>Amenities<input id="clubProfileAmenities" placeholder="VIP tables, coat check, outdoor garden"/></label>
+            <label>FLOQR services<input id="clubProfileServices" placeholder="ShoutOut, Guest List, VIP Reservation"/></label>
+            <label><input id="clubCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
+            <label>Commerce store name<input id="clubCommerceStoreName" placeholder="Zebbies Garden Shop"/></label>
+            <div class="card nested-card profile-grid-wide">
+              <h3>Stripe payouts</h3>
+              <p id="clubStripeConnectStatus" class="sub small">Checking payout onboarding statusâ€¦</p>
+              <div class="queue-actions">
+                <button id="clubStripeConnectBtn" type="button">Start Stripe payout onboarding</button>
+                <button id="clubStripeConnectRefreshBtn" type="button">Refresh payout status</button>
+              </div>
+              <p class="sub small">FLOQR creates and binds the Stripe recipient account securely. Club admins never paste an <code>acct_...</code> value into the browser.</p>
+            </div>
+          </div>
+          <div class="card nested-card">
+            <h3>FLOQR display screens</h3>
+            <p class="sub small">Select the screen formats installed at this venue. Patrons will only see compatible ShoutOut templates, and previews will use the selected screen's aspect ratio.</p>
+            <div class="privacy-datapoint-grid">
+              <label><input data-club-display-format="led-96x48" type="checkbox"/> 96 x 48 cm — 624 x 312</label>
+              <label><input data-club-display-format="led-64x48" type="checkbox"/> 64 x 48 cm — 416 x 312</label>
+              <label><input data-club-display-format="led-64x32" type="checkbox"/> 64 x 32 cm — 416 x 208</label>
+            </div>
+            <label>Primary preview screen<select id="clubPrimaryDisplayFormat"><option value="led-96x48">96 x 48 cm — 624 x 312</option><option value="led-64x48">64 x 48 cm — 416 x 312</option><option value="led-64x32">64 x 32 cm — 416 x 208</option></select></label>
+          </div>
+          <div class="card nested-card">
+            <h3>Featured people & promotion groups</h3>
+            <p class="sub small">One entry per line: <strong>Name | Role | Short bio | Photo URL | Instagram</strong>. Patron pages use compact cards and open details in a popout.</p>
+            <label>Featured DJs<textarea id="clubProfileFeaturedDjs" rows="4" placeholder="DJ Nova | Resident DJ | Afrobeats and Hip Hop | https://... | @djnovaa"></textarea></label>
+            <label>Featured waiters / waitresses / bottle service<textarea id="clubProfileFeaturedStaff" rows="4" placeholder="Ava | Bottle Service | VIP host | https://... | @ava"></textarea></label>
+            <label>Promotion groups<textarea id="clubProfilePromotionGroups" rows="4" placeholder="District Nights | Promotion Group | Thursday event partner | https://... | @districtnights"></textarea></label>
+          </div>
+          <div class="card nested-card">
+            <h3>Public page controls</h3>
+            <div class="privacy-datapoint-grid club-profile-section-controls">
+              <label><input id="clubProfilePublished" type="checkbox" checked/> Publish club page</label>
+              <label><input data-club-section="about" type="checkbox" checked/> About and venue facts</label>
+              <label><input data-club-section="contact" type="checkbox" checked/> Contact and social media</label>
+              <label><input data-club-section="upcomingEvents" type="checkbox" checked/> Upcoming events</label>
+              <label><input data-club-section="pastEvents" type="checkbox" checked/> Past events</label>
+              <label><input data-club-section="featuredDjs" type="checkbox" checked/> Featured DJs</label>
+              <label><input data-club-section="featuredStaff" type="checkbox" checked/> Featured service staff</label>
+              <label><input data-club-section="promotionGroups" type="checkbox" checked/> Promotion groups</label>
+              <label><input data-club-section="gallery" type="checkbox" checked/> Public gallery</label>
+            </div>
+          </div>
+          <button id="saveClubPublicProfileBtn" class="primary" type="button">Save Public Profile</button>
+          <div id="clubPublicProfileReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Venue Media</h2>
+          <p class="sub small">Use this one uploader for the club logo, main public-profile media, or gallery photos and videos. Gallery uploads may contain several files at once. Marketing videos should be 15 seconds or shorter.</p>
+          <div class="profile-grid">
+            <label>Where should it appear?<select id="clubMediaPlacement"><option value="gallery">Public gallery</option><option value="main">Main profile media</option><option value="logo">Club logo (image only)</option></select></label>
+            <label class="profile-grid-wide">Upload photos or videos<input id="clubMediaUnifiedFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,video/mp4,video/webm,video/quicktime" multiple/></label>
+            <label>Media Title<input id="clubMediaTitle" placeholder="Saturday Latin Night"/></label>
+            <label>Related DJs<input id="clubMediaDjs" placeholder="DJ names or usernames"/></label>
+            <label>Related Promoters / Groups<input id="clubMediaPromoters" placeholder="Promoter or promotion group"/></label>
+            <label>Media filter<select id="clubMediaFilter"><option value="none">None</option><option value="vibrant">Vibrant</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="monochrome">Monochrome</option><option value="contrast">High contrast</option></select></label>
+            <label data-club-video-trim>Video trim start (seconds)<input id="clubMediaTrimStart" type="number" min="0" step="0.1" value="0"/></label>
+            <label data-club-video-trim>Video trim end (seconds)<input id="clubMediaTrimEnd" type="number" min="0.1" step="0.1" value="15"/></label>
+          </div>
+          <p id="clubMediaEditorStatus" class="sub small">Choose a placement and one or more files. Replacing an item uses this same uploader; a new file is optional when editing only its details.</p>
+          <div id="clubMediaInputPreview" class="club-media-input-preview hidden"></div>
+          <div class="queue-actions">
+            <button id="saveClubMediaBtn" class="primary" type="button">Add Media</button>
+            <button id="cancelClubMediaEditBtn" class="hidden" type="button">Cancel Edit</button>
+          </div>
+          <div id="clubMediaReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="panelTemplateBackgrounds" class="admin-panel-section">
+        <div class="card club-template-policy-card">
+          <p class="eyebrow">Club policy</p>
+          <h2>Template Background Permissions</h2>
+          <p class="sub">Choose whether patrons can personalize editable template backgrounds at this club. Patrons can always use the original approved templates, and layouts, text positions, media slots, character limits, and screen tags remain locked.</p>
+          <label class="consent-line"><input id="patronTemplateBackgroundEditingEnabled" type="checkbox" checked/> <span><strong>Allow patrons to customize editable backgrounds</strong><br/><small>Turn this off to hide patron background-editing actions and patron/community background variants for this club.</small></span></label>
+          <button id="saveClubTemplatePolicyBtn" class="primary" type="button">Save Background Permission</button>
+          <p id="clubTemplatePolicyStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Club-curated designs</p>
+          <h2>Customize a Template for This Club</h2>
+          <p class="sub small">Club admins may create club-only background variants from templates marked editable by Master Admin. A locked template can still be used in its original form.</p>
+          <label>Search templates<input id="clubTemplateBackgroundSearch" placeholder="Birthday, VIP, neon, image, sports..."/></label>
+          <div id="clubTemplateBackgroundList" class="template-grid club-template-background-grid"></div>
+          <p id="clubTemplateBackgroundStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Saved Club Backgrounds</h2>
+          <p class="sub small">These club-approved background variants appear in the patron template selector for this venue.</p>
+          <div id="clubTemplateVariantList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="panelQueue" class="admin-panel-section">
+        <div class="card">
+          <h2>Pending ShoutOut Queue</h2>
+          <p class="sub small">Club admins see only this location's queue.</p>
+          <div id="queueList"><p class="sub">Loading pending ShoutOuts...</p></div>
+        </div>
+      </section>
+
+      <section id="panelAnalytics" class="admin-panel-section">
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Audience Analytics</h2>
+            <div id="audienceReport" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Music & Demand Intelligence</h2>
+            <div id="musicReport" class="report-block"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Event / Reservation Funnel</h2>
+          <div id="funnelReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="panelAdvertising" class="admin-panel-section">
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Ad Performance</h2>
+            <div id="adReport" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Recommended Sponsor Categories</h2>
+            <div id="sponsorReport" class="report-block"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="panelGuestLists" class="admin-panel-section">
+        <div class="card">
+          <h2>Guest List Campaigns</h2>
+          <p class="sub small">Create up to 6 active guest list campaigns. Campaigns can be disabled, archived, and reused for similar nights.</p>
+          <div class="profile-grid">
+            <label>Campaign Name<input id="guestCampaignName" placeholder="Friday Latin Night Guest List"/></label>
+            <label>Event Type<select id="guestCampaignType">
+              <option value="Free Admission">Free Admission</option>
+              <option value="Free Admission with RSVP">Free Admission with RSVP</option>
+              <option value="Ticketed">Ticketed</option>
+            </select></label>
+            <label>Event Date<input id="guestCampaignDate" type="date"/></label>
+            <label>Capacity<input id="guestCampaignCapacity" type="number" min="1" placeholder="150"/></label>
+            <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
+            <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
+            <label>Guest-list theme<select id="guestCampaignTheme"><option value="midnight">Midnight</option><option value="garden">Garden</option><option value="neon">Neon</option><option value="gold">VIP Gold</option><option value="minimal">Minimal</option></select></label>
+            <label>Main image URL<input id="guestCampaignImage" placeholder="DJ, promoter, waitress, bartender, or event image"/></label>
+            <label>Supporting Team<input id="guestCampaignSupportingTeam" list="guestSupportingTeamOptions" placeholder="Search approved DJ, promoter, waitress, bottle girl, or bartender"/><datalist id="guestSupportingTeamOptions"></datalist></label>
+            <label>Audience<select id="guestCampaignAudience"><option value="followers">Club followers (no distribution charge)</option><option value="targetedFloqr">Targeted FloqR ($0.10/user)</option></select></label>
+            <label id="guestCampaignTargetCountLabel" class="hidden">Targeted patrons<input id="guestCampaignTargetCount" type="number" min="1" value="100"/></label>
+          </div>
+          <label>Description<textarea id="guestCampaignDescription" rows="3" placeholder="Guest list notes, dress code, cutoff time, and arrival requirements."></textarea></label>
+          <button id="createGuestCampaignBtn" class="primary" type="button">Submit Guest List Campaign</button>
+          <div id="guestCampaignReport" class="report-block"></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card"><h2>Guest List Requests</h2><div id="clubGuestListReport" class="report-block"></div></div>
+          <div class="card"><h2>Promoter Performance</h2><div id="clubPromoterReport" class="report-block"></div></div>
+        </div>
+      </section>
+      <section id="panelRep" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">REP</p><h2>Role Activity & Permission</h2>
+          <p class="sub">Assign duties to onboarded club workers and choose whether Club Admin approval is required before they post on behalf of the club.</p>
+          <div id="repRolePolicies" class="report-block"></div>
+          <button id="saveRepPoliciesBtn" class="primary" type="button">Save REP Policies</button>
+          <p id="repStatus" class="status"></p>
+        </div>
+        <div class="card"><h2>Pending Role Activity</h2><p class="sub small">Approve or reject guest lists, public posts, and campaigns submitted on behalf of this club.</p><div id="repPendingActivity" class="report-block"></div></div>
+        <div class="card"><h2>Club Admin Notifications</h2><div class="privacy-datapoint-grid"><label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label><label><input id="repNotifyPush" type="checkbox"/> Push notification</label><label><input id="repNotifyEmail" type="checkbox"/> Email</label><label><input id="repNotifySms" type="checkbox"/> SMS ($10 service charge)</label></div><button id="saveRepNotificationsBtn" type="button">Save Notification Choices</button></div>
+      </section>
+      <section id="panelEmployees" class="admin-panel-section">
+        <div class="card">
+          <h2>Employee / Worker Network</h2>
+          <p class="sub small">View club admins, resident and visiting DJs, affiliated promoters, promoting companies, waiters, waitresses, bottle girls, and designated customer service representatives for this club location.</p>
+          <label>Search workers / affiliates<input id="employeeSearch" placeholder="Search display name, username, email, role, company, or location"/></label>
+          <div class="profile-grid">
+            <label>Elect Patron for Role<input id="roleElectionSearch" placeholder="Search patron display name, username, or email"/></label>
+            <label>Role<select id="roleElectionRole">
+              <option>Club Admin</option>
+              <option>DJ</option>
+              <option>Promoter</option>
+              <option>Waiter / Waitress / Bottle Girl</option>
+              <option>Bartender / Barman</option>
+              <option>Videographer / Camera Operator</option>
+            </select></label>
+            <label>Promotion Company<input id="roleElectionCompany" placeholder="Required only for promoter company affiliation"/></label>
+            <label><input id="roleElectionIndependentPromoter" type="checkbox"/> Independent promoter</label>
+          </div>
+          <button id="electClubRoleBtn" type="button">Elect Selected Patron Role</button>
+          <div id="employeeCandidates" class="report-block"></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Worker / Affiliate Summary</h2>
+            <div id="workerSummaryReport" class="report-block"></div>
+          </div>
+          <div class="card">
+            <h2>Role Groups</h2>
+            <div id="workerRoleReport" class="report-block"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Pending Worker Requests</h2>
+          <p class="sub small">Workers must elect to join this club before club admins can approve or designate them.</p>
+          <div id="pendingWorkerRequests" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Current Customer Service Representatives</h2>
+          <div id="csrList" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promotion / Outreach Tools</h2>
+          <p class="sub small">Draft internal message, email, and SMS promotions for patrons who opted in to receive marketing.</p>
+          <div class="tag-row">
+            <span>Email template: Event invite</span>
+            <span>SMS template: Guest-list reminder</span>
+            <span>Internal message: VIP offer</span>
+          </div>
+          <p><a href="./role-profiles.html?v=29.02">Open role/profile landing pages</a></p>
+        </div>
+      </section>
+      <section id="panelReconciliation" class="admin-panel-section">
+        <div class="card">
+          <h2>Account Reconciliation</h2>
+          <p class="sub small">Prototype report for payouts, platform fees, ad revenue share, and ShoutOut activity.</p>
+          <div id="reconciliationReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="panelReports" class="admin-panel-section">
+        <div class="card">
+          <h2>Exportable Reports</h2>
+          <div id="reportsList" class="report-block"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.07"></script>
+<script src="./global-profile-status.js?v=29.05"></script>
+<script src="./shared-data.js?v=29.08.4"></script>
+<script src="./ai-service.js?v=29.05"></script>
+<script src="./ai-index-service.js?v=29.05"></script>
+<script src="./ai-template-studio.js?v=29.06"></script>
+<script src="./floqr-action-feedback.js?v=29.05"></script>
+<script src="./helper-popouts.js?v=29.05"></script>
+<script src="./payment-service.js?v=29.09.2"></script>
+<script src="./admin-app.js?v=29.08.4"></script>
+<script src="./admin-rep-extension.js?v=29.07"></script>
+<script src="./notification-center.js?v=29.05"></script>
+<script src="./profile-access-guard.js?v=29.05"></script>
+</body>
+</html>

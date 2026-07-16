@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FLOQR v29.03 Preview</title>
+  <link rel="stylesheet" href="../styles.css?v=29.03"/>
+  <style>
+    body{padding:24px}
+    .preview-shell{max-width:1180px;margin:auto;display:grid;gap:22px}
+    .mock-modal{position:relative;inset:auto;display:block;background:rgba(3,7,22,.42);padding:12px}
+    .mock-card{display:grid;gap:12px}
+    .mock-message{display:grid;gap:14px}
+  </style>
+</head>
+<body>
+  <main class="preview-shell">
+    <section class="card">
+      <p class="eyebrow">Preview - ShoutOut Editor</p>
+      <h1>Message First, Preview Popout, Recommendations After</h1>
+      <div class="composer">
+        <div class="card mock-message">
+          <h2>Message</h2>
+          <label>Main message<input value="HAPPY BIRTHDAY PAPI!"/></label>
+          <p class="sub small">Template display cap: main 36 chars, attribution/subtext 24 chars.</p>
+          <label class="consent-line"><input type="checkbox"/> <span>Post my name or handle</span></label>
+          <button type="button">Preview ShoutOut</button>
+          <p class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
+          <button class="primary" type="button">Submit for Approval</button>
+        </div>
+        <div class="card shoutout-recommendations-card">
+          <div class="section-heading-row"><h2>ShoutOut Recommendations</h2><details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Help appears only when expanded.</div></details></div>
+          <label>Recommendation style<select><option>Party</option></select></label>
+          <label>Event / audience context<select><option>Auto-detect from venue and draft</option></select></label>
+          <div class="recommendation-group"><h3>AI Recommendations</h3><button class="ghost personalized-ai-suggestion"><strong>VIP ENERGY ALL NIGHT</strong><span>Venue and profile matched</span><small>contextual</small></button></div>
+          <div class="recommendation-group"><h3>Trending ShoutOuts</h3><button class="ghost personalized-ai-suggestion"><strong>THIS CREW RUNS TONIGHT</strong><span>Selected by patrons</span><small>trending</small></button></div>
+          <div class="recommendation-group"><h3>Generic ShoutOuts</h3><button class="ghost personalized-ai-suggestion"><strong>CELEBRATE THIS MOMENT</strong><span>Friends, lights, memories</span><small>generic</small></button></div>
+        </div>
+      </div>
+      <div class="shoutout-preview-modal mock-modal">
+        <div class="shoutout-preview-dialog">
+          <div class="section-heading-row"><h2>Preview ShoutOut</h2><button type="button">Close</button></div>
+          <div class="template-mini-preview classic-bw"><strong>HAPPY<br>BIRTHDAY<br>PAPI!</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mingl-requests-card">
+      <div class="section-title-row">
+        <div class="section-title-inline"><h2>Mingl Requests</h2><details class="help-popout"><summary>?</summary><div>Sent and received requests stay here.</div></details></div>
+        <button class="mingl-request-status-btn" type="button">(3/0)</button>
+      </div>
+      <div class="mingl-request-status-popout">
+        <div class="mingl-request-status-grid">
+          <section><strong>Sent Mingl/Friend Request</strong><p>3 waiting for Mingl back.</p><span>Nora</span><span>Christine Rand</span><span>Alina</span></section>
+          <section><strong>Received Mingl/Friend Request</strong><p>0 waiting for you.</p><span>None</span></section>
+        </div>
+      </div>
+      <h3 class="mingl-request-section-title">Sent Mingl/Friend Request</h3>
+      <div class="queue-item mingl-request-item"><strong>Nora</strong><span>Sent request</span><small>Waiting for this patron to Mingl back.</small></div>
+    </section>
+
+    <section class="card">
+      <h2>Mingl Chat Actions and Profile Settings</h2>
+      <div class="emoji-row">
+        <button>😊</button><button>🔥</button><button>🎉</button><button>💙</button><button>❤️</button><button>💗</button><button>💔</button><button>🌹</button><button>🖕</button>
+      </div>
+      <p class="sub">Edit now opens an inline mini bubble instead of a browser prompt. Emoji skin tone is stored under Language Settings. Birthday month/day and birthday notification choices are stored in the patron profile/privacy settings.</p>
+    </section>
+  </main>
+</body>
+</html>

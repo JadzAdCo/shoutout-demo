@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR ShoutOut Patron Portal v29.09.1 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ShoutOut App</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.1"/>
+</head>
+<body>
+
+<div id="userMenu" class="user-menu">
+  <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
+    <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
+    <span id="userInitials" class="user-initials">?</span>
+    <span class="user-dots" aria-hidden="true">•••</span>
+  </button>
+  <div id="userDropdown" class="user-dropdown hidden">
+    <div class="user-dropdown-row">
+      <img id="dropdownUserPhoto" class="dropdown-user-photo hidden" alt="User profile"/>
+      <div>
+        <strong id="dropdownUserName">Not signed in</strong>
+        <p id="dropdownUserEmail">Guest</p>
+      </div>
+    </div>
+    <button id="dropdownSignOutBtn" class="ghost full" type="button">Sign out</button>
+  </div>
+</div>
+
+<main class="app">
+  <section id="landingPage" class="page active">
+    <div class="login-wrap">
+      <div class="login-card">
+        <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+        <div class="hero-logo-fallback hidden">FLOQR</div>
+        <p class="eyebrow">Screen 0 — Welcome / Sign In</p>
+        <h2>Welcome</h2>
+        <p class="login-copy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
+        <p id="signedInAs" class="status">Please Sign-In or Sign-Up:</p>
+
+        <div id="signedInActions" class="hidden">
+          <button id="continueBtn" class="primary full" type="button">Continue</button>
+          <button id="logoutBtn1" class="ghost full" type="button">Sign out</button>
+        </div>
+
+        <div id="loginActions">
+          <button id="googleLoginBtn" class="signin google" type="button">
+            <span class="icon google-icon">
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+            </span>
+            Continue with Google
+          </button>
+          <button id="microsoftLoginBtn" class="signin microsoft" type="button"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+          <button id="facebookLoginBtn" class="signin facebook" type="button"><span class="icon fb-icon">f</span>Continue with Facebook</button>
+
+          <button id="showEmailOtpBtn" class="signin email" type="button" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false">Continue with your own Email</button>
+          <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
+            <label>Email address
+              <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
+            </label>
+            <div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 5-minute code</button></div>
+            <label>Enter 8-character code
+              <input id="emailOtpCode" maxlength="8" autocomplete="one-time-code" placeholder="AB7K9M2Q"/>
+            </label>
+            <button id="verifyEmailOtpBtn" class="primary full" type="button">Verify and Continue</button>
+            <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 5 minutes after delivery.</p>
+          </div>
+
+          <div class="divider"><span>Or use One Time Password (OTP) via SMS</span></div>
+          <button id="showSmsOtpBtn" class="signin sms" type="button">Continue with SMS OTP</button>
+          <div id="smsOtpPanel" class="sms-otp-panel hidden">
+          <div class="phone-row sms-number-row">
+            <label>Country code
+              <select id="phoneCountryCode" autocomplete="tel-country-code">
+                <option value="+1">United States / Canada (+1)</option>
+                <option value="+44">United Kingdom (+44)</option>
+                <option value="+234">Nigeria (+234)</option>
+                <option value="+34">Spain (+34)</option>
+                <option value="+33">France (+33)</option>
+                <option value="+49">Germany (+49)</option>
+                <option value="+39">Italy (+39)</option>
+                <option value="+971">United Arab Emirates (+971)</option>
+                <option value="+52">Mexico (+52)</option>
+                <option value="+55">Brazil (+55)</option>
+                <option value="+91">India (+91)</option>
+                <option value="+81">Japan (+81)</option>
+                <option value="+61">Australia (+61)</option>
+                <option value="+27">South Africa (+27)</option>
+                <option value="+233">Ghana (+233)</option>
+                <option value="+254">Kenya (+254)</option>
+                <option value="+86">China (+86)</option>
+                <option value="+82">South Korea (+82)</option>
+                <option value="+65">Singapore (+65)</option>
+                <option value="+60">Malaysia (+60)</option>
+                <option value="+63">Philippines (+63)</option>
+                <option value="+62">Indonesia (+62)</option>
+                <option value="+66">Thailand (+66)</option>
+                <option value="+31">Netherlands (+31)</option>
+                <option value="+32">Belgium (+32)</option>
+                <option value="+41">Switzerland (+41)</option>
+                <option value="+46">Sweden (+46)</option>
+                <option value="+47">Norway (+47)</option>
+                <option value="+45">Denmark (+45)</option>
+                <option value="+353">Ireland (+353)</option>
+                <option value="+351">Portugal (+351)</option>
+                <option value="+30">Greece (+30)</option>
+                <option value="+90">Turkey (+90)</option>
+                <option value="+972">Israel (+972)</option>
+                <option value="+20">Egypt (+20)</option>
+                <option value="+212">Morocco (+212)</option>
+                <option value="+54">Argentina (+54)</option>
+                <option value="+56">Chile (+56)</option>
+                <option value="+57">Colombia (+57)</option>
+                <option value="+51">Peru (+51)</option>
+              </select>
+            </label>
+            <label>Phone number
+              <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
+            </label>
+            <input id="phoneNumber" type="hidden"/>
+            <button id="sendOtpBtn" class="signin sms phone" type="button">Send OTP</button>
+          </div>
+          <div id="recaptcha-container"></div>
+          <div id="phoneCodeBlock" class="hidden">
+            <label class="compact-label">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
+            <button id="verifyOtpBtn" class="signin sms phone verify" type="button">Verify OTP</button>
+          </div>
+          </div>
+        </div>
+        <p id="authStatus" class="status"></p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="signupProfilePage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToWelcomeFromProfileBtn" type="button">← Back to welcome</button>
+        <p class="eyebrow">Screen 1 — Patron Profile</p>
+        <h1>Create your profile</h1>
+        <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
+      </div>
+    </header>
+
+    <div class="card profile-card">
+      <div class="profile-grid">
+        <label>Username *
+          <input id="profileUsername" maxlength="28" placeholder="Choose a username"/>
+        </label>
+        <label>Display name
+          <input id="profileDisplayName" maxlength="60" placeholder="Your display name"/>
+        </label>
+        <label>Country
+          <input id="profileCountry" placeholder="United States"/>
+        </label>
+        <label>State / Region / Province
+          <input id="profileRegion" placeholder="District of Columbia"/>
+        </label>
+        <label>City
+          <input id="profileCity" placeholder="Washington"/>
+        </label>
+        <label>Taxi pickup address
+          <input id="profileTaxiPickupAddress" autocomplete="street-address" placeholder="Private address used by Pickup"/>
+        </label>
+        <label>Age range
+          <select id="profileAgeRange">
+            <option value="">Prefer not to say</option>
+            <option value="18-20">18-20</option>
+            <option value="21-24">21-24</option>
+            <option value="25-34">25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45+">45+</option>
+          </select>
+        </label>
+        <label>Gender
+          <select id="profileGender">
+            <option value="">Prefer not to say</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="nonbinary">Non-binary</option>
+            <option value="self-described">Self-described</option>
+          </select>
+        </label>
+        <label>Height
+          <div class="height-input-row">
+            <input id="profileHeight" placeholder="5'10&quot; or 1.78"/>
+            <select id="profileHeightUnit" aria-label="Height unit">
+              <option value="ftin">ft/in</option>
+              <option value="m">m</option>
+            </select>
+          </div>
+        </label>
+        <label>Favorite music genres
+          <input id="profileGenres" placeholder="Hip Hop, Afro House, EDM"/>
+        </label>
+        <label>Nightlife interests
+          <input id="profileInterests" placeholder="Clubs, Lounges, Beach Clubs, Events"/>
+        </label>
+        <label>Food choices
+          <input id="profileFoodChoices" placeholder="Sushi, tapas, steakhouse"/>
+        </label>
+        <label>Favorite beverage choices
+          <input id="profileBeverageChoices" placeholder="Champagne, tequila, mocktails"/>
+        </label>
+        <label>Instagram handle (optional)
+          <input id="profileInstagram" placeholder="@yourhandle"/>
+        </label>
+        <label>X handle (optional)
+          <input id="profileX" placeholder="@yourhandle"/>
+        </label>
+      </div>
+
+      <label class="consent-line">
+        <input id="profileAnalyticsConsent" type="checkbox"/>
+        I agree that FLOQR may use my activity in aggregate analytics to improve recommendations, venue insights, and advertising performance.
+      </label>
+
+      <label class="consent-line">
+        <input id="profileMarketingConsent" type="checkbox"/>
+        I want to receive nightlife offers, event promotions, and venue recommendations.
+      </label>
+
+      <button id="saveProfileBtn" class="primary" type="button">Continue</button>
+      <p id="profileStatus" class="status"></p>
+    </div>
+  </section>
+
+  <section id="categoryPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToWelcomeBtn" type="button">← Back to welcome</button>
+        <p class="eyebrow">Screen 2 — Main Categories</p>
+        <p class="sub category-sentence">
+          <strong>Search for</strong>
+        </p>
+      </div>
+      <button id="logoutBtn2" type="button">Sign out</button>
+    </header>
+
+    <div class="category-grid compact-category-grid">
+      <button id="eventsBtnCard" class="category-card" type="button">Events</button>
+      <button id="clubsBtnCard" class="category-card" type="button">Clubs</button>
+      <button id="beachClubsBtnCard" class="category-card" type="button">Beach Clubs</button>
+      <button id="loungesBtnCard" class="category-card" type="button">Lounges</button>
+      <button id="loungeClubBtnCard" class="category-card" type="button">Lounge-Clubs</button>
+      <div class="category-or">Or</div>
+      <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
+      <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
+    </div>
+  </section>
+
+  <section id="shoutoutLandingPage" class="page product-page shoutout-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromShoutoutLandingBtn" type="button">&larr; Back to main categories</button>
+        <p class="eyebrow">Screen 2A - ShoutOut Landing</p>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./shoutout-logo.png?v=29.05" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.05'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
+          <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
+        </div>
+        <h1>Throw a ShoutOut</h1>
+        <p class="sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display.</p>
+      </div>
+    </header>
+    <div class="product-action-row">
+      <button id="startShoutoutFlowBtn" class="category-card hot" type="button">Start ShoutOut</button>
+      <button id="backToCategoriesFromShoutoutLandingBtn2" class="category-card" type="button">Back to Search</button>
+    </div>
+  </section>
+
+  <section id="minglLandingPage" class="page product-page mingl-product-page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromMinglBtn" type="button">&larr; Back to main categories</button>
+        <p class="eyebrow">Screen 2B - Mingl / Social</p>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+          <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
+        </div>
+        <div class="mingl-quick-actions" aria-label="Mingl shortcuts">
+          <button id="minglQuickChatBtn" class="icon-action-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 17 0Z"/><path d="M8 10h8M8 14h5"/></svg>
+            <span>Chat</span>
+          </button>
+          <button id="minglQuickSearchBtn" class="icon-action-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
+            <span>Search for People</span>
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="mingl-layout">
+      <div class="card mingl-discovery-card">
+        <div id="minglSelfCard" class="mingl-self-card"></div>
+        <div class="section-title-row">
+          <h2>Mingl Social Playground</h2>
+          <details class="help-popout">
+            <summary aria-label="About Mingl search">?</summary>
+            <div>Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.</div>
+          </details>
+        </div>
+        <input id="minglSearch" class="search" placeholder="Try: girls interested in fast cars and Latina events"/>
+        <div id="minglPeopleGrid" class="mingl-people-grid"></div>
+      </div>
+      <div class="card mingl-requests-card">
+        <div class="section-title-row">
+          <div class="section-title-inline">
+            <h2>Mingl Requests</h2>
+            <details class="help-popout">
+            <summary aria-label="About Mingl Requests">?</summary>
+            <div>Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.</div>
+            </details>
+          </div>
+          <button id="minglRequestStatusBtn" class="mingl-request-status-btn" type="button" aria-label="Mingl request status">(0/0)</button>
+        </div>
+        <div id="minglRequestStatusPopout" class="mingl-request-status-popout hidden" aria-live="polite"></div>
+        <div id="minglRequestsList" class="mingl-chat-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="clubActionsPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesFromActionsBtn" type="button">← Back to categories</button>
+        <p class="eyebrow">Screen 3 — Club / Select Action</p>
+        <h1>What would you like to do?</h1>
+        <p class="sub">Choose a club action, then select the exact location.</p>
+      </div>
+      <button id="logoutBtnClubActions" type="button">Sign out</button>
+    </header>
+    <div class="category-grid">
+      <button id="clubShoutoutBtn" class="category-card hot" type="button">Throw a ShoutOut</button>
+      <button id="reserveTableBtn" class="category-card" type="button">Reserve a Table</button>
+      <button id="joinGuestListBtn" class="category-card" type="button">Join Guest List</button>
+      <button id="payVipEntryBtn" class="category-card hot" type="button">Pay VIP Entry</button>
+      <button id="payEventEntryBtn" class="category-card" type="button">Pay Event Entry</button>
+      <button id="payStdEntryBtn" class="category-card" type="button">Pay Std. Entry</button>
+    </div>
+  </section>
+
+
+  <section id="adSplashPage" class="page">
+    <div class="splash-wrap">
+      <div class="splash-card">
+        <button id="backFromAdBtn" type="button">← Back to categories</button>
+        <p class="eyebrow">Screen 3A — Sponsored Message</p>
+        <div id="adImageSlot" class="ad-image-slot"></div>
+        <h1 id="adTitle">Advertise Here</h1>
+        <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
+        <div id="adBadge" class="ad-badge">FLOQR Media Slot</div>
+        <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
+        <button id="skipAdBtn" class="ghost" type="button">Skip</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="listingPage" class="page">
+    <input type="hidden" id="listingType" value="clubs"/>
+    <header class="topbar">
+      <div>
+        <button id="backToCategoriesBtn" type="button">← Back to categories</button>
+        <p class="eyebrow">Screen 3B — Club / Search</p>
+        <h1 id="listingTitle">Search Clubs</h1>
+        <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
+      </div>
+      <button id="logoutBtn3" type="button">Sign out</button>
+    </header>
+    <div class="card">
+      <input id="locationSearch" class="search" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
+      <p id="locationRankingStatus" class="sub small">Search results rank by nearby/profile location, preferred cities, music genres, venue type, and interests.</p>
+    </div>
+    <div id="locationGrid" class="club-grid"></div>
+  </section>
+
+  <section id="templateSelectPage" class="page">
+    <header class="topbar">
+      <div>
+        <button id="backToListingBtn" type="button">← Back to club search</button>
+        <p class="eyebrow">Screen 4 — Club / Select ShoutOut Template</p>
+        <h1 id="selectedClubTitle">Location</h1>
+        <p id="selectedClubMeta" class="sub"></p>
+      </div>
+      <button id="logoutBtn4" type="button">Sign out</button>
+    </header>
+    <div class="template-layout">
+      <div class="card"><h2>Choose a template</h2><input id="templateSearch" class="search" placeholder="Search birthday, anniversary, car, image, video, classic..."/><div id="templateGrid" class="template-grid"></div></div>
+      <div class="card template-selected-panel"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button></div>
+    </div>
+  </section>
+
+  <section id="editorPage" class="page">
+    <header class="topbar">
+      <div><button id="backToTemplatesBtn" type="button">← Back to template selection</button><p class="eyebrow">Screen 5 — Club / Create ShoutOut</p><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <button id="logoutBtn5" type="button">Sign out</button>
+    </header>
+    <div class="composer">
+      <div class="card">
+        <h2>Message</h2>
+        <label>Main message<textarea id="mainText" rows="3" maxlength="47" placeholder="Enter ShoutOut Here"></textarea></label>
+        <p id="templateCharacterCapHint" class="sub small" aria-live="polite">Choose a template and display to see its safe line and character limits.</p>
+        <label>Club display screen
+          <select id="shoutoutScreenFormat"></select>
+        </label>
+        <div class="attribution-controls">
+          <label class="consent-line"><input id="includeAttribution" type="checkbox"/> <span>Show my name or social handle in the animated identity rail</span></label>
+          <label id="attributionChoiceWrap" class="hidden">Show as
+            <select id="attributionChoice">
+              <option value="displayName">Display name</option>
+              <option value="username">Username</option>
+              <option value="instagram">Instagram handle</option>
+            </select>
+          </label>
+          <input id="subText" type="hidden" value=""/>
+          <small class="sub small">Optional. The template keeps the same spacing either way; the identity rail bursts away during playback.</small>
+        </div>
+        <div id="shoutoutMediaCard" class="media-upload-card hidden">
+          <h2>Media Upload</h2>
+          <p class="single-media-upload-note">Add media only when this template supports image or video.</p>
+          <label class="file-upload-label">Upload Image or Video
+            <input id="shoutoutMediaUpload" type="file" accept="image/*,video/mp4,video/quicktime,video/webm"/>
+          </label>
+          <label>Picture framing
+            <select id="shoutoutMediaFit"><option value="contain">Show the complete picture (no crop)</option><option value="cover">Fill the frame (may crop edges)</option></select>
+          </label>
+          <div class="button-row">
+            <button id="removeShoutoutMediaBtn" type="button">Remove file</button>
+          </div>
+          <div id="shoutoutMediaPreview" class="media-preview-box hidden"></div>
+          <div id="videoTrimNotice" class="status"></div>
+          <input id="shoutoutMediaUrl" type="hidden"/>
+          <input id="shoutoutMediaType" type="hidden"/>
+        </div>
+        <div id="footballTeamIntroCard" class="football-team-editor hidden">
+          <div class="section-heading-row">
+            <div>
+              <p class="eyebrow">Zebbies advanced template</p>
+              <h2>Build the four-player lineup</h2>
+            </div>
+            <strong class="football-template-price">$30</strong>
+          </div>
+          <p class="sub small">Upload exactly four authorized photos. FLOQR produces a reusable 20-second, fictional American-football stadium introduction sized to the panel selected above.</p>
+          <div class="football-player-upload-grid">
+            <article class="football-player-upload" data-football-slot="1">
+              <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
+              <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName1" data-football-team-name data-slot="1" type="text" maxlength="14" value="PLAYER 1"/></label>
+              <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="2">
+              <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
+              <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName2" data-football-team-name data-slot="2" type="text" maxlength="14" value="PLAYER 2"/></label>
+              <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="3">
+              <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
+              <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName3" data-football-team-name data-slot="3" type="text" maxlength="14" value="PLAYER 3"/></label>
+              <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
+            </article>
+            <article class="football-player-upload" data-football-slot="4">
+              <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
+              <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+              <label>Introduction name<input id="footballTeamName4" data-football-team-name data-slot="4" type="text" maxlength="14" value="PLAYER 4"/></label>
+              <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
+            </article>
+          </div>
+          <label class="football-stadium-message-label">Large stadium message
+            <textarea id="footballTeamMessage" rows="3" maxlength="54">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
+          </label>
+          <p id="footballTextCapHint" class="sub small" aria-live="polite">Choose a supported display to see stadium-message and player-name limits.</p>
+          <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Optionally ask Gemini to create generic stadium-ready portraits (originals remain the fallback; no real team logos are added).</span></label>
+          <label class="consent-line football-photo-consent"><input id="footballPhotoConsent" type="checkbox"/> <span>I confirm that I have permission from all four people to upload and display these photos.</span></label>
+          <p id="footballTeamStatus" class="status"></p>
+        </div>
+        <input id="mediaUrl" type="hidden"/>
+        <p id="uploadStatus" class="status"></p>
+        <div class="button-row">
+          <button id="previewShoutoutBtn" type="button">Preview ShoutOut</button>
+        </div>
+        <p id="previewDurationHint" class="status small">Preview opens in a popout and closes automatically after 5 seconds.</p>
+        <button id="submitShoutoutBtn" class="primary" type="button">Submit for Approval</button>
+        <p id="submitStatus" class="status"></p>
+      </div>
+      <div class="card shoutout-recommendations-card">
+        <div class="section-heading-row">
+          <h2>ShoutOut Recommendations</h2>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Recommendations are grouped by AI context, platform trends, and generic occasion ideas. Every recommendation is rewritten to respect the selected template and display's line count, per-line allowance, and total visible-character limit.</div></details>
+        </div>
+        <label>Recommendation style
+          <select id="shoutoutTone">
+            <option value="party">Party</option>
+            <option value="vip">VIP</option>
+            <option value="funny">Funny</option>
+            <option value="romantic">Romantic</option>
+            <option value="birthday">Birthday</option>
+            <option value="classy">Classy</option>
+            <option value="corporate">Corporate</option>
+            <option value="graduation">Graduation</option>
+          </select>
+        </label>
+        <label>Event / audience context
+          <select id="shoutoutEventType">
+            <option value="">Auto-detect from venue and draft</option>
+            <option value="birthday">Birthday</option>
+            <option value="vip-table">VIP / Table</option>
+            <option value="rnb">R&amp;B night</option>
+            <option value="afrobeats">Afrobeats night</option>
+            <option value="latin-reggaeton">Latin / Reggaeton night</option>
+            <option value="romantic">Romantic / couples</option>
+            <option value="graduation">Graduation</option>
+            <option value="general-party">General party</option>
+          </select>
+        </label>
+        <div class="button-row">
+          <button id="aiSuggestBtn" type="button">Improve My ShoutOut</button>
+          <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
+        </div>
+        <div class="recommendation-group">
+          <h3>AI Recommendations</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Personalized recommendations are built from venue context, event/audience type, template limits, your profile datapoints, and your current draft.</div></details>
+          <div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose recommendation context to generate personalized ideas.</p></div>
+        </div>
+        <div class="recommendation-group">
+          <h3>Trending ShoutOuts</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Trending ShoutOuts are phrases patrons commonly select from recommendations. Live analytics can replace these local examples when production tracking is enabled.</div></details>
+          <div id="trendingSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
+        <div class="recommendation-group">
+          <h3>Generic ShoutOuts</h3>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Generic suggestions cover birthdays, anniversaries, holidays, guest-list moments, and other common occasions using available profile and calendar context.</div></details>
+          <div id="genericSuggestionList" class="dynamic-recommendation-list"></div>
+        </div>
+        <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
+      </div>
+    </div>
+    <div id="shoutoutPreviewModal" class="shoutout-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="shoutoutPreviewTitle">
+      <div class="shoutout-preview-dialog">
+        <div class="section-heading-row">
+          <h2 id="shoutoutPreviewTitle">Preview ShoutOut</h2>
+          <button id="closeShoutoutPreviewBtn" type="button" aria-label="Close preview">Close</button>
+        </div>
+        <iframe id="previewFrame" title="ShoutOut preview"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section id="confirmationPage" class="page">
+    <div class="confirmation card">
+      <p class="eyebrow">Screen 6 — ShoutOut Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
+      <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
+      <p id="confirmationRedirectStatus" class="status">Choose your next step.</p>
+      <div class="button-row confirmation-actions"><button id="editSubmittedShoutoutBtn" class="primary" type="button">Edit ShoutOut</button><button id="confirmGoMinglBtn" type="button">Mingl</button><button id="confirmGoBataBtn" type="button">Bata</button></div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.05"></script>
+<script src="./global-profile-status.js?v=29.05.1"></script>
+<script src="./shared-data.js?v=29.09.0"></script>
+<script src="./ai-service.js?v=29.05"></script>
+<script src="./ai-index-service.js?v=28.44-ai"></script>
+<script src="./ai-search-service.js?v=28.44-ai"></script>
+<script src="./ai-location-service.js?v=29.05"></script>
+<script src="./ai-notification-service.js?v=28.44-ai"></script>
+<script src="./ai-template-studio.js?v=29.09.0"></script>
+<script src="./floqr-action-feedback.js?v=29.05"></script>
+<script src="./ai-grammar-service.js?v=29.05"></script>
+<script src="./helper-popouts.js?v=29.05"></script>
+<script src="./ad-campaigns.js?v=29.05"></script>
+<script src="./payment-service.js?v=29.09.2"></script>
+<script src="./patron-app.js?v=29.09.1"></script>
+<script src="./ai-assistant-ui.js?v=28.44-ai"></script>
+<script src="./ai-media-service.js?v=29.05"></script>
+<script src="./notification-center.js?v=29.05"></script>
+</body>
+</html>

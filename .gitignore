@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Local tooling / bundled Git (not for the repo)
+.tools/
+configstore/
+.agents/
+
+# Publish staging clones
+.publish-*/
+
+# Firebase
+.firebase/
+*-debug.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+storage-debug.log
+
+# Secrets / local env
+.env
+.env.*
+!.env.example
+*.pem
+service-account*.json
+*-service-account.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.log
+
+# Archives / local scratch
+*.zip
+.rollback-readme-history.zip
+
+# npm
+npm-debug.log*
