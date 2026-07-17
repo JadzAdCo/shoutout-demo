@@ -977,11 +977,7 @@
     currentUser = user;
     byId("minglChatLogin")?.classList.toggle("hidden", !!user);
     byId("minglChatShell")?.classList.toggle("hidden", !user);
-    if (!user) {
-      setText("minglChatSignedInAs", "Not signed in");
-      return;
-    }
-    setText("minglChatSignedInAs", `Signed in as ${user.displayName || user.email || user.phoneNumber || "Member"}`);
+    if (!user) return;
     const profileSnap = await db.collection("users").doc(user.uid).get().catch(() => null);
     currentProfile = profileSnap?.exists ? profileSnap.data() : {};
     await loadRooms();

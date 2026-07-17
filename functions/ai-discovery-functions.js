@@ -334,25 +334,24 @@ function cityCountryFromText(sourceUrl = "", text = "", location = {}) {
 }
 
 function missingDatapoints(record = {}) {
-  const required = /club|lounge|bar|beach/i.test(record.proposedType || "")
-    ? ["Name", "Description", "Address", "City", "Country", "Phone", "Website or source", "Categories", "Genres"]
-    : ["Name", "Description", "Location name", "Address", "City", "Country", "Phone", "Source or ticket link", "Categories", ...(/comedy/i.test(record.proposedType || "") ? ["Date", "Time"] : [])];
-  const checks = {
-    Name: !!record.proposedTitle,
-    Description: !!record.proposedDescription,
-    "Location name": !!record.proposedLocationName,
-    Address: !!record.proposedAddress,
-    City: !!record.city,
-    Country: !!record.country,
-    Phone: !!(record.telephone || record.phone),
-    "Website or source": !!(record.officialWebsite || record.website || record.sourceUrl),
-    "Source or ticket link": !!(record.sourceUrl || record.ticketUrl),
-    Categories: !!(record.categories || []).length,
-    Genres: !!(record.genres || []).length,
-    Date: !!record.proposedDate,
-    Time: !!record.proposedTime
-  };
-  return required.filter(label => !checks[label]);
+  const missing = [];
+  if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
+  if (!(record.genres || []).length) missing.push("Genre");
+  const artists = record.artistsOrDjs || record.artists || record.djs;
+  if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
+  const promoters = record.promoters || record.promotionGroup;
+  if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) missing.push("Promoter(s)");
+  if (!record.proposedAddress) missing.push("Address");
+  if (!record.city) missing.push("City");
+  if (!record.country) missing.push("Country");
+  if (!(record.telephone || record.phone)) missing.push("Phone");
+  if (!record.email) missing.push("Email");
+  if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
+  if (/comedy/i.test(record.proposedType || "")) {
+    if (!record.proposedDate) missing.push("Date");
+    if (!record.proposedTime) missing.push("Time");
+  }
+  return missing;
 }
 
 async function fetchPublicSource(sourceUrl) {
@@ -488,35 +487,44 @@ async function searchGooglePlaces(job, apiKey) {
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();
-  return (payload.places || []).map(place => ({
-    proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
-    proposedTitle:place.displayName?.text || "Discovered nightlife venue",
-    proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
-    proposedLocationName:place.displayName?.text || "",
-    proposedAddress:place.formattedAddress || "",
-    city:job.city || "",
-    stateRegion:job.stateRegion || "",
-    country:job.country || "",
-    telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
-    phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
-    officialWebsite:place.websiteUri || place.googleMapsUri || "",
-    website:place.websiteUri || place.googleMapsUri || "",
-    sourceUrl:place.googleMapsUri || place.websiteUri || "",
-    sourceName:"Google Places API",
-    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
-    categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
-    genres:job.genre ? [job.genre] : [],
-    searchQuery:job.query || "",
-    searchLanguage:job.language || "",
-    aiSummary:"Localized venue discovery candidate. Master Admin must verify public contact and social details before onboarding.",
-    aiConfidenceScore:0.86,
-    aiStarRating:4,
-    aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
-    missingDatapoints:["Social media handles"],
-    status:"pendingReview",
-    discoveryMode:"localized-places-search",
-    extractionMethod:"google-places-text-search"
-  }));
+  return (payload.places || []).map(place => {
+    const baseRecord = {
+      proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
+      proposedTitle:place.displayName?.text || "Discovered nightlife venue",
+      proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+      proposedLocationName:place.displayName?.text || "",
+      proposedAddress:place.formattedAddress || "",
+      city:job.city || "",
+      stateRegion:job.stateRegion || "",
+      country:job.country || "",
+      telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+      phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+      officialWebsite:place.websiteUri || place.googleMapsUri || "",
+      website:place.websiteUri || place.googleMapsUri || "",
+      sourceUrl:place.googleMapsUri || place.websiteUri || "",
+      sourceName:"Google Places API",
+      email:"",
+      artistsOrDjs:[],
+      promoters:[],
+      promotionGroup:"",
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      sourceConfirmations:{googlePlaces:true, ticketmaster:"later", publicPage:false, eventbrite:false},
+      categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
+      genres:job.genre ? [job.genre] : [],
+      searchQuery:job.query || "",
+      searchLanguage:job.language || "",
+      aiSummary:"Localized venue discovery candidate. Complete DJ/artist, promoter, email, and Instagram before approval.",
+      aiConfidenceScore:0.86,
+      aiStarRating:4,
+      aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
+      status:"pendingReview",
+      discoveryMode:"master-admin-refined-discovery-crawl",
+      extractionMethod:"google-places-text-search"
+    };
+    baseRecord.missingDatapoints = missingDatapoints(baseRecord);
+    baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    return baseRecord;
+  });
 }
 
 async function discoverPlacesForCriteria(criteria = {}) {
@@ -627,7 +635,7 @@ async function runScheduledCrawl(scheduleDoc, now = new Date()) {
 }
 
 async function classifyDiscoveryRecord(record) {
-  return {
+  const classified = {
     ...record,
     aiSummary:record.aiSummary || record.proposedDescription || "",
     aiConfidenceScore:record.aiConfidenceScore || 0.76,
@@ -635,6 +643,9 @@ async function classifyDiscoveryRecord(record) {
     aiRatingReasons:record.aiRatingReasons || ["Extracted from configured public source URL"],
     updatedAt:admin.firestore.FieldValue.serverTimestamp()
   };
+  classified.missingDatapoints = missingDatapoints(classified);
+  classified.crawlResultStatus = classified.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  return classified;
 }
 
 async function writeDiscoveryQueueItem(record) {
@@ -677,16 +688,43 @@ function clampText(value = "", max = 80) {
 
 function preserveProtectedTerms(value = "") {
   let out = String(value || "");
-  ["FLOQR", "ShoutOut", "Mingl", "Bata"].forEach(term => {
+  ["FLOQR", "ShoutOut", "Mingl", "BartR"].forEach(term => {
     out = out.replace(new RegExp(term, "ig"), term);
   });
   return out;
 }
 
+function shoutOutDisplayCaps(data = {}) {
+  const raw = data.displayCaps && typeof data.displayCaps === "object" ? data.displayCaps : {};
+  const mainLimit = Math.max(1, Math.min(Number(data.mainLimit || raw.main || raw.maxMainCharacters || 36), 90));
+  const subLimit = Math.max(0, Math.min(Number(data.subLimit ?? raw.sub ?? raw.maxSubCharacters ?? 60), 90));
+  const lineCount = Math.max(1, Math.min(Number(raw.lineCount || 1), 4));
+  const perLine = Math.max(1, Math.min(Number(raw.perLine || raw.maxCharactersPerLine || mainLimit), 30));
+  return {mainLimit, subLimit, lineCount, perLine};
+}
+
+function fitShoutOutDisplayText(value = "", data = {}, type = "main") {
+  const caps = shoutOutDisplayCaps(data);
+  const limit = type === "sub" ? caps.subLimit : caps.mainLimit;
+  const cleaned = preserveProtectedTerms(clampText(value, limit + caps.lineCount - 1));
+  if (type === "sub" || caps.lineCount <= 1) return cleaned.slice(0, limit);
+  const rows = [];
+  let row = "";
+  cleaned.split(/\s+/).filter(Boolean).forEach(word => {
+    const chunks = [];
+    for (let i = 0; i < word.length; i += caps.perLine) chunks.push(word.slice(i, i + caps.perLine));
+    chunks.forEach(chunk => {
+      const next = row ? `${row} ${chunk}` : chunk;
+      if (next.length <= caps.perLine) row = next;
+      else if (rows.length < caps.lineCount) { rows.push(row); row = chunk; }
+    });
+  });
+  if (row && rows.length < caps.lineCount) rows.push(row);
+  return rows.slice(0, caps.lineCount).join("\n");
+}
+
 function fallbackShoutOutSuggestion(data = {}) {
   const tone = normalized(data.tone || "party");
-  const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
-  const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
   const profile = data.profileSignals && typeof data.profileSignals === "object" ? data.profileSignals : {};
   const interests = Array.isArray(profile.interests) ? profile.interests.slice(0, 3).join(", ") : "";
   const past = Array.isArray(data.pastShoutouts) ? data.pastShoutouts.find(item => item && (item.mainText || item.subText)) : null;
@@ -703,8 +741,8 @@ function fallbackShoutOutSuggestion(data = {}) {
   const picked = options.find(item => tone.includes(item.tone)) || options[5];
   const contextSub = interests ? `${interests} energy.` : past?.subText || picked.subText;
   return {
-    mainText:preserveProtectedTerms(clampText(data.mainText || past?.mainText || picked.mainText, mainLimit)),
-    subText:preserveProtectedTerms(clampText(data.subText || contextSub, subLimit)),
+    mainText:fitShoutOutDisplayText(data.mainText || past?.mainText || picked.mainText, data, "main"),
+    subText:fitShoutOutDisplayText(data.subText || contextSub, data, "sub"),
     tone:picked.tone,
     provider:"curated-fallback",
     providerMode:"curated-fallback",
@@ -810,11 +848,22 @@ function assertOwnedOriginalShoutOutMediaPath(path = "", uid = "") {
 }
 
 function safeEnhancementPrompt(prompt = "", enhancementType = "") {
+  const type = String(enhancementType || "").trim();
+  if (type === "football-portrait-motion") {
+    return [
+      "Prepare this portrait for subtle cinematic motion on a public LED stadium display.",
+      "Preserve the person's recognizable face and natural identity exactly.",
+      "Do not apply color filters, stylized looks, uniforms, logos, text, watermarks, or football branding.",
+      "Prefer a clean, high-contrast framing suitable for gentle Ken Burns zoom/parallax playback.",
+      "Return a single still image only.",
+      `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
+    ].join("\n");
+  }
   const requested = String(prompt || enhancementType || "Improve this ShoutOut media for a nightlife LED display.").slice(0, 600);
   return [
     "Edit only the uploaded ShoutOut media image. Do not add text, logos, watermarks, QR codes, or HTML/CSS/JavaScript.",
     "Keep the result suitable for a public nightlife LED display. Avoid explicit, hateful, violent, illegal, or privacy-invasive content.",
-    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and Bata exactly if they appear. Do not translate or alter those terms.",
+    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and BartR exactly if they appear. Do not translate or alter those terms.",
     "Return a polished image edit. Do not change any FLOQR template layout, text placement, media placeholder, animation, or approval format.",
     `User requested enhancement: ${requested}`
   ].join("\n");
@@ -918,6 +967,40 @@ exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", tim
   return null;
 });
 
+exports.runFloqrDiscoveryCrawl = onCall({
+  region:"us-central1",
+  secrets:[GOOGLE_PLACES_API_KEY],
+  timeoutSeconds:120,
+  memory:"512MiB"
+}, async request => {
+  await assertMasterAdmin(request);
+  const criteria = request.data?.criteria || {};
+  const structuredPlan = request.data?.structuredPlan || criteria.structuredPlan || {};
+  const runId = String(request.data?.runId || "");
+  const records = await discoverPlacesForCriteria({...criteria, structuredPlan});
+  let created = 0;
+  for (const record of records) {
+    const classified = await classifyDiscoveryRecord({
+      ...record,
+      crawlRunId: runId,
+      criteriaSnapshot: criteria,
+      discoveryMode: "master-admin-refined-discovery-crawl"
+    });
+    await writeDiscoveryQueueItem(classified);
+    created += 1;
+  }
+  return {
+    created,
+    placesConfigured: !!optionalPlacesKey(),
+    ticketmaster: "later",
+    message: created
+      ? `Discovery crawl wrote ${created} Google Places candidate(s). Complete DJ/artist, promoter, email, and Instagram before approval.`
+      : (optionalPlacesKey()
+        ? "No Places matches for this refined search. Broaden city/genre/type or add a public page extraction."
+        : "GOOGLE_PLACES_API_KEY is not configured. Set the Firebase secret to run live discovery crawls.")
+  };
+});
+
 exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {
   const email = normalizeEmail(request.data?.email);
   const challengeId = crypto.createHash("sha256").update(email).digest("hex");
@@ -977,10 +1060,24 @@ exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
   if (!userSnap.exists) throw new HttpsError("failed-precondition", "The club admin must first register as a FLOQR patron.");
   const patron = userSnap.data() || {};
   if (patron.profileCompleted !== true) throw new HttpsError("failed-precondition", "The selected patron must complete patron registration first.");
+  const electedServiceRoles = [
+    ...(Array.isArray(patron.requestedRoles) ? patron.requestedRoles : []),
+    ...(Array.isArray(patron.electedRoles) ? patron.electedRoles : []),
+    ...(Array.isArray(patron.approvedRoles) ? patron.approvedRoles : []),
+    patron.requestedRole,
+    patron.electedRole,
+    patron.serviceSubtype,
+    patron.publicProfileType,
+    patron.roleType,
+    patron.role
+  ].filter(Boolean).map(value => String(value).toLowerCase());
+  if (!electedServiceRoles.some(value => /promoter|\bdj\b|disc jockey|waiter|waitress|hospitality|bottle|bartender|barman|bar man|videographer|camera operator|cameraman|camera man|photographer|cinematographer|media ?creator/.test(value))) {
+    throw new HttpsError("failed-precondition", "The selected patron must first elect an eligible service role, including videographer/camera operator when applicable.");
+  }
   const email = String(patron.email || "").toLowerCase();
   const assignmentId = `${clubId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
   const batch = db.batch();
-  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, electedServiceRoles, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
   batch.set(db.collection("clubLocations").doc(clubId), {adminUids:admin.firestore.FieldValue.arrayUnion(patronUid), adminEmails:admin.firestore.FieldValue.arrayUnion(email), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
   batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
   await batch.commit();
@@ -1083,8 +1180,7 @@ exports.aiSuggestShoutOut = onCall({
   const data = request.data || {};
   const fallback = fallbackShoutOutSuggestion(data);
   if (!optionalGeminiSecretValue()) return fallback;
-  const mainLimit = Math.max(12, Math.min(Number(data.mainLimit || 36), 60));
-  const subLimit = Math.max(20, Math.min(Number(data.subLimit || 60), 90));
+  const {mainLimit, subLimit, lineCount, perLine} = shoutOutDisplayCaps(data);
   const profileSignals = data.profileSignals && typeof data.profileSignals === "object" ? {
     displayName:clampText(data.profileSignals.displayName || "", 40),
     city:clampText(data.profileSignals.city || "", 60),
@@ -1103,8 +1199,9 @@ exports.aiSuggestShoutOut = onCall({
   const prompt = [
     "You are FLOQR AI helping write public LED-safe ShoutOut copy.",
     "Return only JSON with keys: mainText, subText, tone, safetyStatus.",
-    `mainText must be ${mainLimit} characters or fewer. subText must be ${subLimit} characters or fewer.`,
-    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those terms.",
+    `mainText must be ${mainLimit} visible characters or fewer, arranged in no more than ${lineCount} lines with about ${perLine} characters per line. subText must be ${subLimit} characters or fewer.`,
+    "Prefer short familiar words that wrap cleanly. Never depend on clipping, ellipsis, or automatic font shrinking.",
+    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and BartR exactly. Do not translate or alter those terms.",
     "Do not include offensive, explicit, hateful, illegal, private, payment, or sensitive personal data.",
     "Keep the copy suitable for a public nightlife display.",
     `Tone: ${clampText(data.tone || "party", 40)}`,
@@ -1119,8 +1216,8 @@ exports.aiSuggestShoutOut = onCall({
   try {
     const json = await callGeminiJson(prompt, "ShoutOut suggestion");
     return {
-      mainText:preserveProtectedTerms(clampText(json?.mainText || fallback.mainText, mainLimit)),
-      subText:preserveProtectedTerms(clampText(json?.subText || fallback.subText, subLimit)),
+      mainText:fitShoutOutDisplayText(json?.mainText || fallback.mainText, data, "main"),
+      subText:fitShoutOutDisplayText(json?.subText || fallback.subText, data, "sub"),
       tone:clampText(json?.tone || data.tone || fallback.tone, 40),
       provider:"gemini",
       providerMode:"gemini",
@@ -1156,7 +1253,7 @@ exports.aiSuggestGrammarCorrection = onCall({
     "You are FLOQR AI helping a signed-in user correct their own private draft text.",
     "Return only JSON with keys: correctedText, detectedIssues, explanation, confidence.",
     "detectedIssues must be an array of objects with original, suggestion, type, and confidence.",
-    "Preserve FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those protected terms.",
+    "Preserve FLOQR, ShoutOut, Mingl, and BartR exactly. Do not translate or alter those protected terms.",
     "Do not add new private facts. Keep the user's meaning and tone unless a tone preference is provided.",
     "This draft is private and must not be treated as searchable or public content.",
     `Context JSON: ${JSON.stringify(context)}`,

@@ -3,7 +3,13 @@
   "use strict";
 
   const byId = id => document.getElementById(id);
-  const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  const setText = (id, value) => {
+    const el = byId(id);
+    if (!el) return;
+    const text = value == null ? "" : String(value);
+    el.textContent = text;
+    if (id === "portalStatus") el.classList.toggle("hidden", !text.trim());
+  };
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const splitCSV = value => String(value || "").split(",").map(x => x.trim()).filter(Boolean);
   const joinCSV = value => Array.isArray(value) ? value.join(", ") : String(value || "");
@@ -179,13 +185,13 @@
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
       if (["chats","mingl","mingl-chat"].includes(tab)) {
-        const params = new URLSearchParams({v:"29.04"});
+        const params = new URLSearchParams({v:"29.09.8", from:"portal"});
         const room = new URL(window.location.href).searchParams.get("room");
         if (room) params.set("room", room);
-        window.location.href = `./mingl-chat.html?${params.toString()}`;
+        window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
         return;
       }
-      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy", bartr:"portalBartrStore", commerce:"portalBartrStore", store:"portalBartrStore"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
@@ -197,7 +203,7 @@
     catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
 
-  async function logout() { await auth.signOut(); window.location.href = "./?v=28.43-f"; }
+  async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
 
   async function getCollectionSafe(name, filterFn, limit=1000) {
     try {
@@ -459,15 +465,26 @@
 
   function recipientText(recipient = {}) {
     return [
-      recipient.label, recipient.displayName, recipient.username, recipient.email,
+      recipient.label, recipient.displayName, recipient.username, recipient.floqrHandle,
       recipient.roleLabel, recipient.locationName, recipient.clubLocationId
+      // Email intentionally omitted from search/display text so patrons never see staff emails.
     ].join(" ");
+  }
+
+  function recipientPublicSubtitle(recipient = {}) {
+    const handle = String(recipient.floqrHandle || recipient.username || "").replace(/^@+/, "");
+    if (handle) return `@${handle}`;
+    if (recipient.locationName) return recipient.locationName;
+    if (recipient.recipientType === "club_admin") return "Club support contact";
+    if (recipient.recipientType === "club_csr") return "Customer service";
+    return "";
   }
 
   function supportRecipientLabel(recipient = {}) {
     const role = recipient.roleLabel || "Internal Recipient";
     const location = recipient.locationName ? ` - ${recipient.locationName}` : "";
-    return `${recipient.label || recipient.email || "Recipient"} (${role}${location})`;
+    const name = recipient.label || recipient.displayName || recipient.username || "Recipient";
+    return `${name} (${role}${location})`;
   }
 
   function buildMessageRecipients(user, users = [], designations = []) {
@@ -479,13 +496,15 @@
       byKey.set(key, item);
     };
 
-    (window.SHOUTOUT_ADMIN_EMAILS || []).forEach(email => add({
+    (window.SHOUTOUT_ADMIN_EMAILS || []).forEach((email, index) => add({
       uid: "",
       email,
       label: "Club Admin",
       displayName: "Club Admin",
       roleLabel: "Club Admin",
-      recipientType: "club_admin"
+      recipientType: "club_admin",
+      // Keep email for routing only; never surface in patron UI.
+      supportIndex: index + 1
     }));
 
     designations.filter(x => x.isCSR !== false).forEach(item => add({
@@ -493,6 +512,7 @@
       email: item.workerEmail || "",
       label: item.workerName || item.workerUsername || "Customer Service Representative",
       username: item.workerUsername || "",
+      floqrHandle: item.workerFloqrHandle || item.workerUsername || "",
       roleLabel: "Customer Service Representative",
       recipientType: "club_csr",
       clubLocationId: item.clubLocationId || "",
@@ -503,8 +523,9 @@
       users.forEach(profile => add({
         uid: profile.uid || profile.id || "",
         email: profile.email || "",
-        label: profile.displayName || profile.fullName || profile.username || profile.email || "Member",
+        label: profile.displayName || profile.fullName || profile.username || profile.floqrHandle || "Member",
         username: profile.username || "",
+        floqrHandle: profile.floqrHandle || profile.username || "",
         roleLabel: getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x).join(", ") || "Member",
         recipientType: "member"
       }));
@@ -530,11 +551,14 @@
     const rows = messageRecipients
       .filter(x => contextualTextMatch(query, recipientText(x)))
       .slice(0, 12);
-    wrap.innerHTML = rows.length ? rows.map((item, index) => `<button type="button" class="${(item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail) ? "selected" : ""}" data-recipient-index="${index}">
-      <strong>${esc(item.label || item.email || "Recipient")}</strong>
-      <span>${esc(item.username ? `@${item.username}` : item.email || "")}</span>
+    wrap.innerHTML = rows.length ? rows.map((item, index) => {
+      const subtitle = recipientPublicSubtitle(item);
+      return `<button type="button" class="${(item.uid && item.uid === selectedUid) || (item.email && item.email === selectedEmail) ? "selected" : ""}" data-recipient-index="${index}">
+      <strong>${esc(item.label || item.displayName || "Recipient")}</strong>
+      ${subtitle ? `<span>${esc(subtitle)}</span>` : ""}
       <small>${esc(item.roleLabel || "Internal Recipient")}${item.locationName ? ` - ${esc(item.locationName)}` : ""}</small>
-    </button>`).join("") : "<p class='sub small'>No allowed internal recipients matched this search.</p>";
+    </button>`;
+    }).join("") : "<p class='sub small'>No allowed internal recipients matched this search.</p>";
     wrap.querySelectorAll("button[data-recipient-index]").forEach(btn => {
       btn.addEventListener("click", () => selectMessageRecipient(rows[Number(btn.dataset.recipientIndex)]));
     });
@@ -571,7 +595,9 @@
     byId("editBio").value = profile.publicProfileBioOriginal || profile.bio || "";
     byId("editBioEnglish").value = profile.publicProfileBioEnglish || profile.bioEnglish || "";
     if (byId("editCommerceEnabled")) byId("editCommerceEnabled").checked = !!profile.commerceEnabled;
-    if (byId("editCommerceStoreName")) byId("editCommerceStoreName").value = profile.commerceStoreName || `${profile.displayName || user.displayName || "My"} Shop`;
+    if (byId("editCommerceStoreName")) byId("editCommerceStoreName").value = profile.commerceStoreName || `${profile.displayName || user.displayName || "My"} BartR shop`;
+    if (byId("editCommerceContact")) byId("editCommerceContact").value = profile.commerceContact || profile.email || user.email || "";
+    if (byId("editCommerceRefundPolicy")) byId("editCommerceRefundPolicy").value = profile.commerceRefundPolicy || "";
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
@@ -764,12 +790,18 @@
       nightlifeStyle: byId("editNightlifeStyle").value.trim(),
       lookingToMeet: byId("editLookingToMeet").value.trim(),
       bio: originalBio,
-      commerceEnabled:!!byId("editCommerceEnabled")?.checked,
-      commerceStoreName:byId("editCommerceStoreName")?.value.trim() || `${byId("editDisplayName").value.trim() || "My"} Shop`,
+      commerceEnabled:!!byId("editCommerceEnabled")?.checked && isUsMarketplaceEligible({country:byId("editCountry")?.value}),
+      commerceStoreName:byId("editCommerceStoreName")?.value.trim() || `${byId("editDisplayName").value.trim() || "My"} BartR shop`,
+      commerceContact:byId("editCommerceContact")?.value.trim() || "",
+      commerceRefundPolicy:byId("editCommerceRefundPolicy")?.value.trim() || "",
       ...translationState,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     updates.fullName = `${updates.firstName} ${updates.lastName}`.trim();
+    if (byId("editCommerceEnabled")?.checked && !isUsMarketplaceEligible(updates)) {
+      setText("portalStatus", "BartR seller store is limited to U.S.-based patrons and service members.");
+      return;
+    }
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
     setText("portalStatus", "Profile updated.");
     await loadPortal(user);
@@ -1323,7 +1355,7 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="./mingl-chat.html?room=mingl_${esc(connection.id || connection.connectionId || "")}&v=29.04">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.8&from=portal`)}">Open Mingl Chat</a></p>` : ""}
       </div>
     </div>`;
     }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
@@ -1446,7 +1478,7 @@
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
         connectionId,
-        link:`./mingl-chat.html?room=${roomId}&v=29.04`,
+        link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&v=29.09.8&from=portal`,
         read:false,
         createdAt:fieldValue()
       });
@@ -2261,7 +2293,7 @@
   function shoutoutModifyUrl(item) {
     const url = new URL("./patron-portal.html", window.location.href);
     url.searchParams.set("tab", "shoutouts");
-    url.searchParams.set("v", "28.43-f");
+    url.searchParams.set("v", "29.09.8");
     if (item.referenceNumber) url.searchParams.set("ref", item.referenceNumber);
     if (item.id) url.searchParams.set("id", item.id);
     return url.toString();
@@ -2432,6 +2464,115 @@
     }
   }
 
+  function isUsMarketplaceEligible(profile = {}) {
+    const value = String(profile.country || "").trim().toLowerCase();
+    return ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america"].includes(value);
+  }
+
+  const moneyCents = cents => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD"}).format(Number(cents || 0) / 100);
+
+  async function renderBartrSellerBackend(user, profile = {}) {
+    const eligible = isUsMarketplaceEligible(profile);
+    const enabled = !!profile.commerceEnabled;
+    const tools = byId("bartrSellerTools");
+    const eligibility = byId("bartrEligibilityStatus");
+    const summary = byId("bartrStoreSummary");
+    if (eligibility) {
+      if (!eligible) eligibility.textContent = "BartR marketplace selling is limited to U.S.-based patrons and service members. Set Country to United States in My Profile to qualify.";
+      else if (!enabled) eligibility.textContent = "Enable BartR seller store under My Profile, then publish products here. Shoppers browse the shared BartR frontend.";
+      else eligibility.textContent = "Your listings can appear on the shared BartR frontend. FloqR collects payment; you ship.";
+    }
+    if (summary) {
+      summary.innerHTML = simpleRows([
+        ["Store name", profile.commerceStoreName || "—"],
+        ["Contact", profile.commerceContact || user.email || "—"],
+        ["Refund policy", profile.commerceRefundPolicy || "Not set"],
+        ["Marketplace region", eligible ? "United States" : (profile.country || "Not set")],
+        ["Seller store", enabled ? "Enabled" : "Disabled"]
+      ]);
+    }
+    tools?.classList.toggle("hidden", !(eligible && enabled));
+    if (!(eligible && enabled)) {
+      if (byId("commerceSellerReport")) byId("commerceSellerReport").innerHTML = "";
+      if (byId("commerceOrdersReport")) byId("commerceOrdersReport").innerHTML = "<p class='sub'>Enable a U.S. BartR seller store to manage listings and fulfillment.</p>";
+      return;
+    }
+    const [productSnap, orderSnap] = await Promise.all([
+      db.collection("commerceProducts").where("sellerEntityId", "==", user.uid).limit(100).get().catch(() => null),
+      db.collection("serviceOrders").where("sellerEntityId", "==", user.uid).limit(100).get().catch(() => null)
+    ]);
+    const products = productSnap ? productSnap.docs.map(doc => ({id:doc.id, ...doc.data()})) : [];
+    const orders = orderSnap ? orderSnap.docs.map(doc => ({id:doc.id, ...doc.data()})) : [];
+    if (byId("commerceSellerReport")) {
+      byId("commerceSellerReport").innerHTML = products.length
+        ? products.map(product => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(product.name || "Product")}</strong><span>${product.active === false ? "Inactive" : "Live on BartR"}</span></div><p>${esc(product.category || "")} · ${moneyCents(product.priceCents)} · ${Number(product.inventory || 0)} available</p><p class="queue-actions">${product.active === false ? "" : `<button type="button" data-deactivate-product="${esc(product.id)}">Deactivate</button>`}</p></div>`).join("")
+        : "<p class='sub'>No BartR products yet. Publish your first listing above.</p>";
+      document.querySelectorAll("[data-deactivate-product]").forEach(button => {
+        button.addEventListener("click", () => deactivateBartrProduct(button.dataset.deactivateProduct, user));
+      });
+    }
+    const paid = orders.filter(order => String(order.paymentStatus || "").toLowerCase() === "paid" || order.orderType === "commerce");
+    if (byId("commerceOrdersReport")) {
+      byId("commerceOrdersReport").innerHTML = paid.length
+        ? paid.map(order => `<article class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.productSnapshot?.name || "BartR sale")}</strong><span>${esc(order.shippingStatus || order.fulfillmentStatus || order.paymentStatus || "paid")}</span></div><p>${esc(order.invoiceNumber || order.id)} - ${moneyCents(order.amountCents)}</p><small>FloqR collected payment · Vendor ships · ${esc(order.customerEmail || order.ownerEmail || "Customer")}</small></article>`).join("")
+        : "<p class='sub'>No paid BartR sales yet.</p>";
+    }
+  }
+
+  async function deactivateBartrProduct(productId, user) {
+    if (!productId) return;
+    await db.collection("commerceProducts").doc(productId).set({active:false, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    setText("portalStatus", "Product deactivated on BartR.");
+    await renderBartrSellerBackend(user, currentProfile || {});
+  }
+
+  async function publishBartrProduct() {
+    const user = auth.currentUser;
+    if (!user) return setText("portalStatus", "Please sign in.");
+    const profile = currentProfile || {};
+    if (!isUsMarketplaceEligible(profile)) return setText("portalStatus", "BartR selling is limited to U.S.-based patrons and service members.");
+    if (!profile.commerceEnabled) return setText("portalStatus", "Enable BartR seller store in My Profile first.");
+    const name = byId("commerceProductName")?.value.trim() || "";
+    const priceCents = Math.round(Number(byId("commerceProductPrice")?.value || 0) * 100);
+    const productType = byId("commerceProductType")?.value || "physical";
+    if (!name || priceCents < 50) return setText("portalStatus", "Add a product name and a price of at least $0.50.");
+    return actionFeedback({
+      starting:"Publishing to BartR…",
+      wait:"Saving your listing to the shared marketplace.",
+      success:"Product published",
+      redirecting:"Your listing is live on BartR. FloqR collects payment; you ship.",
+      failed:"Could not publish product",
+      returnTo:"BartR Store"
+    }, async () => {
+      await db.collection("commerceProducts").add({
+        sellerEntityId:user.uid,
+        sellerEntityType:"member",
+        sellerUid:user.uid,
+        sellerName:profile.commerceStoreName || profile.displayName || user.displayName || "BartR vendor",
+        sellerCountry:profile.country || "United States",
+        marketplaceCountry:"US",
+        marketplace:"bartr",
+        name,
+        category:byId("commerceProductCategory")?.value || "Other",
+        productType,
+        previewMediaType:byId("commerceProductPreviewType")?.value || "image",
+        mediaLicense:byId("commerceProductLicense")?.value || "personal",
+        priceCents,
+        inventory:Math.max(0, Number(byId("commerceProductInventory")?.value || 0)),
+        imageUrl:byId("commerceProductImage")?.value.trim() || "",
+        description:byId("commerceProductDescription")?.value.trim() || "",
+        requiresShipping:productType === "physical" && byId("commerceProductShipping")?.checked !== false,
+        refundPolicySnapshot:profile.commerceRefundPolicy || "",
+        contactSnapshot:profile.commerceContact || user.email || "",
+        active:true,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      ["commerceProductName","commerceProductPrice","commerceProductImage","commerceProductDescription"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+      await renderBartrSellerBackend(user, profile);
+    });
+  }
+
   function renderPolicies(profile) {
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
@@ -2472,8 +2613,7 @@
     await renderTemplateVariantSettings(user, profile);
     renderRoleGuide();
     renderPolicies(profile);
-    setText("portalAccountName", profile.displayName || user.displayName || user.email || "Patron");
-    setText("portalAccountEmail", user.email || "");
+    await renderBartrSellerBackend(user, profile);
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
@@ -2521,8 +2661,7 @@
       ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],
       ["Visibility", profile.publicProfileVisibility || "followers"]
     ]);
-    if (byId("portalCommerceLink")) byId("portalCommerceLink").href = `./commerce.html?seller=${encodeURIComponent(user.uid)}&v=29.07`;
-    if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or Commerce orders yet.</p>";
+    if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or BartR orders yet.</p>";
 
     currentShoutouts = shoutouts;
     byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map((x, index) => {
@@ -2560,7 +2699,7 @@
     renderMessages(messages, user);
     renderPortalMinglRequests(currentMinglConnections, user);
     renderPortalMinglChats(chats, user);
-    setText("portalStatus", "FLOQR Inbox ready. Loading directory tools in the background…");
+    setText("portalStatus", "");
     Promise.all([
       getCollectionSafe("users", null, 500),
       getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false, 300)
@@ -2575,8 +2714,8 @@
       }
       messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
       renderRecipientSearchResults();
-      setText("portalStatus", "FLOQR Inbox and directory tools are ready.");
-    }).catch(() => setText("portalStatus", "FLOQR Inbox is ready. Some directory tools may still be loading."));
+      setText("portalStatus", "");
+    }).catch(() => setText("portalStatus", "Some directory tools may still be loading."));
     const requestedRoom = params.get("room");
     if (requestedRoom && !activePortalMinglRoomId) {
       const room = chats.find(x => x.id === requestedRoom);
@@ -2641,7 +2780,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     bind("portalGoogleLoginBtn", loginGoogle);
-    bind("portalLogoutBtn", logout);
     bind("saveProfileBtn", saveProfile);
     window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
     window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
@@ -2655,6 +2793,17 @@
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
+    bind("commerceSaveProductBtn", publishBartrProduct);
+    byId("commerceProductType")?.addEventListener("change", () => {
+      const type = byId("commerceProductType")?.value || "physical";
+      const digital = type !== "physical";
+      if (byId("commerceProductShipping")) {
+        byId("commerceProductShipping").disabled = digital;
+        byId("commerceProductShipping").checked = !digital;
+      }
+      if (type === "photoLicense") { byId("commerceProductCategory").value = "Photography"; byId("commerceProductPreviewType").value = "image"; }
+      if (type === "videoLicense") { byId("commerceProductCategory").value = "Video"; byId("commerceProductPreviewType").value = "video"; }
+    });
     bind("sendMessageBtn", sendPortalMessage);
     bind("portalSendMinglMessageBtn", sendPortalMinglMessage);
     bind("portalImproveMinglMessageBtn", improvePortalMinglDraft);
@@ -2718,7 +2867,6 @@
     });
 
     auth.onAuthStateChanged(user => {
-      setText("portalSignedInAs", user ? `Signed in as ${user.displayName || user.email}` : "Not signed in");
       if (!user) {
         byId("portalLogin").classList.remove("hidden");
         byId("portalPanel").classList.add("hidden");
@@ -2727,7 +2875,7 @@
       }
       byId("portalLogin").classList.add("hidden");
       byId("portalPanel").classList.remove("hidden");
-      setText("portalStatus", "Patron portal loaded.");
+      setText("portalStatus", "");
       handleMemberConnectReturn();
       loadPortal(user);
     });

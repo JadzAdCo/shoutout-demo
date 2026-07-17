@@ -1366,7 +1366,6 @@
     bind("masterGoogleLoginBtn", loginGoogle);
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
     bind("masterLogoutBtn", logout);
-    bind("masterPanelLogoutBtn", logout);
     bind("createClubOnboardingBtn", createClubFromForm);
     bind("previewClubOnboardingCsvBtn", previewClubCsv);
     bind("importClubOnboardingCsvBtn", importClubCsv);
@@ -1392,9 +1391,6 @@
     }).catch(e => setText("masterStatus", masterAuthErrorMessage(e)));
 
     auth.onAuthStateChanged(user => {
-      setText("masterSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
-      setText("masterPanelSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
-
       if (!user) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");

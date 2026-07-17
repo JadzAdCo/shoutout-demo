@@ -12,7 +12,7 @@ const locations=window.SHOUTOUT_CLUB_LOCATIONS||{}, promoters=window.SHOUTOUT_PR
 let campaigns=[];
 function bind(id,fn){byId(id)?.addEventListener("click",fn);}
 async function loginGoogle(){try{setText("guestStatus","Opening Google sign-in...");await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){setText("guestStatus",`${e.code||"error"}: ${e.message}`);}}
-async function logout(){await auth.signOut();location.href="./?v=28.28-nf";}
+async function logout(){await auth.signOut();location.href="./?v=29.09.8&start=search";}
 function renderSelects(){
  const rl=qs("location"), rp=qs("promoter");
  byId("guestLocation").innerHTML=`<option value="">Select club/location</option>`+Object.entries(locations).map(([id,l])=>`<option value="${esc(id)}">${esc(l.locationName||l.name||id)}</option>`).join("");
@@ -44,5 +44,5 @@ async function submitGuestList(){
  setText("guestStatus","Guest list request submitted.");
  }catch(e){console.error(e);setText("guestStatus",`${e.code||"error"}: ${e.message}`);}
 }
-document.addEventListener("DOMContentLoaded",()=>{renderSelects();bind("guestGoogleLoginBtn",loginGoogle);bind("guestLogoutBtn",logout);bind("submitGuestListBtn",submitGuestList);bind("addGuestBtn",addGuestRow);byId("guestLocation")?.addEventListener("change",event=>loadCampaigns(event.currentTarget.value));byId("guestEventOrDay")?.addEventListener("change",event=>renderCampaignHero(campaigns.find(row=>row.id===event.currentTarget.value)||null));auth.onAuthStateChanged(u=>{setText("guestSignedInAs",u?`Signed in as ${u.displayName||u.email||u.uid}`:"Not signed in");if(!u){byId("guestLogin").classList.remove("hidden");byId("guestFormCard").classList.add("hidden");setText("guestStatus","Please sign in to continue.");return;}byId("guestLogin").classList.add("hidden");byId("guestFormCard").classList.remove("hidden");setText("guestStatus","Guest list app loaded.");loadProfile(u);});});
+document.addEventListener("DOMContentLoaded",()=>{renderSelects();bind("guestGoogleLoginBtn",loginGoogle);bind("submitGuestListBtn",submitGuestList);bind("addGuestBtn",addGuestRow);byId("guestLocation")?.addEventListener("change",event=>loadCampaigns(event.currentTarget.value));byId("guestEventOrDay")?.addEventListener("change",event=>renderCampaignHero(campaigns.find(row=>row.id===event.currentTarget.value)||null));auth.onAuthStateChanged(u=>{if(!u){byId("guestLogin").classList.remove("hidden");byId("guestFormCard").classList.add("hidden");setText("guestStatus","Please sign in to continue.");return;}byId("guestLogin").classList.add("hidden");byId("guestFormCard").classList.remove("hidden");setText("guestStatus","");loadProfile(u);});});
 })();

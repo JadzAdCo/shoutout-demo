@@ -128,7 +128,7 @@
     destination = addressOf(club);
     byId("pickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("pickupDestination").value = destination;
-    byId("pickupBackLink").href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    byId("pickupBackLink").href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
     const mapsUrl = new URL("https://www.google.com/maps/dir/");
     mapsUrl.searchParams.set("api", "1");
     mapsUrl.searchParams.set("origin", byId("pickupAddress").value || "My location");

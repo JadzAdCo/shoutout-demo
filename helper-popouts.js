@@ -37,14 +37,14 @@
   }
 
   function closeOtherPopouts(active = null) {
-    document.querySelectorAll("details.help-popout[open]").forEach(details => {
+    document.querySelectorAll("details.help-popout[open], details.mingl-action-details[open]").forEach(details => {
       if (details !== active) details.open = false;
     });
   }
 
   function bindDismissBehavior() {
     document.addEventListener("click", event => {
-      const openHelp = event.target.closest?.("details.help-popout");
+      const openHelp = event.target.closest?.("details.help-popout, details.mingl-action-details");
       if (!openHelp) {
         closeOtherPopouts(null);
         return;

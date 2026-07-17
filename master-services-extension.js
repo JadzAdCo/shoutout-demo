@@ -34,7 +34,7 @@
     const trackingUrl = document.querySelector(`[data-order-tracking-url="${CSS.escape(id)}"]`)?.value.trim() || "";
     await db.collection("serviceOrders").doc(id).set({shippingStatus, fulfillmentStatus:shippingStatus, shippingCarrier, trackingNumber, trackingUrl, updatedByUid:auth.currentUser.uid, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     const order = orders.find(row => row.id === id);
-    if (order?.ownerUid) await db.collection("inboxNotifications").add({recipientUid:order.ownerUid, type:"orderTracking", title:"FLOQR order update", body:`${order.invoiceNumber || id}: ${shippingStatus}${trackingNumber ? ` - ${trackingNumber}` : ""}`, link:trackingUrl || "./patron-portal.html?tab=paid-services&v=29.07", read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    if (order?.ownerUid) await db.collection("inboxNotifications").add({recipientUid:order.ownerUid, type:"orderTracking", title:"FLOQR order update", body:`${order.invoiceNumber || id}: ${shippingStatus}${trackingNumber ? ` - ${trackingNumber}` : ""}`, link:trackingUrl || "./patron-portal.html?tab=paid-services&v=29.09.8", read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     await load();
   }
 

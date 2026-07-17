@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "Bata"];
+  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR"];
   const AI_FLAGS = {
     enabled: () => window.FLOQR_AI_ENABLED === true,
     provider: () => window.FLOQR_AI_PROVIDER || "firebase-ai-logic",
@@ -23,7 +23,7 @@
     cars: ["cars", "fast cars", "luxury cars", "coupe", "ferrari", "rolls royce"],
     dc: ["dc", "washington dc", "washington district of columbia"],
     "washington dc": ["dc", "washington dc", "washington district of columbia"],
-    merch: ["merch", "merchandise", "apparel", "bata"],
+    merch: ["merch", "merchandise", "apparel", "bartr", "bart"],
     comedy: ["comedy", "comedy show", "comedian", "stand up"],
     club: ["club", "nightclub", "lounge", "nightlife"],
     ticket: ["ticket", "tickets", "entry", "ticketmaster", "eventbrite", "resale"],
@@ -193,7 +193,7 @@
     if (data.city && normalized.includes(normalizeQuery(data.city))) score += 3;
     if (data.country && normalized.includes(normalizeQuery(data.country))) score += 2;
     if ((record.sourceType || record.type || "").includes("template") && /template|background|birthday|flower|tattoo|video/.test(normalized)) score += 2;
-    if ((record.sourceType || record.type || "").includes("bata") && /bata|merch|market|apparel/.test(normalized)) score += 2;
+    if ((record.sourceType || record.type || "").includes("bartr") && /bartr|bart|merch|market|apparel/.test(normalized)) score += 2;
     if ((record.sourceType || record.type || "").includes("event") && /ticket|event|tonight|weekend|comedy|show/.test(normalized)) score += 2;
     return score;
   }
@@ -254,6 +254,29 @@
     return localContextualSearch(normalized, context);
   }
 
+  function fitSuggestedDisplayText(value = "", inputs = {}, type = "main") {
+    const caps = inputs.displayCaps || {};
+    const limit = Math.max(0, Number(type === "sub" ? inputs.subLimit || caps.sub || 60 : inputs.mainLimit || caps.main || 36));
+    const cleaned = restoreProtectedTerms(String(value || "").replace(/\s+/g, " ").trim());
+    if (type === "sub" || Number(caps.lineCount || 1) <= 1) return cleaned.slice(0, limit);
+    const maxRows = Math.max(1, Number(caps.lineCount || 1));
+    const perLine = Math.max(1, Number(caps.perLine || caps.maxCharactersPerLine || limit));
+    const words = cleaned.slice(0, limit + maxRows - 1).split(/\s+/).filter(Boolean);
+    const rows = [];
+    let row = "";
+    words.forEach(word => {
+      const chunks = [];
+      for (let i = 0; i < word.length; i += perLine) chunks.push(word.slice(i, i + perLine));
+      chunks.forEach(chunk => {
+        const next = row ? `${row} ${chunk}` : chunk;
+        if (next.length <= perLine) row = next;
+        else if (rows.length < maxRows) { rows.push(row); row = chunk; }
+      });
+    });
+    if (row && rows.length < maxRows) rows.push(row);
+    return rows.slice(0, maxRows).join("\n");
+  }
+
   function safeShoutOutSuggestion(inputs = {}) {
     const tone = normalizeQuery(inputs.tone || "party");
     const main = String(inputs.mainText || "").trim();
@@ -278,10 +301,9 @@
       (/(latin|reggaeton|salsa|bachata)/.test(context) && pool[2]) ||
       pool.find(item => context.includes(item.key)) ||
       pool[7];
-    const limit = Number(inputs.mainLimit || 36);
     const cleanMain = (main || picked.main).replace(/\b(?:tone|style)\s*:\s*[a-z0-9 /-]+\b/ig, "").replace(/[^a-zA-Z0-9 @!?.'-]/g, " ").replace(/\s+/g, " ").trim();
-    const mainText = restoreProtectedTerms(cleanMain).slice(0, limit);
-    const subText = restoreProtectedTerms(picked.sub).slice(0, Number(inputs.subLimit || 60));
+    const mainText = fitSuggestedDisplayText(cleanMain, inputs, "main");
+    const subText = fitSuggestedDisplayText(picked.sub, inputs, "sub");
     return {
       mainText,
       subText,
@@ -321,7 +343,7 @@
         mainLimit:Number(inputs.mainLimit || 36),
         subLimit:Number(inputs.subLimit || 60),
         displayCaps:inputs.displayCaps || {},
-        instruction:"Use tone, event type, venue genres, profile signals, and past ShoutOuts as guidance only. Do not prefix output with Tone:, Style:, Event:, or labels. Keep mainText within mainLimit and subText within subLimit.",
+        instruction:`Use tone, event type, venue genres, profile signals, and past ShoutOuts as guidance only. Do not prefix output with Tone:, Style:, Event:, or labels. Keep mainText within mainLimit and subText within subLimit. Main text must fit ${Number(inputs.displayCaps?.lineCount || 1)} line(s) with about ${Number(inputs.displayCaps?.perLine || inputs.displayCaps?.maxCharactersPerLine || inputs.mainLimit || 36)} characters per line.`,
         profileSignals:inputs.profileSignals || {},
         pastShoutouts:Array.isArray(inputs.pastShoutouts) ? inputs.pastShoutouts.slice(0, 12) : []
       });
@@ -331,8 +353,8 @@
       return {
         ...safeFallback,
         ...data,
-        mainText:restoreProtectedTerms(String(data.mainText || safeFallback.mainText || "").slice(0, Number(inputs.mainLimit || 36))),
-        subText:restoreProtectedTerms(String(data.subText || safeFallback.subText || "").slice(0, Number(inputs.subLimit || 60))),
+        mainText:fitSuggestedDisplayText(data.mainText || safeFallback.mainText || "", inputs, "main"),
+        subText:fitSuggestedDisplayText(data.subText || safeFallback.subText || "", inputs, "sub"),
         providerMode:data.provider || data.providerMode || "gemini"
       };
     } catch (error) {

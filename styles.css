@@ -132,6 +132,12 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 
 /* v28.29-nf FLOQR + Mingl product surfaces */
 .category-card.mingl-card{background:linear-gradient(90deg,#101724,#263b63 48%,#f43abf);color:#fff;border-color:rgba(38,216,255,.55)}
+/* BartR — featured marketplace tile (larger than other Search categories) */
+a.category-card.bartr-card{display:flex;align-items:center;justify-content:center;grid-column:1/-1;min-height:92px!important;padding:10px 14px!important;text-decoration:none;background:#0a1224;border:1px solid rgba(255,79,200,.28);box-shadow:0 16px 48px rgba(0,0,0,.35)}
+a.category-card.bartr-card:hover{transform:translateY(-1px);border-color:rgba(223,255,90,.45)}
+a.category-card.bartr-card .bartr-card-icon{display:block;width:auto;height:76px;max-width:min(340px,92vw);object-fit:contain}
+@media(max-width:520px){a.category-card.bartr-card{min-height:84px!important;padding:8px 10px!important}a.category-card.bartr-card .bartr-card-icon{height:68px;max-width:min(300px,94vw)}}
+@media(min-width:521px){a.category-card.bartr-card{min-height:108px!important}a.category-card.bartr-card .bartr-card-icon{height:88px}}
 .product-brand-stack{display:grid;justify-items:start;gap:6px;width:100%;max-width:1120px;margin:4px 0 8px}.product-parent-logo{display:block;justify-self:center;width:min(220px,50vw);max-height:72px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
 .product-logo{display:block;width:min(420px,88vw);max-height:220px;object-fit:contain;margin:10px 0 18px;filter:drop-shadow(0 0 18px rgba(38,216,255,.48))}
 .product-logo.small-logo{width:min(330px,82vw);max-height:130px}

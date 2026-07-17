@@ -58,6 +58,19 @@
     else run();
   }
 
+  function bindDismissBehavior() {
+    if (window.__FLOQR_ACTION_FEEDBACK_DISMISS__) return;
+    window.__FLOQR_ACTION_FEEDBACK_DISMISS__ = true;
+    document.addEventListener("click", event => {
+      const overlay = document.getElementById("floqrActionFeedbackOverlay");
+      if (!overlay || overlay.classList.contains("hidden")) return;
+      if (event.target === overlay) hide();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") hide();
+    });
+  }
+
   async function run(messages = {}, action) {
     const returnTo = messages.returnTo || messages.page || "the previous page";
     show(messages.starting || "Working...", messages.wait || "Please wait a few seconds.");
@@ -74,6 +87,7 @@
   }
 
   markDeviceMode();
+  bindDismissBehavior();
   window.addEventListener("resize", markDeviceMode, {passive:true});
   window.addEventListener("orientationchange", markDeviceMode, {passive:true});
 

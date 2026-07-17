@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.1"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
 </head>
 <body>
 
@@ -255,6 +255,9 @@
       <div class="category-or">Or</div>
       <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
       <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
+      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.8&from=search" aria-label="Open BartR marketplace">
+        <img class="bartr-card-icon" src="./images/bartr-icon.png?v=29.09.8" alt="BartR" width="320" height="96" decoding="async"/>
+      </a>
     </div>
   </section>
 
@@ -265,7 +268,7 @@
         <p class="eyebrow">Screen 2A - ShoutOut Landing</p>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./shoutout-logo.png?v=29.05" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.05'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
+          <img src="./shoutout-logo.png?v=29.09.8" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.8'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
         <h1>Throw a ShoutOut</h1>
@@ -575,7 +578,7 @@
       <p class="eyebrow">Screen 6 — ShoutOut Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
       <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
       <p id="confirmationRedirectStatus" class="status">Choose your next step.</p>
-      <div class="button-row confirmation-actions"><button id="editSubmittedShoutoutBtn" class="primary" type="button">Edit ShoutOut</button><button id="confirmGoMinglBtn" type="button">Mingl</button><button id="confirmGoBataBtn" type="button">Bata</button></div>
+      <div class="button-row confirmation-actions"><button id="editSubmittedShoutoutBtn" class="primary" type="button">Edit ShoutOut</button><button id="confirmGoMinglBtn" type="button">Mingl</button><button id="confirmGoBartrBtn" type="button">BartR</button></div>
     </div>
   </section>
 </main>
@@ -585,25 +588,26 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.05"></script>
-<script src="./global-profile-status.js?v=29.05.1"></script>
-<script src="./shared-data.js?v=29.09.6"></script>
-<script src="./ai-service.js?v=29.05"></script>
-<script src="./ai-index-service.js?v=28.44-ai"></script>
-<script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-location-service.js?v=29.05"></script>
-<script src="./ai-notification-service.js?v=28.44-ai"></script>
-<script src="./ai-template-studio.js?v=29.09.0"></script>
-<script src="./floqr-action-feedback.js?v=29.05"></script>
-<script src="./ai-grammar-service.js?v=29.05"></script>
-<script src="./helper-popouts.js?v=29.05"></script>
-<script src="./ad-campaigns.js?v=29.05"></script>
-<script src="./floqr-identity.js?v=29.09.6"></script>
-<script src="./floqr-logger.js?v=29.09.6"></script>
-<script src="./payment-service.js?v=29.09.6"></script>
-<script src="./patron-app.js?v=29.09.6"></script>
-<script src="./ai-assistant-ui.js?v=28.44-ai"></script>
-<script src="./ai-media-service.js?v=29.05"></script>
-<script src="./notification-center.js?v=29.05"></script>
+<script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./shared-data.js?v=29.09.8"></script>
+<script src="./ai-service.js?v=29.09.8"></script>
+<script src="./ai-index-service.js?v=29.09.8"></script>
+<script src="./ai-search-service.js?v=29.09.8"></script>
+<script src="./ai-location-service.js?v=29.09.8"></script>
+<script src="./ai-notification-service.js?v=29.09.8"></script>
+<script src="./ai-template-studio.js?v=29.09.8"></script>
+<script src="./floqr-action-feedback.js?v=29.09.8"></script>
+<script src="./ai-grammar-service.js?v=29.09.8"></script>
+<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./ad-campaigns.js?v=29.09.8"></script>
+<script src="./floqr-identity.js?v=29.09.8"></script>
+<script src="./floqr-logger.js?v=29.09.8"></script>
+<script src="./payment-service.js?v=29.09.8"></script>
+<script src="./patron-app.js?v=29.09.8"></script>
+<script src="./ai-assistant-ui.js?v=29.09.8"></script>
+<script src="./ai-media-service.js?v=29.09.8"></script>
+<script src="./notification-center.js?v=29.09.8"></script>
 </body>
 </html>

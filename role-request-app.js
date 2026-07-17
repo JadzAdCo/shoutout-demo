@@ -124,7 +124,6 @@
   });
 
   auth.onAuthStateChanged(user => {
-    setText("roleSignedInAs", user ? `Signed in as ${user.email || user.phoneNumber || "patron"}` : "Not signed in");
     setText("roleStatus", user ? "Choose the access type you want to request." : "Please sign in.");
     byId("roleLogin")?.classList.toggle("hidden", !!user);
     byId("roleForm")?.classList.toggle("hidden", !user);

@@ -4,19 +4,18 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Request Club Service Access</title>
-  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a class="global-back-btn buttonlike" href="./patron-portal.html?v=28.43-f">← Back to My Profile</a>
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=29.09.8">&larr; Back to My Profile and Settings</a>
   <section class="page active">
     <header class="topbar">
       <div>
         <p class="eyebrow">Role Request</p>
         <h1>Request additional access</h1>
         <p class="sub">All users start as patrons. Elect yourself as a service member and request association with one or more clubs.</p>
-        <p id="roleSignedInAs" class="status">Not signed in</p>
         <p id="roleStatus" class="status">Loading...</p>
       </div>
     </header>
@@ -54,11 +53,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./global-profile-status.js?v=29.03"></script>
-<script src="./shared-data.js?v=29.07"></script>
-<script src="./floqr-action-feedback.js?v=29.04"></script>
-<script src="./role-request-app.js?v=29.07"></script>
-<script src="./profile-access-guard.js?v=29.04"></script>
+<script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./shared-data.js?v=29.09.8"></script>
+<script src="./floqr-action-feedback.js?v=29.09.8"></script>
+<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./role-request-app.js?v=29.09.8"></script>
+<script src="./profile-access-guard.js?v=29.09.8"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const back = document.getElementById("floqrGlobalBack");
+    if (back && !new URLSearchParams(location.search).get("from")) back.dataset.from = "portal";
+    window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
+  });
+</script>
 </body>
 </html>

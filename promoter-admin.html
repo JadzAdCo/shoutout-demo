@@ -4,10 +4,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Promoter Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.04"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
 <body>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
 <main class="app admin-shell">
   <section class="page active">
     <header class="topbar">
@@ -15,7 +16,6 @@
         <p class="eyebrow">Promoter Admin</p>
         <h1>Promoter Referral Dashboard</h1>
         <p class="sub">Track patron app signup referrals and guest list referrals by period and club.</p>
-        <p id="promoterSignedInAs" class="status">Not signed in</p>
         <p id="promoterStatus" class="status">Loading promoter admin...</p>
       </div>
     </header>
@@ -28,11 +28,9 @@
     <div id="promoterPanel" class="hidden">
       <div class="card account-status-card">
         <div>
-          <p class="eyebrow">Account Status</p>
-          <strong id="promoterPanelSignedInAs">Signed in</strong>
+          <p class="eyebrow">Access</p>
           <p id="promoterAccessSummary" class="sub small">Access pending...</p>
         </div>
-        <button id="promoterLogoutBtn" class="ghost" type="button">Sign out</button>
       </div>
 
       <div class="card">
@@ -68,11 +66,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./global-profile-status.js?v=29.03"></script>
-<script src="./shared-data.js?v=28.80-location-template-ai"></script>
-<script src="./promoter-admin-app.js?v=28.43-f"></script>
-<script src="./notification-center.js?v=28.43-f"></script>
-<script src="./profile-access-guard.js?v=29.04"></script>
+<script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./shared-data.js?v=29.09.8"></script>
+<script src="./floqr-action-feedback.js?v=29.09.8"></script>
+<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./promoter-admin-app.js?v=29.09.8"></script>
+<script src="./notification-center.js?v=29.09.8"></script>
+<script src="./profile-access-guard.js?v=29.09.8"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+</script>
 </body>
 </html>

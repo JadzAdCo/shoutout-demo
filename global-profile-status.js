@@ -57,9 +57,10 @@
     const c = await counts(db, user.uid);
     dropdown.innerHTML = `<strong>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</strong>
       <small>${esc(user.email || "")}</small>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=profile">My Profile</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages">FLOQR Inbox (${esc(c.messages)})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html">Mingl Chat (${esc(c.chats)})</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=profile&v=29.09.8">My Profile and Settings</a>
+      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=29.09.8">FLOQR Inbox (${esc(c.messages)})</a>
+      <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat (${esc(c.chats)})</a>
+      <a class="profile-menu-link" href="./commerce.html?v=29.09.8&from=search">BartR</a>
       <button id="floqrGlobalSignOutBtn" type="button">Sign out</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
   }

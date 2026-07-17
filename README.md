@@ -1,4 +1,31 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.08.2 Full Package
+# CURRENT PACKAGE: FLOQR ShoutOut v29.09.8 (workspace)
+
+**After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
+
+## v29.09.8 highlights (publish when approved)
+
+- **BartR** shared ecommerce frontend (barter + swag). Larger Search icon tile → `commerce.html`. US sellers manage products in My Profile → BartR Store. FloqR MoR; vendor ships.
+- Contextual Back (`floqr-nav.js`): satellites → Profile and Settings; portals → Search (`?start=search`).
+- Diagnostics package `v29.09.8` + live step-by-step tests in `STANDARD-AFTER-DEPLOYMENT.md`.
+- Help / command popouts dismiss on outside click and Escape; profile status wired on BartR and other interactive pages.
+
+Current live test URL after upload:
+
+```text
+https://jadzadco.github.io/shoutout-demo/?v=29.09.8&start=search
+```
+
+v29.09.8 focused manual tests:
+
+1. Search BartR tile size + icon → BartR → Back to Search.
+2. Portal → Mingl/Services/BartR (`from=portal`) → Back to Profile and Settings.
+3. US BartR seller: enable store, Save (popout), publish product (popout), find on marketplace.
+4. Fix Grammar personal corrections (`watz -> what's`) on Mingl Chat.
+5. `?` help dismiss; profile pill on interactive pages; Master Admin Diagnostics for `v29.09.8`.
+
+---
+
+# Prior package notes (v29.08.2 and earlier)
 
 Stripe implementation planning and test-mode deployment: see `STRIPE-INTEGRATION-PLAN.md` and `STRIPE-DEPLOYMENT.md`. v29.08 adds trusted Accounts v2 recipient onboarding, backend-only club/member bindings, transfer-capability checks before destination charges, removal of manual `acct_...` browser fields, seller-scoped products, private order access, transactional inventory holds, refund/dispute webhook tracking, protected webhook/account records, and focused Connect/rules tests. Do not enable live marketplace payments until the merchant-of-record, fee, authenticated refund/transfer-reversal, and tax gates in the plan are complete.
 
@@ -18,7 +45,7 @@ Deployment and authentication setup: see `DEPLOYMENT-V29-08.md`. Rollback instru
 
 This ZIP is a full web app package for upload to the GitHub repo root.
 
-Current live test URL after upload:
+Current live test URL after upload (superseded by v29.09.8 header above when published):
 
 ```text
 https://jadzadco.github.io/shoutout-demo/?v=29.08.2
