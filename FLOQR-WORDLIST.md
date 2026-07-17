@@ -42,6 +42,8 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Help popout (?)** | Inline help control explaining field rules (e.g. FloqR handle charset) | Toast |
 | **Marketplace** | Place patrons buy/sell goods and services | Club ShoutOut commerce share |
 | **BartR** | Shared FloqR ecommerce **frontend** (name from **barter** + swag). Amazon/eBay-style discovery + checkout. One site for all shoppers. Formerly drafted as “Bata” — use **BartR** only. | Per-vendor seller backend; ShoutOut |
+| **RydR** | FloqR **mobility** product (ride). Robotaxi path (existing Pickup simulation) + Ultra Luxury chauffeur rides. Plain-language Search (“book a ride”) routes here. Casing: **RydR**. | Generic taxi; unbranded Pickup-only |
+| **Ask FloqR / Intent Search** | Alternate Search: Patron Status card + FloqR logo + plain-language wish box (“In plain words, what do you wish to accomplish”). Routes to Mingl, RydR, BartR, ShoutOut, venues. `?start=intent` | Classic category tile Search only |
 | **BartR seller backend** | Per patron/service (US only) tools in My Profile: products, store info, contact, binding refund policy, fulfillment | Shared BartR frontend |
 | **Vendor** | US-based patron or service member selling through BartR; **ships** the item after FloqR payment | FloqR MoR / checkout |
 | **Vendor category** | Goods type: electronics, clothes, jewelry, arts, services, or multi | Stripe product type only |

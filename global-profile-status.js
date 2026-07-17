@@ -59,8 +59,10 @@
       <small>${esc(user.email || "")}</small>
       <a class="profile-menu-link" href="./patron-portal.html?tab=profile&v=29.09.8">My Profile and Settings</a>
       <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=29.09.8">FLOQR Inbox (${esc(c.messages)})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat (${esc(c.chats)})</a>
-      <a class="profile-menu-link" href="./commerce.html?v=29.09.8&from=search">BartR</a>
+      <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.9&from=portal">Mingl Chat (${esc(c.chats)})</a>
+      <a class="profile-menu-link" href="./commerce.html?v=29.09.9&from=search">BartR</a>
+      <a class="profile-menu-link" href="./rydr.html?v=29.09.9&from=search">RydR</a>
+      <a class="profile-menu-link" href="./?v=29.09.9&start=intent">Ask FloqR</a>
       <button id="floqrGlobalSignOutBtn" type="button">Sign out</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
   }

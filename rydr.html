@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>RydR | FLOQR</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.9"/>
+</head>
+<body>
+<main class="app admin-shell rydr-shell">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.9&start=intent">&larr; Back to Search</a>
+  <section class="page active">
+    <header class="topbar commerce-hero">
+      <div>
+        <p class="eyebrow">FLOQR · Mobility</p>
+        <div class="product-brand-stack">
+          <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+          <img src="./images/rydr-logo.png?v=29.09.9-merge9" alt="RydR" class="product-logo rydr-hero-logo"/>
+        </div>
+        <h1 class="visually-hidden brand-mixed-case">RydR</h1>
+        <p class="sub">Robotaxi convenience and ultra-luxury chauffeur rides — get to the club, lounge, or event without the parking theater.</p>
+      </div>
+      <div class="card commerce-payment-card">
+        <strong>Two modes</strong>
+        <p class="sub small"><strong>Robotaxi</strong> for autonomous/sim hail. <strong>Ultra Luxury</strong> for chauffeur-class arrivals. FloqR coordinates the experience; payment model TBD.</p>
+      </div>
+    </header>
+
+    <div class="product-action-row rydr-action-row">
+      <a class="category-card rydr-card" href="./pickup.html?v=29.09.9&from=search">Robotaxi simulation</a>
+      <button id="rydrLuxurySoonBtn" class="category-card" type="button">Ultra Luxury (preview)</button>
+    </div>
+    <p id="rydrStatus" class="status" aria-live="polite"></p>
+    <div class="card">
+      <h2>What RydR is</h2>
+      <p class="sub">RydR is FloqR’s mobility product: ride intents from plain-language Search (“book a ride”) land here. The existing Pickup robotaxi simulation is the Robotaxi path; Ultra Luxury chauffeur booking is next.</p>
+    </div>
+  </section>
+</main>
+<script src="./floqr-nav.js?v=29.09.9"></script>
+<script src="./global-profile-status.js?v=29.09.9"></script>
+<script>
+  window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
+  document.getElementById("rydrLuxurySoonBtn")?.addEventListener("click", () => {
+    const el = document.getElementById("rydrStatus");
+    if (el) el.textContent = "Ultra Luxury chauffeur booking is queued for the next RydR slice — Robotaxi simulation is available now.";
+  });
+</script>
+</body>
+</html>

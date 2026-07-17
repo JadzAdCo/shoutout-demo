@@ -1,1 +1,0 @@
-Upload/replace index.html, app.js, styles.css. v13 removes inline onclick handlers and the inline startup script. Buttons are wired in app.js after DOMContentLoaded. This helps when CSP/browser settings block inline JavaScript.

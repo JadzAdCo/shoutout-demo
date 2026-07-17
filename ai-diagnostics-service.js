@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.8 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.9 */
 (function () {
   "use strict";
 
@@ -31,7 +31,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.8";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -862,10 +862,49 @@
         {label:"BartR MoR checkout (no destination charge)", file:"functions/commerce-functions.js", includes:["paymentModel:\"floqr-platform\"", "marketplace:\"bartr\"", "type !== \"commerce\""]},
         {label:"Script cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.8"]}
       ]
+    },
+    {
+      version:"v29.09.9",
+      title:"BartR mark polish + Ask FloqR intent Search + RydR",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.9\""]},
+        {label:"Trade by BartR Search tile", file:"index.html", includes:["Trade by BartR", "bartrBtnCard", "intentSearchPage"]},
+        {label:"BartR overlay mark (transparent graphics)", file:"commerce.html", includes:["bartr-mark", "bartr-icon-transparent.png", "bartr-mark-word"]},
+        {label:"Intent Search router", file:"intent-search.js", includes:["FLOQRIntentSearch", "In plain words", "rydr"]},
+        {label:"Ask FloqR start route", file:"floqr-nav.js", includes:["start=intent", "intentSearchPage", "APP_V = \"29.09.9\""]},
+        {label:"RydR landing + approved mark", file:"rydr.html", includes:["RydR", "rydr-logo.png", "Robotaxi"]},
+        {label:"RydR wordlist entry", file:"FLOQR-WORDLIST.md", includes:["**RydR**", "Ask FloqR / Intent Search"]},
+        {label:"Script cache bust", file:"index.html", includes:["intent-search.js?v=29.09.9", "patron-app.js?v=29.09.9"]},
+        {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.9", "floqr-nav.js?v=29.09.9"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-9-ask-floqr-intent-search",
+      area:"Search",
+      feature:"Ask FloqR plain-language intent Search",
+      changed:"Alternate Search (?start=intent) shows Patron Status card + FloqR logo + wish box. Routes meet/social → Mingl, ride/taxi → RydR, trade/shop → BartR, shout/display → ShoutOut.",
+      howToTest:"Open ?v=29.09.9&start=intent. Confirm help text and type 'I want to meet someone' → Mingl result; 'book a ride' → RydR. From classic Search, Ask FloqR tile opens intent page.",
+      expected:"Intent matches open the right product. Classic category Search remains available."
+    },
+    {
+      id:"v29-09-9-rydr-mobility",
+      area:"RydR",
+      feature:"RydR landing with approved mark + Robotaxi path",
+      changed:"RydR product landing uses approved merge mark (#4 car/text + #7 black/yellow road). Robotaxi links to Pickup simulation; Ultra Luxury is preview-queued.",
+      howToTest:"Open rydr.html?v=29.09.9&from=search. Confirm RydR mark, Robotaxi simulation link to pickup.html, and Back to Search.",
+      expected:"RydR page loads with mark; Robotaxi opens Pickup sim; no payment/dispatch claims beyond simulation banner on Pickup."
+    },
+    {
+      id:"v29-09-9-bartr-trade-tile-mark",
+      area:"BartR",
+      feature:"Trade by BartR Search tile + transparent overlay mark",
+      changed:"Search tile label is Trade by BartR (same size as Mingl/ShoutOut). Commerce hero uses transparent BartR overlay mark with large wordmark.",
+      howToTest:"Open ?v=29.09.9&start=search → Trade by BartR tile. Open commerce.html and confirm BartR mark (no navy plate behind wordmark).",
+      expected:"Tile reads Trade by BartR and aligns with siblings. Hero shows pink/lime graphics + BartR text."
+    },
     {
       id:"v29-09-8-bartr-marketplace",
       area:"BartR",

@@ -366,6 +366,7 @@
     }
     setText("dropdownUserName", displayName);
     setText("dropdownUserEmail", email);
+    window.FLOQRIntentSearch?.syncPatronCard(user, cachedUserProfile || {});
   }
 
   function toggleUserDropdown(event) {
@@ -1274,7 +1275,7 @@
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
       link:"./patron-portal.html?tab=inbox&v=29.09.8",
-      minglLink:"./mingl-chat.html?v=29.09.8",
+      minglLink:"./mingl-chat.html?v=29.09.9",
       read:false,
       createdAt:now
     };
@@ -1338,6 +1339,9 @@
     showPage("minglLandingPage");
     await loadMingl();
   }
+
+  window.showShoutoutLanding = showShoutoutLanding;
+  window.showMinglLanding = showMinglLanding;
 
   function focusMinglPeopleSearch() {
     const search = byId("minglSearch");
@@ -2518,7 +2522,7 @@
   function goToBartrFromConfirmation() {
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
     confirmationReturnTimer = null;
-    window.location.href = "./commerce.html?v=29.09.8&from=search";
+    window.location.href = "./commerce.html?v=29.09.9&from=search";
   }
 
   function editSubmittedShoutout() {
@@ -3213,7 +3217,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.8";
+      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -3233,7 +3237,7 @@
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.8&from=portal";
+      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -3379,6 +3383,10 @@
     byId("shoutoutScreenFormat")?.addEventListener("change", event => { selectedScreenFormatId = event.currentTarget.value; updateMediaEditorForTemplate(); schedulePersonalizedShoutOutRecommendations(); updatePreview(); });
     ["mainText","subText","mediaUrl","shoutoutMediaUrl","shoutoutMediaType","shoutoutMediaFit"].forEach(id => byId(id)?.addEventListener("input", updatePreview));
     bindFootballTeamEditor();
+    window.FLOQRIntentSearch?.bindIntentSearch({
+      onShoutout: () => showShoutoutLanding(),
+      onMingl: () => showMinglLanding()
+    });
     window.FLOQRNav?.applyStartPage(showPage);
   });
 
@@ -3438,10 +3446,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.8"}">My Profile and Settings</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9"}">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
       <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.8&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 

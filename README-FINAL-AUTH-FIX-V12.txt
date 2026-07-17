@@ -1,1 +1,0 @@
-Upload/replace index.html, app.js, styles.css. Keep firebase-config.js, admin.html, display.html, seed.html, and images/ShoutOut-logo.png. OAuth now uses redirect sign-in for Google/Microsoft/Facebook.
