@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.8";
+  const APP_V = "29.09.9";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
@@ -73,12 +73,16 @@
       anchor.textContent = target.label;
       return target;
     },
-    /** Call after DOM ready on index.html to honor ?start=search|mingl */
+    /** Call after DOM ready on index.html to honor ?start=search|mingl|intent */
     applyStartPage(showPage) {
       if (typeof showPage !== "function") return;
       const start = String(qs("start") || "").toLowerCase();
-      if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
+      if (start === "intent" || start === "ask" || start === "wish") showPage("intentSearchPage");
+      else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
       else if (start === "mingl") showPage("minglLandingPage");
+    },
+    intentSearchHome() {
+      return `./?v=${APP_V}&start=intent`;
     }
   };
 

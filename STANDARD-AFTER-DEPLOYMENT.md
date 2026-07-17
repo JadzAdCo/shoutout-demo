@@ -89,23 +89,23 @@ Any in-place command (Save, Publish, Deactivate, Accept/Deny, Connect refresh, e
 
 ## How to test current features (live links)
 
-Replace `29.09.8` with the package you just published if different.
+Replace `29.09.9` with the package you just published if different.
 
 ### A. Search screen + BartR entry
 
-1. Open [Search (category page)](https://jadzadco.github.io/shoutout-demo/?v=29.09.8&start=search) (sign in if needed).
+1. Open [Search (category page)](https://jadzadco.github.io/shoutout-demo/?v=29.09.9&start=search) (sign in if needed).
 2. Confirm **BartR** appears as a **larger** tile under ShoutOut / Mingl with the BartR icon.
-3. Tap BartR → [BartR storefront](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.8&from=search).
+3. Tap BartR → [BartR storefront](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.9&from=search).
 4. Confirm Back says **Back to Search** (not welcome).
 5. Confirm top-right **profile status** pill is present.
 
 ### B. Contextual Back (portal satellites)
 
-1. Open [My Profile and Settings](https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=29.09.8).
+1. Open [My Profile and Settings](https://jadzadco.github.io/shoutout-demo/patron-portal.html?v=29.09.9).
 2. Confirm **no** duplicate “Signed in as…” / Account card under the title (identity is the top-right pill).
-3. Open [Mingl Chat from portal](https://jadzadco.github.io/shoutout-demo/mingl-chat.html?v=29.09.8&from=portal) → Back → Profile and Settings.
-4. Open [Follow Services](https://jadzadco.github.io/shoutout-demo/services.html?v=29.09.8&from=portal) → Back → Profile and Settings.
-5. Open [BartR from portal](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.8&from=portal) → Back → Profile and Settings.
+3. Open [Mingl Chat from portal](https://jadzadco.github.io/shoutout-demo/mingl-chat.html?v=29.09.9&from=portal) → Back → Profile and Settings.
+4. Open [Follow Services](https://jadzadco.github.io/shoutout-demo/services.html?v=29.09.9&from=portal) → Back → Profile and Settings.
+5. Open [BartR from portal](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.9&from=portal) → Back → Profile and Settings.
 6. From Profile and Settings, Back → Search (`start=search`).
 
 ### C. BartR seller backend (US only)
@@ -113,12 +113,12 @@ Replace `29.09.8` with the package you just published if different.
 1. In Profile → **My Profile**, set Country to **United States**, enable **BartR seller store**, set store name / contact / refund policy, **Save Profile** (expect success popout).
 2. Open tab **BartR Store** (`?tab=bartr`).
 3. Publish a test product → expect success popout; product listed.
-4. Open [BartR marketplace](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.8&from=search) signed in → product appears (may be shuffled).
+4. Open [BartR marketplace](https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.9&from=search) signed in → product appears (may be shuffled).
 5. Optional Stripe test checkout (marks test payment). Vendor ships; FloqR is MoR.
 
 ### D. Fix Grammar (personal dictionary)
 
-1. [Language Settings](https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=language&v=29.09.8).
+1. [Language Settings](https://jadzadco.github.io/shoutout-demo/patron-portal.html?tab=language&v=29.09.9).
 2. Under **My Personal Corrections** add:
 
    ```text
@@ -127,7 +127,7 @@ Replace `29.09.8` with the package you just published if different.
    ```
 
 3. Save (expect acknowledgement popout).
-4. Open [Mingl Chat](https://jadzadco.github.io/shoutout-demo/mingl-chat.html?v=29.09.8&from=portal).
+4. Open [Mingl Chat](https://jadzadco.github.io/shoutout-demo/mingl-chat.html?v=29.09.9&from=portal).
 5. Type a draft with those words → **Correct Grammar/Spelling** (or Fix Grammar).
 6. Expect Gemini first; if unavailable, only personal corrections apply. Word List entries must not be “fixed away.”
 
@@ -140,13 +140,13 @@ Replace `29.09.8` with the package you just published if different.
 
 ### F. Club / Master Admin Back + profile pill
 
-1. [Club Admin](https://jadzadco.github.io/shoutout-demo/admin.html?v=29.09.8) → Back to Search; profile pill visible.
-2. [Master Admin](https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.8) → Diagnostics for current package; profile pill visible.
+1. [Club Admin](https://jadzadco.github.io/shoutout-demo/admin.html?v=29.09.9) → Back to Search; profile pill visible.
+2. [Master Admin](https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.9) → Diagnostics for current package; profile pill visible.
 
 ### G. Master Admin Diagnostics
 
-1. [Master Admin Diagnostics](https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.8) → open **Diagnostics**.
-2. **Run Diagnostics** for package `v29.09.8` (or current).
+1. [Master Admin Diagnostics](https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.9) → open **Diagnostics**.
+2. **Run Diagnostics** for package `v29.09.9` (or current).
 3. Walk the **manual feature tests** listed for BartR, navigation, and grammar.
 
 ---

@@ -132,13 +132,62 @@ button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
 
 /* v28.29-nf FLOQR + Mingl product surfaces */
 .category-card.mingl-card{background:linear-gradient(90deg,#101724,#263b63 48%,#f43abf);color:#fff;border-color:rgba(38,216,255,.55)}
-/* BartR — featured marketplace tile (larger than other Search categories) */
-a.category-card.bartr-card{display:flex;align-items:center;justify-content:center;grid-column:1/-1;min-height:92px!important;padding:10px 14px!important;text-decoration:none;background:#0a1224;border:1px solid rgba(255,79,200,.28);box-shadow:0 16px 48px rgba(0,0,0,.35)}
-a.category-card.bartr-card:hover{transform:translateY(-1px);border-color:rgba(223,255,90,.45)}
-a.category-card.bartr-card .bartr-card-icon{display:block;width:auto;height:76px;max-width:min(340px,92vw);object-fit:contain}
-@media(max-width:520px){a.category-card.bartr-card{min-height:84px!important;padding:8px 10px!important}a.category-card.bartr-card .bartr-card-icon{height:68px;max-width:min(300px,94vw)}}
-@media(min-width:521px){a.category-card.bartr-card{min-height:108px!important}a.category-card.bartr-card .bartr-card-icon{height:88px}}
+/* BartR Search tile — same size as Mingl / ShoutOut; pink→lime from brand mark */
+a.category-card.bartr-card{display:grid;place-items:center;text-align:center;text-decoration:none;color:#06101c;font-weight:1000;background:linear-gradient(90deg,#ff4fc9 0%,#ff64d8 42%,#dfff5a 100%);border-color:rgba(223,255,90,.45)}
+a.category-card.bartr-card:hover{transform:translateY(-1px);filter:brightness(1.04)}
+a.category-card.rydr-card{display:grid;place-items:center;text-align:center;text-decoration:none;color:#e8f7ff;font-weight:1000;background:linear-gradient(90deg,#0a1628 0%,#14304f 45%,#3de7ff 100%);border-color:rgba(61,231,255,.45)}
+a.category-card.rydr-card:hover{transform:translateY(-1px);filter:brightness(1.06)}
+a.category-card.intent-card{display:grid;place-items:center;text-align:center;text-decoration:none;color:#06101c;font-weight:1000;background:linear-gradient(90deg,#d4b483 0%,#f0e2c4 48%,#3de7ff 100%);border-color:rgba(212,180,131,.5)}
+.product-logo.rydr-hero-logo{width:min(280px,70vw);max-height:160px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(61,231,255,.35))}
+.rydr-shell .rydr-action-row{max-width:720px;margin-bottom:16px}
+/* Intent / plain-language Search */
+.intent-search-page .intent-search-shell{display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr);gap:22px;align-items:start;max-width:980px;margin:8px auto 24px;padding:8px 4px}
+.intent-patron-status{display:grid;gap:8px;padding:16px}
+.intent-patron-status .eyebrow{margin:0}
+.intent-patron-links{display:grid;gap:8px;margin-top:8px}
+.intent-patron-links a{color:var(--accent);font-weight:800;text-decoration:none}
+.intent-patron-links a:hover{text-decoration:underline}
+.intent-search-main{display:grid;justify-items:center;gap:14px;padding:12px 8px 24px;text-align:center}
+.intent-floqr-logo{width:min(320px,78vw);max-height:110px;object-fit:contain;filter:drop-shadow(0 12px 28px rgba(0,0,0,.35))}
+.intent-search-label{display:grid;gap:10px;width:min(560px,94vw);text-align:left}
+.intent-help{color:#fff;font-size:clamp(18px,3.2vw,24px);font-weight:900;letter-spacing:-.02em;line-height:1.25}
+.intent-search-label input{width:100%;min-height:56px;border-radius:16px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font-size:17px;padding:14px 16px}
+.intent-search-label input::placeholder{color:rgba(255,255,255,.45)}
+.intent-hint{margin:0;max-width:560px}
+.intent-search-results{display:grid;gap:10px;width:min(560px,94vw);justify-items:stretch}
+.intent-result-card{display:grid;gap:4px;text-align:left;text-decoration:none;color:inherit;padding:14px 16px;transition:transform .15s ease,border-color .15s ease}
+.intent-result-card:hover{transform:translateY(-1px);border-color:rgba(61,231,255,.55)}
+.intent-result-card strong{font-size:18px}
+.intent-result-card span{color:var(--muted);font-size:14px}
+.intent-result-empty{text-align:left}
+@media(max-width:720px){.intent-search-page .intent-search-shell{grid-template-columns:1fr}.intent-patron-status{order:2}.intent-search-main{order:1}}
 .product-brand-stack{display:grid;justify-items:start;gap:6px;width:100%;max-width:1120px;margin:4px 0 8px}.product-parent-logo{display:block;justify-self:center;width:min(220px,50vw);max-height:72px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
+.product-logo.bartr-hero-logo{width:min(420px,88vw);max-height:140px;color:#ffffff;filter:drop-shadow(0 0 14px rgba(255,79,201,.28))}
+/* BartR hero mark: transparent canvas; graphics/text ratio fixed; overall ~90% of prior */
+.bartr-mark{
+  position:relative;width:min(252px,65vw);aspect-ratio:1;isolation:isolate;
+  margin:6px 0 10px;background:transparent!important;border:0;box-shadow:none;
+  filter:drop-shadow(0 0 14px rgba(255,79,201,.28));
+}
+.bartr-mark .bartr-mark-gfx{
+  position:absolute;inset:0;display:grid;place-items:center;
+  transform:scale(.704);transform-origin:center center;background:transparent;
+}
+.bartr-mark .bartr-mark-gfx img{width:100%;height:100%;object-fit:contain;display:block;background:transparent}
+.bartr-mark .bartr-mark-word{
+  position:absolute;inset:0;display:grid;place-items:center;z-index:2;
+  margin:0;padding:0;border:0;background:transparent!important;
+  color:#fff;font-family:"Arial Black",Impact,"Segoe UI Black",sans-serif;
+  font-weight:900;font-size:clamp(38px,11vw,50px);letter-spacing:-.04em;
+  text-transform:none!important;pointer-events:none;line-height:1;
+  text-shadow:none;box-shadow:none;
+}
+.bartr-mark.on-light .bartr-mark-word{color:#06101c}
+.bartr-shell .commerce-hero .bartr-mark{justify-self:start}
+/* Light / white surfaces: BartR wordmark reads black */
+.bartr-logo-on-light,.card .bartr-hero-logo,.bartr-logo-light{color:#06101c;filter:none}
+.bartr-shell .commerce-hero{align-items:flex-start}
+.bartr-shell .commerce-hero .product-brand-stack{margin-bottom:4px;color:#ffffff}
 .product-logo{display:block;width:min(420px,88vw);max-height:220px;object-fit:contain;margin:10px 0 18px;filter:drop-shadow(0 0 18px rgba(38,216,255,.48))}
 .product-logo.small-logo{width:min(330px,82vw);max-height:130px}
 .product-logo.shoutout-hero-logo{width:min(380px,82vw);max-height:220px;margin:0;object-position:left center}
@@ -214,6 +263,9 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .height-input-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
 .height-input-row input,.height-input-row select{width:100%}
 .visually-hidden-file{position:absolute!important;width:1px;height:1px;opacity:0;pointer-events:none}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* Brand names that must keep mixed case (BartR, FloqR, Mingl) */
+.topbar h1.brand-mixed-case,.brand-mixed-case{text-transform:none!important;letter-spacing:-.03em}
 .mingl-chat-tools{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px}
 .mingl-attachment-preview{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.08);padding:10px;margin:10px 0}
 .mingl-attachment-preview.hidden{display:none}

@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR"];
+  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR", "RydR"];
   const AI_FLAGS = {
     enabled: () => window.FLOQR_AI_ENABLED === true,
     provider: () => window.FLOQR_AI_PROVIDER || "firebase-ai-logic",

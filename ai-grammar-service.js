@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR"];
+  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR", "RydR"];
   function personalWords(context = {}) {
     return Array.isArray(context.personalDictionary)
       ? context.personalDictionary.map(word => String(word || "").trim()).filter(Boolean).slice(0, 120)
