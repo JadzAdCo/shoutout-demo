@@ -150,8 +150,11 @@
 
     <div class="card profile-card">
       <div class="profile-grid">
-        <label>Username *
-          <input id="profileUsername" maxlength="28" placeholder="Choose a username"/>
+        <label>FloqR / Mingl handle *
+          <span class="label-inline-row">
+            <input id="profileUsername" maxlength="28" placeholder="@your_handle"/>
+            <button type="button" id="profileFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button>
+          </span>
         </label>
         <label>Display name
           <input id="profileDisplayName" maxlength="60" placeholder="Your display name"/>
@@ -415,7 +418,7 @@
           <label id="attributionChoiceWrap" class="hidden">Show as
             <select id="attributionChoice">
               <option value="displayName">Display name</option>
-              <option value="username">Username</option>
+              <option value="floqrHandle">FloqR / Mingl handle</option>
               <option value="instagram">Instagram handle</option>
             </select>
           </label>
@@ -443,42 +446,55 @@
           <div class="section-heading-row">
             <div>
               <p class="eyebrow">Zebbies advanced template</p>
-              <h2>Build the four-player lineup</h2>
+              <h2>Football Intro — four-player lineup</h2>
             </div>
             <strong class="football-template-price">$30</strong>
           </div>
-          <p class="sub small">Upload exactly four authorized photos. FLOQR produces a reusable 20-second, fictional American-football stadium introduction sized to the panel selected above.</p>
+          <p class="sub small">Upload exactly four authorized photos. FLOQR produces a reusable 20-second Football Intro sized to the panel selected above. Choose per-player identity, color theme, and optional portrait motion.</p>
           <div class="football-player-upload-grid">
             <article class="football-player-upload" data-football-slot="1">
               <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
               <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName1" data-football-team-name data-slot="1" type="text" maxlength="14" value="PLAYER 1"/></label>
+              <label>Player 1 identity<select id="footballTeamIdentity1" data-football-team-identity data-slot="1"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue1" data-football-team-identity-value data-slot="1" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="2">
               <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
               <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName2" data-football-team-name data-slot="2" type="text" maxlength="14" value="PLAYER 2"/></label>
+              <label>Player 2 identity<select id="footballTeamIdentity2" data-football-team-identity data-slot="2"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue2" data-football-team-identity-value data-slot="2" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="3">
               <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
               <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName3" data-football-team-name data-slot="3" type="text" maxlength="14" value="PLAYER 3"/></label>
+              <label>Player 3 identity<select id="footballTeamIdentity3" data-football-team-identity data-slot="3"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue3" data-football-team-identity-value data-slot="3" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="4">
               <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
               <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Introduction name<input id="footballTeamName4" data-football-team-name data-slot="4" type="text" maxlength="14" value="PLAYER 4"/></label>
+              <label>Player 4 identity<select id="footballTeamIdentity4" data-football-team-identity data-slot="4"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
+              <label>Identity on screen<input id="footballTeamIdentityValue4" data-football-team-identity-value data-slot="4" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
             </article>
           </div>
+          <label>Color theme
+            <select id="footballColorTheme"></select>
+          </label>
+          <label>Background color (optional)
+            <input id="footballBackgroundColor" type="color" value="#071713"/>
+          </label>
+          <label>Background image URL (optional)
+            <input id="footballBackgroundUrl" type="url" placeholder="https://..."/>
+          </label>
           <label class="football-stadium-message-label">Large stadium message
             <textarea id="footballTeamMessage" rows="3" maxlength="54">TONIGHT, WE TAKE THE FIELD TOGETHER</textarea>
           </label>
           <p id="footballTextCapHint" class="sub small" aria-live="polite">Choose a supported display to see stadium-message and player-name limits.</p>
-          <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Optionally ask Gemini to create generic stadium-ready portraits (originals remain the fallback; no real team logos are added).</span></label>
+          <label class="consent-line football-ai-option"><input id="footballAiTreatment" type="checkbox"/> <span>Animate loaded portraits for the display (not filters); completes within 5 seconds or originals are used.</span></label>
           <label class="consent-line football-photo-consent"><input id="footballPhotoConsent" type="checkbox"/> <span>I confirm that I have permission from all four people to upload and display these photos.</span></label>
           <p id="footballTeamStatus" class="status"></p>
         </div>
@@ -571,7 +587,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.05"></script>
 <script src="./global-profile-status.js?v=29.05.1"></script>
-<script src="./shared-data.js?v=29.09.0"></script>
+<script src="./shared-data.js?v=29.09.6"></script>
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=28.44-ai"></script>
 <script src="./ai-search-service.js?v=28.44-ai"></script>
@@ -582,9 +598,10 @@
 <script src="./ai-grammar-service.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
 <script src="./ad-campaigns.js?v=29.05"></script>
-<script src="./floqr-logger.js?v=29.09.5"></script>
-<script src="./payment-service.js?v=29.09.5"></script>
-<script src="./patron-app.js?v=29.09.5"></script>
+<script src="./floqr-identity.js?v=29.09.6"></script>
+<script src="./floqr-logger.js?v=29.09.6"></script>
+<script src="./payment-service.js?v=29.09.6"></script>
+<script src="./patron-app.js?v=29.09.6"></script>
 <script src="./ai-assistant-ui.js?v=28.44-ai"></script>
 <script src="./ai-media-service.js?v=29.05"></script>
 <script src="./notification-center.js?v=29.05"></script>

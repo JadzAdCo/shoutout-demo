@@ -1,4 +1,4 @@
-/* patron-portal-app.js v29.07 */
+/* patron-portal-app.js v29.08 */
 (function(){
   "use strict";
 
@@ -141,6 +141,7 @@
   let currentPortalUsers = [];
   let portalMinglAttachmentFile = null;
   let profileMediaDraft = [];
+  let memberConnectRefreshHandled = false;
 
   const PUBLIC_MINGL_DATAPOINTS = [
     {key:"location", label:"City, state/region, and country"},
@@ -543,6 +544,7 @@
     byId("editFirstName").value = profile.firstName || "";
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
+    byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
     byId("editPhone").value = profile.phone || user.phoneNumber || "";
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("editCity").value = profile.city || "";
@@ -570,7 +572,6 @@
     byId("editBioEnglish").value = profile.publicProfileBioEnglish || profile.bioEnglish || "";
     if (byId("editCommerceEnabled")) byId("editCommerceEnabled").checked = !!profile.commerceEnabled;
     if (byId("editCommerceStoreName")) byId("editCommerceStoreName").value = profile.commerceStoreName || `${profile.displayName || user.displayName || "My"} Shop`;
-    if (byId("editStripeConnectAccountId")) byId("editStripeConnectAccountId").value = profile.stripeConnectAccountId || "";
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
@@ -578,6 +579,55 @@
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
+  }
+
+  function connectStatusMessage(result = {}) {
+    if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;
+    if (!result.connected || result.capabilityStatus === "not-started") return "Stripe payout onboarding has not started.";
+    const due = Number(result.requirementsDue || 0);
+    return `Stripe transfer capability: ${result.capabilityStatus || "pending"}.${due ? ` ${due} requirement${due === 1 ? "" : "s"} need attention.` : ""}`;
+  }
+
+  async function refreshMemberConnectStatus() {
+    const statusEl = byId("memberStripeConnectStatus");
+    const button = byId("memberStripeConnectBtn");
+    try {
+      if (!window.FLOQRPayments?.getConnectStatus) throw new Error("Stripe Connect controls are not loaded.");
+      const result = await window.FLOQRPayments.getConnectStatus({
+        entityType:"member",
+        entityId:auth.currentUser?.uid || "",
+        status:value => { if (statusEl) statusEl.textContent = value; }
+      });
+      if (statusEl) statusEl.textContent = connectStatusMessage(result);
+      if (button) button.textContent = result.connected ? "Continue / manage Stripe onboarding" : "Start Stripe payout onboarding";
+      return result;
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+      return null;
+    }
+  }
+
+  async function startMemberConnectOnboarding() {
+    const statusEl = byId("memberStripeConnectStatus");
+    try {
+      await window.FLOQRPayments.startConnectOnboarding({
+        entityType:"member",
+        entityId:auth.currentUser?.uid || "",
+        status:value => { if (statusEl) statusEl.textContent = value; }
+      });
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+    }
+  }
+
+  async function handleMemberConnectReturn() {
+    const result = await refreshMemberConnectStatus();
+    const state = new URL(window.location.href).searchParams.get("connect") || "";
+    if (state === "refresh" && !memberConnectRefreshHandled) {
+      memberConnectRefreshHandled = true;
+      await startMemberConnectOnboarding();
+    }
+    return result;
   }
 
   function publicMinglDatapoints(profile = {}) {
@@ -679,10 +729,18 @@
     const originalBio = byId("editBio").value.trim();
     const englishBio = byId("editBioEnglish").value.trim();
     const translationState = buildProfileTranslationState(originalBio, englishBio, preferredLanguage);
+    const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value) || "";
+    if (floqrHandle && !window.FLOQRIdentity?.isValidFloqrHandle?.(floqrHandle)) {
+      setText("portalStatus", "Please enter a valid FloqR / Mingl handle.");
+      return;
+    }
+    const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
+      floqrHandle,
+      username,
       phone: byId("editPhone").value.trim(),
       taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
@@ -693,7 +751,7 @@
       heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
       birthMonth: byId("editBirthMonth")?.value || "",
       birthDay: byId("editBirthDay")?.value || "",
-      instagramHandle: byId("editInstagram").value.trim(),
+      instagramHandle: window.FLOQRIdentity?.normalizeInstagramHandle?.(byId("editInstagram").value) || "",
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
       publicProfileVisibility: byId("editProfileVisibility").value,
@@ -708,7 +766,6 @@
       bio: originalBio,
       commerceEnabled:!!byId("editCommerceEnabled")?.checked,
       commerceStoreName:byId("editCommerceStoreName")?.value.trim() || `${byId("editDisplayName").value.trim() || "My"} Shop`,
-      stripeConnectAccountId:byId("editStripeConnectAccountId")?.value.trim() || "",
       ...translationState,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -2210,11 +2267,59 @@
     return url.toString();
   }
 
+  function portalShoutoutTextCaps(item = {}) {
+    const template = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {id:item.template || item.templateId || "blackwhite", className:item.templateClassName || ""};
+    return window.FLOQRTextLayout?.resolve?.(template, item.screenFormatId) || {
+      supported:true,
+      main:Number(item.maxMainCharacters || 45),
+      sub:Number(item.maxSubCharacters ?? 20),
+      lineCount:Number(item.lineCount || 3),
+      perLine:Number(item.maxCharactersPerLine || 15),
+      mainTextSizePercent:Number(item.mainTextSizePercent || 20.8),
+      subTextSizePercent:Number(item.subTextSizePercent || 7.8)
+    };
+  }
+
+  function fitPortalShoutoutText(value = "", caps = {}, type = "main") {
+    const limit = Math.max(0, Number(type === "sub" ? caps.sub : caps.main));
+    const cleaned = String(value || "").replace(/\s+/g, " ").trim();
+    if (type === "sub" || caps.lineCount <= 1) return cleaned.slice(0, limit);
+    const rows = [];
+    let row = "";
+    cleaned.slice(0, limit + caps.lineCount - 1).split(/\s+/).filter(Boolean).forEach(word => {
+      const chunks = [];
+      for (let index = 0; index < word.length; index += caps.perLine) chunks.push(word.slice(index, index + caps.perLine));
+      chunks.forEach(chunk => {
+        const next = row ? `${row} ${chunk}` : chunk;
+        if (next.length <= caps.perLine) row = next;
+        else if (rows.length < caps.lineCount) { rows.push(row); row = chunk; }
+      });
+    });
+    if (row && rows.length < caps.lineCount) rows.push(row);
+    return rows.slice(0, caps.lineCount).join("\n");
+  }
+
+  function updatePortalShoutoutTextHint(item = currentShoutouts.find(x => x.id === activeShoutoutEditId) || {}) {
+    const caps = portalShoutoutTextCaps(item);
+    const mainInput = byId("editShoutoutMain");
+    const subInput = byId("editShoutoutSub");
+    if (mainInput) mainInput.maxLength = Math.max(0, caps.main + Math.max(0, caps.lineCount - 1));
+    if (subInput) subInput.maxLength = Math.max(0, caps.sub);
+    const count = Array.from(String(mainInput?.value || "").replace(/\r?\n/g, "")).length;
+    setText("editShoutoutTextHint", caps.supported === false
+      ? (caps.advice || "This template is not supported on the saved display size.")
+      : `${count}/${caps.main} visible main characters; ${caps.lineCount} line(s), about ${caps.perLine} per line; subtext ${caps.sub}.`);
+    return caps;
+  }
+
   function startShoutoutEdit(item) {
     activeShoutoutEditId = item.id || "";
     byId("editShoutoutMain").value = item.mainText || "";
     byId("editShoutoutSub").value = item.subText || "";
-    setText("shoutoutEditStatus", `Editing ${item.referenceNumber || item.id || "pending ShoutOut"}. Changes apply only while the ShoutOut is pending.`);
+    const caps = updatePortalShoutoutTextHint(item);
+    byId("saveShoutoutEditBtn").disabled = caps.supported === false;
+    byId("resubmitShoutoutEditBtn").disabled = caps.supported === false;
+    setText("shoutoutEditStatus", caps.supported === false ? (caps.advice || "Choose a supported template and display before editing.") : `Editing ${item.referenceNumber || item.id || "pending ShoutOut"}. Changes apply only while the ShoutOut is pending.`);
     byId("shoutoutEditCard").classList.remove("hidden");
     byId("shoutoutEditCard").scrollIntoView({behavior:"smooth", block:"start"});
   }
@@ -2240,12 +2345,23 @@
     const ownsItem = item.submittedByUid === user.uid || item.submittedBy === user.email;
     const pending = String(item.status || "pending").toLowerCase() === "pending" && item.editable !== false;
     if (!ownsItem || !pending) { setText("shoutoutEditStatus", "This ShoutOut can no longer be modified."); return; }
-    const mainText = byId("editShoutoutMain").value.trim();
-    const subText = byId("editShoutoutSub").value.trim();
+    const caps = portalShoutoutTextCaps(item);
+    if (caps.supported === false) { setText("shoutoutEditStatus", caps.advice || "This template is not supported on the saved display."); return; }
+    const mainText = fitPortalShoutoutText(byId("editShoutoutMain").value, caps, "main");
+    const subText = fitPortalShoutoutText(byId("editShoutoutSub").value, caps, "sub");
     if (!mainText) { setText("shoutoutEditStatus", "Main message is required."); return; }
     const update = {
       mainText,
       subText,
+      textLayoutVersion:window.FLOQRTextLayout?.version || "",
+      textProfileId:caps.profileId || item.textProfileId || "full",
+      maxMainCharacters:caps.main,
+      maxSubCharacters:caps.sub,
+      lineCount:caps.lineCount,
+      maxCharactersPerLine:caps.perLine,
+      minimumFontPixels:caps.minimumFontPixels || item.minimumFontPixels || 0,
+      mainTextSizePercent:caps.mainTextSizePercent || 20.8,
+      subTextSizePercent:caps.subTextSizePercent || 7.8,
       modifiedByUid:user.uid,
       modifiedAt:firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -2369,7 +2485,7 @@
       getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]]),
       getParticipantCollectionSafe("chatRooms", user.uid),
       getParticipantCollectionSafe("minglConnections", user.uid),
-      getCollectionSafe("serviceOrders", row => row.ownerUid === user.uid, 300)
+      queryCollectionSafe("serviceOrders", "ownerUid", user.uid, 300)
     ]);
     currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
     currentPortalUsers = [];
@@ -2527,6 +2643,11 @@
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("portalLogoutBtn", logout);
     bind("saveProfileBtn", saveProfile);
+    window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
+    window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
+    window.FLOQRIdentity?.attachHelpPopout?.(byId("editFloqrHandleHelp"), window.FLOQRIdentity?.FLOQR_HANDLE_HELP);
+    bind("memberStripeConnectBtn", startMemberConnectOnboarding);
+    bind("memberStripeConnectRefreshBtn", refreshMemberConnectStatus);
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
@@ -2543,6 +2664,19 @@
     bind("resubmitShoutoutEditBtn", () => saveShoutoutEdit({resubmit:true}));
     bind("cancelShoutoutEditBtn", cancelShoutoutEdit);
     bind("runShoutoutDiagnosticBtn", runShoutoutDiagnostic);
+    byId("editShoutoutMain")?.addEventListener("input", event => {
+      const item = currentShoutouts.find(x => x.id === activeShoutoutEditId) || {};
+      const caps = portalShoutoutTextCaps(item);
+      const fitted = fitPortalShoutoutText(event.currentTarget.value, caps, "main");
+      if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted;
+      updatePortalShoutoutTextHint(item);
+    });
+    byId("editShoutoutSub")?.addEventListener("input", event => {
+      const item = currentShoutouts.find(x => x.id === activeShoutoutEditId) || {};
+      const caps = portalShoutoutTextCaps(item);
+      const fitted = fitPortalShoutoutText(event.currentTarget.value, caps, "sub");
+      if (event.currentTarget.value !== fitted) event.currentTarget.value = fitted;
+    });
     byId("composeRecipientSearch")?.addEventListener("input", () => {
       byId("composeRecipientUid").value = "";
       byId("composeRecipientEmail").value = "";
@@ -2594,6 +2728,7 @@
       byId("portalLogin").classList.add("hidden");
       byId("portalPanel").classList.remove("hidden");
       setText("portalStatus", "Patron portal loaded.");
+      handleMemberConnectReturn();
       loadPortal(user);
     });
   });

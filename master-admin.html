@@ -357,7 +357,7 @@
       <section id="aiCrawling" class="admin-panel-section">
         <div class="card">
           <h2>AI Crawling</h2>
-          <p class="sub small">Configure public-source crawling, review discovered records, consolidate duplicate destinations, and prepare JSON imports for Master Admin or Club Admin review.</p>
+          <p class="sub small">Master Admin defines refined city/genre/venue-or-event searches. FLOQR runs discovery crawls (Google Places and public pages today), returns impactful club and event records for review, and prepares JSON imports for Club Admin onboarding. Ticketmaster Discovery API confirmation is planned for a later release.</p>
           <div id="aiCrawlingSummary" class="report-block"></div>
           <div id="aiDiscoverySummary" class="report-block"></div>
           <p id="aiDiscoveryStatus" class="status"></p>
@@ -396,8 +396,8 @@
           <div id="listingDeleteResults" class="report-block"></div>
         </div>
         <div class="card crawler-engine-card">
-          <h2>Nightlife Discovery Engine</h2>
-          <p class="sub small">Schedule repeatable public-source discovery in each market's native language plus English. All results remain in Master Admin review until required contact fields are verified.</p>
+          <h2>Refined Discovery Search</h2>
+          <p class="sub small">Master Admin defines city, genre, and venue-or-event type. FLOQR runs a crawl (Google Places + public pages today). Ticketmaster Discovery API will be added later for extra confirmation — not required now.</p>
           <div class="profile-grid">
             <label>First daily run (24-hour time)<input id="crawlPrimaryTime" type="time" value="00:00"/></label>
             <label>Time zone<select id="crawlTimeZone"><option value="America/New_York">America/New_York</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="Europe/Paris">Europe/Paris</option><option value="Europe/Berlin">Europe/Berlin</option><option value="Europe/Madrid">Europe/Madrid</option><option value="Africa/Lagos">Africa/Lagos</option><option value="Asia/Dubai">Asia/Dubai</option><option value="Asia/Singapore">Asia/Singapore</option><option value="Asia/Tokyo">Asia/Tokyo</option></select></label>
@@ -406,7 +406,7 @@
             <label>Search languages<select id="crawlLanguageCriteria" multiple size="7"><option>English</option><option>Spanish</option><option>German</option><option>French</option><option>Italian</option><option>Portuguese</option><option>Dutch</option><option>Arabic</option><option>Turkish</option><option>Chinese</option><option>Thai</option><option>Catalan</option></select></label>
             <label>Target countries<select id="crawlCountryCriteria" multiple size="7"><option>United States</option><option selected>Spain</option><option selected>Germany</option><option>France</option><option>United Kingdom</option><option>Italy</option><option>Portugal</option><option>Netherlands</option><option>United Arab Emirates</option><option>Turkey</option><option>Singapore</option><option>Thailand</option><option>China</option></select></label>
             <label>Music genres<select id="crawlGenreCriteria" multiple size="7"><option selected>Hip Hop</option><option>R&amp;B</option><option>Afro Beats</option><option>Amapiano</option><option>House</option><option>EDM</option><option>Latin</option><option>Reggaeton</option><option>Arabic Music</option><option>Live Entertainment</option></select></label>
-            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="7"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="day club">Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option></select></label>
+            <label>Venue / event types<select id="crawlEventTypeCriteria" multiple size="9"><option value="concert" selected>Concerts</option><option value="nightclub" selected>Night Clubs</option><option value="club" selected>Clubs</option><option value="lounge" selected>Lounges</option><option value="pool party">Pool Parties</option><option value="day club">Day Parties / Day Clubs</option><option value="beach club">Beach Clubs</option><option value="rooftop lounge">Rooftop Lounges</option><option value="DJ event">DJ Events</option><option value="comedy show">Comedy Shows</option></select></label>
             <label>Specific cities<input id="crawlCityCriteria" placeholder="Berlin, Madrid, Barcelona, Washington"/></label>
           </div>
           <label>Optional plain-English instruction<textarea id="crawlNaturalLanguageInput" rows="3" placeholder="Find hip hop clubs and ticketed concerts in Germany and Spain, using native-language sources plus English sources."></textarea></label>
@@ -415,8 +415,9 @@
           <textarea id="crawlMarketLanguageCriteria" class="hidden"></textarea>
           <input id="crawlFrequency" type="hidden" value="fourTimesDaily"/>
           <input id="crawlScheduleHours" type="hidden" value="00:00, 06:00, 12:00, 18:00"/>
-          <div class="queue-actions"><button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button><button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button><button id="runManualCrawlBtn" type="button">Run Now / Create Review Records</button></div>
-          <p class="sub small"><strong>Expected downloadable output:</strong> Club/Event/Concert/Lounge Name, Address, Telephone #, Website, and Social Media Handles.</p>
+          <div class="queue-actions"><button id="previewCrawlPlanBtn" type="button">Preview Search Plan</button><button id="saveCrawlScheduleBtn" class="primary" type="button">Save Automatic Schedule</button><button id="runManualCrawlBtn" type="button">Run Discovery Crawl</button></div>
+          <p class="sub small"><strong>Expected output:</strong> Name/Title, Genre, DJ(s)/Artist(s), Promoter(s), Phone, Email, Instagram, Physical address.</p>
+          <p class="sub small"><em>Ticketmaster confirmation: later</em></p>
           <div id="crawlSearchPlanReport" class="report-block"></div>
           <details class="admin-detail">
             <summary>How the multilingual algorithm works</summary>
@@ -625,11 +626,11 @@
 <script src="./ai-service.js?v=29.05"></script>
 <script src="./ai-index-service.js?v=29.05"></script>
 <script src="./ai-search-service.js?v=29.05"></script>
-<script src="./ai-discovery-service.js?v=29.05"></script>
+<script src="./ai-discovery-service.js?v=29.09.6"></script>
 <script src="./floqr-action-feedback.js?v=29.05"></script>
 <script src="./helper-popouts.js?v=29.05"></script>
 <script src="./ad-campaigns.js?v=29.05"></script>
-<script src="./ai-diagnostics-service.js?v=29.06"></script>
+<script src="./ai-diagnostics-service.js?v=29.09.6"></script>
 <script src="./duplicate-record-service.js?v=29.05"></script>
 <script src="./floqr-logger.js?v=29.09.5"></script>
 <script src="./payment-service.js?v=29.09.5"></script>

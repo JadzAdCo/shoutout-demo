@@ -578,7 +578,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', tags:["sports","game night","team","championship","watch party"] },
   zebbiesFootballTeamIntro: {
     id:'zebbiesFootballTeamIntro',
-    name:'Zebbies 4-Player Football Intro',
+    name:'Football Intro',
     scope:'Club',
     venueIds:['zebbies-garden-washington-dc'],
     className:'football-team-intro',
@@ -598,8 +598,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultSub:'GAME NIGHT LINEUP',
     maxMainCharacters:36,
     maxSubCharacters:36,
-    description:'A Zebbies-only, 20-second American football game-introduction sequence. Add exactly four authorized patron photos; each player gets a cinematic reveal followed by the full lineup. Patrons may change the stadium background while the field, player frames, text geometry, and 20-second timing stay locked.',
-    tags:["zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","game night","collaboration","ai image treatment","$30","background editable","locked layout"]
+    description:'Football Intro: a Zebbies-only, 20-second American football stadium sequence with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
+    tags:["football intro","zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] }
@@ -664,14 +664,14 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     }
   },
   footballIntro: {
-    label:"Four-player football introduction",
+    label:"Football Intro four-player sequence",
     formats:{
-      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:72},
-      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:68},
-      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Use a 96 x 48 cm or 64 x 48 cm display. Four portraits, names, positions, and the stadium message are too dense for a 64 x 32 cm panel."},
-      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:58},
-      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:54},
-      "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Use a 96 x 48 cm or 64 x 48 cm display. Four portraits, names, positions, and the stadium message are too dense for a 64 x 32 cm panel."}
+      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:72,skipFinaleLineup:false},
+      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:68,skipFinaleLineup:false},
+      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:14,stadiumLineCount:2,stadiumCharactersPerLine:12,maxStadiumCharacters:24,maxPlayerNameCharacters:8,minimumFontPixels:40,skipFinaleLineup:true,advice:"Reduced Football Intro layout: no finale lineup; stadium message stays visible longer."},
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:58,skipFinaleLineup:false},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:54,skipFinaleLineup:false},
+      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:14,stadiumLineCount:2,stadiumCharactersPerLine:12,maxStadiumCharacters:24,maxPlayerNameCharacters:8,minimumFontPixels:38,skipFinaleLineup:true,advice:"Reduced Football Intro layout: no finale lineup; stadium message stays visible longer."}
     }
   }
 };

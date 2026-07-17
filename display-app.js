@@ -208,6 +208,7 @@
         name,
         position:String(member.position || "TEAM MEMBER").trim().slice(0, 24) || "TEAM MEMBER",
         mediaUrl:String(member.mediaUrl || member.enhancedMediaUrl || member.originalMediaUrl || "").trim().slice(0, 1800),
+        aiEnhancementApplied:member.aiEnhancementApplied === true,
         initials:name.split(/\s+/).map(part => part[0] || "").join("").slice(0, 2).toUpperCase() || String(index + 1)
       };
     });
@@ -278,14 +279,36 @@
     const members = normalizedFootballTeamMembers(data, textCaps);
     const stadiumMessageRows = footballStadiumMessageRows(data.stadiumMessage, textCaps);
     const openingRows = displayTextRows(mainText || "ZEBBIES ALL-STARS", textCaps);
+    const themeId = String(data.colorTheme || "stadiumGold");
+    const theme = window.FLOQRIdentity?.footballTheme?.(themeId) || {accent:data.themeAccent || "#dfff5a", field:"#06180f", ink:"#ffffff", frame:"#5c4700"};
+    const formatId = String(data.screenFormatId || textCaps.formatId || "");
+    const skipFinale = window.FLOQRIdentity?.isSmallFootballDisplay?.(formatId) || data.skipFinaleLineup === true || textCaps.skipFinaleLineup === true;
+    const portraitMotion = data.aiPortraitMotion === true || members.some(member => member.aiEnhancementApplied);
+    const backgroundColor = /^#[0-9a-fA-F]{6}$/.test(String(data.backgroundColor || "")) ? data.backgroundColor : "";
+    const backgroundUrl = String(data.backgroundUrl || "").trim();
+    const stageStyle = [
+      `--football-accent:${theme.accent}`,
+      `--football-field:${theme.field}`,
+      `--football-ink:${theme.ink}`,
+      `--football-frame:${theme.frame}`,
+      backgroundColor ? `background-color:${backgroundColor}` : "",
+      backgroundUrl ? `background-image:url("${backgroundUrl.replace(/"/g, "%22")}");background-size:cover;background-position:center;` : ""
+    ].filter(Boolean).join(";");
     canvas.classList.add("football-team-intro");
     center.className = "display-center football-team-intro-layout";
     mediaSlot.classList.remove("hidden");
     const playerImage = member => member.mediaUrl
       ? `<img data-media-url="${esc(member.mediaUrl)}" data-initials="${esc(member.initials)}" alt="${esc(member.name)}">`
       : `<span class="football-player-initials">${esc(member.initials)}</span>`;
+    const finaleHtml = skipFinale ? "" : `<div class="football-final-lineup">
+          <header><span>ZEBBIES ALL-STARS</span><strong>${openingRows.map(row => esc(row)).join("<br>")}</strong></header>
+          <div class="football-final-grid">${members.map((member, index) => `<article>
+            <div class="football-final-photo">${playerImage(member)}</div>
+            <b>${esc(member.name)}</b><small>${esc(member.position)}</small><em>0${index + 1}</em>
+          </article>`).join("")}</div>
+        </div>`;
     mediaSlot.innerHTML = `
-      <section class="football-intro-stage" aria-label="20-second Zebbies four-player football introduction">
+      <section class="football-intro-stage${skipFinale ? " football-skip-finale" : ""}${portraitMotion ? " football-portrait-motion" : ""}" data-theme="${esc(themeId)}" style="${stageStyle}" aria-label="20-second Football Intro">
         <div class="football-stadium-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="football-field-lines" aria-hidden="true"></div>
         <div class="football-opening">
@@ -304,13 +327,7 @@
           <span>MESSAGE FROM THE LINEUP</span>
           <div>${stadiumMessageRows.map(row => `<b>${esc(row)}</b>`).join("")}</div>
         </div>
-        <div class="football-final-lineup">
-          <header><span>ZEBBIES ALL-STARS</span><strong>${openingRows.map(row => esc(row)).join("<br>")}</strong></header>
-          <div class="football-final-grid">${members.map((member, index) => `<article>
-            <div class="football-final-photo">${playerImage(member)}</div>
-            <b>${esc(member.name)}</b><small>${esc(member.position)}</small><em>0${index + 1}</em>
-          </article>`).join("")}</div>
-        </div>
+        ${finaleHtml}
         <div class="football-intro-progress" aria-hidden="true"></div>
       </section>`;
     prepareFootballTeamMedia(mediaSlot.querySelector(".football-intro-stage")).catch(() => mediaSlot.querySelector(".football-intro-stage")?.classList.add("football-team-ready"));

@@ -130,6 +130,7 @@
     setInputIfMissing("clubProfileEmail", profile.email);
     setInputIfMissing("clubProfileTelephone", profile.telephone || profile.phone);
     setInputIfMissing("clubProfileInstagram", socials.instagram);
+    setInputIfMissing("clubProfileFloqrHandle", socials.floqrHandle || profile.floqrHandle);
     setInputIfMissing("clubProfileX", socials.x || socials.twitter);
     setInputIfMissing("clubProfileTiktok", socials.tiktok);
     setInputIfMissing("clubProfileFacebook", socials.facebook);
@@ -193,6 +194,7 @@
     if (byId("clubProfileEmail")) byId("clubProfileEmail").value = publicClubProfile.email || "";
     if (byId("clubProfileTelephone")) byId("clubProfileTelephone").value = publicClubProfile.telephone || publicClubProfile.phone || "";
     if (byId("clubProfileInstagram")) byId("clubProfileInstagram").value = socials.instagram || "";
+    if (byId("clubProfileFloqrHandle")) byId("clubProfileFloqrHandle").value = socials.floqrHandle || publicClubProfile.floqrHandle || "";
     if (byId("clubProfileX")) byId("clubProfileX").value = socials.x || "";
     if (byId("clubProfileTiktok")) byId("clubProfileTiktok").value = socials.tiktok || "";
     if (byId("clubProfileFacebook")) byId("clubProfileFacebook").value = socials.facebook || "";
@@ -300,6 +302,7 @@
     const addressRecord = {streetAddress, city, stateRegion, postalCode, country};
     const fullAddress = window.FLOQRAddress?.fullAddress(addressRecord) || [streetAddress, city, stateRegion, postalCode, country].filter(Boolean).join(", ");
     const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
+    const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("clubProfileFloqrHandle")?.value || "") || "";
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -319,10 +322,12 @@
       telephone:byId("clubProfileTelephone")?.value.trim() || "",
       socialMediaHandles:{
         instagram:byId("clubProfileInstagram")?.value.trim() || "",
+        floqrHandle,
         x:byId("clubProfileX")?.value.trim() || "",
         tiktok:byId("clubProfileTiktok")?.value.trim() || "",
         facebook:byId("clubProfileFacebook")?.value.trim() || ""
       },
+      floqrHandle,
       genres: splitCSV(byId("clubProfileGenres")?.value || ""),
       hours:byId("clubProfileHours")?.value.trim() || "",
       agePolicy:byId("clubProfileAgePolicy")?.value.trim() || "",
@@ -1838,7 +1843,7 @@
     if (byId("reconciliationSummary")) {
       byId("reconciliationSummary").innerHTML = simpleRows([
         ["Payment model", "Patron pays FloqR; club accrues 20% of priced ShoutOuts"],
-        ["Currently priced template", "Zebbies 4-Player Football Intro ($30)"],
+        ["Currently priced template", "Football Intro ($30)"],
         ["Free templates", "Traditional Black & White and other unpriced templates"],
         ["Estimated local ad share (prototype)", money(adShare)]
       ]);
