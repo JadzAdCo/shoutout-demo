@@ -544,6 +544,7 @@
     byId("editFirstName").value = profile.firstName || "";
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
+    byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
     byId("editPhone").value = profile.phone || user.phoneNumber || "";
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("editCity").value = profile.city || "";
@@ -728,10 +729,18 @@
     const originalBio = byId("editBio").value.trim();
     const englishBio = byId("editBioEnglish").value.trim();
     const translationState = buildProfileTranslationState(originalBio, englishBio, preferredLanguage);
+    const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value) || "";
+    if (floqrHandle && !window.FLOQRIdentity?.isValidFloqrHandle?.(floqrHandle)) {
+      setText("portalStatus", "Please enter a valid FloqR / Mingl handle.");
+      return;
+    }
+    const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
+      floqrHandle,
+      username,
       phone: byId("editPhone").value.trim(),
       taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
@@ -742,7 +751,7 @@
       heightUnit: byId("editHeightUnit")?.value || preferredHeightUnit(byId("editCountry").value),
       birthMonth: byId("editBirthMonth")?.value || "",
       birthDay: byId("editBirthDay")?.value || "",
-      instagramHandle: byId("editInstagram").value.trim(),
+      instagramHandle: window.FLOQRIdentity?.normalizeInstagramHandle?.(byId("editInstagram").value) || "",
       xHandle: byId("editX").value.trim(),
       publicProfileType: byId("editProfileType").value,
       publicProfileVisibility: byId("editProfileVisibility").value,
@@ -2634,6 +2643,9 @@
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("portalLogoutBtn", logout);
     bind("saveProfileBtn", saveProfile);
+    window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
+    window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
+    window.FLOQRIdentity?.attachHelpPopout?.(byId("editFloqrHandleHelp"), window.FLOQRIdentity?.FLOQR_HANDLE_HELP);
     bind("memberStripeConnectBtn", startMemberConnectOnboarding);
     bind("memberStripeConnectRefreshBtn", refreshMemberConnectStatus);
     bind("prepareProfileTranslationBtn", prepareProfileTranslation);

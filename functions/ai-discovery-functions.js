@@ -334,25 +334,24 @@ function cityCountryFromText(sourceUrl = "", text = "", location = {}) {
 }
 
 function missingDatapoints(record = {}) {
-  const required = /club|lounge|bar|beach/i.test(record.proposedType || "")
-    ? ["Name", "Description", "Address", "City", "Country", "Phone", "Website or source", "Categories", "Genres"]
-    : ["Name", "Description", "Location name", "Address", "City", "Country", "Phone", "Source or ticket link", "Categories", ...(/comedy/i.test(record.proposedType || "") ? ["Date", "Time"] : [])];
-  const checks = {
-    Name: !!record.proposedTitle,
-    Description: !!record.proposedDescription,
-    "Location name": !!record.proposedLocationName,
-    Address: !!record.proposedAddress,
-    City: !!record.city,
-    Country: !!record.country,
-    Phone: !!(record.telephone || record.phone),
-    "Website or source": !!(record.officialWebsite || record.website || record.sourceUrl),
-    "Source or ticket link": !!(record.sourceUrl || record.ticketUrl),
-    Categories: !!(record.categories || []).length,
-    Genres: !!(record.genres || []).length,
-    Date: !!record.proposedDate,
-    Time: !!record.proposedTime
-  };
-  return required.filter(label => !checks[label]);
+  const missing = [];
+  if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
+  if (!(record.genres || []).length) missing.push("Genre");
+  const artists = record.artistsOrDjs || record.artists || record.djs;
+  if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
+  const promoters = record.promoters || record.promotionGroup;
+  if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) missing.push("Promoter(s)");
+  if (!record.proposedAddress) missing.push("Address");
+  if (!record.city) missing.push("City");
+  if (!record.country) missing.push("Country");
+  if (!(record.telephone || record.phone)) missing.push("Phone");
+  if (!record.email) missing.push("Email");
+  if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
+  if (/comedy/i.test(record.proposedType || "")) {
+    if (!record.proposedDate) missing.push("Date");
+    if (!record.proposedTime) missing.push("Time");
+  }
+  return missing;
 }
 
 async function fetchPublicSource(sourceUrl) {
@@ -488,35 +487,44 @@ async function searchGooglePlaces(job, apiKey) {
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();
-  return (payload.places || []).map(place => ({
-    proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
-    proposedTitle:place.displayName?.text || "Discovered nightlife venue",
-    proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
-    proposedLocationName:place.displayName?.text || "",
-    proposedAddress:place.formattedAddress || "",
-    city:job.city || "",
-    stateRegion:job.stateRegion || "",
-    country:job.country || "",
-    telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
-    phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
-    officialWebsite:place.websiteUri || place.googleMapsUri || "",
-    website:place.websiteUri || place.googleMapsUri || "",
-    sourceUrl:place.googleMapsUri || place.websiteUri || "",
-    sourceName:"Google Places API",
-    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
-    categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
-    genres:job.genre ? [job.genre] : [],
-    searchQuery:job.query || "",
-    searchLanguage:job.language || "",
-    aiSummary:"Localized venue discovery candidate. Master Admin must verify public contact and social details before onboarding.",
-    aiConfidenceScore:0.86,
-    aiStarRating:4,
-    aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
-    missingDatapoints:["Social media handles"],
-    status:"pendingReview",
-    discoveryMode:"localized-places-search",
-    extractionMethod:"google-places-text-search"
-  }));
+  return (payload.places || []).map(place => {
+    const baseRecord = {
+      proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
+      proposedTitle:place.displayName?.text || "Discovered nightlife venue",
+      proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+      proposedLocationName:place.displayName?.text || "",
+      proposedAddress:place.formattedAddress || "",
+      city:job.city || "",
+      stateRegion:job.stateRegion || "",
+      country:job.country || "",
+      telephone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+      phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
+      officialWebsite:place.websiteUri || place.googleMapsUri || "",
+      website:place.websiteUri || place.googleMapsUri || "",
+      sourceUrl:place.googleMapsUri || place.websiteUri || "",
+      sourceName:"Google Places API",
+      email:"",
+      artistsOrDjs:[],
+      promoters:[],
+      promotionGroup:"",
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      sourceConfirmations:{googlePlaces:true, ticketmaster:"later", publicPage:false, eventbrite:false},
+      categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
+      genres:job.genre ? [job.genre] : [],
+      searchQuery:job.query || "",
+      searchLanguage:job.language || "",
+      aiSummary:"Localized venue discovery candidate. Complete DJ/artist, promoter, email, and Instagram before approval.",
+      aiConfidenceScore:0.86,
+      aiStarRating:4,
+      aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
+      status:"pendingReview",
+      discoveryMode:"master-admin-refined-discovery-crawl",
+      extractionMethod:"google-places-text-search"
+    };
+    baseRecord.missingDatapoints = missingDatapoints(baseRecord);
+    baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    return baseRecord;
+  });
 }
 
 async function discoverPlacesForCriteria(criteria = {}) {
@@ -627,7 +635,7 @@ async function runScheduledCrawl(scheduleDoc, now = new Date()) {
 }
 
 async function classifyDiscoveryRecord(record) {
-  return {
+  const classified = {
     ...record,
     aiSummary:record.aiSummary || record.proposedDescription || "",
     aiConfidenceScore:record.aiConfidenceScore || 0.76,
@@ -635,6 +643,9 @@ async function classifyDiscoveryRecord(record) {
     aiRatingReasons:record.aiRatingReasons || ["Extracted from configured public source URL"],
     updatedAt:admin.firestore.FieldValue.serverTimestamp()
   };
+  classified.missingDatapoints = missingDatapoints(classified);
+  classified.crawlResultStatus = classified.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  return classified;
 }
 
 async function writeDiscoveryQueueItem(record) {
@@ -837,6 +848,17 @@ function assertOwnedOriginalShoutOutMediaPath(path = "", uid = "") {
 }
 
 function safeEnhancementPrompt(prompt = "", enhancementType = "") {
+  const type = String(enhancementType || "").trim();
+  if (type === "football-portrait-motion") {
+    return [
+      "Prepare this portrait for subtle cinematic motion on a public LED stadium display.",
+      "Preserve the person's recognizable face and natural identity exactly.",
+      "Do not apply color filters, stylized looks, uniforms, logos, text, watermarks, or football branding.",
+      "Prefer a clean, high-contrast framing suitable for gentle Ken Burns zoom/parallax playback.",
+      "Return a single still image only.",
+      `User requested enhancement: ${String(prompt || type).slice(0, 400)}`
+    ].join("\n");
+  }
   const requested = String(prompt || enhancementType || "Improve this ShoutOut media for a nightlife LED display.").slice(0, 600);
   return [
     "Edit only the uploaded ShoutOut media image. Do not add text, logos, watermarks, QR codes, or HTML/CSS/JavaScript.",
@@ -943,6 +965,40 @@ exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", tim
   const schedules = await db.collection("aiCrawlerSchedules").where("enabled", "==", true).get();
   for (const schedule of schedules.docs) await runScheduledCrawl(schedule);
   return null;
+});
+
+exports.runFloqrDiscoveryCrawl = onCall({
+  region:"us-central1",
+  secrets:[GOOGLE_PLACES_API_KEY],
+  timeoutSeconds:120,
+  memory:"512MiB"
+}, async request => {
+  await assertMasterAdmin(request);
+  const criteria = request.data?.criteria || {};
+  const structuredPlan = request.data?.structuredPlan || criteria.structuredPlan || {};
+  const runId = String(request.data?.runId || "");
+  const records = await discoverPlacesForCriteria({...criteria, structuredPlan});
+  let created = 0;
+  for (const record of records) {
+    const classified = await classifyDiscoveryRecord({
+      ...record,
+      crawlRunId: runId,
+      criteriaSnapshot: criteria,
+      discoveryMode: "master-admin-refined-discovery-crawl"
+    });
+    await writeDiscoveryQueueItem(classified);
+    created += 1;
+  }
+  return {
+    created,
+    placesConfigured: !!optionalPlacesKey(),
+    ticketmaster: "later",
+    message: created
+      ? `Discovery crawl wrote ${created} Google Places candidate(s). Complete DJ/artist, promoter, email, and Instagram before approval.`
+      : (optionalPlacesKey()
+        ? "No Places matches for this refined search. Broaden city/genre/type or add a public page extraction."
+        : "GOOGLE_PLACES_API_KEY is not configured. Set the Firebase secret to run live discovery crawls.")
+  };
 });
 
 exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {

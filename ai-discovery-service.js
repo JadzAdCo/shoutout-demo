@@ -76,37 +76,50 @@
     return clean(value).length > 0;
   }
 
+  function hasArtistsOrDjs(item = {}) {
+    return hasAny(item.artistsOrDjs || item.artists || item.djs);
+  }
+
+  function hasPromoters(item = {}) {
+    return hasAny(item.promoters || item.promotionGroup);
+  }
+
+  function hasInstagram(item = {}) {
+    return clean(item.socialMediaHandles?.instagram || item.instagramHandle);
+  }
+
+  function artistsOrDjsDisplay(item = {}) {
+    const val = item.artistsOrDjs || item.artists || item.djs;
+    return Array.isArray(val) ? val.join(", ") : String(val || "");
+  }
+
+  function promotersDisplay(item = {}) {
+    const val = item.promoters || item.promotionGroup;
+    return Array.isArray(val) ? val.join(", ") : String(val || "");
+  }
+
   function requiredDatapoints(item = {}) {
-    const categories = Array.isArray(item.categories) ? item.categories : splitCSV(item.categories);
     const genres = Array.isArray(item.genres) ? item.genres : splitCSV(item.genres);
-    if (isVenueRecord(item)) {
-      return [
-        ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
-        ["description", "Description", hasAny(item.proposedDescription || item.aiSummary)],
-        ["address", "Address", hasAny(item.proposedAddress || item.address)],
-        ["city", "City", hasAny(item.city)],
-        ["country", "Country", hasAny(item.country)],
-        ["phone", "Phone", hasAny(item.telephone || item.phone)],
-        ["website", "Website or source", hasAny(item.officialWebsite || item.website || item.sourceUrl)],
-        ["categories", "Venue categories", hasAny(categories)],
-        ["genres", "Music genres/tags", hasAny(genres)]
-      ];
-    }
-    return [
-      ["name", "Name", hasAny(item.proposedTitle)],
-      ["description", "Description", hasAny(item.proposedDescription || item.aiSummary)],
-      ["location", "Location name", hasAny(item.proposedLocationName)],
+    const base = [
+      ["name", "Name", hasAny(item.proposedTitle || item.proposedLocationName)],
+      ["genres", "Genre", hasAny(genres)],
+      ["artistsOrDjs", "DJ(s)/Artist(s)", hasArtistsOrDjs(item)],
+      ["promoters", "Promoter(s)", hasPromoters(item)],
       ["address", "Address", hasAny(item.proposedAddress || item.address)],
       ["city", "City", hasAny(item.city)],
       ["country", "Country", hasAny(item.country)],
       ["phone", "Phone", hasAny(item.telephone || item.phone)],
-      ["source", "Source or ticket link", hasAny(item.sourceUrl || item.ticketUrl)],
-      ["categories", "Event categories", hasAny(categories)],
-      ...(isComedyRecord(item) ? [
+      ["email", "Email", hasAny(item.email)],
+      ["instagram", "Instagram", hasInstagram(item)]
+    ];
+    if (isComedyRecord(item)) {
+      return [
+        ...base,
         ["date", "Date", hasAny(item.proposedDate)],
         ["time", "Time", hasAny(item.proposedTime)]
-      ] : [])
-    ];
+      ];
+    }
+    return base;
   }
 
   function missingDatapoints(item = {}) {
@@ -147,9 +160,25 @@
     }
   }
 
-  function queueField(item, field, label, wide) {
-    const value = Array.isArray(item[field]) ? item[field].join(", ") : queueText(item, field);
+  function queueField(item, field, label, wide, valueOverride) {
+    const value = valueOverride !== undefined
+      ? valueOverride
+      : (Array.isArray(item[field]) ? item[field].join(", ") : queueText(item, field));
     return `<label class="${wide ? "wide-field" : ""}">${esc(label)}<input data-queue-field="${esc(field)}" value="${esc(value)}"/></label>`;
+  }
+
+  function sourceConfirmationsHtml(item = {}) {
+    const sc = item.sourceConfirmations;
+    if (!sc || typeof sc !== "object") return "";
+    const flags = [];
+    if (sc.googlePlaces) flags.push("Google Places");
+    if (sc.publicPage) flags.push("Public page");
+    if (sc.eventbrite) flags.push("Eventbrite");
+    const tm = sc.ticketmaster;
+    if (tm === true) flags.push("Ticketmaster");
+    else if (tm === "later") flags.push("Ticketmaster (later)");
+    if (!flags.length) return "";
+    return `<p class="sub small"><strong>Source confirmation:</strong> ${esc(flags.join(" · "))}</p>`;
   }
 
   function queueTextArea(item, field, label) {
@@ -183,6 +212,11 @@
       ticketUrl:item.ticketUrl || "",
       categories:item.categories || [],
       genres:item.genres || [],
+      artistsOrDjs:item.artistsOrDjs || item.artists || item.djs || [],
+      promoters:item.promoters || [],
+      promotionGroup:item.promotionGroup || "",
+      socialMediaHandles:item.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
+      sourceConfirmations:item.sourceConfirmations || {},
       missingDatapoints:item.missingDatapoints || [],
       crawlResultStatus:item.crawlResultStatus || ""
     };
@@ -221,6 +255,7 @@
       </div>
       <p>${esc(item.proposedDescription || item.aiSummary || "No description yet.")}</p>
       ${missing.length ? `<p class="sub small"><strong>Missing required datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Required datapoints complete.</strong> Ready for final source review and approval.</p>`}
+      ${sourceConfirmationsHtml(item)}
       ${auditDetailsHtml(item)}
       ${datapointChecklist(item)}
       ${sourceLinksHtml(item)}
@@ -241,6 +276,9 @@
         ${queueField(item, "country", "Country")}
         ${queueField(item, "categories", "Categories", true)}
         ${queueField(item, "genres", "Genres", true)}
+        ${queueField(item, "artistsOrDjs", "DJ(s)/Artist(s)", true, artistsOrDjsDisplay(item))}
+        ${queueField(item, "promoters", "Promoter(s)", true, promotersDisplay(item))}
+        ${queueField(item, "instagram", "Instagram", false, item.socialMediaHandles?.instagram || item.instagramHandle || "")}
         ${queueField(item, "sourceUrl", "Source URL", true)}
         ${queueField(item, "ticketUrl", "Ticket URL", true)}
       </div>
@@ -260,8 +298,11 @@
     card.querySelectorAll("[data-queue-field]").forEach(input => {
       const field = input.dataset.queueField;
       const value = input.value.trim();
-      if (["categories", "genres"].includes(field)) next[field] = splitCSV(value);
-      else if (field === "description") {
+      if (["categories", "genres", "artistsOrDjs", "promoters"].includes(field)) next[field] = splitCSV(value);
+      else if (field === "instagram") {
+        next.socialMediaHandles = {...(next.socialMediaHandles || {}), instagram:value};
+        next.instagramHandle = value;
+      } else if (field === "description") {
         next.proposedDescription = value;
         next.aiSummary = value || next.aiSummary;
       } else if (field === "name") {
@@ -524,10 +565,10 @@
     if (!db || !auth || !byId("aiCrawling")) return;
     await ensureDiscoveryDefaults();
     byId("aiDiscoverySummary").innerHTML = simpleRows([
-      ["Crawler input", "Plain-English requests are expanded into structured search jobs"],
-      ["Publish behavior", "Records remain in review until required datapoints are complete and Master Admin approves"],
-      ["Required public fields", "Name, description, address, city/country, phone, source/ticket link, categories, and genres"],
-      ["Event partners", "Ticketmaster, Eventbrite, comedy shows, and resale partners are represented as source-search links"]
+      ["Discovery mode", "Refined city/genre/venue-or-event search with Google Places + public pages"],
+      ["Publish behavior", "Records remain in review until impactful datapoints are complete and Master Admin approves"],
+      ["Impactful datapoints", "Name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, physical address"],
+      ["Source confirmation", "Google Places today; Ticketmaster (later); public page when extracted"]
     ]);
     byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
     byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);

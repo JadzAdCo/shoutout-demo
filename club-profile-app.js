@@ -249,6 +249,8 @@
 
   function renderContact() {
     const socials = club.socialMediaHandles || club.socialHandles || {};
+    const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(socials.floqrHandle || club.floqrHandle || "") || "";
+    const floqrLink = floqrHandle ? `<span class="buttonlike">${esc(floqrHandle)}</span>` : "";
     const socialLink = (label, value, base) => {
       if (!value) return "";
       const clean = String(value).replace(/^@/, "");
@@ -261,7 +263,7 @@
       ${(window.FLOQRAddress?.fullAddress(club) || club.address) ? `<p><strong>Address</strong><span>${esc(window.FLOQRAddress?.fullAddress(club) || club.address)}</span></p>` : ""}
       ${phone ? `<p><strong>Telephone</strong><a href="tel:${esc(phone)}">${esc(phone)}</a></p>` : ""}
       ${email ? `<p><strong>Email</strong><a href="mailto:${esc(email)}">${esc(email)}</a></p>` : ""}
-      <div class="button-row">${socialLink("Instagram", socials.instagram, "https://instagram.com/")}${socialLink("TikTok", socials.tiktok, "https://tiktok.com/@")}${socialLink("Facebook", socials.facebook, "https://facebook.com/")}${socialLink("X", socials.x || socials.twitter, "https://x.com/")}</div>`;
+      <div class="button-row">${floqrLink}${socialLink("Instagram", socials.instagram, "https://instagram.com/")}${socialLink("TikTok", socials.tiktok, "https://tiktok.com/@")}${socialLink("Facebook", socials.facebook, "https://facebook.com/")}${socialLink("X", socials.x || socials.twitter, "https://x.com/")}</div>`;
     toggleSection("clubContactSection", sectionEnabled("contact"));
   }
 

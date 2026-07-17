@@ -1345,6 +1345,7 @@
       ["beach club", ["beach club", "beach clubs"]],
       ["brunch party", ["brunch", "brunch party", "brunch parties"]],
       ["pool party", ["pool party", "pool parties"]],
+      ["day club", ["day club", "day clubs", "day party", "day parties"]],
       ["summer party", ["summer party", "summer parties"]],
       ["DJ event", ["dj", "djs", "dj event", "dj events"]],
       ["promoter event", ["promoter", "promoter event", "promoter events"]],
@@ -1490,10 +1491,9 @@
   }
 
   function requiredDatapointLabels(type = "") {
-    if (isVenueEventType(type)) {
-      return ["name", "description", "address", "city", "country", "telephone", "officialWebsite", "sourceUrl", "categories", "genres"];
-    }
-    return ["name", "description", "locationName", "address", "city", "country", "telephone", "sourceUrl", "ticketUrl", "categories", ...(isComedyEventType(type) ? ["date", "time"] : [])];
+    const base = ["name", "genres", "artistsOrDjs", "promoters", "address", "city", "country", "telephone", "email", "instagram"];
+    if (isComedyEventType(type)) return [...base, "date", "time"];
+    return base;
   }
 
   function sourceHost(sourceUrl = "") {
@@ -1678,33 +1678,29 @@
     const required = requiredDatapointLabels(record.proposedType || "");
     const has = {
       name: !!record.proposedTitle,
-      description: !!record.proposedDescription,
-      locationName: !!record.proposedLocationName,
+      genres: !!(record.genres || []).length,
+      artistsOrDjs: !!(record.artistsOrDjs || []).length || !!(record.artists || []).length || !!(record.djs || []).length || !!String(record.artistsOrDjs || record.artists || record.djs || "").trim(),
+      promoters: !!(record.promoters || []).length || !!String(record.promoters || record.promotionGroup || "").trim(),
       address: !!record.proposedAddress,
       city: !!record.city,
       country: !!record.country,
       telephone: !!(record.telephone || record.phone),
-      officialWebsite: !!(record.officialWebsite || record.website || record.sourceUrl),
-      sourceUrl: !!record.sourceUrl,
-      ticketUrl: !!record.ticketUrl,
-      categories: !!(record.categories || []).length,
-      genres: !!(record.genres || []).length,
+      email: !!record.email,
+      instagram: !!(record.socialMediaHandles?.instagram || record.instagramHandle),
       date: !!record.proposedDate,
       time: !!record.proposedTime
     };
     return required.filter(key => !has[key]).map(key => ({
       name:"Name",
-      description:"Description",
-      locationName:"Location name",
+      genres:"Genre",
+      artistsOrDjs:"DJ(s)/Artist(s)",
+      promoters:"Promoter(s)",
       address:"Address",
       city:"City",
       country:"Country",
       telephone:"Phone",
-      officialWebsite:"Official website",
-      sourceUrl:"Source URL",
-      ticketUrl:"Ticket URL",
-      categories:"Categories",
-      genres:"Genres",
+      email:"Email",
+      instagram:"Instagram",
       date:"Date",
       time:"Time"
     }[key] || key));
@@ -3825,7 +3821,7 @@
       ["Record types", joinList(plan.eventTypes)],
       ["Languages", joinList(plan.languages) || "Market default"],
       ["Language strategy", plan.languageStrategy === "nativePlusEnglish" ? "Native market language + English" : plan.languageStrategy === "nativeOnly" ? "Native market language only" : "Selected languages only"],
-      ["Required result fields", "Name, address, telephone, website, and social media handles"]
+      ["Required result fields", "Name/title, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, physical address"]
     ];
     const jobsHtml = plan.jobs.length ? plan.jobs.slice(0, 24).map((job, index) => `<div class="queue-item">
       <div class="message-envelope-head">
@@ -3990,6 +3986,8 @@
   function eventTypeToProposedType(eventType = "") {
     const text = normalized(eventType);
     if (text.includes("comedy")) return "comedyShow";
+    if (text.includes("pool party")) return "poolParty";
+    if (text.includes("day club") || text.includes("day party")) return "dayClub";
     if (text.includes("rooftop lounge")) return "rooftopLounge";
     if (text.includes("rooftop bar")) return "rooftopBar";
     if (text.includes("lounge")) return "lounge";
@@ -4000,11 +3998,12 @@
     return "event";
   }
 
+  // Ticketmaster link is optional research only — live TM Discovery API confirmation is planned for later.
   function sourceSearchLinksForJob(job = {}) {
     const query = job.query || crawlQueryForJob(job);
     return [
       {label:"Official/source search", href:officialSearchUrl(query, job.city || "")},
-      {label:"Ticketmaster", href:ticketPartnerUrl("Ticketmaster", query, job.city || "")},
+      {label:"Ticketmaster (later)", href:ticketPartnerUrl("Ticketmaster", query, job.city || "")},
       {label:"Eventbrite", href:ticketPartnerUrl("Eventbrite", query, job.city || "")},
       {label:"Resale/partner search", href:ticketPartnerUrl("Resale", query, job.city || "")}
     ];
@@ -4024,14 +4023,19 @@
     const sourceSearchLinks = override.sourceSearchLinks || sourceSearchLinksForJob({query, city, country, genre, eventType});
     const requiredDatapoints = requiredDatapointLabels(eventType);
     const defaultMissing = [
-      "Address",
+      "Genre",
+      "DJ(s)/Artist(s)",
+      "Promoter(s)",
       "Phone",
+      "Email",
+      "Instagram",
+      "Address",
       ...(isComedyEventType(eventType) ? ["Date", "Time"] : [])
     ];
     const record = {
       proposedType,
       proposedTitle: title,
-      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete the required datapoints, verify the source, then approve into FLOQR search.`,
+      proposedDescription: override.description || `Public-source crawl result for ${eventType} matching ${genre} in ${city}. Complete impactful datapoints (genre, DJ/artist, promoter, contacts) before approval.`,
       proposedDate: "",
       proposedTime: "",
       proposedLocationName: override.locationName || title,
@@ -4040,7 +4044,11 @@
       email: override.email || "",
       telephone: override.telephone || "",
       phone: override.phone || override.telephone || "",
+      artistsOrDjs: override.artistsOrDjs || [],
+      promoters: override.promoters || [],
+      promotionGroup: override.promotionGroup || "",
       socialMediaHandles: override.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
+      sourceConfirmations: override.sourceConfirmations || {googlePlaces:false, ticketmaster:"later", publicPage:false, eventbrite:false},
       ticketUrl: override.ticketUrl || sourceSearchLinks.find(link => link.label === "Ticketmaster")?.href || "",
       city,
       stateRegion,
@@ -4114,30 +4122,58 @@
     const runRef = state.db.collection("aiCrawlRuns").doc();
     const plan = buildCrawlSearchPlan(criteria);
     renderCrawlSearchPlan(plan);
-    setText("diagnosticsStatus", `Creating ${plan.jobCount} reviewable crawl result record(s) from the expanded search plan...`);
+    setText("diagnosticsStatus", `Running discovery crawl for ${plan.jobCount} search job(s)...`);
     await runRef.set({
       trigger: "manual",
-      mode: "manual-natural-language-crawl",
+      mode: "master-admin-refined-discovery-crawl",
       status: "running",
       criteria,
       structuredPlan: plan,
       requestedByUid: user?.uid || "",
       requestedByEmail: user?.email || "",
       startedAt: fieldValue(),
-      note: "Manual Master Admin crawl workflow. Records require public-source datapoint completion before approval."
+      note: "Refined discovery crawl. Complete impactful datapoints before approval."
     });
+    let createdCount = 0;
+    let statusMessage = "";
+    if (window.firebase?.app) {
+      try {
+        const callable = firebase.app().functions("us-central1").httpsCallable("runFloqrDiscoveryCrawl");
+        const result = await callable({criteria, structuredPlan: plan, runId: runRef.id});
+        const data = result?.data || {};
+        createdCount = Number(data.created || data.createdCount || 0);
+        statusMessage = data.message || `Discovery crawl wrote ${createdCount} review record(s).`;
+        await runRef.set({
+          status: "completed",
+          createdRecordCount: createdCount,
+          placesConfigured: data.placesConfigured,
+          ticketmaster: data.ticketmaster || "later",
+          completedAt: fieldValue(),
+          updatedAt: fieldValue()
+        }, {merge: true});
+        setText("diagnosticsStatus", statusMessage);
+        await refreshDiagnostics();
+        if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
+        return;
+      } catch (error) {
+        console.warn("runFloqrDiscoveryCrawl unavailable, falling back to local candidates:", error?.message || error);
+      }
+    }
     const candidates = buildManualCrawlCandidates(criteria, runRef.id);
     for (const item of candidates) {
       await state.db.collection("aiDiscoveryQueue").add(item);
     }
+    createdCount = candidates.length;
     await runRef.set({
       status: "completed",
-      createdRecordCount: candidates.length,
+      createdRecordCount: createdCount,
+      fallbackMode: "local-manual-candidates",
       completedAt: fieldValue(),
       updatedAt: fieldValue()
     }, {merge: true});
-    setText("diagnosticsStatus", `Manual crawl complete. ${candidates.length} structured review record(s) added with required datapoint checklists.`);
+    setText("diagnosticsStatus", `Local fallback: ${createdCount} structured review record(s) added. Deploy runFloqrDiscoveryCrawl with GOOGLE_PLACES_API_KEY for live Places discovery crawls.`);
     await refreshDiagnostics();
+    if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
   }
 
   function staleAgeThresholdDays() {

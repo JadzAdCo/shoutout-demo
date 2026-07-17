@@ -18,6 +18,7 @@ const patronPortalApp = fs.readFileSync(path.join(root, "patron-portal-app.js"),
 const sharedData = fs.readFileSync(path.join(root, "shared-data.js"), "utf8");
 const displayApp = fs.readFileSync(path.join(root, "display-app.js"), "utf8");
 const displayCss = fs.readFileSync(path.join(root, "display.css"), "utf8");
+const floqrIdentity = fs.readFileSync(path.join(root, "floqr-identity.js"), "utf8");
 
 test("Checkout keeps dynamic payment methods and trusted Accounts v2 recipients", () => {
   assert.doesNotMatch(backend, /payment_method_types/);
@@ -56,17 +57,27 @@ test("browser code cannot supply connected-account IDs", () => {
 
 test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 dollars", () => {
   assert.match(sharedData, /zebbiesFootballTeamIntro/);
+  assert.match(sharedData, /name:'Football Intro'/);
   assert.match(sharedData, /teamMemberSlots:4/);
   assert.match(sharedData, /durationSeconds:20/);
   assert.match(sharedData, /"p125-96x48"[\s\S]*pixelWidth:768, pixelHeight:384/);
+  assert.match(sharedData, /"p125-64x32"[\s\S]*supported:true[\s\S]*skipFinaleLineup:true/);
   assert.match(patronApp, /uploadFootballTeamMembers/);
   assert.match(patronApp, /footballTeamMessage/);
+  assert.match(patronApp, /football-portrait-motion/);
+  assert.match(patronApp, /5000/);
   assert.match(patronApp, /photoPermissionConfirmed:true/);
+  assert.match(patronApp, /serviceRole/);
+  assert.match(patronApp, /profileMatchScore/);
   assert.match(displayApp, /renderFootballTeamIntro/);
   assert.match(displayApp, /footballStadiumMessageRows/);
-  assert.match(displayCss, /footballFinalLineup 20s linear infinite/);
+  assert.match(displayApp, /football-skip-finale/);
+  assert.match(displayCss, /football-skip-finale/);
+  assert.match(displayCss, /footballStadiumMessageCompact/);
+  assert.match(floqrIdentity, /resolvePlayerIdentityLabel/);
   assert.match(backend, /const pricedAmountCents = footballTeamIntro/);
   assert.match(backend, /normalizeFootballTeamMembers/);
+  assert.match(backend, /Football Intro ShoutOut/);
   assert.match(backend, /members\.length !== 4/);
   assert.match(patronApp, /priceCents > 0/);
   assert.match(patronApp, /Continue to \$30 FloqR Checkout/);
@@ -111,7 +122,8 @@ test("all published templates have display-aware text contracts", () => {
     });
   });
   assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, false);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, false);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "led-64x32").main, 36);
   assert.match(patronApp, /recommendations use the same limits/);

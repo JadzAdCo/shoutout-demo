@@ -1,0 +1,80 @@
+# FLOQR Shared Word List
+
+Use these terms exactly when we plan or build. Prefer the **Term** column in chat.
+
+| Term | Meaning | Not the same as |
+|------|---------|-----------------|
+| **ShoutOut** | A timed display message shown on club LED/panel displays | Mingl chat message; public profile bio |
+| **Template** | A ShoutOut visual design (e.g. Football Intro, Black & White) | Club public-profile layout |
+| **Football Intro** | Display name for the priced football ShoutOut (internal ID still `zebbiesFootballTeamIntro` until renamed in code) | Generic “football” sports content |
+| **Display format** | Physical panel size/type: `p125-96x48`, `p125-64x48`, `p125-64x32`, `led-96x48`, `led-64x48`, `led-64x32` | Browser window size |
+| **Large display** | Formats with height 48 rows (`*-96x48`, `*-64x48`) — keep full finale layout | Small display |
+| **Small display** | Formats with height 32 rows (`*-64x32`) — skip side-by-side all-players finale | Large display |
+| **Finale lineup** | Animation segment where all player photos appear side by side | Sequential single-player reveals |
+| **Stadium message** | Short text shown mid-animation on Football Intro | Player identity label |
+| **Player identity** | What appears under a player photo: one of Display Name, Instagram, or Mingl handle (patron chooses) | Free-typed roster name |
+| **Display name** | Human-facing name; may include special characters and emoji | FloqR handle; Instagram |
+| **FloqR handle** | `@`-style identity stored in `floqrHandle`; same field as **Mingl handle** (username stays synced without `@` for backward compatibility) | Display name; Instagram |
+| **Instagram handle** | Social handle stored normalized with a leading `@` | FloqR handle |
+| **Mingl handle** | Same as FloqR handle (`floqrHandle`); shown on Mingl cards and public profile contacts | Instagram; separate username field |
+| **Patron** | End-user / guest member of FloqR | Club Admin; Master Admin |
+| **Club** | Venue entity (e.g. Zebbies) with Club Admin | Patron vendor store |
+| **Entity** | Any onboarded actor: patron, club, promoter, etc. | Template |
+| **Club Admin** | Operator of one club’s backend | Master Admin |
+| **Master Admin** | Network operator (FloqR) | Club Admin |
+| **Public profile** | Outward-facing page for a patron or club | Private portal settings |
+| **Profile layout** | Chosen visual arrangement for a club’s public profile page | ShoutOut template |
+| **Profile background** | Image/color backdrop for a public profile | ShoutOut template background |
+| **Open/closed days** | Structured weekly schedule (per weekday open/closed + hours) | Free-text “hours” blurb |
+| **What’s open** | Discovery use-case: patrons find currently open clubs | Mingl social match |
+| **Mingl** | Social discovery / matching / chat between patrons | ShoutOut; marketplace |
+| **Match datapoint** | Profile field that contributed to a Mingl match score (e.g. music, location) | Full public profile dump |
+| **Privacy datapoints** | Patrons toggle which datapoints are public vs hidden | Marketing consent |
+| **Match-reason only** | Public Mingl view shows the datapoint(s) that caused the match; other datapoints stay private unless opted in | Show-all public profile |
+| **Onboarding** | First-time signup / setup flow | Later profile edit |
+| **UI language** | Language of FloqR chrome/strings (en, de, fr, es, it, ru, el, pl, pt, …) | Content language of a ShoutOut message |
+| **Source locale** | Canonical copy language: US English (`en-US`) | Override translation |
+| **Auto translation** | Machine-generated strings from `en-US` | Manual override |
+| **Translation override** | Human/admin correction that wins over auto translation | Auto translation |
+| **Translation management** | Master Admin page to review/edit all translated UI strings | Patron language preference |
+| **Browser default language** | `navigator.language` / `navigator.languages` used on first visit | Saved UI language preference |
+| **Toast warning** | Short auto-dismiss notice (~3s) with optional close control | Blocking modal |
+| **Help popout (?)** | Inline help control explaining field rules (e.g. FloqR handle charset) | Toast |
+| **Marketplace** | Place patrons buy/sell goods and services | Club ShoutOut commerce share |
+| **Vendor** | Patron (or club) selling on the marketplace | FloqR platform MoR for priced ShoutOuts |
+| **Vendor category** | Goods type: electronics, clothes, jewelry, arts, services, or multi | Stripe product type only |
+| **Vendor storefront template** | Category-driven storefront layout generated for a vendor | ShoutOut template |
+| **FloqR-priced ShoutOut** | Patron pays FloqR Stripe (e.g. Football Intro $30); club accrues 20% | Connect destination charge to club |
+| **Test payment** | Stripe test-mode payment marked `isTestPayment` for later purge | Live charge |
+| **Account Reconciliation** | Club/Master ledger of FloqR-priced shares | Stripe Connect payout dashboard |
+| **MoR** | Merchant of Record (FloqR for priced ShoutOuts) | Connected-account seller for marketplace |
+| **Refined Discovery Search** | Master Admin panel where city, genre, and venue/event type are defined before a crawl | Generic AI Crawling tab label |
+| **Discovery crawl** | Callable or scheduled run that queries Google Places and public pages and writes review queue records | Manual source paste only |
+| **Impactful datapoints** | Required review fields: name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, address | Optional marketing fields |
+| **Source confirmation** | Flags showing which upstream source verified a record (Google Places, public page, Eventbrite; Ticketmaster later) | Live publish status |
+| **Ticketmaster (later)** | Planned Ticketmaster Discovery API confirmation — optional research link today, not required for crawl | Live Ticketmaster API confirmation |
+
+## Languages in scope (UI)
+
+| Code | Language |
+|------|----------|
+| `en` | English (US source) |
+| `de` | German |
+| `fr` | French |
+| `es` | Spanish |
+| `it` | Italian |
+| `ru` | Russian |
+| `el` | Greek |
+| `pl` | Polish |
+| `pt` | Portuguese |
+
+## Football Intro — agreed behavior (this request)
+
+1. Rename UI label to **Football Intro** (keep stable ID `zebbiesFootballTeamIntro`).
+2. Support **all display formats**, with layout variants by size.
+3. On **small displays** (64×32), omit the **finale lineup** (`skipFinaleLineup`).
+4. Per-player identity: **Display name**, **Instagram**, or **FloqR / Mingl handle**.
+5. **FloqR handle = Mingl handle** (same field `floqrHandle`; username synced without `@`).
+6. Color themes + customizable background.
+7. Portrait motion (not filters), **≤5s** budget; CSS Ken Burns when opted in; Gemini framing optional with timeout → originals.
+8. Role-aware Mingl match bonus for promoter / hospitality (waiter, bottle girl) / DJ / media creator.

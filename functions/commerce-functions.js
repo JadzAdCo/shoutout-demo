@@ -43,8 +43,8 @@ const SHOUTOUT_TEXT_LIMITS = {
     "led-96x48":[2,14,28,22],"led-64x48":[2,10,20,18],"led-64x32":[2,12,24,16]
   },
   footballIntro:{
-    "p125-96x48":[2,14,28,20,3,18,54,14],"p125-64x48":[2,10,20,16,3,12,36,10],"p125-64x32":null,
-    "led-96x48":[2,14,28,20,3,18,54,14],"led-64x48":[2,10,20,16,3,12,36,10],"led-64x32":null
+    "p125-96x48":[2,14,28,20,3,18,54,14,false],"p125-64x48":[2,10,20,16,3,12,36,10,false],"p125-64x32":[2,10,20,14,2,12,24,8,true],
+    "led-96x48":[2,14,28,20,3,18,54,14,false],"led-64x48":[2,10,20,16,3,12,36,10,false],"led-64x32":[2,10,20,14,2,12,24,8,true]
   }
 };
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
@@ -133,7 +133,8 @@ function checkoutTextCaps(templateId = "", formatId = "") {
     stadiumLineCount:values[4] || 0,
     stadiumPerLine:values[5] || 0,
     stadium:values[6] || 0,
-    playerName:values[7] || 0
+    playerName:values[7] || 0,
+    skipFinaleLineup:values[8] === true
   };
 }
 
@@ -169,7 +170,7 @@ function safeHttpsMediaUrl(value = "") {
 
 function normalizeFootballTeamMembers(value, ownerUid, nameLimit = 14) {
   const members = Array.isArray(value) ? value.slice(0, 4) : [];
-  if (members.length !== 4) throw new HttpsError("invalid-argument", "The Zebbies football intro requires exactly four player photos.");
+  if (members.length !== 4) throw new HttpsError("invalid-argument", "Football Intro requires exactly four player photos.");
   return members.map((member, index) => {
     const originalMediaStoragePath = text(member?.originalMediaStoragePath || member?.mediaStoragePath, 500);
     if (!originalMediaStoragePath.startsWith(`shoutouts/${ownerUid}/`) || !originalMediaStoragePath.includes("/original/")) {
@@ -181,6 +182,7 @@ function normalizeFootballTeamMembers(value, ownerUid, nameLimit = 14) {
     const selectedMediaVersion = text(member?.selectedMediaVersion, 20) === "enhanced" ? "enhanced" : "original";
     return {
       slot:index + 1,
+      identityType:text(member?.identityType || "displayName", 40),
       name:text(member?.name || `PLAYER ${index + 1}`, nameLimit) || `PLAYER ${index + 1}`,
       position:text(member?.position || "Team Member", 24) || "Team Member",
       mediaUrl,
@@ -242,6 +244,11 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
       animationDurationSeconds:20,
       collaborationMode:"four-person-roster",
       stadiumMessage:text(rawShoutout.stadiumMessage || "TONIGHT, WE TAKE THE FIELD TOGETHER", caps.stadium || 54),
+      skipFinaleLineup:rawShoutout.skipFinaleLineup === true || caps.skipFinaleLineup === true,
+      colorTheme:text(rawShoutout.colorTheme, 40),
+      themeAccent:text(rawShoutout.themeAccent, 20),
+      backgroundColor:text(rawShoutout.backgroundColor, 20),
+      backgroundUrl:safeHttpsMediaUrl(rawShoutout.backgroundUrl),
       photoPermissionConfirmed:true,
       priceCents:3000
     }
@@ -521,7 +528,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
     if (footballTeamIntro && clubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
     return {
       amountCents:pricedAmountCents,
-      itemName:footballTeamIntro ? "Zebbies four-player football intro ShoutOut" : "FLOQR paid ShoutOut",
+      itemName:footballTeamIntro ? "Football Intro ShoutOut" : "FLOQR paid ShoutOut",
       description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
