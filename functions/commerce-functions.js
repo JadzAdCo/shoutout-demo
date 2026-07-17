@@ -551,24 +551,27 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const amountCents = unitAmountCents * quantity;
     const sellerEntityId = text(product.sellerEntityId || product.sellerUid, 160);
     const sellerEntityType = normalizeConnectEntityType(product.sellerEntityType || (sellerEntityId === text(product.sellerUid, 160) ? "member" : "club"));
-    if (!sellerEntityId || !sellerEntityType) throw new HttpsError("failed-precondition", "This product is missing a valid FLOQR seller.");
-    const recipient = await trustedConnectRecipient(sellerEntityType, sellerEntityId);
+    if (!sellerEntityId || !sellerEntityType) throw new HttpsError("failed-precondition", "This product is missing a valid BartR seller.");
+    const sellerCountry = text(product.sellerCountry || product.marketplaceCountry || "US", 80);
+    const usOk = ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america"].includes(sellerCountry.toLowerCase());
+    if (product.marketplaceCountry && !usOk) throw new HttpsError("failed-precondition", "BartR marketplace selling is limited to U.S.-based vendors.");
+    // FloqR is MoR (same pattern as priced ShoutOuts). Vendor share accrues for payout; vendor ships.
     return {
       amountCents,
-      venueShareCents:amountCents,
+      venueShareCents:0,
       sellerShareCents:amountCents,
       floqrShareCents:0,
       quantity,
       unitAmountCents,
-      itemName:text(product.name || "FLOQR marketplace item", 120),
-      description:text(product.description || "Sold through FLOQR Commerce", 300),
+      itemName:text(product.name || "BartR marketplace item", 120),
+      description:text(product.description || "Sold on BartR. FloqR collects payment; the vendor ships.", 300),
       sellerEntityId,
       sellerEntityType,
       sellerUid:text(product.sellerUid, 160),
-      sellerName:text(product.sellerName || "FLOQR seller", 120),
-      connectedAccountId:recipient.accountId,
-      connectedAccountBindingId:recipient.bindingId,
-      connectedAccountCapabilityStatus:recipient.capabilityStatus,
+      sellerName:text(product.sellerName || "BartR vendor", 120),
+      paymentModel:"floqr-platform",
+      settlementStatus:"accrued-pending-payout",
+      marketplace:"bartr",
       productId,
       productType:text(product.productType || "physical", 40),
       mediaLicense:text(product.mediaLicense || "", 80),
@@ -582,7 +585,9 @@ exports.createFloqrConnectOnboardingLink = onCall({
         mediaLicense:text(product.mediaLicense || "", 80),
         sellerEntityId:text(product.sellerEntityId || product.sellerUid, 160),
         sellerName:text(product.sellerName, 120),
-        priceCents:unitAmountCents
+        priceCents:unitAmountCents,
+        refundPolicy:text(product.refundPolicySnapshot || "", 500),
+        contact:text(product.contactSnapshot || "", 200)
       }
     };
   }
@@ -740,15 +745,15 @@ exports.createFloqrCheckoutSession = onCall({
     };
     if (order.ownerEmail) params.customer_email = order.ownerEmail;
     if (type === "commerce" && summary.requiresShipping) {
-      params.shipping_address_collection = {allowed_countries:["US", "CA", "GB", "FR", "DE", "ES", "IT", "NL", "PT"]};
+      params.shipping_address_collection = {allowed_countries:["US"]};
     }
     if (type === "commerce" || type === "shoutout") {
       params.expires_at = Math.floor(Date.now() / 1000) + (type === "commerce" ? COMMERCE_RESERVATION_SECONDS : SHOUTOUT_CHECKOUT_EXPIRY_SECONDS);
     }
-    if (summary.connectedAccountId) {
-      // Connect destination charges remain for Commerce / seller-billed products only — never for patron ShoutOuts.
+    if (summary.connectedAccountId && type !== "commerce" && type !== "shoutout") {
+      // Destination charges only for non-BartR / non-ShoutOut seller-billed products.
       params.payment_intent_data.transfer_data = {destination:summary.connectedAccountId};
-      if (type !== "shoutout" && Number(summary.floqrShareCents || 0) > 0) {
+      if (Number(summary.floqrShareCents || 0) > 0) {
         params.payment_intent_data.application_fee_amount = summary.floqrShareCents;
       }
     }

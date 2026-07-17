@@ -6,14 +6,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="description" content="Official club profile on FLOQR"/>
   <title>Club Profile | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=29.07"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
 </head>
 <body class="club-profile-body">
   <main id="clubProfilePage" class="club-profile-shell">
     <header class="club-profile-nav">
-      <a class="club-profile-brand" href="./?v=29.07" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
+      <a class="club-profile-brand" href="./?v=29.09.8&start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
       <div class="club-profile-nav-actions">
-        <a class="buttonlike" href="./?v=29.07">Explore FLOQR</a>
+        <a id="floqrGlobalBack" class="buttonlike" data-from="search" href="./?v=29.09.8&start=search">← Back to Search</a>
+        <a class="buttonlike" href="./?v=29.09.8&start=search">Explore FLOQR</a>
         <button id="clubProfileShareBtn" type="button">Copy Link</button>
       </div>
     </header>
@@ -107,10 +108,16 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-config.js?v=29.07"></script>
-<script src="./shared-data.js?v=29.09.6"></script>
-<script src="./floqr-action-feedback.js?v=29.07"></script>
-<script src="./floqr-identity.js?v=29.09.6"></script>
-<script src="./club-profile-app.js?v=29.09.6"></script>
+  <script src="./firebase-config.js?v=29.09.8"></script>
+  <script src="./floqr-nav.js?v=29.09.8"></script>
+  <script src="./global-profile-status.js?v=29.09.8"></script>
+  <script src="./shared-data.js?v=29.09.8"></script>
+  <script src="./floqr-action-feedback.js?v=29.09.8"></script>
+  <script src="./helper-popouts.js?v=29.09.8"></script>
+  <script src="./floqr-identity.js?v=29.09.8"></script>
+  <script src="./club-profile-app.js?v=29.09.8"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+</script>
 </body>
 </html>

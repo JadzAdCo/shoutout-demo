@@ -5,19 +5,18 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.08.4"/>
-  <link rel="stylesheet" href="./admin.css?v=29.07"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.8"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a class="global-back-btn buttonlike" href="./?v=28.43-f">&larr; Back to main app</a>
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
   <section class="page active">
     <header class="topbar">
       <div>
         <h1>My Profile and Settings</h1>
         <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FLOQR Inbox, and Mingl.</p>
-        <p id="portalSignedInAs" class="status">Not signed in</p>
-        <p id="portalStatus" class="status">Loading patron portal...</p>
+        <p id="portalStatus" class="status hidden" aria-live="polite"></p>
       </div>
     </header>
 
@@ -28,15 +27,6 @@
     </div>
 
     <div id="portalPanel" class="hidden">
-      <div class="card account-status-card">
-        <div>
-          <p class="eyebrow">Account</p>
-          <strong id="portalAccountName">&mdash;</strong>
-          <p id="portalAccountEmail" class="sub small">&mdash;</p>
-        </div>
-        <button id="portalLogoutBtn" class="ghost" type="button">Sign out</button>
-      </div>
-
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
         <button class="admin-tab" data-panel="portalProfile" type="button">My Profile</button>
@@ -48,11 +38,12 @@
         <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalPaidServices" type="button">Paid Services & Orders</button>
+        <button class="admin-tab" data-panel="portalBartrStore" type="button">BartR Store</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
         <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
-        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=28.98">Mingl Chat</a>
-        <a class="admin-tab-link buttonlike" href="./services.html?v=29.07">Follow Services</a>
-        <a class="admin-tab-link buttonlike" id="portalCommerceLink" href="./commerce.html?v=29.07">Commerce Site</a>
+        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat</a>
+        <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal">Follow Services</a>
+        <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal">Open BartR</a>
         <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
       </nav>
 
@@ -66,8 +57,8 @@
         <div class="card">
           <h2>Profile Summary</h2>
           <div id="profileSummary" class="report-block"></div>
-          <p><a href="./role-request.html?v=28.43-f">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
-          <p><a href="./services.html?v=29.07">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
+          <p><a href="./role-request.html?v=29.09.8&from=portal">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
+          <p><a href="./services.html?v=29.09.8&from=portal">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
         </div>
       </section>
 
@@ -168,8 +159,10 @@
             <label>Looking To Meet <input id="editLookingToMeet" placeholder="Friends, event crew, travelers, music lovers"/></label>
             <label>Profile Bio <input id="editBio" maxlength="180" placeholder="A short intro shown to followers"/></label>
             <label>English Bio Translation <input id="editBioEnglish" maxlength="180" placeholder="English version for public profile search"/></label>
-            <label><input id="editCommerceEnabled" type="checkbox"/> Enable Commerce Site</label>
-            <label>Commerce store name <input id="editCommerceStoreName" placeholder="My FLOQR Shop"/></label>
+            <label><input id="editCommerceEnabled" type="checkbox"/> Enable BartR seller store (US only)</label>
+            <label>BartR store name <input id="editCommerceStoreName" placeholder="My BartR shop"/></label>
+            <label class="profile-grid-wide">BartR contact info <input id="editCommerceContact" placeholder="Support email or phone for buyers"/></label>
+            <label class="profile-grid-wide">Binding refund policy <textarea id="editCommerceRefundPolicy" rows="3" placeholder="Refund / return rules buyers agree to when purchasing from your BartR listings"></textarea></label>
             <div class="card nested-card profile-grid-wide">
               <h3>Stripe payouts</h3>
               <p id="memberStripeConnectStatus" class="sub small">Checking payout onboarding statusâ€¦</p>
@@ -249,7 +242,37 @@
         </div>
         <div class="card"><h2>My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
       </section>
-      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and Commerce orders.</p><div id="paidServicesReport" class="report-block"></div></div></section>
+      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
+
+      <section id="portalBartrStore" class="admin-panel-section">
+        <div class="card">
+          <h2>BartR seller backend</h2>
+          <p class="sub small">US patrons and service members only. You manage products here; shoppers discover them on the shared <a href="./commerce.html?v=29.09.8&from=portal">BartR</a> frontend. FloqR is Merchant of Record; you ship fulfilled orders.</p>
+          <p id="bartrEligibilityStatus" class="status"></p>
+          <div id="bartrStoreSummary" class="report-block"></div>
+        </div>
+        <div id="bartrSellerTools" class="card hidden">
+          <p class="eyebrow">Listings</p>
+          <h2>Add a product or media license</h2>
+          <p class="sub small">Videographers and camera operators should use a watermarked or low-resolution preview. Paid digital delivery is tracked as fulfillment after FloqR checkout.</p>
+          <div class="profile-grid">
+            <label>Product name<input id="commerceProductName"/></label>
+            <label>Category<select id="commerceProductCategory"><option>Apparel</option><option>Photography</option><option>Video</option><option>Artwork</option><option>Fashion</option><option>Jewelry</option><option>Accessories</option><option>Other</option></select></label>
+            <label>Product type<select id="commerceProductType"><option value="physical">Physical product</option><option value="photoLicense">Digital photo license</option><option value="videoLicense">Digital video license</option></select></label>
+            <label>Price (USD)<input id="commerceProductPrice" type="number" min="0.50" step="0.01"/></label>
+            <label>Available licenses / inventory<input id="commerceProductInventory" type="number" min="0" value="1"/></label>
+            <label>Preview type<select id="commerceProductPreviewType"><option value="image">Image / watermarked photo</option><option value="video">Video preview</option></select></label>
+            <label class="profile-grid-wide">Preview media URL<input id="commerceProductImage" type="url" placeholder="Use a watermarked or low-resolution sales preview"/></label>
+            <label>Media license<select id="commerceProductLicense"><option value="personal">Personal use</option><option value="editorial">Editorial use</option><option value="commercial">Commercial use</option><option value="exclusive">Exclusive rights</option></select></label>
+            <label class="profile-grid-wide">Description<textarea id="commerceProductDescription" rows="3"></textarea></label>
+            <label><input id="commerceProductShipping" type="checkbox" checked/> Requires shipping</label>
+          </div>
+          <button id="commerceSaveProductBtn" class="primary" type="button">Publish to BartR</button>
+          <div id="commerceSellerReport" class="report-block"></div>
+          <h3>Sales and fulfillment</h3>
+          <div id="commerceOrdersReport" class="report-block"><p class="sub">Paid BartR sales appear here with invoice and delivery status. FloqR collected payment; you ship.</p></div>
+        </div>
+      </section>
 
       <section id="portalGuestLists" class="admin-panel-section">
         <div class="card"><h2>My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
@@ -329,7 +352,7 @@
       <section id="portalLanguageSettings" class="admin-panel-section">
         <div class="card">
           <h2>Language Settings</h2>
-          <p class="sub small">Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future Bata descriptions.</p>
+          <p class="sub small">Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future BartR descriptions.</p>
           <label class="consent-checkbox">
             <input id="languageAiGrammarEnabled" type="checkbox"/>
             <span>Enable grammar and spelling check before sending messages, chats, ShoutOuts, profile updates, and other text inputs.</span>
@@ -406,9 +429,9 @@
               </div>
             </details>
             <details class="mingl-action-details">
-              <summary>Bata</summary>
+              <summary>BartR</summary>
               <div class="help-copy">
-                <p>Bata is the future merch, style, and product discovery area connected to FLOQR events and creators.</p>
+                <p>BartR is FloqR’s shared marketplace — barter with swag. US vendors manage listings in My Profile; shoppers discover products on the BartR frontend. FloqR collects payment; the vendor ships.</p>
               </div>
             </details>
             <details class="mingl-action-details">
@@ -466,20 +489,24 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=28.43-f"></script>
-<script src="./global-profile-status.js?v=29.03"></script>
-<script src="./shared-data.js?v=29.09.6"></script>
-<script src="./ai-service.js?v=28.98"></script>
-<script src="./ai-index-service.js?v=28.44-ai"></script>
-<script src="./ai-search-service.js?v=28.44-ai"></script>
-<script src="./ai-notification-service.js?v=28.44-ai"></script>
-<script src="./ai-template-studio.js?v=29.09.0"></script>
-<script src="./ai-grammar-service.js?v=28.98"></script>
-  <script src="./floqr-action-feedback.js?v=29.05"></script>
-<script src="./helper-popouts.js?v=28.98"></script>
-<script src="./floqr-identity.js?v=29.09.6"></script>
-<script src="./payment-service.js?v=29.09.6"></script>
-<script src="./patron-portal-app.js?v=29.09.6"></script>
-  <script src="./profile-access-guard.js?v=29.05"></script>
+<script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./shared-data.js?v=29.09.8"></script>
+<script src="./ai-service.js?v=29.09.8"></script>
+<script src="./ai-index-service.js?v=29.09.8"></script>
+<script src="./ai-search-service.js?v=29.09.8"></script>
+<script src="./ai-notification-service.js?v=29.09.8"></script>
+<script src="./ai-template-studio.js?v=29.09.8"></script>
+<script src="./ai-grammar-service.js?v=29.09.8"></script>
+  <script src="./floqr-action-feedback.js?v=29.09.8"></script>
+<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./floqr-identity.js?v=29.09.8"></script>
+<script src="./payment-service.js?v=29.09.8"></script>
+<script src="./patron-portal-app.js?v=29.09.8"></script>
+  <script src="./profile-access-guard.js?v=29.09.8"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+</script>
 </body>
 </html>

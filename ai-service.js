@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "Bata"];
+  const PROTECTED_TERMS = ["FLOQR", "ShoutOut", "Mingl", "BartR"];
   const AI_FLAGS = {
     enabled: () => window.FLOQR_AI_ENABLED === true,
     provider: () => window.FLOQR_AI_PROVIDER || "firebase-ai-logic",
@@ -23,7 +23,7 @@
     cars: ["cars", "fast cars", "luxury cars", "coupe", "ferrari", "rolls royce"],
     dc: ["dc", "washington dc", "washington district of columbia"],
     "washington dc": ["dc", "washington dc", "washington district of columbia"],
-    merch: ["merch", "merchandise", "apparel", "bata"],
+    merch: ["merch", "merchandise", "apparel", "bartr", "bart"],
     comedy: ["comedy", "comedy show", "comedian", "stand up"],
     club: ["club", "nightclub", "lounge", "nightlife"],
     ticket: ["ticket", "tickets", "entry", "ticketmaster", "eventbrite", "resale"],
@@ -193,7 +193,7 @@
     if (data.city && normalized.includes(normalizeQuery(data.city))) score += 3;
     if (data.country && normalized.includes(normalizeQuery(data.country))) score += 2;
     if ((record.sourceType || record.type || "").includes("template") && /template|background|birthday|flower|tattoo|video/.test(normalized)) score += 2;
-    if ((record.sourceType || record.type || "").includes("bata") && /bata|merch|market|apparel/.test(normalized)) score += 2;
+    if ((record.sourceType || record.type || "").includes("bartr") && /bartr|bart|merch|market|apparel/.test(normalized)) score += 2;
     if ((record.sourceType || record.type || "").includes("event") && /ticket|event|tonight|weekend|comedy|show/.test(normalized)) score += 2;
     return score;
   }

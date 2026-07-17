@@ -136,13 +136,13 @@
   }
 
   function renderActions() {
-    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.07`;
-    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    byId("clubShoutoutLink").href = `./?location=${encodeURIComponent(locationId)}&v=29.09.8`;
+    byId("clubGuestListLink").href = `./guest-list.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
     const address = window.FLOQRAddress?.fullAddress(club) || club.fullAddress || club.address || [club.city, club.region, club.country].filter(Boolean).join(", ");
     byId("clubDirectionsLink").href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-    byId("clubPickupLink").href = `./pickup.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    byId("clubPickupLink").href = `./pickup.html?location=${encodeURIComponent(locationId)}&v=29.09.8`;
     if (club.commerceEnabled) {
-      byId("clubCommerceLink").href = `./commerce.html?club=${encodeURIComponent(locationId)}&v=29.07`;
+      byId("clubCommerceLink").href = `./commerce.html?club=${encodeURIComponent(locationId)}&v=29.09.8`;
       byId("clubCommerceLink").classList.remove("hidden");
     } else byId("clubCommerceLink").classList.add("hidden");
     const website = safeExternal(club.officialWebsite || club.website);
@@ -325,7 +325,7 @@
       await loadClubProfile();
       await refreshClubFollow();
     } catch (error) {
-      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.07">Return to FLOQR</a></p>`;
+      byId("clubProfileLoading").innerHTML = `<h1>Club profile unavailable</h1><p class="sub">${esc(error?.message || error)}</p><p><a class="buttonlike" href="./?v=29.09.8">Return to FLOQR</a></p>`;
     }
   });
 })();

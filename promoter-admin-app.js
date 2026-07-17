@@ -88,13 +88,10 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bind("promoterGoogleLoginBtn", loginGoogle);
-    bind("promoterLogoutBtn", logout);
     byId("periodFilter")?.addEventListener("change", loadReports);
     auth.onAuthStateChanged(user => {
       const email = (user?.email || "").toLowerCase();
       const allowed = getAllowedPromoters(email);
-      setText("promoterSignedInAs", user ? `Signed in as ${user.displayName || user.email}` : "Not signed in");
-      setText("promoterPanelSignedInAs", user ? `Signed in as ${user.displayName || user.email}` : "Not signed in");
       if (!user) {
         byId("promoterLogin").classList.remove("hidden");
         byId("promoterPanel").classList.add("hidden");

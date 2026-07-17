@@ -41,13 +41,16 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Toast warning** | Short auto-dismiss notice (~3s) with optional close control | Blocking modal |
 | **Help popout (?)** | Inline help control explaining field rules (e.g. FloqR handle charset) | Toast |
 | **Marketplace** | Place patrons buy/sell goods and services | Club ShoutOut commerce share |
-| **Vendor** | Patron (or club) selling on the marketplace | FloqR platform MoR for priced ShoutOuts |
+| **BartR** | Shared FloqR ecommerce **frontend** (name from **barter** + swag). Amazon/eBay-style discovery + checkout. One site for all shoppers. Formerly drafted as “Bata” — use **BartR** only. | Per-vendor seller backend; ShoutOut |
+| **BartR seller backend** | Per patron/service (US only) tools in My Profile: products, store info, contact, binding refund policy, fulfillment | Shared BartR frontend |
+| **Vendor** | US-based patron or service member selling through BartR; **ships** the item after FloqR payment | FloqR MoR / checkout |
 | **Vendor category** | Goods type: electronics, clothes, jewelry, arts, services, or multi | Stripe product type only |
-| **Vendor storefront template** | Category-driven storefront layout generated for a vendor | ShoutOut template |
+| **Vendor storefront template** | Category-driven layout for seller backend / public vendor page (later) | ShoutOut template |
 | **FloqR-priced ShoutOut** | Patron pays FloqR Stripe (e.g. Football Intro $30); club accrues 20% | Connect destination charge to club |
+| **BartR payment** | Patron pays **FloqR** (MoR) for BartR goods; FloqR remits vendor share; **vendor ships** | Direct seller Stripe Checkout as MoR |
 | **Test payment** | Stripe test-mode payment marked `isTestPayment` for later purge | Live charge |
 | **Account Reconciliation** | Club/Master ledger of FloqR-priced shares | Stripe Connect payout dashboard |
-| **MoR** | Merchant of Record (FloqR for priced ShoutOuts) | Connected-account seller for marketplace |
+| **MoR** | Merchant of Record — FloqR for priced ShoutOuts **and** BartR checkout | Connected-account seller (payouts only) |
 | **Refined Discovery Search** | Master Admin panel where city, genre, and venue/event type are defined before a crawl | Generic AI Crawling tab label |
 | **Discovery crawl** | Callable or scheduled run that queries Google Places and public pages and writes review queue records | Manual source paste only |
 | **Impactful datapoints** | Required review fields: name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, address | Optional marketing fields |
@@ -78,3 +81,21 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 6. Color themes + customizable background.
 7. Portrait motion (not filters), **≤5s** budget; CSS Ken Burns when opted in; Gemini framing optional with timeout → originals.
 8. Role-aware Mingl match bonus for promoter / hospitality (waiter, bottle girl) / DJ / media creator.
+
+## Next iteration — backlog
+
+Do **not** start these unless asked. Capture only.
+
+| Priority | Feature | Scope |
+|----------|---------|--------|
+| **Next** | **BartR product ranking** | Shared BartR frontend should prefer products from taste/datapoints and people the patron follows; later FloqR may buy 3rd-party datapoints for matching. Today: random/shuffle of active US-vendor listings. |
+| **Next** | **BartR seller backend polish** | Contact info, binding refund policy editor, fulfillment/shipping tools, vendor category templates — beyond basic product publish. |
+| **Next** | **Post-deploy standards enforcement** | Keep `STANDARD-AFTER-DEPLOYMENT.md` current each ship; remaining gaps: index Sign out chrome cleanup, audit every Save button for `FLOQRActionFeedback`. |
+| **Next** | **FloqR Inbox management** | Patron, Club, Promoter, and other entity inboxes need normal inbox controls: **delete** (and typical management: select, bulk delete, archive/trash if we add folders). Today messages cannot be deleted. |
+| **Next** | **Inbox recipient privacy** | Patrons must never see Club Admin / CSR / staff **emails** in FLOQR Inbox recipient search. Show display name, FloqR handle, or role label only. (Local fix in `patron-portal-app.js` + `patron-portal.html?v=29.09.7` — **publish in next iteration**, not live yet.) |
+| **Next** | **Mingl group chat** | Patron can **create a Mingl chat group**, **invite friends**, and friends must **approve** before joining. Pair Mingl chat already exists; group rooms + invite/accept flow do not. |
+| Queued | UI languages (de fr es it ru el pl pt) + browser-default first-use + Master Admin translation overrides | Phase 2 from earlier roadmap |
+| Queued | Club public profile: structured open/closed days, layout templates, backgrounds | Phase 3 |
+| Queued | Mingl match-reason-only privacy | Phase 4 |
+| Queued | BartR vendor category templates / seller-page layouts | Phase 5 (was “Patron marketplace vendor category templates”) |
+| Queued | Ticketmaster Discovery API confirmation for refined crawl | Explicitly deferred |

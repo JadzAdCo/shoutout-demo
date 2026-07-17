@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.06 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.8 */
 (function () {
   "use strict";
 
@@ -31,7 +31,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.06";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.8";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -698,7 +698,7 @@
         {label:"Gemini function prompt uses context", file:"functions/ai-discovery-functions.js", includes:["User-owned profile signals JSON", "User-owned past ShoutOut examples JSON", "Do not reveal private details"]},
         {label:"Live preview direct iframe render hook", file:"patron-app.js", includes:["renderShoutOutDisplay", "previewPayload", "dataset.previewUrl"]},
         {label:"Display app exposes render hook", file:"display-app.js", includes:["window.renderShoutOutDisplay = render"]},
-        {label:"Confirmation actions route to Edit ShoutOut, Mingl, and Bata", file:"index.html", includes:["editSubmittedShoutoutBtn", "confirmGoMinglBtn", "confirmGoBataBtn"], notIncludes:["startAnotherBtn", "chooseAnotherClubBtn", "logoutBtn6"]},
+        {label:"Confirmation actions route to Edit ShoutOut, Mingl, and BartR", file:"index.html", includes:["editSubmittedShoutoutBtn", "confirmGoMinglBtn", "confirmGoBartrBtn"], notIncludes:["startAnotherBtn", "chooseAnotherClubBtn", "logoutBtn6"]},
         {label:"Public Mingl chat message action popout", file:"patron-app.js", includes:["showMinglMessageActions", "Throw Graffiti", "Delete after read", "uploadMinglAttachment", "expireReadOnceMinglMessages"]},
         {label:"Portal Mingl chat media and background tools", file:"patron-portal.html", includes:["portalMinglBackgroundInput", "portalMinglImageInput", "portalClearMinglImageBtn"]},
         {label:"Portal Mingl message action popout", file:"patron-portal-app.js", includes:["showPortalMinglMessageActions", "uploadPortalMinglBackground", "uploadPortalMinglImage", "expireReadOncePortalMinglMessages"]},
@@ -829,10 +829,91 @@
         {label:"Club background variants rule", file:"firestore.rules", includes:["FLOQR FIRESTORE RULES VERSION: v29.06", "clubTemplateVariants"]},
         {label:"Current rollback and deployment docs", file:"ROLLBACK-V29-06.md", includes:["FLOQR Rollback - v29.06", "ShoutOut-wepApp.v29.05.zip"]}
       ]
+    },
+    {
+      version:"v29.09.6",
+      title:"Football Intro animation + FloqR handles + Refined Discovery Crawl",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.6\""]},
+        {label:"Football Intro template rename", file:"shared-data.js", includes:["name:'Football Intro'", "zebbiesFootballTeamIntro"]},
+        {label:"64x32 reduced layout enabled", file:"shared-data.js", includes:["skipFinaleLineup:true"]},
+        {label:"Per-player identity + portrait motion UI", file:"index.html", includes:["footballTeamIdentity1", "footballAiTreatment", "footballColorTheme"]},
+        {label:"5-second portrait motion path", file:"patron-app.js", includes:["football-portrait-motion", "FOOTBALL_AI_TIMEOUT_MS", "aiPortraitMotion"]},
+        {label:"Display skip-finale and portrait motion CSS", file:"display.css", includes:["football-skip-finale", "football-portrait-motion", "footballStadiumMessageCompact"]},
+        {label:"FloqR handle identity helpers", file:"floqr-identity.js", includes:["normalizeFloqrHandle", "FOOTBALL_COLOR_THEMES", "resolvePlayerIdentityLabel"]},
+        {label:"Refined Discovery Search UI", file:"master-admin.html", includes:["Refined Discovery Search", "Run Discovery Crawl"]},
+        {label:"Places-backed discovery callable", file:"functions/ai-discovery-functions.js", includes:["exports.runFloqrDiscoveryCrawl", "ticketmaster:\"later\"", "GOOGLE_PLACES_API_KEY"]},
+        {label:"Impactful discovery datapoints", file:"ai-discovery-service.js", includes:["artistsOrDjs", "promoters", "DJ(s)/Artist(s)"]},
+        {label:"Script cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.6"]}
+      ]
+    },
+    {
+      version:"v29.09.8",
+      title:"BartR marketplace + contextual nav + post-deploy standards",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.8\""]},
+        {label:"Post-deploy standard documented", file:"STANDARD-AFTER-DEPLOYMENT.md", includes:["Standard things to do after each deployment", "Profile and status card", "Command buttons"]},
+        {label:"BartR shared frontend", file:"commerce.html", includes:["BartR", "FloqR collects payment", "bartr-shell"]},
+        {label:"BartR Search entry + icon tile", file:"index.html", includes:["bartrBtnCard", "bartr-card-icon", "images/bartr-icon.png"]},
+        {label:"BartR seller backend in portal", file:"patron-portal.html", includes:["portalBartrStore", "BartR Store", "editCommerceRefundPolicy"]},
+        {label:"Contextual FLOQRNav helper", file:"floqr-nav.js", includes:["FLOQRNav", "start=search", "Back to My Profile and Settings"]},
+        {label:"Help popout dismiss standard", file:"helper-popouts.js", includes:["closeOtherPopouts", "Escape", "mingl-action-details"]},
+        {label:"Action feedback outside click dismiss", file:"floqr-action-feedback.js", includes:["bindDismissBehavior", "Escape"]},
+        {label:"BartR MoR checkout (no destination charge)", file:"functions/commerce-functions.js", includes:["paymentModel:\"floqr-platform\"", "marketplace:\"bartr\"", "type !== \"commerce\""]},
+        {label:"Script cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.8"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-8-bartr-marketplace",
+      area:"BartR",
+      feature:"Shared BartR frontend + US seller backend + FloqR MoR",
+      changed:"BartR is the shared ecommerce frontend (barter + swag). Search shows a larger BartR icon tile. Vendors manage products/store/refund policy under My Profile → BartR Store (US only). Shoppers browse shuffled listings on commerce.html. FloqR collects payment; vendor ships.",
+      howToTest:"Open ?v=29.09.8&start=search, tap BartR. Sign in, confirm marketplace grid (not a single-seller storefront titled with your name). In Patron Portal set Country=United States, enable BartR seller store, save, open BartR Store tab, publish a product, return to BartR and find it. See STANDARD-AFTER-DEPLOYMENT.md §A–C.",
+      expected:"Search BartR tile is larger and uses the icon. Back from BartR with from=search returns to Search. Seller tools are in portal, not on the shared frontend. Non-US country cannot enable seller store."
+    },
+    {
+      id:"v29-09-8-contextual-back",
+      area:"Navigation",
+      feature:"Back stays inside the current portal/area",
+      changed:"Portal satellites use from=portal and return to My Profile and Settings. Leaving a portal returns to Search (?start=search), not welcome.",
+      howToTest:"From patron-portal open Mingl Chat, Services, Role Request, and BartR with from=portal. Confirm Back labels and destinations. From portal Back confirm Search categories (not landing welcome).",
+      expected:"Satellite Back → Profile and Settings. Portal/Admin/Master Back → Search."
+    },
+    {
+      id:"v29-09-8-post-deploy-standards",
+      area:"QA / Diagnostics",
+      feature:"After-deploy checklist, help dismiss, command popouts, profile pill",
+      changed:"STANDARD-AFTER-DEPLOYMENT.md defines required steps: diagnostics, ? help, dismiss behavior, live tests, profile status on non-popout screens, and FLOQRActionFeedback for non-link commands.",
+      howToTest:"Open Master Admin Diagnostics for v29.09.8. On Language Settings click ?, click elsewhere to dismiss. Save profile and confirm success popout auto-closes and Close Window works; click dimmed backdrop to dismiss. Confirm profile pill on portal/admin/commerce.",
+      expected:"Package install checks pass. Help and command popouts dismiss consistently. Profile pill present on interactive pages except display.html."
+    },
+    {
+      id:"v29-09-6-football-intro-animation",
+      area:"ShoutOut — Football Intro",
+      feature:"Animated Football Intro (20s) with identity, themes, and optional portrait motion",
+      changed:"Zebbies priced template is labeled Football Intro. Patrons pick per-player Display name / Instagram / FloqR·Mingl handle (not free-typed names), choose a color theme and optional background, enable all display sizes (64×32 skips the side-by-side finale), and may opt into portrait motion (not filters) with a 5-second AI budget and CSS Ken Burns on the board.",
+      howToTest:"At Zebbies Garden DC, open Create ShoutOut → Football Intro. Select a large display (e.g. p125-96x48) and Preview: expect opening → four player reveals → stadium message → finale lineup of all four photos. Switch to 64×32 and Preview: expect the same flow but NO all-players side-by-side finale (message stays longer). Set each player identity type, pick a color theme, check Animate loaded portraits, upload four photos with consent, Preview again: portraits should gently zoom/pan. Optional: continue to $30 FloqR checkout in Stripe test mode (marks isTestPayment).",
+      expected:"Pass when (1) template title shows Football Intro, (2) large display shows full 20s animation including finale, (3) 64×32 omits finale, (4) on-screen player labels follow the chosen identity type, (5) theme/background colors apply, (6) with Animate checked the board uses portrait motion even if Gemini times out within 5s and originals remain."
+    },
+    {
+      id:"v29-09-6-floqr-mingl-handle",
+      area:"Profiles / contacts",
+      feature:"FloqR handle = Mingl handle on signup, portal, and club public contacts",
+      changed:"Single floqrHandle field (letters/numbers/_/- only) with ? help; username synced without @; Instagram auto-adds @ with a 3-second toast.",
+      howToTest:"Create or edit a patron profile: set FloqR / Mingl handle with an emoji (should reject/warn), then a valid handle. Enter Instagram without @ and blur the field. Check club public profile contacts show the FloqR handle when saved in Club Admin.",
+      expected:"Valid @handle saves; invalid characters warn; Instagram gains @ and toast auto-dismisses in ~3s; public contacts show FloqR/Mingl handle."
+    },
+    {
+      id:"v29-09-6-refined-discovery-crawl",
+      area:"Master Admin — AI Crawling",
+      feature:"Refined Discovery Search runs Places-backed crawl (Ticketmaster later)",
+      changed:"Master Admin sets city/genre/venue-or-event type and Run Discovery Crawl. Live results come from Google Places via runFloqrDiscoveryCrawl; Ticketmaster is marked later. Review requires name, genre, DJ(s)/artists, promoters, phone, email, Instagram, address.",
+      howToTest:"Open Master Admin → AI Crawling → Refined Discovery Search. Choose a city and genre, click Run Discovery Crawl. Open Review Discovery Queue and inspect a Places result checklist.",
+      expected:"Crawl completes without error. New queue rows show Google Places confirmation and Ticketmaster: later. Missing DJ/promoter/email/Instagram block Approve until filled or Soft Fail is documented as incomplete enrichment (not a crash)."
+    },
     {
       id:"v29-04-club-public-page",
       area:"Club Public Profile",
@@ -924,10 +1005,10 @@
     {
       id:"v28-86-confirmation-actions",
       area:"ShoutOut confirmation",
-      feature:"Confirmation uses Edit ShoutOut, Mingl, and Bata actions",
-      changed:"The confirmation splash removed Create another ShoutOut, Choose another location, and Sign out. It now provides Edit ShoutOut, Mingl, and Bata.",
+      feature:"Confirmation uses Edit ShoutOut, Mingl, and BartR actions",
+      changed:"The confirmation splash removed Create another ShoutOut, Choose another location, and Sign out. It now provides Edit ShoutOut, Mingl, and BartR.",
       howToTest:"Submit a ShoutOut and inspect the confirmation page.",
-      expected:"Only the new product/action buttons appear. Edit returns to the editor, Mingl opens the Mingl page, and Bata returns to the main product entry point."
+      expected:"Only the new product/action buttons appear. Edit returns to the editor, Mingl opens the Mingl page, and BartR opens the shared marketplace."
     },
     {
       id:"v28-86-mingl-message-popout-actions",
@@ -1738,7 +1819,7 @@
       rawCrawlInput: {
         ...rawInput,
         auditVersion:"v28.67",
-        protectedTerms:"FLOQR, ShoutOut, Mingl, Bata are preserved"
+        protectedTerms:"FLOQR, ShoutOut, Mingl, BartR are preserved"
       },
       parsedData,
       extractionAudit: {
@@ -5147,7 +5228,7 @@
       ["Mingl", "Realtime editable Mingl chat", collectionError(data, "chatMessages") ? "Soft Fail" : "Pass", collectionError(data, "chatMessages") ? "Rules may block chatMessages diagnostics; run rules smoke test after publishing current rules." : "Mingl chat renderer supports visible compose input, realtime messages, sender edits/actions, unread-only Unsend, read receipts, emoji shortcuts, picture sharing, and AI-ready draft grammar cleanup."],
       ["Mingl", "Chat messages privacy", collectionError(data, "chatMessages") ? "Failed" : "Pass", "Diagnostics checks chat access without copying private chat bodies into aiIndex."],
       ["Messaging", "Inbox notifications", collectionStatus(data, "inboxNotifications", true), `${collectionCount(data, "inboxNotifications")} inbox notifications scanned.`],
-      ["Bata", "Marketplace discovery/search", "TBI", "Bata search hooks are AI-ready, but production listing and checkout workflows are not live yet."],
+      ["BartR", "Marketplace discovery/search", "Pass", "BartR shared frontend + US seller backend; personalized ranking still next iteration."],
       ["AI Search", "floqrSearch local fallback", hasSearch ? "Pass" : "Failed", hasSearch ? `FLOQR_AI_ENABLED=${window.FLOQR_AI_ENABLED === true}; fallback=${window.FLOQR_AI_FALLBACK_MODE || "local-contextual-search"}.` : "FLOQRSearch module was not loaded."],
       ["AI Search", "Privacy-respecting aiIndex", unsafeIndexRows.length ? "Failed" : "Pass", unsafeIndexRows.length ? `${unsafeIndexRows.length} aiIndex records need review.` : `${aiIndexRows.length} aiIndex records scanned without chat/message indexing violations.`],
       ["AI Assistant", "Ask FLOQR scaffold", window.FLOQR_AI_ASSISTANT_ENABLED ? "Soft Fail" : "Pass", window.FLOQR_AI_ASSISTANT_ENABLED ? "Assistant flag is on; verify provider/config before production." : "Assistant remains safely disabled by default."],

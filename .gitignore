@@ -36,8 +36,9 @@ Thumbs.db
 .vscode/
 *.log
 
-# Archives / local scratch
-*.zip
+# Local-only scratch (not part of the app / Pages)
+football-intro-preview.html
+.local-preview/
 .rollback-readme-history.zip
 
 # npm

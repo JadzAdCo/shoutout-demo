@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.07";
+  const CURRENT_VERSION = "29.09.8";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -74,11 +74,13 @@
     loc = getStaticLocation(locationId);
     setText("clubName", loc.locationName || locationId);
     const displayLink = byId("displayLink");
-    if (displayLink) displayLink.href = `./display.html?location=${locationId}`;
+    if (displayLink) displayLink.href = window.FLOQRNav?.adminLink("./display.html", { location: locationId }) || `./display.html?location=${locationId}&from=admin`;
     const liveFrame = byId("liveFrame");
     if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
     const publicLink = byId("clubPublicProfileLink");
-    if (publicLink) publicLink.href = `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.07`;
+    if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
+    const roleProfilesLink = byId("adminRoleProfilesLink");
+    if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
   }
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
@@ -88,7 +90,7 @@
   }
 
   function publicProfileUrl() {
-    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.07`, window.location.href).toString();
+    return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
   }
 
   function parsePeopleLines(value, fallbackRole) {
@@ -1437,7 +1439,7 @@
         return;
       }
       const campaignRef = await db.collection("guestListCampaigns").add(payload);
-      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.07`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
+      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.09.8`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
       await campaignRef.set({publishedAt:firebase.firestore.FieldValue.serverTimestamp(), deliveredCount:result.deliveredCount || 0}, {merge:true});
       setText("adminStatus", `Guest list campaign submitted to ${result.deliveredCount || 0} club follower(s).`);
       await loadGuestListCampaigns();
@@ -1557,7 +1559,7 @@
         status,
         read:false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        link:"./patron-portal.html?tab=shoutouts&v=28.28-nf"
+        link:"./patron-portal.html?tab=shoutouts&v=29.09.8"
       });
     } catch(e) {}
   }
@@ -1982,7 +1984,6 @@
 
     auth.onAuthStateChanged(async user => {
       const email = safeUser(user);
-      setText("adminSignedInAs", user ? `Signed in as ${user.displayName || user.email || user.phoneNumber}` : "Not signed in");
 
       if (!user) {
         byId("adminLogin").classList.toggle("hidden", !!adminMfaResolver);
@@ -1994,7 +1995,7 @@
       if (!(await hasClubAdminAccess(user))) {
         byId("adminLogin").classList.remove("hidden");
         byId("adminPanel").classList.add("hidden");
-        setText("adminStatus", `Signed in as ${email}, but this patron is not assigned as an admin for ${locationId}.`);
+        setText("adminStatus", `${email || "This account"} is not assigned as an admin for ${locationId}.`);
         return;
       }
 

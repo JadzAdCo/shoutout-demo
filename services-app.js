@@ -53,7 +53,7 @@
       .filter(row => !query || `${row.displayName || ""} ${row.username || ""} ${row.city || ""} ${row.country || ""} ${(row.musicInterests || row.favoriteGenres || []).join(" ")} ${roleLabel(roleOf(row))}`.toLowerCase().includes(query));
     byId("serviceDirectory").innerHTML = rows.length ? rows.map(row => `<article class="card service-member-card">
       <div><p class="eyebrow">${esc(roleLabel(roleOf(row)))}</p><h2>${esc(row.displayName || row.username || "FLOQR Service Member")}</h2><p class="sub">${esc([row.city, row.country].filter(Boolean).join(", "))}</p><div class="badge-row">${(row.musicInterests || row.favoriteGenres || []).slice(0,5).map(value => `<span>${esc(value)}</span>`).join("")}</div></div>
-      <div class="queue-actions"><button type="button" data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow service"}</button>${row.commerceEnabled ? `<a class="buttonlike" href="./commerce.html?seller=${encodeURIComponent(row.memberUid)}&v=29.07">Shop</a>` : ""}</div>
+      <div class="queue-actions"><button type="button" data-follow="${esc(row.id)}">${following.has(row.id) ? "Unfollow service" : "Follow service"}</button>${row.commerceEnabled ? `<a class="buttonlike" href="./commerce.html?seller=${encodeURIComponent(row.memberUid)}&v=29.09.8">Shop</a>` : ""}</div>
     </article>`).join("") : `<div class="card"><p class="sub">No approved services matched.</p></div>`;
     document.querySelectorAll("[data-follow]").forEach(button => button.addEventListener("click", () => toggleFollow(button.dataset.follow)));
   }

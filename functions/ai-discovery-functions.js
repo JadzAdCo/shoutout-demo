@@ -688,7 +688,7 @@ function clampText(value = "", max = 80) {
 
 function preserveProtectedTerms(value = "") {
   let out = String(value || "");
-  ["FLOQR", "ShoutOut", "Mingl", "Bata"].forEach(term => {
+  ["FLOQR", "ShoutOut", "Mingl", "BartR"].forEach(term => {
     out = out.replace(new RegExp(term, "ig"), term);
   });
   return out;
@@ -863,7 +863,7 @@ function safeEnhancementPrompt(prompt = "", enhancementType = "") {
   return [
     "Edit only the uploaded ShoutOut media image. Do not add text, logos, watermarks, QR codes, or HTML/CSS/JavaScript.",
     "Keep the result suitable for a public nightlife LED display. Avoid explicit, hateful, violent, illegal, or privacy-invasive content.",
-    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and Bata exactly if they appear. Do not translate or alter those terms.",
+    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and BartR exactly if they appear. Do not translate or alter those terms.",
     "Return a polished image edit. Do not change any FLOQR template layout, text placement, media placeholder, animation, or approval format.",
     `User requested enhancement: ${requested}`
   ].join("\n");
@@ -1201,7 +1201,7 @@ exports.aiSuggestShoutOut = onCall({
     "Return only JSON with keys: mainText, subText, tone, safetyStatus.",
     `mainText must be ${mainLimit} visible characters or fewer, arranged in no more than ${lineCount} lines with about ${perLine} characters per line. subText must be ${subLimit} characters or fewer.`,
     "Prefer short familiar words that wrap cleanly. Never depend on clipping, ellipsis, or automatic font shrinking.",
-    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those terms.",
+    "Preserve the protected terms FLOQR, ShoutOut, Mingl, and BartR exactly. Do not translate or alter those terms.",
     "Do not include offensive, explicit, hateful, illegal, private, payment, or sensitive personal data.",
     "Keep the copy suitable for a public nightlife display.",
     `Tone: ${clampText(data.tone || "party", 40)}`,
@@ -1253,7 +1253,7 @@ exports.aiSuggestGrammarCorrection = onCall({
     "You are FLOQR AI helping a signed-in user correct their own private draft text.",
     "Return only JSON with keys: correctedText, detectedIssues, explanation, confidence.",
     "detectedIssues must be an array of objects with original, suggestion, type, and confidence.",
-    "Preserve FLOQR, ShoutOut, Mingl, and Bata exactly. Do not translate or alter those protected terms.",
+    "Preserve FLOQR, ShoutOut, Mingl, and BartR exactly. Do not translate or alter those protected terms.",
     "Do not add new private facts. Keep the user's meaning and tone unless a tone preference is provided.",
     "This draft is private and must not be treated as searchable or public content.",
     `Context JSON: ${JSON.stringify(context)}`,
