@@ -1,0 +1,373 @@
+/* Batch onboard DC venues extracted from official websites. */
+"use strict";
+const admin = require("firebase-admin");
+if (!admin.apps.length) admin.initializeApp({projectId: "shoutoutdemo-5b402"});
+const db = admin.firestore();
+const now = admin.firestore.FieldValue.serverTimestamp();
+const ORIGIN = "https://jadzadco.github.io/shoutout-demo";
+const VERSION = "v29.09.12";
+
+function base(row) {
+  const id = row.id;
+  return {
+    ...row,
+    clubId: id,
+    locationName: row.locationName || row.brandName,
+    clubName: row.locationName || row.brandName,
+    country: "United States",
+    regionType: "District",
+    region: "District of Columbia",
+    stateRegion: "District of Columbia",
+    city: "Washington",
+    locationLabel: "Washington, District of Columbia, United States",
+    publicProfileType: "club",
+    visibility: "public",
+    published: true,
+    services: row.services || ["shoutout", "guestList", "vip"],
+    floqrServices: row.floqrServices || ["ShoutOut", "Guest List", "VIP Reservation"],
+    maxGuestListCampaigns: 6,
+    mediaPolicy: {
+      maxMainMedia: 1,
+      maxPublicImages: 5,
+      maxPublicVideos: 5,
+      maxMarketingVideoSeconds: 15
+    },
+    displayScreenFormatIds: row.displayScreenFormatIds || ["led-96x48", "led-64x48", "led-64x32"],
+    primaryDisplayScreenFormatId: row.primaryDisplayScreenFormatId || "led-96x48",
+    templates: row.templates || ["hiphop", "vip", "bottle", "neon", "birthday"],
+    active: true,
+    onboardingSource: row.onboardingSource || "website-extract-batch-dc",
+    onboardingVersion: VERSION,
+    updatedAt: now,
+    createdAt: now
+  };
+}
+
+const venues = [
+  {
+    id: "heist-washington-dc",
+    brandName: "Heist",
+    locationName: "Heist Washington DC",
+    type: "club",
+    categories: ["Clubs", "Lounge", "Nightlife", "Events", "ShoutOut"],
+    streetAddress: "1802 Jefferson Pl. NW",
+    addressLine1: "1802 Jefferson Pl. NW",
+    fullAddress: "1802 Jefferson Pl. NW, Washington, DC 20036, United States",
+    postalCode: "20036",
+    telephone: "+12025190477",
+    phoneDisplay: "(202) 519-0477",
+    officialWebsite: "https://www.heistdc.com/",
+    logoUrl: "https://images.getbento.com/accounts/c91f13a9c8b9b7e67e9a92798b49e3c3/media/images/81154Logo_Heist.png",
+    socialMediaHandles: {instagram: "@heistdc", facebook: "", x: "", tiktok: ""},
+    tagline: "#1 Lounge in America — Dupont Circle nightlife",
+    description: "Subterranean nightclub and lounge in the heart of DuPont Circle. Hand-selected DJs, VIP-level service, and a celebrity-friendly nightlife destination.",
+    genres: ["Hip Hop", "Afro Beats", "House", "R&B"],
+    amenities: ["VIP service", "Bottle service", "Private events", "Capacity ~150"],
+    hours: "Thu 10 PM–2 AM; Fri–Sat 10 PM–3 AM; Sun–Wed closed",
+    reservationsUrl: "https://www.sevenrooms.com/events/heistdc",
+    brand: "HEIST DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ HEIST DC",
+    defaultSub: "Dupont Circle",
+    activityStatus: "Active Dupont Circle nightclub / lounge",
+    activityDates: ["Thursday late night", "Friday HEIST", "Saturday HEIST"],
+    templates: ["hiphop", "bottle", "birthday", "fire", "vip", "neon"],
+    sourceUrls: ["https://www.heistdc.com/", "https://www.heistdc.com/location/heist/", "https://www.heistdc.com/about/"]
+  },
+  {
+    id: "gaia-supperclub-washington-dc",
+    brandName: "GAIA Supperclub",
+    locationName: "GAIA Supperclub",
+    type: "club",
+    categories: ["Restaurant", "Supperclub", "Lounge", "Nightlife", "Events", "ShoutOut"],
+    aliasNames: ["Gaiai DC", "Gaia DC"],
+    streetAddress: "1025 Vermont Ave NW",
+    addressLine1: "1025 Vermont Ave NW",
+    fullAddress: "1025 Vermont Ave NW, Washington, DC 20005, United States",
+    postalCode: "20005",
+    postalCodeNote: "Venue site listed 20003; Vermont Ave NW downtown commonly 20005 — confirm with venue",
+    telephone: "",
+    officialWebsite: "https://www.gaiasupperclub.com/",
+    socialMediaHandles: {instagram: "", facebook: "", x: "", tiktok: ""},
+    tagline: "Dine in elegance, dance in allure",
+    description: "Immersive Latin-Mediterranean supperclub by Wayne Johnson, Tony Perry, and Mele Melton. Fine dining, craft cocktails, Ambrosia brunch party, and lively nightlife.",
+    cuisine: "Latin and Mediterranean fusion",
+    genres: ["Latin", "House", "International", "Live entertainment"],
+    amenities: ["Private events", "Brunch party", "Dinner", "Cocktails", "DJ / performers"],
+    hours: "Mon private events; Tue–Thu 5 PM–1 AM; Fri–Sat 5 PM–2 AM; Sun 12 PM–1 AM",
+    menuUrl: "https://www.gaiasupperclub.com/food-menu",
+    brunchUrl: "https://www.gaiasupperclub.com/brunch",
+    brand: "GAIA SUPPERCLUB DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ GAIA",
+    defaultSub: "Downtown DC",
+    activityStatus: "Active downtown supperclub",
+    activityDates: ["Ambrosia Sunday brunch", "Weeknight dinner/lounge", "Weekend late night"],
+    templates: ["latin", "vip", "gold", "neon", "birthday"],
+    sourceUrls: ["https://www.gaiasupperclub.com/"]
+  },
+  {
+    id: "onyx-rooftop-washington-dc",
+    brandName: "Onyx Rooftop Lounge",
+    locationName: "Onyx Rooftop Lounge",
+    type: "club",
+    categories: ["Rooftop", "Lounge", "Nightlife", "Clubs", "Events", "ShoutOut"],
+    streetAddress: "1815 M Street NW",
+    addressLine1: "1815 M Street NW",
+    fullAddress: "1815 M Street NW, Washington, DC 20036, United States",
+    postalCode: "20036",
+    telephone: "",
+    officialWebsite: "https://onyxrooftopdc.com/",
+    socialMediaHandles: {instagram: "", facebook: "", x: "", tiktok: ""},
+    tagline: "DC's premier rooftop nightlife experience",
+    description: "Luxury Dupont Circle rooftop bar and nightclub with retractable glass roof, skyline views, VIP bottle service, and curated Hip-Hop / Afrobeats / Latin / Top 40 nights.",
+    genres: ["Hip Hop", "Afrobeats", "Latin", "Top 40", "Bollywood", "Khaleeji"],
+    amenities: ["Retractable glass roof", "VIP tables", "Bottle service from $500", "Hookah", "High Rollers / Playroom / Main Rooftop", "21+"],
+    hours: "Fri–Sat 10 PM–3 AM; Sun 5 PM–11 PM",
+    agePolicy: "21+ only",
+    dressCode: "Upscale dress code enforced",
+    accessibilityNote: "3rd & 4th floors — stairs only, no elevator",
+    brand: "ONYX ROOFTOP DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ ONYX",
+    defaultSub: "Dupont After Dark",
+    activityStatus: "Active Dupont rooftop lounge",
+    activityDates: ["Feel Good Fridays", "Dupont After Dark Saturdays", "Love Sunday Day Party"],
+    templates: ["hiphop", "afrohouse", "latin", "vip", "bottle", "neon"],
+    sourceUrls: ["https://onyxrooftopdc.com/"]
+  },
+  {
+    id: "vera-cocina-washington-dc",
+    brandName: "Vera Cocina & Bar",
+    locationName: "Vera Cocina & Bar",
+    type: "club",
+    categories: ["Restaurant", "Bar", "Nightlife", "Clubs", "Events", "ShoutOut"],
+    aliasNames: ["Vera DC", "Sala Sonidos"],
+    streetAddress: "2002 Fenwick St NE",
+    addressLine1: "2002 Fenwick St NE",
+    fullAddress: "2002 Fenwick St NE, Washington, DC 20002, United States",
+    postalCode: "20002",
+    neighborhood: "Ivy City",
+    telephone: "",
+    email: "info@veradc.com",
+    officialWebsite: "https://veradc.com/",
+    socialMediaHandles: {
+      instagram: "@veraivycity",
+      facebook: "https://www.facebook.com/veraivycity",
+      x: "",
+      tiktok: ""
+    },
+    tagline: "Lebanese-Mexican fusion by day, Sala Sonidos by night",
+    description: "Halal Lebanese-Mexican restaurant and cocktail bar in Ivy City. Fri/Sat late night becomes Sala Sonidos (Afro house / techno / Arabic / Latin). Signature Brunch Hafla weekends.",
+    cuisine: "Lebanese-Mexican fusion (halal-certified)",
+    genres: ["Afro House", "Techno", "Arabic", "Latin"],
+    amenities: ["Valet Fri–Sat after 7 PM", "Bottle service", "Private event spaces", "Brunch Hafla", "Sala Sonidos late night"],
+    hours: "Thu dinner 6–10 PM; Fri–Sat dinner 6 PM–2 AM (Sala Sonidos from 11:30 PM); Sat–Sun brunch 12–3 PM; Mon–Wed closed",
+    agePolicy: "Brunch Hafla / late night 21+",
+    menuUrl: "https://veradc.com/menu",
+    lateNightUrl: "https://veradc.com/sala-sonidos",
+    brunchUrl: "https://veradc.com/brunch-hafla",
+    brand: "VERA DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ VERA",
+    defaultSub: "Ivy City",
+    activityStatus: "Active Ivy City restaurant / late-night club",
+    activityDates: ["Brunch Hafla Sat–Sun", "Sala Sonidos Fri–Sat from 11:30 PM"],
+    templates: ["afrohouse", "latin", "edm", "vip", "bottle", "gold"],
+    sourceUrls: ["https://veradc.com/", "https://veradc.com/llms"]
+  },
+  {
+    id: "sax-washington-dc",
+    brandName: "SAX",
+    locationName: "SAX Dinner Theater and Lounge",
+    type: "club",
+    categories: ["Dinner Theater", "Lounge", "Nightlife", "Events", "ShoutOut"],
+    streetAddress: "734 11th St NW",
+    addressLine1: "734 11th St NW",
+    fullAddress: "734 11th St NW, Washington, DC 20001, United States",
+    postalCode: "20001",
+    telephone: "+12027370101",
+    phoneDisplay: "(202) 737-0101",
+    textPhone: "+12023010177",
+    email: "SaxEvents@thelostgroupdc.com",
+    officialWebsite: "https://www.saxwdc.com/",
+    logoUrl: "https://images.getbento.com/accounts/942562815b991eabb2ac3155c0002622/media/accounts/media/VJay9GQQPywjN1qzgPAE_goldlogo.png",
+    socialMediaHandles: {
+      instagram: "@saxdc",
+      facebook: "https://www.facebook.com/SAXWDC/",
+      x: "@SAXwdc",
+      tiktok: ""
+    },
+    tagline: "Opulence, service, and great entertainment",
+    description: "Dinner theater and lounge with reinvented American cuisine, craft cocktails, live aerial/pole ballet/contortion entertainment, and late-night DJ lounge with bottle service.",
+    cuisine: "Reinvented American",
+    genres: ["Lounge", "Hip Hop", "R&B", "Live entertainment"],
+    amenities: ["Dinner theater", "Live performers", "Bottle service", "Private buyouts"],
+    hours: "Wed & Fri 11 PM–3 AM; Sat 9 PM–3 AM; Sun SIR matinee (check schedule)",
+    brand: "SAX DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ SAX",
+    defaultSub: "Downtown DC",
+    activityStatus: "Active dinner theater / late-night lounge",
+    activityDates: ["Wednesday late night", "Friday late night", "Saturday late night", "SIR Sundays"],
+    templates: ["vip", "gold", "bottle", "neon", "birthday"],
+    sourceUrls: ["https://www.saxwdc.com/", "https://www.saxwdc.com/location/sax-dc/"]
+  },
+  {
+    id: "decades-washington-dc",
+    brandName: "Decades",
+    locationName: "Decades Nightclub",
+    type: "club",
+    categories: ["Clubs", "Retro", "Nightlife", "Events", "ShoutOut"],
+    streetAddress: "1219 Connecticut Avenue NW",
+    addressLine1: "1219 Connecticut Avenue NW",
+    fullAddress: "1219 Connecticut Avenue NW, Washington, DC 20036, United States",
+    postalCode: "20036",
+    telephone: "+12026507326",
+    phoneDisplay: "(202) 650-7326",
+    officialWebsite: "https://decadesdc.com/",
+    socialMediaHandles: {instagram: "", facebook: "", x: "", tiktok: ""},
+    tagline: "DC's only multi-level retro nightclub",
+    description: "15,000 sq ft retro-themed nightclub with 6 floors, 8 bars, and 5 DJs. Retractable rooftop, VIP, bottle service, and large private-event capacity.",
+    genres: ["Hip Hop", "Top 40", "Throwbacks", "EDM", "House"],
+    amenities: ["6 floors", "8 bars", "5 DJs", "Retractable rooftop", "VIP passes", "Bottle service", "Private events"],
+    hours: "Event-driven (typically Thu–Sat late night; check events calendar)",
+    brand: "DECADES DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ DECADES",
+    defaultSub: "Dupont / Connecticut Ave",
+    activityStatus: "Active multi-level retro nightclub",
+    activityDates: ["Thursday events", "Friday events", "Saturday events"],
+    templates: ["hiphop", "edm", "vip", "bottle", "neon", "birthday"],
+    sourceUrls: ["https://decadesdc.com/", "https://decadesdc.com/venue/"]
+  },
+  {
+    id: "rosebar-lounge-washington-dc",
+    brandName: "Rosebar Lounge",
+    locationName: "Rosebar Lounge",
+    type: "club",
+    categories: ["Clubs", "Lounge", "Nightlife", "Events", "ShoutOut"],
+    aliasNames: ["Rose Bar DC", "Rosebar DC"],
+    streetAddress: "1215 Connecticut Ave NW",
+    addressLine1: "1215 Connecticut Ave NW",
+    fullAddress: "1215 Connecticut Ave NW, Washington, DC 20036, United States",
+    postalCode: "20036",
+    telephone: "+12029555525",
+    phoneDisplay: "(202) 955-5525",
+    textPhone: "+12023018794",
+    email: "info@rosebarlounge.com",
+    officialWebsite: "https://www.rosebarlounge.com/",
+    socialMediaHandles: {instagram: "@rosebardc", facebook: "", x: "", tiktok: ""},
+    tagline: "Premier nightclub lounge on Connecticut Ave",
+    description: "Premier DC nightclub lounge with VIP tables Tue/Thu–Sun, day parties, celebrity guest appearances, and private events.",
+    genres: ["Hip Hop", "Afrobeats", "R&B", "Top 40"],
+    amenities: ["VIP tables", "Bottle service", "Day party", "Private events", "Guest appearances"],
+    hours: "Mon special events 10 PM–2 AM; Tue 11 PM–2 AM; Wed closed; Thu 10 PM–2 AM; Sat 10 PM–3 AM; Sun day 4–9 PM / night 11 PM–2 AM (confirm Fri with venue)",
+    brand: "ROSEBAR DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ ROSEBAR",
+    defaultSub: "Connecticut Ave",
+    activityStatus: "Active Connecticut Ave lounge / nightclub",
+    activityDates: ["Tuesday VIP", "Thursday VIP", "Friday VIP", "Saturday VIP", "Sunday night VIP"],
+    templates: ["hiphop", "afrohouse", "vip", "bottle", "neon", "birthday"],
+    sourceUrls: ["https://www.rosebarlounge.com/", "https://www.rosebarlounge.com/contact"]
+  },
+  {
+    id: "kata-washington-dc",
+    brandName: "KATA",
+    locationName: "KATA DC",
+    type: "club",
+    categories: ["Restaurant", "Bar", "Lounge", "Nightlife", "Events", "ShoutOut"],
+    streetAddress: "600 F Street NW",
+    addressLine1: "600 F Street NW",
+    fullAddress: "600 F Street NW, Washington, DC 20004, United States",
+    postalCode: "20004",
+    neighborhood: "Chinatown / Gallery Place",
+    telephone: "+12028346620",
+    phoneDisplay: "(202) 834-6620",
+    officialWebsite: "https://www.kata-dc.com/",
+    socialMediaHandles: {instagram: "@kata.experience", facebook: "", x: "", tiktok: ""},
+    tagline: "DC's first Asian Tapas Cocktail experience",
+    description: "Asian fusion tapas, sushi, and experiential cocktails in a sleek Chinatown setting — fine dining early, vibrant nightlife energy later.",
+    cuisine: "Asian fusion / sushi / tapas",
+    genres: ["Lounge", "Hip Hop", "International", "House"],
+    amenities: ["Cocktails", "Private events", "Sushi / Asian fusion", "Bar seating"],
+    hours: "Mon 5–8 PM; Tue–Thu 5–10 PM; Fri 5 PM–12 AM; Sat 6 PM–12 AM; Sun closed (third-party hours — confirm with venue)",
+    brand: "KATA DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ KATA",
+    defaultSub: "Chinatown",
+    activityStatus: "Active Chinatown Asian fusion restaurant / cocktail lounge",
+    activityDates: ["Weeknight dinner", "Friday late dining/lounge", "Saturday late dining/lounge"],
+    templates: ["vip", "gold", "neon", "birthday", "ice"],
+    sourceUrls: ["https://www.kata-dc.com/"]
+  },
+  {
+    id: "lima-twist-washington-dc",
+    brandName: "LIMA Twist",
+    locationName: "LIMA Twist",
+    type: "club",
+    categories: ["Restaurant", "Bar", "Lounge", "Nightlife", "Clubs", "Events", "ShoutOut"],
+    streetAddress: "1411 K Street NW",
+    addressLine1: "1411 K Street NW",
+    fullAddress: "1411 K Street NW, Washington, DC 20005, United States",
+    postalCode: "20005",
+    telephone: "+12025067151",
+    phoneDisplay: "(202) 506-7151",
+    officialWebsite: "https://www.limatwist.com/",
+    logoUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/be6ac216-be12-4708-a090-69e3666a2f13/LIMA+Logo+web.png?format=1500w",
+    socialMediaHandles: {
+      instagram: "@limatwistdc",
+      facebook: "https://www.facebook.com/limatwistdc/",
+      x: "",
+      tiktok: ""
+    },
+    tagline: "Join us for a meal to remember!",
+    description: "Downtown DC South American Fusion restaurant, bar, and lounge. Restaurant energy early; late-night house-rooted programming with light and sound. Valet parking.",
+    cuisine: "South American Fusion",
+    genres: ["House", "Deep House", "EDM", "Latin", "International"],
+    amenities: ["Valet Parking", "Restaurant", "Bar", "Lounge", "Bottle Service"],
+    hours: "Fri–Sat 7:00 PM–3:00 AM; Sun 7:00 PM–1:00 AM; Mon–Thu closed",
+    menuUrl: "https://www.limatwist.com/menu",
+    reservationsUrl: "https://www.opentable.com/r/lima-twist-washington",
+    brand: "LIMA TWIST DC x FLOQR",
+    defaultMain: "USE SHOUT OUT @ LIMA TWIST",
+    defaultSub: "Downtown DC",
+    activityStatus: "Active downtown DC restaurant / bar / lounge",
+    activityDates: ["Friday late-night lounge", "Saturday late-night lounge", "Sunday evening lounge"],
+    templates: ["edm", "latin", "vip", "bottle", "birthday", "neon", "gold"],
+    sourceUrls: ["https://www.limatwist.com/", "https://www.limatwist.com/contact", "https://www.limatwist.com/menu"]
+  }
+];
+
+async function onboardOne(raw) {
+  const payload = base(raw);
+  const id = payload.id;
+  await db.collection("clubLocations").doc(id).set(payload, {merge: true});
+  await db.collection("clubs").doc(id).set({
+    clubId: id,
+    clubName: payload.clubName,
+    brandName: payload.brandName,
+    primaryLocationId: id,
+    officialWebsite: payload.officialWebsite || "",
+    telephone: payload.telephone || "",
+    aliasNames: payload.aliasNames || [],
+    updatedAt: now,
+    createdAt: now
+  }, {merge: true});
+  await db.collection("clubOnboardingRecords").doc(id).set({
+    ...payload,
+    adminPortalUrl: `${ORIGIN}/admin.html?location=${id}&v=29.09.12`,
+    displayUrl: `${ORIGIN}/display.html?location=${id}&v=29.09.12`,
+    publicProfileUrl: `${ORIGIN}/club-profile.html?location=${id}&v=29.09.12`,
+    status: "created"
+  }, {merge: true});
+  return id;
+}
+
+async function main() {
+  const results = [];
+  for (const venue of venues) {
+    const id = await onboardOne(venue);
+    results.push(id);
+    console.log("onboarded", id);
+  }
+  console.log(JSON.stringify({ok: true, count: results.length, ids: results}, null, 2));
+}
+
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
