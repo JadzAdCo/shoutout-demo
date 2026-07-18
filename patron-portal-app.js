@@ -2480,7 +2480,10 @@
     if (eligibility) {
       if (!eligible) eligibility.textContent = "BartR marketplace selling is limited to U.S.-based patrons and service members. Set Country to United States in My Profile to qualify.";
       else if (!enabled) eligibility.textContent = "Enable BartR seller store under My Profile, then publish products here. Shoppers browse the shared BartR frontend.";
-      else eligibility.textContent = "Your listings can appear on the shared BartR frontend. FloqR collects payment; you ship.";
+      else eligibility.textContent = "Your listings can appear on the shared BartR frontend. FloqR collects payment; you fulfill (ship merch or deliver digital/Mixcloud access).";
+    }
+    if (byId("djCommercePolicyNote") && window.FLOQRDjCommerce?.POLICY_SUMMARY) {
+      byId("djCommercePolicyNote").textContent = window.FLOQRDjCommerce.POLICY_SUMMARY;
     }
     if (summary) {
       summary.innerHTML = simpleRows([
@@ -2488,7 +2491,8 @@
         ["Contact", profile.commerceContact || user.email || "—"],
         ["Refund policy", profile.commerceRefundPolicy || "Not set"],
         ["Marketplace region", eligible ? "United States" : (profile.country || "Not set")],
-        ["Seller store", enabled ? "Enabled" : "Disabled"]
+        ["Seller store", enabled ? "Enabled" : "Disabled"],
+        ["DJ audio rule", "Curation + Mixcloud links OK; downloads need rights cert"]
       ]);
     }
     tools?.classList.toggle("hidden", !(eligible && enabled));
@@ -2505,7 +2509,7 @@
     const orders = orderSnap ? orderSnap.docs.map(doc => ({id:doc.id, ...doc.data()})) : [];
     if (byId("commerceSellerReport")) {
       byId("commerceSellerReport").innerHTML = products.length
-        ? products.map(product => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(product.name || "Product")}</strong><span>${product.active === false ? "Inactive" : "Live on BartR"}</span></div><p>${esc(product.category || "")} · ${moneyCents(product.priceCents)} · ${Number(product.inventory || 0)} available</p><p class="queue-actions">${product.active === false ? "" : `<button type="button" data-deactivate-product="${esc(product.id)}">Deactivate</button>`}</p></div>`).join("")
+        ? products.map(product => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(product.name || "Product")}</strong><span>${product.active === false ? "Inactive" : "Live on BartR"}</span></div><p>${esc(product.category || "")} · ${esc(product.productType || "physical")} · ${moneyCents(product.priceCents)} · ${Number(product.inventory || 0)} available${product.mixcloudUrl ? ` · <a href="${esc(product.mixcloudUrl)}" target="_blank" rel="noopener">Mixcloud</a>` : ""}${product.externalPlaylistUrl ? ` · <a href="${esc(product.externalPlaylistUrl)}" target="_blank" rel="noopener">Playlist</a>` : ""}</p><p class="queue-actions">${product.active === false ? "" : `<button type="button" data-deactivate-product="${esc(product.id)}">Deactivate</button>`}</p></div>`).join("")
         : "<p class='sub'>No BartR products yet. Publish your first listing above.</p>";
       document.querySelectorAll("[data-deactivate-product]").forEach(button => {
         button.addEventListener("click", () => deactivateBartrProduct(button.dataset.deactivateProduct, user));
@@ -2536,11 +2540,29 @@
     const priceCents = Math.round(Number(byId("commerceProductPrice")?.value || 0) * 100);
     const productType = byId("commerceProductType")?.value || "physical";
     if (!name || priceCents < 50) return setText("portalStatus", "Add a product name and a price of at least $0.50.");
+    if (!byId("commerceNoPlacementGuarantee")?.checked) {
+      return setText("portalStatus", "Confirm you will not sell guaranteed playlist placement before publishing.");
+    }
+    const mixcloudUrl = byId("commerceMixcloudUrl")?.value.trim() || "";
+    const externalPlaylistUrl = byId("commercePlaylistUrl")?.value.trim() || "";
+    const rightsCert = byId("commerceRightsCert")?.value || "";
+    const downloadUrl = byId("commerceDownloadUrl")?.value.trim() || "";
+    const validation = window.FLOQRDjCommerce?.validateDjListing?.({
+      productType, mixcloudUrl, externalPlaylistUrl, rightsCert, downloadUrl
+    });
+    if (validation && !validation.ok) {
+      return setText("portalStatus", validation.errors.join(" "));
+    }
+    if (["playlistCuration", "mixcloudShow"].includes(productType) && !byId("commerceNoAudioDelivery")?.checked) {
+      return setText("portalStatus", "Confirm you will not deliver uncleared audio files for playlist/Mixcloud products.");
+    }
+    const digitalTypes = ["playlistCuration", "mixcloudShow", "djConsultation", "photoLicense", "videoLicense", "clearedMixDownload"];
+    const requiresShipping = productType === "physical" && byId("commerceProductShipping")?.checked !== false;
     return actionFeedback({
       starting:"Publishing to BartR…",
       wait:"Saving your listing to the shared marketplace.",
       success:"Product published",
-      redirecting:"Your listing is live on BartR. FloqR collects payment; you ship.",
+      redirecting:"Your listing is live on BartR. FloqR collects payment; you fulfill.",
       failed:"Could not publish product",
       returnTo:"BartR Store"
     }, async () => {
@@ -2560,15 +2582,23 @@
         priceCents,
         inventory:Math.max(0, Number(byId("commerceProductInventory")?.value || 0)),
         imageUrl:byId("commerceProductImage")?.value.trim() || "",
+        mixcloudUrl,
+        mixcloudSubscribeUrl:byId("commerceMixcloudSubscribeUrl")?.value.trim() || "",
+        externalPlaylistUrl,
+        downloadUrl: productType === "clearedMixDownload" ? downloadUrl : "",
+        rightsCert: productType === "clearedMixDownload" ? rightsCert : (productType === "mixcloudShow" ? "mixcloudHosted" : ""),
+        noPlacementGuarantee:true,
+        noUnclearedAudioDelivery:!!byId("commerceNoAudioDelivery")?.checked,
         description:byId("commerceProductDescription")?.value.trim() || "",
-        requiresShipping:productType === "physical" && byId("commerceProductShipping")?.checked !== false,
+        requiresShipping,
+        digitalDelivery: digitalTypes.includes(productType),
         refundPolicySnapshot:profile.commerceRefundPolicy || "",
         contactSnapshot:profile.commerceContact || user.email || "",
         active:true,
         createdAt:firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       });
-      ["commerceProductName","commerceProductPrice","commerceProductImage","commerceProductDescription"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+      ["commerceProductName","commerceProductPrice","commerceProductImage","commerceProductDescription","commerceMixcloudUrl","commercePlaylistUrl","commerceMixcloudSubscribeUrl","commerceDownloadUrl"].forEach(id => { if (byId(id)) byId(id).value = ""; });
       await renderBartrSellerBackend(user, profile);
     });
   }

@@ -555,7 +555,18 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const sellerCountry = text(product.sellerCountry || product.marketplaceCountry || "US", 80);
     const usOk = ["us", "usa", "u.s.", "u.s.a.", "united states", "united states of america"].includes(sellerCountry.toLowerCase());
     if (product.marketplaceCountry && !usOk) throw new HttpsError("failed-precondition", "BartR marketplace selling is limited to U.S.-based vendors.");
-    // FloqR is MoR (same pattern as priced ShoutOuts). Vendor share accrues for payout; vendor ships.
+    const {validateDjListing} = require("./dj-commerce-policy");
+    const listingCheck = validateDjListing({
+      productType: text(product.productType, 40),
+      mixcloudUrl: text(product.mixcloudUrl, 500),
+      externalPlaylistUrl: text(product.externalPlaylistUrl, 500),
+      rightsCert: text(product.rightsCert, 80),
+      downloadUrl: text(product.downloadUrl, 500)
+    });
+    if (!listingCheck.ok) {
+      throw new HttpsError("failed-precondition", listingCheck.errors[0] || "This DJ/media listing is not eligible for checkout.");
+    }
+    // FloqR is MoR (same pattern as priced ShoutOuts). Vendor share accrues for payout; vendor fulfills.
     return {
       amountCents,
       venueShareCents:0,
@@ -564,7 +575,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
       quantity,
       unitAmountCents,
       itemName:text(product.name || "BartR marketplace item", 120),
-      description:text(product.description || "Sold on BartR. FloqR collects payment; the vendor ships.", 300),
+      description:text(product.description || "Sold on BartR. FloqR collects payment; the vendor fulfills.", 300),
       sellerEntityId,
       sellerEntityType,
       sellerUid:text(product.sellerUid, 160),
@@ -576,13 +587,18 @@ exports.createFloqrConnectOnboardingLink = onCall({
       productType:text(product.productType || "physical", 40),
       mediaLicense:text(product.mediaLicense || "", 80),
       previewMediaType:text(product.previewMediaType || "image", 20),
-      requiresShipping:product.requiresShipping !== false,
+      requiresShipping:product.requiresShipping !== false && text(product.productType, 40) === "physical",
+      mixcloudUrl:text(product.mixcloudUrl, 500),
+      externalPlaylistUrl:text(product.externalPlaylistUrl, 500),
+      rightsCert:text(product.rightsCert, 80),
       productSnapshot:{
         name:text(product.name, 120),
         imageUrl:text(product.imageUrl, 500),
         productType:text(product.productType || "physical", 40),
         previewMediaType:text(product.previewMediaType || "image", 20),
         mediaLicense:text(product.mediaLicense || "", 80),
+        mixcloudUrl:text(product.mixcloudUrl, 500),
+        externalPlaylistUrl:text(product.externalPlaylistUrl, 500),
         sellerEntityId:text(product.sellerEntityId || product.sellerUid, 160),
         sellerName:text(product.sellerName, 120),
         priceCents:unitAmountCents,
@@ -605,13 +621,34 @@ exports.createFloqrConnectOnboardingLink = onCall({
     };
   }
 
-  if (type === "smsNotifications") {
+  if (type === "smsNotifications" || type === "smsMessageBundle") {
+    const {packForOrderType} = require("./messaging-credits");
+    const pack = packForOrderType(type);
     return {
-      amountCents:1000,
-      itemName:"Club Admin SMS notification service",
-      description:"SMS notification service charge.",
-      floqrShareCents:1000,
+      amountCents:pack.priceCents,
+      itemName:type === "smsNotifications" ? "SMS Notification Services ($10)" : "SMS messaging bundle ($10)",
+      description:pack.description,
+      floqrShareCents:pack.floqrProfitCents,
       venueShareCents:0,
+      messagingCredits:pack.messagesPerPack,
+      messagingChannel:"sms",
+      twilioBudgetCents:pack.twilioBudgetCents,
+      clubLocationId:text(payload.clubLocationId, 120)
+    };
+  }
+
+  if (type === "whatsappNotifications" || type === "whatsappMessageBundle") {
+    const {packForOrderType} = require("./messaging-credits");
+    const pack = packForOrderType(type);
+    return {
+      amountCents:pack.priceCents,
+      itemName:type === "whatsappNotifications" ? "WhatsApp Notification Services ($10)" : "WhatsApp messaging bundle ($10)",
+      description:pack.description,
+      floqrShareCents:pack.floqrProfitCents,
+      venueShareCents:0,
+      messagingCredits:pack.messagesPerPack,
+      messagingChannel:"whatsapp",
+      twilioBudgetCents:pack.twilioBudgetCents,
       clubLocationId:text(payload.clubLocationId, 120)
     };
   }
@@ -709,7 +746,9 @@ exports.createFloqrCheckoutSession = onCall({
     const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
     const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
     if (type === "audienceCampaign") await requirePublisher(text(payload.entityId, 160), request.auth);
-    if (["targetedGuestList", "smsNotifications"].includes(type)) await requirePublisher(text(payload.clubLocationId, 160), request.auth);
+    if (["targetedGuestList", "smsNotifications", "smsMessageBundle", "whatsappNotifications", "whatsappMessageBundle"].includes(type)) {
+      await requirePublisher(text(payload.clubLocationId, 160), request.auth);
+    }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();
     const returnBase = safeReturnBase(request);
@@ -1170,6 +1209,54 @@ async function finalizePaidOrder(orderId, session) {
   if (order.orderType === "smsNotifications" && order.clubLocationId) {
     await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({smsEnabled:true, smsServiceOrderId:orderId, smsPaidAt:paidAt, updatedAt:paidAt}, {merge:true});
     await ref.set({fulfillmentStatus:"sms-enabled"}, {merge:true});
+  }
+
+  if (["smsNotifications", "smsMessageBundle", "whatsappNotifications", "whatsappMessageBundle"].includes(order.orderType) && order.clubLocationId) {
+    const {packForOrderType, creditField, purchasedField} = require("./messaging-credits");
+    const pack = packForOrderType(order.orderType);
+    if (pack) {
+      const credits = Math.max(0, Math.floor(Number(order.messagingCredits || pack.messagesPerPack || 0)));
+      const balanceKey = creditField(pack.channel);
+      const purchasedKey = purchasedField(pack.channel);
+      const creditRef = db.collection("clubMessagingCredits").doc(order.clubLocationId);
+      await db.runTransaction(async transaction => {
+        const snap = await transaction.get(creditRef);
+        const data = snap.exists ? snap.data() || {} : {};
+        if (data.lastCreditedOrderId === orderId) return;
+        const nextBalance = Math.max(0, Math.floor(Number(data[balanceKey] || 0))) + credits;
+        const nextPurchased = Math.max(0, Math.floor(Number(data[purchasedKey] || 0))) + credits;
+        const patch = {
+          clubLocationId:order.clubLocationId,
+          [balanceKey]:nextBalance,
+          [purchasedKey]:nextPurchased,
+          lastCreditedOrderId:orderId,
+          lastPackChannel:pack.channel,
+          lastPackCredits:credits,
+          updatedAt:paidAt
+        };
+        if (pack.channel === "sms") {
+          patch.smsServiceEnabled = true;
+          patch.smsLastPaidAt = paidAt;
+        } else {
+          patch.whatsappServiceEnabled = true;
+          patch.whatsappLastPaidAt = paidAt;
+        }
+        transaction.set(creditRef, patch, {merge:true});
+      });
+      if (pack.channel === "whatsapp") {
+        await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({
+          whatsappEnabled:true,
+          whatsappServiceOrderId:orderId,
+          whatsappPaidAt:paidAt,
+          updatedAt:paidAt
+        }, {merge:true});
+      }
+      await ref.set({
+        fulfillmentStatus:pack.channel === "sms" ? "sms-credits-granted" : "whatsapp-credits-granted",
+        messagingCreditsGranted:credits,
+        messagingChannel:pack.channel
+      }, {merge:true});
+    }
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});
 }

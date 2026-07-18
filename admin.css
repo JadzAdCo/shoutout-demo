@@ -230,3 +230,24 @@ body[data-guest-theme] .card,body[data-guest-theme] .guest-campaign-hero{border-
 .modal-shell{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.78);backdrop-filter:blur(8px)}.modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:24px;background:#101937;box-shadow:0 24px 80px rgba(0,0,0,.7)}.modal-shell.hidden{display:none!important}.icon-button{width:42px;height:42px;padding:0;border-radius:50%;font-size:24px}.ride-stage{font-size:18px}.ride-progress{height:12px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.1)}.ride-progress span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ff4fc9,#5eeaff,#dfff5a);transition:width .8s ease}.simulation-footnote{margin-top:16px;color:#ffd35e;font-weight:900}.action-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 
 @media(max-width:820px){.pickup-layout{grid-template-columns:1fr}.pickup-request-card{grid-column:auto}.pickup-mode-picker{grid-template-columns:1fr}.companion-grid,.pickup-fact-grid{grid-template-columns:1fr}.simulation-banner{align-items:flex-start;flex-direction:column}.pickup-map{min-height:320px}}
+
+/* Marketing campaign composer (v29.09.12) */
+.template-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:14px 0}
+.template-pick{display:grid;gap:4px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.22);color:inherit;cursor:pointer}
+.template-pick span{font-size:12px;color:var(--muted)}
+.template-pick.active,.template-pick:hover{border-color:#5eeaff;box-shadow:0 0 0 1px rgba(94,234,255,.25)}
+.marketing-preview{min-height:220px;margin:14px 0;padding:22px;border:1px solid var(--line);border-radius:20px;background:#0c1228 center/cover no-repeat;display:grid;align-content:end;gap:8px}
+.marketing-preview h3{margin:0;font-size:28px;line-height:1.15}
+.marketing-preview p{margin:0;max-width:36ch;color:rgba(255,255,255,.88)}
+.preview-eyebrow{margin:0;text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:900;color:#5eeaff}
+.preview-cta{display:inline-flex;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,#ff4fc9,#5eeaff);color:#040614;font-weight:1000;width:fit-content}
+.preview-images{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.preview-images img{width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.2)}
+.marketing-preview.layout-splitPoster{grid-template-columns:1.2fr .8fr}
+.marketing-preview.layout-stackedCards .preview-images img{width:96px;height:64px}
+.marketing-preview.layout-announcement{align-content:center;text-align:center;justify-items:center}
+
+/* BartR Mixcloud embeds */
+.mixcloud-embed{display:block;width:100%;min-height:120px;border:0;border-radius:12px;background:#0a0f1e}
+.commerce-access-links a{color:#5eeaff;font-weight:800}
+.commerce-product-media iframe{max-width:100%}

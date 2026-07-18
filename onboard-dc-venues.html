@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Onboard DC venues | FLOQR</title>
+  <link rel="stylesheet" href="./admin.css?v=29.09.12"/>
+</head>
+<body>
+<main class="app admin-shell" style="max-width:920px;margin:24px auto;padding:18px">
+  <h1>Onboard extracted DC venues</h1>
+  <p class="sub">Sign in as Master Admin, then push website-extracted club profiles from <code>shared-data.js</code> into Firestore (<code>clubLocations</code>, <code>clubs</code>, <code>clubOnboardingRecords</code>).</p>
+  <p id="status" class="status">Checking auth…</p>
+  <button id="loginBtn" type="button">Sign in with Google</button>
+  <button id="onboardBtn" class="primary" type="button" disabled>Onboard all DC venues</button>
+  <pre id="report" class="report-block" style="white-space:pre-wrap;margin-top:16px"></pre>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.12"></script>
+<script src="./shared-data.js?v=29.09.12"></script>
+<script>
+(function () {
+  const IDS = [
+    "heist-washington-dc",
+    "gaia-supperclub-washington-dc",
+    "onyx-rooftop-washington-dc",
+    "vera-cocina-washington-dc",
+    "sax-washington-dc",
+    "decades-washington-dc",
+    "rosebar-lounge-washington-dc",
+    "kata-washington-dc",
+    "lima-twist-washington-dc"
+  ];
+  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const status = document.getElementById("status");
+  const report = document.getElementById("report");
+  const onboardBtn = document.getElementById("onboardBtn");
+  const MASTER = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"].map(x => x.toLowerCase());
+
+  document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  auth.onAuthStateChanged(user => {
+    const ok = user && MASTER.includes(String(user.email || "").toLowerCase());
+    status.textContent = user
+      ? (ok ? `Signed in as ${user.email}. Ready to onboard ${IDS.length} venues.` : `Signed in as ${user.email}, but Master Admin is required.`)
+      : "Sign in with a Master Admin Google account.";
+    onboardBtn.disabled = !ok;
+    report.textContent = IDS.map(id => {
+      const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id];
+      return loc ? `• ${id} — ${loc.locationName || loc.brandName}` : `• ${id} — MISSING in shared-data`;
+    }).join("\n");
+  });
+
+  async function writeVenue(id) {
+    const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id];
+    if (!loc) throw new Error(`Missing shared-data location: ${id}`);
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const payload = {
+      id,
+      clubId: id,
+      ...loc,
+      clubName: loc.locationName || loc.brandName,
+      country: loc.country || "United States",
+      region: loc.region || "District of Columbia",
+      stateRegion: loc.region || "District of Columbia",
+      city: loc.city || "Washington",
+      locationLabel: loc.locationLabel || "Washington, District of Columbia, United States",
+      publicProfileType: "club",
+      visibility: "public",
+      published: true,
+      services: ["shoutout", "guestList", "vip"],
+      floqrServices: ["ShoutOut", "Guest List", "VIP Reservation"],
+      onboardingSource: "website-extract-batch-dc",
+      onboardingVersion: "v29.09.12",
+      active: true,
+      updatedAt: now,
+      createdAt: now
+    };
+    await db.collection("clubLocations").doc(id).set(payload, {merge: true});
+    await db.collection("clubs").doc(id).set({
+      clubId: id,
+      clubName: payload.clubName,
+      brandName: payload.brandName,
+      primaryLocationId: id,
+      officialWebsite: payload.officialWebsite || "",
+      telephone: payload.telephone || "",
+      aliasNames: payload.aliasNames || [],
+      updatedAt: now,
+      createdAt: now
+    }, {merge: true});
+    await db.collection("clubOnboardingRecords").doc(id).set({
+      ...payload,
+      adminPortalUrl: `./admin.html?location=${id}&v=29.09.12`,
+      displayUrl: `./display.html?location=${id}&v=29.09.12`,
+      publicProfileUrl: `./club-profile.html?location=${id}&v=29.09.12`,
+      status: "created"
+    }, {merge: true});
+    return id;
+  }
+
+  onboardBtn.onclick = async () => {
+    try {
+      status.textContent = "Writing venues…";
+      const done = [];
+      for (const id of IDS) done.push(await writeVenue(id));
+      report.textContent = `Onboarded ${done.length} venues:\n` + done.map(id => `- ${id}`).join("\n");
+      status.textContent = "Done.";
+    } catch (error) {
+      status.textContent = error.message || String(error);
+      report.textContent = String(error?.stack || error);
+    }
+  };
+})();
+</script>
+</body>
+</html>

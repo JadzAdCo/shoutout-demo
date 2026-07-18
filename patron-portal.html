@@ -253,24 +253,66 @@
         </div>
         <div id="bartrSellerTools" class="card hidden">
           <p class="eyebrow">Listings</p>
-          <h2>Add a product or media license</h2>
-          <p class="sub small">Videographers and camera operators should use a watermarked or low-resolution preview. Paid digital delivery is tracked as fulfillment after FloqR checkout.</p>
+          <h2>Add a product, DJ offering, or media license</h2>
+          <p class="sub small">Videographers: use watermarked / low-res previews. <strong>DJs:</strong> sell curation (Spotify/Apple/Tidal links + notes), Mixcloud embeds/links, consultation, or merch — not uncleared audio files. Mixcloud Creator Subscriptions is the preferred path for monetized mixes. FloqR collects payment; you fulfill.</p>
+          <p id="djCommercePolicyNote" class="sub small"></p>
           <div class="profile-grid">
             <label>Product name<input id="commerceProductName"/></label>
-            <label>Category<select id="commerceProductCategory"><option>Apparel</option><option>Photography</option><option>Video</option><option>Artwork</option><option>Fashion</option><option>Jewelry</option><option>Accessories</option><option>Other</option></select></label>
-            <label>Product type<select id="commerceProductType"><option value="physical">Physical product</option><option value="photoLicense">Digital photo license</option><option value="videoLicense">Digital video license</option></select></label>
+            <label>Category<select id="commerceProductCategory">
+              <option>Apparel</option>
+              <option>DJ Merch</option>
+              <option>DJ Playlist</option>
+              <option>DJ Mix (Mixcloud)</option>
+              <option>DJ Consultation</option>
+              <option>Photography</option>
+              <option>Video</option>
+              <option>Artwork</option>
+              <option>Fashion</option>
+              <option>Jewelry</option>
+              <option>Accessories</option>
+              <option>Other</option>
+            </select></label>
+            <label>Product type<select id="commerceProductType">
+              <option value="physical">Physical product / merch</option>
+              <option value="playlistCuration">Playlist curation (links + notes — no audio files)</option>
+              <option value="mixcloudShow">Mixcloud show / mix (embed or link)</option>
+              <option value="djConsultation">DJ consultation / programming</option>
+              <option value="photoLicense">Digital photo license</option>
+              <option value="videoLicense">Digital video license</option>
+              <option value="clearedMixDownload">Cleared mix download (rights certified only)</option>
+            </select></label>
             <label>Price (USD)<input id="commerceProductPrice" type="number" min="0.50" step="0.01"/></label>
             <label>Available licenses / inventory<input id="commerceProductInventory" type="number" min="0" value="1"/></label>
-            <label>Preview type<select id="commerceProductPreviewType"><option value="image">Image / watermarked photo</option><option value="video">Video preview</option></select></label>
-            <label class="profile-grid-wide">Preview media URL<input id="commerceProductImage" type="url" placeholder="Use a watermarked or low-resolution sales preview"/></label>
-            <label>Media license<select id="commerceProductLicense"><option value="personal">Personal use</option><option value="editorial">Editorial use</option><option value="commercial">Commercial use</option><option value="exclusive">Exclusive rights</option></select></label>
-            <label class="profile-grid-wide">Description<textarea id="commerceProductDescription" rows="3"></textarea></label>
+            <label>Preview type<select id="commerceProductPreviewType"><option value="image">Image / cover art</option><option value="video">Video preview</option><option value="mixcloud">Mixcloud embed</option></select></label>
+            <label class="profile-grid-wide">Preview / cover image URL<input id="commerceProductImage" type="url" placeholder="Cover art, merch photo, or watermarked preview"/></label>
+            <label class="profile-grid-wide">Mixcloud show URL<input id="commerceMixcloudUrl" type="url" placeholder="https://www.mixcloud.com/you/your-show/"/></label>
+            <label class="profile-grid-wide">Playlist / streaming links<input id="commercePlaylistUrl" type="url" placeholder="Spotify / Apple Music / Tidal playlist URL (not an .mp3)"/></label>
+            <label class="profile-grid-wide">Creator Subscriptions / Mixcloud tip URL<input id="commerceMixcloudSubscribeUrl" type="url" placeholder="Optional Mixcloud subscribe / support page"/></label>
+            <label class="profile-grid-wide">Download URL (cleared mixes only)<input id="commerceDownloadUrl" type="url" placeholder="Only if rights-certified download"/></label>
+            <label>Media / delivery license<select id="commerceProductLicense">
+              <option value="personal">Personal use</option>
+              <option value="editorial">Editorial use</option>
+              <option value="commercial">Commercial use</option>
+              <option value="exclusive">Exclusive rights</option>
+              <option value="curationService">Curation service (no audio ownership)</option>
+              <option value="mixcloudAccess">Mixcloud access / listen link</option>
+            </select></label>
+            <label>Rights certification<select id="commerceRightsCert">
+              <option value="">Not a downloadable mix</option>
+              <option value="mixcloudHosted">Hosted on Mixcloud (no BartR download)</option>
+              <option value="ownOrCommissioned">Own / commissioned music only</option>
+              <option value="writtenClearance">Written clearance (master + composition, all tracks)</option>
+              <option value="licensedLibrary">Commercial mix/resale-licensed library</option>
+            </select></label>
+            <label class="profile-grid-wide">Description<textarea id="commerceProductDescription" rows="3" placeholder="What the buyer receives: links, notes, Mixcloud show, merch size, consultation scope…"></textarea></label>
+            <label class="profile-grid-wide"><input id="commerceNoPlacementGuarantee" type="checkbox" checked/> I will not sell guaranteed playlist placement to artists (honest review without a placement promise is OK)</label>
+            <label class="profile-grid-wide"><input id="commerceNoAudioDelivery" type="checkbox" checked/> For playlist/Mixcloud products: I will not deliver actual recordings as files unless rights-certified below</label>
             <label><input id="commerceProductShipping" type="checkbox" checked/> Requires shipping</label>
           </div>
           <button id="commerceSaveProductBtn" class="primary" type="button">Publish to BartR</button>
           <div id="commerceSellerReport" class="report-block"></div>
           <h3>Sales and fulfillment</h3>
-          <div id="commerceOrdersReport" class="report-block"><p class="sub">Paid BartR sales appear here with invoice and delivery status. FloqR collected payment; you ship.</p></div>
+          <div id="commerceOrdersReport" class="report-block"><p class="sub">Paid BartR sales appear here with invoice and delivery status. FloqR collected payment; you ship or deliver digital access.</p></div>
         </div>
       </section>
 
@@ -503,7 +545,8 @@
 <script src="./helper-popouts.js?v=29.09.8"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./patron-portal-app.js?v=29.09.8"></script>
+<script src="./dj-commerce-policy.js?v=29.09.12"></script>
+<script src="./patron-portal-app.js?v=29.09.12"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

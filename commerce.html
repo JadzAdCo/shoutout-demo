@@ -25,7 +25,7 @@
           <div class="hero-logo-fallback product-fallback hidden">BartR</div>
         </div>
         <h1 class="visually-hidden">BartR</h1>
-        <p class="sub">One shared storefront for US FloqR vendors. FloqR takes payment; the vendor ships. Manage your listings in My Profile and Settings.</p>
+        <p class="sub">One shared storefront for US FloqR vendors — including DJ merch, playlist curation (streaming links), Mixcloud-linked mixes, and consultation. FloqR takes payment; the vendor fulfills. Manage listings in My Profile and Settings.</p>
         <p id="commerceStatus" class="status hidden" aria-live="polite"></p>
       </div>
       <div class="card commerce-payment-card">
@@ -43,11 +43,15 @@
     <div id="commercePanel" class="hidden">
       <section class="card">
         <div class="commerce-toolbar">
-          <label>Search products<input id="commerceSearch" placeholder="T-shirts, photos, videos, paintings, jewelry"/></label>
+          <label>Search products<input id="commerceSearch" placeholder="DJ playlists, Mixcloud mixes, merch, photos…"/></label>
           <label>Category
             <select id="commerceCategory">
               <option value="">All categories</option>
               <option>Apparel</option>
+              <option>DJ Merch</option>
+              <option>DJ Playlist</option>
+              <option>DJ Mix (Mixcloud)</option>
+              <option>DJ Consultation</option>
               <option>Photography</option>
               <option>Video</option>
               <option>Artwork</option>
@@ -76,7 +80,8 @@
 <script src="./floqr-action-feedback.js?v=29.09.9"></script>
 <script src="./helper-popouts.js?v=29.09.9"></script>
 <script src="./payment-service.js?v=29.09.9"></script>
-<script src="./commerce-app.js?v=29.09.9"></script>
+<script src="./dj-commerce-policy.js?v=29.09.12"></script>
+<script src="./commerce-app.js?v=29.09.12"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {

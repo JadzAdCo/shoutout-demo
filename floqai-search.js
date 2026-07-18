@@ -27,14 +27,14 @@
     let start = performance.now();
 
     const bounds = () => {
-      const status = document.querySelector(".intent-patron-status");
       const topPad = 72;
       const bottomPad = 96;
-      const statusBottom = status
-        ? Math.max(topPad + 40, status.getBoundingClientRect().bottom + 8)
-        : topPad + 120;
-      /* Idle path stays on the right; top capped at profile/status card */
-      const minTop = Math.min(statusBottom, window.innerHeight * 0.22);
+      const userMenu = document.getElementById("userMenu") || document.querySelector(".user-menu");
+      const menuBottom = userMenu
+        ? Math.max(topPad + 40, userMenu.getBoundingClientRect().bottom + 12)
+        : topPad + 80;
+      /* Idle path stays on the right; top capped near top-right profile card */
+      const minTop = Math.min(menuBottom, window.innerHeight * 0.22);
       const maxTop = Math.max(minTop + 80, window.innerHeight - bottomPad - agent.offsetHeight);
       return { minTop, maxTop };
     };
@@ -142,6 +142,8 @@
     start = performance.now();
     raf = requestAnimationFrame(tick);
     scheduleCycle(FIRST_POP_MS);
+    /* First invite: run phrase cycle soon so FloqAi + help text are obvious on load */
+    setTimeout(() => { if (!searchOpen) runPhraseCycle(); }, 900);
 
     return {
       openSearch,
