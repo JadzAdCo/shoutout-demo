@@ -1,4 +1,4 @@
-/* FLOQR Club Role Activity & Permission (REP) v29.07. */
+/* FLOQR Club Role Activity & Permission (REP) v29.09.10. */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -14,6 +14,10 @@
     ["manageCommerce", "Manage club Commerce products and orders"]
   ];
 
+  function callable(name) {
+    return firebase.app().functions("us-central1").httpsCallable(name);
+  }
+
   function roleName(row = {}) { return row.roleElectionType || (row.workerRoles || [])[0] || "Club Worker"; }
 
   function renderPolicies() {
@@ -21,7 +25,7 @@
     if (!wrap) return;
     wrap.innerHTML = designations.length ? designations.map(row => {
       const permissions = new Set(row.rolePermissions || []);
-      return `<article class="queue-item rep-worker-policy" data-rep-id="${esc(row.id)}"><div class="message-envelope-head"><strong>${esc(row.workerName || row.workerEmail || "Club worker")}</strong><span>${esc(roleName(row))}</span></div><div class="privacy-datapoint-grid">${permissionOptions.map(([key,label]) => `<label><input type="checkbox" data-rep-permission="${key}" ${permissions.has(key) ? "checked" : ""}/> ${esc(label)}</label>`).join("")}<label><input type="checkbox" data-rep-approval ${row.requireApproval !== false ? "checked" : ""}/> Club Admin must approve this worker’s postings</label></div></article>`;
+      return `<article class="queue-item rep-worker-policy" data-rep-id="${esc(row.id)}"><div class="message-envelope-head"><strong>${esc(row.workerName || row.workerEmail || "Club worker")}</strong><span>${esc(roleName(row))}</span></div><div class="privacy-datapoint-grid">${permissionOptions.map(([key,label]) => `<label><input type="checkbox" data-rep-permission="${key}" ${permissions.has(key) ? "checked" : ""}/> ${esc(label)}</label>`).join("")}<label><input type="checkbox" data-rep-approval ${row.requireApproval !== false ? "checked" : ""}/> Club Admin must approve this worker's postings</label></div></article>`;
     }).join("") : `<p class="sub">Approve or elect workers on Employee/Workers before assigning REP duties.</p>`;
   }
 
@@ -47,6 +51,9 @@
     byId("repNotifyPush").checked = !!notificationSettings.push;
     byId("repNotifyEmail").checked = !!notificationSettings.email;
     byId("repNotifySms").checked = !!notificationSettings.smsEnabled;
+    if (byId("repNotifyWhatsapp")) byId("repNotifyWhatsapp").checked = !!notificationSettings.whatsappEnabled;
+    if (byId("repAlertPhone")) byId("repAlertPhone").value = notificationSettings.alertPhone || notificationSettings.smsPhone || "";
+    if (byId("repChannelPreference")) byId("repChannelPreference").value = notificationSettings.channelPreference || "sms";
   }
 
   async function savePolicies() {
@@ -70,10 +77,10 @@
         const checkoutCampaign = {...payload, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
         await window.FLOQRPayments.startCheckout({orderType:"targetedGuestList", payload:{clubLocationId:locationId, campaign:checkoutCampaign, targetUserCount:Number(payload.targetUserCount || 0)}, status:message => { byId("repStatus").textContent = message; }});
         return;
-        await db.collection("inboxNotifications").add({recipientUid:activity.submittedByUid, type:"repApproval", title:"Campaign approved — payment required", body:`${payload.campaignName || "Guest list campaign"} is approved. Complete targeted FloqR payment before publication.`, link:`./admin.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        await db.collection("inboxNotifications").add({recipientUid:activity.submittedByUid, type:"repApproval", title:"Campaign approved — payment required", body:`${payload.campaignName || "Guest list campaign"} is approved. Complete targeted FloqR payment before publication.`, link:`./admin.html?location=${encodeURIComponent(locationId)}&v=29.09.10`, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       } else {
         const campaignRef = await db.collection("guestListCampaigns").add({...payload, status:"enabled", active:true, approvedByUid:auth.currentUser.uid, approvedAt:firebase.firestore.FieldValue.serverTimestamp(), createdAt:firebase.firestore.FieldValue.serverTimestamp(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-        const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestList", sourceCampaignId:campaignRef.id, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.09.8`}});
+        const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName || "Guest List", body:payload.description || "A new guest list is open.", campaignType:"guestList", sourceCampaignId:campaignRef.id, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.09.10`}});
         await campaignRef.set({deliveredCount:result.deliveredCount || 0}, {merge:true});
         await db.collection("clubRoleActivity").doc(id).set({status:"approved", publishedCampaignId:campaignRef.id, reviewedByUid:auth.currentUser.uid, reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
       }
@@ -85,7 +92,21 @@
 
   async function saveNotifications() {
     const wantsSms = byId("repNotifySms").checked;
-    await db.collection("clubNotificationSettings").doc(locationId).set({inApp:byId("repNotifyInApp").checked, push:byId("repNotifyPush").checked, email:byId("repNotifyEmail").checked, smsRequested:wantsSms, smsEnabled:wantsSms && !!notificationSettings.smsPaidAt, updatedByUid:auth.currentUser.uid, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    const wantsWhatsapp = !!byId("repNotifyWhatsapp")?.checked;
+    const alertPhone = String(byId("repAlertPhone")?.value || "").trim();
+    const channelPreference = byId("repChannelPreference")?.value || "sms";
+    await db.collection("clubNotificationSettings").doc(locationId).set({
+      inApp:byId("repNotifyInApp").checked,
+      push:byId("repNotifyPush").checked,
+      email:byId("repNotifyEmail").checked,
+      smsRequested:wantsSms,
+      smsEnabled:wantsSms && !!notificationSettings.smsPaidAt,
+      whatsappEnabled:wantsWhatsapp,
+      alertPhone,
+      channelPreference,
+      updatedByUid:auth.currentUser.uid,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
     if (wantsSms && !notificationSettings.smsPaidAt) {
       byId("repStatus").textContent = "SMS selected. Opening the $10 service checkout…";
       await window.FLOQRPayments.startCheckout({orderType:"smsNotifications", payload:{clubLocationId:locationId}, status:message => { byId("repStatus").textContent = message; }});
@@ -95,9 +116,40 @@
     await loadRep();
   }
 
+  async function showDailyAuthCode() {
+    const status = byId("repMessagingStatus") || byId("repStatus");
+    const codeEl = byId("repDailyAuthCode");
+    try {
+      status.textContent = "Loading today's club code…";
+      const result = await callable("getClubDailyAuthCode")({clubLocationId: locationId});
+      const data = result?.data || {};
+      if (codeEl) codeEl.textContent = data.code ? `Today's club code (${data.dayKey || "today"}): ${data.code}` : "No code returned.";
+      status.textContent = "Club daily auth code ready.";
+    } catch (error) {
+      if (codeEl) codeEl.textContent = "";
+      status.textContent = error?.message || String(error);
+    }
+  }
+
+  async function sendTestMessage() {
+    const status = byId("repMessagingStatus") || byId("repStatus");
+    try {
+      status.textContent = "Sending test alert…";
+      const result = await callable("sendClubTestMessage")({clubLocationId: locationId});
+      const data = result?.data || {};
+      status.textContent = data.dryRun
+        ? `Test logged as dry-run (${data.delivered || 0} target(s)). Configure Twilio secrets to send live.`
+        : `Test alert sent to ${data.delivered || 0} channel(s).`;
+    } catch (error) {
+      status.textContent = error?.message || String(error);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     byId("saveRepPoliciesBtn")?.addEventListener("click", () => savePolicies().catch(error => { byId("repStatus").textContent = error.message; }));
     byId("saveRepNotificationsBtn")?.addEventListener("click", () => saveNotifications().catch(error => { byId("repStatus").textContent = error.message; }));
+    byId("showClubDailyAuthCodeBtn")?.addEventListener("click", () => showDailyAuthCode());
+    byId("sendClubTestMessageBtn")?.addEventListener("click", () => sendTestMessage());
     auth.onAuthStateChanged(user => { if (user) loadRep().catch(error => { byId("repStatus").textContent = error.message; }); });
   });
 })();
