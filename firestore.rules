@@ -594,6 +594,13 @@ service cloud.firestore {
     match /clubNotificationSettings/{id} {
       allow read, create, update, delete: if signedIn();
     }
+    match /clubMessagingCredits/{id} {
+      allow read: if signedIn();
+      allow create, update, delete: if false;
+    }
+    match /clubMarketingCampaigns/{id} {
+      allow read, create, update, delete: if signedIn();
+    }
     match /clubDailyAuthCodes/{id} {
       allow read, create, update, delete: if signedIn();
     }

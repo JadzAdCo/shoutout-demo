@@ -1,4 +1,4 @@
-/* BartR shared marketplace frontend v29.09.8 — discovery + FloqR MoR checkout; seller tools live in patron portal. */
+/* BartR shared marketplace frontend v29.09.12 — discovery + FloqR MoR checkout; DJ Mixcloud/playlist-safe cards. */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -34,7 +34,6 @@
   async function loadMarketplaceProducts() {
     const snap = await db.collection("commerceProducts").where("active", "==", true).limit(120).get();
     const rows = snap.docs.map(doc => ({id:doc.id, ...doc.data()}));
-    // US marketplace only — prefer explicit sellerCountry; drop unknown non-US when tagged.
     products = shuffle(rows.filter(product => {
       const country = product.sellerCountry || product.marketplaceCountry || "";
       if (!country) return true;
@@ -43,12 +42,51 @@
     renderProducts();
   }
 
+  function typeLabel(product = {}) {
+    const map = {
+      playlistCuration: "Playlist curation",
+      mixcloudShow: "Mixcloud mix",
+      djConsultation: "DJ consultation",
+      clearedMixDownload: "Cleared mix download",
+      photoLicense: "Photo license",
+      videoLicense: "Video license",
+      physical: "Physical"
+    };
+    return map[product.productType] || product.productType || "Product";
+  }
+
   function previewMarkup(product = {}) {
+    if (product.productType === "mixcloudShow" || product.previewMediaType === "mixcloud") {
+      const embed = window.FLOQRDjCommerce?.mixcloudEmbedSrc?.(product.mixcloudUrl) || "";
+      if (embed) {
+        return `<iframe class="mixcloud-embed" src="${esc(embed)}" width="100%" height="120" frameborder="0" allow="encrypted-media" title="${esc(product.name || "Mixcloud show")}"></iframe>`;
+      }
+    }
     if (!product.imageUrl) return `<span>${esc((product.category || "Item").slice(0, 1))}</span>`;
     if (product.previewMediaType === "video") {
       return `<video src="${esc(product.imageUrl)}" controls muted playsinline preload="metadata" aria-label="${esc(product.name || "Video preview")}"></video>`;
     }
     return `<img src="${esc(product.imageUrl)}" alt="${esc(product.name || "Product")}"/>`;
+  }
+
+  function digitalBadges(product = {}) {
+    const badges = [];
+    if (product.productType && product.productType !== "physical") {
+      badges.push(`<span>${esc(typeLabel(product))}</span>`);
+    }
+    if (product.mediaLicense) badges.push(`<span>${esc(product.mediaLicense)} license</span>`);
+    if (product.productType === "playlistCuration") badges.push("<span>Streaming links only</span>");
+    if (product.productType === "mixcloudShow") badges.push("<span>Listen on Mixcloud</span>");
+    if (product.productType === "clearedMixDownload") badges.push(`<span>Rights: ${esc(product.rightsCert || "certified")}</span>`);
+    return badges.length ? `<div class="badge-row">${badges.join("")}</div>` : "";
+  }
+
+  function accessLinks(product = {}) {
+    const links = [];
+    if (product.mixcloudUrl) links.push(`<a href="${esc(product.mixcloudUrl)}" target="_blank" rel="noopener">Open on Mixcloud</a>`);
+    if (product.mixcloudSubscribeUrl) links.push(`<a href="${esc(product.mixcloudSubscribeUrl)}" target="_blank" rel="noopener">Creator Subscriptions</a>`);
+    if (product.externalPlaylistUrl) links.push(`<a href="${esc(product.externalPlaylistUrl)}" target="_blank" rel="noopener">Open playlist</a>`);
+    return links.length ? `<p class="sub small commerce-access-links">${links.join(" · ")}</p>` : "";
   }
 
   function renderProducts() {
@@ -57,7 +95,7 @@
     const rows = products
       .filter(product => product.active !== false)
       .filter(product => !category || product.category === category)
-      .filter(product => !search || `${product.name || ""} ${product.description || ""} ${product.category || ""} ${product.sellerName || ""} ${product.mediaLicense || ""}`.toLowerCase().includes(search));
+      .filter(product => !search || `${product.name || ""} ${product.description || ""} ${product.category || ""} ${product.sellerName || ""} ${product.mediaLicense || ""} ${product.productType || ""}`.toLowerCase().includes(search));
     const grid = byId("commerceProductGrid");
     if (!grid) return;
     grid.innerHTML = rows.length ? rows.map(product => `<article class="card commerce-product-card">
@@ -66,12 +104,13 @@
       <h2>${esc(product.name || "Product")}</h2>
       <p class="sub">${esc(product.description || "")}</p>
       <p class="sub small">Vendor: ${esc(product.sellerName || "BartR vendor")}</p>
-      ${product.productType && product.productType !== "physical" ? `<div class="badge-row"><span>Digital media</span><span>${esc(product.mediaLicense || "personal")} license</span></div>` : ""}
+      ${digitalBadges(product)}
+      ${accessLinks(product)}
       <div class="commerce-product-buy"><strong>${money(product.priceCents)}</strong><span>${Number(product.inventory || 0)} available</span></div>
       <div class="queue-actions">
         <button type="button" class="primary" data-buy-product="${esc(product.id)}" ${Number(product.inventory || 0) === 0 ? "disabled" : ""}>Buy with Apple Pay / Card</button>
       </div>
-    </article>`).join("") : `<div class="card"><h2>No BartR products yet</h2><p class="sub">US vendors publish from My Profile and Settings → BartR Store. FloqR collects payment; vendors ship.</p></div>`;
+    </article>`).join("") : `<div class="card"><h2>No BartR products yet</h2><p class="sub">US vendors publish from My Profile → BartR Store. DJs: playlist curation, Mixcloud shows, consultation, and merch are supported.</p></div>`;
     document.querySelectorAll("[data-buy-product]").forEach(button => {
       button.addEventListener("click", () => checkout(button.dataset.buyProduct));
     });

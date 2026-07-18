@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.8"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.12"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
@@ -61,6 +61,7 @@
         <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
         <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
+        <button class="admin-tab" data-panel="panelNotifications" type="button">Notifications</button>
         <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
         <button class="admin-tab" data-panel="panelReports" type="button">Reports</button>
       </nav>
@@ -246,6 +247,66 @@
             <div id="sponsorReport" class="report-block"></div>
           </div>
         </div>
+
+        <div class="card" id="messagingCreditsCard">
+          <p class="eyebrow">Service patrons</p>
+          <h2>SMS &amp; WhatsApp messaging packs</h2>
+          <p id="messagingUseCondition" class="sub small"></p>
+          <div class="metric-grid">
+            <div class="metric-card"><span>SMS credits</span><strong id="creditSmsBalance">0</strong></div>
+            <div class="metric-card"><span>WhatsApp credits</span><strong id="creditWhatsappBalance">0</strong></div>
+          </div>
+          <p id="creditPackSummary" class="sub small"></p>
+          <div class="queue-actions" style="margin-top:10px;flex-wrap:wrap;gap:8px">
+            <button id="buySmsServiceBtn" class="primary" type="button">Buy SMS service $10 (466 msgs)</button>
+            <button id="buyWhatsappServiceBtn" class="primary" type="button">Buy WhatsApp service $10 (233 msgs)</button>
+            <button id="buySmsBundleBtn" type="button">Buy SMS bundle $10</button>
+            <button id="buyWhatsappBundleBtn" type="button">Buy WhatsApp bundle $10</button>
+            <button id="refreshMessagingCreditsBtn" type="button">Refresh balances</button>
+          </div>
+          <p id="messagingCreditsStatus" class="status"></p>
+        </div>
+
+        <div class="card" id="marketingCampaignCard">
+          <p class="eyebrow">Marketing</p>
+          <h2>Start a marketing campaign</h2>
+          <p class="sub small">Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS/WhatsApp credits.</p>
+          <div class="profile-grid">
+            <label>Industry
+              <select id="marketingIndustry"></select>
+            </label>
+            <label>Channel
+              <select id="marketingChannel">
+                <option value="sms">SMS</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="both">SMS + WhatsApp</option>
+              </select>
+            </label>
+            <label>Layout id<input id="marketingLayoutId" readonly value="fullBleedHero"/></label>
+            <label>Estimated recipients<input id="marketingRecipients" type="number" min="1" value="1"/></label>
+            <label>Campaign name<input id="marketingName" placeholder="Friday night blast"/></label>
+            <label>Eyebrow<input id="marketingEyebrow" placeholder="Tonight"/></label>
+            <label>Headline<input id="marketingHeadline" placeholder="Doors open"/></label>
+            <label>CTA<input id="marketingCta" placeholder="Get on the list"/></label>
+            <label>Background image URL<input id="marketingBackgroundUrl" placeholder="https://…"/></label>
+            <label>Extra image 1 URL<input id="marketingImage1" placeholder="https://…"/></label>
+            <label>Extra image 2 URL<input id="marketingImage2" placeholder="https://…"/></label>
+            <label>Campaign link URL<input id="marketingLinkUrl" placeholder="https://…"/></label>
+            <label>Test send phone (E.164)<input id="marketingTestPhone" type="tel" placeholder="+12025550123"/></label>
+          </div>
+          <label>Body<textarea id="marketingBody" rows="3" placeholder="Supporting copy for the visual template"></textarea></label>
+          <label>SMS message<textarea id="marketingSmsBody" rows="2" placeholder="SMS body (include Reply STOP to opt out)"></textarea></label>
+          <label>WhatsApp message<textarea id="marketingWhatsappBody" rows="3" placeholder="WhatsApp body"></textarea></label>
+          <div id="marketingTemplateList" class="template-pick-grid"></div>
+          <div id="marketingPreview" class="marketing-preview layout-fullBleedHero"></div>
+          <div class="queue-actions" style="margin-top:10px">
+            <button id="saveMarketingCampaignBtn" class="primary" type="button">Save draft</button>
+            <button id="sendMarketingCampaignBtn" type="button">Send test (debit 1 credit)</button>
+          </div>
+          <p id="marketingCampaignStatus" class="status"></p>
+          <h3 style="margin-top:16px">Recent campaigns</h3>
+          <div id="marketingCampaignReport" class="report-block"></div>
+        </div>
       </section>
 
       <section id="panelGuestLists" class="admin-panel-section">
@@ -287,14 +348,19 @@
           <p id="repStatus" class="status"></p>
         </div>
         <div class="card"><h2>Pending Role Activity</h2><p class="sub small">Approve or reject guest lists, public posts, and campaigns submitted on behalf of this club.</p><div id="repPendingActivity" class="report-block"></div></div>
+      </section>
+
+      <section id="panelNotifications" class="admin-panel-section">
         <div class="card">
-          <h2>Club Admin Notifications</h2>
+          <p class="eyebrow">Club ops</p>
+          <h2>Notifications</h2>
+          <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong> from the alert phone. SMS ($10) and WhatsApp ($10) service packs also grant message credits for marketing (see Advertising).</p>
           <div class="privacy-datapoint-grid">
             <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
             <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
             <label><input id="repNotifyEmail" type="checkbox"/> Email</label>
-            <label><input id="repNotifySms" type="checkbox"/> SMS ($10 service charge)</label>
-            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp system alerts</label>
+            <label><input id="repNotifySms" type="checkbox"/> SMS Notification Services ($10 → 466 credits)</label>
+            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp Notification Services ($10 → 233 credits)</label>
           </div>
           <div class="profile-grid" style="margin-top:12px">
             <label>Alert phone (E.164)<input id="repAlertPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
@@ -306,9 +372,8 @@
               </select>
             </label>
           </div>
-          <p class="sub small">Pending ShoutOut alerts can include a preview link/image. Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong>. Paid SMS checkout is unchanged.</p>
           <div class="queue-actions" style="margin-top:10px">
-            <button id="saveRepNotificationsBtn" type="button">Save Notification Choices</button>
+            <button id="saveRepNotificationsBtn" class="primary" type="button">Save Notification Choices</button>
             <button id="showClubDailyAuthCodeBtn" type="button">Show today's club code</button>
             <button id="sendClubTestMessageBtn" type="button">Send test alert</button>
           </div>
@@ -413,8 +478,12 @@
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-logger.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./admin-app.js?v=29.09.8"></script>
-<script src="./admin-rep-extension.js?v=29.09.10"></script>
+<script src="./messaging-credits.js?v=29.09.12"></script>
+<script src="./marketing-templates.js?v=29.09.12"></script>
+<script src="./admin-app.js?v=29.09.12"></script>
+<script src="./admin-rep-extension.js?v=29.09.11"></script>
+<script src="./admin-notifications.js?v=29.09.12"></script>
+<script src="./admin-marketing.js?v=29.09.12"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
