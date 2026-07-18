@@ -141,13 +141,8 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 .product-logo.rydr-hero-logo{width:min(280px,70vw);max-height:160px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(61,231,255,.35))}
 .rydr-shell .rydr-action-row{max-width:720px;margin-bottom:16px}
 /* Intent / plain-language Search */
-.intent-search-page .intent-search-shell{display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr);gap:22px;align-items:start;max-width:980px;margin:8px auto 24px;padding:8px 4px}
-.intent-patron-status{display:grid;gap:8px;padding:16px}
-.intent-patron-status .eyebrow{margin:0}
-.intent-patron-links{display:grid;gap:8px;margin-top:8px}
-.intent-patron-links a{color:var(--accent);font-weight:800;text-decoration:none}
-.intent-patron-links a:hover{text-decoration:underline}
-.intent-search-main{display:grid;justify-items:center;gap:14px;padding:12px 8px 24px;text-align:center}
+.intent-search-page .intent-search-shell{display:grid;grid-template-columns:1fr;justify-items:center;max-width:720px;margin:8px auto 24px;padding:8px 4px}
+.intent-search-main{display:grid;justify-items:center;gap:14px;padding:12px 8px 24px;text-align:center;width:100%}
 .intent-floqr-logo{width:min(320px,78vw);max-height:110px;object-fit:contain;filter:drop-shadow(0 12px 28px rgba(0,0,0,.35))}
 .intent-search-label{display:grid;gap:10px;width:min(560px,94vw);text-align:left}
 .intent-help{color:#fff;font-size:clamp(18px,3.2vw,24px);font-weight:900;letter-spacing:-.02em;line-height:1.25}
@@ -160,7 +155,7 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 .intent-result-card strong{font-size:18px}
 .intent-result-card span{color:var(--muted);font-size:14px}
 .intent-result-empty{text-align:left}
-@media(max-width:720px){.intent-search-page .intent-search-shell{grid-template-columns:1fr}.intent-patron-status{order:2}.intent-search-main{order:1}}
+@media(max-width:720px){.intent-search-page .intent-search-shell{max-width:100%}}
 .product-brand-stack{display:grid;justify-items:start;gap:6px;width:100%;max-width:1120px;margin:4px 0 8px}.product-parent-logo{display:block;justify-self:center;width:min(220px,50vw);max-height:72px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
 .product-logo.bartr-hero-logo{width:min(420px,88vw);max-height:140px;color:#ffffff;filter:drop-shadow(0 0 14px rgba(255,79,201,.28))}
 /* BartR hero mark: transparent canvas; graphics/text ratio fixed; overall ~90% of prior */

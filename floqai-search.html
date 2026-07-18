@@ -3,37 +3,34 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FloqAi Search — iteration</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.9-floqai1"/>
+  <title>FloqAi Search — preview</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.10"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.10-floqai3"/>
 </head>
 <body>
+<!-- Top-right profile status is injected by global-profile-status.js when Firebase Auth is available -->
+
 <main id="floqAiPage" class="app floqai-page">
-  <p class="floqai-iter-banner">
-    <strong>Preview:</strong> FloqAi Search — local iteration only (not live production).
-    Open this page: <a href="./floqai-search.html?v=29.09.10-floqai1"><code>floqai-search.html</code></a>
-    · <a href="./?v=29.09.9&amp;start=intent">current Ask FloqR</a>
-    · <a href="./?v=29.09.9&amp;start=search">classic Search</a>
-  </p>
-
   <section class="page active intent-search-page">
-    <div class="intent-search-shell">
-      <aside class="card intent-patron-status" aria-label="Patron Status">
-        <p class="eyebrow">Patron Status</p>
-        <strong id="intentPatronName">Patron</strong>
-        <p id="intentPatronEmail" class="sub small">Sign in to personalize</p>
-        <nav class="intent-patron-links" aria-label="Account links">
-          <a href="./patron-portal.html?tab=profile&amp;v=29.09.9&amp;from=search">My Profile and Settings</a>
-          <a href="./patron-portal.html?tab=inbox&amp;v=29.09.9&amp;from=search">FLOQR Inbox</a>
-          <a href="./mingl-chat.html?v=29.09.9&amp;from=search">Mingl Chat</a>
-          <a href="./commerce.html?v=29.09.9&amp;from=search">Trade by BartR</a>
-          <a href="./rydr.html?v=29.09.9&amp;from=search">RydR</a>
-          <a href="./?v=29.09.9&amp;start=search">Classic category Search</a>
-        </nav>
-      </aside>
-
+    <div class="intent-search-shell floqai-top-stack">
       <div class="floqai-search-main intent-search-main">
-        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo" onerror="this.classList.add('hidden')"/>
+        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden')"/>
+
+        <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="Preview help">?</button>
+
+        <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi preview help" aria-hidden="true">
+          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">×</button>
+          <p class="eyebrow">Preview help</p>
+          <p><strong>FloqAi Search</strong> — iteration preview (not the production Search default).</p>
+          <p class="sub small">FloqAi idles on the right, pops into “Tell, how can I help you?”, and opens the wish box when you tap it.</p>
+          <nav class="floqai-help-links" aria-label="Related Search pages">
+            <a href="./floqai-search.html?v=29.09.10-floqai3"><code>floqai-search.html</code></a>
+            <a href="./?v=29.09.10&amp;start=intent">current Ask FloqR</a>
+            <a href="./?v=29.09.10&amp;start=search">classic Search</a>
+          </nav>
+        </div>
+
+        <p id="floqAiInvite" class="floqai-invite" aria-live="polite">Tell, how can I help you?</p>
 
         <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
           <label class="intent-search-label" for="intentSearchInput">
@@ -66,12 +63,42 @@
   <span id="floqAiPhrase" class="floqai-phrase" aria-hidden="true">Tell, how can I help you?</span>
 </button>
 
-<script src="./floqr-nav.js?v=29.09.9"></script>
-<script src="./intent-search.js?v=29.09.9"></script>
-<script src="./floqai-search.js?v=29.09.9-floqai1"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.10"></script>
+<script src="./floqr-nav.js?v=29.09.10"></script>
+<script src="./global-profile-status.js?v=29.09.10"></script>
+<script src="./intent-search.js?v=29.09.10"></script>
+<script src="./floqai-search.js?v=29.09.10-floqai3"></script>
 <script>
 (function () {
   const panel = document.getElementById("floqAiSearchPanel");
+  const helpBtn = document.getElementById("floqAiHelpBtn");
+  const helpPop = document.getElementById("floqAiHelpPopout");
+  const helpClose = document.getElementById("floqAiHelpClose");
+
+  function setHelpOpen(open) {
+    if (!helpPop || !helpBtn) return;
+    helpPop.classList.toggle("hidden", !open);
+    helpPop.setAttribute("aria-hidden", open ? "false" : "true");
+    helpBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  helpBtn?.addEventListener("click", event => {
+    event.stopPropagation();
+    setHelpOpen(helpPop?.classList.contains("hidden"));
+  });
+  helpClose?.addEventListener("click", () => setHelpOpen(false));
+  document.addEventListener("click", event => {
+    if (!helpPop || helpPop.classList.contains("hidden")) return;
+    if (helpPop.contains(event.target) || helpBtn?.contains(event.target)) return;
+    setHelpOpen(false);
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") setHelpOpen(false);
+  });
+
   window.FLOQRIntentSearch?.bindIntentSearch({});
   window.FLOQRFloqAi?.bindFloqAi({
     onOpenSearch() {
@@ -79,6 +106,7 @@
         panel.classList.add("open");
         panel.setAttribute("aria-hidden", "false");
       }
+      document.getElementById("floqAiInvite")?.classList.add("hidden");
     }
   });
 })();
