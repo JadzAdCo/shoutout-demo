@@ -1,0 +1,362 @@
+/* Mingl Gist — Instagram Stories-style viewer */
+
+.mingl-gist-page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px 12px 28px;
+  min-height: 100vh;
+}
+
+.mingl-gist-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.mingl-gist-topbar h1 {
+  margin: 4px 0 0;
+  font-size: clamp(28px, 7vw, 40px);
+  letter-spacing: -0.02em;
+}
+
+.mingl-gist-status {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mingl-gist-ring-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 2px 16px;
+  margin: 0 -4px;
+}
+
+.mingl-gist-ring {
+  display: flex;
+  gap: 14px;
+  padding: 4px 8px;
+  min-width: min-content;
+}
+
+.mingl-gist-ring-item {
+  flex: 0 0 auto;
+  width: 76px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+
+.mingl-gist-ring-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  padding: 3px;
+  background: linear-gradient(135deg, #f43abf, #26d8ff 55%, #d7ff3f);
+  display: grid;
+  place-items: center;
+}
+
+.mingl-gist-ring-avatar.seen {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.mingl-gist-ring-avatar.sponsored {
+  background: linear-gradient(135deg, #ffd45a, #f43abf);
+}
+
+.mingl-gist-ring-avatar > span,
+.mingl-gist-ring-avatar > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  border: 2px solid #070a18;
+  object-fit: cover;
+  background: #12162c;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 22px;
+}
+
+.mingl-gist-ring-item small {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.mingl-gist-empty {
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 22px 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.mingl-gist-login {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.mingl-gist-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: #05070f;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.mingl-gist-viewer.hidden {
+  display: none !important;
+}
+
+.mingl-gist-progress {
+  display: flex;
+  gap: 4px;
+  padding: 10px 10px 0;
+  flex: 0 0 auto;
+}
+
+.mingl-gist-progress-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+
+.mingl-gist-progress-seg > i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #fff;
+  border-radius: inherit;
+}
+
+.mingl-gist-progress-seg.done > i {
+  width: 100%;
+}
+
+.mingl-gist-progress-seg.active > i {
+  width: var(--gist-progress, 0%);
+  transition: width 40ms linear;
+}
+
+.mingl-gist-viewer-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  flex: 0 0 auto;
+}
+
+.mingl-gist-viewer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f43abf, #26d8ff);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex: 0 0 auto;
+}
+
+.mingl-gist-viewer-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mingl-gist-viewer-meta {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+.mingl-gist-viewer-meta strong {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mingl-gist-viewer-meta small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.mingl-gist-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mingl-gist-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.mingl-gist-media {
+  position: absolute;
+  inset: 0;
+  background: #0a0d1c center / cover no-repeat;
+}
+
+.mingl-gist-media img,
+.mingl-gist-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mingl-gist-media.no-media {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(244, 58, 191, 0.35), transparent 42%),
+    radial-gradient(circle at 80% 70%, rgba(38, 216, 255, 0.28), transparent 45%),
+    linear-gradient(160deg, #10162c, #070a18);
+}
+
+.mingl-gist-copy {
+  position: relative;
+  z-index: 2;
+  width: min(920px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 18px 36px;
+  background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.72) 78%);
+  pointer-events: none;
+}
+
+.mingl-gist-copy h2 {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 7vw, 44px);
+  line-height: 1.05;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.mingl-gist-copy p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mingl-gist-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mingl-gist-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(215, 255, 63, 0.16);
+  border: 1px solid rgba(215, 255, 63, 0.35);
+  color: #d7ff3f;
+}
+
+.mingl-gist-chip.sponsored {
+  background: rgba(255, 212, 90, 0.18);
+  border-color: rgba(255, 212, 90, 0.4);
+  color: #ffd45a;
+}
+
+.mingl-gist-cta {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(90deg, #f43abf, #26d8ff);
+  color: #06101c;
+  font-weight: 1000;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.mingl-gist-tap-zones {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.mingl-gist-tap-zones button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mingl-person-ad-card {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 14px;
+  align-items: start;
+  border: 1px solid rgba(255, 212, 90, 0.35);
+  border-radius: 18px;
+  background: linear-gradient(120deg, rgba(255, 212, 90, 0.12), rgba(244, 58, 191, 0.1));
+  padding: 12px;
+}
+
+.mingl-person-ad-card .mingl-person-photo {
+  background: linear-gradient(135deg, #ffd45a, #f43abf);
+}
+
+.mingl-person-ad-card .mingl-person-photo img {
+  object-fit: contain;
+  background: #0b0e22;
+}
+
+.mingl-person-ad-card .ad-badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd45a;
+}
+
+@media (max-width: 520px) {
+  .mingl-person-ad-card {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 10px;
+  }
+}

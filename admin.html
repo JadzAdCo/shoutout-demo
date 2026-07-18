@@ -307,6 +307,31 @@
           <h3 style="margin-top:16px">Recent campaigns</h3>
           <div id="marketingCampaignReport" class="report-block"></div>
         </div>
+
+        <div class="card" id="spotAdCampaignCard">
+          <p class="eyebrow">In-app media</p>
+          <h2>Start a spot advertisement campaign</h2>
+          <p class="sub small">Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required.</p>
+          <div class="profile-grid">
+            <label>Spot template
+              <select id="spotTemplateSelect"></select>
+            </label>
+            <label>Event / activity focus<input id="spotEventFocus" placeholder="e.g. Sunset Sundays, Feel Good Fridays"/></label>
+            <label>Badge / eyebrow<input id="spotBadge" placeholder="Tonight"/></label>
+            <label>Headline<input id="spotHeadline" placeholder="Tonight at the club"/></label>
+            <label>CTA<input id="spotCta" placeholder="Open club"/></label>
+            <label>Image URL (optional)<input id="spotImageUrl" placeholder="https://… or leave blank for auto banner"/></label>
+            <label>Link URL<input id="spotLinkUrl" placeholder="https://…"/></label>
+          </div>
+          <label>Body<textarea id="spotBody" rows="3" placeholder="Event copy from your public site"></textarea></label>
+          <label>Slots (comma-separated)<input id="spotSlots" value="clubs,events,mingl,mingl-gist,rydr,shoutout,default"/></label>
+          <div class="queue-actions" style="margin-top:10px">
+            <button id="publishSpotAdBtn" class="primary" type="button">Publish to advertisement pool</button>
+            <button id="seedClubSpotAdsBtn" type="button">Seed venue event spots from website data</button>
+          </div>
+          <p id="spotAdStatus" class="status"></p>
+          <div id="spotAdReport" class="report-block"></div>
+        </div>
       </section>
 
       <section id="panelGuestLists" class="admin-panel-section">
@@ -479,11 +504,14 @@
 <script src="./floqr-logger.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./messaging-credits.js?v=29.09.12"></script>
-<script src="./marketing-templates.js?v=29.09.12"></script>
-<script src="./admin-app.js?v=29.09.12"></script>
+<script src="./marketing-templates.js?v=29.09.14"></script>
+<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
+<script src="./ad-campaigns.js?v=29.09.14"></script>
+<script src="./admin-app.js?v=29.09.14"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.12"></script>
-<script src="./admin-marketing.js?v=29.09.12"></script>
+<script src="./admin-marketing.js?v=29.09.14"></script>
+<script src="./admin-spot-ads.js?v=29.09.14"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

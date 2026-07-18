@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Seed v29.09.14 · Spot ads + Lucy BartR | FLOQR</title>
+  <link rel="stylesheet" href="./admin.css?v=29.09.14"/>
+</head>
+<body>
+<main class="app admin-shell" style="max-width:920px;margin:24px auto;padding:18px">
+  <h1>Execute v29.09.14 seeds</h1>
+  <p class="sub">Master Admin only. Seeds DC club spot ads into the advertisement pool, and enables Lucy/Cobra BartR with 20 art/jewelry/accessory products (Stripe-testable via BartR checkout).</p>
+  <p id="status" class="status">Checking auth…</p>
+  <button id="loginBtn" type="button">Sign in with Google</button>
+  <div class="queue-actions" style="margin-top:12px;flex-wrap:wrap;gap:8px">
+    <button id="seedSpotBtn" class="primary" type="button" disabled>Seed DC spot ad pool</button>
+    <button id="seedLucyBtn" class="primary" type="button" disabled>Enable Lucy/Cobra BartR + 20 products</button>
+  </div>
+  <label style="display:block;margin-top:12px">Optional sellerUid override<input id="sellerUid" placeholder="Leave blank to auto-find Lucy/Cobra"/></label>
+  <pre id="report" class="report-block" style="white-space:pre-wrap;margin-top:16px"></pre>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.14"></script>
+<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
+<script>
+(function () {
+  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+  const auth = firebase.auth();
+  const fn = firebase.app().functions("us-central1");
+  const status = document.getElementById("status");
+  const report = document.getElementById("report");
+  const MASTER = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"].map(x => x.toLowerCase());
+  const spotBtn = document.getElementById("seedSpotBtn");
+  const lucyBtn = document.getElementById("seedLucyBtn");
+
+  document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  auth.onAuthStateChanged(user => {
+    const ok = user && MASTER.includes(String(user.email || "").toLowerCase());
+    status.textContent = user
+      ? (ok ? `Signed in as ${user.email}. Ready.` : `Signed in as ${user.email}, Master Admin required.`)
+      : "Sign in with a Master Admin Google account.";
+    spotBtn.disabled = !ok;
+    lucyBtn.disabled = !ok;
+  });
+
+  spotBtn.onclick = async () => {
+    try {
+      status.textContent = "Seeding DC spot ads…";
+      const campaigns = (window.FLOQRDcSpotAds?.campaigns || []).map(c => ({...c}));
+      const result = await fn.httpsCallable("seedDcSpotAdPool")({campaigns});
+      report.textContent = JSON.stringify(result.data, null, 2);
+      status.textContent = `Seeded ${result.data?.seeded || 0} spot ads.`;
+    } catch (error) {
+      status.textContent = error.message || String(error);
+      report.textContent = String(error?.details || error?.stack || error);
+    }
+  };
+
+  lucyBtn.onclick = async () => {
+    try {
+      status.textContent = "Enabling Lucy/Cobra BartR catalog…";
+      const sellerUid = document.getElementById("sellerUid").value.trim();
+      const payload = sellerUid ? {sellerUid} : {query: "lucy|cobra"};
+      const result = await fn.httpsCallable("seedLucyCobraBartrCatalog")(payload);
+      report.textContent = JSON.stringify(result.data, null, 2);
+      status.textContent = `BartR ready for ${result.data?.sellerName || "seller"} — ${result.data?.productsCreated || 0} products created.`;
+    } catch (error) {
+      status.textContent = error.message || String(error);
+      report.textContent = String(error?.details || error?.stack || error);
+    }
+  };
+})();
+</script>
+</body>
+</html>
