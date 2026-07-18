@@ -21,9 +21,6 @@ database-debug.log
 storage-debug.log
 
 # Secrets / local env
-.env
-.env.*
-!.env.example
 *.pem
 service-account*.json
 *-service-account.json
@@ -43,3 +40,11 @@ football-intro-preview.html
 
 # npm
 npm-debug.log*
+
+.projects/cache
+.projects/vault
+.projects/state.test.json
+.projects/state.local.test.json
+.env
+.env.*
+!.env.example

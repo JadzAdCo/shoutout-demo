@@ -287,7 +287,34 @@
           <p id="repStatus" class="status"></p>
         </div>
         <div class="card"><h2>Pending Role Activity</h2><p class="sub small">Approve or reject guest lists, public posts, and campaigns submitted on behalf of this club.</p><div id="repPendingActivity" class="report-block"></div></div>
-        <div class="card"><h2>Club Admin Notifications</h2><div class="privacy-datapoint-grid"><label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label><label><input id="repNotifyPush" type="checkbox"/> Push notification</label><label><input id="repNotifyEmail" type="checkbox"/> Email</label><label><input id="repNotifySms" type="checkbox"/> SMS ($10 service charge)</label></div><button id="saveRepNotificationsBtn" type="button">Save Notification Choices</button></div>
+        <div class="card">
+          <h2>Club Admin Notifications</h2>
+          <div class="privacy-datapoint-grid">
+            <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
+            <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
+            <label><input id="repNotifyEmail" type="checkbox"/> Email</label>
+            <label><input id="repNotifySms" type="checkbox"/> SMS ($10 service charge)</label>
+            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp system alerts</label>
+          </div>
+          <div class="profile-grid" style="margin-top:12px">
+            <label>Alert phone (E.164)<input id="repAlertPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
+            <label>Preferred channel
+              <select id="repChannelPreference">
+                <option value="sms">SMS</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="both">SMS and WhatsApp</option>
+              </select>
+            </label>
+          </div>
+          <p class="sub small">Pending ShoutOut alerts can include a preview link/image. Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong>. Paid SMS checkout is unchanged.</p>
+          <div class="queue-actions" style="margin-top:10px">
+            <button id="saveRepNotificationsBtn" type="button">Save Notification Choices</button>
+            <button id="showClubDailyAuthCodeBtn" type="button">Show today's club code</button>
+            <button id="sendClubTestMessageBtn" type="button">Send test alert</button>
+          </div>
+          <p id="repMessagingStatus" class="status"></p>
+          <p id="repDailyAuthCode" class="sub small"></p>
+        </div>
       </section>
       <section id="panelEmployees" class="admin-panel-section">
         <div class="card">
@@ -387,7 +414,7 @@
 <script src="./floqr-logger.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./admin-app.js?v=29.09.8"></script>
-<script src="./admin-rep-extension.js?v=29.09.8"></script>
+<script src="./admin-rep-extension.js?v=29.09.10"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

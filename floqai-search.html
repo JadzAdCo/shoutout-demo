@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FloqAi Search — iteration</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.9-floqai1"/>
+</head>
+<body>
+<main id="floqAiPage" class="app floqai-page">
+  <p class="floqai-iter-banner">
+    <strong>Preview:</strong> FloqAi Search — local iteration only (not live production).
+    Open this page: <a href="./floqai-search.html?v=29.09.10-floqai1"><code>floqai-search.html</code></a>
+    · <a href="./?v=29.09.9&amp;start=intent">current Ask FloqR</a>
+    · <a href="./?v=29.09.9&amp;start=search">classic Search</a>
+  </p>
+
+  <section class="page active intent-search-page">
+    <div class="intent-search-shell">
+      <aside class="card intent-patron-status" aria-label="Patron Status">
+        <p class="eyebrow">Patron Status</p>
+        <strong id="intentPatronName">Patron</strong>
+        <p id="intentPatronEmail" class="sub small">Sign in to personalize</p>
+        <nav class="intent-patron-links" aria-label="Account links">
+          <a href="./patron-portal.html?tab=profile&amp;v=29.09.9&amp;from=search">My Profile and Settings</a>
+          <a href="./patron-portal.html?tab=inbox&amp;v=29.09.9&amp;from=search">FLOQR Inbox</a>
+          <a href="./mingl-chat.html?v=29.09.9&amp;from=search">Mingl Chat</a>
+          <a href="./commerce.html?v=29.09.9&amp;from=search">Trade by BartR</a>
+          <a href="./rydr.html?v=29.09.9&amp;from=search">RydR</a>
+          <a href="./?v=29.09.9&amp;start=search">Classic category Search</a>
+        </nav>
+      </aside>
+
+      <div class="floqai-search-main intent-search-main">
+        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo" onerror="this.classList.add('hidden')"/>
+
+        <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
+          <label class="intent-search-label" for="intentSearchInput">
+            <span id="floqAiHelpText" class="intent-help">Tell, how can I help you?</span>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain words…" aria-describedby="intentSearchHint"/>
+          </label>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club · hip hop night</p>
+          <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<button
+  id="floqAiAgent"
+  class="floqai-agent"
+  type="button"
+  aria-label="FloqAi — open contextual search"
+  title="FloqAi">
+  <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+    <i class="floqai-tile"></i>
+  </span>
+  <span id="floqAiPhrase" class="floqai-phrase" aria-hidden="true">Tell, how can I help you?</span>
+</button>
+
+<script src="./floqr-nav.js?v=29.09.9"></script>
+<script src="./intent-search.js?v=29.09.9"></script>
+<script src="./floqai-search.js?v=29.09.9-floqai1"></script>
+<script>
+(function () {
+  const panel = document.getElementById("floqAiSearchPanel");
+  window.FLOQRIntentSearch?.bindIntentSearch({});
+  window.FLOQRFloqAi?.bindFloqAi({
+    onOpenSearch() {
+      if (panel) {
+        panel.classList.add("open");
+        panel.setAttribute("aria-hidden", "false");
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
