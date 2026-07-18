@@ -32,6 +32,11 @@
       id: "announcement",
       name: "Announcement strip",
       slots: ["background", "eyebrow", "headline", "body", "cta"]
+    },
+    spotInterstitial: {
+      id: "spotInterstitial",
+      name: "Spot interstitial (in-app)",
+      slots: ["background", "eyebrow", "headline", "body", "cta", "badge"]
     }
   };
 
@@ -167,6 +172,71 @@
       cta: "Book stay",
       smsBody: "{{club}} weekend rates: {{link}} Reply STOP to opt out.",
       whatsappBody: "*{{club}}* weekend rates\n{{link}}\nReply STOP to opt out."
+    },
+    {
+      id: "spot-tonight-event",
+      industry: "nightlife",
+      layoutId: "spotInterstitial",
+      channelHint: "spot",
+      name: "Spot ad · Tonight's event",
+      eyebrow: "Tonight",
+      headline: "{{event}} at {{club}}",
+      body: "Don't miss {{event}}. Guest list, VIP, and ShoutOuts on FLOQR.",
+      cta: "Open club",
+      smsBody: "",
+      whatsappBody: ""
+    },
+    {
+      id: "spot-weekend-series",
+      industry: "nightlife",
+      layoutId: "spotInterstitial",
+      channelHint: "spot",
+      name: "Spot ad · Weekend series",
+      eyebrow: "This weekend",
+      headline: "{{club}} weekend",
+      body: "{{event}}. Arrive early — tables and guest list move fast.",
+      cta: "See lineup",
+      smsBody: "",
+      whatsappBody: ""
+    },
+    {
+      id: "spot-rooftop-dayparty",
+      industry: "nightlife",
+      layoutId: "spotInterstitial",
+      channelHint: "spot",
+      name: "Spot ad · Rooftop / day party",
+      eyebrow: "Rooftop",
+      headline: "{{event}}",
+      body: "Sun-to-stars energy at {{club}}. Resy / guest list via FLOQR.",
+      cta: "Rooftop details",
+      smsBody: "",
+      whatsappBody: ""
+    },
+    {
+      id: "spot-promoter-guestlist",
+      industry: "promoter",
+      layoutId: "spotInterstitial",
+      channelHint: "spot",
+      name: "Spot ad · Promoter guest list",
+      eyebrow: "Guest list",
+      headline: "{{event}}",
+      body: "You're invited to {{club}}. RSVP before doors.",
+      cta: "RSVP",
+      smsBody: "",
+      whatsappBody: ""
+    },
+    {
+      id: "spot-rydr-hail",
+      industry: "nightlife",
+      layoutId: "spotInterstitial",
+      channelHint: "spot",
+      name: "Spot ad · RydR interstitial",
+      eyebrow: "On the way",
+      headline: "Going out to {{club}}?",
+      body: "{{event}} — hail with RydR, then throw a ShoutOut.",
+      cta: "Continue hail",
+      smsBody: "",
+      whatsappBody: ""
     }
   ];
 

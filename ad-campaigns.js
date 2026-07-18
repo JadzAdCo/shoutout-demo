@@ -17,7 +17,7 @@
       body: "Bantu fusion flavors are coming to Rowlett. African, Caribbean, and spice-loving food lovers, this one is for you.",
       demoLabel: "Demo ad campaign",
       callToAction: "Join the flavor list",
-      slots: ["shoutout", "events", "clubs", "lounges", "lounge-club", "default"],
+      slots: ["shoutout", "events", "clubs", "lounges", "lounge-club", "mingl", "mingl-gist", "default"],
       targetTags: ["african cuisine", "caribbean cuisine", "bantu fusion", "spicy food", "foodie", "dallas", "rowlett", "texas", "diaspora dining"],
       setupInfo: {
         name: "Cuisine Bantu",
@@ -47,7 +47,7 @@
       body: "Discover cannabis-friendly spots, products, rewards, and your local Puff Club community. 21+ only.",
       demoLabel: "Demo ad campaign",
       callToAction: "Explore Puff Club",
-      slots: ["shoutout", "lounges", "lounge-club", "default"],
+      slots: ["shoutout", "lounges", "lounge-club", "mingl", "default"],
       minimumAge: 21,
       targetTags: ["cannabis", "21 plus", "wellness", "puff club", "social discovery", "rewards", "nightlife"],
       canva: {
@@ -68,7 +68,7 @@
       body: "DC nightlife energy for Latin nights, VIP tables, late-night celebration, and downtown club moments.",
       demoLabel: "Demo ad campaign",
       callToAction: "Plan a Lima night",
-      slots: ["shoutout", "clubs", "events", "lounges", "default"],
+      slots: ["shoutout", "clubs", "events", "lounges", "mingl", "mingl-gist", "default"],
       targetTags: ["washington dc", "district of columbia", "dc", "dmv", "latin music", "latin nightlife", "reggae", "raggae", "reggaeton", "ragatton", "dancehall", "afro latin", "salsa", "bachata", "dembow", "club", "vip", "lounge", "dance", "table service", "bottle service", "birthday", "celebration", "date night"],
       campaignDatapoints: [
         {category:"Location", tags:["Washington DC", "District of Columbia", "DC", "DMV"]},
@@ -101,7 +101,7 @@
       status: "active",
       image: "./ads/gran-coramino.svg",
       body: "A smooth premium tequila experience for lounge-club nights, VIP tables, and celebration moments.",
-      slots: ["lounge-club", "lounges", "clubs"],
+      slots: ["lounge-club", "lounges", "clubs", "mingl"],
       targetTags: ["tequila", "vip", "lounge", "celebration", "premium spirits", "bottle service"]
     },
     {
@@ -112,7 +112,7 @@
       status: "active",
       image: "./ads/gucci-fragrance.svg",
       body: "Luxury fragrance energy for a night out. Own the room before the first song drops.",
-      slots: ["clubs", "events", "default"],
+      slots: ["clubs", "events", "mingl", "mingl-gist", "default"],
       targetTags: ["fashion", "luxury", "fragrance", "club", "date night", "style"]
     },
     {
@@ -123,7 +123,7 @@
       status: "active",
       image: "./ads/nike-airmax.svg",
       body: "Step into the night with Nike energy. Built for movement, style, and the next event.",
-      slots: ["events", "clubs", "default"],
+      slots: ["events", "clubs", "mingl", "default"],
       targetTags: ["sneakers", "sportswear", "events", "streetwear", "dance", "music"]
     },
     {
@@ -134,7 +134,7 @@
       status: "active",
       image: "./ads/teremana.svg",
       body: "Premium tequila for lounge nights, group celebrations, and table-service moments.",
-      slots: ["lounges", "lounge-club", "clubs"],
+      slots: ["lounges", "lounge-club", "clubs", "mingl"],
       targetTags: ["tequila", "lounge", "celebration", "premium spirits", "vip"]
     },
     {
@@ -145,7 +145,7 @@
       status: "active",
       image: "./ads/advertise-here.svg",
       body: "Your brand can own this moment before patrons browse nightlife.",
-      slots: ["default", "beach-clubs", "shoutout"],
+      slots: ["default", "beach-clubs", "shoutout", "rydr", "mingl", "mingl-gist"],
       isHouseFallback: true,
       targetTags: ["nightlife", "events", "clubs"]
     }
@@ -179,9 +179,46 @@
     }
   }
 
+  let firestoreSpotAds = [];
+
   function campaigns() {
     const overrides = readOverrides();
-    return baseCampaigns.map(campaign => ({...campaign, ...(overrides[campaign.id] || {})}));
+    const dc = (typeof window !== "undefined" && window.FLOQRDcSpotAds?.campaigns) || [];
+    const merged = [...baseCampaigns, ...dc, ...firestoreSpotAds];
+    const byId = new Map();
+    merged.forEach(campaign => {
+      if (!campaign?.id) return;
+      byId.set(campaign.id, {...campaign, ...(overrides[campaign.id] || {})});
+    });
+    return Array.from(byId.values());
+  }
+
+  async function loadFirestoreSpotAds(db) {
+    if (!db?.collection) return campaigns();
+    try {
+      const snap = await db.collection("spotAdCampaigns").where("status", "==", "active").limit(80).get();
+      firestoreSpotAds = snap.docs.map(doc => {
+        const row = doc.data() || {};
+        return {
+          id: doc.id,
+          title: row.title || row.headline || "Club spot ad",
+          badge: row.badge || row.eyebrow || "Sponsored",
+          advertiser: row.advertiser || row.clubName || "Club",
+          status: row.status || "active",
+          sourceUrl: row.sourceUrl || row.linkUrl || "",
+          image: row.image || row.imageUrl || row.backgroundImageUrl || "",
+          body: row.body || "",
+          callToAction: row.cta || row.callToAction || "Learn more",
+          slots: Array.isArray(row.slots) && row.slots.length ? row.slots : ["clubs", "events", "mingl", "mingl-gist", "rydr", "default"],
+          targetTags: row.targetTags || [],
+          clubLocationId: row.clubLocationId || "",
+          eventTags: row.eventTags || []
+        };
+      });
+    } catch (error) {
+      firestoreSpotAds = [];
+    }
+    return campaigns();
   }
 
   function normalize(value) {
@@ -291,7 +328,8 @@
       badge: selected.badge,
       image: selected.image,
       campaignId: selected.id,
-      callToAction: selected.callToAction || "Learn more"
+      callToAction: selected.callToAction || "Learn more",
+      sourceUrl: selected.sourceUrl || ""
     };
   }
 
@@ -403,6 +441,7 @@
     pickCampaign,
     campaignAnalytics,
     renderAdminCampaignManager,
-    saveOverride
+    saveOverride,
+    loadFirestoreSpotAds
   };
 })();

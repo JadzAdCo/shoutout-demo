@@ -241,7 +241,7 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 #minglChatPanel .emoji-row,#portalMinglChatPanel .emoji-row{order:50}
 #minglChatPanel .mingl-compose,#portalMinglChatPanel .mingl-compose{order:60}
 .mingl-quick-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.icon-action-button{display:inline-flex;align-items:center;gap:9px;min-height:46px}
+.icon-action-button{display:inline-flex;align-items:center;gap:9px;min-height:46px;text-decoration:none;color:inherit}
 .icon-action-button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .chat-file-button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.09);padding:10px 14px;font-weight:1000;cursor:pointer;text-align:center}
 .chat-plus-button{display:inline-flex;align-items:center;justify-content:center;width:48px;min-height:46px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.10);color:#fff;font-size:28px;font-weight:1000;line-height:1;cursor:pointer}

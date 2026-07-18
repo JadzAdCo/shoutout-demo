@@ -4,16 +4,16 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Pickup Robotaxi Simulation | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.9"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.14"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.14"/>
 </head>
 <body>
   <main class="app admin-shell pickup-shell">
-    <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?v=29.09.9&start=search">&larr; Back to Search</a>
+    <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?v=29.09.14&start=search">&larr; Back to Search</a>
     <section class="page active">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Pickup &middot; Robotaxi concept</p>
+          <p class="eyebrow">RydR &middot; Robotaxi</p>
           <h1>Hail a Ride to the Club</h1>
           <p class="sub">Your destination is filled from the club's verified address.</p>
           <p id="pickupStatus" class="status" aria-live="polite">Loading Pickup...</p>
@@ -21,8 +21,8 @@
       </header>
 
       <div class="simulation-banner" role="note">
-        <strong>Simulation only</strong>
-        <span>No payment is charged, no vehicle is dispatched, and all vehicle, safety-person, route, and arrival data is fictional.</span>
+        <strong>Hybrid demo</strong>
+        <span>Vehicle matching and dispatch are simulated. Trip fare payment is real Stripe Checkout through onboarded FloqR.</span>
       </div>
 
       <div id="pickupLogin" class="card"><button id="pickupGoogleLoginBtn" type="button">Continue with Google</button></div>
@@ -57,45 +57,101 @@
         </section>
 
         <section class="card pickup-request-card">
-          <h2>Confirm your route</h2>
-          <fieldset class="pickup-mode-picker">
-            <legend>Hail service</legend>
-            <label><input type="radio" name="pickupMode" value="onDemand" checked/><span><strong>On-demand</strong><small>Request the nearest simulated vehicle now.</small></span></label>
-            <label><input type="radio" name="pickupMode" value="scheduled"/><span><strong>Scheduled</strong><small>Reserve a simulated pickup date and time.</small></span></label>
-            <label><input type="radio" name="pickupMode" value="forAnother"/><span><strong>For a Flocker</strong><small>Book a ride for another FLOQR patron.</small></span></label>
-            <label><input type="radio" name="pickupMode" value="shared"/><span><strong>Shared</strong><small>Add up to three Flockers with optional separate drop-offs.</small></span></label>
-          </fieldset>
-          <div id="pickupScheduledFields" class="profile-grid hidden">
-            <label>Pickup date<input id="pickupScheduledDate" type="date"/></label>
-            <label>Pickup time<input id="pickupScheduledTime" type="time"/></label>
+          <div class="pickup-wizard-steps" aria-label="Ride request steps">
+            <span data-step-indicator="a" class="active">A Address</span>
+            <span data-step-indicator="b">B Ad</span>
+            <span data-step-indicator="c">C Pay</span>
+            <span data-step-indicator="d">D Match</span>
           </div>
-          <div id="pickupFloqFields" class="hidden floq-ride-panel">
-            <div id="pickupForAnotherFields" class="profile-grid">
-              <label>FLOQR patron username or email<input id="pickupRecipient" placeholder="Search or enter a Flocker"/></label>
-              <label>Who pays?
-                <select id="pickupForAnotherPayment"><option value="organizer">I pay</option><option value="recipient">Recipient pays</option><option value="requestApproval">Ask recipient to approve and pay</option></select>
-              </label>
+
+          <div id="pickupStepA" class="pickup-wizard-panel" data-wizard-step="a">
+            <h2>Confirm your route</h2>
+            <fieldset class="pickup-mode-picker">
+              <legend>Hail service</legend>
+              <label><input type="radio" name="pickupMode" value="onDemand" checked/><span><strong>On-demand</strong><small>Request the nearest simulated vehicle now.</small></span></label>
+              <label><input type="radio" name="pickupMode" value="scheduled"/><span><strong>Scheduled</strong><small>Reserve a simulated pickup date and time.</small></span></label>
+              <label><input type="radio" name="pickupMode" value="forAnother"/><span><strong>For a Flocker</strong><small>Book a ride for another FLOQR patron.</small></span></label>
+              <label><input type="radio" name="pickupMode" value="shared"/><span><strong>Shared</strong><small>Add up to three Flockers with optional separate drop-offs.</small></span></label>
+            </fieldset>
+            <div id="pickupScheduledFields" class="profile-grid hidden">
+              <label>Pickup date<input id="pickupScheduledDate" type="date"/></label>
+              <label>Pickup time<input id="pickupScheduledTime" type="time"/></label>
             </div>
-            <div id="pickupSharedFields" class="hidden">
-              <p class="sub small">Add up to three Flockers. Each companion may have a different drop-off.</p>
-              <div class="companion-grid">
-                <label>Flocker 1<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 1<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
-                <label>Flocker 2<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 2<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
-                <label>Flocker 3<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 3<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+            <div id="pickupFloqFields" class="hidden floq-ride-panel">
+              <div id="pickupForAnotherFields" class="profile-grid">
+                <label>FLOQR patron username or email<input id="pickupRecipient" placeholder="Search or enter a Flocker"/></label>
+                <label>Who pays?
+                  <select id="pickupForAnotherPayment"><option value="organizer">I pay</option><option value="recipient">Recipient pays</option><option value="requestApproval">Ask recipient to approve and pay</option></select>
+                </label>
               </div>
-              <label>Payment arrangement
-                <select id="pickupSharedPayment"><option value="organizer">Organizer pays the full mock fare</option><option value="splitEvenly">Split the mock fare evenly</option><option value="individualLegs">Each rider pays their route leg</option></select>
-              </label>
+              <div id="pickupSharedFields" class="hidden">
+                <p class="sub small">Add up to three Flockers. Each companion may have a different drop-off.</p>
+                <div class="companion-grid">
+                  <label>Flocker 1<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 1<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                  <label>Flocker 2<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 2<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                  <label>Flocker 3<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 3<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                </div>
+                <label>Payment arrangement
+                  <select id="pickupSharedPayment"><option value="organizer">Organizer pays the full fare</option><option value="splitEvenly">Split the fare evenly</option><option value="individualLegs">Each rider pays their route leg</option></select>
+                </label>
+              </div>
+            </div>
+            <div class="profile-grid">
+              <label>Taxi pickup address<input id="pickupAddress" autocomplete="street-address"/></label>
+              <label>Destination<input id="pickupDestination" readonly/></label>
+            </div>
+            <div class="saved-pickup-block">
+              <p class="eyebrow">Saved pickup locations</p>
+              <div id="pickupSavedChips" class="saved-pickup-chips" aria-live="polite"></div>
+              <div class="save-pickup-row">
+                <div class="label-chip-row" role="group" aria-label="Save label">
+                  <button type="button" class="label-chip" data-save-label="Home">Home</button>
+                  <button type="button" class="label-chip" data-save-label="Preferred Home Pickup">Preferred Home Pickup</button>
+                  <button type="button" class="label-chip" data-save-label="Work">Work</button>
+                  <button type="button" class="label-chip" data-save-label="Other">Other</button>
+                </div>
+                <input id="pickupOtherLabel" class="hidden" placeholder="Custom label for Other"/>
+                <button id="pickupSaveAddressBtn" type="button">Save current pickup</button>
+              </div>
+            </div>
+            <button id="pickupContinueAddressBtn" class="primary" type="button">Continue</button>
+          </div>
+
+          <div id="pickupStepB" class="pickup-wizard-panel hidden" data-wizard-step="b">
+            <div class="pickup-ad-panel">
+              <p class="eyebrow" id="pickupAdBadge">Sponsored</p>
+              <h2 id="pickupAdTitle">Spot advertisement</h2>
+              <p id="pickupAdBody" class="sub">A FloqR sponsor message appears before matching.</p>
+              <div id="pickupAdImage" class="pickup-ad-image" aria-hidden="true"></div>
+              <p class="ad-countdown-line">Continue in <strong id="pickupAdCountdown">8</strong>s</p>
+              <div class="action-row">
+                <button id="pickupAdContinueBtn" class="primary" type="button">Continue</button>
+                <button id="pickupAdSkipBtn" type="button">Skip</button>
+              </div>
             </div>
           </div>
-          <div class="profile-grid">
-            <label>Taxi pickup address<input id="pickupAddress" autocomplete="street-address"/></label>
-            <label>Destination<input id="pickupDestination" readonly/></label>
+
+          <div id="pickupStepC" class="pickup-wizard-panel hidden" data-wizard-step="c">
+            <h2>Trip fare</h2>
+            <p class="sub small">Pay the trip fare with Stripe, then FloqR starts the simulated hail.</p>
+            <div class="mock-fare-row"><span>Trip fare estimate<br/><small id="pickupPaymentPlan">Organizer pays</small></span><strong id="pickupMockFare">$18.40</strong></div>
+            <button id="pickupRequestBtn" class="primary" type="button">Pay trip fare &amp; hail</button>
+            <p class="sub small">Stripe Checkout is real. Vehicle dispatch after payment remains simulated.</p>
+            <div id="pickupResult" class="report-block" aria-live="polite"></div>
           </div>
-          <div class="mock-fare-row"><span>Mock fare estimate<br/><small id="pickupPaymentPlan">Organizer pays</small></span><strong id="pickupMockFare">$18.40</strong></div>
-          <button id="pickupRequestBtn" class="primary" type="button">Pay Mock Fare &amp; Request Pickup</button>
-          <p class="sub small">This prototype records a simulated request in FLOQR. It does not call a Tesla booking endpoint or process a real payment.</p>
-          <div id="pickupResult" class="report-block" aria-live="polite"></div>
+
+          <div id="pickupStepD" class="pickup-wizard-panel hidden" data-wizard-step="d">
+            <div class="pickup-matching-panel">
+              <h2>Searching for a driver</h2>
+              <p id="pickupMatchingStatus" class="sub">Matching you with a nearby simulated robotaxi…</p>
+              <div class="matching-pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card pickup-history-card">
+          <div class="section-title-row"><div><p class="eyebrow">Your rides</p><h2>Ride history</h2></div></div>
+          <div id="pickupRideHistory" class="pickup-history-list" aria-live="polite"><p class="sub">Sign in to see recent RydR requests.</p></div>
         </section>
       </div>
     </section>
@@ -103,12 +159,17 @@
 
   <div id="pickupRideModal" class="modal-shell hidden" role="dialog" aria-modal="true" aria-labelledby="pickupRideTitle">
     <div class="modal-card ride-status-popout">
-      <div class="section-title-row"><div><p class="eyebrow">SIMULATED RIDE STATUS</p><h2 id="pickupRideTitle">Mock payment approved</h2></div><button id="pickupRideClose" class="icon-button" type="button" aria-label="Close ride status">&times;</button></div>
+      <div class="section-title-row"><div><p class="eyebrow">SIMULATED RIDE STATUS</p><h2 id="pickupRideTitle">Payment confirmed</h2></div><button id="pickupRideClose" class="icon-button" type="button" aria-label="Close ride status">&times;</button></div>
       <p id="pickupRideStage" class="ride-stage">Assigning your vehicle...</p>
       <div class="ride-progress" aria-hidden="true"><span id="pickupRideProgress"></span></div>
       <div id="pickupRideDetails" class="pickup-fact-grid compact"></div>
-      <p class="simulation-footnote">Prototype only. No charge was made and no vehicle was dispatched.</p>
-      <div class="action-row"><button id="pickupRideCancel" type="button">Cancel Simulation</button><a id="pickupTeslaOfficialLink" class="buttonlike" target="_blank" rel="noopener" href="https://www.tesla.com/robotaxi">Tesla Robotaxi information</a></div>
+      <p class="simulation-footnote">Dispatch is simulated. Trip fare was processed through FloqR Stripe Checkout when paid.</p>
+      <div class="action-row">
+        <button id="pickupConfirmSpotBtn" class="primary hidden" type="button">Confirm pickup spot &amp; vehicle tag</button>
+        <button id="pickupConfirmDropoffBtn" class="primary hidden" type="button">Confirm drop-off complete</button>
+        <button id="pickupRideCancel" type="button">Cancel Simulation</button>
+        <a id="pickupTeslaOfficialLink" class="buttonlike" target="_blank" rel="noopener" href="https://www.tesla.com/robotaxi">Tesla Robotaxi information</a>
+      </div>
     </div>
   </div>
 
@@ -116,15 +177,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-  <script src="./firebase-config.js?v=29.09.9"></script>
-  <script src="./floqr-nav.js?v=29.09.9"></script>
-  <script src="./global-profile-status.js?v=29.09.9"></script>
-  <script src="./shared-data.js?v=29.09.9"></script>
-  <script src="./floqr-action-feedback.js?v=29.09.9"></script>
-  <script src="./helper-popouts.js?v=29.09.9"></script>
-  <script src="./payment-service.js?v=29.09.9"></script>
-  <script src="./pickup-app.js?v=29.09.9"></script>
-  <script src="./profile-access-guard.js?v=29.09.9"></script>
+  <script src="./firebase-config.js?v=29.09.14"></script>
+  <script src="./floqr-nav.js?v=29.09.14"></script>
+  <script src="./global-profile-status.js?v=29.09.14"></script>
+  <script src="./shared-data.js?v=29.09.14"></script>
+  <script src="./floqr-action-feedback.js?v=29.09.14"></script>
+  <script src="./helper-popouts.js?v=29.09.14"></script>
+  <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
+  <script src="./ad-campaigns.js?v=29.09.14"></script>
+  <script src="./payment-service.js?v=29.09.14"></script>
+  <script src="./pickup-app.js?v=29.09.14"></script>
+  <script src="./profile-access-guard.js?v=29.09.14"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
   </script>

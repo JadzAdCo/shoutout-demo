@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR Mingl Gist v29.09.14 -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Mingl Gist</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.14"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.14"/>
+</head>
+<body>
+<main class="app mingl-gist-page">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?v=29.09.14&start=mingl" data-from="mingl">&larr; Back to Mingl</a>
+
+  <header class="mingl-gist-topbar">
+    <div>
+      <p class="eyebrow">MINGL / GIST</p>
+      <h1>Mingl Gist</h1>
+      <p class="sub small">Stories from ShoutOuts, spots, and the night around you.</p>
+      <p id="minglGistStatus" class="mingl-gist-status"></p>
+    </div>
+  </header>
+
+  <div id="minglGistLogin" class="card mingl-gist-login hidden">
+    <h2>Sign in</h2>
+    <p class="sub small">Sign in to load ShoutOut stories for Mingl Gist.</p>
+    <button id="minglGistGoogleLoginBtn" class="auth-btn" type="button">Continue with Google</button>
+    <button id="minglGistMicrosoftLoginBtn" class="auth-btn" type="button">Continue with Microsoft</button>
+  </div>
+
+  <div class="mingl-gist-ring-wrap">
+    <div id="minglGistRing" class="mingl-gist-ring" aria-label="Mingl Gist story ring"></div>
+  </div>
+  <div id="minglGistEmpty" class="mingl-gist-empty hidden">No Gist stories yet. Approved ShoutOuts and Mingl Gists will show here.</div>
+</main>
+
+<div id="minglGistViewer" class="mingl-gist-viewer hidden" aria-hidden="true">
+  <div id="minglGistProgress" class="mingl-gist-progress"></div>
+  <div class="mingl-gist-viewer-head">
+    <div id="minglGistViewerAvatar" class="mingl-gist-viewer-avatar">G</div>
+    <div class="mingl-gist-viewer-meta">
+      <strong id="minglGistViewerName">Story</strong>
+      <small id="minglGistViewerSub"></small>
+    </div>
+    <button id="minglGistCloseBtn" class="mingl-gist-close" type="button" aria-label="Close story">&times;</button>
+  </div>
+  <div class="mingl-gist-stage">
+    <div id="minglGistMedia" class="mingl-gist-media no-media"></div>
+    <div class="mingl-gist-copy">
+      <div id="minglGistChips" class="mingl-gist-chips"></div>
+      <h2 id="minglGistTitle"></h2>
+      <p id="minglGistBody"></p>
+      <a id="minglGistCta" class="mingl-gist-cta hidden" href="#" target="_blank" rel="noopener">Learn more</a>
+    </div>
+    <div class="mingl-gist-tap-zones">
+      <button id="minglGistPrevZone" type="button" aria-label="Previous story"></button>
+      <button id="minglGistNextZone" type="button" aria-label="Next story"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.14"></script>
+<script src="./floqr-nav.js?v=29.09.14"></script>
+<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
+<script src="./ad-campaigns.js?v=29.09.14"></script>
+<script src="./mingl-gist-app.js?v=29.09.14"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const back = document.getElementById("floqrGlobalBack");
+    if (back && !new URLSearchParams(location.search).get("from")) back.dataset.from = "mingl";
+    window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
+  });
+</script>
+</body>
+</html>

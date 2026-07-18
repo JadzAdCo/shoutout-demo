@@ -5,7 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.10"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.14"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.14"/>
 </head>
 <body>
 
@@ -34,13 +35,13 @@
         <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback hidden">FLOQR</div>
         <p class="eyebrow">Screen 0 — Welcome / Sign In</p>
-        <h2>Welcome</h2>
+        <h2 data-i18n="app.welcome">Welcome</h2>
         <p class="login-copy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
-        <p id="signedInAs" class="status">Please Sign-In or Sign-Up:</p>
+        <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
 
         <div id="signedInActions" class="hidden">
-          <button id="continueBtn" class="primary full" type="button">Continue</button>
-          <button id="logoutBtn1" class="ghost full" type="button">Sign out</button>
+          <button id="continueBtn" class="primary full" type="button" data-i18n="app.continue">Continue</button>
+          <button id="logoutBtn1" class="ghost full" type="button" data-i18n="app.signOut">Sign out</button>
         </div>
 
         <div id="loginActions">
@@ -315,6 +316,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
             <span>Search for People</span>
           </button>
+          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.14&from=mingl">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Mingl Gist</span>
+          </a>
         </div>
       </div>
     </header>
@@ -603,27 +608,29 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.9"></script>
-<script src="./floqr-nav.js?v=29.09.9"></script>
-<script src="./intent-search.js?v=29.09.9"></script>
-<script src="./global-profile-status.js?v=29.09.9"></script>
-<script src="./shared-data.js?v=29.09.9"></script>
-<script src="./ai-service.js?v=29.09.9"></script>
-<script src="./ai-index-service.js?v=29.09.9"></script>
-<script src="./ai-search-service.js?v=29.09.9"></script>
-<script src="./ai-location-service.js?v=29.09.9"></script>
-<script src="./ai-notification-service.js?v=29.09.9"></script>
-<script src="./ai-template-studio.js?v=29.09.9"></script>
-<script src="./floqr-action-feedback.js?v=29.09.9"></script>
-<script src="./ai-grammar-service.js?v=29.09.9"></script>
-<script src="./helper-popouts.js?v=29.09.9"></script>
-<script src="./ad-campaigns.js?v=29.09.9"></script>
-<script src="./floqr-identity.js?v=29.09.9"></script>
-<script src="./floqr-logger.js?v=29.09.9"></script>
-<script src="./payment-service.js?v=29.09.9"></script>
-<script src="./patron-app.js?v=29.09.9"></script>
-<script src="./ai-assistant-ui.js?v=29.09.9"></script>
-<script src="./ai-media-service.js?v=29.09.9"></script>
-<script src="./notification-center.js?v=29.09.9"></script>
+<script src="./firebase-config.js?v=29.09.14"></script>
+<script src="./floqr-nav.js?v=29.09.14"></script>
+<script src="./intent-search.js?v=29.09.14"></script>
+<script src="./global-profile-status.js?v=29.09.14"></script>
+<script src="./floqr-i18n.js?v=29.09.14"></script>
+<script src="./shared-data.js?v=29.09.14"></script>
+<script src="./ai-service.js?v=29.09.14"></script>
+<script src="./ai-index-service.js?v=29.09.14"></script>
+<script src="./ai-search-service.js?v=29.09.14"></script>
+<script src="./ai-location-service.js?v=29.09.14"></script>
+<script src="./ai-notification-service.js?v=29.09.14"></script>
+<script src="./ai-template-studio.js?v=29.09.14"></script>
+<script src="./floqr-action-feedback.js?v=29.09.14"></script>
+<script src="./ai-grammar-service.js?v=29.09.14"></script>
+<script src="./helper-popouts.js?v=29.09.14"></script>
+<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
+<script src="./ad-campaigns.js?v=29.09.14"></script>
+<script src="./floqr-identity.js?v=29.09.14"></script>
+<script src="./floqr-logger.js?v=29.09.14"></script>
+<script src="./payment-service.js?v=29.09.14"></script>
+<script src="./patron-app.js?v=29.09.14"></script>
+<script src="./ai-assistant-ui.js?v=29.09.14"></script>
+<script src="./ai-media-service.js?v=29.09.14"></script>
+<script src="./notification-center.js?v=29.09.14"></script>
 </body>
 </html>

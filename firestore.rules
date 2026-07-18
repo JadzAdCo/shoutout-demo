@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
-// EXPECTED DEPLOYED RULES VERSION: v29.09.5-floqr-platform-payments or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09.14-mingl-gist
+// EXPECTED DEPLOYED RULES VERSION: v29.09.14-mingl-gist or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.82-mingl-request-chat-rules
@@ -10,6 +11,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - minglGists public read; signed-in create for own authorUid; update/delete own or master
 // - clubLocationAliases read/write support for Master Admin duplicate record merge aliases
 // - aiMediaEdits owner-visible audit records for Gemini ShoutOut image editing
 // - users/{uid} self create/read/update support for onboarding and existing profiles
@@ -676,6 +678,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if signedIn();
     }
+    match /translationOverrides/{id} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
 
     match /inboxNotifications/{id} {
       allow create, read, update, delete: if signedIn();
@@ -848,6 +854,24 @@ service cloud.firestore {
         && request.auth.uid in resource.data.participants;
       allow update, delete: if signedIn()
         && resource.data.actorUid == request.auth.uid;
+    }
+
+    match /minglGists/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.authorUid is string
+        && request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if signedIn()
+        && (
+          resource.data.authorUid == request.auth.uid
+          || isMasterAdmin()
+        );
+    }
+
+    match /spotAdCampaigns/{id} {
+      allow read: if true;
+      allow create, update: if signedIn();
+      allow delete: if signedIn() && (isMasterAdmin() || resource.data.publishedByUid == request.auth.uid);
     }
 
     match /chatRooms/{roomId} {
