@@ -13,6 +13,19 @@ Extracted 2026-07-18 from official sites. Firestore + `shared-data.js` ids below
 | Rose Bar DC | https://www.rosebarlounge.com/ | `rosebar-lounge-washington-dc` |
 | KATA DC | https://www.kata-dc.com/ | `kata-washington-dc` |
 | LIMA Twist (prior) | https://www.limatwist.com/ | `lima-twist-washington-dc` |
+| **Casamara Rooftop** (onboarded seed) | https://casamaradc.com/rooftop/ | `casamara-rooftop-washington-dc` |
+
+### Casamara Rooftop — extracted (2026-07-18) / onboarded
+
+- Address: 1320 18th St. NW, Washington, DC 20036
+- Phone: (202) 410-1313
+- Email: rooftop@casamaradc.com
+- IG: @casamararooftop (also @casamaradc)
+- Resy: https://resy.com/cities/washington-dc/venues/92169
+- Hours (site): Sun–Mon closed; Tue–Thu 4pm–11pm; Fri 4pm–12am; Sat 3pm–12am
+- Events: Sunset Sundays (from June 7); private events (~80 seated / ~200 cocktail; retractable awning)
+- Concept: Mediterranean rooftop; Sixty DC SMS marketing opt-in on rooftop page
+- FLOQR: seed + `onboard-dc-venues.html` IDS; Master Admin push for Firestore
 
 ## Gaps to fill later (not on public sites)
 

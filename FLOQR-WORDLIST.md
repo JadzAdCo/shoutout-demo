@@ -103,6 +103,7 @@ Do **not** start these unless asked. Capture only.
 | **Next** | **Club/Promoter marketing → FloqR IG** | FloqR posts via marketing Instagram with @club / @promoter mentions; opted-in patron lists at scale (beyond test recipient send). |
 | **Next** | **Patron phone verification + channel gate** | All patrons must enter a valid phone and verify via SMS (or WhatsApp) code; green verified check beside phone in My Profile and Settings. Email already has OTP verify. Unverified phone → access limited to settings until verified. Privacy: select at least one of SMS or WhatsApp for notifications. |
 | **Next** | **Mixcloud OAuth / deeper sync** | Today: URL + embed + Creator Subscriptions link. Later: optional Mixcloud OAuth to pull show catalog into BartR seller tools. |
+| Shipped seed | **Casamara Rooftop DC** | Fully seeded `casamara-rooftop-washington-dc` from https://casamaradc.com/rooftop/ — Sunset Sundays, private events (~80 seated / ~200 cocktail), Resy 92169, Sixty DC SMS. Push Firestore via `onboard-dc-venues.html`. Optional later: public profile media / dress-code polish. |
 | Queued | UI languages (de fr es it ru el pl pt) + browser-default first-use + Master Admin translation overrides | Phase 2 from earlier roadmap |
 | Queued | Club public profile: structured open/closed days, layout templates, backgrounds | Phase 3 |
 | Queued | Mingl match-reason-only privacy | Phase 4 |
