@@ -292,6 +292,9 @@
     club = await resolveLocation(locationId);
     locationId = club.id || locationId;
     if (!club.locationName && !club.brandName) throw new Error("This club profile was not found.");
+    if (window.FLOQRFeatureGates?.entityIsOffboarded(club) || club.publicVisible === false || club.publicProfileEnabled === false) {
+      throw new Error("This club has been offboarded and is no longer publicly available.");
+    }
     if (club.publicProfilePublished === false || String(club.visibility || "public").toLowerCase() !== "public") throw new Error("This club profile is not currently published.");
     const [events, media] = await Promise.all([loadEvents(), loadMedia()]);
     renderHero(media);

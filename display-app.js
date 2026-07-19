@@ -1,4 +1,4 @@
-/* display-app.js v29.08.2 */
+/* display-app.js v29.09.21 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -14,12 +14,14 @@
   const persistenceReady = db.enablePersistence ? db.enablePersistence({synchronizeTabs:true}).catch(() => null) : Promise.resolve();
   const FOOTBALL_MEDIA_CACHE = "floqr-football-media-v29-08-2";
   let footballObjectUrls = [];
+  const explicitLocationRequested = !!(qs("location") || qs("club"));
   const requestedLocationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
   let locationId = canonicalStaticLocationId(requestedLocationId);
   let loc = getStaticLocation(locationId);
   const templates = window.SHOUTOUT_TEMPLATES || {};
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
   let liveContentExpiryTimer = null;
+  let screenFormatOverride = "";
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -30,6 +32,47 @@
   function getStaticLocation(id = "") {
     const key = canonicalStaticLocationId(id);
     return (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+  }
+
+  function normalizeScreenFormatId(raw = "") {
+    const value = String(raw || "").trim().toLowerCase();
+    if (!value) return "";
+    if (value === "64x32" || value === "64×32" || value === "led-64x32" || value === "p125-64x32") return value.startsWith("p125") ? "p125-64x32" : "led-64x32";
+    if (value === "64x48" || value === "led-64x48") return "led-64x48";
+    if (value === "96x48" || value === "led-96x48") return "led-96x48";
+    if ((window.FLOQR_DISPLAY_FORMATS || {})[value]) return value;
+    return "";
+  }
+
+  function displayDeviceDocId(ip = "") {
+    return String(ip || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9.:_-]/g, "-")
+      .replace(/\.+/g, "_")
+      .slice(0, 120);
+  }
+
+  async function resolveLocationFromIpParam() {
+    const ip = String(qs("ip", "") || "").trim();
+    if (!ip) return "";
+    const docId = displayDeviceDocId(ip);
+    try {
+      const byIdDoc = await db.collection("displayDevices").doc(docId).get();
+      if (byIdDoc.exists) {
+        const data = byIdDoc.data() || {};
+        const bound = String(data.locationId || data.clubLocationId || data.location || "").trim();
+        if (bound) return bound;
+      }
+    } catch (e) {}
+    try {
+      const snap = await db.collection("displayDevices").where("ip", "==", ip).limit(1).get();
+      if (!snap.empty) {
+        const data = snap.docs[0].data() || {};
+        return String(data.locationId || data.clubLocationId || data.location || "").trim();
+      }
+    } catch (e) {}
+    return "";
   }
 
   async function resolveDisplayLocationId(id = "") {
@@ -123,10 +166,11 @@
 
   function classicIdentityPresentation(subText) {
     const supplied = glyphSlice(cleanBoardText(subText), 0, 20);
+    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR SHOUTOUT"), 0, 20) || "FLOQR SHOUTOUT";
     return {
       supplied:!!supplied,
       kicker:supplied ? "FROM" : "PRESENTED BY",
-      value:supplied || "FLOQR SHOUTOUT"
+      value:supplied || brandFallback
     };
   }
 
@@ -174,10 +218,12 @@
 
   function classicFitStyle(row, rows, textSizePercent = 16) {
     const rowLen = Math.max(glyphLen(row), 1);
-    const scale = Math.min(1.5, Math.max(.5, Number(textSizePercent || 16) / 16));
+    const compact = /64x32/.test(screenFormatOverride || loc.primaryDisplayScreenFormatId || "");
+    const scale = Math.min(1.5, Math.max(.5, Number(textSizePercent || 16) / 16)) * (compact ? 0.82 : 1);
     const maxPx = Math.round((rowLen <= 5 ? 118 : rowLen <= 8 ? 106 : rowLen <= 10 ? 96 : rowLen <= 12 ? 88 : rowLen <= 16 ? 72 : 58) * scale);
     const vw = ((rowLen <= 8 ? 8.6 : rowLen <= 12 ? 7.4 : rowLen <= 16 ? 6.2 : 5.2) * scale).toFixed(2);
-    return `--fit-size:clamp(38px,${vw}vw,${maxPx}px)`;
+    const minPx = compact ? 18 : 38;
+    return `--fit-size:clamp(${minPx}px,${vw}vw,${maxPx}px)`;
   }
 
   function enforceTrimmedVideoPlayback(video, data = {}) {
@@ -339,9 +385,15 @@
     const templateId = data.template || "neon";
     const baseTemplate = templates[templateId] || templates.neon || {};
     const t = {...baseTemplate, className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
-    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw";
+    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
-    const screenFormatId = String(data.screenFormatId || loc.primaryDisplayScreenFormatId || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48");
+    const screenFormatId = String(
+      data.screenFormatId
+      || screenFormatOverride
+      || loc.primaryDisplayScreenFormatId
+      || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0]
+      || "p125-96x48"
+    );
     const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
       supported:true,
       lineCount:Number(data.lineCount || t.lineCount || 1),
@@ -447,8 +499,30 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
     await persistenceReady;
+    screenFormatOverride = normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")));
+    if (!explicitLocationRequested) {
+      const ipBoundLocation = await resolveLocationFromIpParam();
+      if (ipBoundLocation) locationId = canonicalStaticLocationId(ipBoundLocation);
+    }
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
+    try {
+      const clubDoc = await db.collection("clubLocations").doc(locationId).get();
+      if (clubDoc.exists) {
+        const live = clubDoc.data() || {};
+        loc = {
+          ...loc,
+          ...live,
+          primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
+          displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
+          displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR SHOUTOUT",
+          ledPanel: live.ledPanel || loc.ledPanel
+        };
+      }
+    } catch (e) {}
+    if (!screenFormatOverride) {
+      screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "");
+    }
     if (qs("main","")) {
       render({
         mainText: qs("main"),
@@ -457,7 +531,7 @@
         mediaUrl: qs("media",""),
         mediaType: qs("mediaType",""),
         mediaFit: qs("mediaFit","contain"),
-        screenFormatId: qs("screenFormatId",""),
+        screenFormatId: screenFormatOverride || qs("screenFormatId",""),
         selectedMediaVersion: qs("selectedMediaVersion",""),
         trimStart: qs("trimStart",""),
         trimEnd: qs("trimEnd",""),
@@ -473,7 +547,9 @@
       return;
     }
     db.collection("liveContent").doc(locationId).onSnapshot(doc => {
-      renderTimedLiveContent(doc.exists ? doc.data() : defaultClubDisplayPayload());
+      const payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
+      if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
+      renderTimedLiveContent(payload);
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });
 })();

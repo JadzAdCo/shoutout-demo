@@ -22,17 +22,20 @@ const STRIPE_API_VERSION = "2026-06-24.dahlia";
 const COMMERCE_RESERVATION_SECONDS = 31 * 60;
 const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
 const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
+const HEIST_DC_LOCATION_ID = "heist-washington-dc";
+const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
+const HEIST_ART_PRICE_CENTS = 4000;
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "p125-96x48":[3,16,48,28],"p125-64x48":[3,10,30,22],"p125-64x32":[3,14,42,24],
-    "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,12,36,20]
+    "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,10,30,16]
   },
   classicBoard:{
     "p125-96x48":[3,15,45,20],"p125-64x48":[3,12,36,18],"p125-64x32":[3,14,42,18],
-    "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,12,36,16]
+    "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,10,30,14]
   },
   splitMedia:{
     "p125-96x48":[3,10,30,20],"p125-64x48":[2,12,24,18],"p125-64x32":null,
@@ -225,6 +228,21 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     submittedByUid:authContext.uid || "",
     submittedBy:text(authContext.token?.email || rawShoutout.submittedBy, 200).toLowerCase()
   };
+  if (HEIST_ART_TEMPLATE_IDS.has(templateId)) {
+    const heistClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
+    if (heistClubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
+    return {
+      ...rawPayload,
+      clubLocationId:HEIST_DC_LOCATION_ID,
+      shoutout:{
+        ...shoutout,
+        clubLocationId:HEIST_DC_LOCATION_ID,
+        location:HEIST_DC_LOCATION_ID,
+        screenFormatId:screenFormatId || "led-64x32",
+        priceCents:HEIST_ART_PRICE_CENTS
+      }
+    };
+  }
   if (templateId !== FOOTBALL_TEAM_INTRO_TEMPLATE_ID) return {...rawPayload, shoutout};
   const requestedClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
   if (requestedClubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
@@ -516,9 +534,12 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const shoutout = payload.shoutout || {};
     const templateId = text(shoutout.template || shoutout.templateId, 80);
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
+    const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
-      : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+      : heistArt
+        ? HEIST_ART_PRICE_CENTS
+        : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }
@@ -527,9 +548,10 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const clubId = text(shoutout.clubLocationId || shoutout.location || payload.clubLocationId, 120);
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && clubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
+    if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
     return {
       amountCents:pricedAmountCents,
-      itemName:footballTeamIntro ? "Football Intro ShoutOut" : "FLOQR paid ShoutOut",
+      itemName:footballTeamIntro ? "Football Intro ShoutOut" : heistArt ? "Heist Art ShoutOut" : "FLOQR paid ShoutOut",
       description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
@@ -761,8 +783,15 @@ exports.createFloqrCheckoutSession = onCall({
   };
   try {
     if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+    const featureGateHelpers = require("./feature-gate-functions").__featureGateHelpers;
+    if (type === "shoutout") await featureGateHelpers.assertPatronFeature(request.auth, "shoutOut");
+    if (type === "commerceProduct" || type === "bartr" || type === "marketplace") await featureGateHelpers.assertPatronFeature(request.auth, "bartr");
+    if (type === "rydrTrip" || type === "robotaxi") await featureGateHelpers.assertPatronFeature(request.auth, "rydr");
     const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
     const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
+    const clubGateId = text(payload.clubLocationId || payload.shoutout?.clubLocationId || payload.shoutout?.location, 120);
+    if (clubGateId && type === "shoutout") await featureGateHelpers.assertClubFeature(clubGateId, "shoutOut");
+    if (clubGateId && (type === "commerceProduct" || type === "bartr")) await featureGateHelpers.assertClubFeature(clubGateId, "bartrStores");
     if (type === "audienceCampaign") await requirePublisher(text(payload.entityId, 160), request.auth);
     if (["targetedGuestList", "smsNotifications", "smsMessageBundle", "whatsappNotifications", "whatsappMessageBundle"].includes(type)) {
       await requirePublisher(text(payload.clubLocationId, 160), request.auth);
@@ -1501,6 +1530,7 @@ exports.publishFloqrFollowerCampaign = onCall({region:"us-central1", timeoutSeco
 
 exports.requestTeslaRobotaxiPickup = onCall({region:"us-central1", timeoutSeconds:15, memory:"256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  await require("./feature-gate-functions").__featureGateHelpers.assertPatronFeature(request.auth, "rydr");
   const pickupAddress = text(request.data?.pickupAddress, 300);
   const destinationAddress = text(request.data?.destinationAddress, 300);
   if (!pickupAddress || !destinationAddress) throw new HttpsError("invalid-argument", "Pickup and destination addresses are required.");

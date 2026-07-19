@@ -218,3 +218,119 @@
 /* v29.09.0: patron backgrounds replace the scene while protected template layers stay intact. */
 .display-canvas.custom-background-active.classic-bw .display-center{background:inherit!important}
 .display-canvas.custom-background-active.football-team-intro .football-intro-stage{background:inherit!important}
+
+/* v29.09.21: Heist DC 64×32 LED safe area + heist-art cinematic backgrounds */
+.display-canvas[data-screen-format-id="led-64x32"].classic-bw.classic-board-template .display-center,
+.display-canvas[data-screen-format-id="p125-64x32"].classic-bw.classic-board-template .display-center{
+  width:100vw!important;
+  height:100vh!important;
+  max-width:none!important;
+  min-height:0!important;
+  padding:clamp(6px,1.4vw,14px)!important;
+  border-width:clamp(6px,1.2vw,14px)!important;
+  border-radius:clamp(18px,3.5vw,42px)!important;
+  box-sizing:border-box!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].classic-bw.classic-board-template .display-center:before,
+.display-canvas[data-screen-format-id="p125-64x32"].classic-bw.classic-board-template .display-center:before{
+  inset:clamp(3px,.6vw,8px) clamp(10px,2vw,22px)!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].classic-bw.classic-board-template .display-center:after,
+.display-canvas[data-screen-format-id="p125-64x32"].classic-bw.classic-board-template .display-center:after{
+  inset:5.5% 6.5% 24%!important;
+  border-width:clamp(3px,.55vw,7px)!important;
+  border-radius:clamp(10px,1.8vw,22px)!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].classic-bw.classic-board-template #displayMain.classic-bw-board,
+.display-canvas[data-screen-format-id="p125-64x32"].classic-bw.classic-board-template #displayMain.classic-bw-board{
+  left:8%!important;
+  right:8%!important;
+  top:9.5%!important;
+  bottom:28.5%!important;
+  padding:clamp(4px,.9vw,10px) clamp(8px,1.4vw,16px)!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].classic-bw.classic-board-template .classic-board-lines b,
+.display-canvas[data-screen-format-id="p125-64x32"].classic-bw.classic-board-template .classic-board-lines b{
+  font-size:var(--fit-size,clamp(22px,5.2vw,72px))!important;
+  line-height:.8!important;
+  letter-spacing:.012em!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"] #displaySub.classic-bw-identity,
+.display-canvas[data-screen-format-id="p125-64x32"] #displaySub.classic-bw-identity{
+  left:12%!important;
+  right:12%!important;
+  top:80.5%!important;
+  height:14%!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"] .classic-identity-shell,
+.display-canvas[data-screen-format-id="p125-64x32"] .classic-identity-shell{
+  gap:clamp(4px,.9vw,12px);
+  padding:clamp(2px,.45vh,6px) clamp(8px,1.6vw,20px);
+}
+.display-canvas[data-screen-format-id="led-64x32"] .classic-identity-shell small,
+.display-canvas[data-screen-format-id="p125-64x32"] .classic-identity-shell small{
+  font-size:clamp(6px,1.05vw,14px);
+  letter-spacing:.14em;
+}
+.display-canvas[data-screen-format-id="led-64x32"] .classic-identity-shell strong,
+.display-canvas[data-screen-format-id="p125-64x32"] .classic-identity-shell strong{
+  font-size:clamp(10px,2.4vw,28px);
+  letter-spacing:.04em;
+}
+
+/* Heist art backgrounds (club-scoped templates; board + rail stay locked) */
+.display-canvas.classic-bw[data-template-id="heistVaultNight"]{
+  background:
+    radial-gradient(circle at 50% 42%,rgba(255,40,40,.18),transparent 28%),
+    radial-gradient(circle at 50% 50%,transparent 18%,rgba(0,0,0,.72) 19% 34%,transparent 35%),
+    repeating-radial-gradient(circle at 50% 50%,#1a1a1e 0 10px,#0c0c10 11px 22px),
+    linear-gradient(160deg,#050507,#1a0508 45%,#09090c)!important;
+  animation:none!important;
+}
+.display-canvas.classic-bw[data-template-id="heistVaultNight"] .display-center{
+  background:
+    radial-gradient(circle at 50% 48%,rgba(255,255,255,.06),transparent 42%),
+    linear-gradient(145deg,#070707,#141418 26%,#c81018 27.2%,#101014 44%,#c81018 62%,#050505 80%)!important;
+}
+.display-canvas.classic-bw[data-template-id="heistNeonMask"]{
+  background:
+    radial-gradient(ellipse 46% 58% at 22% 48%,rgba(255,20,60,.35),transparent 55%),
+    radial-gradient(ellipse 46% 58% at 78% 48%,rgba(255,20,60,.28),transparent 55%),
+    radial-gradient(circle at 50% 50%,rgba(120,0,30,.35),transparent 50%),
+    linear-gradient(180deg,#040208,#16040c 55%,#020104)!important;
+  animation:none!important;
+}
+.display-canvas.classic-bw[data-template-id="heistNeonMask"] .display-center{
+  background:linear-gradient(135deg,#050505,#1a0810 28%,#ff1230 29%,#12060a 42%,#ff1230 62%,#070407 78%)!important;
+  box-shadow:0 24px 55px rgba(0,0,0,.55),0 0 0 7px #fff inset,0 0 0 13px #ff1230 inset,0 0 40px rgba(255,18,48,.45)!important;
+}
+.display-canvas.classic-bw[data-template-id="heistDupontUnder"]{
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.75),transparent 18%,transparent 82%,rgba(0,0,0,.75)),
+    repeating-linear-gradient(90deg,transparent 0 48px,rgba(255,80,60,.05) 48px 50px),
+    radial-gradient(circle at 50% 120%,rgba(255,90,40,.22),transparent 45%),
+    linear-gradient(180deg,#06070a,#12151c 40%,#0a0b10)!important;
+  animation:none!important;
+}
+.display-canvas.classic-bw[data-template-id="heistDupontUnder"] .display-center{
+  background:linear-gradient(145deg,#050608,#151820 28%,#d01820 29%,#101218 42%,#d01820 62%,#06070a 78%)!important;
+}
+.display-canvas.classic-bw[data-template-id="heistRedLux"]{
+  background:
+    radial-gradient(circle at 50% 20%,rgba(255,60,80,.35),transparent 40%),
+    radial-gradient(circle at 18% 80%,rgba(120,0,20,.45),transparent 35%),
+    radial-gradient(circle at 82% 75%,rgba(80,0,10,.4),transparent 35%),
+    linear-gradient(155deg,#120208,#2a0410 40%,#080104)!important;
+  animation:none!important;
+}
+.display-canvas.classic-bw[data-template-id="heistRedLux"] .display-center{
+  background:linear-gradient(135deg,#0a0204,#22060c 26%,#ff1a2e 27.5%,#160408 44%,#ff1a2e 63%,#080204 80%)!important;
+  box-shadow:0 24px 55px rgba(0,0,0,.55),0 0 0 7px #f5f5f5 inset,0 0 0 13px #ff1a2e inset!important;
+}
+.display-canvas.classic-bw[data-template-id^="heist"] .display-center:before{
+  border-color:#ff1e2e!important;
+  box-shadow:0 0 16px rgba(255,30,46,.75),0 0 0 3px #fff inset!important;
+}
+.display-canvas.classic-bw[data-template-id^="heist"] .display-center:after{
+  border-color:#ef1119!important;
+}

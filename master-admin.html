@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Master Admin Portal v29.09.0 -->
+  <!-- FLOQR ShoutOut Master Admin Portal v29.09.22 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.9"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.22"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.22"/>
 </head>
 <body>
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.9&start=search">&larr; Back to Search</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.22&start=search">&larr; Back to Search</a>
 <main id="masterAdminPage" class="app admin-shell">
   <section class="page active">
     <header class="topbar admin-topbar">
@@ -48,6 +48,7 @@
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
         <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club Admin URLs</button>
+        <button class="admin-tab" data-panel="entityManagement" type="button">Entity Management</button>
         <button class="admin-tab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
         <button class="admin-tab" data-panel="templateManagement" type="button">Template Management</button>
         <button class="admin-tab" data-panel="recommendationModeration" type="button">Unapproved Recommendations</button>
@@ -85,7 +86,47 @@
         <div class="card">
           <h2>Club Admin Portal URLs</h2>
           <p class="sub small">Open or copy the direct admin portal URL for each club/location. These URLs use the location id in `admin.html?location=`.</p>
+          <div class="profile-grid club-admin-url-search-row">
+            <label>Search club entity
+              <input id="clubAdminUrlSearch" autocomplete="off" placeholder="Search by club, city, ID, or address"/>
+            </label>
+            <div class="queue-actions club-admin-url-search-actions">
+              <button id="clubAdminUrlManageSearchBtn" class="primary" type="button">Search to manage</button>
+            </div>
+          </div>
           <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="entityManagement" class="admin-panel-section">
+        <div class="card">
+          <h2>Search to manage</h2>
+          <p class="sub small">Search venues, events, and patrons/entities. Enable or disable application access, set per-venue feature gates, or offboard an entity so its public profile and datapoints leave the WebApp.</p>
+          <div class="profile-grid">
+            <label>Search<input id="entityManageSearch" autocomplete="off" placeholder="Club, event, patron, city, email, or id"/></label>
+            <label>Type
+              <select id="entityManageTypeFilter">
+                <option value="all">All</option>
+                <option value="club">Clubs / venues</option>
+                <option value="event">Events</option>
+                <option value="user">Patrons / entities</option>
+              </select>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="entityManageRefreshBtn" type="button">Refresh catalog</button>
+          </div>
+          <div class="entity-onboarding-grid">
+            <div><h3>Results</h3><div id="entityManageResults" class="report-block"></div></div>
+            <div><h3>Manage selected</h3><div id="entityManageDetail" class="report-block"></div></div>
+          </div>
+          <p id="entityManageStatus" class="status"></p>
+        </div>
+        <div class="card">
+          <h2>Global patron feature gates</h2>
+          <p class="sub small">Manually enable/disable features for all patrons. Super Admin remains exempt.</p>
+          <div id="globalPatronGatesForm" class="privacy-datapoint-grid"></div>
+          <button id="saveGlobalPatronGatesBtn" class="primary" type="button">Save Global Patron Gates</button>
         </div>
       </section>
 
@@ -124,18 +165,69 @@
             <label><span class="field-icon">TT</span> TikTok<input id="clubOnboardTiktok" placeholder="@club"/></label>
             <label>Music Genres<input id="clubOnboardGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
           </div>
-          <fieldset class="screen-format-fieldset">
-            <legend>Club display screens</legend>
-            <p class="sub small">Select every FLOQR display format installed at this venue. Patrons will only see templates compatible with at least one selected screen.</p>
+          <fieldset id="clubOnboardDisplayTypeSetup" class="screen-format-fieldset">
+            <legend>Display type setup</legend>
+            <p class="sub small">Select every FLOQR LED / P1.25 panel installed at this venue, then choose the primary display type used by the live display screen.</p>
             <div class="privacy-datapoint-grid">
-              <label><input data-onboard-screen-format="led-96x48" type="checkbox" checked/> 96 x 48 cm — 624 x 312</label>
-              <label><input data-onboard-screen-format="led-64x48" type="checkbox"/> 64 x 48 cm — 416 x 312</label>
-              <label><input data-onboard-screen-format="led-64x32" type="checkbox"/> 64 x 32 cm — 416 x 208</label>
+              <label><input data-onboard-screen-format="led-96x48" type="checkbox" checked/> LED 96 × 48 cm — 624 × 312</label>
+              <label><input data-onboard-screen-format="led-64x48" type="checkbox"/> LED 64 × 48 cm — 416 × 312</label>
+              <label><input data-onboard-screen-format="led-64x32" type="checkbox"/> LED 64 × 32 cm — 416 × 208</label>
+              <label><input data-onboard-screen-format="p125-96x48" type="checkbox"/> P1.25 96 × 48 cm — 768 × 384</label>
+              <label><input data-onboard-screen-format="p125-64x48" type="checkbox"/> P1.25 64 × 48 cm — 512 × 384</label>
+              <label><input data-onboard-screen-format="p125-64x32" type="checkbox"/> P1.25 64 × 32 cm — 512 × 256</label>
             </div>
+            <label>Primary display type
+              <select id="clubOnboardPrimaryDisplayFormat">
+                <option value="led-96x48">LED 96 × 48 cm</option>
+                <option value="led-64x48">LED 64 × 48 cm</option>
+                <option value="led-64x32">LED 64 × 32 cm</option>
+                <option value="p125-96x48">P1.25 96 × 48 cm</option>
+                <option value="p125-64x48">P1.25 64 × 48 cm</option>
+                <option value="p125-64x32">P1.25 64 × 32 cm</option>
+              </select>
+            </label>
+            <p class="sub small">Classic board templates keep the bottom rail <strong>PRESENTED BY FLOQR SHOUTOUT</strong> when no patron attribution is supplied.</p>
           </fieldset>
           <button id="createClubOnboardingBtn" class="primary" type="button">Create Club Venue</button>
           <p id="clubOnboardingStatus" class="status"></p>
           <div id="clubOnboardingPreview" class="report-block"></div>
+        </div>
+        <div id="clubDisplayTypeSetup" class="card">
+          <h2>Club Settings — Display type setup</h2>
+          <p class="sub small">Configure an existing club’s LED / P1.25 display types. Example: Heist DC → primary <strong>LED 64 × 32 cm</strong>. Saved to <code>clubLocations</code> and honored by <code>display.html?location=...</code>.</p>
+          <div class="profile-grid">
+            <label>Club location<input id="clubDisplaySetupSearch" list="clubDisplaySetupOptions" autocomplete="off" placeholder="Search Heist, Zebbies, location id…"/><datalist id="clubDisplaySetupOptions"></datalist></label>
+            <label>Selected club ID<input id="clubDisplaySetupLocationId" readonly placeholder="heist-washington-dc"/></label>
+          </div>
+          <fieldset class="screen-format-fieldset">
+            <legend>Installed display types</legend>
+            <div class="privacy-datapoint-grid">
+              <label><input data-club-settings-screen-format="led-96x48" type="checkbox"/> LED 96 × 48 cm — 624 × 312</label>
+              <label><input data-club-settings-screen-format="led-64x48" type="checkbox"/> LED 64 × 48 cm — 416 × 312</label>
+              <label><input data-club-settings-screen-format="led-64x32" type="checkbox"/> LED 64 × 32 cm — 416 × 208</label>
+              <label><input data-club-settings-screen-format="p125-96x48" type="checkbox"/> P1.25 96 × 48 cm — 768 × 384</label>
+              <label><input data-club-settings-screen-format="p125-64x48" type="checkbox"/> P1.25 64 × 48 cm — 512 × 384</label>
+              <label><input data-club-settings-screen-format="p125-64x32" type="checkbox"/> P1.25 64 × 32 cm — 512 × 256</label>
+            </div>
+            <label>Primary display type
+              <select id="clubDisplaySetupPrimaryFormat">
+                <option value="led-96x48">LED 96 × 48 cm</option>
+                <option value="led-64x48">LED 64 × 48 cm</option>
+                <option value="led-64x32">LED 64 × 32 cm</option>
+                <option value="p125-96x48">P1.25 96 × 48 cm</option>
+                <option value="p125-64x48">P1.25 64 × 48 cm</option>
+                <option value="p125-64x32">P1.25 64 × 32 cm</option>
+              </select>
+            </label>
+            <label>Display footer brand fallback<input id="clubDisplaySetupFooterBrand" value="FLOQR SHOUTOUT" placeholder="FLOQR SHOUTOUT"/></label>
+          </fieldset>
+          <div class="queue-actions">
+            <button id="loadClubDisplaySetupBtn" type="button">Load Club Display Settings</button>
+            <button id="applyHeist64x32PresetBtn" type="button">Apply Heist 64×32 LED preset</button>
+            <button id="saveClubDisplaySetupBtn" class="primary" type="button">Save Display Type Setup</button>
+          </div>
+          <p id="clubDisplaySetupStatus" class="status"></p>
+          <div id="clubDisplaySetupPreview" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Bulk Club CSV Onboarding</h2>
@@ -618,25 +710,27 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.9"></script>
-<script src="./floqr-nav.js?v=29.09.9"></script>
-<script src="./global-profile-status.js?v=29.09.9"></script>
-<script src="./shared-data.js?v=29.09.9"></script>
-<script src="./ai-service.js?v=29.09.9"></script>
-<script src="./ai-index-service.js?v=29.09.9"></script>
-<script src="./ai-search-service.js?v=29.09.9"></script>
-<script src="./ai-discovery-service.js?v=29.09.9"></script>
-<script src="./floqr-action-feedback.js?v=29.09.9"></script>
-<script src="./helper-popouts.js?v=29.09.9"></script>
-<script src="./ad-campaigns.js?v=29.09.9"></script>
-<script src="./ai-diagnostics-service.js?v=29.09.9"></script>
-<script src="./duplicate-record-service.js?v=29.09.9"></script>
-<script src="./floqr-logger.js?v=29.09.9"></script>
-<script src="./payment-service.js?v=29.09.9"></script>
-<script src="./master-admin-app.js?v=29.09.9"></script>
-<script src="./master-services-extension.js?v=29.09.19"></script>
-<script src="./master-logging-extension.js?v=29.09.9"></script>
-<script src="./notification-center.js?v=29.09.9"></script>
+<script src="./firebase-config.js?v=29.09.22"></script>
+<script src="./floqr-nav.js?v=29.09.22"></script>
+<script src="./global-profile-status.js?v=29.09.22"></script>
+<script src="./shared-data.js?v=29.09.22"></script>
+<script src="./feature-gates.js?v=29.09.23"></script>
+<script src="./entity-management.js?v=29.09.23"></script>
+<script src="./ai-service.js?v=29.09.22"></script>
+<script src="./ai-index-service.js?v=29.09.22"></script>
+<script src="./ai-search-service.js?v=29.09.22"></script>
+<script src="./ai-discovery-service.js?v=29.09.22"></script>
+<script src="./floqr-action-feedback.js?v=29.09.22"></script>
+<script src="./helper-popouts.js?v=29.09.22"></script>
+<script src="./ad-campaigns.js?v=29.09.22"></script>
+<script src="./ai-diagnostics-service.js?v=29.09.22"></script>
+<script src="./duplicate-record-service.js?v=29.09.22"></script>
+<script src="./floqr-logger.js?v=29.09.22"></script>
+<script src="./payment-service.js?v=29.09.22"></script>
+<script src="./master-admin-app.js?v=29.09.22"></script>
+<script src="./master-services-extension.js?v=29.09.22"></script>
+<script src="./master-logging-extension.js?v=29.09.22"></script>
+<script src="./notification-center.js?v=29.09.22"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

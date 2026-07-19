@@ -499,7 +499,13 @@
   function visibleLocationEntry([id, loc]) {
     const obsoleteIds = new Set((window.FLOQR_OBSOLETE_LOCATION_IDS || []).map(value => String(value || "").toLowerCase()));
     const key = String(id || loc?.id || "").toLowerCase();
-    return loc && !obsoleteIds.has(key) && loc.active !== false && !isMergedLocation(loc) && String(loc.status || "active") !== "deleted";
+    const g = window.FLOQRFeatureGates;
+    if (!loc || obsoleteIds.has(key) || isMergedLocation(loc)) return false;
+    if (g) {
+      if (g.entityIsOffboarded(loc) || !g.entityIsPubliclyVisible(loc)) return false;
+      if (!g.entityIsAppEnabled(loc) && String(loc.status || "").toLowerCase() === "disabled") return false;
+    }
+    return loc.active !== false && String(loc.status || "active") !== "deleted" && String(loc.status || "active") !== "offboarded";
   }
   async function loadLocations() {
     await loadLocationAliases();
@@ -734,6 +740,10 @@
       window.location.href = returnUrl;
       return;
     }
+    try {
+      await window.FLOQRFeatureGates?.loadPatronGates?.(db);
+      window.FLOQRFeatureGates?.applyPatronGateUi?.(currentUser, cachedUserProfile);
+    } catch (e) {}
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
     if (pendingDirectLocation) {
@@ -760,6 +770,13 @@
     if (!profile || !profile.profileCompleted) {
       showSignupProfile();
       return;
+    }
+    if (window.FLOQRFeatureGates?.entityIsOffboarded(profile) || profile.appEnabled === false || String(profile.status || "").toLowerCase() === "disabled") {
+      if (!window.FLOQRFeatureGates?.isSuperAdmin(currentUser, profile)) {
+        setStatus("This account is disabled or offboarded and cannot use FLOQR features.");
+        showPage("landingPage");
+        return;
+      }
     }
 
     try {
@@ -1349,6 +1366,11 @@
   }
 
   async function showShoutoutLanding() {
+    const g = window.FLOQRFeatureGates;
+    if (g && !g.patronMayUse("shoutOut", currentUser, cachedUserProfile)) {
+      setStatus("ShoutOut is currently disabled for patrons.");
+      return;
+    }
     showPage("shoutoutLandingPage");
   }
 
@@ -1356,6 +1378,11 @@
     if (!currentUser) {
       setStatus("Please sign in before using Mingl.");
       showPage("landingPage");
+      return;
+    }
+    const g = window.FLOQRFeatureGates;
+    if (g && !g.patronMayUse("mingl", currentUser, cachedUserProfile)) {
+      setStatus("Mingl is currently disabled for patrons.");
       return;
     }
     const profile = await getUserProfile();
@@ -3035,6 +3062,18 @@
     try {
       if(!currentUser){ status.textContent="Sign in first."; return; }
       if(!selectedLocationId){ status.textContent="Select a location first."; return; }
+      const g = window.FLOQRFeatureGates;
+      if (g && !g.patronMayUse("shoutOut", currentUser, cachedUserProfile)) {
+        status.textContent = "ShoutOut is currently disabled for patrons.";
+        return;
+      }
+      if (g) {
+        const clubRow = await g.loadVenueRecord(db, locationId());
+        if (!g.venueMayUse("shoutOut", clubRow)) {
+          status.textContent = "ShoutOut is disabled for this venue.";
+          return;
+        }
+      }
       const l=getLocation(), t=getTemplate();
       const caps = templateDisplayCaps(t);
       if (caps.supported === false) throw new Error(caps.advice || "Choose a supported display size for this template.");

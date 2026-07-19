@@ -71,6 +71,14 @@
   }
 
   async function publishFromForm() {
+    const g = window.FLOQRFeatureGates;
+    if (g) {
+      const row = await g.loadVenueRecord(db, locationId);
+      if (!g.venueMayUse("uberAds", row)) {
+        if (statusEl()) statusEl().textContent = "UberAds is disabled for this venue.";
+        return;
+      }
+    }
     const club = clubRow();
     const clubName = club.locationName || club.brandName || locationId;
     const headline = byId("spotHeadline")?.value.trim() || clubName;
