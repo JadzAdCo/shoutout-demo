@@ -3,8 +3,14 @@
 
 /* v24 admin dashboards */
 .admin-shell .topbar h1{max-width:900px}
-.admin-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 22px}
-.admin-tab{min-height:40px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08)}
+.admin-tabs{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:18px 0 22px;max-width:100%}
+.admin-tab,.admin-tab-link,a.admin-tab-link.buttonlike{
+  display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  flex:0 1 auto;width:auto!important;max-width:100%;min-width:max-content;min-height:44px;
+  padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);
+  border:1px solid var(--line);color:var(--text);font-size:14px;font-weight:900;line-height:1.25;
+  white-space:nowrap;text-align:center;text-decoration:none;overflow:visible
+}
 .admin-tab.active{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;border:0}
 .admin-panel-section{display:none}
 .admin-panel-section.active{display:block}
@@ -18,7 +24,15 @@
 .report-table span{color:var(--muted);font-weight:800}
 .report-table strong{text-align:right}
 .report-list{display:flex;flex-wrap:wrap;gap:10px}
-@media(max-width:720px){.report-table div{display:block}.report-table strong{display:block;text-align:left;margin-top:5px}.admin-tabs{gap:8px}.admin-tab{font-size:13px;padding:9px 11px}}
+@media(max-width:720px){
+  .report-table div{display:block}
+  .report-table strong{display:block;text-align:left;margin-top:5px}
+  .admin-tabs{gap:8px;flex-wrap:wrap;overflow:visible;scroll-snap-type:none;padding-bottom:0}
+  .admin-tab,.admin-tab-link,a.admin-tab-link.buttonlike{
+    font-size:13px;padding:10px 12px;min-height:44px;width:auto!important;
+    white-space:normal;min-width:0;max-width:100%;flex:1 1 auto
+  }
+}
 
 /* v25.1 account status card */
 .account-status-card{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
@@ -102,11 +116,19 @@
 /* v28.83 admin/device responsive rules */
 .admin-shell,.admin-panel-section,.report-table,.report-block,.queue-item,.manual-feature-test{min-width:0}
 .admin-tabs{max-width:100%}
-.admin-tab{white-space:normal;text-align:center}
+.admin-tab,.admin-tab-link,a.admin-tab-link.buttonlike{text-align:center}
 .profile-grid textarea,.ai-discovery-item textarea,#manualFeatureDiagnosticsOutput,#manualFeatureDiagnosticsPrompt{max-width:100%;min-width:0}
 html.floqr-mobile-browser .admin-shell{padding-left:14px;padding-right:14px}
-html.floqr-mobile-browser .admin-tabs{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding-bottom:8px;scroll-snap-type:x proximity}
-html.floqr-mobile-browser .admin-tab{flex:0 0 auto;max-width:76vw;scroll-snap-align:start}
+/* v29.09.18: wrap tab chips (no nowrap crush / no full-width buttonlike overlap) */
+html.floqr-mobile-browser .admin-tabs{
+  flex-wrap:wrap;overflow:visible;gap:8px;padding-bottom:0;scroll-snap-type:none
+}
+html.floqr-mobile-browser .admin-tab,
+html.floqr-mobile-browser .admin-tab-link,
+html.floqr-mobile-browser a.admin-tab-link.buttonlike{
+  flex:1 1 auto;width:auto!important;max-width:100%;min-width:min(100%,10.5rem);
+  min-height:44px;white-space:normal;scroll-snap-align:unset
+}
 html.floqr-mobile-browser .admin-grid,
 html.floqr-mobile-browser .profile-grid,
 html.floqr-mobile-browser .media-template-grid,
@@ -120,11 +142,19 @@ html.floqr-tablet-browser .admin-grid{grid-template-columns:1fr}
 html.floqr-tablet-browser .profile-grid,
 html.floqr-tablet-browser .media-template-grid,
 html.floqr-tablet-browser .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-html.floqr-desktop-browser .admin-tabs{overflow:visible}
+html.floqr-desktop-browser .admin-tabs{flex-wrap:wrap;overflow:visible;scroll-snap-type:none}
+html.floqr-desktop-browser .admin-tab,
+html.floqr-desktop-browser .admin-tab-link,
+html.floqr-desktop-browser a.admin-tab-link.buttonlike{
+  flex:0 1 auto;width:auto!important;min-width:max-content;white-space:nowrap
+}
 
 @media(max-width:640px){
-  .admin-tabs{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding-bottom:8px;scroll-snap-type:x proximity}
-  .admin-tab{flex:0 0 auto;max-width:76vw;scroll-snap-align:start}
+  .admin-tabs{flex-wrap:wrap;overflow:visible;gap:8px;padding-bottom:0;scroll-snap-type:none}
+  .admin-tab,.admin-tab-link,a.admin-tab-link.buttonlike{
+    flex:1 1 auto;width:auto!important;max-width:100%;min-width:min(100%,10.5rem);
+    min-height:44px;white-space:normal
+  }
   .admin-grid,.profile-grid,.media-template-grid,.metric-grid{grid-template-columns:1fr!important}
   .report-table div{display:grid;grid-template-columns:1fr;gap:4px}
   .report-table strong{text-align:left}

@@ -681,6 +681,9 @@ html.floqr-mobile-browser .button-row button,
 html.floqr-mobile-browser .queue-actions button,
 html.floqr-mobile-browser .manual-test-actions button,
 html.floqr-mobile-browser .buttonlike{width:100%;text-align:center}
+/* Keep admin/portal tab chips as auto-width chips (not full-bleed buttons) */
+html.floqr-mobile-browser .admin-tabs .buttonlike,
+html.floqr-mobile-browser .admin-tabs .admin-tab-link{width:auto!important;max-width:100%}
 html.floqr-mobile-browser .mingl-person-card{grid-template-columns:74px minmax(0,1fr);gap:10px;padding:12px;overflow:hidden}
 html.floqr-mobile-browser .mingl-person-photo{width:74px;height:74px;border-radius:16px}
 html.floqr-mobile-browser .mingl-person-card h3{font-size:20px;line-height:1.1;overflow-wrap:anywhere}
@@ -741,6 +744,7 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
   .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:1fr!important}
   .button-row,.queue-actions,.manual-test-actions{display:grid;grid-template-columns:1fr;gap:9px}
   .button-row button,.queue-actions button,.manual-test-actions button,.buttonlike{width:100%;text-align:center}
+  .admin-tabs .buttonlike,.admin-tabs .admin-tab-link{width:auto!important;max-width:100%}
 }
 
 @media(min-width:641px) and (max-width:1180px){
