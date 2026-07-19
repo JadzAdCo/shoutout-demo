@@ -13,9 +13,15 @@
 
   const TESTS = [
     {
+      id: "dc-casamara",
+      title: "DC venues / Casamara",
+      detail: "Open Casamara Club Admin. Spot-check events + Advertising tab loads. (Optional: another DC venue if you have time.)",
+      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}`
+    },
+    {
       id: "adv-media-upload",
-      title: "Advertising — local media upload",
-      detail: "Club Admin → Advertising. On a template input, upload a local photo/video (not only a URL). Confirm preview sticks.",
+      title: "Advertising — device media upload",
+      detail: "Advertising panel → template input: upload a local photo/video from the phone (not only a URL). Confirm preview sticks.",
       href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelAdvertising`
     },
     {
@@ -47,6 +53,12 @@
       title: "BartR — Cobra arts products",
       detail: "Search “art” or browse; open Cobra Callisto Arts; confirm catalog items; optional checkout smoke.",
       href: `${BASE}/commerce.html?v=${V_COMMERCE}`
+    },
+    {
+      id: "floqr-branding",
+      title: "FloqR branding note",
+      detail: "On the pages you opened, branding should read FloqR / FLOQR (not Flocker). Mark Fail only if you still see Flocker.",
+      href: `${BASE}/index.html?v=${V_MINGL}&start=search`
     },
     {
       id: "seed-optional",
