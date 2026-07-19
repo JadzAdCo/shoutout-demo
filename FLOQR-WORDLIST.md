@@ -17,7 +17,7 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **FloqR handle** | `@`-style identity stored in `floqrHandle`; same field as **Mingl handle** (username stays synced without `@` for backward compatibility) | Display name; Instagram |
 | **Instagram handle** | Social handle stored normalized with a leading `@` | FloqR handle |
 | **Mingl handle** | Same as FloqR handle (`floqrHandle`); shown on Mingl cards and public profile contacts | Instagram; separate username field |
-| **Patron** | End-user / guest member of FloqR | Club Admin; Master Admin |
+| **Patron** | End-user / guest member of FloqR. In UI copy, prefer **FloqR** / **FloqR patron** (never “Flocker” / “Flockers”). | Club Admin; Master Admin; deprecated “Flocker” |
 | **Club** | Venue entity (e.g. Zebbies) with Club Admin | Patron vendor store |
 | **Entity** | Any onboarded actor: patron, club, promoter, etc. | Template |
 | **Club Admin** | Operator of one club’s backend | Master Admin |

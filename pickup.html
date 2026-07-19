@@ -4,12 +4,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Pickup Robotaxi Simulation | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.14"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.14"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.19"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.19"/>
 </head>
 <body>
   <main class="app admin-shell pickup-shell">
-    <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?v=29.09.14&start=search">&larr; Back to Search</a>
+    <a class="global-back-btn buttonlike" id="floqrGlobalBack" data-from="search" href="./?v=29.09.19&start=search">&larr; Back to Search</a>
     <section class="page active">
       <header class="topbar">
         <div>
@@ -70,8 +70,8 @@
               <legend>Hail service</legend>
               <label><input type="radio" name="pickupMode" value="onDemand" checked/><span><strong>On-demand</strong><small>Request the nearest simulated vehicle now.</small></span></label>
               <label><input type="radio" name="pickupMode" value="scheduled"/><span><strong>Scheduled</strong><small>Reserve a simulated pickup date and time.</small></span></label>
-              <label><input type="radio" name="pickupMode" value="forAnother"/><span><strong>For a Flocker</strong><small>Book a ride for another FLOQR patron.</small></span></label>
-              <label><input type="radio" name="pickupMode" value="shared"/><span><strong>Shared</strong><small>Add up to three Flockers with optional separate drop-offs.</small></span></label>
+              <label><input type="radio" name="pickupMode" value="forAnother"/><span><strong>For a FloqR</strong><small>Book a ride for another FloqR patron.</small></span></label>
+              <label><input type="radio" name="pickupMode" value="shared"/><span><strong>Shared</strong><small>Add up to three FloqR patrons with optional separate drop-offs.</small></span></label>
             </fieldset>
             <div id="pickupScheduledFields" class="profile-grid hidden">
               <label>Pickup date<input id="pickupScheduledDate" type="date"/></label>
@@ -79,17 +79,17 @@
             </div>
             <div id="pickupFloqFields" class="hidden floq-ride-panel">
               <div id="pickupForAnotherFields" class="profile-grid">
-                <label>FLOQR patron username or email<input id="pickupRecipient" placeholder="Search or enter a Flocker"/></label>
+                <label>FloqR patron username or email<input id="pickupRecipient" placeholder="Search or enter a FloqR"/></label>
                 <label>Who pays?
                   <select id="pickupForAnotherPayment"><option value="organizer">I pay</option><option value="recipient">Recipient pays</option><option value="requestApproval">Ask recipient to approve and pay</option></select>
                 </label>
               </div>
               <div id="pickupSharedFields" class="hidden">
-                <p class="sub small">Add up to three Flockers. Each companion may have a different drop-off.</p>
+                <p class="sub small">Add up to three FloqR patrons. Each companion may have a different drop-off.</p>
                 <div class="companion-grid">
-                  <label>Flocker 1<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 1<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
-                  <label>Flocker 2<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 2<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
-                  <label>Flocker 3<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 3<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                  <label>FloqR patron 1<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 1<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                  <label>FloqR patron 2<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 2<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
+                  <label>FloqR patron 3<input data-companion="name" placeholder="Username or email"/></label><label>Drop-off 3<input data-companion="dropoff" placeholder="Same as club or another address"/></label>
                 </div>
                 <label>Payment arrangement
                   <select id="pickupSharedPayment"><option value="organizer">Organizer pays the full fare</option><option value="splitEvenly">Split the fare evenly</option><option value="individualLegs">Each rider pays their route leg</option></select>
@@ -177,17 +177,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-  <script src="./firebase-config.js?v=29.09.14"></script>
-  <script src="./floqr-nav.js?v=29.09.14"></script>
-  <script src="./global-profile-status.js?v=29.09.14"></script>
-  <script src="./shared-data.js?v=29.09.14"></script>
-  <script src="./floqr-action-feedback.js?v=29.09.14"></script>
-  <script src="./helper-popouts.js?v=29.09.14"></script>
-  <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
-  <script src="./ad-campaigns.js?v=29.09.14"></script>
-  <script src="./payment-service.js?v=29.09.14"></script>
-  <script src="./pickup-app.js?v=29.09.14"></script>
-  <script src="./profile-access-guard.js?v=29.09.14"></script>
+  <script src="./firebase-config.js?v=29.09.19"></script>
+  <script src="./floqr-nav.js?v=29.09.19"></script>
+  <script src="./global-profile-status.js?v=29.09.19"></script>
+  <script src="./shared-data.js?v=29.09.19"></script>
+  <script src="./floqr-action-feedback.js?v=29.09.19"></script>
+  <script src="./helper-popouts.js?v=29.09.19"></script>
+  <script src="./dc-spot-ad-campaigns.js?v=29.09.19"></script>
+  <script src="./ad-campaigns.js?v=29.09.19"></script>
+  <script src="./payment-service.js?v=29.09.19"></script>
+  <script src="./pickup-app.js?v=29.09.19"></script>
+  <script src="./profile-access-guard.js?v=29.09.19"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
   </script>
