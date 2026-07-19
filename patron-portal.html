@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.8"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.17"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.17"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -284,7 +284,11 @@
             <label>Price (USD)<input id="commerceProductPrice" type="number" min="0.50" step="0.01"/></label>
             <label>Available licenses / inventory<input id="commerceProductInventory" type="number" min="0" value="1"/></label>
             <label>Preview type<select id="commerceProductPreviewType"><option value="image">Image / cover art</option><option value="video">Video preview</option><option value="mixcloud">Mixcloud embed</option></select></label>
-            <label class="profile-grid-wide">Preview / cover image URL<input id="commerceProductImage" type="url" placeholder="Cover art, merch photo, or watermarked preview"/></label>
+            <label class="profile-grid-wide">Preview / cover media
+              <input id="commerceProductImageFile" type="file" accept="image/*,video/*"/>
+            </label>
+            <div id="commerceProductImagePreview" class="url-media-preview hidden profile-grid-wide"></div>
+            <label class="profile-grid-wide">or paste preview / cover image URL<input id="commerceProductImage" type="url" placeholder="Cover art, merch photo, or watermarked preview"/></label>
             <label class="profile-grid-wide">Mixcloud show URL<input id="commerceMixcloudUrl" type="url" placeholder="https://www.mixcloud.com/you/your-show/"/></label>
             <label class="profile-grid-wide">Playlist / streaming links<input id="commercePlaylistUrl" type="url" placeholder="Spotify / Apple Music / Tidal playlist URL (not an .mp3)"/></label>
             <label class="profile-grid-wide">Creator Subscriptions / Mixcloud tip URL<input id="commerceMixcloudSubscribeUrl" type="url" placeholder="Optional Mixcloud subscribe / support page"/></label>
@@ -407,18 +411,31 @@
               <label><input type="radio" name="languageCorrectionMode" value="autoFixMinor"/> <span>Auto-fix minor typos only</span></label>
             </div>
           </div>
+          <div class="card nested-card" style="margin-bottom:14px">
+            <h3 data-i18n="app.languageSettings">App language</h3>
+            <p class="sub small" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
+            <label>FloqR webapp language
+              <select id="uiAppLanguage"></select>
+            </label>
+            <button id="saveUiAppLanguageBtn" class="primary" type="button" data-i18n="app.save">Save</button>
+            <p id="uiAppLanguageStatus" class="status"></p>
+          </div>
           <div class="profile-grid">
             <label class="consent-checkbox"><input id="languageHighlightSpellingErrors" type="checkbox"/><span>Highlight possible spelling errors in red before correction</span></label>
             <label class="consent-checkbox"><input id="languageHighlightGrammarSuggestions" type="checkbox"/><span>Highlight grammar suggestions in yellow or underline</span></label>
-            <label>Preferred Language
+            <label>Preferred Language (grammar / bio)
               <select id="languagePreferredLanguage">
                 <option value="auto">Auto-detect</option>
                 <option value="en">English</option>
+                <option value="ar">Arabic</option>
                 <option value="fr">French</option>
                 <option value="es">Spanish</option>
                 <option value="de">German</option>
                 <option value="it">Italian</option>
                 <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="el">Greek</option>
+                <option value="pl">Polish</option>
               </select>
             </label>
             <label>Tone Preference
@@ -535,6 +552,7 @@
 <script src="./floqr-nav.js?v=29.09.8"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.8"></script>
+<script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-search-service.js?v=29.09.8"></script>
@@ -545,8 +563,9 @@
 <script src="./helper-popouts.js?v=29.09.8"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
+<script src="./floqr-i18n.js?v=29.09.13"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.12"></script>
+<script src="./patron-portal-app.js?v=29.09.17"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

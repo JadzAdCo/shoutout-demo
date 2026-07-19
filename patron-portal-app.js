@@ -305,6 +305,9 @@
     if (byId("languageHighlightSpellingErrors")) byId("languageHighlightSpellingErrors").checked = !!settings.highlightSpellingErrors;
     if (byId("languageHighlightGrammarSuggestions")) byId("languageHighlightGrammarSuggestions").checked = !!settings.highlightGrammarSuggestions;
     if (byId("languagePreferredLanguage")) byId("languagePreferredLanguage").value = settings.preferredLanguage || "auto";
+    if (byId("uiAppLanguage") && window.FLOQRI18n) {
+      byId("uiAppLanguage").innerHTML = window.FLOQRI18n.languageOptionsHtml(window.FLOQRI18n.getLanguage() || "en");
+    }
     if (byId("languageTonePreference")) byId("languageTonePreference").value = settings.tonePreference || "keepTone";
     if (byId("languageEmojiSkinTone")) byId("languageEmojiSkinTone").value = settings.emojiSkinTone || "yellow";
     if (byId("languagePersonalDictionary")) byId("languagePersonalDictionary").value = (settings.personalDictionary || []).join(", ");
@@ -421,6 +424,19 @@
       updateChatGrammarControls();
       setText("portalStatus", "Language settings saved.");
     });
+  }
+
+  async function saveUiAppLanguage() {
+    const code = byId("uiAppLanguage")?.value || "en";
+    const status = byId("uiAppLanguageStatus");
+    try {
+      if (status) status.textContent = "Saving FloqR webapp language…";
+      await window.FLOQRI18n?.setLanguage?.(code, {persist: true, markPrompt: true});
+      window.FLOQRI18n?.applyDom?.();
+      if (status) status.textContent = `FloqR language set to ${window.FLOQRI18n?.meta?.(code)?.native || code}.`;
+    } catch (error) {
+      if (status) status.textContent = error.message || String(error);
+    }
   }
 
   function getApprovedRoles(profile = currentProfile) {
@@ -2599,6 +2615,8 @@
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       });
       ["commerceProductName","commerceProductPrice","commerceProductImage","commerceProductDescription","commerceMixcloudUrl","commercePlaylistUrl","commerceMixcloudSubscribeUrl","commerceDownloadUrl"].forEach(id => { if (byId(id)) byId(id).value = ""; });
+      if (byId("commerceProductImageFile")) byId("commerceProductImageFile").value = "";
+      window.FLOQRUrlMediaField?.renderPreview?.(byId("commerceProductImagePreview"), "");
       await renderBartrSellerBackend(user, profile);
     });
   }
@@ -2820,10 +2838,29 @@
     bind("saveMediaSlotsBtn", saveMediaSlots);
     bind("savePrivacyBtn", savePrivacy);
     bind("saveLanguageSettingsBtn", saveLanguageSettings);
+    bind("saveUiAppLanguageBtn", saveUiAppLanguage);
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("commerceSaveProductBtn", publishBartrProduct);
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"commerceProductImage",
+      fileInputId:"commerceProductImageFile",
+      previewId:"commerceProductImagePreview",
+      statusId:"portalStatus",
+      allowVideo:true,
+      maxBytes:30 * 1024 * 1024,
+      upload: async file => {
+        const user = auth.currentUser;
+        if (!user) throw new Error("Sign in before uploading product media.");
+        const kind = String(file.type || "").startsWith("video/") ? "videos" : "images";
+        return window.FLOQRUrlMediaField.upload(file, {
+          pathPrefix:`profileMedia/${user.uid}/${kind}`,
+          allowVideo:true,
+          maxBytes: kind === "videos" ? 60 * 1024 * 1024 : 12 * 1024 * 1024
+        });
+      }
+    });
     byId("commerceProductType")?.addEventListener("change", () => {
       const type = byId("commerceProductType")?.value || "physical";
       const digital = type !== "physical";

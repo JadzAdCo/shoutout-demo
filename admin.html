@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.12"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.17"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
@@ -288,9 +288,21 @@
             <label>Eyebrow<input id="marketingEyebrow" placeholder="Tonight"/></label>
             <label>Headline<input id="marketingHeadline" placeholder="Doors open"/></label>
             <label>CTA<input id="marketingCta" placeholder="Get on the list"/></label>
-            <label>Background image URL<input id="marketingBackgroundUrl" placeholder="https://…"/></label>
-            <label>Extra image 1 URL<input id="marketingImage1" placeholder="https://…"/></label>
-            <label>Extra image 2 URL<input id="marketingImage2" placeholder="https://…"/></label>
+            <div class="url-media-field profile-grid-wide">
+              <label>Background image<input id="marketingBackgroundFile" type="file" accept="image/*"/></label>
+              <div id="marketingBackgroundPreview" class="url-media-preview hidden"></div>
+              <label>or paste URL<input id="marketingBackgroundUrl" placeholder="https://…"/></label>
+            </div>
+            <div class="url-media-field profile-grid-wide">
+              <label>Extra image 1<input id="marketingImage1File" type="file" accept="image/*"/></label>
+              <div id="marketingImage1Preview" class="url-media-preview hidden"></div>
+              <label>or paste URL<input id="marketingImage1" placeholder="https://…"/></label>
+            </div>
+            <div class="url-media-field profile-grid-wide">
+              <label>Extra image 2<input id="marketingImage2File" type="file" accept="image/*"/></label>
+              <div id="marketingImage2Preview" class="url-media-preview hidden"></div>
+              <label>or paste URL<input id="marketingImage2" placeholder="https://…"/></label>
+            </div>
             <label>Campaign link URL<input id="marketingLinkUrl" placeholder="https://…"/></label>
             <label>Test send phone (E.164)<input id="marketingTestPhone" type="tel" placeholder="+12025550123"/></label>
           </div>
@@ -320,7 +332,11 @@
             <label>Badge / eyebrow<input id="spotBadge" placeholder="Tonight"/></label>
             <label>Headline<input id="spotHeadline" placeholder="Tonight at the club"/></label>
             <label>CTA<input id="spotCta" placeholder="Open club"/></label>
-            <label>Image URL (optional)<input id="spotImageUrl" placeholder="https://… or leave blank for auto banner"/></label>
+            <div class="url-media-field profile-grid-wide">
+              <label>Spot image / video (optional)<input id="spotImageFile" type="file" accept="image/*,video/*"/></label>
+              <div id="spotImagePreview" class="url-media-preview hidden"></div>
+              <label>or paste URL<input id="spotImageUrl" placeholder="https://… or leave blank for auto banner"/></label>
+            </div>
             <label>Link URL<input id="spotLinkUrl" placeholder="https://…"/></label>
           </div>
           <label>Body<textarea id="spotBody" rows="3" placeholder="Event copy from your public site"></textarea></label>
@@ -350,7 +366,11 @@
             <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
             <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
             <label>Guest-list theme<select id="guestCampaignTheme"><option value="midnight">Midnight</option><option value="garden">Garden</option><option value="neon">Neon</option><option value="gold">VIP Gold</option><option value="minimal">Minimal</option></select></label>
-            <label>Main image URL<input id="guestCampaignImage" placeholder="DJ, promoter, waitress, bartender, or event image"/></label>
+            <div class="url-media-field profile-grid-wide">
+              <label>Main image<input id="guestCampaignImageFile" type="file" accept="image/*"/></label>
+              <div id="guestCampaignImagePreview" class="url-media-preview hidden"></div>
+              <label>or paste URL<input id="guestCampaignImage" placeholder="DJ, promoter, waitress, bartender, or event image"/></label>
+            </div>
             <label>Supporting Team<input id="guestCampaignSupportingTeam" list="guestSupportingTeamOptions" placeholder="Search approved DJ, promoter, waitress, bottle girl, or bartender"/><datalist id="guestSupportingTeamOptions"></datalist></label>
             <label>Audience<select id="guestCampaignAudience"><option value="followers">Club followers (no distribution charge)</option><option value="targetedFloqr">Targeted FloqR ($0.10/user)</option></select></label>
             <label id="guestCampaignTargetCountLabel" class="hidden">Targeted patrons<input id="guestCampaignTargetCount" type="number" min="1" value="100"/></label>
@@ -495,6 +515,7 @@
 <script src="./floqr-nav.js?v=29.09.8"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.8"></script>
+<script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
@@ -507,11 +528,11 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.14"></script>
+<script src="./admin-app.js?v=29.09.17"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.12"></script>
-<script src="./admin-marketing.js?v=29.09.14"></script>
-<script src="./admin-spot-ads.js?v=29.09.14"></script>
+<script src="./admin-marketing.js?v=29.09.17"></script>
+<script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

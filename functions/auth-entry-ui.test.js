@@ -38,5 +38,5 @@ test("main message typing preserves spaces instead of live-fitting on every keys
     app,
     /byId\("mainText"\)\?\.addEventListener\("input", event => \{ const fitted = fitTemplateText\(event\.currentTarget\.value, "main"\)/
   );
-  assert.match(html, /patron-app\.js\?v=29\.09\.16/);
+  assert.match(html, /patron-app\.js\?v=29\.09\.17/);
 });

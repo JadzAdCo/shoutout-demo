@@ -183,6 +183,15 @@
       byId("spotEventFocus").value = (club.activityDates || [])[0] || "";
     }
     applySpotTemplate();
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"spotImageUrl",
+      fileInputId:"spotImageFile",
+      previewId:"spotImagePreview",
+      statusId:"spotAdStatus",
+      pathPrefix:`clubMedia/${locationId}/spot-ads`,
+      allowVideo:true,
+      maxBytes:60 * 1024 * 1024
+    });
     byId("spotTemplateSelect")?.addEventListener("change", applySpotTemplate);
     byId("spotEventFocus")?.addEventListener("change", applySpotTemplate);
     byId("publishSpotAdBtn")?.addEventListener("click", () => publishFromForm().catch(err => {

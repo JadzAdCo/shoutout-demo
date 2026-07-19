@@ -253,6 +253,12 @@ body[data-guest-theme] .card,body[data-guest-theme] .guest-campaign-hero{border-
 .marketing-preview.layout-stackedCards .preview-images img{width:96px;height:64px}
 .marketing-preview.layout-announcement{align-content:center;text-align:center;justify-items:center}
 
+/* URL + local file media fields (v29.09.17) */
+.url-media-field{display:grid;gap:8px}
+.url-media-field.profile-grid-wide{grid-column:1 / -1}
+.url-media-preview{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px;background:rgba(0,0,0,.22)}
+.url-media-preview img,.url-media-preview video{display:block;max-width:100%;max-height:180px;border-radius:10px;object-fit:cover}
+
 /* BartR Mixcloud embeds */
 .mixcloud-embed{display:block;width:100%;min-height:120px;border:0;border-radius:12px;background:#0a0f1e}
 .commerce-access-links a{color:#5eeaff;font-weight:800}

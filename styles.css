@@ -771,6 +771,9 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
 .football-stadium-message-label{display:grid;gap:8px;margin:6px 0 2px;font-size:13px;font-weight:1000;letter-spacing:.06em;text-transform:uppercase}.football-stadium-message-label textarea{font-size:18px;font-weight:900;letter-spacing:.03em;text-transform:uppercase}
 .football-ai-option,.football-photo-consent{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.06)}
 .football-photo-consent{border:1px solid rgba(223,255,90,.28)}
+.url-media-field{display:grid;gap:8px;margin:8px 0}
+.url-media-preview{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px;background:rgba(0,0,0,.22)}
+.url-media-preview img,.url-media-preview video{display:block;max-width:100%;max-height:180px;border-radius:10px;object-fit:cover}
 body[data-selected-template="zebbiesFootballTeamIntro"] #aiMediaPanel{display:none!important}
 @media(max-width:720px){.football-player-upload-grid{grid-template-columns:1fr}.football-team-editor{padding:14px}}
 

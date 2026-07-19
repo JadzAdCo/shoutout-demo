@@ -1976,6 +1976,15 @@
     byId("clubMediaTrimStart")?.addEventListener("input", renderClubMediaInputPreview);
     byId("clubMediaTrimEnd")?.addEventListener("input", renderClubMediaInputPreview);
     byId("guestCampaignAudience")?.addEventListener("change", event => byId("guestCampaignTargetCountLabel")?.classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"guestCampaignImage",
+      fileInputId:"guestCampaignImageFile",
+      previewId:"guestCampaignImagePreview",
+      statusId:"adminStatus",
+      pathPrefix:`clubMedia/${locationId}/guest-campaigns`,
+      allowVideo:false,
+      maxBytes:12 * 1024 * 1024
+    });
     updateClubMediaTrimVisibility();
 
     auth.getRedirectResult().then(result => {
