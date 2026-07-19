@@ -32,6 +32,13 @@ test("recommendations fit every supported template's smallest shared ceiling", (
 });
 
 test("every published template allows patron background changes", () => {
-  assert.equal(templates.length, 26);
-  templates.forEach(template => assert.equal(template.backgroundEditable, true, `${template.id} background must be editable`));
+  assert.ok(templates.length >= 30, `expected >= 30 templates, got ${templates.length}`);
+  templates.forEach(template => {
+    // Heist club exclusives lock art backgrounds; Shared / other templates stay editable.
+    if (template.scope === "Club" && String(template.id || "").startsWith("heist")) {
+      assert.equal(template.backgroundEditable, false, `${template.id} Heist art background must stay locked`);
+      return;
+    }
+    assert.equal(template.backgroundEditable, true, `${template.id} background must be editable`);
+  });
 });
