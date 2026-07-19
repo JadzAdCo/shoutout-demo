@@ -89,7 +89,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     logoUrl:"https://images.getbento.com/accounts/c91f13a9c8b9b7e67e9a92798b49e3c3/media/images/81154Logo_Heist.png",
     socialMediaHandles:{instagram:"@heistdc"},
     brand:"HEIST DC x FLOQR",
-    defaultMain:"USE SHOUT OUT @ HEIST DC", defaultSub:"Dupont Circle",
+    defaultMain:"USE SHOUTOUT @ HEIST", defaultSub:"",
     tagline:"#1 Lounge in America — Dupont Circle nightlife",
     description:"Subterranean nightclub and lounge in DuPont Circle with hand-selected DJs and VIP-level service.",
     genres:["Hip Hop","Afro Beats","House","R&B"], artists:["Hand-selected DJs"],
@@ -98,7 +98,10 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     reservationsUrl:"https://www.sevenrooms.com/events/heistdc",
     activityStatus:"Active Dupont Circle nightclub / lounge",
     activityDates:["Thursday late night","Friday HEIST","Saturday HEIST"],
-    templates:["hiphop","bottle","birthday","fire","vip","neon"], active:true
+    templates:["hiphop","bottle","birthday","fire","vip","neon","heistVaultNight","heistNeonMask","heistDupontUnder","heistRedLux"],
+    displayScreenFormatIds:["led-64x32"],
+    primaryDisplayScreenFormatId:"led-64x32",
+    active:true
   },
   "gaia-supperclub-washington-dc": {
     brandName:"GAIA Supperclub", locationName:"GAIA Supperclub", type:"club",
@@ -813,7 +816,107 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     tags:["football intro","zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
-  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] }
+  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] },
+  heistVaultNight: {
+    id:'heistVaultNight',
+    name:'Heist Vault Night',
+    scope:'Club',
+    venueIds:['heist-washington-dc'],
+    className:'classic-bw',
+    category:'Heist Art',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    identityRail:true,
+    identityAnimation:'burst-away',
+    identityAnimationSeconds:20,
+    priceCents:4000,
+    priceLabel:'$40',
+    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    defaultMain:'NIGHT CREW',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:10,
+    maxMainCharacters:30,
+    maxSubCharacters:14,
+    description:'Heist DC exclusive: cinematic vault-door ShoutOut board — dark luxury steel rings, crimson rim light, classic letter board, and PRESENTED BY FLOQR SHOUTOUT rail. Tuned for the 64×32 LED panel.',
+    tags:["heist","vault","heist art","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+  },
+  heistNeonMask: {
+    id:'heistNeonMask',
+    name:'Heist Neon Mask',
+    scope:'Club',
+    venueIds:['heist-washington-dc'],
+    className:'classic-bw',
+    category:'Heist Art',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    identityRail:true,
+    identityAnimation:'burst-away',
+    identityAnimationSeconds:20,
+    priceCents:4000,
+    priceLabel:'$40',
+    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    defaultMain:'MASKS OUT',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:10,
+    maxMainCharacters:30,
+    maxSubCharacters:14,
+    description:'Heist DC exclusive: masks-of-the-night neon energy — red/black glow, subterranean club vibe, locked classic board geometry for the 64×32 LED.',
+    tags:["heist","neon","mask","heist art","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+  },
+  heistDupontUnder: {
+    id:'heistDupontUnder',
+    name:'Heist Dupont Underground',
+    scope:'Club',
+    venueIds:['heist-washington-dc'],
+    className:'classic-bw',
+    category:'Heist Art',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    identityRail:true,
+    identityAnimation:'burst-away',
+    identityAnimationSeconds:20,
+    priceCents:4000,
+    priceLabel:'$40',
+    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    defaultMain:'DUPONT AFTER',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:10,
+    maxMainCharacters:30,
+    maxSubCharacters:14,
+    description:'Heist DC exclusive: Dupont subterranean lounge atmosphere — deep charcoal corridors, ember accents, classic ShoutOut board sized for 64×32 LED.',
+    tags:["heist","dupont","underground","heist art","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+  },
+  heistRedLux: {
+    id:'heistRedLux',
+    name:'Heist Red Luxury',
+    scope:'Club',
+    venueIds:['heist-washington-dc'],
+    className:'classic-bw',
+    category:'Heist Art',
+    mediaMode:'No image/video',
+    supportsMedia:false,
+    backgroundEditable:false,
+    identityRail:true,
+    identityAnimation:'burst-away',
+    identityAnimationSeconds:20,
+    priceCents:4000,
+    priceLabel:'$40',
+    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    defaultMain:'VIP HEIST',
+    defaultSub:'',
+    lineCount:3,
+    maxCharactersPerLine:10,
+    maxMainCharacters:30,
+    maxSubCharacters:14,
+    description:'Heist DC exclusive: dark-luxury crimson velvet ShoutOut — high-contrast red and black frame art with the locked classic board and FLOQR identity rail for 64×32 LED.',
+    tags:["heist","red","luxury","vip","heist art","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+  }
 });
 
 window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate'];
@@ -838,7 +941,7 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:24,minimumFontPixels:48},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:58},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:22,minimumFontPixels:58},
-      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:20,minimumFontPixels:38}
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters so text does not clip."}
     }
   },
   classicBoard: {
@@ -849,7 +952,7 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:44},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:18,minimumFontPixels:46},
-      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:12,maxMainCharacters:36,maxSubCharacters:16,minimumFontPixels:34}
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; identity rail stays PRESENTED BY FLOQR SHOUTOUT when blank."}
     }
   },
   splitMedia: {
@@ -888,10 +991,10 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
 };
 
 window.FLOQRTextLayout = {
-  version:"29.08.4",
+  version:"29.09.21",
   profileId(template = {}) {
     const id = String(template.id || "");
-    if (id === "blackwhite" || template.className === "classic-bw") return "classicBoard";
+    if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
     if (id === "car" || template.className === "car") return "car";
     if (template.layout === "split-media") return "splitMedia";

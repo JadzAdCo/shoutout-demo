@@ -22,17 +22,20 @@ const STRIPE_API_VERSION = "2026-06-24.dahlia";
 const COMMERCE_RESERVATION_SECONDS = 31 * 60;
 const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
 const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
+const HEIST_DC_LOCATION_ID = "heist-washington-dc";
+const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
+const HEIST_ART_PRICE_CENTS = 4000;
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "p125-96x48":[3,16,48,28],"p125-64x48":[3,10,30,22],"p125-64x32":[3,14,42,24],
-    "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,12,36,20]
+    "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,10,30,16]
   },
   classicBoard:{
     "p125-96x48":[3,15,45,20],"p125-64x48":[3,12,36,18],"p125-64x32":[3,14,42,18],
-    "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,12,36,16]
+    "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,10,30,14]
   },
   splitMedia:{
     "p125-96x48":[3,10,30,20],"p125-64x48":[2,12,24,18],"p125-64x32":null,
@@ -225,6 +228,21 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     submittedByUid:authContext.uid || "",
     submittedBy:text(authContext.token?.email || rawShoutout.submittedBy, 200).toLowerCase()
   };
+  if (HEIST_ART_TEMPLATE_IDS.has(templateId)) {
+    const heistClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
+    if (heistClubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
+    return {
+      ...rawPayload,
+      clubLocationId:HEIST_DC_LOCATION_ID,
+      shoutout:{
+        ...shoutout,
+        clubLocationId:HEIST_DC_LOCATION_ID,
+        location:HEIST_DC_LOCATION_ID,
+        screenFormatId:screenFormatId || "led-64x32",
+        priceCents:HEIST_ART_PRICE_CENTS
+      }
+    };
+  }
   if (templateId !== FOOTBALL_TEAM_INTRO_TEMPLATE_ID) return {...rawPayload, shoutout};
   const requestedClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
   if (requestedClubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
@@ -401,6 +419,7 @@ async function canPublishForEntity(entityId, authContext = {}) {
   const uid = authContext.uid || "";
   const email = String(authContext.token?.email || "").toLowerCase();
   if (!uid || !entityId) return false;
+  if (await isMasterAdminAuth(authContext)) return true;
   if (entityId.includes(":")) {
     const [memberUid, requestedRole] = entityId.split(":", 2);
     if (memberUid !== uid) return false;
@@ -515,9 +534,12 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const shoutout = payload.shoutout || {};
     const templateId = text(shoutout.template || shoutout.templateId, 80);
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
+    const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
-      : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+      : heistArt
+        ? HEIST_ART_PRICE_CENTS
+        : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }
@@ -526,9 +548,10 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const clubId = text(shoutout.clubLocationId || shoutout.location || payload.clubLocationId, 120);
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
     if (footballTeamIntro && clubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
+    if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
     return {
       amountCents:pricedAmountCents,
-      itemName:footballTeamIntro ? "Football Intro ShoutOut" : "FLOQR paid ShoutOut",
+      itemName:footballTeamIntro ? "Football Intro ShoutOut" : heistArt ? "Heist Art ShoutOut" : "FLOQR paid ShoutOut",
       description:"Payment is charged to FloqR. The host club accrues a 20% share for Account Reconciliation.",
       venueShareCents:split.venueShare,
       clubShareCents:split.venueShare,
@@ -1663,4 +1686,139 @@ exports.seedDcSpotAdPool = onCall({region:"us-central1", timeoutSeconds:60, memo
   }
   await batch.commit();
   return {seeded: n};
+});
+
+/** HTTP seed so BartR can be filled without a callable auth session. Creates demo seller if Lucy/Cobra missing. */
+exports.seedLucyCobraBartrCatalogHttp = onRequest({
+  region: "us-central1",
+  timeoutSeconds: 60,
+  memory: "512MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).json({ok: false, error: "Method not allowed"});
+      return;
+    }
+    const DEMO_UID = "lucy-cobra-arts";
+    let seller = null;
+    const needles = ["lucy", "cobra"];
+    const shoutoutsSnap = await db.collection("shoutouts").limit(500).get();
+    for (const doc of shoutoutsSnap.docs) {
+      const row = doc.data() || {};
+      const blob = `${row.submittedBy || ""} ${row.displayName || ""} ${row.patronName || ""} ${row.mainText || ""} ${row.subText || ""}`.toLowerCase();
+      if (!needles.some(n => blob.includes(n))) continue;
+      const uid = row.submittedByUid;
+      if (!uid) continue;
+      const userSnap = await db.collection("users").doc(uid).get();
+      if (userSnap.exists) {
+        seller = {uid, ...userSnap.data()};
+        break;
+      }
+    }
+    if (!seller) {
+      const usersSnap = await db.collection("users").limit(500).get();
+      for (const doc of usersSnap.docs) {
+        const row = {uid: doc.id, ...doc.data()};
+        const blob = `${row.displayName || ""} ${row.fullName || ""} ${row.username || ""} ${row.email || ""}`.toLowerCase();
+        if (needles.some(n => blob.includes(n))) {
+          seller = row;
+          break;
+        }
+      }
+    }
+    if (!seller?.uid) {
+      seller = {
+        uid: DEMO_UID,
+        displayName: "Lucy Cobra",
+        username: "lucycobra",
+        email: "bans.don@gmail.com"
+      };
+    }
+    const storeName = text(seller.commerceStoreName || `${seller.displayName || "Lucy Cobra"} Arts`, 120);
+    await db.collection("users").doc(seller.uid).set({
+      displayName: seller.displayName || "Lucy Cobra",
+      username: seller.username || "lucycobra",
+      email: seller.email || "bans.don@gmail.com",
+      country: "United States",
+      commerceEnabled: true,
+      commerceStoreName: storeName,
+      commerceContact: text(seller.email || "bans.don@gmail.com", 200),
+      commerceRefundPolicy: "Unused physical art items may be returned within 14 days unused and in original packaging. Custom commissions are final sale.",
+      publicProfileVisibility: "public",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+
+    const catalog = [
+      {name:"Sunset Over Dupont (oil)", category:"Artwork", productType:"physical", priceCents:18500, desc:"Original oil painting, 16x20 framed."},
+      {name:"Neon Corridor Study", category:"Artwork", productType:"physical", priceCents:9200, desc:"Acrylic on canvas nightlife study."},
+      {name:"Mediterranean Rooftop Light", category:"Artwork", productType:"physical", priceCents:12400, desc:"Watercolor inspired by rooftop evenings."},
+      {name:"Abstract Bassline #3", category:"Artwork", productType:"physical", priceCents:7800, desc:"Mixed media abstract for lounge walls."},
+      {name:"Portrait: Midnight Patron", category:"Artwork", productType:"physical", priceCents:21000, desc:"Charcoal portrait series print + frame option."},
+      {name:"Gold Leaf Mini Series (set of 3)", category:"Artwork", productType:"physical", priceCents:6500, desc:"Three small gold-leaf panels."},
+      {name:"Club Geometry Print", category:"Artwork", productType:"physical", priceCents:4500, desc:"Limited giclee print, signed."},
+      {name:"City Rain Reflections", category:"Artwork", productType:"physical", priceCents:9900, desc:"Oil on board, urban night rain."},
+      {name:"Hammered Brass Cuff", category:"Jewelry", productType:"physical", priceCents:6800, desc:"Hand-hammered brass cuff bracelet."},
+      {name:"Resin Drop Earrings", category:"Jewelry", productType:"physical", priceCents:3200, desc:"Lightweight resin and gold-tone earrings."},
+      {name:"Beaded Night Collar", category:"Jewelry", productType:"physical", priceCents:5400, desc:"Statement beaded collar necklace."},
+      {name:"Silver Stack Ring Set", category:"Jewelry", productType:"physical", priceCents:4100, desc:"Three textured sterling-finish rings."},
+      {name:"Enamel Pin: Throw a ShoutOut", category:"Jewelry", productType:"physical", priceCents:1800, desc:"Hard enamel pin for jackets and bags."},
+      {name:"Gallery Float Frame 16x20", category:"Art accessories", productType:"physical", priceCents:5200, desc:"Black gallery float frame, ready to hang."},
+      {name:"Walnut Shadow Box Frame", category:"Art accessories", productType:"physical", priceCents:7400, desc:"Deep walnut shadow box for mixed media."},
+      {name:"Pro Acrylic Brush Set (12)", category:"Art accessories", productType:"physical", priceCents:3600, desc:"Synthetic brush set for acrylic and oil."},
+      {name:"Palette Knife Kit", category:"Art accessories", productType:"physical", priceCents:2800, desc:"Five stainless palette knives."},
+      {name:"Artist Travel Case", category:"Art accessories", productType:"physical", priceCents:8900, desc:"Compact hard case for brushes and tubes."},
+      {name:"Linen Canvas Pack (5)", category:"Art accessories", productType:"physical", priceCents:4700, desc:"Pre-stretched linen canvases, assorted."},
+      {name:"Archival Print Sleeve Bundle", category:"Art accessories", productType:"physical", priceCents:2200, desc:"Acid-free sleeves for print editions."}
+    ];
+
+    const existing = await db.collection("commerceProducts").where("sellerUid", "==", seller.uid).limit(50).get();
+    const existingNames = new Set(existing.docs.map(d => String((d.data() || {}).name || "").toLowerCase()));
+    const created = [];
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    for (let i = 0; i < catalog.length; i += 1) {
+      const item = catalog[i];
+      if (existingNames.has(item.name.toLowerCase())) continue;
+      const ref = db.collection("commerceProducts").doc();
+      const accent = encodeURIComponent(["dfff5a", "7ad7ff", "ffb347", "c4a1ff", "ff6b9d"][i % 5]);
+      const label = encodeURIComponent(item.name.slice(0, 28));
+      await ref.set({
+        sellerEntityId: seller.uid,
+        sellerEntityType: "member",
+        sellerUid: seller.uid,
+        sellerName: storeName,
+        sellerCountry: "United States",
+        marketplaceCountry: "US",
+        marketplace: "bartr",
+        name: item.name,
+        category: item.category,
+        productType: item.productType,
+        previewMediaType: "image",
+        mediaLicense: "",
+        priceCents: item.priceCents,
+        inventory: 8 + (i % 5),
+        imageUrl: `https://placehold.co/600x600/${accent}/14121c/png?text=${label}`,
+        description: item.desc,
+        requiresShipping: true,
+        active: true,
+        refundPolicySnapshot: "Unused physical art items may be returned within 14 days unused and in original packaging.",
+        contactSnapshot: text(seller.email || "bans.don@gmail.com", 200),
+        seededBy: "seedLucyCobraBartrCatalogHttp",
+        createdAt: now,
+        updatedAt: now
+      });
+      created.push({id: ref.id, name: item.name, priceCents: item.priceCents});
+    }
+
+    res.status(200).json({
+      ok: true,
+      sellerUid: seller.uid,
+      sellerName: storeName,
+      productsCreated: created.length,
+      productsSkippedExisting: catalog.length - created.length,
+      commerceUrl: "https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.14"
+    });
+  } catch (error) {
+    res.status(500).json({ok: false, error: error?.message || String(error)});
+  }
 });
