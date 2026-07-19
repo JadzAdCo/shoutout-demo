@@ -143,6 +143,8 @@
     if (byId("footballPhotoConsent")) byId("footballPhotoConsent").checked = false;
     if (byId("footballTeamMessage")) byId("footballTeamMessage").value = "TONIGHT, WE TAKE THE FIELD TOGETHER";
     if (byId("footballBackgroundUrl")) byId("footballBackgroundUrl").value = "";
+    if (byId("footballBackgroundFile")) byId("footballBackgroundFile").value = "";
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("footballBackgroundPreview"), "");
     if (byId("footballBackgroundColor")) byId("footballBackgroundColor").value = "#071713";
     if (byId("footballColorTheme")) byId("footballColorTheme").value = "stadiumGold";
     for (let slot = 1; slot <= FOOTBALL_TEAM_MEMBER_COUNT; slot += 1) {
@@ -192,6 +194,24 @@
     byId("footballColorTheme")?.addEventListener("change", updatePreview);
     byId("footballBackgroundColor")?.addEventListener("input", updatePreview);
     byId("footballBackgroundUrl")?.addEventListener("input", updatePreview);
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"footballBackgroundUrl",
+      fileInputId:"footballBackgroundFile",
+      previewId:"footballBackgroundPreview",
+      statusId:"footballTeamStatus",
+      pathPrefix: currentUser?.uid ? `shoutouts/${currentUser.uid}/backgrounds` : "shoutouts/anonymous/backgrounds",
+      allowVideo:false,
+      maxBytes:12 * 1024 * 1024,
+      upload: async file => {
+        if (!currentUser?.uid) throw new Error("Sign in before uploading a background image.");
+        return window.FLOQRUrlMediaField.upload(file, {
+          pathPrefix:`shoutouts/${currentUser.uid}/backgrounds`,
+          allowVideo:false,
+          maxBytes:12 * 1024 * 1024
+        });
+      },
+      onChange:updatePreview
+    });
     for (let slot = 1; slot <= FOOTBALL_TEAM_MEMBER_COUNT; slot += 1) autofillFootballIdentityValue(slot);
   }
   async function uploadFootballTeamMembers(referenceNumber) {

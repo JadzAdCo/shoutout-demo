@@ -239,7 +239,30 @@
     if (byId("marketingRecipients")) byId("marketingRecipients").value = row.estimatedRecipients || 1;
     renderTemplateOptions();
     renderPreview();
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("marketingBackgroundPreview"), byId("marketingBackgroundUrl")?.value || "");
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("marketingImage1Preview"), byId("marketingImage1")?.value || "");
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("marketingImage2Preview"), byId("marketingImage2")?.value || "");
     if (statusEl()) statusEl().textContent = `Loaded campaign ${id}.`;
+  }
+
+  function bindMarketingMediaUploads() {
+    const binder = window.FLOQRUrlMediaField;
+    if (!binder?.bind) return;
+    const pathPrefix = `clubMedia/${locationId}/marketing`;
+    [
+      {urlInputId:"marketingBackgroundUrl", fileInputId:"marketingBackgroundFile", previewId:"marketingBackgroundPreview"},
+      {urlInputId:"marketingImage1", fileInputId:"marketingImage1File", previewId:"marketingImage1Preview"},
+      {urlInputId:"marketingImage2", fileInputId:"marketingImage2File", previewId:"marketingImage2Preview"}
+    ].forEach(field => {
+      binder.bind({
+        ...field,
+        statusId:"marketingCampaignStatus",
+        pathPrefix,
+        allowVideo:false,
+        maxBytes:12 * 1024 * 1024,
+        onChange:renderPreview
+      });
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -247,6 +270,7 @@
     renderTemplateOptions();
     renderPreview();
     renderCredits();
+    bindMarketingMediaUploads();
 
     byId("marketingIndustry")?.addEventListener("change", () => {
       selectedTemplateId = "";
