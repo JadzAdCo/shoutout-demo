@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>FLOQR — iPhone mobile test checklist</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.20"/>
+  <style>
+    .mtc-shell{max-width:560px;margin:0 auto;padding:18px 16px calc(28px + env(safe-area-inset-bottom,0px))}
+    .mtc-brand{font-size:clamp(28px,8vw,40px);font-weight:1000;letter-spacing:.04em;margin:0 0 6px;text-shadow:0 0 18px rgba(38,216,255,.55)}
+    .mtc-intro{color:var(--muted);font-size:15px;line-height:1.45;margin:0 0 18px}
+    .mtc-auth{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 18px}
+    .mtc-auth button{min-height:48px;padding:12px 16px;font-size:15px}
+    .mtc-auth .who{flex:1 1 100%;color:var(--lime);font-weight:800;font-size:14px}
+    .mtc-item{border:1px solid var(--line);border-radius:20px;padding:16px;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.05));backdrop-filter:blur(12px)}
+    .mtc-item h2{margin:0 0 6px;font-size:18px;line-height:1.25}
+    .mtc-item p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.4}
+    .mtc-open{display:block;width:100%;text-align:center;min-height:48px;padding:14px 16px;margin:0 0 12px;border-radius:14px;font-weight:900;font-size:15px;text-decoration:none;color:#06101c;background:linear-gradient(90deg,var(--hot),var(--accent));border:0;box-sizing:border-box}
+    .mtc-toggles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 0 10px}
+    .mtc-toggles button{min-height:48px;border-radius:12px;font-weight:900;font-size:15px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text)}
+    .mtc-toggles button[aria-pressed="true"].pass{background:rgba(223,255,90,.28);border-color:var(--lime);color:var(--lime)}
+    .mtc-toggles button[aria-pressed="true"].fail{background:rgba(244,58,191,.28);border-color:var(--hot);color:#ffb3e4}
+    .mtc-toggles button[aria-pressed="true"].skip{background:rgba(38,216,255,.22);border-color:var(--accent);color:var(--accent)}
+    .mtc-item textarea{min-height:72px;font-size:16px;margin-top:0}
+    .mtc-submit{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;width:100%;min-height:56px;margin-top:8px;padding:16px;border:0;border-radius:16px;font-size:17px;font-weight:1000;color:#06101c;background:linear-gradient(90deg,var(--hot),var(--accent));box-shadow:0 12px 36px rgba(0,0,0,.45)}
+    .mtc-submit:disabled{opacity:.55}
+    .mtc-status{margin:12px 0 0;font-weight:800;color:var(--lime);font-size:14px;min-height:1.2em}
+    .mtc-done{display:none;text-align:center;padding:36px 18px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(223,255,90,.16),rgba(255,255,255,.06))}
+    .mtc-done.show{display:block}
+    .mtc-done h2{margin:0 0 10px;font-size:clamp(26px,7vw,36px);line-height:1.15;color:var(--lime)}
+    .mtc-done p{margin:0;color:var(--muted);font-size:16px;line-height:1.45}
+    .mtc-form.hidden{display:none!important}
+  </style>
+</head>
+<body>
+<main class="mtc-shell">
+  <p class="eyebrow">FLOQR · iPhone</p>
+  <h1 class="mtc-brand">FLOQR</h1>
+  <p class="mtc-intro">Open each link, run the check, mark Pass / Fail / Skip, add a note if useful, then Submit. Results email bans.don@gmail.com.</p>
+
+  <div class="mtc-auth">
+    <button id="mtcGoogleBtn" type="button" class="signin google">Sign in with Google (optional)</button>
+    <button id="mtcSignOutBtn" type="button" class="ghost hidden">Sign out</button>
+    <p id="mtcWho" class="who">Not signed in — you can still submit.</p>
+  </div>
+
+  <div id="mtcForm" class="mtc-form">
+    <div id="mtcList"></div>
+    <button id="mtcSubmitBtn" class="mtc-submit" type="button">Submit results</button>
+    <p id="mtcStatus" class="mtc-status" role="status"></p>
+  </div>
+
+  <div id="mtcDone" class="mtc-done" aria-live="polite">
+    <h2>Results emailed — thank you</h2>
+    <p>Your Pass / Fail / Skip summary was sent to bans.don@gmail.com.</p>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.20"></script>
+<script src="./mobile-test-checklist.js?v=29.09.20"></script>
+</body>
+</html>
