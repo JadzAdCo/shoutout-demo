@@ -15,7 +15,7 @@ The production integration is designed as a provider adapter. FLOQR can replace 
 | `onDemand` | Request the closest eligible vehicle now | pickup, destination | organizer |
 | `scheduled` | Reserve a future pickup | pickup, destination, scheduled time/time zone | organizer |
 | `forAnother` | Request a ride for another FLOQR patron | recipient, pickup, destination | organizer pays, recipient pays, recipient approves and pays |
-| `shared` | Add one to three Flockers, including separate drop-offs | companions and their drop-offs | organizer pays, split evenly, each rider pays their route leg |
+| `shared` | Add one to three FloqR patrons, including separate drop-offs | companions and their drop-offs | organizer pays, split evenly, each rider pays their route leg |
 
 ## Proposed REST API
 

@@ -1,4 +1,4 @@
-/* FLOQR Pickup / RydR simulation v29.09.14. Dispatch is simulated; trip fare uses real Stripe Checkout. */
+/* FLOQR Pickup / RydR simulation v29.09.19. Dispatch is simulated; trip fare uses real Stripe Checkout. */
 (function () {
   "use strict";
 
@@ -141,14 +141,14 @@
     }
     if (mode === "forAnother") {
       const recipient = byId("pickupRecipient").value.trim();
-      if (!recipient) throw new Error("Select or enter the Flocker receiving the ride.");
+      if (!recipient) throw new Error("Select or enter the FloqR patron receiving the ride.");
       return {mode, recipient, payerChoice:byId("pickupForAnotherPayment").value};
     }
     if (mode === "shared") {
       const names = Array.from(document.querySelectorAll('[data-companion="name"]'));
       const dropoffs = Array.from(document.querySelectorAll('[data-companion="dropoff"]'));
       const companions = names.map((field, index) => ({patron:field.value.trim(), dropoffAddress:dropoffs[index]?.value.trim() || destination})).filter(item => item.patron);
-      if (!companions.length) throw new Error("Add at least one Flocker to a shared ride.");
+      if (!companions.length) throw new Error("Add at least one FloqR patron to a shared ride.");
       return {mode, companions:companions.slice(0, 3), payerChoice:byId("pickupSharedPayment").value};
     }
     return {mode:"onDemand", payerChoice:"organizer"};
@@ -243,7 +243,7 @@
   }
 
   function renderRideDetails(booking = {}) {
-    const modeLabels = {onDemand:"On-demand", scheduled:"Scheduled", forAnother:"For a Flocker", shared:"Shared"};
+    const modeLabels = {onDemand:"On-demand", scheduled:"Scheduled", forAnother:"For a FloqR", shared:"Shared"};
     const payerLabels = {organizer:"Organizer pays", recipient:"Recipient pays", requestApproval:"Recipient approves and pays", splitEvenly:"Split evenly", individualLegs:"Each rider pays their route leg"};
     byId("pickupRideDetails").innerHTML = `
       <div><span>Booking mode</span><strong>${esc(modeLabels[booking.mode] || booking.mode || "On-demand")}</strong></div>

@@ -33,7 +33,7 @@ No Tesla API key is configured. Pickup is intentionally a no-charge/no-dispatch 
 2. Save a US and a non-US club. Confirm public/search locations use `City, State` and `City, Country`, respectively.
 3. Open Master Admin crawler review. Confirm raw and parsed JSON are collapsed until the plus/summary control is opened and address fields are separate.
 4. In Template Management, test View, Edit, Deactivate, and the resulting Activate action.
-5. In Pickup, test On-demand, Scheduled, For a Flocker, and Shared. Confirm the simulation notice, fictional map, confidence data, payment choice, and status popout appear. Confirm no real checkout opens.
+5. In Pickup, test On-demand, Scheduled, For a FloqR, and Shared. Confirm the simulation notice, fictional map, confidence data, payment choice, and status popout appear. Confirm no real checkout opens.
 6. Enable Commerce for a patron and a club, publish products, and complete a Stripe test-mode Checkout using card and an eligible Apple Pay test device.
    Elect and approve a Videographer / Camera Operator, enable their Commerce site, publish watermarked photo and video previews with license terms, purchase in test mode, and confirm the sale appears in seller and Master Admin fulfillment tracking.
 7. Submit a free follower guest-list campaign and a targeted test campaign. Confirm the targeted amount is `$0.10 x target users`.
