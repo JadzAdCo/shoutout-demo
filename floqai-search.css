@@ -1,7 +1,7 @@
 /* FloqAi Search iteration — idle agent + explode-to-phrase */
 .floqai-page{
   position:relative;
-  overflow:hidden;
+  overflow:visible;
   min-height:100vh;
   padding-top:8px;
 }

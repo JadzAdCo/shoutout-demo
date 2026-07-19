@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FloqAi Search — preview</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.10"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.10-floqai3"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.10-floqai4"/>
 </head>
 <body>
 <!-- Top-right profile status is injected by global-profile-status.js when Firebase Auth is available -->
@@ -24,13 +24,11 @@
           <p><strong>FloqAi Search</strong> — iteration preview (not the production Search default).</p>
           <p class="sub small">FloqAi idles on the right, pops into “Tell, how can I help you?”, and opens the wish box when you tap it.</p>
           <nav class="floqai-help-links" aria-label="Related Search pages">
-            <a href="./floqai-search.html?v=29.09.10-floqai3"><code>floqai-search.html</code></a>
+            <a href="./floqai-search.html?v=29.09.10-floqai4"><code>floqai-search.html</code></a>
             <a href="./?v=29.09.10&amp;start=intent">current Ask FloqR</a>
             <a href="./?v=29.09.10&amp;start=search">classic Search</a>
           </nav>
         </div>
-
-        <p id="floqAiInvite" class="floqai-invite" aria-live="polite">Tell, how can I help you?</p>
 
         <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
           <label class="intent-search-label" for="intentSearchInput">
@@ -52,13 +50,14 @@
   aria-label="FloqAi — open contextual search"
   title="FloqAi">
   <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
-    <i class="floqai-tile"></i>
+    <img class="floqai-mark-fallback" src="./images/floqr-color.png" alt="" width="96" height="96"/>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
+    <span class="floqai-tile"></span>
   </span>
   <span id="floqAiPhrase" class="floqai-phrase" aria-hidden="true">Tell, how can I help you?</span>
 </button>
@@ -70,7 +69,7 @@
 <script src="./floqr-nav.js?v=29.09.10"></script>
 <script src="./global-profile-status.js?v=29.09.10"></script>
 <script src="./intent-search.js?v=29.09.10"></script>
-<script src="./floqai-search.js?v=29.09.10-floqai3"></script>
+<script src="./floqai-search.js?v=29.09.10-floqai4"></script>
 <script>
 (function () {
   const panel = document.getElementById("floqAiSearchPanel");
@@ -106,7 +105,6 @@
         panel.classList.add("open");
         panel.setAttribute("aria-hidden", "false");
       }
-      document.getElementById("floqAiInvite")?.classList.add("hidden");
     }
   });
 })();

@@ -6,7 +6,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onCall, onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {defineSecret} = require("firebase-functions/params");
 
@@ -1339,3 +1339,426 @@ exports.aiModifyTemplateBackground = exports.aiGenerateTemplateBackground;
 exports.aiSummarizeAdminQueue = exports.aiSearch;
 exports.aiGenerateRecommendation = exports.aiSearch;
 exports.aiProcessNotificationPreferences = exports.aiSearch;
+
+/** One-shot: email v29.09.14 test links to Master Admin testers via SendGrid. */
+exports.emailV290914TestLinks = onRequest({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+    const toEmail = "bans.don@gmail.com";
+    const base = "https://jadzadco.github.io/shoutout-demo";
+    const v = "29.09.14";
+    const links = [
+      ["Master seed (spot ads + Lucy/Cobra BartR)", `${base}/seed-v29-09-14.html?v=${v}`],
+      ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
+      ["Mingl Gist (Stories)", `${base}/mingl-gist.html?v=${v}&from=mingl`],
+      ["RydR landing", `${base}/rydr.html?v=${v}&from=search`],
+      ["Pickup / RydR hail (Stripe fare + sim stages)", `${base}/pickup.html?v=${v}`],
+      ["BartR commerce", `${base}/commerce.html?v=${v}`],
+      ["Casamara Club Admin (spot ads)", `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`],
+      ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
+      ["Onyx Club Admin", `${base}/admin.html?location=onyx-rooftop-washington-dc&v=${v}`],
+      ["GAIA Club Admin", `${base}/admin.html?location=gaia-supperclub-washington-dc&v=${v}`],
+      ["Vera Club Admin", `${base}/admin.html?location=vera-cocina-washington-dc&v=${v}`],
+      ["SAX Club Admin", `${base}/admin.html?location=sax-washington-dc&v=${v}`],
+      ["Decades Club Admin", `${base}/admin.html?location=decades-washington-dc&v=${v}`],
+      ["Rosebar Club Admin", `${base}/admin.html?location=rosebar-lounge-washington-dc&v=${v}`],
+      ["KATA Club Admin", `${base}/admin.html?location=kata-washington-dc&v=${v}`],
+      ["LIMA Twist Club Admin", `${base}/admin.html?location=lima-twist-washington-dc&v=${v}`],
+      ["Zebbies Club Admin", `${base}/admin.html?location=zebbies-garden-washington-dc&v=${v}`],
+      ["Casamara public profile", `${base}/club-profile.html?location=casamara-rooftop-washington-dc&v=${v}`],
+      ["Onboard DC venues (Firestore)", `${base}/onboard-dc-venues.html?v=${v}`],
+      ["Deployment notes", `${base}/DEPLOYMENT-V29-09.14.md`]
+    ];
+    const textBody = [
+      "FLOQR v29.09.14 — test links",
+      "",
+      "Hard-refresh (Ctrl+F5). Use ?v=29.09.14 on every URL.",
+      "",
+      "1) First: open Master seed and run both buttons (spot ad pool + Lucy/Cobra BartR).",
+      "2) Then walk Mingl → Mingl Gist, RydR/Pickup (real Stripe fare), Club Admin Advertising spot campaigns, and BartR checkout.",
+      "",
+      ...links.map(([label, url], i) => `${i + 1}. ${label}\n   ${url}`),
+      "",
+      "— FLOQR automated test-link mailer"
+    ].join("\n");
+    const htmlBody = `
+      <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111">
+        <h2>FLOQR v29.09.14 — test links</h2>
+        <p>Hard-refresh (<strong>Ctrl+F5</strong>). Keep <code>?v=29.09.14</code> on every URL.</p>
+        <ol>
+          <li>Open <strong>Master seed</strong> and run both buttons (DC spot ad pool + Lucy/Cobra BartR).</li>
+          <li>Test Mingl → Mingl Gist, RydR/Pickup (real Stripe fare; simulated dispatch), Club Admin spot ads, BartR checkout.</li>
+        </ol>
+        <ul>
+          ${links.map(([label, url]) => `<li><a href="${url}">${label}</a><br/><span style="color:#555;font-size:12px">${url}</span></li>`).join("")}
+        </ul>
+        <p style="color:#666;font-size:12px">Sent by FLOQR emailV290914TestLinks</p>
+      </div>`;
+    const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
+    if (!key) {
+      res.status(500).json({ok: false, error: "SENDGRID_API_KEY missing"});
+      return;
+    }
+    // Verified Single Sender Identity in SendGrid (Domain Auth not required).
+    const fromEmail = "bans.don@gmail.com";
+    const replyTo = {email: "bans.don@gmail.com"};
+    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+      body: JSON.stringify({
+        personalizations: [{to: [{email: toEmail}]}],
+        from: {email: fromEmail, name: "FLOQR"},
+        reply_to: replyTo,
+        subject: "FLOQR v29.09.14 - your test links",
+        content: [
+          {type: "text/plain", value: textBody},
+          {type: "text/html", value: htmlBody}
+        ]
+      })
+    });
+    if (!(response.ok || response.status === 202)) {
+      const errText = await response.text().catch(() => "");
+      res.status(502).json({ok: false, status: response.status, from: fromEmail, error: errText.slice(0, 500)});
+      return;
+    }
+    res.status(200).json({ok: true, to: toEmail, from: fromEmail, reply_to: replyTo.email, links: links.length, package: v, status: response.status});
+  } catch (error) {
+    res.status(500).json({ok: false, error: error?.message || String(error)});
+  }
+});
+
+/** One-shot: email 3-day FLOQR feature test checklist to Master Admin. */
+exports.emailFloqrThreeDayTestPlan = onRequest({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+    const toEmail = "bans.don@gmail.com";
+    const fromEmail = "bans.don@gmail.com";
+    const base = "https://jadzadco.github.io/shoutout-demo";
+    const vMingl = "29.09.16";
+    const v = "29.09.14";
+    const items = [
+      {
+        title: "1. DC venues onboarded",
+        open: `${base}/onboard-dc-venues.html?v=${v}`,
+        do: "Sign in as Master Admin; push venues (Heist, GAIA, Onyx, Vera, SAX, Decades, Rosebar, KATA, LIMA Twist, Casamara). Spot-check club admin + profile + display for one venue.",
+        expect: "Venue docs exist; Club Admin / club-profile / display open without missing-location errors."
+      },
+      {
+        title: "2. Casamara Rooftop events",
+        open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
+        do: "Open Casamara Club Admin / profile; confirm Sunset Sundays + private events from seed.",
+        expect: "Events list shows seeded Casamara events (public + private)."
+      },
+      {
+        title: "3. Spot ads pool + Club Admin Advertising",
+        open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
+        do: "Advertising tab → Publish to advertisement pool / seed from website events. Repeat on another DC club if needed.",
+        expect: "Campaigns appear in the pool; patron surfaces can pick DC spot ads."
+      },
+      {
+        title: "4. Master seed page",
+        open: `${base}/seed-v29-09-14.html?v=${v}`,
+        do: "Run both buttons: DC spot ad pool + Lucy/Cobra BartR seed.",
+        expect: "Success toasts; ads + BartR sellers/products written to Firestore."
+      },
+      {
+        title: "5. BartR — Cobra Callisto Arts",
+        open: `${base}/commerce.html?v=${v}`,
+        do: "Search “art”; open Cobra Callisto Arts (~20 art/jewelry/accessory items); start Stripe checkout on one SKU.",
+        expect: "Catalog loads; checkout session opens (test mode OK)."
+      },
+      {
+        title: "6. RydR / Pickup",
+        open: `${base}/pickup.html?v=${v}`,
+        do: "Use saved labels (Home / Preferred Home Pickup); confirm ride history; note spot ad between address + matching; pay real Stripe rydrFare; walk map stages through drop-off confirm.",
+        expect: "Fare charges via Stripe; stages advance to drop-off confirm; dispatch remains simulated."
+      },
+      {
+        title: "7. Mingl ads + Mingl Gist",
+        open: `${base}/?v=${vMingl}&start=search`,
+        do: `Open Mingl → see ad splash; people grid spot ads. Then open ${base}/mingl-gist.html?v=${v}&from=mingl`,
+        expect: "Splash + in-grid ads show; Gist shows shoutouts + ads."
+      },
+      {
+        title: "8. Mingl Accept (Anne) permission fix",
+        open: `${base}/?v=${vMingl}&start=search`,
+        do: "Hard-refresh; open Mingl Requests; Accept Anne (or pending Friend/Mingl request).",
+        expect: "No permission-denied; status becomes mutual; Mingl Chat opens."
+      },
+      {
+        title: "9. Marketing SMS/WhatsApp packs",
+        open: `${base}/admin.html?location=casamara-rooftop-washington-dc&v=${v}`,
+        do: "Club Admin → Advertising: check $10 SMS/WhatsApp packs / campaigns UI (if present).",
+        expect: "Pack purchase / campaign controls visible and usable for the club."
+      },
+      {
+        title: "10. SendGrid From verified",
+        open: "(this email)",
+        do: "Confirm this checklist arrived From bans.don@gmail.com.",
+        expect: "Inbox delivery; no 403 sender-identity errors."
+      }
+    ];
+    const textBody = [
+      "FLOQR — 3-day feature test checklist",
+      "",
+      `Hard-refresh (Ctrl+F5). Mingl/search: ?v=${vMingl}. Other pages: ?v=${v}.`,
+      "",
+      ...items.flatMap((it, i) => [
+        it.title,
+        `  Open: ${it.open}`,
+        `  Do: ${it.do}`,
+        `  Expect: ${it.expect}`,
+        ""
+      ]),
+      "— FLOQR emailFloqrThreeDayTestPlan"
+    ].join("\n");
+    const htmlBody = `
+      <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:720px">
+        <h2 style="margin:0 0 8px">FLOQR — 3-day feature test checklist</h2>
+        <p style="margin:0 0 16px">Hard-refresh (<strong>Ctrl+F5</strong>). Mingl/search use <code>?v=${vMingl}</code>; other pages <code>?v=${v}</code>.</p>
+        ${items.map(it => `
+          <div style="margin:0 0 14px;padding:10px 12px;border-left:3px solid #111">
+            <strong>${it.title}</strong>
+            <div style="margin-top:6px"><a href="${it.open}">${it.open}</a></div>
+            <div style="margin-top:4px"><strong>Do:</strong> ${it.do}</div>
+            <div style="margin-top:4px"><strong>Expect:</strong> ${it.expect}</div>
+          </div>`).join("")}
+        <p style="color:#666;font-size:12px">Sent by FLOQR emailFloqrThreeDayTestPlan · From ${fromEmail}</p>
+      </div>`;
+    const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
+    if (!key) {
+      res.status(500).json({ok: false, error: "SENDGRID_API_KEY missing"});
+      return;
+    }
+    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+      body: JSON.stringify({
+        personalizations: [{to: [{email: toEmail}]}],
+        from: {email: fromEmail, name: "FLOQR"},
+        reply_to: {email: fromEmail},
+        subject: "FLOQR — 3-day feature test checklist",
+        content: [
+          {type: "text/plain", value: textBody},
+          {type: "text/html", value: htmlBody}
+        ]
+      })
+    });
+    if (!(response.ok || response.status === 202)) {
+      const errText = await response.text().catch(() => "");
+      res.status(502).json({ok: false, status: response.status, from: fromEmail, error: errText.slice(0, 500)});
+      return;
+    }
+    res.status(200).json({
+      ok: true,
+      to: toEmail,
+      from: fromEmail,
+      subject: "FLOQR — 3-day feature test checklist",
+      items: items.length,
+      status: response.status
+    });
+  } catch (error) {
+    res.status(500).json({ok: false, error: error?.message || String(error)});
+  }
+});
+
+async function sendgridMail({to, from, subject, textBody, htmlBody}) {
+  const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
+  if (!key) {
+    const err = new Error("SENDGRID_API_KEY missing");
+    err.code = "missing-key";
+    throw err;
+  }
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+    body: JSON.stringify({
+      personalizations: [{to: [{email: to}]}],
+      from: {email: from, name: "FLOQR"},
+      reply_to: {email: from},
+      subject,
+      content: [
+        {type: "text/plain", value: textBody},
+        {type: "text/html", value: htmlBody}
+      ]
+    })
+  });
+  if (!(response.ok || response.status === 202)) {
+    const errText = await response.text().catch(() => "");
+    const err = new Error(errText.slice(0, 500) || `SendGrid ${response.status}`);
+    err.status = response.status;
+    throw err;
+  }
+  return response.status;
+}
+
+/** Email iPhone mobile test checklist link (no RydR). */
+exports.emailMobileTestChecklist = onRequest({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+    const toEmail = "bans.don@gmail.com";
+    const fromEmail = "bans.don@gmail.com";
+    const base = "https://jadzadco.github.io/shoutout-demo";
+    const checklistV = "29.09.20";
+    const checklistUrl = `${base}/mobile-test-checklist.html?v=${checklistV}`;
+    const bullets = [
+      "DC venues / Casamara Club Admin + events (spot-check one venue)",
+      "Spot ads + device media upload on Advertising template inputs",
+      "$10 SMS/WhatsApp credits → Stripe Checkout",
+      "BartR Cobra arts products catalog",
+      "Mingl Accept + Mingl Gist + spot ads",
+      "Profile tabs readable on iPhone (wrap)",
+      "FloqR branding looks correct on the surfaces you open (not Flocker)"
+    ];
+    const subject = "FLOQR — mobile test checklist (iPhone)";
+    const textBody = [
+      subject,
+      "",
+      "Open this on your iPhone, run tests in comfort, tap Submit when done.",
+      "Or reply to this email with Pass/Fail notes if easier.",
+      "",
+      checklistUrl,
+      "",
+      "Past ~3 days — what to verify:",
+      ...bullets.map((b) => `• ${b}`),
+      "",
+      "Feedback: use Submit on the page (emails a summary here) OR reply to this email.",
+      "",
+      "— FLOQR emailMobileTestChecklist"
+    ].join("\n");
+    const htmlBody = `
+      <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:640px">
+        <h2 style="margin:0 0 8px">${subject}</h2>
+        <p style="margin:0 0 14px">Open this on your iPhone, run tests in comfort, tap <strong>Submit</strong> when done.<br/>
+        Or <strong>reply to this email</strong> with Pass/Fail notes if easier.</p>
+        <p style="margin:0 0 16px"><a href="${checklistUrl}" style="font-size:18px;font-weight:700">${checklistUrl}</a></p>
+        <p style="margin:0 0 6px"><strong>Past ~3 days — what to verify</strong></p>
+        <ul style="margin:0;padding-left:20px">
+          ${bullets.map((b) => `<li>${b}</li>`).join("")}
+        </ul>
+        <p style="margin:16px 0 0">Feedback: <strong>Submit</strong> on the page emails a summary here, or just reply to this message.</p>
+        <p style="color:#666;font-size:12px;margin-top:18px">Sent by FLOQR emailMobileTestChecklist · From ${fromEmail}</p>
+      </div>`;
+    const status = await sendgridMail({to: toEmail, from: fromEmail, subject, textBody, htmlBody});
+    res.status(200).json({ok: true, to: toEmail, from: fromEmail, subject, checklistUrl, status});
+  } catch (error) {
+    const code = error?.code === "missing-key" ? 500 : (error?.status ? 502 : 500);
+    res.status(code).json({ok: false, error: error?.message || String(error)});
+  }
+});
+
+/** Callable: phone submits Pass/Fail/Skip summary → email Master Admin. */
+exports.submitMobileTestResults = onCall({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB"
+}, async (request) => {
+  const data = request.data || {};
+  const results = Array.isArray(data.results) ? data.results.slice(0, 40) : [];
+  if (!results.length) {
+    throw new HttpsError("invalid-argument", "results required");
+  }
+  const auth = request.auth || null;
+  const runRef = db.collection("mobileTestRuns").doc();
+  const runId = runRef.id;
+  const normalized = results.map((row) => ({
+    id: String(row?.id || "").slice(0, 80),
+    title: String(row?.title || row?.id || "test").slice(0, 160),
+    result: ["pass", "fail", "skip", "unset"].includes(String(row?.result || "").toLowerCase())
+      ? String(row.result).toLowerCase()
+      : "unset",
+    note: String(row?.note || "").slice(0, 500)
+  }));
+  const counts = {pass: 0, fail: 0, skip: 0, unset: 0};
+  normalized.forEach((r) => { counts[r.result] = (counts[r.result] || 0) + 1; });
+  const submitter = auth
+    ? `${auth.token?.email || auth.uid}`
+    : "anonymous";
+  const toEmail = "bans.don@gmail.com";
+  const fromEmail = "bans.don@gmail.com";
+  const subject = `FLOQR — mobile test results (${counts.pass}P / ${counts.fail}F / ${counts.skip}S)`;
+  const lines = normalized.map((r) => {
+    const mark = r.result.toUpperCase();
+    const note = r.note ? ` — ${r.note}` : "";
+    return `• [${mark}] ${r.title}${note}`;
+  });
+  const textBody = [
+    subject,
+    "",
+    `Submitter: ${submitter}`,
+    `Run: ${runId}`,
+    `UA: ${String(data.userAgent || "").slice(0, 240)}`,
+    "",
+    ...lines,
+    "",
+    "— FLOQR submitMobileTestResults"
+  ].join("\n");
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:640px">
+      <h2 style="margin:0 0 8px">${subject}</h2>
+      <p style="margin:0 0 8px">Submitter: <strong>${submitter}</strong><br/>Run: <code>${runId}</code></p>
+      <ul style="margin:0;padding-left:18px">
+        ${normalized.map((r) => {
+          const color = r.result === "pass" ? "#0a7a2f" : r.result === "fail" ? "#b00020" : "#555";
+          const note = r.note ? `<br/><span style="color:#555">${r.note.replace(/</g, "&lt;")}</span>` : "";
+          return `<li style="margin:0 0 8px"><strong style="color:${color}">${r.result.toUpperCase()}</strong> — ${r.title.replace(/</g, "&lt;")}${note}</li>`;
+        }).join("")}
+      </ul>
+      <p style="color:#666;font-size:12px;margin-top:16px">FLOQR submitMobileTestResults</p>
+    </div>`;
+
+  let emailStatus = 0;
+  try {
+    emailStatus = await sendgridMail({to: toEmail, from: fromEmail, subject, textBody, htmlBody});
+  } catch (error) {
+    throw new HttpsError("internal", error?.message || "email failed");
+  }
+
+  const doc = {
+    results: normalized,
+    counts,
+    submitterUid: auth?.uid || null,
+    submitterEmail: auth?.token?.email || null,
+    userAgent: String(data.userAgent || "").slice(0, 400),
+    pageUrl: String(data.pageUrl || "").slice(0, 400),
+    submittedAtClient: String(data.submittedAtClient || "").slice(0, 64),
+    emailed: true,
+    emailStatus,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    await runRef.set(doc);
+  } catch (_) {
+    /* email already delivered; doc write is best-effort for anonymous */
+  }
+
+  return {ok: true, runId, to: toEmail, counts, emailStatus};
+});

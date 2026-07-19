@@ -957,5 +957,21 @@ service cloud.firestore {
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );
     }
+
+    // iPhone mobile test checklist runs (Admin SDK writes; client merge when signed in)
+    match /mobileTestRuns/{runId} {
+      allow read: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      allow create: if signedIn()
+        && (
+          request.resource.data.uid == request.auth.uid
+          || request.resource.data.submitterUid == request.auth.uid
+        );
+      allow update: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      allow delete: if isMasterAdmin();
+    }
   }
 }
