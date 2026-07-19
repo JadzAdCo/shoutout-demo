@@ -2,9 +2,19 @@
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
-  const locationId = new URL(location.href).searchParams.get("location") || new URL(location.href).searchParams.get("club") || "zebbies-garden-washington-dc";
+  const params = new URL(location.href).searchParams;
+  const locationId = String(params.get("location") || params.get("club") || "").trim();
   if (!window.firebase || !byId("panelNotifications")) return;
-  const auth = firebase.auth(), db = firebase.firestore();
+  let auth;
+  let db;
+  try {
+    auth = firebase.auth();
+    db = firebase.firestore();
+  } catch (error) {
+    const status = byId("repMessagingStatus");
+    if (status) status.textContent = error?.message || "Firebase is not initialized for Notifications.";
+    return;
+  }
   let notificationSettings = {};
 
   function callable(name) {
@@ -13,6 +23,23 @@
 
   function statusEl() {
     return byId("repMessagingStatus");
+  }
+
+  function setStatus(message) {
+    const status = statusEl();
+    if (status) status.textContent = message || "";
+  }
+
+  async function startMessagingCheckout(orderType, openingMessage) {
+    setStatus(openingMessage);
+    if (!locationId) throw new Error("Add ?location=<club-id> to the Club Admin URL before buying messaging services.");
+    if (!window.FLOQRPayments?.startCheckout) throw new Error("Stripe checkout is not loaded. Refresh the page and try again.");
+    if (!auth.currentUser) throw new Error("Sign in as Club Admin or Master Admin before buying credits.");
+    await window.FLOQRPayments.startCheckout({
+      orderType,
+      payload: {clubLocationId: locationId},
+      status: setStatus
+    });
   }
 
   async function loadNotifications() {
@@ -28,7 +55,8 @@
   }
 
   async function saveNotifications() {
-    const status = statusEl();
+    if (!locationId) throw new Error("Add ?location=<club-id> to the Club Admin URL before saving notification settings.");
+    if (!auth.currentUser) throw new Error("Sign in before saving notification choices.");
     const wantsSms = !!byId("repNotifySms")?.checked;
     const wantsWhatsapp = !!byId("repNotifyWhatsapp")?.checked;
     const alertPhone = String(byId("repAlertPhone")?.value || "").trim();
@@ -47,24 +75,20 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
     if (wantsSms && !notificationSettings.smsPaidAt) {
-      if (status) status.textContent = "SMS selected. Opening the $10 SMS service checkout (466 message credits)…";
-      await window.FLOQRPayments.startCheckout({
-        orderType: "smsNotifications",
-        payload: {clubLocationId: locationId},
-        status: message => { if (status) status.textContent = message; }
-      });
+      await startMessagingCheckout(
+        "smsNotifications",
+        "SMS selected. Opening the $10 SMS service checkout (466 message credits)…"
+      );
       return;
     }
     if (wantsWhatsapp && !notificationSettings.whatsappPaidAt) {
-      if (status) status.textContent = "WhatsApp selected. Opening the $10 WhatsApp service checkout (233 message credits)…";
-      await window.FLOQRPayments.startCheckout({
-        orderType: "whatsappNotifications",
-        payload: {clubLocationId: locationId},
-        status: message => { if (status) status.textContent = message; }
-      });
+      await startMessagingCheckout(
+        "whatsappNotifications",
+        "WhatsApp selected. Opening the $10 WhatsApp service checkout (233 message credits)…"
+      );
       return;
     }
-    if (status) status.textContent = "Notification choices saved.";
+    setStatus("Notification choices saved.");
     await loadNotifications();
   }
 
