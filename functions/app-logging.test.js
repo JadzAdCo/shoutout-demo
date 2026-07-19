@@ -20,8 +20,8 @@ test("master admin logging tab can inspect logs and clear unpaid checkouts", () 
   const extension = read("master-logging-extension.js");
   assert.match(html, /data-panel="appLogging"/);
   assert.match(html, /id="appLogging"/);
-  assert.match(html, /master-logging-extension\.js\?v=29\.09\.5/);
-  assert.match(html, /floqr-logger\.js\?v=29\.09\.5/);
+  assert.match(html, /master-logging-extension\.js\?v=29\.09\.9/);
+  assert.match(html, /floqr-logger\.js\?v=29\.09\.9/);
   assert.match(extension, /do not require club Stripe Connect/);
   assert.match(extension, /getClubCheckoutReadiness/);
   assert.match(extension, /zebbies-garden-washington-dc/);
