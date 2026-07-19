@@ -1513,20 +1513,34 @@
       }
     };
     const nextStatus = status.state === "received" ? "mutual" : "pending";
-    await connectionRef.set({
+    const existing = status.connection || {};
+    // Preserve existing participant order so Firestore rules / merges stay stable.
+    const participants = Array.isArray(existing.participants) && existing.participants.length === 2
+      ? existing.participants.slice()
+      : [currentUser.uid, targetUid];
+    if (!participants.includes(currentUser.uid)) participants[0] = currentUser.uid;
+    if (!participants.includes(targetUid)) participants[1] = targetUid;
+    const payload = {
       connectionId:id,
-      participants:[currentUser.uid, targetUid],
-      requestedBy: status.state === "received" ? status.connection.requestedBy : currentUser.uid,
-      requestedTo: status.state === "received" ? status.connection.requestedTo : targetUid,
+      participants,
+      requestedBy: status.state === "received" ? (existing.requestedBy || targetUid) : currentUser.uid,
+      requestedTo: status.state === "received" ? (existing.requestedTo || currentUser.uid) : targetUid,
       status: nextStatus,
-      userSummaries: summary,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
+      userSummaries: {...(existing.userSummaries || {}), ...summary},
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (status.state === "received" || status.state === "sent") {
+      await connectionRef.set(payload, {merge:true});
+    } else {
+      await connectionRef.set({
+        ...payload,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }
     await recordMinglRequest({connectionId:id, targetUid, targetProfile:profile, nextStatus, sharedLabels});
     if (nextStatus === "mutual") {
-      const roomId = await ensureMinglChatRoom(id, [currentUser.uid, targetUid], summary);
-      await addMinglSystemMessage(roomId, id, [currentUser.uid, targetUid], minglRequestBody(profile, sharedLabels, "mutual"));
+      const roomId = await ensureMinglChatRoom(id, participants, summary);
+      await addMinglSystemMessage(roomId, id, participants, minglRequestBody(profile, sharedLabels, "mutual"));
     }
     setStatus(nextStatus === "mutual" ? "You both Mingled back. Chat is now open." : "Mingl request sent.");
     await loadMingl();
