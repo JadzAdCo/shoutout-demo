@@ -166,10 +166,11 @@
 
   function classicIdentityPresentation(subText) {
     const supplied = glyphSlice(cleanBoardText(subText), 0, 20);
+    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR SHOUTOUT"), 0, 20) || "FLOQR SHOUTOUT";
     return {
       supplied:!!supplied,
       kicker:supplied ? "FROM" : "PRESENTED BY",
-      value:supplied || "FLOQR SHOUTOUT"
+      value:supplied || brandFallback
     };
   }
 
@@ -505,8 +506,22 @@
     }
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
+    try {
+      const clubDoc = await db.collection("clubLocations").doc(locationId).get();
+      if (clubDoc.exists) {
+        const live = clubDoc.data() || {};
+        loc = {
+          ...loc,
+          ...live,
+          primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
+          displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
+          displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR SHOUTOUT",
+          ledPanel: live.ledPanel || loc.ledPanel
+        };
+      }
+    } catch (e) {}
     if (!screenFormatOverride) {
-      screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || "");
+      screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "");
     }
     if (qs("main","")) {
       render({

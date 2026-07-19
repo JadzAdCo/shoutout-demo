@@ -66,11 +66,13 @@ const venues = [
     hours: "Thu 10 PM–2 AM; Fri–Sat 10 PM–3 AM; Sun–Wed closed",
     reservationsUrl: "https://www.sevenrooms.com/events/heistdc",
     brand: "HEIST DC x FLOQR",
-    defaultMain: "USE SHOUT OUT @ HEIST DC",
-    defaultSub: "Dupont Circle",
+    defaultMain: "USE SHOUTOUT @ HEIST",
+    defaultSub: "",
     activityStatus: "Active Dupont Circle nightclub / lounge",
     activityDates: ["Thursday late night", "Friday HEIST", "Saturday HEIST"],
-    templates: ["hiphop", "bottle", "birthday", "fire", "vip", "neon"],
+    templates: ["hiphop", "bottle", "birthday", "fire", "vip", "neon", "heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"],
+    displayScreenFormatIds: ["led-64x32"],
+    primaryDisplayScreenFormatId: "led-64x32",
     sourceUrls: ["https://www.heistdc.com/", "https://www.heistdc.com/location/heist/", "https://www.heistdc.com/about/"]
   },
   {

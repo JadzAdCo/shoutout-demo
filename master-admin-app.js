@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.09.0
+/* master-admin-app.js v29.09.22
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,9 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.0";
+  const CURRENT_VERSION = "29.09.22";
+  const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
+  let clubDisplaySetupLocationId = "";
 
   if (!window.firebaseConfig) {
     setText("masterStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -263,6 +265,44 @@
     return {city, region, country: country || "United States"};
   }
 
+  function ledPanelFromFormatId(formatId = "") {
+    const format = (window.FLOQR_DISPLAY_FORMATS || {})[formatId] || {};
+    return {
+      widthCm: Number(format.widthCm || 0) || null,
+      heightCm: Number(format.heightCm || 0) || null,
+      pixelWidth: Number(format.pixelWidth || 0) || null,
+      pixelHeight: Number(format.pixelHeight || 0) || null,
+      pixelPitchMm: format.pixelPitchMm == null ? null : Number(format.pixelPitchMm),
+      formatId: String(formatId || ""),
+      label: String(format.label || formatId || "")
+    };
+  }
+
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR SHOUTOUT"} = {}) {
+    const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
+    const selected = formats.length ? formats : ["led-96x48"];
+    const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
+    const panel = ledPanelFromFormatId(primary);
+    return {
+      displayScreenFormatIds: selected,
+      primaryDisplayScreenFormatId: primary,
+      displayType: primary,
+      screenFormatId: primary,
+      ledPanel: {
+        width: panel.widthCm,
+        height: panel.heightCm,
+        widthCm: panel.widthCm,
+        heightCm: panel.heightCm,
+        pixelWidth: panel.pixelWidth,
+        pixelHeight: panel.pixelHeight,
+        pixelPitchMm: panel.pixelPitchMm,
+        formatId: primary,
+        label: panel.label
+      },
+      displayFooterBrand: String(displayFooterBrand || "FLOQR SHOUTOUT").trim() || "FLOQR SHOUTOUT"
+    };
+  }
+
   function clubOnboardingPayload(input = {}) {
     const name = String(input.clubName || input["Club Name"] || "").trim();
     const suppliedFullAddress = String(input.fullAddress || input["Full Address"] || input.address || "").trim();
@@ -280,6 +320,12 @@
     const displayScreenFormatIds = Array.isArray(input.displayScreenFormatIds)
       ? input.displayScreenFormatIds
       : Array.from(document.querySelectorAll("[data-onboard-screen-format]:checked")).map(el => el.dataset.onboardScreenFormat);
+    const primaryFromForm = String(input.primaryDisplayScreenFormatId || byId("clubOnboardPrimaryDisplayFormat")?.value || "").trim();
+    const displayConfig = normalizeClubDisplayConfig({
+      displayScreenFormatIds,
+      primaryDisplayScreenFormatId: primaryFromForm,
+      displayFooterBrand: "FLOQR SHOUTOUT"
+    });
     return {
       id,
       clubId: id,
@@ -306,8 +352,7 @@
         tiktok: String(input.tiktok || input["Tic Tok"] || input.TikTok || input.Tiktok || "").trim()
       },
       genres,
-      displayScreenFormatIds: displayScreenFormatIds.length ? displayScreenFormatIds : ["led-96x48"],
-      primaryDisplayScreenFormatId: displayScreenFormatIds[0] || "led-96x48",
+      ...displayConfig,
       publicProfileType: "club",
       visibility: "public",
       services: ["shoutout", "guestList"],
@@ -345,7 +390,8 @@
       x: byId("clubOnboardX")?.value,
       tiktok: byId("clubOnboardTiktok")?.value,
       genres: byId("clubOnboardGenres")?.value,
-      displayScreenFormatIds: Array.from(document.querySelectorAll("[data-onboard-screen-format]:checked")).map(el => el.dataset.onboardScreenFormat)
+      displayScreenFormatIds: Array.from(document.querySelectorAll("[data-onboard-screen-format]:checked")).map(el => el.dataset.onboardScreenFormat),
+      primaryDisplayScreenFormatId: byId("clubOnboardPrimaryDisplayFormat")?.value
     });
   }
 
@@ -1011,16 +1057,135 @@
       const admin = clubAdminUrl(row.id);
       const display = displayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
+      const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       return `<div class="queue-item">
         <div class="message-envelope-head">
           <strong>${esc(locationName(row))}</strong>
           <span>${esc(row.id)}</span>
         </div>
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
+        <p><strong>Primary display:</strong> ${esc(primary)}</p>
         <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
         <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
+    populateClubDisplaySetupOptions(locationRows);
+  }
+
+  function populateClubDisplaySetupOptions(locationRows = []) {
+    const list = byId("clubDisplaySetupOptions");
+    if (!list) return;
+    const rows = (locationRows.length ? locationRows : networkLocations).filter(row => row && row.id);
+    list.innerHTML = rows
+      .sort((a, b) => locationName(a).localeCompare(locationName(b)))
+      .map(row => `<option value="${esc(row.id)}">${esc(locationName(row))} (${esc(row.id)})</option>`)
+      .join("");
+  }
+
+  function resolveClubDisplaySetupId(raw = "") {
+    const value = String(raw || "").trim();
+    if (!value) return "";
+    const lower = value.toLowerCase();
+    const match = networkLocations.find(row => {
+      const id = String(row.id || "").toLowerCase();
+      const name = locationName(row).toLowerCase();
+      return id === lower || name === lower || `${name} (${id})` === lower;
+    });
+    return match?.id || (networkLocations.some(row => row.id === value) ? value : value);
+  }
+
+  function applyClubDisplaySetupForm(config = {}, locationId = "") {
+    const formats = new Set(config.displayScreenFormatIds || []);
+    document.querySelectorAll("[data-club-settings-screen-format]").forEach(input => {
+      input.checked = formats.has(input.dataset.clubSettingsScreenFormat);
+    });
+    if (byId("clubDisplaySetupPrimaryFormat")) byId("clubDisplaySetupPrimaryFormat").value = config.primaryDisplayScreenFormatId || "led-96x48";
+    if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR SHOUTOUT";
+    if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId || "";
+    clubDisplaySetupLocationId = locationId || "";
+  }
+
+  async function loadClubDisplaySetup() {
+    const locationId = resolveClubDisplaySetupId(byId("clubDisplaySetupSearch")?.value || byId("clubDisplaySetupLocationId")?.value || "");
+    if (!locationId) {
+      setText("clubDisplaySetupStatus", "Choose a club location first.");
+      return;
+    }
+    setText("clubDisplaySetupStatus", `Loading display settings for ${locationId}...`);
+    const snap = await db.collection("clubLocations").doc(locationId).get();
+    const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
+    const data = snap.exists ? (snap.data() || {}) : staticLoc;
+    if (!snap.exists && !staticLoc.locationName && !staticLoc.brandName) {
+      setText("clubDisplaySetupStatus", `No clubLocations doc found for ${locationId}. You can still save to create/update it.`);
+    }
+    const config = normalizeClubDisplayConfig({
+      displayScreenFormatIds: data.displayScreenFormatIds || staticLoc.displayScreenFormatIds || ["led-96x48"],
+      primaryDisplayScreenFormatId: data.primaryDisplayScreenFormatId || data.displayType || data.screenFormatId || staticLoc.primaryDisplayScreenFormatId || "led-96x48",
+      displayFooterBrand: data.displayFooterBrand || "FLOQR SHOUTOUT"
+    });
+    if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = locationId;
+    applyClubDisplaySetupForm(config, locationId);
+    const preview = byId("clubDisplaySetupPreview");
+    if (preview) {
+      preview.innerHTML = `<p><strong>${esc(locationName({...staticLoc, ...data, id:locationId}))}</strong></p>
+        <p>Primary: ${esc(config.primaryDisplayScreenFormatId)} · Panel ${esc(config.ledPanel.widthCm || "?")}×${esc(config.ledPanel.heightCm || "?")} cm</p>
+        <p>Formats: ${esc(config.displayScreenFormatIds.join(", "))}</p>
+        <p>Footer brand: ${esc(config.displayFooterBrand)}</p>
+        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open live display</a></p>`;
+    }
+    setText("clubDisplaySetupStatus", `Loaded display type setup for ${locationId}.`);
+  }
+
+  function applyHeist64x32Preset() {
+    if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = "heist-washington-dc";
+    applyClubDisplaySetupForm(normalizeClubDisplayConfig({
+      displayScreenFormatIds: ["led-64x32"],
+      primaryDisplayScreenFormatId: "led-64x32",
+      displayFooterBrand: "FLOQR SHOUTOUT"
+    }), "heist-washington-dc");
+    setText("clubDisplaySetupStatus", "Heist DC preset applied locally — click Save Display Type Setup to write Firestore.");
+  }
+
+  async function saveClubDisplaySetup() {
+    const locationId = resolveClubDisplaySetupId(byId("clubDisplaySetupSearch")?.value || clubDisplaySetupLocationId || "");
+    if (!locationId) {
+      setText("clubDisplaySetupStatus", "Choose a club location first.");
+      return;
+    }
+    const formats = Array.from(document.querySelectorAll("[data-club-settings-screen-format]:checked")).map(el => el.dataset.clubSettingsScreenFormat);
+    if (!formats.length) {
+      setText("clubDisplaySetupStatus", "Select at least one display type.");
+      return;
+    }
+    const config = normalizeClubDisplayConfig({
+      displayScreenFormatIds: formats,
+      primaryDisplayScreenFormatId: byId("clubDisplaySetupPrimaryFormat")?.value || formats[0],
+      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR SHOUTOUT"
+    });
+    setText("clubDisplaySetupStatus", `Saving display type setup for ${locationId}...`);
+    const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
+    await db.collection("clubLocations").doc(locationId).set({
+      id: locationId,
+      clubId: locationId,
+      locationName: staticLoc.locationName || locationId,
+      brandName: staticLoc.brandName || staticLoc.locationName || locationId,
+      ...config,
+      updatedByUid: auth.currentUser?.uid || "",
+      updatedByEmail: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      displaySetupVersion: `v${CURRENT_VERSION}`
+    }, {merge: true});
+    clubDisplaySetupLocationId = locationId;
+    if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId;
+    const preview = byId("clubDisplaySetupPreview");
+    if (preview) {
+      preview.innerHTML = `<p><strong>Saved</strong> ${esc(locationId)}</p>
+        <p>Primary display type: ${esc(config.primaryDisplayScreenFormatId)}</p>
+        <p>LED panel: ${esc(config.ledPanel.widthCm)}×${esc(config.ledPanel.heightCm)} cm (${esc(config.ledPanel.pixelWidth)}×${esc(config.ledPanel.pixelHeight)} px)</p>
+        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open live display</a></p>`;
+    }
+    setText("clubDisplaySetupStatus", `Saved display type setup for ${locationId}.`);
+    window.FLOQRActionFeedback?.success?.({title: "Display type saved", message: `${locationId} → ${config.primaryDisplayScreenFormatId}`});
   }
 
   function splitCSV(value) {
@@ -1367,6 +1532,13 @@
     bind("masterMicrosoftLoginBtn", loginMicrosoft);
     bind("masterLogoutBtn", logout);
     bind("createClubOnboardingBtn", createClubFromForm);
+    bind("loadClubDisplaySetupBtn", loadClubDisplaySetup);
+    bind("saveClubDisplaySetupBtn", saveClubDisplaySetup);
+    bind("applyHeist64x32PresetBtn", applyHeist64x32Preset);
+    byId("clubDisplaySetupSearch")?.addEventListener("change", () => {
+      const id = resolveClubDisplaySetupId(byId("clubDisplaySetupSearch")?.value || "");
+      if (id && byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = id;
+    });
     bind("previewClubOnboardingCsvBtn", previewClubCsv);
     bind("importClubOnboardingCsvBtn", importClubCsv);
     bind("createPromoterOnboardingBtn", createPromoterOnboarding);
@@ -1385,6 +1557,10 @@
     byId("templateManagementSearch")?.addEventListener("input", renderTemplateManagement);
     byId("recommendationStatusFilter")?.addEventListener("change", renderRecommendationModeration);
     byId("recommendationModerationSearch")?.addEventListener("input", renderRecommendationModeration);
+    if (location.hash === "#clubDisplayTypeSetup" || /clubDisplayTypeSetup|display-type/i.test(location.hash)) {
+      document.querySelector('[data-panel="clubOnboarding"]')?.click();
+      setTimeout(() => byId("clubDisplayTypeSetup")?.scrollIntoView({behavior:"smooth", block:"start"}), 250);
+    }
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);

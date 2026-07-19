@@ -101,6 +101,10 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     templates:["hiphop","bottle","birthday","fire","vip","neon","heistVaultNight","heistNeonMask","heistDupontUnder","heistRedLux"],
     displayScreenFormatIds:["led-64x32"],
     primaryDisplayScreenFormatId:"led-64x32",
+    displayType:"led-64x32",
+    screenFormatId:"led-64x32",
+    ledPanel:{width:64,height:32,widthCm:64,heightCm:32,pixelWidth:416,pixelHeight:208,formatId:"led-64x32",label:"64 x 32 cm"},
+    displayFooterBrand:"FLOQR SHOUTOUT",
     active:true
   },
   "gaia-supperclub-washington-dc": {

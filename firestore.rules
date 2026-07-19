@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.14-mingl-gist
-// EXPECTED DEPLOYED RULES VERSION: v29.09.14-mingl-gist or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
+// EXPECTED DEPLOYED RULES VERSION: v29.09.21-heist-display-devices or newer
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.86-mingl-message-action-rules
@@ -486,20 +486,24 @@ service cloud.firestore {
             && request.resource.data.maxMainCharacters == 36
             && request.resource.data.maxCharactersPerLine == 12)
           || (request.resource.data.screenFormatId == 'led-64x32'
-            && request.resource.data.mainText.size() <= 38
-            && request.resource.data.subText.size() <= 16
-            && request.resource.data.maxMainCharacters == 36
-            && request.resource.data.maxCharactersPerLine == 12)
+            && request.resource.data.mainText.size() <= 32
+            && request.resource.data.subText.size() <= 14
+            && request.resource.data.maxMainCharacters == 30
+            && request.resource.data.maxCharactersPerLine == 10)
         );
     }
 
-    // Free (no priceCents) templates other than Traditional B&W and paid football.
+    // Free (no priceCents) templates other than Traditional B&W and paid football/heist art.
     function validFreePatronShoutoutCreate() {
       return signedIn()
         && request.resource.data.keys().hasAll(['template', 'mainText', 'submittedByUid'])
         && request.resource.data.template is string
         && request.resource.data.template != 'blackwhite'
         && request.resource.data.template != 'zebbiesFootballTeamIntro'
+        && request.resource.data.template != 'heistVaultNight'
+        && request.resource.data.template != 'heistNeonMask'
+        && request.resource.data.template != 'heistDupontUnder'
+        && request.resource.data.template != 'heistRedLux'
         && request.resource.data.submittedByUid == request.auth.uid
         && request.resource.data.mainText is string
         && request.resource.data.mainText.size() <= 120;
@@ -513,6 +517,13 @@ service cloud.firestore {
     match /liveContent/{id} {
       allow read: if true;
       allow write: if signedIn();
+    }
+
+    // LED player device → club binding. Public read so display.html?ip= can resolve without auth.
+    // Master Admin / signed-in operators write bindings (ip, locationId).
+    match /displayDevices/{deviceId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
     }
 
     match /guestListRequests/{id} {
@@ -956,6 +967,22 @@ service cloud.firestore {
           !isExistingMinglMessage() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );
+    }
+
+    // iPhone mobile test checklist runs (Admin SDK writes; client merge when signed in)
+    match /mobileTestRuns/{runId} {
+      allow read: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      allow create: if signedIn()
+        && (
+          request.resource.data.uid == request.auth.uid
+          || request.resource.data.submitterUid == request.auth.uid
+        );
+      allow update: if isMasterAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      allow delete: if isMasterAdmin();
     }
   }
 }
