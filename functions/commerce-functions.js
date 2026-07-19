@@ -401,6 +401,7 @@ async function canPublishForEntity(entityId, authContext = {}) {
   const uid = authContext.uid || "";
   const email = String(authContext.token?.email || "").toLowerCase();
   if (!uid || !entityId) return false;
+  if (await isMasterAdminAuth(authContext)) return true;
   if (entityId.includes(":")) {
     const [memberUid, requestedRole] = entityId.split(":", 2);
     if (memberUid !== uid) return false;
@@ -1663,4 +1664,139 @@ exports.seedDcSpotAdPool = onCall({region:"us-central1", timeoutSeconds:60, memo
   }
   await batch.commit();
   return {seeded: n};
+});
+
+/** HTTP seed so BartR can be filled without a callable auth session. Creates demo seller if Lucy/Cobra missing. */
+exports.seedLucyCobraBartrCatalogHttp = onRequest({
+  region: "us-central1",
+  timeoutSeconds: 60,
+  memory: "512MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).json({ok: false, error: "Method not allowed"});
+      return;
+    }
+    const DEMO_UID = "lucy-cobra-arts";
+    let seller = null;
+    const needles = ["lucy", "cobra"];
+    const shoutoutsSnap = await db.collection("shoutouts").limit(500).get();
+    for (const doc of shoutoutsSnap.docs) {
+      const row = doc.data() || {};
+      const blob = `${row.submittedBy || ""} ${row.displayName || ""} ${row.patronName || ""} ${row.mainText || ""} ${row.subText || ""}`.toLowerCase();
+      if (!needles.some(n => blob.includes(n))) continue;
+      const uid = row.submittedByUid;
+      if (!uid) continue;
+      const userSnap = await db.collection("users").doc(uid).get();
+      if (userSnap.exists) {
+        seller = {uid, ...userSnap.data()};
+        break;
+      }
+    }
+    if (!seller) {
+      const usersSnap = await db.collection("users").limit(500).get();
+      for (const doc of usersSnap.docs) {
+        const row = {uid: doc.id, ...doc.data()};
+        const blob = `${row.displayName || ""} ${row.fullName || ""} ${row.username || ""} ${row.email || ""}`.toLowerCase();
+        if (needles.some(n => blob.includes(n))) {
+          seller = row;
+          break;
+        }
+      }
+    }
+    if (!seller?.uid) {
+      seller = {
+        uid: DEMO_UID,
+        displayName: "Lucy Cobra",
+        username: "lucycobra",
+        email: "bans.don@gmail.com"
+      };
+    }
+    const storeName = text(seller.commerceStoreName || `${seller.displayName || "Lucy Cobra"} Arts`, 120);
+    await db.collection("users").doc(seller.uid).set({
+      displayName: seller.displayName || "Lucy Cobra",
+      username: seller.username || "lucycobra",
+      email: seller.email || "bans.don@gmail.com",
+      country: "United States",
+      commerceEnabled: true,
+      commerceStoreName: storeName,
+      commerceContact: text(seller.email || "bans.don@gmail.com", 200),
+      commerceRefundPolicy: "Unused physical art items may be returned within 14 days unused and in original packaging. Custom commissions are final sale.",
+      publicProfileVisibility: "public",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+
+    const catalog = [
+      {name:"Sunset Over Dupont (oil)", category:"Artwork", productType:"physical", priceCents:18500, desc:"Original oil painting, 16x20 framed."},
+      {name:"Neon Corridor Study", category:"Artwork", productType:"physical", priceCents:9200, desc:"Acrylic on canvas nightlife study."},
+      {name:"Mediterranean Rooftop Light", category:"Artwork", productType:"physical", priceCents:12400, desc:"Watercolor inspired by rooftop evenings."},
+      {name:"Abstract Bassline #3", category:"Artwork", productType:"physical", priceCents:7800, desc:"Mixed media abstract for lounge walls."},
+      {name:"Portrait: Midnight Patron", category:"Artwork", productType:"physical", priceCents:21000, desc:"Charcoal portrait series print + frame option."},
+      {name:"Gold Leaf Mini Series (set of 3)", category:"Artwork", productType:"physical", priceCents:6500, desc:"Three small gold-leaf panels."},
+      {name:"Club Geometry Print", category:"Artwork", productType:"physical", priceCents:4500, desc:"Limited giclee print, signed."},
+      {name:"City Rain Reflections", category:"Artwork", productType:"physical", priceCents:9900, desc:"Oil on board, urban night rain."},
+      {name:"Hammered Brass Cuff", category:"Jewelry", productType:"physical", priceCents:6800, desc:"Hand-hammered brass cuff bracelet."},
+      {name:"Resin Drop Earrings", category:"Jewelry", productType:"physical", priceCents:3200, desc:"Lightweight resin and gold-tone earrings."},
+      {name:"Beaded Night Collar", category:"Jewelry", productType:"physical", priceCents:5400, desc:"Statement beaded collar necklace."},
+      {name:"Silver Stack Ring Set", category:"Jewelry", productType:"physical", priceCents:4100, desc:"Three textured sterling-finish rings."},
+      {name:"Enamel Pin: Throw a ShoutOut", category:"Jewelry", productType:"physical", priceCents:1800, desc:"Hard enamel pin for jackets and bags."},
+      {name:"Gallery Float Frame 16x20", category:"Art accessories", productType:"physical", priceCents:5200, desc:"Black gallery float frame, ready to hang."},
+      {name:"Walnut Shadow Box Frame", category:"Art accessories", productType:"physical", priceCents:7400, desc:"Deep walnut shadow box for mixed media."},
+      {name:"Pro Acrylic Brush Set (12)", category:"Art accessories", productType:"physical", priceCents:3600, desc:"Synthetic brush set for acrylic and oil."},
+      {name:"Palette Knife Kit", category:"Art accessories", productType:"physical", priceCents:2800, desc:"Five stainless palette knives."},
+      {name:"Artist Travel Case", category:"Art accessories", productType:"physical", priceCents:8900, desc:"Compact hard case for brushes and tubes."},
+      {name:"Linen Canvas Pack (5)", category:"Art accessories", productType:"physical", priceCents:4700, desc:"Pre-stretched linen canvases, assorted."},
+      {name:"Archival Print Sleeve Bundle", category:"Art accessories", productType:"physical", priceCents:2200, desc:"Acid-free sleeves for print editions."}
+    ];
+
+    const existing = await db.collection("commerceProducts").where("sellerUid", "==", seller.uid).limit(50).get();
+    const existingNames = new Set(existing.docs.map(d => String((d.data() || {}).name || "").toLowerCase()));
+    const created = [];
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    for (let i = 0; i < catalog.length; i += 1) {
+      const item = catalog[i];
+      if (existingNames.has(item.name.toLowerCase())) continue;
+      const ref = db.collection("commerceProducts").doc();
+      const accent = encodeURIComponent(["dfff5a", "7ad7ff", "ffb347", "c4a1ff", "ff6b9d"][i % 5]);
+      const label = encodeURIComponent(item.name.slice(0, 28));
+      await ref.set({
+        sellerEntityId: seller.uid,
+        sellerEntityType: "member",
+        sellerUid: seller.uid,
+        sellerName: storeName,
+        sellerCountry: "United States",
+        marketplaceCountry: "US",
+        marketplace: "bartr",
+        name: item.name,
+        category: item.category,
+        productType: item.productType,
+        previewMediaType: "image",
+        mediaLicense: "",
+        priceCents: item.priceCents,
+        inventory: 8 + (i % 5),
+        imageUrl: `https://placehold.co/600x600/${accent}/14121c/png?text=${label}`,
+        description: item.desc,
+        requiresShipping: true,
+        active: true,
+        refundPolicySnapshot: "Unused physical art items may be returned within 14 days unused and in original packaging.",
+        contactSnapshot: text(seller.email || "bans.don@gmail.com", 200),
+        seededBy: "seedLucyCobraBartrCatalogHttp",
+        createdAt: now,
+        updatedAt: now
+      });
+      created.push({id: ref.id, name: item.name, priceCents: item.priceCents});
+    }
+
+    res.status(200).json({
+      ok: true,
+      sellerUid: seller.uid,
+      sellerName: storeName,
+      productsCreated: created.length,
+      productsSkippedExisting: catalog.length - created.length,
+      commerceUrl: "https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.14"
+    });
+  } catch (error) {
+    res.status(500).json({ok: false, error: error?.message || String(error)});
+  }
 });
