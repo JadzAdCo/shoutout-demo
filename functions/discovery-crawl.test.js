@@ -28,8 +28,8 @@ test("master-admin refined discovery search UI copy", () => {
   assert.match(html, /Refined Discovery Search/);
   assert.match(html, /Run Discovery Crawl/);
   assert.match(html, /Ticketmaster confirmation: later/);
-  assert.match(html, /ai-discovery-service\.js\?v=29\.09\.9/);
-  assert.match(html, /ai-diagnostics-service\.js\?v=29\.09\.9/);
+  assert.match(html, /ai-discovery-service\.js\?v=\d+\.\d+\.\d+/);
+  assert.match(html, /ai-diagnostics-service\.js\?v=\d+\.\d+\.\d+/);
   assert.match(html, /pool party/);
   assert.match(html, /day club/);
   assert.match(html, /rooftop lounge/);

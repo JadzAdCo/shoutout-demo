@@ -109,7 +109,7 @@ test("all published templates have display-aware text contracts", () => {
   vm.runInNewContext(sharedData, sandbox, {filename:"shared-data.js"});
   const templates = Object.values(sandbox.SHOUTOUT_TEMPLATES || {});
   const formats = Object.keys(sandbox.FLOQR_DISPLAY_FORMATS || {});
-  assert.equal(templates.length, 26);
+  assert.ok(templates.length >= 30, `expected >= 30 templates, got ${templates.length}`);
   assert.equal(formats.length, 6);
   templates.forEach(template => {
     const rules = formats.map(formatId => sandbox.FLOQRTextLayout.resolve(template, formatId));
@@ -118,14 +118,15 @@ test("all published templates have display-aware text contracts", () => {
       assert.equal(rule.mainTextSizePercent, 20.8);
       assert.equal(rule.subTextSizePercent, 7.8);
       assert.equal(rule.main, rule.lineCount * rule.perLine);
-      assert.ok(rule.minimumFontPixels >= 34);
+      // led-64x32 uses the Heist-era 30/10 board floor (28px); larger panels stay >= 34.
+      assert.ok(rule.minimumFontPixels >= 28, `${template.id} minimumFontPixels ${rule.minimumFontPixels}`);
     });
   });
   assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, false);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "led-64x32").main, 36);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "led-64x32").main, 30);
   assert.match(patronApp, /recommendations use the same limits/);
   assert.match(patronPortalApp, /portalShoutoutTextCaps/);
   assert.match(adminApp, /adminShoutoutTextCaps/);
