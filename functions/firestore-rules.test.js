@@ -68,6 +68,13 @@ test("identity and club updates preserve backend Stripe fields", () => {
   assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.5-floqr-platform-payments/);
 });
 
+test("platformSettings feature gates are Master Admin write / public read", () => {
+  const block = blockFor("/platformSettings/{docId}");
+  assert.match(block, /allow read: if true;/);
+  assert.match(block, /allow write: if isMasterAdmin\(\);/);
+  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.23-entity-feature-gates/);
+});
+
 test("recommendation moderation is Master Admin controlled", () => {
   const block = blockFor("/shoutoutRecommendations/{id}");
   assert.match(block, /resource\.data\.status == "approved"/);

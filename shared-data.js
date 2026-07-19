@@ -9,6 +9,11 @@ window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
   "don.b@jadzholdings.com"
 ];
 
+/* Super Admin = primary Master Admin; exempt from global patron feature disables and offboard/disable via entity tools. */
+window.SHOUTOUT_SUPER_ADMIN_EMAILS = [
+  "bands.don@gmail.com"
+];
+
 /*
   v25 Master Admin Security Policy
   Master admin must be explicitly listed, use an approved FLOQR email domain,

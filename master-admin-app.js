@@ -1050,6 +1050,11 @@
   function renderClubAdminUrls(locationRows = []) {
     const wrap = byId("clubAdminUrlList");
     if (!wrap) return;
+    if (window.FLOQREntityManagement?.updateLocations) {
+      window.FLOQREntityManagement.updateLocations(locationRows);
+      populateClubDisplaySetupOptions(locationRows);
+      return;
+    }
     const rows = locationRows
       .filter(row => row && row.id)
       .sort((a,b) => locationName(a).localeCompare(locationName(b)));
@@ -1561,6 +1566,9 @@
       document.querySelector('[data-panel="clubOnboarding"]')?.click();
       setTimeout(() => byId("clubDisplayTypeSetup")?.scrollIntoView({behavior:"smooth", block:"start"}), 250);
     }
+    if (location.hash === "#entityManagement" || /entityManagement|entity-manage/i.test(location.hash)) {
+      document.querySelector('[data-panel="entityManagement"]')?.click();
+    }
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -1585,7 +1593,11 @@
       byId("masterPanel").classList.remove("hidden");
       setText("masterStatus", check.reason);
       setText("masterPanelSecurityStatus", check.reason);
-      loadNetworkReports();
+      loadNetworkReports().then(() => {
+        if (window.FLOQREntityManagement) {
+          window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});
+        }
+      });
       loadManagedTemplates();
       loadRecommendationModeration();
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});

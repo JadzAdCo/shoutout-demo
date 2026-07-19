@@ -235,6 +235,13 @@
 
   async function saveCampaign() {
     if (!locationId) throw new Error("Add ?location=<club-id> before saving a marketing campaign.");
+    const g = window.FLOQRFeatureGates;
+    if (g) {
+      const row = await g.loadVenueRecord(db, locationId);
+      if (!g.venueMayUse("windowAds", row) && !g.venueMayUse("uberAds", row)) {
+        throw new Error("UberAds / WindowAds are disabled for this venue.");
+      }
+    }
     const status = statusEl();
     if (status) status.textContent = "Saving campaign draft…";
     const result = await callable("saveClubMarketingCampaign")(campaignPayload());

@@ -783,8 +783,15 @@ exports.createFloqrCheckoutSession = onCall({
   };
   try {
     if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+    const featureGateHelpers = require("./feature-gate-functions").__featureGateHelpers;
+    if (type === "shoutout") await featureGateHelpers.assertPatronFeature(request.auth, "shoutOut");
+    if (type === "commerceProduct" || type === "bartr" || type === "marketplace") await featureGateHelpers.assertPatronFeature(request.auth, "bartr");
+    if (type === "rydrTrip" || type === "robotaxi") await featureGateHelpers.assertPatronFeature(request.auth, "rydr");
     const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
     const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
+    const clubGateId = text(payload.clubLocationId || payload.shoutout?.clubLocationId || payload.shoutout?.location, 120);
+    if (clubGateId && type === "shoutout") await featureGateHelpers.assertClubFeature(clubGateId, "shoutOut");
+    if (clubGateId && (type === "commerceProduct" || type === "bartr")) await featureGateHelpers.assertClubFeature(clubGateId, "bartrStores");
     if (type === "audienceCampaign") await requirePublisher(text(payload.entityId, 160), request.auth);
     if (["targetedGuestList", "smsNotifications", "smsMessageBundle", "whatsappNotifications", "whatsappMessageBundle"].includes(type)) {
       await requirePublisher(text(payload.clubLocationId, 160), request.auth);
@@ -1523,6 +1530,7 @@ exports.publishFloqrFollowerCampaign = onCall({region:"us-central1", timeoutSeco
 
 exports.requestTeslaRobotaxiPickup = onCall({region:"us-central1", timeoutSeconds:15, memory:"256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  await require("./feature-gate-functions").__featureGateHelpers.assertPatronFeature(request.auth, "rydr");
   const pickupAddress = text(request.data?.pickupAddress, 300);
   const destinationAddress = text(request.data?.destinationAddress, 300);
   if (!pickupAddress || !destinationAddress) throw new HttpsError("invalid-argument", "Pickup and destination addresses are required.");

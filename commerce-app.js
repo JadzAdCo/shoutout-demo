@@ -137,6 +137,16 @@
       byId("commercePanel")?.classList.toggle("hidden", !user);
       if (!user) return setStatus("Sign in to shop BartR.");
       try {
+        await window.FLOQRFeatureGates?.loadPatronGates?.(db);
+        let profile = null;
+        try {
+          const snap = await db.collection("users").doc(user.uid).get();
+          profile = snap.exists ? snap.data() : null;
+        } catch (e) {}
+        if (window.FLOQRFeatureGates && !window.FLOQRFeatureGates.patronMayUse("bartr", user, profile)) {
+          byId("commercePanel")?.classList.add("hidden");
+          return setStatus("BartR is currently disabled for patrons.");
+        }
         setStatus("Loading BartR…");
         await loadMarketplaceProducts();
         setStatus("");

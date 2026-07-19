@@ -83,6 +83,111 @@
     if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
   }
 
+  function clubSearchBlob(id, row = {}) {
+    return [id, row.locationName, row.brandName, row.city, row.region, row.state, row.country, row.streetAddress, row.address, row.locationLabel, ...(row.genres || [])]
+      .filter(Boolean).join(" ").toLowerCase();
+  }
+
+  function listSearchableClubs() {
+    const map = new Map();
+    Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, data]) => map.set(id, {id, ...data}));
+    return Array.from(map.values()).sort((a, b) => String(a.locationName || a.id).localeCompare(String(b.locationName || b.id)));
+  }
+
+  function populateMasterClubSearchOptions() {
+    const list = byId("masterClubSearchOptions");
+    if (!list) return;
+    list.innerHTML = listSearchableClubs()
+      .map(row => `<option value="${esc(row.id)}">${esc(row.locationName || row.brandName || row.id)}</option>`)
+      .join("");
+  }
+
+  function renderMasterClubSearchResults(query = "") {
+    const wrap = byId("masterClubSearchResults");
+    if (!wrap) return;
+    const q = String(query || "").trim().toLowerCase();
+    if (!q) {
+      wrap.innerHTML = "";
+      return;
+    }
+    const rows = listSearchableClubs()
+      .filter(row => clubSearchBlob(row.id, row).includes(q) || q.split(/\s+/).every(token => clubSearchBlob(row.id, row).includes(token)))
+      .slice(0, 12);
+    wrap.innerHTML = rows.length ? rows.map(row => `
+      <button class="entity-result-card" type="button" data-switch-club="${esc(row.id)}">
+        <strong>${esc(row.locationName || row.brandName || row.id)}</strong>
+        <small>${esc([row.city, row.region || row.state, row.id].filter(Boolean).join(" · "))}</small>
+      </button>`).join("") : `<p class="sub small">No clubs match “${esc(query)}”.</p>`;
+    wrap.querySelectorAll("[data-switch-club]").forEach(btn => {
+      btn.addEventListener("click", () => switchMasterClub(btn.dataset.switchClub));
+    });
+  }
+
+  function switchMasterClub(nextId) {
+    const id = String(nextId || "").trim();
+    if (!id) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("location", id);
+    url.searchParams.delete("club");
+    window.location.href = url.toString();
+  }
+
+  function setupMasterClubSearch(isMasterAdmin) {
+    const bar = byId("masterClubSearchBar");
+    if (!bar) return;
+    bar.classList.toggle("hidden", !isMasterAdmin);
+    if (!isMasterAdmin) return;
+    populateMasterClubSearchOptions();
+    if (byId("masterClubSearchInput") && !byId("masterClubSearchInput").value) {
+      byId("masterClubSearchInput").value = locationId;
+    }
+    const run = () => renderMasterClubSearchResults(byId("masterClubSearchInput")?.value || "");
+    byId("masterClubSearchBtn")?.addEventListener("click", () => {
+      const raw = String(byId("masterClubSearchInput")?.value || "").trim();
+      const exact = listSearchableClubs().find(row => {
+        const id = String(row.id || "").toLowerCase();
+        const name = String(row.locationName || row.brandName || "").toLowerCase();
+        return id === raw.toLowerCase() || name === raw.toLowerCase();
+      });
+      if (exact) switchMasterClub(exact.id);
+      else run();
+    });
+    byId("masterClubSearchInput")?.addEventListener("input", run);
+    byId("masterClubSearchInput")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        byId("masterClubSearchBtn")?.click();
+      }
+    });
+  }
+
+  async function enforceVenueFeatureGates() {
+    const g = window.FLOQRFeatureGates;
+    if (!g) return;
+    const row = await g.loadVenueRecord(db, locationId);
+    const advertising = byId("panelAdvertising") || document.querySelector('[data-panel="panelAdvertising"]');
+    const spotCard = byId("spotAdCampaignCard");
+    const marketingCard = byId("marketingCampaignCard");
+    const shoutoutTab = document.querySelector('[data-panel="panelQueue"]');
+    if (!g.entityIsAppEnabled(row)) {
+      setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
+      byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
+        if (el.closest("#masterClubSearchBar")) return;
+        el.disabled = true;
+      });
+      return;
+    }
+    const uberOk = g.venueMayUse("uberAds", row);
+    const windowOk = g.venueMayUse("windowAds", row);
+    const shoutOk = g.venueMayUse("shoutOut", row);
+    const bartrOk = g.venueMayUse("bartrStores", row);
+    if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
+    if (marketingCard) marketingCard.classList.toggle("hidden", !(uberOk || windowOk));
+    if (advertising && advertising.tagName === "BUTTON") advertising.classList.toggle("hidden", !(uberOk || windowOk));
+    if (shoutoutTab) shoutoutTab.classList.toggle("hidden", !shoutOk);
+    document.querySelectorAll("[data-bartr-store-gate]").forEach(el => el.classList.toggle("hidden", !bartrOk));
+  }
+
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
   function actionFeedback(messages, action) {
@@ -2017,7 +2122,9 @@
       byId("adminLogin").classList.add("hidden");
       byId("adminMfaPanel")?.classList.add("hidden");
       byId("adminPanel").classList.remove("hidden");
-      setText("adminStatus", "Club admin verified.");
+      setText("adminStatus", isMasterAdmin ? "Master Admin verified for Club Admin." : "Club admin verified.");
+      setupMasterClubSearch(isMasterAdmin);
+      enforceVenueFeatureGates();
       renderQueue();
       loadClubPublicProfile().then(async () => {
         await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);

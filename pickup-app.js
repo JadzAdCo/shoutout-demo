@@ -630,8 +630,24 @@
     auth.onAuthStateChanged(user => {
       byId("pickupLogin").classList.toggle("hidden", !!user);
       byId("pickupPanel").classList.toggle("hidden", !user);
-      if (user) load(user).catch(error => setStatus(error.message));
-      else setStatus("Sign in to use the Pickup simulation.");
+      if (!user) return setStatus("Sign in to use the Pickup simulation.");
+      (async () => {
+        try {
+          await window.FLOQRFeatureGates?.loadPatronGates?.(db);
+          let profile = null;
+          try {
+            const snap = await db.collection("users").doc(user.uid).get();
+            profile = snap.exists ? snap.data() : null;
+          } catch (e) {}
+          if (window.FLOQRFeatureGates && !window.FLOQRFeatureGates.patronMayUse("rydr", user, profile)) {
+            byId("pickupPanel").classList.add("hidden");
+            return setStatus("RydR is currently disabled for patrons.");
+          }
+          await load(user);
+        } catch (error) {
+          setStatus(error.message);
+        }
+      })();
     });
   });
 })();

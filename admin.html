@@ -51,6 +51,17 @@
     </div>
 
     <div id="adminPanel" class="hidden">
+      <div id="masterClubSearchBar" class="master-club-search-bar hidden">
+        <label>Search club entity
+          <input id="masterClubSearchInput" list="masterClubSearchOptions" autocomplete="off" placeholder="Search club, city, or location id"/>
+          <datalist id="masterClubSearchOptions"></datalist>
+        </label>
+        <div class="queue-actions">
+          <button id="masterClubSearchBtn" class="primary" type="button">Search club</button>
+          <a id="masterEntityManageLink" class="buttonlike" href="./master-admin.html?v=29.09.23#entityManagement">Full entity manage</a>
+        </div>
+        <div id="masterClubSearchResults" class="master-club-search-results" style="grid-column:1 / -1"></div>
+      </div>
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
         <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
@@ -515,6 +526,7 @@
 <script src="./floqr-nav.js?v=29.09.8"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.8"></script>
+<script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
