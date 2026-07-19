@@ -12,6 +12,7 @@
   let catalog = {clubs:[], events:[], users:[]};
   let selected = null;
   let clubUrlFilter = "";
+  let pendingManage = null;
 
   function setStatus(msg) {
     const el = byId("entityManageStatus");
@@ -36,7 +37,8 @@
   }
 
   function matchesQuery(row, type, query) {
-    if (!query) return true;
+    const q = String(query || "").trim().toLowerCase();
+    if (!q) return false;
     const blob = [
       entityTitle(row, type),
       entityMeta(row, type),
@@ -44,7 +46,7 @@
       row.streetAddress, row.address, row.brandName, row.locationLabel,
       ...(row.genres || [])
     ].join(" ").toLowerCase();
-    return query.split(/\s+/).every(token => blob.includes(token));
+    return q.split(/\s+/).every(token => blob.includes(token));
   }
 
   function statusBadge(row) {
@@ -107,7 +109,11 @@
   function renderSearchResults() {
     const wrap = byId("entityManageResults");
     if (!wrap) return;
-    const query = byId("entityManageSearch")?.value || "";
+    const query = String(byId("entityManageSearch")?.value || "").trim();
+    if (!query) {
+      wrap.innerHTML = `<p class="sub">Type a search to find a venue, event, or patron. No entities are listed until you search.</p>`;
+      return;
+    }
     const rows = searchResults(query);
     if (!rows.length) {
       wrap.innerHTML = `<p class="sub">No matching venues, events, or patrons. Try another search.</p>`;
@@ -326,13 +332,28 @@
     }).join("") : "<p class='sub'>No club locations match this search.</p>";
     wrap.querySelectorAll("[data-manage-club]").forEach(btn => {
       btn.addEventListener("click", () => {
+        pendingManage = {type:"club", id:btn.dataset.manageClub, query:btn.dataset.manageClub};
         document.querySelector('[data-panel="entityManagement"]')?.click();
-        if (byId("entityManageSearch")) byId("entityManageSearch").value = btn.dataset.manageClub;
-        if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = "club";
-        selectEntity("club", btn.dataset.manageClub);
-        renderSearchResults();
       });
     });
+  }
+
+  function applyPendingManage() {
+    if (!pendingManage) return;
+    if (!window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) return;
+    const {type, id, query} = pendingManage;
+    pendingManage = null;
+    if (byId("entityManageSearch")) byId("entityManageSearch").value = query || id || "";
+    if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = type === "club" ? "club" : "all";
+    if (id) selectEntity(type || "club", id);
+    else renderSearchResults();
+  }
+
+  function onSos2faUnlocked() {
+    applyPendingManage();
+    renderSearchResults();
+    renderManagePanel();
+    renderGlobalPatronGates();
   }
 
   async function mount(options = {}) {
@@ -359,11 +380,20 @@
     byId("clubAdminUrlSearch")?.addEventListener("input", renderClubAdminUrlFilter);
     byId("clubAdminUrlManageSearchBtn")?.addEventListener("click", () => {
       const q = byId("clubAdminUrlSearch")?.value || "";
+      pendingManage = {type:"club", query:q};
       document.querySelector('[data-panel="entityManagement"]')?.click();
-      if (byId("entityManageSearch")) byId("entityManageSearch").value = q;
-      if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = "club";
-      renderSearchResults();
     });
+    byId("sos2faRelockBtn")?.addEventListener("click", () => {
+      window.FLOQRSOS2FA?.lock?.("entityManagement");
+      window.FLOQRSOS2FA?.syncGateUi?.("entityManagement", false);
+      window.FLOQRSOS2FA?.requireUnlock?.("entityManagement");
+    });
+    if (window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
+      window.FLOQRSOS2FA.syncGateUi("entityManagement", true);
+      onSos2faUnlocked();
+    } else {
+      window.FLOQRSOS2FA?.syncGateUi?.("entityManagement", false);
+    }
   }
 
   function updateLocations(locations = []) {
@@ -377,5 +407,5 @@
     renderSearchResults();
   }
 
-  window.FLOQREntityManagement = {mount, updateLocations, refreshCatalog, selectEntity, renderClubAdminUrlFilter};
+  window.FLOQREntityManagement = {mount, updateLocations, refreshCatalog, selectEntity, renderClubAdminUrlFilter, onSos2faUnlocked};
 })();

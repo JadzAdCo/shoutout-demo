@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.22"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.22"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.24"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.22&start=search">&larr; Back to Search</a>
@@ -99,9 +99,35 @@
       </section>
 
       <section id="entityManagement" class="admin-panel-section">
+        <div id="sos2faGate" class="card sos2fa-gate">
+          <div class="sos2fa-gate-head">
+            <div class="sos2fa-mark" aria-hidden="true">SOS2FA</div>
+            <div>
+              <p class="eyebrow">Social OS · SOS2FA</p>
+              <h2>Super Admin SMS confirmation</h2>
+              <p class="sub small">Entity Management is protected by <strong>SOS2FA</strong> (Social OS two-factor SMS). FloqR detects Super Admin access and sends a one-time code to the Super Admin mobile before search, enable/disable, gates, or offboarding are available.</p>
+              <p id="sos2faPhoneHint" class="sub small"></p>
+            </div>
+          </div>
+          <div id="sos2faEnrollFields" class="profile-grid hidden">
+            <label>Super Admin mobile (E.164)<input id="sos2faPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
+          </div>
+          <div class="profile-grid">
+            <label>SOS2FA SMS code<input id="sos2faCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/></label>
+          </div>
+          <div id="sos2fa-recaptcha" class="sos2fa-recaptcha"></div>
+          <div id="sos2faActions" class="queue-actions">
+            <button id="sos2faSendBtn" class="primary" type="button">Send SOS2FA SMS</button>
+            <button id="sos2faVerifyBtn" type="button">Verify &amp; unlock</button>
+            <button id="sos2faLockBtn" type="button">Lock panel</button>
+          </div>
+          <p id="sos2faStatus" class="status"></p>
+        </div>
+
+        <div id="entityManageSecureBody" class="hidden">
         <div class="card">
           <h2>Search to manage</h2>
-          <p class="sub small">Search venues, events, and patrons/entities. Enable or disable application access, set per-venue feature gates, or offboard an entity so its public profile and datapoints leave the WebApp.</p>
+          <p class="sub small">Search venues, events, and patrons/entities. Enable or disable application access, set per-venue feature gates, or offboard an entity so its public profile and datapoints leave the WebApp. Results stay empty until you search.</p>
           <div class="profile-grid">
             <label>Search<input id="entityManageSearch" autocomplete="off" placeholder="Club, event, patron, city, email, or id"/></label>
             <label>Type
@@ -115,6 +141,7 @@
           </div>
           <div class="queue-actions">
             <button id="entityManageRefreshBtn" type="button">Refresh catalog</button>
+            <button id="sos2faRelockBtn" type="button">Lock with SOS2FA</button>
           </div>
           <div class="entity-onboarding-grid">
             <div><h3>Results</h3><div id="entityManageResults" class="report-block"></div></div>
@@ -127,6 +154,7 @@
           <p class="sub small">Manually enable/disable features for all patrons. Super Admin remains exempt.</p>
           <div id="globalPatronGatesForm" class="privacy-datapoint-grid"></div>
           <button id="saveGlobalPatronGatesBtn" class="primary" type="button">Save Global Patron Gates</button>
+        </div>
         </div>
       </section>
 
@@ -715,7 +743,8 @@
 <script src="./global-profile-status.js?v=29.09.22"></script>
 <script src="./shared-data.js?v=29.09.22"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./entity-management.js?v=29.09.23"></script>
+<script src="./sos2fa.js?v=29.09.24"></script>
+<script src="./entity-management.js?v=29.09.24"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
 <script src="./ai-search-service.js?v=29.09.22"></script>
@@ -727,7 +756,7 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.22"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.22"></script>
+<script src="./master-admin-app.js?v=29.09.24"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>

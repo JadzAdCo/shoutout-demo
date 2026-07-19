@@ -121,6 +121,12 @@
         byId(btn.dataset.panel)?.classList.add("active");
         if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
         if (btn.dataset.panel === "networkReconciliation") loadNetworkPaymentLedger();
+        if (btn.dataset.panel === "entityManagement" && window.FLOQRSOS2FA) {
+          window.FLOQRSOS2FA.mount({
+            scope: "entityManagement",
+            onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
+          });
+        }
       });
     });
   }
