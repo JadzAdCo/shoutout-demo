@@ -73,6 +73,18 @@ Any in-place command (Save, Publish, Deactivate, Accept/Deny, Connect refresh, e
 
 **Not** required for pure links (`<a href>` to another page) or Back navigation.
 
+### 7. Email mobile preview links (required after webapp changes)
+
+After every iteration that changes patron/admin UX, **send preview links by email** so testers can open them on iPhone:
+
+1. Publish the package to GitHub Pages (or confirm the live site reflects the change).
+2. Master Admin → **Diagnostics** → **Email mobile preview links** (SendGrid via `sendFloqrPreviewLinksEmail` when signed in).
+3. Or POST to Cloud Function `emailFloqrPreviewLinks` (defaults to `bans.don@gmail.com` if not signed in).
+4. Update `PREVIEW_LINKS_PACKAGE` in `ai-diagnostics-service.js` and `defaultFloqrPreviewLinks()` in `functions/ai-discovery-functions.js` when the package version changes.
+5. Include **stable display URLs** (no `?v=`) for LED/embed links; admin/portal links may include `?v=`.
+
+Confirm the email arrived before marking the deploy complete.
+
 ---
 
 ## Also update (same iteration)
@@ -84,6 +96,9 @@ Any in-place command (Save, Publish, Deactivate, Accept/Deny, Connect refresh, e
 | `DEPLOYMENT-V*.md` / `ROLLBACK-V*.md` | When shipping a numbered package |
 | Firebase functions/rules | Deploy only when backend changed; then Rules Smoke Test |
 | Script `?v=` cache-busts | Every edited JS/CSS/HTML consumer |
+| Media inputs | Local file upload first; use `url-media-field.js`; no visible URL paste for logos/icons |
+| Display URLs | Stable `display.html?location=…` without `?v=` (devices + external embeds) |
+| Preview link email | Master Admin → Email mobile preview links; bump `PREVIEW_LINKS_PACKAGE` each release |
 
 ---
 

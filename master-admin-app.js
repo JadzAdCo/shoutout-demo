@@ -245,10 +245,7 @@
   }
 
   function displayUrl(id = "") {
-    const url = new URL("./display.html", window.location.href);
-    url.searchParams.set("location", id);
-    url.searchParams.set("v", CURRENT_VERSION);
-    return url.toString();
+    return window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
   }
 
   function slugify(value = "") {
@@ -284,7 +281,7 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR SHOUTOUT"} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut"} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
@@ -305,7 +302,7 @@
         formatId: primary,
         label: panel.label
       },
-      displayFooterBrand: String(displayFooterBrand || "FLOQR SHOUTOUT").trim() || "FLOQR SHOUTOUT"
+      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut"
     };
   }
 
@@ -330,7 +327,7 @@
     const displayConfig = normalizeClubDisplayConfig({
       displayScreenFormatIds,
       primaryDisplayScreenFormatId: primaryFromForm,
-      displayFooterBrand: "FLOQR SHOUTOUT"
+      displayFooterBrand: "FLOQR ShoutOut"
     });
     return {
       id,
@@ -1122,7 +1119,7 @@
       input.checked = formats.has(input.dataset.clubSettingsScreenFormat);
     });
     if (byId("clubDisplaySetupPrimaryFormat")) byId("clubDisplaySetupPrimaryFormat").value = config.primaryDisplayScreenFormatId || "led-96x48";
-    if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR SHOUTOUT";
+    if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR ShoutOut";
     if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId || "";
     clubDisplaySetupLocationId = locationId || "";
   }
@@ -1143,7 +1140,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: data.displayScreenFormatIds || staticLoc.displayScreenFormatIds || ["led-96x48"],
       primaryDisplayScreenFormatId: data.primaryDisplayScreenFormatId || data.displayType || data.screenFormatId || staticLoc.primaryDisplayScreenFormatId || "led-96x48",
-      displayFooterBrand: data.displayFooterBrand || "FLOQR SHOUTOUT"
+      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut"
     });
     if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = locationId;
     applyClubDisplaySetupForm(config, locationId);
@@ -1163,7 +1160,7 @@
     applyClubDisplaySetupForm(normalizeClubDisplayConfig({
       displayScreenFormatIds: ["led-64x32"],
       primaryDisplayScreenFormatId: "led-64x32",
-      displayFooterBrand: "FLOQR SHOUTOUT"
+      displayFooterBrand: "FLOQR ShoutOut"
     }), "heist-washington-dc");
     setText("clubDisplaySetupStatus", "Heist DC preset applied locally — click Save Display Type Setup to write Firestore.");
   }
@@ -1182,7 +1179,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: formats,
       primaryDisplayScreenFormatId: byId("clubDisplaySetupPrimaryFormat")?.value || formats[0],
-      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR SHOUTOUT"
+      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut"
     });
     setText("clubDisplaySetupStatus", `Saving display type setup for ${locationId}...`);
     const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};

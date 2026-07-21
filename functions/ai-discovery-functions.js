@@ -1762,3 +1762,122 @@ exports.submitMobileTestResults = onCall({
 
   return {ok: true, runId, to: toEmail, counts, emailStatus};
 });
+
+const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
+const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
+const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
+
+function defaultFloqrPreviewLinks(v = "29.09.35") {
+  const base = PREVIEW_LINKS_DEFAULT_BASE;
+  return [
+    ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
+    ["Shôko Club Admin — public profile + logo upload", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
+    ["Shôko stable display URL (no ?v= — for LED / embeds)", `${base}/display.html?location=shoko-barcelona-spain`],
+    ["Heist DC Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
+    ["Heist jail bars display", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1`],
+    ["Heist police car display", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1`],
+    ["Heist interrogation display", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1`],
+    ["Heist courthouse night display", `${base}/display.html?location=heist-washington-dc&template=heistRedLux&main=FOURTEEN%20CHARS&screen=led-64x32&preview=1`],
+    ["Heist preview gallery", `${base}/heist-frame-preview.html`],
+    ["Mobile test checklist (iPhone)", `${base}/mobile-test-checklist.html?v=${v}`],
+    ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
+  ];
+}
+
+function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.34") {
+  if (!Array.isArray(raw) || !raw.length) return defaultFloqrPreviewLinks(fallbackVersion);
+  return raw.slice(0, 40).map((row) => {
+    if (Array.isArray(row)) return [String(row[0] || "Link").slice(0, 160), String(row[1] || "").slice(0, 500)];
+    return [String(row?.label || row?.title || "Link").slice(0, 160), String(row?.url || row?.href || "").slice(0, 500)];
+  }).filter((row) => row[0] && row[1]);
+}
+
+function buildPreviewLinksEmail({packageVersion = "29.09.34", links = [], note = ""} = {}) {
+  const v = String(packageVersion || "29.09.34").replace(/^v/i, "");
+  const rows = normalizePreviewLinks(links, v);
+  const subject = `FLOQR v${v} — mobile preview links`;
+  const intro = String(note || "").trim();
+  const textBody = [
+    subject,
+    "",
+    intro ? `${intro}\n` : "",
+    "Open these on your phone. Admin/portal URLs include ?v= for cache-bust. Display board URLs stay stable (no version query).",
+    "",
+    ...rows.map(([label, url], i) => `${i + 1}. ${label}\n   ${url}`),
+    "",
+    "— FLOQR emailFloqrPreviewLinks"
+  ].join("\n");
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:680px">
+      <h2 style="margin:0 0 8px">${subject}</h2>
+      ${intro ? `<p style="margin:0 0 12px">${intro.replace(/</g, "&lt;")}</p>` : ""}
+      <p style="margin:0 0 14px">Open on your phone. <strong>Admin/portal</strong> links use <code>?v=</code> for cache-bust. <strong>Display board</strong> links stay stable (no version query) for LED devices and external embeds.</p>
+      <ul style="margin:0;padding-left:18px">
+        ${rows.map(([label, url]) => `<li style="margin:0 0 10px"><a href="${url}">${label.replace(/</g, "&lt;")}</a><br/><span style="color:#555;font-size:12px;word-break:break-all">${url}</span></li>`).join("")}
+      </ul>
+      <p style="color:#666;font-size:12px;margin-top:16px">Sent by FLOQR emailFloqrPreviewLinks</p>
+    </div>`;
+  return {subject, textBody, htmlBody, links: rows, packageVersion: v};
+}
+
+/** Email current-iteration preview links for iPhone / mobile testing (SendGrid). */
+exports.emailFloqrPreviewLinks = onRequest({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB",
+  cors: true
+}, async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const query = req.query || {};
+    const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
+    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.34").trim();
+    const note = String(body.note || query.note || "").trim();
+    const links = Array.isArray(body.links) ? body.links : [];
+    const mail = buildPreviewLinksEmail({packageVersion, links, note});
+    const status = await sendgridMail({
+      to: toEmail,
+      from: PREVIEW_LINKS_DEFAULT_FROM,
+      subject: mail.subject,
+      textBody: mail.textBody,
+      htmlBody: mail.htmlBody
+    });
+    res.status(200).json({ok: true, to: toEmail, from: PREVIEW_LINKS_DEFAULT_FROM, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status});
+  } catch (error) {
+    const code = error?.code === "missing-key" ? 500 : (error?.status ? 502 : 500);
+    res.status(code).json({ok: false, error: error?.message || String(error)});
+  }
+});
+
+/** Callable: Master Admin emails preview links (defaults to signed-in email). */
+exports.sendFloqrPreviewLinksEmail = onCall({
+  region: "us-central1",
+  secrets: [SENDGRID_API_KEY],
+  timeoutSeconds: 30,
+  memory: "256MiB"
+}, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const email = String(request.auth.token?.email || "").trim().toLowerCase();
+  if (!MASTER_ADMIN_EMAILS.includes(email) && request.auth.token?.masterAdmin !== true) {
+    throw new HttpsError("permission-denied", "Master Admin access is required.");
+  }
+  const data = request.data || {};
+  const toEmail = String(data.to || email || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
+  const packageVersion = String(data.package || data.v || "29.09.34").trim();
+  const note = String(data.note || "").trim();
+  const links = Array.isArray(data.links) ? data.links : [];
+  const mail = buildPreviewLinksEmail({packageVersion, links, note});
+  const status = await sendgridMail({
+    to: toEmail,
+    from: PREVIEW_LINKS_DEFAULT_FROM,
+    subject: mail.subject,
+    textBody: mail.textBody,
+    htmlBody: mail.htmlBody
+  });
+  return {ok: true, to: toEmail, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status};
+});

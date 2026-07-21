@@ -70,13 +70,17 @@
     return canonicalStaticLocationId(key);
   }
 
+  function stableVenueDisplayUrl(extra = {}) {
+    return window.FLOQRNav?.stableDisplayUrl?.(locationId, extra) || `./display.html?location=${encodeURIComponent(locationId)}`;
+  }
+
   function refreshLocationShell() {
     loc = getStaticLocation(locationId);
     setText("clubName", loc.locationName || locationId);
     const displayLink = byId("displayLink");
-    if (displayLink) displayLink.href = window.FLOQRNav?.adminLink("./display.html", { location: locationId }) || `./display.html?location=${locationId}&from=admin`;
+    if (displayLink) displayLink.href = stableVenueDisplayUrl();
     const liveFrame = byId("liveFrame");
-    if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
+    if (liveFrame) liveFrame.src = stableVenueDisplayUrl();
     const publicLink = byId("clubPublicProfileLink");
     if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");
@@ -117,6 +121,52 @@
 
   function publicProfileUrl() {
     return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
+  }
+
+  function staticAddressDefaults(source = loc) {
+    return {
+      streetAddress: String(source.streetAddress || source.addressLine1 || source.address || "").trim(),
+      city: String(source.city || "").trim(),
+      stateRegion: String(source.stateRegion || source.region || "").trim(),
+      postalCode: String(source.postalCode || source.zipCode || "").trim(),
+      country: String(source.country || "").trim()
+    };
+  }
+
+  function shouldReplaceStaleAddress(profile = {}, staticLoc = loc) {
+    const seed = staticAddressDefaults(staticLoc);
+    if (!seed.country && !seed.city) return false;
+    const current = {
+      streetAddress: String(profile.streetAddress || profile.addressLine1 || "").trim(),
+      city: String(profile.city || "").trim(),
+      stateRegion: String(profile.stateRegion || profile.region || "").trim(),
+      postalCode: String(profile.postalCode || profile.postalCode || profile.zipCode || "").trim(),
+      country: String(profile.country || "").trim()
+    };
+    if (!current.country && seed.country) return true;
+    if (seed.country && current.country && seed.country !== current.country) return true;
+    if (seed.city && current.city && seed.city.toLowerCase() === current.city.toLowerCase() && seed.streetAddress && current.streetAddress
+      && seed.streetAddress !== current.streetAddress
+      && /connecticut avenue|20036|1411 k st|washington,? dc/i.test(current.streetAddress)) {
+      return true;
+    }
+    return false;
+  }
+
+  function resolvedClubAddress(profile = {}, staticLoc = loc) {
+    const seed = staticAddressDefaults(staticLoc);
+    if (shouldReplaceStaleAddress(profile, staticLoc)) return seed;
+    return {
+      streetAddress: String(profile.streetAddress || profile.addressLine1 || seed.streetAddress || "").trim(),
+      city: String(profile.city || seed.city || "").trim(),
+      stateRegion: String(profile.stateRegion || profile.region || seed.stateRegion || "").trim(),
+      postalCode: String(profile.postalCode || profile.zipCode || seed.postalCode || "").trim(),
+      country: String(profile.country || seed.country || "").trim()
+    };
+  }
+
+  function renderClubLogoPreview(url = "") {
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("clubProfileLogoPreview"), url);
   }
 
   function parsePeopleLines(value, fallbackRole) {
@@ -210,12 +260,15 @@
       publicClubProfile = {...loc};
     }
     const socials = publicClubProfile.socialMediaHandles || publicClubProfile.socialHandles || {};
-    if (byId("clubProfileStreetAddress")) byId("clubProfileStreetAddress").value = publicClubProfile.streetAddress || publicClubProfile.addressLine1 || (publicClubProfile.fullAddress ? "" : publicClubProfile.address) || "";
-    if (byId("clubProfileCity")) byId("clubProfileCity").value = publicClubProfile.city || loc.city || "";
-    if (byId("clubProfileRegion")) byId("clubProfileRegion").value = publicClubProfile.stateRegion || publicClubProfile.region || loc.region || "";
-    if (byId("clubProfilePostalCode")) byId("clubProfilePostalCode").value = publicClubProfile.postalCode || publicClubProfile.zipCode || "";
-    if (byId("clubProfileCountry")) byId("clubProfileCountry").value = publicClubProfile.country || loc.country || "";
-    if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
+    const address = resolvedClubAddress(publicClubProfile, loc);
+    if (byId("clubProfileStreetAddress")) byId("clubProfileStreetAddress").value = address.streetAddress;
+    if (byId("clubProfileCity")) byId("clubProfileCity").value = address.city;
+    if (byId("clubProfileRegion")) byId("clubProfileRegion").value = address.stateRegion;
+    if (byId("clubProfilePostalCode")) byId("clubProfilePostalCode").value = address.postalCode;
+    if (byId("clubProfileCountry")) byId("clubProfileCountry").value = address.country;
+    const logoUrl = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
+    if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = logoUrl;
+    renderClubLogoPreview(logoUrl);
     if (byId("clubProfileTagline")) byId("clubProfileTagline").value = publicClubProfile.tagline || publicClubProfile.publicTagline || "";
     if (byId("clubProfileDescription")) byId("clubProfileDescription").value = publicClubProfile.description || publicClubProfile.publicDescription || publicClubProfile.about || "";
     if (byId("clubProfileWebsite")) byId("clubProfileWebsite").value = publicClubProfile.officialWebsite || publicClubProfile.website || "";
@@ -255,8 +308,11 @@
         ["Subscription required for edits", publicClubProfile.subscriptionRequiredForPublicProfileEdits === false ? "No" : "Yes"],
         ["AI index", "Public profile fields only"]
         ,["Public page", publicProfileUrl()]
+        ,["Display URL", stableVenueDisplayUrl()]
       ]);
     }
+    const displayField = byId("clubDisplayUrlField");
+    if (displayField) displayField.value = stableVenueDisplayUrl();
     await loadProfileImportDraft();
   }
 
@@ -321,16 +377,17 @@
     const primaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubPrimaryDisplayFormat")?.value)
       ? byId("clubPrimaryDisplayFormat").value
       : displayScreenFormatIds[0];
-    const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || "";
-    const city = byId("clubProfileCity")?.value.trim() || "";
-    const stateRegion = byId("clubProfileRegion")?.value.trim() || "";
-    const postalCode = byId("clubProfilePostalCode")?.value.trim() || "";
-    const country = byId("clubProfileCountry")?.value.trim() || "";
+    const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || loc.streetAddress || "";
+    const city = byId("clubProfileCity")?.value.trim() || loc.city || "";
+    const stateRegion = byId("clubProfileRegion")?.value.trim() || loc.region || loc.stateRegion || "";
+    const postalCode = byId("clubProfilePostalCode")?.value.trim() || loc.postalCode || "";
+    const country = byId("clubProfileCountry")?.value.trim() || loc.country || "";
     if (!streetAddress || !city || !stateRegion || !country) throw new Error("Street address, city, state/region, and country are required.");
     const addressRecord = {streetAddress, city, stateRegion, postalCode, country};
     const fullAddress = window.FLOQRAddress?.fullAddress(addressRecord) || [streetAddress, city, stateRegion, postalCode, country].filter(Boolean).join(", ");
     const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
     const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("clubProfileFloqrHandle")?.value || "") || "";
+    const displayUrl = stableVenueDisplayUrl();
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -374,6 +431,7 @@
       publicProfilePublished:!!byId("clubProfilePublished")?.checked,
       visibility:"public",
       publicProfileType:"club",
+      displayUrl,
       subscriptionRequiredForPublicProfileEdits:true,
       clubOwnershipStatus:publicClubProfile.clubOwnershipStatus || "unclaimed",
       publicSearchKeywords:[
@@ -786,6 +844,7 @@
       }, {merge:true});
       publicClubProfile.logoUrl = url;
       if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = url;
+      renderClubLogoPreview(url);
     });
   }
 
@@ -1668,7 +1727,7 @@
   }
 
   async function approve(id, item) {
-    const defaultMain = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const textCaps = adminShoutoutTextCaps(item);
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     await db.collection("liveContent").doc(locationId).set({
@@ -1750,7 +1809,7 @@
       setText("adminStatus", "Please sign in first.");
       return;
     }
-    const main = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const main = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const screenFormatId = loc.primaryDisplayScreenFormatId || "led-96x48";
     const textCaps = window.FLOQRTextLayout?.resolve?.(window.SHOUTOUT_TEMPLATES?.blackwhite || {id:"blackwhite", className:"classic-bw"}, screenFormatId) || {main:45,sub:20,lineCount:3,perLine:15,mainTextSizePercent:20.8,subTextSizePercent:7.8};
     const payload = {
@@ -2024,10 +2083,23 @@
     bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
     bind("refreshReconciliationBtn", loadClubPaymentLedger);
     bind("saveClubTemplatePolicyBtn", saveClubTemplatePolicy);
-    bind("copyClubPublicProfileLinkBtn", async () => {
-      await navigator.clipboard?.writeText(publicProfileUrl());
-      window.FLOQRActionFeedback?.show("Club page link copied", "The patron-facing FLOQR club profile URL is ready to share.", {status:"success"});
-      window.FLOQRActionFeedback?.hide(2200);
+    bind("showDisplayUrlBtn", async () => {
+      const url = stableVenueDisplayUrl();
+      const wrap = byId("clubDisplayUrlWrap");
+      const field = byId("clubDisplayUrlField");
+      if (field) {
+        field.value = url;
+        field.focus();
+        field.select();
+      }
+      wrap?.classList.remove("hidden");
+      try {
+        await navigator.clipboard?.writeText(url);
+        window.FLOQRActionFeedback?.show("Display URL ready", "Stable venue board URL copied — no version query string.", {status:"success"});
+      } catch (e) {
+        window.FLOQRActionFeedback?.show("Display URL", url, {status:"success"});
+      }
+      window.FLOQRActionFeedback?.hide(3200);
     });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
     bind("saveClubMediaBtn", saveClubMedia);
@@ -2042,6 +2114,16 @@
     byId("clubMediaTrimStart")?.addEventListener("input", renderClubMediaInputPreview);
     byId("clubMediaTrimEnd")?.addEventListener("input", renderClubMediaInputPreview);
     byId("guestCampaignAudience")?.addEventListener("change", event => byId("guestCampaignTargetCountLabel")?.classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"clubProfileLogoUrl",
+      fileInputId:"clubProfileLogoFile",
+      previewId:"clubProfileLogoPreview",
+      statusId:"adminStatus",
+      pathPrefix:`clubMedia/${locationId}/logo`,
+      allowVideo:false,
+      maxBytes:12 * 1024 * 1024,
+      onChange: url => { publicClubProfile.logoUrl = url; }
+    });
     window.FLOQRUrlMediaField?.bind?.({
       urlInputId:"guestCampaignImage",
       fileInputId:"guestCampaignImageFile",

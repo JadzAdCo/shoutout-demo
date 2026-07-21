@@ -1463,11 +1463,11 @@ exports.expireLiveShoutouts = onSchedule({
   expired.docs.forEach(doc => {
     const data = doc.data() || {};
     const clubName = text(data.locationName || data.brandName || doc.id, 80).toUpperCase();
-    const configuredDefault = text(data.defaultMain, 45).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const configuredDefault = text(data.defaultMain, 45).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     batch.set(doc.ref, {
       template:"blackwhite",
       templateName:"Traditional Black and White ShoutOut",
-      mainText:configuredDefault || `USE SHOUTOUT @ ${clubName}`,
+      mainText:configuredDefault || `USE ShoutOut @ ${clubName}`,
       subText:"",
       mediaUrl:"",
       mediaType:"",

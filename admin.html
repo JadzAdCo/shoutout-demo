@@ -93,17 +93,23 @@
           <p class="sub small">Manage the patron-facing club page and FLOQR search profile. Only sections enabled below appear publicly.</p>
           <div class="queue-actions">
             <a id="clubPublicProfileLink" class="buttonlike" target="_blank" href="#">View Public Club Page</a>
-            <button id="copyClubPublicProfileLinkBtn" type="button">Copy Public Page Link</button>
+            <button id="showDisplayUrlBtn" type="button">Show Display URL</button>
           </div>
+          <label id="clubDisplayUrlWrap" class="profile-grid-wide hidden">Display URL (stable — no version query)<input id="clubDisplayUrlField" type="text" readonly spellcheck="false"/></label>
           <div class="profile-grid">
-            <label>Club logo URL<input id="clubProfileLogoUrl" placeholder="https://.../club-logo.png"/></label>
+            <div class="url-media-field profile-grid-wide">
+              <label>Club logo<input id="clubProfileLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"/></label>
+              <input id="clubProfileLogoUrl" type="hidden"/>
+              <div id="clubProfileLogoPreview" class="url-media-preview hidden"></div>
+              <p class="sub small">Upload a logo image from this device. FLOQR stores it in Firebase Storage for the public club page.</p>
+            </div>
             <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
             <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
-            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="1223 Connecticut Avenue NW" required/></label>
-            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="Washington" required/></label>
-            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
-            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="20036"/></label>
-            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="United States" required/></label>
+            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="Street and number" required/></label>
+            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="City" required/></label>
+            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="State or region" required/></label>
+            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="Postal code"/></label>
+            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="Country" required/></label>
             <label>Official website<input id="clubProfileWebsite" placeholder="https://example.com"/></label>
             <label>Email<input id="clubProfileEmail" placeholder="info@example.com"/></label>
             <label>Telephone<input id="clubProfileTelephone" placeholder="+1 202 555 0123"/></label>
@@ -512,7 +518,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.34"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.33"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
@@ -529,7 +535,7 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.33"></script>
+<script src="./admin-app.js?v=29.09.34"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>

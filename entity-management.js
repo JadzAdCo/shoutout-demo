@@ -170,7 +170,7 @@
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
     const adminUrl = type === "club" ? `./admin.html?location=${encodeURIComponent(id)}&v=29.09.22&from=master` : "";
-    const displayUrl = type === "club" ? `./display.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
+    const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
     const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
 
     wrap.innerHTML = `
@@ -310,7 +310,7 @@
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = `./admin.html?location=${encodeURIComponent(row.id)}&v=29.09.22&from=master`;
-      const display = `./display.html?location=${encodeURIComponent(row.id)}&v=29.09.22`;
+      const display = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       const g = gates();
