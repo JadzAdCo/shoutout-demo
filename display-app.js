@@ -1,4 +1,4 @@
-/* display-app.js v29.09.30 */
+/* display-app.js v29.09.31 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -538,18 +538,11 @@
       const rows = mainText.trim()
         ? classicBoardRows(mainText, textCaps)
         : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
-      const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("text-overlay-main");
       byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      if (identity.supplied) {
-        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", "has-attribution");
-        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-        byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
-      } else {
-        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", "uses-brand-fallback");
-        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-        byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
-      }
+      byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
+      byId("displaySub").removeAttribute("aria-label");
+      byId("displaySub").innerHTML = "";
     } else if (isClassicBoard) {
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
@@ -596,7 +589,13 @@
     if (!screenFormatOverride) {
       screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "");
     }
-    if (qs("main","")) {
+    const hasQueryRenderOverride =
+      !!qs("main","")
+      || !!qs("template","")
+      || !!qs("backgroundUrl","")
+      || !!qs("backgroundColor","")
+      || !!qs("backgroundGradient","");
+    if (hasQueryRenderOverride) {
       render({
         mainText: qs("main"),
         subText: qs("sub"),
