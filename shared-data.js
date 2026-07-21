@@ -257,16 +257,40 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   },
   "shoko-barcelona-spain": {
     brandName:"Shôko", locationName:"Shôko Barcelona", type:"club",
-    categories:["Clubs","Beach Clubs","Events","ShoutOut"],
+    categories:["Restaurant","Bar","Lounge","Nightlife","Clubs","Beach Clubs","Events","ShoutOut"],
     aliasLocationIds:["shoko-barcelona-beach-club-spain"],
     aliasNames:["Shôko Barcelona Beach Club"],
     country:"Spain", regionType:"Region", region:"Catalonia", city:"Barcelona",
+    streetAddress:"Passeig Marítim de la Barceloneta, 36",
+    postalCode:"08005",
     locationLabel:"Barcelona, Catalonia, Spain",
+    telephone:"+34932259200",
+    reservationPhone:"+34695875082",
+    officialWebsite:"https://shoko.biz/",
+    contactEmail:"shoko@shoko.biz",
     brand:"SHÔKO BARCELONA x FLOQR",
     defaultMain:"USE SHOUT OUT @ SHÔKO", defaultSub:"",
-    genres:["Hip Hop","House","Reggaeton","R&B","Afro Beats"], artists:["Noriel","Resident DJs"],
-    activityStatus:"Active official venue with ticketed events",
-    activityDates:["Thursday 2026-06-11 Noriel","Weekly late-night club programming","Typical late-night schedule"],
+    tagline:"Barcelona seafront dining and award-winning nightlife since 2004.",
+    description:"Seafront Barcelona venue blending Mediterranean-Asian dining, terrace/chill-out spaces, and late-night club programming with ticketed headline events.",
+    genres:["Hip Hop","House","Reggaeton","R&B","Afrobeats","Latin Urban"], artists:["Resident DJs","J Alvarez","Franglish","GIMS","La Fouine","YOMO"],
+    amenities:["VIP tables","Ticketed events","Seafront terrace","Mediterranean-Asian cuisine","Lounge/chill-out areas"],
+    hours:"Daily dining and nightlife service; club programming is event-driven and runs late (confirm each event on official calendar).",
+    activityStatus:"Active official venue with recurring weekly club nights and headline artist dates.",
+    activityDates:[
+      "Mon 2026-07-27: FUCKING MONDAY BY SHÔKO MONDAZE",
+      "Tue 2026-07-28: PLK",
+      "Wed 2026-07-29: POP THAT PARTY",
+      "Thu 2026-07-30: J ALVAREZ",
+      "Fri 2026-07-31: DEMON TIME",
+      "Sat 2026-08-01: PURE SHÔKO",
+      "Sun 2026-08-02: LEVEL UP",
+      "Tue 2026-08-04: FRANGLISH",
+      "Thu 2026-08-06: ALMIGHTY",
+      "Tue 2026-08-11: GIMS",
+      "Tue 2026-08-18: LA FOUINE",
+      "Tue 2026-08-25: KISS KISS BANG BANG",
+      "Thu 2026-09-10: YOMO"
+    ],
     templates:["latin","hiphop","vip","neon"], active:true
   },
   "chrystie-cannes-france": {
@@ -629,11 +653,96 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
 };
 
 window.SHOUTOUT_EVENTS = {
-  "shoko-noriel-2026-06-11": {
-    eventName:"Noriel at Shôko Barcelona", locationId:"shoko-barcelona-spain",
+  "shoko-fucking-monday-2026-07-27": {
+    eventName:"FUCKING MONDAY BY SHÔKO MONDAZE", locationId:"shoko-barcelona-spain",
     country:"Spain", region:"Catalonia", city:"Barcelona",
-    genres:["Hip Hop","Reggaeton","Latin"], artists:["Noriel"],
-    eventDate:"2026-06-11", eventDay:"Thursday", eventTime:"23:55-06:00", active:true
+    genres:["Reggaeton","Hip Hop","Latin"], artists:["Resident DJs"],
+    eventDate:"2026-07-27", eventDay:"Monday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-plk-2026-07-28": {
+    eventName:"PLK", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Hip Hop","Urban"], artists:["PLK"],
+    eventDate:"2026-07-28", eventDay:"Tuesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-pop-that-party-2026-07-29": {
+    eventName:"POP THAT PARTY", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Open Format","Pop","Urban"], artists:["Resident DJs"],
+    eventDate:"2026-07-29", eventDay:"Wednesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-j-alvarez-2026-07-30": {
+    eventName:"J ALVAREZ", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Reggaeton","Latin Urban"], artists:["J Alvarez"],
+    eventDate:"2026-07-30", eventDay:"Thursday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-demon-time-2026-07-31": {
+    eventName:"DEMON TIME", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Hip Hop","Open Format"], artists:["Resident DJs"],
+    eventDate:"2026-07-31", eventDay:"Friday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-pure-shoko-2026-08-01": {
+    eventName:"PURE SHÔKO", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["House","Open Format"], artists:["Resident DJs"],
+    eventDate:"2026-08-01", eventDay:"Saturday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-level-up-2026-08-02": {
+    eventName:"LEVEL UP", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Urban","Open Format"], artists:["Resident DJs"],
+    eventDate:"2026-08-02", eventDay:"Sunday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-franglish-2026-08-04": {
+    eventName:"FRANGLISH", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Hip Hop","Urban"], artists:["Franglish"],
+    eventDate:"2026-08-04", eventDay:"Tuesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-almighty-2026-08-06": {
+    eventName:"ALMIGHTY", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Reggaeton","Latin Urban"], artists:["Almighty"],
+    eventDate:"2026-08-06", eventDay:"Thursday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-gims-2026-08-11": {
+    eventName:"GIMS", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Hip Hop","Urban"], artists:["GIMS"],
+    eventDate:"2026-08-11", eventDay:"Tuesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-la-fouine-2026-08-18": {
+    eventName:"LA FOUINE", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Hip Hop","Urban"], artists:["La Fouine"],
+    eventDate:"2026-08-18", eventDay:"Tuesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-kiss-kiss-bang-bang-2026-08-25": {
+    eventName:"KISS KISS BANG BANG", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Urban","Open Format"], artists:["Resident DJs"],
+    eventDate:"2026-08-25", eventDay:"Tuesday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
+  },
+  "shoko-yomo-2026-09-10": {
+    eventName:"YOMO", locationId:"shoko-barcelona-spain",
+    country:"Spain", region:"Catalonia", city:"Barcelona",
+    genres:["Reggaeton","Latin Urban"], artists:["YOMO"],
+    eventDate:"2026-09-10", eventDay:"Thursday", eventTime:"Late", active:true,
+    ticketUrl:"https://shoko.biz/"
   },
   "chrystie-friday-night": {
     eventName:"Chrystie Cannes Friday Night", locationId:"chrystie-cannes-france",
@@ -649,10 +758,10 @@ window.SHOUTOUT_EVENTS = {
     ticketUrl:"#"
   },
   "shoko-beach-night": {
-    eventName:"Shôko Barcelona Beach Night", locationId:"shoko-barcelona-beach-club-spain",
+    eventName:"Shôko Barcelona Beach Night", locationId:"shoko-barcelona-spain",
     country:"Spain", region:"Catalonia", city:"Barcelona",
     genres:["Hip Hop","House","Reggaeton"], artists:["Resident DJs"],
-    eventDate:"Recurring Weekly", eventDay:"Thursday", eventTime:"23:55-06:00", active:true,
+    eventDate:"Recurring Weekly", eventDay:"Thursday", eventTime:"23:55-06:00", active:false,
     ticketUrl:"#"
   },
   "club-space-saturday-afterhours": {
