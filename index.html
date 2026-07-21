@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.17"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.32"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.14"/>
 </head>
 <body>
@@ -378,11 +378,23 @@
     <div class="splash-wrap">
       <div class="splash-card">
         <button id="backFromAdBtn" type="button">← Back to categories</button>
-        <p class="eyebrow">Screen 3A — Sponsored Message</p>
-        <div id="adImageSlot" class="ad-image-slot"></div>
-        <h1 id="adTitle">Advertise Here</h1>
-        <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
-        <div id="adBadge" class="ad-badge">FLOQR Media Slot</div>
+        <p class="eyebrow">Screen 3A — ShoutOut Splash</p>
+        <div class="splash-logo-row">
+          <div id="splashClubLogoWrap" class="splash-logo-wrap">
+            <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
+            <div id="splashClubLogoFallback" class="hero-logo-fallback splash-fallback-logo">CLUB</div>
+          </div>
+          <div id="splashFloqrLogoWrap" class="splash-logo-wrap">
+            <img src="./images/floqr-color.png" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
+            <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
+          </div>
+        </div>
+        <h1 id="adTitle">Get Ready</h1>
+        <p id="adBody" class="sub">Your shoutout is almost live.</p>
+        <div class="splash-statement-stack">
+          <p id="splashStatementPrimary" class="splash-statement">Powered by Papi</p>
+          <p id="splashStatementSecondary" class="splash-statement">and Social OS</p>
+        </div>
         <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
         <button id="skipAdBtn" class="ghost" type="button">Skip</button>
       </div>
@@ -619,7 +631,7 @@
 <script src="./intent-search.js?v=29.09.14"></script>
 <script src="./global-profile-status.js?v=29.09.14"></script>
 <script src="./floqr-i18n.js?v=29.09.14"></script>
-<script src="./shared-data.js?v=29.09.22"></script>
+<script src="./shared-data.js?v=29.09.32"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.14"></script>
@@ -636,7 +648,7 @@
 <script src="./floqr-identity.js?v=29.09.14"></script>
 <script src="./floqr-logger.js?v=29.09.14"></script>
 <script src="./payment-service.js?v=29.09.14"></script>
-<script src="./patron-app.js?v=29.09.17"></script>
+<script src="./patron-app.js?v=29.09.32"></script>
 <script src="./ai-assistant-ui.js?v=29.09.14"></script>
 <script src="./ai-media-service.js?v=29.09.14"></script>
 <script src="./notification-center.js?v=29.09.14"></script>

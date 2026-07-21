@@ -409,6 +409,7 @@
     if (!wrap) return;
     const query = String(byId("clubTemplateBackgroundSearch")?.value || "").trim().toLowerCase();
     const formats = publicClubProfile.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const assignedIds = new Set(publicClubProfile.templates || loc.templates || []);
     const rows = Object.values(clubTemplates)
       .filter(template => String(template.status || "active") === "active")
       .filter(template => (template.screenFormatIds || formats).some(id => formats.includes(id)))
@@ -417,15 +418,54 @@
     wrap.innerHTML = rows.map(template => {
       const editable = template.backgroundEditable !== false;
       const count = clubTemplateVariants.filter(variant => variant.baseTemplateId === template.id && String(variant.status || "active") === "active").length;
+      const assigned = assignedIds.has(template.id) || (template.venueIds || []).includes(locationId);
       return `<article class="template ${esc(template.className || "neon")}">
         <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
         <div class="name">${esc(template.name || template.id)}</div>
         <div class="tag">${editable ? "Editable background" : "Background locked by Master Admin"}</div>
-        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span></div>
-        ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
+        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
+        <div class="queue-actions">
+          ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
+          ${assigned ? `<button type="button" data-club-template-remove="${esc(template.id)}">Remove template</button>` : `<button type="button" data-club-template-assign="${esc(template.id)}">Assign template</button>`}
+        </div>
       </article>`;
     }).join("") || '<p class="sub">No compatible templates matched.</p>';
     wrap.querySelectorAll("[data-club-template-customize]").forEach(button => button.addEventListener("click", () => openClubTemplateStudio(button.dataset.clubTemplateCustomize)));
+    wrap.querySelectorAll("[data-club-template-remove]").forEach(button => button.addEventListener("click", () => removeTemplateFromClub(button.dataset.clubTemplateRemove)));
+    wrap.querySelectorAll("[data-club-template-assign]").forEach(button => button.addEventListener("click", () => assignTemplateToClub(button.dataset.clubTemplateAssign)));
+  }
+
+  async function removeTemplateFromClub(templateId = "") {
+    const id = String(templateId || "").trim();
+    if (!id) return;
+    const current = new Set(publicClubProfile.templates || loc.templates || []);
+    if (!current.has(id)) return;
+    current.delete(id);
+    const next = Array.from(current);
+    await db.collection("clubLocations").doc(locationId).set({
+      templates:next,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedByUid:auth.currentUser?.uid || ""
+    }, {merge:true});
+    publicClubProfile.templates = next;
+    setText("clubTemplateBackgroundStatus", `Removed ${id} from this club's template list.`);
+    await loadClubTemplateControls();
+  }
+
+  async function assignTemplateToClub(templateId = "") {
+    const id = String(templateId || "").trim();
+    if (!id) return;
+    const current = new Set(publicClubProfile.templates || loc.templates || []);
+    current.add(id);
+    const next = Array.from(current);
+    await db.collection("clubLocations").doc(locationId).set({
+      templates:next,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedByUid:auth.currentUser?.uid || ""
+    }, {merge:true});
+    publicClubProfile.templates = next;
+    setText("clubTemplateBackgroundStatus", `Assigned ${id} to this club.`);
+    await loadClubTemplateControls();
   }
 
   function renderClubTemplateVariants() {

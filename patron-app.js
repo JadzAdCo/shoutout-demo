@@ -415,20 +415,45 @@
 
   function showAdSplash(type, nextFn) {
     pendingCategoryAfterAd = nextFn;
-    const ad = window.FLOQRAdCampaigns?.pickCampaign?.(type, cachedUserProfile || {}) || AD_CONTENT[type] || AD_CONTENT.default;
-    setText("adTitle", ad.title);
-    setText("adBody", ad.body);
-    setText("adBadge", ad.badge);
-    const adImageSlot = byId("adImageSlot");
-    if (adImageSlot) {
-      adImageSlot.innerHTML = `<img src="${ad.image || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20900%20520%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20x2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ff64d8%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23dfff5a%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Crect%20width%3D%22900%22%20height%3D%22520%22%20rx%3D%2244%22%20fill%3D%22%2309091c%22/%3E%0A%3Ccircle%20cx%3D%22170%22%20cy%3D%22110%22%20r%3D%22155%22%20fill%3D%22%23ff64d8%22%20opacity%3D%22.20%22/%3E%0A%3Ccircle%20cx%3D%22730%22%20cy%3D%22385%22%20r%3D%22185%22%20fill%3D%22%23dfff5a%22%20opacity%3D%22.20%22/%3E%0A%3Crect%20x%3D%22245%22%20y%3D%22135%22%20width%3D%22410%22%20height%3D%22240%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%2214%22/%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22245%22%20fill%3D%22%23fff%22%20font-size%3D%2256%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22900%22%3EADVERTISE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22310%22%20fill%3D%22%23dfff5a%22%20font-size%3D%2230%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22800%22%3EHERE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22450%22%20fill%3D%22%23c9cee5%22%20font-size%3D%2224%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%3ESponsored%20FLOQR%20Media%20Slot%3C/text%3E%0A%3C/svg%3E'}" alt="${ad.title} advertisement">`;
+    const activeLocation = getLocation?.() || {};
+    const clubName = activeLocation.locationName || activeLocation.brandName || "Club";
+    const clubLogoUrl = activeLocation.logoUrl || activeLocation.clubLogoUrl || "";
+    setText("adTitle", clubName);
+    setText("adBody", "Your shoutout goes live after this splash.");
+    const clubLogo = byId("splashClubLogo");
+    const clubLogoFallback = byId("splashClubLogoFallback");
+    if (clubLogo) {
+      if (clubLogoUrl) {
+        clubLogo.src = clubLogoUrl;
+        clubLogo.onerror = () => {
+          clubLogo.classList.add("hidden");
+          if (clubLogoFallback) {
+            clubLogoFallback.textContent = String(clubName || "Club").slice(0, 24).toUpperCase();
+            clubLogoFallback.classList.remove("hidden");
+          }
+        };
+        clubLogo.classList.remove("hidden");
+        clubLogoFallback?.classList.add("hidden");
+      } else {
+        clubLogo.classList.add("hidden");
+        if (clubLogoFallback) {
+          clubLogoFallback.textContent = String(clubName || "Club").slice(0, 24).toUpperCase();
+          clubLogoFallback.classList.remove("hidden");
+        }
+      }
     }
+    const statementPrimary = byId("splashStatementPrimary");
+    const statementSecondary = byId("splashStatementSecondary");
+    statementPrimary?.classList.remove("is-hidden");
+    statementSecondary?.classList.remove("is-hidden");
     let remaining = 10;
     setText("adCountdown", String(remaining));
     showPage("adSplashPage");
     clearInterval(adTimer);
     adTimer = setInterval(() => {
       remaining -= 1;
+      if (remaining <= 6) statementPrimary?.classList.add("is-hidden");
+      if (remaining <= 3) statementSecondary?.classList.add("is-hidden");
       setText("adCountdown", String(Math.max(remaining, 0)));
       if (remaining <= 0) {
         clearInterval(adTimer);
@@ -2413,8 +2438,11 @@
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const discoveryQuery = query || templateContextQuery();
     const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const location = getLocation() || {};
     const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
-    const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...venueSpecificIds, ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
+    const standardTemplateIds = location.restrictTemplatesToLocationSet ? [] : (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []);
+    const alwaysInclude = location.restrictTemplatesToLocationSet ? [] : ["blackwhite"];
+    const ids = Array.from(new Set([...alwaysInclude, ...(location.templates || []), ...venueSpecificIds, ...standardTemplateIds]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id) && window.FLOQRTextLayout?.resolve?.(record.data, id)?.supported !== false));
     const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");

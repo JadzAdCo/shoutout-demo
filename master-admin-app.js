@@ -800,7 +800,7 @@
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
       <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
-      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button></div>
+      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button><button type="button" data-template-delete="${esc(template.id)}">Delete</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
     wrap.querySelectorAll("[data-template-preview]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templatePreview] || {})));
@@ -810,6 +810,17 @@
       const status = template.status === "deleted" ? "active" : "deleted";
       await db.collection("templates").doc(button.dataset.templateToggle).set({status, updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedByUid:auth.currentUser?.uid || ""}, {merge:true});
       setText("templateManagementStatus", `${template.name || template.id} is now ${status}.`);
+      await loadManagedTemplates();
+    }));
+    wrap.querySelectorAll("[data-template-delete]").forEach(button => button.addEventListener("click", async () => {
+      const template = managedTemplates[button.dataset.templateDelete] || {};
+      await db.collection("templates").doc(button.dataset.templateDelete).set({
+        status:"deleted",
+        deletedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedByUid:auth.currentUser?.uid || ""
+      }, {merge:true});
+      setText("templateManagementStatus", `${template.name || template.id} deleted.`);
       await loadManagedTemplates();
     }));
   }
