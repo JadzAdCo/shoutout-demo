@@ -328,30 +328,26 @@
 }
 .display-canvas.frame-overlay-template .display-compose-slot{
   position:relative;
-  width:min(94vw,1180px);
-  aspect-ratio:16/9;
-  max-height:58vh;
-  margin:0 auto;
-  flex:0 0 auto;
+  width:100%;
+  height:100%;
 }
 .display-canvas.frame-overlay-template .display-frame-overlay{
   position:absolute;
-  inset:0;
+  inset:6.2% 7.5% 22.94%;
   z-index:2;
   pointer-events:none;
   background-position:center;
   background-repeat:no-repeat;
-  background-size:contain;
+  background-size:100% 100%;
 }
 .display-canvas.text-overlay-template .display-center{
-  position:absolute!important;
+  position:relative!important;
   z-index:3!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
+  width:100vw!important;
+  height:100vh!important;
   max-width:none!important;
   min-height:0!important;
-  padding:0!important;
+  padding:clamp(6px,1.4vw,14px)!important;
   margin:0!important;
   display:block!important;
   background:transparent!important;
@@ -367,10 +363,10 @@
 .display-canvas.frame-overlay-template #displayMain.text-overlay-main{
   position:absolute!important;
   z-index:3!important;
-  left:9.5%!important;
-  right:9.5%!important;
-  top:18%!important;
-  bottom:24%!important;
+  left:9%!important;
+  right:9%!important;
+  top:10.9%!important;
+  bottom:27.62%!important;
   max-width:none!important;
   margin:0!important;
   padding:0 clamp(8px,1.2vw,16px)!important;
@@ -456,17 +452,15 @@
 }
 .display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template .display-compose-slot,
 .display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template .display-compose-slot{
-  width:92vw;
-  max-height:none;
-  height:46vh;
-  margin-top:6vh;
+  width:100%;
+  height:100%;
 }
 .display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template #displayMain.text-overlay-main,
 .display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template #displayMain.text-overlay-main{
-  left:10%!important;
-  right:10%!important;
-  top:19%!important;
-  bottom:25%!important;
+  left:9%!important;
+  right:9%!important;
+  top:10.9%!important;
+  bottom:27.62%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template .text-overlay-lines b,
 .display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template .text-overlay-lines b{
