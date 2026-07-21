@@ -1,4 +1,4 @@
-/* display-app.js v29.09.31 */
+/* display-app.js v29.09.37 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -166,7 +166,7 @@
 
   function classicIdentityPresentation(subText) {
     const supplied = glyphSlice(cleanBoardText(subText), 0, 20);
-    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR SHOUTOUT"), 0, 20) || "FLOQR SHOUTOUT";
+    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR ShoutOut"), 0, 20) || "FLOQR ShoutOut";
     return {
       supplied:!!supplied,
       kicker:supplied ? "FROM" : "PRESENTED BY",
@@ -212,9 +212,22 @@
     return String(data.frameOverlayUrl || template.defaultFrameOverlayUrl || "").trim();
   }
 
-  function applyFrameOverlay(frameEl, frameUrl = "") {
+  function applyFrameOverlay(frameEl, frameUrl = "", template = {}) {
     if (!frameEl) return false;
     const url = String(frameUrl || "").trim();
+    const useCssHeistFrame = template.frameOverlay === true
+      || template.frameOverlayStyle === "css-heist"
+      || (!!url && /heist-text-frame-overlay/i.test(url))
+      || String(template.id || "").startsWith("heist");
+    // Never paint the old checkerboard PNG — Heist frames are CSS-only (true transparent center).
+    if (useCssHeistFrame) {
+      frameEl.className = "display-frame-overlay display-frame-overlay-css-heist";
+      frameEl.style.backgroundImage = "";
+      frameEl.style.backgroundSize = "";
+      frameEl.style.backgroundPosition = "";
+      frameEl.style.backgroundRepeat = "";
+      return true;
+    }
     if (!url) {
       frameEl.className = "display-frame-overlay hidden";
       frameEl.style.backgroundImage = "";
@@ -222,29 +235,143 @@
     }
     frameEl.className = "display-frame-overlay";
     frameEl.style.backgroundImage = `url("${url.replace(/"/g, "%22")}")`;
-    frameEl.style.backgroundSize = "contain";
+    frameEl.style.backgroundSize = "100% 100%";
     frameEl.style.backgroundPosition = "center";
     frameEl.style.backgroundRepeat = "no-repeat";
     return true;
   }
 
+  function heistIdentityMessages(template = {}) {
+    const custom = Array.isArray(template.identityMessages) ? template.identityMessages.filter(Boolean) : [];
+    if (custom.length) return custom.map(String);
+    return ["$Caught in HEISTS", "Powered by FloqR Social OS"];
+  }
+
+  function stopHeistIdentityCycle() {
+    if (window.__floqrHeistIdentityTimer) {
+      window.clearInterval(window.__floqrHeistIdentityTimer);
+      window.__floqrHeistIdentityTimer = null;
+    }
+  }
+
+  function renderHeistIdentityRail(template = {}, patronSubText = "") {
+    stopHeistIdentityCycle();
+    const sub = byId("displaySub");
+    if (!sub) return;
+    const supplied = glyphSlice(cleanBoardText(patronSubText), 0, 28);
+    sub.classList.remove("classic-bw-sub-hidden", "text-overlay-identity");
+    sub.classList.add("classic-bw-identity", "heist-identity-rail");
+    if (supplied) {
+      sub.classList.add("has-attribution");
+      sub.classList.remove("uses-brand-fallback");
+      sub.setAttribute("aria-label", `FROM ${supplied}`);
+      sub.innerHTML = `<span class="classic-identity-shell"><small>FROM</small><strong>${esc(supplied)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      return;
+    }
+    const messages = heistIdentityMessages(template);
+    let index = 0;
+    const paint = () => {
+      const value = messages[index % messages.length] || "FLOQR ShoutOut";
+      sub.classList.add("uses-brand-fallback");
+      sub.classList.remove("has-attribution");
+      sub.setAttribute("aria-label", value);
+      const shell = sub.querySelector(".classic-identity-shell strong");
+      if (shell) {
+        shell.textContent = value;
+        const wrap = sub.querySelector(".classic-identity-shell");
+        if (wrap) {
+          wrap.style.animation = "none";
+          void wrap.offsetWidth;
+          wrap.style.animation = "";
+        }
+      } else {
+        sub.innerHTML = `<span class="classic-identity-shell"><small></small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      }
+      index += 1;
+    };
+    paint();
+    // Swap phrase mid-cycle, then let classic 20s burst animation explode the rail.
+    window.__floqrHeistIdentityTimer = window.setInterval(paint, 7000);
+  }
+
+  function urlSearchParams() {
+    try { return new URL(window.location.href).searchParams; }
+    catch (error) { return new URLSearchParams(); }
+  }
+
+  function urlHasParam(name = "") {
+    return urlSearchParams().has(String(name || ""));
+  }
+
+  function isUrlPreviewMode() {
+    const params = urlSearchParams();
+    return params.has("template")
+      || params.has("main")
+      || params.has("backgroundUrl")
+      || params.has("backgroundColor")
+      || params.has("backgroundGradient")
+      || params.get("preview") === "1";
+  }
+
+  function buildUrlPreviewPayload() {
+    const params = urlSearchParams();
+    const templateId = String(params.get("template") || "neon").trim();
+    const baseTemplate = templates[templateId] || templates.neon || {};
+    const isOverlay = isTextOverlayTemplate(baseTemplate, templateId);
+    let mainText = "";
+    if (params.has("main")) mainText = params.get("main") || "";
+    else if (!isOverlay) mainText = clubDefaultMainText(loc);
+    return {
+      mainText,
+      subText: params.get("sub") || "",
+      template: templateId,
+      mediaUrl: params.get("media") || "",
+      mediaType: params.get("mediaType") || "",
+      mediaFit: params.get("mediaFit") || "contain",
+      screenFormatId: screenFormatOverride || params.get("screenFormatId") || "",
+      selectedMediaVersion: params.get("selectedMediaVersion") || "",
+      trimStart: params.get("trimStart") || "",
+      trimEnd: params.get("trimEnd") || "",
+      trimmedDuration: params.get("trimmedDuration") || "",
+      backgroundUrl: params.get("backgroundUrl") || "",
+      backgroundColor: params.get("backgroundColor") || "",
+      backgroundGradient: params.get("backgroundGradient") || "",
+      teamMembers: qsJson("teamMembers", []),
+      stadiumMessage: params.get("stadiumMessage") || "",
+      animationDurationSeconds: 20,
+      locationName: loc.locationName,
+      status: "preview"
+    };
+  }
+
   function clubDefaultMainText(location = {}) {
     const configured = String(location.defaultMain || "").trim();
-    if (configured) return configured.replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    if (configured) return configured.replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const clubName = String(location.locationName || location.brandName || "THIS CLUB")
       .replace(/\s+x\s+FLOQR.*$/i, "")
       .trim()
       .toUpperCase();
-    return `USE SHOUTOUT @ ${clubName}`;
+    return `USE ShoutOut @ ${clubName}`;
   }
 
   function defaultClubDisplayPayload() {
+    const previewTemplate = String(urlSearchParams().get("template") || "").trim();
+    const previewMeta = previewTemplate ? templates[previewTemplate] : null;
+    if (previewTemplate && isTextOverlayTemplate(previewMeta || {}, previewTemplate)) {
+      return {
+        locationName: loc.locationName,
+        mainText: urlHasParam("main") ? (urlSearchParams().get("main") || "") : "",
+        subText: "",
+        template: previewTemplate,
+        status: "preview"
+      };
+    }
     return {
-      locationName:loc.locationName,
-      mainText:clubDefaultMainText(loc),
-      subText:"",
-      template:"blackwhite",
-      status:"default"
+      locationName: loc.locationName,
+      mainText: clubDefaultMainText(loc),
+      subText: "",
+      template: previewTemplate || "blackwhite",
+      status: "default"
     };
   }
 
@@ -479,7 +606,7 @@
     const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient });
     canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
     const frameUrl = resolveFrameOverlayUrl(t, data);
-    const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "");
+    const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);
     canvas.classList.toggle("frame-overlay-template", hasFrameOverlay);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
@@ -540,10 +667,16 @@
         : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
       byId("displayMain").classList.add("text-overlay-main");
       byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
-      byId("displaySub").removeAttribute("aria-label");
-      byId("displaySub").innerHTML = "";
+      if (t.identityRail !== false) {
+        renderHeistIdentityRail(t, subText);
+      } else {
+        stopHeistIdentityCycle();
+        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
+        byId("displaySub").removeAttribute("aria-label");
+        byId("displaySub").innerHTML = "";
+      }
     } else if (isClassicBoard) {
+      stopHeistIdentityCycle();
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("classic-bw-board");
@@ -552,6 +685,7 @@
       byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
       byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     } else {
+      stopHeistIdentityCycle();
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");
@@ -581,7 +715,7 @@
           ...live,
           primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
           displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
-          displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR SHOUTOUT",
+          displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
           ledPanel: live.ledPanel || loc.ledPanel
         };
       }
@@ -589,33 +723,18 @@
     if (!screenFormatOverride) {
       screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "");
     }
-    const hasQueryRenderOverride =
-      !!qs("main","")
-      || !!qs("template","")
-      || !!qs("backgroundUrl","")
-      || !!qs("backgroundColor","")
-      || !!qs("backgroundGradient","");
-    if (hasQueryRenderOverride) {
-      render({
-        mainText: qs("main"),
-        subText: qs("sub"),
-        template: qs("template","neon"),
-        mediaUrl: qs("media",""),
-        mediaType: qs("mediaType",""),
-        mediaFit: qs("mediaFit","contain"),
-        screenFormatId: screenFormatOverride || qs("screenFormatId",""),
-        selectedMediaVersion: qs("selectedMediaVersion",""),
-        trimStart: qs("trimStart",""),
-        trimEnd: qs("trimEnd",""),
-        trimmedDuration: qs("trimmedDuration",""),
-        backgroundUrl: qs("backgroundUrl",""),
-        backgroundColor: qs("backgroundColor",""),
-        backgroundGradient: qs("backgroundGradient",""),
-        teamMembers: qsJson("teamMembers", []),
-        stadiumMessage:qs("stadiumMessage",""),
-        animationDurationSeconds:20,
-        locationName: loc.locationName
-      });
+    if (isUrlPreviewMode()) {
+      render(buildUrlPreviewPayload());
+      db.collection("liveContent").doc(locationId).onSnapshot(doc => {
+        if (!doc.exists) return;
+        const data = doc.data() || {};
+        const status = String(data.status || "").toLowerCase();
+        const hasLiveMessage = !!(String(data.mainText || "").trim() || data.mediaUrl);
+        if (status === "approved" && hasLiveMessage) {
+          if (screenFormatOverride && !data.screenFormatId) data.screenFormatId = screenFormatOverride;
+          renderTimedLiveContent(data);
+        }
+      }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
       return;
     }
     db.collection("liveContent").doc(locationId).onSnapshot(doc => {

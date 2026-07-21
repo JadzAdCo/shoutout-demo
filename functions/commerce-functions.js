@@ -23,11 +23,11 @@ const COMMERCE_RESERVATION_SECONDS = 31 * 60;
 const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
 const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
 const HEIST_DC_LOCATION_ID = "heist-washington-dc";
-const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
-const HEIST_ART_PRICE_CENTS = 4000;
+const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
+const HEIST_ART_PRICE_CENTS = 3000;
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "p125-96x48":[3,16,48,28],"p125-64x48":[3,10,30,22],"p125-64x32":[3,14,42,24],
@@ -1463,11 +1463,11 @@ exports.expireLiveShoutouts = onSchedule({
   expired.docs.forEach(doc => {
     const data = doc.data() || {};
     const clubName = text(data.locationName || data.brandName || doc.id, 80).toUpperCase();
-    const configuredDefault = text(data.defaultMain, 45).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const configuredDefault = text(data.defaultMain, 45).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     batch.set(doc.ref, {
       template:"blackwhite",
       templateName:"Traditional Black and White ShoutOut",
-      mainText:configuredDefault || `USE SHOUTOUT @ ${clubName}`,
+      mainText:configuredDefault || `USE ShoutOut @ ${clubName}`,
       subText:"",
       mediaUrl:"",
       mediaType:"",

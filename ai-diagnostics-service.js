@@ -32,6 +32,8 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
+  const PREVIEW_LINKS_PACKAGE = "29.09.37";
+  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
@@ -5599,10 +5601,68 @@
     });
   }
 
+  function buildPreviewLinksPayload(note = "") {
+    const base = "https://jadzadco.github.io/shoutout-demo";
+    const v = PREVIEW_LINKS_PACKAGE;
+    return {
+      package: v,
+      note: note || `FLOQR v${v} — open on iPhone after this deploy.`,
+      links: [
+        ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
+        ["Shôko Club Admin — public profile + logo upload", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
+        ["Shôko stable display URL (no ?v=)", `${base}/display.html?location=shoko-barcelona-spain`],
+        ["Heist DC Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
+        ["Locked Up (Jail Bars)", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
+        ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
+        ["I Aint No Snitch", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=${v}`],
+        ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
+        ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
+        ["Mobile test checklist", `${base}/mobile-test-checklist.html?v=${v}`],
+        ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
+      ]
+    };
+  }
+
+  async function emailPreviewLinksToMobile() {
+    const statusId = "diagnosticsStatus";
+    const user = state.auth?.currentUser;
+    const payload = buildPreviewLinksPayload();
+    setText(statusId, "Sending mobile preview links to your email…");
+    try {
+      if (user && firebase.app().functions) {
+        const callable = firebase.app().functions("us-central1").httpsCallable("sendFloqrPreviewLinksEmail");
+        const result = await callable({
+          package: payload.package,
+          note: payload.note,
+          links: payload.links,
+          to: user.email || ""
+        });
+        const data = result?.data || {};
+        setText(statusId, `Preview links emailed to ${data.to || user.email || "your inbox"} (${data.links || payload.links.length} links, v${data.package || payload.package}).`);
+        return data;
+      }
+      const response = await fetch(PREVIEW_LINKS_HTTP, {
+        method: "POST",
+        headers: {"content-type": "application/json"},
+        body: JSON.stringify({...payload, to: "bans.don@gmail.com"})
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || `Email request failed (${response.status})`);
+      setText(statusId, `Preview links emailed to ${data.to} (${data.links} links, v${data.package}).`);
+      return data;
+    } catch (error) {
+      setText(statusId, `Preview link email failed: ${error?.message || error}`);
+      throw error;
+    }
+  }
+
   function bindControls() {
     byId("diagnosticsRefreshBtn")?.addEventListener("click", refreshDiagnostics);
     byId("runFeatureDiagnosticsBtn")?.addEventListener("click", runFeatureDiagnostics);
     byId("exportDiagnosticsTxtBtn")?.addEventListener("click", exportDiagnosticsReport);
+    byId("emailPreviewLinksBtn")?.addEventListener("click", () => {
+      emailPreviewLinksToMobile().catch(error => setText("diagnosticsStatus", error?.message || String(error)));
+    });
     byId("copyManualFeatureOutputBtn")?.addEventListener("click", copyManualFeatureOutput);
     byId("downloadManualFeatureOutputBtn")?.addEventListener("click", downloadManualFeatureOutput);
     byId("archivePassedManualFeatureTestsBtn")?.addEventListener("click", archivePassedManualFeatureTests);
