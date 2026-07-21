@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heist Background Art — Capture Theme Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #f5f5f5;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid #2a2a2a;
+      position: sticky;
+      top: 0;
+      background: rgba(10, 10, 10, 0.95);
+      z-index: 10;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 600; }
+    header p {
+      margin-top: 0.35rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      max-width: 46rem;
+      line-height: 1.45;
+    }
+    main {
+      display: grid;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #111;
+    }
+    .card-head {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #222;
+    }
+    .card-head h2 { font-size: 0.95rem; font-weight: 600; }
+    .card-head p {
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+      color: #999;
+    }
+    .card-head code {
+      font-size: 0.72rem;
+      color: #777;
+    }
+    .frame {
+      aspect-ratio: 16 / 9;
+      background: #000 center / cover no-repeat;
+      margin: 1rem;
+      border-radius: 6px;
+      border: 1px solid #222;
+    }
+    .frame.portrait {
+      aspect-ratio: 9 / 16;
+      max-width: 280px;
+    }
+    .sizes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 0 1rem 1rem;
+    }
+    @media (min-width: 900px) {
+      .sizes { grid-template-columns: 1fr auto; align-items: start; }
+    }
+    .size-label {
+      font-size: 0.68rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 1rem 0.35rem;
+    }
+    .note {
+      margin: 0 1.5rem 1.5rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #bbb;
+      background: #141414;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Heist-inspired backgrounds — capture theme</h1>
+    <p>
+      Art only. Heist-inspired = aftermath: jailed, cuffed, transported, processed.
+      Prison bars, police car, interrogation, courthouse — not vaults or neon masks.
+      Templates are <strong>not</strong> wired until you approve.
+    </p>
+  </header>
+  <main id="gallery"></main>
+  <script>
+    const scenes = [
+      {
+        id: 'jailBars',
+        name: 'Jail Bars',
+        file: 'heist-jail-bars.png',
+        hook: 'Steel bars, concrete cell, harsh overhead light'
+      },
+      {
+        id: 'policeCar',
+        name: 'Police Car Back Seat',
+        file: 'heist-police-car.png',
+        hook: 'Cuffs on door, mesh divider, red-blue cruiser lights'
+      },
+      {
+        id: 'interrogation',
+        name: 'Interrogation Room',
+        file: 'heist-interrogation.png',
+        hook: 'Metal table, handcuffs, one-way mirror, bare bulb'
+      },
+      {
+        id: 'courthouseNight',
+        name: 'Courthouse Night',
+        file: 'heist-courthouse-night.png',
+        hook: 'Rain-slick steps, fence, distant siren glow'
+      }
+    ];
+
+    document.getElementById('gallery').innerHTML = scenes.map(function (s) {
+      var url = './images/heist/' + s.file;
+      return [
+        '<article class="card" id="' + s.id + '">',
+        '  <div class="card-head">',
+        '    <h2>' + s.name + '</h2>',
+        '    <p>' + s.hook + '</p>',
+        '    <code>' + s.file + '</code>',
+        '  </div>',
+        '  <div class="size-label">Landscape (LED / display)</div>',
+        '  <div class="frame" style="background-image:url(\'' + url + '\')"></div>',
+        '  <div class="sizes">',
+        '    <div class="size-label">Portrait crop (phone)</div>',
+        '    <div class="frame portrait" style="background-image:url(\'' + url + '\')"></div>',
+        '  </div>',
+        '</article>'
+      ].join('');
+    }).join('');
+  </script>
+</body>
+</html>
