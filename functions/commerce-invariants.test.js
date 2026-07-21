@@ -109,11 +109,16 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
 
 test("Heist identity rail cycles optional handle then brand lines for 3s each", () => {
   assert.match(displayApp, /renderHeistIdentityRail/);
-  assert.match(displayApp, /Caught in HEISTS/);
+  assert.match(displayApp, /Caught in a HEIST/);
   assert.match(displayApp, /Powered by FloqR Social OS/);
   assert.match(displayApp, /kicker: "FROM"/);
+  assert.match(displayApp, /scheduleHeistMessageThenBrandSlide/);
+  assert.match(displayApp, /showHeistBrandSlide/);
+  assert.match(displayApp, /HEIST_MESSAGE_SECONDS = 20/);
   assert.match(displayCss, /heistIdentityShellBurst 3s/);
+  assert.match(displayCss, /heist-brand-slide/);
   assert.match(sharedData, /identityAnimationSeconds:3/);
+  assert.match(sharedData, /messageDurationSeconds:20/);
 });
 
 test("all published templates have display-aware text contracts", () => {
