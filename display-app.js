@@ -1,4 +1,4 @@
-/* display-app.js v29.09.21 */
+/* display-app.js v29.09.29 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -172,6 +172,40 @@
       kicker:supplied ? "FROM" : "PRESENTED BY",
       value:supplied || brandFallback
     };
+  }
+
+  function isTextOverlayTemplate(template = {}, templateId = "") {
+    return template.textOverlay === true || String(templateId || template.id || "").startsWith("heist");
+  }
+
+  function resetBackgroundLayer(bgEl) {
+    if (!bgEl) return;
+    bgEl.className = "display-background";
+    bgEl.style.backgroundImage = "";
+    bgEl.style.background = "";
+    bgEl.style.backgroundSize = "";
+    bgEl.style.backgroundPosition = "";
+    bgEl.style.backgroundRepeat = "";
+  }
+
+  function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "" } = {}) {
+    resetBackgroundLayer(bgEl);
+    if (backgroundUrl) {
+      bgEl.style.backgroundImage = `url("${String(backgroundUrl).replace(/"/g, "%22")}")`;
+      bgEl.style.backgroundSize = "cover";
+      bgEl.style.backgroundPosition = "center";
+      bgEl.style.backgroundRepeat = "no-repeat";
+      return true;
+    }
+    if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) {
+      bgEl.style.background = backgroundGradient;
+      return true;
+    }
+    if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) {
+      bgEl.style.background = backgroundColor;
+      return true;
+    }
+    return false;
   }
 
   function clubDefaultMainText(location = {}) {
@@ -386,6 +420,7 @@
     const baseTemplate = templates[templateId] || templates.neon || {};
     const t = {...baseTemplate, className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
     const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
+    const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const screenFormatId = String(
       data.screenFormatId
@@ -410,7 +445,8 @@
     const canvas = byId("displayCanvas");
     canvas.className = "display-canvas";
     if (t.className && t.className !== "neon") canvas.classList.add(t.className);
-    if (isClassicBoard) canvas.classList.add("classic-board-template");
+    if (isClassicBoard && !isTextOverlay) canvas.classList.add("classic-board-template");
+    if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
     canvas.dataset.textProfile = textCaps.profileId || "custom";
@@ -419,18 +455,13 @@
     const backgroundGradient = data.backgroundGradient || "";
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
     canvas.classList.toggle("custom-background-active", hasCustomBackground);
+    const bgEl = byId("displayBackground");
+    const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient });
+    canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
     canvas.style.backgroundSize = "";
     canvas.style.backgroundPosition = "";
-    if (backgroundUrl) {
-      canvas.style.backgroundImage = `linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.45)), url("${backgroundUrl.replace(/"/g, "%22")}")`;
-      canvas.style.backgroundSize = "cover";
-      canvas.style.backgroundPosition = "center";
-      canvas.style.backgroundRepeat = "no-repeat";
-    }
-    else if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) canvas.style.background = backgroundGradient;
-    else if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) canvas.style.background = backgroundColor;
     const staleZebbiesDefault = value => {
       const text = String(value || "").toUpperCase().replace(/\s+/g, " ").trim();
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
@@ -478,7 +509,15 @@
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
     }
-    if (isClassicBoard) {
+    if (isClassicBoard && isTextOverlay) {
+      const rows = classicBoardRows(mainText, textCaps);
+      const identity = classicIdentityPresentation(subText);
+      byId("displayMain").classList.add("text-overlay-main");
+      byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
+      byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
+      byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+      byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
+    } else if (isClassicBoard) {
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("classic-bw-board");
