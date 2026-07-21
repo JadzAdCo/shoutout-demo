@@ -46,6 +46,7 @@
   let templateVariants = {mine:[], community:[], club:[]};
   let locationContextPromise = null;
   let confirmationReturnTimer = null;
+  let confirmationCountdownTimer = null;
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
   let approvedRecommendationLibrary = [];
@@ -1343,7 +1344,7 @@
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
       link:"./patron-portal.html?tab=inbox&v=29.09.8",
-      minglLink:"./mingl-chat.html?v=29.09.9",
+      minglLink:"./mingl-chat.html?v=29.09.33",
       read:false,
       createdAt:now
     };
@@ -2624,28 +2625,31 @@
     shoutoutPreviewTimer = setTimeout(closeShoutoutPreviewModal, isFootballTeamIntro() ? 20000 : 5000);
   }
 
-  function returnToMainFromConfirmation() {
+  function clearConfirmationTimers() {
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    if (confirmationCountdownTimer) clearInterval(confirmationCountdownTimer);
     confirmationReturnTimer = null;
+    confirmationCountdownTimer = null;
+  }
+
+  function returnToMainFromConfirmation() {
+    clearConfirmationTimers();
     showPage("categoryPage");
   }
 
   function goToMinglFromConfirmation() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
     setText("confirmationRedirectStatus", "Opening Mingl...");
     showMinglLanding();
   }
 
   function goToBartrFromConfirmation() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
-    window.location.href = "./commerce.html?v=29.09.9&from=search";
+    clearConfirmationTimers();
+    window.location.href = "./commerce.html?v=29.09.33&from=search";
   }
 
   function editSubmittedShoutout() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
     setText("confirmationRedirectStatus", "");
     goToEditor();
   }
@@ -2654,10 +2658,20 @@
     setText("confirmRef", payload.referenceNumber);
     setText("confirmClub", location.locationName);
     setText("confirmTemplate", template.name);
-    setText("confirmationRedirectStatus", "ShoutOut submitted. Choose Edit ShoutOut, Mingl, or BartR.");
+    let secondsRemaining = 15;
+    setText("confirmationCountdown", String(secondsRemaining));
+    setText("confirmationRedirectStatus", `Returning to Search in ${secondsRemaining} seconds...`);
     showPage("confirmationPage");
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
+    confirmationCountdownTimer = setInterval(() => {
+      secondsRemaining -= 1;
+      setText("confirmationCountdown", String(Math.max(secondsRemaining, 0)));
+      setText("confirmationRedirectStatus", `Returning to Search in ${Math.max(secondsRemaining, 0)} seconds...`);
+      if (secondsRemaining <= 0) {
+        returnToMainFromConfirmation();
+      }
+    }, 1000);
+    confirmationReturnTimer = setTimeout(returnToMainFromConfirmation, 15000);
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -3347,7 +3361,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9";
+      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -3367,7 +3381,7 @@
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal";
+      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -3479,7 +3493,7 @@
     bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list")));
     bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry")));
     bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry")));
-    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
+    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
@@ -3578,10 +3592,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9"}">My Profile and Settings</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33"}">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
       <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 
