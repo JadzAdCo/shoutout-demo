@@ -1,4 +1,4 @@
-/* display-app.js v29.09.37 */
+/* display-app.js v29.09.38 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -153,7 +153,7 @@
       pushWrapped(rows, words, maxRows, maxChars);
     });
 
-    return (rows.length ? rows : ["SHOUTOUT"]).slice(0, maxRows);
+    return (rows.length ? rows : [""]).slice(0, maxRows);
   }
 
   function classicBoardRows(mainText, caps = {}) {
@@ -243,8 +243,9 @@
 
   function heistIdentityMessages(template = {}) {
     const custom = Array.isArray(template.identityMessages) ? template.identityMessages.filter(Boolean) : [];
-    if (custom.length) return custom.map(String);
-    return ["$Caught in HEISTS", "Powered by FloqR Social OS"];
+    const lines = custom.length ? custom.map(String) : ["Caught in HEISTS", "Powered by FloqR Social OS"];
+    // Normalize legacy "$Caught…" copy so the dollar sign never appears on-rail.
+    return lines.map(line => String(line || "").replace(/^\$\s*/, "").trim()).filter(Boolean);
   }
 
   function stopHeistIdentityCycle() {
@@ -258,40 +259,36 @@
     stopHeistIdentityCycle();
     const sub = byId("displaySub");
     if (!sub) return;
+
+    // Optional patron attribution (display name / Mingl / Instagram). When present it
+    // leads the cycle; when absent the brand lines still run on their own.
     const supplied = glyphSlice(cleanBoardText(patronSubText), 0, 28);
+    const brandLines = heistIdentityMessages(template);
+    const queue = [];
+    if (supplied) queue.push({kicker: "FROM", value: supplied, attributed: true});
+    brandLines.forEach(value => {
+      const line = String(value || "").trim();
+      if (line) queue.push({kicker: "", value: line, attributed: false});
+    });
+    if (!queue.length) return;
+
     sub.classList.remove("classic-bw-sub-hidden", "text-overlay-identity");
     sub.classList.add("classic-bw-identity", "heist-identity-rail");
-    if (supplied) {
-      sub.classList.add("has-attribution");
-      sub.classList.remove("uses-brand-fallback");
-      sub.setAttribute("aria-label", `FROM ${supplied}`);
-      sub.innerHTML = `<span class="classic-identity-shell"><small>FROM</small><strong>${esc(supplied)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-      return;
-    }
-    const messages = heistIdentityMessages(template);
+
     let index = 0;
+    const holdSeconds = Math.max(1, Number(template.identityAnimationSeconds) || 3);
+    const HOLD_MS = Math.round(holdSeconds * 1000);
     const paint = () => {
-      const value = messages[index % messages.length] || "FLOQR ShoutOut";
-      sub.classList.add("uses-brand-fallback");
-      sub.classList.remove("has-attribution");
-      sub.setAttribute("aria-label", value);
-      const shell = sub.querySelector(".classic-identity-shell strong");
-      if (shell) {
-        shell.textContent = value;
-        const wrap = sub.querySelector(".classic-identity-shell");
-        if (wrap) {
-          wrap.style.animation = "none";
-          void wrap.offsetWidth;
-          wrap.style.animation = "";
-        }
-      } else {
-        sub.innerHTML = `<span class="classic-identity-shell"><small></small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-      }
+      const item = queue[index % queue.length];
       index += 1;
+      sub.classList.toggle("has-attribution", !!item.attributed);
+      sub.classList.toggle("uses-brand-fallback", !item.attributed);
+      sub.setAttribute("aria-label", item.kicker ? `${item.kicker} ${item.value}` : item.value);
+      const kickerHtml = item.kicker ? `<small>${esc(item.kicker)}</small>` : "";
+      sub.innerHTML = `<span class="classic-identity-shell heist-identity-shell">${kickerHtml}<strong>${esc(item.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     };
     paint();
-    // Swap phrase mid-cycle, then let classic 20s burst animation explode the rail.
-    window.__floqrHeistIdentityTimer = window.setInterval(paint, 7000);
+    window.__floqrHeistIdentityTimer = window.setInterval(paint, HOLD_MS);
   }
 
   function urlSearchParams() {
@@ -344,14 +341,20 @@
     };
   }
 
+  function markDisplayReady() {
+    document.body?.classList.remove("display-booting");
+    document.body?.classList.add("display-ready");
+  }
+
+  function stripLegacyUseShoutOutCta(value = "") {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    if (/^USE\s*SHOUT\s*OUT\b/i.test(text)) return "";
+    return text;
+  }
+
   function clubDefaultMainText(location = {}) {
-    const configured = String(location.defaultMain || "").trim();
-    if (configured) return configured.replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
-    const clubName = String(location.locationName || location.brandName || "THIS CLUB")
-      .replace(/\s+x\s+FLOQR.*$/i, "")
-      .trim()
-      .toUpperCase();
-    return `USE ShoutOut @ ${clubName}`;
+    return stripLegacyUseShoutOutCta(location.defaultMain || "");
   }
 
   function defaultClubDisplayPayload() {
@@ -361,16 +364,19 @@
       return {
         locationName: loc.locationName,
         mainText: urlHasParam("main") ? (urlSearchParams().get("main") || "") : "",
-        subText: "",
+        subText: urlSearchParams().get("sub") || "",
         template: previewTemplate,
         status: "preview"
       };
     }
+    const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
+      .map(String)
+      .find(id => id.startsWith("heist")) || "";
     return {
       locationName: loc.locationName,
-      mainText: clubDefaultMainText(loc),
+      mainText: "",
       subText: "",
-      template: previewTemplate || "blackwhite",
+      template: previewTemplate || heistIdleTemplate || "blackwhite",
       status: "default"
     };
   }
@@ -617,11 +623,13 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
-    const mainSource = isTextOverlay
+    const rawMain = isTextOverlay
       ? String(data.mainText || "")
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
+    // Never flash the legacy idle CTA on any template / venue board.
+    const mainSource = stripLegacyUseShoutOutCta(rawMain);
     const mainText = mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
-    const subText = String(data.subText || t.defaultSub || "").slice(0, subLimit);
+    const subText = String(data.subText || data.attribution || data.displayName || t.defaultSub || "").slice(0, subLimit);
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
     const mediaSlot = byId("mediaSlot");
@@ -634,10 +642,12 @@
       byId("displaySub").textContent = textCaps.advice || "Choose another display size for this template.";
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+      markDisplayReady();
       return;
     }
     if (isFootballTeamIntro && center && mediaSlot) {
       renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps});
+      markDisplayReady();
       return;
     }
     const mediaUrl = data.mediaUrl || "";
@@ -694,6 +704,7 @@
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
       byId("displaySub").textContent = subText;
     }
+    markDisplayReady();
   }
   window.renderShoutOutDisplay = render;
 

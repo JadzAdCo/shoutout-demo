@@ -1462,12 +1462,15 @@ exports.expireLiveShoutouts = onSchedule({
   const expiredAt = admin.firestore.FieldValue.serverTimestamp();
   expired.docs.forEach(doc => {
     const data = doc.data() || {};
-    const clubName = text(data.locationName || data.brandName || doc.id, 80).toUpperCase();
-    const configuredDefault = text(data.defaultMain, 45).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
+    const previousTemplate = text(data.template, 80);
+    const keepHeist = /^heist/i.test(previousTemplate);
+    // Idle boards stay blank — never flash the legacy "USE ShoutOut" CTA.
+    const configuredDefault = text(data.defaultMain, 45);
+    const idleMain = /^USE\s*SHOUT\s*OUT\b/i.test(configuredDefault) ? "" : configuredDefault;
     batch.set(doc.ref, {
-      template:"blackwhite",
-      templateName:"Traditional Black and White ShoutOut",
-      mainText:configuredDefault || `USE ShoutOut @ ${clubName}`,
+      template: keepHeist ? previousTemplate : "blackwhite",
+      templateName: keepHeist ? text(data.templateName, 120) : "Traditional Black and White ShoutOut",
+      mainText: idleMain,
       subText:"",
       mediaUrl:"",
       mediaType:"",
