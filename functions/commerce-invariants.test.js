@@ -88,19 +88,37 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
   assert.match(sharedData, /identityAnimation:'burst-away'/);
   assert.match(sharedData, /maxSubCharacters:20/);
   assert.match(displayApp, /classicIdentityPresentation/);
-  assert.match(displayApp, /FLOQR SHOUTOUT/);
+  assert.match(displayApp, /FLOQR ShoutOut/);
   assert.match(displayApp, /classic-bw-identity/);
   assert.match(displayCss, /classicIdentityShellBurst 20s/);
   assert.match(displayCss, /classicIdentityParticle 20s/);
   assert.match(indexHtml, /placeholder="Enter ShoutOut Here"/);
-  assert.match(displayApp, /template:"blackwhite"/);
-  assert.match(displayApp, /USE SHOUTOUT @/);
+  assert.match(displayApp, /heistIdleTemplate \|\| "blackwhite"/);
+  // Idle boards must not flash the legacy USE SHOUTOUT CTA.
+  assert.match(displayApp, /stripLegacyUseShoutOutCta/);
+  assert.match(displayApp, /markDisplayReady/);
+  assert.doesNotMatch(displayApp, /return `USE ShoutOut @ \$\{clubName\}`/);
   assert.match(adminApp, /template: "blackwhite"/);
   assert.match(adminApp, /displayDurationSeconds: 600/);
   assert.match(displayApp, /renderTimedLiveContent/);
   assert.match(displayApp, /DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 \* 60/);
   assert.match(backend, /exports\.expireLiveShoutouts = onSchedule/);
   assert.match(backend, /automaticTenMinuteReset/);
+  assert.match(backend, /Idle boards stay blank/);
+});
+
+test("Heist identity rail cycles optional handle then brand lines for 3s each", () => {
+  assert.match(displayApp, /renderHeistIdentityRail/);
+  assert.match(displayApp, /Caught in a HEIST/);
+  assert.match(displayApp, /Powered by FloqR Social OS/);
+  assert.match(displayApp, /kicker: "FROM"/);
+  assert.match(displayApp, /scheduleHeistMessageThenBrandSlide/);
+  assert.match(displayApp, /showHeistBrandSlide/);
+  assert.match(displayApp, /HEIST_MESSAGE_SECONDS = 20/);
+  assert.match(displayCss, /heistIdentityShellBurst 3s/);
+  assert.match(displayCss, /heist-brand-slide/);
+  assert.match(sharedData, /identityAnimationSeconds:3/);
+  assert.match(sharedData, /messageDurationSeconds:20/);
 });
 
 test("all published templates have display-aware text contracts", () => {

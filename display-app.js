@@ -1,4 +1,4 @@
-/* display-app.js v29.09.38 */
+/* display-app.js v29.09.39 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -20,8 +20,13 @@
   let loc = getStaticLocation(locationId);
   const templates = window.SHOUTOUT_TEMPLATES || {};
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
+  const HEIST_MESSAGE_SECONDS = 20;
+  const HEIST_BRAND_SLIDE_SECONDS = 8;
+  const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
   let liveContentExpiryTimer = null;
   let screenFormatOverride = "";
+  let heistPhaseTimer = null;
+  let heistPhaseLoopTimer = null;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -243,9 +248,12 @@
 
   function heistIdentityMessages(template = {}) {
     const custom = Array.isArray(template.identityMessages) ? template.identityMessages.filter(Boolean) : [];
-    const lines = custom.length ? custom.map(String) : ["Caught in HEISTS", "Powered by FloqR Social OS"];
-    // Normalize legacy "$Caught…" copy so the dollar sign never appears on-rail.
-    return lines.map(line => String(line || "").replace(/^\$\s*/, "").trim()).filter(Boolean);
+    const lines = custom.length ? custom.map(String) : ["Caught in a HEIST", "Powered by FloqR Social OS"];
+    // Normalize legacy "$Caught…" / "Caught in HEISTS" copy.
+    return lines
+      .map(line => String(line || "").replace(/^\$\s*/, "").trim())
+      .map(line => /^caught in heists?$/i.test(line) ? "Caught in a HEIST" : line)
+      .filter(Boolean);
   }
 
   function stopHeistIdentityCycle() {
@@ -253,6 +261,68 @@
       window.clearInterval(window.__floqrHeistIdentityTimer);
       window.__floqrHeistIdentityTimer = null;
     }
+  }
+
+  function stopHeistPhaseTimers() {
+    if (heistPhaseTimer) {
+      window.clearTimeout(heistPhaseTimer);
+      heistPhaseTimer = null;
+    }
+    if (heistPhaseLoopTimer) {
+      window.clearTimeout(heistPhaseLoopTimer);
+      heistPhaseLoopTimer = null;
+    }
+  }
+
+  function heistBrandLogoUrl() {
+    return String(loc.logoUrl || loc.clubLogoUrl || loc.brandLogoUrl || HEIST_LOCAL_LOGO || "").trim() || HEIST_LOCAL_LOGO;
+  }
+
+  function hideHeistBrandSlide() {
+    const slide = byId("heistBrandSlide");
+    const canvas = byId("displayCanvas");
+    if (slide) {
+      slide.classList.add("hidden");
+      slide.setAttribute("aria-hidden", "true");
+    }
+    canvas?.classList.remove("heist-brand-slide-active");
+  }
+
+  function showHeistBrandSlide() {
+    const slide = byId("heistBrandSlide");
+    const logo = byId("heistBrandLogo");
+    const canvas = byId("displayCanvas");
+    if (!slide || !canvas) return;
+    stopHeistIdentityCycle();
+    if (logo) {
+      const src = heistBrandLogoUrl();
+      logo.src = src;
+      logo.onerror = () => {
+        if (logo.src.indexOf(HEIST_LOCAL_LOGO) === -1) logo.src = HEIST_LOCAL_LOGO;
+      };
+    }
+    slide.classList.remove("hidden");
+    slide.setAttribute("aria-hidden", "false");
+    canvas.classList.add("heist-brand-slide-active");
+  }
+
+  function scheduleHeistMessageThenBrandSlide(template = {}) {
+    stopHeistPhaseTimers();
+    hideHeistBrandSlide();
+    const messageSeconds = Math.max(5, Number(template.messageDurationSeconds || HEIST_MESSAGE_SECONDS));
+    const brandSeconds = Math.max(3, Number(template.brandSlideSeconds || HEIST_BRAND_SLIDE_SECONDS));
+    heistPhaseTimer = window.setTimeout(() => {
+      showHeistBrandSlide();
+      heistPhaseLoopTimer = window.setTimeout(() => {
+        hideHeistBrandSlide();
+        // Restart the identity rail and message phase for continuous venue playback.
+        if (template.identityRail !== false) {
+          const subText = String(byId("displaySub")?.getAttribute("data-patron-sub") || "");
+          renderHeistIdentityRail(template, subText);
+        }
+        scheduleHeistMessageThenBrandSlide(template);
+      }, brandSeconds * 1000);
+    }, messageSeconds * 1000);
   }
 
   function renderHeistIdentityRail(template = {}, patronSubText = "") {
@@ -263,6 +333,7 @@
     // Optional patron attribution (display name / Mingl / Instagram). When present it
     // leads the cycle; when absent the brand lines still run on their own.
     const supplied = glyphSlice(cleanBoardText(patronSubText), 0, 28);
+    sub.setAttribute("data-patron-sub", supplied);
     const brandLines = heistIdentityMessages(template);
     const queue = [];
     if (supplied) queue.push({kicker: "FROM", value: supplied, attributed: true});
@@ -642,10 +713,14 @@
       byId("displaySub").textContent = textCaps.advice || "Choose another display size for this template.";
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
       markDisplayReady();
       return;
     }
     if (isFootballTeamIntro && center && mediaSlot) {
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
       renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps});
       markDisplayReady();
       return;
@@ -685,8 +760,16 @@
         byId("displaySub").removeAttribute("aria-label");
         byId("displaySub").innerHTML = "";
       }
+      if (String(templateId || "").startsWith("heist") || String(t.id || "").startsWith("heist")) {
+        scheduleHeistMessageThenBrandSlide(t);
+      } else {
+        stopHeistPhaseTimers();
+        hideHeistBrandSlide();
+      }
     } else if (isClassicBoard) {
       stopHeistIdentityCycle();
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("classic-bw-board");
@@ -696,6 +779,8 @@
       byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     } else {
       stopHeistIdentityCycle();
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");

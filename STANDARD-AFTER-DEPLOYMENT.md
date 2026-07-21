@@ -73,6 +73,30 @@ Any in-place command (Save, Publish, Deactivate, Accept/Deny, Connect refresh, e
 
 **Not** required for pure links (`<a href>` to another page) or Back navigation.
 
+### 7. Quality gate — CI logs before preview email (required)
+
+**Do not email preview links until CI is green** for the published commit.
+
+1. Confirm the commit is on the intended remotes (`workspace/v29-08` and, for GitHub Pages, `main`).
+2. If `functions/**`, `firestore.rules`, `storage.rules`, or related paths changed, open the latest **Functions CI and Deploy** run for that SHA and read the **Functions tests** logs (not just the email/notification).
+3. Run `npm test` in `functions/` locally when CI is red or before pushing functions changes.
+4. Fix failures and re-push; wait for a **success** conclusion on Functions tests (Pages build success alone is not enough when functions changed).
+5. Only after the gate passes → send mobile preview email (step 8).
+
+Firebase Functions / rules deploy is separate: Pages can be live while Functions CI failed and `workflow_dispatch` deploy was skipped. Treat that as **not fully deployed**.
+
+### 8. Email mobile preview links (required after webapp changes)
+
+After every iteration that changes patron/admin UX, **and after the CI quality gate in step 7 passes**, send preview links by email so testers can open them on iPhone:
+
+1. Publish the package to GitHub Pages (or confirm the live site reflects the change).
+2. Master Admin → **Diagnostics** → **Email mobile preview links** (SendGrid via `sendFloqrPreviewLinksEmail` when signed in).
+3. Or POST to Cloud Function `emailFloqrPreviewLinks` (defaults to `bans.don@gmail.com` if not signed in).
+4. Update `PREVIEW_LINKS_PACKAGE` in `ai-diagnostics-service.js` and `defaultFloqrPreviewLinks()` in `functions/ai-discovery-functions.js` when the package version changes.
+5. Include **stable display URLs** (no `?v=`) for LED/embed links; admin/portal links may include `?v=`.
+
+Confirm the email arrived before marking the deploy complete.
+
 ---
 
 ## Also update (same iteration)
@@ -84,6 +108,9 @@ Any in-place command (Save, Publish, Deactivate, Accept/Deny, Connect refresh, e
 | `DEPLOYMENT-V*.md` / `ROLLBACK-V*.md` | When shipping a numbered package |
 | Firebase functions/rules | Deploy only when backend changed; then Rules Smoke Test |
 | Script `?v=` cache-busts | Every edited JS/CSS/HTML consumer |
+| Media inputs | Local file upload first; use `url-media-field.js`; no visible URL paste for logos/icons |
+| Display URLs | Stable `display.html?location=…` without `?v=` (devices + external embeds) |
+| Preview link email | Master Admin → Email mobile preview links; bump `PREVIEW_LINKS_PACKAGE` each release |
 
 ---
 

@@ -2,6 +2,17 @@
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
 
+## UI media input convention (required)
+
+When adding or updating upload controls for logos, icons, profile photos, campaign art, or other patron/admin media:
+
+- **Always provide a local file upload** (`<input type="file">`) as the primary control.
+- Use `url-media-field.js` (`FLOQRUrlMediaField.bind`) to upload to Firebase Storage and store the resulting URL internally — do **not** expose a visible “paste URL” field for logos/icons unless a legacy migration path is explicitly required.
+- **Display URLs** for venue LED boards (`display.html?location=…`) must stay **stable** (no `?v=` cache-bust query). Those links are embedded on devices and third-party sites. Use `FLOQRNav.stableDisplayUrl(locationId)`.
+- **After every webapp modification**, first verify GitHub Actions / Functions CI logs are green for the published commit, then email mobile preview links so testers can open live URLs on iPhone: Master Admin → **Diagnostics** → **Email mobile preview links**, or deploy/call Cloud Function `emailFloqrPreviewLinks`. See `STANDARD-AFTER-DEPLOYMENT.md` steps 7–8.
+- **Product spelling:** always **ShoutOut** (capital O) in user-facing copy — not “Shoutout”, “SHOUTOUT”, or “Shout Out”.
+- Admin portal pages may still use `?v=` for cache-busting JS/CSS; venue board URLs should not.
+
 ## v29.09.8 highlights (publish when approved)
 
 - **BartR** shared ecommerce frontend (barter + swag). Larger Search icon tile → `commerce.html`. US sellers manage products in My Profile → BartR Store. FloqR MoR; vendor ships.
@@ -427,6 +438,10 @@ Protected terms must not be translated or altered: FLOQR, ShoutOut, Mingl, Bata.
 Patrons choose an official/admin ShoutOut template, click Customize Background, choose a safe color/gradient or upload an image, optionally enter an AI prompt, and save the variant as private or public. Saved variants appear in Settings > My ShoutOut Templates. Public variants can appear in Community Templates, template search, and the patron public profile when `isPublicProfileItem` is true.
 
 Patrons cannot change layout, text positioning, media placeholder position, video placeholder position, font rules, animation timing, template structure, approval format, or display format.
+
+## Template Pricing Policy
+
+The Traditional Black and White template (`blackwhite`, class `classic-bw`) is always free for patrons. Do not assign a paid price to this template in frontend metadata, checkout payloads, or backend pricing logic.
 
 Storage paths:
 
