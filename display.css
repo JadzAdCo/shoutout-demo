@@ -316,18 +316,42 @@
   background:#000!important;
 }
 
-/* Text-overlay templates: photo background + transparent white lettering */
+/* Text-overlay templates: background layer + transparent framed text */
 .display-canvas.text-overlay-template.classic-bw{
   background:#000!important;
   animation:none!important;
 }
+.display-canvas.text-overlay-template .display-text-overlay{
+  flex-direction:column;
+  justify-content:center;
+  gap:0;
+}
+.display-canvas.frame-overlay-template .display-compose-slot{
+  position:relative;
+  width:min(94vw,1180px);
+  aspect-ratio:16/9;
+  max-height:58vh;
+  margin:0 auto;
+  flex:0 0 auto;
+}
+.display-canvas.frame-overlay-template .display-frame-overlay{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:contain;
+}
 .display-canvas.text-overlay-template .display-center{
-  position:relative!important;
-  width:100vw!important;
-  height:100vh!important;
+  position:absolute!important;
+  z-index:3!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
   max-width:none!important;
   min-height:0!important;
-  padding:clamp(6px,1.4vw,14px)!important;
+  padding:0!important;
   margin:0!important;
   display:block!important;
   background:transparent!important;
@@ -340,16 +364,16 @@
   content:none!important;
   display:none!important;
 }
-.display-canvas.text-overlay-template #displayMain.text-overlay-main{
+.display-canvas.frame-overlay-template #displayMain.text-overlay-main{
   position:absolute!important;
-  z-index:2!important;
-  left:8%!important;
-  right:8%!important;
-  top:9.5%!important;
-  bottom:28.5%!important;
+  z-index:3!important;
+  left:9.5%!important;
+  right:9.5%!important;
+  top:18%!important;
+  bottom:24%!important;
   max-width:none!important;
   margin:0!important;
-  padding:clamp(4px,.9vw,10px) clamp(8px,1.4vw,16px)!important;
+  padding:0 clamp(8px,1.2vw,16px)!important;
   display:grid!important;
   align-items:center!important;
   background:transparent!important;
@@ -357,7 +381,7 @@
   font-family:Impact,"Arial Black","Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",Arial,sans-serif!important;
   text-align:center!important;
   overflow:hidden!important;
-  text-shadow:0 2px 14px rgba(0,0,0,.88),0 0 36px rgba(0,0,0,.72)!important;
+  text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 36px rgba(0,0,0,.75)!important;
 }
 .display-canvas.text-overlay-template .text-overlay-lines{
   display:grid!important;
@@ -376,21 +400,24 @@
   max-width:100%!important;
   white-space:nowrap!important;
   overflow:hidden!important;
-  font-size:var(--fit-size,clamp(22px,5.2vw,72px))!important;
-  line-height:.8!important;
-  letter-spacing:.012em!important;
+  font-size:var(--fit-size,clamp(18px,4.8vw,64px))!important;
+  line-height:.78!important;
+  letter-spacing:.01em!important;
   color:#fff!important;
   font-weight:1000!important;
-  text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 32px rgba(0,0,0,.75),0 1px 0 rgba(0,0,0,.55)!important;
+  text-shadow:0 2px 14px rgba(0,0,0,.92),0 0 30px rgba(0,0,0,.78),0 1px 0 rgba(0,0,0,.55)!important;
   filter:none!important;
 }
-.display-canvas.text-overlay-template #displaySub.text-overlay-identity{
+.display-canvas.frame-overlay-template #displaySub.text-overlay-identity{
   position:absolute!important;
   z-index:4!important;
-  left:12%!important;
-  right:12%!important;
-  top:80.5%!important;
-  height:14%!important;
+  left:50%!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:-12%!important;
+  transform:translateX(-50%);
+  width:min(72vw,640px);
+  height:auto!important;
   margin:0!important;
   padding:0!important;
   display:grid!important;
@@ -399,6 +426,10 @@
   color:#fff!important;
   font-family:Inter,"Arial Black",Arial,sans-serif!important;
   text-transform:uppercase!important;
+}
+.display-canvas.frame-overlay-template #displaySub.text-overlay-identity:empty,
+.display-canvas.frame-overlay-template #displaySub.uses-brand-fallback{
+  display:none!important;
 }
 .display-canvas.text-overlay-template .text-overlay-identity-shell{
   display:flex;
@@ -422,6 +453,24 @@
   font:1000 clamp(10px,2.4vw,28px)/.9 Impact,"Arial Black",Arial,sans-serif;
   letter-spacing:.04em;
   text-shadow:0 2px 12px rgba(0,0,0,.88),0 0 24px rgba(0,0,0,.7);
+}
+.display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template .display-compose-slot,
+.display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template .display-compose-slot{
+  width:92vw;
+  max-height:none;
+  height:46vh;
+  margin-top:6vh;
+}
+.display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template #displayMain.text-overlay-main,
+.display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template #displayMain.text-overlay-main{
+  left:10%!important;
+  right:10%!important;
+  top:19%!important;
+  bottom:25%!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template .text-overlay-lines b,
+.display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template .text-overlay-lines b{
+  font-size:var(--fit-size,clamp(14px,4.2vw,48px))!important;
 }
 
 .display-canvas.text-overlay-template .display-background::after{

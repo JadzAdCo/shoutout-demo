@@ -1,4 +1,4 @@
-/* display-app.js v29.09.29 */
+/* display-app.js v29.09.30 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -206,6 +206,26 @@
       return true;
     }
     return false;
+  }
+
+  function resolveFrameOverlayUrl(template = {}, data = {}) {
+    return String(data.frameOverlayUrl || template.defaultFrameOverlayUrl || "").trim();
+  }
+
+  function applyFrameOverlay(frameEl, frameUrl = "") {
+    if (!frameEl) return false;
+    const url = String(frameUrl || "").trim();
+    if (!url) {
+      frameEl.className = "display-frame-overlay hidden";
+      frameEl.style.backgroundImage = "";
+      return false;
+    }
+    frameEl.className = "display-frame-overlay";
+    frameEl.style.backgroundImage = `url("${url.replace(/"/g, "%22")}")`;
+    frameEl.style.backgroundSize = "contain";
+    frameEl.style.backgroundPosition = "center";
+    frameEl.style.backgroundRepeat = "no-repeat";
+    return true;
   }
 
   function clubDefaultMainText(location = {}) {
@@ -458,6 +478,9 @@
     const bgEl = byId("displayBackground");
     const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient });
     canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
+    const frameUrl = resolveFrameOverlayUrl(t, data);
+    const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "");
+    canvas.classList.toggle("frame-overlay-template", hasFrameOverlay);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
     canvas.style.backgroundSize = "";
@@ -467,7 +490,9 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
-    const mainSource = String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
+    const mainSource = isTextOverlay
+      ? String(data.mainText || "")
+      : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     const mainText = mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
     const subText = String(data.subText || t.defaultSub || "").slice(0, subLimit);
     byId("displayBrand").textContent = "";
@@ -510,13 +535,21 @@
       mediaSlot.innerHTML = "";
     }
     if (isClassicBoard && isTextOverlay) {
-      const rows = classicBoardRows(mainText, textCaps);
+      const rows = mainText.trim()
+        ? classicBoardRows(mainText, textCaps)
+        : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("text-overlay-main");
       byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
-      byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-      byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
+      if (identity.supplied) {
+        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", "has-attribution");
+        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+        byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
+      } else {
+        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-identity", "uses-brand-fallback");
+        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+        byId("displaySub").innerHTML = `<span class="text-overlay-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span>`;
+      }
     } else if (isClassicBoard) {
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);

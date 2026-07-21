@@ -835,23 +835,25 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     category:'Heist Art',
     mediaMode:'No image/video',
     supportsMedia:false,
-    backgroundEditable:false,
+    backgroundEditable:true,
     textOverlay:true,
+    frameOverlay:true,
+    defaultFrameOverlayUrl:'./images/heist/heist-text-frame-overlay.png',
     defaultBackgroundUrl:'./images/heist/heist-jail-bars.png',
-    identityRail:true,
+    identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
     priceCents:4000,
     priceLabel:'$40',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
-    defaultMain:'LOCKED UP',
+    defaultMain:'',
     defaultSub:'',
     lineCount:3,
-    maxCharactersPerLine:10,
-    maxMainCharacters:30,
+    maxCharactersPerLine:14,
+    maxMainCharacters:42,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: jail-cell bars noir background with classic letter board and PRESENTED BY FLOQR SHOUTOUT rail. Tuned for the 64×32 LED panel.',
-    tags:["heist","jail","bars","heist art","noir","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
+    tags:["heist","jail","bars","heist art","noir","framed overlay","$40","64x32","dupont","nightlife","text overlay","club exclusive"]
   },
   heistNeonMask: {
     id:'heistNeonMask',
@@ -862,23 +864,25 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     category:'Heist Art',
     mediaMode:'No image/video',
     supportsMedia:false,
-    backgroundEditable:false,
+    backgroundEditable:true,
     textOverlay:true,
+    frameOverlay:true,
+    defaultFrameOverlayUrl:'./images/heist/heist-text-frame-overlay.png',
     defaultBackgroundUrl:'./images/heist/heist-police-car.png',
-    identityRail:true,
+    identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
     priceCents:4000,
     priceLabel:'$40',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
-    defaultMain:'IN CUSTODY',
+    defaultMain:'',
     defaultSub:'',
     lineCount:3,
-    maxCharactersPerLine:10,
-    maxMainCharacters:30,
+    maxCharactersPerLine:14,
+    maxMainCharacters:42,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: police cruiser back-seat noir background with locked classic board geometry for the 64×32 LED.',
-    tags:["heist","police","cruiser","handcuffs","heist art","noir","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
+    tags:["heist","police","cruiser","handcuffs","heist art","noir","framed overlay","$40","64x32","dupont","nightlife","text overlay","club exclusive"]
   },
   heistDupontUnder: {
     id:'heistDupontUnder',
@@ -889,23 +893,25 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     category:'Heist Art',
     mediaMode:'No image/video',
     supportsMedia:false,
-    backgroundEditable:false,
+    backgroundEditable:true,
     textOverlay:true,
+    frameOverlay:true,
+    defaultFrameOverlayUrl:'./images/heist/heist-text-frame-overlay.png',
     defaultBackgroundUrl:'./images/heist/heist-interrogation.png',
-    identityRail:true,
+    identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
     priceCents:4000,
     priceLabel:'$40',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
-    defaultMain:'NO COMMENT',
+    defaultMain:'',
     defaultSub:'',
     lineCount:3,
-    maxCharactersPerLine:10,
-    maxMainCharacters:30,
+    maxCharactersPerLine:14,
+    maxMainCharacters:42,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: interrogation-room noir background with classic ShoutOut board sized for 64×32 LED.',
-    tags:["heist","interrogation","handcuffs","heist art","noir","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
+    tags:["heist","interrogation","handcuffs","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
   },
   heistRedLux: {
     id:'heistRedLux',
@@ -916,23 +922,25 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     category:'Heist Art',
     mediaMode:'No image/video',
     supportsMedia:false,
-    backgroundEditable:false,
+    backgroundEditable:true,
     textOverlay:true,
+    frameOverlay:true,
+    defaultFrameOverlayUrl:'./images/heist/heist-text-frame-overlay.png',
     defaultBackgroundUrl:'./images/heist/heist-courthouse-night.png',
-    identityRail:true,
+    identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
     priceCents:4000,
     priceLabel:'$40',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
-    defaultMain:'BOOKED',
+    defaultMain:'',
     defaultSub:'',
     lineCount:3,
-    maxCharactersPerLine:10,
-    maxMainCharacters:30,
+    maxCharactersPerLine:14,
+    maxMainCharacters:42,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: courthouse-night noir background with locked classic board and FLOQR identity rail for 64×32 LED.',
-    tags:["heist","courthouse","night","heist art","noir","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
+    tags:["heist","courthouse","night","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
   }
 });
 
@@ -1004,13 +1012,25 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:54,skipFinaleLineup:false},
       "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:14,stadiumLineCount:2,stadiumCharactersPerLine:12,maxStadiumCharacters:24,maxPlayerNameCharacters:8,minimumFontPixels:38,skipFinaleLineup:true,advice:"Reduced Football Intro layout: no finale lineup; stadium message stays visible longer."}
     }
+  },
+  textOverlayFrame: {
+    label:"Framed transparent text overlay",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:20,minimumFontPixels:52},
+      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:48},
+      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:44},
+      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:20,minimumFontPixels:44},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:40},
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED framed overlay: up to 3 lines, 14 characters per line (42 total)."}
+    }
   }
 };
 
 window.FLOQRTextLayout = {
-  version:"29.09.21",
+  version:"29.09.30",
   profileId(template = {}) {
     const id = String(template.id || "");
+    if (template.textOverlay === true) return "textOverlayFrame";
     if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
     if (id === "car" || template.className === "car") return "car";
