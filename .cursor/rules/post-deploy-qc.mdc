@@ -1,0 +1,14 @@
+﻿---
+description: Post-deploy quality control — verify CI logs before preview emails
+alwaysApply: true
+---
+
+# Post-deploy quality control
+
+After publishing FLOQR changes (especially to GitHub Pages `main` or any `functions/**` path):
+
+1. **Confirm remotes** — workspace commit on `origin/workspace/v29-08`; Pages commit on `origin/main` when the change must be live.
+2. **Check CI logs before emailing** — open the latest GitHub Actions run for the published SHA. If **Functions CI and Deploy** ran, read the **Functions tests** job logs until they show success. Do not rely on the notification email alone.
+3. **Local gate** — when functions/rules/shared-data contracts changed, run `npm test` in `functions/` and fix failures before (or immediately after) push.
+4. **Deploy completeness** — Pages build success ≠ Firebase Functions deploy. Automatic Functions deploy only runs on `workflow_dispatch` with `deploy=true` after tests pass. Say so explicitly if backend changes are Pages-only.
+5. **Preview email last** — send `emailFloqrPreviewLinks` / Diagnostics preview email only after the CI quality gate is green (see `STANDARD-AFTER-DEPLOYMENT.md` steps 7–8).
