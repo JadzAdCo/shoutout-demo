@@ -5,17 +5,20 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR ShoutOut Display</title>
-  <link rel="stylesheet" href="./display.css?v=29.09.29"/>
+  <link rel="stylesheet" href="./display.css?v=29.09.30"/>
 </head>
 <body class="display">
   <main id="displayCanvas" class="display-canvas">
     <div id="displayBackground" class="display-background" aria-hidden="true"></div>
     <div class="display-text-overlay">
       <div id="displayBrand" class="brand"></div>
-      <div class="display-center">
-        <div id="mediaSlot" class="media-slot hidden"></div>
-        <h1 id="displayMain">USE SHOUTOUT</h1>
-        <h2 id="displaySub"></h2>
+      <div class="display-compose-slot">
+        <div id="displayFrameOverlay" class="display-frame-overlay hidden" aria-hidden="true"></div>
+        <div class="display-center">
+          <div id="mediaSlot" class="media-slot hidden"></div>
+          <h1 id="displayMain">USE SHOUTOUT</h1>
+          <h2 id="displaySub"></h2>
+        </div>
       </div>
       <div class="ticker"></div>
     </div>
@@ -23,9 +26,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
-<script src="./shared-data.js?v=29.09.29"></script>
+<script src="./shared-data.js?v=29.09.30"></script>
 <script src="./floqr-identity.js?v=29.09.22"></script>
-<script src="./display-app.js?v=29.09.29"></script>
+<script src="./display-app.js?v=29.09.30"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
 </body>
 </html>
