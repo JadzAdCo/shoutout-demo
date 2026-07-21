@@ -836,6 +836,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     mediaMode:'No image/video',
     supportsMedia:false,
     backgroundEditable:false,
+    defaultBackgroundUrl:'./images/heist/vault-night.jpg',
     identityRail:true,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
@@ -848,8 +849,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:10,
     maxMainCharacters:30,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: cinematic vault-door ShoutOut board — dark luxury steel rings, crimson rim light, classic letter board, and PRESENTED BY FLOQR SHOUTOUT rail. Tuned for the 64×32 LED panel.',
-    tags:["heist","vault","heist art","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: pictorial vault-door heist scene background with classic letter board and PRESENTED BY FLOQR SHOUTOUT rail. Tuned for the 64×32 LED panel.',
+    tags:["heist","vault","heist art","heist scene","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
   },
   heistNeonMask: {
     id:'heistNeonMask',
@@ -861,6 +862,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     mediaMode:'No image/video',
     supportsMedia:false,
     backgroundEditable:false,
+    defaultBackgroundUrl:'./images/heist/neon-mask.jpg',
     identityRail:true,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
@@ -873,8 +875,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:10,
     maxMainCharacters:30,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: masks-of-the-night neon energy — red/black glow, subterranean club vibe, locked classic board geometry for the 64×32 LED.',
-    tags:["heist","neon","mask","heist art","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: pictorial neon mask heist scene background with locked classic board geometry for the 64×32 LED.',
+    tags:["heist","neon","mask","heist art","heist scene","$40","64x32","dupont","nightlife","classic board","identity rail","club exclusive"]
   },
   heistDupontUnder: {
     id:'heistDupontUnder',
@@ -886,6 +888,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     mediaMode:'No image/video',
     supportsMedia:false,
     backgroundEditable:false,
+    defaultBackgroundUrl:'./images/heist/dupont-under.jpg',
     identityRail:true,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
@@ -898,8 +901,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:10,
     maxMainCharacters:30,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: Dupont subterranean lounge atmosphere — deep charcoal corridors, ember accents, classic ShoutOut board sized for 64×32 LED.',
-    tags:["heist","dupont","underground","heist art","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: pictorial Dupont underground corridor heist scene with classic ShoutOut board sized for 64×32 LED.',
+    tags:["heist","dupont","underground","heist art","heist scene","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
   },
   heistRedLux: {
     id:'heistRedLux',
@@ -911,6 +914,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     mediaMode:'No image/video',
     supportsMedia:false,
     backgroundEditable:false,
+    defaultBackgroundUrl:'./images/heist/red-lux.jpg',
     identityRail:true,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
@@ -923,8 +927,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:10,
     maxMainCharacters:30,
     maxSubCharacters:14,
-    description:'Heist DC exclusive: dark-luxury crimson velvet ShoutOut — high-contrast red and black frame art with the locked classic board and FLOQR identity rail for 64×32 LED.',
-    tags:["heist","red","luxury","vip","heist art","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
+    description:'Heist DC exclusive: pictorial crimson VIP heist luxury scene with locked classic board and FLOQR identity rail for 64×32 LED.',
+    tags:["heist","red","luxury","vip","heist art","heist scene","$40","64x32","nightlife","classic board","identity rail","club exclusive"]
   }
 });
 

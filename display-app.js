@@ -414,7 +414,7 @@
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
     canvas.dataset.textProfile = textCaps.profileId || "custom";
-    const backgroundUrl = data.backgroundUrl || "";
+    const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
     const backgroundGradient = data.backgroundGradient || "";
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
@@ -424,9 +424,10 @@
     canvas.style.backgroundSize = "";
     canvas.style.backgroundPosition = "";
     if (backgroundUrl) {
-      canvas.style.backgroundImage = `url("${backgroundUrl.replace(/"/g, "%22")}")`;
+      canvas.style.backgroundImage = `linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.45)), url("${backgroundUrl.replace(/"/g, "%22")}")`;
       canvas.style.backgroundSize = "cover";
       canvas.style.backgroundPosition = "center";
+      canvas.style.backgroundRepeat = "no-repeat";
     }
     else if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) canvas.style.background = backgroundGradient;
     else if (backgroundColor && /^#[0-9a-fA-F]{6}$/.test(backgroundColor)) canvas.style.background = backgroundColor;

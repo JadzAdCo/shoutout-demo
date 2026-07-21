@@ -278,54 +278,35 @@
   letter-spacing:.04em;
 }
 
-/* Heist art backgrounds (club-scoped templates; board + rail stay locked) */
-.display-canvas.classic-bw[data-template-id="heistVaultNight"]{
-  background:
-    radial-gradient(circle at 50% 42%,rgba(255,40,40,.18),transparent 28%),
-    radial-gradient(circle at 50% 50%,transparent 18%,rgba(0,0,0,.72) 19% 34%,transparent 35%),
-    repeating-radial-gradient(circle at 50% 50%,#1a1a1e 0 10px,#0c0c10 11px 22px),
-    linear-gradient(160deg,#050507,#1a0508 45%,#09090c)!important;
+/* Heist art: pictorial heist-scene photo backgrounds (board + rail stay locked) */
+.display-canvas.classic-bw[data-template-id="heistVaultNight"],
+.display-canvas.classic-bw[data-template-id="heistNeonMask"],
+.display-canvas.classic-bw[data-template-id="heistDupontUnder"],
+.display-canvas.classic-bw[data-template-id="heistRedLux"]{
+  background-color:#050507!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
   animation:none!important;
 }
-.display-canvas.classic-bw[data-template-id="heistVaultNight"] .display-center{
-  background:
-    radial-gradient(circle at 50% 48%,rgba(255,255,255,.06),transparent 42%),
-    linear-gradient(145deg,#070707,#141418 26%,#c81018 27.2%,#101014 44%,#c81018 62%,#050505 80%)!important;
+.display-canvas.classic-bw[data-template-id="heistVaultNight"]{
+  background-image:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.48)),url("./images/heist/vault-night.jpg")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistNeonMask"]{
-  background:
-    radial-gradient(ellipse 46% 58% at 22% 48%,rgba(255,20,60,.35),transparent 55%),
-    radial-gradient(ellipse 46% 58% at 78% 48%,rgba(255,20,60,.28),transparent 55%),
-    radial-gradient(circle at 50% 50%,rgba(120,0,30,.35),transparent 50%),
-    linear-gradient(180deg,#040208,#16040c 55%,#020104)!important;
-  animation:none!important;
-}
-.display-canvas.classic-bw[data-template-id="heistNeonMask"] .display-center{
-  background:linear-gradient(135deg,#050505,#1a0810 28%,#ff1230 29%,#12060a 42%,#ff1230 62%,#070407 78%)!important;
-  box-shadow:0 24px 55px rgba(0,0,0,.55),0 0 0 7px #fff inset,0 0 0 13px #ff1230 inset,0 0 40px rgba(255,18,48,.45)!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.5)),url("./images/heist/neon-mask.jpg")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistDupontUnder"]{
-  background:
-    linear-gradient(90deg,rgba(0,0,0,.75),transparent 18%,transparent 82%,rgba(0,0,0,.75)),
-    repeating-linear-gradient(90deg,transparent 0 48px,rgba(255,80,60,.05) 48px 50px),
-    radial-gradient(circle at 50% 120%,rgba(255,90,40,.22),transparent 45%),
-    linear-gradient(180deg,#06070a,#12151c 40%,#0a0b10)!important;
-  animation:none!important;
-}
-.display-canvas.classic-bw[data-template-id="heistDupontUnder"] .display-center{
-  background:linear-gradient(145deg,#050608,#151820 28%,#d01820 29%,#101218 42%,#d01820 62%,#06070a 78%)!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.5)),url("./images/heist/dupont-under.jpg")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistRedLux"]{
-  background:
-    radial-gradient(circle at 50% 20%,rgba(255,60,80,.35),transparent 40%),
-    radial-gradient(circle at 18% 80%,rgba(120,0,20,.45),transparent 35%),
-    radial-gradient(circle at 82% 75%,rgba(80,0,10,.4),transparent 35%),
-    linear-gradient(155deg,#120208,#2a0410 40%,#080104)!important;
-  animation:none!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.46)),url("./images/heist/red-lux.jpg")!important;
 }
-.display-canvas.classic-bw[data-template-id="heistRedLux"] .display-center{
-  background:linear-gradient(135deg,#0a0204,#22060c 26%,#ff1a2e 27.5%,#160408 44%,#ff1a2e 63%,#080204 80%)!important;
-  box-shadow:0 24px 55px rgba(0,0,0,.55),0 0 0 7px #f5f5f5 inset,0 0 0 13px #ff1a2e inset!important;
+.display-canvas.classic-bw[data-template-id^="heist"] .display-center{
+  background:linear-gradient(145deg,rgba(7,7,7,.72),rgba(20,8,10,.55) 28%,rgba(200,16,24,.55) 29%,rgba(16,16,20,.5) 44%,rgba(200,16,24,.55) 62%,rgba(5,5,5,.72) 80%)!important;
+  box-shadow:0 24px 55px rgba(0,0,0,.55),0 0 0 7px rgba(255,255,255,.88) inset,0 0 0 13px rgba(255,18,48,.85) inset!important;
+}
+.display-canvas.classic-bw[data-template-id^="heist"].custom-background-active .display-center{
+  background:linear-gradient(145deg,rgba(7,7,7,.72),rgba(20,8,10,.55) 28%,rgba(200,16,24,.55) 29%,rgba(16,16,20,.5) 44%,rgba(200,16,24,.55) 62%,rgba(5,5,5,.72) 80%)!important;
 }
 .display-canvas.classic-bw[data-template-id^="heist"] .display-center:before{
   border-color:#ff1e2e!important;
