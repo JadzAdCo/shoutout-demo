@@ -1767,13 +1767,14 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.37") {
+function defaultFloqrPreviewLinks(v = "29.09.38") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
-    ["Locked Up (Jail Bars)", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
+    ["Locked Up — no handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
+    ["Locked Up — with patron handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&sub=%40mingl.don&screen=led-64x32&preview=1&v=${v}`],
     ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
-    ["I Aint No Snitch", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=${v}`],
+    ["I Aint No Snitch — with name", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&sub=Don&screen=led-64x32&preview=1&v=${v}`],
     ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
     ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
     ["Shôko Club Admin", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
@@ -1781,7 +1782,7 @@ function defaultFloqrPreviewLinks(v = "29.09.37") {
   ];
 }
 
-function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.37") {
+function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.38") {
   if (!Array.isArray(raw) || !raw.length) return defaultFloqrPreviewLinks(fallbackVersion);
   return raw.slice(0, 40).map((row) => {
     if (Array.isArray(row)) return [String(row[0] || "Link").slice(0, 160), String(row[1] || "").slice(0, 500)];
@@ -1789,8 +1790,8 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.37") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.37", links = [], note = ""} = {}) {
-  const v = String(packageVersion || "29.09.37").replace(/^v/i, "");
+function buildPreviewLinksEmail({packageVersion = "29.09.38", links = [], note = ""} = {}) {
+  const v = String(packageVersion || "29.09.38").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
   const subject = `FLOQR v${v} — mobile preview links`;
   const intro = String(note || "").trim();
