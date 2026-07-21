@@ -3,9 +3,10 @@
   "use strict";
 
   const HELP = "Tell me, what are you looking for?";
-  const LINE_HI = "Hi, I am FloqAi!";
+  const LINE_HI = "Hi, I am FloqAi";
   const LINE_LOOK = "Tell me, what are you looking for?";
   const LINE_FEATURE = "Need to learn about a feature or do something else?";
+  const RANDOM_LINES = [LINE_LOOK, LINE_FEATURE];
   const SHOW_MS = 3000;
   const HIDE_MS = 3000;
 
@@ -46,9 +47,11 @@
     let moveStart = 0;
     let moveDur = 4200;
     let bobPhase = Math.random() * Math.PI * 2;
-    let saidIntro = false;
     let speechVisible = false;
     let lastBobY = 0;
+    let recentLines = [];
+    /* After each randomized line, next spoken line is Hi */
+    let nextIsHi = false;
 
     function floqrLogoFloor() {
       if (!logo || logo.classList.contains("hidden")) {
@@ -229,12 +232,41 @@
       if (t >= 1) pickNextMove();
     }
 
+    function wouldBeThirdRepeat(line) {
+      return recentLines.length >= 2
+        && recentLines[recentLines.length - 1] === line
+        && recentLines[recentLines.length - 2] === line;
+    }
+
+    function rememberLine(line) {
+      recentLines.push(line);
+      if (recentLines.length > 8) recentLines.shift();
+    }
+
+    function pickRandomLine() {
+      const options = RANDOM_LINES.filter(line => !wouldBeThirdRepeat(line));
+      const pool = options.length ? options : RANDOM_LINES;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     function nextLine() {
-      if (!saidIntro) {
-        saidIntro = true;
+      if (nextIsHi) {
+        nextIsHi = false;
+        /* Hi always follows a randomized line (3s gap handled by hide timer) */
+        if (wouldBeThirdRepeat(LINE_HI)) {
+          /* Extremely unlikely; fall back to a random line instead of 3× Hi */
+          const line = pickRandomLine();
+          rememberLine(line);
+          nextIsHi = true;
+          return line;
+        }
+        rememberLine(LINE_HI);
         return LINE_HI;
       }
-      return Math.random() < 0.5 ? LINE_LOOK : LINE_FEATURE;
+      const line = pickRandomLine();
+      rememberLine(line);
+      nextIsHi = true; /* after this randomized line is shown, Hi comes next */
+      return line;
     }
 
     function hideSpeech() {
@@ -257,7 +289,6 @@
       speech.classList.remove("is-hiding");
       speech.classList.add("is-visible");
       speech.setAttribute("aria-hidden", "false");
-      /* Measure then place so full text stays on-screen */
       requestAnimationFrame(() => {
         placeSpeechBubble();
         requestAnimationFrame(placeSpeechBubble);
@@ -276,6 +307,7 @@
           scheduleSpeech(SHOW_MS, false);
         } else {
           hideSpeech();
+          /* 3s after randomized text finishes → Hi; same cadence between all lines */
           scheduleSpeech(HIDE_MS, true);
         }
       }, delay);
@@ -345,6 +377,6 @@
   global.FLOQRFloqAi = {
     bindFloqAi,
     HELP,
-    LINES: {LINE_HI: "Hi, I am FloqAi!", LINE_LOOK: "Tell me, what are you looking for?", LINE_FEATURE: "Need to learn about a feature or do something else?"}
+    LINES: {LINE_HI: "Hi, I am FloqAi", LINE_LOOK: "Tell me, what are you looking for?", LINE_FEATURE: "Need to learn about a feature or do something else?"}
   };
 })(window);
