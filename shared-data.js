@@ -103,7 +103,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     reservationsUrl:"https://www.sevenrooms.com/events/heistdc",
     activityStatus:"Active Dupont Circle nightclub / lounge",
     activityDates:["Thursday late night","Friday HEIST","Saturday HEIST"],
-    templates:["heistVaultNight","heistNeonMask","heistDupontUnder","heistRedLux"],
+    templates:["heistJailBars","heistPoliceCar","heistInterrogation","heistCourthouseNight"],
     restrictTemplatesToLocationSet:true,
     displayScreenFormatIds:["led-64x32"],
     primaryDisplayScreenFormatId:"led-64x32",
@@ -936,8 +936,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] },
-  heistVaultNight: {
-    id:'heistVaultNight',
+  heistJailBars: {
+    id:'heistJailBars',
     name:'Heist Jail Bars',
     scope:'Club',
     venueIds:['heist-washington-dc'],
@@ -963,10 +963,10 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","jail","bars","heist art","noir","framed overlay","$40","64x32","dupont","nightlife","text overlay","club exclusive"]
+    tags:["heist","jail","bars","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
   },
-  heistNeonMask: {
-    id:'heistNeonMask',
+  heistPoliceCar: {
+    id:'heistPoliceCar',
     name:'Heist Police Car',
     scope:'Club',
     venueIds:['heist-washington-dc'],
@@ -992,10 +992,10 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","police","cruiser","handcuffs","heist art","noir","framed overlay","$40","64x32","dupont","nightlife","text overlay","club exclusive"]
+    tags:["heist","police","cruiser","handcuffs","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
   },
-  heistDupontUnder: {
-    id:'heistDupontUnder',
+  heistInterrogation: {
+    id:'heistInterrogation',
     name:'Heist Interrogation',
     scope:'Club',
     venueIds:['heist-washington-dc'],
@@ -1023,8 +1023,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
     tags:["heist","interrogation","handcuffs","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
   },
-  heistRedLux: {
-    id:'heistRedLux',
+  heistCourthouseNight: {
+    id:'heistCourthouseNight',
     name:'Heist Courthouse Night',
     scope:'Club',
     venueIds:['heist-washington-dc'],

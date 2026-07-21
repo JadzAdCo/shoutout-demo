@@ -70,7 +70,7 @@ const venues = [
     defaultSub: "",
     activityStatus: "Active Dupont Circle nightclub / lounge",
     activityDates: ["Thursday late night", "Friday HEIST", "Saturday HEIST"],
-    templates: ["hiphop", "bottle", "birthday", "fire", "vip", "neon", "heistVaultNight", "heistNeonMask", "heistDupontUnder", "heistRedLux"],
+    templates: ["heistJailBars", "heistPoliceCar", "heistInterrogation", "heistCourthouseNight"],
     displayScreenFormatIds: ["led-64x32"],
     primaryDisplayScreenFormatId: "led-64x32",
     sourceUrls: ["https://www.heistdc.com/", "https://www.heistdc.com/location/heist/", "https://www.heistdc.com/about/"]

@@ -474,22 +474,22 @@
   background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.48));
   pointer-events:none;
 }
-.display-canvas.classic-bw[data-template-id="heistVaultNight"],
-.display-canvas.classic-bw[data-template-id="heistNeonMask"],
-.display-canvas.classic-bw[data-template-id="heistDupontUnder"],
-.display-canvas.classic-bw[data-template-id="heistRedLux"]{
+.display-canvas.classic-bw[data-template-id="heistJailBars"],
+.display-canvas.classic-bw[data-template-id="heistPoliceCar"],
+.display-canvas.classic-bw[data-template-id="heistInterrogation"],
+.display-canvas.classic-bw[data-template-id="heistCourthouseNight"]{
   background:#000!important;
   animation:none!important;
 }
-.display-canvas.classic-bw[data-template-id="heistVaultNight"] .display-background{
+.display-canvas.classic-bw[data-template-id="heistJailBars"] .display-background{
   background-image:url("./images/heist/heist-jail-bars.png")!important;
 }
-.display-canvas.classic-bw[data-template-id="heistNeonMask"] .display-background{
+.display-canvas.classic-bw[data-template-id="heistPoliceCar"] .display-background{
   background-image:url("./images/heist/heist-police-car.png")!important;
 }
-.display-canvas.classic-bw[data-template-id="heistDupontUnder"] .display-background{
+.display-canvas.classic-bw[data-template-id="heistInterrogation"] .display-background{
   background-image:url("./images/heist/heist-interrogation.png")!important;
 }
-.display-canvas.classic-bw[data-template-id="heistRedLux"] .display-background{
+.display-canvas.classic-bw[data-template-id="heistCourthouseNight"] .display-background{
   background-image:url("./images/heist/heist-courthouse-night.png")!important;
 }
