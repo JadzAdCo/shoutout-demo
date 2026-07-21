@@ -4,8 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FloqAi Search — preview</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.24"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.24"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.25"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.25"/>
 </head>
 <body>
 <!-- Top-right profile status is injected by global-profile-status.js when Firebase Auth is available -->
@@ -22,11 +22,11 @@
           <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">×</button>
           <p class="eyebrow">Preview help</p>
           <p><strong>FloqAi Search</strong> — iteration preview (not the production Search default).</p>
-          <p class="sub small">FloqAi floats below the FloqR logo, glows and pulses, and opens the wish box when you tap it.</p>
+          <p class="sub small">FloqAi floats below the FloqR logo, speaks from a bubble that stays fully on-screen, and opens the wish box when you tap it.</p>
           <nav class="floqai-help-links" aria-label="Related Search pages">
-            <a href="./floqai-search.html?v=29.09.24"><code>floqai-search.html</code></a>
-            <a href="./?v=29.09.24&amp;start=intent">current Ask FloqR</a>
-            <a href="./?v=29.09.24&amp;start=search">classic Search</a>
+            <a href="./floqai-search.html?v=29.09.25"><code>floqai-search.html</code></a>
+            <a href="./?v=29.09.25&amp;start=intent">current Ask FloqR</a>
+            <a href="./?v=29.09.25&amp;start=search">classic Search</a>
           </nav>
         </div>
 
@@ -52,17 +52,19 @@
   <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
     <img class="floqai-mark-img" src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/>
   </span>
-  <span id="floqAiPhrase" class="floqai-phrase" aria-hidden="true">Tell, how can I help you?</span>
 </button>
+<div id="floqAiSpeech" class="floqai-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
+  <span id="floqAiSpeechText"></span>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.24"></script>
-<script src="./floqr-nav.js?v=29.09.24"></script>
-<script src="./global-profile-status.js?v=29.09.24"></script>
-<script src="./intent-search.js?v=29.09.24"></script>
-<script src="./floqai-search.js?v=29.09.24"></script>
+<script src="./firebase-config.js?v=29.09.25"></script>
+<script src="./floqr-nav.js?v=29.09.25"></script>
+<script src="./global-profile-status.js?v=29.09.25"></script>
+<script src="./intent-search.js?v=29.09.25"></script>
+<script src="./floqai-search.js?v=29.09.25"></script>
 <script>
 (function () {
   const panel = document.getElementById("floqAiSearchPanel");
