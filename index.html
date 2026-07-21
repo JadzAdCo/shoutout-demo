@@ -5,8 +5,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.39"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.39"/>
 </head>
 <body>
 
@@ -258,22 +259,42 @@
       <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
       <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.33&from=search">Trade by BartR</a>
       <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.33&from=search">RydR</a>
-      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.33&start=intent">Ask FloqR</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.39&start=intent">FloqAi</a>
     </div>
   </section>
 
-  <section id="intentSearchPage" class="page intent-search-page">
-    <div class="intent-search-shell">
-      <div class="intent-search-main">
-        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+  <section id="intentSearchPage" class="page intent-search-page floqai-intent-page">
+    <div class="intent-search-shell floqai-top-stack">
+      <div class="floqai-search-main intent-search-main">
+        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback hidden">FLOQR</div>
-        <label class="intent-search-label" for="intentSearchInput">
-          <span class="intent-help">In plain words, what do you wish to accomplish</span>
-          <input id="intentSearchInput" type="search" autocomplete="off" placeholder="e.g. I want to meet someone… Book a ride…" aria-describedby="intentSearchHint"/>
-        </label>
-        <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club</p>
-        <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+
+        <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="FloqAi help">?</button>
+        <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi help" aria-hidden="true">
+          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">×</button>
+          <p class="eyebrow">FloqAi</p>
+          <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
+          <p class="sub small">Routes to Mingl, RydR, BartR, ShoutOut, clubs, and more.</p>
+        </div>
+
+        <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
+          <label class="intent-search-label" for="intentSearchInput">
+            <span id="floqAiHelpText" class="intent-help">Tell, how can I help you?</span>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain words…" aria-describedby="intentSearchHint"/>
+          </label>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club · hip hop night</p>
+          <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+        </div>
       </div>
+    </div>
+
+    <button id="floqAiAgent" class="floqai-agent" type="button" aria-label="FloqAi — open contextual search" title="FloqAi">
+      <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
+        <img class="floqai-mark-img" src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/>
+      </span>
+    </button>
+    <div id="floqAiSpeech" class="floqai-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
+      <span id="floqAiSpeechText"></span>
     </div>
   </section>
 
@@ -627,8 +648,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.33"></script>
-<script src="./floqr-nav.js?v=29.09.33"></script>
-<script src="./intent-search.js?v=29.09.33"></script>
+<script src="./floqr-nav.js?v=29.09.39"></script>
+<script src="./intent-search.js?v=29.09.39"></script>
+<script src="./floqai-search.js?v=29.09.39"></script>
 <script src="./global-profile-status.js?v=29.09.33"></script>
 <script src="./floqr-i18n.js?v=29.09.33"></script>
 <script src="./shared-data.js?v=29.09.33"></script>

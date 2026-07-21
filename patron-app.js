@@ -3533,6 +3533,37 @@
       onShoutout: () => showShoutoutLanding(),
       onMingl: () => showMinglLanding()
     });
+    const floqAiPanel = byId("floqAiSearchPanel");
+    const floqAiHelpBtn = byId("floqAiHelpBtn");
+    const floqAiHelpPop = byId("floqAiHelpPopout");
+    const floqAiHelpClose = byId("floqAiHelpClose");
+    function setFloqAiHelpOpen(open) {
+      if (!floqAiHelpPop || !floqAiHelpBtn) return;
+      floqAiHelpPop.classList.toggle("hidden", !open);
+      floqAiHelpPop.setAttribute("aria-hidden", open ? "false" : "true");
+      floqAiHelpBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    floqAiHelpBtn?.addEventListener("click", event => {
+      event.stopPropagation();
+      setFloqAiHelpOpen(floqAiHelpPop?.classList.contains("hidden"));
+    });
+    floqAiHelpClose?.addEventListener("click", () => setFloqAiHelpOpen(false));
+    document.addEventListener("click", event => {
+      if (!floqAiHelpPop || floqAiHelpPop.classList.contains("hidden")) return;
+      if (floqAiHelpPop.contains(event.target) || floqAiHelpBtn?.contains(event.target)) return;
+      setFloqAiHelpOpen(false);
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") setFloqAiHelpOpen(false);
+    });
+    window.FLOQRFloqAi?.bindFloqAi({
+      onOpenSearch() {
+        if (floqAiPanel) {
+          floqAiPanel.classList.add("open");
+          floqAiPanel.setAttribute("aria-hidden", "false");
+        }
+      }
+    });
     window.FLOQRNav?.applyStartPage(showPage);
   });
 

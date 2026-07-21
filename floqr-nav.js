@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.14";
+  const APP_V = "29.09.39";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }

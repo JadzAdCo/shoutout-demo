@@ -1,9 +1,15 @@
-/* FloqAi Search iteration — idle agent + explode-to-phrase */
-.floqai-page{
+/* FloqAi on production Ask FloqR (?start=intent) */
+.floqai-page,
+.floqai-intent-page{
   position:relative;
   overflow:visible;
-  min-height:100vh;
+  min-height:70vh;
   padding-top:8px;
+}
+.floqai-intent-page .floqai-agent,
+.floqai-intent-page .floqai-speech{
+  /* Keep agent inside the intent page so other Search screens stay clean */
+  z-index:40;
 }
 .floqai-page .intent-search-shell{
   position:relative;

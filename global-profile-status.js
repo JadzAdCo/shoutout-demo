@@ -62,7 +62,7 @@
       <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.9&from=portal">Mingl Chat (${esc(c.chats)})</a>
       <a class="profile-menu-link" href="./commerce.html?v=29.09.9&from=search">BartR</a>
       <a class="profile-menu-link" href="./rydr.html?v=29.09.9&from=search">RydR</a>
-      <a class="profile-menu-link" href="./?v=29.09.9&start=intent">Ask FloqR</a>
+      <a class="profile-menu-link" href="./?v=29.09.39&start=intent">FloqAi</a>
       <button id="floqrGlobalSignOutBtn" type="button">Sign out</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
   }
