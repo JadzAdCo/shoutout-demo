@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heist Framed Overlay Preview</title>
+  <title>Heist framed overlay preview</title>
   <style>
     body { margin:0; font-family:system-ui,sans-serif; background:#0a0a0a; color:#f5f5f5; }
     header { padding:1rem 1.25rem; border-bottom:1px solid #222; }
-    header p { color:#aaa; font-size:.85rem; max-width:48rem; line-height:1.45; }
+    header p { color:#aaa; font-size:.85rem; max-width:52rem; line-height:1.45; }
     main { display:grid; gap:1rem; padding:1rem; max-width:1100px; margin:0 auto; }
     a.card { display:block; text-decoration:none; color:inherit; border:1px solid #2a2a2a; border-radius:10px; padding:1rem; background:#111; }
     a.card:hover { border-color:#555; }
@@ -19,28 +19,24 @@
 <body>
   <header>
     <h1>Heist framed overlay preview</h1>
-    <p>Background layer + transparent red/black frame + white text (3×14 = 42 chars). Links include <code>template=</code> and <code>preview=1</code> so the venue board shows the art — not the idle “USE ShoutOut” splash.</p>
+    <p>Floating CSS frame (true transparent center — no checkerboard PNG) over each background. Footer rail cycles <strong>$Caught in HEISTS</strong> → <strong>Powered by FloqR Social OS</strong> then bursts (classic board behavior). Cache-bust <code>v=29.09.37</code>.</p>
   </header>
   <main>
-    <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultNight&main=&screen=led-64x32&preview=1" target="_blank">
-      <strong>Heist Vault Night (Jail Bars) — empty frame</strong><span>No main text (patron enters at ShoutOut)</span>
-      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultNight&main=&screen=led-64x32&preview=1"></iframe>
+    <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
+      <strong>Locked Up</strong><span>Jail Bars background · floating frame · identity rail</span>
+      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=29.09.37"></iframe>
     </a>
-    <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1" target="_blank">
-      <strong>Heist Vault Night — LOCKED UP</strong><span>Sample 8 characters</span>
-      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1"></iframe>
+    <a class="card" href="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
+      <strong>Police Car Arrest</strong><span>Police Car background</span>
+      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=29.09.37"></iframe>
     </a>
-    <a class="card" href="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1" target="_blank">
-      <strong>Heist Police Car — IN CUSTODY</strong>
-      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1"></iframe>
+    <a class="card" href="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
+      <strong>I Aint No Snitch</strong><span>Interrogation background</span>
+      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=29.09.37"></iframe>
     </a>
-    <a class="card" href="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1" target="_blank">
-      <strong>Heist Interrogation — NO COMMENT</strong>
-      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1"></iframe>
-    </a>
-    <a class="card" href="./display.html?location=heist-washington-dc&template=heistRedLux&main=FOURTEEN%20CHARS%0AFOURTEEN%20CHARS%0AFOURTEEN%20CHARS&screen=led-64x32&preview=1" target="_blank">
-      <strong>Heist Red Lux (Courthouse Night) — 3 lines (14 char demo)</strong>
-      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistRedLux&main=FOURTEEN%20CHARS%0AFOURTEEN%20CHARS%0AFOURTEEN%20CHARS&screen=led-64x32&preview=1"></iframe>
+    <a class="card" href="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=29.09.37" target="_blank">
+      <strong>Tengo muchos dólares</strong><span>Vault Night background</span>
+      <iframe loading="lazy" src="./display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=29.09.37"></iframe>
     </a>
   </main>
 </body>

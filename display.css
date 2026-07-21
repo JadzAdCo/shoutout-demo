@@ -334,26 +334,44 @@
 .frame-overlay-template .display-frame-overlay,
 .display-canvas.frame-overlay-template .display-frame-overlay{
   position:absolute;
-  inset:6.2% 7.5% 22.94%;
+  /* Enlarged ~30% wider / ~40% taller vs prior inset; leave bottom band for identity rail */
+  inset:1.5% 2% 16.5%;
   z-index:2;
   pointer-events:none;
+  background:transparent!important;
+  background-image:none!important;
   background-position:center;
   background-repeat:no-repeat;
   background-size:100% 100%;
 }
-/* Heist frame: true transparent center (SVG or CSS fallback — never checkerboard PNG) */
+/* Heist frame: CSS-only neon border — center is truly transparent (no PNG/SVG fill) */
 .display-frame-overlay.display-frame-overlay-css-heist{
-  background-color:transparent!important;
-  border:clamp(5px,.85vw,11px) solid #101010;
-  border-radius:clamp(20px,3.5vw,48px);
+  background:transparent!important;
+  background-image:none!important;
+  border:clamp(6px,1vw,14px) solid #101010;
+  border-radius:clamp(18px,3.2vw,44px);
   box-shadow:
-    0 0 0 clamp(1.5px,.28vw,3px) rgba(255,255,255,.92),
-    0 0 clamp(10px,2.2vw,28px) rgba(255,26,110,.95),
-    0 0 clamp(22px,4.5vw,60px) rgba(255,26,110,.42);
+    0 0 0 clamp(2px,.35vw,4px) rgba(255,255,255,.95),
+    0 0 clamp(12px,2.4vw,32px) rgba(255,26,110,.98),
+    0 0 clamp(26px,5vw,70px) rgba(255,26,110,.45);
 }
-.display-frame-overlay.display-frame-overlay-css-heist[style*="background-image"]{
-  border:none;
-  box-shadow:none;
+.display-frame-overlay.display-frame-overlay-css-heist::before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:33.33%;
+  border-top:1px solid rgba(255,102,136,.45);
+  pointer-events:none;
+}
+.display-frame-overlay.display-frame-overlay-css-heist::after{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:66.66%;
+  border-top:1px solid rgba(255,102,136,.45);
+  pointer-events:none;
 }
 .display-canvas.text-overlay-template .display-center{
   position:relative!important;
@@ -378,10 +396,10 @@
 .display-canvas.frame-overlay-template #displayMain.text-overlay-main{
   position:absolute!important;
   z-index:3!important;
-  left:9%!important;
-  right:9%!important;
-  top:10.9%!important;
-  bottom:27.62%!important;
+  left:5%!important;
+  right:5%!important;
+  top:5%!important;
+  bottom:19%!important;
   max-width:none!important;
   margin:0!important;
   padding:0 clamp(8px,1.2vw,16px)!important;
@@ -438,9 +456,29 @@
   font-family:Inter,"Arial Black",Arial,sans-serif!important;
   text-transform:uppercase!important;
 }
+.display-canvas.frame-overlay-template #displaySub.heist-identity-rail,
+.display-canvas.text-overlay-template #displaySub.heist-identity-rail{
+  position:absolute!important;
+  z-index:5!important;
+  left:8%!important;
+  right:8%!important;
+  top:84%!important;
+  bottom:auto!important;
+  transform:none!important;
+  width:auto!important;
+  height:12%!important;
+  display:grid!important;
+  place-items:center!important;
+}
 .display-canvas.frame-overlay-template #displaySub.text-overlay-identity:empty,
 .display-canvas.frame-overlay-template #displaySub.uses-brand-fallback{
   display:none!important;
+}
+.display-canvas.frame-overlay-template #displaySub.heist-identity-rail.uses-brand-fallback,
+.display-canvas.text-overlay-template #displaySub.heist-identity-rail.uses-brand-fallback,
+.display-canvas.classic-bw.text-overlay-template #displaySub.heist-identity-rail,
+.display-canvas.classic-bw #displaySub.heist-identity-rail{
+  display:grid!important;
 }
 .display-canvas.text-overlay-template .text-overlay-identity-shell{
   display:flex;
@@ -472,10 +510,10 @@
 }
 .display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template #displayMain.text-overlay-main,
 .display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template #displayMain.text-overlay-main{
-  left:9%!important;
-  right:9%!important;
-  top:10.9%!important;
-  bottom:27.62%!important;
+  left:5%!important;
+  right:5%!important;
+  top:5%!important;
+  bottom:19%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].frame-overlay-template .text-overlay-lines b,
 .display-canvas[data-screen-format-id="p125-64x32"].frame-overlay-template .text-overlay-lines b{
@@ -492,19 +530,33 @@
 .display-canvas.classic-bw[data-template-id="heistVaultNight"],
 .display-canvas.classic-bw[data-template-id="heistPoliceCar"],
 .display-canvas.classic-bw[data-template-id="heistInterrogation"],
+.display-canvas.classic-bw[data-template-id="heistVaultDollars"],
 .display-canvas.classic-bw[data-template-id="heistRedLux"]{
   background:#000!important;
   animation:none!important;
 }
 .display-canvas.classic-bw[data-template-id="heistVaultNight"] .display-background{
   background-image:url("./images/heist/heist-jail-bars.png")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
 }
 .display-canvas.classic-bw[data-template-id="heistPoliceCar"] .display-background{
   background-image:url("./images/heist/heist-police-car.png")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
 }
 .display-canvas.classic-bw[data-template-id="heistInterrogation"] .display-background{
   background-image:url("./images/heist/heist-interrogation.png")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
 }
+.display-canvas.classic-bw[data-template-id="heistVaultDollars"] .display-background,
 .display-canvas.classic-bw[data-template-id="heistRedLux"] .display-background{
-  background-image:url("./images/heist/heist-courthouse-night.png")!important;
+  background-image:url("./images/heist/vault-night.jpg")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
 }

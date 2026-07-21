@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.35";
+  const PREVIEW_LINKS_PACKAGE = "29.09.37";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -5612,8 +5612,11 @@
         ["Shôko Club Admin — public profile + logo upload", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
         ["Shôko stable display URL (no ?v=)", `${base}/display.html?location=shoko-barcelona-spain`],
         ["Heist DC Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-        ["Heist jail bars display", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1`],
-        ["Heist preview gallery", `${base}/heist-frame-preview.html`],
+        ["Locked Up (Jail Bars)", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
+        ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
+        ["I Aint No Snitch", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=${v}`],
+        ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
+        ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
         ["Mobile test checklist", `${base}/mobile-test-checklist.html?v=${v}`],
         ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
       ]

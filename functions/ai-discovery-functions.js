@@ -1767,24 +1767,21 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.35") {
+function defaultFloqrPreviewLinks(v = "29.09.37") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
-    ["Shôko Club Admin — public profile + logo upload", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
-    ["Shôko stable display URL (no ?v= — for LED / embeds)", `${base}/display.html?location=shoko-barcelona-spain`],
-    ["Heist DC Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-    ["Heist jail bars display", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1`],
-    ["Heist police car display", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1`],
-    ["Heist interrogation display", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1`],
-    ["Heist courthouse night display", `${base}/display.html?location=heist-washington-dc&template=heistRedLux&main=FOURTEEN%20CHARS&screen=led-64x32&preview=1`],
-    ["Heist preview gallery", `${base}/heist-frame-preview.html`],
-    ["Mobile test checklist (iPhone)", `${base}/mobile-test-checklist.html?v=${v}`],
+    ["Locked Up (Jail Bars)", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
+    ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
+    ["I Aint No Snitch", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&screen=led-64x32&preview=1&v=${v}`],
+    ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
+    ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
+    ["Shôko Club Admin", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
     ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
   ];
 }
 
-function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.34") {
+function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.37") {
   if (!Array.isArray(raw) || !raw.length) return defaultFloqrPreviewLinks(fallbackVersion);
   return raw.slice(0, 40).map((row) => {
     if (Array.isArray(row)) return [String(row[0] || "Link").slice(0, 160), String(row[1] || "").slice(0, 500)];
@@ -1792,8 +1789,8 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.34") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.34", links = [], note = ""} = {}) {
-  const v = String(packageVersion || "29.09.34").replace(/^v/i, "");
+function buildPreviewLinksEmail({packageVersion = "29.09.37", links = [], note = ""} = {}) {
+  const v = String(packageVersion || "29.09.37").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
   const subject = `FLOQR v${v} — mobile preview links`;
   const intro = String(note || "").trim();

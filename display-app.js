@@ -1,4 +1,4 @@
-/* display-app.js v29.09.36 */
+/* display-app.js v29.09.37 */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -215,14 +215,17 @@
   function applyFrameOverlay(frameEl, frameUrl = "", template = {}) {
     if (!frameEl) return false;
     const url = String(frameUrl || "").trim();
-    const useCssHeistFrame = template.frameOverlayStyle === "css-heist"
-      || (!!url && /heist-text-frame-overlay\.(png|svg)/i.test(url));
+    const useCssHeistFrame = template.frameOverlay === true
+      || template.frameOverlayStyle === "css-heist"
+      || (!!url && /heist-text-frame-overlay/i.test(url))
+      || String(template.id || "").startsWith("heist");
+    // Never paint the old checkerboard PNG — Heist frames are CSS-only (true transparent center).
     if (useCssHeistFrame) {
       frameEl.className = "display-frame-overlay display-frame-overlay-css-heist";
-      frameEl.style.backgroundImage = url && /\.svg(\?|#|$)/i.test(url) ? `url("${url.replace(/"/g, "%22")}")` : "";
-      frameEl.style.backgroundSize = "100% 100%";
-      frameEl.style.backgroundPosition = "center";
-      frameEl.style.backgroundRepeat = "no-repeat";
+      frameEl.style.backgroundImage = "";
+      frameEl.style.backgroundSize = "";
+      frameEl.style.backgroundPosition = "";
+      frameEl.style.backgroundRepeat = "";
       return true;
     }
     if (!url) {
@@ -236,6 +239,59 @@
     frameEl.style.backgroundPosition = "center";
     frameEl.style.backgroundRepeat = "no-repeat";
     return true;
+  }
+
+  function heistIdentityMessages(template = {}) {
+    const custom = Array.isArray(template.identityMessages) ? template.identityMessages.filter(Boolean) : [];
+    if (custom.length) return custom.map(String);
+    return ["$Caught in HEISTS", "Powered by FloqR Social OS"];
+  }
+
+  function stopHeistIdentityCycle() {
+    if (window.__floqrHeistIdentityTimer) {
+      window.clearInterval(window.__floqrHeistIdentityTimer);
+      window.__floqrHeistIdentityTimer = null;
+    }
+  }
+
+  function renderHeistIdentityRail(template = {}, patronSubText = "") {
+    stopHeistIdentityCycle();
+    const sub = byId("displaySub");
+    if (!sub) return;
+    const supplied = glyphSlice(cleanBoardText(patronSubText), 0, 28);
+    sub.classList.remove("classic-bw-sub-hidden", "text-overlay-identity");
+    sub.classList.add("classic-bw-identity", "heist-identity-rail");
+    if (supplied) {
+      sub.classList.add("has-attribution");
+      sub.classList.remove("uses-brand-fallback");
+      sub.setAttribute("aria-label", `FROM ${supplied}`);
+      sub.innerHTML = `<span class="classic-identity-shell"><small>FROM</small><strong>${esc(supplied)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      return;
+    }
+    const messages = heistIdentityMessages(template);
+    let index = 0;
+    const paint = () => {
+      const value = messages[index % messages.length] || "FLOQR ShoutOut";
+      sub.classList.add("uses-brand-fallback");
+      sub.classList.remove("has-attribution");
+      sub.setAttribute("aria-label", value);
+      const shell = sub.querySelector(".classic-identity-shell strong");
+      if (shell) {
+        shell.textContent = value;
+        const wrap = sub.querySelector(".classic-identity-shell");
+        if (wrap) {
+          wrap.style.animation = "none";
+          void wrap.offsetWidth;
+          wrap.style.animation = "";
+        }
+      } else {
+        sub.innerHTML = `<span class="classic-identity-shell"><small></small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      }
+      index += 1;
+    };
+    paint();
+    // Swap phrase mid-cycle, then let classic 20s burst animation explode the rail.
+    window.__floqrHeistIdentityTimer = window.setInterval(paint, 7000);
   }
 
   function urlSearchParams() {
@@ -611,10 +667,16 @@
         : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
       byId("displayMain").classList.add("text-overlay-main");
       byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
-      byId("displaySub").removeAttribute("aria-label");
-      byId("displaySub").innerHTML = "";
+      if (t.identityRail !== false) {
+        renderHeistIdentityRail(t, subText);
+      } else {
+        stopHeistIdentityCycle();
+        byId("displaySub").classList.add("text-overlay-identity", "classic-bw-sub-hidden");
+        byId("displaySub").removeAttribute("aria-label");
+        byId("displaySub").innerHTML = "";
+      }
     } else if (isClassicBoard) {
+      stopHeistIdentityCycle();
       const rows = classicBoardRows(mainText, textCaps);
       const identity = classicIdentityPresentation(subText);
       byId("displayMain").classList.add("classic-bw-board");
@@ -623,6 +685,7 @@
       byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
       byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     } else {
+      stopHeistIdentityCycle();
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");
