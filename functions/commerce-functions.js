@@ -23,11 +23,11 @@ const COMMERCE_RESERVATION_SECONDS = 31 * 60;
 const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
 const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
 const HEIST_DC_LOCATION_ID = "heist-washington-dc";
-const HEIST_ART_TEMPLATE_IDS = new Set(["heistJailBars", "heistPoliceCar", "heistInterrogation", "heistCourthouseNight"]);
-const HEIST_ART_PRICE_CENTS = 4000;
+const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistRedLux"]);
+const HEIST_ART_PRICE_CENTS = 3000;
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
-const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistJailBars", "heistPoliceCar", "heistInterrogation", "heistCourthouseNight"]);
+const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
     "p125-96x48":[3,16,48,28],"p125-64x48":[3,10,30,22],"p125-64x32":[3,14,42,24],

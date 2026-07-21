@@ -103,7 +103,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     reservationsUrl:"https://www.sevenrooms.com/events/heistdc",
     activityStatus:"Active Dupont Circle nightclub / lounge",
     activityDates:["Thursday late night","Friday HEIST","Saturday HEIST"],
-    templates:["heistJailBars","heistPoliceCar","heistInterrogation","heistCourthouseNight"],
+    templates:["heistVaultNight","heistPoliceCar","heistInterrogation","heistRedLux"],
     restrictTemplatesToLocationSet:true,
     displayScreenFormatIds:["led-64x32"],
     primaryDisplayScreenFormatId:"led-64x32",
@@ -936,8 +936,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] },
-  heistJailBars: {
-    id:'heistJailBars',
+  heistVaultNight: {
+    id:'heistVaultNight',
     name:'Heist Jail Bars',
     scope:'Club',
     venueIds:['heist-washington-dc'],
@@ -953,8 +953,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
-    priceCents:4000,
-    priceLabel:'$40',
+    priceCents:3000,
+    priceLabel:'$30',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -963,7 +963,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","jail","bars","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
+    tags:["heist","jail","bars","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistPoliceCar: {
     id:'heistPoliceCar',
@@ -982,8 +982,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
-    priceCents:4000,
-    priceLabel:'$40',
+    priceCents:3000,
+    priceLabel:'$30',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -992,7 +992,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","police","cruiser","handcuffs","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
+    tags:["heist","police","cruiser","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistInterrogation: {
     id:'heistInterrogation',
@@ -1011,8 +1011,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
-    priceCents:4000,
-    priceLabel:'$40',
+    priceCents:3000,
+    priceLabel:'$30',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1021,10 +1021,10 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","interrogation","handcuffs","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
+    tags:["heist","interrogation","handcuffs","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
-  heistCourthouseNight: {
-    id:'heistCourthouseNight',
+  heistRedLux: {
+    id:'heistRedLux',
     name:'Heist Courthouse Night',
     scope:'Club',
     venueIds:['heist-washington-dc'],
@@ -1040,8 +1040,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityRail:false,
     identityAnimation:'burst-away',
     identityAnimationSeconds:20,
-    priceCents:4000,
-    priceLabel:'$40',
+    priceCents:3000,
+    priceLabel:'$30',
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1050,7 +1050,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:42,
     maxSubCharacters:14,
     description:'Heist DC exclusive: patron background photo with transparent framed text overlay (3 lines, 14 characters per line). Tuned for 64×32 LED.',
-    tags:["heist","courthouse","night","heist art","noir","framed overlay","$40","64x32","nightlife","text overlay","club exclusive"]
+    tags:["heist","courthouse","night","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   }
 });
 

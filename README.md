@@ -428,6 +428,10 @@ Patrons choose an official/admin ShoutOut template, click Customize Background, 
 
 Patrons cannot change layout, text positioning, media placeholder position, video placeholder position, font rules, animation timing, template structure, approval format, or display format.
 
+## Template Pricing Policy
+
+The Traditional Black and White template (`blackwhite`, class `classic-bw`) is always free for patrons. Do not assign a paid price to this template in frontend metadata, checkout payloads, or backend pricing logic.
+
 Storage paths:
 
 ```text
