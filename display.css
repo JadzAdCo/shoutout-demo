@@ -290,16 +290,16 @@
   animation:none!important;
 }
 .display-canvas.classic-bw[data-template-id="heistVaultNight"]{
-  background-image:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.48)),url("./images/heist/vault-night.jpg")!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.52)),url("./images/heist/heist-jail-bars.png")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistNeonMask"]{
-  background-image:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.5)),url("./images/heist/neon-mask.jpg")!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.5)),url("./images/heist/heist-police-car.png")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistDupontUnder"]{
-  background-image:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.5)),url("./images/heist/dupont-under.jpg")!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.5)),url("./images/heist/heist-interrogation.png")!important;
 }
 .display-canvas.classic-bw[data-template-id="heistRedLux"]{
-  background-image:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.46)),url("./images/heist/red-lux.jpg")!important;
+  background-image:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.48)),url("./images/heist/heist-courthouse-night.png")!important;
 }
 .display-canvas.classic-bw[data-template-id^="heist"] .display-center{
   background:linear-gradient(145deg,rgba(7,7,7,.72),rgba(20,8,10,.55) 28%,rgba(200,16,24,.55) 29%,rgba(16,16,20,.5) 44%,rgba(200,16,24,.55) 62%,rgba(5,5,5,.72) 80%)!important;
