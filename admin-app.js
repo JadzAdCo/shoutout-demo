@@ -1,4 +1,4 @@
-/* admin-app.js v29.08.2 - Venue Command Center, trusted Stripe onboarding, commerce, guest-list distribution, staffing, and REP */
+/* admin-app.js v29.09.43 - Venue Command Center; elected Club Admins only (no club-entity search bar) */
 (function () {
   "use strict";
 
@@ -771,23 +771,28 @@
   async function hasClubAdminAccess(user) {
     if (!user) return false;
     const email = safeUser(user);
-    if (MASTER_ADMIN_EMAILS.includes(email) || CLUB_ADMIN_EMAILS.includes(email)) return true;
+    // Master / Super Admins may open any Venue Command Center for oversight.
+    // Club-entity search stays on master-admin.html only — never on this portal.
+    if (MASTER_ADMIN_EMAILS.includes(email)) return true;
+
+    // Elected Club Admin: active assignment created by Master/Super Admin.
+    try {
+      const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
+      if (assignment.exists && String(assignment.data()?.status || "").toLowerCase() === "active") return true;
+    } catch (error) {}
+
+    // Location admin roster maintained by Master Admin during onboarding / election.
     try {
       const locationSnap = await db.collection("clubLocations").doc(locationId).get();
       const locationData = locationSnap.exists ? locationSnap.data() || {} : {};
       if ((locationData.adminUids || []).includes(user.uid)) return true;
       if ((locationData.adminEmails || []).map(value => String(value).toLowerCase()).includes(email)) return true;
+      if ((locationData.masterAdminUids || []).includes(user.uid)) return true;
     } catch (error) {}
-    try {
-      const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
-      if (assignment.exists && String(assignment.data()?.status || "active") === "active") return true;
-      const designation = await db.collection("clubEmployeeDesignations").doc(assignmentId).get();
-      const permissions = designation.exists ? designation.data()?.rolePermissions || [] : [];
-      return designation.exists && designation.data()?.status !== "rejected" && permissions.some(permission => ["manageGuestLists","postPublicContent","manageCommerce","customerSupport"].includes(permission));
-    } catch (error) {
-      return false;
-    }
+
+    // Workers / REP designations do not unlock the full Club Admin portal.
+    return false;
   }
 
   function setupTabs() {
@@ -2152,7 +2157,7 @@
       if (!(await hasClubAdminAccess(user))) {
         byId("adminLogin").classList.remove("hidden");
         byId("adminPanel").classList.add("hidden");
-        setText("adminStatus", `${email || "This account"} is not assigned as an admin for ${locationId}.`);
+        setText("adminStatus", `${email || "This account"} is not an elected Club Admin for ${locationId}. Ask a Master/Super Admin to assign this venue.`);
         return;
       }
 
