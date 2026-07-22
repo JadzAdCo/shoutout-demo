@@ -29,6 +29,11 @@ const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
   "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
 ]);
 const SOCCER_JERSEY_PRICE_CENTS = 3000;
+function isSportsJerseyTemplateId(templateId = "") {
+  const id = String(templateId || "");
+  if (SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
+  return /^(soccer|nba|nfl)[A-Za-z0-9]+$/.test(id);
+}
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
 const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
@@ -133,7 +138,7 @@ function text(value = "", max = 500) {
 function checkoutTextCaps(templateId = "", formatId = "") {
   const profileId = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID
     ? "footballIntro"
-    : SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)
+    : isSportsJerseyTemplateId(templateId)
       ? "soccerJersey"
       : templateId === "car"
         ? "car"
@@ -243,13 +248,13 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     subTextSizePercent:7.8,
     mainText:fitCheckoutDisplayText(rawShoutout.mainText || "SHOUTOUT!", caps, "main"),
     // Soccer jersey mark: any characters, hard-capped at 2 glyphs (not digits-only).
-    subText:SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)
+    subText:isSportsJerseyTemplateId(templateId)
       ? Array.from(String(rawShoutout.subText || "")).slice(0, 2).join("")
       : fitCheckoutDisplayText(rawShoutout.subText || "", caps, "sub"),
     submittedByUid:authContext.uid || "",
     submittedBy:text(authContext.token?.email || rawShoutout.submittedBy, 200).toLowerCase()
   };
-  if (SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)) {
+  if (isSportsJerseyTemplateId(templateId)) {
     return {
       ...rawPayload,
       shoutout:{
@@ -568,7 +573,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const templateId = text(shoutout.template || shoutout.templateId, 80);
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
     const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
-    const soccerJersey = SOCCER_JERSEY_TEMPLATE_IDS.has(templateId);
+    const soccerJersey = isSportsJerseyTemplateId(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
       : heistArt
@@ -728,6 +733,29 @@ exports.createFloqrConnectOnboardingLink = onCall({
       destinationAddress:text(payload.destinationAddress, 300)
     };
   }
+
+  if (type === "staffSchedulingSubscription") {
+    const ownerType = text(payload.ownerType, 40);
+    const ownerId = text(payload.ownerId || payload.clubLocationId, 160);
+    if (!["club", "promoterCompany", "dj"].includes(ownerType) || !ownerId) {
+      throw new HttpsError("invalid-argument", "Staff Scheduling requires ownerType (club|promoterCompany|dj) and ownerId.");
+    }
+    return {
+      amountCents:2000,
+      itemName:"FLOQR Staff Scheduling ($20/mo)",
+      description:"Monthly subscription for staff and talent scheduling with Email/SMS/WhatsApp notify-and-approve. Clubs, promoting companies, and DJs only — not events.",
+      floqrShareCents:2000,
+      venueShareCents:0,
+      paymentModel:"floqr-platform",
+      billingInterval:"month",
+      checkoutMode:"subscription",
+      ownerType,
+      ownerId,
+      ownerName:text(payload.ownerName, 160),
+      ownerKey:`${ownerType}:${ownerId}`,
+      clubLocationId:ownerType === "club" ? ownerId : text(payload.clubLocationId, 120)
+    };
+  }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
 }
 
@@ -832,6 +860,17 @@ exports.createFloqrCheckoutSession = onCall({
     if (["targetedGuestList", "smsNotifications", "smsMessageBundle", "whatsappNotifications", "whatsappMessageBundle"].includes(type)) {
       await requirePublisher(text(payload.clubLocationId, 160), request.auth);
     }
+    if (type === "staffSchedulingSubscription") {
+      const ownerType = text(payload.ownerType, 40);
+      const ownerId = text(payload.ownerId || payload.clubLocationId, 160);
+      if (ownerType === "club") await requirePublisher(ownerId, request.auth);
+      else if (ownerType === "dj" && ownerId !== request.auth.uid) {
+        throw new HttpsError("permission-denied", "DJs can only subscribe for their own scheduling calendar.");
+      } else if (ownerType === "promoterCompany") {
+        // Company managers subscribe under their company id; enforce ownership at entitlement write.
+        if (!ownerId) throw new HttpsError("invalid-argument", "promoterCompany ownerId is required.");
+      }
+    }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();
     const returnBase = safeReturnBase(request);
@@ -857,8 +896,9 @@ exports.createFloqrCheckoutSession = onCall({
 
     const rydrLoc = type === "rydrFare" ? text(payload.clubLocationId, 120) : "";
     const rydrLocQuery = rydrLoc ? `&location=${encodeURIComponent(rydrLoc)}` : "";
+    const isSubscription = summary.checkoutMode === "subscription" || type === "staffSchedulingSubscription";
     const params = {
-      mode:"payment",
+      mode:isSubscription ? "subscription" : "payment",
       success_url:type === "rydrFare"
         ? `${returnBase}pickup.html?rydrPaid=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}&session_id={CHECKOUT_SESSION_ID}`
         : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
@@ -866,11 +906,30 @@ exports.createFloqrCheckoutSession = onCall({
         ? `${returnBase}pickup.html?rydrCancelled=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}`
         : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
       client_reference_id:orderRef.id,
-      metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId},
+      metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId, ownerKey:text(summary.ownerKey, 220)},
       billing_address_collection:"auto",
-      payment_intent_data:{metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId}},
-      line_items:[stripeLineItem(order)]
+      line_items:isSubscription
+        ? [{
+          price_data:{
+            currency:"usd",
+            unit_amount:summary.amountCents,
+            recurring:{interval:"month"},
+            product_data:{
+              name:summary.itemName,
+              description:summary.description || "FLOQR Staff Scheduling"
+            }
+          },
+          quantity:1
+        }]
+        : [stripeLineItem(order)]
     };
+    if (!isSubscription) {
+      params.payment_intent_data = {metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId}};
+    } else {
+      params.subscription_data = {
+        metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId, ownerKey:text(summary.ownerKey, 220), ownerType:text(summary.ownerType, 40), ownerId:text(summary.ownerId, 160)}
+      };
+    }
     if (order.ownerEmail) params.customer_email = order.ownerEmail;
     if (type === "commerce" && summary.requiresShipping) {
       params.shipping_address_collection = {allowed_countries:["US"]};
@@ -878,7 +937,7 @@ exports.createFloqrCheckoutSession = onCall({
     if (type === "commerce" || type === "shoutout") {
       params.expires_at = Math.floor(Date.now() / 1000) + (type === "commerce" ? COMMERCE_RESERVATION_SECONDS : SHOUTOUT_CHECKOUT_EXPIRY_SECONDS);
     }
-    if (summary.connectedAccountId && type !== "commerce" && type !== "shoutout") {
+    if (!isSubscription && summary.connectedAccountId && type !== "commerce" && type !== "shoutout") {
       // Destination charges only for non-BartR / non-ShoutOut seller-billed products.
       params.payment_intent_data.transfer_data = {destination:summary.connectedAccountId};
       if (Number(summary.floqrShareCents || 0) > 0) {
@@ -1347,6 +1406,36 @@ async function finalizePaidOrder(orderId, session) {
       }, {merge:true});
     }
   }
+
+  if (order.orderType === "staffSchedulingSubscription") {
+    const ownerType = text(order.ownerType || order.payload?.ownerType, 40);
+    const ownerId = text(order.ownerId || order.payload?.ownerId || order.clubLocationId, 160);
+    const key = text(order.ownerKey || `${ownerType}:${ownerId}`, 220);
+    const subscriptionId = text(session?.subscription, 160);
+    await db.collection("schedulingSubscriptions").doc(key).set({
+      ownerKey:key,
+      ownerType,
+      ownerId,
+      ownerName:text(order.ownerName || order.payload?.ownerName, 160),
+      ownerUid:text(order.ownerUid, 160),
+      ownerEmail:text(order.ownerEmail || order.customerEmail, 200),
+      status:"active",
+      priceCents:Number(order.amountCents || 2000),
+      billingInterval:"month",
+      serviceOrderId:orderId,
+      stripeCheckoutSessionId:text(session?.id || order.stripeCheckoutSessionId, 200),
+      stripeSubscriptionId:subscriptionId,
+      stripeCustomerId:text(session?.customer, 160),
+      clubLocationId:ownerType === "club" ? ownerId : text(order.clubLocationId, 120),
+      activatedAt:paidAt,
+      updatedAt:paidAt
+    }, {merge:true});
+    await ref.set({
+      fulfillmentStatus:"scheduling-subscription-active",
+      stripeSubscriptionId:subscriptionId,
+      fulfilledRecordId:key
+    }, {merge:true});
+  }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});
 }
 
@@ -1437,6 +1526,34 @@ async function recordDisputeEvent(dispute = {}, eventType = "") {
   }, {merge:true});
 }
 
+async function syncSchedulingSubscriptionFromStripe(subscription = {}) {
+  const meta = subscription.metadata || {};
+  let key = text(meta.ownerKey, 220);
+  if (!key) {
+    const ownerType = text(meta.ownerType, 40);
+    const ownerId = text(meta.ownerId, 160);
+    if (ownerType && ownerId) key = `${ownerType}:${ownerId}`;
+  }
+  if (!key) {
+    const orderId = text(meta.orderId, 160);
+    if (orderId) {
+      const orderSnap = await db.collection("serviceOrders").doc(orderId).get();
+      key = text(orderSnap.data()?.ownerKey, 220);
+    }
+  }
+  if (!key) return;
+  const statusRaw = text(subscription.status, 40).toLowerCase();
+  const active = ["active", "trialing"].includes(statusRaw);
+  await db.collection("schedulingSubscriptions").doc(key).set({
+    status: active ? statusRaw || "active" : (statusRaw || "canceled"),
+    stripeSubscriptionId: text(subscription.id, 160),
+    stripeCustomerId: text(subscription.customer, 160),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end === true,
+    currentPeriodEnd: Number(subscription.current_period_end || 0) || null,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
+}
+
 exports.stripeFloqrWebhook = onRequest({
   region:"us-central1",
   secrets:[STRIPE_WEBHOOK_SECRET],
@@ -1462,7 +1579,8 @@ exports.stripeFloqrWebhook = onRequest({
     const session = event.data?.object || {};
     const orderId = text(session.metadata?.orderId || session.client_reference_id, 160);
     if (["checkout.session.completed", "checkout.session.async_payment_succeeded"].includes(event.type)) {
-      if (session.payment_status === "paid" && orderId) await finalizePaidOrder(orderId, session);
+      const paid = session.payment_status === "paid" || (session.mode === "subscription" && ["paid", "no_payment_required"].includes(session.payment_status));
+      if (paid && orderId) await finalizePaidOrder(orderId, session);
       else await updateCheckoutOrderStatus(session, {status:"payment-processing", paymentStatus:"processing"});
     } else if (event.type === "checkout.session.async_payment_failed") {
       await updateCheckoutOrderStatus(session, {status:"payment-failed", paymentStatus:"failed"});
@@ -1474,6 +1592,8 @@ exports.stripeFloqrWebhook = onRequest({
       await recordRefundEvent(session);
     } else if (["charge.dispute.created", "charge.dispute.updated", "charge.dispute.closed"].includes(event.type)) {
       await recordDisputeEvent(session, event.type);
+    } else if (["customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
+      await syncSchedulingSubscriptionFromStripe(session);
     }
     await claim.ref.set({status:"processed", processedAt:admin.firestore.FieldValue.serverTimestamp(), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
     response.json({received:true});

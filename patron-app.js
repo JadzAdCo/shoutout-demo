@@ -86,11 +86,20 @@
   function isSoccerJerseyTemplate(templateId = selectedTemplate) {
     const id = String(templateId || selectedTemplate || "");
     const t = getTemplate(id);
-    return t.layout === "soccer-jersey" || id.startsWith("soccer") || t.jerseyNumberField === true;
+    return t.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || t.jerseyNumberField === true;
+  }
+  function graphemes(value = "") {
+    const text = String(value ?? "");
+    try {
+      if (typeof Intl !== "undefined" && Intl.Segmenter) {
+        return [...new Intl.Segmenter(undefined, {granularity: "grapheme"}).segment(text)].map(part => part.segment);
+      }
+    } catch (_) {}
+    return Array.from(text);
   }
   function glyphCap(value = "", max = 0) {
     const limit = Math.max(0, Number(max) || 0);
-    return Array.from(String(value ?? "")).slice(0, limit).join("");
+    return graphemes(value).slice(0, limit).join("");
   }
   function soccerNameFromSource() {
     const profile = cachedUserProfile || {};
@@ -114,9 +123,10 @@
     const nameLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 12));
     const numberLimit = Math.min(2, Math.max(1, Number(caps.sub || caps.maxSubCharacters || 2)));
     if (byId("soccerManualName")) byId("soccerManualName").maxLength = nameLimit;
-    if (byId("soccerJerseyNumber")) byId("soccerJerseyNumber").maxLength = numberLimit;
+    // HTML maxlength counts UTF-16 units and blocks emoji — rely on grapheme glyphCap instead.
+    if (byId("soccerJerseyNumber")) byId("soccerJerseyNumber").removeAttribute("maxlength");
     const name = glyphCap(String(soccerNameFromSource() || "").toUpperCase(), nameLimit);
-    // Any characters allowed for jersey mark; hard-capped at 2 glyphs (not digits-only).
+    // Any characters allowed for jersey mark (emoji/special); hard-capped at 2 graphemes.
     const mark = glyphCap(byId("soccerJerseyNumber")?.value || "", numberLimit);
     if (byId("soccerJerseyNumber") && byId("soccerJerseyNumber").value !== mark) byId("soccerJerseyNumber").value = mark;
     if (byId("mainText")) byId("mainText").value = name;
@@ -396,6 +406,12 @@
     if (!id || !byId(id)) return;
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     byId(id)?.classList.add("active");
+    if (id === "templateSelectPage") {
+      window.FLOQRFloqAi?.setMode?.("templates");
+      window.FLOQRFloqAi?.ensureTemplateMode?.();
+    } else if (id === "floqAiPage" || document.getElementById("floqAiPage")?.classList.contains("active")) {
+      window.FLOQRFloqAi?.setMode?.("intent");
+    }
   }
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
 
@@ -2492,15 +2508,21 @@
     const community = (templateVariants.community || []).filter(x => String(x.visibility || "") === "public" && String(x.status || "active") === "active" && x.ownerUid !== currentUser?.uid && patronVariantAllowedAtClub(x));
     const allVariants = [...club, ...mine, ...community];
     if (!discoveryQuery) {
-      const defaultRecord = official.find(record => record.id === "blackwhite") || official[0];
-      const remainingOfficial = official.filter(record => record !== defaultRecord);
+      const defaultRecord = official.find(record => record.id === "blackwhite") || official.find(record => !record.data.priceCents) || official[0];
       grid.innerHTML = `
-        <section class="template-section template-section-default"><h3>Default Template</h3><div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : '<div class="empty">No default template is available.</div>'}</div></section>
+        <section class="template-section template-section-default">
+          <h3>Default Template</h3>
+          <p class="sub small">Free Traditional Black and White Classic. Use FloqAi below (or search) for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.</p>
+          <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : '<div class="empty">No default template is available.</div>'}</div>
+        </section>
+        <section class="template-section template-section-floqai" id="templateFloqAiHost">
+          <h3>FloqAi template search</h3>
+          <p class="sub small">Ask FloqAi for paid templates — try Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.</p>
+          <div id="templateFloqAiMount" class="template-floqai-mount"></div>
+        </section>
         ${club.length ? `<section class="template-section"><h3>Club-Approved Backgrounds</h3><p class="sub small">Customized by this club's admins.</p><div class="template-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
-        <section class="template-section"><h3>Official FLOQR Templates</h3><div class="template-grid">${remainingOfficial.map(record => templateCard(record.data)).join("") || '<div class="empty">No additional official templates are available.</div>'}</div></section>
-        ${clubAllowsPatronBackgroundEditing() && mine.length ? `<section class="template-section"><h3>My Saved Backgrounds</h3><div class="template-grid">${mine.map(variant => variantCard(variant, "mine")).join("")}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() && community.length ? `<section class="template-section"><h3>Community Backgrounds</h3><div class="template-grid">${community.map(variant => variantCard(variant, "community")).join("")}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization. Original and club-approved templates remain available.</p>'}`;
+      window.FLOQRFloqAi?.ensureTemplateMode?.();
     } else {
       const [officialRecords, clubRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
         window.floqrSearch(discoveryQuery, {records:official, db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),

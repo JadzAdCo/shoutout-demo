@@ -94,17 +94,16 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
   assert.match(displayCss, /classicIdentityParticle 20s/);
   assert.match(indexHtml, /placeholder="Enter ShoutOut Here"/);
   assert.match(displayApp, /heistIdleTemplate \|\| "blackwhite"/);
-  // Idle boards must not flash the legacy USE SHOUTOUT CTA.
-  assert.match(displayApp, /stripLegacyUseShoutOutCta/);
+  // Idle classic board shows Use ShoutOut @ Clubname (club default verbiage).
+  assert.match(displayApp, /clubDefaultMainText/);
+  assert.match(displayApp, /Use ShoutOut @ \$\{clubName\}/);
   assert.match(displayApp, /markDisplayReady/);
-  assert.doesNotMatch(displayApp, /return `USE ShoutOut @ \$\{clubName\}`/);
   assert.match(adminApp, /template: "blackwhite"/);
   assert.match(adminApp, /displayDurationSeconds: 600/);
   assert.match(displayApp, /renderTimedLiveContent/);
   assert.match(displayApp, /DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 \* 60/);
   assert.match(backend, /exports\.expireLiveShoutouts = onSchedule/);
   assert.match(backend, /automaticTenMinuteReset/);
-  assert.match(backend, /Idle boards stay blank/);
 });
 
 test("Soccer jersey mark accepts any 2 characters", () => {
@@ -112,8 +111,10 @@ test("Soccer jersey mark accepts any 2 characters", () => {
   assert.match(sharedData, /maxSubCharacters:2/);
   assert.match(sharedData, /jerseyNumberMaxChars:2/);
   assert.match(displayApp, /isSoccerJerseyTemplate/);
-  assert.match(displayApp, /glyphSlice\(String\(data\.subText/);
+  assert.match(displayApp, /cleanJerseyMark/);
+  assert.match(displayApp, /graphemes/);
   assert.match(backend, /SOCCER_JERSEY_TEMPLATE_IDS/);
+  assert.match(backend, /isSportsJerseyTemplateId/);
   assert.match(backend, /Array\.from\(String\(rawShoutout\.subText/);
 });
 

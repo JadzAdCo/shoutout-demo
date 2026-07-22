@@ -1113,7 +1113,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     textOverlay:true,
     layout:'soccer-jersey',
-    identityRail:false,
+    identityRail:true,
     defaultBackgroundUrl:'./images/soccer/soccer-morocco-back.png',
     priceCents:3000,
     priceLabel:'$30',
@@ -1141,7 +1141,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     textOverlay:true,
     layout:'soccer-jersey',
-    identityRail:false,
+    identityRail:true,
     defaultBackgroundUrl:'./images/soccer/soccer-spain-back.png',
     priceCents:3000,
     priceLabel:'$30',
@@ -1169,7 +1169,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     textOverlay:true,
     layout:'soccer-jersey',
-    identityRail:false,
+    identityRail:true,
     defaultBackgroundUrl:'./images/soccer/soccer-chelsea-back.png',
     priceCents:3000,
     priceLabel:'$30',
@@ -1197,7 +1197,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     textOverlay:true,
     layout:'soccer-jersey',
-    identityRail:false,
+    identityRail:true,
     defaultBackgroundUrl:'./images/soccer/soccer-psg-back.png',
     priceCents:3000,
     priceLabel:'$30',
@@ -1225,7 +1225,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     backgroundEditable:false,
     textOverlay:true,
     layout:'soccer-jersey',
-    identityRail:false,
+    identityRail:true,
     defaultBackgroundUrl:'./images/soccer/soccer-monaco-back.png',
     priceCents:3000,
     priceLabel:'$30',
@@ -1325,14 +1325,14 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     }
   },
   soccerJersey: {
-    label:"Soccer jersey name + 2-character mark",
+    label:"Sports jersey name + 2-character mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:10.8,subTextSizePercent:56},
-      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:10.8,subTextSizePercent:56},
-      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:10.2,subTextSizePercent:52},
-      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:10.8,subTextSizePercent:56},
-      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:10.8,subTextSizePercent:56},
-      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:10.2,subTextSizePercent:52}
+      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:10.8,subTextSizePercent:32},
+      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:10.8,subTextSizePercent:32},
+      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:10.2,subTextSizePercent:28},
+      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:10.8,subTextSizePercent:32},
+      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:10.8,subTextSizePercent:32},
+      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:10.2,subTextSizePercent:28}
     }
   }
 };
@@ -1341,7 +1341,7 @@ window.FLOQRTextLayout = {
   version:"29.09.30",
   profileId(template = {}) {
     const id = String(template.id || "");
-    if (template.layout === "soccer-jersey" || id.startsWith("soccer")) return "soccerJersey";
+    if (template.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || template.jerseyNumberField) return "soccerJersey";
     if (template.textOverlay === true) return "textOverlayFrame";
     if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";

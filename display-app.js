@@ -100,6 +100,28 @@
     return canonicalStaticLocationId(key);
   }
 
+  function graphemes(value) {
+    const text = String(value ?? "");
+    try {
+      if (typeof Intl !== "undefined" && Intl.Segmenter) {
+        return [...new Intl.Segmenter(undefined, {granularity: "grapheme"}).segment(text)].map(part => part.segment);
+      }
+    } catch (_) {}
+    return Array.from(text);
+  }
+
+  function glyphs(value) {
+    return graphemes(value);
+  }
+
+  function glyphLen(value) {
+    return glyphs(value).length;
+  }
+
+  function glyphSlice(value, start, end) {
+    return glyphs(value).slice(start, end).join("");
+  }
+
   function cleanBoardText(value) {
     return String(value || "")
       .normalize("NFC")
@@ -109,16 +131,12 @@
       .trim();
   }
 
-  function glyphs(value) {
-    return Array.from(String(value || ""));
-  }
-
-  function glyphLen(value) {
-    return glyphs(value).length;
-  }
-
-  function glyphSlice(value, start, end) {
-    return glyphs(value).slice(start, end).join("");
+  function cleanJerseyMark(value) {
+    // Preserve emoji + special characters; do not force uppercase.
+    return String(value || "")
+      .normalize("NFC")
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+      .trim();
   }
 
   function pushWrapped(rows, words, maxRows, maxChars) {
@@ -185,7 +203,12 @@
   }
 
   function isSoccerJerseyTemplate(template = {}, templateId = "") {
-    return template.layout === "soccer-jersey" || String(templateId || template.id || "").startsWith("soccer");
+    const id = String(templateId || template.id || "");
+    return template.layout === "soccer-jersey"
+      || id.startsWith("soccer")
+      || id.startsWith("nba")
+      || id.startsWith("nfl")
+      || template.jerseyNumberField === true;
   }
 
   function resetBackgroundLayer(bgEl) {
@@ -423,14 +446,16 @@
   }
 
   function stripLegacyUseShoutOutCta(value = "") {
-    const text = String(value || "").trim();
-    if (!text) return "";
-    if (/^USE\s*SHOUT\s*OUT\b/i.test(text)) return "";
-    return text;
+    // Kept for stale cross-club copy detection only — idle CTA is restored intentionally.
+    return String(value || "").trim();
   }
 
   function clubDefaultMainText(location = {}) {
-    return stripLegacyUseShoutOutCta(location.defaultMain || "");
+    const clubName = String(location.locationName || location.brandName || location.name || "Club").trim() || "Club";
+    const configured = String(location.defaultMain || "").trim();
+    if (configured && !/^USE\s*SHOUT\s*OUT\b/i.test(configured)) return configured;
+    // Typical club idle board: Use ShoutOut @ Clubname
+    return `Use ShoutOut @ ${clubName}`;
   }
 
   function defaultClubDisplayPayload() {
@@ -448,12 +473,15 @@
     const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
       .map(String)
       .find(id => id.startsWith("heist")) || "";
+    const idleTemplate = previewTemplate || heistIdleTemplate || "blackwhite";
+    const idleIsJersey = isSoccerJerseyTemplate(templates[idleTemplate] || {}, idleTemplate);
     return {
       locationName: loc.locationName,
-      mainText: "",
+      mainText: idleIsJersey ? "" : clubDefaultMainText(loc),
       subText: "",
-      template: previewTemplate || heistIdleTemplate || "blackwhite",
-      status: "default"
+      template: idleTemplate,
+      status: "default",
+      idleCta: true
     };
   }
 
@@ -707,14 +735,16 @@
     const rawMain = (isTextOverlay || isSoccerJersey)
       ? String(data.mainText || "")
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
-    // Never flash the legacy idle CTA on any template / venue board.
-    const mainSource = stripLegacyUseShoutOutCta(rawMain);
+    // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
+    const mainSource = (data.idleCta || data.status === "default") && !isSoccerJersey && !isTextOverlay
+      ? (rawMain || locationDefaultMain)
+      : rawMain;
     const mainText = isSoccerJersey
       ? glyphSlice(cleanBoardText(mainSource), 0, mainLimit)
       : mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
-    // Soccer jersey mark: any characters (letters, digits, symbols), hard-capped at 2 glyphs.
+    // Soccer jersey mark: any characters including emoji (grapheme-capped at 2).
     const subText = isSoccerJersey
-      ? glyphSlice(String(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
+      ? glyphSlice(cleanJerseyMark(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
       : String(data.subText || data.attribution || data.displayName || t.defaultSub || "").slice(0, subLimit);
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
@@ -765,7 +795,19 @@
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
-      canvas.classList.add("soccer-jersey-template");
+      canvas.classList.add("soccer-jersey-template", "sports-jersey-template");
+      if (t.jerseyCssBack || !backgroundUrl) {
+        canvas.classList.add("jersey-css-back");
+        canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || "#111111");
+        canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || "#ffffff");
+        canvas.style.setProperty("--jersey-accent", t.jerseyAccent || t.jerseySecondary || "#ffffff");
+        if (!hasBackgroundLayer) {
+          applyBackgroundLayer(bgEl, {
+            backgroundGradient: `linear-gradient(165deg, ${t.jerseyPrimary || "#111"} 0%, ${t.jerseyPrimary || "#111"} 42%, ${t.jerseySecondary || "#fff"} 42%, ${t.jerseySecondary || "#fff"} 58%, ${t.jerseyPrimary || "#111"} 58%, #050505 100%)`
+          });
+          canvas.classList.add("has-background-layer");
+        }
+      }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
       byId("displayMain").classList.add("soccer-jersey-name");
@@ -773,11 +815,30 @@
       byId("displayMain").textContent = mainText;
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").classList.add("soccer-jersey-number");
-      byId("displaySub").style.setProperty("font-size", `${Math.min(64, Math.max(24, Number(textCaps.subTextSizePercent || 56)))}vh`, "important");
+      byId("displaySub").style.setProperty("font-size", `${Math.min(42, Math.max(18, Number(textCaps.subTextSizePercent || 32)))}vh`, "important");
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
+      // Animated text holder at bottom (same burst rail as classic).
+      const rail = byId("displayIdentityRail");
+      if (rail && t.identityRail !== false) {
+        const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
+        const identity = classicIdentityPresentation(data.attribution || "");
+        const idleValue = glyphSlice(cleanBoardText(`Use ShoutOut @ ${clubName}`), 0, 28) || identity.value;
+        const showIdle = !subText && !mainText;
+        rail.className = "display-identity-rail classic-bw-identity soccer-jersey-rail" + (showIdle || !identity.supplied ? " uses-brand-fallback" : " has-attribution");
+        rail.setAttribute("aria-label", showIdle ? `Use ShoutOut @ ${clubName}` : `${identity.kicker} ${identity.value}`);
+        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? "USE" : identity.kicker)}</small><strong>${esc(showIdle ? idleValue.replace(/^USE\s*/i, "") : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      } else if (rail) {
+        rail.className = "display-identity-rail hidden";
+        rail.innerHTML = "";
+      }
       markDisplayReady();
       return;
+    }
+    const railClear = byId("displayIdentityRail");
+    if (railClear) {
+      railClear.className = "display-identity-rail hidden";
+      railClear.innerHTML = "";
     }
     if (isClassicBoard && isTextOverlay) {
       const rows = mainText.trim()

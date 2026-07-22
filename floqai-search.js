@@ -6,9 +6,24 @@
   const LINE_HI = "Hi, I am FloqAi";
   const LINE_LOOK = "Tell me, what are you looking for?";
   const LINE_FEATURE = "Need to learn about a feature or do something else?";
-  const RANDOM_LINES = [LINE_LOOK, LINE_FEATURE];
+  const LINE_PRONOUNCE = 'pronounced Flo-ké (floh-KAY, with a crisp "é" sound)';
+  const LINE_CONTEXT = "I am contextual, so speak freely to me";
+  const LINE_USE_SEARCH = "Use me to search for templates";
+  const TEMPLATE_RANDOM_LINES = [
+    "Do you know the name of the paid template you intend to use?",
+    "Enter Sports, for sports related templates, Cars, for exotic car related templates",
+    "Humor for funny templates",
+    "VIP for VIP Templates",
+    "Video or Pictures for templates you can upload your images or video for ShoutOuts",
+    "Powered by FloqR Social OS",
+    "Ballers if you are balling and need baller's related templates...."
+  ];
+  const INTENT_RANDOM_LINES = [LINE_LOOK, LINE_FEATURE];
   const SHOW_MS = 3000;
   const HIDE_MS = 3000;
+
+  let activeMode = "intent";
+  let templateIntroStep = 0;
 
   function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
@@ -26,17 +41,22 @@
     return window.matchMedia("(max-width:720px), (pointer:coarse)").matches;
   }
 
+  function setMode(mode) {
+    activeMode = mode === "templates" ? "templates" : "intent";
+    templateIntroStep = 0;
+    document.body.classList.toggle("floqai-template-mode", activeMode === "templates");
+  }
+
   function bindFloqAi(opts = {}) {
     const agent = document.getElementById("floqAiAgent");
     const mark = document.getElementById("floqAiMark");
     const speech = document.getElementById("floqAiSpeech");
     const speechText = document.getElementById("floqAiSpeechText") || speech;
     const panel = document.getElementById("floqAiSearchPanel");
-    const input = document.getElementById("intentSearchInput");
+    const input = document.getElementById("intentSearchInput") || document.getElementById("templateSearch");
     const helpEl = document.getElementById("floqAiHelpText");
-    const page = document.getElementById("floqAiPage");
     const logo = document.querySelector(".floqai-hero-logo") || document.querySelector(".intent-floqr-logo");
-    if (!agent || !mark) return;
+    if (!agent || !mark) return null;
 
     let speechTimer = null;
     let searchOpen = false;
@@ -50,16 +70,23 @@
     let speechVisible = false;
     let lastBobY = 0;
     let recentLines = [];
-    /* After each randomized line, next spoken line is Hi */
     let nextIsHi = false;
 
+    if (opts.mode) setMode(opts.mode);
+
     function floqrLogoFloor() {
+      if (activeMode === "templates") {
+        const host = document.getElementById("templateFloqAiHost") || document.getElementById("templateSelectPage");
+        if (host) {
+          const rect = host.getBoundingClientRect();
+          return Math.max(80, Math.ceil(rect.top + 24));
+        }
+      }
       if (!logo || logo.classList.contains("hidden")) {
         return Math.round(window.innerHeight * (isMobile() ? 0.28 : 0.22));
       }
       const rect = logo.getBoundingClientRect();
-      const gap = isMobile() ? 28 : 36;
-      return Math.ceil(rect.bottom + gap);
+      return Math.ceil(rect.bottom + (isMobile() ? 28 : 36));
     }
 
     function agentSize() {
@@ -69,37 +96,19 @@
       };
     }
 
-    function speechReserve() {
-      /* Leave room so a bubble next to/above the icon can stay on-screen */
-      const mobile = isMobile();
-      return {
-        x: mobile ? 8 : 12,
-        y: mobile ? 64 : 72
-      };
-    }
-
     function bounds() {
       const mobile = isMobile();
       const {w, h} = agentSize();
-      const reserve = speechReserve();
       const padX = mobile ? 10 : 16;
       const padBottom = mobile ? 18 : 24;
       const userMenu = document.getElementById("userMenu") || document.querySelector(".user-menu");
-      const menuBottom = userMenu
-        ? Math.ceil(userMenu.getBoundingClientRect().bottom + 10)
-        : 0;
-
-      const minTop = Math.max(floqrLogoFloor(), menuBottom, reserve.y);
-      const maxTop = Math.max(minTop + 48, window.innerHeight - padBottom - h - (mobile ? 8 : 0));
+      const menuBottom = userMenu ? Math.ceil(userMenu.getBoundingClientRect().bottom + 10) : 0;
+      const minTop = Math.max(floqrLogoFloor(), menuBottom, mobile ? 64 : 72);
+      const maxTop = Math.max(minTop + 48, window.innerHeight - padBottom - h);
       const minLeft = padX;
       const maxLeft = Math.max(minLeft, window.innerWidth - padX - w);
-
-      const preferredMinTop = mobile
-        ? Math.max(minTop, Math.round(window.innerHeight * 0.34))
-        : minTop;
-
       return {
-        minTop: preferredMinTop,
+        minTop: mobile ? Math.max(minTop, Math.round(window.innerHeight * 0.34)) : minTop,
         maxTop,
         minLeft,
         maxLeft,
@@ -107,6 +116,10 @@
         h,
         mobile
       };
+    }
+
+    function mobileMaxBubble() {
+      return Math.min(280, window.innerWidth - 24);
     }
 
     function placeSpeechBubble() {
@@ -118,81 +131,33 @@
       const bubbleW = Math.min(speech.offsetWidth || 220, mobileMaxBubble());
       const bubbleH = speech.offsetHeight || 56;
       const cx = agentRect.left + agentRect.width / 2;
-      const cy = agentRect.top + agentRect.height / 2;
-
-      const candidates = [
-        {place:"above", left: cx - bubbleW / 2, top: agentRect.top - bubbleH - 12},
-        {place:"below", left: cx - bubbleW / 2, top: agentRect.bottom + 12},
-        {place:"right", left: agentRect.right + 12, top: cy - bubbleH / 2},
-        {place:"left", left: agentRect.left - bubbleW - 12, top: cy - bubbleH / 2}
-      ];
-
-      let best = null;
-      for (const c of candidates) {
-        const left = clamp(c.left, pad, vw - bubbleW - pad);
-        const top = clamp(c.top, pad, vh - bubbleH - pad);
-        const fullyVisible =
-          left >= pad - 0.5 &&
-          top >= pad - 0.5 &&
-          left + bubbleW <= vw - pad + 0.5 &&
-          top + bubbleH <= vh - pad + 0.5;
-        /* Prefer placement that didn't need much clamp (stays near icon) */
-        const drift = Math.abs(left - c.left) + Math.abs(top - c.top);
-        if (fullyVisible && drift < 2) {
-          best = {place:c.place, left, top, drift:0};
-          break;
-        }
-        if (!best || drift < best.drift) best = {place:c.place, left, top, drift};
+      let left = clamp(cx - bubbleW / 2, pad, vw - bubbleW - pad);
+      let top = agentRect.top - bubbleH - 12;
+      let place = "above";
+      if (top < pad) {
+        top = agentRect.bottom + 12;
+        place = "below";
       }
-
-      if (!best) {
-        best = {
-          place: "below",
-          left: clamp(cx - bubbleW / 2, pad, vw - bubbleW - pad),
-          top: clamp(agentRect.bottom + 12, pad, vh - bubbleH - pad),
-          drift: 0
-        };
+      if (top + bubbleH > vh - pad) {
+        top = clamp(agentRect.top - bubbleH - 12, pad, vh - bubbleH - pad);
+        place = "above";
       }
-
-      speech.dataset.place = best.place;
-      speech.style.position = "fixed";
-      speech.style.left = `${best.left}px`;
-      speech.style.top = `${best.top}px`;
-      speech.style.right = "auto";
-      speech.style.bottom = "auto";
-      speech.style.transform = "none";
-    }
-
-    function mobileMaxBubble() {
-      return Math.min(isMobile() ? window.innerWidth - 20 : 280, window.innerWidth - 20);
+      speech.style.left = `${Math.round(left)}px`;
+      speech.style.top = `${Math.round(top)}px`;
+      speech.dataset.place = place;
     }
 
     function applyPos(x, y, bobY = 0) {
-      const {minTop, maxTop, minLeft, maxLeft} = bounds();
-      pos.x = clamp(x, minLeft, maxLeft);
-      pos.y = clamp(y, minTop, maxTop);
       lastBobY = bobY;
-      agent.style.left = `${pos.x}px`;
-      agent.style.top = `${pos.y + bobY}px`;
-      agent.style.right = "auto";
+      pos = {x, y};
+      agent.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y + bobY)}px, 0)`;
       placeSpeechBubble();
     }
 
     function randomTarget(b) {
-      const spanX = Math.max(0, b.maxLeft - b.minLeft);
-      const spanY = Math.max(0, b.maxTop - b.minTop);
-      let nx;
-      let ny;
-      if (!b.mobile) {
-        nx = 0.35 + Math.random() * 0.65;
-        ny = 0.15 + Math.random() * 0.85;
-      } else {
-        nx = 0.08 + Math.random() * 0.84;
-        ny = 0.25 + Math.random() * 0.7;
-      }
       return {
-        x: b.minLeft + nx * spanX,
-        y: b.minTop + ny * spanY
+        x: b.minLeft + Math.random() * Math.max(1, b.maxLeft - b.minLeft),
+        y: b.minTop + Math.random() * Math.max(1, b.maxTop - b.minTop)
       };
     }
 
@@ -200,15 +165,9 @@
       const b = bounds();
       from = {x: pos.x, y: pos.y};
       to = randomTarget(b);
-      const dx = to.x - from.x;
-      const dy = to.y - from.y;
-      if (Math.hypot(dx, dy) < (b.mobile ? 40 : 60)) {
-        to = randomTarget(b);
-      }
+      if (Math.hypot(to.x - from.x, to.y - from.y) < (b.mobile ? 40 : 60)) to = randomTarget(b);
       moveStart = performance.now();
-      moveDur = b.mobile
-        ? 5200 + Math.random() * 3800
-        : 3800 + Math.random() * 3200;
+      moveDur = b.mobile ? 5200 + Math.random() * 3800 : 3800 + Math.random() * 3200;
     }
 
     function tick(now) {
@@ -217,18 +176,11 @@
         placeSpeechBubble();
         return;
       }
-
       const b = bounds();
       const t = clamp((now - moveStart) / moveDur, 0, 1);
       const e = easeInOut(t);
-      const x = lerp(from.x, to.x, e);
-      const y = lerp(from.y, to.y, e);
-
       bobPhase += b.mobile ? 0.018 : 0.022;
-      const bobAmp = b.mobile ? 4 : 7;
-      const bobY = Math.sin(bobPhase) * bobAmp;
-
-      applyPos(x, y, bobY);
+      applyPos(lerp(from.x, to.x, e), lerp(from.y, to.y, e), Math.sin(bobPhase) * (b.mobile ? 4 : 7));
       if (t >= 1) pickNextMove();
     }
 
@@ -244,17 +196,22 @@
     }
 
     function pickRandomLine() {
-      const options = RANDOM_LINES.filter(line => !wouldBeThirdRepeat(line));
-      const pool = options.length ? options : RANDOM_LINES;
+      const poolSource = activeMode === "templates" ? TEMPLATE_RANDOM_LINES : INTENT_RANDOM_LINES;
+      const options = poolSource.filter(line => !wouldBeThirdRepeat(line));
+      const pool = options.length ? options : poolSource;
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function nextLine() {
+      if (activeMode === "templates" && templateIntroStep < 4) {
+        const fixed = [LINE_HI, LINE_USE_SEARCH, LINE_PRONOUNCE, LINE_CONTEXT];
+        const line = fixed[templateIntroStep++];
+        rememberLine(line);
+        return line;
+      }
       if (nextIsHi) {
         nextIsHi = false;
-        /* Hi always follows a randomized line (3s gap handled by hide timer) */
         if (wouldBeThirdRepeat(LINE_HI)) {
-          /* Extremely unlikely; fall back to a random line instead of 3× Hi */
           const line = pickRandomLine();
           rememberLine(line);
           nextIsHi = true;
@@ -265,7 +222,7 @@
       }
       const line = pickRandomLine();
       rememberLine(line);
-      nextIsHi = true; /* after this randomized line is shown, Hi comes next */
+      nextIsHi = true;
       return line;
     }
 
@@ -307,7 +264,6 @@
           scheduleSpeech(SHOW_MS, false);
         } else {
           hideSpeech();
-          /* 3s after randomized text finishes → Hi; same cadence between all lines */
           scheduleSpeech(HIDE_MS, true);
         }
       }, delay);
@@ -317,37 +273,34 @@
       searchOpen = true;
       clearTimeout(speechTimer);
       hideSpeech();
-      agent.classList.add("is-idle");
-      if (helpEl) helpEl.textContent = HELP;
-      if (panel) panel.classList.add("open");
-      if (page) page.classList.add("search-open");
-      if (input) {
-        input.setAttribute("placeholder", "Type in plain words…");
-        input.focus();
+      agent.classList.remove("is-idle");
+      opts.onOpenSearch?.(activeMode);
+      if (activeMode === "templates") {
+        const templateInput = document.getElementById("templateSearch");
+        templateInput?.focus();
+        templateInput?.scrollIntoView({behavior: "smooth", block: "center"});
+      } else {
+        panel?.classList.add("open");
+        panel?.setAttribute("aria-hidden", "false");
+        (document.getElementById("intentSearchInput") || input)?.focus();
       }
-      if (typeof opts.onOpenSearch === "function") opts.onOpenSearch();
     }
 
-    agent.addEventListener("click", event => {
-      event.preventDefault();
-      openSearch();
+    function closeSearch() {
+      searchOpen = false;
+      agent.classList.add("is-idle");
+      panel?.classList.remove("open");
+      panel?.setAttribute("aria-hidden", "true");
+      pickNextMove();
+      scheduleSpeech(700, true);
+    }
+
+    agent.addEventListener("click", () => {
+      if (searchOpen) closeSearch();
+      else openSearch();
     });
 
-    agent.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openSearch();
-      }
-    });
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        clearTimeout(speechTimer);
-        hideSpeech();
-      } else if (!searchOpen) {
-        scheduleSpeech(600, true);
-      }
-    });
+    if (helpEl) helpEl.textContent = activeMode === "templates" ? LINE_USE_SEARCH : HELP;
 
     window.addEventListener("resize", () => {
       const b = bounds();
@@ -365,18 +318,40 @@
     applyPos(pos.x, pos.y);
     pickNextMove();
     raf = requestAnimationFrame(tick);
-    /* First line soon after load */
     scheduleSpeech(700, true);
 
-    return {
-      openSearch,
-      HELP
-    };
+    return {openSearch, closeSearch, setMode, HELP};
+  }
+
+  let boundController = null;
+
+  function ensureTemplateMode() {
+    setMode("templates");
+    if (!boundController) boundController = bindFloqAi({mode: "templates"});
+    else boundController.setMode?.("templates");
+    const mount = document.getElementById("templateFloqAiMount");
+    if (mount) {
+      mount.innerHTML = '<p class="sub small floqai-template-hint">FloqAi is pulsating on this screen — tap the mark to search templates (Sports, Jersey, VIP, Humor, Cars, Video, Pictures, Ballers).</p>';
+    }
+    document.getElementById("floqAiAgent")?.classList.add("is-idle");
   }
 
   global.FLOQRFloqAi = {
-    bindFloqAi,
+    bindFloqAi(opts) {
+      boundController = bindFloqAi(opts);
+      return boundController;
+    },
+    ensureTemplateMode,
+    setMode,
     HELP,
-    LINES: {LINE_HI: "Hi, I am FloqAi", LINE_LOOK: "Tell me, what are you looking for?", LINE_FEATURE: "Need to learn about a feature or do something else?"}
+    LINES: {
+      LINE_HI,
+      LINE_LOOK,
+      LINE_FEATURE,
+      LINE_USE_SEARCH,
+      LINE_PRONOUNCE,
+      LINE_CONTEXT,
+      TEMPLATE_RANDOM_LINES
+    }
   };
 })(window);
