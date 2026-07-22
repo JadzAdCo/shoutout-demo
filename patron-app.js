@@ -46,6 +46,7 @@
   let templateVariants = {mine:[], community:[], club:[]};
   let locationContextPromise = null;
   let confirmationReturnTimer = null;
+  let confirmationCountdownTimer = null;
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
   let approvedRecommendationLibrary = [];
@@ -81,6 +82,45 @@
   }
   function isFootballTeamIntro(templateId = selectedTemplate) {
     return String(templateId || "") === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
+  }
+  function isSoccerJerseyTemplate(templateId = selectedTemplate) {
+    const id = String(templateId || selectedTemplate || "");
+    const t = getTemplate(id);
+    return t.layout === "soccer-jersey" || id.startsWith("soccer") || t.jerseyNumberField === true;
+  }
+  function glyphCap(value = "", max = 0) {
+    const limit = Math.max(0, Number(max) || 0);
+    return Array.from(String(value ?? "")).slice(0, limit).join("");
+  }
+  function soccerNameFromSource() {
+    const profile = cachedUserProfile || {};
+    const source = byId("soccerNameSource")?.value || "displayName";
+    const emailName = (currentUser?.email || "").split("@")[0] || "";
+    const username = profile.username || emailName || currentUser?.displayName || "patron";
+    if (source === "manual") return String(byId("soccerManualName")?.value || "").trim();
+    if (source === "instagram") return floqrId().normalizeInstagramHandle?.(profile.instagramHandle || byId("profileInstagram")?.value || username) || cleanHandle(username);
+    if (source === "floqrHandle") return floqrId().normalizeFloqrHandle?.(profile.floqrHandle || profile.username || username) || floqrId().normalizeFloqrHandle?.(username);
+    return String(profile.displayName || currentUser?.displayName || username).trim();
+  }
+  function syncSoccerJerseyFields() {
+    const soccer = isSoccerJerseyTemplate();
+    byId("soccerJerseyFields")?.classList.toggle("hidden", !soccer);
+    byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer);
+    document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer);
+    const source = byId("soccerNameSource")?.value || "displayName";
+    byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
+    if (!soccer) return;
+    const caps = templateDisplayCaps();
+    const nameLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 12));
+    const numberLimit = Math.min(2, Math.max(1, Number(caps.sub || caps.maxSubCharacters || 2)));
+    if (byId("soccerManualName")) byId("soccerManualName").maxLength = nameLimit;
+    if (byId("soccerJerseyNumber")) byId("soccerJerseyNumber").maxLength = numberLimit;
+    const name = glyphCap(String(soccerNameFromSource() || "").toUpperCase(), nameLimit);
+    // Any characters allowed for jersey mark; hard-capped at 2 glyphs (not digits-only).
+    const mark = glyphCap(byId("soccerJerseyNumber")?.value || "", numberLimit);
+    if (byId("soccerJerseyNumber") && byId("soccerJerseyNumber").value !== mark) byId("soccerJerseyNumber").value = mark;
+    if (byId("mainText")) byId("mainText").value = name;
+    if (byId("subText")) byId("subText").value = mark;
   }
   function footballThemePayload() {
     const themeId = byId("footballColorTheme")?.value || "stadiumGold";
@@ -415,20 +455,45 @@
 
   function showAdSplash(type, nextFn) {
     pendingCategoryAfterAd = nextFn;
-    const ad = window.FLOQRAdCampaigns?.pickCampaign?.(type, cachedUserProfile || {}) || AD_CONTENT[type] || AD_CONTENT.default;
-    setText("adTitle", ad.title);
-    setText("adBody", ad.body);
-    setText("adBadge", ad.badge);
-    const adImageSlot = byId("adImageSlot");
-    if (adImageSlot) {
-      adImageSlot.innerHTML = `<img src="${ad.image || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20900%20520%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20x2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ff64d8%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23dfff5a%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Crect%20width%3D%22900%22%20height%3D%22520%22%20rx%3D%2244%22%20fill%3D%22%2309091c%22/%3E%0A%3Ccircle%20cx%3D%22170%22%20cy%3D%22110%22%20r%3D%22155%22%20fill%3D%22%23ff64d8%22%20opacity%3D%22.20%22/%3E%0A%3Ccircle%20cx%3D%22730%22%20cy%3D%22385%22%20r%3D%22185%22%20fill%3D%22%23dfff5a%22%20opacity%3D%22.20%22/%3E%0A%3Crect%20x%3D%22245%22%20y%3D%22135%22%20width%3D%22410%22%20height%3D%22240%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%2214%22/%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22245%22%20fill%3D%22%23fff%22%20font-size%3D%2256%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22900%22%3EADVERTISE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22310%22%20fill%3D%22%23dfff5a%22%20font-size%3D%2230%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22800%22%3EHERE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22450%22%20fill%3D%22%23c9cee5%22%20font-size%3D%2224%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%3ESponsored%20FLOQR%20Media%20Slot%3C/text%3E%0A%3C/svg%3E'}" alt="${ad.title} advertisement">`;
+    const activeLocation = getLocation?.() || {};
+    const clubName = activeLocation.locationName || activeLocation.brandName || "Club";
+    const clubLogoUrl = activeLocation.logoUrl || activeLocation.clubLogoUrl || "";
+    setText("adTitle", clubName);
+    setText("adBody", "Your shoutout goes live after this splash.");
+    const clubLogo = byId("splashClubLogo");
+    const clubLogoFallback = byId("splashClubLogoFallback");
+    if (clubLogo) {
+      if (clubLogoUrl) {
+        clubLogo.src = clubLogoUrl;
+        clubLogo.onerror = () => {
+          clubLogo.classList.add("hidden");
+          if (clubLogoFallback) {
+            clubLogoFallback.textContent = String(clubName || "Club").slice(0, 24).toUpperCase();
+            clubLogoFallback.classList.remove("hidden");
+          }
+        };
+        clubLogo.classList.remove("hidden");
+        clubLogoFallback?.classList.add("hidden");
+      } else {
+        clubLogo.classList.add("hidden");
+        if (clubLogoFallback) {
+          clubLogoFallback.textContent = String(clubName || "Club").slice(0, 24).toUpperCase();
+          clubLogoFallback.classList.remove("hidden");
+        }
+      }
     }
+    const statementPrimary = byId("splashStatementPrimary");
+    const statementSecondary = byId("splashStatementSecondary");
+    statementPrimary?.classList.remove("is-hidden");
+    statementSecondary?.classList.remove("is-hidden");
     let remaining = 10;
     setText("adCountdown", String(remaining));
     showPage("adSplashPage");
     clearInterval(adTimer);
     adTimer = setInterval(() => {
       remaining -= 1;
+      if (remaining <= 6) statementPrimary?.classList.add("is-hidden");
+      if (remaining <= 3) statementSecondary?.classList.add("is-hidden");
       setText("adCountdown", String(Math.max(remaining, 0)));
       if (remaining <= 0) {
         clearInterval(adTimer);
@@ -1318,7 +1383,7 @@
       requesterLocation:profileLocationParts(cachedUserProfile || {}).join(", "),
       status:nextStatus,
       link:"./patron-portal.html?tab=inbox&v=29.09.8",
-      minglLink:"./mingl-chat.html?v=29.09.9",
+      minglLink:"./mingl-chat.html?v=29.09.33",
       read:false,
       createdAt:now
     };
@@ -2413,8 +2478,13 @@
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const discoveryQuery = query || templateContextQuery();
     const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const location = getLocation() || {};
     const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
-    const ids = Array.from(new Set(["blackwhite", ...(getLocation().templates || []), ...venueSpecificIds, ...(window.SHOUTOUT_STANDARD_TEMPLATE_IDS || [])]));
+    const standardTemplateIds = location.restrictTemplatesToLocationSet
+      ? (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []).filter(id => String(id).startsWith("soccer"))
+      : (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []);
+    const alwaysInclude = location.restrictTemplatesToLocationSet ? [] : ["blackwhite"];
+    const ids = Array.from(new Set([...alwaysInclude, ...(location.templates || []), ...venueSpecificIds, ...standardTemplateIds]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id) && window.FLOQRTextLayout?.resolve?.(record.data, id)?.supported !== false));
     const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");
@@ -2521,7 +2591,15 @@
     }
     return url.href;
   }
-  function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`); updatePreview(); showPage("editorPage"); }
+  function goToEditor() {
+    const l=getLocation(), t=getTemplate();
+    setText("editorClubTitle", l.locationName);
+    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
+    updateMediaEditorForTemplate();
+    syncSoccerJerseyFields();
+    updatePreview();
+    showPage("editorPage");
+  }
   function updatePreview() {
     const frame=byId("previewFrame");
     const mediaField = byId("shoutoutMediaUrl");
@@ -2596,28 +2674,31 @@
     shoutoutPreviewTimer = setTimeout(closeShoutoutPreviewModal, isFootballTeamIntro() ? 20000 : 5000);
   }
 
-  function returnToMainFromConfirmation() {
+  function clearConfirmationTimers() {
     if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
+    if (confirmationCountdownTimer) clearInterval(confirmationCountdownTimer);
     confirmationReturnTimer = null;
+    confirmationCountdownTimer = null;
+  }
+
+  function returnToMainFromConfirmation() {
+    clearConfirmationTimers();
     showPage("categoryPage");
   }
 
   function goToMinglFromConfirmation() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
     setText("confirmationRedirectStatus", "Opening Mingl...");
     showMinglLanding();
   }
 
   function goToBartrFromConfirmation() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
-    window.location.href = "./commerce.html?v=29.09.9&from=search";
+    clearConfirmationTimers();
+    window.location.href = "./commerce.html?v=29.09.33&from=search";
   }
 
   function editSubmittedShoutout() {
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
     setText("confirmationRedirectStatus", "");
     goToEditor();
   }
@@ -2626,10 +2707,20 @@
     setText("confirmRef", payload.referenceNumber);
     setText("confirmClub", location.locationName);
     setText("confirmTemplate", template.name);
-    setText("confirmationRedirectStatus", "ShoutOut submitted. Choose Edit ShoutOut, Mingl, or BartR.");
+    let secondsRemaining = 15;
+    setText("confirmationCountdown", String(secondsRemaining));
+    setText("confirmationRedirectStatus", `Returning to Search in ${secondsRemaining} seconds...`);
     showPage("confirmationPage");
-    if (confirmationReturnTimer) clearTimeout(confirmationReturnTimer);
-    confirmationReturnTimer = null;
+    clearConfirmationTimers();
+    confirmationCountdownTimer = setInterval(() => {
+      secondsRemaining -= 1;
+      setText("confirmationCountdown", String(Math.max(secondsRemaining, 0)));
+      setText("confirmationRedirectStatus", `Returning to Search in ${Math.max(secondsRemaining, 0)} seconds...`);
+      if (secondsRemaining <= 0) {
+        returnToMainFromConfirmation();
+      }
+    }, 1000);
+    confirmationReturnTimer = setTimeout(returnToMainFromConfirmation, 15000);
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -2732,6 +2823,13 @@
     const limit = Number(type === "sub" ? caps.sub : caps.main);
     const cleaned = cleanRecommendationText(value);
     if (caps.supported === false || limit <= 0) return "";
+    if (isSoccerJerseyTemplate() && type === "sub") {
+      // Soccer jersey mark: keep any characters, hard-cap at 2 glyphs.
+      return glyphCap(cleaned, Math.min(2, limit));
+    }
+    if (isSoccerJerseyTemplate() && type === "main") {
+      return glyphCap(cleaned.toUpperCase(), limit);
+    }
     if (type !== "main" || caps.lineCount <= 1) return cleaned.slice(0, limit);
     const availableLines = caps.lineCount;
     const visibleLimit = Math.min(limit, caps.perLine * availableLines);
@@ -3171,7 +3269,8 @@
         templateVariantScope:selectedTemplateVariant.variantScope || "patron",
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      syncSoccerJerseyFields();
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const priceCents = Math.max(0, Math.round(Number(t.priceCents || mediaPayload.priceCents || 0)));
       if (priceCents > 0) {
         const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
@@ -3204,7 +3303,7 @@
       }
     }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -3222,9 +3321,11 @@
     }
     const subInput = byId("subText");
     if (subInput) {
-      subInput.maxLength = caps.sub;
-      if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
+      subInput.maxLength = isSoccerJerseyTemplate(t.id || selectedTemplate) ? Math.min(2, caps.sub || 2) : caps.sub;
+      if (isSoccerJerseyTemplate(t.id || selectedTemplate)) subInput.value = glyphCap(subInput.value, subInput.maxLength);
+      else if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
     }
+    syncSoccerJerseyFields();
     document.querySelectorAll("[data-football-team-identity-value]").forEach(input => {
       input.maxLength = Math.max(1, Number(caps.maxPlayerNameCharacters || 14));
       if (input.value.length > input.maxLength) input.value = input.value.slice(0, input.maxLength);
@@ -3319,7 +3420,7 @@
       const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
 
       const portalLink = document.createElement("a");
-      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9";
+      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33";
       portalLink.textContent = "My Profile and Settings";
       portalLink.dataset.patronMenu = "portal";
       portalLink.className = "profile-menu-link";
@@ -3339,7 +3440,7 @@
       menu.insertBefore(messages, signOutButton);
 
       const chats = document.createElement("a");
-      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal";
+      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal";
       chats.textContent = "Mingl (0/0)";
       chats.dataset.patronMenu = "chats";
       chats.className = "profile-menu-link";
@@ -3451,7 +3552,7 @@
     bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list")));
     bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry")));
     bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry")));
-    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
+    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
@@ -3464,6 +3565,16 @@
     byId("minglImageInput")?.addEventListener("change", renderMinglAttachmentPreview);
     byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerNameSource")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerJerseyNumber")?.addEventListener("input", event => {
+      // Any character allowed; hard-cap at 2 glyphs for soccer templates.
+      const next = glyphCap(event.currentTarget.value, 2);
+      if (event.currentTarget.value !== next) event.currentTarget.value = next;
+      syncSoccerJerseyFields();
+      updatePreview();
+      schedulePersonalizedShoutOutRecommendations();
+    });
     byId("shoutoutTone")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     byId("shoutoutEventType")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     byId("shoutoutPreviewModal")?.addEventListener("click", event => {
@@ -3490,6 +3601,37 @@
     window.FLOQRIntentSearch?.bindIntentSearch({
       onShoutout: () => showShoutoutLanding(),
       onMingl: () => showMinglLanding()
+    });
+    const floqAiPanel = byId("floqAiSearchPanel");
+    const floqAiHelpBtn = byId("floqAiHelpBtn");
+    const floqAiHelpPop = byId("floqAiHelpPopout");
+    const floqAiHelpClose = byId("floqAiHelpClose");
+    function setFloqAiHelpOpen(open) {
+      if (!floqAiHelpPop || !floqAiHelpBtn) return;
+      floqAiHelpPop.classList.toggle("hidden", !open);
+      floqAiHelpPop.setAttribute("aria-hidden", open ? "false" : "true");
+      floqAiHelpBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    floqAiHelpBtn?.addEventListener("click", event => {
+      event.stopPropagation();
+      setFloqAiHelpOpen(floqAiHelpPop?.classList.contains("hidden"));
+    });
+    floqAiHelpClose?.addEventListener("click", () => setFloqAiHelpOpen(false));
+    document.addEventListener("click", event => {
+      if (!floqAiHelpPop || floqAiHelpPop.classList.contains("hidden")) return;
+      if (floqAiHelpPop.contains(event.target) || floqAiHelpBtn?.contains(event.target)) return;
+      setFloqAiHelpOpen(false);
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") setFloqAiHelpOpen(false);
+    });
+    window.FLOQRFloqAi?.bindFloqAi({
+      onOpenSearch() {
+        if (floqAiPanel) {
+          floqAiPanel.classList.add("open");
+          floqAiPanel.setAttribute("aria-hidden", "false");
+        }
+      }
     });
     window.FLOQRNav?.applyStartPage(showPage);
   });
@@ -3550,10 +3692,10 @@
     const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
     menu.innerHTML = `
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.9"}">My Profile and Settings</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33"}">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
       <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FLOQR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.9&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }
 

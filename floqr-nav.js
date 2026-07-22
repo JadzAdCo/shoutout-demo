@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.14";
+  const APP_V = "29.09.40";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
@@ -46,6 +46,14 @@
     adminLink(path, extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
       return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
+    },
+    /** Stable venue board URL — no cache-bust ?v= (for LED devices and external embeds). */
+    stableDisplayUrl(locationId = "", extra = {}) {
+      const id = String(locationId || qs("location") || qs("club") || extra.location || "").trim();
+      const params = {...extra};
+      delete params.location;
+      delete params.v;
+      return buildUrl("./display.html", id ? {location: id, ...params} : params);
     },
     /** Resolve the correct back target for a satellite page. */
     resolveBack(fromOverride = "") {

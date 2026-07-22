@@ -107,6 +107,16 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
   assert.match(backend, /Idle boards stay blank/);
 });
 
+test("Soccer jersey mark accepts any 2 characters", () => {
+  assert.match(sharedData, /soccerMorocco/);
+  assert.match(sharedData, /maxSubCharacters:2/);
+  assert.match(sharedData, /jerseyNumberMaxChars:2/);
+  assert.match(displayApp, /isSoccerJerseyTemplate/);
+  assert.match(displayApp, /glyphSlice\(String\(data\.subText/);
+  assert.match(backend, /SOCCER_JERSEY_TEMPLATE_IDS/);
+  assert.match(backend, /Array\.from\(String\(rawShoutout\.subText/);
+});
+
 test("Heist identity rail cycles optional handle then brand lines for 3s each", () => {
   assert.match(displayApp, /renderHeistIdentityRail/);
   assert.match(displayApp, /Caught in a HEIST/);
@@ -133,8 +143,14 @@ test("all published templates have display-aware text contracts", () => {
     const rules = formats.map(formatId => sandbox.FLOQRTextLayout.resolve(template, formatId));
     assert.ok(rules.some(rule => rule.supported), `${template.id} must support at least one display`);
     rules.filter(rule => rule.supported).forEach(rule => {
-      assert.equal(rule.mainTextSizePercent, 20.8);
-      assert.equal(rule.subTextSizePercent, 7.8);
+      if (rule.profileId === "soccerJersey") {
+        assert.ok(rule.mainTextSizePercent >= 6 && rule.mainTextSizePercent <= 12, `${template.id} soccer name size`);
+        assert.ok(rule.subTextSizePercent >= 20 && rule.subTextSizePercent <= 36, `${template.id} soccer mark size`);
+        assert.equal(rule.sub, 2, `${template.id} soccer mark must be exactly 2 characters`);
+      } else {
+        assert.equal(rule.mainTextSizePercent, 20.8);
+        assert.equal(rule.subTextSizePercent, 7.8);
+      }
       assert.equal(rule.main, rule.lineCount * rule.perLine);
       // led-64x32 uses the Heist-era 30/10 board floor (28px); larger panels stay >= 34.
       assert.ok(rule.minimumFontPixels >= 28, `${template.id} minimumFontPixels ${rule.minimumFontPixels}`);

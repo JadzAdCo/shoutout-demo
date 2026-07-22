@@ -25,6 +25,10 @@ const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
 const HEIST_DC_LOCATION_ID = "heist-washington-dc";
 const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const HEIST_ART_PRICE_CENTS = 3000;
+const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
+  "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
+]);
+const SOCCER_JERSEY_PRICE_CENTS = 3000;
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
 const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
@@ -48,6 +52,10 @@ const SHOUTOUT_TEXT_LIMITS = {
   footballIntro:{
     "p125-96x48":[2,14,28,20,3,18,54,14,false],"p125-64x48":[2,10,20,16,3,12,36,10,false],"p125-64x32":[2,10,20,14,2,12,24,8,true],
     "led-96x48":[2,14,28,20,3,18,54,14,false],"led-64x48":[2,10,20,16,3,12,36,10,false],"led-64x32":[2,10,20,14,2,12,24,8,true]
+  },
+  soccerJersey:{
+    "p125-96x48":[1,12,12,2],"p125-64x48":[1,12,12,2],"p125-64x32":[1,10,10,2],
+    "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
   }
 };
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
@@ -123,7 +131,17 @@ function text(value = "", max = 500) {
 }
 
 function checkoutTextCaps(templateId = "", formatId = "") {
-  const profileId = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID ? "footballIntro" : templateId === "car" ? "car" : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId) ? "splitMedia" : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId) ? "classicBoard" : "full";
+  const profileId = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID
+    ? "footballIntro"
+    : SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)
+      ? "soccerJersey"
+      : templateId === "car"
+        ? "car"
+        : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+          ? "splitMedia"
+          : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+            ? "classicBoard"
+            : "full";
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[formatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
   return {
@@ -224,10 +242,25 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     mainTextSizePercent:20.8,
     subTextSizePercent:7.8,
     mainText:fitCheckoutDisplayText(rawShoutout.mainText || "SHOUTOUT!", caps, "main"),
-    subText:fitCheckoutDisplayText(rawShoutout.subText || "", caps, "sub"),
+    // Soccer jersey mark: any characters, hard-capped at 2 glyphs (not digits-only).
+    subText:SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)
+      ? Array.from(String(rawShoutout.subText || "")).slice(0, 2).join("")
+      : fitCheckoutDisplayText(rawShoutout.subText || "", caps, "sub"),
     submittedByUid:authContext.uid || "",
     submittedBy:text(authContext.token?.email || rawShoutout.submittedBy, 200).toLowerCase()
   };
+  if (SOCCER_JERSEY_TEMPLATE_IDS.has(templateId)) {
+    return {
+      ...rawPayload,
+      shoutout:{
+        ...shoutout,
+        priceCents:SOCCER_JERSEY_PRICE_CENTS,
+        priceLabel:"$30",
+        maxSubCharacters:2,
+        jerseyNumberMaxChars:2
+      }
+    };
+  }
   if (HEIST_ART_TEMPLATE_IDS.has(templateId)) {
     const heistClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
     if (heistClubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
@@ -535,11 +568,14 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const templateId = text(shoutout.template || shoutout.templateId, 80);
     const footballTeamIntro = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
     const heistArt = HEIST_ART_TEMPLATE_IDS.has(templateId);
+    const soccerJersey = SOCCER_JERSEY_TEMPLATE_IDS.has(templateId);
     const pricedAmountCents = footballTeamIntro
       ? 3000
       : heistArt
         ? HEIST_ART_PRICE_CENTS
-        : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
+        : soccerJersey
+          ? SOCCER_JERSEY_PRICE_CENTS
+          : Math.max(0, Math.round(Number(shoutout.priceCents || payload.priceCents || 0)));
     if (!pricedAmountCents) {
       throw new HttpsError("failed-precondition", "This ShoutOut template does not require checkout. Submit it as a free ShoutOut.");
     }

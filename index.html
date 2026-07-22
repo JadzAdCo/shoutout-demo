@@ -5,8 +5,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.17"/>
-  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.14"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.40"/>
+  <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.40"/>
 </head>
 <body>
 
@@ -256,24 +257,44 @@
       <div class="category-or">Or</div>
       <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
       <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
-      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.9&from=search">Trade by BartR</a>
-      <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.9&from=search">RydR</a>
-      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.9&start=intent">Ask FloqR</a>
+      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.33&from=search">Trade by BartR</a>
+      <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.33&from=search">RydR</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.40&start=intent">FloqAi</a>
     </div>
   </section>
 
-  <section id="intentSearchPage" class="page intent-search-page">
-    <div class="intent-search-shell">
-      <div class="intent-search-main">
-        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
+  <section id="intentSearchPage" class="page intent-search-page floqai-intent-page">
+    <div class="intent-search-shell floqai-top-stack">
+      <div class="floqai-search-main intent-search-main">
+        <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback hidden">FLOQR</div>
-        <label class="intent-search-label" for="intentSearchInput">
-          <span class="intent-help">In plain words, what do you wish to accomplish</span>
-          <input id="intentSearchInput" type="search" autocomplete="off" placeholder="e.g. I want to meet someone… Book a ride…" aria-describedby="intentSearchHint"/>
-        </label>
-        <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club</p>
-        <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+
+        <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="FloqAi help">?</button>
+        <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi help" aria-hidden="true">
+          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">×</button>
+          <p class="eyebrow">FloqAi</p>
+          <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
+          <p class="sub small">Routes to Mingl, RydR, BartR, ShoutOut, clubs, and more.</p>
+        </div>
+
+        <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
+          <label class="intent-search-label" for="intentSearchInput">
+            <span id="floqAiHelpText" class="intent-help">Tell, how can I help you?</span>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain words…" aria-describedby="intentSearchHint"/>
+          </label>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club · hip hop night</p>
+          <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
+        </div>
       </div>
+    </div>
+
+    <button id="floqAiAgent" class="floqai-agent" type="button" aria-label="FloqAi — open contextual search" title="FloqAi">
+      <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
+        <img class="floqai-mark-img" src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/>
+      </span>
+    </button>
+    <div id="floqAiSpeech" class="floqai-speech" role="status" aria-live="polite" aria-hidden="true" data-place="above">
+      <span id="floqAiSpeechText"></span>
     </div>
   </section>
 
@@ -284,7 +305,7 @@
         <p class="eyebrow">Screen 2A - ShoutOut Landing</p>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./shoutout-logo.png?v=29.09.9" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.9'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
+          <img src="./shoutout-logo.png?v=29.09.33" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
         <h1>Throw a ShoutOut</h1>
@@ -316,7 +337,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
             <span>Search for People</span>
           </button>
-          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.14&from=mingl">
+          <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.33&from=mingl">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>
             <span>Mingl Gist</span>
           </a>
@@ -378,11 +399,23 @@
     <div class="splash-wrap">
       <div class="splash-card">
         <button id="backFromAdBtn" type="button">← Back to categories</button>
-        <p class="eyebrow">Screen 3A — Sponsored Message</p>
-        <div id="adImageSlot" class="ad-image-slot"></div>
-        <h1 id="adTitle">Advertise Here</h1>
-        <p id="adBody" class="sub">Your brand can own this moment before patrons browse nightlife.</p>
-        <div id="adBadge" class="ad-badge">FLOQR Media Slot</div>
+        <p class="eyebrow">Screen 3A — ShoutOut Splash</p>
+        <div class="splash-logo-row">
+          <div id="splashClubLogoWrap" class="splash-logo-wrap">
+            <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
+            <div id="splashClubLogoFallback" class="hero-logo-fallback splash-fallback-logo">CLUB</div>
+          </div>
+          <div id="splashFloqrLogoWrap" class="splash-logo-wrap">
+            <img src="./images/floqr-color.png" alt="FLOQR logo" class="splash-logo" onerror="this.classList.add('hidden');document.getElementById('splashFloqrLogoFallback')?.classList.remove('hidden')"/>
+            <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
+          </div>
+        </div>
+        <h1 id="adTitle">Get Ready</h1>
+        <p id="adBody" class="sub">Your shoutout is almost live.</p>
+        <div class="splash-statement-stack">
+          <p id="splashStatementPrimary" class="splash-statement">Powered by Papi</p>
+          <p id="splashStatementSecondary" class="splash-statement">and Social OS</p>
+        </div>
         <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
         <button id="skipAdBtn" class="ghost" type="button">Skip</button>
       </div>
@@ -432,6 +465,23 @@
       <div class="card">
         <h2>Message</h2>
         <label>Main message<textarea id="mainText" rows="3" maxlength="47" placeholder="Enter ShoutOut Here"></textarea></label>
+        <div id="soccerJerseyFields" class="soccer-jersey-fields hidden">
+          <label>Display name
+            <select id="soccerNameSource">
+              <option value="displayName">Use my display name</option>
+              <option value="floqrHandle">Use my FloqR / Mingl handle</option>
+              <option value="instagram">Use my Instagram handle</option>
+              <option value="manual">Enter name manually</option>
+            </select>
+          </label>
+          <label id="soccerManualNameWrap" class="hidden">Jersey name
+            <input id="soccerManualName" type="text" maxlength="12" autocomplete="off" placeholder="Name on jersey"/>
+          </label>
+          <label>Jersey mark (any 2 characters)
+            <input id="soccerJerseyNumber" type="text" maxlength="2" autocomplete="off" placeholder="e.g. 7, AB, ★1" aria-describedby="soccerJerseyNumberHint"/>
+          </label>
+          <p id="soccerJerseyNumberHint" class="sub small">Exactly up to 2 characters of any kind (letters, numbers, or symbols).</p>
+        </div>
         <p id="templateCharacterCapHint" class="sub small" aria-live="polite">Choose a template and display to see its safe line and character limits.</p>
         <label>Club display screen
           <select id="shoutoutScreenFormat"></select>
@@ -601,10 +651,10 @@
 
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
-      <p class="eyebrow">Screen 6 — ShoutOut Confirmation</p><h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
+      <h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
       <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
-      <p id="confirmationRedirectStatus" class="status">Choose your next step.</p>
-      <div class="button-row confirmation-actions"><button id="editSubmittedShoutoutBtn" class="primary" type="button">Edit ShoutOut</button><button id="confirmGoMinglBtn" type="button">Mingl</button><button id="confirmGoBartrBtn" type="button">BartR</button></div>
+      <p id="confirmationRedirectStatus" class="status">Returning to Search in <span id="confirmationCountdown">15</span> seconds...</p>
+      <div class="button-row confirmation-actions"><button id="skipConfirmationBtn" class="ghost" type="button">Skip</button></div>
     </div>
   </section>
 </main>
@@ -614,31 +664,32 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.14"></script>
-<script src="./floqr-nav.js?v=29.09.14"></script>
-<script src="./intent-search.js?v=29.09.14"></script>
-<script src="./global-profile-status.js?v=29.09.14"></script>
-<script src="./floqr-i18n.js?v=29.09.14"></script>
-<script src="./shared-data.js?v=29.09.22"></script>
-<script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./url-media-field.js?v=29.09.17"></script>
-<script src="./ai-service.js?v=29.09.14"></script>
-<script src="./ai-index-service.js?v=29.09.14"></script>
-<script src="./ai-search-service.js?v=29.09.14"></script>
-<script src="./ai-location-service.js?v=29.09.14"></script>
-<script src="./ai-notification-service.js?v=29.09.14"></script>
-<script src="./ai-template-studio.js?v=29.09.14"></script>
-<script src="./floqr-action-feedback.js?v=29.09.14"></script>
-<script src="./ai-grammar-service.js?v=29.09.14"></script>
-<script src="./helper-popouts.js?v=29.09.14"></script>
-<script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
-<script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./floqr-identity.js?v=29.09.14"></script>
-<script src="./floqr-logger.js?v=29.09.14"></script>
-<script src="./payment-service.js?v=29.09.14"></script>
-<script src="./patron-app.js?v=29.09.17"></script>
-<script src="./ai-assistant-ui.js?v=29.09.14"></script>
-<script src="./ai-media-service.js?v=29.09.14"></script>
-<script src="./notification-center.js?v=29.09.14"></script>
+<script src="./firebase-config.js?v=29.09.33"></script>
+<script src="./floqr-nav.js?v=29.09.39"></script>
+<script src="./intent-search.js?v=29.09.39"></script>
+<script src="./floqai-search.js?v=29.09.40"></script>
+<script src="./global-profile-status.js?v=29.09.33"></script>
+<script src="./floqr-i18n.js?v=29.09.33"></script>
+<script src="./shared-data.js?v=29.09.40"></script>
+<script src="./feature-gates.js?v=29.09.33"></script>
+<script src="./url-media-field.js?v=29.09.33"></script>
+<script src="./ai-service.js?v=29.09.33"></script>
+<script src="./ai-index-service.js?v=29.09.33"></script>
+<script src="./ai-search-service.js?v=29.09.33"></script>
+<script src="./ai-location-service.js?v=29.09.33"></script>
+<script src="./ai-notification-service.js?v=29.09.33"></script>
+<script src="./ai-template-studio.js?v=29.09.33"></script>
+<script src="./floqr-action-feedback.js?v=29.09.33"></script>
+<script src="./ai-grammar-service.js?v=29.09.33"></script>
+<script src="./helper-popouts.js?v=29.09.33"></script>
+<script src="./dc-spot-ad-campaigns.js?v=29.09.33"></script>
+<script src="./ad-campaigns.js?v=29.09.33"></script>
+<script src="./floqr-identity.js?v=29.09.33"></script>
+<script src="./floqr-logger.js?v=29.09.33"></script>
+<script src="./payment-service.js?v=29.09.33"></script>
+<script src="./patron-app.js?v=29.09.40"></script>
+<script src="./ai-assistant-ui.js?v=29.09.33"></script>
+<script src="./ai-media-service.js?v=29.09.33"></script>
+<script src="./notification-center.js?v=29.09.33"></script>
 </body>
 </html>
