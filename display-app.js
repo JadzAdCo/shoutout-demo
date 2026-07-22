@@ -769,11 +769,11 @@
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
       byId("displayMain").classList.add("soccer-jersey-name");
-      byId("displayMain").style.setProperty("font-size", `${Math.min(12, Math.max(5, Number(textCaps.mainTextSizePercent || 7.2)))}vh`, "important");
+      byId("displayMain").style.setProperty("font-size", `${Math.min(18, Math.max(7, Number(textCaps.mainTextSizePercent || 10.8)))}vh`, "important");
       byId("displayMain").textContent = mainText;
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").classList.add("soccer-jersey-number");
-      byId("displaySub").style.setProperty("font-size", `${Math.min(36, Math.max(16, Number(textCaps.subTextSizePercent || 28)))}vh`, "important");
+      byId("displaySub").style.setProperty("font-size", `${Math.min(64, Math.max(24, Number(textCaps.subTextSizePercent || 56)))}vh`, "important");
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
       markDisplayReady();
