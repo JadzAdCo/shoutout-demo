@@ -83,6 +83,45 @@
   function isFootballTeamIntro(templateId = selectedTemplate) {
     return String(templateId || "") === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
   }
+  function isSoccerJerseyTemplate(templateId = selectedTemplate) {
+    const id = String(templateId || selectedTemplate || "");
+    const t = getTemplate(id);
+    return t.layout === "soccer-jersey" || id.startsWith("soccer") || t.jerseyNumberField === true;
+  }
+  function glyphCap(value = "", max = 0) {
+    const limit = Math.max(0, Number(max) || 0);
+    return Array.from(String(value ?? "")).slice(0, limit).join("");
+  }
+  function soccerNameFromSource() {
+    const profile = cachedUserProfile || {};
+    const source = byId("soccerNameSource")?.value || "displayName";
+    const emailName = (currentUser?.email || "").split("@")[0] || "";
+    const username = profile.username || emailName || currentUser?.displayName || "patron";
+    if (source === "manual") return String(byId("soccerManualName")?.value || "").trim();
+    if (source === "instagram") return floqrId().normalizeInstagramHandle?.(profile.instagramHandle || byId("profileInstagram")?.value || username) || cleanHandle(username);
+    if (source === "floqrHandle") return floqrId().normalizeFloqrHandle?.(profile.floqrHandle || profile.username || username) || floqrId().normalizeFloqrHandle?.(username);
+    return String(profile.displayName || currentUser?.displayName || username).trim();
+  }
+  function syncSoccerJerseyFields() {
+    const soccer = isSoccerJerseyTemplate();
+    byId("soccerJerseyFields")?.classList.toggle("hidden", !soccer);
+    byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer);
+    document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer);
+    const source = byId("soccerNameSource")?.value || "displayName";
+    byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
+    if (!soccer) return;
+    const caps = templateDisplayCaps();
+    const nameLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 12));
+    const numberLimit = Math.min(2, Math.max(1, Number(caps.sub || caps.maxSubCharacters || 2)));
+    if (byId("soccerManualName")) byId("soccerManualName").maxLength = nameLimit;
+    if (byId("soccerJerseyNumber")) byId("soccerJerseyNumber").maxLength = numberLimit;
+    const name = glyphCap(String(soccerNameFromSource() || "").toUpperCase(), nameLimit);
+    // Any characters allowed for jersey mark; hard-capped at 2 glyphs (not digits-only).
+    const mark = glyphCap(byId("soccerJerseyNumber")?.value || "", numberLimit);
+    if (byId("soccerJerseyNumber") && byId("soccerJerseyNumber").value !== mark) byId("soccerJerseyNumber").value = mark;
+    if (byId("mainText")) byId("mainText").value = name;
+    if (byId("subText")) byId("subText").value = mark;
+  }
   function footballThemePayload() {
     const themeId = byId("footballColorTheme")?.value || "stadiumGold";
     const theme = floqrId().footballTheme?.(themeId) || {id:themeId, accent:"#dfff5a"};
@@ -2441,7 +2480,9 @@
     const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
     const location = getLocation() || {};
     const venueSpecificIds = Object.values(templates || {}).filter(template => (template.venueIds || []).includes(locationId())).map(template => template.id).filter(Boolean);
-    const standardTemplateIds = location.restrictTemplatesToLocationSet ? [] : (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []);
+    const standardTemplateIds = location.restrictTemplatesToLocationSet
+      ? (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []).filter(id => String(id).startsWith("soccer"))
+      : (window.SHOUTOUT_STANDARD_TEMPLATE_IDS || []);
     const alwaysInclude = location.restrictTemplatesToLocationSet ? [] : ["blackwhite"];
     const ids = Array.from(new Set([...alwaysInclude, ...(location.templates || []), ...venueSpecificIds, ...standardTemplateIds]));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
@@ -2550,7 +2591,15 @@
     }
     return url.href;
   }
-  function goToEditor() { const l=getLocation(), t=getTemplate(); setText("editorClubTitle", l.locationName); setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`); updatePreview(); showPage("editorPage"); }
+  function goToEditor() {
+    const l=getLocation(), t=getTemplate();
+    setText("editorClubTitle", l.locationName);
+    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
+    updateMediaEditorForTemplate();
+    syncSoccerJerseyFields();
+    updatePreview();
+    showPage("editorPage");
+  }
   function updatePreview() {
     const frame=byId("previewFrame");
     const mediaField = byId("shoutoutMediaUrl");
@@ -2774,6 +2823,13 @@
     const limit = Number(type === "sub" ? caps.sub : caps.main);
     const cleaned = cleanRecommendationText(value);
     if (caps.supported === false || limit <= 0) return "";
+    if (isSoccerJerseyTemplate() && type === "sub") {
+      // Soccer jersey mark: keep any characters, hard-cap at 2 glyphs.
+      return glyphCap(cleaned, Math.min(2, limit));
+    }
+    if (isSoccerJerseyTemplate() && type === "main") {
+      return glyphCap(cleaned.toUpperCase(), limit);
+    }
     if (type !== "main" || caps.lineCount <= 1) return cleaned.slice(0, limit);
     const availableLines = caps.lineCount;
     const visibleLimit = Math.min(limit, caps.perLine * availableLines);
@@ -3213,7 +3269,8 @@
         templateVariantScope:selectedTemplateVariant.variantScope || "patron",
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      syncSoccerJerseyFields();
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:selectedTemplate, templateName:t.name, templateClassName:t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const priceCents = Math.max(0, Math.round(Number(t.priceCents || mediaPayload.priceCents || 0)));
       if (priceCents > 0) {
         const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
@@ -3246,7 +3303,7 @@
       }
     }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; syncAttribution(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();
@@ -3264,9 +3321,11 @@
     }
     const subInput = byId("subText");
     if (subInput) {
-      subInput.maxLength = caps.sub;
-      if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
+      subInput.maxLength = isSoccerJerseyTemplate(t.id || selectedTemplate) ? Math.min(2, caps.sub || 2) : caps.sub;
+      if (isSoccerJerseyTemplate(t.id || selectedTemplate)) subInput.value = glyphCap(subInput.value, subInput.maxLength);
+      else if (subInput.value.length > subInput.maxLength) subInput.value = subInput.value.slice(0, subInput.maxLength);
     }
+    syncSoccerJerseyFields();
     document.querySelectorAll("[data-football-team-identity-value]").forEach(input => {
       input.maxLength = Math.max(1, Number(caps.maxPlayerNameCharacters || 14));
       if (input.value.length > input.maxLength) input.value = input.value.slice(0, input.maxLength);
@@ -3506,6 +3565,16 @@
     byId("minglImageInput")?.addEventListener("change", renderMinglAttachmentPreview);
     byId("includeAttribution")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
     byId("attributionChoice")?.addEventListener("change", () => { syncAttribution(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerNameSource")?.addEventListener("change", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerManualName")?.addEventListener("input", () => { syncSoccerJerseyFields(); updatePreview(); schedulePersonalizedShoutOutRecommendations(); });
+    byId("soccerJerseyNumber")?.addEventListener("input", event => {
+      // Any character allowed; hard-cap at 2 glyphs for soccer templates.
+      const next = glyphCap(event.currentTarget.value, 2);
+      if (event.currentTarget.value !== next) event.currentTarget.value = next;
+      syncSoccerJerseyFields();
+      updatePreview();
+      schedulePersonalizedShoutOutRecommendations();
+    });
     byId("shoutoutTone")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     byId("shoutoutEventType")?.addEventListener("change", schedulePersonalizedShoutOutRecommendations);
     byId("shoutoutPreviewModal")?.addEventListener("click", event => {

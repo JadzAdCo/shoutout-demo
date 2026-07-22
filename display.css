@@ -650,3 +650,98 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 @media(prefers-reduced-motion:reduce){
   .heist-brand-slide{animation:none!important}
 }
+
+/* Soccer jersey name + 2-character mark (FIFA-proportion spacing) */
+.display-canvas.soccer-jersey-template{
+  background:#050505!important;
+  animation:none!important;
+}
+.display-canvas.soccer-jersey-template .display-background{
+  background-size:cover!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+}
+.display-canvas.soccer-jersey-template .display-frame-overlay{
+  display:none!important;
+}
+.display-canvas.soccer-jersey-template .display-center{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  padding:0!important;
+  margin:0!important;
+  display:block!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+}
+.display-canvas.soccer-jersey-template .display-center:before,
+.display-canvas.soccer-jersey-template .display-center:after{
+  display:none!important;
+}
+.display-canvas.soccer-jersey-template #displayMain.soccer-jersey-name{
+  position:absolute!important;
+  z-index:4!important;
+  left:18%!important;
+  right:18%!important;
+  top:30%!important;
+  height:8%!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#fff!important;
+  font-family:Impact,"Arial Narrow","Arial Black",Arial,sans-serif!important;
+  font-weight:1000!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-shadow:0 2px 0 rgba(0,0,0,.55),0 0 12px rgba(0,0,0,.35)!important;
+}
+.display-canvas.soccer-jersey-template #displaySub.soccer-jersey-number{
+  position:absolute!important;
+  z-index:4!important;
+  left:22%!important;
+  right:22%!important;
+  top:40%!important;
+  height:28%!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#fff!important;
+  font-family:Impact,"Arial Black",Arial,sans-serif!important;
+  font-weight:1000!important;
+  letter-spacing:.04em!important;
+  line-height:.85!important;
+  text-transform:none!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-shadow:0 3px 0 rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.4)!important;
+}
+.display-canvas.soccer-jersey-template.soccer-spain #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.soccer-spain #displaySub.soccer-jersey-number,
+.display-canvas.soccer-jersey-template.soccer-monaco #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.soccer-monaco #displaySub.soccer-jersey-number{
+  color:#fff!important;
+}
+.display-canvas.soccer-jersey-template.soccer-chelsea #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.soccer-chelsea #displaySub.soccer-jersey-number{
+  color:#fff!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template #displayMain.soccer-jersey-name,
+.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template #displayMain.soccer-jersey-name{
+  top:28%!important;
+  height:9%!important;
+  left:16%!important;
+  right:16%!important;
+  letter-spacing:.1em!important;
+}
+.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template #displaySub.soccer-jersey-number,
+.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template #displaySub.soccer-jersey-number{
+  top:39%!important;
+  height:30%!important;
+}

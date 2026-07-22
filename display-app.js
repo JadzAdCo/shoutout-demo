@@ -180,7 +180,12 @@
   }
 
   function isTextOverlayTemplate(template = {}, templateId = "") {
+    if (template.layout === "soccer-jersey" || String(templateId || template.id || "").startsWith("soccer")) return false;
     return template.textOverlay === true || String(templateId || template.id || "").startsWith("heist");
+  }
+
+  function isSoccerJerseyTemplate(template = {}, templateId = "") {
+    return template.layout === "soccer-jersey" || String(templateId || template.id || "").startsWith("soccer");
   }
 
   function resetBackgroundLayer(bgEl) {
@@ -644,6 +649,7 @@
     const baseTemplate = templates[templateId] || templates.neon || {};
     const t = {...baseTemplate, className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
     const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
+    const isSoccerJersey = isSoccerJerseyTemplate(t, templateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const screenFormatId = String(
@@ -694,13 +700,18 @@
       return locationId !== "zebbies-garden-washington-dc" && /^USE SHOUT\s*OUT/.test(text) && /ZEBBIES/.test(text);
     };
     const locationDefaultMain = clubDefaultMainText(loc);
-    const rawMain = isTextOverlay
+    const rawMain = (isTextOverlay || isSoccerJersey)
       ? String(data.mainText || "")
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Never flash the legacy idle CTA on any template / venue board.
     const mainSource = stripLegacyUseShoutOutCta(rawMain);
-    const mainText = mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
-    const subText = String(data.subText || data.attribution || data.displayName || t.defaultSub || "").slice(0, subLimit);
+    const mainText = isSoccerJersey
+      ? glyphSlice(cleanBoardText(mainSource), 0, mainLimit)
+      : mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
+    // Soccer jersey mark: any characters (letters, digits, symbols), hard-capped at 2 glyphs.
+    const subText = isSoccerJersey
+      ? glyphSlice(String(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
+      : String(data.subText || data.attribution || data.displayName || t.defaultSub || "").slice(0, subLimit);
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
     const mediaSlot = byId("mediaSlot");
@@ -745,6 +756,24 @@
     } else {
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+    }
+    if (isSoccerJersey) {
+      stopHeistIdentityCycle();
+      stopHeistPhaseTimers();
+      hideHeistBrandSlide();
+      canvas.classList.add("soccer-jersey-template");
+      mediaSlot.classList.add("hidden");
+      mediaSlot.innerHTML = "";
+      byId("displayMain").classList.add("soccer-jersey-name");
+      byId("displayMain").style.setProperty("font-size", `${Math.min(12, Math.max(5, Number(textCaps.mainTextSizePercent || 7.2)))}vh`, "important");
+      byId("displayMain").textContent = mainText;
+      byId("displaySub").classList.remove("classic-bw-sub-hidden");
+      byId("displaySub").classList.add("soccer-jersey-number");
+      byId("displaySub").style.setProperty("font-size", `${Math.min(36, Math.max(16, Number(textCaps.subTextSizePercent || 28)))}vh`, "important");
+      byId("displaySub").textContent = subText;
+      byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
+      markDisplayReady();
+      return;
     }
     if (isClassicBoard && isTextOverlay) {
       const rows = mainText.trim()

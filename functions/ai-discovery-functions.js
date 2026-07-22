@@ -1767,10 +1767,18 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.38") {
+function defaultFloqrPreviewLinks(v = "29.09.40") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
+    ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
     ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
+    ["Heist ShoutOut — Soccer + Heist templates", `${base}/?v=${v}&location=heist-washington-dc`],
+    ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
+    ["Soccer Morocco $30", `${base}/display.html?location=heist-washington-dc&template=soccerMorocco&main=FLOQR&sub=10&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Spain $30", `${base}/display.html?location=heist-washington-dc&template=soccerSpain&main=DON&sub=OK&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Chelsea $30", `${base}/display.html?location=heist-washington-dc&template=soccerChelsea&main=BLUE&sub=CF&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer PSG $30", `${base}/display.html?location=heist-washington-dc&template=soccerParisSaintGermain&main=PARIS&sub=PS&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Monaco $30", `${base}/display.html?location=heist-washington-dc&template=soccerMonaco&main=ASM&sub=MC&screen=led-64x32&preview=1&v=${v}`],
     ["Locked Up — no handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
     ["Locked Up — with patron handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&sub=%40mingl.don&screen=led-64x32&preview=1&v=${v}`],
     ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
@@ -1782,7 +1790,7 @@ function defaultFloqrPreviewLinks(v = "29.09.38") {
   ];
 }
 
-function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.38") {
+function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.40") {
   if (!Array.isArray(raw) || !raw.length) return defaultFloqrPreviewLinks(fallbackVersion);
   return raw.slice(0, 40).map((row) => {
     if (Array.isArray(row)) return [String(row[0] || "Link").slice(0, 160), String(row[1] || "").slice(0, 500)];
@@ -1790,8 +1798,8 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.38") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.38", links = [], note = ""} = {}) {
-  const v = String(packageVersion || "29.09.38").replace(/^v/i, "");
+function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = ""} = {}) {
+  const v = String(packageVersion || "29.09.40").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
   const subject = `FLOQR v${v} — mobile preview links`;
   const intro = String(note || "").trim();
