@@ -1,4 +1,4 @@
-/* admin-app.js v29.08.2 - Venue Command Center, trusted Stripe onboarding, commerce, guest-list distribution, staffing, and REP */
+/* admin-app.js v29.09.43 - Venue Command Center; elected Club Admins only (no club-entity search bar) */
 (function () {
   "use strict";
 
@@ -70,95 +70,21 @@
     return canonicalStaticLocationId(key);
   }
 
+  function stableVenueDisplayUrl(extra = {}) {
+    return window.FLOQRNav?.stableDisplayUrl?.(locationId, extra) || `./display.html?location=${encodeURIComponent(locationId)}`;
+  }
+
   function refreshLocationShell() {
     loc = getStaticLocation(locationId);
     setText("clubName", loc.locationName || locationId);
     const displayLink = byId("displayLink");
-    if (displayLink) displayLink.href = window.FLOQRNav?.adminLink("./display.html", { location: locationId }) || `./display.html?location=${locationId}&from=admin`;
+    if (displayLink) displayLink.href = stableVenueDisplayUrl();
     const liveFrame = byId("liveFrame");
-    if (liveFrame) liveFrame.src = `./display.html?location=${locationId}`;
+    if (liveFrame) liveFrame.src = stableVenueDisplayUrl();
     const publicLink = byId("clubPublicProfileLink");
     if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");
     if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
-  }
-
-  function clubSearchBlob(id, row = {}) {
-    return [id, row.locationName, row.brandName, row.city, row.region, row.state, row.country, row.streetAddress, row.address, row.locationLabel, ...(row.genres || [])]
-      .filter(Boolean).join(" ").toLowerCase();
-  }
-
-  function listSearchableClubs() {
-    const map = new Map();
-    Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, data]) => map.set(id, {id, ...data}));
-    return Array.from(map.values()).sort((a, b) => String(a.locationName || a.id).localeCompare(String(b.locationName || b.id)));
-  }
-
-  function populateMasterClubSearchOptions() {
-    const list = byId("masterClubSearchOptions");
-    if (!list) return;
-    list.innerHTML = listSearchableClubs()
-      .map(row => `<option value="${esc(row.id)}">${esc(row.locationName || row.brandName || row.id)}</option>`)
-      .join("");
-  }
-
-  function renderMasterClubSearchResults(query = "") {
-    const wrap = byId("masterClubSearchResults");
-    if (!wrap) return;
-    const q = String(query || "").trim().toLowerCase();
-    if (!q) {
-      wrap.innerHTML = "";
-      return;
-    }
-    const rows = listSearchableClubs()
-      .filter(row => clubSearchBlob(row.id, row).includes(q) || q.split(/\s+/).every(token => clubSearchBlob(row.id, row).includes(token)))
-      .slice(0, 12);
-    wrap.innerHTML = rows.length ? rows.map(row => `
-      <button class="entity-result-card" type="button" data-switch-club="${esc(row.id)}">
-        <strong>${esc(row.locationName || row.brandName || row.id)}</strong>
-        <small>${esc([row.city, row.region || row.state, row.id].filter(Boolean).join(" · "))}</small>
-      </button>`).join("") : `<p class="sub small">No clubs match “${esc(query)}”.</p>`;
-    wrap.querySelectorAll("[data-switch-club]").forEach(btn => {
-      btn.addEventListener("click", () => switchMasterClub(btn.dataset.switchClub));
-    });
-  }
-
-  function switchMasterClub(nextId) {
-    const id = String(nextId || "").trim();
-    if (!id) return;
-    const url = new URL(window.location.href);
-    url.searchParams.set("location", id);
-    url.searchParams.delete("club");
-    window.location.href = url.toString();
-  }
-
-  function setupMasterClubSearch(isMasterAdmin) {
-    const bar = byId("masterClubSearchBar");
-    if (!bar) return;
-    bar.classList.toggle("hidden", !isMasterAdmin);
-    if (!isMasterAdmin) return;
-    populateMasterClubSearchOptions();
-    if (byId("masterClubSearchInput") && !byId("masterClubSearchInput").value) {
-      byId("masterClubSearchInput").value = locationId;
-    }
-    const run = () => renderMasterClubSearchResults(byId("masterClubSearchInput")?.value || "");
-    byId("masterClubSearchBtn")?.addEventListener("click", () => {
-      const raw = String(byId("masterClubSearchInput")?.value || "").trim();
-      const exact = listSearchableClubs().find(row => {
-        const id = String(row.id || "").toLowerCase();
-        const name = String(row.locationName || row.brandName || "").toLowerCase();
-        return id === raw.toLowerCase() || name === raw.toLowerCase();
-      });
-      if (exact) switchMasterClub(exact.id);
-      else run();
-    });
-    byId("masterClubSearchInput")?.addEventListener("input", run);
-    byId("masterClubSearchInput")?.addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        byId("masterClubSearchBtn")?.click();
-      }
-    });
   }
 
   async function enforceVenueFeatureGates() {
@@ -172,7 +98,6 @@
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
-        if (el.closest("#masterClubSearchBar")) return;
         el.disabled = true;
       });
       return;
@@ -196,6 +121,52 @@
 
   function publicProfileUrl() {
     return new URL(`./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8`, window.location.href).toString();
+  }
+
+  function staticAddressDefaults(source = loc) {
+    return {
+      streetAddress: String(source.streetAddress || source.addressLine1 || source.address || "").trim(),
+      city: String(source.city || "").trim(),
+      stateRegion: String(source.stateRegion || source.region || "").trim(),
+      postalCode: String(source.postalCode || source.zipCode || "").trim(),
+      country: String(source.country || "").trim()
+    };
+  }
+
+  function shouldReplaceStaleAddress(profile = {}, staticLoc = loc) {
+    const seed = staticAddressDefaults(staticLoc);
+    if (!seed.country && !seed.city) return false;
+    const current = {
+      streetAddress: String(profile.streetAddress || profile.addressLine1 || "").trim(),
+      city: String(profile.city || "").trim(),
+      stateRegion: String(profile.stateRegion || profile.region || "").trim(),
+      postalCode: String(profile.postalCode || profile.postalCode || profile.zipCode || "").trim(),
+      country: String(profile.country || "").trim()
+    };
+    if (!current.country && seed.country) return true;
+    if (seed.country && current.country && seed.country !== current.country) return true;
+    if (seed.city && current.city && seed.city.toLowerCase() === current.city.toLowerCase() && seed.streetAddress && current.streetAddress
+      && seed.streetAddress !== current.streetAddress
+      && /connecticut avenue|20036|1411 k st|washington,? dc/i.test(current.streetAddress)) {
+      return true;
+    }
+    return false;
+  }
+
+  function resolvedClubAddress(profile = {}, staticLoc = loc) {
+    const seed = staticAddressDefaults(staticLoc);
+    if (shouldReplaceStaleAddress(profile, staticLoc)) return seed;
+    return {
+      streetAddress: String(profile.streetAddress || profile.addressLine1 || seed.streetAddress || "").trim(),
+      city: String(profile.city || seed.city || "").trim(),
+      stateRegion: String(profile.stateRegion || profile.region || seed.stateRegion || "").trim(),
+      postalCode: String(profile.postalCode || profile.zipCode || seed.postalCode || "").trim(),
+      country: String(profile.country || seed.country || "").trim()
+    };
+  }
+
+  function renderClubLogoPreview(url = "") {
+    window.FLOQRUrlMediaField?.renderPreview?.(byId("clubProfileLogoPreview"), url);
   }
 
   function parsePeopleLines(value, fallbackRole) {
@@ -289,12 +260,15 @@
       publicClubProfile = {...loc};
     }
     const socials = publicClubProfile.socialMediaHandles || publicClubProfile.socialHandles || {};
-    if (byId("clubProfileStreetAddress")) byId("clubProfileStreetAddress").value = publicClubProfile.streetAddress || publicClubProfile.addressLine1 || (publicClubProfile.fullAddress ? "" : publicClubProfile.address) || "";
-    if (byId("clubProfileCity")) byId("clubProfileCity").value = publicClubProfile.city || loc.city || "";
-    if (byId("clubProfileRegion")) byId("clubProfileRegion").value = publicClubProfile.stateRegion || publicClubProfile.region || loc.region || "";
-    if (byId("clubProfilePostalCode")) byId("clubProfilePostalCode").value = publicClubProfile.postalCode || publicClubProfile.zipCode || "";
-    if (byId("clubProfileCountry")) byId("clubProfileCountry").value = publicClubProfile.country || loc.country || "";
-    if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
+    const address = resolvedClubAddress(publicClubProfile, loc);
+    if (byId("clubProfileStreetAddress")) byId("clubProfileStreetAddress").value = address.streetAddress;
+    if (byId("clubProfileCity")) byId("clubProfileCity").value = address.city;
+    if (byId("clubProfileRegion")) byId("clubProfileRegion").value = address.stateRegion;
+    if (byId("clubProfilePostalCode")) byId("clubProfilePostalCode").value = address.postalCode;
+    if (byId("clubProfileCountry")) byId("clubProfileCountry").value = address.country;
+    const logoUrl = publicClubProfile.logoUrl || publicClubProfile.clubLogoUrl || "";
+    if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = logoUrl;
+    renderClubLogoPreview(logoUrl);
     if (byId("clubProfileTagline")) byId("clubProfileTagline").value = publicClubProfile.tagline || publicClubProfile.publicTagline || "";
     if (byId("clubProfileDescription")) byId("clubProfileDescription").value = publicClubProfile.description || publicClubProfile.publicDescription || publicClubProfile.about || "";
     if (byId("clubProfileWebsite")) byId("clubProfileWebsite").value = publicClubProfile.officialWebsite || publicClubProfile.website || "";
@@ -334,8 +308,11 @@
         ["Subscription required for edits", publicClubProfile.subscriptionRequiredForPublicProfileEdits === false ? "No" : "Yes"],
         ["AI index", "Public profile fields only"]
         ,["Public page", publicProfileUrl()]
+        ,["Display URL", stableVenueDisplayUrl()]
       ]);
     }
+    const displayField = byId("clubDisplayUrlField");
+    if (displayField) displayField.value = stableVenueDisplayUrl();
     await loadProfileImportDraft();
   }
 
@@ -400,16 +377,17 @@
     const primaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubPrimaryDisplayFormat")?.value)
       ? byId("clubPrimaryDisplayFormat").value
       : displayScreenFormatIds[0];
-    const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || "";
-    const city = byId("clubProfileCity")?.value.trim() || "";
-    const stateRegion = byId("clubProfileRegion")?.value.trim() || "";
-    const postalCode = byId("clubProfilePostalCode")?.value.trim() || "";
-    const country = byId("clubProfileCountry")?.value.trim() || "";
+    const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || loc.streetAddress || "";
+    const city = byId("clubProfileCity")?.value.trim() || loc.city || "";
+    const stateRegion = byId("clubProfileRegion")?.value.trim() || loc.region || loc.stateRegion || "";
+    const postalCode = byId("clubProfilePostalCode")?.value.trim() || loc.postalCode || "";
+    const country = byId("clubProfileCountry")?.value.trim() || loc.country || "";
     if (!streetAddress || !city || !stateRegion || !country) throw new Error("Street address, city, state/region, and country are required.");
     const addressRecord = {streetAddress, city, stateRegion, postalCode, country};
     const fullAddress = window.FLOQRAddress?.fullAddress(addressRecord) || [streetAddress, city, stateRegion, postalCode, country].filter(Boolean).join(", ");
     const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
     const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("clubProfileFloqrHandle")?.value || "") || "";
+    const displayUrl = stableVenueDisplayUrl();
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -453,6 +431,7 @@
       publicProfilePublished:!!byId("clubProfilePublished")?.checked,
       visibility:"public",
       publicProfileType:"club",
+      displayUrl,
       subscriptionRequiredForPublicProfileEdits:true,
       clubOwnershipStatus:publicClubProfile.clubOwnershipStatus || "unclaimed",
       publicSearchKeywords:[
@@ -488,6 +467,7 @@
     if (!wrap) return;
     const query = String(byId("clubTemplateBackgroundSearch")?.value || "").trim().toLowerCase();
     const formats = publicClubProfile.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
+    const assignedIds = new Set(publicClubProfile.templates || loc.templates || []);
     const rows = Object.values(clubTemplates)
       .filter(template => String(template.status || "active") === "active")
       .filter(template => (template.screenFormatIds || formats).some(id => formats.includes(id)))
@@ -496,15 +476,54 @@
     wrap.innerHTML = rows.map(template => {
       const editable = template.backgroundEditable !== false;
       const count = clubTemplateVariants.filter(variant => variant.baseTemplateId === template.id && String(variant.status || "active") === "active").length;
+      const assigned = assignedIds.has(template.id) || (template.venueIds || []).includes(locationId);
       return `<article class="template ${esc(template.className || "neon")}">
         <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
         <div class="name">${esc(template.name || template.id)}</div>
         <div class="tag">${editable ? "Editable background" : "Background locked by Master Admin"}</div>
-        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span></div>
-        ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
+        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
+        <div class="queue-actions">
+          ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
+          ${assigned ? `<button type="button" data-club-template-remove="${esc(template.id)}">Remove template</button>` : `<button type="button" data-club-template-assign="${esc(template.id)}">Assign template</button>`}
+        </div>
       </article>`;
     }).join("") || '<p class="sub">No compatible templates matched.</p>';
     wrap.querySelectorAll("[data-club-template-customize]").forEach(button => button.addEventListener("click", () => openClubTemplateStudio(button.dataset.clubTemplateCustomize)));
+    wrap.querySelectorAll("[data-club-template-remove]").forEach(button => button.addEventListener("click", () => removeTemplateFromClub(button.dataset.clubTemplateRemove)));
+    wrap.querySelectorAll("[data-club-template-assign]").forEach(button => button.addEventListener("click", () => assignTemplateToClub(button.dataset.clubTemplateAssign)));
+  }
+
+  async function removeTemplateFromClub(templateId = "") {
+    const id = String(templateId || "").trim();
+    if (!id) return;
+    const current = new Set(publicClubProfile.templates || loc.templates || []);
+    if (!current.has(id)) return;
+    current.delete(id);
+    const next = Array.from(current);
+    await db.collection("clubLocations").doc(locationId).set({
+      templates:next,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedByUid:auth.currentUser?.uid || ""
+    }, {merge:true});
+    publicClubProfile.templates = next;
+    setText("clubTemplateBackgroundStatus", `Removed ${id} from this club's template list.`);
+    await loadClubTemplateControls();
+  }
+
+  async function assignTemplateToClub(templateId = "") {
+    const id = String(templateId || "").trim();
+    if (!id) return;
+    const current = new Set(publicClubProfile.templates || loc.templates || []);
+    current.add(id);
+    const next = Array.from(current);
+    await db.collection("clubLocations").doc(locationId).set({
+      templates:next,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedByUid:auth.currentUser?.uid || ""
+    }, {merge:true});
+    publicClubProfile.templates = next;
+    setText("clubTemplateBackgroundStatus", `Assigned ${id} to this club.`);
+    await loadClubTemplateControls();
   }
 
   function renderClubTemplateVariants() {
@@ -752,23 +771,28 @@
   async function hasClubAdminAccess(user) {
     if (!user) return false;
     const email = safeUser(user);
-    if (MASTER_ADMIN_EMAILS.includes(email) || CLUB_ADMIN_EMAILS.includes(email)) return true;
+    // Master / Super Admins may open any Venue Command Center for oversight.
+    // Club-entity search stays on master-admin.html only — never on this portal.
+    if (MASTER_ADMIN_EMAILS.includes(email)) return true;
+
+    // Elected Club Admin: active assignment created by Master/Super Admin.
+    try {
+      const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
+      if (assignment.exists && String(assignment.data()?.status || "").toLowerCase() === "active") return true;
+    } catch (error) {}
+
+    // Location admin roster maintained by Master Admin during onboarding / election.
     try {
       const locationSnap = await db.collection("clubLocations").doc(locationId).get();
       const locationData = locationSnap.exists ? locationSnap.data() || {} : {};
       if ((locationData.adminUids || []).includes(user.uid)) return true;
       if ((locationData.adminEmails || []).map(value => String(value).toLowerCase()).includes(email)) return true;
+      if ((locationData.masterAdminUids || []).includes(user.uid)) return true;
     } catch (error) {}
-    try {
-      const assignmentId = `${locationId}_${user.uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const assignment = await db.collection("clubAdminAssignments").doc(assignmentId).get();
-      if (assignment.exists && String(assignment.data()?.status || "active") === "active") return true;
-      const designation = await db.collection("clubEmployeeDesignations").doc(assignmentId).get();
-      const permissions = designation.exists ? designation.data()?.rolePermissions || [] : [];
-      return designation.exists && designation.data()?.status !== "rejected" && permissions.some(permission => ["manageGuestLists","postPublicContent","manageCommerce","customerSupport"].includes(permission));
-    } catch (error) {
-      return false;
-    }
+
+    // Workers / REP designations do not unlock the full Club Admin portal.
+    return false;
   }
 
   function setupTabs() {
@@ -825,6 +849,7 @@
       }, {merge:true});
       publicClubProfile.logoUrl = url;
       if (byId("clubProfileLogoUrl")) byId("clubProfileLogoUrl").value = url;
+      renderClubLogoPreview(url);
     });
   }
 
@@ -1707,7 +1732,7 @@
   }
 
   async function approve(id, item) {
-    const defaultMain = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const textCaps = adminShoutoutTextCaps(item);
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     await db.collection("liveContent").doc(locationId).set({
@@ -1789,7 +1814,7 @@
       setText("adminStatus", "Please sign in first.");
       return;
     }
-    const main = String(loc.defaultMain || `USE SHOUTOUT @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/i, "USE SHOUTOUT");
+    const main = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const screenFormatId = loc.primaryDisplayScreenFormatId || "led-96x48";
     const textCaps = window.FLOQRTextLayout?.resolve?.(window.SHOUTOUT_TEMPLATES?.blackwhite || {id:"blackwhite", className:"classic-bw"}, screenFormatId) || {main:45,sub:20,lineCount:3,perLine:15,mainTextSizePercent:20.8,subTextSizePercent:7.8};
     const payload = {
@@ -2063,10 +2088,23 @@
     bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
     bind("refreshReconciliationBtn", loadClubPaymentLedger);
     bind("saveClubTemplatePolicyBtn", saveClubTemplatePolicy);
-    bind("copyClubPublicProfileLinkBtn", async () => {
-      await navigator.clipboard?.writeText(publicProfileUrl());
-      window.FLOQRActionFeedback?.show("Club page link copied", "The patron-facing FLOQR club profile URL is ready to share.", {status:"success"});
-      window.FLOQRActionFeedback?.hide(2200);
+    bind("showDisplayUrlBtn", async () => {
+      const url = stableVenueDisplayUrl();
+      const wrap = byId("clubDisplayUrlWrap");
+      const field = byId("clubDisplayUrlField");
+      if (field) {
+        field.value = url;
+        field.focus();
+        field.select();
+      }
+      wrap?.classList.remove("hidden");
+      try {
+        await navigator.clipboard?.writeText(url);
+        window.FLOQRActionFeedback?.show("Display URL ready", "Stable venue board URL copied — no version query string.", {status:"success"});
+      } catch (e) {
+        window.FLOQRActionFeedback?.show("Display URL", url, {status:"success"});
+      }
+      window.FLOQRActionFeedback?.hide(3200);
     });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
     bind("saveClubMediaBtn", saveClubMedia);
@@ -2081,6 +2119,16 @@
     byId("clubMediaTrimStart")?.addEventListener("input", renderClubMediaInputPreview);
     byId("clubMediaTrimEnd")?.addEventListener("input", renderClubMediaInputPreview);
     byId("guestCampaignAudience")?.addEventListener("change", event => byId("guestCampaignTargetCountLabel")?.classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));
+    window.FLOQRUrlMediaField?.bind?.({
+      urlInputId:"clubProfileLogoUrl",
+      fileInputId:"clubProfileLogoFile",
+      previewId:"clubProfileLogoPreview",
+      statusId:"adminStatus",
+      pathPrefix:`clubMedia/${locationId}/logo`,
+      allowVideo:false,
+      maxBytes:12 * 1024 * 1024,
+      onChange: url => { publicClubProfile.logoUrl = url; }
+    });
     window.FLOQRUrlMediaField?.bind?.({
       urlInputId:"guestCampaignImage",
       fileInputId:"guestCampaignImageFile",
@@ -2109,7 +2157,7 @@
       if (!(await hasClubAdminAccess(user))) {
         byId("adminLogin").classList.remove("hidden");
         byId("adminPanel").classList.add("hidden");
-        setText("adminStatus", `${email || "This account"} is not assigned as an admin for ${locationId}.`);
+        setText("adminStatus", `${email || "This account"} is not an elected Club Admin for ${locationId}. Ask a Master/Super Admin to assign this venue.`);
         return;
       }
 
@@ -2123,7 +2171,6 @@
       byId("adminMfaPanel")?.classList.add("hidden");
       byId("adminPanel").classList.remove("hidden");
       setText("adminStatus", isMasterAdmin ? "Master Admin verified for Club Admin." : "Club admin verified.");
-      setupMasterClubSearch(isMasterAdmin);
       enforceVenueFeatureGates();
       renderQueue();
       loadClubPublicProfile().then(async () => {

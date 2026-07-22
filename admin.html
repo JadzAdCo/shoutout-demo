@@ -5,11 +5,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.17"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.43"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.43"/>
 </head>
 <body>
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.43&start=search">&larr; Back to Search</a>
 <main id="adminPage" class="app admin-shell">
   <section class="page active">
     <header class="topbar admin-topbar">
@@ -22,13 +22,13 @@
       <div class="card admin-club-card">
         <p class="eyebrow">Location View</p>
         <h2 id="clubName">Loading...</h2>
-        <p class="sub small">Club admins only see the selected location.</p>
+        <p class="sub small">Only Club Admins elected by Master/Super Admin for this venue can open this portal.</p>
       </div>
     </header>
 
     <div id="adminLogin" class="card">
       <h2>Club admin sign-in</h2>
-      <p class="sub">Sign in using an approved admin email. Master admins should use <strong>master-admin.html</strong>.</p>
+      <p class="sub">Sign in with the account elected as Club Admin for this location. Master / Super Admins should use <strong>master-admin.html</strong> for network-wide entity search and management.</p>
       <p class="sub small"><strong>Sign-in note:</strong> Admin login uses the same popup configuration as the patron page. Use auth-debug.html if Microsoft still fails.</p>
       <div class="auth-grid">
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
@@ -51,17 +51,6 @@
     </div>
 
     <div id="adminPanel" class="hidden">
-      <div id="masterClubSearchBar" class="master-club-search-bar hidden">
-        <label>Search club entity
-          <input id="masterClubSearchInput" list="masterClubSearchOptions" autocomplete="off" placeholder="Search club, city, or location id"/>
-          <datalist id="masterClubSearchOptions"></datalist>
-        </label>
-        <div class="queue-actions">
-          <button id="masterClubSearchBtn" class="primary" type="button">Search club</button>
-          <a id="masterEntityManageLink" class="buttonlike" href="./master-admin.html?v=29.09.23#entityManagement">Full entity manage</a>
-        </div>
-        <div id="masterClubSearchResults" class="master-club-search-results" style="grid-column:1 / -1"></div>
-      </div>
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
         <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
@@ -104,17 +93,23 @@
           <p class="sub small">Manage the patron-facing club page and FLOQR search profile. Only sections enabled below appear publicly.</p>
           <div class="queue-actions">
             <a id="clubPublicProfileLink" class="buttonlike" target="_blank" href="#">View Public Club Page</a>
-            <button id="copyClubPublicProfileLinkBtn" type="button">Copy Public Page Link</button>
+            <button id="showDisplayUrlBtn" type="button">Show Display URL</button>
           </div>
+          <label id="clubDisplayUrlWrap" class="profile-grid-wide hidden">Display URL (stable — no version query)<input id="clubDisplayUrlField" type="text" readonly spellcheck="false"/></label>
           <div class="profile-grid">
-            <label>Club logo URL<input id="clubProfileLogoUrl" placeholder="https://.../club-logo.png"/></label>
+            <div class="url-media-field profile-grid-wide">
+              <label>Club logo<input id="clubProfileLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"/></label>
+              <input id="clubProfileLogoUrl" type="hidden"/>
+              <div id="clubProfileLogoPreview" class="url-media-preview hidden"></div>
+              <p class="sub small">Upload a logo image from this device. FLOQR stores it in Firebase Storage for the public club page.</p>
+            </div>
             <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
             <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
-            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="1223 Connecticut Avenue NW" required/></label>
-            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="Washington" required/></label>
-            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="District of Columbia" required/></label>
-            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="20036"/></label>
-            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="United States" required/></label>
+            <label>Street address<input id="clubProfileStreetAddress" autocomplete="address-line1" placeholder="Street and number" required/></label>
+            <label>City<input id="clubProfileCity" autocomplete="address-level2" placeholder="City" required/></label>
+            <label>State / region<input id="clubProfileRegion" autocomplete="address-level1" placeholder="State or region" required/></label>
+            <label>Postal code<input id="clubProfilePostalCode" autocomplete="postal-code" placeholder="Postal code"/></label>
+            <label>Country<input id="clubProfileCountry" autocomplete="country-name" placeholder="Country" required/></label>
             <label>Official website<input id="clubProfileWebsite" placeholder="https://example.com"/></label>
             <label>Email<input id="clubProfileEmail" placeholder="info@example.com"/></label>
             <label>Telephone<input id="clubProfileTelephone" placeholder="+1 202 555 0123"/></label>
@@ -485,7 +480,7 @@
             <span>SMS template: Guest-list reminder</span>
             <span>Internal message: VIP offer</span>
           </div>
-          <p><a id="adminRoleProfilesLink" href="./role-profiles.html?v=29.09.8&from=admin">Open role/profile landing pages</a></p>
+          <p><a id="adminRoleProfilesLink" href="./role-profiles.html?v=29.09.33&from=admin">Open role/profile landing pages</a></p>
         </div>
       </section>
       <section id="panelReconciliation" class="admin-panel-section">
@@ -523,9 +518,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.34"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
-<script src="./shared-data.js?v=29.09.8"></script>
+<script src="./shared-data.js?v=29.09.33"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
@@ -540,7 +535,7 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.17"></script>
+<script src="./admin-app.js?v=29.09.43"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
