@@ -5,11 +5,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.44"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.44"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.46"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.46"/>
 </head>
 <body>
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.44">&larr; Venue Command Center</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
 <main id="adminPage" class="app admin-shell">
   <section class="page active">
     <header class="topbar admin-topbar">
@@ -60,6 +60,7 @@
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
         <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
+        <button class="admin-tab" data-panel="panelScheduling" type="button">Scheduling</button>
         <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
         <button class="admin-tab" data-panel="panelNotifications" type="button">Notifications</button>
         <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
@@ -390,6 +391,42 @@
           <div class="card"><h2>Promoter Performance</h2><div id="clubPromoterReport" class="report-block"></div></div>
         </div>
       </section>
+      <section id="panelScheduling" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Staff calendars</p>
+          <h2>Scheduling <span id="schedulingSubBadge" class="tag">$20/mo</span></h2>
+          <p class="sub small">Create work schedules for elected staff and talent. Assignees get in-app plus Email/SMS/WhatsApp notify-and-approve when channels are enabled. Promoting companies and DJs use <a href="./scheduling.html?v=29.09.46&from=admin">Scheduling portal</a> — not events.</p>
+          <div class="queue-actions">
+            <button id="refreshSchedulingBtn" type="button">Refresh</button>
+            <a class="buttonlike" href="./scheduling.html?v=29.09.46&from=admin">Open full Scheduling portal</a>
+          </div>
+          <p id="schedulingStatus" class="status"></p>
+        </div>
+        <div id="schedulingSubscribeGate" class="card">
+          <h2>Subscribe · $20 / month</h2>
+          <p class="sub small">Club members unlock Staff Scheduling with a FloqR subscription. Charged to FloqR via Stripe (recurring).</p>
+          <button id="buySchedulingSubBtn" class="primary" type="button">Subscribe $20/mo</button>
+        </div>
+        <div id="schedulingWorkspace" class="hidden">
+          <div class="card">
+            <h2>Create staff shift</h2>
+            <div class="profile-grid">
+              <label>Worker<select id="scheduleAssignee"></select></label>
+              <label>Role / title<input id="scheduleRole" placeholder="Bartender · Door · Bottle service · DJ support"/></label>
+              <label>Starts<input id="scheduleStartsAt" type="datetime-local"/></label>
+              <label>Ends<input id="scheduleEndsAt" type="datetime-local"/></label>
+              <label class="profile-grid-wide">Notes<textarea id="scheduleNotes" rows="2" placeholder="Station, dress code, call time…"></textarea></label>
+              <label><input id="scheduleRequireApproval" type="checkbox" checked/> Require worker approval (Email/SMS/WhatsApp + in-app)</label>
+            </div>
+            <button id="createScheduleShiftBtn" class="primary" type="button">Create shift &amp; notify</button>
+          </div>
+          <div class="card">
+            <h2>Upcoming &amp; pending shifts</h2>
+            <div id="schedulingShiftList" class="report-block"></div>
+          </div>
+        </div>
+      </section>
+
       <section id="panelRep" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">REP</p><h2>Role Activity & Permission</h2>
@@ -518,7 +555,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.44"></script>
+<script src="./floqr-nav.js?v=29.09.46"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.33"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
@@ -530,16 +567,17 @@
 <script src="./helper-popouts.js?v=29.09.8"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-logger.js?v=29.09.8"></script>
-<script src="./payment-service.js?v=29.09.18"></script>
+<script src="./payment-service.js?v=29.09.46"></script>
 <script src="./messaging-credits.js?v=29.09.12"></script>
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.43"></script>
+<script src="./admin-app.js?v=29.09.46"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
+<script src="./admin-scheduling.js?v=29.09.46"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

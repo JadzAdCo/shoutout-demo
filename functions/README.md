@@ -6,7 +6,8 @@ Included functions:
 
 - `requestEmailOtp` and `verifyEmailOtp`: SendGrid-delivered, eight-character alphanumeric email codes with server-side HMAC hashes, five-minute expiry, resend throttling, attempt limits, one-time use, and Firebase custom-token sign-in.
 - `assignClubAdmin`: Master Admin-only assignment of a completed patron who elected an eligible service role to a specific `clubLocations` record.
-- `createFloqrCheckoutSession`: server-priced Stripe Checkout for ShoutOuts, Commerce, targeted distribution, and paid SMS notification service.
+- `createFloqrCheckoutSession`: server-priced Stripe Checkout for ShoutOuts, Commerce, targeted distribution, paid SMS/WhatsApp packs, and **Staff Scheduling** (`staffSchedulingSubscription`, $20/mo Stripe `mode: subscription`).
+- Scheduling callables: `getSchedulingAccess`, `createScheduleShift`, `respondToScheduleShift`, `listScheduleShifts` plus `onScheduleNotifyQueued` for SMS/WhatsApp delivery.
 - `createFloqrConnectOnboardingLink`: authorization-checked Accounts v2 recipient-account creation plus Stripe-hosted onboarding/account-update links for a club or the signed-in member.
 - `getFloqrConnectStatus`: retrieves the trusted Accounts v2 recipient capability and returns only readiness/status data to the authorized club admin or member.
 - `stripeFloqrWebhook`: Stripe SDK-verified, idempotent Checkout completion/delayed-payment/expiration handling, paid-service invoicing, fulfillment records, paid ShoutOut submission, and targeted campaign creation.

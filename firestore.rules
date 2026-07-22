@@ -705,6 +705,21 @@ service cloud.firestore {
       allow create, read, update, delete: if signedIn();
     }
 
+    match /schedulingSubscriptions/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /scheduleShifts/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /scheduleNotifyQueue/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
     match /shoutoutAudit/{id} {
       allow create, read, update, delete: if signedIn();
     }

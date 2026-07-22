@@ -9,6 +9,7 @@
   let designations = [], activities = [];
   const permissionOptions = [
     ["manageGuestLists", "Create and manage guest lists"],
+    ["manageSchedules", "Create and manage staff schedules"],
     ["postPublicContent", "Post to the club public page"],
     ["customerSupport", "Act as a Customer Service Representative"],
     ["manageCommerce", "Manage club Commerce products and orders"]

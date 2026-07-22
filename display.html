@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- FLOQR ShoutOut Display Page v29.09.22. Use with ?location=... (optional ?ip=... / ?screen=64x32). -->
+  <!-- FLOQR ShoutOut Display Page v29.09.47. Use with ?location=... (optional ?ip=... / ?screen=64x32). -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR ShoutOut Display</title>
-  <link rel="stylesheet" href="./display.css?v=29.09.42"/>
+  <link rel="stylesheet" href="./display.css?v=29.09.47"/>
 </head>
 <body class="display display-booting">
   <main id="displayCanvas" class="display-canvas">
@@ -18,6 +18,7 @@
           <div id="mediaSlot" class="media-slot hidden"></div>
           <h1 id="displayMain"></h1>
           <h2 id="displaySub"></h2>
+          <div id="displayIdentityRail" class="display-identity-rail hidden" aria-hidden="true"></div>
         </div>
       </div>
       <div class="ticker"></div>
@@ -32,9 +33,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
-<script src="./shared-data.js?v=29.09.42"></script>
+<script src="./shared-data.js?v=29.09.47"></script>
+<script src="./jersey-catalog.js?v=29.09.47"></script>
 <script src="./floqr-identity.js?v=29.09.22"></script>
-<script src="./display-app.js?v=29.09.42"></script>
+<script src="./display-app.js?v=29.09.47"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
 </body>
 </html>

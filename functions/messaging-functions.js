@@ -419,6 +419,63 @@ exports.onShoutoutCreatedNotifyClub = onDocumentCreated({
   await deliverToClubTargets(clubLocationId, settings, body, {purpose: "pending-shoutout", shoutoutId: snap.id});
 });
 
+/** Drain Staff Scheduling notify queue → SMS/WhatsApp (Email/in-app already handled at create). */
+exports.onScheduleNotifyQueued = onDocumentCreated({
+  document: "scheduleNotifyQueue/{id}",
+  region: "us-central1",
+  secrets: MESSAGING_SECRETS,
+  timeoutSeconds: 30,
+  memory: "256MiB"
+}, async event => {
+  const snap = event.data;
+  if (!snap) return;
+  const row = snap.data() || {};
+  if (text(row.status, 40) !== "queued") return;
+  const body = text(row.body, 900);
+  const clubLocationId = text(row.clubLocationId, 160);
+  const results = [];
+  const assigneePhone = normalizeE164(row.assigneePhone || "");
+  if (assigneePhone) {
+    const settingsSnap = clubLocationId ? await db.collection("clubNotificationSettings").doc(clubLocationId).get() : null;
+    const settings = settingsSnap?.exists ? settingsSnap.data() || {} : {};
+    const pref = text(settings.channelPreference, 20) || "sms";
+    if ((pref === "sms" || pref === "both") && (settings.smsEnabled || !clubLocationId)) {
+      results.push(await sendTwilioMessage({
+        channel: "sms",
+        to: assigneePhone,
+        body,
+        clubLocationId,
+        purpose: text(row.purpose, 80) || "schedule-invite"
+      }));
+    }
+    if ((pref === "whatsapp" || pref === "both") && settings.whatsappEnabled) {
+      results.push(await sendTwilioMessage({
+        channel: "whatsapp",
+        to: assigneePhone,
+        body,
+        clubLocationId,
+        purpose: text(row.purpose, 80) || "schedule-invite"
+      }));
+    }
+  } else if (clubLocationId) {
+    const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
+    if (settingsSnap.exists) {
+      const delivery = await deliverToClubTargets(
+        clubLocationId,
+        settingsSnap.data() || {},
+        body,
+        {purpose: text(row.purpose, 80) || "schedule-invite"}
+      );
+      results.push(delivery);
+    }
+  }
+  await snap.ref.set({
+    status: "processed",
+    processedAt: admin.firestore.FieldValue.serverTimestamp(),
+    deliveryResults: results
+  }, {merge: true});
+});
+
 exports.rotateClubDailyAuthCodes = onSchedule({
   region: "us-central1",
   schedule: "5 0 * * *",

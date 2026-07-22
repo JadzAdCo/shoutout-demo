@@ -1767,25 +1767,18 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.40") {
+function defaultFloqrPreviewLinks(v = "29.09.47") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
-    ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
-    ["Heist ShoutOut — Soccer + Heist templates", `${base}/?v=${v}&location=heist-washington-dc`],
+    ["Search / choose club (template page = free B&W + FloqAi)", `${base}/?v=${v}&location=heist-washington-dc`],
+    ["Idle board — Use ShoutOut @ Clubname", `${base}/display.html?location=heist-washington-dc&screen=led-64x32`],
+    ["Jersey Morocco — mark + bottom rail", `${base}/display.html?location=heist-washington-dc&template=soccerMorocco&main=FLOQR&sub=%F0%9F%94%A5&screen=led-64x32&preview=1&v=${v}`],
+    ["NBA Lakers jersey $30", `${base}/display.html?location=heist-washington-dc&template=nbaLosAngelesLakers&main=KING&sub=23&screen=led-64x32&preview=1&v=${v}`],
+    ["NFL Chiefs jersey $30", `${base}/display.html?location=heist-washington-dc&template=nflKansasCityChiefs&main=MAHOMES&sub=15&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Real Madrid jersey $30", `${base}/display.html?location=heist-washington-dc&template=soccerRealMadrid&main=VINI&sub=7&screen=led-64x32&preview=1&v=${v}`],
     ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-    ["Soccer Morocco $30", `${base}/display.html?location=heist-washington-dc&template=soccerMorocco&main=FLOQR&sub=10&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Spain $30", `${base}/display.html?location=heist-washington-dc&template=soccerSpain&main=DON&sub=OK&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Chelsea $30", `${base}/display.html?location=heist-washington-dc&template=soccerChelsea&main=BLUE&sub=CF&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer PSG $30", `${base}/display.html?location=heist-washington-dc&template=soccerParisSaintGermain&main=PARIS&sub=PS&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Monaco $30", `${base}/display.html?location=heist-washington-dc&template=soccerMonaco&main=ASM&sub=MC&screen=led-64x32&preview=1&v=${v}`],
-    ["Locked Up — no handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
-    ["Locked Up — with patron handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&sub=%40mingl.don&screen=led-64x32&preview=1&v=${v}`],
-    ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
-    ["I Aint No Snitch — with name", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&sub=Don&screen=led-64x32&preview=1&v=${v}`],
-    ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
-    ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
-    ["Shôko Club Admin", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
+    ["Staff Scheduling portal", `${base}/scheduling.html?v=${v}`],
     ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
   ];
 }

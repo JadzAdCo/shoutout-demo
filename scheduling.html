@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Scheduling</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.46"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.46"/>
+</head>
+<body>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=29.09.46">&larr; Back</a>
+<main class="app admin-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Staff &amp; talent calendars</p>
+        <h1>FLOQR Scheduling</h1>
+        <p class="sub">Clubs, promoting companies, and DJs manage shifts with Email / SMS / WhatsApp notify-and-approve. <strong>$20/month</strong> per member. Events are not included.</p>
+        <p id="schedulingPortalStatus" class="status">Sign in to continue.</p>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Subscription</p>
+        <h2 id="portalSubBadge">$20 / month</h2>
+        <div class="queue-actions">
+          <button id="portalGoogleLoginBtn" type="button">Google sign-in</button>
+          <button id="portalBuySubBtn" class="primary" type="button">Subscribe $20/mo</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>Who is scheduling?</h2>
+      <div class="profile-grid">
+        <label>Owner type
+          <select id="portalOwnerType">
+            <option value="dj">DJ</option>
+            <option value="promoterCompany">Promoting company</option>
+            <option value="club">Club / lounge</option>
+          </select>
+        </label>
+        <label>Owner id<input id="portalOwnerId" placeholder="Auto for DJ (your uid) · company slug · club location id"/></label>
+        <label>Display name<input id="portalOwnerName" placeholder="DJ Nova / Apex Promotions / Club name"/></label>
+      </div>
+      <div class="queue-actions">
+        <button id="portalRefreshBtn" type="button">Refresh access &amp; shifts</button>
+        <a class="buttonlike" href="./admin.html?v=29.09.46">Club Admin Scheduling tab</a>
+      </div>
+    </div>
+
+    <div id="portalSubscribeGate" class="card">
+      <h2>Activate Staff Scheduling</h2>
+      <p class="sub small">Subscribe to publish shifts and send approval requests over Email, SMS, and WhatsApp (uses club messaging credits when the owner is a club).</p>
+    </div>
+
+    <div id="portalWorkspace" class="hidden">
+      <div class="card">
+        <h2>Create shift / booking</h2>
+        <div class="profile-grid">
+          <label>Role / title<input id="portalRole" placeholder="Resident DJ · Door · Promoter shift"/></label>
+          <label>Assignee uid<input id="portalAssigneeUid" placeholder="Firebase uid of worker or collaborator"/></label>
+          <label>Assignee name<input id="portalAssigneeName" placeholder="Display name"/></label>
+          <label>Assignee email<input id="portalAssigneeEmail" type="email" placeholder="for Email notify"/></label>
+          <label>Assignee phone<input id="portalAssigneePhone" type="tel" placeholder="+1… for SMS/WhatsApp"/></label>
+          <label>Starts<input id="portalStartsAt" type="datetime-local"/></label>
+          <label>Ends<input id="portalEndsAt" type="datetime-local"/></label>
+          <label class="profile-grid-wide">Notes<textarea id="portalNotes" rows="2" placeholder="Call time, dress code, booth, guest list duty…"></textarea></label>
+          <label><input id="portalRequireApproval" type="checkbox" checked/> Require assignee approval</label>
+        </div>
+        <button id="portalCreateShiftBtn" class="primary" type="button">Create &amp; notify</button>
+      </div>
+      <div class="card">
+        <h2>Shifts</h2>
+        <div id="portalShiftList" class="report-block"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>My assignments</h2>
+      <p class="sub small">Approve or decline shifts assigned to you.</p>
+      <div id="portalMyShifts" class="report-block"></div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=29.09.46"></script>
+<script src="./payment-service.js?v=29.09.46"></script>
+<script src="./scheduling-portal.js?v=29.09.46"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+</script>
+</body>
+</html>
