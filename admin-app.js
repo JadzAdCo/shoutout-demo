@@ -22,7 +22,6 @@
   let loc = getStaticLocation(locationId);
   let publicClubProfile = {...loc};
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
-  const CLUB_ADMIN_EMAILS = (window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
   let workerAssociationRequests = [];
@@ -1569,7 +1568,7 @@
         return;
       }
       const campaignRef = await db.collection("guestListCampaigns").add(payload);
-      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link:`./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&v=29.09.8`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
+      const result = await window.FLOQRPayments.publishFollowerCampaign({entityId:locationId, campaign:{title:payload.campaignName, body:payload.description || `${payload.eventType}${payload.eventDate ? ` on ${payload.eventDate}` : ""}`, link: window.FLOQRNav?.adminLink("./guest-list.html", { campaign: campaignRef.id }) || `./guest-list.html?location=${encodeURIComponent(locationId)}&campaign=${encodeURIComponent(campaignRef.id)}&from=admin&v=29.09.44`, campaignType:"guestList", sourceCampaignId:campaignRef.id}, status:message => setText("adminStatus", message)});
       await campaignRef.set({publishedAt:firebase.firestore.FieldValue.serverTimestamp(), deliveredCount:result.deliveredCount || 0}, {merge:true});
       setText("adminStatus", `Guest list campaign submitted to ${result.deliveredCount || 0} club follower(s).`);
       await loadGuestListCampaigns();
