@@ -1,4 +1,4 @@
-/* global-profile-status.js v29.05 */
+/* global-profile-status.js v29.09.45 */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
@@ -14,7 +14,7 @@
     shell = document.createElement("div");
     shell.id = "floqrGlobalProfileStatus";
     shell.className = "user-menu floqr-global-profile-status";
-    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">•••</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
+    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">&#8226;&#8226;&#8226;</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
     document.body.appendChild(shell);
     return shell;
   }
