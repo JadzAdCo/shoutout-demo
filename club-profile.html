@@ -11,10 +11,10 @@
 <body class="club-profile-body">
   <main id="clubProfilePage" class="club-profile-shell">
     <header class="club-profile-nav">
-      <a class="club-profile-brand" href="./?v=29.09.8&start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
+      <a id="clubProfileBrandLink" class="club-profile-brand" href="./?v=29.09.44&start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
       <div class="club-profile-nav-actions">
-        <a id="floqrGlobalBack" class="buttonlike" data-from="search" href="./?v=29.09.8&start=search">← Back to Search</a>
-        <a class="buttonlike" href="./?v=29.09.8&start=search">Explore FLOQR</a>
+        <a id="floqrGlobalBack" class="buttonlike" href="./admin.html?v=29.09.44">← Back</a>
+        <a id="clubProfileExploreLink" class="buttonlike" href="./?v=29.09.44&start=search">Explore FLOQR</a>
         <button id="clubProfileShareBtn" type="button">Copy Link</button>
       </div>
     </header>
@@ -109,7 +109,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="./firebase-config.js?v=29.09.8"></script>
-  <script src="./floqr-nav.js?v=29.09.8"></script>
+  <script src="./floqr-nav.js?v=29.09.44"></script>
   <script src="./global-profile-status.js?v=29.09.8"></script>
   <script src="./shared-data.js?v=29.09.8"></script>
   <script src="./feature-gates.js?v=29.09.23"></script>
@@ -118,7 +118,20 @@
   <script src="./floqr-identity.js?v=29.09.8"></script>
   <script src="./club-profile-app.js?v=29.09.8"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
+  document.addEventListener("DOMContentLoaded", () => {
+    const from = new URLSearchParams(location.search).get("from") || "";
+    const back = document.getElementById("floqrGlobalBack");
+    const brand = document.getElementById("clubProfileBrandLink");
+    const explore = document.getElementById("clubProfileExploreLink");
+    if (from === "admin" || from === "club") {
+      if (back) back.dataset.from = "admin";
+      if (brand && window.FLOQRNav?.adminHome) brand.href = window.FLOQRNav.adminHome();
+      explore?.classList.add("hidden");
+    } else if (!from && back) {
+      back.dataset.from = "search";
+    }
+    window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
+  });
 </script>
 </body>
 </html>

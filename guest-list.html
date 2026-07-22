@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Join Guest List</title><link rel="stylesheet" href="./styles.css?v=29.09.8"/><link rel="stylesheet" href="./admin.css?v=29.09.8"/></head>
-<body data-guest-theme="midnight"><a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a><main class="app admin-shell guest-list-shell"><section class="page active">
+<body data-guest-theme="midnight"><a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./?v=29.09.44&start=search">&larr; Back</a><main class="app admin-shell guest-list-shell"><section class="page active">
 <header class="topbar"><div><p class="eyebrow">Guest List</p><h1>Join Guest List</h1><p class="sub">Enter legal names exactly as they appear on government-issued ID.</p><p id="guestStatus" class="status">Loading guest list app...</p></div></header>
 <div id="guestLogin" class="card"><h2>Sign in first</h2><button id="guestGoogleLoginBtn" type="button">Continue with Google</button></div>
 <div id="guestCampaignHero" class="guest-campaign-hero hidden"><img id="guestCampaignHeroImage" alt="Guest list event"/><div><p class="eyebrow">Guest List</p><h2 id="guestCampaignHeroTitle"></h2><p id="guestCampaignHeroDescription" class="sub"></p><div id="guestCampaignSupportingTeam" class="badge-row"></div></div></div>
@@ -21,8 +21,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.8"></script><script src="./floqr-nav.js?v=29.09.8"></script><script src="./global-profile-status.js?v=29.09.8"></script><script src="./shared-data.js?v=29.09.8"></script><script src="./floqr-action-feedback.js?v=29.09.8"></script><script src="./helper-popouts.js?v=29.09.8"></script><script src="./guest-list-app.js?v=29.09.8"></script>
+<script src="./firebase-config.js?v=29.09.8"></script><script src="./floqr-nav.js?v=29.09.44"></script><script src="./global-profile-status.js?v=29.09.8"></script><script src="./shared-data.js?v=29.09.8"></script><script src="./floqr-action-feedback.js?v=29.09.8"></script><script src="./helper-popouts.js?v=29.09.8"></script><script src="./guest-list-app.js?v=29.09.8"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));</script>
+<script>document.addEventListener("DOMContentLoaded",()=>{
+  const from=new URLSearchParams(location.search).get("from")||"";
+  const back=document.getElementById("floqrGlobalBack");
+  if(back&&!from) back.dataset.from="search";
+  window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
+});</script>
 </body></html>
