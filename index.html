@@ -5,9 +5,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.44"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.45"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.44"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.45"/>
 </head>
 <body>
 
@@ -15,7 +15,7 @@
   <button id="userMenuBtn" class="user-menu-btn" type="button" aria-label="User menu">
     <img id="userPhoto" class="user-photo hidden" alt="User profile"/>
     <span id="userInitials" class="user-initials">?</span>
-    <span class="user-dots" aria-hidden="true">â€¢â€¢â€¢</span>
+    <span class="user-dots" aria-hidden="true">&#8226;&#8226;&#8226;</span>
   </button>
   <div id="userDropdown" class="user-dropdown hidden">
     <div class="user-dropdown-row">
@@ -142,7 +142,7 @@
   <section id="signupProfilePage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeFromProfileBtn" type="button">â† Back to welcome</button>
+        <button id="backToWelcomeFromProfileBtn" type="button">&larr; Back to welcome</button>
         <h1>Create your profile</h1>
         <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
       </div>
@@ -237,7 +237,7 @@
   <section id="categoryPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeBtn" type="button">â† Back to welcome</button>
+        <button id="backToWelcomeBtn" type="button">&larr; Back to welcome</button>
         <p class="sub category-sentence">
           <strong>Search for</strong>
         </p>
@@ -268,24 +268,24 @@
 
         <button id="floqAiHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="floqAiHelpPopout" title="FloqAi help">?</button>
         <div id="floqAiHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="FloqAi help" aria-hidden="true">
-          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">Ã—</button>
+          <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">&times;</button>
           <p class="eyebrow">FloqAi</p>
-          <p><strong>Ask FloqR</strong> with FloqAi â€” tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
+          <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
           <p class="sub small">Routes to Mingl, RydR, BartR, ShoutOut, clubs, and more.</p>
         </div>
 
         <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
           <label class="intent-search-label" for="intentSearchInput">
             <span id="floqAiHelpText" class="intent-help">Tell, how can I help you?</span>
-            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain wordsâ€¦" aria-describedby="intentSearchHint"/>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain words…" aria-describedby="intentSearchHint"/>
           </label>
-          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone Â· book a ride Â· trade swag Â· throw a ShoutOut Â· find a club Â· hip hop night</p>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club · hip hop night</p>
           <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
         </div>
       </div>
     </div>
 
-    <button id="floqAiAgent" class="floqai-agent" type="button" aria-label="FloqAi â€” open contextual search" title="FloqAi">
+    <button id="floqAiAgent" class="floqai-agent" type="button" aria-label="FloqAi — open contextual search" title="FloqAi">
       <span id="floqAiMark" class="floqai-mark" aria-hidden="true">
         <img class="floqai-mark-img" src="./images/floqr-tiles-transparent.png" alt="" width="96" height="96"/>
       </span>
@@ -372,7 +372,7 @@
   <section id="clubActionsPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromActionsBtn" type="button">â† Back to categories</button>
+        <button id="backToCategoriesFromActionsBtn" type="button">&larr; Back to categories</button>
         <h1>What would you like to do?</h1>
         <p class="sub">Choose a club action, then select the exact location.</p>
       </div>
@@ -392,7 +392,7 @@
   <section id="adSplashPage" class="page">
     <div class="splash-wrap">
       <div class="splash-card">
-        <button id="backFromAdBtn" type="button">â† Back to categories</button>
+        <button id="backFromAdBtn" type="button">&larr; Back to categories</button>
         <div class="splash-logo-row">
           <div id="splashClubLogoWrap" class="splash-logo-wrap">
             <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
@@ -419,7 +419,7 @@
     <input type="hidden" id="listingType" value="clubs"/>
     <header class="topbar">
       <div>
-        <button id="backToCategoriesBtn" type="button">â† Back to categories</button>
+        <button id="backToCategoriesBtn" type="button">&larr; Back to categories</button>
         <h1 id="listingTitle">Search Clubs</h1>
         <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
@@ -435,7 +435,7 @@
   <section id="templateSelectPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToListingBtn" type="button">â† Back to club search</button>
+        <button id="backToListingBtn" type="button">&larr; Back to club search</button>
         <h1 id="selectedClubTitle">Location</h1>
         <p id="selectedClubMeta" class="sub"></p>
       </div>
@@ -449,7 +449,7 @@
 
   <section id="editorPage" class="page">
     <header class="topbar">
-      <div><button id="backToTemplatesBtn" type="button">â† Back to template selection</button><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <div><button id="backToTemplatesBtn" type="button">&larr; Back to template selection</button><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
       <button id="logoutBtn5" type="button">Sign out</button>
     </header>
     <div class="composer">
@@ -469,7 +469,7 @@
             <input id="soccerManualName" type="text" maxlength="12" autocomplete="off" placeholder="Name on jersey"/>
           </label>
           <label>Jersey mark (any 2 characters)
-            <input id="soccerJerseyNumber" type="text" maxlength="2" autocomplete="off" placeholder="e.g. 7, AB, â˜…1" aria-describedby="soccerJerseyNumberHint"/>
+            <input id="soccerJerseyNumber" type="text" maxlength="2" autocomplete="off" placeholder="e.g. 7, AB, *1" aria-describedby="soccerJerseyNumberHint"/>
           </label>
           <p id="soccerJerseyNumberHint" class="sub small">Exactly up to 2 characters of any kind (letters, numbers, or symbols).</p>
         </div>
@@ -510,7 +510,7 @@
           <div class="section-heading-row">
             <div>
               <p class="eyebrow">Zebbies advanced template</p>
-              <h2>Football Intro â€” four-player lineup</h2>
+              <h2>Football Intro — four-player lineup</h2>
             </div>
             <strong class="football-template-price">$30</strong>
           </div>
@@ -519,28 +519,28 @@
             <article class="football-player-upload" data-football-slot="1">
               <div id="footballTeamPreview1" class="football-player-photo-preview"><span>1</span></div>
               <label>Player 1 photo<input id="footballTeamPhoto1" data-football-team-photo data-slot="1" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Player 1 identity<select id="footballTeamIdentity1" data-football-team-identity data-slot="1"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR Â· Mingl handle</option></select></label>
+              <label>Player 1 identity<select id="footballTeamIdentity1" data-football-team-identity data-slot="1"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
               <label>Identity on screen<input id="footballTeamIdentityValue1" data-football-team-identity-value data-slot="1" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition1" data-football-team-position data-slot="1"><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="2">
               <div id="footballTeamPreview2" class="football-player-photo-preview"><span>2</span></div>
               <label>Player 2 photo<input id="footballTeamPhoto2" data-football-team-photo data-slot="2" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Player 2 identity<select id="footballTeamIdentity2" data-football-team-identity data-slot="2"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR Â· Mingl handle</option></select></label>
+              <label>Player 2 identity<select id="footballTeamIdentity2" data-football-team-identity data-slot="2"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
               <label>Identity on screen<input id="footballTeamIdentityValue2" data-football-team-identity-value data-slot="2" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition2" data-football-team-position data-slot="2"><option>Running Back</option><option>Quarterback</option><option>Wide Receiver</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="3">
               <div id="footballTeamPreview3" class="football-player-photo-preview"><span>3</span></div>
               <label>Player 3 photo<input id="footballTeamPhoto3" data-football-team-photo data-slot="3" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Player 3 identity<select id="footballTeamIdentity3" data-football-team-identity data-slot="3"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR Â· Mingl handle</option></select></label>
+              <label>Player 3 identity<select id="footballTeamIdentity3" data-football-team-identity data-slot="3"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
               <label>Identity on screen<input id="footballTeamIdentityValue3" data-football-team-identity-value data-slot="3" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition3" data-football-team-position data-slot="3"><option>Wide Receiver</option><option>Quarterback</option><option>Running Back</option><option>Linebacker</option></select></label>
             </article>
             <article class="football-player-upload" data-football-slot="4">
               <div id="footballTeamPreview4" class="football-player-photo-preview"><span>4</span></div>
               <label>Player 4 photo<input id="footballTeamPhoto4" data-football-team-photo data-slot="4" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-              <label>Player 4 identity<select id="footballTeamIdentity4" data-football-team-identity data-slot="4"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR Â· Mingl handle</option></select></label>
+              <label>Player 4 identity<select id="footballTeamIdentity4" data-football-team-identity data-slot="4"><option value="displayName">Display name</option><option value="instagram">Instagram</option><option value="floqrHandle">FloqR · Mingl handle</option></select></label>
               <label>Identity on screen<input id="footballTeamIdentityValue4" data-football-team-identity-value data-slot="4" maxlength="14" placeholder="Resolved from your profile"/></label>
               <label>Position<select id="footballTeamPosition4" data-football-team-position data-slot="4"><option>Linebacker</option><option>Quarterback</option><option>Running Back</option><option>Wide Receiver</option></select></label>
             </article>
@@ -643,7 +643,7 @@
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
       <h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
-      <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">â€”</span></p><p><strong>Location:</strong> <span id="confirmClub">â€”</span></p><p><strong>Template:</strong> <span id="confirmTemplate">â€”</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
+      <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
       <p id="confirmationRedirectStatus" class="status">Returning to Search in <span id="confirmationCountdown">15</span> seconds...</p>
       <div class="button-row confirmation-actions"><button id="skipConfirmationBtn" class="ghost" type="button">Skip</button></div>
     </div>
@@ -659,7 +659,7 @@
 <script src="./floqr-nav.js?v=29.09.39"></script>
 <script src="./intent-search.js?v=29.09.39"></script>
 <script src="./floqai-search.js?v=29.09.44"></script>
-<script src="./global-profile-status.js?v=29.09.33"></script>
+<script src="./global-profile-status.js?v=29.09.45"></script>
 <script src="./floqr-i18n.js?v=29.09.33"></script>
 <script src="./shared-data.js?v=29.09.44"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>

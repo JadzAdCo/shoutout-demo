@@ -1,4 +1,4 @@
-/* global-profile-status.js v29.05 */
+/* global-profile-status.js v29.09.45 */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
@@ -14,7 +14,7 @@
     shell = document.createElement("div");
     shell.id = "floqrGlobalProfileStatus";
     shell.className = "user-menu floqr-global-profile-status";
-    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">•••</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
+    shell.innerHTML = `<button id="floqrGlobalProfileBtn" class="user-menu-btn" type="button" aria-label="Profile status"><span class="avatar-circle">?</span><span class="menu-dots">&#8226;&#8226;&#8226;</span></button><div id="floqrGlobalProfileDropdown" class="user-dropdown hidden"></div>`;
     document.body.appendChild(shell);
     return shell;
   }
@@ -62,7 +62,7 @@
       <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.9&from=portal">Mingl Chat (${esc(c.chats)})</a>
       <a class="profile-menu-link" href="./commerce.html?v=29.09.9&from=search">BartR</a>
       <a class="profile-menu-link" href="./rydr.html?v=29.09.9&from=search">RydR</a>
-      <a class="profile-menu-link" href="./?v=29.09.9&start=intent">Ask FloqR</a>
+      <a class="profile-menu-link" href="./?v=29.09.39&start=intent">FloqAi</a>
       <button id="floqrGlobalSignOutBtn" type="button">Sign out</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
   }
