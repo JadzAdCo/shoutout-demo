@@ -674,7 +674,11 @@
     const subLimit = Math.max(0, Number(textCaps.maxSubCharacters ?? textCaps.sub ?? 60));
     const canvas = byId("displayCanvas");
     canvas.className = "display-canvas";
-    if (t.className && t.className !== "neon") canvas.classList.add(t.className);
+    // className may be space-separated (e.g. "soccer-jersey soccer-morocco"); classList.add rejects spaces.
+    String(t.className || "")
+      .split(/\s+/)
+      .filter(cls => cls && cls !== "neon")
+      .forEach(cls => canvas.classList.add(cls));
     if (isClassicBoard && !isTextOverlay) canvas.classList.add("classic-board-template");
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
