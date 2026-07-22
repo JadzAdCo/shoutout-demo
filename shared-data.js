@@ -1327,12 +1327,12 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   soccerJersey: {
     label:"Soccer jersey name + 2-character mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:7.2,subTextSizePercent:28},
-      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:7.2,subTextSizePercent:28},
-      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:6.8,subTextSizePercent:26},
-      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:7.2,subTextSizePercent:28},
-      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:7.2,subTextSizePercent:28},
-      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:6.8,subTextSizePercent:26}
+      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:10.8,subTextSizePercent:56},
+      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:10.8,subTextSizePercent:56},
+      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:10.2,subTextSizePercent:52},
+      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:10.8,subTextSizePercent:56},
+      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:10.8,subTextSizePercent:56},
+      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:10.2,subTextSizePercent:52}
     }
   }
 };
