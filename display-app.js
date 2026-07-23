@@ -139,6 +139,45 @@
       .trim();
   }
 
+  function jerseyTeamLabel(template = {}, data = {}) {
+    const explicit = cleanBoardText(data.jerseyTeamLabel || template.jerseyTeamLabel || template.jerseyCountry || template.teamName || "");
+    if (explicit) return glyphSlice(explicit, 0, 22);
+    const rawName = String(template.name || template.id || "");
+    const stripped = rawName
+      .replace(/^(Soccer|NBA|NFL)\s+/i, "")
+      .replace(/\s+jersey$/i, "")
+      .trim();
+    return glyphSlice(cleanBoardText(stripped), 0, 22);
+  }
+
+  function jerseyNameRows(mainText, caps = {}) {
+    const maxTotal = Math.max(1, Math.min(14, Number(caps.maxMainCharacters || caps.main || 14)));
+    const perLine = Math.max(1, Math.min(maxTotal, Number(caps.maxCharactersPerLine || caps.perLine || 8)));
+    const name = glyphSlice(cleanBoardText(mainText), 0, maxTotal);
+    if (!name) return [""];
+    if (glyphLen(name) <= perLine) return [name];
+    const rows = displayTextRows(name, {lineCount: 2, maxCharactersPerLine: perLine, maxMainCharacters: maxTotal});
+    if (rows.length >= 2) return rows.slice(0, 2);
+    // Hard wrap mid-word when a single token exceeds one line.
+    const chars = glyphs(name);
+    const mid = Math.ceil(chars.length / 2);
+    return [chars.slice(0, mid).join(""), chars.slice(mid).join("")].filter(Boolean);
+  }
+
+  function ensureJerseyTeamEl(center) {
+    let teamEl = byId("displayJerseyTeam");
+    if (teamEl) return teamEl;
+    if (!center) return null;
+    teamEl = document.createElement("div");
+    teamEl.id = "displayJerseyTeam";
+    teamEl.className = "soccer-jersey-team hidden";
+    teamEl.setAttribute("aria-hidden", "true");
+    const main = byId("displayMain");
+    if (main) center.insertBefore(teamEl, main);
+    else center.appendChild(teamEl);
+    return teamEl;
+  }
+
   function pushWrapped(rows, words, maxRows, maxChars) {
     let line = "";
     words.forEach(word => {
@@ -694,7 +733,8 @@
       maxMainCharacters:Number(data.maxMainCharacters || t.maxMainCharacters || 60),
       maxSubCharacters:Number(data.maxSubCharacters ?? t.maxSubCharacters ?? 60),
       mainTextSizePercent:Number(data.mainTextSizePercent || t.mainTextSizePercent || 20.8),
-      subTextSizePercent:Number(data.subTextSizePercent || t.subTextSizePercent || 7.8)
+      subTextSizePercent:Number(data.subTextSizePercent || t.subTextSizePercent || 7.8),
+      teamTextSizePercent:Number(data.teamTextSizePercent || t.teamTextSizePercent || 7.2)
     };
     const mainSize = Math.min(40, Math.max(4, Number(textCaps.mainTextSizePercent || 20.8)));
     const subSize = Math.min(20, Math.max(2, Number(textCaps.subTextSizePercent || 7.8)));
@@ -740,7 +780,7 @@
       ? (rawMain || locationDefaultMain)
       : rawMain;
     const mainText = isSoccerJersey
-      ? glyphSlice(cleanBoardText(mainSource), 0, mainLimit)
+      ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
       : mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
     // Soccer jersey mark: any characters including emoji (grapheme-capped at 2).
     const subText = isSoccerJersey
@@ -752,6 +792,13 @@
     if (center) center.className = "display-center";
     byId("displayMain").className = "";
     byId("displaySub").className = "";
+    const teamReset = byId("displayJerseyTeam");
+    if (teamReset && !isSoccerJersey) {
+      teamReset.className = "soccer-jersey-team hidden";
+      teamReset.textContent = "";
+      teamReset.setAttribute("aria-hidden", "true");
+    }
+    canvas.classList.remove("jersey-name-wrapped");
     if (textCaps.supported === false) {
       if (center) center.classList.add("unsupported-text-layout");
       byId("displayMain").textContent = "DISPLAY SIZE NOT SUPPORTED";
@@ -810,12 +857,37 @@
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
+      const nameRows = jerseyNameRows(mainText, {
+        ...textCaps,
+        maxMainCharacters: Math.min(14, Number(textCaps.maxMainCharacters || textCaps.main || 14)),
+        maxCharactersPerLine: Math.min(8, Number(textCaps.maxCharactersPerLine || textCaps.perLine || 8)),
+        lineCount: 2
+      });
+      const wrapped = nameRows.filter(Boolean).length > 1;
+      const wrapScale = wrapped ? 0.85 : 1;
+      // Base sizes: name +50% vs prior 10.8vh → 16.2; number +100% vs prior 32vh → 64.
+      const baseName = Number(textCaps.mainTextSizePercent || 16.2);
+      const baseNumber = Number(textCaps.subTextSizePercent || 64);
+      const baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
+      const nameSize = Math.min(24, Math.max(8, baseName * wrapScale));
+      const numberSize = Math.min(72, Math.max(22, baseNumber * wrapScale));
+      const teamSize = Math.min(12, Math.max(4.5, baseTeam * wrapScale));
+      const teamLabel = jerseyTeamLabel(t, data);
+      const teamEl = ensureJerseyTeamEl(center);
+      if (teamEl) {
+        teamEl.className = "soccer-jersey-team" + (teamLabel ? "" : " hidden");
+        teamEl.setAttribute("aria-hidden", teamLabel ? "false" : "true");
+        teamEl.textContent = teamLabel;
+        teamEl.style.setProperty("font-size", `${teamSize}vh`, "important");
+      }
+      canvas.classList.toggle("jersey-name-wrapped", wrapped);
       byId("displayMain").classList.add("soccer-jersey-name");
-      byId("displayMain").style.setProperty("font-size", `${Math.min(18, Math.max(7, Number(textCaps.mainTextSizePercent || 10.8)))}vh`, "important");
-      byId("displayMain").textContent = mainText;
+      byId("displayMain").classList.toggle("jersey-name-wrap", wrapped);
+      byId("displayMain").style.setProperty("font-size", `${nameSize}vh`, "important");
+      byId("displayMain").innerHTML = nameRows.filter(Boolean).map(row => `<span class="jersey-name-line">${esc(row)}</span>`).join("") || "";
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").classList.add("soccer-jersey-number");
-      byId("displaySub").style.setProperty("font-size", `${Math.min(42, Math.max(18, Number(textCaps.subTextSizePercent || 32)))}vh`, "important");
+      byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
       // Animated text holder at bottom (same burst rail as classic).

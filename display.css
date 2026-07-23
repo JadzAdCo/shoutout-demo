@@ -651,7 +651,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   .heist-brand-slide{animation:none!important}
 }
 
-/* Soccer jersey name + 2-character mark (FIFA-proportion spacing) */
+/* Soccer / sports jersey: country|club crest + player name + large number */
 .display-canvas.soccer-jersey-template{
   background:#050505!important;
   animation:none!important;
@@ -681,13 +681,13 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template .display-center:after{
   display:none!important;
 }
-.display-canvas.soccer-jersey-template #displayMain.soccer-jersey-name{
+.display-canvas.soccer-jersey-template .soccer-jersey-team{
   position:absolute!important;
   z-index:4!important;
-  left:16%!important;
-  right:16%!important;
-  top:32%!important;
-  height:10%!important;
+  left:10%!important;
+  right:10%!important;
+  top:16%!important;
+  height:9%!important;
   margin:0!important;
   padding:0!important;
   display:grid!important;
@@ -695,19 +695,58 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   color:#fff!important;
   font-family:Impact,"Arial Narrow","Arial Black",Arial,sans-serif!important;
   font-weight:1000!important;
-  letter-spacing:.12em!important;
+  letter-spacing:.18em!important;
   text-transform:uppercase!important;
   white-space:nowrap!important;
   overflow:hidden!important;
+  text-shadow:0 2px 0 rgba(0,0,0,.55),0 0 10px rgba(0,0,0,.35)!important;
+  transform:perspective(520px) rotateX(18deg);
+  transform-origin:center bottom;
+}
+.display-canvas.soccer-jersey-template .soccer-jersey-team.hidden{
+  display:none!important;
+}
+.display-canvas.soccer-jersey-template #displayMain.soccer-jersey-name{
+  position:absolute!important;
+  z-index:4!important;
+  left:12%!important;
+  right:12%!important;
+  top:28%!important;
+  height:16%!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  align-content:center!important;
+  gap:0!important;
+  color:#fff!important;
+  font-family:Impact,"Arial Narrow","Arial Black",Arial,sans-serif!important;
+  font-weight:1000!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase!important;
+  line-height:.95!important;
+  overflow:hidden!important;
   text-shadow:0 2px 0 rgba(0,0,0,.55),0 0 12px rgba(0,0,0,.35)!important;
+}
+.display-canvas.soccer-jersey-template #displayMain.soccer-jersey-name.jersey-name-wrap{
+  top:26%!important;
+  height:18%!important;
+  white-space:normal!important;
+}
+.display-canvas.soccer-jersey-template #displayMain.soccer-jersey-name .jersey-name-line{
+  display:block;
+  width:100%;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
 }
 .display-canvas.soccer-jersey-template #displaySub.soccer-jersey-number{
   position:absolute!important;
   z-index:4!important;
-  left:18%!important;
-  right:18%!important;
-  top:44%!important;
-  height:26%!important;
+  left:14%!important;
+  right:14%!important;
+  top:46%!important;
+  height:32%!important;
   bottom:auto!important;
   margin:0!important;
   padding:0!important;
@@ -724,13 +763,17 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   overflow:visible!important;
   text-shadow:0 3px 0 rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.4)!important;
 }
+.display-canvas.soccer-jersey-template.jersey-name-wrapped #displaySub.soccer-jersey-number{
+  top:48%!important;
+  height:30%!important;
+}
 .display-canvas.soccer-jersey-template .display-identity-rail.soccer-jersey-rail{
   position:absolute!important;
   z-index:5!important;
   left:12%!important;
   right:12%!important;
-  top:78%!important;
-  height:14%!important;
+  top:80%!important;
+  height:12%!important;
   margin:0!important;
   padding:0!important;
   display:grid!important;
@@ -740,22 +783,28 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-css-back .display-background{
   background-size:cover!important;
 }
+.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template .soccer-jersey-team,
+.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template .soccer-jersey-team{
+  top:14%!important;
+  height:10%!important;
+  letter-spacing:.12em!important;
+}
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template #displayMain.soccer-jersey-name{
-  top:30%!important;
-  height:11%!important;
-  left:14%!important;
-  right:14%!important;
+  top:26%!important;
+  height:16%!important;
+  left:10%!important;
+  right:10%!important;
   letter-spacing:.08em!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template #displaySub.soccer-jersey-number{
-  top:42%!important;
-  height:28%!important;
+  top:44%!important;
+  height:34%!important;
   overflow:visible!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template .display-identity-rail.soccer-jersey-rail,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template .display-identity-rail.soccer-jersey-rail{
-  top:76%!important;
-  height:16%!important;
+  top:78%!important;
+  height:14%!important;
 }

@@ -4,22 +4,23 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Onboard DC venues | FLOQR</title>
-  <link rel="stylesheet" href="./admin.css?v=29.09.13"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.48"/>
 </head>
 <body>
 <main class="app admin-shell" style="max-width:920px;margin:24px auto;padding:18px">
   <h1>Onboard extracted DC venues</h1>
-  <p class="sub">Sign in as Master Admin, then push website-extracted club profiles from <code>shared-data.js</code> into Firestore (<code>clubLocations</code>, <code>clubs</code>, <code>clubOnboardingRecords</code>). Includes <strong>Casamara Rooftop</strong> rooftop events.</p>
+  <p class="sub">Sign in as Master Admin, then push website-extracted club profiles from <code>shared-data.js</code> into Firestore (<code>clubLocations</code>, <code>clubs</code>, <code>clubOnboardingRecords</code>, <code>events</code>, <code>clubMedia</code>). Includes Decades, Mayflower, LIMA Twist nightlife media/events.</p>
   <p id="status" class="status">Checking auth…</p>
   <button id="loginBtn" type="button">Sign in with Google</button>
   <button id="onboardBtn" class="primary" type="button" disabled>Onboard all DC venues</button>
+  <button id="onboardThreeBtn" class="primary" type="button" disabled>Onboard Decades + Mayflower + LIMA only</button>
   <pre id="report" class="report-block" style="white-space:pre-wrap;margin-top:16px"></pre>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.13"></script>
-<script src="./shared-data.js?v=29.09.13"></script>
+<script src="./firebase-config.js?v=29.09.48"></script>
+<script src="./shared-data.js?v=29.09.48"></script>
 <script>
 (function () {
   const IDS = [
@@ -29,18 +30,61 @@
     "vera-cocina-washington-dc",
     "sax-washington-dc",
     "decades-washington-dc",
+    "mayflower-washington-dc",
     "rosebar-lounge-washington-dc",
     "kata-washington-dc",
     "lima-twist-washington-dc",
     "casamara-rooftop-washington-dc"
   ];
+  const THREE = ["decades-washington-dc", "mayflower-washington-dc", "lima-twist-washington-dc"];
+  const MEDIA = {
+    "decades-washington-dc": {
+      main: {title: "Decades Nightclub floor", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/02/722A8852.jpg?ssl=1"},
+      gallery: [
+        {title: "Summer Beach Club", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1"},
+        {title: "Jell-O Shot Night", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1"},
+        {title: "Ladies Night", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1"},
+        {title: "Sueño Sundays", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/08/SUENO-FEATURED.jpg?ssl=1"},
+        {title: "Decades crowd", mediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2025/12/IMG_7269-copy.jpg?ssl=1"}
+      ]
+    },
+    "mayflower-washington-dc": {
+      main: {title: "The Mayflower DC cover", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/6776ceb045575851c01b68b2_websitecover.jpg"},
+      gallery: [
+        {title: "Mayflower lounge", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/61778e898a0e587ab4c2b269_10.15.21%20mayflower-19.jpeg"},
+        {title: "Zebbie's Garden interior", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/60a582518e7662d6a9cdb012_Zebbies_Interior-2.jpg"},
+        {title: "Zebbie's Garden section", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/611584bb8d0a823285ab8bf2_Zebbies_interior-section.jpg"},
+        {title: "Zebbie's sign", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/611c04a44f1583a27103770c_zebbies-sign-interior.jpg"},
+        {title: "Mayflower vibe still", mediaUrl: "https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/60c2aca6dcffab2025abed06_IMG_8714-poster-00001.jpg"}
+      ]
+    },
+    "lima-twist-washington-dc": {
+      main: {title: "LIMA Twist dining / lounge", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/fb22d58b-4396-4697-8eea-da403bc01db8/LIMA-115.png?format=1500w"},
+      gallery: [
+        {title: "LIMA Twist interior", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/b54f519c-f8c8-480a-a3a4-64a44ede9550/LIMA-015.png?format=1500w"},
+        {title: "LIMA Twist nightlife", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/c7acf1b9-6c5e-418e-8375-027cf3302178/LIMA-109.png?format=1500w"},
+        {title: "LIMA Twist ambience", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/5c17ad51-798b-43f8-851e-cf04bb538db0/LIMA-022.png?format=1500w"},
+        {title: "LIMA Twist bar", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/530df192-622e-48cc-a61f-d080a72f3dc6/LIMA-028.png?format=1500w"},
+        {title: "LIMA Twist dining room", mediaUrl: "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/0576a0b2-40bb-4271-a3ec-da03f68b25a4/LIMA-058.png?format=1500w"}
+      ]
+    }
+  };
+
   if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
   const status = document.getElementById("status");
   const report = document.getElementById("report");
   const onboardBtn = document.getElementById("onboardBtn");
+  const onboardThreeBtn = document.getElementById("onboardThreeBtn");
   const MASTER = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"].map(x => x.toLowerCase());
+
+  function renderList() {
+    report.textContent = IDS.map(id => {
+      const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id];
+      return loc ? `• ${id} — ${loc.locationName || loc.brandName}` : `• ${id} — MISSING in shared-data`;
+    }).join("\n");
+  }
 
   document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   auth.onAuthStateChanged(user => {
@@ -49,11 +93,70 @@
       ? (ok ? `Signed in as ${user.email}. Ready to onboard ${IDS.length} venues.` : `Signed in as ${user.email}, but Master Admin is required.`)
       : "Sign in with a Master Admin Google account.";
     onboardBtn.disabled = !ok;
-    report.textContent = IDS.map(id => {
-      const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id];
-      return loc ? `• ${id} — ${loc.locationName || loc.brandName}` : `• ${id} — MISSING in shared-data`;
-    }).join("\n");
+    onboardThreeBtn.disabled = !ok;
+    renderList();
   });
+
+  async function writeMedia(id, locationName) {
+    const pack = MEDIA[id];
+    if (!pack) return 0;
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    let count = 0;
+    if (pack.main) {
+      await db.collection("clubMedia").doc(`${id}_main`).set({
+        clubLocationId: id,
+        locationName,
+        slotType: "main",
+        mediaType: "image",
+        mediaUrl: pack.main.mediaUrl,
+        title: pack.main.title || "",
+        source: "website-crawl",
+        uploadedAt: now,
+        updatedAt: now
+      }, {merge: true});
+      count += 1;
+    }
+    for (let i = 0; i < (pack.gallery || []).slice(0, 5).length; i += 1) {
+      const item = pack.gallery[i];
+      await db.collection("clubMedia").doc(`${id}_gallery_${i + 1}`).set({
+        clubLocationId: id,
+        locationName,
+        slotType: "gallery",
+        mediaType: "image",
+        mediaUrl: item.mediaUrl,
+        title: item.title || "",
+        galleryOrder: i + 1,
+        source: "website-crawl",
+        uploadedAt: now,
+        updatedAt: now
+      }, {merge: true});
+      count += 1;
+    }
+    return count;
+  }
+
+  async function writeEventsForClub(id) {
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const events = Object.entries(window.SHOUTOUT_EVENTS || {}).filter(([, event]) =>
+      [event.locationId, event.clubLocationId].includes(id)
+    );
+    for (const [eventId, event] of events) {
+      await db.collection("events").doc(eventId).set({
+        ...event,
+        locationId: id,
+        clubLocationId: id,
+        country: event.country || "United States",
+        region: event.region || "District of Columbia",
+        city: event.city || "Washington",
+        status: event.status || (event.active === false ? "inactive" : "active"),
+        onboardingSource: "website-crawl-dc-nightlife",
+        onboardingVersion: "v29.09.48",
+        updatedAt: now,
+        createdAt: now
+      }, {merge: true});
+    }
+    return events.length;
+  }
 
   async function writeVenue(id) {
     const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id];
@@ -74,8 +177,18 @@
       published: true,
       services: ["shoutout", "guestList", "vip"],
       floqrServices: ["ShoutOut", "Guest List", "VIP Reservation"],
-      onboardingSource: "website-extract-batch-dc",
-      onboardingVersion: "v29.09.13",
+      publicSections: {
+        about: true,
+        contact: true,
+        upcomingEvents: true,
+        pastEvents: true,
+        featuredDjs: true,
+        featuredStaff: true,
+        promotionGroups: true,
+        gallery: true
+      },
+      onboardingSource: loc.onboardingSource || "website-extract-batch-dc",
+      onboardingVersion: "v29.09.48",
       active: true,
       updatedAt: now,
       createdAt: now
@@ -94,22 +207,36 @@
     }, {merge: true});
     await db.collection("clubOnboardingRecords").doc(id).set({
       ...payload,
-      adminPortalUrl: `./admin.html?location=${id}&v=29.09.13`,
-      displayUrl: `./display.html?location=${id}&v=29.09.13`,
-      publicProfileUrl: `./club-profile.html?location=${id}&v=29.09.13`,
+      adminPortalUrl: `./admin.html?location=${id}&v=29.09.48`,
+      displayUrl: `./display.html?location=${id}&v=29.09.48`,
+      publicProfileUrl: `./club-profile.html?location=${id}&v=29.09.48`,
       status: "created"
     }, {merge: true});
-    return id;
+    const mediaCount = await writeMedia(id, payload.clubName);
+    const eventCount = await writeEventsForClub(id);
+    return {id, mediaCount, eventCount};
+  }
+
+  async function runOnboard(ids) {
+    status.textContent = "Writing venues, events, and media…";
+    const done = [];
+    for (const id of ids) done.push(await writeVenue(id));
+    report.textContent = `Onboarded ${done.length} venues:\n` + done.map(row =>
+      `- ${row.id} (media ${row.mediaCount}, events ${row.eventCount})`
+    ).join("\n");
+    status.textContent = "Done.";
   }
 
   onboardBtn.onclick = async () => {
-    try {
-      status.textContent = "Writing venues…";
-      const done = [];
-      for (const id of IDS) done.push(await writeVenue(id));
-      report.textContent = `Onboarded ${done.length} venues:\n` + done.map(id => `- ${id}`).join("\n");
-      status.textContent = "Done.";
-    } catch (error) {
+    try { await runOnboard(IDS); }
+    catch (error) {
+      status.textContent = error.message || String(error);
+      report.textContent = String(error?.stack || error);
+    }
+  };
+  onboardThreeBtn.onclick = async () => {
+    try { await runOnboard(THREE); }
+    catch (error) {
       status.textContent = error.message || String(error);
       report.textContent = String(error?.stack || error);
     }

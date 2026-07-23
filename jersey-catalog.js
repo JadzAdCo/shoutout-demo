@@ -42,17 +42,18 @@
       screenFormatIds: SCREEN.slice(),
       defaultMain: "",
       defaultSub: "",
-      lineCount: 1,
-      maxCharactersPerLine: 12,
-      maxMainCharacters: 12,
+      lineCount: 2,
+      maxCharactersPerLine: 8,
+      maxMainCharacters: 14,
       maxSubCharacters: 2,
       jerseyNameField: true,
       jerseyNumberField: true,
       jerseyNumberMaxChars: 2,
+      jerseyTeamLabel: String(name || "").toUpperCase(),
       season: "2026/27",
       sport,
       league,
-      description: `Shared $30 ${name} jersey-back ShoutOut (${league}, 2026/27). Display name on the upper back; jersey mark accepts any 2 characters including emoji.`,
+      description: `Shared $30 ${name} jersey-back ShoutOut (${league}, 2026/27). Country/club crest in CAPS, player name (max 14, wraps), jersey mark up to 2 characters.`,
       tags
     };
   }

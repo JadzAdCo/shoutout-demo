@@ -1,0 +1,22 @@
+---
+description: FloqAi help repository — register every "?" popout before committing an iteration
+alwaysApply: true
+---
+
+# FloqAi help repository (always before commit)
+
+Before finishing or committing any iteration that adds/changes in-app help:
+
+1. **If you add or edit a `?` help popout** (FloqAi `?`, `details.help-popout`, `floqr-help-popout`, helper text converted by `helper-popouts.js`, or any `aria-label="Help"` copy):
+   - Add the **same verbiage** to `floqai-help-repository.js` via `register` / `registerMany` (title, body, `searchPhrases`, and links).
+   - Prefer `data-search` / `data-blurb` on popout links so runtime registration stays rich.
+2. **Confirm FloqAi can find it** — search phrases such as the link label, “Onboarding”, or a distinctive sentence from the popout body must resolve through `FLOQRHelpRepository.toSearchIntents()` → `intent-search.js`.
+3. **Do not ship popout-only help** — UI `?` copy without a repository entry is incomplete.
+4. **Script order** — pages that use FloqAi must load `floqai-help-repository.js` before `intent-search.js`.
+5. **Runtime safety net** — `helper-popouts.js` registers converted nodes automatically; still seed durable copy in the repository so search works before DOM conversion.
+
+Checklist (tick mentally before commit):
+
+- [ ] New/changed `?` verbiage mirrored in `floqai-help-repository.js`
+- [ ] `searchPhrases` cover natural patron wording
+- [ ] Links point at real FLOQR routes with `v=` / `from=floqai` when applicable

@@ -1370,6 +1370,7 @@ exports.emailV290914TestLinks = onRequest({
       ["Vera Club Admin", `${base}/admin.html?location=vera-cocina-washington-dc&v=${v}`],
       ["SAX Club Admin", `${base}/admin.html?location=sax-washington-dc&v=${v}`],
       ["Decades Club Admin", `${base}/admin.html?location=decades-washington-dc&v=${v}`],
+      ["Mayflower Club Admin", `${base}/admin.html?location=mayflower-washington-dc&v=${v}`],
       ["Rosebar Club Admin", `${base}/admin.html?location=rosebar-lounge-washington-dc&v=${v}`],
       ["KATA Club Admin", `${base}/admin.html?location=kata-washington-dc&v=${v}`],
       ["LIMA Twist Club Admin", `${base}/admin.html?location=lima-twist-washington-dc&v=${v}`],

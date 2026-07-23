@@ -10,6 +10,7 @@ Extracted 2026-07-18 from official sites. Firestore + `shared-data.js` ids below
 | Vera DC | https://veradc.com/ | `vera-cocina-washington-dc` |
 | SAX DC | https://www.saxwdc.com/ | `sax-washington-dc` |
 | Decades DC | https://decadesdc.com/ | `decades-washington-dc` |
+| The Mayflower DC | https://www.themayflowerdc.com/ | `mayflower-washington-dc` |
 | Rose Bar DC | https://www.rosebarlounge.com/ | `rosebar-lounge-washington-dc` |
 | KATA DC | https://www.kata-dc.com/ | `kata-washington-dc` |
 | LIMA Twist (prior) | https://www.limatwist.com/ | `lima-twist-washington-dc` |

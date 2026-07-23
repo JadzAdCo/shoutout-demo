@@ -23,13 +23,20 @@
     const details = document.createElement("details");
     details.className = "help-popout inline-help-popout";
     const summary = document.createElement("summary");
-    summary.setAttribute("aria-label", labelFor(node));
+    const helpTitle = labelFor(node);
+    summary.setAttribute("aria-label", helpTitle);
     summary.textContent = "?";
     const body = document.createElement("div");
+    body.className = "help-popout-body";
     body.innerHTML = node.innerHTML;
     details.append(summary, body);
     node.dataset.helpPopoutConverted = "1";
     node.replaceWith(details);
+    window.FLOQRHelpRepository?.registerFromHelpNode?.(details, {
+      title: helpTitle,
+      source: "help-popout-converted",
+      page: location.pathname || ""
+    });
   }
 
   function convertAll(root = document) {
@@ -60,6 +67,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     convertAll(document);
+    window.FLOQRHelpRepository?.registerDomHelpPopouts?.(document);
     bindDismissBehavior();
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -67,6 +75,9 @@
           if (node.nodeType !== 1) return;
           if (shouldConvert(node)) convert(node);
           convertAll(node);
+          if (node.matches?.("details.help-popout, .floqai-help-popout, [data-floqai-help-entry]") || node.querySelector?.("details.help-popout, .floqai-help-popout")) {
+            window.FLOQRHelpRepository?.registerDomHelpPopouts?.(node);
+          }
         });
       });
     });

@@ -7,7 +7,7 @@
   <title>ShoutOut App</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.45"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.45"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.48"/>
 </head>
 <body>
 
@@ -271,15 +271,24 @@
           <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">&times;</button>
           <p class="eyebrow">FloqAi</p>
           <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
-          <p class="sub small">Routes to Mingl, RydR, BartR, ShoutOut, clubs, and more.</p>
+          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>.</p>
+          <div class="floqai-help-links" data-floqai-search-catalog="1">
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=dj" data-search="become a dj|dj access|I want to be a dj|disc jockey" data-blurb="Elect DJ as your service role and associate with clubs.">Become a DJ</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai&type=promoter" data-search="become a promoter|promoter access|promotion company" data-blurb="Request Promoter access for guest lists and campaigns.">Become a Promoter</a>
+            <a href="./role-profiles.html?v=29.09.48&from=floqai" data-search="role profiles|role profiles overview|how roles work|service roles" data-blurb="See how Club Admin, DJ, Promoter, and hospitality roles work.">Role profiles overview</a>
+            <a href="./patron-portal.html?v=29.09.48&from=floqai" data-search="my profile|profile and settings|settings|account" data-blurb="Open My Profile &amp; Settings for roles, seller tools, and account options.">My Profile &amp; Settings</a>
+            <a href="./role-request.html?v=29.09.48&from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access.">Onboarding (role / service access)</a>
+            <a href="./onboard-dc-venues.html?v=29.09.48&from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push crawled club profiles into Firestore.">Venue onboarding (Master Admin)</a>
+          </div>
         </div>
 
         <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
           <label class="intent-search-label" for="intentSearchInput">
-            <span id="floqAiHelpText" class="intent-help">Tell, how can I help you?</span>
-            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Type in plain words…" aria-describedby="intentSearchHint"/>
+            <span id="floqAiHelpText" class="intent-help">Tell me what you want to do</span>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Onboarding · I want to be able to… · Mingl / RydR / ShoutOut" aria-describedby="intentSearchHint"/>
           </label>
-          <p id="intentSearchHint" class="sub small intent-hint">Try: meet someone · book a ride · trade swag · throw a ShoutOut · find a club · hip hop night</p>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: Onboarding · link to onboarding · I want to be a Club Admin · become a DJ · meet someone · throw a ShoutOut</p>
           <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
         </div>
       </div>
@@ -466,7 +475,7 @@
             </select>
           </label>
           <label id="soccerManualNameWrap" class="hidden">Jersey name
-            <input id="soccerManualName" type="text" maxlength="12" autocomplete="off" placeholder="Name on jersey"/>
+            <input id="soccerManualName" type="text" maxlength="14" autocomplete="off" placeholder="Name on jersey (max 14)"/>
           </label>
           <label>Jersey mark (any 2 characters — emoji &amp; symbols OK)
             <input id="soccerJerseyNumber" type="text" autocomplete="off" placeholder="e.g. 7, AB, *1, 🔥" aria-describedby="soccerJerseyNumberHint"/>
@@ -657,8 +666,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.33"></script>
 <script src="./floqr-nav.js?v=29.09.39"></script>
-<script src="./intent-search.js?v=29.09.39"></script>
-<script src="./floqai-search.js?v=29.09.47"></script>
+<script src="./floqai-help-repository.js?v=29.09.49"></script>
+<script src="./intent-search.js?v=29.09.49"></script>
+<script src="./floqai-search.js?v=29.09.49"></script>
 <script src="./global-profile-status.js?v=29.09.45"></script>
 <script src="./floqr-i18n.js?v=29.09.33"></script>
 <script src="./shared-data.js?v=29.09.47"></script>
@@ -673,7 +683,7 @@
 <script src="./ai-template-studio.js?v=29.09.33"></script>
 <script src="./floqr-action-feedback.js?v=29.09.33"></script>
 <script src="./ai-grammar-service.js?v=29.09.33"></script>
-<script src="./helper-popouts.js?v=29.09.33"></script>
+<script src="./helper-popouts.js?v=29.09.49"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.33"></script>
 <script src="./ad-campaigns.js?v=29.09.33"></script>
 <script src="./floqr-identity.js?v=29.09.33"></script>

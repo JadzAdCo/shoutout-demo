@@ -201,17 +201,56 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     streetAddress:"1219 Connecticut Avenue NW", postalCode:"20036",
     locationLabel:"Washington, District of Columbia, United States",
     telephone:"+12026507326",
+    phoneDisplay:"(202) 650-7326",
     officialWebsite:"https://decadesdc.com/",
+    eventsUrl:"https://decadesdc.com/weekly-events/",
+    logoUrl:"https://decadesdc.com/wp-content/uploads/2024/02/Logo-p-500x97-1-1.png",
+    mainMediaUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/02/722A8852.jpg?ssl=1",
+    mainMediaType:"image",
+    coverImageUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/02/722A8852.jpg?ssl=1",
     brand:"DECADES DC x FLOQR",
     defaultMain:"USE ShoutOut @ DECADES", defaultSub:"Connecticut Ave",
     tagline:"DC's only multi-level retro nightclub",
-    description:"15,000 sq ft retro nightclub with 6 floors, 8 bars, 5 DJs, and a retractable rooftop.",
-    genres:["Hip Hop","Top 40","Throwbacks","EDM","House"], artists:["5 DJs"],
-    amenities:["6 floors","8 bars","Retractable rooftop","VIP","Bottle service"],
-    hours:"Event-driven (typically Thu–Sat late night)",
-    activityStatus:"Active multi-level retro nightclub",
-    activityDates:["Thursday events","Friday events","Saturday events"],
-    templates:["hiphop","edm","vip","bottle","neon","birthday"], active:true
+    description:"Located in the heart of Dupont Circle / Connecticut Ave, Decades is a 15,000 sq ft retro-themed nightclub with 6 floors, 8 bars, and 5 DJs — plus a retractable rooftop, VIP passes, bottle service, and weekly themed nights (Summer Beach Club, Fridays, Saturdays, Sueño Sundays).",
+    genres:["Hip Hop","Top 40","Throwbacks","EDM","House","Reggaeton","Techno","International"], artists:["5 DJs","Guest DJs"],
+    amenities:["6 floors","8 bars","5 DJs","Retractable rooftop","VIP passes","Bottle service","Private events","Birthday experiences"],
+    hours:"Event-driven (typically Thu–Sun late night; confirm each event)",
+    activityStatus:"Active multi-level retro nightclub — weekly Beach Club / Fridays / Saturdays / Sueño Sundays",
+    activityDates:["Thu Summer Beach Club (18+)","Fri Fridays at Decades (21+)","Sat Saturdays at Decades (21+)","Sun Sueño Sundays rooftop"],
+    templates:["hiphop","edm","vip","bottle","neon","birthday"],
+    onboardingSource:"website-extract-decadesdc.com",
+    active:true
+  },
+  "mayflower-washington-dc": {
+    brandName:"The Mayflower", locationName:"The Mayflower DC", type:"club",
+    categories:["Clubs","Lounge","Restaurant","Nightlife","Events","Private Events","ShoutOut"],
+    aliasNames:["Mayflower Club DC","The Mayflower Club","Zebbie's Garden"],
+    country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
+    streetAddress:"1223 Connecticut Avenue NW", postalCode:"20036",
+    locationLabel:"Washington, District of Columbia, United States",
+    telephone:"+12022711171",
+    phoneDisplay:"(202) 271-1171",
+    email:"info@mayflowerclubdc.com",
+    eventsEmail:"events@mayflowerclubdc.com",
+    officialWebsite:"https://www.themayflowerdc.com/",
+    eventsUrl:"https://www.themayflowerdc.com/weekly-events",
+    reservationsUrl:"https://www.themayflowerdc.com/reservations",
+    logoUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/6099e2367e59b6b7dd31c8f4_Mayflower_Icon.png",
+    mainMediaUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/6776ceb045575851c01b68b2_websitecover.jpg",
+    mainMediaType:"image",
+    coverImageUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/6776ceb045575851c01b68b2_websitecover.jpg",
+    brand:"MAYFLOWER DC x FLOQR",
+    defaultMain:"USE ShoutOut @ MAYFLOWER", defaultSub:"Connecticut Ave",
+    tagline:"DC's newest multi-level lounge, garden & event space",
+    description:"Historic Connecticut Ave speakeasy legacy (est. 1933) reborn as The Mayflower Club — multi-level lounge, dinner service, bottle service, and Zebbie's Garden nightlife. Private events for groups from 10 to 800; catering available on request.",
+    genres:["Lounge","Hip Hop","Open Format","House","Top 40"], artists:["Curated DJs"],
+    amenities:["Multi-level lounge","Dinner service","Bottle service","Private events (10–800)","Zebbie's Garden","VIP / reservations"],
+    hours:"Mayflower: Fri–Sat 6:00 PM–11:45 PM dinner / bar to 3:00 AM. Zebbie's Garden: Thu 10:00 PM–2:00 AM; Fri–Sat 10:00 PM–3:00 AM; Mon–Wed closed",
+    activityStatus:"Active multi-level lounge / garden / event space on Connecticut Ave",
+    activityDates:["Friday dinner + late bar","Saturday dinner + late bar","Thursday Zebbie's Garden","Friday–Saturday Zebbie's Garden","Private events"],
+    templates:["vip","bottle","gold","neon","hiphop","birthday"],
+    onboardingSource:"website-extract-themayflowerdc.com",
+    active:true
   },
   "rosebar-lounge-washington-dc": {
     brandName:"Rosebar Lounge", locationName:"Rosebar Lounge", type:"club",
@@ -366,23 +405,31 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     streetAddress:"1411 K Street NW", postalCode:"20005",
     locationLabel:"Washington, District of Columbia, United States",
     telephone:"+12025067151",
+    phoneDisplay:"(202) 506-7151",
     officialWebsite:"https://www.limatwist.com/",
-    logoUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/be6ac216-be12-4708-a090-69e3666a2f13/LIMA+Logo+web.png?format=1500w",
+    logoUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/5d815a65-4fc9-4128-a947-f8058a482da0/LIMA+Logo+web.png?format=1500w",
+    mainMediaUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/fb22d58b-4396-4697-8eea-da403bc01db8/LIMA-115.png?format=1500w",
+    mainMediaType:"image",
+    coverImageUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/fb22d58b-4396-4697-8eea-da403bc01db8/LIMA-115.png?format=1500w",
     socialMediaHandles:{instagram:"@limatwistdc", facebook:"https://www.facebook.com/limatwistdc/"},
     brand:"LIMA TWIST DC x FLOQR",
     defaultMain:"USE ShoutOut @ LIMA TWIST", defaultSub:"Downtown DC",
     tagline:"Join us for a meal to remember!",
-    description:"Downtown DC South American Fusion restaurant, bar, and lounge. Restaurant energy early; late-night house-rooted programming with light and sound.",
+    description:"Downtown DC South American Fusion restaurant, bar, and lounge. Restaurant by day; by night the twist reveals itself through light, state-of-the-art sound, and house-rooted musical programming — festive nightlife with bottle service and private events.",
+    cuisine:"South American Fusion",
     genres:["House","Deep House","EDM","Latin","International"], artists:["Curated DJs"],
-    amenities:["Valet Parking","Restaurant","Bar","Lounge","Bottle Service"],
+    amenities:["Valet Parking","Restaurant","Bar","Lounge","Bottle Service","Private events","OpenTable reservations"],
+    dressCode:"Smart upscale — collared shirts, fashion-forward denim OK; no sportswear, hats, or flip-flops",
     hours:"Fri–Sat 7:00 PM–3:00 AM; Sun 7:00 PM–1:00 AM; Mon–Thu closed",
-    activityStatus:"Active downtown DC restaurant / bar / lounge",
-    activityDates:["Friday late-night lounge","Saturday late-night lounge","Sunday evening lounge"],
+    activityStatus:"Active downtown DC restaurant / bar / lounge with late-night house nightlife",
+    activityDates:["Friday late-night lounge / house","Saturday late-night lounge / house","Sunday evening lounge","Private events"],
     templates:["edm","latin","vip","bottle","birthday","neon","gold"],
     displayScreenFormatIds:["led-96x48","led-64x48","led-64x32"],
     primaryDisplayScreenFormatId:"led-96x48",
     menuUrl:"https://www.limatwist.com/menu",
     reservationsUrl:"https://www.opentable.com/r/lima-twist-washington",
+    eventsUrl:"https://www.limatwist.com/private-events",
+    onboardingSource:"website-extract-limatwist.com",
     active:true
   },
   "casamara-rooftop-washington-dc": {
@@ -770,6 +817,126 @@ window.SHOUTOUT_EVENTS = {
     genres:["House","Deep House","Afro House"], artists:["International DJs"],
     eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"23:00-Late", active:true,
     ticketUrl:"#"
+  },
+  "decades-summer-beach-club-2026-07-23": {
+    eventName:"Summer Beach Club", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Throwbacks","Hip Hop","Top 40"], artists:["DCClubbing DJs"],
+    eventDate:"2026-07-23", eventDay:"Thursday", eventTime:"10:00 PM",
+    agePolicy:"18+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
+  },
+  "decades-jello-shot-night-2026-07-24": {
+    eventName:"Jell-O Shot Night", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Hip Hop","Throwbacks","Top 40"], artists:["Decades DJs"],
+    eventDate:"2026-07-24", eventDay:"Friday", eventTime:"10:00 PM",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
+  },
+  "decades-ladies-night-2026-07-25": {
+    eventName:"Pretty Girls Like to Party — Ladies Night", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Hip Hop","Open Format","Top 40"], artists:["Decades DJs"],
+    eventDate:"2026-07-25", eventDay:"Saturday", eventTime:"9:30 PM",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
+  },
+  "decades-summer-beach-club-weekly": {
+    eventName:"Summer Beach Club", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Throwbacks","Hip Hop","Top 40"], artists:["DCClubbing DJs"],
+    eventDate:"Recurring Thursday", eventDay:"Thursday", eventTime:"Late",
+    agePolicy:"18+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
+  },
+  "decades-fridays": {
+    eventName:"Fridays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Hip Hop","Throwbacks","90s","2000s","2010s"], artists:["Decades DJs"],
+    eventDate:"Recurring Friday", eventDay:"Friday", eventTime:"Late",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
+  },
+  "decades-saturdays": {
+    eventName:"Saturdays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Hip Hop","EDM","Open Format","Guest DJs"], artists:["Guest DJs","Decades DJs"],
+    eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"Late",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
+  },
+  "decades-sueno-sundays": {
+    eventName:"Sueño Sundays", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["International","Techno","Reggaeton","Top 40"], artists:["EG Productions","City Socials"],
+    eventDate:"Recurring Sunday", eventDay:"Sunday", eventTime:"Rooftop late",
+    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/08/SUENO-FEATURED.jpg?ssl=1",
+    ticketUrl:"https://posh.vip/e/sueo-decades-58", active:true
+  },
+  "mayflower-friday-late": {
+    eventName:"Mayflower Friday Dinner & Late Night", locationId:"mayflower-washington-dc", clubLocationId:"mayflower-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Lounge","Open Format","Hip Hop"], artists:["Curated DJs"],
+    eventDate:"Recurring Friday", eventDay:"Friday", eventTime:"6:00 PM–3:00 AM",
+    flyerUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/6776ceb045575851c01b68b2_websitecover.jpg",
+    ticketUrl:"https://www.themayflowerdc.com/reservations", active:true
+  },
+  "mayflower-saturday-late": {
+    eventName:"Mayflower Saturday Dinner & Late Night", locationId:"mayflower-washington-dc", clubLocationId:"mayflower-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Lounge","Open Format","Hip Hop"], artists:["Curated DJs"],
+    eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"6:00 PM–3:00 AM",
+    flyerUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/61778e898a0e587ab4c2b269_10.15.21%20mayflower-19.jpeg",
+    ticketUrl:"https://www.themayflowerdc.com/bottle-service", active:true
+  },
+  "mayflower-zebbies-thu": {
+    eventName:"Zebbie's Garden Thursday", locationId:"mayflower-washington-dc", clubLocationId:"mayflower-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Lounge","Open Format"], artists:["Curated DJs"],
+    eventDate:"Recurring Thursday", eventDay:"Thursday", eventTime:"10:00 PM–2:00 AM",
+    flyerUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/60a582518e7662d6a9cdb012_Zebbies_Interior-2.jpg",
+    ticketUrl:"https://www.themayflowerdc.com/weekly-events", active:true
+  },
+  "mayflower-private-events": {
+    eventName:"Private Events at The Mayflower", locationId:"mayflower-washington-dc", clubLocationId:"mayflower-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Private Events","Lounge"], artists:["Venue programming"],
+    eventDate:"By inquiry", eventDay:"Flexible", eventTime:"Custom",
+    flyerUrl:"https://cdn.prod.website-files.com/6099dfe7b24896a8568af325/611584bb8d0a823285ab8bf2_Zebbies_interior-section.jpg",
+    ticketUrl:"https://www.themayflowerdc.com/private-events/private-events", active:true
+  },
+  "lima-twist-friday-nightlife": {
+    eventName:"LIMA Twist Friday Nightlife", locationId:"lima-twist-washington-dc", clubLocationId:"lima-twist-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["House","Deep House","Latin"], artists:["Curated DJs"],
+    eventDate:"Recurring Friday", eventDay:"Friday", eventTime:"7:00 PM–3:00 AM",
+    flyerUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/fb22d58b-4396-4697-8eea-da403bc01db8/LIMA-115.png?format=1500w",
+    ticketUrl:"https://www.opentable.com/r/lima-twist-washington", active:true
+  },
+  "lima-twist-saturday-nightlife": {
+    eventName:"LIMA Twist Saturday Nightlife", locationId:"lima-twist-washington-dc", clubLocationId:"lima-twist-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["House","Deep House","EDM","Latin"], artists:["Curated DJs"],
+    eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"7:00 PM–3:00 AM",
+    flyerUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/b54f519c-f8c8-480a-a3a4-64a44ede9550/LIMA-015.png?format=1500w",
+    ticketUrl:"https://www.opentable.com/r/lima-twist-washington", active:true
+  },
+  "lima-twist-sunday-lounge": {
+    eventName:"LIMA Twist Sunday Lounge", locationId:"lima-twist-washington-dc", clubLocationId:"lima-twist-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["House","Lounge","International"], artists:["Curated DJs"],
+    eventDate:"Recurring Sunday", eventDay:"Sunday", eventTime:"7:00 PM–1:00 AM",
+    flyerUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/c7acf1b9-6c5e-418e-8375-027cf3302178/LIMA-109.png?format=1500w",
+    ticketUrl:"https://www.limatwist.com/contact", active:true
+  },
+  "lima-twist-private-events": {
+    eventName:"Private Events at LIMA Twist", locationId:"lima-twist-washington-dc", clubLocationId:"lima-twist-washington-dc",
+    country:"United States", region:"District of Columbia", city:"Washington",
+    genres:["Private Events","House","Latin"], artists:["Venue programming"],
+    eventDate:"By inquiry", eventDay:"Flexible", eventTime:"Custom",
+    flyerUrl:"https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/530df192-622e-48cc-a61f-d080a72f3dc6/LIMA-028.png?format=1500w",
+    ticketUrl:"https://www.limatwist.com/private-events", active:true
   }
 
 };
@@ -1325,14 +1492,14 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     }
   },
   soccerJersey: {
-    label:"Sports jersey name + 2-character mark",
+    label:"Sports jersey country/club + name + mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:10.8,subTextSizePercent:32},
-      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:10.8,subTextSizePercent:32},
-      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:10.2,subTextSizePercent:28},
-      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:10.8,subTextSizePercent:32},
-      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:12,maxMainCharacters:12,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:10.8,subTextSizePercent:32},
-      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:10,maxMainCharacters:10,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:10.2,subTextSizePercent:28}
+      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:7,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8},
+      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:7,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8}
     }
   }
 };
@@ -1365,6 +1532,7 @@ window.FLOQRTextLayout = {
       profileLabel:profile.label,
       mainTextSizePercent:Number(rule.mainTextSizePercent || 20.8),
       subTextSizePercent:Number(rule.subTextSizePercent || 7.8),
+      teamTextSizePercent:Number(rule.teamTextSizePercent || 7.2),
       main:Number(rule.maxMainCharacters || 0),
       sub:Number(rule.maxSubCharacters || 0),
       total:Number(rule.maxMainCharacters || 0),

@@ -129,7 +129,8 @@
   opacity:1;
   transform:none;
   pointer-events:auto;
-  max-height:420px;
+  max-height:min(72vh, 720px);
+  overflow:auto;
 }
 .floqai-search-panel .intent-help{
   font-size:clamp(18px,3.2vw,26px);
@@ -331,4 +332,63 @@
     filter:drop-shadow(0 0 10px rgba(38,216,255,.4));
   }
   .floqai-speech{transition:none}
+}
+
+.intent-search-results{
+  display:grid;
+  gap:10px;
+  margin-top:8px;
+}
+.intent-result-card{
+  display:grid;
+  gap:6px;
+  text-align:left;
+  text-decoration:none;
+  color:inherit;
+  padding:14px 16px;
+}
+.intent-result-card strong{font-size:1.05rem}
+.intent-result-card span,
+.intent-help-card > span{
+  opacity:.88;
+  font-size:.92rem;
+  line-height:1.35;
+}
+.intent-help-card{
+  border-color:rgba(38,216,255,.4);
+  background:linear-gradient(180deg,rgba(38,216,255,.12),rgba(6,16,28,.55));
+}
+.intent-help-card .eyebrow{
+  margin:0;
+  font-size:.72rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(38,216,255,.95);
+  font-weight:800;
+}
+.intent-help-steps{
+  margin:8px 0 0;
+  padding-left:1.15rem;
+  display:grid;
+  gap:4px;
+  font-size:.86rem;
+  line-height:1.35;
+  opacity:.92;
+}
+.intent-help-link-row{
+  margin-top:10px;
+}
+.intent-help-link,
+.floqai-help-links a.intent-help-link{
+  display:block;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.intent-help-link:last-child,
+.floqai-help-links a.intent-help-link:last-child{
+  border-bottom:0;
+}
+.intent-result-empty{
+  padding:14px 16px;
+  text-align:left;
 }

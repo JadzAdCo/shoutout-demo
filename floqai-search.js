@@ -2,10 +2,14 @@
 (function (global) {
   "use strict";
 
-  const HELP = "Tell me, what are you looking for?";
+  const HELP = "Tell me what you want to do — or say “I want to be able to…”";
   const LINE_HI = "Hi, I am FloqAi";
   const LINE_LOOK = "Tell me, what are you looking for?";
   const LINE_FEATURE = "Need to learn about a feature or do something else?";
+  const LINE_WANT = 'Say “I want to be able to…” — for example, become a Club Admin';
+  const LINE_SERVICE = "Patrons can request DJ, Promoter, hospitality, or Club Admin access";
+  const LINE_HELP_LINKS = "I’ll answer with steps and links when you need help";
+  const LINE_ONBOARD = 'Try “Onboarding” or “link to onboarding” for role and venue setup';
   const LINE_PRONOUNCE = 'pronounced Flo-ké (floh-KAY, with a crisp "é" sound)';
   const LINE_CONTEXT = "I am contextual, so speak freely to me";
   const LINE_USE_SEARCH = "Use me to search for templates";
@@ -18,7 +22,7 @@
     "Powered by FloqR Social OS",
     "Ballers if you are balling and need baller's related templates...."
   ];
-  const INTENT_RANDOM_LINES = [LINE_LOOK, LINE_FEATURE];
+  const INTENT_RANDOM_LINES = [LINE_LOOK, LINE_FEATURE, LINE_WANT, LINE_SERVICE, LINE_HELP_LINKS, LINE_ONBOARD];
   const SHOW_MS = 3000;
   const HIDE_MS = 3000;
 
@@ -348,10 +352,15 @@
       LINE_HI,
       LINE_LOOK,
       LINE_FEATURE,
+      LINE_WANT,
+      LINE_SERVICE,
+      LINE_HELP_LINKS,
+      LINE_ONBOARD,
       LINE_USE_SEARCH,
       LINE_PRONOUNCE,
       LINE_CONTEXT,
-      TEMPLATE_RANDOM_LINES
+      TEMPLATE_RANDOM_LINES,
+      INTENT_RANDOM_LINES
     }
   };
 })(window);
