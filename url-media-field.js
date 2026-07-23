@@ -15,6 +15,11 @@
     return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(String(url || ""));
   }
 
+  function looksLikeEmbed(url) {
+    const text = String(url || "");
+    return /youtube\.com|youtu\.be|tiktok\.com/i.test(text);
+  }
+
   function renderPreview(previewEl, url, file) {
     if (!previewEl) return;
     const resolved = String(url || "").trim();
@@ -22,6 +27,23 @@
       previewEl.classList.add("hidden");
       previewEl.innerHTML = "";
       return;
+    }
+    if (global.FLOQRMediaSourcePicker?.renderPreview && (looksLikeEmbed(resolved) || file)) {
+      try {
+        if (file) {
+          global.FLOQRMediaSourcePicker.renderPreview(previewEl, {
+            mediaUrl: resolved,
+            mediaType: String(file.type || "").startsWith("video/") ? "video" : "image",
+            file
+          });
+          return;
+        }
+        const parsed = global.FLOQRMediaSourcePicker.parseExternalMedia(resolved, {allowEmbed:true, allowVideo:true, allowImage:true});
+        global.FLOQRMediaSourcePicker.renderPreview(previewEl, parsed);
+        return;
+      } catch (e) {
+        /* fall through to basic preview */
+      }
     }
     previewEl.classList.remove("hidden");
     previewEl.innerHTML = looksLikeVideo(resolved, file)

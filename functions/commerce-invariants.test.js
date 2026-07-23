@@ -107,14 +107,19 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
 });
 
 test("Soccer jersey mark accepts any 2 characters", () => {
-  assert.match(sharedData, /soccerMorocco/);
+  const jerseyCatalog = fs.readFileSync(path.join(root, "jersey-catalog.js"), "utf8");
+  assert.match(sharedData, /id:'soccerJersey'/);
+  assert.match(sharedData, /requiresTeamSelect:true/);
   assert.match(sharedData, /maxSubCharacters:2/);
   assert.match(sharedData, /jerseyNumberMaxChars:2/);
+  assert.match(jerseyCatalog, /soccerMorocco/);
+  assert.match(jerseyCatalog, /FLOQR_SOCCER_TEAMS/);
   assert.match(displayApp, /isSoccerJerseyTemplate/);
   assert.match(displayApp, /cleanJerseyMark/);
   assert.match(displayApp, /graphemes/);
   assert.match(backend, /SOCCER_JERSEY_TEMPLATE_IDS/);
   assert.match(backend, /isSportsJerseyTemplateId/);
+  assert.match(backend, /soccerJersey/);
   assert.match(backend, /Array\.from\(String\(rawShoutout\.subText/);
 });
 
@@ -145,14 +150,15 @@ test("all published templates have display-aware text contracts", () => {
     assert.ok(rules.some(rule => rule.supported), `${template.id} must support at least one display`);
     rules.filter(rule => rule.supported).forEach(rule => {
       if (rule.profileId === "soccerJersey") {
-        assert.ok(rule.mainTextSizePercent >= 6 && rule.mainTextSizePercent <= 12, `${template.id} soccer name size`);
-        assert.ok(rule.subTextSizePercent >= 20 && rule.subTextSizePercent <= 36, `${template.id} soccer mark size`);
+        assert.ok(rule.mainTextSizePercent >= 14 && rule.mainTextSizePercent <= 18, `${template.id} soccer name size`);
+        assert.ok(rule.subTextSizePercent >= 50 && rule.subTextSizePercent <= 70, `${template.id} soccer mark size`);
         assert.equal(rule.sub, 2, `${template.id} soccer mark must be exactly 2 characters`);
+        assert.ok(rule.main <= rule.lineCount * rule.perLine, `${template.id} soccer main ceiling`);
       } else {
         assert.equal(rule.mainTextSizePercent, 20.8);
         assert.equal(rule.subTextSizePercent, 7.8);
+        assert.equal(rule.main, rule.lineCount * rule.perLine);
       }
-      assert.equal(rule.main, rule.lineCount * rule.perLine);
       // led-64x32 uses the Heist-era 30/10 board floor (28px); larger panels stay >= 34.
       assert.ok(rule.minimumFontPixels >= 28, `${template.id} minimumFontPixels ${rule.minimumFontPixels}`);
     });

@@ -1370,6 +1370,7 @@ exports.emailV290914TestLinks = onRequest({
       ["Vera Club Admin", `${base}/admin.html?location=vera-cocina-washington-dc&v=${v}`],
       ["SAX Club Admin", `${base}/admin.html?location=sax-washington-dc&v=${v}`],
       ["Decades Club Admin", `${base}/admin.html?location=decades-washington-dc&v=${v}`],
+      ["Mayflower Club Admin", `${base}/admin.html?location=mayflower-washington-dc&v=${v}`],
       ["Rosebar Club Admin", `${base}/admin.html?location=rosebar-lounge-washington-dc&v=${v}`],
       ["KATA Club Admin", `${base}/admin.html?location=kata-washington-dc&v=${v}`],
       ["LIMA Twist Club Admin", `${base}/admin.html?location=lima-twist-washington-dc&v=${v}`],
@@ -1767,16 +1768,16 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.47") {
+function defaultFloqrPreviewLinks(v = "29.09.52") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
     ["Search / choose club (template page = free B&W + FloqAi)", `${base}/?v=${v}&location=heist-washington-dc`],
     ["Idle board — Use ShoutOut @ Clubname", `${base}/display.html?location=heist-washington-dc&screen=led-64x32`],
-    ["Jersey Morocco — mark + bottom rail", `${base}/display.html?location=heist-washington-dc&template=soccerMorocco&main=FLOQR&sub=%F0%9F%94%A5&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Jersey $30 — pick team in editor (Morocco preview)", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerMorocco&main=FLOQR&sub=%F0%9F%94%A5&screen=led-64x32&preview=1&v=${v}`],
+    ["Soccer Jersey — Real Madrid crest", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerRealMadrid&jerseyTeamLabel=REAL%20MADRID&jerseyPrimary=%23FFFFFF&jerseySecondary=%23FEBE10&jerseyCssBack=1&main=VINI&sub=7&screen=led-64x32&preview=1&v=${v}`],
     ["NBA Lakers jersey $30", `${base}/display.html?location=heist-washington-dc&template=nbaLosAngelesLakers&main=KING&sub=23&screen=led-64x32&preview=1&v=${v}`],
     ["NFL Chiefs jersey $30", `${base}/display.html?location=heist-washington-dc&template=nflKansasCityChiefs&main=MAHOMES&sub=15&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Real Madrid jersey $30", `${base}/display.html?location=heist-washington-dc&template=soccerRealMadrid&main=VINI&sub=7&screen=led-64x32&preview=1&v=${v}`],
     ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
     ["Staff Scheduling portal", `${base}/scheduling.html?v=${v}`],
     ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]

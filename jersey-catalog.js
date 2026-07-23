@@ -1,9 +1,10 @@
-/* FLOQR Sports Jersey templates — NBA, NFL, European soccer top-5 (2026/27). $30 each. */
+/* FLOQR Sports Jersey catalog — soccer teams (picker) + NBA/NFL templates. Soccer is one $30 template. */
 (function (global) {
   "use strict";
 
   const SCREEN = ["led-64x32", "led-64x48", "led-96x48", "p125-64x32", "p125-64x48", "p125-96x48"];
   const PRICE = 3000;
+  const SOCCER_TEMPLATE_ID = "soccerJersey";
 
   function slug(name) {
     return String(name || "")
@@ -13,16 +14,17 @@
       .replace(/^[0-9]+/, "");
   }
 
-  function jerseyTemplate({id, name, league, sport, primary, secondary, accent, bgUrl, extraTags}) {
+  function jerseyTemplate({id, name, league, sport, primary, secondary, accent, bgUrl, extraTags, teamName}) {
     const classSport = sport === "nba" ? "nba-jersey" : sport === "nfl" ? "nfl-jersey" : "soccer-jersey";
     const tags = Array.from(new Set([
-      "Sports", "Jersey", sport.toUpperCase(), league, name,
+      "Sports", "Jersey", sport.toUpperCase(), league, name, teamName,
       "2026/27", "$30", "shared", "name", "number",
       ...(extraTags || [])
     ].filter(Boolean)));
     return {
       id,
       name,
+      teamName: teamName || String(name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").trim(),
       scope: "Shared",
       className: `sports-jersey ${classSport} jersey-css-back`,
       category: "Sports",
@@ -32,7 +34,7 @@
       textOverlay: true,
       layout: "soccer-jersey",
       identityRail: true,
-      jerseyCssBack: true,
+      jerseyCssBack: !bgUrl,
       jerseyPrimary: primary || "#111111",
       jerseySecondary: secondary || "#ffffff",
       jerseyAccent: accent || secondary || "#ffffff",
@@ -42,17 +44,18 @@
       screenFormatIds: SCREEN.slice(),
       defaultMain: "",
       defaultSub: "",
-      lineCount: 1,
-      maxCharactersPerLine: 12,
-      maxMainCharacters: 12,
+      lineCount: 2,
+      maxCharactersPerLine: 8,
+      maxMainCharacters: 14,
       maxSubCharacters: 2,
       jerseyNameField: true,
       jerseyNumberField: true,
       jerseyNumberMaxChars: 2,
+      jerseyTeamLabel: String(teamName || name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").toUpperCase(),
       season: "2026/27",
       sport,
       league,
-      description: `Shared $30 ${name} jersey-back ShoutOut (${league}, 2026/27). Display name on the upper back; jersey mark accepts any 2 characters including emoji.`,
+      description: `Shared $30 ${name} jersey-back ShoutOut (${league}, 2026/27). Country/club crest in CAPS, player name (max 14, wraps), jersey mark up to 2 characters.`,
       tags
     };
   }
@@ -125,13 +128,12 @@
     ["Washington Commanders", "#5A1414", "#FFB612"]
   ];
 
-  /* Top 5 clubs per major European league country (2026/27 seed list). */
   const EU_SOCCER = [
     {league: "Premier League", country: "England", teams: [
       ["Arsenal", "#EF0107", "#FFFFFF"],
       ["Manchester City", "#6CABDD", "#1C2C5B"],
       ["Liverpool", "#C8102E", "#00B2A9"],
-      ["Chelsea", "#034694", "#DBA111"],
+      ["Chelsea", "#034694", "#DBA111", "./images/soccer/soccer-chelsea-back.png"],
       ["Manchester United", "#DA291C", "#FBE122"]
     ]},
     {league: "La Liga", country: "Spain", teams: [
@@ -156,8 +158,8 @@
       ["Eintracht Frankfurt", "#E1000F", "#000000"]
     ]},
     {league: "Ligue 1", country: "France", teams: [
-      ["Paris Saint-Germain", "#004170", "#DA291C"],
-      ["AS Monaco", "#E30613", "#FFFFFF"],
+      ["Paris Saint-Germain", "#004170", "#DA291C", "./images/soccer/soccer-psg-back.png"],
+      ["AS Monaco", "#E30613", "#FFFFFF", "./images/soccer/soccer-monaco-back.png"],
       ["Olympique Marseille", "#2FAEE0", "#FFFFFF"],
       ["Olympique Lyonnais", "#003399", "#FFFFFF"],
       ["Lille", "#E01E26", "#FFFFFF"]
@@ -199,55 +201,139 @@
     ]}
   ];
 
-  const catalog = {};
-  const ids = [];
+  const PHOTO_NATIONALS = [
+    {id: "soccerMorocco", teamName: "Morocco", league: "National teams", country: "Morocco", primary: "#C1272D", secondary: "#006233", bgUrl: "./images/soccer/soccer-morocco-back.png"},
+    {id: "soccerSpain", teamName: "Spain", league: "National teams", country: "Spain", primary: "#AA151B", secondary: "#F1BF00", bgUrl: "./images/soccer/soccer-spain-back.png"}
+  ];
 
-  function add(prefix, sport, league, teamName, primary, secondary, extraTags) {
-    const id = `${prefix}${slug(teamName)}`;
-    if (catalog[id]) return;
-    catalog[id] = jerseyTemplate({
+  const soccerTeams = {};
+  const nbaNflTemplates = {};
+  const nbaNflIds = [];
+
+  function addSoccerTeam(id, teamName, league, country, primary, secondary, bgUrl) {
+    if (soccerTeams[id]) return;
+    soccerTeams[id] = jerseyTemplate({
       id,
-      name: `${sport === "soccer" ? "Soccer" : sport.toUpperCase()} ${teamName}`,
+      name: `Soccer ${teamName}`,
+      teamName,
+      league,
+      sport: "soccer",
+      primary,
+      secondary,
+      bgUrl: bgUrl || "",
+      extraTags: ["soccer", "football", country, league, "Europe"].filter(Boolean)
+    });
+  }
+
+  function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags) {
+    const id = `${prefix}${slug(teamName)}`;
+    if (nbaNflTemplates[id]) return;
+    nbaNflTemplates[id] = jerseyTemplate({
+      id,
+      name: `${sport.toUpperCase()} ${teamName}`,
+      teamName,
       league,
       sport,
       primary,
       secondary,
       extraTags
     });
-    ids.push(id);
+    nbaNflIds.push(id);
   }
 
-  NBA.forEach(([name, p, s]) => add("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
-  NFL.forEach(([name, p, s]) => add("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"]));
   EU_SOCCER.forEach(group => {
-    group.teams.forEach(([name, p, s]) => {
-      add("soccer", "soccer", group.league, name, p, s, ["soccer", "football", group.country, "Europe"]);
+    group.teams.forEach(([name, p, s, bg]) => {
+      addSoccerTeam(`soccer${slug(name)}`, name, group.league, group.country, p, s, bg || "");
     });
   });
+  PHOTO_NATIONALS.forEach(row => {
+    addSoccerTeam(row.id, row.teamName, row.league, row.country, row.primary, row.secondary, row.bgUrl);
+  });
+  // Legacy photo Monaco id (catalog AS Monaco uses soccerASMonaco).
+  if (soccerTeams.soccerASMonaco && !soccerTeams.soccerMonaco) {
+    soccerTeams.soccerMonaco = {
+      ...soccerTeams.soccerASMonaco,
+      id: "soccerMonaco",
+      name: "Soccer Monaco",
+      defaultBackgroundUrl: "./images/soccer/soccer-monaco-back.png",
+      jerseyCssBack: false
+    };
+  }
 
-  /* Keep classic photo jersey IDs discoverable alongside CSS catalog. */
-  const PHOTO_KEEP = ["soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"];
+  NBA.forEach(([name, p, s]) => addNbaNfl("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
+  NFL.forEach(([name, p, s]) => addNbaNfl("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"]));
 
-  global.FLOQR_JERSEY_CATALOG = catalog;
-  global.FLOQR_JERSEY_TEMPLATE_IDS = ids.slice();
-  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_KEEP.slice();
-  global.FLOQR_ALL_JERSEY_TEMPLATE_IDS = Array.from(new Set([...PHOTO_KEEP, ...ids]));
+  function resolveSoccerTeam(teamId) {
+    const id = String(teamId || "").trim();
+    if (!id) return null;
+    if (soccerTeams[id]) return soccerTeams[id];
+    // Legacy: template id used as team id.
+    if (/^soccer/i.test(id) && soccerTeams[id]) return soccerTeams[id];
+    return null;
+  }
+
+  function soccerTeamOptions() {
+    const byLeague = new Map();
+    Object.values(soccerTeams).forEach(team => {
+      const league = team.league || "Other";
+      if (!byLeague.has(league)) byLeague.set(league, []);
+      byLeague.get(league).push(team);
+    });
+    return Array.from(byLeague.entries()).map(([league, teams]) => ({
+      league,
+      teams: teams.slice().sort((a, b) => String(a.teamName || a.name).localeCompare(String(b.teamName || b.name)))
+    })).sort((a, b) => a.league.localeCompare(b.league));
+  }
+
+  function findSoccerTeamsMatching(query) {
+    const q = String(query || "").trim().toLowerCase();
+    if (!q) return [];
+    return Object.values(soccerTeams).filter(team => {
+      const hay = `${team.id} ${team.name} ${team.teamName} ${team.league} ${(team.tags || []).join(" ")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  global.FLOQR_SOCCER_TEMPLATE_ID = SOCCER_TEMPLATE_ID;
+  global.FLOQR_SOCCER_TEAMS = soccerTeams;
+  global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
+  global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
+  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco"]);
+  global.FLOQR_ALL_JERSEY_TEMPLATE_IDS = Array.from(new Set([SOCCER_TEMPLATE_ID, ...nbaNflIds]));
+  global.FLOQRResolveSoccerTeam = resolveSoccerTeam;
+  global.FLOQRSoccerTeamOptions = soccerTeamOptions;
+  global.FLOQRFindSoccerTeamsMatching = findSoccerTeamsMatching;
 
   function mergeIntoShoutOutTemplates() {
     const templates = global.SHOUTOUT_TEMPLATES || (global.SHOUTOUT_TEMPLATES = {});
-    Object.keys(catalog).forEach(id => {
-      if (!templates[id]) templates[id] = catalog[id];
+    // NBA / NFL remain individual templates.
+    Object.keys(nbaNflTemplates).forEach(id => {
+      if (!templates[id]) templates[id] = nbaNflTemplates[id];
     });
-    // Ensure photo jerseys carry Sports/Jersey tags
-    PHOTO_KEEP.forEach(id => {
-      const t = templates[id];
-      if (!t) return;
-      t.identityRail = true;
-      t.tags = Array.from(new Set([...(t.tags || []), "Sports", "Jersey", "soccer", "$30", "2026/27"]));
-      t.category = "Sports";
+    // Enrich consolidated soccer template with searchable team names.
+    const soccer = templates[SOCCER_TEMPLATE_ID];
+    if (soccer) {
+      const teamNames = Object.values(soccerTeams).map(t => t.teamName || t.name).filter(Boolean);
+      soccer.searchKeywords = Array.from(new Set([...(soccer.searchKeywords || []), ...teamNames, "jersey", "soccer", "football", "premier league", "la liga"]));
+      soccer.tags = Array.from(new Set([...(soccer.tags || []), "Sports", "Jersey", "soccer", "football", "$30", "2026/27", ...teamNames.slice(0, 40)]));
+    }
+    // Keep legacy soccer IDs as thin aliases → consolidated template + team id (for old links / HEIST).
+    Object.keys(soccerTeams).forEach(id => {
+      if (templates[id]) return;
+      const team = soccerTeams[id];
+      templates[id] = {
+        ...team,
+        aliasOf: SOCCER_TEMPLATE_ID,
+        consolidatedTemplateId: SOCCER_TEMPLATE_ID,
+        description: `${team.description} (Legacy team alias — patrons now pick this team inside Soccer Jersey.)`
+      };
     });
     const std = global.SHOUTOUT_STANDARD_TEMPLATE_IDS || [];
-    global.SHOUTOUT_STANDARD_TEMPLATE_IDS = Array.from(new Set([...std, ...global.FLOQR_ALL_JERSEY_TEMPLATE_IDS]));
+    global.SHOUTOUT_STANDARD_TEMPLATE_IDS = Array.from(new Set([
+      ...std.filter(id => !String(id).startsWith("soccer") || id === SOCCER_TEMPLATE_ID),
+      SOCCER_TEMPLATE_ID,
+      ...nbaNflIds
+    ]));
   }
 
   global.FLOQRMergeJerseyTemplates = mergeIntoShoutOutTemplates;

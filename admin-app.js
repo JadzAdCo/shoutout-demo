@@ -29,6 +29,7 @@
   let clubMediaEditTargetId = "";
   let clubMediaPreviewFile = null;
   let clubMediaPreviewObjectUrl = "";
+  let clubMediaPendingExternal = null;
   let clubTemplates = {};
   let clubTemplateVariants = [];
   let guestListCampaigns = [];

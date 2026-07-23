@@ -98,11 +98,11 @@
           </div>
           <label id="clubDisplayUrlWrap" class="profile-grid-wide hidden">Display URL (stable — no version query)<input id="clubDisplayUrlField" type="text" readonly spellcheck="false"/></label>
           <div class="profile-grid">
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-allow-video="0" data-allow-embed="0" data-media-button="Add Logo Image" data-media-label="Club logo">
               <label>Club logo<input id="clubProfileLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"/></label>
               <input id="clubProfileLogoUrl" type="hidden"/>
               <div id="clubProfileLogoPreview" class="url-media-preview hidden"></div>
-              <p class="sub small">Upload a logo image from this device. FLOQR stores it in Firebase Storage for the public club page.</p>
+              <p class="sub small">Add a logo from this device or paste an image URL. FLOQR stores device uploads in Firebase Storage for the public club page.</p>
             </div>
             <label>Public tagline<input id="clubProfileTagline" placeholder="The garden after dark"/></label>
             <label class="profile-grid-wide">Public description<textarea id="clubProfileDescription" rows="4" placeholder="Describe the venue experience for patrons."></textarea></label>
@@ -173,10 +173,12 @@
         </div>
         <div class="card">
           <h2>Venue Media</h2>
-          <p class="sub small">Use this one uploader for the club logo, main public-profile media, or gallery photos and videos. Gallery uploads may contain several files at once. Marketing videos should be 15 seconds or shorter.</p>
+          <p class="sub small">Add logo, main public-profile, or gallery media. Use <strong>Add Video / Photo</strong> to choose local upload, a direct media URL, or an embedded YouTube / TikTok link. Gallery may contain several local files at once. Direct/local marketing clips should stay 15 seconds or shorter.</p>
           <div class="profile-grid">
             <label>Where should it appear?<select id="clubMediaPlacement"><option value="gallery">Public gallery</option><option value="main">Main profile media</option><option value="logo">Club logo (image only)</option></select></label>
-            <label class="profile-grid-wide">Upload photos or videos<input id="clubMediaUnifiedFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,video/mp4,video/webm,video/quicktime" multiple/></label>
+            <div class="profile-grid-wide floqr-media-source-host" data-floqr-media-source="clubMedia" data-media-multiple="1" data-prefer-video="1" data-media-button="Add Video / Photo" data-media-label="Venue media">
+              <input id="clubMediaUnifiedFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,video/mp4,video/webm,video/quicktime" multiple/>
+            </div>
             <label>Media Title<input id="clubMediaTitle" placeholder="Saturday Latin Night"/></label>
             <label>Related DJs<input id="clubMediaDjs" placeholder="DJ names or usernames"/></label>
             <label>Related Promoters / Groups<input id="clubMediaPromoters" placeholder="Promoter or promotion group"/></label>
@@ -184,7 +186,7 @@
             <label data-club-video-trim>Video trim start (seconds)<input id="clubMediaTrimStart" type="number" min="0" step="0.1" value="0"/></label>
             <label data-club-video-trim>Video trim end (seconds)<input id="clubMediaTrimEnd" type="number" min="0.1" step="0.1" value="15"/></label>
           </div>
-          <p id="clubMediaEditorStatus" class="sub small">Choose a placement and one or more files. Replacing an item uses this same uploader; a new file is optional when editing only its details.</p>
+          <p id="clubMediaEditorStatus" class="sub small">Choose a placement, then Add Video / Photo (local, URL, or YouTube/TikTok). Replacing an item uses the same flow; a new selection is optional when editing only details.</p>
           <div id="clubMediaInputPreview" class="club-media-input-preview hidden"></div>
           <div class="queue-actions">
             <button id="saveClubMediaBtn" class="primary" type="button">Add Media</button>
@@ -295,17 +297,17 @@
             <label>Eyebrow<input id="marketingEyebrow" placeholder="Tonight"/></label>
             <label>Headline<input id="marketingHeadline" placeholder="Doors open"/></label>
             <label>CTA<input id="marketingCta" placeholder="Get on the list"/></label>
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-allow-video="0" data-allow-embed="0" data-media-button="Add Background Image" data-media-label="Marketing background">
               <label>Background image<input id="marketingBackgroundFile" type="file" accept="image/*"/></label>
               <div id="marketingBackgroundPreview" class="url-media-preview hidden"></div>
               <label>or paste URL<input id="marketingBackgroundUrl" placeholder="https://…"/></label>
             </div>
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-allow-video="0" data-allow-embed="0" data-media-button="Add Image" data-media-label="Marketing image 1">
               <label>Extra image 1<input id="marketingImage1File" type="file" accept="image/*"/></label>
               <div id="marketingImage1Preview" class="url-media-preview hidden"></div>
               <label>or paste URL<input id="marketingImage1" placeholder="https://…"/></label>
             </div>
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-allow-video="0" data-allow-embed="0" data-media-button="Add Image" data-media-label="Marketing image 2">
               <label>Extra image 2<input id="marketingImage2File" type="file" accept="image/*"/></label>
               <div id="marketingImage2Preview" class="url-media-preview hidden"></div>
               <label>or paste URL<input id="marketingImage2" placeholder="https://…"/></label>
@@ -339,10 +341,10 @@
             <label>Badge / eyebrow<input id="spotBadge" placeholder="Tonight"/></label>
             <label>Headline<input id="spotHeadline" placeholder="Tonight at the club"/></label>
             <label>CTA<input id="spotCta" placeholder="Open club"/></label>
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-prefer-video="1" data-media-button="Add Video / Image" data-media-label="Spot ad media">
               <label>Spot image / video (optional)<input id="spotImageFile" type="file" accept="image/*,video/*"/></label>
               <div id="spotImagePreview" class="url-media-preview hidden"></div>
-              <label>or paste URL<input id="spotImageUrl" placeholder="https://… or leave blank for auto banner"/></label>
+              <label>or paste URL<input id="spotImageUrl" placeholder="https://… file, YouTube, TikTok, or leave blank for auto banner"/></label>
             </div>
             <label>Link URL<input id="spotLinkUrl" placeholder="https://…"/></label>
           </div>
@@ -373,7 +375,7 @@
             <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
             <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
             <label>Guest-list theme<select id="guestCampaignTheme"><option value="midnight">Midnight</option><option value="garden">Garden</option><option value="neon">Neon</option><option value="gold">VIP Gold</option><option value="minimal">Minimal</option></select></label>
-            <div class="url-media-field profile-grid-wide">
+            <div class="url-media-field profile-grid-wide" data-allow-video="0" data-allow-embed="0" data-media-button="Add Image" data-media-label="Guest list image">
               <label>Main image<input id="guestCampaignImageFile" type="file" accept="image/*"/></label>
               <div id="guestCampaignImagePreview" class="url-media-preview hidden"></div>
               <label>or paste URL<input id="guestCampaignImage" placeholder="DJ, promoter, waitress, bartender, or event image"/></label>
@@ -560,6 +562,7 @@
 <script src="./shared-data.js?v=29.09.33"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
+<script src="./media-source-picker.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>

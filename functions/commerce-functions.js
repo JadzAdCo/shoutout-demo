@@ -26,12 +26,12 @@ const HEIST_DC_LOCATION_ID = "heist-washington-dc";
 const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const HEIST_ART_PRICE_CENTS = 3000;
 const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
-  "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
+  "soccerJersey", "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
 ]);
 const SOCCER_JERSEY_PRICE_CENTS = 3000;
 function isSportsJerseyTemplateId(templateId = "") {
   const id = String(templateId || "");
-  if (SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
+  if (id === "soccerJersey" || SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
   return /^(soccer|nba|nfl)[A-Za-z0-9]+$/.test(id);
 }
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
