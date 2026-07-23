@@ -201,7 +201,7 @@ a.category-card.intent-card{display:grid;place-items:center;text-align:center;te
 .section-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .section-title-row h2{margin:0}
 .help-popout{position:relative;justify-self:end}
-.help-popout summary{list-style:none;width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.10);font-weight:1000;cursor:pointer}
+.help-popout summary{list-style:none;width:20px;height:20px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.10);font-weight:1000;font-size:11px;cursor:pointer}
 .help-popout summary::-webkit-details-marker{display:none}
 .help-popout[open] summary{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c}
 .help-popout div{position:absolute;right:0;z-index:20;width:min(320px,calc(100vw - 38px));margin-top:8px;border:1px solid var(--line);border-radius:16px;background:#12183a;color:#fff;padding:12px;box-shadow:0 18px 48px rgba(0,0,0,.42);font-size:14px;line-height:1.35}
@@ -565,14 +565,23 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:38px;
+  min-height:23px;
+  min-width:23px;
   border:1px solid var(--line);
   border-radius:999px;
   background:rgba(255,255,255,.10);
-  padding:8px 13px;
+  padding:5px 8px;
   color:#fff;
   font-weight:1000;
-  font-size:13px;
+  font-size:11px;
+}
+.info-popout summary:is(:only-child),
+.info-popout > summary{
+  box-sizing:border-box;
+}
+/* Compact "?" chip (40% smaller than prior pill) */
+.info-popout > summary:not(:empty){
+  line-height:1;
 }
 .info-popout summary::-webkit-details-marker{display:none}
 .info-popout-bubble{
@@ -707,8 +716,8 @@ html.floqr-mobile-browser .privacy-datapoint-grid label,
 html.floqr-mobile-browser .profile-grid .consent-checkbox{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center}
 html.floqr-mobile-browser .mingl-compose{grid-template-columns:1fr}
 html.floqr-mobile-browser .user-dropdown{max-width:calc(100vw - 24px)}
-html.floqr-mobile-browser .info-popout{display:block}
-html.floqr-mobile-browser .info-popout summary{width:100%}
+html.floqr-mobile-browser .info-popout{display:inline-block}
+html.floqr-mobile-browser .info-popout summary{width:auto;min-width:23px}
 html.floqr-mobile-browser .info-popout-bubble{position:static;min-width:0;max-width:100%;margin-top:8px;box-shadow:none}
 
 html.floqr-tablet-browser .app{width:min(100%,980px);padding:calc(env(safe-area-inset-top,0px) + 24px) 22px 32px}
@@ -799,7 +808,7 @@ body[data-selected-template="zebbiesFootballTeamIntro"] #aiMediaPanel{display:no
 .floqr-toast-warn{border-color:rgba(255,196,77,.45)}
 .floqr-toast button{border:0;background:transparent;color:inherit;font-size:18px;line-height:1;cursor:pointer;opacity:.75}
 .floqr-toast-leaving{opacity:0;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease}
-.floqr-help-popout{display:inline-grid;place-items:center;width:28px;height:28px;margin-left:8px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.08);color:inherit;font-size:14px;font-weight:900;cursor:pointer;vertical-align:middle}
+.floqr-help-popout{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:8px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.08);color:inherit;font-size:9px;font-weight:900;cursor:pointer;vertical-align:middle;line-height:1;padding:0}
 .label-inline-row{display:flex;align-items:center;gap:8px}
 .label-inline-row input{flex:1}
 .floqr-help-panel{display:inline-block;max-width:min(92vw,320px);margin:6px 0 0;padding:10px 12px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(12,16,22,.96);font-size:12px;font-weight:600;line-height:1.45;text-transform:none;letter-spacing:0}

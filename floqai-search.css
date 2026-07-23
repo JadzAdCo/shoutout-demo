@@ -28,32 +28,46 @@
   align-content:start;
   text-align:center;
 }
+.floqai-brand-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:nowrap;
+  width:100%;
+  max-width:min(420px,94vw);
+}
 .floqai-hero-logo,
 .floqai-search-main .intent-floqr-logo.floqai-hero-logo{
   opacity:1 !important;
-  width:min(320px,78vw);
-  max-height:110px;
-  margin-top:4px;
+  width:min(280px,68vw);
+  max-height:96px;
+  margin:0;
+  flex:0 1 auto;
   filter:drop-shadow(0 12px 28px rgba(0,0,0,.35));
 }
+.floqai-brand-row .hero-logo-fallback{
+  margin:0;
+}
 
-/* ? help control — sized like the top-right profile status card */
+/* ? help control — same row as FLOQR mark; 40% smaller than prior 58×60 */
 .floqai-help-btn{
-  width:58px !important;
-  min-width:58px !important;
-  height:60px !important;
-  min-height:60px !important;
+  width:35px !important;
+  min-width:35px !important;
+  height:36px !important;
+  min-height:36px !important;
+  flex:0 0 auto;
   padding:0 !important;
-  border-radius:20px !important;
+  border-radius:12px !important;
   display:grid !important;
   place-items:center !important;
-  font-size:28px !important;
+  font-size:17px !important;
   font-weight:1000 !important;
   line-height:1 !important;
   color:#fff !important;
   background:linear-gradient(145deg,rgba(244,58,191,.82),rgba(38,216,255,.72)) !important;
   border:1px solid rgba(255,255,255,.36) !important;
-  box-shadow:0 9px 28px rgba(19,217,255,.24),0 6px 22px rgba(244,58,191,.22) !important;
+  box-shadow:0 6px 18px rgba(19,217,255,.22),0 4px 14px rgba(244,58,191,.2) !important;
   cursor:pointer;
 }
 .floqai-help-btn:hover,
@@ -161,7 +175,7 @@
   width:96px;
   height:96px;
   left:0;
-  top:42%;
+  top:0;
   border:0;
   padding:0;
   background:transparent;
@@ -169,7 +183,7 @@
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
   transition:width .35s ease, height .35s ease;
-  will-change:left, top, filter;
+  will-change:transform, filter;
   overflow:visible;
 }
 .floqai-agent:hover,

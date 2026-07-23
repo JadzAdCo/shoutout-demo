@@ -104,15 +104,22 @@
       const mobile = isMobile();
       const {w, h} = agentSize();
       const padX = mobile ? 10 : 16;
-      const padBottom = mobile ? 18 : 24;
+      const padBottom = mobile ? 16 : 24;
       const userMenu = document.getElementById("userMenu") || document.querySelector(".user-menu");
       const menuBottom = userMenu ? Math.ceil(userMenu.getBoundingClientRect().bottom + 10) : 0;
-      const minTop = Math.max(floqrLogoFloor(), menuBottom, mobile ? 64 : 72);
-      const maxTop = Math.max(minTop + 48, window.innerHeight - padBottom - h);
+      // Keep roam area inside the first phone viewport (no scroll required to see FloqAi).
+      const visibleBottom = mobile
+        ? Math.min(window.innerHeight, Math.round(window.visualViewport?.height || window.innerHeight))
+        : window.innerHeight;
+      const minTop = Math.max(floqrLogoFloor(), menuBottom, mobile ? 72 : 72);
+      const softCeiling = mobile
+        ? Math.round(visibleBottom * 0.72) - h
+        : visibleBottom - padBottom - h;
+      const maxTop = Math.max(minTop + 40, Math.min(visibleBottom - padBottom - h, softCeiling));
       const minLeft = padX;
       const maxLeft = Math.max(minLeft, window.innerWidth - padX - w);
       return {
-        minTop: mobile ? Math.max(minTop, Math.round(window.innerHeight * 0.34)) : minTop,
+        minTop,
         maxTop,
         minLeft,
         maxLeft,
@@ -316,8 +323,8 @@
     agent.classList.add("is-idle");
     const b0 = bounds();
     pos = {
-      x: b0.minLeft + (b0.maxLeft - b0.minLeft) * (b0.mobile ? 0.62 : 0.72),
-      y: b0.minTop + (b0.maxTop - b0.minTop) * (b0.mobile ? 0.55 : 0.45)
+      x: b0.minLeft + (b0.maxLeft - b0.minLeft) * (b0.mobile ? 0.58 : 0.72),
+      y: b0.minTop + (b0.maxTop - b0.minTop) * (b0.mobile ? 0.28 : 0.4)
     };
     applyPos(pos.x, pos.y);
     pickNextMove();
