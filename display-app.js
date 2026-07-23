@@ -140,7 +140,15 @@
   }
 
   function jerseyTeamLabel(template = {}, data = {}) {
-    const explicit = cleanBoardText(data.jerseyTeamLabel || template.jerseyTeamLabel || template.jerseyCountry || template.teamName || "");
+    const team = window.FLOQRResolveSoccerTeam?.(data.jerseyTeamId || "") || null;
+    const explicit = cleanBoardText(
+      data.jerseyTeamLabel
+      || team?.jerseyTeamLabel
+      || template.jerseyTeamLabel
+      || template.jerseyCountry
+      || template.teamName
+      || ""
+    );
     if (explicit) return glyphSlice(explicit, 0, 22);
     const rawName = String(template.name || template.id || "");
     const stripped = rawName
@@ -148,6 +156,25 @@
       .replace(/\s+jersey$/i, "")
       .trim();
     return glyphSlice(cleanBoardText(stripped), 0, 22);
+  }
+
+  function resolveJerseyStyle(template = {}, data = {}) {
+    const team = window.FLOQRResolveSoccerTeam?.(data.jerseyTeamId || "") || null;
+    const legacyTeam = (!team && /^soccer/i.test(String(data.template || template.id || "")) && String(data.template || template.id) !== "soccerJersey")
+      ? (window.FLOQRResolveSoccerTeam?.(data.template || template.id) || templates[data.template || template.id] || null)
+      : null;
+    const source = team || legacyTeam || template;
+    return {
+      ...template,
+      ...source,
+      id: template.id === "soccerJersey" ? "soccerJersey" : (template.id || source.id),
+      jerseyPrimary: data.jerseyPrimary || source.jerseyPrimary || template.jerseyPrimary,
+      jerseySecondary: data.jerseySecondary || source.jerseySecondary || template.jerseySecondary,
+      jerseyAccent: data.jerseyAccent || source.jerseyAccent || source.jerseySecondary || template.jerseyAccent,
+      jerseyCssBack: data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.defaultBackgroundUrl ? false : (source.jerseyCssBack !== false)),
+      defaultBackgroundUrl: data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl || "",
+      jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || ""
+    };
   }
 
   function jerseyNameRows(mainText, caps = {}) {
@@ -244,6 +271,10 @@
   function isSoccerJerseyTemplate(template = {}, templateId = "") {
     const id = String(templateId || template.id || "");
     return template.layout === "soccer-jersey"
+      || id === "soccerJersey"
+      || template.requiresTeamSelect === true
+      || template.consolidatedTemplateId === "soccerJersey"
+      || template.aliasOf === "soccerJersey"
       || id.startsWith("soccer")
       || id.startsWith("nba")
       || id.startsWith("nfl")
@@ -471,6 +502,12 @@
       backgroundUrl: params.get("backgroundUrl") || "",
       backgroundColor: params.get("backgroundColor") || "",
       backgroundGradient: params.get("backgroundGradient") || "",
+      jerseyTeamId: params.get("jerseyTeamId") || "",
+      jerseyTeamLabel: params.get("jerseyTeamLabel") || "",
+      jerseyPrimary: params.get("jerseyPrimary") || "",
+      jerseySecondary: params.get("jerseySecondary") || "",
+      jerseyAccent: params.get("jerseyAccent") || "",
+      jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       teamMembers: qsJson("teamMembers", []),
       stadiumMessage: params.get("stadiumMessage") || "",
       animationDurationSeconds: 20,
@@ -712,11 +749,19 @@
   }
 
   function render(data) {
-    const templateId = data.template || "neon";
-    const baseTemplate = templates[templateId] || templates.neon || {};
-    const t = {...baseTemplate, className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
+    const rawTemplateId = data.template || "neon";
+    const baseTemplate = templates[rawTemplateId] || templates.neon || {};
+    const consolidatedId = baseTemplate.consolidatedTemplateId || baseTemplate.aliasOf || rawTemplateId;
+    const templateId = (consolidatedId === "soccerJersey" || rawTemplateId === "soccerJersey") ? "soccerJersey" : rawTemplateId;
+    let t = {...(templates[templateId] || baseTemplate), className:data.templateClassName || baseTemplate.className, supportsMedia:data.templateSupportsMedia ?? baseTemplate.supportsMedia};
+    if (!data.jerseyTeamId && /^soccer/i.test(rawTemplateId) && rawTemplateId !== "soccerJersey") {
+      data = {...data, jerseyTeamId: rawTemplateId, template: "soccerJersey"};
+    }
+    if (isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId)) {
+      t = resolveJerseyStyle(t, data);
+    }
     const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
-    const isSoccerJersey = isSoccerJerseyTemplate(t, templateId);
+    const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const screenFormatId = String(
@@ -843,17 +888,21 @@
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template");
-      if (t.jerseyCssBack || !backgroundUrl) {
+      const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
+      if (t.jerseyCssBack || !jerseyBg) {
         canvas.classList.add("jersey-css-back");
-        canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || "#111111");
-        canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || "#ffffff");
-        canvas.style.setProperty("--jersey-accent", t.jerseyAccent || t.jerseySecondary || "#ffffff");
+        canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || data.jerseyPrimary || "#111111");
+        canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
+        canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
         if (!hasBackgroundLayer) {
           applyBackgroundLayer(bgEl, {
             backgroundGradient: `linear-gradient(165deg, ${t.jerseyPrimary || "#111"} 0%, ${t.jerseyPrimary || "#111"} 42%, ${t.jerseySecondary || "#fff"} 42%, ${t.jerseySecondary || "#fff"} 58%, ${t.jerseyPrimary || "#111"} 58%, #050505 100%)`
           });
           canvas.classList.add("has-background-layer");
         }
+      } else if (jerseyBg && !hasBackgroundLayer) {
+        applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
+        canvas.classList.add("has-background-layer");
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";

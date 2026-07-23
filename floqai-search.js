@@ -51,6 +51,18 @@
     document.body.classList.toggle("floqai-template-mode", activeMode === "templates");
   }
 
+  function syncAgentVisibility(agent, speech) {
+    const onIntent = document.getElementById("intentSearchPage")?.classList.contains("active");
+    const onTemplates = document.getElementById("templateSelectPage")?.classList.contains("active");
+    const show = !!(onIntent || onTemplates);
+    agent?.classList.toggle("hidden", !show);
+    if (!show) {
+      speech?.classList.remove("is-visible");
+      speech?.setAttribute("aria-hidden", "true");
+    }
+    return show;
+  }
+
   function bindFloqAi(opts = {}) {
     const agent = document.getElementById("floqAiAgent");
     const mark = document.getElementById("floqAiMark");
@@ -80,17 +92,16 @@
 
     function floqrLogoFloor() {
       if (activeMode === "templates") {
-        const host = document.getElementById("templateFloqAiHost") || document.getElementById("templateSelectPage");
-        if (host) {
-          const rect = host.getBoundingClientRect();
-          return Math.max(80, Math.ceil(rect.top + 24));
-        }
+        const page = document.getElementById("templateSelectPage");
+        const topbar = page?.querySelector(".topbar");
+        if (topbar) return Math.max(72, Math.ceil(topbar.getBoundingClientRect().bottom + 10));
+        return Math.round(window.innerHeight * (isMobile() ? 0.16 : 0.14));
       }
       if (!logo || logo.classList.contains("hidden")) {
-        return Math.round(window.innerHeight * (isMobile() ? 0.28 : 0.22));
+        return Math.round(window.innerHeight * (isMobile() ? 0.22 : 0.18));
       }
       const rect = logo.getBoundingClientRect();
-      return Math.ceil(rect.bottom + (isMobile() ? 28 : 36));
+      return Math.ceil(rect.bottom + (isMobile() ? 20 : 28));
     }
 
     function agentSize() {
@@ -183,8 +194,8 @@
 
     function tick(now) {
       raf = requestAnimationFrame(tick);
-      if (!agent.classList.contains("is-idle") || searchOpen) {
-        placeSpeechBubble();
+      if (agent.classList.contains("hidden") || !agent.classList.contains("is-idle") || searchOpen) {
+        if (!agent.classList.contains("hidden")) placeSpeechBubble();
         return;
       }
       const b = bounds();
@@ -266,7 +277,7 @@
     function scheduleSpeech(delay, show) {
       clearTimeout(speechTimer);
       speechTimer = setTimeout(() => {
-        if (searchOpen || document.hidden) {
+        if (agent.classList.contains("hidden") || searchOpen || document.hidden) {
           scheduleSpeech(HIDE_MS, true);
           return;
         }
@@ -287,9 +298,11 @@
       agent.classList.remove("is-idle");
       opts.onOpenSearch?.(activeMode);
       if (activeMode === "templates") {
+        const templatePanel = document.getElementById("templateSearchPanel");
         const templateInput = document.getElementById("templateSearch");
+        templatePanel?.classList.remove("hidden");
         templateInput?.focus();
-        templateInput?.scrollIntoView({behavior: "smooth", block: "center"});
+        templatePanel?.scrollIntoView({behavior: "smooth", block: "nearest"});
       } else {
         panel?.classList.add("open");
         panel?.setAttribute("aria-hidden", "false");
@@ -302,6 +315,9 @@
       agent.classList.add("is-idle");
       panel?.classList.remove("open");
       panel?.setAttribute("aria-hidden", "true");
+      if (activeMode !== "templates") {
+        document.getElementById("templateSearchPanel")?.classList.add("hidden");
+      }
       pickNextMove();
       scheduleSpeech(700, true);
     }
@@ -321,6 +337,7 @@
     });
 
     agent.classList.add("is-idle");
+    syncAgentVisibility(agent, speech);
     const b0 = bounds();
     pos = {
       x: b0.minLeft + (b0.maxLeft - b0.minLeft) * (b0.mobile ? 0.58 : 0.72),
@@ -331,7 +348,30 @@
     raf = requestAnimationFrame(tick);
     scheduleSpeech(700, true);
 
-    return {openSearch, closeSearch, setMode, HELP};
+    return {
+      openSearch,
+      closeSearch,
+      setMode(mode) {
+        setMode(mode);
+        if (helpEl) helpEl.textContent = activeMode === "templates" ? LINE_USE_SEARCH : HELP;
+        syncAgentVisibility(agent, speech);
+        const b = bounds();
+        applyPos(clamp(pos.x, b.minLeft, b.maxLeft), clamp(pos.y, b.minTop, b.maxTop), lastBobY);
+        pickNextMove();
+      },
+      syncVisibility() {
+        const show = syncAgentVisibility(agent, speech);
+        if (show) {
+          const b = bounds();
+          applyPos(clamp(pos.x, b.minLeft, b.maxLeft), clamp(pos.y, b.minTop, b.maxTop), lastBobY);
+          if (!agent.classList.contains("is-idle") && !searchOpen) agent.classList.add("is-idle");
+          pickNextMove();
+          if (!searchOpen && !speechVisible) scheduleSpeech(500, true);
+        }
+        return show;
+      },
+      HELP
+    };
   }
 
   let boundController = null;
@@ -342,9 +382,11 @@
     else boundController.setMode?.("templates");
     const mount = document.getElementById("templateFloqAiMount");
     if (mount) {
-      mount.innerHTML = '<p class="sub small floqai-template-hint">FloqAi is pulsating on this screen — tap the mark to search templates (Sports, Jersey, VIP, Humor, Cars, Video, Pictures, Ballers).</p>';
+      mount.innerHTML = '<p class="floqai-template-hint" data-keep-visible="true">FloqAi floats on this screen — tap the glowing mark to search templates, or wait for its tips.</p>';
     }
-    document.getElementById("floqAiAgent")?.classList.add("is-idle");
+    const agent = document.getElementById("floqAiAgent");
+    agent?.classList.add("is-idle");
+    boundController?.syncVisibility?.();
   }
 
   global.FLOQRFloqAi = {
@@ -353,7 +395,14 @@
       return boundController;
     },
     ensureTemplateMode,
-    setMode,
+    setMode(mode) {
+      setMode(mode);
+      boundController?.setMode?.(mode);
+      boundController?.syncVisibility?.();
+    },
+    syncVisibility() {
+      return boundController?.syncVisibility?.();
+    },
     HELP,
     LINES: {
       LINE_HI,

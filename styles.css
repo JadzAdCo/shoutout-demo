@@ -418,6 +418,14 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 #editorPage .preview{order:20}
 #editorPage .preview iframe{height:min(62vh,520px)}
 .template-section-default .template-grid{grid-template-columns:minmax(0,360px)}
+.template-heading-row{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:nowrap;margin:0 0 10px}
+.template-heading-row h3{margin:0}
+.template-heading-row .help-popout{justify-self:auto;margin:0;flex:0 0 auto}
+.template-floqai-search-panel{margin:0 0 14px;padding:14px;border:1px solid rgba(38,216,255,.35);border-radius:18px;background:linear-gradient(180deg,rgba(38,216,255,.12),rgba(6,16,28,.45))}
+.template-floqai-search-panel .intent-help{display:block;margin:0 0 8px;font-size:clamp(16px,3.2vw,22px);font-weight:900;color:#fff}
+.template-floqai-search-panel .search{margin:0}
+.template-floqai-mount .floqai-template-hint{margin:0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.35}
+.floqai-agent.hidden{display:none!important}
 .media-upload-card{margin:16px 0}
 .media-upload-card label{margin-bottom:10px}
 .template-media-unavailable .ai-media-panel{display:none!important}
@@ -799,6 +807,31 @@ html.floqr-desktop-browser .metric-grid{grid-template-columns:repeat(auto-fit,mi
 .url-media-field{display:grid;gap:8px;margin:8px 0}
 .url-media-preview{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px;background:rgba(0,0,0,.22)}
 .url-media-preview img,.url-media-preview video{display:block;max-width:100%;max-height:180px;border-radius:10px;object-fit:cover}
+
+/* Standardized Add Media / Add Video source picker */
+.floqr-media-native-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important}
+.floqr-media-source-host{position:relative}
+.floqr-media-source-trigger-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 8px}
+.floqr-media-add-btn{min-height:44px}
+.floqr-media-source-field-status{margin:0}
+.floqr-media-embed-frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;background:#000}
+.floqr-media-embed-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+html.floqr-media-source-open{overflow:hidden}
+.floqr-media-source-modal{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:18px}
+.floqr-media-source-modal.hidden{display:none!important}
+.floqr-media-source-backdrop{position:absolute;inset:0;background:rgba(4,8,24,.72);backdrop-filter:blur(8px)}
+.floqr-media-source-dialog{position:relative;z-index:1;width:min(560px,94vw);max-height:min(88vh,720px);overflow:auto;border:1px solid rgba(255,255,255,.18);border-radius:22px;background:linear-gradient(180deg,rgba(18,24,48,.98),rgba(8,12,28,.98));box-shadow:0 24px 80px rgba(0,0,0,.55);padding:22px 20px 18px}
+.floqr-media-source-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.floqr-media-source-dialog h2{margin:4px 0 8px;font-size:clamp(22px,4vw,30px)}
+.floqr-media-source-options{display:grid;gap:10px;margin-top:14px}
+.floqr-media-source-option{display:grid;gap:4px;text-align:left;padding:14px 16px;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
+.floqr-media-source-option:hover,.floqr-media-source-option:focus-visible{border-color:rgba(38,216,255,.55);background:rgba(38,216,255,.12);outline:none}
+.floqr-media-source-option strong{font-size:16px}
+.floqr-media-source-option span{color:var(--muted,#b7c0d4);font-size:13px;font-weight:700;line-height:1.35}
+.floqr-media-source-label{display:grid;gap:8px;margin-top:12px;font-weight:800}
+.floqr-media-source-actions{margin-top:14px}
+.floqr-media-source-live-preview{margin-top:12px}
+.floqr-media-source-live-preview iframe{max-height:220px}
 body[data-selected-template="zebbiesFootballTeamIntro"] #aiMediaPanel{display:none!important}
 @media(max-width:720px){.football-player-upload-grid{grid-template-columns:1fr}.football-team-editor{padding:14px}}
 
