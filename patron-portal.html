@@ -15,7 +15,7 @@
     <header class="topbar">
       <div>
         <h1>My Profile and Settings</h1>
-        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FLOQR Inbox, and Mingl.</p>
+        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl.</p>
         <p id="portalStatus" class="status hidden" aria-live="polite"></p>
       </div>
     </header>
@@ -39,7 +39,7 @@
         <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalPaidServices" type="button">Paid Services & Orders</button>
         <button class="admin-tab" data-panel="portalBartrStore" type="button">BartR Store</button>
-        <button class="admin-tab" data-panel="portalMessages" type="button">FLOQR Inbox</button>
+        <button class="admin-tab" data-panel="portalMessages" type="button">FloqR Inbox</button>
         <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
         <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat</a>
         <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal">Follow Services</a>
@@ -50,7 +50,7 @@
       <section id="portalOverview" class="admin-panel-section active">
         <div class="metric-grid">
           <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
-          <div class="metric-card"><span>FLOQR Inbox</span><strong id="metricMessages">0/0</strong></div>
+          <div class="metric-card"><span>FloqR Inbox</span><strong id="metricMessages">0/0</strong></div>
           <div class="metric-card"><span>Mingl</span><strong id="metricChats">0/0</strong></div>
           <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
         </div>
@@ -326,11 +326,11 @@
 
       <section id="portalMessages" class="admin-panel-section">
         <div class="card">
-          <h2>FLOQR Inbox Rules</h2>
+          <h2>FloqR Inbox Rules</h2>
           <div id="messagePolicySummary" class="policy-list"></div>
         </div>
         <div class="card" id="portalCompose">
-          <h2>Send FLOQR Inbox Message</h2>
+          <h2>Send FloqR Inbox Message</h2>
           <p id="composePolicyNote" class="sub small"></p>
           <div class="profile-grid">
             <label>Recipient Search<input id="composeRecipientSearch" placeholder="Search club admin, CSR, display name, or username"/></label>
@@ -343,7 +343,7 @@
           <label>Message<input id="composeBody" placeholder="Write your message..."/></label>
           <button id="sendMessageBtn" class="primary" type="button">Send Message</button>
         </div>
-        <div class="card"><h2>FLOQR Inbox <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
+        <div class="card"><h2>FloqR Inbox <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
       </section>
 
       <section id="portalChats" class="admin-panel-section hidden" aria-hidden="true">
@@ -534,10 +534,13 @@
       <section id="portalMinglFriends" class="admin-panel-section">
         <div class="card">
           <h2>Manage Mingl Friends</h2>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Manage mutual Mingl friends. Mark close friends, exclude someone from viewing or contacting you, or require only disappearing messages with that person.</div></details>
+          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Manage mutual Mingl friends. Mark close friends, exclude someone from viewing or contacting you, require only disappearing messages, or UnMingl to block their access to your public profile, public services, Mingl Chat, and Mingl Gist.</div></details>
           <input id="minglFriendSearchInput" class="search" placeholder="Search Mingl friends by name, username, or email"/>
           <div id="minglFriendManagementReport" class="report-block"></div>
           <button id="saveMinglFriendSettingsBtn" class="primary" type="button">Save Mingl Friend Settings</button>
+          <h3 style="margin-top:1.25rem">Blocked (UnMingl)</h3>
+          <p class="sub small">People you UnMingl'd cannot see your public profile, public services, Mingl Chat, or Mingl Gist. Unblock restores discovery only after a new Let's Mingl.</p>
+          <div id="minglBlockedReport" class="report-block"></div>
         </div>
       </section>
     </div>
@@ -562,10 +565,11 @@
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./helper-popouts.js?v=29.09.8"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
+<script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./floqr-i18n.js?v=29.09.13"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.18"></script>
+<script src="./patron-portal-app.js?v=29.09.57"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

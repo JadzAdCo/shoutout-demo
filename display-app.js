@@ -281,6 +281,62 @@
       || template.jerseyNumberField === true;
   }
 
+  function jerseySportOf(template = {}, data = {}) {
+    const sport = String(template.sport || data.sport || "").toLowerCase();
+    if (sport === "nba" || sport === "nfl" || sport === "soccer") return sport;
+    const id = String(template.id || data.template || data.jerseyTeamId || "");
+    if (id.startsWith("nba")) return "nba";
+    if (id.startsWith("nfl")) return "nfl";
+    return "soccer";
+  }
+
+  function lockerRoomBackground() {
+    return "linear-gradient(90deg,#1a1410 0%,#2a2118 8%,#1a1410 16%,#2c2219 24%,#18120e 32%,#2a2118 40%,#1a1410 48%,#2c2219 56%,#18120e 64%,#2a2118 72%,#1a1410 80%,#2c2219 88%,#18120e 100%),#14100c";
+  }
+
+  function ensureJerseyMount(sport = "soccer", {hangerOnly = false} = {}) {
+    let mount = byId("displayJerseyMount");
+    if (!mount) {
+      const center = document.querySelector(".display-center");
+      if (!center) return null;
+      mount = document.createElement("div");
+      mount.id = "displayJerseyMount";
+      mount.setAttribute("aria-hidden", "true");
+      const team = byId("displayJerseyTeam");
+      if (team) center.insertBefore(mount, team);
+      else center.insertBefore(mount, center.firstChild);
+    }
+    mount.className = `jersey-hanger-mount jersey-sport-${sport}` + (hangerOnly ? " jersey-photo-hanger-only" : "");
+    mount.setAttribute("aria-hidden", "false");
+    mount.innerHTML = [
+      '<div class="jersey-hanger">',
+      '<span class="jersey-hanger-hook"></span>',
+      '<span class="jersey-hanger-shoulder"></span>',
+      "</div>",
+      hangerOnly ? "" : [
+        `<div class="jersey-garment jersey-garment-${sport}">`,
+        '<span class="jersey-collar"></span>',
+        '<span class="jersey-sleeve jersey-sleeve-l"></span>',
+        '<span class="jersey-sleeve jersey-sleeve-r"></span>',
+        '<span class="jersey-yoke"></span>',
+        '<span class="jersey-nameplate"></span>',
+        '<span class="jersey-torso"></span>',
+        '<span class="jersey-side jersey-side-l"></span>',
+        '<span class="jersey-side jersey-side-r"></span>',
+        "</div>"
+      ].join("")
+    ].join("");
+    return mount;
+  }
+
+  function hideJerseyMount() {
+    const mount = byId("displayJerseyMount");
+    if (!mount) return;
+    mount.className = "jersey-hanger-mount hidden";
+    mount.setAttribute("aria-hidden", "true");
+    mount.innerHTML = "";
+  }
+
   function resetBackgroundLayer(bgEl) {
     if (!bgEl) return;
     bgEl.className = "display-background";
@@ -887,22 +943,34 @@
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
-      canvas.classList.add("soccer-jersey-template", "sports-jersey-template");
+      const sport = jerseySportOf(t, data);
+      canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl");
+      canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
-      if (t.jerseyCssBack || !jerseyBg) {
-        canvas.classList.add("jersey-css-back");
-        canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || data.jerseyPrimary || "#111111");
-        canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
-        canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
+      const usePhotoBack = !!(jerseyBg && !t.jerseyCssBack);
+      canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || data.jerseyPrimary || "#111111");
+      canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
+      canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
+      if (usePhotoBack) {
+        // Photo kit + explicit hanger overlay so ~60% hanger stays visible (Monaco/Lille parity).
+        canvas.classList.remove("jersey-css-back");
+        canvas.classList.add("jersey-photo-back");
+        ensureJerseyMount(sport, {hangerOnly: true});
         if (!hasBackgroundLayer) {
-          applyBackgroundLayer(bgEl, {
-            backgroundGradient: `linear-gradient(165deg, ${t.jerseyPrimary || "#111"} 0%, ${t.jerseyPrimary || "#111"} 42%, ${t.jerseySecondary || "#fff"} 42%, ${t.jerseySecondary || "#fff"} 58%, ${t.jerseyPrimary || "#111"} 58%, #050505 100%)`
-          });
+          applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
+          bgEl.style.backgroundSize = "";
+          bgEl.style.backgroundPosition = "";
           canvas.classList.add("has-background-layer");
         }
-      } else if (jerseyBg && !hasBackgroundLayer) {
-        applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
-        canvas.classList.add("has-background-layer");
+      } else {
+        // CSS hanger mount — same presentation language as photo kits.
+        canvas.classList.add("jersey-css-back");
+        canvas.classList.remove("jersey-photo-back");
+        ensureJerseyMount(sport, {hangerOnly: false});
+        if (!hasBackgroundLayer) {
+          applyBackgroundLayer(bgEl, {backgroundGradient: lockerRoomBackground()});
+          canvas.classList.add("has-background-layer");
+        }
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
@@ -914,18 +982,33 @@
       });
       const wrapped = nameRows.filter(Boolean).length > 1;
       const wrapScale = wrapped ? 0.85 : 1;
-      // Base sizes: name +50% vs prior 10.8vh → 16.2; number +100% vs prior 32vh → 64.
-      const baseName = Number(textCaps.mainTextSizePercent || 16.2);
-      const baseNumber = Number(textCaps.subTextSizePercent || 64);
-      const baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
-      const nameSize = Math.min(24, Math.max(8, baseName * wrapScale));
-      const numberSize = Math.min(72, Math.max(22, baseNumber * wrapScale));
-      const teamSize = Math.min(12, Math.max(4.5, baseTeam * wrapScale));
+      // Sport typography: soccer arched mid, NBA smaller name + huge number, NFL plate + thicker huge number.
+      // Photo soccer (Monaco/Lille): shrink overlays ~15% so more kit + ~60% hanger stay visible.
+      let baseName = Number(textCaps.mainTextSizePercent || 16.2);
+      let baseNumber = Number(textCaps.subTextSizePercent || 64);
+      let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
+      if (sport === "soccer" && usePhotoBack) {
+        baseName = Math.min(baseName * 0.65, 10);
+        baseNumber = Math.min(baseNumber * 0.42, 24);
+        baseTeam = Math.min(baseTeam * 0.65, 5.5);
+      } else if (sport === "nba") {
+        baseName = Math.min(baseName, 12.5);
+        baseNumber = Math.max(baseNumber, 70);
+        baseTeam = Math.min(baseTeam, 5.8);
+      } else if (sport === "nfl") {
+        baseName = Math.min(baseName, 11.5);
+        baseNumber = Math.max(baseNumber, 74);
+        baseTeam = Math.min(baseTeam, 5);
+      }
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 10 : 18), Math.max(7, baseName * wrapScale));
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 24 : 72), Math.max(16, baseNumber * wrapScale));
+      const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
-        teamEl.className = "soccer-jersey-team" + (teamLabel ? "" : " hidden");
-        teamEl.setAttribute("aria-hidden", teamLabel ? "false" : "true");
+        const hideCrest = sport === "nfl" || !teamLabel;
+        teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
+        teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         teamEl.textContent = teamLabel;
         teamEl.style.setProperty("font-size", `${teamSize}vh`, "important");
       }
@@ -956,6 +1039,8 @@
       markDisplayReady();
       return;
     }
+    hideJerseyMount();
+    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       railClear.className = "display-identity-rail hidden";

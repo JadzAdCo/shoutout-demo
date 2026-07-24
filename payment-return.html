@@ -4,8 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Payment Status | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.8"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.56"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.56"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -15,8 +15,9 @@
       <h1 id="paymentReturnTitle">Checking payment…</h1>
       <p id="paymentReturnStatus" class="sub">Waiting for secure confirmation.</p>
       <div id="paymentReturnDetails" class="report-block"></div>
-      <a class="buttonlike primary" href="./patron-portal.html?v=29.09.8">View My Paid Services</a>
-      <a class="buttonlike" href="./?v=29.09.8">Return to FLOQR</a>
+      <a class="buttonlike primary" href="./patron-portal.html?tab=inbox&v=29.09.56">Open FloqR Inbox</a>
+      <a class="buttonlike" href="./patron-portal.html?tab=shoutouts&v=29.09.56">View My ShoutOuts</a>
+      <a class="buttonlike" href="./?v=29.09.56">Return to FLOQR</a>
     </div>
   </section>
 </main>
@@ -24,9 +25,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-logger.js?v=29.09.8"></script>
-<script src="./payment-service.js?v=29.09.8"></script>
-<script src="./payment-return-app.js?v=29.09.8"></script>
+<script src="./firebase-config.js?v=29.09.56"></script>
+<script src="./floqr-logger.js?v=29.09.56"></script>
+<script src="./payment-service.js?v=29.09.56"></script>
+<script src="./payment-return-app.js?v=29.09.56"></script>
 </body>
 </html>

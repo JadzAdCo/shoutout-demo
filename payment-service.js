@@ -42,7 +42,7 @@
     } catch (_) {}
   }
 
-  async function startCheckout({orderType, payload = {}, status} = {}) {
+  async function startCheckout({orderType, payload = {}, status, redirect = true} = {}) {
     requireUser();
     const correlationId = window.FLOQRLog?.correlationId?.("chk") || `chk_${Date.now().toString(36)}`;
     status?.("Opening secure Stripe checkout…");
@@ -56,11 +56,11 @@
       const response = await callable("createFloqrCheckoutSession")({orderType, payload, returnBase, correlationId});
       const result = response?.data || {};
       if (!result.checkoutUrl) throw new Error("Stripe checkout did not return a secure payment link.");
-      await logClient("info", "checkout_redirect", "Redirecting to Stripe Checkout", {
+      await logClient("info", "checkout_redirect", redirect ? "Redirecting to Stripe Checkout" : "Checkout session ready (deferred redirect)", {
         orderId: result.orderId || "",
         amountCents: result.amountCents || 0
       }, result.correlationId || correlationId);
-      window.location.assign(result.checkoutUrl);
+      if (redirect !== false) window.location.assign(result.checkoutUrl);
       return result;
     } catch (error) {
       const unwrapped = unwrapCallableError(error);

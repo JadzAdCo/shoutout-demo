@@ -19,6 +19,7 @@
   let activeRoomId = "";
   let unsubscribeMessages = null;
   let attachmentFile = null;
+  let blockedUids = new Set();
   const HIDDEN_ROOM_NAMES = new Set(["diagnostics peer", "mingl chat"]);
 
   function fmtDate(value) {
@@ -512,10 +513,19 @@
 
   async function loadRooms() {
     setText("minglChatStatus", "Loading Mingl chats...");
+    if (window.FLOQRBlocks?.loadActiveBlocks && currentUser) {
+      const blocks = await window.FLOQRBlocks.loadActiveBlocks(db, currentUser.uid);
+      blockedUids = window.FLOQRBlocks.blockedUidSet(blocks, currentUser.uid);
+    } else {
+      blockedUids = new Set();
+    }
     const rawRooms = await getParticipantCollectionSafe("chatRooms", currentUser.uid, 1000, []);
     const existingRooms = [];
     for (const room of rawRooms) {
       const hydrated = await hydrateRoomSummary(room);
+      const other = otherUid(hydrated);
+      if (other && blockedUids.has(other)) continue;
+      if (hydrated.blocked || String(hydrated.status || "").toLowerCase() === "closed") continue;
       if (isVisiblePatronRoom(hydrated)) existingRooms.push(hydrated);
     }
     rooms = existingRooms;
@@ -524,18 +534,27 @@
     const connections = await loadConnections();
     const createdRooms = [];
     for (const connection of connections) {
+      if (String(connection.status || "").toLowerCase() === "blocked") continue;
+      const other = (connection.participants || []).find(uid => uid !== currentUser.uid);
+      if (other && blockedUids.has(other)) continue;
       const row = await ensureRoomFromConnection(connection);
-      if (row && isVisiblePatronRoom(row)) createdRooms.push(row);
+      if (row && isVisiblePatronRoom(row) && !row.blocked && String(row.status || "").toLowerCase() !== "closed") createdRooms.push(row);
     }
     const byRoom = new Map();
     [...existingRooms, ...createdRooms].forEach(room => {
       const normalized = {...room, participants:normalizedParticipants(room)};
+      const other = otherUid(normalized);
+      if (other && blockedUids.has(other)) return;
+      if (normalized.blocked || String(normalized.status || "").toLowerCase() === "closed") return;
       if (isVisiblePatronRoom(normalized)) byRoom.set(room.id, normalized);
     });
     rooms = [...byRoom.values()].sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
     renderRooms();
     const requested = qs("room");
     if (requested && rooms.some(room => room.id === requested)) openRoom(requested);
+    else if (requested && !rooms.some(room => room.id === requested)) {
+      setText("minglChatStatus", "That Mingl Chat is closed or UnMingl-blocked.");
+    }
     setText("minglChatStatus", rooms.length ? "Mingl chats ready." : "No mutual Mingl chats found yet.");
   }
 
@@ -605,6 +624,11 @@
       if (!roomSnap.exists) throw new Error("Mingl chat room was not found.");
       const room = roomSnap.data();
       if (!(room.participants || []).includes(currentUser.uid)) throw new Error("Mingl chat is available only to approved participants.");
+      if (room.blocked || String(room.status || "").toLowerCase() === "closed") {
+        throw new Error("This Mingl Chat is closed after UnMingl.");
+      }
+      const peer = (room.participants || []).find(uid => uid !== currentUser.uid);
+      if (peer && blockedUids.has(peer)) throw new Error("UnMingl block is active. Chat is unavailable.");
       const mediaPayload = file ? await uploadMedia(activeRoomId, file) : {};
       const unreadCounts = {...(room.unreadCounts || {})};
       (room.participants || []).forEach(uid => { if (uid !== currentUser.uid) unreadCounts[uid] = Number(unreadCounts[uid] || 0) + 1; });

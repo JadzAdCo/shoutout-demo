@@ -16,7 +16,22 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+const TWILIO_ACCOUNT_SID = defineSecret("TWILIO_ACCOUNT_SID");
+const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
+const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
+const {
+  buildTempShoutoutReceipt,
+  promoteShoutoutReceipt,
+  deliverFinalPaidShoutoutReceipt,
+  formatPaidAt
+} = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
+const RECEIPT_FROM_EMAIL = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+  .split(",")
+  .map(value => value.trim().toLowerCase())
+  .filter(Boolean);
 const STRIPE_API_VERSION = "2026-06-24.dahlia";
 // Stripe Checkout requires expires_at to be at least 30 minutes in the future.
 const COMMERCE_RESERVATION_SECONDS = 31 * 60;
@@ -63,10 +78,6 @@ const SHOUTOUT_TEXT_LIMITS = {
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
   }
 };
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
-  .split(",")
-  .map(value => value.trim().toLowerCase())
-  .filter(Boolean);
 const SHOUTOUT_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
 const SHOUTOUT_CLUB_SHARE_PERCENT = 20;
 const UNPAID_CLEARABLE_STATUSES = new Set(["checkout-created", "checkout-failed", "checkout-expired", "payment-failed"]);
@@ -133,6 +144,16 @@ function testPaymentFields(session = null, existing = {}) {
 
 function text(value = "", max = 500) {
   return String(value || "").trim().slice(0, max);
+}
+
+function secretValueSafe(secret, envName = "") {
+  try {
+    const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
+    if (fromSecret) return String(fromSecret);
+  } catch (_) {
+    /* Secret not bound in this runtime. */
+  }
+  return envName ? String(process.env[envName] || "") : "";
 }
 
 function checkoutTextCaps(templateId = "", formatId = "") {
@@ -876,6 +897,7 @@ exports.createFloqrCheckoutSession = onCall({
     const returnBase = safeReturnBase(request);
     const now = admin.firestore.FieldValue.serverTimestamp();
     const testFields = testPaymentFields(null, {});
+    const invoiceNumber = `FLOQR-${new Date().toISOString().slice(0,10).replace(/-/g, "")}-${orderRef.id.slice(0,8).toUpperCase()}`;
     const order = {
       orderType:type,
       ownerUid:request.auth.uid,
@@ -887,11 +909,20 @@ exports.createFloqrCheckoutSession = onCall({
       ...testFields,
       payload,
       correlationId,
-      invoiceNumber:`FLOQR-${new Date().toISOString().slice(0,10).replace(/-/g, "")}-${orderRef.id.slice(0,8).toUpperCase()}`,
+      invoiceNumber,
       shippingStatus:type === "commerce" && summary.requiresShipping ? "awaiting-payment" : type === "commerce" && summary.productType !== "physical" ? "digital-delivery-pending" : "not-required",
       createdAt:now,
       updatedAt:now
     };
+    if (type === "shoutout" && payload?.shoutout) {
+      order.receipt = buildTempShoutoutReceipt({
+        shoutout:payload.shoutout,
+        orderId:orderRef.id,
+        invoiceNumber,
+        amountCents:summary.amountCents
+      });
+      order.receiptStatus = "temp";
+    }
     await createOrderWithInventoryReservation(orderRef, order);
 
     const rydrLoc = type === "rydrFare" ? text(payload.clubLocationId, 120) : "";
@@ -1230,6 +1261,22 @@ async function finalizePaidOrder(orderId, session) {
     const shoutoutRef = db.collection("shoutouts").doc(`stripe_${orderId}`);
     const clubShareCents = Number(order.clubShareCents ?? order.venueShareCents ?? 0);
     const floqrShareCents = Number(order.floqrShareCents || 0);
+    const paidAtIso = formatPaidAt(new Date());
+    const finalReceipt = promoteShoutoutReceipt(order.receipt || buildTempShoutoutReceipt({
+      shoutout,
+      orderId,
+      invoiceNumber:order.invoiceNumber || "",
+      amountCents:order.amountCents
+    }), {
+      paidAt,
+      paidAtIso,
+      stripeCheckoutSessionId:session?.id || order.stripeCheckoutSessionId || "",
+      stripePaymentIntentId:session?.payment_intent || order.stripePaymentIntentId || "",
+      invoiceNumber:order.invoiceNumber || "",
+      amountCents:order.amountCents,
+      currency:order.currency || "usd",
+      shoutoutId:shoutoutRef.id
+    });
     await shoutoutRef.set({
       ...shoutout,
       status:"pending",
@@ -1243,13 +1290,19 @@ async function finalizePaidOrder(orderId, session) {
       floqrShareCents,
       clubSharePercent:Number(order.clubSharePercent || SHOUTOUT_CLUB_SHARE_PERCENT),
       submittedAt:paidAt,
+      paidAt,
+      paidAtIso,
+      receipt:finalReceipt,
       ...testFields
     }, {merge:true});
     await ref.set({
       fulfilledRecordId:shoutoutRef.id,
       fulfillmentStatus:"submitted-for-club-approval",
       clubShareCents,
-      settlementStatus:order.settlementStatus || "accrued-pending-payout"
+      settlementStatus:order.settlementStatus || "accrued-pending-payout",
+      receipt:finalReceipt,
+      receiptStatus:"final",
+      paidAtIso
     }, {merge:true});
     await db.collection("paymentLedger").doc(orderId).set({
       orderId,
@@ -1271,10 +1324,48 @@ async function finalizePaidOrder(orderId, session) {
       stripeCheckoutSessionId:text(session?.id || order.stripeCheckoutSessionId, 200),
       stripePaymentIntentId:text(session?.payment_intent || order.stripePaymentIntentId, 200),
       paidAt,
+      paidAtIso,
       createdAt:paidAt,
       updatedAt:paidAt,
       ...testFields
     }, {merge:true});
+    try {
+      let ownerPhone = "";
+      if (order.ownerUid) {
+        const userSnap = await db.collection("users").doc(order.ownerUid).get();
+        ownerPhone = text(userSnap.data()?.phone || userSnap.data()?.smsPhone || "", 40);
+      }
+      const delivery = await deliverFinalPaidShoutoutReceipt({
+        order:{...order, customerEmail:session?.customer_details?.email || order.customerEmail || order.ownerEmail || ""},
+        receipt:finalReceipt,
+        shoutoutId:shoutoutRef.id,
+        sendgridApiKey:secretValueSafe(SENDGRID_API_KEY, "SENDGRID_API_KEY"),
+        fromEmail:RECEIPT_FROM_EMAIL,
+        twilio:{
+          accountSid:secretValueSafe(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
+          authToken:secretValueSafe(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
+          fromNumber:secretValueSafe(TWILIO_FROM_NUMBER, "TWILIO_FROM_NUMBER"),
+          toPhone:ownerPhone
+        }
+      });
+      await ref.set({
+        receiptDelivery:{
+          inboxId:delivery.inboxId || "",
+          emailStatus:delivery.emailStatus || null,
+          emailError:delivery.emailError || "",
+          smsStatus:delivery.smsStatus || null,
+          deliveredAt:admin.firestore.FieldValue.serverTimestamp()
+        }
+      }, {merge:true});
+    } catch (deliveryError) {
+      await ref.set({
+        receiptDelivery:{
+          error:text(deliveryError?.message || deliveryError, 300),
+          failedAt:admin.firestore.FieldValue.serverTimestamp()
+        }
+      }, {merge:true});
+      console.error("paid shoutout receipt delivery failed", deliveryError?.message || deliveryError);
+    }
   }
 
   if (order.orderType === "targetedGuestList" && order.payload?.campaign) {
@@ -1556,8 +1647,8 @@ async function syncSchedulingSubscriptionFromStripe(subscription = {}) {
 
 exports.stripeFloqrWebhook = onRequest({
   region:"us-central1",
-  secrets:[STRIPE_WEBHOOK_SECRET],
-  timeoutSeconds:30,
+  secrets:[STRIPE_WEBHOOK_SECRET, SENDGRID_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER],
+  timeoutSeconds:60,
   memory:"256MiB"
 }, async (request, response) => {
   const raw = request.rawBody;
@@ -1989,3 +2080,77 @@ exports.seedLucyCobraBartrCatalogHttp = onRequest({
     res.status(500).json({ok: false, error: error?.message || String(error)});
   }
 });
+
+/** Master Admin: deliver a sample final paid-shoutout receipt (Inbox + email PDF ± SMS) without Stripe. */
+exports.sendTestPaidShoutoutReceipt = onCall({
+  region:"us-central1",
+  secrets:[SENDGRID_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  if (!await isMasterAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master Admin required.");
+  const toEmail = text(request.data?.toEmail || request.auth.token?.email, 200);
+  const toUid = text(request.data?.uid || request.auth.uid, 160);
+  const paidAtIso = formatPaidAt(new Date());
+  const referenceNumber = text(request.data?.referenceNumber, 80) || `SO-TEST-${Date.now().toString().slice(-7)}`;
+  const invoiceNumber = text(request.data?.invoiceNumber, 80) || `FLOQR-TEST-${Date.now().toString().slice(-6)}`;
+  const temp = buildTempShoutoutReceipt({
+    shoutout:{
+      referenceNumber,
+      locationName:text(request.data?.locationName, 160) || "Zebbies Garden",
+      templateName:text(request.data?.templateName, 160) || "Soccer Jersey",
+      mainText:text(request.data?.mainText, 80) || "TEST",
+      subText:text(request.data?.subText, 8) || "99"
+    },
+    orderId:`test_${Date.now().toString(36)}`,
+    invoiceNumber,
+    amountCents:3000
+  });
+  const receipt = promoteShoutoutReceipt(temp, {
+    paidAt:admin.firestore.FieldValue.serverTimestamp(),
+    paidAtIso,
+    stripeCheckoutSessionId:"cs_test_preview",
+    stripePaymentIntentId:"pi_test_preview",
+    invoiceNumber,
+    amountCents:3000,
+    shoutoutId:"stripe_test_preview"
+  });
+  let ownerPhone = text(request.data?.phone, 40);
+  if (!ownerPhone && toUid) {
+    const userSnap = await db.collection("users").doc(toUid).get();
+    ownerPhone = text(userSnap.data()?.phone || userSnap.data()?.smsPhone || "", 40);
+  }
+  const delivery = await deliverFinalPaidShoutoutReceipt({
+    order:{ownerUid:toUid, ownerEmail:toEmail, customerEmail:toEmail},
+    receipt,
+    shoutoutId:"stripe_test_preview",
+    sendgridApiKey:secretValueSafe(SENDGRID_API_KEY, "SENDGRID_API_KEY"),
+    fromEmail:RECEIPT_FROM_EMAIL,
+    twilio:{
+      accountSid:secretValueSafe(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
+      authToken:secretValueSafe(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
+      fromNumber:secretValueSafe(TWILIO_FROM_NUMBER, "TWILIO_FROM_NUMBER"),
+      toPhone:ownerPhone
+    }
+  });
+  return {
+    ok:true,
+    receipt:{
+      referenceNumber:receipt.referenceNumber,
+      locationName:receipt.locationName,
+      templateName:receipt.templateName,
+      statusLabel:receipt.statusLabel,
+      paidAtIso:receipt.paidAtIso,
+      invoiceNumber:receipt.invoiceNumber,
+      amountCents:receipt.amountCents
+    },
+    delivery
+  };
+});
+
+exports.__receiptHelpers = {
+  buildTempShoutoutReceipt,
+  promoteShoutoutReceipt,
+  formatPaidAt
+};

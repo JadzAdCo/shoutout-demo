@@ -1273,7 +1273,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     id:'soccerJersey',
     name:'Soccer Jersey',
     scope:'Shared',
-    className:'soccer-jersey jersey-css-back sports-jersey',
+    className:'soccer-jersey jersey-css-back sports-jersey jersey-on-hanger',
     category:'Sports',
     mediaMode:'No image/video',
     supportsMedia:false,
@@ -1282,6 +1282,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     layout:'soccer-jersey',
     identityRail:true,
     jerseyCssBack:true,
+    jerseyOnHanger:true,
+    jerseySilhouette:'short-sleeve',
     jerseyNameField:true,
     jerseyNumberField:true,
     jerseyNumberMaxChars:2,
@@ -1296,8 +1298,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:8,
     maxMainCharacters:14,
     maxSubCharacters:2,
-    description:'One $30 Soccer Jersey template. After you select it, choose a national team or European club, then enter the jersey name and mark.',
-    tags:["soccer","football","jersey","Sports","Jersey","name","number","$30","shared","2026/27","team"]
+    description:'One $30 Soccer Jersey template on a hanger (Morocco/Spain presentation). After you select it, choose a national team or European club, then enter the jersey name and mark.',
+    tags:["soccer","football","jersey","Sports","Jersey","name","number","$30","shared","2026/27","team","hanger"]
   }
 });
 

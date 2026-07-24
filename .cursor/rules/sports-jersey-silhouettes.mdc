@@ -1,0 +1,22 @@
+---
+description: Sports jersey templates must use sport-specific hanger silhouettes
+alwaysApply: true
+---
+
+# Sports jersey silhouettes (always)
+
+When creating or editing **NBA / soccer / NFL** jersey templates or display art:
+
+1. **Always show the jersey on a hanger** (Morocco / Spain photo style: hanger + dark locker/wood backdrop). Prefer a real photo back when available; otherwise the CSS hanger mount in `display-app.js` / `display.css`.
+2. **Soccer** — slim short-sleeve shirt; fabric / kit fashion; name + number (name often arched); side accent panels OK. Match the presentation language of Morocco, Spain, Monaco photo backs.
+3. **NBA** — sleeveless / tank cut; athleisure mesh feel; **big number**, name smaller/cleaner and higher on the back.
+4. **NFL** — bulkier cut with yoke/shoulders; name **plate across the shoulders**; **huge number**; armor-adjacent, thicker graphics / heavier text shadow.
+5. Do **not** ship flat diagonal stripe CSS as the only NBA/NFL/soccer identity — that reads as one generic jersey. Colors alone are not enough; silhouette + typography must differ by sport.
+6. Keep `sport: "soccer" | "nba" | "nfl"` on catalog rows so `display-app.js` can pick `jersey-sport-*` classes.
+
+Checklist before commit:
+
+- [ ] Hanger presentation (photo or CSS mount)
+- [ ] Correct sport silhouette class
+- [ ] Sport-appropriate name/number hierarchy
+- [ ] Previewed on `led-64x32` (and gallery if touched)
