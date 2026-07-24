@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FLOQR — All jersey previews (demo name / number)</title>
+  <style>
+    :root {
+      --bg: #0e1014;
+      --ink: #f2f4f7;
+      --muted: #9aa3af;
+      --line: #242830;
+      --chip: #1a1e26;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      padding: 14px 18px 12px;
+      background: rgba(14,16,20,.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+    h1 { margin: 0 0 4px; font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
+    .sub { margin: 0; color: var(--muted); font-size: .86rem; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+    .toolbar input, .toolbar select {
+      background: var(--chip);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font: inherit;
+    }
+    .toolbar input { min-width: 220px; flex: 1; }
+    .count { color: var(--muted); font-size: .82rem; }
+    main { padding: 16px 18px 40px; }
+    section { margin-bottom: 28px; }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: .95rem;
+      font-weight: 650;
+      color: var(--muted);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+      gap: 14px;
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #12151b;
+    }
+    a.card:hover { border-color: #3a4250; }
+    .board {
+      position: relative;
+      aspect-ratio: 2 / 1;
+      background: #050505;
+      overflow: hidden;
+    }
+    .board.css-back {
+      background:
+        linear-gradient(165deg,
+          var(--jp) 0%, var(--jp) 42%,
+          var(--js) 42%, var(--js) 58%,
+          var(--jp) 58%, #050505 100%);
+    }
+    .board.photo-back {
+      background-color: #050505;
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+    }
+    .team, .name, .num {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-family: Impact, "Arial Narrow", "Arial Black", Arial, sans-serif;
+      font-weight: 1000;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(0,0,0,.55), 0 0 8px rgba(0,0,0,.35);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: .95;
+    }
+    .team {
+      top: 14%;
+      height: 12%;
+      letter-spacing: .14em;
+      font-size: clamp(7px, 3.2vw, 11px);
+      transform: perspective(420px) rotateX(16deg);
+      transform-origin: center bottom;
+    }
+    .name {
+      top: 30%;
+      height: 18%;
+      letter-spacing: .08em;
+      font-size: clamp(10px, 4.6vw, 15px);
+      white-space: normal;
+      text-align: center;
+    }
+    .num {
+      top: 48%;
+      height: 38%;
+      letter-spacing: .04em;
+      font-size: clamp(28px, 14vw, 46px);
+      font-style: italic;
+    }
+    .meta {
+      padding: 8px 10px 10px;
+      border-top: 1px solid var(--line);
+    }
+    .meta strong {
+      display: block;
+      font-size: .78rem;
+      font-weight: 650;
+      margin-bottom: 2px;
+    }
+    .meta span {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>All jersey previews</h1>
+    <p class="sub">Demo crest / team + fake player name + fake mark. Click any tile for the live LED board URL.</p>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Filter team, league, sport…" autocomplete="off"/>
+      <select id="sport">
+        <option value="all">All sports</option>
+        <option value="soccer">Soccer</option>
+        <option value="nba">NBA</option>
+        <option value="nfl">NFL</option>
+      </select>
+      <span class="count" id="count"></span>
+    </div>
+  </header>
+  <main id="root"></main>
+  <script src="./jersey-catalog.js?v=29.09.52"></script>
+  <script>
+    const LIVE = "https://jadzadco.github.io/shoutout-demo";
+    const FAKE_NAMES = ["NOVA", "RIVER", "BLAZE", "KAI", "MIRA", "ZED", "AXEL", "LUNA", "ORION", "SAGE", "REM", "VEX", "ION", "NYX"];
+    const FAKE_MARKS = ["7", "10", "9", "11", "23", "99", "8", "17", "21", "3", "14", "22"];
+
+    function hash(s) {
+      let h = 0;
+      for (let i = 0; i < String(s).length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    }
+
+    function demoFor(id) {
+      const h = hash(id);
+      return {
+        name: FAKE_NAMES[h % FAKE_NAMES.length],
+        mark: FAKE_MARKS[h % FAKE_MARKS.length]
+      };
+    }
+
+    function teamLabel(row) {
+      return String(row.jerseyTeamLabel || row.teamName || row.name || "")
+        .replace(/^(Soccer|NBA|NFL)\s+/i, "")
+        .trim()
+        .toUpperCase();
+    }
+
+    function liveUrl(row, demo) {
+      const label = encodeURIComponent(teamLabel(row));
+      const primary = encodeURIComponent(row.jerseyPrimary || "#111111");
+      const secondary = encodeURIComponent(row.jerseySecondary || "#ffffff");
+      const css = row.jerseyCssBack || !row.defaultBackgroundUrl ? "1" : "0";
+      if (row.sport === "soccer") {
+        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.52`;
+      }
+      return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.52`;
+    }
+
+    function collect() {
+      const soccer = Object.values(window.FLOQR_SOCCER_TEAMS || {});
+      const all = Object.values(window.FLOQR_JERSEY_CATALOG || {});
+      const nbaNfl = all.filter(r => r.sport === "nba" || r.sport === "nfl");
+      // Prefer unique soccer teams from FLOQR_SOCCER_TEAMS (skip legacy monaco dup if identical render).
+      const seen = new Set();
+      const rows = [];
+      [...soccer, ...nbaNfl].forEach(row => {
+        if (!row || !row.id || seen.has(row.id)) return;
+        if (row.id === "soccerMonaco" && window.FLOQR_SOCCER_TEAMS.soccerASMonaco) return;
+        seen.add(row.id);
+        rows.push(row);
+      });
+      return rows;
+    }
+
+    function groupKey(row) {
+      if (row.sport === "nba") return "NBA";
+      if (row.sport === "nfl") return "NFL";
+      return row.league || "Soccer";
+    }
+
+    function render() {
+      const q = String(document.getElementById("q").value || "").trim().toLowerCase();
+      const sport = document.getElementById("sport").value;
+      let rows = collect().filter(row => {
+        if (sport !== "all" && row.sport !== sport) return false;
+        if (!q) return true;
+        const hay = `${row.id} ${row.name} ${row.teamName} ${row.league} ${row.sport}`.toLowerCase();
+        return hay.includes(q);
+      });
+      rows.sort((a, b) => {
+        const ga = groupKey(a).localeCompare(groupKey(b));
+        if (ga) return ga;
+        return String(a.teamName || a.name).localeCompare(String(b.teamName || b.name));
+      });
+      document.getElementById("count").textContent = `${rows.length} jerseys`;
+
+      const byGroup = new Map();
+      rows.forEach(row => {
+        const g = groupKey(row);
+        if (!byGroup.has(g)) byGroup.set(g, []);
+        byGroup.get(g).push(row);
+      });
+
+      const root = document.getElementById("root");
+      root.innerHTML = "";
+      byGroup.forEach((list, group) => {
+        const sec = document.createElement("section");
+        const h = document.createElement("h2");
+        h.textContent = `${group} (${list.length})`;
+        sec.appendChild(h);
+        const grid = document.createElement("div");
+        grid.className = "grid";
+        list.forEach(row => {
+          const demo = demoFor(row.id);
+          const label = teamLabel(row);
+          const a = document.createElement("a");
+          a.className = "card";
+          a.href = liveUrl(row, demo);
+          a.target = "_blank";
+          a.rel = "noopener";
+          const board = document.createElement("div");
+          board.className = "board";
+          const primary = row.jerseyPrimary || "#111";
+          const secondary = row.jerseySecondary || "#fff";
+          board.style.setProperty("--jp", primary);
+          board.style.setProperty("--js", secondary);
+          if (row.defaultBackgroundUrl && !row.jerseyCssBack) {
+            board.classList.add("photo-back");
+            board.style.backgroundImage = `url("${row.defaultBackgroundUrl}")`;
+          } else {
+            board.classList.add("css-back");
+          }
+          board.innerHTML = `
+            <p class="team">${label}</p>
+            <p class="name">${demo.name}</p>
+            <p class="num">${demo.mark}</p>
+          `;
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.innerHTML = `<strong>${label}</strong><span>${demo.name} · #${demo.mark} · ${row.sport.toUpperCase()}</span>`;
+          a.appendChild(board);
+          a.appendChild(meta);
+          grid.appendChild(a);
+        });
+        sec.appendChild(grid);
+        root.appendChild(sec);
+      });
+    }
+
+    document.getElementById("q").addEventListener("input", render);
+    document.getElementById("sport").addEventListener("change", render);
+    render();
+  </script>
+</body>
+</html>
