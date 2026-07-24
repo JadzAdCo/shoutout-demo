@@ -37,7 +37,12 @@
       db.collection("entityFollows").where("followerUid", "==", user.uid).limit(500).get()
     ]);
     profile = mine.exists ? mine.data() || {} : {};
-    services = users.docs.flatMap(doc => rolesOf(doc.data() || {}).map(serviceRole => ({id:`${doc.id}:${serviceRole}`, memberUid:doc.id, serviceRole, ...doc.data()}))).filter(row => row.memberUid !== user.uid);
+    let blocked = new Set();
+    if (window.FLOQRBlocks?.loadActiveBlocks) {
+      const blocks = await window.FLOQRBlocks.loadActiveBlocks(db, user.uid);
+      blocked = window.FLOQRBlocks.blockedUidSet(blocks, user.uid);
+    }
+    services = users.docs.flatMap(doc => rolesOf(doc.data() || {}).map(serviceRole => ({id:`${doc.id}:${serviceRole}`, memberUid:doc.id, serviceRole, ...doc.data()}))).filter(row => row.memberUid !== user.uid && !blocked.has(row.memberUid));
     following = new Set(follows.docs.filter(doc => doc.data()?.active !== false).map(doc => doc.data()?.entityId));
     const ownRoles = rolesOf(profile);
     byId("serviceCampaignPanel").classList.toggle("hidden", !ownRoles.length);

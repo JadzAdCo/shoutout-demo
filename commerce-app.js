@@ -34,7 +34,15 @@
   async function loadMarketplaceProducts() {
     const snap = await db.collection("commerceProducts").where("active", "==", true).limit(120).get();
     const rows = snap.docs.map(doc => ({id:doc.id, ...doc.data()}));
+    let blocked = new Set();
+    const user = auth.currentUser;
+    if (user && window.FLOQRBlocks?.loadActiveBlocks) {
+      const blocks = await window.FLOQRBlocks.loadActiveBlocks(db, user.uid);
+      blocked = window.FLOQRBlocks.blockedUidSet(blocks, user.uid);
+    }
     products = shuffle(rows.filter(product => {
+      const sellerUid = product.sellerUid || product.ownerUid || "";
+      if (sellerUid && blocked.has(sellerUid)) return false;
       const country = product.sellerCountry || product.marketplaceCountry || "";
       if (!country) return true;
       return isUsMarketplaceCountry(country);

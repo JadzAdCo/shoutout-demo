@@ -1,4 +1,7 @@
-/* FLOQR Sports Jersey catalog — soccer teams (picker) + NBA/NFL templates. Soccer is one $30 template. */
+/* FLOQR Sports Jersey catalog — soccer teams (picker) + NBA/NFL templates.
+   Silhouette rule (always): every jersey on a hanger (photo like Morocco/Spain or CSS mount).
+   Soccer = slim short-sleeve kit; NBA = sleeveless tank + mesh + big number; NFL = yoke + shoulder name plate + huge thick number.
+   See .cursor/rules/sports-jersey-silhouettes.mdc */
 (function (global) {
   "use strict";
 
@@ -18,7 +21,7 @@
     const classSport = sport === "nba" ? "nba-jersey" : sport === "nfl" ? "nfl-jersey" : "soccer-jersey";
     const tags = Array.from(new Set([
       "Sports", "Jersey", sport.toUpperCase(), league, name, teamName,
-      "2026/27", "$30", "shared", "name", "number",
+      "2026/27", "$30", "shared", "name", "number", "hanger",
       ...(extraTags || [])
     ].filter(Boolean)));
     return {
@@ -26,7 +29,7 @@
       name,
       teamName: teamName || String(name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").trim(),
       scope: "Shared",
-      className: `sports-jersey ${classSport} jersey-css-back`,
+      className: `sports-jersey ${classSport} jersey-css-back jersey-on-hanger`,
       category: "Sports",
       mediaMode: "No image/video",
       supportsMedia: false,
@@ -35,6 +38,8 @@
       layout: "soccer-jersey",
       identityRail: true,
       jerseyCssBack: !bgUrl,
+      jerseyOnHanger: true,
+      jerseySilhouette: sport === "nba" ? "tank" : sport === "nfl" ? "yoke" : "short-sleeve",
       jerseyPrimary: primary || "#111111",
       jerseySecondary: secondary || "#ffffff",
       jerseyAccent: accent || secondary || "#ffffff",
@@ -55,7 +60,7 @@
       season: "2026/27",
       sport,
       league,
-      description: `Shared $30 ${name} jersey-back ShoutOut (${league}, 2026/27). Country/club crest in CAPS, player name (max 14, wraps), jersey mark up to 2 characters.`,
+      description: `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${sport === "nba" ? "Sleeveless tank, mesh, big number." : sport === "nfl" ? "Yoke + shoulder name plate, huge number." : "Slim short-sleeve kit, fabric fashion."}`,
       tags
     };
   }
@@ -162,7 +167,7 @@
       ["AS Monaco", "#E30613", "#FFFFFF", "./images/soccer/soccer-monaco-back.png"],
       ["Olympique Marseille", "#2FAEE0", "#FFFFFF"],
       ["Olympique Lyonnais", "#003399", "#FFFFFF"],
-      ["Lille", "#E01E26", "#FFFFFF"]
+      ["Lille", "#E01E26", "#FFFFFF", "./images/soccer/soccer-lille-back.png"]
     ]},
     {league: "Eredivisie", country: "Netherlands", teams: [
       ["Ajax", "#D2122E", "#FFFFFF"],
@@ -298,7 +303,7 @@
   global.FLOQR_SOCCER_TEAMS = soccerTeams;
   global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
-  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco"]);
+  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"]);
   global.FLOQR_ALL_JERSEY_TEMPLATE_IDS = Array.from(new Set([SOCCER_TEMPLATE_ID, ...nbaNflIds]));
   global.FLOQRResolveSoccerTeam = resolveSoccerTeam;
   global.FLOQRSoccerTeamOptions = soccerTeamOptions;

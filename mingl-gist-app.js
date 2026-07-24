@@ -133,6 +133,8 @@
           id: `shoutout:${row.id}`,
           ringId: `user:${row.submittedByUid || name}`,
           type: "shoutout",
+          authorUid: row.submittedByUid || "",
+          submittedByUid: row.submittedByUid || "",
           authorName: name,
           avatarUrl: row.submitterPhotoURL || row.photoURL || "",
           mediaUrl,
@@ -158,6 +160,8 @@
           id: `gist:${row.id}`,
           ringId: `user:${row.authorUid || name}`,
           type: "gist",
+          authorUid: row.authorUid || "",
+          submittedByUid: row.authorUid || "",
           authorName: name,
           avatarUrl: row.authorPhotoURL || row.photoURL || "",
           mediaUrl: row.mediaUrl || row.image || "",
@@ -394,8 +398,18 @@
   async function refreshFeed() {
     setStatus("Loading Mingl Gist…");
     await loadClubNames();
+    let blocked = new Set();
+    if (currentUser && window.FLOQRBlocks?.loadActiveBlocks) {
+      const blocks = await window.FLOQRBlocks.loadActiveBlocks(db, currentUser.uid);
+      blocked = window.FLOQRBlocks.blockedUidSet(blocks, currentUser.uid);
+    }
     const [shoutouts, gists] = await Promise.all([loadShoutoutStories(), loadMinglGistStories()]);
-    const content = [...gists, ...shoutouts].sort((a, b) => b.createdAt - a.createdAt);
+    const content = [...gists, ...shoutouts]
+      .filter(story => {
+        const author = story.authorUid || story.submittedByUid || "";
+        return !author || !blocked.has(author);
+      })
+      .sort((a, b) => b.createdAt - a.createdAt);
     const ads = loadAdStories();
     stories = interleaveAds(content, ads);
     rings = buildRings(stories);

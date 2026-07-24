@@ -47,6 +47,7 @@
   let locationContextPromise = null;
   let confirmationReturnTimer = null;
   let confirmationCountdownTimer = null;
+  let pendingCheckoutUrl = "";
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
   let approvedRecommendationLibrary = [];
@@ -1561,11 +1562,23 @@
 
   async function loadMingl() {
     if (!currentUser) return;
-    const users = await getCollectionSafe("users", x => x.uid !== currentUser.uid && isPublicMinglCandidate(x));
+    const blocks = window.FLOQRBlocks?.loadActiveBlocks
+      ? await window.FLOQRBlocks.loadActiveBlocks(db, currentUser.uid)
+      : [];
+    const blocked = window.FLOQRBlocks?.blockedUidSet
+      ? window.FLOQRBlocks.blockedUidSet(blocks, currentUser.uid)
+      : new Set();
+    const users = await getCollectionSafe("users", x => {
+      const uid = x.uid || x.id;
+      return uid !== currentUser.uid && !blocked.has(uid) && isPublicMinglCandidate(x);
+    });
     const fallbackConnectionIds = users.map(profile => pairId(currentUser.uid, profile.uid || profile.id));
     const connections = await getParticipantCollectionSafe("minglConnections", currentUser.uid, 1000, fallbackConnectionIds);
     minglCandidates = users;
-    minglConnections = connections;
+    minglConnections = connections.filter(conn => {
+      const other = (conn.participants || []).find(uid => uid !== currentUser.uid);
+      return !other || !blocked.has(other);
+    });
     renderMinglSelfCard();
     renderMinglPeople();
     renderMinglChats();
@@ -1687,6 +1700,13 @@
 
   async function handleMinglAction(profile) {
     const targetUid = profile.uid || profile.id;
+    if (window.FLOQRBlocks?.isBlockedPair) {
+      const blocked = await window.FLOQRBlocks.isBlockedPair(db, currentUser.uid, targetUid);
+      if (blocked) {
+        setStatus("UnMingl is active with this patron. Unblock them in Patron Portal → Manage Mingl Friends first.");
+        return;
+      }
+    }
     const status = connectionStatusFor(targetUid);
     if (status.state === "mutual") {
       openMinglChat(status.connection);
@@ -2805,6 +2825,12 @@
 
   function returnToMainFromConfirmation() {
     clearConfirmationTimers();
+    if (pendingCheckoutUrl) {
+      const url = pendingCheckoutUrl;
+      pendingCheckoutUrl = "";
+      window.location.assign(url);
+      return;
+    }
     showPage("categoryPage");
   }
 
@@ -2821,28 +2847,45 @@
 
   function editSubmittedShoutout() {
     clearConfirmationTimers();
+    pendingCheckoutUrl = "";
     setText("confirmationRedirectStatus", "");
     goToEditor();
   }
 
-  function showShoutoutConfirmation(payload, location, template) {
+  function showShoutoutConfirmation(payload, location, template, options = {}) {
     setText("confirmRef", payload.referenceNumber);
-    setText("confirmClub", location.locationName);
-    setText("confirmTemplate", template.name);
-    let secondsRemaining = 15;
+    setText("confirmClub", location.locationName || payload.locationName || "—");
+    setText("confirmTemplate", template?.name || payload.templateName || "—");
+    const paidBlock = byId("confirmPaidBlock");
+    if (paidBlock) {
+      const showPaid = !!options.paidAtIso || !!payload.paidAtIso;
+      paidBlock.classList.toggle("hidden", !showPaid);
+      if (showPaid) {
+        setText("confirmPaidAt", options.paidAtIso || payload.paidAtIso || "—");
+        setText("confirmInvoice", options.invoiceNumber || payload.invoiceNumber || "—");
+        const cents = Number(options.amountCents ?? payload.amountCents ?? 0);
+        setText("confirmPaidTotal", cents ? `$${(cents / 100).toFixed(2)}` : "—");
+      }
+    }
+    const redirectMs = Math.max(0, Number(options.redirectMs ?? 15000));
+    const redirectLabel = options.redirectLabel || "Returning to Search";
+    const onRedirect = typeof options.onRedirect === "function" ? options.onRedirect : returnToMainFromConfirmation;
+    let secondsRemaining = Math.max(1, Math.round(redirectMs / 1000));
     setText("confirmationCountdown", String(secondsRemaining));
-    setText("confirmationRedirectStatus", `Returning to Search in ${secondsRemaining} seconds...`);
+    setText("confirmationRedirectStatus", `${redirectLabel} in ${secondsRemaining} seconds...`);
     showPage("confirmationPage");
     clearConfirmationTimers();
+    if (redirectMs <= 0) {
+      onRedirect();
+      return;
+    }
     confirmationCountdownTimer = setInterval(() => {
       secondsRemaining -= 1;
       setText("confirmationCountdown", String(Math.max(secondsRemaining, 0)));
-      setText("confirmationRedirectStatus", `Returning to Search in ${Math.max(secondsRemaining, 0)} seconds...`);
-      if (secondsRemaining <= 0) {
-        returnToMainFromConfirmation();
-      }
+      setText("confirmationRedirectStatus", `${redirectLabel} in ${Math.max(secondsRemaining, 0)} seconds...`);
+      if (secondsRemaining <= 0) onRedirect();
     }, 1000);
-    confirmationReturnTimer = setTimeout(returnToMainFromConfirmation, 15000);
+    confirmationReturnTimer = setTimeout(onRedirect, redirectMs);
   }
 
   async function uploadShoutoutPhoto(referenceNumber) {
@@ -3407,7 +3450,24 @@
         status.textContent = footballIntro
           ? `Zebbies four-player football intro: $${(priceCents / 100).toFixed(0)} FloqR checkout required.`
           : `Paid ShoutOut: $${(priceCents / 100).toFixed(2)} FloqR checkout required.`;
-        await window.FLOQRPayments.startCheckout({orderType:"shoutout", payload:{clubLocationId:locationId(), shoutout:checkoutPayload, priceCents}, status:message => { status.textContent = message; }});
+        const checkout = await window.FLOQRPayments.startCheckout({
+          orderType:"shoutout",
+          payload:{clubLocationId:locationId(), shoutout:checkoutPayload, priceCents},
+          status:message => { status.textContent = message; },
+          redirect:false
+        });
+        pendingCheckoutUrl = checkout.checkoutUrl || "";
+        // Temp receipt matches unpaid confirmation (Reference / Location / Template / Pending Location Approval).
+        showShoutoutConfirmation(payload, l, {name: payload.templateName || canonicalTemplate.name || t.name}, {
+          redirectMs: 2500,
+          redirectLabel: "Opening secure Stripe checkout",
+          onRedirect: () => {
+            clearConfirmationTimers();
+            const url = pendingCheckoutUrl || checkout.checkoutUrl;
+            pendingCheckoutUrl = "";
+            window.location.assign(url);
+          }
+        });
         return;
       }
       const shoutoutRef = await db.collection("shoutouts").add(payload);
@@ -3564,7 +3624,7 @@
 
       const messages = document.createElement("a");
       messages.href = window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8";
-      messages.textContent = "FLOQR Inbox (0/0)";
+      messages.textContent = "FloqR Inbox (0/0)";
       messages.dataset.patronMenu = "messages";
       messages.className = "profile-menu-link";
       menu.insertBefore(messages, signOutButton);
@@ -3610,7 +3670,7 @@
       } catch(e) {}
 
       const msgEl = document.querySelector("[data-patron-menu='messages']");
-      if (msgEl) msgEl.textContent = `FLOQR Inbox (${unreadMessages}/${totalMessages})`;
+      if (msgEl) msgEl.textContent = `FloqR Inbox (${unreadMessages}/${totalMessages})`;
 
       const chatEl = document.querySelector("[data-patron-menu='chats']");
       if (chatEl) chatEl.textContent = `Mingl (${unreadChats}/${totalChats})`;
@@ -3825,7 +3885,7 @@
       <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
       <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33"}">My Profile and Settings</a>
       <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FLOQR Inbox (${c.um}/${c.tm})</a>
+      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FloqR Inbox (${c.um}/${c.tm})</a>
       <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
       <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
   }

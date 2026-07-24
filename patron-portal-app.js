@@ -145,6 +145,8 @@
   let currentMinglConnections = [];
   let currentMinglFriendRows = [];
   let currentPortalUsers = [];
+  let currentUserBlocks = [];
+  let currentBlockedUids = new Set();
   let portalMinglAttachmentFile = null;
   let profileMediaDraft = [];
   let memberConnectRefreshHandled = false;
@@ -707,7 +709,7 @@
         const profile = userByUid.get(uid) || connection.userSummaries?.[uid] || {};
         return {uid, profile, settings:settings[uid] || {}};
       })
-      .filter(row => row.uid);
+      .filter(row => row.uid && !currentBlockedUids.has(row.uid));
     const query = String(byId("minglFriendSearchInput")?.value || "").trim().toLowerCase();
     const rows = currentMinglFriendRows.filter(row => {
       const haystack = `${row.profile.displayName || ""} ${row.profile.username || ""} ${row.profile.email || ""}`.toLowerCase();
@@ -722,8 +724,95 @@
         <label><input type="checkbox" data-friend-setting="excludeViewing" ${row.settings.excludeViewing ? "checked" : ""}/> Exclude from viewing</label>
         <label><input type="checkbox" data-friend-setting="excludeContacting" ${row.settings.excludeContacting ? "checked" : ""}/> Exclude from contacting</label>
         <label><input type="checkbox" data-friend-setting="onlyDisappearingMessages" ${row.settings.onlyDisappearingMessages ? "checked" : ""}/> Only send disappearing messages</label>
+        <p class="queue-actions"><button type="button" class="ghost unmingl-friend-btn" data-friend-uid="${esc(row.uid)}">UnMingl (block)</button></p>
       </div>`;
     }).join("") : "<p class='sub'>No mutual Mingl friends matched this search yet.</p>";
+    document.querySelectorAll(".unmingl-friend-btn").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        unMinglFriend(btn.dataset.friendUid || "");
+      });
+    });
+    renderBlockedList(allUsers);
+  }
+
+  function renderBlockedList(allUsers = []) {
+    const wrap = byId("minglBlockedReport");
+    if (!wrap) return;
+    const userByUid = new Map((allUsers || []).map(profile => [profile.uid || profile.id, profile]));
+    const selfUid = auth.currentUser?.uid || "";
+    const rows = (currentUserBlocks || []).filter(block => block.active !== false && block.blockedBy === selfUid);
+    wrap.innerHTML = rows.length ? rows.map(block => {
+      const uid = block.blockedUid || (block.participants || []).find(x => x !== selfUid) || "";
+      const profile = userByUid.get(uid) || block.userSummaries?.[uid] || {};
+      const name = profile.displayName || profile.username || uid || "Blocked patron";
+      return `<div class="queue-item">
+        <strong>${esc(name)}</strong>
+        <small>Blocked from public profile, services, Mingl Chat, and Mingl Gist</small>
+        <p class="queue-actions"><button type="button" class="buttonlike unblock-mingl-btn" data-friend-uid="${esc(uid)}">Unblock</button></p>
+      </div>`;
+    }).join("") : "<p class='sub'>No UnMingl blocks yet.</p>";
+    document.querySelectorAll(".unblock-mingl-btn").forEach(btn => {
+      btn.addEventListener("click", () => unblockMinglFriend(btn.dataset.friendUid || ""));
+    });
+  }
+
+  async function refreshBlocks(user) {
+    if (!window.FLOQRBlocks?.loadActiveBlocks || !user) {
+      currentUserBlocks = [];
+      currentBlockedUids = new Set();
+      return;
+    }
+    currentUserBlocks = await window.FLOQRBlocks.loadActiveBlocks(db, user.uid);
+    currentBlockedUids = window.FLOQRBlocks.blockedUidSet(currentUserBlocks, user.uid);
+  }
+
+  async function unMinglFriend(friendUid) {
+    const user = auth.currentUser;
+    if (!user || !friendUid || !window.FLOQRBlocks?.unMinglBlock) return;
+    const profile = currentPortalUsers.find(x => (x.uid || x.id) === friendUid) || {};
+    if (!window.confirm(`UnMingl ${profile.displayName || profile.username || "this patron"}? They will lose access to your public profile, public services, Mingl Chat, and Mingl Gist.`)) return;
+    return actionFeedback({
+      starting:"Applying UnMingl block…",
+      wait:"Closing Mingl Chat and blocking public access.",
+      success:"UnMingl applied",
+      redirecting:"Block is active. Returning to Manage Mingl Friends.",
+      returnTo:"Manage Mingl Friends"
+    }, async () => {
+      await window.FLOQRBlocks.unMinglBlock(db, {
+        blockerUid: user.uid,
+        blockedUid: friendUid,
+        blockerProfile: currentProfile,
+        blockedProfile: profile,
+        reason: "unmingl"
+      });
+      await refreshBlocks(user);
+      currentMinglConnections = currentMinglConnections.map(conn => {
+        const other = (conn.participants || []).find(uid => uid !== user.uid);
+        return other === friendUid ? {...conn, status: "blocked"} : conn;
+      });
+      renderMinglFriendSettings(currentPortalUsers);
+      renderPortalMinglRequests(currentMinglConnections, user);
+      setText("portalStatus", "UnMingl applied. Public profile, services, Mingl Chat, and Mingl Gist are blocked for that patron.");
+    });
+  }
+
+  async function unblockMinglFriend(friendUid) {
+    const user = auth.currentUser;
+    if (!user || !friendUid || !window.FLOQRBlocks?.unblockUser) return;
+    return actionFeedback({
+      starting:"Removing UnMingl block…",
+      wait:"Restoring discovery eligibility (a new Let's Mingl is still required for chat).",
+      success:"UnMingl block removed",
+      redirecting:"Returning to Manage Mingl Friends.",
+      returnTo:"Manage Mingl Friends"
+    }, async () => {
+      await window.FLOQRBlocks.unblockUser(db, {blockerUid: user.uid, blockedUid: friendUid});
+      await refreshBlocks(user);
+      renderMinglFriendSettings(currentPortalUsers);
+      setText("portalStatus", "Unblock saved. They still need a new Let's Mingl before Mingl Chat reopens.");
+    });
   }
 
   async function saveMinglFriendSettings() {
@@ -1350,7 +1439,10 @@
   }
 
   function renderMessages(messages, user) {
-    currentMessages = messages.map(normalizeMessage).sort((a,b) => {
+    currentMessages = messages
+      .filter(x => !x.deleted)
+      .map(normalizeMessage)
+      .sort((a,b) => {
       const da = a.createdAt?.seconds || 0;
       const dbb = b.createdAt?.seconds || 0;
       return dbb - da;
@@ -1362,6 +1454,7 @@
         && x.connectionId
         && (!connection || (connection.status !== "mutual" && (!connection.requestedTo || connection.requestedTo === user.uid)));
       const alreadyMutual = x.messageType === "mingl_request" && connection?.status === "mutual";
+      const canDelete = (x.recipientUid === user.uid || x.recipientEmail === user.email) && x.id && x._collection;
       return `<div class="queue-item message-envelope ${x.read ? "read" : "unread"}" data-message-index="${index}">
       <div class="message-envelope-head">
         <strong>${esc(x.subject)}</strong>
@@ -1371,10 +1464,11 @@
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
       <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
-        ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.8&from=portal`)}">Open Mingl Chat</a></p>` : ""}
+        ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
+        ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
       </div>
     </div>`;
-    }).join("") : "<p class='sub'>No FLOQR Inbox messages yet.</p>";
+    }).join("") : "<p class='sub'>No FloqR Inbox messages yet.</p>";
     document.querySelectorAll(".message-envelope").forEach(el => {
       el.addEventListener("click", () => openMessage(el, user));
     });
@@ -1390,6 +1484,44 @@
         event.stopPropagation();
         denyPortalMinglRequest(button.dataset.connectionId || "");
       });
+    });
+    document.querySelectorAll(".delete-inbox-btn").forEach(button => {
+      button.addEventListener("click", event => {
+        event.stopPropagation();
+        deleteInboxMessage(Number(button.dataset.messageIndex), user);
+      });
+    });
+  }
+
+  async function deleteInboxMessage(index, user) {
+    const msg = currentMessages[index];
+    if (!msg?.id || !msg._collection || !user) return;
+    const isRecipient = msg.recipientUid === user.uid || msg.recipientEmail === user.email;
+    if (!isRecipient) {
+      setText("portalStatus", "You can only delete messages sent to you.");
+      return;
+    }
+    if (!window.confirm("Delete this FloqR Inbox message? It will be removed from your inbox.")) return;
+    return actionFeedback({
+      starting:"Deleting FloqR Inbox message…",
+      wait:"Removing the message from your inbox.",
+      success:"Message deleted",
+      redirecting:"Returning to FloqR Inbox.",
+      returnTo:"FloqR Inbox"
+    }, async () => {
+      await db.collection(msg._collection).doc(msg.id).set({
+        deleted: true,
+        deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        deletedByUid: user.uid,
+        read: true
+      }, {merge: true});
+      currentMessages = currentMessages.filter((_, i) => i !== index);
+      const visible = currentMessages.filter(x => !x.deleted);
+      const unread = visible.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
+      setText("metricMessages", `${unread}/${visible.length}`);
+      setText("messageCountLabel", `(${unread}/${visible.length})`);
+      renderMessages(visible, user);
+      setText("portalStatus", "Message deleted from FloqR Inbox.");
     });
   }
 
@@ -2625,10 +2757,10 @@
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
     byId("messagePolicySummary").innerHTML = `<ul>
-      <li>System notifications are internal FLOQR Inbox messages and use <strong>System Message</strong> as the sender.</li>
-      <li>FLOQR Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
+      <li>System notifications are internal FloqR Inbox messages and use <strong>System Message</strong> as the sender.</li>
+      <li>FloqR Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
       <li>Patrons can send internal support messages to Club Admins or club-designated Customer Service Representatives.</li>
-      <li>Patron-to-patron direct FLOQR Inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
+      <li>Patron-to-patron direct FloqR Inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
       <li>Your current approved role set: <strong>${esc(roles.join(", "))}</strong>.</li>
     </ul>`;
     byId("chatPolicySummary").innerHTML = `<ul>
@@ -2665,7 +2797,8 @@
     setText("metricMemberLevel", profile.memberLevel || "Patron");
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
-    setText("portalStatus", "Loading your FLOQR Inbox…");
+    setText("portalStatus", "Loading your FloqR Inbox…");
+    await refreshBlocks(user);
     const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
       getUserScopedRows("shoutouts", user, [["submittedByUid","uid"],["submittedBy","email"]]),
       getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
@@ -2677,13 +2810,16 @@
     ]);
     currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
     currentPortalUsers = [];
-    const chats = await getPortalMinglRooms(user, [], queriedChats);
+    const chats = (await getPortalMinglRooms(user, [], queriedChats)).filter(room => {
+      const other = (room.participants || []).find(uid => uid !== user.uid);
+      return !other || !currentBlockedUids.has(other);
+    });
     renderMinglFriendSettings([]);
     messageRecipients = [];
 
     const messages = [
-      ...directMessages,
-      ...inboxNotifications.map(x => ({...x, senderUid:"system", senderName:"System Message", messageType:"system", subject:x.subject || x.title || "System Message", body:x.body || x.preview || "", type:x.type || "notification"}))
+      ...directMessages.filter(x => !x.deleted),
+      ...inboxNotifications.filter(x => !x.deleted).map(x => ({...x, senderUid:"system", senderName:"System Message", messageType:"system", subject:x.subject || x.title || "System Message", body:x.body || x.preview || "", type:x.type || "notification"}))
     ];
     const unreadMessages = messages.filter(x => (x.recipientUid === user.uid || x.recipientEmail === user.email) && !x.read).length;
     const unreadChats = chats.reduce((sum,x) => sum + Number(x.unreadCounts?.[user.uid] || 0), 0);
@@ -2792,8 +2928,8 @@
       starting:"Sending message...",
       wait:"We are sending your message. Please wait a few seconds.",
       success:"Message sent",
-      redirecting:"Message sent, redirecting back to FLOQR Inbox.",
-      returnTo:"FLOQR Inbox"
+      redirecting:"Message sent, redirecting back to FloqR Inbox.",
+      returnTo:"FloqR Inbox"
     }, async () => {
     await db.collection("messages").add({
       messageType:selectedRecipient.recipientType === "club_csr" || selectedRecipient.recipientType === "club_admin" ? "patron_support" : "role_direct",

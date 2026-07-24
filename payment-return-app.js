@@ -10,15 +10,50 @@
   const cancelled = qs("cancelled") === "1";
   let cancelAttempted = false;
 
+  function money(cents) {
+    return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
+  }
+
+  function paidAtLabel(order = {}) {
+    if (order.paidAtIso) return order.paidAtIso;
+    if (order.receipt?.paidAtIso) return order.receipt.paidAtIso;
+    const ts = order.paidAt;
+    if (ts?.toDate) return ts.toDate().toISOString();
+    return "";
+  }
+
   function render(order = {}) {
     const paid = order.paymentStatus === "paid";
-    byId("paymentReturnTitle").textContent = paid ? "Payment confirmed" : cancelled || order.status === "checkout-cancelled" ? "Payment cancelled" : "Payment processing";
+    const isShoutout = order.orderType === "shoutout";
+    const receipt = order.receipt || {};
+    byId("paymentReturnTitle").textContent = paid
+      ? (isShoutout ? "ShoutOut submitted" : "Payment confirmed")
+      : cancelled || order.status === "checkout-cancelled"
+        ? "Payment cancelled"
+        : "Payment processing";
     byId("paymentReturnStatus").textContent = paid
-      ? "Your order is recorded and the next service step is underway."
+      ? (isShoutout
+        ? "Your message has been sent to the location approval queue. A final receipt was also sent to FloqR Inbox and your email/SMS when available."
+        : "Your order is recorded and the next service step is underway.")
       : cancelled || order.status === "checkout-cancelled"
         ? "Nothing was submitted. The unpaid checkout was cleared so you can try again."
         : "Stripe confirmation can take a few seconds. This page updates automatically.";
-    byId("paymentReturnDetails").innerHTML = `<div class="report-table"><div><span>Invoice</span><strong>${esc(order.invoiceNumber || "Pending")}</strong></div><div><span>Order</span><strong>${esc(orderId || "-")}</strong></div><div><span>Service</span><strong>${esc(order.orderType || "-")}</strong></div><div><span>Total</span><strong>$${(Number(order.amountCents || 0) / 100).toFixed(2)}</strong></div><div><span>Status</span><strong>${esc(order.paymentStatus || order.status || "pending")}</strong></div><div><span>Fulfillment</span><strong>${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}</strong></div></div>`;
+
+    if (paid && isShoutout) {
+      const paidAt = paidAtLabel(order) || "—";
+      byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
+        <p><strong>Reference:</strong> ${esc(receipt.referenceNumber || order.payload?.shoutout?.referenceNumber || "—")}</p>
+        <p><strong>Location:</strong> ${esc(receipt.locationName || order.payload?.shoutout?.locationName || "—")}</p>
+        <p><strong>Template:</strong> ${esc(receipt.templateName || order.payload?.shoutout?.templateName || order.itemName || "—")}</p>
+        <p><strong>Status:</strong> ${esc(receipt.statusLabel || "Pending Location Approval")}</p>
+        <p><strong>Paid at:</strong> ${esc(paidAt)}</p>
+        <p><strong>Invoice:</strong> ${esc(receipt.invoiceNumber || order.invoiceNumber || "—")}</p>
+        <p><strong>Total:</strong> ${esc(money(receipt.amountCents ?? order.amountCents))}</p>
+      </div>`;
+      return;
+    }
+
+    byId("paymentReturnDetails").innerHTML = `<div class="report-table"><div><span>Invoice</span><strong>${esc(order.invoiceNumber || "Pending")}</strong></div><div><span>Order</span><strong>${esc(orderId || "-")}</strong></div><div><span>Service</span><strong>${esc(order.orderType || "-")}</strong></div><div><span>Total</span><strong>${esc(money(order.amountCents))}</strong></div><div><span>Status</span><strong>${esc(order.paymentStatus || order.status || "pending")}</strong></div><div><span>Fulfillment</span><strong>${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}</strong></div></div>`;
   }
 
   async function clearCancelledCheckout() {

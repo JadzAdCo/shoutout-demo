@@ -658,7 +658,17 @@
   <section id="confirmationPage" class="page">
     <div class="confirmation card">
       <h1>ShoutOut submitted</h1><p class="sub">Your message has been sent to the location approval queue.</p>
-      <div class="receipt"><p><strong>Reference:</strong> <span id="confirmRef">—</span></p><p><strong>Location:</strong> <span id="confirmClub">—</span></p><p><strong>Template:</strong> <span id="confirmTemplate">—</span></p><p><strong>Status:</strong> Pending Location Approval</p></div>
+      <div class="receipt">
+        <p><strong>Reference:</strong> <span id="confirmRef">—</span></p>
+        <p><strong>Location:</strong> <span id="confirmClub">—</span></p>
+        <p><strong>Template:</strong> <span id="confirmTemplate">—</span></p>
+        <p><strong>Status:</strong> Pending Location Approval</p>
+        <div id="confirmPaidBlock" class="hidden">
+          <p><strong>Paid at:</strong> <span id="confirmPaidAt">—</span></p>
+          <p><strong>Invoice:</strong> <span id="confirmInvoice">—</span></p>
+          <p><strong>Total:</strong> <span id="confirmPaidTotal">—</span></p>
+        </div>
+      </div>
       <p id="confirmationRedirectStatus" class="status">Returning to Search in <span id="confirmationCountdown">15</span> seconds...</p>
       <div class="button-row confirmation-actions"><button id="skipConfirmationBtn" class="ghost" type="button">Skip</button></div>
     </div>
@@ -686,8 +696,8 @@
 <script src="./floqai-search.js?v=29.09.52"></script>
 <script src="./global-profile-status.js?v=29.09.45"></script>
 <script src="./floqr-i18n.js?v=29.09.33"></script>
-<script src="./shared-data.js?v=29.09.52"></script>
-<script src="./jersey-catalog.js?v=29.09.52"></script>
+<script src="./shared-data.js?v=29.09.53"></script>
+<script src="./jersey-catalog.js?v=29.09.53"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>
 <script src="./url-media-field.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.33"></script>
@@ -702,9 +712,10 @@
 <script src="./dc-spot-ad-campaigns.js?v=29.09.33"></script>
 <script src="./ad-campaigns.js?v=29.09.33"></script>
 <script src="./floqr-identity.js?v=29.09.33"></script>
+<script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./floqr-logger.js?v=29.09.33"></script>
-<script src="./payment-service.js?v=29.09.33"></script>
-<script src="./patron-app.js?v=29.09.52"></script>
+<script src="./payment-service.js?v=29.09.56"></script>
+<script src="./patron-app.js?v=29.09.57"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>
