@@ -283,9 +283,11 @@
     </div>
   </header>
   <main id="root"></main>
-  <script src="./jersey-catalog.js?v=29.09.54"></script>
+  <script src="./national-teams-data.js?v=29.09.59"></script>
+  <script src="./jersey-catalog.js?v=29.09.59"></script>
   <script>
-    const LIVE = "https://jadzadco.github.io/shoutout-demo";
+    // Same-origin local display so photo kits match the catalog (Pages may lag the feature branch).
+    const LIVE = ".";
     const FAKE_NAMES = ["NOVA", "RIVER", "BLAZE", "KAI", "MIRA", "ZED", "AXEL", "LUNA", "ORION", "SAGE", "REM", "VEX", "ION", "NYX"];
     const FAKE_MARKS = ["7", "10", "9", "11", "23", "99", "8", "17", "21", "3", "14", "22"];
 
@@ -316,9 +318,9 @@
       const secondary = encodeURIComponent(row.jerseySecondary || "#ffffff");
       const css = row.jerseyCssBack || !row.defaultBackgroundUrl ? "1" : "0";
       if (row.sport === "soccer") {
-        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.52`;
+        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.59`;
       }
-      return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.52`;
+      return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.59`;
     }
 
     function collect() {

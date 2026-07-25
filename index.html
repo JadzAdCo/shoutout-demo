@@ -64,12 +64,12 @@
             <label>Email address
               <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
             </label>
-            <div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 5-minute code</button></div>
+            <div class="button-row"><button id="requestEmailOtpBtn" type="button">Send 6-minute code</button></div>
             <label>Enter 8-character code
-              <input id="emailOtpCode" maxlength="8" autocomplete="one-time-code" placeholder="AB7K9M2Q"/>
+              <input id="emailOtpCode" maxlength="8" autocomplete="one-time-code" placeholder="Enter code from email"/>
             </label>
             <button id="verifyEmailOtpBtn" class="primary full" type="button">Verify and Continue</button>
-            <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 5 minutes after delivery.</p>
+            <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 6 minutes after delivery.</p>
           </div>
 
           <div class="divider"><span>Or use One Time Password (OTP) via SMS</span></div>
@@ -653,6 +653,16 @@
         <iframe id="previewFrame" title="ShoutOut preview"></iframe>
       </div>
     </div>
+
+    <div id="emailOtpSentModal" class="email-otp-sent-modal hidden" role="dialog" aria-modal="true" aria-labelledby="emailOtpSentTitle" aria-describedby="emailOtpSentBody">
+      <div class="email-otp-sent-dialog" role="document">
+        <button id="emailOtpSentCloseX" class="email-otp-sent-x" type="button" aria-label="Close">×</button>
+        <h2 id="emailOtpSentTitle">Code sent</h2>
+        <p id="emailOtpSentBody" class="sub">A secure sign-in code was emailed. It expires in 6 minutes. Check your inbox (and spam) then enter the code below.</p>
+        <p id="emailOtpSentEmail" class="status"></p>
+        <div class="button-row"><button id="emailOtpSentCloseBtn" class="primary" type="button">Close</button></div>
+      </div>
+    </div>
   </section>
 
   <section id="confirmationPage" class="page">
@@ -697,7 +707,8 @@
 <script src="./global-profile-status.js?v=29.09.45"></script>
 <script src="./floqr-i18n.js?v=29.09.33"></script>
 <script src="./shared-data.js?v=29.09.53"></script>
-<script src="./jersey-catalog.js?v=29.09.53"></script>
+<script src="./national-teams-data.js?v=29.09.59"></script>
+<script src="./jersey-catalog.js?v=29.09.59"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>
 <script src="./url-media-field.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.33"></script>
