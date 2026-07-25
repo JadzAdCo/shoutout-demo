@@ -633,6 +633,13 @@ textarea{width:100%;margin-top:7px;padding:15px;border-radius:15px;border:1px so
 .floqr-grammar-modal{position:fixed;inset:0;z-index:10001;display:grid;place-items:center;background:rgba(4,8,24,.72);backdrop-filter:blur(10px);padding:18px}
 .floqr-grammar-dialog{width:min(680px,94vw);max-height:88vh;overflow:auto;border:1px solid var(--line);border-radius:20px;background:rgba(10,14,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:20px}
 .floqr-grammar-dialog h2{margin-top:0}
+.email-otp-sent-modal{position:fixed;inset:0;z-index:10040;display:grid;place-items:center;background:rgba(3,7,22,.78);backdrop-filter:blur(10px);padding:16px}
+.email-otp-sent-modal.hidden{display:none}
+.email-otp-sent-dialog{position:relative;width:min(420px,94vw);border:1px solid var(--line);border-radius:20px;background:rgba(10,14,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.58);padding:22px 20px 18px}
+.email-otp-sent-dialog h2{margin:0 36px 10px 0;font-size:1.35rem}
+.email-otp-sent-dialog .sub{margin:0 0 10px;line-height:1.45}
+.email-otp-sent-x{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer}
+.email-otp-sent-x:hover,.email-otp-sent-x:focus-visible{background:rgba(255,255,255,.16)}
 .grammar-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grammar-compare div{border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.18);padding:12px}
 .grammar-compare p{white-space:pre-wrap;color:#fff}
