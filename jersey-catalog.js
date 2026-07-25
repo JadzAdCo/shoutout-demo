@@ -206,17 +206,71 @@
     ]}
   ];
 
-  const PHOTO_NATIONALS = [
-    {id: "soccerMorocco", teamName: "Morocco", league: "National teams", country: "Morocco", primary: "#C1272D", secondary: "#006233", bgUrl: "./images/soccer/soccer-morocco-back.png"},
-    {id: "soccerSpain", teamName: "Spain", league: "National teams", country: "Spain", primary: "#AA151B", secondary: "#F1BF00", bgUrl: "./images/soccer/soccer-spain-back.png"}
-  ];
+  /** Legacy lowercase filenames already on disk (before slug casing). */
+  const PHOTO_FILE_ALIASES = {
+    Morocco: "soccer-morocco-back.png",
+    Spain: "soccer-spain-back.png",
+    Cameroon: "soccer-cameroon-back.png",
+    Nigeria: "soccer-nigeria-back.png"
+  };
+
+  /** Nations with confirmed flat blank photo backs (Cameroon/Nigeria methodology). Expanded as batch agents finish. */
+  const PHOTO_READY = new Set(Object.keys(PHOTO_FILE_ALIASES));
+
+  function nationalPhotoUrl(teamName) {
+    const alias = PHOTO_FILE_ALIASES[teamName];
+    if (alias) return `./images/soccer/${alias}`;
+    return `./images/soccer/soccer-${slug(teamName)}-back.png`;
+  }
+
+  const NATIONAL_SOURCE = Array.isArray(global.FLOQR_NATIONAL_TEAMS) ? global.FLOQR_NATIONAL_TEAMS : [];
+  const PHOTO_NATIONALS = NATIONAL_SOURCE.map(row => {
+    const hasPhoto = PHOTO_READY.has(row.name);
+    return {
+      id: `soccer${slug(row.name)}`,
+      teamName: row.name,
+      league: "National teams",
+      country: row.name,
+      region: row.region || "",
+      primary: row.primary,
+      secondary: row.secondary,
+      accent: row.accent,
+      bgUrl: hasPhoto ? nationalPhotoUrl(row.name) : ""
+    };
+  });
+
+  // Ensure legacy photo kits remain if national-teams-data.js failed to load.
+  [
+    {name: "Morocco", primary: "#C1272D", secondary: "#006233", region: "Africa"},
+    {name: "Spain", primary: "#AA151B", secondary: "#F1BF00", region: "Europe"},
+    {name: "Cameroon", primary: "#007A33", secondary: "#FCD116", accent: "#CE1126", region: "Africa"},
+    {name: "Nigeria", primary: "#008751", secondary: "#FFFFFF", region: "Africa"}
+  ].forEach(row => {
+    const id = `soccer${slug(row.name)}`;
+    if (PHOTO_NATIONALS.some(n => n.id === id)) return;
+    PHOTO_NATIONALS.push({
+      id,
+      teamName: row.name,
+      league: "National teams",
+      country: row.name,
+      region: row.region,
+      primary: row.primary,
+      secondary: row.secondary,
+      accent: row.accent,
+      bgUrl: nationalPhotoUrl(row.name)
+    });
+  });
 
   const soccerTeams = {};
   const nbaNflTemplates = {};
   const nbaNflIds = [];
 
-  function addSoccerTeam(id, teamName, league, country, primary, secondary, bgUrl) {
+  function addSoccerTeam(id, teamName, league, country, primary, secondary, bgUrl, extra = {}) {
     if (soccerTeams[id]) return;
+    const europeLeagues = new Set([
+      "Premier League", "La Liga", "Serie A", "Bundesliga", "Ligue 1",
+      "Eredivisie", "Primeira Liga", "Belgian Pro League", "Scottish Premiership", "Super Lig"
+    ]);
     soccerTeams[id] = jerseyTemplate({
       id,
       name: `Soccer ${teamName}`,
@@ -225,8 +279,17 @@
       sport: "soccer",
       primary,
       secondary,
+      accent: extra.accent || secondary || "#ffffff",
       bgUrl: bgUrl || "",
-      extraTags: ["soccer", "football", country, league, "Europe"].filter(Boolean)
+      extraTags: [
+        "soccer",
+        "football",
+        country,
+        league,
+        europeLeagues.has(league) ? "Europe" : "",
+        league === "National teams" ? "National" : "",
+        ...(extra.extraTags || [])
+      ].filter(Boolean)
     });
   }
 
@@ -252,7 +315,10 @@
     });
   });
   PHOTO_NATIONALS.forEach(row => {
-    addSoccerTeam(row.id, row.teamName, row.league, row.country, row.primary, row.secondary, row.bgUrl);
+    addSoccerTeam(row.id, row.teamName, row.league, row.country, row.primary, row.secondary, row.bgUrl, {
+      accent: row.accent,
+      extraTags: [row.region, "National", row.region === "Oceania" ? "Australia" : ""].filter(Boolean)
+    });
   });
   // Legacy photo Monaco id (catalog AS Monaco uses soccerASMonaco).
   if (soccerTeams.soccerASMonaco && !soccerTeams.soccerMonaco) {
