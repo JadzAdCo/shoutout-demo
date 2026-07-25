@@ -952,10 +952,10 @@
       canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
       canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
       if (usePhotoBack) {
-        // Photo kit + explicit hanger overlay so ~60% hanger stays visible (Monaco/Lille parity).
+        // Flat blank photo kits (Cameroon/Nigeria methodology): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
         canvas.classList.add("jersey-photo-back");
-        ensureJerseyMount(sport, {hangerOnly: true});
+        hideJerseyMount();
         if (!hasBackgroundLayer) {
           applyBackgroundLayer(bgEl, {backgroundUrl: jerseyBg});
           bgEl.style.backgroundSize = "";

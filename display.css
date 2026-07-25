@@ -783,27 +783,19 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-css-back .display-background{
   background-size:cover!important;
 }
-/* Photo kits (Monaco / Lille / Morocco / Spain): show ~60% of hanger, -15% type */
+/* Photo kits (flat blank nationals + club photos): no hanger overlay; kit fills frame */
 .display-canvas.soccer-jersey-template.jersey-photo-back .display-background{
-  background-size:68% auto!important;
-  background-position:center 36%!important;
+  background-size:78% auto!important;
+  background-position:center 42%!important;
   background-repeat:no-repeat!important;
-  background-color:#cfcfcf!important;
+  background-color:#0e0e0e!important;
+}
+.display-canvas.soccer-jersey-template.jersey-photo-back .jersey-hanger-mount{
+  display:none!important;
 }
 .jersey-hanger-mount.jersey-photo-hanger-only .jersey-garment{display:none!important}
 .jersey-hanger-mount.jersey-photo-hanger-only .jersey-hanger{
-  top:2%!important;
-  width:52%!important;
-  height:18%!important;
-  z-index:6!important;
-}
-.jersey-hanger-mount.jersey-photo-hanger-only .jersey-hanger-hook{
-  height:44%!important;
-  border-width:2.5px!important;
-}
-.jersey-hanger-mount.jersey-photo-hanger-only .jersey-hanger-shoulder{
-  top:40%!important;
-  height:24%!important;
+  display:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back .soccer-jersey-team{
   top:34%!important;
