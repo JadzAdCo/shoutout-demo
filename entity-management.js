@@ -12,6 +12,7 @@
   let catalog = {clubs:[], events:[], users:[]};
   let selected = null;
   let clubUrlFilter = "";
+  let pendingManage = null;
 
   function setStatus(msg) {
     const el = byId("entityManageStatus");
@@ -36,7 +37,8 @@
   }
 
   function matchesQuery(row, type, query) {
-    if (!query) return true;
+    const q = String(query || "").trim().toLowerCase();
+    if (!q) return false;
     const blob = [
       entityTitle(row, type),
       entityMeta(row, type),
@@ -44,7 +46,7 @@
       row.streetAddress, row.address, row.brandName, row.locationLabel,
       ...(row.genres || [])
     ].join(" ").toLowerCase();
-    return query.split(/\s+/).every(token => blob.includes(token));
+    return q.split(/\s+/).every(token => blob.includes(token));
   }
 
   function statusBadge(row) {
@@ -107,7 +109,11 @@
   function renderSearchResults() {
     const wrap = byId("entityManageResults");
     if (!wrap) return;
-    const query = byId("entityManageSearch")?.value || "";
+    const query = String(byId("entityManageSearch")?.value || "").trim();
+    if (!query) {
+      wrap.innerHTML = `<p class="sub">Type a search to find a venue, event, or patron. No entities are listed until you search.</p>`;
+      return;
+    }
     const rows = searchResults(query);
     if (!rows.length) {
       wrap.innerHTML = `<p class="sub">No matching venues, events, or patrons. Try another search.</p>`;
@@ -164,7 +170,8 @@
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
     const adminUrl = type === "club" ? `./admin.html?location=${encodeURIComponent(id)}&v=29.09.22&from=master` : "";
-    const displayUrl = type === "club" ? `./display.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
+    const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
+    const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
     const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
 
     wrap.innerHTML = `
@@ -177,7 +184,8 @@
         </div>
         ${type === "club" ? `<div class="queue-actions">
           <a class="buttonlike" href="${esc(adminUrl)}">Open Club Admin</a>
-          <a class="buttonlike" href="${esc(displayUrl)}" target="_blank" rel="noopener">Display</a>
+          <a class="buttonlike" href="${esc(displayUrl)}" target="_blank" rel="noopener">Display 1</a>
+          <a class="buttonlike" href="${esc(display2Url)}" target="_blank" rel="noopener">Display 2</a>
           <a class="buttonlike" href="${esc(profileUrl)}" target="_blank" rel="noopener">Public profile</a>
         </div>` : ""}
       </div>
@@ -304,9 +312,9 @@
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = `./admin.html?location=${encodeURIComponent(row.id)}&v=29.09.22&from=master`;
-      const display = `./display.html?location=${encodeURIComponent(row.id)}&v=29.09.22`;
+      const shoutout = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
+      const suprstar = window.FLOQRNav?.stableSecondaryDisplayUrl?.(row.id) || `./display2.html?location=${encodeURIComponent(row.id)}`;
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
-      const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       const g = gates();
       const enabled = g?.entityIsAppEnabled(row);
       return `<div class="queue-item ${enabled ? "" : "entity-row-disabled"}">
@@ -316,9 +324,9 @@
         </div>
         ${statusBadge(row)}
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
-        <p><strong>Primary display:</strong> ${esc(primary)}</p>
-        <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
-        <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
+        <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
+        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
         <div class="queue-actions">
           <button type="button" data-manage-club="${esc(row.id)}">Manage entity</button>
         </div>
@@ -326,13 +334,28 @@
     }).join("") : "<p class='sub'>No club locations match this search.</p>";
     wrap.querySelectorAll("[data-manage-club]").forEach(btn => {
       btn.addEventListener("click", () => {
+        pendingManage = {type:"club", id:btn.dataset.manageClub, query:btn.dataset.manageClub};
         document.querySelector('[data-panel="entityManagement"]')?.click();
-        if (byId("entityManageSearch")) byId("entityManageSearch").value = btn.dataset.manageClub;
-        if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = "club";
-        selectEntity("club", btn.dataset.manageClub);
-        renderSearchResults();
       });
     });
+  }
+
+  function applyPendingManage() {
+    if (!pendingManage) return;
+    if (!window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) return;
+    const {type, id, query} = pendingManage;
+    pendingManage = null;
+    if (byId("entityManageSearch")) byId("entityManageSearch").value = query || id || "";
+    if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = type === "club" ? "club" : "all";
+    if (id) selectEntity(type || "club", id);
+    else renderSearchResults();
+  }
+
+  function onSos2faUnlocked() {
+    applyPendingManage();
+    renderSearchResults();
+    renderManagePanel();
+    renderGlobalPatronGates();
   }
 
   async function mount(options = {}) {
@@ -359,11 +382,20 @@
     byId("clubAdminUrlSearch")?.addEventListener("input", renderClubAdminUrlFilter);
     byId("clubAdminUrlManageSearchBtn")?.addEventListener("click", () => {
       const q = byId("clubAdminUrlSearch")?.value || "";
+      pendingManage = {type:"club", query:q};
       document.querySelector('[data-panel="entityManagement"]')?.click();
-      if (byId("entityManageSearch")) byId("entityManageSearch").value = q;
-      if (byId("entityManageTypeFilter")) byId("entityManageTypeFilter").value = "club";
-      renderSearchResults();
     });
+    byId("sos2faRelockBtn")?.addEventListener("click", () => {
+      window.FLOQRSOS2FA?.lock?.("entityManagement");
+      window.FLOQRSOS2FA?.syncGateUi?.("entityManagement", false);
+      window.FLOQRSOS2FA?.requireUnlock?.("entityManagement");
+    });
+    if (window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
+      window.FLOQRSOS2FA.syncGateUi("entityManagement", true);
+      onSos2faUnlocked();
+    } else {
+      window.FLOQRSOS2FA?.syncGateUi?.("entityManagement", false);
+    }
   }
 
   function updateLocations(locations = []) {
@@ -377,5 +409,5 @@
     renderSearchResults();
   }
 
-  window.FLOQREntityManagement = {mount, updateLocations, refreshCatalog, selectEntity, renderClubAdminUrlFilter};
+  window.FLOQREntityManagement = {mount, updateLocations, refreshCatalog, selectEntity, renderClubAdminUrlFilter, onSos2faUnlocked};
 })();
