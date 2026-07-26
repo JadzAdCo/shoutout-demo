@@ -1505,6 +1505,9 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   loc.subscriptionRequiredForPublicProfileEdits = true;
   loc.displayScreenFormatIds = Array.from(new Set(loc.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
   loc.primaryDisplayScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds[0] || "led-96x48";
+  loc.secondaryDisplayScreenFormatId = loc.secondaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId;
+  loc.displayUrl = loc.displayUrl || `./display.html?location=${encodeURIComponent(id)}`;
+  loc.secondaryDisplayUrl = loc.secondaryDisplayUrl || `./display2.html?location=${encodeURIComponent(id)}`;
   loc.patronTemplateBackgroundEditingEnabled = loc.patronTemplateBackgroundEditingEnabled !== false;
   loc.streetAddress = loc.streetAddress || loc.addressLine1 || "";
   loc.fullAddress = loc.fullAddress || window.FLOQRAddress.fullAddress(loc);

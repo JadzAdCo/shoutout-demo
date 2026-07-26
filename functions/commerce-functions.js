@@ -777,6 +777,25 @@ exports.createFloqrConnectOnboardingLink = onCall({
       clubLocationId:ownerType === "club" ? ownerId : text(payload.clubLocationId, 120)
     };
   }
+
+  if (type === "suprstrSlot") {
+    // Fixed FloqR MoR product: one live-stream slot for SupRstR (Master Admin purchase path first).
+    const slots = Math.max(1, Math.min(10, Math.floor(Number(payload.slots || 1))));
+    const unitCents = 2000;
+    return {
+      amountCents:unitCents * slots,
+      unitAmountCents:unitCents,
+      quantity:slots,
+      itemName:slots === 1 ? "SupRstR live-stream slot ($20)" : `SupRstR live-stream slots ×${slots} ($20 each)`,
+      description:"One SupRstR entitlement to live-stream device video to a FLOQR ShoutOut display. Consume one slot when Go Live succeeds. WebRTC go-live ships separately.",
+      floqrShareCents:unitCents * slots,
+      venueShareCents:0,
+      paymentModel:"floqr-platform",
+      product:"suprstrSlot",
+      slotsGranted:slots,
+      clubLocationId:text(payload.clubLocationId, 120)
+    };
+  }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
 }
 
@@ -891,6 +910,9 @@ exports.createFloqrCheckoutSession = onCall({
         // Company managers subscribe under their company id; enforce ownership at entitlement write.
         if (!ownerId) throw new HttpsError("invalid-argument", "promoterCompany ownerId is required.");
       }
+    }
+    if (type === "suprstrSlot") {
+      // Any signed-in patron may purchase a live-stream slot (public SupRstR).
     }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();
@@ -1525,6 +1547,41 @@ async function finalizePaidOrder(orderId, session) {
       fulfillmentStatus:"scheduling-subscription-active",
       stripeSubscriptionId:subscriptionId,
       fulfilledRecordId:key
+    }, {merge:true});
+  }
+
+  if (order.orderType === "suprstrSlot") {
+    const uid = text(order.ownerUid, 160);
+    if (!uid) throw new Error("SupRstR fulfillment missing ownerUid.");
+    const slots = Math.max(1, Math.floor(Number(order.slotsGranted || order.quantity || 1)));
+    const entitlementRef = db.collection("suprstrEntitlements").doc(uid);
+    await db.runTransaction(async transaction => {
+      const snap = await transaction.get(entitlementRef);
+      const data = snap.exists ? snap.data() || {} : {};
+      if (data.lastCreditedOrderId === orderId) return;
+      const remaining = Math.max(0, Math.floor(Number(data.slotsRemaining || 0))) + slots;
+      const purchased = Math.max(0, Math.floor(Number(data.slotsPurchased || 0))) + slots;
+      transaction.set(entitlementRef, {
+        ownerUid:uid,
+        ownerEmail:text(order.ownerEmail || order.customerEmail, 200),
+        product:"suprstrSlot",
+        status:"active",
+        slotsRemaining:remaining,
+        slotsPurchased:purchased,
+        priceCentsUnit:2000,
+        lastServiceOrderId:orderId,
+        lastCreditedOrderId:orderId,
+        stripeCheckoutSessionId:text(session?.id || order.stripeCheckoutSessionId, 200),
+        stripePaymentIntentId:text(session?.payment_intent || order.stripePaymentIntentId, 200),
+        isTestPayment:order.isTestPayment === true,
+        purchasedAt:paidAt,
+        updatedAt:paidAt
+      }, {merge:true});
+    });
+    await ref.set({
+      fulfillmentStatus:"suprstr-slots-granted",
+      slotsGranted:slots,
+      fulfilledRecordId:uid
     }, {merge:true});
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});

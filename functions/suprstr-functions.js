@@ -1,4 +1,4 @@
-/* SupRstR live stream — start/end session, consume slot (Master Admin v1). */
+/* SupRstR live stream â€” start/end session, consume slot (Master Admin v1). */
 "use strict";
 
 const admin = require("firebase-admin");
@@ -30,17 +30,17 @@ function isMasterAdminAuth(authContext = {}) {
  */
 exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  if (!await isMasterAdminAuth(request.auth)) {
-    throw new HttpsError("permission-denied", "SupRstR go-live is Master Admin only for now.");
-  }
   const locationId = text(request.data?.locationId || request.data?.clubLocationId, 120);
   if (!locationId) throw new HttpsError("invalid-argument", "Choose a venue (locationId) like a ShoutOut.");
   const locationName = text(request.data?.locationName, 160);
+  const boardRaw = text(request.data?.displayBoard || request.data?.board, 40).toLowerCase();
+  const displayBoard = (boardRaw === "secondary" || boardRaw === "2" || boardRaw === "display2" || boardRaw === "displays") ? "secondary" : "primary";
+  const liveDocId = displayBoard === "secondary" ? `${locationId}__secondary` : locationId;
   const uid = request.auth.uid;
   const email = text(request.auth.token?.email, 200).toLowerCase();
   const entitlementRef = db.collection("suprstrEntitlements").doc(uid);
   const sessionRef = db.collection("suprstrSessions").doc();
-  const liveRef = db.collection("suprstrLive").doc(locationId);
+  const liveRef = db.collection("suprstrLive").doc(liveDocId);
   const now = admin.firestore.Timestamp.now();
 
   await db.runTransaction(async (tx) => {
@@ -53,7 +53,7 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     const liveSnap = await tx.get(liveRef);
     const existing = liveSnap.exists ? liveSnap.data() || {} : {};
     if (existing.status === "live" && existing.sessionId && existing.broadcasterUid !== uid) {
-      throw new HttpsError("already-exists", "This venue already has an active SupRstR stream. End it first.");
+      throw new HttpsError("already-exists", "This venue board already has an active SupRstR stream. End it first.");
     }
 
     tx.set(entitlementRef, {
@@ -68,9 +68,11 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       sessionId: sessionRef.id,
       locationId,
       locationName: locationName || locationId,
+      displayBoard,
+      liveDocId,
       broadcasterUid: uid,
       broadcasterEmail: email,
-      status: "waiting", // waiting → offering → connected → ended
+      status: "waiting",
       offer: null,
       answer: null,
       createdAt: now,
@@ -81,6 +83,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     tx.set(liveRef, {
       locationId,
       locationName: locationName || locationId,
+      displayBoard,
+      liveDocId,
       sessionId: sessionRef.id,
       broadcasterUid: uid,
       status: "live",
@@ -89,10 +93,12 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     }, {merge: true});
   });
 
+  const displayPage = displayBoard === "secondary" ? "display2.html" : "display.html";
   return {
     sessionId: sessionRef.id,
     locationId,
-    displayUrl: `./display.html?location=${encodeURIComponent(locationId)}&suprstr=1`,
+    displayBoard,
+    displayUrl: `./${displayPage}?location=${encodeURIComponent(locationId)}&suprstr=1`,
     slotsRemainingHint: "refresh entitlement listener"
   };
 });
@@ -100,25 +106,27 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
 /** End live session and clear venue pointer. Does not refund the slot. */
 exports.endSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  if (!await isMasterAdminAuth(request.auth)) {
-    throw new HttpsError("permission-denied", "Master Admin required.");
-  }
   const sessionId = text(request.data?.sessionId, 120);
   const locationId = text(request.data?.locationId, 120);
+  const boardRaw = text(request.data?.displayBoard || request.data?.board, 40).toLowerCase();
+  const displayBoard = (boardRaw === "secondary" || boardRaw === "2" || boardRaw === "display2" || boardRaw === "displays") ? "secondary" : "primary";
   if (!sessionId && !locationId) {
     throw new HttpsError("invalid-argument", "sessionId or locationId required.");
   }
   const now = admin.firestore.Timestamp.now();
   let sid = sessionId;
   let loc = locationId;
+  let board = displayBoard;
   if (!sid && loc) {
-    const live = await db.collection("suprstrLive").doc(loc).get();
+    const liveId = board === "secondary" ? `${loc}__secondary` : loc;
+    const live = await db.collection("suprstrLive").doc(liveId).get();
     sid = text(live.data()?.sessionId, 120);
   }
   if (sid) {
     const sess = await db.collection("suprstrSessions").doc(sid).get();
     if (sess.exists) {
       loc = loc || text(sess.data()?.locationId, 120);
+      board = text(sess.data()?.displayBoard, 40) === "secondary" ? "secondary" : board;
       const owner = text(sess.data()?.broadcasterUid, 160);
       if (owner && owner !== request.auth.uid && !(await isMasterAdminAuth(request.auth))) {
         throw new HttpsError("permission-denied", "Only the broadcaster can end this session.");
@@ -127,12 +135,13 @@ exports.endSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     }
   }
   if (loc) {
-    await db.collection("suprstrLive").doc(loc).set({
+    const liveId = board === "secondary" ? `${loc}__secondary` : loc;
+    await db.collection("suprstrLive").doc(liveId).set({
       status: "idle",
       sessionId: "",
       endedAt: now,
       updatedAt: now
     }, {merge: true});
   }
-  return {ok: true, sessionId: sid || "", locationId: loc || ""};
+  return {ok: true, sessionId: sid || "", locationId: loc || "", displayBoard: board};
 });

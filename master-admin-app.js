@@ -121,6 +121,12 @@
         byId(btn.dataset.panel)?.classList.add("active");
         if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
         if (btn.dataset.panel === "networkReconciliation") loadNetworkPaymentLedger();
+        if (btn.dataset.panel === "entityManagement" && window.FLOQRSOS2FA) {
+          window.FLOQRSOS2FA.mount({
+            scope: "entityManagement",
+            onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
+          });
+        }
       });
     });
   }
@@ -239,10 +245,11 @@
   }
 
   function displayUrl(id = "") {
-    const url = new URL("./display.html", window.location.href);
-    url.searchParams.set("location", id);
-    url.searchParams.set("v", CURRENT_VERSION);
-    return url.toString();
+    return window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
+  }
+
+  function secondaryDisplayUrl(id = "") {
+    return window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
   }
 
   function slugify(value = "") {
@@ -278,7 +285,7 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR SHOUTOUT"} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut"} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
@@ -299,7 +306,7 @@
         formatId: primary,
         label: panel.label
       },
-      displayFooterBrand: String(displayFooterBrand || "FLOQR SHOUTOUT").trim() || "FLOQR SHOUTOUT"
+      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut"
     };
   }
 
@@ -324,7 +331,7 @@
     const displayConfig = normalizeClubDisplayConfig({
       displayScreenFormatIds,
       primaryDisplayScreenFormatId: primaryFromForm,
-      displayFooterBrand: "FLOQR SHOUTOUT"
+      displayFooterBrand: "FLOQR ShoutOut"
     });
     return {
       id,
@@ -794,7 +801,7 @@
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
       <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
-      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button></div>
+      <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button><button type="button" data-template-delete="${esc(template.id)}">Delete</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
     wrap.querySelectorAll("[data-template-preview]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templatePreview] || {})));
@@ -804,6 +811,17 @@
       const status = template.status === "deleted" ? "active" : "deleted";
       await db.collection("templates").doc(button.dataset.templateToggle).set({status, updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedByUid:auth.currentUser?.uid || ""}, {merge:true});
       setText("templateManagementStatus", `${template.name || template.id} is now ${status}.`);
+      await loadManagedTemplates();
+    }));
+    wrap.querySelectorAll("[data-template-delete]").forEach(button => button.addEventListener("click", async () => {
+      const template = managedTemplates[button.dataset.templateDelete] || {};
+      await db.collection("templates").doc(button.dataset.templateDelete).set({
+        status:"deleted",
+        deletedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedByUid:auth.currentUser?.uid || ""
+      }, {merge:true});
+      setText("templateManagementStatus", `${template.name || template.id} deleted.`);
       await loadManagedTemplates();
     }));
   }
@@ -1061,6 +1079,7 @@
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = clubAdminUrl(row.id);
       const display = displayUrl(row.id);
+      const display2 = secondaryDisplayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       return `<div class="queue-item">
@@ -1072,6 +1091,7 @@
         <p><strong>Primary display:</strong> ${esc(primary)}</p>
         <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
         <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
+        <p><strong>Display 2 URL:</strong> <a class="message-inline-link" href="${esc(display2)}">${esc(display2)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
     populateClubDisplaySetupOptions(locationRows);
@@ -1105,7 +1125,7 @@
       input.checked = formats.has(input.dataset.clubSettingsScreenFormat);
     });
     if (byId("clubDisplaySetupPrimaryFormat")) byId("clubDisplaySetupPrimaryFormat").value = config.primaryDisplayScreenFormatId || "led-96x48";
-    if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR SHOUTOUT";
+    if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR ShoutOut";
     if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId || "";
     clubDisplaySetupLocationId = locationId || "";
   }
@@ -1126,7 +1146,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: data.displayScreenFormatIds || staticLoc.displayScreenFormatIds || ["led-96x48"],
       primaryDisplayScreenFormatId: data.primaryDisplayScreenFormatId || data.displayType || data.screenFormatId || staticLoc.primaryDisplayScreenFormatId || "led-96x48",
-      displayFooterBrand: data.displayFooterBrand || "FLOQR SHOUTOUT"
+      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut"
     });
     if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = locationId;
     applyClubDisplaySetupForm(config, locationId);
@@ -1146,7 +1166,7 @@
     applyClubDisplaySetupForm(normalizeClubDisplayConfig({
       displayScreenFormatIds: ["led-64x32"],
       primaryDisplayScreenFormatId: "led-64x32",
-      displayFooterBrand: "FLOQR SHOUTOUT"
+      displayFooterBrand: "FLOQR ShoutOut"
     }), "heist-washington-dc");
     setText("clubDisplaySetupStatus", "Heist DC preset applied locally — click Save Display Type Setup to write Firestore.");
   }
@@ -1165,7 +1185,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: formats,
       primaryDisplayScreenFormatId: byId("clubDisplaySetupPrimaryFormat")?.value || formats[0],
-      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR SHOUTOUT"
+      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut"
     });
     setText("clubDisplaySetupStatus", `Saving display type setup for ${locationId}...`);
     const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};

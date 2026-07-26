@@ -74,11 +74,18 @@
     return window.FLOQRNav?.stableDisplayUrl?.(locationId, extra) || `./display.html?location=${encodeURIComponent(locationId)}`;
   }
 
+  function stableVenueSecondaryDisplayUrl(extra = {}) {
+    return window.FLOQRNav?.stableSecondaryDisplayUrl?.(locationId, extra)
+      || `./display2.html?location=${encodeURIComponent(locationId)}`;
+  }
+
   function refreshLocationShell() {
     loc = getStaticLocation(locationId);
     setText("clubName", loc.locationName || locationId);
     const displayLink = byId("displayLink");
     if (displayLink) displayLink.href = stableVenueDisplayUrl();
+    const display2Link = byId("display2Link");
+    if (display2Link) display2Link.href = stableVenueSecondaryDisplayUrl();
     const liveFrame = byId("liveFrame");
     if (liveFrame) liveFrame.src = stableVenueDisplayUrl();
     const publicLink = byId("clubPublicProfileLink");
