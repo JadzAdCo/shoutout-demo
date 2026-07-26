@@ -4,26 +4,25 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>SupRstR | FLOQR Master</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.60"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.60"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.60"/>
-  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.60"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.62"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.62"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.62"/>
+  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.62"/>
 </head>
 <body class="suprstr-page">
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="master" href="./master-admin.html?v=29.09.60">&larr; Back to Master Admin</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="master" href="./master-admin.html?v=29.09.62">&larr; Back to Master Admin</a>
 
 <main class="app admin-shell suprstr-shell">
-  <!-- Gate: signed-out / denied -->
   <section id="suprstrGate" class="page active">
     <header class="topbar">
       <div>
         <p class="eyebrow">FLOQR · Master module</p>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/suprstr-logo.png?v=29.09.60" alt="SupRstR" class="product-logo suprstr-hero-logo"/>
+          <img src="./images/suprstr-logo.png?v=29.09.62" alt="SupRstR" class="product-logo suprstr-hero-logo"/>
         </div>
         <h1 class="visually-hidden">SupRstR</h1>
-        <p class="sub">Live device video to a ShoutOut display — Master Admin only. Not listed on the public Search page.</p>
+        <p class="sub">Live device video to the venue’s ShoutOut display (display.html) — same venue pick as ShoutOut. Master Admin only.</p>
       </div>
     </header>
     <div class="card">
@@ -37,49 +36,50 @@
     </div>
   </section>
 
-  <!-- Mimics FloqAi / Ask FloqR intent search layout -->
   <section id="suprstrSearchPage" class="page intent-search-page floqai-intent-page hidden">
     <div class="intent-search-shell floqai-top-stack">
       <div class="floqai-search-main intent-search-main">
         <div class="floqai-brand-row suprstr-brand-row">
           <img src="./images/floqr-color.png" alt="FLOQR" class="intent-floqr-logo floqai-hero-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/suprstr-logo.png?v=29.09.60" alt="SupRstR" class="suprstr-mark-inline"/>
+          <img src="./images/suprstr-logo.png?v=29.09.62" alt="SupRstR" class="suprstr-mark-inline"/>
           <button id="suprstrHelpBtn" class="floqai-help-btn" type="button" aria-expanded="false" aria-controls="suprstrHelpPopout" title="SupRstR help">?</button>
         </div>
         <div id="suprstrHelpPopout" class="floqai-help-popout hidden" role="dialog" aria-label="SupRstR help" aria-hidden="true">
           <button id="suprstrHelpClose" class="floqai-help-close" type="button" aria-label="Close help">&times;</button>
           <p class="eyebrow">SupRstR</p>
-          <p><strong>Super Roster / live feed</strong> — purchase a SupRstR slot, then stream your device camera to a venue ShoutOut display end-to-end.</p>
-          <p class="sub small">Prefer same-LAN peer-to-peer when the phone and display share a network; otherwise use a secured relay. Master Admin entry only — not on public Search.</p>
-          <div class="floqai-help-links" id="suprstrHelpCatalog">
-            <a href="#live" data-search="live stream|start stream|go live|camera to display">Live stream to display</a>
-            <a href="#purchase" data-search="buy suprstr|purchase|buy live slot">Purchase SupRstR</a>
-            <a href="#lan" data-search="lan|peer to peer|p2p|same network|wifi">Same-LAN peer-to-peer</a>
-            <a href="#security" data-search="security|consent|encrypt|e2e|end to end">Security &amp; consent</a>
-            <a href="./master-admin.html?v=29.09.60" data-search="master admin|back to master">Back to Master Admin</a>
-          </div>
+          <p><strong>Go live</strong> — pick a venue (like ShoutOut), then stream your camera to that venue’s <code>display.html?location=…</code>.</p>
+          <p class="sub small">Best on the same Wi‑Fi/LAN as the display. Off-network may need a TURN relay (not configured yet).</p>
         </div>
 
         <div id="suprstrSearchPanel" class="floqai-search-panel" aria-hidden="false">
           <label class="intent-search-label" for="suprstrSearchInput">
             <span class="intent-help">What do you want to do with SupRstR?</span>
-            <input id="suprstrSearchInput" type="search" autocomplete="off" placeholder="Go live · buy a slot · same-LAN stream · security" aria-describedby="suprstrSearchHint"/>
+            <input id="suprstrSearchInput" type="search" autocomplete="off" placeholder="Go live · buy a slot · pick venue" aria-describedby="suprstrSearchHint"/>
           </label>
-          <p id="suprstrSearchHint" class="sub small intent-hint">Try: go live · purchase SupRstR · peer to peer · pick a display</p>
+          <p id="suprstrSearchHint" class="sub small intent-hint">Try: go live · purchase · Heist</p>
           <div id="suprstrSearchResults" class="intent-search-results" aria-live="polite"></div>
         </div>
 
         <div class="suprstr-action-cards">
           <p id="suprstrEntitlementStatus" class="status" aria-live="polite">Checking SupRstR slots…</p>
-          <button id="suprstrBuyBtn" class="category-card primary" type="button">
-            Purchase SupRstR — $20 / live slot
-          </button>
-          <button id="suprstrGoLiveBtn" class="category-card suprstr-live-card" type="button" disabled title="Need an unused slot; live video not enabled yet">
-            Live stream (coming soon)
-          </button>
+
+          <label class="intent-search-label" for="suprstrVenueSelect">
+            <span class="intent-help">Venue display (same as ShoutOut)</span>
+            <select id="suprstrVenueSelect"></select>
+          </label>
+          <p class="sub small" id="suprstrDisplayLinkWrap">
+            Opens on: <a id="suprstrDisplayLink" href="./display.html?location=heist-washington-dc" target="_blank" rel="noopener">display.html</a>
+          </p>
+
+          <video id="suprstrPreview" class="suprstr-preview" playsinline muted autoplay></video>
+          <p id="suprstrLiveStatus" class="status" aria-live="polite"></p>
+
+          <button id="suprstrBuyBtn" class="category-card" type="button">Purchase SupRstR — $20 / live slot</button>
+          <button id="suprstrGoLiveBtn" class="category-card primary" type="button" disabled>Go live to venue display</button>
+          <button id="suprstrEndLiveBtn" class="category-card ghost hidden" type="button">End live stream</button>
+
           <p id="suprstrLiveNote" class="sub small suprstr-tech-note">
-            You purchase a <strong>SupRstR live-stream slot</strong> ($20). That is an entitlement to go live later — not a jersey or ShoutOut message.
-            After Stripe confirms, slots appear here. Camera/WebRTC go-live is still disabled until the stream path ships.
+            1) Buy a slot if needed · 2) Choose venue · 3) Open that venue’s display in another tab/device · 4) Go live — your camera appears on <strong>that</strong> display.html (not the main Search page).
           </p>
         </div>
       </div>
@@ -91,11 +91,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.61"></script>
-<script src="./shared-data.js?v=29.09.61"></script>
-<script src="./floqr-nav.js?v=29.09.61"></script>
-<script src="./floqr-logger.js?v=29.09.61"></script>
-<script src="./payment-service.js?v=29.09.61"></script>
-<script src="./suprstr-search.js?v=29.09.61"></script>
+<script src="./firebase-config.js?v=29.09.62"></script>
+<script src="./shared-data.js?v=29.09.62"></script>
+<script src="./floqr-nav.js?v=29.09.62"></script>
+<script src="./floqr-logger.js?v=29.09.62"></script>
+<script src="./payment-service.js?v=29.09.62"></script>
+<script src="./suprstr-webrtc.js?v=29.09.62"></script>
+<script src="./suprstr-search.js?v=29.09.62"></script>
 </body>
 </html>

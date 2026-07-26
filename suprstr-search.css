@@ -71,3 +71,35 @@
   opacity:.78;
   cursor:default;
 }
+.suprstr-preview{
+  width:100%;
+  max-width:420px;
+  aspect-ratio:16/10;
+  object-fit:cover;
+  border-radius:14px;
+  background:#0a0c10;
+  border:1px solid rgba(255,255,255,.14);
+  display:none;
+}
+.suprstr-preview.is-on{
+  display:block;
+}
+#suprstrVenueSelect{
+  width:100%;
+  max-width:420px;
+  margin-top:6px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.16);
+  background:#141820;
+  color:inherit;
+  font:inherit;
+}
+#suprstrDisplayLinkWrap{
+  text-align:left;
+  max-width:420px;
+}
+.category-card.ghost{
+  background:transparent;
+  border:1px dashed rgba(255,255,255,.25);
+}

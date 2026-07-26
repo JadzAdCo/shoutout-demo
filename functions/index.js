@@ -6,6 +6,7 @@ module.exports = {
   ...require("./messaging-functions"),
   ...require("./marketing-campaign-functions"),
   ...require("./scheduling-functions"),
+  ...require("./suprstr-functions"),
   setPatronFeatureGates: featureGateFns.setPatronFeatureGates,
   setEntityAppEnabled: featureGateFns.setEntityAppEnabled,
   setVenueFeatureGates: featureGateFns.setVenueFeatureGates,

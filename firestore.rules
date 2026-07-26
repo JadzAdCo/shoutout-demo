@@ -737,6 +737,42 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /suprstrEntitlements/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isMasterAdmin());
+      allow write: if false;
+    }
+
+    // Venue live pointer — public read so display.html?location=… can attach without auth (like liveContent).
+    match /suprstrLive/{locationId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // WebRTC signaling for SupRstR → selected venue display.html
+    match /suprstrSessions/{sessionId} {
+      allow read: if true;
+      allow create: if isMasterAdmin();
+      allow update: if isMasterAdmin()
+        || (
+          resource.data.status in ["waiting", "offering"]
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["answer", "status", "answeredAt", "updatedAt"])
+          && request.resource.data.status in ["offering", "connected"]
+        );
+      allow delete: if isMasterAdmin();
+
+      match /callerCandidates/{candidateId} {
+        allow read: if true;
+        allow create: if isMasterAdmin();
+        allow update, delete: if false;
+      }
+      match /calleeCandidates/{candidateId} {
+        allow read: if true;
+        allow create: if true;
+        allow update, delete: if false;
+      }
+    }
+
     match /scheduleShifts/{id} {
       allow read: if signedIn();
       allow write: if false;
