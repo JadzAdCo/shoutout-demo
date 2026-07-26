@@ -25,16 +25,19 @@
   function render(order = {}) {
     const paid = order.paymentStatus === "paid";
     const isShoutout = order.orderType === "shoutout";
+    const isSuprstr = order.orderType === "suprstrSlot";
     const receipt = order.receipt || {};
     byId("paymentReturnTitle").textContent = paid
-      ? (isShoutout ? "ShoutOut submitted" : "Payment confirmed")
+      ? (isShoutout ? "ShoutOut submitted" : isSuprstr ? "SupRstR slot purchased" : "Payment confirmed")
       : cancelled || order.status === "checkout-cancelled"
         ? "Payment cancelled"
         : "Payment processing";
     byId("paymentReturnStatus").textContent = paid
       ? (isShoutout
         ? "Your message has been sent to the location approval queue. A final receipt was also sent to FloqR Inbox and your email/SMS when available."
-        : "Your order is recorded and the next service step is underway.")
+        : isSuprstr
+          ? "Your live-stream slot(s) are credited. Return to SupRstR to see remaining slots. Go-live (camera) ships next."
+          : "Your order is recorded and the next service step is underway.")
       : cancelled || order.status === "checkout-cancelled"
         ? "Nothing was submitted. The unpaid checkout was cleared so you can try again."
         : "Stripe confirmation can take a few seconds. This page updates automatically.";

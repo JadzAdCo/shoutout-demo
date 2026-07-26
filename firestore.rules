@@ -737,6 +737,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /suprstrEntitlements/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isMasterAdmin());
+      allow write: if false;
+    }
+
     match /scheduleShifts/{id} {
       allow read: if signedIn();
       allow write: if false;
