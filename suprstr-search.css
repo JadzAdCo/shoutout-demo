@@ -1,0 +1,73 @@
+/* SupRstR — Master-only search module (mirrors FloqAi intent layout) */
+.suprstr-page{
+  min-height:100vh;
+}
+.suprstr-shell{
+  max-width:920px;
+  margin:0 auto;
+}
+.suprstr-hero-logo,
+.suprstr-mark-inline{
+  width:min(160px,42vw);
+  max-height:120px;
+  object-fit:contain;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,.4));
+}
+.suprstr-brand-row{
+  max-width:min(520px,96vw);
+  gap:10px;
+}
+.suprstr-brand-row .floqai-hero-logo{
+  width:min(200px,48vw);
+  max-height:72px;
+}
+.suprstr-action-cards{
+  width:100%;
+  max-width:520px;
+  margin-top:8px;
+  display:grid;
+  gap:10px;
+  justify-items:stretch;
+}
+.suprstr-live-card[disabled]{
+  opacity:.72;
+  cursor:not-allowed;
+}
+.suprstr-tech-note{
+  text-align:left;
+  line-height:1.45;
+  padding:0 4px 24px;
+  color:var(--muted,#9aa3af);
+}
+.suprstr-tech-note code{
+  font-size:.9em;
+}
+.intent-search-results .intent-result{
+  display:block;
+  text-align:left;
+  width:100%;
+  margin:0 0 8px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(26,30,38,.92);
+  color:inherit;
+  cursor:pointer;
+}
+.intent-search-results .intent-result:hover,
+.intent-search-results .intent-result:focus-visible{
+  border-color:rgba(200,16,46,.55);
+  outline:none;
+}
+.intent-search-results .intent-result strong{
+  display:block;
+  margin-bottom:4px;
+}
+.intent-search-results .intent-result .sub{
+  margin:0;
+}
+.intent-search-results .intent-result[disabled],
+.intent-search-results .intent-result.is-soon{
+  opacity:.78;
+  cursor:default;
+}

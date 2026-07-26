@@ -50,6 +50,9 @@
     masterHome() {
       return `./master-admin.html?v=${APP_V}`;
     },
+    suprstrHome(extra = {}) {
+      return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
+    },
     /** Satellite page under My Profile and Settings */
     portalLink(path, extra = {}) {
       return buildUrl(path, { v: APP_V, from: "portal", ...extra });
