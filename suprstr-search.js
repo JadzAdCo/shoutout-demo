@@ -2,20 +2,14 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.62";
+  const APP_V = "29.09.64";
   const SLOT_PRICE_LABEL = "$20";
 
-  const MASTER_ADMIN_EMAILS = (global.SHOUTOUT_MASTER_ADMIN_EMAILS || global.SHOUTOUT_ADMIN_EMAILS || [])
-    .map(x => String(x).toLowerCase());
-  const ALLOWED_PROVIDERS = (global.SHOUTOUT_MASTER_ADMIN_ALLOWED_PROVIDERS || ["google.com", "microsoft.com"])
-    .map(x => String(x).toLowerCase());
-  const REQUIRE_VERIFIED = global.SHOUTOUT_MASTER_ADMIN_REQUIRE_VERIFIED_EMAIL !== false;
-
   const INTENTS = [
-    {id: "live", title: "Go live to venue display", blurb: "Stream your camera to the selected venue’s display.html (like ShoutOut destination).", keywords: ["live", "stream", "go live", "camera", "display", "broadcast"], action: "live"},
+    {id: "live", title: "Go live to venue display", blurb: "Stream your camera to the selected venue’s display.html or display2.html.", keywords: ["live", "stream", "go live", "camera", "display", "broadcast", "superstar"], action: "live"},
     {id: "purchase", title: `Purchase a SupRstR slot (${SLOT_PRICE_LABEL})`, blurb: "Buy one live-stream entitlement before going on air.", keywords: ["buy", "purchase", "pay", "slot", "20"], action: "buy"},
     {id: "venue", title: "Pick a venue", blurb: "Same club location list as ShoutOut — video lands on that display.", keywords: ["venue", "club", "location", "heist", "display"], action: "focusVenue"},
-    {id: "master", title: "Back to Master Admin", blurb: "Return to the Network Intelligence Center.", keywords: ["master", "admin", "back"], href: `./master-admin.html?v=${APP_V}&from=suprstr`}
+    {id: "search", title: "Back to Search", blurb: "Return to FLOQR main categories.", keywords: ["search", "home", "back", "categories"], href: `./?v=${APP_V}&start=search`}
   ];
 
   let entitlementUnsub = null;
@@ -24,6 +18,7 @@
   let broadcastHandle = null;
   let activeSessionId = "";
   let activeLocationId = "";
+  let activeDisplayBoard = "primary";
 
   function byId(id) {
     return document.getElementById(id);
@@ -52,19 +47,10 @@
     return (user?.providerData || []).map(p => String(p.providerId || "").toLowerCase()).filter(Boolean);
   }
 
-  function masterCheck(user) {
-    if (!user) return {ok: false, reason: "Sign in with a Master Admin account."};
+  function accessCheck(user) {
+    if (!user) return {ok: false, reason: "Sign in to use SupRstR."};
     const email = String(user.email || "").toLowerCase();
-    if (!email || !email.includes("@")) return {ok: false, reason: "Master Admin requires email sign-in."};
-    if (!MASTER_ADMIN_EMAILS.includes(email)) {
-      return {ok: false, reason: `${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS.`};
-    }
-    const providers = providerIds(user);
-    const providerOk = providers.some(p => ALLOWED_PROVIDERS.includes(p) || /google|microsoft|windowslive/i.test(p));
-    if (!providerOk) return {ok: false, reason: `Sign in with ${ALLOWED_PROVIDERS.join(" or ")}.`};
-    if (REQUIRE_VERIFIED && user.emailVerified === false) {
-      return {ok: false, reason: "Email must be verified."};
-    }
+    if (!email || !email.includes("@")) return {ok: false, reason: "Sign in with Google or Microsoft (email required)."};
     return {ok: true, email};
   }
 
@@ -101,13 +87,20 @@
     return {id, name: row.locationName || row.brandName || id};
   }
 
+  function selectedBoard() {
+    const v = byId("suprstrBoardSelect")?.value || "primary";
+    return v === "secondary" ? "secondary" : "primary";
+  }
+
   function syncDisplayLink() {
     const {id, name} = selectedVenue();
+    const board = selectedBoard();
     const a = byId("suprstrDisplayLink");
     if (!a || !id) return;
-    const url = `./display.html?location=${encodeURIComponent(id)}&v=${APP_V}`;
+    const page = board === "secondary" ? "display2.html" : "display.html";
+    const url = `./${page}?location=${encodeURIComponent(id)}&v=${APP_V}`;
     a.href = url;
-    a.textContent = `${name} display`;
+    a.textContent = `${name} · ${board === "secondary" ? "Display 2" : "Display 1"}`;
     updateGoLiveEnabled();
   }
 
@@ -178,12 +171,14 @@
       setLiveStatus("Starting session for " + venue.name + "…");
       const start = await callable("startSuprstrLive")({
         locationId: venue.id,
-        locationName: venue.name
+        locationName: venue.name,
+        displayBoard: selectedBoard()
       });
       const sessionId = start?.data?.sessionId;
       if (!sessionId) throw new Error("No sessionId returned.");
       activeSessionId = sessionId;
       activeLocationId = venue.id;
+      activeDisplayBoard = selectedBoard();
 
       setLiveStatus("Requesting camera…");
       localStream = await global.FLOQRSuprstrRtc.getCameraStream({audio: true});
@@ -193,16 +188,17 @@
         preview.classList.add("is-on");
       }
 
-      setLiveStatus("Connecting to venue display… Open the display link if it is not already open.");
+      const boardLabel = activeDisplayBoard === "secondary" ? "display2.html (Display 2)" : "display.html (Display 1)";
+      setLiveStatus(`Connecting to ${venue.name} ${boardLabel}… Open that board if it is not already open.`);
       broadcastHandle = await global.FLOQRSuprstrRtc.startBroadcast({
         sessionId,
         stream: localStream,
         onStatus(s) {
-          setLiveStatus(`WebRTC: ${s} → ${venue.name} display`);
+          setLiveStatus(`WebRTC: ${s} → ${venue.name} ${boardLabel}`);
         }
       });
       updateGoLiveEnabled();
-      setLiveStatus(`Live to ${venue.name}. Keep this tab open. Display: display.html?location=${venue.id}`);
+      setLiveStatus(`Live to ${venue.name} on ${boardLabel}. Keep this tab open.`);
     } catch (err) {
       setLiveStatus(err?.message || "Go live failed.");
       await endLive({silent: true});
@@ -228,7 +224,8 @@
       if (activeSessionId || activeLocationId) {
         await callable("endSuprstrLive")({
           sessionId: activeSessionId,
-          locationId: activeLocationId
+          locationId: activeLocationId,
+          displayBoard: activeDisplayBoard
         });
       }
     } catch (err) {
@@ -236,6 +233,7 @@
     }
     activeSessionId = "";
     activeLocationId = "";
+    activeDisplayBoard = "primary";
     updateGoLiveEnabled();
     if (!silent) setLiveStatus("Live ended.");
   }
@@ -280,6 +278,7 @@
   function bindUi() {
     fillVenues();
     byId("suprstrVenueSelect")?.addEventListener("change", syncDisplayLink);
+    byId("suprstrBoardSelect")?.addEventListener("change", syncDisplayLink);
     byId("suprstrSearchInput")?.addEventListener("input", e => renderResults(e.target.value));
     byId("suprstrSearchResults")?.addEventListener("click", e => {
       const btn = e.target.closest("[data-intent]");
@@ -317,10 +316,10 @@
     byId("suprstrLogoutBtn")?.addEventListener("click", () => auth.signOut());
 
     auth.onAuthStateChanged(user => {
-      const check = masterCheck(user);
+      const check = accessCheck(user);
       if (!check.ok) {
         showGate(true);
-        setStatus(user ? `Access denied: ${check.reason}` : "Sign in as Master Admin to open SupRstR.");
+        setStatus(user ? `Access issue: ${check.reason}` : "Sign in to open SupRstR and go live.");
         watchEntitlement(null);
         return;
       }

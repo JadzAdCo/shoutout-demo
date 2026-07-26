@@ -248,6 +248,10 @@
     return window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
   }
 
+  function secondaryDisplayUrl(id = "") {
+    return window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
+  }
+
   function slugify(value = "") {
     return String(value || "")
       .normalize("NFD")
@@ -1075,6 +1079,7 @@
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = clubAdminUrl(row.id);
       const display = displayUrl(row.id);
+      const display2 = secondaryDisplayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       return `<div class="queue-item">
@@ -1086,6 +1091,7 @@
         <p><strong>Primary display:</strong> ${esc(primary)}</p>
         <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
         <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
+        <p><strong>Display 2 URL:</strong> <a class="message-inline-link" href="${esc(display2)}">${esc(display2)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
     populateClubDisplaySetupOptions(locationRows);

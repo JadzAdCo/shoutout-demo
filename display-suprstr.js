@@ -1,4 +1,4 @@
-/* Venue display.html — receive SupRstR live video for this location (like liveContent). */
+/* Venue display / displays — receive SupRstR live video for this location + board. */
 (function () {
   "use strict";
 
@@ -12,6 +12,22 @@
     } catch (_) {
       return "";
     }
+  }
+
+  function displayBoard() {
+    if (window.FLOQR_DISPLAY_BOARD === "secondary" || window.FLOQR_DISPLAY_BOARD === "primary") {
+      return window.FLOQR_DISPLAY_BOARD;
+    }
+    try {
+      const file = String(location.pathname.split("/").pop() || "").toLowerCase();
+      if (file === "display2.html" || file === "displays.html") return "secondary";
+    } catch (_) {}
+    return "primary";
+  }
+
+  function suprstrLiveDocId(locationId) {
+    const id = String(locationId || "").trim();
+    return displayBoard() === "secondary" ? `${id}__secondary` : id;
   }
 
   function ensureOverlay() {
@@ -45,8 +61,7 @@
       activeJoin = null;
     }
     activeSessionId = sessionId;
-    const wrap = ensureOverlay();
-    const video = byId("suprstrLiveVideo");
+    const video = byId("suprstrLiveVideo") || ensureOverlay() && byId("suprstrLiveVideo");
     showOverlay(true);
     if (!window.FLOQRSuprstrRtc?.joinAsDisplay) {
       console.warn("SupRstR RTC helper missing");
@@ -77,7 +92,8 @@
     if (!firebase.apps.length && window.firebaseConfig) {
       firebase.initializeApp(window.firebaseConfig);
     }
-    firebase.firestore().collection("suprstrLive").doc(locationId).onSnapshot((snap) => {
+    const liveId = suprstrLiveDocId(locationId);
+    firebase.firestore().collection("suprstrLive").doc(liveId).onSnapshot((snap) => {
       const data = snap.exists ? snap.data() || {} : {};
       const status = String(data.status || "").toLowerCase();
       const sessionId = String(data.sessionId || "").trim();

@@ -68,7 +68,15 @@
       const params = {...extra};
       delete params.location;
       delete params.v;
-      return buildUrl("./display.html", id ? {location: id, ...params} : params);
+      const board = String(params.board || params.displayBoard || "").toLowerCase();
+      delete params.board;
+      delete params.displayBoard;
+      const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";
+      return buildUrl(page, id ? {location: id, ...params} : params);
+    },
+    /** Second LED/board per club — display2.html?location=… */
+    stableSecondaryDisplayUrl(locationId = "", extra = {}) {
+      return this.stableDisplayUrl(locationId, {...extra, board: "secondary"});
     },
     /** Resolve the correct back target for a satellite page. */
     resolveBack(fromOverride = "") {

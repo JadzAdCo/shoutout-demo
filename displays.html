@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Redirect → Display 2</title>
+  <script>
+    (function () {
+      var q = location.search || "";
+      location.replace("./display2.html" + q + location.hash);
+    })();
+  </script>
+  <meta http-equiv="refresh" content="0;url=./display2.html"/>
+</head>
+<body>
+  <p>Display 2 moved to <a id="r" href="./display2.html">display2.html</a>.</p>
+  <script>document.getElementById("r").href = "./display2.html" + (location.search || "");</script>
+</body>
+</html>

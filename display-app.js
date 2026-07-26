@@ -1,4 +1,4 @@
-/* display-app.js v29.09.39 */
+/* display-app.js v29.09.63 — supports display.html (primary) + display2.html (secondary) */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -8,6 +8,31 @@
     catch (error) { return fallback; }
   };
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+  function resolveDisplayBoard() {
+    const q = String(qs("board", qs("display", "")) || "").toLowerCase();
+    if (q === "secondary" || q === "2" || q === "display2" || q === "displays") return "secondary";
+    if (q === "primary" || q === "1") return "primary";
+    try {
+      const file = String(location.pathname.split("/").pop() || "").toLowerCase();
+      if (file === "display2.html" || file === "displays.html") return "secondary";
+    } catch (_) {}
+    const meta = document.querySelector('meta[name="floqr-display-board"]');
+    if (meta && String(meta.content || "").toLowerCase() === "secondary") return "secondary";
+    const canvas = byId("displayCanvas");
+    if (canvas && String(canvas.getAttribute("data-display-board") || "").toLowerCase() === "secondary") return "secondary";
+    return "primary";
+  }
+
+  const DISPLAY_BOARD = resolveDisplayBoard();
+  window.FLOQR_DISPLAY_BOARD = DISPLAY_BOARD;
+
+  function liveContentDocId(locId) {
+    const id = String(locId || "").trim();
+    return DISPLAY_BOARD === "secondary" ? `${id}__secondary` : id;
+  }
+  window.FLOQR_LIVE_CONTENT_DOC_ID = liveContentDocId;
+
   if (!window.firebaseConfig) { byId("displayMain").textContent = "CONFIG ERROR"; byId("displaySub").textContent = "firebase-config.js missing"; return; }
   firebase.initializeApp(window.firebaseConfig);
   const db = firebase.firestore();
@@ -1117,11 +1142,18 @@
       }
     } catch (e) {}
     if (!screenFormatOverride) {
-      screenFormatOverride = normalizeScreenFormatId(loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "");
+      const secondaryFmt = loc.secondaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
+      const primaryFmt = loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
+      screenFormatOverride = normalizeScreenFormatId(DISPLAY_BOARD === "secondary" ? secondaryFmt : primaryFmt);
     }
+    try {
+      document.title = DISPLAY_BOARD === "secondary"
+        ? `FLOQR Display 2 · ${loc.locationName || locationId}`
+        : `FLOQR ShoutOut Display · ${loc.locationName || locationId}`;
+    } catch (_) {}
     if (isUrlPreviewMode()) {
       render(buildUrlPreviewPayload());
-      db.collection("liveContent").doc(locationId).onSnapshot(doc => {
+      db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
         if (!doc.exists) return;
         const data = doc.data() || {};
         const status = String(data.status || "").toLowerCase();
@@ -1133,7 +1165,7 @@
       }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
       return;
     }
-    db.collection("liveContent").doc(locationId).onSnapshot(doc => {
+    db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       const payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
       if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
       renderTimedLiveContent(payload);

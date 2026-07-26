@@ -912,9 +912,7 @@ exports.createFloqrCheckoutSession = onCall({
       }
     }
     if (type === "suprstrSlot") {
-      if (!await isMasterAdminAuth(request.auth)) {
-        throw new HttpsError("permission-denied", "SupRstR slot purchase is Master Admin only for now.");
-      }
+      // Any signed-in patron may purchase a live-stream slot (public SupRstR).
     }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();

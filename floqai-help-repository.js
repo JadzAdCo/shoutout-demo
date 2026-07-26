@@ -136,13 +136,30 @@
     {
       id: "floqai-ask-floqr",
       title: "Ask FloqR with FloqAi",
-      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) for steps and links. Type any help-link phrase — including Onboarding.",
-      searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help"],
+      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open FloqAi", href: `./?v=${APP_V}&start=intent`}
+        {label: "Open FloqAi", href: `./?v=${APP_V}&start=intent`},
+        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "index.html#floqAiHelpPopout"
+    },
+    {
+      id: "help-suprstr-superstar",
+      title: "Make me a SupRstR / superstar",
+      body: "Buy a $20 SupRstR live-stream slot, pick a club and board (display.html or display2.html), open that board, then Go live with your camera to the venue LED.",
+      searchPhrases: [
+        "make me a superstar", "make me a suprstr", "make me a super star", "make me a super-star",
+        "superstar", "super star", "super-star", "suprstr", "supr str", "go live",
+        "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
+      ],
+      links: [
+        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})},
+        {label: "Display 1 example", href: "./display.html?location=heist-washington-dc"},
+        {label: "Display 2 example", href: "./display2.html?location=heist-washington-dc"}
+      ],
+      source: "help-repository-seed"
     },
     {
       id: "help-become-club-admin",

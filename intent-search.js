@@ -44,6 +44,20 @@
       patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/]
     },
     {
+      id: "suprstr",
+      kind: "product",
+      label: "SupRstR — go live / be a superstar",
+      blurb: "Buy a live-stream slot and broadcast your camera to a club display (display.html or display2.html).",
+      href: vUrl("./suprstr-search.html", {from: "floqai"}),
+      patterns: [
+        /supr\s*str/, /suprstr/, /super\s*-?\s*star/, /superstar/,
+        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|supr\s*str)/,
+        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar)/,
+        /go\s+live/, /live\s*stream/, /stream\s+(to\s+)?(the\s+)?display/,
+        /camera\s+to\s+(the\s+)?(club|venue|display)/, /broadcast\s+(live|myself|to)/
+      ]
+    },
+    {
       id: "clubs",
       kind: "product",
       label: "Clubs & venues",
@@ -55,6 +69,34 @@
 
   /* “I want to be able to…” / how-to help for patrons & service members */
   const HELP_INTENTS = [
+    {
+      id: "help-suprstr",
+      kind: "help",
+      label: "Make me a SupRstR / superstar",
+      blurb: "Purchase a $20 SupRstR live-stream slot, pick a club venue and board (display.html or display2.html), open that board, then Go live with your camera — like a live ShoutOut, but video.",
+      steps: [
+        "Open SupRstR from Search or FloqAi.",
+        "Sign in and purchase a $20 live-stream slot if you need one.",
+        "Choose the venue and Display 1 or Display 2.",
+        "Open that venue’s display page on the LED / second device.",
+        "Tap Go live and allow camera access."
+      ],
+      links: [
+        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})},
+        {label: "Example Display 1 (Heist)", href: "./display.html?location=heist-washington-dc"},
+        {label: "Example Display 2 (Heist)", href: "./display2.html?location=heist-washington-dc"}
+      ],
+      searchPhrases: [
+        "make me a superstar", "make me a suprstr", "make me a super star", "make me a super-star",
+        "superstar", "super star", "super-star", "suprstr", "supr str",
+        "go live", "live stream", "stream to display", "be a superstar", "become a superstar"
+      ],
+      patterns: [
+        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr)/,
+        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar)/,
+        /supr\s*str/, /super\s*-?\s*star/, /go\s+live/, /live\s*stream/
+      ]
+    },
     {
       id: "help-club-admin",
       kind: "help",
