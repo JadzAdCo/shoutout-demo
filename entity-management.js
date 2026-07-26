@@ -171,6 +171,7 @@
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
     const adminUrl = type === "club" ? `./admin.html?location=${encodeURIComponent(id)}&v=29.09.22&from=master` : "";
     const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
+    const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
     const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
 
     wrap.innerHTML = `
@@ -183,7 +184,8 @@
         </div>
         ${type === "club" ? `<div class="queue-actions">
           <a class="buttonlike" href="${esc(adminUrl)}">Open Club Admin</a>
-          <a class="buttonlike" href="${esc(displayUrl)}" target="_blank" rel="noopener">Display</a>
+          <a class="buttonlike" href="${esc(displayUrl)}" target="_blank" rel="noopener">Display 1</a>
+          <a class="buttonlike" href="${esc(display2Url)}" target="_blank" rel="noopener">Display 2</a>
           <a class="buttonlike" href="${esc(profileUrl)}" target="_blank" rel="noopener">Public profile</a>
         </div>` : ""}
       </div>
@@ -310,9 +312,9 @@
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = `./admin.html?location=${encodeURIComponent(row.id)}&v=29.09.22&from=master`;
-      const display = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
+      const shoutout = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
+      const suprstar = window.FLOQRNav?.stableSecondaryDisplayUrl?.(row.id) || `./display2.html?location=${encodeURIComponent(row.id)}`;
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
-      const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       const g = gates();
       const enabled = g?.entityIsAppEnabled(row);
       return `<div class="queue-item ${enabled ? "" : "entity-row-disabled"}">
@@ -322,9 +324,9 @@
         </div>
         ${statusBadge(row)}
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
-        <p><strong>Primary display:</strong> ${esc(primary)}</p>
-        <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
-        <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
+        <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
+        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
         <div class="queue-actions">
           <button type="button" data-manage-club="${esc(row.id)}">Manage entity</button>
         </div>

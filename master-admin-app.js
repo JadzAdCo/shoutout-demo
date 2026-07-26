@@ -420,6 +420,7 @@
       ...payload,
       adminPortalUrl: clubAdminUrl(payload.id),
       displayUrl: displayUrl(payload.id),
+      secondaryDisplayUrl: secondaryDisplayUrl(payload.id),
       status: "created"
     }, {merge:true});
     if (window.FLOQRAIIndex) {
@@ -436,8 +437,9 @@
       <strong>${esc(payload.locationName)}</strong>
       <p>${esc(payload.fullAddress || "")}</p>
       <p><strong>Club Location ID:</strong> ${esc(payload.id)}</p>
-      <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
-      <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
+      <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
+      <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
+      <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
     </div>`;
   }
 
@@ -1078,20 +1080,18 @@
       .sort((a,b) => locationName(a).localeCompare(locationName(b)));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = clubAdminUrl(row.id);
-      const display = displayUrl(row.id);
-      const display2 = secondaryDisplayUrl(row.id);
+      const shoutout = displayUrl(row.id);
+      const suprstar = secondaryDisplayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
-      const primary = row.primaryDisplayScreenFormatId || row.displayType || row.screenFormatId || "—";
       return `<div class="queue-item">
         <div class="message-envelope-head">
           <strong>${esc(locationName(row))}</strong>
           <span>${esc(row.id)}</span>
         </div>
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
-        <p><strong>Primary display:</strong> ${esc(primary)}</p>
-        <p><strong>Admin Portal:</strong> <a class="message-inline-link" href="${esc(admin)}">${esc(admin)}</a></p>
-        <p><strong>Display URL:</strong> <a class="message-inline-link" href="${esc(display)}">${esc(display)}</a></p>
-        <p><strong>Display 2 URL:</strong> <a class="message-inline-link" href="${esc(display2)}">${esc(display2)}</a></p>
+        <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
+        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
+        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
     populateClubDisplaySetupOptions(locationRows);
@@ -1156,7 +1156,8 @@
         <p>Primary: ${esc(config.primaryDisplayScreenFormatId)} · Panel ${esc(config.ledPanel.widthCm || "?")}×${esc(config.ledPanel.heightCm || "?")} cm</p>
         <p>Formats: ${esc(config.displayScreenFormatIds.join(", "))}</p>
         <p>Footer brand: ${esc(config.displayFooterBrand)}</p>
-        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open live display</a></p>`;
+        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open Display 1</a>
+           · <a class="message-inline-link" href="${esc(secondaryDisplayUrl(locationId))}" target="_blank" rel="noopener">Open Display 2</a></p>`;
     }
     setText("clubDisplaySetupStatus", `Loaded display type setup for ${locationId}.`);
   }
@@ -1207,7 +1208,8 @@
       preview.innerHTML = `<p><strong>Saved</strong> ${esc(locationId)}</p>
         <p>Primary display type: ${esc(config.primaryDisplayScreenFormatId)}</p>
         <p>LED panel: ${esc(config.ledPanel.widthCm)}×${esc(config.ledPanel.heightCm)} cm (${esc(config.ledPanel.pixelWidth)}×${esc(config.ledPanel.pixelHeight)} px)</p>
-        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open live display</a></p>`;
+        <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open Display 1</a>
+           · <a class="message-inline-link" href="${esc(secondaryDisplayUrl(locationId))}" target="_blank" rel="noopener">Open Display 2</a></p>`;
     }
     setText("clubDisplaySetupStatus", `Saved display type setup for ${locationId}.`);
     window.FLOQRActionFeedback?.success?.({title: "Display type saved", message: `${locationId} → ${config.primaryDisplayScreenFormatId}`});
