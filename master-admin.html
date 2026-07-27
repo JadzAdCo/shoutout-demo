@@ -103,9 +103,9 @@
         <div class="card">
           <h2>Display Security — approved IPs</h2>
           <p class="sub small">
-            Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) to approved public IP addresses.
-            When restriction is <strong>off</strong> (default), boards stay open so existing Xibo configs keep working.
-            Turn restriction <strong>on</strong> only after you add the venue’s public egress IP(s). Supports exact IPs, trailing <code>*</code> prefixes, and <code>x.x.x.0/24</code>.
+            Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
+            IP alone blocks the open internet but not other devices on the same venue LAN.
+            Token URLs are for Xibo only — generate them in the section below.
           </p>
           <div class="profile-grid">
             <label>Venue
@@ -115,6 +115,7 @@
             <label>Selected venue ID<input id="displaySecurityLocationId" readonly placeholder="heist-washington-dc"/></label>
           </div>
           <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction for this venue’s display pages</label>
+          <label><input id="displaySecurityTokenRequired" type="checkbox"/> Require display token (<code>?k=</code>) in the Xibo URL</label>
           <label>Approved display IPs (one per line)
             <textarea id="displaySecurityIps" rows="6" placeholder="203.0.113.10&#10;198.51.100.0/24"></textarea>
           </label>
@@ -122,10 +123,27 @@
           <div class="queue-actions">
             <button id="loadDisplaySecurityBtn" type="button">Load venue</button>
             <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
-            <button id="saveDisplaySecurityBtn" class="primary" type="button">Save approved IPs</button>
+            <button id="saveDisplaySecurityBtn" class="primary" type="button">Save security settings</button>
           </div>
           <p id="displaySecurityStatus" class="status"></p>
           <div id="displaySecurityPreview" class="report-block"></div>
+        </div>
+        <div class="card">
+          <!-- Feature: Xibo board tokens (?k=) — obfuscated in portal; full value only on onboarding/rotate reveal -->
+          <h2>Display board tokens (Xibo URLs)</h2>
+          <p class="sub small">
+            One secret per board (Display 1 = ShoutOut, Display 2 = supRstar). Tokens are created at club onboarding and shown <strong>once</strong> there for Xibo.
+            This Security portal shows <strong>obfuscated</strong> values only. Use <em>Generate / rotate</em> to issue a new one-time full URL, then paste it into the Xibo Webpage widget.
+            Do not publish token URLs on Club URLs. Do not add <code>?v=</code>.
+          </p>
+          <div class="queue-actions">
+            <button id="rotatePrimaryDisplayTokenBtn" type="button">Generate / rotate Display 1 token</button>
+            <button id="rotateSecondaryDisplayTokenBtn" type="button">Generate / rotate Display 2 token</button>
+            <button id="clearPrimaryDisplayTokenBtn" type="button">Clear Display 1 token</button>
+            <button id="clearSecondaryDisplayTokenBtn" type="button">Clear Display 2 token</button>
+          </div>
+          <p id="displayTokenStatus" class="status"></p>
+          <div id="displayTokenReport" class="report-block"></div>
         </div>
         <div class="card">
           <h2>Display access log (per venue)</h2>
@@ -216,7 +234,7 @@
         </div>
         <div class="card">
           <h2>Club Onboarding</h2>
-          <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team.</p>
+          <p class="sub small">Onboard one venue at a time or import many venues by CSV. Master Admin is added as a default member of every new club admin team. Creating a club also generates Display 1 + Display 2 Xibo tokens and shows them <strong>once</strong> in the result — paste into Xibo before leaving this page (afterwards only obfuscated tokens appear under Display Security).</p>
           <div class="profile-grid">
             <label>Club Name<input id="clubOnboardName" placeholder="Lima Twist"/></label>
             <label>Street address<input id="clubOnboardStreetAddress" autocomplete="address-line1" placeholder="1411 K St NW" required/></label>
@@ -797,8 +815,8 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.22"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.65"></script>
-<script src="./master-display-security.js?v=29.09.76"></script>
+<script src="./master-admin-app.js?v=29.09.78"></script>
+<script src="./master-display-security.js?v=29.09.78"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>

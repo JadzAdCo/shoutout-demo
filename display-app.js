@@ -1,4 +1,6 @@
-/* display-app.js v29.09.76 — supports display.html (primary) + display2.html (secondary) */
+/* display-app.js v29.09.78 — supports display.html (primary) + display2.html (secondary)
+ * Features: liveContent player, secondary board idle (supRstar), Display Security gate (IP + ?k= token).
+ */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -1243,13 +1245,20 @@
     markDisplayReady();
   }
 
+  /**
+   * Feature: Display Security gate (IP allowlist + optional Xibo ?k= token).
+   * Called on every display.html / display2.html boot before liveContent subscribe.
+   * Server observes real public IP; token must match displayBoardSecrets for this board when required.
+   */
   async function enforceDisplayAccess() {
     const restrictionOn = loc.displayIpRestrictionEnabled === true
       && Array.isArray(loc.approvedDisplayIps)
       && loc.approvedDisplayIps.length > 0;
+    const tokenRequiredOn = loc.displayTokenRequired === true;
+    const accessKey = String(qs("k", qs("token", "")) || "").trim();
     try {
       if (!firebase?.app || !firebase.functions) {
-        if (restrictionOn) {
+        if (restrictionOn || tokenRequiredOn) {
           showDisplayAccessDenied({locationName: loc.locationName, observedIp: ""});
           return false;
         }
@@ -1259,6 +1268,8 @@
       const result = await fn({
         locationId,
         displayBoard: DISPLAY_BOARD,
+        accessToken: accessKey,
+        k: accessKey,
         pageUrl: String(location.href || "").slice(0, 500),
         userAgent: String(navigator.userAgent || "").slice(0, 400),
         screenFormatId: screenFormatOverride || "",
@@ -1271,19 +1282,30 @@
       });
       const data = result?.data || {};
       window.__FLOQR_DISPLAY_CLIENT_IP = data.observedIp || "";
-      if (data.restrictionEnabled && data.allowed === false) {
+      if (data.allowed === false) {
+        const why = String(data.reason || "");
+        let main = "This board IP is not approved";
+        if (/token/i.test(why)) main = "Display token missing or invalid";
+        if (/ip_denied/i.test(why) && /token/i.test(why)) main = "IP and display token rejected";
         showDisplayAccessDenied({
           observedIp: data.observedIp || "",
           locationName: data.locationName || loc.locationName || locationId,
-          reason: data.reason || ""
+          reason: why
         });
+        byId("displayMain").textContent = main;
+        byId("displaySub").textContent = [
+          data.observedIp ? `Observed IP: ${data.observedIp}` : "",
+          data.locationName || locationId,
+          /token/i.test(why)
+            ? "Use the Master Admin token URL in Xibo (?k=…)"
+            : "Ask Master Admin → Display Security to allowlist this venue IP"
+        ].filter(Boolean).join(" · ");
         return false;
       }
       return true;
     } catch (err) {
       console.warn("[display access]", err?.message || err);
-      // Fail open if restriction is not configured, so Xibo stays up when Functions is briefly down.
-      if (restrictionOn) {
+      if (restrictionOn || tokenRequiredOn) {
         showDisplayAccessDenied({
           observedIp: "",
           locationName: loc.locationName || locationId,
@@ -1319,7 +1341,8 @@
           displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
           ledPanel: live.ledPanel || loc.ledPanel,
           approvedDisplayIps: live.approvedDisplayIps || [],
-          displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true
+          displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
+          displayTokenRequired: live.displayTokenRequired === true
         };
       }
     } catch (e) {}

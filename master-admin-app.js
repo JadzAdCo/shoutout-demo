@@ -402,6 +402,10 @@
     });
   }
 
+  /**
+   * Feature: Club onboarding — persist venue + provision Display 1/2 Xibo tokens.
+   * Tokens are generated server-side and returned once for the onboarding preview warning.
+   */
   async function saveClubOnboarding(payload) {
     if (!payload.locationName) throw new Error("Club Name is required.");
     if (!payload.streetAddress || !payload.city || !payload.region || !payload.country) throw new Error("Street address, city, state/region, and country are required.");
@@ -427,19 +431,56 @@
       const indexRecord = window.FLOQRAIIndex.clubLocationIndexRecord(payload.id, payload);
       await window.FLOQRAIIndex.upsertAiIndex(db, `clubLocation_${payload.id}`, indexRecord);
     }
-    return payload;
+
+    // Provision private board secrets (?k=). Cleartext returned only when newly created.
+    let displaySecrets = null;
+    try {
+      const fn = firebase.app().functions("us-central1").httpsCallable("provisionVenueDisplayTokens");
+      const result = await fn({
+        locationId: payload.id,
+        tokenRequired: true,
+        onlyIfMissing: true
+      });
+      displaySecrets = result?.data || null;
+    } catch (err) {
+      console.warn("[onboarding display tokens]", err?.message || err);
+      displaySecrets = {ok: false, error: err?.message || "Token provision failed"};
+    }
+
+    return {...payload, displaySecrets};
   }
 
+  /**
+   * Feature: One-time Xibo token reveal on Master Admin club onboarding results.
+   * Warns operators to paste into Xibo before leaving — Security portal only shows obfuscated values later.
+   */
   function renderOnboardingResult(payload, targetId = "clubOnboardingPreview") {
     const wrap = byId(targetId);
     if (!wrap) return;
+    const secrets = payload.displaySecrets || {};
+    const reveal = secrets.revealOnce === true && secrets.primaryUrl && secrets.secondaryUrl;
+    const tokenBlock = reveal ? `
+      <div class="display-token-onetime" style="margin-top:12px;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
+        <p><strong>⚠️ Copy into Xibo NOW — one-time full display tokens</strong></p>
+        <p class="sub small">After you leave this onboarding result, Master Admin → Display Security only shows <em>obfuscated</em> tokens. You will need <strong>Rotate</strong> to get a new full URL.</p>
+        <p><strong>Display 1 (ShoutOut) Xibo URL</strong></p>
+        <p><code style="word-break:break-all">${esc(secrets.primaryUrl)}</code></p>
+        <p><strong>Display 2 (supRstar) Xibo URL</strong></p>
+        <p><code style="word-break:break-all">${esc(secrets.secondaryUrl)}</code></p>
+        <p class="sub small">${esc(secrets.warning || "")}</p>
+      </div>` : (secrets.primaryTokenObfuscated || secrets.warning ? `
+      <div class="sub small" style="margin-top:10px">
+        Display tokens: already provisioned (obfuscated D1 ${esc(secrets.primaryTokenObfuscated || "—")} · D2 ${esc(secrets.secondaryTokenObfuscated || "—")}).
+        ${esc(secrets.warning || "Use Display Security → Rotate for a new one-time Xibo URL.")}
+      </div>` : secrets.error ? `<p class="sub small">Display token provision warning: ${esc(secrets.error)}</p>` : "");
     wrap.innerHTML = `<div class="queue-item">
       <strong>${esc(payload.locationName)}</strong>
       <p>${esc(payload.fullAddress || "")}</p>
       <p><strong>Club Location ID:</strong> ${esc(payload.id)}</p>
       <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
-      <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
-      <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
+      <p><strong>ShoutOut URL (no token — do not use in Xibo when token required):</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
+      <p><strong>SupRStar URL (no token):</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
+      ${tokenBlock}
     </div>`;
   }
 
@@ -506,13 +547,19 @@
     setText("clubOnboardingStatus", `Importing ${previewedClubCsvRows.length} club(s)...`);
     const imported = [];
     for (const row of previewedClubCsvRows) {
+      // Each new club gets one-time display tokens in displaySecrets (show in import report).
       imported.push(await saveClubOnboarding(row));
     }
     if (report) {
-      report.innerHTML = imported.map(row => `<div class="queue-item">
+      report.innerHTML = imported.map(row => {
+        const secrets = row.displaySecrets || {};
+        const reveal = secrets.revealOnce === true;
+        return `<div class="queue-item">
         <strong>${esc(row.locationName)}</strong>
         <p>Created: <a class="message-inline-link" href="${esc(clubAdminUrl(row.id))}">${esc(clubAdminUrl(row.id))}</a></p>
-      </div>`).join("");
+        ${reveal ? `<p class="sub small"><strong>⚠️ Copy Xibo URLs now</strong><br/>D1: <code style="word-break:break-all">${esc(secrets.primaryUrl)}</code><br/>D2: <code style="word-break:break-all">${esc(secrets.secondaryUrl)}</code></p>` : `<p class="sub small">Display tokens: ${esc(secrets.primaryTokenObfuscated || "see Display Security")}</p>`}
+      </div>`;
+      }).join("");
     }
     setText("clubOnboardingStatus", `Imported ${imported.length} club(s).`);
     await loadNetworkReports();
