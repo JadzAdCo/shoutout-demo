@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.72";
+  const APP_V = "29.09.75";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -36,23 +36,95 @@
     return firebase.app().functions("us-central1").httpsCallable(name);
   }
 
+  function cameraReady() {
+    try {
+      return !!(localStream && localStream.getVideoTracks().some((t) => t.readyState === "live"));
+    } catch (_) {
+      return !!localStream;
+    }
+  }
+
+  /** One CTA that advances: camera → pay → wait → go live → end. */
   function updateButtons() {
+    const btn = byId("suprstarStageBtn");
+    if (!btn) return;
     const row = requestDoc || {};
     const status = String(row.status || "");
     const paid = row.paymentStatus === "paid";
     const live = !!broadcastHandle || status === "live";
-    const payBtn = byId("suprstarPayBtn");
-    const goBtn = byId("suprstarGoLiveBtn");
-    const endBtn = byId("suprstarEndLiveBtn");
-    if (payBtn) {
-      payBtn.disabled = paid || live || !["preview", "awaiting_payment"].includes(status);
-      payBtn.textContent = paid ? "Paid — waiting for venue approval" : "Pay $20 — become a supRstar";
+
+    btn.classList.remove("ghost");
+    btn.classList.add("primary");
+    btn.removeAttribute("aria-busy");
+
+    if (!requestDoc) {
+      btn.disabled = true;
+      btn.textContent = "Unavailable";
+      btn.dataset.stage = "done";
+      return;
     }
-    if (goBtn) {
-      goBtn.disabled = !paid || status !== "approved" || live;
-      goBtn.textContent = live ? "Live…" : "Go live, be a supRstar";
+
+    if (status === "rejected") {
+      btn.disabled = true;
+      btn.textContent = "Not approved — start a new supRstar";
+      btn.dataset.stage = "done";
+      return;
     }
-    endBtn?.classList.toggle("hidden", !live);
+
+    if (status === "ended" && !live) {
+      btn.disabled = true;
+      btn.textContent = "Session ended — start a new supRstar";
+      btn.dataset.stage = "done";
+      return;
+    }
+
+    if (live) {
+      btn.disabled = false;
+      btn.classList.remove("primary");
+      btn.classList.add("ghost");
+      btn.textContent = "End live stream";
+      btn.dataset.stage = "end";
+      return;
+    }
+
+    if (paid && status === "approved") {
+      btn.disabled = false;
+      btn.textContent = "Go live, be a supRstar";
+      btn.dataset.stage = "live";
+      return;
+    }
+
+    if (paid || status === "pending_approval") {
+      btn.disabled = true;
+      btn.textContent = "Paid — waiting for venue approval";
+      btn.dataset.stage = "wait";
+      return;
+    }
+
+    if (["preview", "awaiting_payment"].includes(status)) {
+      if (!cameraReady()) {
+        btn.disabled = false;
+        btn.textContent = "Start camera preview";
+        btn.dataset.stage = "camera";
+        return;
+      }
+      btn.disabled = false;
+      btn.textContent = "Go pay $20 — become a supRstar";
+      btn.dataset.stage = "pay";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Preparing…";
+    btn.dataset.stage = "idle";
+  }
+
+  function onStageClick() {
+    const stage = String(byId("suprstarStageBtn")?.dataset?.stage || "");
+    if (stage === "camera") return startCamera();
+    if (stage === "pay") return startPayment();
+    if (stage === "live") return goLive();
+    if (stage === "end") return endLive();
   }
 
   function applyRequest(data) {
@@ -66,17 +138,19 @@
     byId("suprstarVenueLabel").textContent = `Venue: ${venue} · Ref ${requestDoc.referenceNumber || requestDoc.requestId || ""}`;
     const status = String(requestDoc.status || "");
     if (status === "preview") {
-      setGate("Private preview ready. Start your camera, then pay $20.");
-      setStatus("");
+      setGate(cameraReady()
+        ? "Preview on. Tap Go pay $20 when ready."
+        : "Private preview ready. Start your camera, then pay $20.");
+      if (!cameraReady()) setStatus("");
     } else if (status === "awaiting_payment") {
       setGate("Finish payment in Stripe, or wait a moment while we confirm your payment.");
       setStatus("If you already paid, this page will update automatically.");
       maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
       setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
-      setStatus("Do not close this tab. You will unlock Go live when approved.");
+      setStatus("Do not close this tab. Go live unlocks when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! You can Go live — your stream will reach the venue SupRStar board.");
+      setGate("Approved! Tap Go live — your stream will reach the venue SupRStar board.");
       setStatus("Club Admin approved. Tap Go live when ready.");
     } else if (status === "live") {
       setGate("You are live on the venue SupRStar board.");
@@ -116,10 +190,12 @@
         video.classList.add("is-on");
         video.muted = true;
       }
+      setGate("Preview on. Tap Go pay $20 when ready.");
       setStatus("Local preview only — not on the club board yet.");
       updateButtons();
     } catch (err) {
       setStatus(err?.message || "Camera failed.");
+      updateButtons();
     }
   }
 
@@ -147,6 +223,11 @@
 
   async function startPayment() {
     if (!requestDoc?.requestId) return;
+    if (!cameraReady()) {
+      setStatus("Start camera preview before paying.");
+      updateButtons();
+      return;
+    }
     if (!global.FLOQRPayments?.startCheckout) {
       setStatus("Payment service failed to load.");
       return;
@@ -271,10 +352,7 @@
   }
 
   function bindUi() {
-    byId("suprstarStartCamBtn")?.addEventListener("click", () => startCamera());
-    byId("suprstarPayBtn")?.addEventListener("click", () => startPayment());
-    byId("suprstarGoLiveBtn")?.addEventListener("click", () => goLive());
-    byId("suprstarEndLiveBtn")?.addEventListener("click", () => endLive());
+    byId("suprstarStageBtn")?.addEventListener("click", () => onStageClick());
     window.addEventListener("message", (ev) => {
       if (ev?.data?.type === "floqr-suprstar-paid") {
         setStatus("Payment confirmed. Waiting for Club Admin approval…");
@@ -310,6 +388,7 @@
     if (!accessToken || accessToken.length < 24) {
       setGate("Missing private preview token. Start again from Search → supRstar, or open the preview link from your payment receipt.");
       byId("suprstarRecoverActions")?.classList.remove("hidden");
+      updateButtons();
       return;
     }
     try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}

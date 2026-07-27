@@ -7,7 +7,7 @@
   <title>supRstar Preview | FLOQR</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.66"/>
   <link rel="stylesheet" href="./admin.css?v=29.09.66"/>
-  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.66"/>
+  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.75"/>
 </head>
 <body class="suprstr-page">
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./suprstr-search.html?v=29.09.66&from=search">&larr; Back to supRstar</a>
@@ -44,16 +44,13 @@
 
       <video id="suprstarPreviewVideo" class="suprstr-preview" playsinline muted autoplay></video>
 
-      <div class="queue-actions" style="flex-wrap:wrap;gap:8px">
-        <button id="suprstarStartCamBtn" class="category-card" type="button">Start camera preview</button>
-        <button id="suprstarPayBtn" class="category-card primary" type="button" disabled>Pay $20 — become a supRstar</button>
-        <button id="suprstarGoLiveBtn" class="category-card primary" type="button" disabled>Go live, be a supRstar</button>
-        <button id="suprstarEndLiveBtn" class="category-card ghost hidden" type="button">End live stream</button>
+      <div class="queue-actions suprstar-stage-actions">
+        <button id="suprstarStageBtn" class="category-card primary" type="button" data-stage="camera">Start camera preview</button>
       </div>
 
       <p id="suprstarLiveNote" class="sub small suprstr-tech-note">
-        Keep this tab open after payment. When Club Admin approves, this page unlocks Go live.
-        The live URL is secret — never shareable by guessing a club name.
+        One button guides each step: preview → pay → wait for approval → go live.
+        Keep this tab open after payment. The live URL is secret — never shareable by guessing a club name.
       </p>
     </div>
   </section>
@@ -68,6 +65,6 @@
 <script src="./floqr-logger.js?v=29.09.66"></script>
 <script src="./payment-service.js?v=29.09.72"></script>
 <script src="./suprstr-webrtc.js?v=29.09.73"></script>
-<script src="./suprstar-preview.js?v=29.09.72"></script>
+<script src="./suprstar-preview.js?v=29.09.75"></script>
 </body>
 </html>
