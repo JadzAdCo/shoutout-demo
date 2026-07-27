@@ -43,6 +43,18 @@
 .account-status-card{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
 .account-status-card strong{display:block;font-size:18px}
 @media(max-width:720px){.account-status-card{display:block}.account-status-card button{margin-top:12px;width:100%}}
+.master-system-messages-card{margin:0 0 18px}
+.master-system-messages{max-height:220px;overflow:auto}
+.master-system-message-row{
+  display:grid;
+  gap:4px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.master-system-message-row:last-child{border-bottom:0}
+.master-system-message-row.is-unread{background:rgba(255,90,110,.08);margin:0 -8px;padding:10px 8px;border-radius:8px}
+.master-system-message-row strong{font-size:14px}
+.master-system-message-row .sub{margin:0}
 
 /* v26 promoter guest list additions */
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}

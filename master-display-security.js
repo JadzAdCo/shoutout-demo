@@ -464,6 +464,68 @@
     }
   }
 
+  let systemMessagesUnsub = null;
+
+  function formatMessageWhen(ms) {
+    const n = Number(ms || 0);
+    if (!n) return "—";
+    try {
+      return new Date(n).toLocaleString();
+    } catch (_) {
+      return String(n);
+    }
+  }
+
+  function renderSystemMessages(rows = []) {
+    const host = byId("masterSystemMessages");
+    if (!host) return;
+    if (!rows.length) {
+      host.textContent = "No display denial alerts yet.";
+      return;
+    }
+    host.innerHTML = rows.map((row) => {
+      const unread = row.read !== true;
+      return `<article class="master-system-message-row${unread ? " is-unread" : ""}">
+        <strong>${esc(row.title || "Display access denied")}</strong>
+        <p class="sub small">${esc(row.body || "")}</p>
+        <p class="sub small">${esc(formatMessageWhen(row.createdAtMs || row.createdAt?.toMillis?.()))}${row.clubLocationId ? ` · ${esc(row.clubLocationId)}` : ""}</p>
+      </article>`;
+    }).join("");
+  }
+
+  /**
+   * Feature: live Master Admin system messages for display page denials.
+   * Also lands in FloqR Inbox as type displayAccessDenied.
+   */
+  function startMasterSystemMessageFeed() {
+    if (systemMessagesUnsub) {
+      try { systemMessagesUnsub(); } catch (_) {}
+      systemMessagesUnsub = null;
+    }
+    const user = firebase.auth().currentUser;
+    const host = byId("masterSystemMessages");
+    if (!user || !host) return;
+    host.textContent = "Listening for display denial alerts…";
+    try {
+      systemMessagesUnsub = firebase.firestore()
+        .collection("inboxNotifications")
+        .where("recipientUid", "==", user.uid)
+        .limit(80)
+        .onSnapshot((snap) => {
+          const rows = snap.docs
+            .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
+            .filter((row) => row.type === "displayAccessDenied" && row.deleted !== true)
+            .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))
+            .slice(0, 12);
+          renderSystemMessages(rows);
+        }, (err) => {
+          host.textContent = err?.message || "Could not load system messages.";
+        });
+    } catch (err) {
+      host.textContent = err?.message || "Could not start system message feed.";
+    }
+  }
+
   function bind() {
     byId("loadDisplaySecurityBtn")?.addEventListener("click", () => loadVenueDisplaySecurity());
     byId("saveDisplaySecurityBtn")?.addEventListener("click", () => saveVenueDisplaySecurity());
@@ -480,6 +542,16 @@
       if (id && byId("displaySecurityLocationId")) byId("displaySecurityLocationId").value = id;
     });
     populateClubList();
+    try {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) startMasterSystemMessageFeed();
+        else if (systemMessagesUnsub) {
+          try { systemMessagesUnsub(); } catch (_) {}
+          systemMessagesUnsub = null;
+          renderSystemMessages([]);
+        }
+      });
+    } catch (_) {}
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
@@ -490,6 +562,7 @@
     saveVenueDisplaySecurity,
     loadDisplayAccessLogs,
     detectMyIp,
-    rotateBoardToken
+    rotateBoardToken,
+    startMasterSystemMessageFeed
   };
 })(window);

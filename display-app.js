@@ -1241,15 +1241,12 @@
       rail.className = "display-identity-rail hidden";
       rail.innerHTML = "";
     }
-    byId("displayBrand").textContent = "DISPLAY LOCKED";
-    byId("displayMain").className = "";
-    byId("displayMain").textContent = "Authorized player only";
-    byId("displaySub").className = "";
-    byId("displaySub").textContent = [
-      info.observedIp ? `IP ${info.observedIp}` : "",
-      info.reason ? String(info.reason) : "",
-      "Use the Master Admin Xibo URL with ?k= token"
-    ].filter(Boolean).join(" · ");
+    byId("displayBrand").textContent = "Floq Media / FloqR";
+    byId("displayMain").className = "display-denied-message";
+    byId("displayMain").textContent =
+      "This device has not been configured to work with Floq Media or FloqR. Please contact Floq Media or FloqR to get device properly configured";
+    byId("displaySub").className = "display-denied-sub";
+    byId("displaySub").textContent = "";
     markDisplayReady();
   }
 

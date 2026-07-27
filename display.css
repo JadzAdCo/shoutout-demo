@@ -1267,11 +1267,17 @@ body.suprstr-live-active .heist-brand-slide{
   letter-spacing:.08em;
   font-size:clamp(14px,2.2vw,22px);
 }
-.display-canvas.display-access-denied #displayMain{
+.display-canvas.display-access-denied #displayMain,
+.display-canvas.display-access-denied .display-denied-message{
   color:#fff!important;
-  font-size:clamp(28px,5vw,56px)!important;
+  font-size:clamp(22px,3.6vw,40px)!important;
+  font-weight:700!important;
+  line-height:1.35!important;
+  max-width:min(92vw,920px);
+  text-wrap:balance;
+  text-align:center;
 }
-.display-canvas.display-access-denied #displaySub{
-  color:#ffd0d0!important;
-  max-width:80vw;
+.display-canvas.display-access-denied #displaySub,
+.display-canvas.display-access-denied .display-denied-sub{
+  display:none;
 }
