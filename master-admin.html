@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.84"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.85"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -122,7 +122,7 @@
           </div>
           <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction (IPv4 + IPv6 allowlist)</label>
           <label><input id="displaySecurityTokenRequired" type="checkbox" checked/> Lock display pages — require <code>?k=</code> token for idle and live (recommended)</label>
-          <p class="sub small">Idle and live use the same gate. If IP restriction is ON, <code>?k=</code> is required even when the token checkbox was previously off. Client <code>?ip=</code> cannot bypass the allowlist.</p>
+          <p class="sub small">IP allowlist and token lock are independent. Uncheck token lock to test IP-only blocking. Client <code>?ip=</code> cannot bypass the allowlist.</p>
           <p class="sub small">
             With lock ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
             Uncheck only for temporary open testing.
@@ -839,7 +839,7 @@
 <script src="./floqr-logger.js?v=29.09.22"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.78"></script>
-<script src="./master-display-security.js?v=29.09.84"></script>
+<script src="./master-display-security.js?v=29.09.85"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>

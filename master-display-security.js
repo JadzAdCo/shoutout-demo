@@ -197,9 +197,8 @@
     try {
       const result = await callable("getVenueDisplayTokens")({locationId});
       const data = result?.data || {};
-      if (byId("displaySecurityTokenRequired")) {
-        byId("displaySecurityTokenRequired").checked = data.tokenRequired === true;
-      }
+      // Do not overwrite the Master Admin token checkbox from token portal status —
+      // IP restriction and token lock are independent controls.
       renderTokenReport(data, null);
       setText("displayTokenStatus", `Loaded obfuscated tokens for ${locationId}.`);
       return data;
@@ -223,8 +222,10 @@
       const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
       if (byId("displaySecurityIps")) byId("displaySecurityIps").value = ips.join("\n");
       if (byId("displaySecurityRestrict")) byId("displaySecurityRestrict").checked = data.displayIpRestrictionEnabled === true;
-      // Lock default ON unless Master explicitly set displayTokenRequired === false.
-      if (byId("displaySecurityTokenRequired")) byId("displaySecurityTokenRequired").checked = data.displayTokenRequired !== false;
+      // Exact saved value: undefined/true → checked (default lock), explicit false → unchecked (IP-only tests).
+      if (byId("displaySecurityTokenRequired")) {
+        byId("displaySecurityTokenRequired").checked = data.displayTokenRequired !== false;
+      }
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
       const preview = byId("displaySecurityPreview");
       if (preview) {
@@ -423,7 +424,7 @@
     try {
       const result = await callable("provisionVenueDisplayTokens")({
         locationId,
-        tokenRequired: !!byId("displaySecurityTokenRequired")?.checked || true,
+        tokenRequired: !!byId("displaySecurityTokenRequired")?.checked,
         onlyIfMissing: false,
         force: true
       });
@@ -457,7 +458,6 @@
         renderTokenReport(view, null);
         setText("displayTokenStatus", data.warning || "Tokens exist but cleartext was not returned.");
       }
-      if (byId("displaySecurityTokenRequired")) byId("displaySecurityTokenRequired").checked = true;
       await loadDisplayAccessLogs(locationId);
     } catch (err) {
       setText("displayTokenStatus", err?.message || "Re-issue failed.");
