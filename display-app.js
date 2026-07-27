@@ -1253,20 +1253,14 @@
   /**
    * Feature: Display Security gate — runs BEFORE idle or live content.
    * Protects display.html / display2.html equally (idle board included).
-   * Server checks public IP allowlist + per-board ?k= token when lock is on.
+   * Always fail closed on venue players — never show idle when the check fails.
    */
   async function enforceDisplayAccess() {
-    const restrictionOn = loc.displayIpRestrictionEnabled === true;
-    // Locked unless Master explicitly set displayTokenRequired === false.
-    const tokenRequiredOn = loc.displayTokenRequired !== false;
     const accessKey = String(qs("k", qs("token", "")) || "").trim();
     try {
       if (!firebase?.app || !firebase.functions) {
-        if (restrictionOn || tokenRequiredOn) {
-          showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
-          return false;
-        }
-        return true;
+        showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
+        return false;
       }
       const fn = firebase.app().functions("us-central1").httpsCallable("checkDisplayAccess");
       const result = await fn({
@@ -1277,6 +1271,7 @@
         pageUrl: String(location.href || "").slice(0, 500),
         userAgent: String(navigator.userAgent || "").slice(0, 400),
         screenFormatId: screenFormatOverride || "",
+        // reportedIp is observational only — server must not allowlist from client-supplied IP.
         reportedIp: String(qs("ip", "") || "").trim(),
         reportedHostname: String(qs("host", qs("hostname", "")) || "").trim(),
         reportedMac: String(qs("mac", qs("macAddress", "")) || "").trim(),
@@ -1288,7 +1283,7 @@
       });
       const data = result?.data || {};
       window.__FLOQR_DISPLAY_CLIENT_IP = data.observedIp || "";
-      if (data.allowed === false) {
+      if (data.allowed !== true) {
         showDisplayAccessDenied({
           observedIp: data.observedIp || "",
           reason: data.reason || "denied"
@@ -1298,15 +1293,11 @@
       return true;
     } catch (err) {
       console.warn("[display access]", err?.message || err);
-      // Fail closed when venue is in lock posture (token required is default).
-      if (restrictionOn || tokenRequiredOn) {
-        showDisplayAccessDenied({
-          observedIp: "",
-          reason: "check_failed"
-        });
-        return false;
-      }
-      return true;
+      showDisplayAccessDenied({
+        observedIp: "",
+        reason: "check_failed"
+      });
+      return false;
     }
   }
 
