@@ -69,7 +69,7 @@
       const requestId = order.payload?.requestId || order.requestId || "";
       // Token stored in sessionStorage is the accessToken (== Firestore doc id == requestId for suprstarRequests).
       const previewToken = storedToken || requestId;
-      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}` : "";
+      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.71` : "";
       const backLink = isPopup
         ? `<p class="sub small">You can close this window and return to your preview tab.</p>`
         : previewUrl

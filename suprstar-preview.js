@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.70";
+  const APP_V = "29.09.71";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -280,15 +280,35 @@
     });
   }
 
+  function recoverAccessToken() {
+    let token = qs("t");
+    if (token && token.length >= 24) return token;
+    try {
+      token = sessionStorage.getItem("floqr_suprstar_token") || "";
+    } catch (_) {}
+    if (token && token.length >= 24) {
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set("t", token);
+        if (!url.searchParams.get("v")) url.searchParams.set("v", APP_V);
+        history.replaceState(null, "", url.toString());
+      } catch (_) {}
+      return token;
+    }
+    return "";
+  }
+
   function boot() {
     global.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
-    accessToken = qs("t");
-    if (!accessToken || accessToken.length < 24) {
-      setGate("Missing private preview token. Start again from Search → supRstar.");
-      return;
-    }
     if (!global.firebase?.apps?.length && global.firebaseConfig) firebase.initializeApp(global.firebaseConfig);
     bindUi();
+    accessToken = recoverAccessToken();
+    if (!accessToken || accessToken.length < 24) {
+      setGate("Missing private preview token. Start again from Search → supRstar, or open the preview link from your payment receipt.");
+      byId("suprstarRecoverActions")?.classList.remove("hidden");
+      return;
+    }
+    try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
         setGate("Sign in to open your private preview.");
