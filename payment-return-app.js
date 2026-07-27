@@ -7,9 +7,11 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
   const orderId = qs("order");
+  const sessionId = qs("session_id");
   const cancelled = qs("cancelled") === "1";
   const isPopup = qs("popup") === "1";
   let cancelAttempted = false;
+  let confirmAttempted = false;
 
   function money(cents) {
     return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
@@ -103,6 +105,46 @@
     byId("paymentReturnDetails").innerHTML = `<div class="report-table"><div><span>Invoice</span><strong>${esc(order.invoiceNumber || "Pending")}</strong></div><div><span>Order</span><strong>${esc(orderId || "-")}</strong></div><div><span>Service</span><strong>${esc(order.orderType || "-")}</strong></div><div><span>Total</span><strong>${esc(money(order.amountCents))}</strong></div><div><span>Status</span><strong>${esc(order.paymentStatus || order.status || "pending")}</strong></div><div><span>Fulfillment</span><strong>${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}</strong></div></div>`;
   }
 
+  async function confirmPaymentIfNeeded(order = {}) {
+    if (cancelled || !orderId || confirmAttempted) return order;
+    if (order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true) return order;
+    const stripeSessionId = sessionId || order.stripeCheckoutSessionId || "";
+    if (!stripeSessionId) return order;
+    confirmAttempted = true;
+    try {
+      if (window.FLOQRPayments?.confirmCheckoutSession) {
+        const result = await window.FLOQRPayments.confirmCheckoutSession({
+          orderId,
+          sessionId: stripeSessionId,
+          status: msg => { byId("paymentReturnStatus").textContent = msg; }
+        });
+        if (result?.ok) {
+          const snap = await db.collection("serviceOrders").doc(orderId).get();
+          return snap.exists ? snap.data() : order;
+        }
+      } else {
+        const fn = firebase.app().functions("us-central1").httpsCallable("confirmFloqrCheckoutSession");
+        const res = await fn({orderId, sessionId: stripeSessionId});
+        if (res?.data?.ok) {
+          const snap = await db.collection("serviceOrders").doc(orderId).get();
+          return snap.exists ? snap.data() : order;
+        }
+      }
+    } catch (error) {
+      if (window.FLOQRLog?.write) {
+        window.FLOQRLog.write({
+          level: "warn",
+          category: "checkout",
+          action: "confirm_checkout_failed",
+          message: error?.message || "Payment confirm failed.",
+          details: {orderId, sessionId: stripeSessionId},
+          source: "payment-return"
+        });
+      }
+    }
+    return order;
+  }
+
   async function clearCancelledCheckout() {
     if (!cancelled || !orderId || cancelAttempted) return;
     cancelAttempted = true;
@@ -122,7 +164,11 @@
     if (!orderId) return render({ status: "missing order" });
     clearCancelledCheckout();
     db.collection("serviceOrders").doc(orderId).onSnapshot(
-      snap => render(snap.exists ? snap.data() : { status: "not found" }),
+      async snap => {
+        let order = snap.exists ? snap.data() : {status: "not found"};
+        order = await confirmPaymentIfNeeded(order);
+        render(order);
+      },
       error => { byId("paymentReturnStatus").textContent = error.message; }
     );
   });

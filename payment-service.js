@@ -37,7 +37,7 @@
         details,
         correlationId,
         source: "payment-service",
-        appVersion: "29.09.68"
+        appVersion: "29.09.69"
       });
     } catch (_) {}
   }
@@ -195,10 +195,23 @@
     }
   }
 
+  async function confirmCheckoutSession({orderId, sessionId, status} = {}) {
+    requireUser();
+    if (!orderId) throw new Error("Order id is required.");
+    status?.("Confirming payment with Stripe…");
+    try {
+      const response = await callable("confirmFloqrCheckoutSession")({orderId, sessionId: sessionId || ""});
+      return response?.data || {};
+    } catch (error) {
+      throw unwrapCallableError(error);
+    }
+  }
+
   window.FLOQRPayments = {
     getConnectStatus,
     getClubCheckoutReadiness,
     startCheckout,
+    confirmCheckoutSession,
     startConnectOnboarding,
     cancelCheckoutOrder,
     clearUnpaidCheckouts,

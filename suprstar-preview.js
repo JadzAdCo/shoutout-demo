@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.68";
+  const APP_V = "29.09.69";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -65,9 +65,13 @@
     const venue = requestDoc.locationName || requestDoc.locationId || "venue";
     byId("suprstarVenueLabel").textContent = `Venue: ${venue} · Ref ${requestDoc.referenceNumber || requestDoc.requestId || ""}`;
     const status = String(requestDoc.status || "");
-    if (status === "preview" || status === "awaiting_payment") {
+    if (status === "preview") {
       setGate("Private preview ready. Start your camera, then pay $20.");
-      setStatus(status === "awaiting_payment" ? "Checkout opened — finish payment in the Stripe window." : "");
+      setStatus("");
+    } else if (status === "awaiting_payment") {
+      setGate("Finish payment in Stripe, or wait a moment while we confirm your payment.");
+      setStatus("If you already paid, this page will update automatically.");
+      maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
       setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
       setStatus("Do not close this tab. You will unlock Go live when approved.");
@@ -84,6 +88,18 @@
       setGate("Live session ended.");
     }
     updateButtons();
+  }
+
+  async function maybeConfirmAwaitingPayment() {
+    if (!requestDoc || String(requestDoc.status) !== "awaiting_payment") return;
+    let orderId = "";
+    try { orderId = sessionStorage.getItem("floqr_suprstar_order") || ""; } catch (_) {}
+    if (!orderId) return;
+    try {
+      if (global.FLOQRPayments?.confirmCheckoutSession) {
+        await global.FLOQRPayments.confirmCheckoutSession({orderId, status: setStatus});
+      }
+    } catch (_) {}
   }
 
   async function startCamera() {
@@ -153,6 +169,9 @@
       });
       const url = result?.checkoutUrl;
       if (!url) throw new Error("No checkout URL.");
+      try {
+        if (result?.orderId) sessionStorage.setItem("floqr_suprstar_order", result.orderId);
+      } catch (_) {}
       if (!popupBlocked && checkoutPopup && !checkoutPopup.closed) {
         checkoutPopup.location.href = url;
         await logPopup("popup_opened", "supRstar Stripe checkout opened in pop-out", {
@@ -256,6 +275,7 @@
       if (ev?.data?.type === "floqr-suprstar-paid") {
         setStatus("Payment confirmed. Waiting for Club Admin approval…");
         try { checkoutPopup?.close(); } catch (_) {}
+        maybeConfirmAwaitingPayment();
       }
     });
   }
