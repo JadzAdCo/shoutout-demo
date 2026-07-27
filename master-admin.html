@@ -48,6 +48,7 @@
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
         <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club URLs</button>
+        <button class="admin-tab" data-panel="displaySecurity" type="button">Display Security</button>
         <button class="admin-tab" data-panel="entityManagement" type="button">Entity Management</button>
         <button class="admin-tab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
         <button class="admin-tab" data-panel="templateManagement" type="button">Template Management</button>
@@ -95,6 +96,45 @@
             </div>
           </div>
           <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="displaySecurity" class="admin-panel-section">
+        <div class="card">
+          <h2>Display Security — approved IPs</h2>
+          <p class="sub small">
+            Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) to approved public IP addresses.
+            When restriction is <strong>off</strong> (default), boards stay open so existing Xibo configs keep working.
+            Turn restriction <strong>on</strong> only after you add the venue’s public egress IP(s). Supports exact IPs, trailing <code>*</code> prefixes, and <code>x.x.x.0/24</code>.
+          </p>
+          <div class="profile-grid">
+            <label>Venue
+              <input id="displaySecuritySearch" list="displaySecurityOptions" autocomplete="off" placeholder="Search Heist, Zebbies, location id…"/>
+              <datalist id="displaySecurityOptions"></datalist>
+            </label>
+            <label>Selected venue ID<input id="displaySecurityLocationId" readonly placeholder="heist-washington-dc"/></label>
+          </div>
+          <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction for this venue’s display pages</label>
+          <label>Approved display IPs (one per line)
+            <textarea id="displaySecurityIps" rows="6" placeholder="203.0.113.10&#10;198.51.100.0/24"></textarea>
+          </label>
+          <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
+          <div class="queue-actions">
+            <button id="loadDisplaySecurityBtn" type="button">Load venue</button>
+            <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
+            <button id="saveDisplaySecurityBtn" class="primary" type="button">Save approved IPs</button>
+          </div>
+          <p id="displaySecurityStatus" class="status"></p>
+          <div id="displaySecurityPreview" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Display access log (per venue)</h2>
+          <p class="sub small">Each board open calls the server and logs client IP, board (display 1 / display 2), user agent, timezone, and allow/deny. Load a venue above, then refresh.</p>
+          <div class="queue-actions">
+            <button id="refreshDisplayAccessLogsBtn" type="button">Refresh display logs</button>
+          </div>
+          <p id="displayAccessLogStatus" class="status"></p>
+          <div id="displayAccessLogReport" class="report-block"></div>
         </div>
       </section>
 
@@ -758,6 +798,7 @@
 <script src="./floqr-logger.js?v=29.09.22"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.65"></script>
+<script src="./master-display-security.js?v=29.09.76"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>

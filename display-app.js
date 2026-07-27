@@ -1,4 +1,4 @@
-/* display-app.js v29.09.74 — supports display.html (primary) + display2.html (secondary) */
+/* display-app.js v29.09.76 — supports display.html (primary) + display2.html (secondary) */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -1217,6 +1217,85 @@
     }
     markDisplayReady();
   }
+  function showDisplayAccessDenied(info = {}) {
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    const canvas = byId("displayCanvas");
+    if (canvas) {
+      canvas.className = "display-canvas display-access-denied";
+    }
+    const mediaSlot = byId("mediaSlot");
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot hidden";
+      mediaSlot.innerHTML = "";
+    }
+    byId("displayBrand").textContent = "DISPLAY ACCESS DENIED";
+    byId("displayMain").className = "";
+    byId("displayMain").textContent = "This board IP is not approved";
+    byId("displaySub").className = "";
+    byId("displaySub").textContent = [
+      info.observedIp ? `Observed IP: ${info.observedIp}` : "",
+      info.locationName || locationId,
+      "Ask Master Admin → Display Security to allowlist this venue IP"
+    ].filter(Boolean).join(" · ");
+    markDisplayReady();
+  }
+
+  async function enforceDisplayAccess() {
+    const restrictionOn = loc.displayIpRestrictionEnabled === true
+      && Array.isArray(loc.approvedDisplayIps)
+      && loc.approvedDisplayIps.length > 0;
+    try {
+      if (!firebase?.app || !firebase.functions) {
+        if (restrictionOn) {
+          showDisplayAccessDenied({locationName: loc.locationName, observedIp: ""});
+          return false;
+        }
+        return true;
+      }
+      const fn = firebase.app().functions("us-central1").httpsCallable("checkDisplayAccess");
+      const result = await fn({
+        locationId,
+        displayBoard: DISPLAY_BOARD,
+        pageUrl: String(location.href || "").slice(0, 500),
+        userAgent: String(navigator.userAgent || "").slice(0, 400),
+        screenFormatId: screenFormatOverride || "",
+        reportedIp: String(qs("ip", "") || "").trim(),
+        language: String(navigator.language || "").slice(0, 40),
+        timezone: (() => {
+          try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (_) { return ""; }
+        })(),
+        platform: String(navigator.platform || "").slice(0, 120)
+      });
+      const data = result?.data || {};
+      window.__FLOQR_DISPLAY_CLIENT_IP = data.observedIp || "";
+      if (data.restrictionEnabled && data.allowed === false) {
+        showDisplayAccessDenied({
+          observedIp: data.observedIp || "",
+          locationName: data.locationName || loc.locationName || locationId,
+          reason: data.reason || ""
+        });
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.warn("[display access]", err?.message || err);
+      // Fail open if restriction is not configured, so Xibo stays up when Functions is briefly down.
+      if (restrictionOn) {
+        showDisplayAccessDenied({
+          observedIp: "",
+          locationName: loc.locationName || locationId,
+          reason: "check_failed"
+        });
+        byId("displaySub").textContent = `Security check failed · ${err?.message || "retry"} · Master Admin → Display Security`;
+        return false;
+      }
+      return true;
+    }
+  }
+
   window.renderShoutOutDisplay = render;
 
   document.addEventListener("DOMContentLoaded", async () => {
@@ -1238,7 +1317,9 @@
           primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
           displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
           displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
-          ledPanel: live.ledPanel || loc.ledPanel
+          ledPanel: live.ledPanel || loc.ledPanel,
+          approvedDisplayIps: live.approvedDisplayIps || [],
+          displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true
         };
       }
     } catch (e) {}
@@ -1252,6 +1333,10 @@
         ? `FLOQR Display 2 · ${loc.locationName || locationId}`
         : `FLOQR ShoutOut Display · ${loc.locationName || locationId}`;
     } catch (_) {}
+
+    const accessOk = await enforceDisplayAccess();
+    if (!accessOk) return;
+
     if (isUrlPreviewMode()) {
       render(buildUrlPreviewPayload());
       db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
