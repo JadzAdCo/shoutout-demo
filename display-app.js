@@ -715,7 +715,9 @@
     byId("displayMain").style.removeProperty("font-size");
     byId("displayMain").innerHTML = [
       `<span class="suprstar-idle-line">Awaiting live Feed.</span>`,
-      `<span class="suprstar-idle-line">Be a SupRstar @ ${esc(clubName)}</span>`
+      `<span class="suprstar-idle-line">Be a SupRstar @ ${esc(clubName)}</span>`,
+      // Feature: make clear this is the idle/default board, not an IP/security block.
+      `<span class="suprstar-idle-note">Idle board · no guest is live right now</span>`
     ].join("");
     byId("displaySub").className = "hidden";
     byId("displaySub").removeAttribute("aria-label");
@@ -1220,6 +1222,7 @@
     markDisplayReady();
   }
   function showDisplayAccessDenied(info = {}) {
+    // Feature: locked display — never show idle/venue marketing to unauthorized clients.
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
     hideHeistBrandSlide();
@@ -1233,33 +1236,37 @@
       mediaSlot.className = "media-slot hidden";
       mediaSlot.innerHTML = "";
     }
-    byId("displayBrand").textContent = "DISPLAY ACCESS DENIED";
+    const rail = byId("displayIdentityRail");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+    }
+    byId("displayBrand").textContent = "DISPLAY LOCKED";
     byId("displayMain").className = "";
-    byId("displayMain").textContent = "This board IP is not approved";
+    byId("displayMain").textContent = "Authorized player only";
     byId("displaySub").className = "";
     byId("displaySub").textContent = [
-      info.observedIp ? `Observed IP: ${info.observedIp}` : "",
-      info.locationName || locationId,
-      "Ask Master Admin → Display Security to allowlist this venue IP"
+      info.observedIp ? `IP ${info.observedIp}` : "",
+      info.reason ? String(info.reason) : "",
+      "Use the Master Admin Xibo URL with ?k= token"
     ].filter(Boolean).join(" · ");
     markDisplayReady();
   }
 
   /**
-   * Feature: Display Security gate (IP allowlist + optional Xibo ?k= token).
-   * Called on every display.html / display2.html boot before liveContent subscribe.
-   * Server observes real public IP; token must match displayBoardSecrets for this board when required.
+   * Feature: Display Security gate — runs BEFORE idle or live content.
+   * Protects display.html / display2.html equally (idle board included).
+   * Server checks public IP allowlist + per-board ?k= token when lock is on.
    */
   async function enforceDisplayAccess() {
-    const restrictionOn = loc.displayIpRestrictionEnabled === true
-      && Array.isArray(loc.approvedDisplayIps)
-      && loc.approvedDisplayIps.length > 0;
-    const tokenRequiredOn = loc.displayTokenRequired === true;
+    const restrictionOn = loc.displayIpRestrictionEnabled === true;
+    // Locked unless Master explicitly set displayTokenRequired === false.
+    const tokenRequiredOn = loc.displayTokenRequired !== false;
     const accessKey = String(qs("k", qs("token", "")) || "").trim();
     try {
       if (!firebase?.app || !firebase.functions) {
         if (restrictionOn || tokenRequiredOn) {
-          showDisplayAccessDenied({locationName: loc.locationName, observedIp: ""});
+          showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
           return false;
         }
         return true;
@@ -1285,35 +1292,21 @@
       const data = result?.data || {};
       window.__FLOQR_DISPLAY_CLIENT_IP = data.observedIp || "";
       if (data.allowed === false) {
-        const why = String(data.reason || "");
-        let main = "This board IP is not approved";
-        if (/token/i.test(why)) main = "Display token missing or invalid";
-        if (/ip_denied/i.test(why) && /token/i.test(why)) main = "IP and display token rejected";
         showDisplayAccessDenied({
           observedIp: data.observedIp || "",
-          locationName: data.locationName || loc.locationName || locationId,
-          reason: why
+          reason: data.reason || "denied"
         });
-        byId("displayMain").textContent = main;
-        byId("displaySub").textContent = [
-          data.observedIp ? `Observed IP: ${data.observedIp}` : "",
-          data.locationName || locationId,
-          /token/i.test(why)
-            ? "Use the Master Admin token URL in Xibo (?k=…)"
-            : "Ask Master Admin → Display Security to allowlist this venue IP"
-        ].filter(Boolean).join(" · ");
         return false;
       }
       return true;
     } catch (err) {
       console.warn("[display access]", err?.message || err);
+      // Fail closed when venue is in lock posture (token required is default).
       if (restrictionOn || tokenRequiredOn) {
         showDisplayAccessDenied({
           observedIp: "",
-          locationName: loc.locationName || locationId,
           reason: "check_failed"
         });
-        byId("displaySub").textContent = `Security check failed · ${err?.message || "retry"} · Master Admin → Display Security`;
         return false;
       }
       return true;
@@ -1344,7 +1337,8 @@
           ledPanel: live.ledPanel || loc.ledPanel,
           approvedDisplayIps: live.approvedDisplayIps || [],
           displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
-          displayTokenRequired: live.displayTokenRequired === true
+          // Preserve undefined as lock-default; only explicit false unlocks idle.
+          displayTokenRequired: live.displayTokenRequired
         };
       }
     } catch (e) {}

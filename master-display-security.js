@@ -9,6 +9,9 @@
 (function (global) {
   "use strict";
 
+  /** Last fetched access-log rows — used by “Add IPs from access log”. */
+  let lastAccessLogRows = [];
+
   function byId(id) {
     return document.getElementById(id);
   }
@@ -26,6 +29,66 @@
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
+  }
+
+  /**
+   * Feature: suggest a stable IPv6 /64 from a host address seen in the access log.
+   * Xibo devices often change the last 64 bits while staying in the same /64.
+   */
+  function ipv6Slash64Suggestion(ip = "") {
+    const raw = String(ip || "").trim().toLowerCase();
+    if (!raw.includes(":")) return "";
+    const cleaned = raw.replace(/^\[|\]$/g, "");
+    const sides = cleaned.split("::");
+    let head = (sides[0] ? sides[0].split(":") : []).filter(Boolean);
+    let tail = sides.length > 1 ? (sides[1] ? sides[1].split(":") : []).filter(Boolean) : [];
+    if (sides.length === 1) {
+      head = cleaned.split(":").filter(Boolean);
+      tail = [];
+    }
+    const missing = 8 - (head.length + tail.length);
+    if (missing < 0) return "";
+    const full = [...head, ...Array(Math.max(0, missing)).fill("0"), ...tail];
+    if (full.length < 4) return "";
+    const p = full.slice(0, 4).map((h) => (parseInt(h || "0", 16) || 0).toString(16));
+    return `${p.join(":")}::/64`;
+  }
+
+  /**
+   * Feature: pull distinct client IPs (and IPv6 /64 suggestions) from the access log into the allowlist box.
+   */
+  async function importIpsFromAccessLog() {
+    const locationId = resolveLocationId();
+    if (!locationId) {
+      setText("displaySecurityStatus", "Choose a venue first.");
+      return;
+    }
+    if (!lastAccessLogRows.length) {
+      await loadDisplayAccessLogs(locationId);
+    }
+    const box = byId("displaySecurityIps");
+    if (!box) return;
+    const existing = String(box.value || "").split(/[\n,;]+/).map((x) => x.trim()).filter(Boolean);
+    const seen = new Set(existing.map((x) => x.toLowerCase()));
+    let added = 0;
+    lastAccessLogRows.forEach((row) => {
+      const ip = String(row.clientIp || "").trim();
+      if (!ip || ip === "—" || String(row.displayBoard || "") === "master-admin") return;
+      const candidates = [ip];
+      const slash64 = ipv6Slash64Suggestion(ip);
+      if (slash64) candidates.push(slash64);
+      candidates.forEach((c) => {
+        const key = c.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        existing.push(c);
+        added += 1;
+      });
+    });
+    box.value = existing.join("\n");
+    setText("displaySecurityStatus", added
+      ? `Added ${added} address/prefix entr${added === 1 ? "y" : "ies"} from the access log (includes IPv6 /64 suggestions). Review, then Save.`
+      : "No new IPs to add from the current log (board rows only; master-admin probes skipped).");
   }
 
   async function copyText(value) {
@@ -160,14 +223,15 @@
       const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
       if (byId("displaySecurityIps")) byId("displaySecurityIps").value = ips.join("\n");
       if (byId("displaySecurityRestrict")) byId("displaySecurityRestrict").checked = data.displayIpRestrictionEnabled === true;
-      if (byId("displaySecurityTokenRequired")) byId("displaySecurityTokenRequired").checked = data.displayTokenRequired === true;
+      // Lock default ON unless Master explicitly set displayTokenRequired === false.
+      if (byId("displaySecurityTokenRequired")) byId("displaySecurityTokenRequired").checked = data.displayTokenRequired !== false;
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
       const preview = byId("displaySecurityPreview");
       if (preview) {
         preview.innerHTML = `
           <p><strong>${esc(data.locationName || locationId)}</strong></p>
           <p class="sub small">IP restriction: ${data.displayIpRestrictionEnabled === true ? "ON" : "OFF"} · Approved IPs: ${ips.length}</p>
-          <p class="sub small">Token required: ${data.displayTokenRequired === true ? "ON" : "OFF"}</p>
+          <p class="sub small">Token lock: ${data.displayTokenRequired === false ? "OFF (public idle)" : "ON (idle+live require ?k=)"}</p>
           <p class="sub small">Updated by: ${esc(data.displayIpUpdatedBy || "—")}</p>`;
       }
       setText("displaySecurityStatus", snap.exists
@@ -289,6 +353,7 @@
     try {
       const result = await callable("listDisplayAccessLogs")({locationId, limit: 80});
       const rows = result?.data?.rows || [];
+      lastAccessLogRows = rows;
       if (!rows.length) {
         host.innerHTML = "<p class='sub'>No display access logs yet. Open a venue display page to generate one.</p>";
         setText("displayAccessLogStatus", "No logs.");
@@ -403,6 +468,7 @@
     byId("loadDisplaySecurityBtn")?.addEventListener("click", () => loadVenueDisplaySecurity());
     byId("saveDisplaySecurityBtn")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
+    byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
     byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => loadDisplayAccessLogs());
     byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));

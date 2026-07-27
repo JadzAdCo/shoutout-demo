@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.80"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.82"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -114,15 +114,25 @@
             </label>
             <label>Selected venue ID<input id="displaySecurityLocationId" readonly placeholder="heist-washington-dc"/></label>
           </div>
-          <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction for this venue’s display pages</label>
-          <label><input id="displaySecurityTokenRequired" type="checkbox"/> Require display token (<code>?k=</code>) in the Xibo URL</label>
+          <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction (IPv4 + IPv6 allowlist)</label>
+          <label><input id="displaySecurityTokenRequired" type="checkbox" checked/> Lock display pages — require <code>?k=</code> token for idle and live (recommended)</label>
+          <p class="sub small">
+            With lock ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
+            Uncheck only for temporary open testing.
+          </p>
           <label>Approved display IPs (one per line)
-            <textarea id="displaySecurityIps" rows="6" placeholder="203.0.113.10&#10;198.51.100.0/24"></textarea>
+            <textarea id="displaySecurityIps" rows="6" placeholder="69.243.87.16&#10;2601:14d:8700:2fc0::/64&#10;198.51.100.0/24"></textarea>
           </label>
+          <p class="sub small">
+            IPv4 and IPv6 are both supported. Xibo often appears as IPv6 in the access log — paste the exact address, or prefer a stable
+            <code>/64</code> prefix (example: <code>2601:14d:8700:2fc0::/64</code>) so rotating host IPv6 still matches.
+            Also supports trailing <code>*</code> and IPv4 <code>/24</code>.
+          </p>
           <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
           <div class="queue-actions">
             <button id="loadDisplaySecurityBtn" type="button">Load venue</button>
             <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
+            <button id="importIpsFromDisplayLogBtn" type="button">Add IPs from access log</button>
             <button id="saveDisplaySecurityBtn" class="primary" type="button">Save security settings</button>
           </div>
           <p id="displaySecurityStatus" class="status"></p>
@@ -822,7 +832,7 @@
 <script src="./floqr-logger.js?v=29.09.22"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.78"></script>
-<script src="./master-display-security.js?v=29.09.80"></script>
+<script src="./master-display-security.js?v=29.09.82"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
