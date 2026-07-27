@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.71";
+  const APP_V = "29.09.72";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -91,13 +91,17 @@
   }
 
   async function maybeConfirmAwaitingPayment() {
-    if (!requestDoc || String(requestDoc.status) !== "awaiting_payment") return;
+    if (!requestDoc) return;
+    const status = String(requestDoc.status || "");
+    if (!["awaiting_payment", "preview"].includes(status) && requestDoc.paymentStatus === "paid") return;
+    if (requestDoc.paymentStatus === "paid" && status === "pending_approval") return;
     let orderId = "";
     try { orderId = sessionStorage.getItem("floqr_suprstar_order") || ""; } catch (_) {}
     if (!orderId) return;
     try {
       if (global.FLOQRPayments?.confirmCheckoutSession) {
-        await global.FLOQRPayments.confirmCheckoutSession({orderId, status: setStatus});
+        const result = await global.FLOQRPayments.confirmCheckoutSession({orderId, status: setStatus});
+        if (result?.ok) setStatus("Payment confirmed. Waiting for Club Admin approval…");
       }
     } catch (_) {}
   }

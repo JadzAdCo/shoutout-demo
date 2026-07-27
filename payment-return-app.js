@@ -11,7 +11,9 @@
   const cancelled = qs("cancelled") === "1";
   const isPopup = qs("popup") === "1";
   let cancelAttempted = false;
-  let confirmAttempted = false;
+  let confirmInFlight = false;
+  let confirmAttempts = 0;
+  let closeArmed = false;
 
   function money(cents) {
     return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
@@ -26,17 +28,23 @@
   }
 
   function notifyOpenerPaid(order = {}) {
-    if (!isPopup) return;
     try {
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({
           type: "floqr-suprstar-paid",
           orderId,
           requestId: order.payload?.requestId || order.requestId || "",
-          paymentStatus: order.paymentStatus || ""
+          paymentStatus: order.paymentStatus || "",
+          requestStatus: order.requestStatus || ""
         }, "*");
       }
     } catch (_) {}
+  }
+
+  function armPopupClose() {
+    if (!isPopup || closeArmed) return;
+    closeArmed = true;
+    setTimeout(() => { try { window.close(); } catch (_) {} }, 2500);
   }
 
   function render(order = {}) {
@@ -53,25 +61,23 @@
       ? (isShoutout
         ? "Your message has been sent to the location approval queue. A final receipt was also sent to FloqR Inbox and your email/SMS when available."
         : order.orderType === "suprstarRequest"
-          ? "Payment received. Return to your private preview tab — Club Admin must approve before you can go live."
+          ? "Payment received and sent to Club Admin for approval. Return to your private preview tab."
           : isSuprstar
             ? "Your live-stream slot(s) are credited."
             : "Your order is recorded and the next service step is underway.")
       : cancelled || order.status === "checkout-cancelled"
         ? "Nothing was submitted. The unpaid checkout was cleared so you can try again."
-        : "Stripe confirmation can take a few seconds. This page updates automatically.";
+        : "Confirming payment with Stripe… this can take a few seconds.";
 
     if (paid && order.orderType === "suprstarRequest") {
       notifyOpenerPaid(order);
-      // Try to get the preview token from sessionStorage (set by suprstar-preview.js before checkout).
       let storedToken = "";
       try { storedToken = sessionStorage.getItem("floqr_suprstar_token") || ""; } catch (_) {}
       const requestId = order.payload?.requestId || order.requestId || "";
-      // Token stored in sessionStorage is the accessToken (== Firestore doc id == requestId for suprstarRequests).
       const previewToken = storedToken || requestId;
-      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.71` : "";
+      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}&v=29.09.72` : "";
       const backLink = isPopup
-        ? `<p class="sub small">You can close this window and return to your preview tab.</p>`
+        ? `<p class="sub small">This window will close. Keep your preview tab open for Club Admin approval.</p>`
         : previewUrl
           ? `<p><a class="buttonlike" href="${esc(previewUrl)}">Return to your private preview →</a></p>`
           : `<p class="sub small">Return to your private preview tab and wait for Club Admin approval.</p>`;
@@ -82,9 +88,7 @@
         <p><strong>Total:</strong> ${esc(money(order.amountCents))}</p>
         ${backLink}
       </div>`;
-      if (isPopup) {
-        setTimeout(() => { try { window.close(); } catch (_) {} }, 1800);
-      }
+      armPopupClose();
       return;
     }
 
@@ -106,29 +110,33 @@
   }
 
   async function confirmPaymentIfNeeded(order = {}) {
-    if (cancelled || !orderId || confirmAttempted) return order;
-    if (order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true) return order;
+    if (cancelled || !orderId || confirmInFlight) return order;
+    const needsConfirm = !(order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true)
+      || order.orderType === "suprstarRequest";
+    if (!needsConfirm) return order;
     const stripeSessionId = sessionId || order.stripeCheckoutSessionId || "";
-    if (!stripeSessionId) return order;
-    confirmAttempted = true;
+    if (!stripeSessionId && order.paymentStatus !== "paid") return order;
+    if (confirmAttempts >= 5) return order;
+    confirmInFlight = true;
+    confirmAttempts += 1;
     try {
-      if (window.FLOQRPayments?.confirmCheckoutSession) {
-        const result = await window.FLOQRPayments.confirmCheckoutSession({
-          orderId,
-          sessionId: stripeSessionId,
-          status: msg => { byId("paymentReturnStatus").textContent = msg; }
-        });
-        if (result?.ok) {
-          const snap = await db.collection("serviceOrders").doc(orderId).get();
-          return snap.exists ? snap.data() : order;
-        }
-      } else {
-        const fn = firebase.app().functions("us-central1").httpsCallable("confirmFloqrCheckoutSession");
-        const res = await fn({orderId, sessionId: stripeSessionId});
-        if (res?.data?.ok) {
-          const snap = await db.collection("serviceOrders").doc(orderId).get();
-          return snap.exists ? snap.data() : order;
-        }
+      const confirm = window.FLOQRPayments?.confirmCheckoutSession
+        ? (args) => window.FLOQRPayments.confirmCheckoutSession(args)
+        : async (args) => {
+            const fn = firebase.app().functions("us-central1").httpsCallable("confirmFloqrCheckoutSession");
+            const res = await fn(args);
+            return res?.data || {};
+          };
+      const result = await confirm({
+        orderId,
+        sessionId: stripeSessionId,
+        status: msg => { byId("paymentReturnStatus").textContent = msg; }
+      });
+      if (result?.ok) {
+        const snap = await db.collection("serviceOrders").doc(orderId).get();
+        const next = snap.exists ? snap.data() : order;
+        next.requestStatus = result.requestStatus || "";
+        return next;
       }
     } catch (error) {
       if (window.FLOQRLog?.write) {
@@ -137,10 +145,12 @@
           category: "checkout",
           action: "confirm_checkout_failed",
           message: error?.message || "Payment confirm failed.",
-          details: {orderId, sessionId: stripeSessionId},
+          details: {orderId, sessionId: stripeSessionId, attempt: confirmAttempts},
           source: "payment-return"
         });
       }
+    } finally {
+      confirmInFlight = false;
     }
     return order;
   }

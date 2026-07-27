@@ -822,6 +822,20 @@
   }
 
   let suprstarQueueUnsub = null;
+  let suprstarRepairBound = false;
+  async function repairSuprstarQueue() {
+    try {
+      setText("suprstarQueueStatus", "Repairing paid requests into the approval queue...");
+      const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
+      const res = await callable("repairSuprstarPaidOrders")({locationId});
+      const repaired = Number(res?.data?.repaired || 0);
+      setText("suprstarQueueStatus", repaired
+        ? ("Moved " + repaired + " paid request(s) into the queue.")
+        : "No stuck paid requests found for this venue.");
+    } catch (e) {
+      setText("suprstarQueueStatus", e.message || String(e));
+    }
+  }
   function renderSuprstarQueue() {
     const list = byId("suprstarQueueList");
     if (!list) return;
@@ -831,19 +845,23 @@
       suprstarQueueUnsub = null;
     }
     const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
+    if (!suprstarRepairBound) {
+      byId("suprstarRepairBtn")?.addEventListener("click", () => repairSuprstarQueue());
+      suprstarRepairBound = true;
+    }
     suprstarQueueUnsub = db.collection("suprstarRequests")
       .where("locationId", "==", locationId)
-      .where("status", "in", ["pending_approval", "approved", "live"])
       .onSnapshot(snapshot => {
         const rows = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+          .filter(r => r.paymentStatus === "paid" || ["pending_approval", "approved", "live"].includes(String(r.status || "")))
           .sort((a, b) => (b.paidAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.paidAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
-        const pending = rows.filter(r => r.status === "pending_approval");
+        const pending = rows.filter(r => r.status === "pending_approval" || (r.paymentStatus === "paid" && !["approved", "live", "ended", "rejected"].includes(String(r.status || ""))));
         const live = rows.filter(r => r.status === "live");
         setText("metricSuprstarPending", String(pending.length));
         setText("metricSuprstarLive", String(live.length));
         setText("metricSuprstarDash", String(pending.length));
         if (!rows.length) {
-          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval.</p>";
+          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
           return;
         }
         list.innerHTML = "";
@@ -861,7 +879,7 @@
               · ${esc(item.locationName || locationId)}
             </small>
             <div class="queue-actions">
-              ${status === "pending_approval" ? `<button class="approve" type="button">Approve — allow go live</button>
+              ${status === "pending_approval" || (paid && (status === "awaiting_payment" || status === "preview")) ? `<button class="approve" type="button">Approve — allow go live</button>
               <button class="reject" type="button">Reject</button>` : ""}
               ${status === "live" ? `<span class="sub small">Live on venue SupRStar board</span>` : ""}
               ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
@@ -869,6 +887,7 @@
           div.querySelector(".approve")?.addEventListener("click", async () => {
             try {
               setText("suprstarQueueStatus", "Approving…");
+              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
               await callable("approveSuprstarRequest")({requestId: item.id});
               setText("suprstarQueueStatus", "Approved. Patron can go live from their preview tab.");
             } catch (e) {
@@ -879,6 +898,7 @@
             if (!confirm("Reject this paid supRstar request?")) return;
             try {
               setText("suprstarQueueStatus", "Rejecting…");
+              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
               await callable("rejectSuprstarRequest")({requestId: item.id, reason: "Rejected by venue"});
               setText("suprstarQueueStatus", "Rejected.");
             } catch (e) {
