@@ -1179,3 +1179,73 @@ body.suprstr-live-active .heist-brand-slide{
   opacity:0;
   pointer-events:none;
 }
+
+/* display2 idle — awaiting supRstar live feed */
+.display-canvas.suprstar-idle-canvas{
+  background:
+    radial-gradient(circle at 28% 32%,rgba(223,255,90,.22),transparent 34%),
+    radial-gradient(circle at 74% 28%,rgba(88,236,255,.28),transparent 36%),
+    linear-gradient(145deg,#05070f 0%,#0a1630 55%,#02040a 100%)!important;
+  animation:none;
+}
+.display-canvas.suprstar-idle-canvas .display-text-overlay{
+  display:grid;
+  place-items:center;
+}
+.suprstar-idle-center{
+  width:min(920px,92vw)!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:clamp(20px,4vw,48px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:clamp(18px,3.5vh,36px)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.suprstar-idle-center:before,
+.suprstar-idle-center:after{display:none!important}
+.media-slot.suprstar-idle-logo-slot{
+  display:block!important;
+  width:min(360px,46vw);
+  max-height:28vh;
+  margin:0 auto;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.suprstar-idle-logo{
+  width:100%;
+  height:100%;
+  max-height:28vh;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 28px rgba(0,0,0,.45));
+}
+#displayMain.suprstar-idle-copy{
+  position:static!important;
+  inset:auto!important;
+  width:min(900px,94vw)!important;
+  max-width:94vw!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:clamp(8px,1.6vh,16px)!important;
+  font-size:clamp(28px,5.2vw,64px)!important;
+  line-height:1.12!important;
+  font-weight:800!important;
+  letter-spacing:.01em!important;
+  color:#f4f7ff!important;
+  text-shadow:0 2px 18px rgba(0,0,0,.45)!important;
+}
+#displayMain.suprstar-idle-copy .suprstar-idle-line{
+  display:block;
+  text-align:center;
+}
+#displayMain.suprstar-idle-copy .suprstar-idle-line:last-child{
+  color:#dfff5a;
+  font-size:.88em;
+}

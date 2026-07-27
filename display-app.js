@@ -1,4 +1,4 @@
-/* display-app.js v29.09.63 — supports display.html (primary) + display2.html (secondary) */
+/* display-app.js v29.09.74 — supports display.html (primary) + display2.html (secondary) */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -48,6 +48,7 @@
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
+  const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
@@ -607,12 +608,33 @@
     return String(value || "").trim();
   }
 
+  function clubVenueName(location = {}) {
+    return String(location.locationName || location.brandName || location.name || "Club").trim() || "Club";
+  }
+
   function clubDefaultMainText(location = {}) {
-    const clubName = String(location.locationName || location.brandName || location.name || "Club").trim() || "Club";
+    const clubName = clubVenueName(location);
+    if (DISPLAY_BOARD === "secondary") {
+      // display2 / Xibo SupRStar board idle CTA
+      return `Awaiting live Feed. Be a SupRstar @ ${clubName}`;
+    }
     const configured = String(location.defaultMain || "").trim();
     if (configured && !/^USE\s*SHOUT\s*OUT\b/i.test(configured)) return configured;
     // Typical club idle board: Use ShoutOut @ Clubname
     return `Use ShoutOut @ ${clubName}`;
+  }
+
+  function isLegacyShoutOutIdleText(value = "") {
+    return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
+  }
+
+  function isSuprstarIdlePayload(data = {}) {
+    if (DISPLAY_BOARD !== "secondary") return false;
+    if (isUrlPreviewMode() && (urlSearchParams().has("template") || urlSearchParams().has("main"))) return false;
+    const status = String(data.status || "").toLowerCase();
+    if (status === "approved" || status === "live" || status === "preview") return false;
+    if (data.idleCta || status === "default" || !status) return true;
+    return isLegacyShoutOutIdleText(data.mainText);
   }
 
   function defaultClubDisplayPayload() {
@@ -625,6 +647,17 @@
         subText: urlSearchParams().get("sub") || "",
         template: previewTemplate,
         status: "preview"
+      };
+    }
+    if (DISPLAY_BOARD === "secondary") {
+      return {
+        locationName: loc.locationName,
+        mainText: clubDefaultMainText(loc),
+        subText: "",
+        template: "blackwhite",
+        status: "default",
+        idleCta: true,
+        suprstarIdle: true
       };
     }
     const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
@@ -640,6 +673,63 @@
       status: "default",
       idleCta: true
     };
+  }
+
+  function renderSuprstarIdleScreen(location = {}) {
+    const clubName = clubVenueName(location);
+    const canvas = byId("displayCanvas");
+    const mediaSlot = byId("mediaSlot");
+    const center = document.querySelector(".display-center");
+    const rail = byId("displayIdentityRail");
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    if (canvas) {
+      canvas.className = "display-canvas display-board-secondary suprstar-idle-canvas";
+      canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
+      canvas.style.backgroundImage = "";
+      canvas.style.background = "";
+    }
+    const bgEl = byId("displayBackground");
+    if (bgEl) {
+      bgEl.style.backgroundImage = "";
+      bgEl.style.background = "";
+      bgEl.style.backgroundColor = "";
+    }
+    const frame = byId("displayFrameOverlay");
+    if (frame) {
+      frame.className = "display-frame-overlay hidden";
+      frame.setAttribute("aria-hidden", "true");
+      frame.innerHTML = "";
+    }
+    if (center) center.className = "display-center suprstar-idle-center";
+    byId("displayBrand").textContent = "";
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot suprstar-idle-logo-slot";
+      mediaSlot.innerHTML = `<img src="${esc(SUPRSTAR_LOGO)}" alt="supRstar" class="suprstar-idle-logo" decoding="async"/>`;
+    }
+    byId("displayMain").className = "suprstar-idle-copy";
+    byId("displayMain").style.removeProperty("font-size");
+    byId("displayMain").innerHTML = [
+      `<span class="suprstar-idle-line">Awaiting live Feed.</span>`,
+      `<span class="suprstar-idle-line">Be a SupRstar @ ${esc(clubName)}</span>`
+    ].join("");
+    byId("displaySub").className = "hidden";
+    byId("displaySub").removeAttribute("aria-label");
+    byId("displaySub").textContent = "";
+    byId("displaySub").style.removeProperty("font-size");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+    }
+    const teamReset = byId("displayJerseyTeam");
+    if (teamReset) {
+      teamReset.className = "soccer-jersey-team hidden";
+      teamReset.textContent = "";
+      teamReset.setAttribute("aria-hidden", "true");
+    }
+    markDisplayReady();
   }
 
   function renderTimedLiveContent(data = {}) {
@@ -830,6 +920,10 @@
   }
 
   function render(data) {
+    if (isSuprstarIdlePayload(data)) {
+      renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
+      return;
+    }
     const rawTemplateId = data.template || "neon";
     const baseTemplate = templates[rawTemplateId] || templates.neon || {};
     const consolidatedId = baseTemplate.consolidatedTemplateId || baseTemplate.aliasOf || rawTemplateId;
@@ -1052,11 +1146,18 @@
       if (rail && t.identityRail !== false) {
         const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
         const identity = classicIdentityPresentation(data.attribution || "");
-        const idleValue = glyphSlice(cleanBoardText(`Use ShoutOut @ ${clubName}`), 0, 28) || identity.value;
+        const idleCta = DISPLAY_BOARD === "secondary"
+          ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
+          : `Use ShoutOut @ ${clubName}`;
+        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || identity.value;
         const showIdle = !subText && !mainText;
         rail.className = "display-identity-rail classic-bw-identity soccer-jersey-rail" + (showIdle || !identity.supplied ? " uses-brand-fallback" : " has-attribution");
-        rail.setAttribute("aria-label", showIdle ? `Use ShoutOut @ ${clubName}` : `${identity.kicker} ${identity.value}`);
-        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? "USE" : identity.kicker)}</small><strong>${esc(showIdle ? idleValue.replace(/^USE\s*/i, "") : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+        rail.setAttribute("aria-label", showIdle ? idleCta : `${identity.kicker} ${identity.value}`);
+        const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
+        const idleStrong = showIdle
+          ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
+          : identity.value;
+        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? idleKicker : identity.kicker)}</small><strong>${esc(showIdle ? idleStrong : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
       } else if (rail) {
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
@@ -1166,7 +1267,14 @@
       return;
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
-      const payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
+      let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
+      if (DISPLAY_BOARD === "secondary") {
+        const status = String(payload.status || "").toLowerCase();
+        const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
+        if (!doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage) || isLegacyShoutOutIdleText(payload.mainText)) {
+          payload = defaultClubDisplayPayload();
+        }
+      }
       if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
       renderTimedLiveContent(payload);
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
