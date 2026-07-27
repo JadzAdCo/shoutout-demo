@@ -61,12 +61,24 @@
 
     if (paid && order.orderType === "suprstarRequest") {
       notifyOpenerPaid(order);
+      // Try to get the preview token from sessionStorage (set by suprstar-preview.js before checkout).
+      let storedToken = "";
+      try { storedToken = sessionStorage.getItem("floqr_suprstar_token") || ""; } catch (_) {}
+      const requestId = order.payload?.requestId || order.requestId || "";
+      // Token stored in sessionStorage is the accessToken (== Firestore doc id == requestId for suprstarRequests).
+      const previewToken = storedToken || requestId;
+      const previewUrl = previewToken ? `./suprstar-preview.html?t=${encodeURIComponent(previewToken)}` : "";
+      const backLink = isPopup
+        ? `<p class="sub small">You can close this window and return to your preview tab.</p>`
+        : previewUrl
+          ? `<p><a class="buttonlike" href="${esc(previewUrl)}">Return to your private preview →</a></p>`
+          : `<p class="sub small">Return to your private preview tab and wait for Club Admin approval.</p>`;
       byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
         <p><strong>Service:</strong> supRstar live appearance</p>
-        <p><strong>Ref:</strong> ${esc(order.referenceNumber || order.payload?.requestId || "—")}</p>
+        <p><strong>Ref:</strong> ${esc(order.referenceNumber || requestId || "—")}</p>
         <p><strong>Status:</strong> Pending Club Admin approval</p>
         <p><strong>Total:</strong> ${esc(money(order.amountCents))}</p>
-        <p class="sub small">${isPopup ? "You can close this window and return to your preview tab." : "Keep your private preview tab open."}</p>
+        ${backLink}
       </div>`;
       if (isPopup) {
         setTimeout(() => { try { window.close(); } catch (_) {} }, 1800);

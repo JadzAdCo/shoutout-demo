@@ -37,9 +37,34 @@
         details,
         correlationId,
         source: "payment-service",
-        appVersion: "29.09.4"
+        appVersion: "29.09.68"
       });
     } catch (_) {}
+  }
+
+  /**
+   * Open a popup synchronously during a user click (before any await).
+   * Do NOT pass noopener — modern browsers return null even when the window opens,
+   * which makes callers think the popup was blocked.
+   */
+  function openUserGesturePopup(name = "floqr_checkout", features = "width=540,height=780") {
+    const popup = window.open("about:blank", name, features);
+    if (popup) {
+      try {
+        popup.document.title = "FLOQR Checkout";
+        popup.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening secure checkout…</p>";
+        popup.opener = null;
+      } catch (_) {}
+    }
+    return popup || null;
+  }
+
+  async function logPopupEvent(action, message, details = {}, correlationId) {
+    await logClient(action === "popup_blocked" ? "warn" : "info", action, message, {
+      href: typeof location !== "undefined" ? location.href : "",
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+      ...details
+    }, correlationId);
   }
 
   async function startCheckout({orderType, payload = {}, status, redirect = true} = {}) {
@@ -179,6 +204,8 @@
     clearUnpaidCheckouts,
     purgeTestPayments,
     publishFollowerCampaign,
-    requestTeslaPickup
+    requestTeslaPickup,
+    openUserGesturePopup,
+    logPopupEvent
   };
 })();

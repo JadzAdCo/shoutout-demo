@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.66";
+  const APP_V = "29.09.68";
   let venueRows = [];
 
   function byId(id) {
@@ -82,6 +82,23 @@
     return {id, name: row.name || id};
   }
 
+  async function logPopup(action, message, details = {}) {
+    try {
+      if (global.FLOQRPayments?.logPopupEvent) {
+        await global.FLOQRPayments.logPopupEvent(action, message, {flow: "suprstar_search", ...details});
+      } else if (global.FLOQRLog?.write) {
+        await global.FLOQRLog.write({
+          level: action === "popup_blocked" ? "warn" : "info",
+          category: "checkout",
+          action,
+          message,
+          details: {flow: "suprstar_search", ...details},
+          source: "suprstr-search"
+        });
+      }
+    } catch (_) {}
+  }
+
   async function beginSuprstar() {
     const venue = selectedVenue();
     if (!venue.id) {
@@ -90,19 +107,46 @@
     }
     const btn = byId("suprstrGoLiveBtn");
     if (btn) btn.disabled = true;
+    // Open placeholder tab synchronously on click — before any await.
+    let previewTab = window.open("about:blank", "floqr_suprstar_preview");
+    const tabBlocked = !previewTab;
+    if (!tabBlocked) {
+      try {
+        previewTab.document.title = "supRstar Preview";
+        previewTab.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening your private supRstar preview…</p>";
+        previewTab.opener = null;
+      } catch (_) {}
+    }
     try {
       setLiveStatus(`Opening private preview for ${venue.name}…`);
-      // Always target SupRStar board (display2) — Display 1 stays for ShoutOuts.
       const res = await callable("createSuprstarRequest")({
         locationId: venue.id,
         locationName: venue.name,
         displayBoard: "secondary"
       });
       const path = res?.data?.previewPath || `./suprstar-preview.html?t=${encodeURIComponent(res?.data?.accessToken || "")}`;
-      location.href = path.includes("?") ? `${path}&v=${APP_V}&from=search` : `${path}?v=${APP_V}&from=search`;
+      const fullUrl = path.includes("?") ? `${path}&v=${APP_V}&from=search` : `${path}?v=${APP_V}&from=search`;
+      try { sessionStorage.setItem("floqr_suprstar_token", res?.data?.accessToken || ""); } catch (_) {}
+      if (!tabBlocked && previewTab && !previewTab.closed) {
+        previewTab.location.href = fullUrl;
+        await logPopup("popup_opened", "supRstar preview opened in new tab", {
+          locationId: venue.id,
+          popupName: "floqr_suprstar_preview"
+        });
+        setLiveStatus("Private preview opened in a new tab. Follow the steps there.");
+      } else {
+        await logPopup("popup_blocked", "supRstar preview tab blocked; using same-tab fallback", {
+          locationId: venue.id,
+          tabBlocked
+        });
+        try { previewTab?.close(); } catch (_) {}
+        location.href = fullUrl;
+      }
     } catch (err) {
+      try { previewTab?.close(); } catch (_) {}
       setLiveStatus(err?.message || "Could not start supRstar.");
       if (btn) btn.disabled = false;
+      await logPopup("checkout_failed", err?.message || "Could not start supRstar.", {locationId: venue.id});
     }
   }
 

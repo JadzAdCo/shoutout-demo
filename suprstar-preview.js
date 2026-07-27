@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.66";
+  const APP_V = "29.09.68";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -103,14 +103,45 @@
     }
   }
 
+  async function logPopup(action, message, details = {}) {
+    try {
+      if (global.FLOQRPayments?.logPopupEvent) {
+        await global.FLOQRPayments.logPopupEvent(action, message, {
+          flow: "suprstar_preview",
+          requestId: requestDoc?.requestId || "",
+          accessToken: accessToken ? `${accessToken.slice(0, 6)}…` : "",
+          ...details
+        });
+      } else if (global.FLOQRLog?.write) {
+        await global.FLOQRLog.write({
+          level: action === "popup_blocked" ? "warn" : "info",
+          category: "checkout",
+          action,
+          message,
+          details: {flow: "suprstar_preview", ...details},
+          source: "suprstar-preview"
+        });
+      }
+    } catch (_) {}
+  }
+
   async function startPayment() {
     if (!requestDoc?.requestId) return;
     if (!global.FLOQRPayments?.startCheckout) {
       setStatus("Payment service failed to load.");
       return;
     }
+    // Open popup synchronously on click — before any await — or browsers block it.
+    checkoutPopup = global.FLOQRPayments.openUserGesturePopup
+      ? global.FLOQRPayments.openUserGesturePopup("floqr_suprstar_pay")
+      : window.open("about:blank", "floqr_suprstar_pay", "width=540,height=780");
+    const popupBlocked = !checkoutPopup;
+    if (!popupBlocked) {
+      try { checkoutPopup.opener = null; } catch (_) {}
+    }
     try {
-      setStatus("Opening Stripe checkout in a pop-out… keep this preview open.");
+      try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
+      setStatus(popupBlocked ? "Preparing Stripe checkout…" : "Opening Stripe checkout in a pop-out… keep this preview open.");
       const result = await global.FLOQRPayments.startCheckout({
         orderType: "suprstarRequest",
         payload: {
@@ -122,15 +153,27 @@
       });
       const url = result?.checkoutUrl;
       if (!url) throw new Error("No checkout URL.");
-      checkoutPopup = window.open(url, "floqr_suprstar_pay", "popup=yes,width=520,height=760");
-      if (!checkoutPopup) {
-        setStatus("Pop-up blocked. Allow pop-ups, or continue in this tab.");
-        window.location.assign(url);
+      if (!popupBlocked && checkoutPopup && !checkoutPopup.closed) {
+        checkoutPopup.location.href = url;
+        await logPopup("popup_opened", "supRstar Stripe checkout opened in pop-out", {
+          orderId: result?.orderId || "",
+          popupName: "floqr_suprstar_pay"
+        });
+        setStatus("Complete payment in the Stripe pop-out. This preview tab stays open — do not close it.");
         return;
       }
-      setStatus("Complete payment in the Stripe window. This preview stays active.");
+      await logPopup("popup_blocked", "supRstar checkout pop-out unavailable; using same-tab fallback", {
+        orderId: result?.orderId || "",
+        popupBlocked,
+        popupClosed: popupBlocked ? true : !!checkoutPopup?.closed
+      });
+      try { checkoutPopup?.close(); } catch (_) {}
+      setStatus("Pop-up unavailable — opening Stripe in this tab. Use Return to preview after payment.");
+      window.location.assign(url);
     } catch (err) {
+      try { checkoutPopup?.close(); } catch (_) {}
       setStatus(err?.message || "Checkout failed.");
+      await logPopup("checkout_failed", err?.message || "Checkout failed.", {requestId: requestDoc?.requestId || ""});
     }
   }
 
