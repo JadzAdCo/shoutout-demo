@@ -779,7 +779,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
   }
 
   if (type === "suprstrSlot") {
-    // Fixed FloqR MoR product: one live-stream slot for SupRstR (Master Admin purchase path first).
+    // Legacy prepaid slot wallet (deprecated — use suprstarRequest per appearance).
     const slots = Math.max(1, Math.min(10, Math.floor(Number(payload.slots || 1))));
     const unitCents = 2000;
     return {
@@ -794,6 +794,35 @@ exports.createFloqrConnectOnboardingLink = onCall({
       product:"suprstrSlot",
       slotsGranted:slots,
       clubLocationId:text(payload.clubLocationId, 120)
+    };
+  }
+
+  if (type === "suprstarRequest") {
+    const requestId = text(payload.requestId, 120);
+    if (!requestId) throw new HttpsError("invalid-argument", "A supRstar request id is required.");
+    const reqSnap = await db.collection("suprstarRequests").doc(requestId).get();
+    if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar preview request not found.");
+    const req = reqSnap.data() || {};
+    if (!["preview", "awaiting_payment"].includes(text(req.status, 40))) {
+      throw new HttpsError("failed-precondition", "This supRstar request is already paid or closed.");
+    }
+    const unitCents = 2000;
+    const split = moneyParts(unitCents, SHOUTOUT_CLUB_SHARE_PERCENT);
+    return {
+      amountCents:unitCents,
+      unitAmountCents:unitCents,
+      quantity:1,
+      itemName:"supRstar live appearance ($20)",
+      description:"Payment is charged to FloqR. After payment, the venue approves before your camera goes to the SupRStar board.",
+      venueShareCents:split.venueShare,
+      clubShareCents:split.venueShare,
+      floqrShareCents:split.floqrShare,
+      clubSharePercent:SHOUTOUT_CLUB_SHARE_PERCENT,
+      paymentModel:"floqr-platform",
+      product:"suprstarRequest",
+      requestId,
+      clubLocationId:text(req.locationId, 120),
+      referenceNumber:text(req.referenceNumber, 80)
     };
   }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
@@ -912,7 +941,20 @@ exports.createFloqrCheckoutSession = onCall({
       }
     }
     if (type === "suprstrSlot") {
-      // Any signed-in patron may purchase a live-stream slot (public SupRstR).
+      // Legacy prepaid slot wallet.
+    }
+    if (type === "suprstarRequest") {
+      const requestId = text(payload.requestId, 120);
+      if (!requestId) throw new HttpsError("invalid-argument", "requestId is required.");
+      const reqSnap = await db.collection("suprstarRequests").doc(requestId).get();
+      if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+      const req = reqSnap.data() || {};
+      if (req.broadcasterUid !== request.auth.uid) throw new HttpsError("permission-denied", "Not your supRstar request.");
+      await featureGateHelpers.assertClubFeature(text(req.locationId, 120), "supRstar");
+      await db.collection("suprstarRequests").doc(requestId).set({
+        status:"awaiting_payment",
+        updatedAt:admin.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
     }
     const summary = await describeOrder(type, payload);
     const orderRef = db.collection("serviceOrders").doc();
@@ -954,10 +996,14 @@ exports.createFloqrCheckoutSession = onCall({
       mode:isSubscription ? "subscription" : "payment",
       success_url:type === "rydrFare"
         ? `${returnBase}pickup.html?rydrPaid=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}&session_id={CHECKOUT_SESSION_ID}`
-        : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
+        : type === "suprstarRequest"
+          ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}&popup=1`
+          : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:type === "rydrFare"
         ? `${returnBase}pickup.html?rydrCancelled=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}`
-        : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
+        : type === "suprstarRequest"
+          ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1&popup=1`
+          : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
       client_reference_id:orderRef.id,
       metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId, ownerKey:text(summary.ownerKey, 220)},
       billing_address_collection:"auto",
@@ -1582,6 +1628,52 @@ async function finalizePaidOrder(orderId, session) {
       fulfillmentStatus:"suprstr-slots-granted",
       slotsGranted:slots,
       fulfilledRecordId:uid
+    }, {merge:true});
+  }
+
+  if (order.orderType === "suprstarRequest") {
+    const requestId = text(order.payload?.requestId || order.requestId, 120);
+    if (!requestId) throw new Error("supRstar fulfillment missing requestId.");
+    const reqRef = db.collection("suprstarRequests").doc(requestId);
+    const reqSnap = await reqRef.get();
+    if (!reqSnap.exists) throw new Error(`supRstar request ${requestId} not found for fulfillment.`);
+    const req = reqSnap.data() || {};
+    if (!(req.paymentStatus === "paid" && req.serviceOrderId === orderId)) {
+      await reqRef.set({
+        paymentStatus:"paid",
+        status:"pending_approval",
+        serviceOrderId:orderId,
+        paidAt,
+        amountCents:Math.max(0, Math.round(Number(order.amountCents || 2000))),
+        updatedAt:paidAt
+      }, {merge:true});
+      try {
+        const locSnap = await db.collection("clubLocations").doc(text(req.locationId, 120)).get();
+        const loc = locSnap.exists ? locSnap.data() || {} : {};
+        const adminUids = new Set([
+          ...(Array.isArray(loc.adminUids) ? loc.adminUids : []),
+          ...(Array.isArray(loc.masterAdminUids) ? loc.masterAdminUids : [])
+        ]);
+        const note = {
+          type:"suprstarPending",
+          title:"supRstar awaiting approval",
+          body:`${text(req.broadcasterEmail, 200) || "A patron"} paid for a supRstar live appearance at ${text(req.locationName, 160) || req.locationId}. Approve in Club Admin.`,
+          clubLocationId:text(req.locationId, 120),
+          locationName:text(req.locationName, 160) || text(req.locationId, 120),
+          requestId,
+          referenceNumber:text(req.referenceNumber, 80),
+          read:false,
+          createdAt:paidAt,
+          link:`./admin.html?location=${encodeURIComponent(text(req.locationId, 120))}&panel=suprstar`
+        };
+        await Promise.all([...adminUids].filter(Boolean).map(uid => db.collection("inboxNotifications").add({...note, recipientUid:uid})));
+      } catch (notifyErr) {
+        console.warn("supRstar admin notify failed", notifyErr?.message || notifyErr);
+      }
+    }
+    await ref.set({
+      fulfillmentStatus:"suprstar-pending-approval",
+      fulfilledRecordId:requestId
     }, {merge:true});
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});

@@ -18,7 +18,7 @@ const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands
   .filter(Boolean);
 
 const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, floqAi:true, shoutOut:true};
-const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true};
+const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true, supRstar:true};
 
 const CLUB_PUBLIC_CLEAR_FIELDS = [
   "logoUrl", "logoStoragePath", "mainMediaUrl", "mainMediaType", "mainMediaStoragePath",

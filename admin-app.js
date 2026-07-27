@@ -102,6 +102,7 @@
     const spotCard = byId("spotAdCampaignCard");
     const marketingCard = byId("marketingCampaignCard");
     const shoutoutTab = document.querySelector('[data-panel="panelQueue"]');
+    const suprstarTab = document.querySelector('[data-panel="panelSuprstar"]');
     if (!g.entityIsAppEnabled(row)) {
       setText("adminStatus", `${row.locationName || locationId} is disabled or offboarded. Club Admin features are locked.`);
       byId("adminPanel")?.querySelectorAll("button, input, select, textarea").forEach(el => {
@@ -112,11 +113,13 @@
     const uberOk = g.venueMayUse("uberAds", row);
     const windowOk = g.venueMayUse("windowAds", row);
     const shoutOk = g.venueMayUse("shoutOut", row);
+    const suprstarOk = g.venueMayUse("supRstar", row);
     const bartrOk = g.venueMayUse("bartrStores", row);
     if (spotCard) spotCard.classList.toggle("hidden", !uberOk);
     if (marketingCard) marketingCard.classList.toggle("hidden", !(uberOk || windowOk));
     if (advertising && advertising.tagName === "BUTTON") advertising.classList.toggle("hidden", !(uberOk || windowOk));
     if (shoutoutTab) shoutoutTab.classList.toggle("hidden", !shoutOk);
+    if (suprstarTab) suprstarTab.classList.toggle("hidden", !suprstarOk);
     document.querySelectorAll("[data-bartr-store-gate]").forEach(el => el.classList.toggle("hidden", !bartrOk));
   }
 
@@ -812,6 +815,81 @@
         if (btn.dataset.panel === "panelReconciliation") loadClubPaymentLedger();
       });
     });
+    const wanted = new URL(location.href).searchParams.get("panel") || "";
+    if (wanted === "suprstar" || wanted === "panelSuprstar") {
+      document.querySelector('[data-panel="panelSuprstar"]')?.click();
+    }
+  }
+
+  let suprstarQueueUnsub = null;
+  function renderSuprstarQueue() {
+    const list = byId("suprstarQueueList");
+    if (!list) return;
+    list.innerHTML = "<p class='sub'>Loading pending supRstar requests...</p>";
+    if (suprstarQueueUnsub) {
+      suprstarQueueUnsub();
+      suprstarQueueUnsub = null;
+    }
+    const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
+    suprstarQueueUnsub = db.collection("suprstarRequests")
+      .where("locationId", "==", locationId)
+      .where("status", "in", ["pending_approval", "approved", "live"])
+      .onSnapshot(snapshot => {
+        const rows = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+          .sort((a, b) => (b.paidAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.paidAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
+        const pending = rows.filter(r => r.status === "pending_approval");
+        const live = rows.filter(r => r.status === "live");
+        setText("metricSuprstarPending", String(pending.length));
+        setText("metricSuprstarLive", String(live.length));
+        setText("metricSuprstarDash", String(pending.length));
+        if (!rows.length) {
+          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval.</p>";
+          return;
+        }
+        list.innerHTML = "";
+        rows.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "queue-item";
+          const status = String(item.status || "");
+          const paid = item.paymentStatus === "paid";
+          div.innerHTML = `
+            <strong>supRstar · ${esc(item.broadcasterEmail || item.broadcasterUid || "patron")}</strong>
+            <p>Ref: ${esc(item.referenceNumber || item.id)} · Board: ${esc(item.displayBoard === "secondary" ? "SupRStar (display2)" : "Display 1")}</p>
+            <small>
+              Status: ${esc(status)}
+              · Payment: ${esc(paid ? "paid $20" : "unpaid")}
+              · ${esc(item.locationName || locationId)}
+            </small>
+            <div class="queue-actions">
+              ${status === "pending_approval" ? `<button class="approve" type="button">Approve — allow go live</button>
+              <button class="reject" type="button">Reject</button>` : ""}
+              ${status === "live" ? `<span class="sub small">Live on venue SupRStar board</span>` : ""}
+              ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
+            </div>`;
+          div.querySelector(".approve")?.addEventListener("click", async () => {
+            try {
+              setText("suprstarQueueStatus", "Approving…");
+              await callable("approveSuprstarRequest")({requestId: item.id});
+              setText("suprstarQueueStatus", "Approved. Patron can go live from their preview tab.");
+            } catch (e) {
+              setText("suprstarQueueStatus", e.message || String(e));
+            }
+          });
+          div.querySelector(".reject")?.addEventListener("click", async () => {
+            if (!confirm("Reject this paid supRstar request?")) return;
+            try {
+              setText("suprstarQueueStatus", "Rejecting…");
+              await callable("rejectSuprstarRequest")({requestId: item.id, reason: "Rejected by venue"});
+              setText("suprstarQueueStatus", "Rejected.");
+            } catch (e) {
+              setText("suprstarQueueStatus", e.message || String(e));
+            }
+          });
+          list.appendChild(div);
+        });
+      }, e => {
+        list.innerHTML = `<p class="status">${esc(e.message)}</p>`;
+      });
   }
 
   function simpleRows(rows) {
@@ -2180,6 +2258,7 @@
       setText("adminStatus", isMasterAdmin ? "Master Admin verified for Club Admin." : "Club admin verified.");
       enforceVenueFeatureGates();
       renderQueue();
+      renderSuprstarQueue();
       loadClubPublicProfile().then(async () => {
         await Promise.all([loadReports(), loadClubTemplateControls(), handleClubConnectReturn()]);
       });

@@ -147,17 +147,15 @@
     },
     {
       id: "help-suprstr-superstar",
-      title: "Make me a SupRstR / superstar",
-      body: "Buy a $20 SupRstR live-stream slot, pick a club and board (display.html or display2.html), open that board, then Go live with your camera to the venue LED.",
+      title: "Make me a supRstar / superstar",
+      body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
-        "make me a superstar", "make me a suprstr", "make me a super star", "make me a super-star",
-        "superstar", "super star", "super-star", "suprstr", "supr str", "go live",
+        "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
+        "superstar", "super star", "super-star", "suprstr", "suprstar", "supr str", "supr star", "go live",
         "live stream", "stream to display", "be a superstar", "become a superstar", "camera to display"
       ],
       links: [
-        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})},
-        {label: "Display 1 example", href: "./display.html?location=heist-washington-dc"},
-        {label: "Display 2 example", href: "./display2.html?location=heist-washington-dc"}
+        {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed"
     },
