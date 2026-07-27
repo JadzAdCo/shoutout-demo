@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.69";
+  const APP_V = "29.09.70";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
