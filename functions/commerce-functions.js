@@ -1634,13 +1634,43 @@ async function finalizePaidOrder(orderId, session) {
   if (order.orderType === "suprstarRequest") {
     const requestId = text(order.payload?.requestId || order.requestId, 120);
     if (!requestId) throw new Error("supRstar fulfillment missing requestId.");
-    const suprstrFns = require("./suprstr-functions");
-    await suprstrFns.markSuprstarRequestPaid({
-      requestId,
-      orderId,
-      paidAt,
-      amountCents:order.amountCents || 2000
-    });
+    const reqRef = db.collection("suprstarRequests").doc(requestId);
+    const reqSnap = await reqRef.get();
+    if (!reqSnap.exists) throw new Error(`supRstar request ${requestId} not found for fulfillment.`);
+    const req = reqSnap.data() || {};
+    if (!(req.paymentStatus === "paid" && req.serviceOrderId === orderId)) {
+      await reqRef.set({
+        paymentStatus:"paid",
+        status:"pending_approval",
+        serviceOrderId:orderId,
+        paidAt,
+        amountCents:Math.max(0, Math.round(Number(order.amountCents || 2000))),
+        updatedAt:paidAt
+      }, {merge:true});
+      try {
+        const locSnap = await db.collection("clubLocations").doc(text(req.locationId, 120)).get();
+        const loc = locSnap.exists ? locSnap.data() || {} : {};
+        const adminUids = new Set([
+          ...(Array.isArray(loc.adminUids) ? loc.adminUids : []),
+          ...(Array.isArray(loc.masterAdminUids) ? loc.masterAdminUids : [])
+        ]);
+        const note = {
+          type:"suprstarPending",
+          title:"supRstar awaiting approval",
+          body:`${text(req.broadcasterEmail, 200) || "A patron"} paid for a supRstar live appearance at ${text(req.locationName, 160) || req.locationId}. Approve in Club Admin.`,
+          clubLocationId:text(req.locationId, 120),
+          locationName:text(req.locationName, 160) || text(req.locationId, 120),
+          requestId,
+          referenceNumber:text(req.referenceNumber, 80),
+          read:false,
+          createdAt:paidAt,
+          link:`./admin.html?location=${encodeURIComponent(text(req.locationId, 120))}&panel=suprstar`
+        };
+        await Promise.all([...adminUids].filter(Boolean).map(uid => db.collection("inboxNotifications").add({...note, recipientUid:uid})));
+      } catch (notifyErr) {
+        console.warn("supRstar admin notify failed", notifyErr?.message || notifyErr);
+      }
+    }
     await ref.set({
       fulfillmentStatus:"suprstar-pending-approval",
       fulfilledRecordId:requestId
