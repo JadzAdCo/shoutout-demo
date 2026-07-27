@@ -331,11 +331,67 @@
     }
   }
 
+  /**
+   * Feature: One-click Heist/venue test helper — regenerate Display 1 + Display 2 secrets
+   * and show both full Xibo URLs once (yellow reveal). Use when testing both boards.
+   */
+  async function reissueBothDisplayTokens() {
+    const locationId = resolveLocationId();
+    if (!locationId) {
+      setText("displayTokenStatus", "Choose a venue first (e.g. Heist Washington DC).");
+      return;
+    }
+    setText("displayTokenStatus", `Re-issuing BOTH board tokens for ${locationId}…`);
+    try {
+      const result = await callable("provisionVenueDisplayTokens")({
+        locationId,
+        tokenRequired: !!byId("displaySecurityTokenRequired")?.checked || true,
+        onlyIfMissing: false,
+        force: true
+      });
+      const data = result?.data || {};
+      const summary = await callable("getVenueDisplayTokens")({locationId});
+      const view = summary?.data || {};
+      if (data.revealOnce && data.primaryUrl && data.secondaryUrl) {
+        const host = byId("displayTokenReport");
+        if (host) {
+          host.innerHTML = `
+            <div class="display-token-onetime" style="margin:12px 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
+              <p><strong>⚠️ ONE-TIME — Heist / venue test URLs for BOTH boards</strong></p>
+              <p class="sub small">${esc(data.warning || "Paste into Xibo (or open in a browser) now. Full values will not be shown again until the next re-issue/rotate.")}</p>
+              <p><strong>Display 1 (ShoutOut)</strong></p>
+              <p><code id="heistTestPrimaryUrl" style="word-break:break-all">${esc(data.primaryUrl)}</code></p>
+              <div class="queue-actions"><button type="button" id="copyHeistPrimaryUrlBtn">Copy Display 1 URL</button></div>
+              <p style="margin-top:10px"><strong>Display 2 (supRstar)</strong></p>
+              <p><code id="heistTestSecondaryUrl" style="word-break:break-all">${esc(data.secondaryUrl)}</code></p>
+              <div class="queue-actions"><button type="button" id="copyHeistSecondaryUrlBtn">Copy Display 2 URL</button></div>
+            </div>
+            <p class="sub small">After this, the portal returns to obfuscated tokens only (${esc(view.primaryTokenObfuscated || "••••")} / ${esc(view.secondaryTokenObfuscated || "••••")}).</p>`;
+          byId("copyHeistPrimaryUrlBtn")?.addEventListener("click", async () => {
+            setText("displayTokenStatus", (await copyText(data.primaryUrl)) ? "Display 1 URL copied." : "Copy failed.");
+          });
+          byId("copyHeistSecondaryUrlBtn")?.addEventListener("click", async () => {
+            setText("displayTokenStatus", (await copyText(data.secondaryUrl)) ? "Display 2 URL copied." : "Copy failed.");
+          });
+        }
+        setText("displayTokenStatus", `Both tokens ready for ${locationId}. Copy the yellow URLs now.`);
+      } else {
+        renderTokenReport(view, null);
+        setText("displayTokenStatus", data.warning || "Tokens exist but cleartext was not returned.");
+      }
+      if (byId("displaySecurityTokenRequired")) byId("displaySecurityTokenRequired").checked = true;
+      await loadDisplayAccessLogs(locationId);
+    } catch (err) {
+      setText("displayTokenStatus", err?.message || "Re-issue failed.");
+    }
+  }
+
   function bind() {
     byId("loadDisplaySecurityBtn")?.addEventListener("click", () => loadVenueDisplaySecurity());
     byId("saveDisplaySecurityBtn")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => loadDisplayAccessLogs());
+    byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));
     byId("rotateSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary"));
     byId("clearPrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary", {clear: true}));
