@@ -1162,3 +1162,20 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background:rgba(200,16,46,.92);
   box-shadow:0 0 0 2px rgba(255,255,255,.2);
 }
+.suprstr-live-status{
+  position:absolute;
+  bottom:4%;
+  left:50%;
+  transform:translateX(-50%);
+  padding:.4em .8em;
+  border-radius:999px;
+  font:600 1.8vh/1.2 system-ui,sans-serif;
+  color:#fff;
+  background:rgba(0,0,0,.55);
+}
+.suprstr-live-status:empty{display:none}
+body.suprstr-live-active .display-text-overlay,
+body.suprstr-live-active .heist-brand-slide{
+  opacity:0;
+  pointer-events:none;
+}
