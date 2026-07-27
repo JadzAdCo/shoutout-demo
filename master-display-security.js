@@ -268,7 +268,7 @@
           box.value = lines.join("\n");
         }
       }
-      setText("displaySecurityStatus", `Observed IP: ${ip}. Added to the list (click Save to keep).`);
+      setText("displaySecurityStatus", `Observed IP: ${ip}. Added to the list (click Save to keep). If Xibo logs show a different IPv6 address, add that too — venues often use both.`);
       await loadDisplayAccessLogs(locationId);
     } catch (err) {
       setText("displaySecurityStatus", err?.message || "IP detect failed.");
@@ -294,33 +294,46 @@
         setText("displayAccessLogStatus", "No logs.");
         return;
       }
+      // Use display-access-log-table (NOT .report-table) — admin.css .report-table is a div-grid pattern that breaks <table>.
       host.innerHTML = `
-        <div class="report-table-wrap" style="overflow:auto">
-          <table class="report-table" style="width:100%;border-collapse:collapse;font-size:13px">
+        <div class="display-access-log-wrap">
+          <table class="display-access-log-table" role="table">
             <thead>
               <tr>
-                <th align="left">When</th>
-                <th align="left">Venue</th>
-                <th align="left">Board</th>
-                <th align="left">Client IP</th>
-                <th align="left">Token</th>
-                <th align="left">Allowed</th>
-                <th align="left">Reason</th>
-                <th align="left">UA / platform</th>
+                <th scope="col">When</th>
+                <th scope="col">Venue</th>
+                <th scope="col">Board</th>
+                <th scope="col">Client IP</th>
+                <th scope="col">Hostname</th>
+                <th scope="col">MAC Address</th>
+                <th scope="col">Token</th>
+                <th scope="col">IP restrict</th>
+                <th scope="col">Allowed</th>
+                <th scope="col">Reason</th>
+                <th scope="col">UA / platform</th>
               </tr>
             </thead>
             <tbody>
-              ${rows.map((row) => `
-                <tr>
+              ${rows.map((row) => {
+                const tokenCell = row.tokenRequired
+                  ? (row.tokenOk ? "ok" : (row.tokenProvided ? "bad" : "missing"))
+                  : "off";
+                const allowedCell = row.allowed ? "yes" : "no";
+                return `
+                <tr class="${row.allowed ? "is-allowed" : "is-denied"}">
                   <td>${esc(formatWhen(row.createdAtMs))}</td>
                   <td>${esc(row.locationName || row.locationId)}</td>
                   <td>${esc(row.displayBoard || "—")}</td>
-                  <td><code>${esc(row.clientIp || "—")}</code></td>
-                  <td>${row.tokenRequired ? (row.tokenOk ? "ok" : (row.tokenProvided ? "bad" : "missing")) : "—"}</td>
-                  <td>${row.allowed ? "yes" : "<strong>no</strong>"}</td>
+                  <td><code>${esc(row.clientIp || "—")}</code>${row.reportedIp && row.reportedIp !== row.clientIp ? `<br/><small>reported ${esc(row.reportedIp)}</small>` : ""}</td>
+                  <td>${esc(row.hostname || "—")}</td>
+                  <td>${esc(row.macAddress || "n/a")}</td>
+                  <td>${esc(tokenCell)}</td>
+                  <td>${row.restrictionEnabled ? "on" : "off"}</td>
+                  <td><strong>${allowedCell}</strong></td>
                   <td>${esc(row.reason || "—")}</td>
-                  <td><small>${esc((row.userAgent || "").slice(0, 80))}</small></td>
-                </tr>`).join("")}
+                  <td class="display-access-log-ua"><small>${esc((row.userAgent || "").slice(0, 100))}${row.platform ? ` · ${esc(row.platform)}` : ""}</small></td>
+                </tr>`;
+              }).join("")}
             </tbody>
           </table>
         </div>`;

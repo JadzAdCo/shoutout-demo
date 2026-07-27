@@ -1274,6 +1274,8 @@
         userAgent: String(navigator.userAgent || "").slice(0, 400),
         screenFormatId: screenFormatOverride || "",
         reportedIp: String(qs("ip", "") || "").trim(),
+        reportedHostname: String(qs("host", qs("hostname", "")) || "").trim(),
+        reportedMac: String(qs("mac", qs("macAddress", "")) || "").trim(),
         language: String(navigator.language || "").slice(0, 40),
         timezone: (() => {
           try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (_) { return ""; }
