@@ -46,13 +46,13 @@
     {
       id: "suprstr",
       kind: "product",
-      label: "SupRstR — go live / be a superstar",
-      blurb: "Buy a live-stream slot and broadcast your camera to a club display (display.html or display2.html).",
+      label: "supRstar — go live / be a superstar",
+      blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.",
       href: vUrl("./suprstr-search.html", {from: "floqai"}),
       patterns: [
-        /supr\s*str/, /suprstr/, /super\s*-?\s*star/, /superstar/,
-        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|supr\s*str)/,
-        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar)/,
+        /supr\s*str/, /suprstr/, /supr\s*star/, /suprstar/, /super\s*-?\s*star/, /superstar/,
+        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar|supr\s*str|supr\s*star)/,
+        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar|suprstar)/,
         /go\s+live/, /live\s*stream/, /stream\s+(to\s+)?(the\s+)?display/,
         /camera\s+to\s+(the\s+)?(club|venue|display)/, /broadcast\s+(live|myself|to)/
       ]
@@ -72,29 +72,28 @@
     {
       id: "help-suprstr",
       kind: "help",
-      label: "Make me a SupRstR / superstar",
-      blurb: "Purchase a $20 SupRstR live-stream slot, pick a club venue and board (display.html or display2.html), open that board, then Go live with your camera — like a live ShoutOut, but video.",
+      label: "Make me a supRstar / superstar",
+      blurb: "Like a ShoutOut for video: pick a venue → private camera preview → pay $20 in a Stripe pop-out → Club Admin approves in the supRstar Queue → Go live on the SupRStar board (display2). Preview URLs are secret tokens so video cannot leak from a guessed club URL.",
       steps: [
-        "Open SupRstR from Search or FloqAi.",
-        "Sign in and purchase a $20 live-stream slot if you need one.",
-        "Choose the venue and Display 1 or Display 2.",
-        "Open that venue’s display page on the LED / second device.",
-        "Tap Go live and allow camera access."
+        "Open supRstar from Search or FloqAi.",
+        "Choose a venue that has supRstar enabled.",
+        "Tap Go live, be a supRstar — a private preview page opens (camera only, not on the board yet).",
+        "Pay $20 in the Stripe pop-out while the preview stays open.",
+        "Wait for Club Admin to Approve in Club Admin → supRstar Queue.",
+        "When approved, tap Go live on your preview page."
       ],
       links: [
-        {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})},
-        {label: "Example Display 1 (Heist)", href: "./display.html?location=heist-washington-dc"},
-        {label: "Example Display 2 (Heist)", href: "./display2.html?location=heist-washington-dc"}
+        {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       searchPhrases: [
-        "make me a superstar", "make me a suprstr", "make me a super star", "make me a super-star",
-        "superstar", "super star", "super-star", "suprstr", "supr str",
+        "make me a superstar", "make me a suprstr", "make me a suprstar", "make me a super star", "make me a super-star",
+        "superstar", "super star", "super-star", "suprstr", "suprstar", "supr str", "supr star",
         "go live", "live stream", "stream to display", "be a superstar", "become a superstar"
       ],
       patterns: [
-        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr)/,
-        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar)/,
-        /supr\s*str/, /super\s*-?\s*star/, /go\s+live/, /live\s*stream/
+        /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar)/,
+        /be(come)?\s+(a\s+)?(super\s*-?\s*star|superstar|suprstar)/,
+        /supr\s*str/, /supr\s*star/, /super\s*-?\s*star/, /go\s+live/, /live\s*stream/
       ]
     },
     {

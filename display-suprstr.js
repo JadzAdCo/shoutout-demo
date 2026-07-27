@@ -39,7 +39,7 @@
     wrap.setAttribute("aria-live", "polite");
     wrap.innerHTML = `
       <video id="suprstrLiveVideo" class="suprstr-live-video" autoplay playsinline muted></video>
-      <div class="suprstr-live-badge">LIVE · SupRstR</div>
+      <div class="suprstr-live-badge">LIVE · supRstar</div>
     `;
     const canvas = byId("displayCanvas") || document.body;
     canvas.appendChild(wrap);

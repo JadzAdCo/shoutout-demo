@@ -8,6 +8,7 @@
   const db = firebase.firestore();
   const orderId = qs("order");
   const cancelled = qs("cancelled") === "1";
+  const isPopup = qs("popup") === "1";
   let cancelAttempted = false;
 
   function money(cents) {
@@ -22,25 +23,56 @@
     return "";
   }
 
+  function notifyOpenerPaid(order = {}) {
+    if (!isPopup) return;
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          type: "floqr-suprstar-paid",
+          orderId,
+          requestId: order.payload?.requestId || order.requestId || "",
+          paymentStatus: order.paymentStatus || ""
+        }, "*");
+      }
+    } catch (_) {}
+  }
+
   function render(order = {}) {
     const paid = order.paymentStatus === "paid";
     const isShoutout = order.orderType === "shoutout";
-    const isSuprstr = order.orderType === "suprstrSlot";
+    const isSuprstar = order.orderType === "suprstarRequest" || order.orderType === "suprstrSlot";
     const receipt = order.receipt || {};
     byId("paymentReturnTitle").textContent = paid
-      ? (isShoutout ? "ShoutOut submitted" : isSuprstr ? "SupRstR slot purchased" : "Payment confirmed")
+      ? (isShoutout ? "ShoutOut submitted" : isSuprstar ? "supRstar paid" : "Payment confirmed")
       : cancelled || order.status === "checkout-cancelled"
         ? "Payment cancelled"
         : "Payment processing";
     byId("paymentReturnStatus").textContent = paid
       ? (isShoutout
         ? "Your message has been sent to the location approval queue. A final receipt was also sent to FloqR Inbox and your email/SMS when available."
-        : isSuprstr
-          ? "Your live-stream slot(s) are credited. Return to SupRstR to see remaining slots. Go-live (camera) ships next."
-          : "Your order is recorded and the next service step is underway.")
+        : order.orderType === "suprstarRequest"
+          ? "Payment received. Return to your private preview tab — Club Admin must approve before you can go live."
+          : isSuprstar
+            ? "Your live-stream slot(s) are credited."
+            : "Your order is recorded and the next service step is underway.")
       : cancelled || order.status === "checkout-cancelled"
         ? "Nothing was submitted. The unpaid checkout was cleared so you can try again."
         : "Stripe confirmation can take a few seconds. This page updates automatically.";
+
+    if (paid && order.orderType === "suprstarRequest") {
+      notifyOpenerPaid(order);
+      byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
+        <p><strong>Service:</strong> supRstar live appearance</p>
+        <p><strong>Ref:</strong> ${esc(order.referenceNumber || order.payload?.requestId || "—")}</p>
+        <p><strong>Status:</strong> Pending Club Admin approval</p>
+        <p><strong>Total:</strong> ${esc(money(order.amountCents))}</p>
+        <p class="sub small">${isPopup ? "You can close this window and return to your preview tab." : "Keep your private preview tab open."}</p>
+      </div>`;
+      if (isPopup) {
+        setTimeout(() => { try { window.close(); } catch (_) {} }, 1800);
+      }
+      return;
+    }
 
     if (paid && isShoutout) {
       const paidAt = paidAtLabel(order) || "—";
@@ -66,18 +98,7 @@
       if (window.FLOQRPayments?.cancelCheckoutOrder) {
         await window.FLOQRPayments.cancelCheckoutOrder({ orderId, reason: "stripe-cancel-return" });
       }
-      if (window.FLOQRLog) {
-        window.FLOQRLog.write({
-          level: "info",
-          category: "checkout",
-          action: "payment_return_cancelled",
-          message: `Patron returned from cancelled Stripe checkout ${orderId}`,
-          details: { orderId }
-        });
-      }
-    } catch (error) {
-      if (window.FLOQRLog) window.FLOQRLog.fromError(error, { category: "checkout", action: "payment_return_cancel_failed", details: { orderId } });
-    }
+    } catch (_) {}
   }
 
   auth.onAuthStateChanged(user => {

@@ -1,7 +1,6 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
-// EXPECTED DEPLOYED RULES VERSION: v29.09.23-entity-feature-gates or newer
+// FLOQR FIRESTORE RULES VERSION: v29.09.66-suprstar-approval-flow
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
@@ -742,19 +741,35 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Venue live pointer — public read so display.html?location=… can attach without auth (like liveContent).
+    match /suprstarRequests/{requestId} {
+      allow read: if signedIn() && (
+        resource.data.broadcasterUid == request.auth.uid
+        || isClubManager(resource.data.locationId)
+        || isMasterAdmin()
+      );
+      allow write: if false;
+    }
+
+    // Venue live pointer — public read so display boards can attach (session id is unguessable).
     match /suprstrLive/{locationId} {
       allow read: if true;
       allow write: if false;
     }
 
-    // WebRTC signaling for SupRstR → selected venue display.html
+    // WebRTC signaling — session ids are random; broadcaster + display board only.
     match /suprstrSessions/{sessionId} {
       allow read: if true;
-      allow create: if isMasterAdmin();
+      allow create: if false;
       allow update: if isMasterAdmin()
         || (
-          resource.data.status in ["waiting", "offering"]
+          signedIn()
+          && resource.data.broadcasterUid == request.auth.uid
+          && resource.data.status in ["waiting", "offering"]
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["offer", "status", "updatedAt"])
+        )
+        || (
+          resource.data.status in ["waiting", "offering", "connected"]
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(["answer", "status", "answeredAt", "updatedAt"])
           && request.resource.data.status in ["offering", "connected"]
@@ -763,7 +778,8 @@ service cloud.firestore {
 
       match /callerCandidates/{candidateId} {
         allow read: if true;
-        allow create: if isMasterAdmin();
+        allow create: if signedIn()
+          && get(/databases/$(database)/documents/suprstrSessions/$(sessionId)).data.broadcasterUid == request.auth.uid;
         allow update, delete: if false;
       }
       match /calleeCandidates/{candidateId} {

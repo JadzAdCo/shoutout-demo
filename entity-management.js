@@ -200,7 +200,7 @@
       ${type === "club" && !offboarded ? `
         <div class="card entity-gate-card">
           <h4>Per-venue feature gates</h4>
-          <p class="sub small">Disable venue ability to use UberAds, WindowAds, BartR Stores, or ShoutOut.</p>
+          <p class="sub small">Disable venue ability to use UberAds, WindowAds, BartR Stores, ShoutOut, or supRstar.</p>
           <div class="privacy-datapoint-grid">${venueGateChecks(row)}</div>
           <button id="saveVenueGatesBtn" class="primary" type="button">Save Venue Feature Gates</button>
         </div>` : ""}

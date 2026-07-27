@@ -17,7 +17,8 @@
     uberAds: true,
     windowAds: true,
     bartrStores: true,
-    shoutOut: true
+    shoutOut: true,
+    supRstar: true
   });
 
   const PATRON_GATE_LABELS = Object.freeze({
@@ -32,7 +33,8 @@
     uberAds: "UberAds",
     windowAds: "WindowAds",
     bartrStores: "BartR Stores",
-    shoutOut: "ShoutOut Capability"
+    shoutOut: "ShoutOut Capability",
+    supRstar: "supRstar live video"
   });
 
   let cachedPatronGates = { ...DEFAULT_PATRON_GATES };

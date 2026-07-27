@@ -84,7 +84,17 @@
 .suprstr-preview.is-on{
   display:block;
 }
-#suprstrVenueSelect{
+.suprstar-steps{
+  margin:0;
+  padding-left:1.2rem;
+  line-height:1.5;
+  text-align:left;
+}
+.suprstar-steps li{
+  margin:0.25rem 0;
+}
+#suprstrVenueSelect,
+#suprstrBoardSelect{
   width:100%;
   max-width:420px;
   margin-top:6px;

@@ -56,6 +56,7 @@
         <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
         <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button">Template Backgrounds</button>
         <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
+        <button class="admin-tab" data-panel="panelSuprstar" type="button">supRstar Queue</button>
         <button class="admin-tab" data-panel="panelAnalytics" type="button">Analytics</button>
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
         <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
@@ -71,6 +72,7 @@
         <div class="metric-grid">
           <div class="metric-card"><span>Pending ShoutOuts</span><strong id="metricPending">0</strong></div>
           <div class="metric-card"><span>Live ShoutOut</span><strong id="metricLive">0</strong></div>
+          <div class="metric-card"><span>Pending supRstar</span><strong id="metricSuprstarDash">0</strong></div>
           <div class="metric-card"><span>Estimated ShoutOut Revenue</span><strong id="metricRevenue">$0</strong></div>
           <div class="metric-card"><span>Ad Impressions</span><strong id="metricAdImpressions">0</strong></div>
         </div>
@@ -226,6 +228,19 @@
           <h2>Pending ShoutOut Queue</h2>
           <p class="sub small">Club admins see only this location's queue.</p>
           <div id="queueList"><p class="sub">Loading pending ShoutOuts...</p></div>
+        </div>
+      </section>
+
+      <section id="panelSuprstar" class="admin-panel-section">
+        <div class="card">
+          <h2>Pending supRstar Queue</h2>
+          <p class="sub small">Patrons pay $20 first, then wait here for venue approval before their camera can go live on the SupRStar board (<code>display2.html</code>). Same idea as ShoutOut approval.</p>
+          <div class="metric-grid" style="margin-bottom:12px">
+            <div class="metric-card"><span>Awaiting approval</span><strong id="metricSuprstarPending">0</strong></div>
+            <div class="metric-card"><span>Live now</span><strong id="metricSuprstarLive">0</strong></div>
+          </div>
+          <p id="suprstarQueueStatus" class="status"></p>
+          <div id="suprstarQueueList"><p class="sub">Loading pending supRstar requests...</p></div>
         </div>
       </section>
 
@@ -561,7 +576,7 @@
 <script src="./floqr-nav.js?v=29.09.46"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.33"></script>
-<script src="./feature-gates.js?v=29.09.23"></script>
+<script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./media-source-picker.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
@@ -576,7 +591,7 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.46"></script>
+<script src="./admin-app.js?v=29.09.66"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
