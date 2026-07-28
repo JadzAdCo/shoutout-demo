@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.96";
+  const CURRENT_VERSION = "29.09.97";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 

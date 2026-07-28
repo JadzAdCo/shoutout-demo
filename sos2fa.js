@@ -5,7 +5,7 @@
   const STORAGE_PREFIX = "floqr_sos2fa_";
   const DEFAULT_TTL_MS = 60 * 60 * 1000;
   const WRONG_CODE_MESSAGE = "Wrong code entered, please enter the correct code to proceed";
-  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com"]).map(x => String(x).toLowerCase());
+  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com", "bans.don@gmail.com"]).map(x => String(x).toLowerCase());
   const ENTITY_MGMT_PANELS = [
     "clubAdminUrls",
     "entityManagement",
@@ -149,10 +149,8 @@
     }
 
     const hint = byId("sos2faPhoneHint");
-    if (hint) {
-      hint.textContent = challengeRequested
-        ? "Enter the six-digit code sent to your Super Admin mobile."
-        : "Request a one-time SMS code using the mobile number saved in your Super Admin profile.";
+    if (hint && !challengeRequested) {
+      hint.textContent = "";
     }
   }
 
