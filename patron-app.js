@@ -55,6 +55,7 @@
   let emailOtpChallengeId = "";
   let emailOtpExpiresAt = 0;
   let emailOtpTimer = null;
+  let emailOtpSentAutoCloseTimer = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -1013,6 +1014,30 @@
     }
     if (willOpen) byId("emailOtpAddress")?.focus();
   }
+  function closeEmailOtpSentModal() {
+    if (emailOtpSentAutoCloseTimer) {
+      clearTimeout(emailOtpSentAutoCloseTimer);
+      emailOtpSentAutoCloseTimer = null;
+    }
+    const modal = byId("emailOtpSentModal");
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function showEmailOtpSentModal(email = "") {
+    const modal = byId("emailOtpSentModal");
+    if (!modal) return;
+    const emailLine = byId("emailOtpSentEmail");
+    if (emailLine) emailLine.textContent = email ? `Sent to ${email}` : "";
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+    byId("emailOtpSentCloseBtn")?.focus?.();
+    if (emailOtpSentAutoCloseTimer) clearTimeout(emailOtpSentAutoCloseTimer);
+    // Auto-close shortly after the backend confirmed SendGrid accepted the message.
+    emailOtpSentAutoCloseTimer = setTimeout(closeEmailOtpSentModal, 4500);
+  }
+
   function updateEmailOtpCountdown() {
     const status = byId("emailOtpStatus");
     if (!status || !emailOtpExpiresAt) return;
@@ -1022,15 +1047,18 @@
   }
   async function requestEmailOtp() {
     const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
+    if (!email) { setText("emailOtpStatus", "Enter your email address first."); byId("emailOtpAddress")?.focus?.(); return; }
     if (!functions) { setText("emailOtpStatus", "Firebase Functions is unavailable on this page."); return; }
     try {
       setText("emailOtpStatus", "Sending your secure sign-in code...");
       const response = await functions.httpsCallable("requestEmailOtp")({email});
       emailOtpChallengeId = response.data?.challengeId || "";
-      emailOtpExpiresAt = Date.now() + Number(response.data?.expiresInSeconds || 300) * 1000;
+      if (!emailOtpChallengeId) throw new Error("The email code could not be confirmed. Please try again.");
+      emailOtpExpiresAt = Date.now() + Number(response.data?.expiresInSeconds || 360) * 1000;
       clearInterval(emailOtpTimer);
       emailOtpTimer = setInterval(updateEmailOtpCountdown, 1000);
       updateEmailOtpCountdown();
+      showEmailOtpSentModal(email);
       byId("emailOtpCode")?.focus();
     } catch (error) {
       setText("emailOtpStatus", error?.message || "The email code could not be sent.");
@@ -3691,7 +3719,7 @@
       if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
     }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
-    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
+    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));

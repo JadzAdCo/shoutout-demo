@@ -9,6 +9,11 @@ configstore/
 
 # Publish staging clones
 .publish-*/
+so-main-publish/
+
+# Local scrape / scratch dumps
+functions/scripts/_scrape-out.json
+rollback-readme-history.zip
 
 # Firebase
 .firebase/

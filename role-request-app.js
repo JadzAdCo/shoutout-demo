@@ -117,8 +117,17 @@
     setText("roleStatus", `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
   }
 
+  function applyTypeFromQuery() {
+    const type = new URLSearchParams(location.search).get("type") || new URLSearchParams(location.search).get("role") || "";
+    const select = byId("requestType");
+    if (!select || !type) return;
+    const allowed = new Set(["clubAdmin", "dj", "promoter", "hospitality", "bartender", "mediaCreator"]);
+    if (allowed.has(type)) select.value = type;
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     populateLocations();
+    applyTypeFromQuery();
     byId("roleGoogleLoginBtn")?.addEventListener("click", () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
     byId("submitRoleRequestBtn")?.addEventListener("click", submitRoleRequest);
   });
