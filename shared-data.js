@@ -11,7 +11,8 @@ window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
 
 /* Super Admin = primary Master Admin; exempt from global patron feature disables and offboard/disable via entity tools. */
 window.SHOUTOUT_SUPER_ADMIN_EMAILS = [
-  "bands.don@gmail.com"
+  "bands.don@gmail.com",
+  "bans.don@gmail.com"
 ];
 
 /*

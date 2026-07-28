@@ -24,7 +24,7 @@ const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com")
+const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);

@@ -2,7 +2,7 @@
 (function (root) {
   "use strict";
 
-  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com"]).map(x => String(x).toLowerCase());
+  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com", "bans.don@gmail.com"]).map(x => String(x).toLowerCase());
   const MASTER_ADMIN_EMAILS = (root.SHOUTOUT_MASTER_ADMIN_EMAILS || root.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
 
   const DEFAULT_PATRON_GATES = Object.freeze({

@@ -13,7 +13,7 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
 
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com")
+const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
