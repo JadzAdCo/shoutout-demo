@@ -88,14 +88,33 @@
     if (parent) parent.classList.toggle("is-blink", !!hasNew);
   }
 
-  function formatWhen(ms) {
+  function formatDatePart(ms) {
     const n = Number(ms || 0);
     if (!n) return "—";
     try {
-      return new Date(n).toLocaleString();
+      return new Date(n).toLocaleDateString(undefined, {year: "numeric", month: "short", day: "numeric"});
     } catch (_) {
-      return String(n);
+      return "—";
     }
+  }
+
+  function formatTimePart(ms) {
+    const n = Number(ms || 0);
+    if (!n) return "—";
+    try {
+      return new Date(n).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+    } catch (_) {
+      return "—";
+    }
+  }
+
+  function hostIpFromRow(row = {}) {
+    const d = row.details || {};
+    return String(d.clientIp || d.hostIp || d.ip || row.clientIp || "").trim() || "—";
+  }
+
+  function errorDetailsFromRow(row = {}) {
+    return String(row.message || "Display load-error fallback").trim();
   }
 
   function renderLoadErrors(rows = []) {
@@ -122,20 +141,35 @@
       return;
     }
 
-    host.innerHTML = rows.map((row) => {
+    const bodyRows = rows.map((row) => {
       const d = row.details || {};
-      const locationId = d.locationId || row.details?.locationId || "";
-      const board = d.displayBoard || row.details?.displayBoard || "";
-      const reason = d.reason || row.action || "xibo_page_load_error";
-      const code = d.httpCode || "";
-      const ip = d.clientIp || "";
+      const locationId = d.locationId || "";
+      const board = d.displayBoard || "";
       const isNew = Number(row.createdAtMs || 0) > seenMs && !viewing;
-      return `<article class="master-system-message-row${isNew ? " is-unread" : ""}">
-        <strong>${esc(boardLabel(board))}${locationId ? ` · ${esc(locationId)}` : ""}${isNew ? " · NEW" : ""}</strong>
-        <p class="sub small">${esc(row.message || "Display load-error fallback")}</p>
-        <p class="sub small">${esc(formatWhen(row.createdAtMs))}${reason ? ` · ${esc(reason)}` : ""}${code ? ` · HTTP ${esc(code)}` : ""}${ip ? ` · ${esc(ip)}` : ""}</p>
-      </article>`;
+      return `<tr class="${isNew ? "is-unread" : ""}">
+        <td>${esc(formatDatePart(row.createdAtMs))}</td>
+        <td>${esc(formatTimePart(row.createdAtMs))}</td>
+        <td>${esc(hostIpFromRow(row))}</td>
+        <td>
+          <div class="display-load-error-detail">${esc(errorDetailsFromRow(row))}</div>
+          <div class="display-load-error-meta">${esc(boardLabel(board))}${locationId ? ` · ${esc(locationId)}` : ""}${isNew ? " · NEW" : ""}</div>
+        </td>
+      </tr>`;
     }).join("");
+
+    host.innerHTML = `<div class="display-load-errors-table-wrap" data-keep-visible="true">
+      <table class="display-load-errors-table" data-keep-visible="true">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Time</th>
+            <th scope="col">Host IP</th>
+            <th scope="col">Error Details</th>
+          </tr>
+        </thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>`;
   }
 
   function startDisplayLoadErrorFeed() {

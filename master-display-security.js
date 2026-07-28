@@ -151,14 +151,44 @@
   /**
    * Feature: Obfuscated token panel (normal Security portal view).
    * Full secrets are intentionally not shown — rotate for a one-time clear URL.
+   * Obfuscated last-4 keys sit behind "View Obfuscated Keys" (not help-popout nested text).
    */
+  function obfuscatedKeysTableHtml(data = {}) {
+    const d1 = data.primaryHasToken ? (data.primaryTokenObfuscated || "••••") : "none";
+    const d2 = data.secondaryHasToken ? (data.secondaryTokenObfuscated || "••••") : "none";
+    return `<details class="display-obfuscated-keys" data-keep-visible="true">
+      <summary class="display-obfuscated-keys-btn">View Obfuscated Keys</summary>
+      <div class="display-obfuscated-keys-panel" data-keep-visible="true">
+        <p class="display-obfuscated-keys-meta" data-keep-visible="true">Token required: <strong>${data.tokenRequired ? "ON" : "OFF"}</strong></p>
+        <table class="display-obfuscated-keys-table" data-keep-visible="true">
+          <thead>
+            <tr>
+              <th scope="col">Display</th>
+              <th scope="col">Obfuscated Keys showing last 4 digits</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Display 1 (ShoutOut)</td>
+              <td><code>${esc(d1)}</code></td>
+            </tr>
+            <tr>
+              <td>Display 2 (supRstar)</td>
+              <td><code>${esc(d2)}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>`;
+  }
+
   function renderTokenReport(data = {}, oneTimeReveal = null) {
     const host = byId("displayTokenReport");
     if (!host) return;
     const revealHtml = oneTimeReveal?.url ? `
       <div class="display-token-onetime" style="margin:12px 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
         <p><strong>⚠️ ONE-TIME full ${esc(oneTimeReveal.label || "board")} URL</strong></p>
-        <p class="sub small">${esc(oneTimeReveal.warning || "Paste into Xibo now. This full value will not appear again until the next rotate.")}</p>
+        <p class="sub small" data-keep-visible="true">${esc(oneTimeReveal.warning || "Paste into Xibo now. This full value will not appear again until the next rotate.")}</p>
         <p><code id="displayOneTimeTokenUrl" style="word-break:break-all">${esc(oneTimeReveal.url)}</code></p>
         <div class="queue-actions">
           <button type="button" id="copyOneTimeDisplayTokenBtn">Copy full Xibo URL</button>
@@ -166,7 +196,7 @@
       </div>` : "";
 
     host.innerHTML = `
-      <div class="sub small" style="margin-bottom:10px;line-height:1.45">
+      <div class="sub small" style="margin-bottom:10px;line-height:1.45" data-keep-visible="true">
         <strong>How to rotate (directives)</strong>
         <ol style="margin:6px 0 0;padding-left:1.2rem">
           <li>Choose the venue above and confirm token requirement is ON if Xibo should reject open links.</li>
@@ -176,15 +206,9 @@
           <li>This portal then shows only an obfuscated token (last 4 characters) for confirmation.</li>
         </ol>
       </div>
-      <p class="sub small">Token required: <strong>${data.tokenRequired ? "ON" : "OFF"}</strong>
-        · Display 1: ${data.primaryHasToken ? `set · <code>${esc(data.primaryTokenObfuscated || "••••")}</code>` : "none"}
-        · Display 2: ${data.secondaryHasToken ? `set · <code>${esc(data.secondaryTokenObfuscated || "••••")}</code>` : "none"}</p>
+      ${obfuscatedKeysTableHtml(data)}
       ${revealHtml}
-      <p><strong>Display 1 (ShoutOut) — obfuscated preview</strong></p>
-      <p><code style="word-break:break-all">${esc(data.primaryUrlObfuscated || data.primaryBaseUrl || "—")}</code></p>
-      <p><strong>Display 2 (supRstar) — obfuscated preview</strong></p>
-      <p><code style="word-break:break-all">${esc(data.secondaryUrlObfuscated || data.secondaryBaseUrl || "—")}</code></p>
-      <p class="sub small" style="margin-top:10px">Obfuscated URLs are not usable in Xibo. Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
+      <p class="sub small" style="margin-top:10px" data-keep-visible="true">Obfuscated secrets are confirmation-only (last 4 digits). Use onboarding reveal or Rotate for a real <code>?k=</code> URL. Never add <code>?v=</code>.</p>`;
 
     byId("copyOneTimeDisplayTokenBtn")?.addEventListener("click", async () => {
       const ok = await copyText(oneTimeReveal?.url || "");
@@ -447,7 +471,7 @@
           host.innerHTML = `
             <div class="display-token-onetime" style="margin:12px 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
               <p><strong>⚠️ ONE-TIME — Heist / venue test URLs for BOTH boards</strong></p>
-              <p class="sub small">${esc(data.warning || "Paste into Xibo (or open in a browser) now. Full values will not be shown again until the next re-issue/rotate.")}</p>
+              <p class="sub small" data-keep-visible="true">${esc(data.warning || "Paste into Xibo (or open in a browser) now. Full values will not be shown again until the next re-issue/rotate.")}</p>
               <p><strong>Display 1 (ShoutOut)</strong></p>
               <p><code id="heistTestPrimaryUrl" style="word-break:break-all">${esc(data.primaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistPrimaryUrlBtn">Copy Display 1 URL</button></div>
@@ -455,7 +479,8 @@
               <p><code id="heistTestSecondaryUrl" style="word-break:break-all">${esc(data.secondaryUrl)}</code></p>
               <div class="queue-actions"><button type="button" id="copyHeistSecondaryUrlBtn">Copy Display 2 URL</button></div>
             </div>
-            <p class="sub small">After this, the portal returns to obfuscated tokens only (${esc(view.primaryTokenObfuscated || "••••")} / ${esc(view.secondaryTokenObfuscated || "••••")}).</p>`;
+            <p class="sub small" data-keep-visible="true">After this, the portal returns to obfuscated tokens only. Use <em>View Obfuscated Keys</em> to confirm last-4 digits.</p>
+            ${obfuscatedKeysTableHtml(view)}`;
           byId("copyHeistPrimaryUrlBtn")?.addEventListener("click", async () => {
             setText("displayTokenStatus", (await copyText(data.primaryUrl)) ? "Display 1 URL copied." : "Copy failed.");
           });
