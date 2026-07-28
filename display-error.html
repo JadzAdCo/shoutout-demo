@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- FLOQR display load-error fallback for Xibo. Stable URL — do not add ?v=. -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <title>FLOQR Display · Load Error</title>
+  <link rel="stylesheet" href="./display.css?v=29.09.90"/>
+  <style>
+    .display-canvas.display-load-error{
+      background:linear-gradient(145deg,#12080f,#1a0a18 50%,#07040a)!important;
+      animation:none;
+    }
+    .display-canvas.display-load-error .brand{
+      color:#ffc9a8;
+      letter-spacing:.08em;
+      font-size:clamp(14px,2.2vw,22px);
+    }
+    .display-canvas.display-load-error #displayMain{
+      color:#fff!important;
+      font-size:clamp(22px,3.6vw,40px)!important;
+      font-weight:700!important;
+      line-height:1.35!important;
+      max-width:min(92vw,920px);
+      text-wrap:balance;
+      text-align:center;
+    }
+    .display-canvas.display-load-error #displaySub{
+      color:rgba(255,220,200,.82)!important;
+      max-width:min(90vw,720px);
+      text-align:center;
+      font-size:clamp(14px,2vw,20px)!important;
+    }
+  </style>
+</head>
+<body class="display display-board-error">
+  <main id="displayCanvas" class="display-canvas display-load-error" data-display-board="error-fallback">
+    <div class="display-text-overlay">
+      <div id="displayBrand" class="brand">Floq Media / FloqR</div>
+      <div class="display-compose-slot">
+        <div class="display-center">
+          <h1 id="displayMain">Display page failed to load</h1>
+          <h2 id="displaySub">This is the Xibo load-error fallback. Check the Webpage Link URL, network, and Display Security settings. FloqR Diagnostics records this event.</h2>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+  <script src="./firebase-config.js?v=29.09.22"></script>
+  <script src="./display-error-app.js?v=29.09.90"></script>
+</body>
+</html>

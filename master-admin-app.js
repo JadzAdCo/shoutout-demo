@@ -146,6 +146,10 @@
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
+      if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
+      if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
+        window.FLOQRDiagnosticsPanels?.ensureMounted?.();
+      }
       if (panelId === "entityManagement" && window.FLOQRSOS2FA) {
         window.FLOQRSOS2FA.mount({
           scope: "entityManagement",
@@ -204,6 +208,7 @@
         : `Clicked action: ${label}. Waiting for the feature-specific result message...`;
       setText("masterActionFeedback", message);
       if (target.closest("#diagnostics")) setText("diagnosticsStatus", message);
+      if (target.closest("#diagnosticsDisplayErrors")) setText("displayLoadErrorsStatus", message);
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
