@@ -475,6 +475,7 @@
   }
 
   let systemMessagesUnsub = null;
+  let lastSecurityMessages = [];
 
   function formatMessageWhen(ms) {
     const n = Number(ms || 0);
@@ -486,26 +487,121 @@
     }
   }
 
+  function setSecurityMessagesBlink(hasUnread) {
+    const tab = byId("securitySystemMessagesTab");
+    if (tab) {
+      tab.classList.toggle("is-blink", !!hasUnread);
+      tab.setAttribute("aria-label", hasUnread
+        ? "Security System Messages — new deny alerts"
+        : "Security System Messages");
+    }
+    // Also pulse the parent Security tab so unread alerts are visible before expanding.
+    const parent = document.querySelector('.admin-tab-parent[data-group="security"]');
+    if (parent) parent.classList.toggle("is-blink", !!hasUnread);
+  }
+
   function renderSystemMessages(rows = []) {
     const host = byId("masterSystemMessages");
     if (!host) return;
+    lastSecurityMessages = rows;
+    const unreadCount = rows.filter((row) => row.read !== true).length;
+    setSecurityMessagesBlink(unreadCount > 0);
+    setText("securitySystemMessagesStatus", rows.length
+      ? `${rows.length} security message(s) · ${unreadCount} unread`
+      : "No security system messages.");
     if (!rows.length) {
-      host.textContent = "No display denial alerts yet.";
+      host.textContent = "No security system messages yet.";
       return;
     }
     host.innerHTML = rows.map((row) => {
       const unread = row.read !== true;
-      return `<article class="master-system-message-row${unread ? " is-unread" : ""}">
-        <strong>${esc(row.title || "Display access denied")}</strong>
+      return `<article class="master-system-message-row${unread ? " is-unread" : ""}" data-message-id="${esc(row.id)}">
+        <strong>${esc(row.title || "Display access denied")}${unread ? " · NEW" : ""}</strong>
         <p class="sub small">${esc(row.body || "")}</p>
         <p class="sub small">${esc(formatMessageWhen(row.createdAtMs || row.createdAt?.toMillis?.()))}${row.clubLocationId ? ` · ${esc(row.clubLocationId)}` : ""}</p>
+        <div class="queue-actions">
+          ${unread ? `<button type="button" class="security-msg-read-btn" data-message-id="${esc(row.id)}">Mark read</button>` : ""}
+          <button type="button" class="ghost security-msg-delete-btn" data-message-id="${esc(row.id)}">Delete message</button>
+        </div>
       </article>`;
     }).join("");
+    host.querySelectorAll(".security-msg-delete-btn").forEach((btn) => {
+      btn.addEventListener("click", () => deleteSecurityMessage(btn.getAttribute("data-message-id")));
+    });
+    host.querySelectorAll(".security-msg-read-btn").forEach((btn) => {
+      btn.addEventListener("click", () => markSecurityMessageRead(btn.getAttribute("data-message-id")));
+    });
+  }
+
+  async function deleteSecurityMessage(messageId) {
+    const id = String(messageId || "").trim();
+    if (!id) return;
+    if (!window.confirm("Delete this security system message? (Access logs are kept separately.)")) return;
+    try {
+      await firebase.firestore().collection("inboxNotifications").doc(id).set({
+        deleted: true,
+        deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        deletedAtMs: Date.now(),
+        read: true
+      }, {merge: true});
+      setText("securitySystemMessagesStatus", "Message deleted.");
+    } catch (err) {
+      setText("securitySystemMessagesStatus", err?.message || "Delete failed.");
+    }
+  }
+
+  async function markSecurityMessageRead(messageId) {
+    const id = String(messageId || "").trim();
+    if (!id) return;
+    try {
+      await firebase.firestore().collection("inboxNotifications").doc(id).set({
+        read: true,
+        readAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    } catch (err) {
+      setText("securitySystemMessagesStatus", err?.message || "Could not mark read.");
+    }
+  }
+
+  async function markVisibleSecurityMessagesRead() {
+    const ids = lastSecurityMessages.filter((row) => row.read !== true).map((row) => row.id).filter(Boolean);
+    if (!ids.length) {
+      setText("securitySystemMessagesStatus", "No unread messages.");
+      return;
+    }
+    try {
+      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
+        read: true,
+        readAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true})));
+      setText("securitySystemMessagesStatus", `Marked ${ids.length} message(s) read.`);
+    } catch (err) {
+      setText("securitySystemMessagesStatus", err?.message || "Mark read failed.");
+    }
+  }
+
+  async function deleteReadSecurityMessages() {
+    const ids = lastSecurityMessages.filter((row) => row.read === true).map((row) => row.id).filter(Boolean);
+    if (!ids.length) {
+      setText("securitySystemMessagesStatus", "No read messages to delete.");
+      return;
+    }
+    if (!window.confirm(`Delete ${ids.length} read security message(s)? Logs are not affected.`)) return;
+    try {
+      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
+        deleted: true,
+        deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        deletedAtMs: Date.now()
+      }, {merge: true})));
+      setText("securitySystemMessagesStatus", `Deleted ${ids.length} read message(s).`);
+    } catch (err) {
+      setText("securitySystemMessagesStatus", err?.message || "Delete failed.");
+    }
   }
 
   /**
-   * Feature: live Master Admin system messages for display page denials.
-   * Also lands in FloqR Inbox as type displayAccessDenied.
+   * Feature: live Master Admin security system messages for display denials.
+   * Blinks Security → Security System Messages while unread deny alerts exist.
    */
   function startMasterSystemMessageFeed() {
     if (systemMessagesUnsub) {
@@ -515,24 +611,90 @@
     const user = firebase.auth().currentUser;
     const host = byId("masterSystemMessages");
     if (!user || !host) return;
-    host.textContent = "Listening for display denial alerts…";
+    host.textContent = "Listening for security deny alerts…";
     try {
       systemMessagesUnsub = firebase.firestore()
         .collection("inboxNotifications")
         .where("recipientUid", "==", user.uid)
-        .limit(80)
+        .limit(120)
         .onSnapshot((snap) => {
           const rows = snap.docs
             .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
-            .filter((row) => row.type === "displayAccessDenied" && row.deleted !== true)
+            .filter((row) => {
+              const isSecurity = row.messageCategory === "security"
+                || row.type === "displayAccessDenied";
+              return isSecurity && row.deleted !== true;
+            })
             .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))
-            .slice(0, 12);
+            .slice(0, 40);
           renderSystemMessages(rows);
         }, (err) => {
-          host.textContent = err?.message || "Could not load system messages.";
+          host.textContent = err?.message || "Could not load security system messages.";
+          setSecurityMessagesBlink(false);
         });
     } catch (err) {
-      host.textContent = err?.message || "Could not start system message feed.";
+      host.textContent = err?.message || "Could not start security message feed.";
+      setSecurityMessagesBlink(false);
+    }
+  }
+
+  function focusSecurityMessages() {
+    startMasterSystemMessageFeed();
+    // Opening the page does not auto-clear blink; Master marks read or deletes.
+  }
+
+  function csvEscape(value) {
+    const s = String(value ?? "");
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
+  async function exportSecurityLogsCsv() {
+    const filterRaw = String(byId("securityLogVenueFilter")?.value || "").trim();
+    const locationId = filterRaw
+      ? (window.FLOQRLocations?.resolveLocationId?.(filterRaw) || filterRaw.toLowerCase().replace(/\s+/g, "-"))
+      : "";
+    setText("displayAccessLogStatus", "Preparing security log CSV export…");
+    try {
+      const result = await callable("listDisplayAccessLogs")({locationId, limit: 200});
+      const rows = result?.data?.rows || [];
+      if (!rows.length) {
+        setText("displayAccessLogStatus", "No security logs to export.");
+        return;
+      }
+      const header = ["when","locationId","locationName","displayBoard","clientIp","hostname","macAddress","allowed","reason","tokenRequired","tokenOk","tokenProvided","restrictionEnabled","userAgent","platform"];
+      const lines = [header.join(",")];
+      rows.forEach((row) => {
+        lines.push([
+          formatWhen(row.createdAtMs),
+          row.locationId,
+          row.locationName,
+          row.displayBoard,
+          row.clientIp,
+          row.hostname,
+          row.macAddress,
+          row.allowed,
+          row.reason,
+          row.tokenRequired,
+          row.tokenOk,
+          row.tokenProvided,
+          row.restrictionEnabled,
+          row.userAgent,
+          row.platform
+        ].map(csvEscape).join(","));
+      });
+      const blob = new Blob([lines.join("\n")], {type: "text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `floqr-security-logs-${locationId || "all"}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setText("displayAccessLogStatus", `Exported ${rows.length} security log row(s). Retention is 90 days.`);
+    } catch (err) {
+      setText("displayAccessLogStatus", err?.message || "Export failed.");
     }
   }
 
@@ -543,7 +705,15 @@
     byId("saveDisplaySecurityBtnBottom")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
-    byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => loadDisplayAccessLogs());
+    byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => {
+      const filter = String(byId("securityLogVenueFilter")?.value || "").trim();
+      const id = filter ? resolveLocationIdFromFilter(filter) : "";
+      loadDisplayAccessLogs(id);
+    });
+    byId("exportSecurityLogsBtn")?.addEventListener("click", () => exportSecurityLogsCsv());
+    byId("markSecurityMessagesReadBtn")?.addEventListener("click", () => markVisibleSecurityMessagesRead());
+    byId("deleteReadSecurityMessagesBtn")?.addEventListener("click", () => deleteReadSecurityMessages());
+    byId("refreshSecurityMessagesBtn")?.addEventListener("click", () => startMasterSystemMessageFeed());
     byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));
     byId("rotateSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary"));
@@ -561,9 +731,32 @@
           try { systemMessagesUnsub(); } catch (_) {}
           systemMessagesUnsub = null;
           renderSystemMessages([]);
+          setSecurityMessagesBlink(false);
         }
       });
     } catch (_) {}
+  }
+
+  function resolveLocationIdFromFilter(raw) {
+    const value = String(raw || "").trim();
+    if (!value) return "";
+    try {
+      const fromSearch = resolveLocationId();
+      // Prefer security log filter box value when present.
+      if (byId("securityLogVenueFilter")) {
+        const locations = window.SHOUTOUT_CLUB_LOCATIONS || window.FLOQR_CLUB_LOCATIONS || {};
+        const lower = value.toLowerCase();
+        if (locations[lower]) return lower;
+        const hit = Object.entries(locations).find(([, loc]) => {
+          const name = String(loc?.locationName || loc?.brandName || "").toLowerCase();
+          return name === lower || name.includes(lower) || lower.includes(String(loc?.id || "").toLowerCase());
+        });
+        if (hit) return hit[0];
+      }
+      return fromSearch || value.toLowerCase().replace(/\s+/g, "-");
+    } catch (_) {
+      return value.toLowerCase().replace(/\s+/g, "-");
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
@@ -575,6 +768,9 @@
     loadDisplayAccessLogs,
     detectMyIp,
     rotateBoardToken,
-    startMasterSystemMessageFeed
+    startMasterSystemMessageFeed,
+    focusSecurityMessages,
+    populateClubList,
+    exportSecurityLogsCsv
   };
 })(window);

@@ -113,22 +113,83 @@
   }
 
   function setupTabs() {
-    document.querySelectorAll(".admin-tab").forEach(btn => {
+    const hideAllSubtabs = () => {
+      document.querySelectorAll(".admin-subtabs").forEach((el) => el.classList.add("hidden"));
+      document.querySelectorAll(".admin-tab-parent").forEach((el) => el.setAttribute("aria-expanded", "false"));
+    };
+
+    const activatePanel = (panelId, opts = {}) => {
+      if (!panelId || !byId(panelId)) return;
+      document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tab:not(.admin-tab-parent)").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-subtab").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-parent").forEach((x) => x.classList.remove("active"));
+      byId(panelId).classList.add("active");
+
+      const sub = document.querySelector(`.admin-subtab[data-panel="${panelId}"]`);
+      if (sub) {
+        sub.classList.add("active");
+        const group = sub.closest(".admin-tab-group");
+        const parent = group?.querySelector(".admin-tab-parent");
+        const subtabs = group?.querySelector(".admin-subtabs");
+        parent?.classList.add("active");
+        parent?.setAttribute("aria-expanded", "true");
+        hideAllSubtabs();
+        subtabs?.classList.remove("hidden");
+      } else if (!opts.keepSubtabs) {
+        hideAllSubtabs();
+        document.querySelector(`.admin-tab[data-panel="${panelId}"]`)?.classList.add("active");
+      }
+
+      if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
+      if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
+      if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+      if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
+      if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
+      if (panelId === "entityManagement" && window.FLOQRSOS2FA) {
+        window.FLOQRSOS2FA.mount({
+          scope: "entityManagement",
+          onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
+        });
+      }
+      try {
+        if (location.hash !== `#${panelId}`) history.replaceState(null, "", `#${panelId}`);
+      } catch (_) {}
+    };
+
+    document.querySelectorAll(".admin-tab[data-panel]").forEach((btn) => {
+      btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
+    });
+
+    document.querySelectorAll(".admin-tab-parent[data-group]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".admin-tab").forEach(x => x.classList.remove("active"));
-        document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
-        btn.classList.add("active");
-        byId(btn.dataset.panel)?.classList.add("active");
-        if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
-        if (btn.dataset.panel === "networkReconciliation") loadNetworkPaymentLedger();
-        if (btn.dataset.panel === "entityManagement" && window.FLOQRSOS2FA) {
-          window.FLOQRSOS2FA.mount({
-            scope: "entityManagement",
-            onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
-          });
+        const group = btn.closest(".admin-tab-group");
+        const subtabs = group?.querySelector(".admin-subtabs");
+        const open = !subtabs?.classList.contains("hidden");
+        if (open) {
+          // Keep group open; jump to first sub-page if none active in this group.
+          const activeSub = group?.querySelector(".admin-subtab.active");
+          activatePanel(activeSub?.dataset.panel || group?.querySelector(".admin-subtab")?.dataset.panel);
+          return;
         }
+        hideAllSubtabs();
+        subtabs?.classList.remove("hidden");
+        btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
+        const first = group?.querySelector(".admin-subtab")?.dataset.panel;
+        if (first) activatePanel(first, {keepSubtabs: true});
       });
     });
+
+    document.querySelectorAll(".admin-subtab[data-panel]").forEach((btn) => {
+      btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
+    });
+
+    // Deep-link: #securityLogs / #displaySecurity / etc.
+    const hashPanel = String(location.hash || "").replace(/^#/, "");
+    if (hashPanel && byId(hashPanel)) activatePanel(hashPanel);
+
+    window.FLOQRMasterTabs = {activatePanel};
   }
 
   function setupActionFeedback() {

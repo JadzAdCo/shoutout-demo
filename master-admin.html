@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.87"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.88"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -45,16 +45,17 @@
           <p id="masterActionFeedback" class="sub small">No admin action clicked yet.</p>
         </div>
       </div>
-      <div id="masterSystemMessagesCard" class="card master-system-messages-card">
-        <p class="eyebrow">System messages</p>
-        <h2>Display security alerts</h2>
-        <p class="sub small">Denied display page loads notify Master Admin here (and FloqR Inbox). Same IP/venue/reason is rate-limited to once per 15 minutes.</p>
-        <div id="masterSystemMessages" class="report-block master-system-messages">No display denial alerts yet.</div>
-      </div>
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button">Network Dashboard</button>
         <button class="admin-tab" data-panel="clubAdminUrls" type="button">Club URLs</button>
-        <button class="admin-tab" data-panel="displaySecurity" type="button">Display Security</button>
+        <div class="admin-tab-group" data-tab-group="security">
+          <button class="admin-tab admin-tab-parent" data-group="security" type="button" aria-expanded="false">Security</button>
+          <div class="admin-subtabs hidden" id="securitySubtabs" role="group" aria-label="Security pages">
+            <button class="admin-subtab" data-panel="securityLogs" type="button">Security Logs</button>
+            <button class="admin-subtab" id="securitySystemMessagesTab" data-panel="securitySystemMessages" type="button">Security System Messages</button>
+            <button class="admin-subtab" data-panel="displaySecurity" type="button">Display Security Setting</button>
+          </div>
+        </div>
         <button class="admin-tab" data-panel="entityManagement" type="button">Entity Management</button>
         <button class="admin-tab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
         <button class="admin-tab" data-panel="templateManagement" type="button">Template Management</button>
@@ -105,12 +106,52 @@
         </div>
       </section>
 
+      <section id="securityLogs" class="admin-panel-section">
+        <div class="card">
+          <h2>Security Logs</h2>
+          <p class="sub small">
+            Board access attempts (allow/deny) for venue displays. These are <strong>security logs</strong>, not diagnostics.
+            Retention: <strong>90 days</strong>, then automatic deletion. Export anytime before expiry.
+          </p>
+          <div class="profile-grid">
+            <label>Filter by venue (optional)
+              <input id="securityLogVenueFilter" list="displaySecurityOptions" autocomplete="off" placeholder="All venues, or search Heist / location id…"/>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshDisplayAccessLogsBtn" type="button">Refresh security logs</button>
+            <button id="exportSecurityLogsBtn" class="primary" type="button">Export CSV (90-day window)</button>
+          </div>
+          <p id="displayAccessLogStatus" class="status"></p>
+          <div id="displayAccessLogReport" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="securitySystemMessages" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Security · not diagnostics</p>
+          <h2>Security System Messages</h2>
+          <p class="sub small">
+            Alerts when a display page is denied (IP or token). Distinct from Diagnostics / Logging operational noise.
+            Same IP/venue/reason is rate-limited to once per 15 minutes. Unread messages blink the nested tab above.
+          </p>
+          <div class="queue-actions">
+            <button id="markSecurityMessagesReadBtn" type="button">Mark visible as read</button>
+            <button id="deleteReadSecurityMessagesBtn" type="button">Delete read messages</button>
+            <button id="refreshSecurityMessagesBtn" type="button">Refresh</button>
+          </div>
+          <p class="sub small">Messages are deletable. Security <em>logs</em> (access attempts) are not deleted here — they auto-purge after 90 days and remain exportable until then.</p>
+          <p id="securitySystemMessagesStatus" class="status"></p>
+          <div id="masterSystemMessages" class="report-block master-system-messages">No security system messages yet.</div>
+        </div>
+      </section>
+
       <section id="displaySecurity" class="admin-panel-section">
         <div class="card display-security-card">
-          <h2>Display Security — approved IPs</h2>
+          <h2>Display Security Setting</h2>
           <p class="sub small">
             Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
-            Token URLs are for Xibo only — generate them in the section below.
+            Token URLs are for Xibo only — generate them in the section below. Access attempts appear under <strong>Security → Security Logs</strong>.
           </p>
           <div class="profile-grid">
             <label>
@@ -194,20 +235,6 @@
           </div>
           <p id="displayTokenStatus" class="status"></p>
           <div id="displayTokenReport" class="report-block"></div>
-        </div>
-        <div class="card">
-          <h2>Display access log (per venue)</h2>
-          <p class="sub small">
-            Each board open is logged with time, board, client IP, allow/deny, and reason.
-            <strong>Hostname</strong> is best-effort reverse DNS (often blank on residential/CGNAT).
-            <strong>MAC address</strong> cannot be read from a browser or Xibo webpage widget (browser security) — column shows <code>n/a</code> unless you optionally pass <code>?mac=</code> in a custom Xibo URL.
-            Tip: venues often have both IPv4 and IPv6 egress — allowlist <em>both</em> addresses seen in this log.
-          </p>
-          <div class="queue-actions">
-            <button id="refreshDisplayAccessLogsBtn" type="button">Refresh display logs</button>
-          </div>
-          <p id="displayAccessLogStatus" class="status"></p>
-          <div id="displayAccessLogReport" class="report-block"></div>
         </div>
       </section>
 
@@ -472,6 +499,10 @@
         </div>
         <div class="card">
           <h2>Application Logging</h2>
+          <p class="sub small">
+            Operational / diagnostic application logs (<code>appLogs</code>). These are <strong>not</strong> security access logs.
+            Diagnostic logs auto-delete after <strong>30 days</strong>. Board deny alerts live under <strong>Security → Security System Messages</strong>.
+          </p>
           <p class="sub small">Client and Cloud Functions write operational events here: auth, ShoutOut submit, Stripe checkout, Connect readiness, media uploads, and cancellations. Use this when a patron reports a failed paid ShoutOut.</p>
           <div class="profile-grid">
             <label>Level
@@ -868,10 +899,10 @@
 <script src="./ad-campaigns.js?v=29.09.22"></script>
 <script src="./ai-diagnostics-service.js?v=29.09.34"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
-<script src="./floqr-logger.js?v=29.09.22"></script>
+<script src="./floqr-logger.js?v=29.09.88"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.78"></script>
-<script src="./master-display-security.js?v=29.09.87"></script>
+<script src="./master-admin-app.js?v=29.09.88"></script>
+<script src="./master-display-security.js?v=29.09.88"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>

@@ -75,7 +75,10 @@
       userAgent: String(typeof navigator !== "undefined" ? navigator.userAgent : "").slice(0, 300),
       appVersion: String(entry.appVersion || "29.09.4").slice(0, 40),
       source: String(entry.source || "client").slice(0, 40),
-      createdAt: window.firebase?.firestore?.FieldValue?.serverTimestamp?.() || new Date()
+      logCategory: "diagnostic",
+      createdAt: window.firebase?.firestore?.FieldValue?.serverTimestamp?.() || new Date(),
+      createdAtMs: Date.now(),
+      expireAtMs: Date.now() + (30 * 24 * 60 * 60 * 1000)
     };
     consoleMirror(level, `${category}${action ? `/${action}` : ""}: ${message}`, payload.details);
     const db = byDb();
