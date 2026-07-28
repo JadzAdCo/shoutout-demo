@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.09.22
+/* master-admin-app.js v29.09.94
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.22";
+  const CURRENT_VERSION = "29.09.94";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 
@@ -304,9 +304,13 @@
   }
 
   function clubAdminUrl(id = "") {
+    if (window.FLOQRNav?.adminHome) {
+      return window.FLOQRNav.adminHome({location: id, from: "master"});
+    }
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
     url.searchParams.set("v", CURRENT_VERSION);
+    url.searchParams.set("from", "master");
     return url.toString();
   }
 
@@ -316,6 +320,37 @@
 
   function secondaryDisplayUrl(id = "") {
     return window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
+  }
+
+  function mergeClubSnapshots(locationRows = [], clubRows = []) {
+    const merged = new Map();
+    locationRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || "").trim();
+      if (!id) return;
+      merged.set(id, {...row, id});
+    });
+    clubRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || row.primaryLocationId || "").trim();
+      if (!id) return;
+      const prev = merged.get(id) || {id};
+      merged.set(id, {
+        ...row,
+        ...prev,
+        id,
+        // Prefer display settings + address profile from clubLocations when present.
+        displayScreenFormatIds: prev.displayScreenFormatIds || row.displayScreenFormatIds,
+        primaryDisplayScreenFormatId: prev.primaryDisplayScreenFormatId || row.primaryDisplayScreenFormatId,
+        secondaryDisplayScreenFormatId: prev.secondaryDisplayScreenFormatId || row.secondaryDisplayScreenFormatId,
+        displayFooterBrand: prev.displayFooterBrand || row.displayFooterBrand,
+        streetAddress: prev.streetAddress || row.streetAddress,
+        address: prev.address || row.address,
+        city: prev.city || row.city,
+        region: prev.region || row.region,
+        country: prev.country || row.country,
+        sourceCollection: prev.sourceCollection || "clubs+clubLocations"
+      });
+    });
+    return Array.from(merged.values());
   }
 
   function slugify(value = "") {
@@ -1534,11 +1569,12 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("clubLocations"),
+      getCollectionSafe("clubs"),
       getCollectionSafe("events"),
       getCollectionSafe("guestListRequests"),
       getCollectionSafe("clubOnboardingRecords"),
@@ -1555,7 +1591,7 @@
       const id = slugify(`${row.proposedTitle || row.proposedLocationName || "discovered-club"}-${row.city || row.country || row.id}`);
       if (!locationMap.has(id)) locationMap.set(id, {...row, id, locationName:row.proposedTitle || row.proposedLocationName, address:row.proposedAddress || row.address || "", sourceCollection:"aiDiscoveryQueue", sourceRecordId:row.id, onboardingSource:"AI crawl discovery"});
     });
-    const locationRows = Array.from(locationMap.values());
+    const locationRows = mergeClubSnapshots(Array.from(locationMap.values()), clubs);
     networkUsers = users.map(row => ({...row, uid:row.uid || row.id}));
     networkLocations = locationRows;
     renderEntityClubResults();

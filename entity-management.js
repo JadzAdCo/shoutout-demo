@@ -19,6 +19,38 @@
     if (el) el.textContent = msg || "";
   }
 
+  function masterAdminUrl(locationId = "") {
+    const id = String(locationId || "").trim();
+    if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
+    return `./admin.html?location=${encodeURIComponent(id)}&v=29.09.94&from=master`;
+  }
+
+  function mergeClubRows(locationRows = [], clubRows = []) {
+    const merged = new Map();
+    locationRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || "").trim();
+      if (!id) return;
+      merged.set(id, {...row, id});
+    });
+    clubRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || row.primaryLocationId || "").trim();
+      if (!id) return;
+      const prev = merged.get(id) || {id};
+      merged.set(id, {
+        ...row,
+        ...prev,
+        id,
+        displayScreenFormatIds: prev.displayScreenFormatIds || row.displayScreenFormatIds,
+        primaryDisplayScreenFormatId: prev.primaryDisplayScreenFormatId || row.primaryDisplayScreenFormatId,
+        displayFooterBrand: prev.displayFooterBrand || row.displayFooterBrand,
+        city: prev.city || row.city,
+        region: prev.region || row.region,
+        country: prev.country || row.country
+      });
+    });
+    return Array.from(merged.values());
+  }
+
   function callable(name) {
     if (!functions) functions = firebase.app().functions("us-central1");
     return functions.httpsCallable(name);
@@ -58,18 +90,24 @@
   }
 
   async function refreshCatalog(existingLocations = null) {
-    const clubs = existingLocations && existingLocations.length
+    let locationRows = existingLocations && existingLocations.length
       ? existingLocations.map(row => ({...row, id:row.id}))
       : [];
-    if (!clubs.length) {
+    if (!locationRows.length) {
       try {
         const snap = await db.collection("clubLocations").limit(500).get();
-        snap.forEach(doc => clubs.push({id:doc.id, ...doc.data()}));
+        snap.forEach(doc => locationRows.push({id:doc.id, ...doc.data()}));
       } catch (e) {}
       Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, data]) => {
-        if (!clubs.some(c => c.id === id)) clubs.push({id, ...data});
+        if (!locationRows.some(c => c.id === id)) locationRows.push({id, ...data});
       });
     }
+    const clubDocs = [];
+    try {
+      const snap = await db.collection("clubs").limit(500).get();
+      snap.forEach(doc => clubDocs.push({id:doc.id, ...doc.data()}));
+    } catch (e) {}
+    const clubs = mergeClubRows(locationRows, clubDocs);
 
     const events = [];
     try {
@@ -169,10 +207,10 @@
     const enabled = g?.entityIsAppEnabled(row);
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
-    const adminUrl = type === "club" ? `./admin.html?location=${encodeURIComponent(id)}&v=29.09.22&from=master` : "";
+    const adminUrl = type === "club" ? masterAdminUrl(id) : "";
     const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
     const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
-    const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
+    const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.94` : "";
 
     wrap.innerHTML = `
       <div class="entity-manage-head">
@@ -311,7 +349,7 @@
       .filter(row => !q || matchesQuery(row, "club", q))
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
-      const admin = `./admin.html?location=${encodeURIComponent(row.id)}&v=29.09.22&from=master`;
+      const admin = masterAdminUrl(row.id);
       const shoutout = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
       const suprstar = window.FLOQRNav?.stableSecondaryDisplayUrl?.(row.id) || `./display2.html?location=${encodeURIComponent(row.id)}`;
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
