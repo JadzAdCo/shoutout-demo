@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.85"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.86"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -106,7 +106,7 @@
       </section>
 
       <section id="displaySecurity" class="admin-panel-section">
-        <div class="card">
+        <div class="card display-security-card">
           <h2>Display Security — approved IPs</h2>
           <p class="sub small">
             Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
@@ -114,34 +114,58 @@
             Token URLs are for Xibo only — generate them in the section below.
           </p>
           <div class="profile-grid">
-            <label>Venue
+            <label>
+              <span class="label-inline-row">Venue
+                <details class="help-popout inline-help-popout">
+                  <summary>?</summary>
+                  <div>Search by club name, city, or location id, then click <strong>Load venue</strong> to pull IP allowlist, lock flags, tokens, and access logs for that venue.</div>
+                </details>
+              </span>
               <input id="displaySecuritySearch" list="displaySecurityOptions" autocomplete="off" placeholder="Search Heist, Zebbies, location id…"/>
               <datalist id="displaySecurityOptions"></datalist>
             </label>
             <label>Selected venue ID<input id="displaySecurityLocationId" readonly placeholder="heist-washington-dc"/></label>
           </div>
-          <label><input id="displaySecurityRestrict" type="checkbox"/> Enable IP restriction (IPv4 + IPv6 allowlist)</label>
-          <label><input id="displaySecurityTokenRequired" type="checkbox" checked/> Lock display pages — require <code>?k=</code> token for idle and live (recommended)</label>
-          <p class="sub small">IP allowlist and token lock are independent. Uncheck token lock to test IP-only blocking. Client <code>?ip=</code> cannot bypass the allowlist.</p>
-          <p class="sub small">
-            With lock ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
-            Uncheck only for temporary open testing.
-          </p>
-          <label>Approved display IPs (one per line)
-            <textarea id="displaySecurityIps" rows="6" placeholder="69.243.87.16&#10;2601:14d:8700:2fc0::/64&#10;198.51.100.0/24"></textarea>
-          </label>
-          <p class="sub small">
-            IPv4 and IPv6 are both supported. Xibo often appears as IPv6 in the access log — paste the exact address, or prefer a stable
-            <code>/64</code> prefix (example: <code>2601:14d:8700:2fc0::/64</code>) so rotating host IPv6 still matches.
-            Also supports trailing <code>*</code> and IPv4 <code>/24</code>.
-          </p>
-          <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
-          <div class="queue-actions">
+          <div class="queue-actions display-security-load-row">
             <button id="loadDisplaySecurityBtn" type="button">Load venue</button>
-            <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
-            <button id="importIpsFromDisplayLogBtn" type="button">Add IPs from access log</button>
+          </div>
+          <label class="display-security-check">
+            <input id="displaySecurityRestrict" type="checkbox"/>
+            <span>Enable IP restriction (IPv4 + IPv6 allowlist)</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                When ON, only allowlisted public IPs may open the idle or live board.
+                Supports IPv4, IPv6, trailing <code>*</code>, IPv4 <code>/24</code>, and IPv6 <code>/64</code>.
+                Client <code>?ip=</code> cannot bypass the allowlist.
+              </div>
+            </details>
+          </label>
+          <label class="display-security-check">
+            <input id="displaySecurityTokenRequired" type="checkbox" checked/>
+            <span>Lock display pages — require <code>?k=</code> token for idle and live (recommended)</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                Independent of IP restriction. When ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
+                Uncheck to test IP-only blocking. Uncheck only for temporary open testing.
+              </div>
+            </details>
+          </label>
+          <div class="display-security-ips-head">
+            <label class="display-security-ips-label" for="displaySecurityIps">Approved display IPs (one per line)</label>
             <button id="saveDisplaySecurityBtn" class="primary" type="button">Save security settings</button>
           </div>
+          <textarea id="displaySecurityIps" rows="6" placeholder="69.243.87.16&#10;2601:14d:8700:2fc0::/64&#10;198.51.100.0/24"></textarea>
+          <div class="queue-actions display-security-ip-tools">
+            <button id="detectDisplayIpBtn" type="button">Detect my public IP</button>
+            <button id="importIpsFromDisplayLogBtn" type="button">Add IPs from access log</button>
+          </div>
+          <p class="sub small">
+            Xibo often appears as IPv6 in the access log — paste the exact address, or prefer a stable
+            <code>/64</code> prefix so rotating host IPv6 still matches.
+          </p>
+          <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
           <p id="displaySecurityStatus" class="status"></p>
           <div id="displaySecurityPreview" class="report-block"></div>
         </div>

@@ -55,6 +55,58 @@
 .master-system-message-row.is-unread{background:rgba(255,90,110,.08);margin:0 -8px;padding:10px 8px;border-radius:8px}
 .master-system-message-row strong{font-size:14px}
 .master-system-message-row .sub{margin:0}
+/* Display Security layout — checkbox rows + relocated actions */
+.display-security-card .display-security-check{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:10px 0;
+  font-weight:700;
+  cursor:pointer;
+}
+.display-security-card .display-security-check input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  margin:0;
+  flex:0 0 auto;
+  accent-color:#5eeaff;
+}
+.display-security-card .display-security-check > span{
+  flex:1 1 auto;
+  line-height:1.35;
+}
+.display-security-card .display-security-check .help-popout{
+  flex:0 0 auto;
+  margin:0;
+  justify-self:auto;
+}
+.display-security-card .display-security-load-row{
+  margin:12px 0 4px;
+}
+.display-security-card .display-security-ips-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:14px 0 8px;
+}
+.display-security-card .display-security-ips-label{
+  margin:0;
+  font-weight:700;
+}
+.display-security-card #displaySecurityIps{
+  width:100%;
+  display:block;
+}
+.display-security-card .display-security-ip-tools{
+  margin:10px 0 6px;
+}
+.display-security-card .label-inline-row{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
 
 /* v26 promoter guest list additions */
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}
