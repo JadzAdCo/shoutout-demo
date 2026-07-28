@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.88"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.89"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.89"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -130,10 +130,18 @@
       <section id="securitySystemMessages" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Security · not diagnostics</p>
-          <h2>Security System Messages</h2>
+          <h2 class="help-label">
+            <span class="help-label-text">Security System Messages</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                These are <strong>security</strong> alerts (display IP/token denies), not diagnostic logs.
+                Delete messages here anytime. Access attempt history stays under Security Logs (90-day retention).
+              </div>
+            </details>
+          </h2>
           <p class="sub small">
-            Alerts when a display page is denied (IP or token). Distinct from Diagnostics / Logging operational noise.
-            Same IP/venue/reason is rate-limited to once per 15 minutes. Unread messages blink the nested tab above.
+            Alerts when a display page is denied (IP or token). Unread messages blink the nested tab above.
           </p>
           <div class="queue-actions">
             <button id="markSecurityMessagesReadBtn" type="button">Mark visible as read</button>
@@ -155,7 +163,8 @@
           </p>
           <div class="profile-grid">
             <label>
-              <span class="label-inline-row">Venue
+              <span class="help-label">
+                <span class="help-label-text">Venue</span>
                 <details class="help-popout inline-help-popout">
                   <summary>?</summary>
                   <div>Search by club name, city, or location id, then click <strong>Load venue</strong> to pull IP allowlist, lock flags, tokens, and access logs for that venue.</div>
@@ -178,26 +187,30 @@
           </div>
           <label class="display-security-check">
             <input id="displaySecurityRestrict" type="checkbox"/>
-            <span>Enable IP restriction (IPv4 + IPv6 allowlist)</span>
-            <details class="help-popout inline-help-popout">
-              <summary>?</summary>
-              <div>
-                When ON, only allowlisted public IPs may open the idle or live board.
-                Supports IPv4, IPv6, trailing <code>*</code>, IPv4 <code>/24</code>, and IPv6 <code>/64</code>.
-                Client <code>?ip=</code> cannot bypass the allowlist.
-              </div>
-            </details>
+            <span class="help-label">
+              <span class="help-label-text">Enable IP restriction (IPv4 + IPv6 allowlist)</span>
+              <details class="help-popout inline-help-popout">
+                <summary>?</summary>
+                <div>
+                  When ON, only allowlisted public IPs may open the idle or live board.
+                  Supports IPv4, IPv6, trailing <code>*</code>, IPv4 <code>/24</code>, and IPv6 <code>/64</code>.
+                  Client <code>?ip=</code> cannot bypass the allowlist.
+                </div>
+              </details>
+            </span>
           </label>
           <label class="display-security-check">
             <input id="displaySecurityTokenRequired" type="checkbox" checked/>
-            <span>Lock display pages — require <code>?k=</code> token for idle and live (recommended)</span>
-            <details class="help-popout inline-help-popout">
-              <summary>?</summary>
-              <div>
-                Independent of IP restriction. When ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
-                Uncheck to test IP-only blocking. Uncheck only for temporary open testing.
-              </div>
-            </details>
+            <span class="help-label">
+              <span class="help-label-text">Lock display pages — require <code>?k=</code> token for idle and live (recommended)</span>
+              <details class="help-popout inline-help-popout">
+                <summary>?</summary>
+                <div>
+                  Independent of IP restriction. When ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
+                  Uncheck to test IP-only blocking. Uncheck only for temporary open testing.
+                </div>
+              </details>
+            </span>
           </label>
           <div class="display-security-ips-head">
             <label class="display-security-ips-label" for="displaySecurityIps">Approved display IPs (one per line)</label>

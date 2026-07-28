@@ -95,10 +95,30 @@
 .master-system-message-row strong{font-size:14px}
 .master-system-message-row .sub{margin:0}
 .master-system-messages{max-height:420px;overflow:auto}
+/* Site-wide help-label (also in styles.css) — keep ? glued to verbiage on admin surfaces */
+.help-label{
+  display:inline-flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px 8px;
+  max-width:100%;
+  min-width:0;
+}
+.help-label-text{
+  flex:0 1 auto;
+  min-width:0;
+  line-height:1.35;
+}
+.help-label > .help-popout,
+.help-label > .floqr-help-popout{
+  flex:0 0 auto;
+  margin:0;
+  justify-self:auto;
+}
 /* Display Security layout — checkbox rows + relocated actions */
 .display-security-card .display-security-check{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   gap:10px;
   margin:10px 0;
   font-weight:700;
@@ -107,13 +127,13 @@
 .display-security-card .display-security-check input[type="checkbox"]{
   width:18px;
   height:18px;
-  margin:0;
+  margin:3px 0 0;
   flex:0 0 auto;
   accent-color:#5eeaff;
 }
-.display-security-card .display-security-check > span{
+.display-security-card .display-security-check > .help-label{
   flex:1 1 auto;
-  line-height:1.35;
+  min-width:0;
 }
 .display-security-card .display-security-check .help-popout{
   flex:0 0 auto;
