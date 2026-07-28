@@ -92,6 +92,49 @@
     if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");
     if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
+    const d1 = byId("clubDisplaySecurityDisplay1Link");
+    if (d1) d1.href = stableVenueDisplayUrl();
+    const d2 = byId("clubDisplaySecurityDisplay2Link");
+    if (d2) d2.href = stableVenueSecondaryDisplayUrl();
+    loadClubDisplaySecurityStatus();
+  }
+
+  /** Feature: Club Admin read-only Display Security status (Master Admin owns edits). */
+  async function loadClubDisplaySecurityStatus() {
+    const preview = byId("clubDisplaySecurityPreview");
+    const noteEl = byId("clubDisplaySecurityNote");
+    const statusEl = byId("clubDisplaySecurityActionStatus");
+    if (!preview) return;
+    preview.innerHTML = `<p class="sub small">Loading display security status…</p>`;
+    if (statusEl) statusEl.textContent = "";
+    try {
+      const snap = await db.collection("clubLocations").doc(locationId).get();
+      const data = snap.exists ? snap.data() || {} : {};
+      const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
+      const ipOn = data.displayIpRestrictionEnabled === true;
+      const tokenOn = data.displayTokenRequired !== false;
+      const name = data.locationName || loc.locationName || locationId;
+      preview.innerHTML = `
+        <div class="display-security-status-row">
+          <strong class="display-security-status-venue">${esc(name)}</strong>
+          <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
+          <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
+          <span class="display-security-badge">${ips.length} approved IP${ips.length === 1 ? "" : "s"}</span>
+        </div>`;
+      if (noteEl) {
+        noteEl.textContent = data.displayIpNotes
+          ? `Notes: ${data.displayIpNotes}`
+          : "Master Admin manages allowlist IPs and board tokens. Contact Master Admin to change lock settings.";
+      }
+      if (statusEl) {
+        statusEl.textContent = snap.exists
+          ? `Display security loaded for ${locationId}.`
+          : `No saved display security doc yet for ${locationId}.`;
+      }
+    } catch (err) {
+      preview.innerHTML = `<p class="sub small">${esc(err?.message || "Could not load display security status.")}</p>`;
+      if (statusEl) statusEl.textContent = err?.message || "Load failed.";
+    }
   }
 
   async function enforceVenueFeatureGates() {
@@ -2212,6 +2255,7 @@
       window.FLOQRActionFeedback?.hide(3200);
     });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
+    bind("refreshClubDisplaySecurityBtn", loadClubDisplaySecurityStatus);
     bind("saveClubMediaBtn", saveClubMedia);
     bind("cancelClubMediaEditBtn", () => resetClubMediaEditor("Media edit cancelled."));
     bind("electClubRoleBtn", electClubRole);

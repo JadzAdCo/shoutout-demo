@@ -102,10 +102,54 @@
 .display-security-card .display-security-ip-tools{
   margin:10px 0 6px;
 }
+.display-security-card .display-security-bottom-actions{
+  margin-top:14px;
+}
 .display-security-card .label-inline-row{
   display:inline-flex;
   align-items:center;
   gap:8px;
+}
+.display-security-current-status{
+  margin:14px 0 16px;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;
+  background:rgba(0,0,0,.18);
+}
+.display-security-current-status .eyebrow{
+  margin:0 0 8px;
+}
+.display-security-status-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+}
+.display-security-status-venue{
+  margin-right:6px;
+}
+.display-security-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+.display-security-badge.is-on{
+  border-color:rgba(157,255,176,.45);
+  background:rgba(157,255,176,.12);
+  color:#9dffb0;
+}
+.display-security-badge.is-off{
+  border-color:rgba(255,138,154,.4);
+  background:rgba(255,70,90,.12);
+  color:#ff8a9a;
 }
 
 /* v26 promoter guest list additions */

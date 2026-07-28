@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.46"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.46"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.87"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -53,6 +53,7 @@
     <div id="adminPanel" class="hidden">
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
+        <button class="admin-tab" data-panel="panelDisplaySecurity" type="button">Display Security</button>
         <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
         <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button">Template Backgrounds</button>
         <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
@@ -88,6 +89,29 @@
             <p><a id="display2Link" target="_blank" href="#">Open Display 2 (display2.html)</a></p>
             <button id="resetDisplayDefaultBtn" type="button">Reset Display to Club Default</button>
           </div>
+        </div>
+      </section>
+
+      <section id="panelDisplaySecurity" class="admin-panel-section">
+        <div class="card">
+          <h2>Display Security status</h2>
+          <p class="sub small">
+            Read-only view of this venue’s board lock settings (managed in Master Admin).
+            Use this to confirm whether idle/live boards require an approved public IP and/or a <code>?k=</code> token in Xibo.
+          </p>
+          <div id="clubDisplaySecurityStatus" class="display-security-current-status">
+            <p class="eyebrow">Current Status</p>
+            <div id="clubDisplaySecurityPreview" class="display-security-status-grid">
+              <p class="sub small">Loading display security status…</p>
+            </div>
+            <p id="clubDisplaySecurityNote" class="sub small"></p>
+          </div>
+          <div class="queue-actions">
+            <button id="refreshClubDisplaySecurityBtn" type="button">Refresh status</button>
+            <a id="clubDisplaySecurityDisplay1Link" class="buttonlike" target="_blank" href="#">Open Display 1</a>
+            <a id="clubDisplaySecurityDisplay2Link" class="buttonlike" target="_blank" href="#">Open Display 2</a>
+          </div>
+          <p id="clubDisplaySecurityActionStatus" class="status"></p>
         </div>
       </section>
 
@@ -592,7 +616,7 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.72"></script>
+<script src="./admin-app.js?v=29.09.87"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>

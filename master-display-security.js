@@ -208,6 +208,23 @@
     }
   }
 
+  function renderDisplaySecurityStatus(data = {}, ips = []) {
+    const preview = byId("displaySecurityPreview");
+    if (!preview) return;
+    const ipOn = data.displayIpRestrictionEnabled === true;
+    const tokenOn = data.displayTokenRequired !== false;
+    const ipCount = Array.isArray(ips) ? ips.length : 0;
+    const name = data.locationName || data.brandName || "";
+    preview.innerHTML = `
+      <div class="display-security-status-row">
+        ${name ? `<strong class="display-security-status-venue">${esc(name)}</strong>` : ""}
+        <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
+        <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
+        <span class="display-security-badge">${ipCount} approved IP${ipCount === 1 ? "" : "s"}</span>
+      </div>
+      <p class="sub small">Updated by: ${esc(data.displayIpUpdatedBy || "—")}</p>`;
+  }
+
   async function loadVenueDisplaySecurity() {
     const locationId = resolveLocationId();
     if (!locationId) {
@@ -227,14 +244,7 @@
         byId("displaySecurityTokenRequired").checked = data.displayTokenRequired !== false;
       }
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
-      const preview = byId("displaySecurityPreview");
-      if (preview) {
-        preview.innerHTML = `
-          <p><strong>${esc(data.locationName || locationId)}</strong></p>
-          <p class="sub small">IP restriction: ${data.displayIpRestrictionEnabled === true ? "ON" : "OFF"} · Approved IPs: ${ips.length}</p>
-          <p class="sub small">Token lock: ${data.displayTokenRequired === false ? "OFF (public idle)" : "ON (idle+live require ?k=)"}</p>
-          <p class="sub small">Updated by: ${esc(data.displayIpUpdatedBy || "—")}</p>`;
-      }
+      renderDisplaySecurityStatus(data, ips);
       setText("displaySecurityStatus", snap.exists
         ? `Loaded display security for ${locationId}.`
         : `No clubLocations doc yet for ${locationId} — save will create settings.`);
@@ -528,7 +538,9 @@
 
   function bind() {
     byId("loadDisplaySecurityBtn")?.addEventListener("click", () => loadVenueDisplaySecurity());
+    byId("loadDisplaySecurityBtnBottom")?.addEventListener("click", () => loadVenueDisplaySecurity());
     byId("saveDisplaySecurityBtn")?.addEventListener("click", () => saveVenueDisplaySecurity());
+    byId("saveDisplaySecurityBtnBottom")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
     byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => loadDisplayAccessLogs());
