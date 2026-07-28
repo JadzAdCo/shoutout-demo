@@ -164,7 +164,7 @@
           <thead>
             <tr>
               <th scope="col">Display</th>
-              <th scope="col">Obfuscated Secret show last 4 digits</th>
+              <th scope="col">Obfuscated Keys showing last 4 digits</th>
             </tr>
           </thead>
           <tbody>
