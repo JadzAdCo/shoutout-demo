@@ -506,6 +506,15 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .display-load-errors-table td:nth-child(3){font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap}
 .display-load-error-detail{font-weight:700;line-height:1.35}
 .display-load-error-meta{margin-top:4px;opacity:.72;font-size:12px}
+.display-obfuscated-keys{margin:8px 0 12px}
+.display-obfuscated-keys > summary{list-style:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:800;color:#06101c;background:linear-gradient(90deg,#ff4f9a,#4f9dff)}
+.display-obfuscated-keys > summary::-webkit-details-marker{display:none}
+.display-obfuscated-keys-panel{margin-top:12px;overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px}
+.display-obfuscated-keys-meta{margin:0 0 10px;font-size:13px}
+.display-obfuscated-keys-table{width:100%;border-collapse:collapse;font-size:13px}
+.display-obfuscated-keys-table th,.display-obfuscated-keys-table td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+.display-obfuscated-keys-table thead th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9fdfff;background:rgba(8,18,40,.55)}
+.display-obfuscated-keys-table code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 @media(max-width:820px){.entity-manage-head{flex-direction:column}.sos2fa-gate-head{grid-template-columns:1fr}}
 
 /* Feature: Display Security access log — real HTML table (do not use .report-table; that class is a div-grid). */
