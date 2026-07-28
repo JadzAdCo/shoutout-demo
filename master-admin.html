@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.91"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.91"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.92"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.92"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -52,6 +52,7 @@
           <div class="admin-subtabs hidden" id="entityManagementSubtabs" role="group" aria-label="Entity Management pages">
             <button class="admin-subtab" data-panel="clubAdminUrls" type="button">Club URLs</button>
             <button class="admin-subtab" data-panel="entityManagement" type="button">Search &amp; Manage</button>
+            <button class="admin-subtab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
             <button class="admin-subtab" data-panel="clubOnboarding" type="button">Entity Onboarding</button>
             <button class="admin-subtab" data-panel="templateManagement" type="button">Template Management</button>
             <button class="admin-subtab" data-panel="recommendationModeration" type="button">Unapproved Recommendations</button>
@@ -65,7 +66,6 @@
             <button class="admin-subtab" data-panel="displaySecurity" type="button">Display Security Setting</button>
           </div>
         </div>
-        <button class="admin-tab" data-panel="allQueues" type="button">All ShoutOut Queues</button>
         <div class="admin-tab-group" data-tab-group="reports">
           <button class="admin-tab admin-tab-parent" data-group="reports" type="button" aria-expanded="false">Reports</button>
           <div class="admin-subtabs hidden" id="reportsSubtabs" role="group" aria-label="Reports pages">
@@ -585,6 +585,7 @@
 
       <section id="allQueues" class="admin-panel-section">
         <div class="card">
+          <p class="eyebrow">Entity management · queues</p>
           <h2>All Pending ShoutOut Queues</h2>
           <p class="sub small">Master admins see every location's queue.</p>
           <div id="allQueueList" class="report-block"></div>
@@ -1015,9 +1016,9 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.91"></script>
-<script src="./master-display-security.js?v=29.09.91"></script>
-<script src="./master-diagnostics-panels.js?v=29.09.91"></script>
+<script src="./master-admin-app.js?v=29.09.92"></script>
+<script src="./master-display-security.js?v=29.09.92"></script>
+<script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
