@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>RydR logo — all iterations (local)</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
+  <style>
+    body{margin:0;padding:24px 24px 48px;background:linear-gradient(160deg,#070d18,#102038 55%,#0a1628)}
+    .note{color:#3de7ff;font-weight:900;margin:0 0 8px}
+    .intro{color:rgba(255,255,255,.75);max-width:760px;line-height:1.45;margin:0 0 22px;font-size:14px}
+    .grid{display:grid;gap:18px;max-width:980px}
+    .card{
+      display:grid;grid-template-columns:minmax(160px,240px) minmax(0,1fr);
+      gap:16px;align-items:center;padding:16px;border-radius:16px;
+      border:1px dashed rgba(255,255,255,.22);background:rgba(255,255,255,.04);
+    }
+    @media(max-width:640px){.card{grid-template-columns:1fr}}
+    .shot{margin:0;padding:12px;border-radius:12px;background:rgba(0,0,0,.25);display:grid;place-items:center;min-height:160px}
+    .shot.light{background:#e8edf5}
+    .shot img{display:block;width:min(220px,100%);height:auto}
+    .meta h2{color:#fff;margin:0 0 6px;font-size:18px}
+    .meta .tag{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-bottom:8px}
+    .tag.keep{background:rgba(61,231,255,.2);color:#3de7ff}
+    .tag.mistake{background:rgba(255,100,120,.2);color:#ff8f9f}
+    .tag.current{background:rgba(223,255,90,.2);color:#dfff5a}
+    .meta p{color:rgba(255,255,255,.72);margin:0;font-size:14px;line-height:1.45}
+    .pair{display:grid;gap:8px;width:100%}
+  </style>
+</head>
+<body>
+  <p class="note">LOCAL ONLY — every RydR logo iteration in order. Not deployed.</p>
+  <p class="intro">Reply with an iteration number (e.g. <strong style="color:#fff">#9</strong>) to lock a baseline. <strong style="color:#fff">#9</strong> = merge of #4 car/text + #7 road.</p>
+
+  <div class="grid">
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-01-first-plate.png?v=all" alt="Iteration 1 plate"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag current">#1 · current plate</span>
+        <h2>First plate / badge mark</h2>
+        <p>Initial generation: car + RydR text + perspective road + circular arch/star above. Dark shield style.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-02-first-transparent.png?v=all" alt="Iteration 2 transparent"/></figure>
+        <figure class="shot light"><img src="./images/rydr-iter-02-first-transparent.png?v=all" alt="Iteration 2 on light"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag current">#2 · current transparent</span>
+        <h2>First transparent mark</h2>
+        <p>Transparent canvas. Car + RydR text. Roof LIDAR sensor + cyan halo still present. No separate road strip under the wordmark (text acts as base).</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-03-no-roof-sensor.png?v=all" alt="Iteration 3"/></figure>
+        <figure class="shot light"><img src="./images/rydr-iter-03-no-roof-sensor.png?v=all" alt="Iteration 3 light"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag keep">#3 · keep candidate</span>
+        <h2>Roof sensor / halo removed</h2>
+        <p>Your ask: keep text + car + road feel; remove anything above the car. Sensor pod and cyan ring gone. Best baseline for a road-only paint edit.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-04-plate-trimmed.png?v=all" alt="Iteration 4"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag keep">#4</span>
+        <h2>Plate trimmed (arch/star attempt)</h2>
+        <p>Tried trimming top arch/star on the plate variant while keeping car, text, and bottom road.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-05-regen-lanes-only.png?v=all" alt="Iteration 5"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag mistake">#5 · mistake</span>
+        <h2>Full regen — “lanes only”</h2>
+        <p>Wrong approach: regenerated the whole logo. Car and text changed. Do not use as source.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-06-regen-lanes-v2.png?v=all" alt="Iteration 6"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag mistake">#6 · mistake</span>
+        <h2>Full regen — lanes v2</h2>
+        <p>Second regen attempt with a road strip. Again redesigned car/text. Do not use as source.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-07-black-yellow-regen.png?v=all" alt="Iteration 7"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag mistake">#7 · mistake</span>
+        <h2>AI regen — black lanes / yellow markers</h2>
+        <p>Asked for black lanes + yellow markers but AI redrew car (darker) and text. Not pixel-faithful.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-07-black-yellow-composite.png?v=all" alt="Iteration 8"/></figure>
+        <figure class="shot light"><img src="./images/rydr-iter-07-black-yellow-composite.png?v=all" alt="Iteration 8 light"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag mistake">#8 · mistake (composite)</span>
+        <h2>Composite: #3 car+text + new black/yellow strip</h2>
+        <p>Kept #3 car/text pixels, but drew a <em>new</em> rectangular road under them instead of recoloring the existing road art. Not what you meant.</p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="pair">
+        <figure class="shot"><img src="./images/rydr-iter-09-merge-4cartext-7road.png?v=merge" alt="Iteration 9 merge"/></figure>
+        <figure class="shot light"><img src="./images/rydr-iter-09-merge-4cartext-7road.png?v=merge" alt="Iteration 9 on light"/></figure>
+      </div>
+      <div class="meta">
+        <span class="tag keep">#9 · merge (latest)</span>
+        <h2>#4 car + text  ×  #7 road + yellow lane markers</h2>
+        <p>Car and RydR wordmark from iteration #4. Black road and yellow dashed lane markers from iteration #7. Cyan shield road from #4 removed.</p>
+      </div>
+    </article>
+
+  </div>
+</body>
+</html>

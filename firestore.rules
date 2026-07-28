@@ -532,6 +532,18 @@ service cloud.firestore {
       allow create, update, delete: if signedIn();
     }
 
+    // Display page access attempts (IP + UA). Written only by Cloud Functions (Admin SDK).
+    match /displayAccessLogs/{id} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Per-board display URL secrets (?k=). Never public — Master Admin + Admin SDK only.
+    match /displayBoardSecrets/{locationId} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
     match /guestListRequests/{id} {
       allow create: if signedIn();
       allow read, update, delete: if signedIn();
@@ -764,9 +776,10 @@ service cloud.firestore {
         || (
           signedIn()
           && resource.data.broadcasterUid == request.auth.uid
-          && resource.data.status in ["waiting", "offering"]
+          && resource.data.status in ["waiting", "offering", "connected"]
           && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(["offer", "status", "updatedAt"])
+            .hasOnly(["offer", "answer", "status", "updatedAt"])
+          && request.resource.data.status in ["waiting", "offering", "connected"]
         )
         || (
           resource.data.status in ["waiting", "offering", "connected"]

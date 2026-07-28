@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>RydR logo — revert &amp; step history (local)</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
+  <style>
+    body{margin:0;padding:24px;background:linear-gradient(160deg,#070d18,#102038 55%,#0a1628)}
+    .note{color:#3de7ff;font-weight:900;margin-bottom:12px}
+    .sub{color:rgba(255,255,255,.72);margin:0 0 20px;max-width:720px;line-height:1.45}
+    .block{margin:20px 0;padding:16px;border:1px dashed rgba(255,255,255,.22);border-radius:16px}
+    .block h2{color:#fff;margin:0 0 8px;font-size:17px}
+    .block p{color:rgba(255,255,255,.7);margin:0 0 12px;font-size:14px;line-height:1.4}
+    .row{display:flex;flex-wrap:wrap;gap:16px}
+    figure{margin:0;padding:12px;border-radius:12px;background:rgba(255,255,255,.05)}
+    figcaption{color:#d4b483;font-size:12px;font-weight:800;margin-bottom:8px}
+    img{display:block;width:min(220px,70vw);height:auto}
+    .ok{color:#9dffb0}.bad{color:#ff8f9f}
+  </style>
+</head>
+<body>
+  <p class="note">REVERTED to original RydR marks. Local only — not deployed.</p>
+  <p class="sub">Active files <code>images/rydr-logo.png</code> and <code>images/rydr-logo-plate.png</code> are restored to Step 0. Reply with the step number to use as the new baseline (e.g. “start from Step 1”), then give one road instruction.</p>
+
+  <div class="block">
+    <h2>Step 0 — Original (CURRENT / restored)</h2>
+    <p class="ok">First icons I generated for approval. Transparent (A) and plate (B).</p>
+    <div class="row">
+      <figure>
+        <figcaption>A transparent (now active)</figcaption>
+        <img src="./images/rydr-step0-original-transparent.png?v=revert" alt="Step 0 transparent"/>
+      </figure>
+      <figure>
+        <figcaption>B plate (now active plate)</figcaption>
+        <img src="./images/rydr-step0-original-plate.png?v=revert" alt="Step 0 plate"/>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Step 1 — Remove anything above the car</h2>
+    <p>You liked text + car + road; asked to remove roof sensor / cyan halo above the car. Car + text otherwise same family as Step 0A.</p>
+    <div class="row">
+      <figure>
+        <figcaption>No roof sensor</figcaption>
+        <img src="./images/rydr-step1-no-roof-sensor.png?v=revert" alt="Step 1"/>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Step 2 — <span class="bad">Mistake</span>: “lanes only”</h2>
+    <p class="bad">I regenerated the whole mark. That wrongly changed the car and the text. Ignore this as a design source.</p>
+    <div class="row">
+      <figure>
+        <figcaption>Wrong regen</figcaption>
+        <img src="./images/rydr-step2-wrong-regen-lanes.png?v=revert" alt="Step 2 wrong"/>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Step 3 — <span class="bad">Mistake</span>: black/yellow road composite</h2>
+    <p class="bad">Tried to fix by pasting Step 1 car+text and drawing a new black road with yellow dashes underneath. That was not editing “the existing road” — it added a new strip. Also not what you meant.</p>
+  </div>
+
+  <div class="block">
+    <h2>What you actually asked (for when we restart)</h2>
+    <p><strong>Keep unchanged:</strong> car graphic, RydR text, and the existing road shape/position under them.</p>
+    <p><strong>Only change the road’s paint:</strong> lanes → <strong>black</strong>; lane markers → <strong>yellow</strong>; drop other road decorations (cyan glow, gold frames, etc.).</p>
+  </div>
+</body>
+</html>

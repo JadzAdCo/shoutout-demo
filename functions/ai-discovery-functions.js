@@ -18,7 +18,8 @@ const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
-const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
+const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
+const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -570,10 +571,13 @@ async function sendEmailOtp(email, code) {
       personalizations:[{to:[{email}]}],
       from:{email:EMAIL_OTP_FROM, name:"FLOQR"},
       subject:"Your FLOQR sign-in code",
-      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 5 minutes. If you did not request this code, ignore this email.`}]
+      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`}]
     })
   });
-  if (!response.ok) throw new HttpsError("internal", `Email provider returned HTTP ${response.status}.`);
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "");
+    throw new HttpsError("internal", `Email provider returned HTTP ${response.status}${errText ? `: ${errText.slice(0, 180)}` : ""}.`);
+  }
 }
 
 async function assertMasterAdmin(request) {
@@ -1013,10 +1017,10 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
   await ref.set({
     email, codeHash:otpHash(email, code), attempts:0, used:false,
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 5 * 60 * 1000)
+    expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
   });
   await sendEmailOtp(email, code);
-  return {challengeId, expiresInSeconds:300, delivery:"email"};
+  return {challengeId, expiresInSeconds:360, delivery:"email"};
 });
 
 exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {
@@ -1051,7 +1055,7 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
 });
 
 exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
-  await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubId = String(request.data?.clubId || request.data?.clubLocationId || "").trim();
   const patronUid = String(request.data?.patronUid || "").trim();
   if (!clubId || !patronUid) throw new HttpsError("invalid-argument", "clubId and patronUid are required.");
@@ -1081,6 +1085,13 @@ exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
   batch.set(db.collection("clubLocations").doc(clubId), {adminUids:admin.firestore.FieldValue.arrayUnion(patronUid), adminEmails:admin.firestore.FieldValue.arrayUnion(email), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
   batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
   await batch.commit();
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "assign_club_admin",
+    detail: {clubId, patronUid, patronEmail: email},
+    sessionId
+  });
   return {assignmentId, clubId, patronUid, patronEmail:email, status:"active"};
 });
 

@@ -8,7 +8,7 @@ When adding or updating upload controls for logos, icons, profile photos, campai
 
 - **Always provide a local file upload** (`<input type="file">`) as the primary control.
 - Use `url-media-field.js` (`FLOQRUrlMediaField.bind`) to upload to Firebase Storage and store the resulting URL internally — do **not** expose a visible “paste URL” field for logos/icons unless a legacy migration path is explicitly required.
-- **Display URLs** for venue LED boards (`display.html?location=…`) must stay **stable** (no `?v=` cache-bust query). Those links are embedded on devices and third-party sites. Use `FLOQRNav.stableDisplayUrl(locationId)`.
+- **Display URLs** for venue LED / Xibo boards (`display.html?location=…` and `display2.html?location=…`) must stay **stable** (no `?v=` cache-bust query). Configure once in Xibo; do not change the URL when app versions update. Cache-bust JS/CSS only inside the HTML (`script`/`link` `?v=`). Use `FLOQRNav.stableDisplayUrl` / `stableSecondaryDisplayUrl`.
 - **After every webapp modification**, first verify GitHub Actions / Functions CI logs are green for the published commit, then email mobile preview links so testers can open live URLs on iPhone: Master Admin → **Diagnostics** → **Email mobile preview links**, or deploy/call Cloud Function `emailFloqrPreviewLinks`. See `STANDARD-AFTER-DEPLOYMENT.md` steps 7–8.
 - **Product spelling:** always **ShoutOut** (capital O) in user-facing copy — not “Shoutout”, “SHOUTOUT”, or “Shout Out”.
 - Admin portal pages may still use `?v=` for cache-busting JS/CSS; venue board URLs should not.

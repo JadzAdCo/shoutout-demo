@@ -1,0 +1,41 @@
+{
+  "id": "lima-twist-washington-dc",
+  "source": "https://www.limatwist.com/",
+  "extractedAt": "2026-07-18",
+  "datapoints": {
+    "clubName": "LIMA Twist",
+    "brandName": "LIMA Twist",
+    "tagline": "Join us for a meal to remember!",
+    "concept": "The legendary LIMA is back — Restaurant | Bar | Lounge | Valet Parking",
+    "description": "Located in Downtown Washington DC, LIMA Twist serves South American Fusion cuisine. Restaurant by day; by night light, sound, and house-rooted programming.",
+    "cuisine": "South American Fusion",
+    "streetAddress": "1411 K Street NW",
+    "city": "Washington",
+    "stateRegion": "District of Columbia",
+    "postalCode": "20005",
+    "country": "United States",
+    "telephone": "(202) 506-7151",
+    "telephoneE164": "+12025067151",
+    "officialWebsite": "https://www.limatwist.com/",
+    "menuUrl": "https://www.limatwist.com/menu",
+    "contactUrl": "https://www.limatwist.com/contact",
+    "reservationsUrl": "https://www.opentable.com/r/lima-twist-washington",
+    "instagram": "@limatwistdc",
+    "facebook": "https://www.facebook.com/limatwistdc/",
+    "logoUrl": "https://images.squarespace-cdn.com/content/v1/66031ca5fde1186b2367bc7f/be6ac216-be12-4708-a090-69e3666a2f13/LIMA+Logo+web.png?format=1500w",
+    "hoursOfficialSite": {
+      "mon": "Closed",
+      "tue": "Closed",
+      "wed": "Closed",
+      "thu": "Closed",
+      "fri": "7:00 PM – 3:00 AM",
+      "sat": "7:00 PM – 3:00 AM",
+      "sun": "7:00 PM – 1:00 AM"
+    },
+    "hoursOpenTableNote": "OpenTable lists brunch Sun 2–5 PM and dinner Thu–Sat 7–11:30 PM — confirm with venue",
+    "genresInferred": ["House", "Deep House", "EDM", "Latin", "International"],
+    "amenities": ["Valet Parking", "Restaurant", "Bar", "Lounge", "Bottle Service", "Signature cocktails", "Wine list"],
+    "menuHighlights": ["Ceviche / South American fusion", "Branzino", "Jerk lamb chops", "Bottle service", "Specialty cocktails"],
+    "missingFromWebsite": ["public email", "dress code", "age policy", "TikTok", "X/Twitter"]
+  }
+}
