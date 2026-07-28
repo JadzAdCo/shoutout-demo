@@ -22,7 +22,7 @@
   function masterAdminUrl(locationId = "") {
     const id = String(locationId || "").trim();
     if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
-    return `./admin.html?location=${encodeURIComponent(id)}&v=29.09.94&from=master`;
+    return `./admin.html?location=${encodeURIComponent(id)}&v=29.09.95&from=master`;
   }
 
   function mergeClubRows(locationRows = [], clubRows = []) {
@@ -51,9 +51,14 @@
     return Array.from(merged.values());
   }
 
-  function callable(name) {
+  function callableFn(name) {
     if (!functions) functions = firebase.app().functions("us-central1");
     return functions.httpsCallable(name);
+  }
+
+  async function invokeCallable(name, data = {}) {
+    const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+    return callableFn(name)({...data, sos2faSessionId: sessionId});
   }
 
   function entityTitle(row, type) {
@@ -257,7 +262,7 @@
       const next = !!event.target.checked;
       try {
         setStatus(next ? "Enabling entity..." : "Disabling entity...");
-        await callable("setEntityAppEnabled")({entityType:type, entityId:id, enabled:next, email:row.email || ""});
+        await invokeCallable("setEntityAppEnabled", {entityType:type, entityId:id, enabled:next, email:row.email || ""});
         row.appEnabled = next;
         row.active = next;
         row.status = next ? "active" : "disabled";
@@ -279,7 +284,7 @@
       });
       try {
         setStatus("Saving venue feature gates...");
-        await callable("setVenueFeatureGates")({clubId:id, gates:nextGates});
+        await invokeCallable("setVenueFeatureGates", {clubId:id, gates:nextGates});
         row.featureGates = nextGates;
         gates()?.invalidateVenueCache?.(id);
         setStatus("Venue feature gates saved.");
@@ -297,7 +302,7 @@
       if (!window.confirm(`Offboard "${entityTitle(row, type)}"? Public profile fields will be cleared. This cannot be undone from this tool.`)) return;
       try {
         setStatus("Offboarding entity...");
-        await callable("offboardEntity")({entityType:type, entityId:id, confirmName, email:row.email || ""});
+        await invokeCallable("offboardEntity", {entityType:type, entityId:id, confirmName, email:row.email || ""});
         row.offboarded = true;
         row.appEnabled = false;
         row.active = false;
@@ -329,7 +334,7 @@
     });
     try {
       setStatus("Saving global patron feature gates...");
-      await callable("setPatronFeatureGates")({gates:next});
+      await invokeCallable("setPatronFeatureGates", {gates:next});
       gates()?.setCachedPatronGates?.(next);
       setStatus("Global patron feature gates saved. Super Admin remains exempt.");
       renderGlobalPatronGates();
@@ -350,8 +355,6 @@
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = masterAdminUrl(row.id);
-      const shoutout = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
-      const suprstar = window.FLOQRNav?.stableSecondaryDisplayUrl?.(row.id) || `./display2.html?location=${encodeURIComponent(row.id)}`;
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const g = gates();
       const enabled = g?.entityIsAppEnabled(row);
@@ -363,8 +366,6 @@
         ${statusBadge(row)}
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
         <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
-        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
-        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
         <div class="queue-actions">
           <button type="button" data-manage-club="${esc(row.id)}">Manage entity</button>
         </div>

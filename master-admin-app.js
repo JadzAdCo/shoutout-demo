@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.94";
+  const CURRENT_VERSION = "29.09.96";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 
@@ -150,11 +150,14 @@
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
       }
-      if (panelId === "entityManagement" && window.FLOQRSOS2FA) {
+      if (window.FLOQRSOS2FA?.isEntityMgmtPanel?.(panelId)) {
         window.FLOQRSOS2FA.mount({
           scope: "entityManagement",
           onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
         });
+        window.FLOQRSOS2FA.onPanelActivate(panelId);
+      } else {
+        window.FLOQRSOS2FA?.onPanelActivate?.(panelId);
       }
       try {
         if (location.hash !== `#${panelId}`) history.replaceState(null, "", `#${panelId}`);
@@ -840,7 +843,8 @@
     let backendActivated = false;
     if (functions) {
       try {
-        const result = await functions.httpsCallable("assignClubAdmin")({clubId:club.id, clubLocationId:club.id, patronUid:uid});
+        const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+        const result = await functions.httpsCallable("assignClubAdmin")({clubId:club.id, clubLocationId:club.id, patronUid:uid, sos2faSessionId: sessionId});
         backendActivated = result?.data?.status === "active";
       } catch (error) {
         console.warn("assignClubAdmin callable unavailable; using assignment-record fallback:", error?.message || error);
@@ -1228,8 +1232,6 @@
       .sort((a,b) => locationName(a).localeCompare(locationName(b)));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = clubAdminUrl(row.id);
-      const shoutout = displayUrl(row.id);
-      const suprstar = secondaryDisplayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       return `<div class="queue-item">
         <div class="message-envelope-head">
@@ -1238,8 +1240,6 @@
         </div>
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
         <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
-        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
-        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
     populateClubDisplaySetupOptions(locationRows);
@@ -1687,7 +1687,10 @@
       byId("promoterNetworkReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter referrals yet.</p>";
     }
 
-    byId("allQueueList").innerHTML = pending.length ? pending.map(item => `
+    byId("allQueueList").innerHTML = pending.length ? pending.map(item => {
+      const paidCents = Math.max(0, Math.round(Number(item.amountCents || item.priceCents || item.receipt?.amountCents || 0)));
+      const paid = String(item.paymentStatus || "").toLowerCase() === "paid" || paidCents > 0;
+      return `
       <div class="queue-item">
         <strong>${esc(item.mainText || "Untitled ShoutOut")}</strong>
         <p>${esc(item.subText || "")}</p>
@@ -1695,8 +1698,42 @@
           ${esc(item.locationName || item.clubName || item.clubLocationId || "Unknown location")}
           • ${esc(item.referenceNumber || "")}
           • ${esc(item.submittedBy || "unknown")}
+          ${paid ? ` • paid ${esc(money(paidCents / 100))}` : ""}
         </small>
-      </div>`).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+      </div>`;
+    }).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+  }
+
+  async function purgeAllPendingShoutoutQueues() {
+    const statusEl = byId("allQueueStatus");
+    if (!window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
+      if (statusEl) statusEl.textContent = "Unlock Entity Management with SOS2FA before purging queues.";
+      document.querySelector('[data-panel="entityManagement"]')?.click();
+      return;
+    }
+    const pendingCount = Number(byId("netPending")?.textContent?.replace(/,/g, "") || 0);
+    const ok = window.confirm(`Purge ALL pending ShoutOuts across every venue?\n\nPaid pending items will be refunded via Stripe, then removed from the queue.\nThis cannot be undone.`);
+    if (!ok) return;
+    const confirmWord = window.prompt('Type PURGE to confirm.', "");
+    if (String(confirmWord || "").trim().toUpperCase() !== "PURGE") {
+      if (statusEl) statusEl.textContent = "Purge cancelled — confirmation word not entered.";
+      return;
+    }
+    try {
+      if (statusEl) statusEl.textContent = `Purging pending queues${pendingCount ? ` (${pendingCount} shown)` : ""}…`;
+      const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+      const result = await firebase.app().functions("us-central1").httpsCallable("purgePendingShoutoutQueues")({
+        confirm: "purge",
+        sos2faSessionId: sessionId
+      });
+      const data = result?.data || {};
+      if (statusEl) {
+        statusEl.textContent = `Purged ${data.purged || 0} pending ShoutOut(s); refunded ${data.refunded || 0}. Errors: ${(data.errors || []).length}.`;
+      }
+      await loadNetworkReports();
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1721,6 +1758,8 @@
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
     bind("refreshNetworkReconBtn", loadNetworkPaymentLedger);
     bind("purgeTestPaymentsReconBtn", purgeNetworkTestPayments);
+    bind("refreshAllQueuesBtn", loadNetworkReports);
+    bind("purgePendingShoutoutQueuesBtn", purgeAllPendingShoutoutQueues);
     bind("previewManagedTemplateBtn", () => viewManagedTemplate(currentManagedTemplateDraft()));
     bind("saveManagedTemplateBtn", saveManagedTemplate);
     bind("clearManagedTemplateBtn", clearManagedTemplateForm);
