@@ -177,7 +177,6 @@
 
       <section id="securitySystemMessages" class="admin-panel-section">
         <div class="card">
-          <p class="eyebrow">Security · not diagnostics</p>
           <h2 class="help-label">
             <span class="help-label-text">Security System Messages</span>
             <details class="help-popout inline-help-popout">
@@ -185,18 +184,14 @@
               <div>
                 These are <strong>security</strong> alerts (display IP/token denies), not diagnostic logs.
                 Delete messages here anytime. Access attempt history stays under Security Logs (90-day retention).
+                Check <strong>All security system messages have been read</strong> to clear the Security tab blink until new denies arrive.
               </div>
             </details>
           </h2>
-          <p class="sub small" data-keep-visible="true">
-            Alerts when a display page is denied (IP or token). Unread messages blink the nested tab above.
-          </p>
-          <div class="queue-actions">
-            <button id="markSecurityMessagesReadBtn" type="button">Mark visible as read</button>
-            <button id="deleteReadSecurityMessagesBtn" type="button">Delete read messages</button>
-            <button id="refreshSecurityMessagesBtn" type="button">Refresh</button>
-          </div>
-          <p class="sub small" data-keep-visible="true">Messages are deletable. Security <em>logs</em> (access attempts) are not deleted here — they auto-purge after 90 days and remain exportable until then.</p>
+          <label class="security-messages-ack" for="securityMessagesAckRead">
+            <input id="securityMessagesAckRead" type="checkbox"/>
+            <span>All security system messages have been read</span>
+          </label>
           <p id="securitySystemMessagesStatus" class="status"></p>
           <div id="masterSystemMessages" class="report-block master-system-messages">No security system messages yet.</div>
         </div>
