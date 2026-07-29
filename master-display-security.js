@@ -591,9 +591,8 @@
   function syncSecurityMessagesAck(hasUnread) {
     const ack = byId("securityMessagesAckRead");
     if (!ack) return;
-    // Checked means all current messages are acknowledged/read → Security blink off.
-    ack.checked = !hasUnread && lastSecurityMessages.length >= 0;
-    if (!lastSecurityMessages.length) ack.checked = true;
+    // Checked only when there is nothing unread (including empty inbox).
+    ack.checked = !hasUnread;
   }
 
   async function acknowledgeAllSecurityMessagesRead() {
@@ -611,6 +610,11 @@
         readAt: firebase.firestore.FieldValue.serverTimestamp(),
         acknowledgedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge: true})));
+      // Optimistic local update so blink clears immediately before snapshot returns.
+      lastSecurityMessages = lastSecurityMessages.map((row) => (
+        ids.includes(row.id) ? {...row, read: true} : row
+      ));
+      setSecurityMessagesBlink(false);
       setText("securitySystemMessagesStatus", `${lastSecurityMessages.length} security message(s)`);
     } catch (err) {
       const ack = byId("securityMessagesAckRead");
@@ -899,9 +903,16 @@
       loadDisplayAccessLogs(id);
     });
     byId("exportSecurityLogsBtn")?.addEventListener("click", () => exportSecurityLogsCsv());
-    byId("markSecurityMessagesReadBtn")?.addEventListener("click", () => markVisibleSecurityMessagesRead());
-    byId("deleteReadSecurityMessagesBtn")?.addEventListener("click", () => deleteReadSecurityMessages());
-    byId("refreshSecurityMessagesBtn")?.addEventListener("click", () => startMasterSystemMessageFeed());
+    byId("securityMessagesAckRead")?.addEventListener("change", async (event) => {
+      const ack = event.currentTarget;
+      if (ack?.checked) {
+        await acknowledgeAllSecurityMessagesRead();
+        return;
+      }
+      // Blink is driven by unread messages only — unchecking does not re-open them.
+      const hasUnread = lastSecurityMessages.some((row) => row.read !== true);
+      if (!hasUnread) ack.checked = true;
+    });
     byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));
     byId("rotateSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary"));
