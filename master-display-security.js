@@ -585,6 +585,42 @@
     // Also pulse the parent Security tab so unread alerts are visible before expanding.
     const parent = document.querySelector('.admin-tab-parent[data-group="security"]');
     if (parent) parent.classList.toggle("is-blink", !!hasUnread);
+    syncSecurityMessagesAck(hasUnread);
+  }
+
+  function syncSecurityMessagesAck(hasUnread) {
+    const ack = byId("securityMessagesAckRead");
+    if (!ack) return;
+    // Checked only when there is nothing unread (including empty inbox).
+    ack.checked = !hasUnread;
+  }
+
+  async function acknowledgeAllSecurityMessagesRead() {
+    const ids = lastSecurityMessages.filter((row) => row.read !== true).map((row) => row.id).filter(Boolean);
+    if (!ids.length) {
+      setSecurityMessagesBlink(false);
+      setText("securitySystemMessagesStatus", lastSecurityMessages.length
+        ? `${lastSecurityMessages.length} security message(s)`
+        : "No security system messages.");
+      return;
+    }
+    try {
+      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
+        read: true,
+        readAt: firebase.firestore.FieldValue.serverTimestamp(),
+        acknowledgedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true})));
+      // Optimistic local update so blink clears immediately before snapshot returns.
+      lastSecurityMessages = lastSecurityMessages.map((row) => (
+        ids.includes(row.id) ? {...row, read: true} : row
+      ));
+      setSecurityMessagesBlink(false);
+      setText("securitySystemMessagesStatus", `${lastSecurityMessages.length} security message(s)`);
+    } catch (err) {
+      const ack = byId("securityMessagesAckRead");
+      if (ack) ack.checked = false;
+      setText("securitySystemMessagesStatus", err?.message || "Could not acknowledge messages as read.");
+    }
   }
 
   function selectedSecurityMessageIds() {
@@ -621,7 +657,7 @@
     const unreadCount = rows.filter((row) => row.read !== true).length;
     setSecurityMessagesBlink(unreadCount > 0);
     setText("securitySystemMessagesStatus", rows.length
-      ? `${rows.length} security message(s) · ${unreadCount} unread`
+      ? `${rows.length} security message(s)`
       : "No security system messages.");
     if (!rows.length) {
       host.textContent = "No security system messages yet.";
@@ -867,9 +903,16 @@
       loadDisplayAccessLogs(id);
     });
     byId("exportSecurityLogsBtn")?.addEventListener("click", () => exportSecurityLogsCsv());
-    byId("markSecurityMessagesReadBtn")?.addEventListener("click", () => markVisibleSecurityMessagesRead());
-    byId("deleteReadSecurityMessagesBtn")?.addEventListener("click", () => deleteReadSecurityMessages());
-    byId("refreshSecurityMessagesBtn")?.addEventListener("click", () => startMasterSystemMessageFeed());
+    byId("securityMessagesAckRead")?.addEventListener("change", async (event) => {
+      const ack = event.currentTarget;
+      if (ack?.checked) {
+        await acknowledgeAllSecurityMessagesRead();
+        return;
+      }
+      // Blink is driven by unread messages only — unchecking does not re-open them.
+      const hasUnread = lastSecurityMessages.some((row) => row.read !== true);
+      if (!hasUnread) ack.checked = true;
+    });
     byId("reissueBothDisplayTokensBtn")?.addEventListener("click", () => reissueBothDisplayTokens());
     byId("rotatePrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary"));
     byId("rotateSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary"));

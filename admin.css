@@ -523,6 +523,8 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .security-messages-table td:nth-child(2),.security-messages-table td:nth-child(3){white-space:nowrap}
 .security-msg-check-cell{width:36px;text-align:center}
 .security-messages-table-actions{display:flex;justify-content:flex-end;gap:10px;padding:12px;border-top:1px solid rgba(255,255,255,.08);background:rgba(8,18,40,.35)}
+.security-messages-ack{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-weight:700;cursor:pointer}
+.security-messages-ack input{width:18px;height:18px;accent-color:#4f9dff}
 @media(max-width:820px){.entity-manage-head{flex-direction:column}.sos2fa-gate-head{grid-template-columns:1fr}}
 
 /* Feature: Display Security access log — real HTML table (do not use .report-table; that class is a div-grid). */
