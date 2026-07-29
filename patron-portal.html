@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.19"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.19"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.103"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.103"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -73,7 +73,13 @@
             <label>FloqR / Mingl handle
               <span class="label-inline-row"><input id="editFloqrHandle" maxlength="28" placeholder="@your_handle"/><button type="button" id="editFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button></span>
             </label>
-            <label>Phone Number <input id="editPhone"/></label>
+            <label class="profile-grid-wide">Mobile #
+              <div class="phone-row mobile-number-row">
+                <select id="editPhoneCountryCode" autocomplete="tel-country-code" aria-label="Country code"></select>
+                <input id="editPhoneNational" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="2025550123" aria-label="Mobile number"/>
+                <input id="editPhone" type="hidden"/>
+              </div>
+            </label>
             <label>Taxi pickup address <input id="editTaxiPickupAddress" autocomplete="street-address" placeholder="Used privately by Pickup"/></label>
             <label>City <input id="editCity"/></label>
             <label>Country <input id="editCountry"/></label>
@@ -565,11 +571,12 @@
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./helper-popouts.js?v=29.09.8"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
+  <script src="./phone-country-codes.js?v=29.09.103"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./floqr-i18n.js?v=29.09.13"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.57"></script>
+<script src="./patron-portal-app.js?v=29.09.103"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

@@ -2,8 +2,9 @@
 (function (root) {
   "use strict";
 
-  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com", "bans.don@gmail.com"]).map(x => String(x).toLowerCase());
-  const MASTER_ADMIN_EMAILS = (root.SHOUTOUT_MASTER_ADMIN_EMAILS || root.SHOUTOUT_ADMIN_EMAILS || []).map(x => String(x).toLowerCase());
+  const MASTER_ADMIN_EMAILS = (root.SHOUTOUT_MASTER_ADMIN_EMAILS || root.SHOUTOUT_ADMIN_EMAILS || ["bans.don@gmail.com", "don.b@jadzholdings.com"]).map(x => String(x).toLowerCase());
+  /* Master Admin = Super Admin */
+  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || MASTER_ADMIN_EMAILS).map(x => String(x).toLowerCase());
 
   const DEFAULT_PATRON_GATES = Object.freeze({
     bartr: true,
@@ -49,15 +50,14 @@
 
   function isSuperAdmin(userOrEmail, profile = null) {
     const email = emailOf(userOrEmail);
-    if (email && SUPER_ADMIN_EMAILS.includes(email)) return true;
-    if (profile?.superAdmin === true) return true;
-    if (userOrEmail?.superAdmin === true) return true;
+    if (email && (SUPER_ADMIN_EMAILS.includes(email) || MASTER_ADMIN_EMAILS.includes(email))) return true;
+    if (profile?.superAdmin === true || profile?.masterAdmin === true) return true;
+    if (userOrEmail?.superAdmin === true || userOrEmail?.masterAdmin === true) return true;
     return false;
   }
 
   function isMasterAdminEmail(userOrEmail) {
-    const email = emailOf(userOrEmail);
-    return !!email && (MASTER_ADMIN_EMAILS.includes(email) || SUPER_ADMIN_EMAILS.includes(email));
+    return isSuperAdmin(userOrEmail);
   }
 
   function normalizePatronGates(raw = {}) {

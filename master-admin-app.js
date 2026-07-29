@@ -145,6 +145,7 @@
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
+      if (panelId === "adminUserManagement") window.FLOQRAdminUserManagement?.mount?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
