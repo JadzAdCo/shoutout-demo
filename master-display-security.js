@@ -502,14 +502,76 @@
   let systemMessagesUnsub = null;
   let lastSecurityMessages = [];
 
-  function formatMessageWhen(ms) {
+  function formatMessageDate(ms) {
     const n = Number(ms || 0);
     if (!n) return "—";
     try {
-      return new Date(n).toLocaleString();
+      return new Date(n).toLocaleDateString(undefined, {year: "numeric", month: "short", day: "numeric"});
     } catch (_) {
-      return String(n);
+      return "—";
     }
+  }
+
+  function formatMessageTime(ms) {
+    const n = Number(ms || 0);
+    if (!n) return "—";
+    try {
+      return new Date(n).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+    } catch (_) {
+      return "—";
+    }
+  }
+
+  function boardLabelForMessage(board) {
+    const b = String(board || "").toLowerCase();
+    if (b === "2" || b === "secondary" || b === "display2" || b === "suprstar") return "Display 2 (supRstar)";
+    if (b === "1" || b === "primary" || b === "display" || b === "shoutout") return "Display 1 (ShoutOut)";
+    return board ? `Board ${board}` : "";
+  }
+
+  function parseSecurityMessageColumns(row = {}) {
+    const ms = Number(row.createdAtMs || row.createdAt?.toMillis?.() || 0);
+    const venue = String(row.locationName || row.clubLocationId || "—").trim() || "—";
+    const error = String(row.title || "Display access denied").trim();
+    const board = boardLabelForMessage(row.displayBoard);
+    const body = String(row.body || "").trim();
+    let description = "";
+    let causation = "";
+
+    if (board || row.clientIp || row.locationName || row.clubLocationId) {
+      description = [
+        board ? `${board} blocked for ${row.locationName || row.clubLocationId || venue}.` : "",
+        row.clientIp ? `IP ${row.clientIp}.` : ""
+      ].filter(Boolean).join(" ");
+    }
+
+    if (row.denialReason) {
+      causation = `${String(row.denialReason).trim()}. Device was shown the Floq Media / FloqR not-configured message.`;
+    }
+
+    if ((!description || !causation) && body) {
+      const reasonMatch = body.match(/Reason:\s*([^.]*)\.?/i);
+      const deviceMatch = body.match(/Device was shown[\s\S]*$/i);
+      if (!description) {
+        description = reasonMatch
+          ? body.slice(0, reasonMatch.index).replace(/\s+/g, " ").trim()
+          : body;
+      }
+      if (!causation) {
+        const reason = reasonMatch ? reasonMatch[1].trim() : "";
+        const device = deviceMatch ? deviceMatch[0].trim() : "Device was shown the Floq Media / FloqR not-configured message.";
+        causation = reason ? `${reason}. ${device}` : device;
+      }
+    }
+
+    return {
+      date: formatMessageDate(ms),
+      time: formatMessageTime(ms),
+      venue,
+      error,
+      description: description || "—",
+      causation: causation || "—"
+    };
   }
 
   function setSecurityMessagesBlink(hasUnread) {
@@ -525,6 +587,33 @@
     if (parent) parent.classList.toggle("is-blink", !!hasUnread);
   }
 
+  function selectedSecurityMessageIds() {
+    return Array.from(document.querySelectorAll("#masterSystemMessages .security-msg-check:checked"))
+      .map((el) => String(el.value || "").trim())
+      .filter(Boolean);
+  }
+
+  function bindSecurityMessageTableActions(host) {
+    const selectAll = host.querySelector("#securityMsgSelectAll");
+    const checks = () => Array.from(host.querySelectorAll(".security-msg-check"));
+    selectAll?.addEventListener("change", () => {
+      const on = !!selectAll.checked;
+      checks().forEach((box) => { box.checked = on; });
+    });
+    host.querySelector("#securityMsgSelectAllBtn")?.addEventListener("click", () => {
+      checks().forEach((box) => { box.checked = true; });
+      if (selectAll) selectAll.checked = true;
+    });
+    host.querySelector("#securityMsgDeleteSelectedBtn")?.addEventListener("click", () => {
+      deleteSelectedSecurityMessages();
+    });
+    checks().forEach((box) => {
+      box.addEventListener("change", () => {
+        if (selectAll) selectAll.checked = checks().length > 0 && checks().every((c) => c.checked);
+      });
+    });
+  }
+
   function renderSystemMessages(rows = []) {
     const host = byId("masterSystemMessages");
     if (!host) return;
@@ -538,24 +627,66 @@
       host.textContent = "No security system messages yet.";
       return;
     }
-    host.innerHTML = rows.map((row) => {
+
+    const bodyRows = rows.map((row) => {
       const unread = row.read !== true;
-      return `<article class="master-system-message-row${unread ? " is-unread" : ""}" data-message-id="${esc(row.id)}">
-        <strong>${esc(row.title || "Display access denied")}${unread ? " · NEW" : ""}</strong>
-        <p class="sub small">${esc(row.body || "")}</p>
-        <p class="sub small">${esc(formatMessageWhen(row.createdAtMs || row.createdAt?.toMillis?.()))}${row.clubLocationId ? ` · ${esc(row.clubLocationId)}` : ""}</p>
-        <div class="queue-actions">
-          ${unread ? `<button type="button" class="security-msg-read-btn" data-message-id="${esc(row.id)}">Mark read</button>` : ""}
-          <button type="button" class="ghost security-msg-delete-btn" data-message-id="${esc(row.id)}">Delete message</button>
-        </div>
-      </article>`;
+      const cols = parseSecurityMessageColumns(row);
+      return `<tr class="${unread ? "is-unread" : ""}" data-message-id="${esc(row.id)}">
+        <td class="security-msg-check-cell">
+          <input class="security-msg-check" type="checkbox" value="${esc(row.id)}" aria-label="Select message"/>
+        </td>
+        <td>${esc(cols.date)}</td>
+        <td>${esc(cols.time)}</td>
+        <td>${esc(cols.venue)}</td>
+        <td>${esc(cols.error)}${unread ? " · NEW" : ""}</td>
+        <td>${esc(cols.description)}</td>
+        <td>${esc(cols.causation)}</td>
+      </tr>`;
     }).join("");
-    host.querySelectorAll(".security-msg-delete-btn").forEach((btn) => {
-      btn.addEventListener("click", () => deleteSecurityMessage(btn.getAttribute("data-message-id")));
-    });
-    host.querySelectorAll(".security-msg-read-btn").forEach((btn) => {
-      btn.addEventListener("click", () => markSecurityMessageRead(btn.getAttribute("data-message-id")));
-    });
+
+    host.innerHTML = `<div class="security-messages-table-wrap" data-keep-visible="true">
+      <table class="security-messages-table" data-keep-visible="true">
+        <thead>
+          <tr>
+            <th scope="col" class="security-msg-check-cell">
+              <input id="securityMsgSelectAll" type="checkbox" aria-label="Select all messages"/>
+            </th>
+            <th scope="col">Date</th>
+            <th scope="col">Time</th>
+            <th scope="col">Venue</th>
+            <th scope="col">Error</th>
+            <th scope="col">Error Description</th>
+            <th scope="col">Causation</th>
+          </tr>
+        </thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+      <div class="security-messages-table-actions">
+        <button id="securityMsgSelectAllBtn" type="button">Select All</button>
+        <button id="securityMsgDeleteSelectedBtn" class="danger" type="button">Delete Selected</button>
+      </div>
+    </div>`;
+    bindSecurityMessageTableActions(host);
+  }
+
+  async function deleteSelectedSecurityMessages() {
+    const ids = selectedSecurityMessageIds();
+    if (!ids.length) {
+      setText("securitySystemMessagesStatus", "Select one or more messages first.");
+      return;
+    }
+    if (!window.confirm(`Delete ${ids.length} selected security message(s)? (Access logs are kept separately.)`)) return;
+    try {
+      await Promise.all(ids.map((id) => firebase.firestore().collection("inboxNotifications").doc(id).set({
+        deleted: true,
+        deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        deletedAtMs: Date.now(),
+        read: true
+      }, {merge: true})));
+      setText("securitySystemMessagesStatus", `Deleted ${ids.length} selected message(s).`);
+    } catch (err) {
+      setText("securitySystemMessagesStatus", err?.message || "Delete selected failed.");
+    }
   }
 
   async function deleteSecurityMessage(messageId) {

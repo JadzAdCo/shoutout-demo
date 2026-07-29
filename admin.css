@@ -515,6 +515,14 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .display-obfuscated-keys-table th,.display-obfuscated-keys-table td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
 .display-obfuscated-keys-table thead th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9fdfff;background:rgba(8,18,40,.55)}
 .display-obfuscated-keys-table code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.security-messages-table-wrap{overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:12px}
+.security-messages-table{width:100%;border-collapse:collapse;font-size:13px}
+.security-messages-table th,.security-messages-table td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.08)}
+.security-messages-table thead th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9fdfff;background:rgba(8,18,40,.55);white-space:nowrap}
+.security-messages-table tbody tr.is-unread{background:rgba(255,90,110,.08)}
+.security-messages-table td:nth-child(2),.security-messages-table td:nth-child(3){white-space:nowrap}
+.security-msg-check-cell{width:36px;text-align:center}
+.security-messages-table-actions{display:flex;justify-content:flex-end;gap:10px;padding:12px;border-top:1px solid rgba(255,255,255,.08);background:rgba(8,18,40,.35)}
 @media(max-width:820px){.entity-manage-head{flex-direction:column}.sos2fa-gate-head{grid-template-columns:1fr}}
 
 /* Feature: Display Security access log — real HTML table (do not use .report-table; that class is a div-grid). */
