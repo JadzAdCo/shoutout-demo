@@ -1455,6 +1455,33 @@
     };
   }
 
+  function inboxRelatedLinkLabel(message = {}) {
+    const type = String(message.type || message.messageType || "").toLowerCase();
+    const subject = String(message.subject || message.title || "").toLowerCase();
+    const body = String(message.body || "").toLowerCase();
+    const link = String(message.link || "").toLowerCase();
+    const hay = `${type} ${subject} ${body} ${link}`;
+    if (/supr\s*star|suprstar|suprstr/.test(hay) || link.includes("suprstar-preview")) {
+      return "Open related supRstar";
+    }
+    if (/mingl/.test(hay) || link.includes("mingl-chat")) {
+      return "Open related Mingl";
+    }
+    if (/display access|security|token_missing|access denied/.test(hay)) {
+      return "Open related details";
+    }
+    if (/bartr|commerce|order/.test(hay) || link.includes("commerce")) {
+      return "Open related BartR order";
+    }
+    if (/rydr|pickup/.test(hay) || link.includes("pickup")) {
+      return "Open related RydR";
+    }
+    if (/shoutout|shout-out/.test(hay) || link.includes("shoutout") || link.includes("tab=shoutouts")) {
+      return "Open related ShoutOut";
+    }
+    return "Open related item";
+  }
+
   function renderMessages(messages, user) {
     currentMessages = messages
       .filter(x => !x.deleted)
@@ -1479,7 +1506,7 @@
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
+      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">${esc(inboxRelatedLinkLabel(x))}</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
         ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
         ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
