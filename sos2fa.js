@@ -101,6 +101,33 @@
     if (el) el.textContent = message || "";
   }
 
+  function showSentConfirmToast(phoneLast5, {failed = false} = {}) {
+    const digits = String(phoneLast5 || "").replace(/\D/g, "").slice(-5);
+    if (!digits) return;
+    document.querySelectorAll(".sos2fa-sent-toast").forEach((el) => el.remove());
+    const toast = document.createElement("div");
+    toast.className = "sos2fa-sent-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    toast.innerHTML = failed
+      ? `<strong>SOS2FA SMS failed</strong><span>Tried mobile ending <em>•••••${digits}</em></span>`
+      : `<strong>SOS2FA code requested</strong><span>Sending to mobile ending <em>•••••${digits}</em></span>`;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add("is-visible"));
+    setTimeout(() => {
+      toast.classList.remove("is-visible");
+      setTimeout(() => toast.remove(), 280);
+    }, 2000);
+  }
+
+  function phoneLast5FromError(error) {
+    const details = error?.details || error?.customData?.details || error?.customData || {};
+    if (details.phoneLast5) return String(details.phoneLast5);
+    const msg = String(error?.message || "");
+    const match = msg.match(/ending\s+(\d{4,5})/i);
+    return match ? match[1] : "";
+  }
+
   function ensureGatedWrappers() {
     ENTITY_MGMT_PANELS.forEach(id => {
       if (id === "entityManagement") return;
@@ -173,13 +200,22 @@
       throw new Error("SOS2FA Entity Management unlock is limited to Super Admin.");
     }
     setStatus("Requesting SOS2FA code via SMS…");
-    const result = await callable("requestSos2faCode")({});
-    const data = result?.data || {};
-    challengeRequested = true;
-    const last4 = data.phoneLast4 ? ` ending ${data.phoneLast4}` : "";
-    setStatus(`SOS2FA code sent to Super Admin mobile${last4}. Enter the six-digit code.`);
-    syncGateUi("entityManagement", false);
-    return data;
+    try {
+      const result = await callable("requestSos2faCode")({});
+      const data = result?.data || {};
+      challengeRequested = true;
+      const last5 = data.phoneLast5 || data.phoneLast4 || "";
+      showSentConfirmToast(last5);
+      const hint = byId("sos2faPhoneHint");
+      if (hint && last5) hint.textContent = `Code destination mobile ends with ${last5}.`;
+      setStatus(`SOS2FA code sent to Super Admin mobile ending ${last5 || "*****"}. Enter the six-digit code.`);
+      syncGateUi("entityManagement", false);
+      return data;
+    } catch (error) {
+      const last5 = phoneLast5FromError(error);
+      if (last5) showSentConfirmToast(last5, {failed: true});
+      throw error;
+    }
   }
 
   async function verifyCode({code} = {}) {
