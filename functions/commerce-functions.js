@@ -28,7 +28,7 @@ const {
 } = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
 const RECEIPT_FROM_EMAIL = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);

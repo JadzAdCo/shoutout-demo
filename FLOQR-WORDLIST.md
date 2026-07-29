@@ -21,8 +21,8 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Club** | Venue entity (e.g. Zebbies) with Club Admin | Patron vendor store |
 | **Entity** | Any onboarded actor: patron, club, promoter, etc. | Template |
 | **Club Admin** | Operator of one club’s backend | Master Admin |
-| **Master Admin** | Network operator (FloqR) | Club Admin |
-| **Super Admin** | Primary Master Admin account (e.g. `bands.don@gmail.com`) with elevated SOS2FA-gated tools | Other Master Admins |
+| **Master Admin** | Network operator (FloqR); same as Super Admin. Allowlist: `bans.don@gmail.com`, `don.b@jadzholdings.com` | Club Admin |
+| **Super Admin** | Same as Master Admin. Allowlist: `bans.don@gmail.com`, `don.b@jadzholdings.com`. Elevated SOS2FA-gated tools | Club Admin |
 | **Social OS / SocOS / SOS** | FloqR’s Social OS layer: the algorithms, features, and controls that power the WebApp | FloqR product brand alone; a single feature (Mingl, BartR, etc.) |
 | **SOS2FA** | Social OS SMS two-factor confirmation module used to unlock sensitive Super Admin surfaces (e.g. Entity Management) | Firebase login MFA alone; Club Admin MFA |
 | **Public profile** | Outward-facing page for a patron or club | Private portal settings |

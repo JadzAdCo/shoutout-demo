@@ -27,7 +27,7 @@ const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
 const TWILIO_WHATSAPP_FROM = defineSecret("TWILIO_WHATSAPP_FROM");
 const CLUB_AUTH_CODE_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);

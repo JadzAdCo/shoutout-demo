@@ -20,7 +20,7 @@ const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-2.5-flash";
@@ -1075,21 +1075,32 @@ exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
     patron.roleType,
     patron.role
   ].filter(Boolean).map(value => String(value).toLowerCase());
-  if (!electedServiceRoles.some(value => /promoter|\bdj\b|disc jockey|waiter|waitress|hospitality|bottle|bartender|barman|bar man|videographer|camera operator|cameraman|camera man|photographer|cinematographer|media ?creator/.test(value))) {
-    throw new HttpsError("failed-precondition", "The selected patron must first elect an eligible service role, including videographer/camera operator when applicable.");
-  }
+  // Master Admin may assign Club Admin without prior self-election.
   const email = String(patron.email || "").toLowerCase();
   const assignmentId = `${clubId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
   const batch = db.batch();
-  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, electedServiceRoles, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, electedServiceRoles, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp(), assignedWithoutSelfElection:true}, {merge:true});
   batch.set(db.collection("clubLocations").doc(clubId), {adminUids:admin.firestore.FieldValue.arrayUnion(patronUid), adminEmails:admin.firestore.FieldValue.arrayUnion(email), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
-  batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), approvedRoles:admin.firestore.FieldValue.arrayUnion("Club Admin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), approvedLocations:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubEmployeeDesignations").doc(assignmentId), {
+    clubLocationId: clubId,
+    clubLocationName: clubSnap.data()?.locationName || clubId,
+    workerUid: patronUid,
+    workerEmail: email,
+    workerName: patron.displayName || patron.fullName || email || "Club Admin",
+    workerRoles: admin.firestore.FieldValue.arrayUnion("Club Admin"),
+    roleElectionType: "Club Admin",
+    status: "active",
+    assignedByUid: request.auth.uid,
+    assignedWithoutSelfElection: true,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
   await batch.commit();
   await writeEntityManagementAudit({
     uid: request.auth.uid,
     email: actorEmail,
     action: "assign_club_admin",
-    detail: {clubId, patronUid, patronEmail: email},
+    detail: {clubId, patronUid, patronEmail: email, withoutSelfElection: true},
     sessionId
   });
   return {assignmentId, clubId, patronUid, patronEmail:email, status:"active"};

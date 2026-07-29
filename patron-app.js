@@ -1082,12 +1082,22 @@
   async function logout() { await auth.signOut(); window.location.href = "./"; }
   window.jadzPatronLogout = logout;
 
+  function populatePhoneCountrySelect() {
+    if (window.FLOQRPhoneCountries && typeof window.FLOQRPhoneCountries.populateSelect === "function") {
+      window.FLOQRPhoneCountries.populateSelect(byId("phoneCountryCode"));
+    }
+  }
   function showSmsOtpPanel() {
     byId("smsOtpPanel")?.classList.remove("hidden");
+    populatePhoneCountrySelect();
     setupPhoneAuth();
     setStatus("Enter your phone number, then send the SMS OTP.");
   }
-  function setupPhoneAuth() { if (!byId("recaptcha-container") || window.recaptchaVerifier) return; window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {size:"normal"}); }
+  function setupPhoneAuth() {
+    populatePhoneCountrySelect();
+    if (!byId("recaptcha-container") || window.recaptchaVerifier) return;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {size:"normal"});
+  }
   function buildSmsPhoneNumber() {
     const countryCode = byId("phoneCountryCode")?.value || "";
     const local = (byId("phoneNationalNumber")?.value || byId("phoneNumber")?.value || "").replace(/[^\d]/g, "");
@@ -3709,6 +3719,7 @@
 
 
   document.addEventListener("DOMContentLoaded", function(){
+    populatePhoneCountrySelect();
     window.FLOQRAdCampaigns?.loadFirestoreSpotAds?.(db).catch(() => {});
     detectRenderContext();
     window.FLOQRI18n?.init?.({}).then(() => window.FLOQRI18n?.applyDom?.()).catch(() => {});

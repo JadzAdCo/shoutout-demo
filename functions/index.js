@@ -23,5 +23,7 @@ module.exports = {
   purgeLogRetention: displaySecurityFns.purgeLogRetention,
   requestSos2faCode: sos2faFns.requestSos2faCode,
   verifySos2faCode: sos2faFns.verifySos2faCode,
-  logEntityManagementActivity: sos2faFns.logEntityManagementActivity
+  logEntityManagementActivity: sos2faFns.logEntityManagementActivity,
+  assignVenueEmployee: sos2faFns.assignVenueEmployee,
+  removeVenueEmployee: sos2faFns.removeVenueEmployee
 };

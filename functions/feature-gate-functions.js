@@ -8,12 +8,13 @@ const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-func
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
 
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com")
+/* Master Admin = Super Admin */
+const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);

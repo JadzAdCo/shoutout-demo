@@ -24,7 +24,12 @@ const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com")
+/* Master Admin = Super Admin */
+const SUPER_ADMIN_EMAILS = String(
+  process.env.FLOQR_SUPER_ADMIN_EMAILS ||
+  process.env.FLOQR_MASTER_ADMIN_EMAILS ||
+  "bans.don@gmail.com,don.b@jadzholdings.com"
+)
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
@@ -254,5 +259,192 @@ exports.logEntityManagementActivity = onCall({region: "us-central1", timeoutSeco
   return {ok: true};
 });
 
+const STAFF_ROLE_CANONICAL = {
+  "club admin": "Club Admin",
+  "promoter": "Promoter",
+  "dj": "DJ",
+  "bottle girl": "Bottle Girl",
+  "bus boy": "Bus Boy",
+  "security": "Security",
+  "waiter / waitress": "Waiter / Waitress",
+  "bartender / barman": "Bartender / Barman",
+  "hospitality": "Hospitality",
+  "videographer / camera operator": "Videographer / Camera Operator"
+};
+
+const STAFF_ROLE_SLUGS = {
+  "Club Admin": "clubAdmin",
+  "Promoter": "promoter",
+  "DJ": "dj",
+  "Bottle Girl": "hospitality",
+  "Bus Boy": "hospitality",
+  "Security": "security",
+  "Waiter / Waitress": "hospitality",
+  "Bartender / Barman": "bartender",
+  "Hospitality": "hospitality",
+  "Videographer / Camera Operator": "mediaCreator"
+};
+
+function normalizeStaffRole(raw = "") {
+  const label = text(raw, 80);
+  if (!label) return "";
+  return STAFF_ROLE_CANONICAL[label.toLowerCase()] || label;
+}
+
+function staffRoleSlug(roleLabel = "") {
+  return STAFF_ROLE_SLUGS[roleLabel] || "staff";
+}
+
+async function resolvePatronByEmailOrUid({patronUid = "", patronEmail = ""} = {}) {
+  const uid = text(patronUid, 128);
+  const email = text(patronEmail, 200).toLowerCase();
+  if (uid) {
+    const snap = await db.collection("users").doc(uid).get();
+    if (!snap.exists) throw new HttpsError("not-found", "Patron uid was not found. The person must register as a FLOQR patron first.");
+    return {uid, profile: snap.data() || {}};
+  }
+  if (!email) throw new HttpsError("invalid-argument", "patronEmail or patronUid is required.");
+  const snap = await db.collection("users").where("email", "==", email).limit(1).get();
+  if (snap.empty) throw new HttpsError("not-found", "No patron profile matches that email. They must register as a FLOQR patron first.");
+  const doc = snap.docs[0];
+  return {uid: doc.id, profile: doc.data() || {}};
+}
+
+exports.assignVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  const actorEmail = await assertSuperAdmin(request);
+  const clubLocationId = text(request.data?.clubLocationId || request.data?.clubId, 120);
+  const role = normalizeStaffRole(request.data?.role);
+  if (!clubLocationId) throw new HttpsError("invalid-argument", "clubLocationId is required.");
+  if (!role) throw new HttpsError("invalid-argument", "role is required.");
+
+  const clubSnap = await db.collection("clubLocations").doc(clubLocationId).get();
+  if (!clubSnap.exists) throw new HttpsError("not-found", "Venue / business was not found.");
+  const club = clubSnap.data() || {};
+
+  const {uid: patronUid, profile: patron} = await resolvePatronByEmailOrUid({
+    patronUid: request.data?.patronUid,
+    patronEmail: request.data?.patronEmail
+  });
+  if (patron.profileCompleted !== true) {
+    throw new HttpsError("failed-precondition", "The selected patron must complete patron registration first.");
+  }
+
+  const email = text(patron.email || request.data?.patronEmail, 200).toLowerCase();
+  const assignmentId = `${clubLocationId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const slug = staffRoleSlug(role);
+  const batch = db.batch();
+
+  batch.set(db.collection("clubEmployeeDesignations").doc(assignmentId), {
+    clubLocationId,
+    clubLocationName: club.locationName || club.name || clubLocationId,
+    workerUid: patronUid,
+    workerEmail: email,
+    workerName: patron.displayName || patron.fullName || email || "Staff",
+    workerUsername: patron.username || patron.floqrHandle || "",
+    workerRoles: admin.firestore.FieldValue.arrayUnion(role),
+    roleElectionType: role,
+    status: "active",
+    assignedByUid: request.auth.uid,
+    assignedByEmail: actorEmail,
+    assignedWithoutSelfElection: true,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
+
+  const userUpdate = {
+    approvedRoles: admin.firestore.FieldValue.arrayUnion(role),
+    roles: admin.firestore.FieldValue.arrayUnion(slug),
+    approvedLocations: admin.firestore.FieldValue.arrayUnion(clubLocationId),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  if (role === "Club Admin") {
+    batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {
+      clubId: clubLocationId,
+      patronUid,
+      patronEmail: email,
+      status: "active",
+      assignedByUid: request.auth.uid,
+      assignedAt: admin.firestore.FieldValue.serverTimestamp(),
+      assignedWithoutSelfElection: true
+    }, {merge: true});
+    batch.set(db.collection("clubLocations").doc(clubLocationId), {
+      adminUids: admin.firestore.FieldValue.arrayUnion(patronUid),
+      adminEmails: admin.firestore.FieldValue.arrayUnion(email),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    userUpdate.roles = admin.firestore.FieldValue.arrayUnion("clubAdmin");
+    userUpdate.clubAdminLocationIds = admin.firestore.FieldValue.arrayUnion(clubLocationId);
+  }
+
+  batch.set(db.collection("users").doc(patronUid), userUpdate, {merge: true});
+  await batch.commit();
+
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "assign_venue_employee",
+    detail: {clubLocationId, patronUid, patronEmail: email, role, withoutSelfElection: true}
+  });
+
+  return {ok: true, assignmentId, clubLocationId, patronUid, patronEmail: email, role, status: "active"};
+});
+
+exports.removeVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  const actorEmail = await assertSuperAdmin(request);
+  const clubLocationId = text(request.data?.clubLocationId || request.data?.clubId, 120);
+  const patronUid = text(request.data?.patronUid, 128);
+  const role = normalizeStaffRole(request.data?.role);
+  if (!clubLocationId || !patronUid) {
+    throw new HttpsError("invalid-argument", "clubLocationId and patronUid are required.");
+  }
+  const assignmentId = `${clubLocationId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const ref = db.collection("clubEmployeeDesignations").doc(assignmentId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "No staff assignment found for that patron at this venue.");
+  const row = snap.data() || {};
+  const batch = db.batch();
+
+  if (role && Array.isArray(row.workerRoles) && row.workerRoles.length > 1) {
+    batch.set(ref, {
+      workerRoles: admin.firestore.FieldValue.arrayRemove(role),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      removedRoleByUid: request.auth.uid
+    }, {merge: true});
+  } else {
+    batch.delete(ref);
+  }
+
+  if (role === "Club Admin" || String(row.roleElectionType || "") === "Club Admin") {
+    batch.set(db.collection("clubLocations").doc(clubLocationId), {
+      adminUids: admin.firestore.FieldValue.arrayRemove(patronUid),
+      adminEmails: admin.firestore.FieldValue.arrayRemove(text(row.workerEmail, 200).toLowerCase()),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    batch.delete(db.collection("clubAdminAssignments").doc(assignmentId));
+    batch.set(db.collection("users").doc(patronUid), {
+      clubAdminLocationIds: admin.firestore.FieldValue.arrayRemove(clubLocationId),
+      roles: admin.firestore.FieldValue.arrayRemove("clubAdmin"),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  }
+
+  if (role) {
+    batch.set(db.collection("users").doc(patronUid), {
+      approvedRoles: admin.firestore.FieldValue.arrayRemove(role),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  }
+
+  await batch.commit();
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "remove_venue_employee",
+    detail: {clubLocationId, patronUid, role: role || row.roleElectionType || ""}
+  });
+  return {ok: true, clubLocationId, patronUid};
+});
+
 exports.assertSos2faSession = assertSos2faSession;
 exports.writeEntityManagementAudit = writeEntityManagementAudit;
+exports.assertSuperAdmin = assertSuperAdmin;

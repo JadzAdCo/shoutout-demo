@@ -587,7 +587,16 @@
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
     byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
-    byId("editPhone").value = profile.phone || user.phoneNumber || "";
+    const phoneRaw = profile.phone || profile.mobile || user.phoneNumber || "";
+    const split = window.FLOQRPhoneCountries?.splitPhone?.(phoneRaw) || {dial: "+1", national: String(phoneRaw || "").replace(/[^\d]/g, "")};
+    const countrySel = byId("editPhoneCountryCode");
+    if (countrySel && window.FLOQRPhoneCountries?.populateSelect) {
+      window.FLOQRPhoneCountries.populateSelect(countrySel, split.dial || profile.phoneCountryCode || "+1");
+    } else if (countrySel && split.dial) {
+      countrySel.value = split.dial;
+    }
+    if (byId("editPhoneNational")) byId("editPhoneNational").value = split.national || profile.phoneNationalNumber || "";
+    if (byId("editPhone")) byId("editPhone").value = phoneRaw;
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("editCity").value = profile.city || "";
     byId("editCountry").value = profile.country || "";
@@ -866,13 +875,21 @@
       return;
     }
     const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
+    const phoneDial = byId("editPhoneCountryCode")?.value || "+1";
+    const phoneNational = String(byId("editPhoneNational")?.value || "").replace(/[^\d]/g, "");
+    const mobileE164 = window.FLOQRPhoneCountries?.joinPhone?.(phoneDial, phoneNational)
+      || (phoneNational ? `${phoneDial}${phoneNational}` : "");
+    if (byId("editPhone")) byId("editPhone").value = mobileE164;
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
       floqrHandle,
       username,
-      phone: byId("editPhone").value.trim(),
+      phone: mobileE164,
+      mobile: mobileE164,
+      phoneCountryCode: phoneDial,
+      phoneNationalNumber: phoneNational,
       taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),

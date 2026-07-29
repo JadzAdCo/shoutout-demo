@@ -5,7 +5,11 @@
   const STORAGE_PREFIX = "floqr_sos2fa_";
   const DEFAULT_TTL_MS = 60 * 60 * 1000;
   const WRONG_CODE_MESSAGE = "Wrong code entered, please enter the correct code to proceed";
-  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com", "bans.don@gmail.com"]).map(x => String(x).toLowerCase());
+  const SUPER_ADMIN_EMAILS = (
+    root.SHOUTOUT_SUPER_ADMIN_EMAILS ||
+    root.SHOUTOUT_MASTER_ADMIN_EMAILS ||
+    ["bans.don@gmail.com", "don.b@jadzholdings.com"]
+  ).map(x => String(x).toLowerCase());
   const ENTITY_MGMT_PANELS = [
     "clubAdminUrls",
     "entityManagement",
