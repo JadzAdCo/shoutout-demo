@@ -149,21 +149,52 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
 
   const code = createSmsCode();
   const twilio = twilioConfig();
+  const phoneLast5 = phone.slice(-5);
   const smsBody = `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes.`;
-  const sms = await sendTwilioSms({
-    accountSid: twilio.accountSid,
-    authToken: twilio.authToken,
-    fromNumber: twilio.fromNumber,
-    to: phone,
-    body: smsBody
-  });
+  let sms;
+  try {
+    sms = await sendTwilioSms({
+      accountSid: twilio.accountSid,
+      authToken: twilio.authToken,
+      fromNumber: twilio.fromNumber,
+      to: phone,
+      body: smsBody
+    });
+  } catch (err) {
+    console.error("requestSos2faCode twilio threw", {
+      uid,
+      phoneLast5,
+      fromLast4: twilio.fromNumber ? twilio.fromNumber.slice(-4) : "",
+      message: String(err?.message || err).slice(0, 200)
+    });
+    throw new HttpsError("internal", "Could not reach Twilio to send SOS2FA SMS.", {phoneLast5});
+  }
 
   if (!sms.ok) {
     const dry = sms.dryRun || sms.status === "missing-config";
     if (dry) {
-      console.warn("requestSos2faCode dry-run", {uid, phoneLast4: phone.slice(-4)});
+      console.warn("requestSos2faCode dry-run", {
+        uid,
+        phoneLast5,
+        hasSid: !!twilio.accountSid,
+        hasToken: !!twilio.authToken,
+        hasFrom: !!twilio.fromNumber
+      });
     } else {
-      throw new HttpsError("internal", "Could not send SOS2FA SMS. Check Twilio configuration.");
+      let twilioHint = "";
+      try {
+        const parsed = JSON.parse(String(sms.error || "{}"));
+        const codeNum = parsed.code || parsed.status;
+        const msg = String(parsed.message || "").slice(0, 160);
+        twilioHint = [codeNum, msg].filter(Boolean).join(": ");
+        console.error("requestSos2faCode twilio-error", {uid, phoneLast5, code: codeNum, message: msg});
+      } catch (_) {
+        console.error("requestSos2faCode twilio-error-raw", {uid, phoneLast5, error: String(sms.error || "").slice(0, 200)});
+      }
+      const detail = twilioHint
+        ? `Could not send SOS2FA SMS (${twilioHint})`
+        : "Could not send SOS2FA SMS. Check Twilio From number and that the destination mobile is allowed on this Twilio account.";
+      throw new HttpsError("internal", detail, {phoneLast5, twilioStatus: sms.status || "twilio-error"});
     }
   }
 
@@ -171,6 +202,7 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
     uid,
     email,
     phoneLast4: phone.slice(-4),
+    phoneLast5,
     codeHash: codeHash(uid, code),
     attempts: 0,
     used: false,
@@ -182,12 +214,13 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
     uid,
     email,
     action: "sos2fa_code_requested",
-    detail: {phoneLast4: phone.slice(-4), delivery: sms.ok ? "sms" : sms.status || "dry-run"}
+    detail: {phoneLast5, phoneLast4: phone.slice(-4), delivery: sms.ok ? "sms" : sms.status || "dry-run"}
   });
 
   return {
     ok: true,
     phoneLast4: phone.slice(-4),
+    phoneLast5,
     expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
     delivery: sms.ok ? "sms" : sms.status || "dry-run"
   };
