@@ -1,6 +1,7 @@
 const featureGateFns = require("./feature-gate-functions");
 const displaySecurityFns = require("./display-security-functions");
 const sos2faFns = require("./sos2fa-functions");
+const twilioDebuggerFns = require("./twilio-debugger-webhook");
 
 module.exports = {
   ...require("./ai-discovery-functions"),
@@ -25,5 +26,6 @@ module.exports = {
   verifySos2faCode: sos2faFns.verifySos2faCode,
   logEntityManagementActivity: sos2faFns.logEntityManagementActivity,
   assignVenueEmployee: sos2faFns.assignVenueEmployee,
-  removeVenueEmployee: sos2faFns.removeVenueEmployee
+  removeVenueEmployee: sos2faFns.removeVenueEmployee,
+  twilioDebuggerWebhook: twilioDebuggerFns.twilioDebuggerWebhook
 };

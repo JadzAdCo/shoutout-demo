@@ -583,6 +583,12 @@ service cloud.firestore {
       allow delete: if isMasterAdmin();
     }
 
+    // Twilio Debugger / error-log webhook events (Admin SDK writes only).
+    match /twilioDebuggerEvents/{id} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
     // FloqR platform payment ledger (ShoutOut and future FloqR-sold services). Backend writes only.
     match /paymentLedger/{id} {
       allow read: if isMasterAdmin()
