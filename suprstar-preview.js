@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.110";
+  const APP_V = "29.09.111";
   const ALLOWED_DURATIONS = [15, 30, 45, 60];
   const DEFAULT_LIVE_SECONDS = 60;
   const COUNTDOWN_SECONDS = 5;
@@ -16,10 +16,14 @@
   let accessToken = "";
   let facingMode = "user";
   let autoLiveArmed = false;
+  let liveStartInFlight = false;
+  let liveTimerArmed = false;
+  let liveTimerArmInFlight = false;
   let countdownTimer = null;
   let liveExpireTimer = null;
   let liveEndsAtMs = 0;
   let venueLiveSeconds = DEFAULT_LIVE_SECONDS;
+  let activeSessionId = "";
 
   function byId(id) {
     return document.getElementById(id);
@@ -116,6 +120,46 @@
       liveExpireTimer = null;
     }
     liveEndsAtMs = 0;
+    liveTimerArmed = false;
+  }
+
+  function scheduleLiveExpire(endsAtMs) {
+    clearLiveExpireTimer();
+    liveEndsAtMs = Number(endsAtMs) || 0;
+    if (!liveEndsAtMs) return;
+    liveTimerArmed = true;
+    const remainMs = Math.max(1000, liveEndsAtMs - Date.now());
+    liveExpireTimer = setTimeout(() => {
+      endLive({silent: false, reason: "duration"});
+    }, remainMs);
+    syncPreviewChrome();
+  }
+
+  async function armLiveDurationClock(sessionId) {
+    if (liveTimerArmed && liveEndsAtMs > Date.now()) return liveEndsAtMs;
+    if (liveTimerArmInFlight) return liveEndsAtMs;
+    liveTimerArmInFlight = true;
+    const durationSeconds = ALLOWED_DURATIONS.includes(venueLiveSeconds) ? venueLiveSeconds : DEFAULT_LIVE_SECONDS;
+    try {
+      const armed = await callable("armSuprstrLiveDuration")({
+        requestId: requestDoc?.requestId || "",
+        sessionId: sessionId || activeSessionId || requestDoc?.sessionId || ""
+      });
+      const ends = Number(armed?.data?.liveEndsAtMs) || (Date.now() + durationSeconds * 1000);
+      venueLiveSeconds = ALLOWED_DURATIONS.includes(Number(armed?.data?.liveDurationSeconds))
+        ? Number(armed.data.liveDurationSeconds)
+        : durationSeconds;
+      scheduleLiveExpire(ends);
+      setStatus(`LIVE on the venue SupRStar board for ${venueLiveSeconds}s. Keep the live pop-out open.`);
+      return ends;
+    } catch (_) {
+      // Local fallback — still start the clock only after connect, never at approval.
+      scheduleLiveExpire(Date.now() + durationSeconds * 1000);
+      setStatus(`LIVE on the venue SupRStar board for ${durationSeconds}s. Keep the live pop-out open.`);
+      return liveEndsAtMs;
+    } finally {
+      liveTimerArmInFlight = false;
+    }
   }
 
   function attachStreamToVideo(stream) {
@@ -156,7 +200,7 @@
       const overlay = byId("suprstarCountdownOverlay");
       const numberEl = byId("suprstarCountdownNumber");
       if (!overlay || !numberEl) {
-        resolve();
+        resolve(true);
         return;
       }
       overlay.classList.remove("hidden");
@@ -172,7 +216,7 @@
         left -= 1;
         if (left <= 0) {
           clearCountdownUi();
-          resolve();
+          resolve(true);
           return;
         }
         numberEl.textContent = String(left);
@@ -234,8 +278,8 @@
     }
 
     if (paid && status === "approved") {
-      btn.disabled = false;
-      btn.textContent = autoLiveArmed ? "Starting live…" : "Go live now (or wait for auto-start)";
+      btn.disabled = liveStartInFlight || autoLiveArmed;
+      btn.textContent = (liveStartInFlight || autoLiveArmed) ? "Starting live…" : "Go live now (or wait for auto-start)";
       btn.dataset.stage = "live";
       syncPreviewChrome();
       return;
@@ -318,8 +362,13 @@
       maybeAutoStartOnApproval(prevStatus, status);
     } else if (status === "live") {
       setGate("You are LIVE on the venue SupRStar board.");
-      setStatus("Keep the live pop-out open while streaming.");
+      setStatus(broadcastHandle
+        ? "Keep the live pop-out open while streaming."
+        : "Reconnecting live broadcast…");
       openLivePopout();
+      if (!broadcastHandle && !liveStartInFlight && requestDoc.paymentStatus === "paid") {
+        beginLiveWithCountdown({manual: false});
+      }
     } else if (status === "rejected") {
       setGate("This request was not approved by the venue.");
       setStatus(requestDoc.rejectionReason || "Rejected.");
@@ -467,30 +516,51 @@
 
   async function beginLiveWithCountdown({manual = false} = {}) {
     if (!requestDoc?.requestId) return;
-    if (String(requestDoc.status) !== "approved" || requestDoc.paymentStatus !== "paid") {
+    const statusNow = String(requestDoc.status || "");
+    if (requestDoc.paymentStatus !== "paid") {
       setStatus("Payment and Club Admin approval are required first.");
       return;
     }
-    if (isLive()) return;
+    if (!["approved", "live"].includes(statusNow)) {
+      setStatus("Payment and Club Admin approval are required first.");
+      return;
+    }
+    if (broadcastHandle || liveStartInFlight) return;
+    liveStartInFlight = true;
+    autoLiveArmed = true;
+    updateButtons();
     try {
       if (!localStream) await startCamera();
       openLivePopout();
-      setStatus("Cinema countdown… then you go live.");
-      await showHollywoodCountdown(COUNTDOWN_SECONDS);
+      if (statusNow === "approved") {
+        setStatus("Cinema countdown… then you go live. Duration starts after the board connects.");
+        await showHollywoodCountdown(COUNTDOWN_SECONDS);
+      }
+      if (broadcastHandle) return;
       await goLive();
     } catch (err) {
       autoLiveArmed = false;
       setStatus(err?.message || "Could not start live.");
       if (!manual) updateButtons();
+    } finally {
+      liveStartInFlight = false;
+      updateButtons();
     }
   }
 
   async function goLive() {
     if (!requestDoc?.requestId) return;
-    if (String(requestDoc.status) !== "approved" || requestDoc.paymentStatus !== "paid") {
+    if (broadcastHandle) return;
+    const status = String(requestDoc.status || "");
+    if (requestDoc.paymentStatus !== "paid") {
       setStatus("Payment and Club Admin approval are required first.");
       return;
     }
+    if (!["approved", "live"].includes(status)) {
+      setStatus("Payment and Club Admin approval are required first.");
+      return;
+    }
+    let startedSessionId = "";
     try {
       if (!localStream) await startCamera();
       await loadVenueDuration(requestDoc.locationId);
@@ -501,31 +571,42 @@
       });
       const sessionId = start?.data?.sessionId;
       if (!sessionId) throw new Error("No sessionId returned.");
+      startedSessionId = sessionId;
+      activeSessionId = sessionId;
+      if (requestDoc) requestDoc.sessionId = sessionId;
       const durationSeconds = ALLOWED_DURATIONS.includes(Number(start?.data?.liveDurationSeconds))
         ? Number(start.data.liveDurationSeconds)
         : venueLiveSeconds;
       venueLiveSeconds = durationSeconds;
-      liveEndsAtMs = Number(start?.data?.liveEndsAtMs) || (Date.now() + durationSeconds * 1000);
+      // Do not arm the duration clock yet — wait until WebRTC is connected.
+      liveEndsAtMs = Number(start?.data?.liveEndsAtMs) || 0;
+      liveTimerArmed = false;
 
       broadcastHandle = await global.FLOQRSuprstrRtc.startBroadcast({
         sessionId,
         stream: localStream,
         onStatus(s) {
           setStatus(`LIVE · WebRTC: ${s}`);
+          if (s === "connected" || s === "track") {
+            armLiveDurationClock(sessionId);
+          }
         }
       });
-      clearLiveExpireTimer();
-      const remainMs = Math.max(1000, liveEndsAtMs - Date.now());
-      liveExpireTimer = setTimeout(() => {
-        endLive({silent: false, reason: "duration"});
-      }, remainMs);
-      setStatus(`LIVE on the venue SupRStar board for ${durationSeconds}s. Keep the live pop-out open.`);
+      setStatus("LIVE — waiting for the venue board to connect (timer starts then)…");
       openLivePopout();
       syncPreviewChrome();
       updateButtons();
+      // Safety: if ICE never reports connected, still arm after a short grace so the slot cannot hang forever.
+      setTimeout(() => {
+        if (broadcastHandle && !liveTimerArmed) armLiveDurationClock(sessionId);
+      }, 12000);
     } catch (err) {
+      // Never tear down a session that already started — overlapping go-live used to endLive() here.
+      if (broadcastHandle || (startedSessionId && String(requestDoc?.status || "") === "live")) {
+        setStatus(err?.message || "Live already starting — keep this tab open.");
+        return;
+      }
       setStatus(err?.message || "Go live failed.");
-      await endLive({silent: true});
     }
   }
 
@@ -533,6 +614,8 @@
     clearCountdownUi();
     clearLiveExpireTimer();
     autoLiveArmed = false;
+    liveStartInFlight = false;
+    const endingSessionId = activeSessionId || requestDoc?.sessionId || "";
     try {
       if (broadcastHandle) {
         broadcastHandle.stop({stopTracks: false});
@@ -541,7 +624,7 @@
       if (requestDoc?.requestId) {
         await callable("endSuprstrLive")({
           requestId: requestDoc.requestId,
-          sessionId: requestDoc.sessionId || "",
+          sessionId: endingSessionId,
           locationId: requestDoc.locationId,
           displayBoard: requestDoc.displayBoard
         });
@@ -549,6 +632,7 @@
     } catch (err) {
       if (!silent) setStatus(err?.message || "End live failed.");
     }
+    activeSessionId = "";
     stopCamera();
     updateButtons();
     if (!silent) {
