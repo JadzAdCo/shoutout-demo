@@ -134,6 +134,20 @@
   /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
   registerMany([
     {
+      id: "help-sos2fa-critical-access",
+      title: "SOS2FA Entity Management unlock",
+      body: "SOS2FA unlocks Entity Management for Super Admins. Request a one-time code by SMS, email, or both (recommended when Twilio SMS fails). You can also enroll an authenticator app (Google Authenticator, Authy, Microsoft Authenticator) and unlock with a 6-digit TOTP code. Sessions last one hour and activity is audited.",
+      searchPhrases: [
+        "sos2fa", "sos 2fa", "social os 2fa", "entity management critical access",
+        "authenticator", "totp", "google authenticator", "sms and email code", "request sos2fa"
+      ],
+      links: [
+        {label: "Master Admin Entity Management", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#sos2faGate"
+    },
+    {
       id: "floqai-ask-floqr",
       title: "Ask FloqR with FloqAi",
       body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
