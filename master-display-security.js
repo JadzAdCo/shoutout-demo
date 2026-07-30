@@ -140,12 +140,26 @@
     const list = byId("displaySecurityOptions");
     if (!list) return;
     try {
+      const byIdMap = new Map();
+      Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || window.FLOQR_CLUB_LOCATIONS || {}).forEach(([id, data]) => {
+        if (id) byIdMap.set(id, {id, ...data});
+      });
       const snap = await firebase.firestore().collection("clubLocations").limit(400).get();
-      const rows = snap.docs.map((d) => ({id: d.id, ...(d.data() || {})}))
-        .sort((a, b) => String(a.locationName || a.id).localeCompare(String(b.locationName || b.id)));
+      snap.docs.forEach((d) => {
+        const prev = byIdMap.get(d.id) || {};
+        byIdMap.set(d.id, {...prev, ...(d.data() || {}), id: d.id});
+      });
+      const rows = Array.from(byIdMap.values())
+        .sort((a, b) => String(a.locationName || a.brandName || a.id).localeCompare(String(b.locationName || b.brandName || b.id)));
       global.__floqrMasterClubs = rows;
       list.innerHTML = clubOptionsHtml(rows);
-    } catch (_) {}
+    } catch (_) {
+      const rows = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || window.FLOQR_CLUB_LOCATIONS || {})
+        .map(([id, data]) => ({id, ...data}))
+        .sort((a, b) => String(a.locationName || a.brandName || a.id).localeCompare(String(b.locationName || b.brandName || b.id)));
+      global.__floqrMasterClubs = rows;
+      list.innerHTML = clubOptionsHtml(rows);
+    }
   }
 
   /**
