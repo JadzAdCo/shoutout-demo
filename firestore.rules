@@ -590,6 +590,17 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // SOS2FA challenges, sessions, and authenticator secrets (Admin SDK / Functions only).
+    match /sos2faChallenges/{uid} {
+      allow read, write: if false;
+    }
+    match /sos2faSessions/{id} {
+      allow read, write: if false;
+    }
+    match /sos2faTotp/{uid} {
+      allow read, write: if false;
+    }
+
     // FloqR platform payment ledger (ShoutOut and future FloqR-sold services). Backend writes only.
     match /paymentLedger/{id} {
       allow read: if isMasterAdmin()

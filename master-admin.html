@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.105"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.105"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.108"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.108"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -117,22 +117,50 @@
             </div>
           </div>
           <h2 class="sos2fa-critical-title">Entity Management - Critical Access</h2>
+          <fieldset class="sos2fa-channel-fieldset">
+            <legend>Send one-time code by</legend>
+            <label class="sos2fa-channel-option"><input type="radio" name="sos2faChannel" value="both" checked/> Both SMS + Email <span class="sub small">(recommended)</span></label>
+            <label class="sos2fa-channel-option"><input type="radio" name="sos2faChannel" value="sms"/> SMS only</label>
+            <label class="sos2fa-channel-option"><input type="radio" name="sos2faChannel" value="email"/> Email only</label>
+          </fieldset>
           <div class="queue-actions sos2fa-request-row">
-            <button id="sos2faSendBtn" class="primary" type="button">Request SOS2FA Code via SMS</button>
+            <button id="sos2faSendBtn" class="primary" type="button">Request SOS2FA code</button>
             <span class="help-label sos2fa-request-help">
               <details class="help-popout inline-help-popout">
                 <summary>?</summary>
-                <div>Request a one-time SMS code using the mobile number saved in your Super Admin profile. Entity Management is protected by <strong>SOS2FA</strong> (Social OS two-factor SMS). Activity is logged for 90 days.</div>
+                <div>Request a one-time code by <strong>SMS</strong>, <strong>email</strong>, or both. SMS uses your Super Admin mobile; email uses your signed-in address. You can also unlock with an <strong>authenticator app</strong> after enrollment. Activity is logged for 90 days.</div>
               </details>
             </span>
           </div>
           <p id="sos2faPhoneHint" class="sub small"></p>
           <div class="profile-grid">
-            <label>SOS2FA SMS code<input id="sos2faCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/></label>
+            <label>SOS2FA code (SMS or email)<input id="sos2faCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/></label>
           </div>
           <div id="sos2faActions" class="queue-actions">
             <button id="sos2faVerifyBtn" type="button">Verify &amp; unlock</button>
             <button id="sos2faLockBtn" type="button">Lock panel</button>
+          </div>
+
+          <div class="sos2fa-totp-block">
+            <h3 class="sos2fa-totp-title">Authenticator app</h3>
+            <p id="sos2faTotpStatus" class="sub small">Optional. Use Google Authenticator, Authy, or Microsoft Authenticator after you enroll.</p>
+            <div id="sos2faTotpEnrollPanel" class="sos2fa-totp-enroll hidden">
+              <img id="sos2faTotpQr" class="sos2fa-totp-qr" alt="Authenticator QR code" width="180" height="180"/>
+              <p class="sub small">Or enter this secret manually:</p>
+              <code id="sos2faTotpSecret" class="sos2fa-totp-secret"></code>
+              <label>Confirm authenticator code<input id="sos2faTotpConfirmCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/></label>
+              <div class="queue-actions">
+                <button id="sos2faTotpConfirmBtn" type="button">Confirm enrollment</button>
+              </div>
+            </div>
+            <div class="profile-grid">
+              <label>Authenticator code<input id="sos2faTotpCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6"/></label>
+            </div>
+            <div class="queue-actions sos2fa-totp-actions">
+              <button id="sos2faTotpVerifyBtn" type="button">Unlock with authenticator</button>
+              <button id="sos2faTotpStartBtn" type="button">Enroll authenticator</button>
+              <button id="sos2faTotpDisableBtn" type="button" class="hidden">Disable authenticator</button>
+            </div>
           </div>
           <p id="sos2faStatus" class="status"></p>
         </div>
@@ -1033,7 +1061,7 @@
 <script src="./global-profile-status.js?v=29.09.22"></script>
 <script src="./shared-data.js?v=29.09.103"></script>
 <script src="./feature-gates.js?v=29.09.103"></script>
-<script src="./sos2fa.js?v=29.09.105"></script>
+<script src="./sos2fa.js?v=29.09.108"></script>
 <script src="./entity-management.js?v=29.09.97"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
