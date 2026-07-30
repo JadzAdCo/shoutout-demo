@@ -925,7 +925,7 @@
               ${status === "pending_approval" || (paid && (status === "awaiting_payment" || status === "preview")) ? `<button class="approve" type="button">Approve — allow go live</button>
               <button class="reject" type="button">Reject</button>` : ""}
               ${status === "live" ? `<span class="sub small">Live on venue SupRStar board</span>` : ""}
-              ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
+              ${status === "approved" ? `<span class="sub small">Approved — patron live starts automatically after a 5-second cinema countdown</span>` : ""}
             </div>`;
           div.querySelector(".approve")?.addEventListener("click", async () => {
             try {

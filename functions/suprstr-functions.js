@@ -155,7 +155,7 @@ exports.approveSuprstarRequest = onCall({region: "us-central1"}, async (request)
       recipientEmail: row.broadcasterEmail || "",
       type: "suprstarApproved",
       title: "supRstar approved",
-      body: `${row.locationName || row.locationId} approved your supRstar. Return to your preview tab to go live.`,
+      body: `${row.locationName || row.locationId} approved your supRstar. Keep your preview tab open — live starts after a 5-second countdown.`,
       clubLocationId: row.locationId,
       requestId,
       referenceNumber: row.referenceNumber || "",
@@ -237,6 +237,19 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   const sessionRef = db.collection("suprstrSessions").doc();
   const liveRef = db.collection("suprstrLive").doc(liveId);
   const now = admin.firestore.Timestamp.now();
+  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60];
+  let liveDurationSeconds = 60;
+  try {
+    const clubSnap = await db.collection("clubLocations").doc(locationId).get();
+    const fromClub = Number(clubSnap.exists ? clubSnap.data()?.suprstarLiveDurationSeconds : 60);
+    const fromClient = Number(request.data?.liveDurationSeconds);
+    const preferred = ALLOWED_LIVE_SECONDS.includes(fromClub) ? fromClub
+      : (ALLOWED_LIVE_SECONDS.includes(fromClient) ? fromClient : 60);
+    liveDurationSeconds = preferred;
+  } catch (_) {
+    liveDurationSeconds = 60;
+  }
+  const liveEndsAtMs = Date.now() + (liveDurationSeconds * 1000);
 
   await db.runTransaction(async (tx) => {
     const fresh = await tx.get(reqRef);
@@ -259,6 +272,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       broadcasterUid: uid,
       broadcasterEmail: email,
       status: "waiting",
+      liveDurationSeconds,
+      liveEndsAtMs,
       offer: null,
       answer: null,
       createdAt: now,
@@ -273,6 +288,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       requestId,
       broadcasterUid: uid,
       status: "live",
+      liveDurationSeconds,
+      liveEndsAtMs,
       startedAt: now,
       updatedAt: now
     }, {merge: true});
@@ -280,6 +297,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       status: "live",
       sessionId: sessionRef.id,
       liveStartedAt: now,
+      liveDurationSeconds,
+      liveEndsAtMs,
       updatedAt: now
     }, {merge: true});
   });
@@ -289,6 +308,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     requestId,
     locationId,
     displayBoard,
+    liveDurationSeconds,
+    liveEndsAtMs,
     displayPage: displayBoard === "secondary" ? "display2.html" : "display.html"
   };
 });

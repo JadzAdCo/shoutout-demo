@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>supRstar LIVE | FLOQR</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.110"/>
+  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.110"/>
+</head>
+<body class="suprstr-page suprstr-live-popout-body">
+<main class="suprstr-live-popout">
+  <div class="suprstr-live-popout-chrome">
+    <span id="livePopoutBadge" class="suprstr-preview-badge is-live">LIVE</span>
+    <span id="livePopoutTimer" class="suprstr-live-timer"></span>
+  </div>
+  <div id="livePopoutCountdown" class="suprstr-countdown-overlay hidden" aria-live="assertive">
+    <div id="livePopoutCountdownNumber" class="suprstr-countdown-number"></div>
+    <p class="suprstr-countdown-caption">Going live</p>
+  </div>
+  <video id="livePopoutVideo" class="suprstr-preview is-on is-live" playsinline muted autoplay></video>
+  <p id="livePopoutStatus" class="sub small">Waiting for feed from preview…</p>
+  <button id="livePopoutEndBtn" class="ghost" type="button">End live</button>
+</main>
+<script src="./suprstr-webrtc.js?v=29.09.110"></script>
+<script>
+(function () {
+  const video = document.getElementById("livePopoutVideo");
+  const status = document.getElementById("livePopoutStatus");
+  const badge = document.getElementById("livePopoutBadge");
+  const timer = document.getElementById("livePopoutTimer");
+  const overlay = document.getElementById("livePopoutCountdown");
+  const numberEl = document.getElementById("livePopoutCountdownNumber");
+  let tick = null;
+
+  function attach() {
+    try {
+      const stream = window.opener && window.opener.__floqrSuprstarStream;
+      if (stream && video) {
+        video.srcObject = stream;
+        window.FLOQRSuprstrRtc?.forceVideoPlay?.(video);
+        status.textContent = "Live camera feed";
+      }
+      const meta = window.opener && window.opener.__floqrSuprstarLiveMeta;
+      applyMeta(meta);
+    } catch (e) {
+      status.textContent = "Open this from the private preview tab.";
+    }
+  }
+
+  function applyMeta(meta) {
+    if (!meta) return;
+    badge.textContent = meta.isLive ? "LIVE" : "STANDBY";
+    badge.classList.toggle("is-live", !!meta.isLive);
+    if (meta.endsAtMs && meta.isLive) {
+      if (tick) clearInterval(tick);
+      tick = setInterval(() => {
+        const left = Math.max(0, Math.ceil((meta.endsAtMs - Date.now()) / 1000));
+        timer.textContent = left + "s left";
+        if (left <= 0) clearInterval(tick);
+      }, 250);
+    }
+  }
+
+  function showCountdown(seconds) {
+    overlay.classList.remove("hidden");
+    numberEl.textContent = String(seconds);
+    numberEl.classList.remove("flash");
+    void numberEl.offsetWidth;
+    numberEl.classList.add("flash");
+    if (seconds <= 0) overlay.classList.add("hidden");
+  }
+
+  window.addEventListener("message", (ev) => {
+    if (ev.origin !== location.origin) return;
+    if (ev.data?.type === "floqr-suprstar-countdown") showCountdown(ev.data.seconds);
+    if (ev.data?.type === "floqr-suprstar-live-meta") {
+      applyMeta(ev.data.meta);
+      attach();
+    }
+    if (ev.data?.type === "floqr-suprstar-ended") {
+      badge.textContent = "ENDED";
+      badge.classList.remove("is-live");
+      status.textContent = "Live ended.";
+      if (tick) clearInterval(tick);
+      timer.textContent = "";
+      overlay.classList.add("hidden");
+    }
+  });
+
+  document.getElementById("livePopoutEndBtn")?.addEventListener("click", () => {
+    try { window.opener?.postMessage({type: "floqr-suprstar-end-from-popout"}, location.origin); } catch (_) {}
+  });
+
+  try { window.opener?.postMessage({type: "floqr-suprstar-popout-ready"}, location.origin); } catch (_) {}
+  attach();
+  setInterval(attach, 1000);
+})();
+</script>
+</body>
+</html>

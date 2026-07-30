@@ -25,6 +25,8 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Super Admin** | Same as Master Admin. Allowlist: `bans.don@gmail.com`, `don.b@jadzholdings.com`. Elevated SOS2FA-gated tools | Club Admin |
 | **Social OS / SocOS / SOS** | FloqR’s Social OS layer: the algorithms, features, and controls that power the WebApp | FloqR product brand alone; a single feature (Mingl, BartR, etc.) |
 | **SOS2FA** | Social OS second-factor module for Super Admin Entity Management: SMS and/or email one-time codes, plus optional authenticator-app (TOTP) unlock | Firebase login MFA alone; Club Admin phone MFA |
+| **FloqMedia** | Media brand mark for ShoutOut bumpers and social creatives — chrome FloqR tile cluster fused with media identity | FloqAi mark; FloqR chrome logo alone |
+| **supRstar live duration** | Per-venue Master Admin setting (15 / 30 / 45 / 60 seconds) controlling how long an approved live session runs after the cinema countdown | ShoutOut display duration |
 | **SMS Consent Grant** | Public page where patrons/admins opt in to FLOQR SMS notifications; preference also lives under My Privacy | SOS2FA one-time codes; marketing email consent alone |
 | **Public profile** | Outward-facing page for a patron or club | Private portal settings |
 | **Profile layout** | Chosen visual arrangement for a club’s public profile page | ShoutOut template |

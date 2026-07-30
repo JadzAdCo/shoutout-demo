@@ -74,8 +74,9 @@
 .suprstr-preview{
   width:100%;
   max-width:420px;
-  aspect-ratio:16/10;
-  object-fit:cover;
+  aspect-ratio:16/9;
+  object-fit:contain;
+  object-position:center center;
   border-radius:14px;
   background:#0a0c10;
   border:1px solid rgba(255,255,255,.14);
@@ -84,6 +85,90 @@
 .suprstr-preview.is-on{
   display:block;
 }
+.suprstr-preview-shell{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  margin:12px 0;
+}
+.suprstr-preview-badge{
+  position:absolute;
+  z-index:2;
+  top:10px;
+  left:10px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  background:rgba(0,0,0,.55);
+  color:#e8eef8;
+}
+.suprstr-preview-badge.is-live{
+  background:#c1121f;
+  color:#fff;
+}
+.suprstr-countdown-overlay{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:grid;
+  place-content:center;
+  gap:8px;
+  background:rgba(0,0,0,.72);
+  border-radius:14px;
+}
+.suprstr-countdown-overlay.hidden{display:none}
+.suprstr-countdown-number{
+  font-size:clamp(64px,18vw,120px);
+  font-weight:900;
+  line-height:1;
+  color:#fff;
+  text-shadow:0 0 24px rgba(255,80,80,.55);
+}
+.suprstr-countdown-number.flash{
+  animation:suprstrCinemaFlash .85s ease-out;
+}
+.suprstr-countdown-caption{
+  margin:0;
+  text-align:center;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-size:12px;
+  color:#f5f5f5;
+}
+@keyframes suprstrCinemaFlash{
+  0%{transform:scale(1.35);opacity:.35}
+  40%{transform:scale(1);opacity:1}
+  100%{transform:scale(.92);opacity:.85}
+}
+.suprstr-live-popout-body{
+  margin:0;
+  min-height:100vh;
+  background:#05070c;
+  display:grid;
+  place-items:center;
+}
+.suprstr-live-popout{
+  width:min(100%,420px);
+  padding:16px;
+  display:grid;
+  gap:10px;
+  justify-items:center;
+}
+.suprstr-live-popout-chrome{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.suprstr-live-timer{
+  font-size:13px;
+  letter-spacing:.04em;
+  color:#b8ff4a;
+}
+.suprstar-stage-actions{flex-wrap:wrap}
 .suprstar-steps{
   margin:0;
   padding-left:1.2rem;
