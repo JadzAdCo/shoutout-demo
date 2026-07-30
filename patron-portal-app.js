@@ -197,6 +197,9 @@
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
+      if (map[tab] === "portalPrivacy" && location.hash === "#sms-notifications") {
+        setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 120);
+      }
     }
   }
 
@@ -628,11 +631,16 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
+    if (byId("privacySmsNotifications")) {
+      byId("privacySmsNotifications").checked = !!(profile.smsNotificationConsent || profile.marketingSmsConsent);
+    }
     if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
-  }
+    if (location.hash === "#sms-notifications") {
+      setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+    }
 
   function connectStatusMessage(result = {}) {
     if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;
@@ -963,12 +971,16 @@
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
+      smsNotificationConsent: !!byId("privacySmsNotifications")?.checked,
+      smsNotificationConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      smsNotificationConsentSource: "patron-portal-privacy",
       birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
       birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    if (prefs.smsNotificationConsent) prefs.marketingSmsConsent = true;
     await db.collection("users").doc(user.uid).set(prefs, {merge:true});
     await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...prefs, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
     setText("portalStatus", "Privacy preferences saved.");
@@ -1455,6 +1467,33 @@
     };
   }
 
+  function inboxRelatedLinkLabel(message = {}) {
+    const type = String(message.type || message.messageType || "").toLowerCase();
+    const subject = String(message.subject || message.title || "").toLowerCase();
+    const body = String(message.body || "").toLowerCase();
+    const link = String(message.link || "").toLowerCase();
+    const hay = `${type} ${subject} ${body} ${link}`;
+    if (/supr\s*star|suprstar|suprstr/.test(hay) || link.includes("suprstar-preview")) {
+      return "Open related supRstar";
+    }
+    if (/mingl/.test(hay) || link.includes("mingl-chat")) {
+      return "Open related Mingl";
+    }
+    if (/display access|security|token_missing|access denied/.test(hay)) {
+      return "Open related details";
+    }
+    if (/bartr|commerce|order/.test(hay) || link.includes("commerce")) {
+      return "Open related BartR order";
+    }
+    if (/rydr|pickup/.test(hay) || link.includes("pickup")) {
+      return "Open related RydR";
+    }
+    if (/shoutout|shout-out/.test(hay) || link.includes("shoutout") || link.includes("tab=shoutouts")) {
+      return "Open related ShoutOut";
+    }
+    return "Open related item";
+  }
+
   function renderMessages(messages, user) {
     currentMessages = messages
       .filter(x => !x.deleted)
@@ -1479,7 +1518,7 @@
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
+      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">${esc(inboxRelatedLinkLabel(x))}</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
         ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
         ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
@@ -2925,6 +2964,7 @@
     }
     byId("privacyReport").innerHTML = simpleRows([
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
+      ["SMS notification consent", profile.smsNotificationConsent || profile.marketingSmsConsent ? "Yes" : "No"],
       ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
       ["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"],
       ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]
