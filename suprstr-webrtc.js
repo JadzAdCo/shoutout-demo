@@ -15,11 +15,57 @@
     return new RTCPeerConnection({iceServers: ICE_SERVERS});
   }
 
-  async function getCameraStream({audio = true} = {}) {
+  function isMobileLike() {
+    try {
+      if (navigator.userAgentData?.mobile === true) return true;
+    } catch (_) {}
+    const ua = String(navigator.userAgent || "");
+    return /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(ua)
+      || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua));
+  }
+
+  async function getCameraStream({audio = true, facingMode = "user", deviceId = ""} = {}) {
+    const video = deviceId
+      ? {deviceId: {exact: deviceId}, width: {ideal: 1280}, height: {ideal: 720}, aspectRatio: {ideal: 16 / 9}}
+      : {
+          facingMode: {ideal: facingMode || "user"},
+          width: {ideal: 1280},
+          height: {ideal: 720},
+          aspectRatio: {ideal: 16 / 9}
+        };
     return navigator.mediaDevices.getUserMedia({
-      video: {facingMode: "user", width: {ideal: 1280}, height: {ideal: 720}},
+      video,
       audio: !!audio
     });
+  }
+
+  async function switchCameraFacing(currentStream, {facingMode = "environment", audio = true} = {}) {
+    const next = await getCameraStream({audio, facingMode});
+    if (currentStream) {
+      currentStream.getTracks().forEach((t) => {
+        try { t.stop(); } catch (_) {}
+      });
+    }
+    return next;
+  }
+
+  async function replaceBroadcastTracks(pc, stream) {
+    if (!pc || !stream) return;
+    const senders = pc.getSenders?.() || [];
+    for (const track of stream.getTracks()) {
+      const sender = senders.find((s) => s.track && s.track.kind === track.kind);
+      if (sender) await sender.replaceTrack(track);
+      else pc.addTrack(track, stream);
+    }
+  }
+
+  function stopStream(stream) {
+    if (!stream) return;
+    try {
+      stream.getTracks().forEach((t) => {
+        try { t.stop(); } catch (_) {}
+      });
+    } catch (_) {}
   }
 
   function wireIce(pc, sessionRef, collectionName) {
@@ -38,9 +84,10 @@
     let lastAnswerSdp = "";
     let unsubCallee = null;
     let rebuilding = false;
+    let activeStream = stream;
 
-    function attachLocalTracks(peer) {
-      stream.getTracks().forEach(track => peer.addTrack(track, stream));
+    function attachLocalTracks(peer, media) {
+      (media || activeStream).getTracks().forEach(track => peer.addTrack(track, media || activeStream));
     }
 
     function listenCalleeIce(peer) {
@@ -69,7 +116,7 @@
       onStatus?.("offering");
     }
 
-    attachLocalTracks(pc);
+    attachLocalTracks(pc, activeStream);
     await publishOffer(pc);
 
     const unsubSession = sessionRef.onSnapshot(async (snap) => {
@@ -84,7 +131,7 @@
         try {
           try { pc.close(); } catch (_) {}
           pc = createPeer();
-          attachLocalTracks(pc);
+          attachLocalTracks(pc, activeStream);
           await publishOffer(pc);
         } catch (e) {
           onStatus?.(`renegotiate-error:${e.message}`);
@@ -110,10 +157,16 @@
 
     return {
       get pc() { return pc; },
-      stop() {
+      get stream() { return activeStream; },
+      async replaceStream(nextStream) {
+        activeStream = nextStream;
+        await replaceBroadcastTracks(pc, nextStream);
+      },
+      stop({stopTracks = false} = {}) {
         unsubSession();
         if (unsubCallee) unsubCallee();
         try { pc.close(); } catch (_) {}
+        if (stopTracks) stopStream(activeStream);
       }
     };
   }
@@ -225,7 +278,11 @@
 
   global.FLOQRSuprstrRtc = {
     ICE_SERVERS,
+    isMobileLike,
     getCameraStream,
+    switchCameraFacing,
+    replaceBroadcastTracks,
+    stopStream,
     startBroadcast,
     joinAsDisplay,
     forceVideoPlay

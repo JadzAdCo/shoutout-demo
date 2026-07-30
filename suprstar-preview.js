@@ -1,14 +1,25 @@
-/* Private supRstar preview — camera local until paid + Club Admin approved. */
+/* Private supRstar preview — camera local until paid + Club Admin approved; auto-live with countdown. */
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.75";
+  const APP_V = "29.09.110";
+  const ALLOWED_DURATIONS = [15, 30, 45, 60];
+  const DEFAULT_LIVE_SECONDS = 60;
+  const COUNTDOWN_SECONDS = 5;
+
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
   let broadcastHandle = null;
   let checkoutPopup = null;
+  let livePopout = null;
   let accessToken = "";
+  let facingMode = "user";
+  let autoLiveArmed = false;
+  let countdownTimer = null;
+  let liveExpireTimer = null;
+  let liveEndsAtMs = 0;
+  let venueLiveSeconds = DEFAULT_LIVE_SECONDS;
 
   function byId(id) {
     return document.getElementById(id);
@@ -44,6 +55,137 @@
     }
   }
 
+  function isLive() {
+    return !!broadcastHandle || String(requestDoc?.status || "") === "live";
+  }
+
+  function syncPreviewChrome() {
+    const video = byId("suprstarPreviewVideo");
+    const label = byId("suprstarPreviewLabel");
+    const flip = byId("suprstarFlipCamBtn");
+    const mobile = !!global.FLOQRSuprstrRtc?.isMobileLike?.();
+    if (flip) flip.classList.toggle("hidden", !mobile || !cameraReady());
+    if (label) {
+      label.textContent = isLive() ? "LIVE" : "Preview";
+      label.classList.toggle("is-live", isLive());
+    }
+    if (video) {
+      video.classList.toggle("is-on", cameraReady());
+      video.classList.toggle("is-live", isLive());
+    }
+    // Expose stream to same-origin live popout.
+    global.__floqrSuprstarStream = localStream || null;
+    global.__floqrSuprstarLiveMeta = {
+      isLive: isLive(),
+      endsAtMs: liveEndsAtMs,
+      durationSeconds: venueLiveSeconds,
+      requestId: requestDoc?.requestId || "",
+      venue: requestDoc?.locationName || requestDoc?.locationId || ""
+    };
+    try {
+      livePopout?.postMessage?.({type: "floqr-suprstar-live-meta", meta: global.__floqrSuprstarLiveMeta}, location.origin);
+    } catch (_) {}
+  }
+
+  function stopCamera() {
+    try {
+      global.FLOQRSuprstrRtc?.stopStream?.(localStream);
+    } catch (_) {}
+    localStream = null;
+    const video = byId("suprstarPreviewVideo");
+    if (video) {
+      video.srcObject = null;
+      video.classList.remove("is-on", "is-live");
+    }
+    syncPreviewChrome();
+  }
+
+  function clearCountdownUi() {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+    byId("suprstarCountdownOverlay")?.classList.add("hidden");
+    const n = byId("suprstarCountdownNumber");
+    if (n) n.textContent = "";
+  }
+
+  function clearLiveExpireTimer() {
+    if (liveExpireTimer) {
+      clearTimeout(liveExpireTimer);
+      liveExpireTimer = null;
+    }
+    liveEndsAtMs = 0;
+  }
+
+  function attachStreamToVideo(stream) {
+    const video = byId("suprstarPreviewVideo");
+    if (!video || !stream) return;
+    video.srcObject = stream;
+    video.muted = true;
+    video.classList.add("is-on");
+    global.FLOQRSuprstrRtc?.forceVideoPlay?.(video);
+  }
+
+  async function loadVenueDuration(locationId) {
+    venueLiveSeconds = DEFAULT_LIVE_SECONDS;
+    if (!locationId) return venueLiveSeconds;
+    try {
+      const snap = await firebase.firestore().collection("clubLocations").doc(locationId).get();
+      const raw = Number(snap.exists ? snap.data()?.suprstarLiveDurationSeconds : DEFAULT_LIVE_SECONDS);
+      venueLiveSeconds = ALLOWED_DURATIONS.includes(raw) ? raw : DEFAULT_LIVE_SECONDS;
+    } catch (_) {}
+    return venueLiveSeconds;
+  }
+
+  function openLivePopout() {
+    try {
+      if (livePopout && !livePopout.closed) {
+        livePopout.focus();
+        return livePopout;
+      }
+    } catch (_) {}
+    const url = `./suprstar-live-popout.html?v=${APP_V}&t=${encodeURIComponent(accessToken)}`;
+    livePopout = window.open(url, "floqr_suprstar_live", "width=420,height=720,noopener=no");
+    return livePopout;
+  }
+
+  function showHollywoodCountdown(seconds = COUNTDOWN_SECONDS) {
+    return new Promise((resolve) => {
+      clearCountdownUi();
+      const overlay = byId("suprstarCountdownOverlay");
+      const numberEl = byId("suprstarCountdownNumber");
+      if (!overlay || !numberEl) {
+        resolve();
+        return;
+      }
+      overlay.classList.remove("hidden");
+      let left = Math.max(1, Number(seconds) || COUNTDOWN_SECONDS);
+      numberEl.textContent = String(left);
+      numberEl.classList.remove("flash");
+      void numberEl.offsetWidth;
+      numberEl.classList.add("flash");
+      try {
+        livePopout?.postMessage?.({type: "floqr-suprstar-countdown", seconds: left}, location.origin);
+      } catch (_) {}
+      countdownTimer = setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          clearCountdownUi();
+          resolve();
+          return;
+        }
+        numberEl.textContent = String(left);
+        numberEl.classList.remove("flash");
+        void numberEl.offsetWidth;
+        numberEl.classList.add("flash");
+        try {
+          livePopout?.postMessage?.({type: "floqr-suprstar-countdown", seconds: left}, location.origin);
+        } catch (_) {}
+      }, 1000);
+    });
+  }
+
   /** One CTA that advances: camera → pay → wait → go live → end. */
   function updateButtons() {
     const btn = byId("suprstarStageBtn");
@@ -51,7 +193,7 @@
     const row = requestDoc || {};
     const status = String(row.status || "");
     const paid = row.paymentStatus === "paid";
-    const live = !!broadcastHandle || status === "live";
+    const live = isLive();
 
     btn.classList.remove("ghost");
     btn.classList.add("primary");
@@ -61,6 +203,7 @@
       btn.disabled = true;
       btn.textContent = "Unavailable";
       btn.dataset.stage = "done";
+      syncPreviewChrome();
       return;
     }
 
@@ -68,6 +211,7 @@
       btn.disabled = true;
       btn.textContent = "Not approved — start a new supRstar";
       btn.dataset.stage = "done";
+      syncPreviewChrome();
       return;
     }
 
@@ -75,6 +219,7 @@
       btn.disabled = true;
       btn.textContent = "Session ended — start a new supRstar";
       btn.dataset.stage = "done";
+      syncPreviewChrome();
       return;
     }
 
@@ -84,13 +229,15 @@
       btn.classList.add("ghost");
       btn.textContent = "End live stream";
       btn.dataset.stage = "end";
+      syncPreviewChrome();
       return;
     }
 
     if (paid && status === "approved") {
       btn.disabled = false;
-      btn.textContent = "Go live, be a supRstar";
+      btn.textContent = autoLiveArmed ? "Starting live…" : "Go live now (or wait for auto-start)";
       btn.dataset.stage = "live";
+      syncPreviewChrome();
       return;
     }
 
@@ -98,6 +245,7 @@
       btn.disabled = true;
       btn.textContent = "Paid — waiting for venue approval";
       btn.dataset.stage = "wait";
+      syncPreviewChrome();
       return;
     }
 
@@ -106,28 +254,43 @@
         btn.disabled = false;
         btn.textContent = "Start camera preview";
         btn.dataset.stage = "camera";
+        syncPreviewChrome();
         return;
       }
       btn.disabled = false;
       btn.textContent = "Go pay $20 — become a supRstar";
       btn.dataset.stage = "pay";
+      syncPreviewChrome();
       return;
     }
 
     btn.disabled = true;
     btn.textContent = "Preparing…";
     btn.dataset.stage = "idle";
+    syncPreviewChrome();
   }
 
   function onStageClick() {
     const stage = String(byId("suprstarStageBtn")?.dataset?.stage || "");
     if (stage === "camera") return startCamera();
     if (stage === "pay") return startPayment();
-    if (stage === "live") return goLive();
+    if (stage === "live") return beginLiveWithCountdown({manual: true});
     if (stage === "end") return endLive();
   }
 
-  function applyRequest(data) {
+  async function maybeAutoStartOnApproval(prevStatus, nextStatus) {
+    if (nextStatus !== "approved") return;
+    if (prevStatus === "approved" || prevStatus === "live") return;
+    if (isLive() || autoLiveArmed) return;
+    if (requestDoc?.paymentStatus !== "paid") return;
+    autoLiveArmed = true;
+    setGate("Approved! Live starts after a 5-second cinema countdown.");
+    setStatus("Opening live pop-out and starting countdown…");
+    openLivePopout();
+    await beginLiveWithCountdown({manual: false});
+  }
+
+  function applyRequest(data, {prevStatus = ""} = {}) {
     requestDoc = data || null;
     if (!requestDoc) {
       setGate("Private preview not found or expired.");
@@ -148,18 +311,22 @@
       maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
       setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
-      setStatus("Do not close this tab. Go live unlocks when the venue approves.");
+      setStatus("Keep this tab open. Live starts automatically when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! Tap Go live — your stream will reach the venue SupRStar board.");
-      setStatus("Club Admin approved. Tap Go live when ready.");
+      setGate("Approved! Live starts after a 5-second cinema countdown.");
+      setStatus("Club Admin approved — preparing live session…");
+      maybeAutoStartOnApproval(prevStatus, status);
     } else if (status === "live") {
-      setGate("You are live on the venue SupRStar board.");
-      setStatus("Keep this tab open while streaming.");
+      setGate("You are LIVE on the venue SupRStar board.");
+      setStatus("Keep the live pop-out open while streaming.");
+      openLivePopout();
     } else if (status === "rejected") {
       setGate("This request was not approved by the venue.");
       setStatus(requestDoc.rejectionReason || "Rejected.");
+      stopCamera();
     } else if (status === "ended") {
       setGate("Live session ended.");
+      stopCamera();
     }
     updateButtons();
   }
@@ -183,19 +350,37 @@
   async function startCamera() {
     try {
       if (!global.FLOQRSuprstrRtc) throw new Error("Camera helper failed to load.");
-      localStream = await global.FLOQRSuprstrRtc.getCameraStream({audio: true});
-      const video = byId("suprstarPreviewVideo");
-      if (video) {
-        video.srcObject = localStream;
-        video.classList.add("is-on");
-        video.muted = true;
-      }
+      localStream = await global.FLOQRSuprstrRtc.getCameraStream({audio: true, facingMode});
+      attachStreamToVideo(localStream);
       setGate("Preview on. Tap Go pay $20 when ready.");
       setStatus("Local preview only — not on the club board yet.");
       updateButtons();
     } catch (err) {
       setStatus(err?.message || "Camera failed.");
       updateButtons();
+    }
+  }
+
+  async function flipCamera() {
+    if (!global.FLOQRSuprstrRtc?.isMobileLike?.()) {
+      setStatus("Camera flip is only available on phones and tablets.");
+      return;
+    }
+    if (!cameraReady()) {
+      setStatus("Start camera first.");
+      return;
+    }
+    try {
+      facingMode = facingMode === "user" ? "environment" : "user";
+      const next = await global.FLOQRSuprstrRtc.switchCameraFacing(localStream, {facingMode, audio: true});
+      localStream = next;
+      attachStreamToVideo(localStream);
+      if (broadcastHandle?.replaceStream) await broadcastHandle.replaceStream(localStream);
+      syncPreviewChrome();
+      setStatus(facingMode === "user" ? "Front camera" : "Rear camera");
+    } catch (err) {
+      facingMode = facingMode === "user" ? "environment" : "user";
+      setStatus(err?.message || "Could not switch camera.");
     }
   }
 
@@ -232,7 +417,6 @@
       setStatus("Payment service failed to load.");
       return;
     }
-    // Open popup synchronously on click — before any await — or browsers block it.
     checkoutPopup = global.FLOQRPayments.openUserGesturePopup
       ? global.FLOQRPayments.openUserGesturePopup("floqr_suprstar_pay")
       : window.open("about:blank", "floqr_suprstar_pay", "width=540,height=780");
@@ -281,6 +465,26 @@
     }
   }
 
+  async function beginLiveWithCountdown({manual = false} = {}) {
+    if (!requestDoc?.requestId) return;
+    if (String(requestDoc.status) !== "approved" || requestDoc.paymentStatus !== "paid") {
+      setStatus("Payment and Club Admin approval are required first.");
+      return;
+    }
+    if (isLive()) return;
+    try {
+      if (!localStream) await startCamera();
+      openLivePopout();
+      setStatus("Cinema countdown… then you go live.");
+      await showHollywoodCountdown(COUNTDOWN_SECONDS);
+      await goLive();
+    } catch (err) {
+      autoLiveArmed = false;
+      setStatus(err?.message || "Could not start live.");
+      if (!manual) updateButtons();
+    }
+  }
+
   async function goLive() {
     if (!requestDoc?.requestId) return;
     if (String(requestDoc.status) !== "approved" || requestDoc.paymentStatus !== "paid") {
@@ -289,18 +493,35 @@
     }
     try {
       if (!localStream) await startCamera();
+      await loadVenueDuration(requestDoc.locationId);
       setStatus("Starting live session…");
-      const start = await callable("startSuprstrLive")({requestId: requestDoc.requestId});
+      const start = await callable("startSuprstrLive")({
+        requestId: requestDoc.requestId,
+        liveDurationSeconds: venueLiveSeconds
+      });
       const sessionId = start?.data?.sessionId;
       if (!sessionId) throw new Error("No sessionId returned.");
+      const durationSeconds = ALLOWED_DURATIONS.includes(Number(start?.data?.liveDurationSeconds))
+        ? Number(start.data.liveDurationSeconds)
+        : venueLiveSeconds;
+      venueLiveSeconds = durationSeconds;
+      liveEndsAtMs = Number(start?.data?.liveEndsAtMs) || (Date.now() + durationSeconds * 1000);
+
       broadcastHandle = await global.FLOQRSuprstrRtc.startBroadcast({
         sessionId,
         stream: localStream,
         onStatus(s) {
-          setStatus(`WebRTC: ${s}`);
+          setStatus(`LIVE · WebRTC: ${s}`);
         }
       });
-      setStatus("Live on the venue SupRStar board. Keep this tab open.");
+      clearLiveExpireTimer();
+      const remainMs = Math.max(1000, liveEndsAtMs - Date.now());
+      liveExpireTimer = setTimeout(() => {
+        endLive({silent: false, reason: "duration"});
+      }, remainMs);
+      setStatus(`LIVE on the venue SupRStar board for ${durationSeconds}s. Keep the live pop-out open.`);
+      openLivePopout();
+      syncPreviewChrome();
       updateButtons();
     } catch (err) {
       setStatus(err?.message || "Go live failed.");
@@ -308,10 +529,13 @@
     }
   }
 
-  async function endLive({silent = false} = {}) {
+  async function endLive({silent = false, reason = ""} = {}) {
+    clearCountdownUi();
+    clearLiveExpireTimer();
+    autoLiveArmed = false;
     try {
       if (broadcastHandle) {
-        broadcastHandle.stop();
+        broadcastHandle.stop({stopTracks: false});
         broadcastHandle = null;
       }
       if (requestDoc?.requestId) {
@@ -325,8 +549,14 @@
     } catch (err) {
       if (!silent) setStatus(err?.message || "End live failed.");
     }
+    stopCamera();
     updateButtons();
-    if (!silent) setStatus("Live ended.");
+    if (!silent) {
+      setStatus(reason === "duration" ? "Live ended — time limit reached." : "Live ended. Camera stopped.");
+    }
+    try {
+      livePopout?.postMessage?.({type: "floqr-suprstar-ended"}, location.origin);
+    } catch (_) {}
   }
 
   function watchRequest(uid) {
@@ -335,6 +565,7 @@
       requestUnsub = null;
     }
     if (!accessToken || !uid) return;
+    let prevStatus = "";
     requestUnsub = firebase.firestore().collection("suprstarRequests").doc(accessToken)
       .onSnapshot(snap => {
         if (!snap.exists) {
@@ -347,18 +578,32 @@
           applyRequest(null);
           return;
         }
-        applyRequest(data);
+        const nextStatus = String(data.status || "");
+        applyRequest(data, {prevStatus});
+        prevStatus = nextStatus;
       }, err => setGate(err.message || "Could not load private preview."));
   }
 
   function bindUi() {
     byId("suprstarStageBtn")?.addEventListener("click", () => onStageClick());
+    byId("suprstarFlipCamBtn")?.addEventListener("click", () => flipCamera());
     window.addEventListener("message", (ev) => {
       if (ev?.data?.type === "floqr-suprstar-paid") {
         setStatus("Payment confirmed. Waiting for Club Admin approval…");
         try { checkoutPopup?.close(); } catch (_) {}
         maybeConfirmAwaitingPayment();
       }
+      if (ev?.data?.type === "floqr-suprstar-popout-ready") {
+        syncPreviewChrome();
+      }
+      if (ev?.data?.type === "floqr-suprstar-end-from-popout") {
+        endLive();
+      }
+    });
+    window.addEventListener("beforeunload", () => {
+      try {
+        global.FLOQRSuprstrRtc?.stopStream?.(localStream);
+      } catch (_) {}
     });
   }
 
@@ -384,6 +629,7 @@
     global.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
     if (!global.firebase?.apps?.length && global.firebaseConfig) firebase.initializeApp(global.firebaseConfig);
     bindUi();
+    syncPreviewChrome();
     accessToken = recoverAccessToken();
     if (!accessToken || accessToken.length < 24) {
       setGate("Missing private preview token. Start again from Search → supRstar, or open the preview link from your payment receipt.");

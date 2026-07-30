@@ -390,11 +390,13 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut"} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 60} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
     const panel = ledPanelFromFormatId(primary);
+    const durationRaw = Number(suprstarLiveDurationSeconds);
+    const duration = [15, 30, 45, 60].includes(durationRaw) ? durationRaw : 60;
     return {
       displayScreenFormatIds: selected,
       primaryDisplayScreenFormatId: primary,
@@ -411,7 +413,8 @@
         formatId: primary,
         label: panel.label
       },
-      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut"
+      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut",
+      suprstarLiveDurationSeconds: duration
     };
   }
 
@@ -1275,6 +1278,7 @@
     });
     if (byId("clubDisplaySetupPrimaryFormat")) byId("clubDisplaySetupPrimaryFormat").value = config.primaryDisplayScreenFormatId || "led-96x48";
     if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR ShoutOut";
+    if (byId("clubDisplaySetupSuprstarDuration")) byId("clubDisplaySetupSuprstarDuration").value = String(config.suprstarLiveDurationSeconds || 60);
     if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId || "";
     clubDisplaySetupLocationId = locationId || "";
   }
@@ -1295,7 +1299,8 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: data.displayScreenFormatIds || staticLoc.displayScreenFormatIds || ["led-96x48"],
       primaryDisplayScreenFormatId: data.primaryDisplayScreenFormatId || data.displayType || data.screenFormatId || staticLoc.primaryDisplayScreenFormatId || "led-96x48",
-      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut"
+      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut",
+      suprstarLiveDurationSeconds: data.suprstarLiveDurationSeconds || staticLoc.suprstarLiveDurationSeconds || 60
     });
     if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = locationId;
     applyClubDisplaySetupForm(config, locationId);
@@ -1305,6 +1310,7 @@
         <p>Primary: ${esc(config.primaryDisplayScreenFormatId)} · Panel ${esc(config.ledPanel.widthCm || "?")}×${esc(config.ledPanel.heightCm || "?")} cm</p>
         <p>Formats: ${esc(config.displayScreenFormatIds.join(", "))}</p>
         <p>Footer brand: ${esc(config.displayFooterBrand)}</p>
+        <p>supRstar live duration: ${esc(String(config.suprstarLiveDurationSeconds))}s</p>
         <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open Display 1</a>
            · <a class="message-inline-link" href="${esc(secondaryDisplayUrl(locationId))}" target="_blank" rel="noopener">Open Display 2</a></p>`;
     }
@@ -1335,7 +1341,8 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: formats,
       primaryDisplayScreenFormatId: byId("clubDisplaySetupPrimaryFormat")?.value || formats[0],
-      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut"
+      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut",
+      suprstarLiveDurationSeconds: byId("clubDisplaySetupSuprstarDuration")?.value || 60
     });
     setText("clubDisplaySetupStatus", `Saving display type setup for ${locationId}...`);
     const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
