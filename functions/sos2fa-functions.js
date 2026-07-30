@@ -54,9 +54,9 @@ function twilioConfig() {
   const read = (secret, envName) => {
     try {
       const value = secret?.value?.();
-      if (value) return String(value);
+      if (value) return String(value).trim();
     } catch (_) {}
-    return String(process.env[envName] || "");
+    return String(process.env[envName] || "").trim();
   };
   return {
     accountSid: read(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
@@ -190,6 +190,12 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
         console.error("requestSos2faCode twilio-error", {uid, phoneLast5, code: codeNum, message: msg});
       } catch (_) {
         console.error("requestSos2faCode twilio-error-raw", {uid, phoneLast5, error: String(sms.error || "").slice(0, 200)});
+      }
+      if (!twilioHint) {
+        const sidLooksInvalid = !/^AC[a-zA-Z0-9]{32}$/.test(String(twilio.accountSid || ""));
+        if (sidLooksInvalid) {
+          twilioHint = "TWILIO_ACCOUNT_SID appears invalid (expected AC...)";
+        }
       }
       const detail = twilioHint
         ? `Could not send SOS2FA SMS (${twilioHint})`
