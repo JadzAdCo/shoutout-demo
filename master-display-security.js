@@ -531,12 +531,33 @@
 
   function parseSecurityMessageColumns(row = {}) {
     const ms = Number(row.createdAtMs || row.createdAt?.toMillis?.() || 0);
-    const venue = String(row.locationName || row.clubLocationId || "—").trim() || "—";
-    const error = String(row.title || "Display access denied").trim();
+    const isTwilio = row.type === "twilioSecurityAlert" || row.provider === "twilio";
+    const venue = isTwilio
+      ? "Twilio"
+      : (String(row.locationName || row.clubLocationId || "—").trim() || "—");
+    const error = String(row.title || (isTwilio ? "Twilio security alert" : "Display access denied")).trim();
     const board = boardLabelForMessage(row.displayBoard);
     const body = String(row.body || "").trim();
     let description = "";
     let causation = "";
+
+    if (isTwilio) {
+      description = body || String(row.errorMessage || "Twilio Debugger security event.").trim();
+      causation = [
+        row.errorCode ? `Code ${row.errorCode}` : "",
+        row.denialReason || "",
+        row.moreInfo || "",
+        row.eventSid ? `Event ${row.eventSid}` : ""
+      ].filter(Boolean).join(". ") || "Review Twilio Monitor / Debugger logs.";
+      return {
+        date: formatMessageDate(ms),
+        time: formatMessageTime(ms),
+        venue,
+        error,
+        description: description || "—",
+        causation: causation || "—"
+      };
+    }
 
     if (board || row.clientIp || row.locationName || row.clubLocationId) {
       description = [
@@ -814,7 +835,8 @@
             .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
             .filter((row) => {
               const isSecurity = row.messageCategory === "security"
-                || row.type === "displayAccessDenied";
+                || row.type === "displayAccessDenied"
+                || row.type === "twilioSecurityAlert";
               return isSecurity && row.deleted !== true;
             })
             .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))
