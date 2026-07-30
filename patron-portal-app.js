@@ -197,6 +197,9 @@
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
+      if (map[tab] === "portalPrivacy" && location.hash === "#sms-notifications") {
+        setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 120);
+      }
     }
   }
 
@@ -628,11 +631,16 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
+    if (byId("privacySmsNotifications")) {
+      byId("privacySmsNotifications").checked = !!(profile.smsNotificationConsent || profile.marketingSmsConsent);
+    }
     if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
-  }
+    if (location.hash === "#sms-notifications") {
+      setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+    }
 
   function connectStatusMessage(result = {}) {
     if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;
@@ -963,12 +971,16 @@
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
+      smsNotificationConsent: !!byId("privacySmsNotifications")?.checked,
+      smsNotificationConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      smsNotificationConsentSource: "patron-portal-privacy",
       birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
       birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    if (prefs.smsNotificationConsent) prefs.marketingSmsConsent = true;
     await db.collection("users").doc(user.uid).set(prefs, {merge:true});
     await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...prefs, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
     setText("portalStatus", "Privacy preferences saved.");
@@ -2952,6 +2964,7 @@
     }
     byId("privacyReport").innerHTML = simpleRows([
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
+      ["SMS notification consent", profile.smsNotificationConsent || profile.marketingSmsConsent ? "Yes" : "No"],
       ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
       ["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"],
       ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]

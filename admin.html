@@ -482,10 +482,16 @@
       </section>
 
       <section id="panelNotifications" class="admin-panel-section">
-        <div class="card">
+        <div class="card" id="sms-consent">
           <p class="eyebrow">Club ops</p>
           <h2>Notifications</h2>
           <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong> from the alert phone. SMS ($10) and WhatsApp ($10) service packs also grant message credits for marketing (see Advertising).</p>
+          <p class="sub small" data-keep-visible="true">
+            Before enabling SMS alerts, review and grant consent on the
+            <a href="./sms-consent.html?v=29.09.106&from=admin">SMS Consent Grant</a> page.
+            Admins and patrons manage ongoing SMS preference under
+            <a href="./patron-portal.html?v=29.09.106&tab=privacy#sms-notifications">My Privacy → SMS notifications</a>.
+          </p>
           <div class="privacy-datapoint-grid">
             <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
             <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
