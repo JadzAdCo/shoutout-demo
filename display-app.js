@@ -1360,12 +1360,17 @@
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
-      if (DISPLAY_BOARD === "secondary") {
-        const status = String(payload.status || "").toLowerCase();
-        const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
-        if (!doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage) || isLegacyShoutOutIdleText(payload.mainText)) {
-          payload = defaultClubDisplayPayload();
-        }
+      const status = String(payload.status || "").toLowerCase();
+      const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
+      // Primary + secondary: expired/default docs must not keep jersey/background ghosts.
+      if (!doc.exists
+        || status === "default"
+        || payload.idleCta
+        || (!status && !hasLiveMessage)
+        || isLegacyShoutOutIdleText(payload.mainText)) {
+        payload = defaultClubDisplayPayload();
+      } else if (DISPLAY_BOARD === "secondary" && status !== "approved" && status !== "live") {
+        payload = defaultClubDisplayPayload();
       }
       if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
       renderTimedLiveContent(payload);

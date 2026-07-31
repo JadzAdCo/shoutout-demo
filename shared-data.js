@@ -111,6 +111,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     screenFormatId:"led-64x32",
     ledPanel:{width:64,height:32,widthCm:64,heightCm:32,pixelWidth:416,pixelHeight:208,formatId:"led-64x32",label:"64 x 32 cm"},
     displayFooterBrand:"FLOQR ShoutOut",
+    suprstarLiveDurationSeconds:90,
     active:true
   },
   "gaia-supperclub-washington-dc": {

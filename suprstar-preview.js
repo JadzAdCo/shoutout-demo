@@ -2,10 +2,10 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.111";
-  const ALLOWED_DURATIONS = [15, 30, 45, 60];
-  const DEFAULT_LIVE_SECONDS = 60;
-  const COUNTDOWN_SECONDS = 5;
+  const APP_V = "29.09.115";
+  const ALLOWED_DURATIONS = [15, 30, 45, 60, 90];
+  const DEFAULT_LIVE_SECONDS = 90;
+  const COUNTDOWN_SECONDS = 10;
 
   let requestDoc = null;
   let requestUnsub = null;
@@ -322,15 +322,54 @@
     if (stage === "end") return endLive();
   }
 
+  function applyPreviewFilter(value = "none") {
+    const video = byId("suprstarPreviewVideo");
+    if (!video) return;
+    video.classList.remove("filter-bright", "filter-warm", "filter-cool", "filter-mono");
+    const key = String(value || "none").toLowerCase();
+    if (key && key !== "none") video.classList.add(`filter-${key}`);
+  }
+
+  function showApprovedToast() {
+    return new Promise((resolve) => {
+      const existing = byId("suprstarApprovedToast");
+      if (existing) existing.remove();
+      const mins = Math.floor(venueLiveSeconds / 60);
+      const secs = venueLiveSeconds % 60;
+      const durLabel = mins && secs ? `${mins} min ${secs} sec` : (mins ? `${mins} min` : `${venueLiveSeconds} sec`);
+      const toast = document.createElement("div");
+      toast.id = "suprstarApprovedToast";
+      toast.className = "suprstr-approved-toast";
+      toast.setAttribute("role", "dialog");
+      toast.setAttribute("aria-live", "assertive");
+      toast.innerHTML = `
+        <div class="suprstr-approved-toast-card">
+          <p class="suprstr-approved-toast-title">Live feed approved</p>
+          <p class="suprstr-approved-toast-body">${COUNTDOWN_SECONDS}-second countdown starts now. Live runs for ${durLabel}.</p>
+        </div>`;
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("is-visible"));
+      window.setTimeout(() => {
+        toast.classList.remove("is-visible");
+        window.setTimeout(() => {
+          toast.remove();
+          resolve(true);
+        }, 280);
+      }, 1600);
+    });
+  }
+
   async function maybeAutoStartOnApproval(prevStatus, nextStatus) {
     if (nextStatus !== "approved") return;
     if (prevStatus === "approved" || prevStatus === "live") return;
     if (isLive() || autoLiveArmed) return;
     if (requestDoc?.paymentStatus !== "paid") return;
     autoLiveArmed = true;
-    setGate("Approved! Live starts after a 5-second cinema countdown.");
-    setStatus("Opening live pop-out and starting countdown…");
+    setGate(`Live feed approved — ${COUNTDOWN_SECONDS}-second countdown, then live.`);
+    setStatus("Live feed approved…");
+    await showApprovedToast();
     openLivePopout();
+    setStatus("Cinema countdown… then you go live.");
     await beginLiveWithCountdown({manual: false});
   }
 
@@ -357,7 +396,7 @@
       setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
       setStatus("Keep this tab open. Live starts automatically when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! Live starts after a 5-second cinema countdown.");
+      setGate(`Live feed approved — ${COUNTDOWN_SECONDS}-second countdown, then live.`);
       setStatus("Club Admin approved — preparing live session…");
       maybeAutoStartOnApproval(prevStatus, status);
     } else if (status === "live") {
@@ -671,6 +710,9 @@
   function bindUi() {
     byId("suprstarStageBtn")?.addEventListener("click", () => onStageClick());
     byId("suprstarFlipCamBtn")?.addEventListener("click", () => flipCamera());
+    byId("suprstarPreviewFilter")?.addEventListener("change", (event) => {
+      applyPreviewFilter(event.target?.value || "none");
+    });
     window.addEventListener("message", (ev) => {
       if (ev?.data?.type === "floqr-suprstar-paid") {
         setStatus("Payment confirmed. Waiting for Club Admin approval…");

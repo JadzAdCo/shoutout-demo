@@ -390,13 +390,13 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 60} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 90} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
     const panel = ledPanelFromFormatId(primary);
     const durationRaw = Number(suprstarLiveDurationSeconds);
-    const duration = [15, 30, 45, 60].includes(durationRaw) ? durationRaw : 60;
+    const duration = [15, 30, 45, 60, 90].includes(durationRaw) ? durationRaw : 90;
     return {
       displayScreenFormatIds: selected,
       primaryDisplayScreenFormatId: primary,

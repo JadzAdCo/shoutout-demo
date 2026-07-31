@@ -155,7 +155,7 @@ exports.approveSuprstarRequest = onCall({region: "us-central1"}, async (request)
       recipientEmail: row.broadcasterEmail || "",
       type: "suprstarApproved",
       title: "supRstar approved",
-      body: `${row.locationName || row.locationId} approved your supRstar. Keep your preview tab open — live starts after a 5-second countdown.`,
+      body: `${row.locationName || row.locationId} approved your supRstar. Keep your preview tab open — live starts after a 10-second countdown.`,
       clubLocationId: row.locationId,
       requestId,
       referenceNumber: row.referenceNumber || "",
@@ -231,7 +231,7 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   const uid = request.auth.uid;
   // Idempotent: overlapping go-live calls must not fail+tear-down an active session.
   if (req.status === "live" && text(req.sessionId, 120) && (req.broadcasterUid === uid || isMasterAdminAuth(request.auth))) {
-    const duration = [15, 30, 45, 60].includes(Number(req.liveDurationSeconds)) ? Number(req.liveDurationSeconds) : 60;
+    const duration = [15, 30, 45, 60, 90].includes(Number(req.liveDurationSeconds)) ? Number(req.liveDurationSeconds) : 90;
     return {
       sessionId: text(req.sessionId, 120),
       requestId,
@@ -251,17 +251,17 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   const sessionRef = db.collection("suprstrSessions").doc();
   const liveRef = db.collection("suprstrLive").doc(liveId);
   const now = admin.firestore.Timestamp.now();
-  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60];
-  let liveDurationSeconds = 60;
+  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60, 90];
+  let liveDurationSeconds = 90;
   try {
     const clubSnap = await db.collection("clubLocations").doc(locationId).get();
-    const fromClub = Number(clubSnap.exists ? clubSnap.data()?.suprstarLiveDurationSeconds : 60);
+    const fromClub = Number(clubSnap.exists ? clubSnap.data()?.suprstarLiveDurationSeconds : 90);
     const fromClient = Number(request.data?.liveDurationSeconds);
     const preferred = ALLOWED_LIVE_SECONDS.includes(fromClub) ? fromClub
-      : (ALLOWED_LIVE_SECONDS.includes(fromClient) ? fromClient : 60);
+      : (ALLOWED_LIVE_SECONDS.includes(fromClient) ? fromClient : 90);
     liveDurationSeconds = preferred;
   } catch (_) {
-    liveDurationSeconds = 60;
+    liveDurationSeconds = 90;
   }
   // Duration clock arms when the patron WebRTC link is connected — not at approval / start call.
   const liveEndsAtMs = 0;
@@ -356,10 +356,10 @@ exports.armSuprstrLiveDuration = onCall({region: "us-central1"}, async (request)
   }
   if (req.status !== "live") throw new HttpsError("failed-precondition", "Live session is not active.");
   const sid = sessionId || text(req.sessionId, 120);
-  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60];
+  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60, 90];
   const liveDurationSeconds = ALLOWED_LIVE_SECONDS.includes(Number(req.liveDurationSeconds))
     ? Number(req.liveDurationSeconds)
-    : 60;
+    : 90;
   const existingEnds = Number(req.liveEndsAtMs) || 0;
   if (existingEnds > Date.now() + 2000) {
     return {ok: true, liveDurationSeconds, liveEndsAtMs: existingEnds, alreadyArmed: true};
