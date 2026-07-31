@@ -174,6 +174,21 @@
       source: "help-repository-seed"
     },
     {
+      id: "help-display-security-setting",
+      title: "Display Security Setting",
+      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs.",
+      searchPhrases: [
+        "display security", "display security setting", "approved display ips", "ip restriction",
+        "token lock", "xibo token", "venue not onboarded", "display board security"
+      ],
+      links: [
+        {label: "Master Admin Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},
+        {label: "Entity Onboarding", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubOnboarding"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#displaySecurity"
+    },
+    {
       id: "help-become-club-admin",
       title: "Become a Club Admin",
       body: "Request Club Admin access, then get venue approval.",

@@ -165,6 +165,13 @@
 .display-security-card .display-security-bottom-actions{
   margin-top:14px;
 }
+.display-security-card #displaySecurityStatus a.display-security-onboard-link,
+#displaySecurityStatus a.display-security-onboard-link{
+  color:#dfff5a;
+  font-weight:700;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
 .display-security-card .label-inline-row{
   display:inline-flex;
   align-items:center;

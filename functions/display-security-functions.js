@@ -270,6 +270,8 @@ async function writeAccessLog(entry = {}) {
     language: text(entry.language, 40),
     timezone: text(entry.timezone, 80),
     platform: text(entry.platform, 120),
+    actorEmail: text(entry.actorEmail, 200),
+    eventType: text(entry.eventType, 80),
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     createdAtMs: Date.now(),
     logCategory: "security",
@@ -550,7 +552,13 @@ exports.setVenueDisplayIps = onCall({
   const notes = text(data.notes, 500);
   const clubRef = db.collection("clubLocations").doc(locationId);
   const clubSnap = await clubRef.get();
-  const existing = clubSnap.exists ? clubSnap.data() || {} : {};
+  if (!clubSnap.exists) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Venue not onboarded. Please onboard the venue or club under Entity Management (SOS2FA) before setting display security."
+    );
+  }
+  const existing = clubSnap.data() || {};
   const payload = {
     approvedDisplayIps,
     displayIpRestrictionEnabled,
@@ -560,10 +568,6 @@ exports.setVenueDisplayIps = onCall({
     displayIpUpdatedBy: email,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
-  if (!clubSnap.exists) {
-    payload.locationName = text(data.locationName, 200) || locationId;
-    payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
-  }
   await clubRef.set(payload, {merge: true});
 
   await db.collection("displayBoardSecrets").doc(locationId).set({
@@ -592,10 +596,26 @@ exports.setVenueDisplayIps = onCall({
   });
   await batch.commit();
 
+  const locationName = existing.locationName || existing.brandName || locationId;
+  await writeAccessLog({
+    locationId,
+    locationName,
+    displayBoard: "admin-settings",
+    allowed: true,
+    restrictionEnabled: displayIpRestrictionEnabled,
+    tokenRequired: displayTokenRequired,
+    reason: `admin_display_security_saved by ${email}; IP ${displayIpRestrictionEnabled ? "ON" : "OFF"}; token ${displayTokenRequired ? "ON" : "OFF"}; ${approvedDisplayIps.length} IP(s)`,
+    pageUrl: "master-admin.html#displaySecurity",
+    userAgent: "master-admin",
+    platform: "admin",
+    actorEmail: email,
+    eventType: "admin_display_security_saved"
+  });
+
   return {
     ok: true,
     locationId,
-    locationName: existing.locationName || existing.brandName || locationId,
+    locationName,
     approvedDisplayIps,
     displayIpRestrictionEnabled,
     displayTokenRequired,
@@ -758,7 +778,13 @@ exports.rotateVenueDisplayToken = onCall({
   const clear = data.clear === true;
   const secretsRef = db.collection("displayBoardSecrets").doc(locationId);
   const clubSnap = await db.collection("clubLocations").doc(locationId).get();
-  const club = clubSnap.exists ? clubSnap.data() || {} : {};
+  if (!clubSnap.exists) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Venue not onboarded. Please onboard the venue or club under Entity Management (SOS2FA) before rotating display tokens."
+    );
+  }
+  const club = clubSnap.data() || {};
 
   const patch = {
     locationId,
@@ -786,11 +812,30 @@ exports.rotateVenueDisplayToken = onCall({
   const primaryToken = text(secrets.primaryToken || "", 120);
   const secondaryToken = text(secrets.secondaryToken || "", 120);
   const activeToken = clear ? "" : (board === "secondary" ? secondaryToken : primaryToken);
+  const locationName = club.locationName || club.brandName || locationId;
+  const boardLabel = board === "secondary" ? "Display 2" : "Display 1";
+
+  await writeAccessLog({
+    locationId,
+    locationName,
+    displayBoard: "admin-settings",
+    allowed: true,
+    restrictionEnabled: club.displayIpRestrictionEnabled === true,
+    tokenRequired: secrets.tokenRequired === true || club.displayTokenRequired === true,
+    reason: clear
+      ? `admin_display_token_cleared by ${email}; ${boardLabel}`
+      : `admin_display_token_rotated by ${email}; ${boardLabel}`,
+    pageUrl: "master-admin.html#displaySecurity",
+    userAgent: "master-admin",
+    platform: "admin",
+    actorEmail: email,
+    eventType: clear ? "admin_display_token_cleared" : "admin_display_token_rotated"
+  });
 
   return {
     ok: true,
     locationId,
-    locationName: club.locationName || club.brandName || locationId,
+    locationName,
     board,
     cleared: clear,
     revealOnce: !clear,
@@ -848,6 +893,8 @@ exports.listDisplayAccessLogs = onCall({
       platform: row.platform || "",
       language: row.language || "",
       timezone: row.timezone || "",
+      actorEmail: row.actorEmail || "",
+      eventType: row.eventType || "",
       createdAtMs: Number(row.createdAtMs || 0)
     };
   });

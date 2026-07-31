@@ -9,7 +9,7 @@
 <body>
 <main class="app admin-shell" style="max-width:920px;margin:24px auto;padding:18px">
   <h1>Onboard extracted DC venues</h1>
-  <p class="sub">Sign in as Master Admin, then push website-extracted club profiles from <code>shared-data.js</code> into Firestore (<code>clubLocations</code>, <code>clubs</code>, <code>clubOnboardingRecords</code>, <code>events</code>, <code>clubMedia</code>). Includes Decades, Mayflower, LIMA Twist nightlife media/events.</p>
+  <p class="sub">Sign in as Master Admin, then push website-extracted club profiles from <code>shared-data.js</code> into Firestore (<code>clubLocations</code>, <code>clubs</code>, <code>clubOnboardingRecords</code>, <code>events</code>, <code>clubMedia</code>). Includes Decades weekly nights + Posh Sueño tickets, Mayflower, LIMA Twist nightlife media/events. Heist may already exist — merge is safe.</p>
   <p id="status" class="status">Checking auth…</p>
   <button id="loginBtn" type="button">Sign in with Google</button>
   <button id="onboardBtn" class="primary" type="button" disabled>Onboard all DC venues</button>
@@ -20,7 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.48"></script>
-<script src="./shared-data.js?v=29.09.48"></script>
+<script src="./shared-data.js?v=29.09.114"></script>
 <script>
 (function () {
   const IDS = [

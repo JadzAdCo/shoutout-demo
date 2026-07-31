@@ -1,0 +1,39 @@
+---
+description: Venue/event onboarding must capture full official-site + ticket-platform details (DJs, presenters, VIP, sources)
+alwaysApply: true
+---
+
+# Venue & event onboarding completeness (always)
+
+When creating or refreshing a club/venue onboard (seed in `shared-data.js`, `onboard-dc-venues.html`, Entity Onboarding, CSV, or Firestore push):
+
+## Club / venue required fields
+- Stable `locationId` (slug), brand + location name, full address, phone, website
+- `eventsUrl` = canonical weekly/events page (prefer the live URL patrons use, not a short redirect if known)
+- `sourceUrls[]` = every official page used for the extract (home, events, VIP, reservations, ticket platforms)
+- Services, display formats, templates, genres, amenities, hours / activity dates
+- When published: DJs / artists / promoters that belong to the venue (even if only “resident DJs” is published)
+
+## Event required fields (every night / ticketed show)
+Do **not** ship thin stubs (`eventName` + day only). Capture everything the venue or ticket page publishes:
+
+| Field | Examples |
+|---|---|
+| Identity | `eventName`, `description`, `eventDate` / recurring, `eventDay`, `eventTime` |
+| Music / talent | `genres`, `artists`, `featuredDjs` (named when known; else published billing like “Guest DJs”) |
+| Presenters | `presentedBy`, `promoters` (e.g. DCClubbing, EG Productions × City Socials) |
+| Access | `agePolicy`, `entryCutoffNotes`, `venueSpace` (rooftop / main / etc.) |
+| Commerce links | `ticketUrl`, `vipPassUrl`, `bottleServiceUrl`, `externalTicketProvider` (`posh`, `eventbrite`, …) |
+| Provenance | `flyerUrl`, `eventsPageUrl`, `sourceUrls[]`, `onboardingSource` |
+
+## Ticket platforms (Posh, Eventbrite, etc.)
+- If the venue weekly page links out (e.g. Sueño → `https://posh.vip/e/...`), that URL **must** be stored on the Decades/venue event as `ticketUrl` **and** listed in club + event `sourceUrls`.
+- Pull date, title, presenter, age, and lineup from the ticket page when available; never leave the external link orphaned from the club.
+
+## Checklist before commit / Firestore push
+- [ ] Club `eventsUrl` matches the live weekly page
+- [ ] Each weekly night has description, presenters, age, VIP/ticket links
+- [ ] Named DJs when published; otherwise explicit resident/guest billing (not empty)
+- [ ] External ticket URLs onboarded onto the **club’s** events (same `locationId`)
+- [ ] `onboard-*.html` / scripts write `events` + `clubMedia`, not only `clubLocations`
+- [ ] Re-run venue push after seed enrichment so Firestore matches `shared-data.js`

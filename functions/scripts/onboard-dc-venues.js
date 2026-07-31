@@ -223,7 +223,13 @@ const venues = [
     telephone: "+12026507326",
     phoneDisplay: "(202) 650-7326",
     officialWebsite: "https://decadesdc.com/",
-    eventsUrl: "https://decadesdc.com/weekly-events/",
+    eventsUrl: "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
+    eventsUrlAliases: [
+      "https://decadesdc.com/weekly-events/",
+      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/"
+    ],
+    vipPassUrl: "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
+    bottleServiceUrl: "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
     logoUrl: "https://decadesdc.com/wp-content/uploads/2024/02/Logo-p-500x97-1-1.png",
     mainMediaUrl: "https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/02/722A8852.jpg?ssl=1",
     mainMediaType: "image",
@@ -231,15 +237,25 @@ const venues = [
     tagline: "DC's only multi-level retro nightclub",
     description: "Located in the heart of Dupont Circle / Connecticut Ave, Decades is a 15,000 sq ft retro-themed nightclub with 6 floors, 8 bars, and 5 DJs — plus a retractable rooftop, VIP passes, bottle service, and weekly themed nights (Summer Beach Club, Fridays, Saturdays, Sueño Sundays).",
     genres: ["Hip Hop", "Top 40", "Throwbacks", "EDM", "House", "Reggaeton", "Techno", "International"],
-    amenities: ["6 floors", "8 bars", "5 DJs", "Retractable rooftop", "VIP passes", "Bottle service", "Private events", "Birthday experiences"],
+    artists: ["Decades resident DJs", "Guest DJs", "DCClubbing DJs"],
+    featuredDjs: ["Decades resident DJs (5 rooms)", "Guest DJs (Saturdays)", "DCClubbing DJs (Summer Beach Club)"],
+    promoters: ["DCClubbing", "Decades", "Decades DC", "EG Productions", "City Socials"],
+    amenities: ["6 floors", "8 bars", "5 DJs", "Retractable rooftop", "VIP passes", "Bottle service", "Private events", "Birthday experiences", "Free entry with VIP RSVP"],
     hours: "Event-driven (typically Thu–Sun late night; confirm each event)",
     brand: "DECADES DC x FLOQR",
     defaultMain: "USE SHOUT OUT @ DECADES",
     defaultSub: "Dupont / Connecticut Ave",
     activityStatus: "Active multi-level retro nightclub — weekly Beach Club / Fridays / Saturdays / Sueño Sundays",
     activityDates: ["Thu Summer Beach Club (18+)", "Fri Fridays at Decades (21+)", "Sat Saturdays at Decades (21+)", "Sun Sueño Sundays rooftop"],
+    weeklyLineupSummary: "Thu Summer Beach Club (DCClubbing, 18+) · Fri Fridays at Decades (21+) · Sat Saturdays at Decades / guest DJs (21+) · Sun Sueño Sundays rooftop (EG Productions x City Socials)",
     templates: ["hiphop", "edm", "vip", "bottle", "neon", "birthday"],
-    sourceUrls: ["https://decadesdc.com/", "https://decadesdc.com/weekly-events/", "https://decadesdc.com/venue/"]
+    sourceUrls: [
+      "https://decadesdc.com/",
+      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
+      "https://decadesdc.com/weekly-events/",
+      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
+      "https://posh.vip/e/sueo-decades-58"
+    ]
   },
   {
     id: "mayflower-washington-dc",
