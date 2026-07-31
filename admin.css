@@ -497,9 +497,24 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sos2fa-gate-head{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-bottom:12px}
 .sos2fa-mark{width:72px;height:72px;border-radius:18px;display:grid;place-items:center;font-size:11px;font-weight:1000;letter-spacing:.04em;color:#06101c;background:linear-gradient(135deg,#26d8ff,#b8ff4a);box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .sos2fa-recaptcha{margin:10px 0}
-.sos2fa-channel-fieldset{border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:10px 12px;margin:0 0 12px;display:grid;gap:6px}
+.sos2fa-channel-fieldset{border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:10px 12px;margin:0 0 12px;display:grid;gap:8px}
 .sos2fa-channel-fieldset legend{padding:0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;opacity:.85}
-.sos2fa-channel-option{display:flex;align-items:center;gap:8px;font-size:14px}
+.sos2fa-channel-option{
+  display:flex;align-items:center;gap:10px;margin:0;padding:8px 10px;
+  border:1px solid rgba(148,163,184,.18);border-radius:10px;background:rgba(0,0,0,.16);
+  font-size:14px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.35
+}
+.sos2fa-channel-option:hover{border-color:rgba(94,234,255,.35)}
+.sos2fa-channel-option:has(input:checked){border-color:rgba(94,234,255,.55);background:rgba(94,234,255,.08)}
+.sos2fa-channel-option input[type="radio"]{
+  width:auto;min-width:18px;max-width:18px;height:18px;margin:0;flex:0 0 auto;
+  accent-color:#5eeaff;align-self:center
+}
+.sos2fa-channel-option .sub,.sos2fa-channel-option .sub.small{margin:0;display:inline;opacity:.85;font-weight:600}
+@media(max-width:520px){
+  .sos2fa-channel-option{padding:10px;gap:12px;font-size:15px}
+  .sos2fa-channel-option input[type="radio"]{min-width:20px;max-width:20px;height:20px}
+}
 .sos2fa-totp-block{margin-top:18px;padding-top:14px;border-top:1px solid rgba(148,163,184,.25)}
 .sos2fa-totp-title{margin:0 0 6px;font-size:1rem}
 .sos2fa-totp-enroll{display:grid;gap:8px;margin:10px 0;justify-items:start}
