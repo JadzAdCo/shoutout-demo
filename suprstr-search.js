@@ -2,8 +2,9 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.68";
+  const APP_V = "29.09.112";
   let venueRows = [];
+  let venuesLoading = false;
 
   function byId(id) {
     return document.getElementById(id);
@@ -42,43 +43,121 @@
     byId("suprstrSearchPage")?.classList.toggle("active", !show);
   }
 
-  async function loadVenues() {
-    const map = global.SHOUTOUT_CLUB_LOCATIONS || {};
-    const g = global.FLOQRFeatureGates;
-    const db = firebase.firestore();
-    const rows = [];
-    for (const [id, row] of Object.entries(map)) {
-      let club = {id, ...row};
-      try {
-        if (g?.loadVenueRecord) club = await g.loadVenueRecord(db, id) || club;
-      } catch (_) {}
-      const enabled = g ? g.venueMayUse("supRstar", club) : true;
-      if (!enabled) continue;
-      rows.push({
-        id,
-        name: club.locationName || club.brandName || row.locationName || row.brandName || id
-      });
-    }
-    rows.sort((a, b) => a.name.localeCompare(b.name));
+  function isUsableVenueRow(club = {}) {
+    if (!club || !club.id) return false;
+    if (club.canonicalLocationId || club.aliasOf || club.mergedInto) return false;
+    const obsolete = new Set((global.FLOQR_OBSOLETE_LOCATION_IDS || []).map((v) => String(v || "").toLowerCase()));
+    if (obsolete.has(String(club.id).toLowerCase())) return false;
+    const status = String(club.status || "active").toLowerCase();
+    if (["deleted", "offboarded", "disabled"].includes(status)) return false;
+    if (club.active === false && status === "disabled") return false;
+    if (club.offboarded === true) return false;
+    return true;
+  }
+
+  function venueDisplayName(club = {}, fallbackId = "") {
+    return club.locationName || club.brandName || club.name || fallbackId;
+  }
+
+  function applyVenueOptions(rows, {statusMsg = ""} = {}) {
     venueRows = rows;
     const sel = byId("suprstrVenueSelect");
     if (!sel) return;
+    const btn = byId("suprstrGoLiveBtn");
     if (!rows.length) {
       sel.innerHTML = `<option value="">No venues with supRstar enabled</option>`;
-      setVenueStatus("No venues currently allow supRstar.");
-      byId("suprstrGoLiveBtn") && (byId("suprstrGoLiveBtn").disabled = true);
+      setVenueStatus(statusMsg || "No venues currently allow supRstar.");
+      if (btn) btn.disabled = true;
       return;
     }
-    sel.innerHTML = rows.map(r => `<option value="${r.id}">${r.name}</option>`).join("");
-    const preferred = rows.find(r => r.id === "heist-washington-dc") || rows[0];
+    const previous = sel.value;
+    sel.innerHTML = rows.map((r) => `<option value="${r.id}">${r.name}</option>`).join("");
+    const preferred = rows.find((r) => r.id === previous)
+      || rows.find((r) => r.id === "heist-washington-dc")
+      || rows[0];
     if (preferred) sel.value = preferred.id;
-    setVenueStatus(`${rows.length} venue${rows.length === 1 ? "" : "s"} with supRstar enabled.`);
-    byId("suprstrGoLiveBtn") && (byId("suprstrGoLiveBtn").disabled = false);
+    setVenueStatus(statusMsg || `${rows.length} venue${rows.length === 1 ? "" : "s"} with supRstar enabled.`);
+    if (btn) btn.disabled = false;
+  }
+
+  function buildVenueRows(sourceMap = {}) {
+    const g = global.FLOQRFeatureGates;
+    const rows = [];
+    Object.values(sourceMap).forEach((club) => {
+      if (!isUsableVenueRow(club)) return;
+      const enabled = g ? g.venueMayUse("supRstar", club) : true;
+      if (!enabled) return;
+      rows.push({
+        id: club.id,
+        name: venueDisplayName(club, club.id)
+      });
+    });
+    rows.sort((a, b) => a.name.localeCompare(b.name));
+    return rows;
+  }
+
+  async function fetchClubLocationMap() {
+    const staticMap = global.SHOUTOUT_CLUB_LOCATIONS || {};
+    const merged = {};
+    Object.entries(staticMap).forEach(([id, row]) => {
+      merged[id] = {id, ...row};
+    });
+    try {
+      const db = firebase.firestore();
+      // One list read instead of N sequential doc gets (was making venue load feel broken).
+      const snap = await Promise.race([
+        db.collection("clubLocations").limit(400).get(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("venue-timeout")), 8000))
+      ]);
+      snap.forEach((doc) => {
+        const prev = merged[doc.id] || {};
+        merged[doc.id] = {id: doc.id, ...prev, ...doc.data()};
+      });
+    } catch (_) {
+      // Keep static catalog — still usable offline / on slow networks.
+    }
+    return merged;
+  }
+
+  async function loadVenues() {
+    if (venuesLoading) return;
+    venuesLoading = true;
+    setVenueStatus("Loading venues…");
+    const btn = byId("suprstrGoLiveBtn");
+    if (btn) btn.disabled = true;
+
+    // Fast path: paint from seeded catalog immediately so the select is never empty.
+    const staticRows = buildVenueRows(
+      Object.fromEntries(
+        Object.entries(global.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, row]) => [id, {id, ...row}])
+      )
+    );
+    if (staticRows.length) {
+      applyVenueOptions(staticRows, {statusMsg: `Loading live venue settings… (${staticRows.length} available)`});
+    }
+
+    try {
+      const merged = await fetchClubLocationMap();
+      const rows = buildVenueRows(merged);
+      applyVenueOptions(rows, {
+        statusMsg: rows.length
+          ? `${rows.length} venue${rows.length === 1 ? "" : "s"} with supRstar enabled.`
+          : "No venues currently allow supRstar."
+      });
+    } catch (err) {
+      if (staticRows.length) {
+        applyVenueOptions(staticRows, {statusMsg: `${staticRows.length} venues loaded (catalog). Live settings unavailable.`});
+      } else {
+        applyVenueOptions([], {statusMsg: err?.message || "Could not load venues."});
+      }
+    } finally {
+      venuesLoading = false;
+    }
   }
 
   function selectedVenue() {
     const id = byId("suprstrVenueSelect")?.value || "";
-    const row = venueRows.find(r => r.id === id) || {};
+    const row = venueRows.find((r) => r.id === id) || {};
     return {id, name: row.name || id};
   }
 
@@ -186,7 +265,7 @@
     });
     byId("suprstrLogoutBtn")?.addEventListener("click", () => auth.signOut());
 
-    auth.onAuthStateChanged(async user => {
+    auth.onAuthStateChanged(async (user) => {
       const check = accessCheck(user);
       if (!check.ok) {
         showGate(true);

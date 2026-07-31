@@ -390,13 +390,13 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 60} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 90} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
     const panel = ledPanelFromFormatId(primary);
     const durationRaw = Number(suprstarLiveDurationSeconds);
-    const duration = [15, 30, 45, 60].includes(durationRaw) ? durationRaw : 60;
+    const duration = [15, 30, 45, 60, 90].includes(durationRaw) ? durationRaw : 90;
     return {
       displayScreenFormatIds: selected,
       primaryDisplayScreenFormatId: primary,
@@ -1590,7 +1590,17 @@
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
-    const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => [row.id, row]));
+    // Always merge seeded catalog venues (e.g. Decades) — do not drop them when Firestore
+    // already has a partial clubLocations set (that left display-setup lists incomplete).
+    const locationMap = new Map();
+    fallbackLocations.forEach(row => {
+      if (row?.id) locationMap.set(row.id, {...row});
+    });
+    locations.forEach(row => {
+      if (!row?.id) return;
+      const prev = locationMap.get(row.id) || {};
+      locationMap.set(row.id, {...prev, ...row, id: row.id});
+    });
     onboardingRecords.forEach(row => {
       const id = slugify(row.clubLocationId || row.id || row.clubName || row.locationName || "imported-club");
       if (!locationMap.has(id)) locationMap.set(id, {...row, id, sourceCollection:"clubOnboardingRecords", sourceRecordId:row.id, onboardingSource:row.onboardingSource || "CSV/manual onboarding"});

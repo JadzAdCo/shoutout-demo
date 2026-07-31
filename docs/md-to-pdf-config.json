@@ -1,0 +1,15 @@
+{
+  "pdf_options": {
+    "format": "Letter",
+    "margin": {
+      "top": "18mm",
+      "right": "16mm",
+      "bottom": "18mm",
+      "left": "16mm"
+    },
+    "printBackground": true
+  },
+  "stylesheet": [],
+  "body_class": ["floqr-bible"],
+  "css": "body { font-family: Georgia, 'Times New Roman', serif; font-size: 11pt; line-height: 1.45; color: #111; } h1 { font-size: 20pt; page-break-before: always; border-bottom: 1px solid #ccc; padding-bottom: 6px; } h1:first-of-type { page-break-before: avoid; } h2 { font-size: 14pt; margin-top: 1.4em; } h3 { font-size: 12pt; } table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 10px 0 16px; } th, td { border: 1px solid #bbb; padding: 4px 6px; vertical-align: top; } th { background: #f0f0f0; } code { font-family: Consolas, monospace; font-size: 9pt; } pre { background: #f6f6f6; padding: 8px; overflow-x: auto; font-size: 8.5pt; } a { color: #0645ad; }"
+}

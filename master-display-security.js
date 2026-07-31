@@ -27,6 +27,24 @@
     }[c]));
   }
 
+  /** Feature: Display Security is not onboarding — link to Entity Onboarding (SOS2FA-gated). */
+  function showVenueNotOnboardedStatus(typed = "") {
+    const el = byId("displaySecurityStatus");
+    if (!el) return;
+    const hint = typed ? ` (“${esc(typed)}”)` : "";
+    el.innerHTML = `Venue not onboarded${hint}. Please onboard — <a href="#clubOnboarding" class="display-security-onboard-link">click here</a> to onboard venue or club.`;
+  }
+
+  function goEntityOnboarding(event) {
+    if (event) event.preventDefault();
+    const btn = document.querySelector('.admin-subtab[data-panel="clubOnboarding"]');
+    if (btn) {
+      btn.click();
+      return;
+    }
+    try { location.hash = "clubOnboarding"; } catch (_) {}
+  }
+
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
   }
@@ -129,23 +147,31 @@
     const hit = clubs.find((c) => {
       const id = String(c.id || "").toLowerCase();
       const name = String(c.locationName || c.brandName || "").toLowerCase();
-      return id === lower || name === lower || `${name} (${id})` === lower || lower.includes(id);
+      return id === lower || name === lower || `${name} (${id})` === lower;
     });
-    if (hit) return String(hit.id);
-    if (/^[a-z0-9][a-z0-9_-]+$/i.test(raw)) return raw.toLowerCase();
-    return "";
+    return hit ? String(hit.id) : "";
   }
 
+  /**
+   * Feature: Display Security venue picker — onboarded clubLocations only.
+   * Seeded catalog is not merged here; this panel does not onboard venues.
+   */
   async function populateClubList() {
     const list = byId("displaySecurityOptions");
     if (!list) return;
     try {
       const snap = await firebase.firestore().collection("clubLocations").limit(400).get();
-      const rows = snap.docs.map((d) => ({id: d.id, ...(d.data() || {})}))
-        .sort((a, b) => String(a.locationName || a.id).localeCompare(String(b.locationName || b.id)));
+      const rows = snap.docs
+        .map((d) => ({...(d.data() || {}), id: d.id}))
+        .filter((row) => row.id)
+        .sort((a, b) => String(a.locationName || a.brandName || a.id).localeCompare(String(b.locationName || b.brandName || b.id)));
       global.__floqrMasterClubs = rows;
       list.innerHTML = clubOptionsHtml(rows);
-    } catch (_) {}
+    } catch (err) {
+      global.__floqrMasterClubs = [];
+      list.innerHTML = "";
+      setText("displaySecurityStatus", err?.message || "Could not load onboarded venues.");
+    }
   }
 
   /**
@@ -245,21 +271,27 @@
         <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge">${ipCount} approved IP${ipCount === 1 ? "" : "s"}</span>
-      </div>
-      <p class="sub small">Updated by: ${esc(data.displayIpUpdatedBy || "—")}</p>`;
+      </div>`;
   }
 
   async function loadVenueDisplaySecurity() {
+    const typed = String(byId("displaySecuritySearch")?.value || "").trim();
     const locationId = resolveLocationId();
     if (!locationId) {
-      setText("displaySecurityStatus", "Choose a venue first.");
+      if (typed) showVenueNotOnboardedStatus(typed);
+      else setText("displaySecurityStatus", "Choose an onboarded venue first.");
       return;
     }
     if (byId("displaySecurityLocationId")) byId("displaySecurityLocationId").value = locationId;
     setText("displaySecurityStatus", `Loading display security for ${locationId}…`);
     try {
       const snap = await firebase.firestore().collection("clubLocations").doc(locationId).get();
-      const data = snap.exists ? snap.data() || {} : {};
+      if (!snap.exists) {
+        renderDisplaySecurityStatus({}, []);
+        showVenueNotOnboardedStatus(locationId);
+        return;
+      }
+      const data = snap.data() || {};
       const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
       if (byId("displaySecurityIps")) byId("displaySecurityIps").value = ips.join("\n");
       if (byId("displaySecurityRestrict")) byId("displaySecurityRestrict").checked = data.displayIpRestrictionEnabled === true;
@@ -269,9 +301,7 @@
       }
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
       renderDisplaySecurityStatus(data, ips);
-      setText("displaySecurityStatus", snap.exists
-        ? `Loaded display security for ${locationId}.`
-        : `No clubLocations doc yet for ${locationId} — save will create settings.`);
+      setText("displaySecurityStatus", `Loaded display security for ${locationId}.`);
       await loadVenueDisplayTokens(locationId);
       await loadDisplayAccessLogs(locationId);
     } catch (err) {
@@ -280,9 +310,11 @@
   }
 
   async function saveVenueDisplaySecurity() {
+    const typed = String(byId("displaySecuritySearch")?.value || "").trim();
     const locationId = resolveLocationId();
     if (!locationId) {
-      setText("displaySecurityStatus", "Choose a venue first.");
+      if (typed) showVenueNotOnboardedStatus(typed);
+      else setText("displaySecurityStatus", "Choose an onboarded venue first.");
       return;
     }
     setText("displaySecurityStatus", `Saving security settings for ${locationId}…`);
@@ -298,7 +330,9 @@
       setText("displaySecurityStatus", `Saved. IP ${data.displayIpRestrictionEnabled ? "ON" : "OFF"} · Token ${data.displayTokenRequired ? "ON" : "OFF"} · ${Number(data.approvedDisplayIps?.length || 0)} IP(s).`);
       await loadVenueDisplaySecurity();
     } catch (err) {
-      setText("displaySecurityStatus", err?.message || "Save failed.");
+      const msg = String(err?.message || err || "Save failed.");
+      if (/not onboarded/i.test(msg)) showVenueNotOnboardedStatus(locationId);
+      else setText("displaySecurityStatus", msg);
     }
   }
 
@@ -430,7 +464,7 @@
                   <td>${esc(tokenCell)}</td>
                   <td>${row.restrictionEnabled ? "on" : "off"}</td>
                   <td><strong>${allowedCell}</strong></td>
-                  <td>${esc(row.reason || "—")}</td>
+                  <td>${esc(row.reason || "—")}${row.actorEmail ? `<br/><small>${esc(row.actorEmail)}</small>` : ""}</td>
                   <td class="display-access-log-ua"><small>${esc((row.userAgent || "").slice(0, 100))}${row.platform ? ` · ${esc(row.platform)}` : ""}</small></td>
                 </tr>`;
               }).join("")}
@@ -531,12 +565,33 @@
 
   function parseSecurityMessageColumns(row = {}) {
     const ms = Number(row.createdAtMs || row.createdAt?.toMillis?.() || 0);
-    const venue = String(row.locationName || row.clubLocationId || "—").trim() || "—";
-    const error = String(row.title || "Display access denied").trim();
+    const isTwilio = row.type === "twilioSecurityAlert" || row.provider === "twilio";
+    const venue = isTwilio
+      ? "Twilio"
+      : (String(row.locationName || row.clubLocationId || "—").trim() || "—");
+    const error = String(row.title || (isTwilio ? "Twilio security alert" : "Display access denied")).trim();
     const board = boardLabelForMessage(row.displayBoard);
     const body = String(row.body || "").trim();
     let description = "";
     let causation = "";
+
+    if (isTwilio) {
+      description = body || String(row.errorMessage || "Twilio Debugger security event.").trim();
+      causation = [
+        row.errorCode ? `Code ${row.errorCode}` : "",
+        row.denialReason || "",
+        row.moreInfo || "",
+        row.eventSid ? `Event ${row.eventSid}` : ""
+      ].filter(Boolean).join(". ") || "Review Twilio Monitor / Debugger logs.";
+      return {
+        date: formatMessageDate(ms),
+        time: formatMessageTime(ms),
+        venue,
+        error,
+        description: description || "—",
+        causation: causation || "—"
+      };
+    }
 
     if (board || row.clientIp || row.locationName || row.clubLocationId) {
       description = [
@@ -814,7 +869,8 @@
             .map((doc) => ({id: doc.id, ...(doc.data() || {})}))
             .filter((row) => {
               const isSecurity = row.messageCategory === "security"
-                || row.type === "displayAccessDenied";
+                || row.type === "displayAccessDenied"
+                || row.type === "twilioSecurityAlert";
               return isSecurity && row.deleted !== true;
             })
             .sort((a, b) => Number(b.createdAtMs || b.createdAt?.toMillis?.() || 0) - Number(a.createdAtMs || a.createdAt?.toMillis?.() || 0))
@@ -897,6 +953,10 @@
     byId("saveDisplaySecurityBtnBottom")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
+    byId("displaySecurityStatus")?.addEventListener("click", (event) => {
+      const link = event.target?.closest?.("a.display-security-onboard-link");
+      if (link) goEntityOnboarding(event);
+    });
     byId("refreshDisplayAccessLogsBtn")?.addEventListener("click", () => {
       const filter = String(byId("securityLogVenueFilter")?.value || "").trim();
       const id = filter ? resolveLocationIdFromFilter(filter) : "";
@@ -919,8 +979,13 @@
     byId("clearPrimaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("primary", {clear: true}));
     byId("clearSecondaryDisplayTokenBtn")?.addEventListener("click", () => rotateBoardToken("secondary", {clear: true}));
     byId("displaySecuritySearch")?.addEventListener("change", () => {
+      const typed = String(byId("displaySecuritySearch")?.value || "").trim();
       const id = resolveLocationId();
       if (id && byId("displaySecurityLocationId")) byId("displaySecurityLocationId").value = id;
+      else if (typed && byId("displaySecurityLocationId")) {
+        byId("displaySecurityLocationId").value = "";
+        showVenueNotOnboardedStatus(typed);
+      }
     });
     populateClubList();
     try {

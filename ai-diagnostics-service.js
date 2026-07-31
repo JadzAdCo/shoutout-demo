@@ -3367,6 +3367,7 @@
     await capture("Firestore: shoutouts lifecycle", () => firestoreDocLifecycle("shoutouts", {
       uid:user.uid,
       submittedByUid:user.uid,
+      template:"neon",
       mainText:"Diagnostics ShoutOut",
       status:"pending"
     }, runId));

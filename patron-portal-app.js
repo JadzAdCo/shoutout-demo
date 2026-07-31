@@ -130,7 +130,7 @@
 
   if (!window.firebaseConfig) { setText("portalStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
-  firebase.initializeApp(window.firebaseConfig);
+  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
   const storage = firebase.storage();
@@ -204,8 +204,44 @@
   }
 
   async function loginGoogle() {
-    try { setText("portalStatus", "Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-    catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
+    try {
+      setText("portalStatus", "Opening Google sign-in...");
+      await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    } catch (e) {
+      setText("portalStatus", `${e.code || "error"}: ${e.message}`);
+    }
+  }
+
+  function applyPortalAuthUi(user) {
+    const login = byId("portalLogin");
+    const panel = byId("portalPanel");
+    if (!login || !panel) return;
+    if (!user) {
+      login.classList.remove("hidden");
+      panel.classList.add("hidden");
+      setText("portalStatus", "Please sign in to continue.");
+      return;
+    }
+    login.classList.add("hidden");
+    panel.classList.remove("hidden");
+    setText("portalStatus", "");
+  }
+
+  function bootPortalForUser(user) {
+    applyPortalAuthUi(user);
+    if (!user) return;
+    handleMemberConnectReturn();
+    loadPortal(user).catch(err => {
+      setText("portalStatus", err?.message || "Could not load your profile.");
+    });
+  }
+
+  // Wire auth immediately so an existing session is recognized even if later DOM setup throws.
+  auth.onAuthStateChanged(user => bootPortalForUser(user));
+  if (typeof auth.authStateReady === "function") {
+    auth.authStateReady().then(() => {
+      if (auth.currentUser) applyPortalAuthUi(auth.currentUser);
+    }).catch(() => {});
   }
 
   async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
@@ -3126,18 +3162,7 @@
       button.addEventListener("click", () => insertPortalEmoji(button.dataset.portalMinglEmoji || ""));
     });
 
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        byId("portalLogin").classList.remove("hidden");
-        byId("portalPanel").classList.add("hidden");
-        setText("portalStatus", "Please sign in to continue.");
-        return;
-      }
-      byId("portalLogin").classList.add("hidden");
-      byId("portalPanel").classList.remove("hidden");
-      setText("portalStatus", "");
-      handleMemberConnectReturn();
-      loadPortal(user);
-    });
+    // DOM may not have existed on the first auth event — re-apply visibility only.
+    applyPortalAuthUi(auth.currentUser);
   });
 })();

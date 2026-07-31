@@ -1,0 +1,26 @@
+---
+description: Complete fixes end-to-end — code, deploy, and verify; prompt when something remains pending
+alwaysApply: true
+---
+
+# Complete the fix (always)
+
+When the user asks for a **fix** (bug, display ghost, security, payments, etc.):
+
+1. **Ship the full path** — code change alone is not done if the bug is still live. Finish whatever is required for the fix to take effect:
+   - Pages / `main` publish for static frontend
+   - Firebase Functions deploy for `functions/**`
+   - Firestore/rules deploy when rules or data contracts changed
+   - One-time data cleanup when leftover docs keep the bug visible
+2. **Do not stop at “committed on the feature branch.”** If production still shows the defect, say what is still pending and ask to proceed (or do it when they already asked to deploy/fix).
+3. **Prompt explicitly** when a step needs approval or credentials, e.g.  
+   “Code is ready. Still need: (a) Functions deploy, (b) Pages publish, (c) reset Heist `liveContent`. Proceed with a–c?”
+4. **Verify after deploy** — reopen the affected URL/token path or run the relevant check; confirm the symptom is gone before calling the fix complete.
+5. **Post-deploy QC** still applies (`post-deploy-qc.mdc`): CI green before preview email; Functions deploy ≠ Pages success.
+
+Checklist before saying “fixed”:
+
+- [ ] Code on the branch that serves the environment
+- [ ] Required deploys done (or user declined after a clear prompt)
+- [ ] Stale data cleaned if it would keep the bug
+- [ ] Spot-check passed on the real surface (token URL, admin panel, etc.)

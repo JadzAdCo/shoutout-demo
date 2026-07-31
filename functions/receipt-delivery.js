@@ -278,5 +278,6 @@ module.exports = {
   writeFloqrInboxReceipt,
   receiptBodyLines,
   formatPaidAt,
-  money
+  money,
+  sendTwilioSms
 };

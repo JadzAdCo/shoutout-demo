@@ -8,7 +8,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
@@ -155,7 +155,7 @@ exports.approveSuprstarRequest = onCall({region: "us-central1"}, async (request)
       recipientEmail: row.broadcasterEmail || "",
       type: "suprstarApproved",
       title: "supRstar approved",
-      body: `${row.locationName || row.locationId} approved your supRstar. Return to your preview tab to go live.`,
+      body: `${row.locationName || row.locationId} approved your supRstar. Keep your preview tab open — live starts after a 10-second countdown.`,
       clubLocationId: row.locationId,
       requestId,
       referenceNumber: row.referenceNumber || "",
@@ -228,19 +228,50 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
     throw new HttpsError("permission-denied", "Only the patron who submitted this supRstar can go live.");
   }
   if (req.paymentStatus !== "paid") throw new HttpsError("failed-precondition", "Payment is required before going live.");
+  const uid = request.auth.uid;
+  // Idempotent: overlapping go-live calls must not fail+tear-down an active session.
+  if (req.status === "live" && text(req.sessionId, 120) && (req.broadcasterUid === uid || isMasterAdminAuth(request.auth))) {
+    const duration = [15, 30, 45, 60, 90].includes(Number(req.liveDurationSeconds)) ? Number(req.liveDurationSeconds) : 90;
+    return {
+      sessionId: text(req.sessionId, 120),
+      requestId,
+      locationId: text(req.locationId, 120),
+      displayBoard: boardFromRaw(req.displayBoard),
+      liveDurationSeconds: duration,
+      liveEndsAtMs: Number(req.liveEndsAtMs) || 0,
+      resumed: true,
+      displayPage: boardFromRaw(req.displayBoard) === "secondary" ? "display2.html" : "display.html"
+    };
+  }
   if (req.status !== "approved") throw new HttpsError("failed-precondition", "Venue approval is required before going live.");
   const locationId = text(req.locationId, 120);
   const displayBoard = boardFromRaw(req.displayBoard);
   const liveId = liveDocId(locationId, displayBoard);
-  const uid = request.auth.uid;
   const email = text(request.auth.token?.email, 200).toLowerCase();
   const sessionRef = db.collection("suprstrSessions").doc();
   const liveRef = db.collection("suprstrLive").doc(liveId);
   const now = admin.firestore.Timestamp.now();
+  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60, 90];
+  let liveDurationSeconds = 90;
+  try {
+    const clubSnap = await db.collection("clubLocations").doc(locationId).get();
+    const fromClub = Number(clubSnap.exists ? clubSnap.data()?.suprstarLiveDurationSeconds : 90);
+    const fromClient = Number(request.data?.liveDurationSeconds);
+    const preferred = ALLOWED_LIVE_SECONDS.includes(fromClub) ? fromClub
+      : (ALLOWED_LIVE_SECONDS.includes(fromClient) ? fromClient : 90);
+    liveDurationSeconds = preferred;
+  } catch (_) {
+    liveDurationSeconds = 90;
+  }
+  // Duration clock arms when the patron WebRTC link is connected — not at approval / start call.
+  const liveEndsAtMs = 0;
 
   await db.runTransaction(async (tx) => {
     const fresh = await tx.get(reqRef);
     const row = fresh.exists ? fresh.data() || {} : {};
+    if (row.status === "live" && text(row.sessionId, 120) && row.broadcasterUid === uid) {
+      return;
+    }
     if (row.status !== "approved" || row.paymentStatus !== "paid") {
       throw new HttpsError("failed-precondition", "Request is not ready to go live.");
     }
@@ -259,6 +290,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       broadcasterUid: uid,
       broadcasterEmail: email,
       status: "waiting",
+      liveDurationSeconds,
+      liveEndsAtMs,
       offer: null,
       answer: null,
       createdAt: now,
@@ -273,6 +306,8 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       requestId,
       broadcasterUid: uid,
       status: "live",
+      liveDurationSeconds,
+      liveEndsAtMs,
       startedAt: now,
       updatedAt: now
     }, {merge: true});
@@ -280,17 +315,69 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       status: "live",
       sessionId: sessionRef.id,
       liveStartedAt: now,
+      liveDurationSeconds,
+      liveEndsAtMs,
       updatedAt: now
     }, {merge: true});
   });
 
+  const after = await reqRef.get();
+  const afterRow = after.exists ? after.data() || {} : {};
+  const sid = text(afterRow.sessionId, 120) || sessionRef.id;
+  const durationOut = ALLOWED_LIVE_SECONDS.includes(Number(afterRow.liveDurationSeconds))
+    ? Number(afterRow.liveDurationSeconds)
+    : liveDurationSeconds;
+
   return {
-    sessionId: sessionRef.id,
+    sessionId: sid,
     requestId,
     locationId,
     displayBoard,
+    liveDurationSeconds: durationOut,
+    liveEndsAtMs: Number(afterRow.liveEndsAtMs) || 0,
     displayPage: displayBoard === "secondary" ? "display2.html" : "display.html"
   };
+});
+
+/**
+ * Arm the venue live duration clock once WebRTC is connected (not at approval / countdown).
+ */
+exports.armSuprstrLiveDuration = onCall({region: "us-central1"}, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const requestId = text(request.data?.requestId, 120);
+  const sessionId = text(request.data?.sessionId, 120);
+  if (!requestId) throw new HttpsError("invalid-argument", "requestId required.");
+  const reqRef = db.collection("suprstarRequests").doc(requestId);
+  const reqSnap = await reqRef.get();
+  if (!reqSnap.exists) throw new HttpsError("not-found", "supRstar request not found.");
+  const req = reqSnap.data() || {};
+  if (req.broadcasterUid !== request.auth.uid && !isMasterAdminAuth(request.auth)) {
+    throw new HttpsError("permission-denied", "Only the broadcaster can arm the live timer.");
+  }
+  if (req.status !== "live") throw new HttpsError("failed-precondition", "Live session is not active.");
+  const sid = sessionId || text(req.sessionId, 120);
+  const ALLOWED_LIVE_SECONDS = [15, 30, 45, 60, 90];
+  const liveDurationSeconds = ALLOWED_LIVE_SECONDS.includes(Number(req.liveDurationSeconds))
+    ? Number(req.liveDurationSeconds)
+    : 90;
+  const existingEnds = Number(req.liveEndsAtMs) || 0;
+  if (existingEnds > Date.now() + 2000) {
+    return {ok: true, liveDurationSeconds, liveEndsAtMs: existingEnds, alreadyArmed: true};
+  }
+  const liveEndsAtMs = Date.now() + (liveDurationSeconds * 1000);
+  const now = admin.firestore.Timestamp.now();
+  const locationId = text(req.locationId, 120);
+  const displayBoard = boardFromRaw(req.displayBoard);
+  await reqRef.set({liveEndsAtMs, liveDurationSeconds, updatedAt: now}, {merge: true});
+  if (sid) {
+    await db.collection("suprstrSessions").doc(sid).set({liveEndsAtMs, liveDurationSeconds, updatedAt: now}, {merge: true});
+  }
+  if (locationId) {
+    await db.collection("suprstrLive").doc(liveDocId(locationId, displayBoard)).set({
+      liveEndsAtMs, liveDurationSeconds, updatedAt: now
+    }, {merge: true});
+  }
+  return {ok: true, liveDurationSeconds, liveEndsAtMs, alreadyArmed: false};
 });
 
 /** End live session and clear venue pointer. */

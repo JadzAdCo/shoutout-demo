@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>BartR UI preview (local — not published)</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
+  <style>
+    body{margin:0;padding:24px;background:linear-gradient(160deg,#0a1024,#1a0a2e 55%,#06101c)}
+    .preview-note{color:#dfff5a;font-weight:900;margin-bottom:18px}
+    .preview-block{margin:28px 0;padding:18px;border:1px dashed rgba(255,255,255,.25);border-radius:18px}
+    .preview-block h2{color:#fff;margin:0 0 12px;font-size:18px}
+    .preview-block p{color:rgba(255,255,255,.72);margin:0 0 14px;font-size:14px;line-height:1.45}
+    .product-brand-stack .bartr-overlay{width:min(252px,65vw)}
+    .light-surface{background:#f4f6fb;border-radius:12px;padding:16px}
+    /* Same text/graphics ratio; overall −10%. Transparent canvas (no navy plate). */
+    .bartr-overlay{
+      position:relative;width:min(252px,90%);aspect-ratio:1;isolation:isolate;
+      background:transparent!important;box-shadow:none;border:0;
+    }
+    .bartr-overlay .gfx{
+      position:absolute;inset:0;display:grid;place-items:center;
+      transform:scale(.704);transform-origin:center center;
+      background:transparent;
+    }
+    .bartr-overlay .gfx img{
+      width:100%;height:100%;object-fit:contain;display:block;
+      background:transparent;
+    }
+    .bartr-overlay .word{
+      position:absolute;inset:0;display:grid;place-items:center;z-index:2;
+      margin:0;padding:0;border:0;background:transparent!important;
+      color:#fff;font-family:"Arial Black",Impact,"Segoe UI Black",sans-serif;
+      font-weight:900;font-size:clamp(38px,16vw,50px);letter-spacing:-.04em;
+      text-transform:none;pointer-events:none;line-height:1;
+      text-shadow:none;box-shadow:none;
+    }
+    .bartr-overlay.on-light .word{color:#06101c}
+  </style>
+</head>
+<body>
+  <p class="preview-note">LOCAL PREVIEW ONLY — mark approved; Search tile = “Trade by BartR”. Not deployed.</p>
+
+  <div class="preview-block">
+    <h2>1) Search tiles (approved)</h2>
+    <div class="category-grid compact-category-grid">
+      <button class="category-card hot" type="button">Throw a ShoutOut</button>
+      <button class="category-card mingl-card" type="button">Mingl</button>
+      <a class="category-card bartr-card" href="#">Trade by BartR</a>
+    </div>
+  </div>
+
+  <div class="preview-block">
+    <h2>2) Mark — overall −10%, transparent background</h2>
+    <p>Same text-to-graphics balance. Whole mark 10% smaller. Navy plate removed so only pink/lime + BartR float on the page.</p>
+    <div class="bartr-overlay" aria-label="BartR">
+      <div class="gfx">
+        <img src="./images/bartr-icon-transparent.png?v=29.09.9i" alt=""/>
+      </div>
+      <p class="word">BartR</p>
+    </div>
+  </div>
+
+  <div class="preview-block">
+    <h2>3) Portal hero (dark / white text)</h2>
+    <div class="product-brand-stack">
+      <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+      <div class="bartr-overlay bartr-hero-mark" aria-label="BartR">
+        <div class="gfx">
+          <img src="./images/bartr-icon-transparent.png?v=29.09.9i" alt=""/>
+        </div>
+        <p class="word">BartR</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-block">
+    <h2>4) Light surface (black text) — check transparency</h2>
+    <div class="light-surface">
+      <div class="bartr-overlay on-light bartr-hero-mark" aria-label="BartR">
+        <div class="gfx">
+          <img src="./images/bartr-icon-transparent.png?v=29.09.9i" alt=""/>
+        </div>
+        <p class="word">BartR</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

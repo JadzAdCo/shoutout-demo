@@ -28,7 +28,7 @@ const {
 } = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
 const RECEIPT_FROM_EMAIL = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
@@ -1201,6 +1201,170 @@ exports.cancelFloqrCheckoutOrder = onCall({
   return cancelUnpaidOrder(request.data?.orderId, request.auth, text(request.data?.reason, 120) || "user-cancelled");
 });
 
+/** Client-side fallback when Stripe webhook fulfillment is delayed or missed. */
+exports.confirmFloqrCheckoutSession = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const orderId = text(request.data?.orderId, 160);
+  if (!orderId) throw new HttpsError("invalid-argument", "orderId is required.");
+  const ref = db.collection("serviceOrders").doc(orderId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Order not found.");
+  const order = snap.data() || {};
+  if (order.ownerUid !== request.auth.uid && !await isMasterAdminAuth(request.auth)) {
+    throw new HttpsError("permission-denied", "Not your order.");
+  }
+
+  async function ensureSuprstarQueue(orderRow = {}) {
+    if (text(orderRow.orderType, 80) !== "suprstarRequest") return {requestId:"", status:""};
+    const requestId = text(orderRow.payload?.requestId || orderRow.requestId, 120);
+    if (!requestId) return {requestId:"", status:""};
+    const reqRef = db.collection("suprstarRequests").doc(requestId);
+    const reqSnap = await reqRef.get();
+    if (!reqSnap.exists) return {requestId, status:""};
+    const req = reqSnap.data() || {};
+    const status = text(req.status, 40);
+    if (req.paymentStatus === "paid" && ["pending_approval", "approved", "live", "ended", "rejected"].includes(status)) {
+      return {requestId, status};
+    }
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    await reqRef.set({
+      paymentStatus:"paid",
+      status: ["approved", "live", "ended", "rejected"].includes(status) ? status : "pending_approval",
+      serviceOrderId:orderId,
+      paidAt:req.paidAt || now,
+      amountCents:Math.max(0, Math.round(Number(orderRow.amountCents || 2000))),
+      updatedAt:now
+    }, {merge:true});
+    return {requestId, status:"pending_approval"};
+  }
+
+  if (order.paymentStatus === "paid" && order.stripeFulfillmentComplete === true) {
+    const repaired = await ensureSuprstarQueue(order);
+    return {
+      ok: true,
+      paymentStatus: "paid",
+      fulfillmentStatus: text(order.fulfillmentStatus, 80) || "suprstar-pending-approval",
+      orderType: text(order.orderType, 80),
+      requestId: repaired.requestId || text(order.payload?.requestId, 120),
+      requestStatus: repaired.status,
+      alreadyFulfilled: true
+    };
+  }
+  const sessionId = text(request.data?.sessionId, 200) || text(order.stripeCheckoutSessionId, 200);
+  if (!sessionId) throw new HttpsError("failed-precondition", "Stripe session id is missing.");
+  const stripe = new Stripe(STRIPE_SECRET_KEY.value(), {apiVersion: STRIPE_API_VERSION});
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const sessionOrderId = text(session.metadata?.orderId || session.client_reference_id, 160);
+  if (sessionOrderId && sessionOrderId !== orderId) {
+    throw new HttpsError("failed-precondition", "Stripe session does not match this order.");
+  }
+  const paid = session.payment_status === "paid"
+    || (session.mode === "subscription" && ["paid", "no_payment_required"].includes(session.payment_status));
+  if (!paid) {
+    return {
+      ok: false,
+      paymentStatus: text(session.payment_status || order.paymentStatus, 40),
+      orderType: text(order.orderType, 80),
+      message: "Stripe has not marked this checkout as paid yet."
+    };
+  }
+  await finalizePaidOrder(orderId, session);
+  const fresh = await ref.get();
+  const updated = fresh.exists ? fresh.data() || {} : {};
+  const repaired = await ensureSuprstarQueue(updated);
+  await writeAppLog({
+    level: "info",
+    category: "checkout",
+    action: "checkout_confirmed_client",
+    message: `Client confirmed paid checkout ${orderId}`,
+    uid: request.auth.uid,
+    email: request.auth.token?.email || "",
+    details: {
+      orderId,
+      orderType: updated.orderType || "",
+      requestId: repaired.requestId || updated.payload?.requestId || "",
+      fulfillmentStatus: updated.fulfillmentStatus || "",
+      requestStatus: repaired.status || ""
+    }
+  });
+  return {
+    ok: true,
+    paymentStatus: text(updated.paymentStatus, 40) || "paid",
+    fulfillmentStatus: text(updated.fulfillmentStatus, 80),
+    orderType: text(updated.orderType, 80),
+    requestId: repaired.requestId || text(updated.payload?.requestId, 120),
+    requestStatus: repaired.status,
+    alreadyFulfilled: false
+  };
+});
+
+/** Master/club admin: push paid but stuck suprstar orders into the venue approval queue. */
+exports.repairSuprstarPaidOrders = onCall({
+  region:"us-central1",
+  timeoutSeconds:60,
+  memory:"256MiB"
+}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const locationId = text(request.data?.locationId || request.data?.clubLocationId, 120);
+  const isMaster = await isMasterAdminAuth(request.auth);
+  if (!isMaster) {
+    if (!locationId) throw new HttpsError("invalid-argument", "locationId is required.");
+    // Reuse club manager check via clubLocations fields.
+    const snap = await db.collection("clubLocations").doc(locationId).get();
+    const row = snap.exists ? snap.data() || {} : {};
+    const uid = request.auth.uid;
+    const email = text(request.auth.token?.email, 200).toLowerCase();
+    const ok = (Array.isArray(row.adminUids) && row.adminUids.includes(uid))
+      || (Array.isArray(row.masterAdminUids) && row.masterAdminUids.includes(uid))
+      || (email && Array.isArray(row.adminEmails) && row.adminEmails.map(e => String(e).toLowerCase()).includes(email));
+    if (!ok) throw new HttpsError("permission-denied", "Club Admin access required.");
+  }
+  let query = db.collection("serviceOrders").where("orderType", "==", "suprstarRequest").limit(200);
+  const orderSnap = await query.get();
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  let repaired = 0;
+  let scanned = 0;
+  const refs = [];
+  for (const doc of orderSnap.docs) {
+    const order = doc.data() || {};
+    if (text(order.paymentStatus, 40) !== "paid") continue;
+    const requestId = text(order.payload?.requestId || order.requestId, 120);
+    if (!requestId) continue;
+    const reqRef = db.collection("suprstarRequests").doc(requestId);
+    const reqSnap = await reqRef.get();
+    if (!reqSnap.exists) continue;
+    const req = reqSnap.data() || {};
+    scanned += 1;
+    if (locationId && text(req.locationId, 120) !== locationId) continue;
+    const status = text(req.status, 40);
+    if (req.paymentStatus === "paid" && ["pending_approval", "approved", "live"].includes(status)) continue;
+    await reqRef.set({
+      paymentStatus:"paid",
+      status: ["approved", "live", "ended", "rejected"].includes(status) ? status : "pending_approval",
+      serviceOrderId:doc.id,
+      paidAt:req.paidAt || order.paidAt || now,
+      amountCents:Math.max(0, Math.round(Number(order.amountCents || 2000))),
+      updatedAt:now
+    }, {merge:true});
+    if (order.stripeFulfillmentComplete !== true || text(order.fulfillmentStatus, 80) !== "suprstar-pending-approval") {
+      await doc.ref.set({
+        stripeFulfillmentComplete:true,
+        fulfillmentStatus:"suprstar-pending-approval",
+        fulfilledRecordId:requestId,
+        updatedAt:now
+      }, {merge:true});
+    }
+    repaired += 1;
+    refs.push({orderId:doc.id, requestId, locationId:text(req.locationId, 120), referenceNumber:text(req.referenceNumber, 80)});
+  }
+  return {ok:true, scanned, repaired, refs};
+});
+
 exports.clearUnpaidFloqrCheckouts = onCall({
   region:"us-central1",
   secrets:[STRIPE_SECRET_KEY],
@@ -1237,6 +1401,144 @@ exports.clearUnpaidFloqrCheckouts = onCall({
     details:{cleared, skipped, errorCount:errors.length, errors:errors.slice(0, 20)}
   });
   return {cleared, skipped, errors:errors.slice(0, 20)};
+});
+
+exports.purgePendingShoutoutQueues = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:300,
+  memory:"512MiB"
+}, async request => {
+  const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
+  const confirm = text(request.data?.confirm, 40).toLowerCase();
+  if (confirm !== "purge") {
+    throw new HttpsError("invalid-argument", 'Type confirm:"purge" to purge all pending ShoutOut queues.');
+  }
+
+  const stripe = stripeClient();
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  const summary = {scanned:0, purged:0, refunded:0, skippedPaidNoIntent:0, errors:[]};
+  const pendingSnap = await db.collection("shoutouts").where("status", "==", "pending").limit(400).get();
+  summary.scanned = pendingSnap.size;
+
+  for (const doc of pendingSnap.docs) {
+    const shoutout = doc.data() || {};
+    const shoutoutId = doc.id;
+    try {
+      const paymentStatus = text(shoutout.paymentStatus, 40).toLowerCase();
+      const amountCents = Math.max(0, Math.round(Number(shoutout.amountCents || shoutout.priceCents || shoutout.receipt?.amountCents || 0)));
+      let paymentIntentId = text(shoutout.stripePaymentIntentId || shoutout.receipt?.stripePaymentIntentId, 200);
+      let orderId = text(shoutout.serviceOrderId, 160);
+      let order = null;
+
+      if (orderId) {
+        const orderSnap = await db.collection("serviceOrders").doc(orderId).get();
+        if (orderSnap.exists) {
+          order = orderSnap.data() || {};
+          paymentIntentId = paymentIntentId || text(order.stripePaymentIntentId, 200);
+        }
+      } else if (paymentIntentId) {
+        const orderSnap = await db.collection("serviceOrders").where("stripePaymentIntentId", "==", paymentIntentId).limit(1).get();
+        if (!orderSnap.empty) {
+          orderId = orderSnap.docs[0].id;
+          order = orderSnap.docs[0].data() || {};
+        }
+      }
+
+      const looksPaid = paymentStatus === "paid" || amountCents > 0 || !!paymentIntentId || !!orderId;
+      let refundId = "";
+      let refundAmountCents = 0;
+
+      if (looksPaid) {
+        if (!paymentIntentId) {
+          summary.skippedPaidNoIntent += 1;
+          summary.errors.push({shoutoutId, message:"Paid pending ShoutOut has no Stripe payment intent; marked purged without refund."});
+        } else if (["refunded", "partially-refunded"].includes(paymentStatus) || text(order?.paymentStatus, 40).toLowerCase() === "refunded") {
+          refundId = text(order?.stripeRefundId || shoutout.stripeRefundId, 160);
+          refundAmountCents = Math.max(0, Math.round(Number(order?.refundAmountCents || amountCents || 0)));
+        } else {
+          const refund = await stripe.refunds.create({
+            payment_intent: paymentIntentId,
+            reason: "requested_by_customer",
+            metadata: {
+              floqrAction: "purge_pending_shoutout_queues",
+              shoutoutId,
+              orderId: orderId || "",
+              actorEmail
+            }
+          }, {idempotencyKey: `purge-pending-${shoutoutId}`.slice(0, 255)});
+          refundId = text(refund.id, 160);
+          refundAmountCents = Math.max(0, Math.round(Number(refund.amount || amountCents || 0)));
+          summary.refunded += 1;
+        }
+      }
+
+      await doc.ref.set({
+        status: "purged",
+        paymentStatus: looksPaid ? "refunded" : (paymentStatus || "unpaid"),
+        purgedAt: now,
+        purgedByUid: request.auth.uid,
+        purgedByEmail: actorEmail,
+        purgeReason: "super-admin-purge-all-pending-queues",
+        stripeRefundId: refundId || shoutout.stripeRefundId || "",
+        refundAmountCents: refundAmountCents || shoutout.refundAmountCents || 0,
+        refundedAt: refundId ? now : (shoutout.refundedAt || null),
+        updatedAt: now
+      }, {merge: true});
+
+      if (orderId) {
+        await db.collection("serviceOrders").doc(orderId).set({
+          status: looksPaid ? "refunded" : "cancelled",
+          paymentStatus: looksPaid ? "refunded" : text(order?.paymentStatus || "unpaid", 40),
+          stripeRefundId: refundId || order?.stripeRefundId || "",
+          refundAmountCents: refundAmountCents || order?.refundAmountCents || 0,
+          refundStatus: looksPaid ? "full" : text(order?.refundStatus || "", 40),
+          purgedAt: now,
+          purgedByEmail: actorEmail,
+          updatedAt: now
+        }, {merge: true});
+        await db.collection("paymentLedger").doc(orderId).set({
+          paymentStatus: looksPaid ? "refunded" : text(order?.paymentStatus || "unpaid", 40),
+          settlementStatus: looksPaid ? "refunded" : "cancelled",
+          stripeRefundId: refundId || "",
+          refundAmountCents: refundAmountCents || 0,
+          purgedAt: now,
+          updatedAt: now
+        }, {merge: true});
+      }
+
+      summary.purged += 1;
+    } catch (error) {
+      summary.errors.push({shoutoutId, message: error?.message || String(error)});
+    }
+  }
+
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "purge_pending_shoutout_queues",
+    detail: {
+      scanned: summary.scanned,
+      purged: summary.purged,
+      refunded: summary.refunded,
+      skippedPaidNoIntent: summary.skippedPaidNoIntent,
+      errorCount: summary.errors.length
+    },
+    sessionId
+  });
+
+  await writeAppLog({
+    level: "info",
+    category: "entity-management",
+    action: "purge_pending_shoutout_queues",
+    message: `Super Admin purged ${summary.purged} pending ShoutOut(s); refunded ${summary.refunded}`,
+    uid: request.auth.uid,
+    email: actorEmail,
+    details: summary
+  });
+
+  return summary;
 });
 
 exports.purgeFloqrTestPayments = onCall({
@@ -1873,6 +2175,21 @@ exports.expireLiveShoutouts = onSchedule({
       mediaFileName:"",
       mediaStoragePath:"",
       teamMembers:[],
+      // Clear sports-jersey leftovers so idle never ghosts a prior Cameroon/etc. photo.
+      backgroundUrl:"",
+      backgroundColor:"",
+      backgroundGradient:"",
+      backgroundType:"",
+      backgroundStoragePath:"",
+      jerseyTeamId:"",
+      jerseyTeamLabel:"",
+      jerseyPrimary:"",
+      jerseySecondary:"",
+      jerseyAccent:"",
+      jerseyCssBack:admin.firestore.FieldValue.delete(),
+      templateVariantId:"",
+      templateVariantName:"",
+      lockedBaseTemplateId:"",
       status:"default",
       source:"automaticTenMinuteReset",
       previousReferenceNumber:text(data.referenceNumber, 120),

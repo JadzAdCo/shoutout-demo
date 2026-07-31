@@ -1,6 +1,7 @@
 rules_version = '2';
 
 // FLOQR FIRESTORE RULES VERSION: v29.09.66-suprstar-approval-flow
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.4-app-logging
@@ -532,6 +533,18 @@ service cloud.firestore {
       allow create, update, delete: if signedIn();
     }
 
+    // Display page access attempts (IP + UA). Written only by Cloud Functions (Admin SDK).
+    match /displayAccessLogs/{id} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Per-board display URL secrets (?k=). Never public — Master Admin + Admin SDK only.
+    match /displayBoardSecrets/{locationId} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
     match /guestListRequests/{id} {
       allow create: if signedIn();
       allow read, update, delete: if signedIn();
@@ -569,6 +582,23 @@ service cloud.firestore {
         || (signedIn() && resource.data.uid == request.auth.uid);
       allow update: if false;
       allow delete: if isMasterAdmin();
+    }
+
+    // Twilio Debugger / error-log webhook events (Admin SDK writes only).
+    match /twilioDebuggerEvents/{id} {
+      allow read: if isMasterAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // SOS2FA challenges, sessions, and authenticator secrets (Admin SDK / Functions only).
+    match /sos2faChallenges/{uid} {
+      allow read, write: if false;
+    }
+    match /sos2faSessions/{id} {
+      allow read, write: if false;
+    }
+    match /sos2faTotp/{uid} {
+      allow read, write: if false;
     }
 
     // FloqR platform payment ledger (ShoutOut and future FloqR-sold services). Backend writes only.
@@ -764,9 +794,10 @@ service cloud.firestore {
         || (
           signedIn()
           && resource.data.broadcasterUid == request.auth.uid
-          && resource.data.status in ["waiting", "offering"]
+          && resource.data.status in ["waiting", "offering", "connected"]
           && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(["offer", "status", "updatedAt"])
+            .hasOnly(["offer", "answer", "status", "updatedAt"])
+          && request.resource.data.status in ["waiting", "offering", "connected"]
         )
         || (
           resource.data.status in ["waiting", "offering", "connected"]

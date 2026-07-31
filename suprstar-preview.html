@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
   <title>supRstar Preview | FLOQR</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.110"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.110"/>
-  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.110"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./suprstr-search.css?v=29.09.115"/>
 </head>
 <body class="suprstr-page">
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./suprstr-search.html?v=29.09.110&from=search">&larr; Back to supRstar</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./suprstr-search.html?v=29.09.115&from=search">&larr; Back to supRstar</a>
 
 <main class="app admin-shell suprstr-shell">
   <section class="page active">
@@ -19,7 +19,7 @@
         <p class="eyebrow">FLOQR · Private preview</p>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
-          <img src="./images/suprstr-logo.png?v=29.09.110" alt="supRstar" class="product-logo suprstr-hero-logo"/>
+          <img src="./images/suprstr-logo.png?v=29.09.115" alt="supRstar" class="product-logo suprstr-hero-logo"/>
         </div>
         <h1>Private camera preview</h1>
         <p class="sub">This page is private — it is <strong>not</strong> on the club board yet. Pay $20, wait for Club Admin approval, then live starts automatically with a cinema countdown.</p>
@@ -32,14 +32,14 @@
       <p id="suprstarStepStatus" class="status" aria-live="polite"></p>
 
       <p id="suprstarRecoverActions" class="sub small hidden" style="margin-top:12px">
-        <a class="buttonlike" href="./suprstr-search.html?v=29.09.110&from=search">Start supRstar again</a>
+        <a class="buttonlike" href="./suprstr-search.html?v=29.09.115&from=search">Start supRstar again</a>
       </p>
 
       <ol class="suprstar-steps sub small">
         <li>Preview yourself on camera (local only)</li>
         <li>Pay $20 in the Stripe pop-out (this tab stays open)</li>
         <li>Club Admin approves in the <strong>supRstar Queue</strong></li>
-        <li>5-second cinema countdown → live pop-out + venue board (duration set by venue)</li>
+        <li>Approval popup → <strong>10-second</strong> cinema countdown → live pop-out + venue board (<strong>1 min 30 sec</strong> default; venue may override)</li>
       </ol>
 
       <div class="suprstr-preview-shell">
@@ -49,16 +49,33 @@
           <div id="suprstarCountdownNumber" class="suprstr-countdown-number"></div>
           <p class="suprstr-countdown-caption">Going live</p>
         </div>
+        <div class="suprstr-preview-tools">
+          <label class="suprstr-filter-chip" title="Preview look (local). Live board uses your camera feed.">
+            <span class="visually-hidden">Filter</span>
+            <select id="suprstarPreviewFilter" aria-label="Preview filter">
+              <option value="none">Filter · None</option>
+              <option value="bright">Bright</option>
+              <option value="warm">Warm</option>
+              <option value="cool">Cool</option>
+              <option value="mono">Mono</option>
+            </select>
+          </label>
+          <button id="suprstarFlipCamBtn" class="suprstr-flip-fab hidden" type="button" aria-label="Flip camera" title="Flip camera">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M16 7h-1.2l-.9-1.2A2 2 0 0 0 12.3 5h-2.6a2 2 0 0 0-1.6.8L7.2 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-6 9.5A3.5 3.5 0 1 1 13.5 13 3.5 3.5 0 0 1 10 16.5zM20.5 6.2a1 1 0 0 0-1.4 0l-.6.6V5a1 1 0 1 0-2 0v4h4a1 1 0 1 0 0-2h-1.2l.6-.6a1 1 0 0 0 0-1.4z"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="queue-actions suprstar-stage-actions">
         <button id="suprstarStageBtn" class="category-card primary" type="button" data-stage="camera">Start camera preview</button>
-        <button id="suprstarFlipCamBtn" class="ghost hidden" type="button">Flip camera</button>
       </div>
 
       <p id="suprstarLiveNote" class="sub small suprstr-tech-note">
-        After approval, live starts automatically (you can also tap Go live). Phones/tablets can flip front/rear camera.
-        Ending live stops the camera completely. Live length is configured per venue by Master Admin (15–60 seconds).
+        After approval, a popup confirms <strong>Live feed approved</strong>, then a 10-second countdown starts live automatically.
+        Live length defaults to <strong>1 minute 30 seconds</strong> (Master Admin can set 15–90 seconds per venue).
+        Preview filters are local cosmetics; the venue board receives your camera feed. Flip camera sits on the preview (phones/tablets).
       </p>
     </div>
   </section>
@@ -72,7 +89,7 @@
 <script src="./floqr-nav.js?v=29.09.66"></script>
 <script src="./floqr-logger.js?v=29.09.66"></script>
 <script src="./payment-service.js?v=29.09.72"></script>
-<script src="./suprstr-webrtc.js?v=29.09.110"></script>
-<script src="./suprstar-preview.js?v=29.09.110"></script>
+<script src="./suprstr-webrtc.js?v=29.09.115"></script>
+<script src="./suprstar-preview.js?v=29.09.115"></script>
 </body>
 </html>
