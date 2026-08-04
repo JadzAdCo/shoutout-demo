@@ -82,7 +82,9 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .template.car .template-mini-preview:before{content:"";position:absolute;left:14%;right:14%;bottom:18px;height:32px;background:#e41616;border-radius:60px 60px 18px 18px;box-shadow:0 -16px 0 #111 inset}
 .template.car .template-mini-preview strong,.template.car .template-mini-preview span{position:relative;z-index:1}
 .template.celebration-media .template-mini-preview,.template.anniversary-media .template-mini-preview,.template.engagement-media .template-mini-preview{grid-template-columns:1fr 1fr;gap:8px}
+.template.celebration-media .template-mini-preview{grid-template-columns:1.5fr 1fr}
 .template.celebration-media .template-mini-preview:before,.template.anniversary-media .template-mini-preview:before,.template.engagement-media .template-mini-preview:before{content:"IMAGE / VIDEO";display:grid;place-items:center;align-self:stretch;border:2px dashed rgba(255,255,255,.75);border-radius:12px;font-size:11px;font-weight:1000;color:rgba(255,255,255,.82)}
+.template.celebration-media .template-mini-preview span{display:none}
 
 /* v28.11 preview revision: tighter selector thumbnail for traditional template */
 .template.classic-bw .template-mini-preview{background:linear-gradient(135deg,#050505,#1b1b1b 28%,#e41616 29%,#111 50%,#e41616 72%,#060606);border:3px solid #090909;box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 7px #e41616;color:#fff;overflow:hidden}

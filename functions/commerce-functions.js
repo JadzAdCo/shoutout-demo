@@ -65,6 +65,10 @@ const SHOUTOUT_TEXT_LIMITS = {
     "p125-96x48":[3,10,30,20],"p125-64x48":[2,12,24,18],"p125-64x32":null,
     "led-96x48":[3,10,30,20],"led-64x48":[2,12,24,18],"led-64x32":null
   },
+  birthdayMedia:{
+    "p125-96x48":[3,15,45,20],"p125-64x48":null,"p125-64x32":null,
+    "led-96x48":[3,15,45,20],"led-64x48":null,"led-64x32":null
+  },
   car:{
     "p125-96x48":[2,14,28,22],"p125-64x48":[2,10,20,18],"p125-64x32":[2,12,24,18],
     "led-96x48":[2,14,28,22],"led-64x48":[2,10,20,18],"led-64x32":[2,12,24,16]
@@ -163,11 +167,13 @@ function checkoutTextCaps(templateId = "", formatId = "") {
       ? "soccerJersey"
       : templateId === "car"
         ? "car"
-        : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
-          ? "splitMedia"
-          : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
-            ? "classicBoard"
-            : "full";
+        : templateId === "birthdayMedia"
+          ? "birthdayMedia"
+          : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+            ? "splitMedia"
+            : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+              ? "classicBoard"
+              : "full";
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[formatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
   return {

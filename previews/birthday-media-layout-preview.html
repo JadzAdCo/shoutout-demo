@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday media 96×48 max-char preview (local — not published)</title>
+  <link rel="stylesheet" href="../display.css" />
+  <style>
+    html, body { margin: 0; background: #050507; }
+    body.display { display: grid; place-items: center; min-height: 100vh; }
+    .preview-stage {
+      width: min(1600px, 100vw);
+      aspect-ratio: 2 / 1; /* 96 × 48 cm panel */
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 0 2px rgba(255,255,255,.18);
+    }
+    .preview-stage .display-canvas {
+      width: 100% !important;
+      height: 100% !important;
+      aspect-ratio: auto !important;
+    }
+    .preview-note {
+      position: fixed; z-index: 20; left: 12px; top: 12px; max-width: 520px;
+      padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.78);
+      color: #fff; font: 600 12px/1.35 Inter, Arial, sans-serif;
+    }
+    .preview-freeze .classic-identity-shell,
+    .preview-freeze .classic-identity-particles i {
+      animation: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body class="display preview-freeze">
+  <p class="preview-note">
+    Local birthdayMedia preview — <strong>not published</strong>.<br/>
+    Panel: <strong>96 × 48 cm only</strong> (2:1). Max main = <strong>45 chars</strong> (3 × 15) filled below.<br/>
+    Media +20% (60/40) · no secondary · primary +15% · FloqR burst card.
+  </p>
+  <div class="preview-stage">
+    <main id="displayCanvas" class="display-canvas celebration-media" data-template-id="birthdayMedia" data-screen-format-id="p125-96x48" data-text-profile="birthdayMedia">
+      <div id="displayBackground" class="display-background" aria-hidden="true" style="background:transparent"></div>
+      <div class="display-text-overlay">
+        <div id="displayBrand" class="brand"></div>
+        <div class="display-compose-slot">
+          <div class="display-center split-media-layout birthday-media-layout">
+            <div id="mediaSlot" class="media-slot"><div class="media-placeholder">IMAGE / VIDEO</div></div>
+            <!-- Exactly 45 visible characters: 3 lines × 15 -->
+            <h1 id="displayMain" class="display-message-lines display-message-lines-3" aria-label="45 character maximum sample">
+              <span>HAPPY BIRTHDAY!</span>
+              <span>CELEBRATE BIGLY</span>
+              <span>ALL NIGHT LONG!</span>
+            </h1>
+            <h2 id="displaySub" class="classic-bw-identity uses-brand-fallback" aria-label="PRESENTED BY FLOQR ShoutOut">
+              <span class="classic-identity-shell"><small>PRESENTED BY</small><strong>FLOQR ShoutOut</strong></span>
+              <span class="classic-identity-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </h2>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    function fitBirthdayMainText(mainEl, {minPx = 34, maxPx = 108} = {}) {
+      if (!mainEl) return;
+      const spans = Array.from(mainEl.querySelectorAll("span"));
+      if (!spans.length) return;
+      const availableWidth = Math.max(1, mainEl.clientWidth);
+      const availableHeight = Math.max(1, mainEl.clientHeight);
+      spans.forEach(span => { span.style.transform = ""; });
+      mainEl.style.fontSize = "10px";
+      const widestLineAt10 = Math.max(1, ...spans.map(span => span.scrollWidth || 1));
+      const blockHeightAt10 = Math.max(1, mainEl.scrollHeight || 1);
+      const widthLimitedPx = (availableWidth / widestLineAt10) * 10;
+      const heightLimitedPx = (availableHeight / blockHeightAt10) * 10;
+      const rowCount = spans.length;
+      const rowBoost = rowCount <= 1 ? 1.22 : (rowCount === 2 ? 1.1 : 1);
+      const fittedPx = Math.max(minPx, Math.min(maxPx, Math.min(widthLimitedPx, heightLimitedPx) * rowBoost));
+      mainEl.style.fontSize = `${fittedPx}px`;
+      spans.forEach(span => {
+        const needed = span.scrollWidth || availableWidth;
+        const scale = needed > availableWidth ? Math.max(0.55, availableWidth / needed) : 1;
+        span.style.transform = scale < 0.999 ? `scale(${scale})` : "";
+      });
+    }
+
+    requestAnimationFrame(() => {
+      const params = new URLSearchParams(location.search || "");
+      const sample = String(params.get("sample") || "max").toLowerCase();
+      const mainEl = document.getElementById("displayMain");
+      if (mainEl && sample === "short") {
+        mainEl.className = "display-message-lines display-message-lines-1";
+        mainEl.innerHTML = "<span>HAPPY BIRTHDAY</span>";
+      }
+      fitBirthdayMainText(mainEl, {minPx:34, maxPx:108});
+    });
+  </script>
+</body>
+</html>

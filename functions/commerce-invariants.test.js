@@ -166,6 +166,11 @@ test("all published templates have display-aware text contracts", () => {
     });
   });
   assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, false);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-64x48").supported, false);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-96x48").main, 45);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-96x48").profileId, "birthdayMedia");
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-96x48").supported, true);
+  assert.deepEqual(Array.from(sandbox.SHOUTOUT_TEMPLATES.birthdayMedia.screenFormatIds || []), ["p125-96x48", "led-96x48"]);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
