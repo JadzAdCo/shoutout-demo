@@ -3602,6 +3602,12 @@
       if (mediaType) mediaType.value = "";
       if (legacyUrl) legacyUrl.value = "";
     }
+    const fitEl = byId("shoutoutMediaFit");
+    if (fitEl && allowsMedia) {
+      const preferredFit = String(t.defaultMediaFit || "").toLowerCase() === "cover" ? "cover" : (fitEl.value || "contain");
+      if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
+      else if (!fitEl.value) fitEl.value = preferredFit;
+    }
     if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);
   }
 

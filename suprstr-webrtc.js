@@ -100,10 +100,37 @@
       });
     }
 
+    function emitPeerState(peer, label) {
+      const connectionState = String(peer?.connectionState || "");
+      const ice = String(peer?.iceConnectionState || "");
+      const signaling = String(peer?.signalingState || "");
+      onStatus?.(label || connectionState || "unknown", {
+        connectionState,
+        iceConnectionState: ice,
+        signalingState: signaling
+      });
+    }
+
+    function wirePeerState(peer) {
+      // Duration clock must arm on real ICE/peer connected — never on SDP answer alone.
+      peer.onconnectionstatechange = () => emitPeerState(peer, peer.connectionState);
+      peer.oniceconnectionstatechange = () => {
+        const ice = String(peer.iceConnectionState || "");
+        if (ice === "connected" || ice === "completed") {
+          if (peer.connectionState === "connected") emitPeerState(peer, "connected");
+          else emitPeerState(peer, `ice-${ice}`);
+        } else if (ice === "failed" || ice === "disconnected" || ice === "closed") {
+          emitPeerState(peer, ice === "failed" ? "failed" : ice);
+        } else {
+          emitPeerState(peer, peer.connectionState || ice);
+        }
+      };
+    }
+
     async function publishOffer(peer) {
       wireIce(peer, sessionRef, "callerCandidates");
       listenCalleeIce(peer);
-      peer.onconnectionstatechange = () => onStatus?.(peer.connectionState);
+      wirePeerState(peer);
       const offer = await peer.createOffer({offerToReceiveAudio: false, offerToReceiveVideo: false});
       await peer.setLocalDescription(offer);
       await sessionRef.set({
@@ -113,7 +140,11 @@
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge: true});
       lastAnswerSdp = "";
-      onStatus?.("offering");
+      onStatus?.("offering", {
+        connectionState: peer.connectionState,
+        iceConnectionState: peer.iceConnectionState,
+        signalingState: peer.signalingState
+      });
     }
 
     attachLocalTracks(pc, activeStream);
@@ -145,10 +176,15 @@
         lastAnswerSdp = data.answer.sdp;
         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
         await sessionRef.set({
-          status: "connected",
+          status: "answered",
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
-        onStatus?.("connected");
+        // Signaling answer applied — ICE may still be connecting. Do NOT report "connected" here.
+        onStatus?.("answered", {
+          connectionState: pc.connectionState,
+          iceConnectionState: pc.iceConnectionState,
+          signalingState: pc.signalingState
+        });
       } catch (e) {
         lastAnswerSdp = "";
         onStatus?.(`answer-error:${e.message}`);

@@ -362,22 +362,38 @@ exports.armSuprstrLiveDuration = onCall({region: "us-central1"}, async (request)
     : 90;
   const existingEnds = Number(req.liveEndsAtMs) || 0;
   if (existingEnds > Date.now() + 2000) {
-    return {ok: true, liveDurationSeconds, liveEndsAtMs: existingEnds, alreadyArmed: true};
+    return {
+      ok: true,
+      liveDurationSeconds,
+      liveEndsAtMs: existingEnds,
+      armedAtMs: Number(req.liveArmedAtMs) || 0,
+      alreadyArmed: true
+    };
   }
   const liveEndsAtMs = Date.now() + (liveDurationSeconds * 1000);
   const now = admin.firestore.Timestamp.now();
+  const armedAtMs = Date.now();
   const locationId = text(req.locationId, 120);
   const displayBoard = boardFromRaw(req.displayBoard);
-  await reqRef.set({liveEndsAtMs, liveDurationSeconds, updatedAt: now}, {merge: true});
+  const armSource = text(request.data?.armSource, 80) || "client";
+  await reqRef.set({
+    liveEndsAtMs,
+    liveDurationSeconds,
+    liveArmedAtMs: armedAtMs,
+    liveArmSource: armSource,
+    updatedAt: now
+  }, {merge: true});
   if (sid) {
-    await db.collection("suprstrSessions").doc(sid).set({liveEndsAtMs, liveDurationSeconds, updatedAt: now}, {merge: true});
+    await db.collection("suprstrSessions").doc(sid).set({
+      liveEndsAtMs, liveDurationSeconds, liveArmedAtMs: armedAtMs, updatedAt: now
+    }, {merge: true});
   }
   if (locationId) {
     await db.collection("suprstrLive").doc(liveDocId(locationId, displayBoard)).set({
-      liveEndsAtMs, liveDurationSeconds, updatedAt: now
+      liveEndsAtMs, liveDurationSeconds, liveArmedAtMs: armedAtMs, updatedAt: now
     }, {merge: true});
   }
-  return {ok: true, liveDurationSeconds, liveEndsAtMs, alreadyArmed: false};
+  return {ok: true, liveDurationSeconds, liveEndsAtMs, armedAtMs, alreadyArmed: false};
 });
 
 /** End live session and clear venue pointer. */

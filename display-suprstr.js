@@ -2,8 +2,32 @@
 (function () {
   "use strict";
 
+  const APP_V = "29.09.121";
+
   function byId(id) {
     return document.getElementById(id);
+  }
+
+  function liveDiag(action, message, details = {}, level = "info") {
+    const payload = {
+      level,
+      category: "suprstar",
+      action: String(action || "display_live_diag"),
+      message: String(message || action || "supRstar display diagnostic"),
+      appVersion: APP_V,
+      details: {
+        locationId: locationFromUrl(),
+        board: displayBoard(),
+        ...details
+      },
+      source: "display-suprstr"
+    };
+    try {
+      if (window.FLOQRLog?.write) window.FLOQRLog.write(payload);
+    } catch (_) {}
+    try {
+      console.info("[supRstar-display]", action, message, payload.details);
+    } catch (_) {}
   }
 
   function locationFromUrl() {
@@ -85,6 +109,7 @@
       sessionId,
       videoEl: video,
       onStatus(s) {
+        liveDiag("display_webrtc_status", `Display WebRTC → ${s}`, {sessionId, status: s});
         if (s === "ended") {
           detach();
           return;
@@ -95,9 +120,13 @@
         else setLiveStatus(`WebRTC: ${s}`);
       }
     });
+    liveDiag("display_session_attach", "Joined patron session", {sessionId});
   }
 
   function detach() {
+    if (activeSessionId) {
+      liveDiag("display_session_detach", "Detached from live session", {sessionId: activeSessionId});
+    }
     if (activeJoin) {
       activeJoin.stop();
       activeJoin = null;
@@ -115,15 +144,24 @@
       firebase.initializeApp(window.firebaseConfig);
     }
     const liveId = suprstrLiveDocId(locationId);
+    liveDiag("display_watch_start", "Watching suprstrLive doc", {liveId, board: displayBoard()});
     console.info("[supRstar display] watching", liveId, "board=", displayBoard());
     firebase.firestore().collection("suprstrLive").doc(liveId).onSnapshot((snap) => {
       const data = snap.exists ? snap.data() || {} : {};
       const status = String(data.status || "").toLowerCase();
       const sessionId = String(data.sessionId || "").trim();
+      liveDiag("display_live_doc", "suprstrLive snapshot", {
+        liveId,
+        status,
+        sessionId,
+        liveEndsAtMs: Number(data.liveEndsAtMs) || 0,
+        liveDurationSeconds: Number(data.liveDurationSeconds) || 0
+      });
       if (status === "live" && sessionId) attachSession(sessionId);
       else detach();
     }, (err) => {
       console.warn("suprstrLive watch", err);
+      liveDiag("display_watch_error", err?.message || "Live watch failed", {error: err?.message || String(err || "")}, "error");
       setLiveStatus(err?.message || "Live watch failed");
       showOverlay(true);
     });

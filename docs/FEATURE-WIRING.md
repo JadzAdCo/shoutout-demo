@@ -101,6 +101,38 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 **Bug fixed (v29.09.119):** Signed-in avatar could show while Sign-in card stayed visible — portal shell now re-syncs from `auth.currentUser` and keeps the panel open if profile load fails.
 
+---
+
+## Birthday media template (split + rotate)
+
+**Purpose:** Birthday ShoutOut with patron photo/video — readable on large panels and compact LEDs.
+
+| Layer | Wiring |
+|---|---|
+| UI | Patron ShoutOut editor template `birthdayMedia`; display render on `display.html` |
+| Client | `display-app.js` — `birthdayUsesRotate` / `startBirthdayRotate`; split uses `object-fit:cover`; rotate uses `contain` + decorative slot |
+| Styles | `display.css` — `.birthday-media-layout`, `.birthday-rotate-layout`, phase classes |
+| Data | `shared-data.js` profile `birthdayMedia` + `SHOUTOUT_TEMPLATES.birthdayMedia.screenFormatIds` (all six formats) |
+| Backend normalize | `functions/commerce-functions.js` birthday caps (96×48: 3×15; 64×48: 4×8; 64×32: 4×10) |
+| Contract | 96×48 split (~60/40); 64×48 boxed + 64×32 landscape rotate fullscreen picture ↔ 4-line text |
+| Docs | `TEXT-LIMITS-V29-08-4.md` birthday notes |
+
+---
+
+## supRstar live duration + diagnostics
+
+**Purpose:** Paid live minutes must not burn before the venue board ICE-connects; brief disconnects must be traceable.
+
+| Layer | Wiring |
+|---|---|
+| UI | `suprstar-preview.html` + live pop-out; venue `display2.html` via `display-suprstr.js` |
+| Client timer | `suprstar-preview.js` — arms only after **stable ICE/peer `connected`** (2.5s debounce); never on SDP answer alone |
+| WebRTC | `suprstr-webrtc.js` — answer → status `answered`; true `connected` from `connectionState` / ICE |
+| Backend | `startSuprstrLive` sets `liveEndsAtMs:0`; `armSuprstrLiveDuration` sets ends + `liveArmedAtMs` / `liveArmSource` |
+| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `suprstar` (`webrtc_status`, `live_timer_*`, `live_heartbeat`, display `display_*`) |
+| Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
+| Cache bust | Preview scripts `?v=29.09.121` |
+
 When adding a section, use this skeleton:
 
 ```markdown
