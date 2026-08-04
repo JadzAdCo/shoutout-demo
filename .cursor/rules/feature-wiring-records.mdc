@@ -1,0 +1,29 @@
+---
+description: Keep durable records of product features and how they are wired (UI → functions → data → URLs)
+alwaysApply: true
+---
+
+# Feature wiring records (always)
+
+When you **add, change, or fix** a FLOQR product feature (security, displays, payments, SOS2FA, supRstar, onboarding, help, etc.):
+
+1. **Update the registry** — `docs/FEATURE-WIRING.md`. Add or revise the feature section so another agent (or you next week) can answer “how is this wired?” without rediscovering the codebase.
+2. **Record the full path**, not just the file you touched:
+   - **Surfaces** — HTML pages, Master Admin tabs/panels, Club Admin, patron flows, Xibo/display
+   - **Client scripts** — key JS modules and important entry functions
+   - **Backend** — Cloud Functions / callables / triggers (`functions/**`)
+   - **Data** — Firestore collections/fields, Storage paths, secrets
+   - **URL / contract** — query params (`?k=`, `location=`, stable vs `?v=` cache-bust), who may call what
+   - **Security / gates** — SOS2FA, Master Admin, token/IP locks, rules
+   - **Observability** — logs, Security System Messages, Diagnostics panels
+   - **Help** — `floqai-help-repository.js` ids / FloqAi phrases when patron-facing or admin `?` help changed
+3. **Do not invent architecture essays** — keep registry entries short, factual, and current. Deep architecture stays in `docs/FLOQR-TECHNICAL-BIBLE.md`; update that only when boundaries, storage model, or roadmap change.
+4. **Same iteration as the code** — wiring notes ship with the feature change (before calling the work done). If publish is pending, still update the registry in the same commit when possible.
+5. **When diagnosing live bugs** — read the registry section first, then code. Prefer logged reasons (`token_missing`, `token_not_configured`, `ip_denied`) over guessing venues from chat history.
+
+Checklist before “done”:
+
+- [ ] `docs/FEATURE-WIRING.md` updated for the feature
+- [ ] Entry lists UI + callable/data + URL contracts that matter
+- [ ] Related help / FloqAi entries noted if applicable
+- [ ] Technical Bible touched only if architecture/roadmap changed

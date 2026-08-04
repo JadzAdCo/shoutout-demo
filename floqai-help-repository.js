@@ -176,14 +176,30 @@
     {
       id: "help-display-security-setting",
       title: "Display Security Setting",
-      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs.",
+      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs. Trigger on Error URL builds the stable display-error.html Webpage for Xibo’s page-load-error fallback layout.",
       searchPhrases: [
         "display security", "display security setting", "approved display ips", "ip restriction",
-        "token lock", "xibo token", "venue not onboarded", "display board security"
+        "token lock", "xibo token", "venue not onboarded", "display board security",
+        "trigger on error", "trigger on page load error", "xibo error url", "display-error"
       ],
       links: [
         {label: "Master Admin Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},
         {label: "Entity Onboarding", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubOnboarding"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#displaySecurity"
+    },
+    {
+      id: "help-display-trigger-on-error-url",
+      title: "Trigger on Error URL",
+      body: "Xibo’s Trigger on page load error is usually a trigger code, not a URL. Copy the Trigger on Error URL from Display Security (or Diagnostics → Display / Xibo Load Errors) into a fallback Webpage layout that runs when that trigger fires. The URL opens display-error.html and logs under Diagnostics — not Security. Do not add ?v= or a board token.",
+      searchPhrases: [
+        "trigger on error url", "trigger on page load error", "xibo fallback url", "display-error.html",
+        "xibo page load error", "error layout webpage"
+      ],
+      links: [
+        {label: "Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},
+        {label: "Display / Xibo Load Errors", href: vUrl("./master-admin.html", {from: "floqai"}) + "#diagnosticsDisplayErrors"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#displaySecurity"

@@ -259,8 +259,8 @@
               <div>
                 Restrict venue <code>display.html</code> / <code>display2.html</code> (Xibo boards) with approved public IPs and/or a secret board token (<code>?k=</code>).
                 Token URLs are for Xibo only — generate them in the section below. Access attempts and admin setting changes appear under <strong>Security → Security Logs</strong>.
-                If Xibo cannot load a board page, use a fallback Webpage pointing at <code>display-error.html</code>
-                (copy the URL under <strong>Diagnostics → Display / Xibo Load Errors</strong>). That is a load failure, not an access deny.
+                If Xibo cannot load a board page, paste the <strong>Trigger on Error URL</strong> below into a Xibo fallback Webpage
+                (also under <strong>Diagnostics → Display / Xibo Load Errors</strong>). That is a load failure, not an access deny.
                 This panel is not onboarding — pick an already onboarded venue, or use Entity Onboarding (SOS2FA) first.
               </div>
             </details>
@@ -333,6 +333,35 @@
             <code>/64</code> prefix so rotating host IPv6 still matches.
           </p>
           <label>Notes<textarea id="displaySecurityNotes" rows="2" placeholder="Xibo player at Heist front bar · Comcast business WAN"></textarea></label>
+          <div class="display-security-error-urls" data-keep-visible="true">
+            <h3 class="help-label" style="margin:16px 0 6px">
+              <span class="help-label-text">Trigger on Error URL</span>
+              <details class="help-popout inline-help-popout" data-floqai-help-entry="help-display-trigger-on-error-url">
+                <summary>?</summary>
+                <div>
+                  Xibo’s <em>Trigger on page load error</em> is usually a trigger code, not a URL. Put this stable
+                  <code>display-error.html</code> Webpage URL on the fallback layout/region that runs when that trigger fires.
+                  Hits log under Diagnostics (not Security). No <code>?v=</code>. No board token required.
+                </div>
+              </details>
+            </h3>
+            <p class="sub small" data-keep-visible="true">
+              Load a venue first. Paste into Xibo’s error/fallback Webpage widget for that board.
+            </p>
+            <label>Display 1 (ShoutOut) trigger-on-error URL
+              <input id="displaySecurityErrorUrlPrimary" readonly spellcheck="false" placeholder="Load a venue to build the URL…"/>
+            </label>
+            <div class="queue-actions">
+              <button id="copyDisplaySecurityErrorUrlPrimaryBtn" type="button">Copy Display 1 error URL</button>
+            </div>
+            <label>Display 2 (supRstar) trigger-on-error URL
+              <input id="displaySecurityErrorUrlSecondary" readonly spellcheck="false" placeholder="Load a venue to build the URL…"/>
+            </label>
+            <div class="queue-actions">
+              <button id="copyDisplaySecurityErrorUrlSecondaryBtn" type="button">Copy Display 2 error URL</button>
+            </div>
+            <p id="displaySecurityErrorUrlStatus" class="status"></p>
+          </div>
           <div class="queue-actions display-security-bottom-actions">
             <button id="loadDisplaySecurityBtnBottom" type="button">Load venue</button>
             <button id="saveDisplaySecurityBtnBottom" class="primary" type="button">Save security settings</button>
@@ -1093,7 +1122,7 @@
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.115"></script>
-<script src="./master-display-security.js?v=29.09.114"></script>
+<script src="./master-display-security.js?v=29.09.116"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.98"></script>
 <script src="./admin-user-management.js?v=29.09.103"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>

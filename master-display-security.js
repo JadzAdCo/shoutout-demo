@@ -5,9 +5,12 @@
  *  - Per-board Xibo secrets (?k=) stored privately in displayBoardSecrets
  *  - Obfuscated token view after onboarding (full value only on provision/rotate reveal)
  *  - Per-venue display access log (IP, board, token ok/deny, UA)
+ *  - Trigger-on-error fallback Webpage URLs (display-error.html) per board
  */
 (function (global) {
   "use strict";
+
+  const PUBLIC_DISPLAY_BASE = "https://jadzadco.github.io/shoutout-demo";
 
   /** Last fetched access-log rows — used by “Add IPs from access log”. */
   let lastAccessLogRows = [];
@@ -47,6 +50,40 @@
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
+  }
+
+  /** Feature: Xibo “trigger on page load error” fallback Webpage — stable, no ?v=, no ?k=. */
+  function buildTriggerOnErrorUrl(locationId = "", board = "1") {
+    const venue = String(locationId || "").trim().toLowerCase();
+    const boardKey = String(board || "1").trim() === "2" || String(board).toLowerCase() === "secondary" ? "2" : "1";
+    const url = new URL(`${PUBLIC_DISPLAY_BASE}/display-error.html`);
+    if (venue) url.searchParams.set("location", venue);
+    url.searchParams.set("board", boardKey);
+    url.searchParams.set("reason", "xibo_page_load_error");
+    return url.toString();
+  }
+
+  function refreshTriggerOnErrorUrls(locationId = "") {
+    const id = String(locationId || byId("displaySecurityLocationId")?.value || "").trim().toLowerCase();
+    const primary = byId("displaySecurityErrorUrlPrimary");
+    const secondary = byId("displaySecurityErrorUrlSecondary");
+    if (primary) primary.value = id ? buildTriggerOnErrorUrl(id, "1") : "";
+    if (secondary) secondary.value = id ? buildTriggerOnErrorUrl(id, "2") : "";
+  }
+
+  async function copyTriggerOnErrorUrl(board = "1") {
+    const id = String(byId("displaySecurityLocationId")?.value || resolveLocationId() || "").trim().toLowerCase();
+    if (!id) {
+      setText("displaySecurityErrorUrlStatus", "Load an onboarded venue first.");
+      return;
+    }
+    refreshTriggerOnErrorUrls(id);
+    const url = buildTriggerOnErrorUrl(id, board);
+    const label = board === "2" || board === "secondary" ? "Display 2" : "Display 1";
+    const ok = await copyText(url);
+    setText("displaySecurityErrorUrlStatus", ok
+      ? `${label} trigger-on-error URL copied — paste into the Xibo fallback Webpage.`
+      : `Copy failed — select the ${label} URL field and copy manually.`);
   }
 
   /**
@@ -301,7 +338,9 @@
       }
       if (byId("displaySecurityNotes")) byId("displaySecurityNotes").value = data.displayIpNotes || "";
       renderDisplaySecurityStatus(data, ips);
+      refreshTriggerOnErrorUrls(locationId);
       setText("displaySecurityStatus", `Loaded display security for ${locationId}.`);
+      setText("displaySecurityErrorUrlStatus", "Trigger-on-error URLs ready to copy.");
       await loadVenueDisplayTokens(locationId);
       await loadDisplayAccessLogs(locationId);
     } catch (err) {
@@ -953,6 +992,9 @@
     byId("saveDisplaySecurityBtnBottom")?.addEventListener("click", () => saveVenueDisplaySecurity());
     byId("detectDisplayIpBtn")?.addEventListener("click", () => detectMyIp());
     byId("importIpsFromDisplayLogBtn")?.addEventListener("click", () => importIpsFromAccessLog());
+    byId("copyDisplaySecurityErrorUrlPrimaryBtn")?.addEventListener("click", () => copyTriggerOnErrorUrl("1"));
+    byId("copyDisplaySecurityErrorUrlSecondaryBtn")?.addEventListener("click", () => copyTriggerOnErrorUrl("2"));
+    refreshTriggerOnErrorUrls(String(byId("displaySecurityLocationId")?.value || "").trim());
     byId("displaySecurityStatus")?.addEventListener("click", (event) => {
       const link = event.target?.closest?.("a.display-security-onboard-link");
       if (link) goEntityOnboarding(event);
