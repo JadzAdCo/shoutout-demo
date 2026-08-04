@@ -299,7 +299,7 @@
               <details class="help-popout inline-help-popout">
                 <summary>?</summary>
                 <div>
-                  When ON, only allowlisted public IPs may open the idle or live board.
+                  When ON, allowlisted public IPs unlock the idle or live board (even without <code>?k=</code> if Token lock is also ON — IP <strong>or</strong> valid token).
                   Supports IPv4, IPv6, trailing <code>*</code>, IPv4 <code>/24</code>, and IPv6 <code>/64</code>.
                   Client <code>?ip=</code> cannot bypass the allowlist.
                 </div>
@@ -313,8 +313,8 @@
               <details class="help-popout inline-help-popout">
                 <summary>?</summary>
                 <div>
-                  Independent of IP restriction. When ON, Display 1 / Display 2 never show the venue idle board unless the Xibo URL includes the secret token.
-                  Uncheck to test IP-only blocking. Uncheck only for temporary open testing.
+                  Independent unlock from IP restriction (OR, not AND). When ON, a valid <code>?k=</code> in the Xibo URL unlocks Display 1 / Display 2 even if the player egress IP is not allowlisted.
+                  When both IP and Token are ON, either path unlocks the board. Uncheck to rely on IP-only (or leave both OFF only for temporary open testing).
                 </div>
               </details>
             </span>
@@ -1122,7 +1122,7 @@
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.115"></script>
-<script src="./master-display-security.js?v=29.09.116"></script>
+<script src="./master-display-security.js?v=29.09.122"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.98"></script>
 <script src="./admin-user-management.js?v=29.09.103"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>

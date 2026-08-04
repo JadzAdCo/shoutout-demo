@@ -285,7 +285,7 @@
       const result = await callable("getVenueDisplayTokens")({locationId});
       const data = result?.data || {};
       // Do not overwrite the Master Admin token checkbox from token portal status —
-      // IP restriction and token lock are independent controls.
+      // IP restriction and token lock are independent unlocks (OR: either may open the board).
       renderTokenReport(data, null);
       setText("displayTokenStatus", `Loaded obfuscated tokens for ${locationId}.`);
       return data;
@@ -308,6 +308,7 @@
         <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
         <span class="display-security-badge">${ipCount} approved IP${ipCount === 1 ? "" : "s"}</span>
+        <span class="display-security-badge">Unlock: IP <strong>or</strong> token</span>
       </div>`;
   }
 
@@ -480,6 +481,8 @@
                 <th scope="col">Hostname</th>
                 <th scope="col">MAC Address</th>
                 <th scope="col">Token</th>
+                <th scope="col">k last5 got/expect</th>
+                <th scope="col">URL (redacted)</th>
                 <th scope="col">IP restrict</th>
                 <th scope="col">Allowed</th>
                 <th scope="col">Reason</th>
@@ -492,6 +495,9 @@
                   ? (row.tokenOk ? "ok" : (row.tokenProvided ? "bad" : "missing"))
                   : "off";
                 const allowedCell = row.allowed ? "yes" : "no";
+                const got = row.tokenProvidedLast5 || (row.tokenProvided ? "?" : "(none)");
+                const expect = row.tokenExpectedLast5 || "—";
+                const suffixNote = row.tokenSuffixMatch === true ? " · suffix✓" : "";
                 return `
                 <tr class="${row.allowed ? "is-allowed" : "is-denied"}">
                   <td>${esc(formatWhen(row.createdAtMs))}</td>
@@ -501,6 +507,8 @@
                   <td>${esc(row.hostname || "—")}</td>
                   <td>${esc(row.macAddress || "n/a")}</td>
                   <td>${esc(tokenCell)}</td>
+                  <td><code>${esc(got)}</code> / <code>${esc(expect)}</code>${esc(suffixNote)}</td>
+                  <td class="display-access-log-ua"><small>${esc((row.pageUrlRedacted || "").slice(0, 160) || "—")}</small></td>
                   <td>${row.restrictionEnabled ? "on" : "off"}</td>
                   <td><strong>${allowedCell}</strong></td>
                   <td>${esc(row.reason || "—")}${row.actorEmail ? `<br/><small>${esc(row.actorEmail)}</small>` : ""}</td>
@@ -640,7 +648,13 @@
     }
 
     if (row.denialReason) {
-      causation = `${String(row.denialReason).trim()}. Device was shown the Floq Media / FloqR not-configured message.`;
+      const got = row.tokenProvidedLast5 || "";
+      const expect = row.tokenExpectedLast5 || "";
+      const compare = (got || expect)
+        ? ` Token last5 provided=${got || "(none)"} expect=${expect || "(none)"}${row.tokenSuffixMatch === true ? " (suffix match)" : ""}.`
+        : "";
+      const urlBit = row.pageUrlRedacted ? ` URL ${String(row.pageUrlRedacted).trim()}.` : "";
+      causation = `${String(row.denialReason).trim()}.${compare}${urlBit} Device was shown the Floq Media / FloqR not-configured message.`;
     }
 
     if ((!description || !causation) && body) {

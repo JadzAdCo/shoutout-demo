@@ -1196,7 +1196,7 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
   blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR ShoutOut so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
-  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
+  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', textProfileId:'birthdayMedia', screenFormatIds:['p125-96x48','led-96x48','p125-64x48','led-64x48','p125-64x32','led-64x32'], defaultMain:'HAPPY BIRTHDAY', defaultSub:'', defaultMediaFit:'cover', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, hideSecondary:true, mediaColumnScale:1.2, primaryTextScale:1.15, description:'Birthday media rule notes: On 96×48, split layout with cover-filled media (~60/40), no secondary line, FloqR burst card, 45-char main (3×15). On 64×48 (boxed) and 64×32 (landscape), picture and verbiage rotate fullscreen in a loop; text is 4 lines sized for ~4 m LED readability; photos use contain with a decorative slot background so they are not stretched ugly.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration","45 characters","floqr card","burst animation","no secondary","identity rail","96x48","64x48","64x32","rotate","cover","4 lines"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
   fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
@@ -1481,6 +1481,17 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."}
     }
   },
+  birthdayMedia: {
+    label:"Birthday media with FloqR card / rotate on compact panels",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:54,displayMode:"split"},
+      "p125-64x48": {supported:true,lineCount:4,maxCharactersPerLine:8,maxMainCharacters:32,maxSubCharacters:20,minimumFontPixels:56,displayMode:"rotate",advice:"64×48 boxed: picture and message rotate fullscreen; 4×8 for ~4 m LED readability."},
+      "p125-64x32": {supported:true,lineCount:4,maxCharactersPerLine:10,maxMainCharacters:40,maxSubCharacters:20,minimumFontPixels:48,displayMode:"rotate",advice:"64×32 landscape: picture and message rotate fullscreen; 4×10 for ~4 m LED readability."},
+      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:44,displayMode:"split"},
+      "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:8,maxMainCharacters:32,maxSubCharacters:20,minimumFontPixels:52,displayMode:"rotate",advice:"64×48 boxed: picture and message rotate fullscreen; 4×8 for ~4 m LED readability."},
+      "led-64x32": {supported:true,lineCount:4,maxCharactersPerLine:10,maxMainCharacters:40,maxSubCharacters:20,minimumFontPixels:44,displayMode:"rotate",advice:"64×32 landscape: picture and message rotate fullscreen; 4×10 for ~4 m LED readability."}
+    }
+  },
   car: {
     label:"Illustrated car message",
     formats:{
@@ -1533,10 +1544,11 @@ window.FLOQRTextLayout = {
     const id = String(template.id || "");
     if (template.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || template.jerseyNumberField) return "soccerJersey";
     if (template.textOverlay === true) return "textOverlayFrame";
-    if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
+    if (id === "birthdayMedia" || template.textProfileId === "birthdayMedia") return "birthdayMedia";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
     if (id === "car" || template.className === "car") return "car";
     if (template.layout === "split-media") return "splitMedia";
+    if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     return String(template.textProfileId || "full");
   },
   resolve(templateOrId = {}, formatId = "") {

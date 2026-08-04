@@ -14,7 +14,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Display Security (IP + board tokens)
 
-**Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows for allowlisted IPs and/or a secret `?k=` token in the Xibo Webpage URL.
+**Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows when an allowlisted IP **or** a valid `?k=` board token unlocks the page (OR — not both required).
 
 | Layer | Wiring |
 |---|---|
@@ -25,7 +25,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Data | `clubLocations/{id}`: `displayIpRestrictionEnabled`, `displayTokenRequired`, `approvedDisplayIps`, `displayIpNotes`; secrets in `displayBoardSecrets/{id}`: `primaryToken`, `secondaryToken` (not on public club docs) |
 | Logs | `displayAccessLogs` (90-day); Master Admin **Security Logs** + **Security System Messages** (`inboxNotifications` type `displayAccessDenied`) |
 | URL contract | Display 1: `display.html?location={id}&k={token}` — **no `?v=`**. Display 2: `display2.html?location={id}&k={token}`. Token lock default ON unless `displayTokenRequired === false`. |
-| Deny reasons | `token_missing` (secret exists, URL has no/empty `k`); `token_denied` (wrong `k`); `token_not_configured` (lock ON, no secret stored); `ip_denied` / `restriction_enabled_empty_allowlist` |
+| Gate logic | **OR:** allowlisted IP unlocks **or** valid `?k=` unlocks. Deny only when every configured gate fails. Reasons include `ip_or_token_ok`, `token_missing`, `token_denied`, `token_not_configured`, `ip_denied`, `restriction_enabled_empty_allowlist`, combined `ip_denied+token_missing`. |
 | Token compare | Access logs + Security System Messages record **last 5** of provided `?k=` vs expected secret, plus redacted `pageUrl` (`k=…xxxxx`). Full secrets never logged. |
 | Help | `help-display-security-setting` in `floqai-help-repository.js` |
 
@@ -33,8 +33,9 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 - Venue name in a deny message is the **location being opened**, not client geography. Check **client IP** (e.g. US Comcast `2601:14d:…` vs Spain venue) before assuming Xibo failed.
 - IP restriction OFF + `token_missing` ⇒ page loaded without `?k=` (browser test, wrong Xibo URI, or query stripped)—not “token unset” if obfuscated last digits exist in portal.
+- With both ON: home/office IP not on the list can still open the board with the correct Xibo `?k=`; venue LAN IP can open without a token.
 - Full `?k=` shown **once** on onboard/rotate; portal otherwise obfuscates (last 4).
-
+- Ask Xibo which public egress IP(s) players use and whether Webpage query strings (`?k=`) are preserved.
 ---
 
 ## Xibo Trigger on Error / display load-error fallback
@@ -100,6 +101,38 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Global chrome | `global-profile-status.js` — avatar menu uses the same Firebase auth |
 
 **Bug fixed (v29.09.119):** Signed-in avatar could show while Sign-in card stayed visible — portal shell now re-syncs from `auth.currentUser` and keeps the panel open if profile load fails.
+
+---
+
+## Birthday media template (split + rotate)
+
+**Purpose:** Birthday ShoutOut with patron photo/video — readable on large panels and compact LEDs.
+
+| Layer | Wiring |
+|---|---|
+| UI | Patron ShoutOut editor template `birthdayMedia`; display render on `display.html` |
+| Client | `display-app.js` — `birthdayUsesRotate` / `startBirthdayRotate`; split uses `object-fit:cover`; rotate uses `contain` + decorative slot |
+| Styles | `display.css` — `.birthday-media-layout`, `.birthday-rotate-layout`, phase classes |
+| Data | `shared-data.js` profile `birthdayMedia` + `SHOUTOUT_TEMPLATES.birthdayMedia.screenFormatIds` (all six formats) |
+| Backend normalize | `functions/commerce-functions.js` birthday caps (96×48: 3×15; 64×48: 4×8; 64×32: 4×10) |
+| Contract | 96×48 split (~60/40); 64×48 boxed + 64×32 landscape rotate fullscreen picture ↔ 4-line text |
+| Docs | `TEXT-LIMITS-V29-08-4.md` birthday notes |
+
+---
+
+## supRstar live duration + diagnostics
+
+**Purpose:** Paid live minutes must not burn before the venue board ICE-connects; brief disconnects must be traceable.
+
+| Layer | Wiring |
+|---|---|
+| UI | `suprstar-preview.html` + live pop-out; venue `display2.html` via `display-suprstr.js` |
+| Client timer | `suprstar-preview.js` — arms only after **stable ICE/peer `connected`** (2.5s debounce); never on SDP answer alone |
+| WebRTC | `suprstr-webrtc.js` — answer → status `answered`; true `connected` from `connectionState` / ICE |
+| Backend | `startSuprstrLive` sets `liveEndsAtMs:0`; `armSuprstrLiveDuration` sets ends + `liveArmedAtMs` / `liveArmSource` |
+| Diagnostics | `FLOQRLog` → Firestore `appLogs` category `suprstar` (`webrtc_status`, `live_timer_*`, `live_heartbeat`, display `display_*`) |
+| Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
+| Cache bust | Preview scripts `?v=29.09.121` |
 
 When adding a section, use this skeleton:
 

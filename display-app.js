@@ -9,6 +9,20 @@
     try { return JSON.parse(new URL(window.location.href).searchParams.get(name) || ""); }
     catch (error) { return fallback; }
   };
+
+  /** Board secret from ?k= / ?token=, or #k= / #token= (Xibo often rewrites query and drops unknown params). */
+  function displayAccessKeyFromUrl() {
+    const fromQuery = String(qs("k", qs("token", "")) || "").trim();
+    if (fromQuery) return fromQuery;
+    try {
+      const rawHash = String(window.location.hash || "").replace(/^#/, "");
+      if (!rawHash) return "";
+      const hashParams = new URLSearchParams(rawHash.includes("=") ? rawHash : `k=${rawHash}`);
+      return String(hashParams.get("k") || hashParams.get("token") || "").trim();
+    } catch (_) {
+      return "";
+    }
+  }
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 
   function resolveDisplayBoard() {
@@ -271,6 +285,59 @@
     });
 
     return (rows.length ? rows : [""]).slice(0, maxRows);
+  }
+
+  function fitBirthdayMainText(mainEl, {minPx = 34, maxPx = 108} = {}) {
+    if (!mainEl) return;
+    const spans = Array.from(mainEl.querySelectorAll("span"));
+    if (!spans.length) return;
+    const availableWidth = Math.max(1, mainEl.clientWidth);
+    const availableHeight = Math.max(1, mainEl.clientHeight);
+    spans.forEach(span => { span.style.transform = ""; });
+    mainEl.style.fontSize = "10px";
+    const widestLineAt10 = Math.max(1, ...spans.map(span => span.scrollWidth || 1));
+    const blockHeightAt10 = Math.max(1, mainEl.scrollHeight || 1);
+    const widthLimitedPx = (availableWidth / widestLineAt10) * 10;
+    const heightLimitedPx = (availableHeight / blockHeightAt10) * 10;
+    const rowCount = spans.length;
+    const rowBoost = rowCount <= 1 ? 1.22 : (rowCount === 2 ? 1.1 : 1);
+    const fittedPx = Math.max(minPx, Math.min(maxPx, Math.min(widthLimitedPx, heightLimitedPx) * rowBoost));
+    mainEl.style.fontSize = `${fittedPx}px`;
+    // Final overflow guard: shrink only the lines that still spill after fitting.
+    spans.forEach(span => {
+      const needed = span.scrollWidth || availableWidth;
+      const scale = needed > availableWidth ? Math.max(0.55, availableWidth / needed) : 1;
+      span.style.transform = scale < 0.999 ? `scale(${scale})` : "";
+    });
+  }
+
+  const BIRTHDAY_ROTATE_FORMATS = new Set(["p125-64x48", "led-64x48", "p125-64x32", "led-64x32"]);
+  const BIRTHDAY_ROTATE_MS = 5500;
+
+  function stopBirthdayRotate() {
+    if (window.__floqrBirthdayRotateTimer) {
+      window.clearInterval(window.__floqrBirthdayRotateTimer);
+      window.__floqrBirthdayRotateTimer = null;
+    }
+  }
+
+  function birthdayUsesRotate(formatId = "") {
+    return BIRTHDAY_ROTATE_FORMATS.has(String(formatId || ""));
+  }
+
+  function startBirthdayRotate(canvas, {phaseMs = BIRTHDAY_ROTATE_MS} = {}) {
+    stopBirthdayRotate();
+    if (!canvas) return;
+    canvas.classList.add("birthday-rotate-layout");
+    let phase = "media";
+    const apply = () => {
+      const showMedia = phase === "media";
+      canvas.classList.toggle("birthday-phase-media", showMedia);
+      canvas.classList.toggle("birthday-phase-text", !showMedia);
+      phase = showMedia ? "text" : "media";
+    };
+    apply();
+    window.__floqrBirthdayRotateTimer = window.setInterval(apply, Math.max(2500, Number(phaseMs) || BIRTHDAY_ROTATE_MS));
   }
 
   function classicBoardRows(mainText, caps = {}) {
@@ -939,7 +1006,8 @@
     if (isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId)) {
       t = resolveJerseyStyle(t, data);
     }
-    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
+    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || (t.identityRail === true && t.layout !== "split-media" && templateId !== "birthdayMedia");
+    const isBirthdayMedia = templateId === "birthdayMedia" || t.id === "birthdayMedia";
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
@@ -1044,16 +1112,37 @@
     const mediaUrl = data.mediaUrl || "";
     const mediaType = data.mediaType || "";
     const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
-    byId("displayMain").style.setProperty("font-size", `${usesSplitMedia ? mainSize * .78 : mainSize}vh`, "important");
-    byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
-    if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
-    if (usesSplitMedia) {
+    const birthdayRotate = isBirthdayMedia && birthdayUsesRotate(screenFormatId);
+    stopBirthdayRotate();
+    const birthdayPrimaryScale = isBirthdayMedia ? Number(t.primaryTextScale || 1.15) : 1;
+    const splitMainScale = (usesSplitMedia ? 0.78 : 1) * birthdayPrimaryScale;
+    if (isBirthdayMedia) {
+      // CSS clamp / rotate fit carries readability; clear inline size so layout CSS wins.
+      byId("displayMain").style.removeProperty("font-size");
+      byId("displaySub").style.removeProperty("font-size");
+    } else {
+      byId("displayMain").style.setProperty("font-size", `${mainSize * splitMainScale}vh`, "important");
+      byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
+    }
+    if (center) {
+      center.classList.toggle("split-media-layout", usesSplitMedia && !birthdayRotate);
+      center.classList.toggle("birthday-media-layout", isBirthdayMedia && usesSplitMedia && !birthdayRotate);
+    }
+    canvas.classList.remove("birthday-rotate-layout", "birthday-phase-media", "birthday-phase-text");
+    if (usesSplitMedia || birthdayRotate) {
       mediaSlot.classList.remove("hidden");
       if (mediaUrl) {
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) mediaElement.style.objectFit = data.mediaFit === "cover" ? "cover" : "contain";
+        if (mediaElement) {
+          // Birthday 96×48 split: cover fills the media frame (no letterbox bars).
+          // Birthday 64× rotate: contain + decorative slot background (no ugly stretch).
+          const fit = isBirthdayMedia
+            ? (birthdayRotate ? "contain" : "cover")
+            : (data.mediaFit === "cover" ? "cover" : "contain");
+          mediaElement.style.objectFit = fit;
+        }
         if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
@@ -1217,12 +1306,28 @@
       const rows = displayTextRows(mainText, textCaps);
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
-      byId("displaySub").textContent = subText;
+      if (isBirthdayMedia) {
+        requestAnimationFrame(() => {
+          const maxPx = birthdayRotate ? 120 : 108;
+          const minPx = birthdayRotate ? Number(textCaps.minimumFontPixels || 48) : 34;
+          fitBirthdayMainText(byId("displayMain"), {minPx, maxPx});
+        });
+        if (birthdayRotate) startBirthdayRotate(canvas);
+      }
+      if (isBirthdayMedia || (usesSplitMedia && t.identityRail === true)) {
+        const identity = classicIdentityPresentation(subText);
+        byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
+        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+        byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      } else {
+        byId("displaySub").textContent = t.hideSecondary ? "" : subText;
+      }
     }
     markDisplayReady();
   }
   function showDisplayAccessDenied(info = {}) {
     // Feature: locked display — never show idle/venue marketing to unauthorized clients.
+    stopBirthdayRotate();
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
     hideHeistBrandSlide();
@@ -1257,6 +1362,11 @@
    */
   async function enforceDisplayAccess() {
     const accessKey = String(qs("k", qs("token", "")) || "").trim();
+    // Local URL preview only — never unlock venue players on the public host.
+    try {
+      const host = String(location.hostname || "").toLowerCase();
+      if (isUrlPreviewMode() && (host === "localhost" || host === "127.0.0.1")) return true;
+    } catch (_) {}
     try {
       if (!firebase?.app || !firebase.functions) {
         showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
