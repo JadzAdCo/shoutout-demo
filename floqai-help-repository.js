@@ -176,11 +176,12 @@
     {
       id: "help-display-security-setting",
       title: "Display Security Setting",
-      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs. Trigger on Error URL builds the stable display-error.html Webpage for Xibo’s page-load-error fallback layout.",
+      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). When both are ON, either unlocks the board (OR — not both required). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs. Trigger on Error URL builds the stable display-error.html Webpage for Xibo’s page-load-error fallback layout.",
       searchPhrases: [
         "display security", "display security setting", "approved display ips", "ip restriction",
         "token lock", "xibo token", "venue not onboarded", "display board security",
-        "trigger on error", "trigger on page load error", "xibo error url", "display-error"
+        "trigger on error", "trigger on page load error", "xibo error url", "display-error",
+        "ip or token", "either ip or token"
       ],
       links: [
         {label: "Master Admin Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},

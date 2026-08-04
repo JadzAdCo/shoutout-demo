@@ -14,7 +14,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ## Display Security (IP + board tokens)
 
-**Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows for allowlisted IPs and/or a secret `?k=` token in the Xibo Webpage URL.
+**Purpose:** Gate venue LED boards (`display.html` / `display2.html`) so idle/live content only shows when an allowlisted IP **or** a valid `?k=` board token unlocks the page (OR — not both required).
 
 | Layer | Wiring |
 |---|---|
@@ -25,7 +25,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Data | `clubLocations/{id}`: `displayIpRestrictionEnabled`, `displayTokenRequired`, `approvedDisplayIps`, `displayIpNotes`; secrets in `displayBoardSecrets/{id}`: `primaryToken`, `secondaryToken` (not on public club docs) |
 | Logs | `displayAccessLogs` (90-day); Master Admin **Security Logs** + **Security System Messages** (`inboxNotifications` type `displayAccessDenied`) |
 | URL contract | Display 1: `display.html?location={id}&k={token}` — **no `?v=`**. Display 2: `display2.html?location={id}&k={token}`. Token lock default ON unless `displayTokenRequired === false`. |
-| Deny reasons | `token_missing` (secret exists, URL has no/empty `k`); `token_denied` (wrong `k`); `token_not_configured` (lock ON, no secret stored); `ip_denied` / `restriction_enabled_empty_allowlist` |
+| Gate logic | **OR:** allowlisted IP unlocks **or** valid `?k=` unlocks. Deny only when every configured gate fails. Reasons include `ip_or_token_ok`, `token_missing`, `token_denied`, `token_not_configured`, `ip_denied`, `restriction_enabled_empty_allowlist`, combined `ip_denied+token_missing`. |
 | Token compare | Access logs + Security System Messages record **last 5** of provided `?k=` vs expected secret, plus redacted `pageUrl` (`k=…xxxxx`). Full secrets never logged. |
 | Help | `help-display-security-setting` in `floqai-help-repository.js` |
 
@@ -33,8 +33,9 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 - Venue name in a deny message is the **location being opened**, not client geography. Check **client IP** (e.g. US Comcast `2601:14d:…` vs Spain venue) before assuming Xibo failed.
 - IP restriction OFF + `token_missing` ⇒ page loaded without `?k=` (browser test, wrong Xibo URI, or query stripped)—not “token unset” if obfuscated last digits exist in portal.
+- With both ON: home/office IP not on the list can still open the board with the correct Xibo `?k=`; venue LAN IP can open without a token.
 - Full `?k=` shown **once** on onboard/rotate; portal otherwise obfuscates (last 4).
-
+- Ask Xibo which public egress IP(s) players use and whether Webpage query strings (`?k=`) are preserved.
 ---
 
 ## Xibo Trigger on Error / display load-error fallback

@@ -217,6 +217,33 @@ function obfuscateToken(token = "") {
   return `${"•".repeat(Math.min(20, Math.max(8, t.length - 4)))}${visible}`;
 }
 
+/** Last N chars for operator compare — never log the full board secret. */
+function tokenLastN(token = "", n = 5) {
+  const t = String(token || "");
+  if (!t) return "(none)";
+  const size = Math.max(1, Math.min(Number(n) || 5, 12));
+  return t.slice(-Math.min(size, t.length));
+}
+
+/** Redact ?k= in logged page URLs — keep only last 5 of the token. */
+function redactPageUrlToken(pageUrl = "") {
+  const raw = text(pageUrl, 500);
+  if (!raw) return "";
+  try {
+    const u = new URL(raw);
+    if (u.searchParams.has("k")) {
+      const k = String(u.searchParams.get("k") || "");
+      u.searchParams.set("k", k ? `…${tokenLastN(k, 5)}` : "(empty)");
+    }
+    return u.toString().slice(0, 500);
+  } catch (_) {
+    return raw.replace(/([?&]k=)([^&]*)/gi, (_, prefix, value) => {
+      const v = decodeURIComponent(String(value || ""));
+      return `${prefix}${v ? `…${tokenLastN(v, 5)}` : "(empty)"}`;
+    }).slice(0, 500);
+  }
+}
+
 function timingSafeEqualText(a = "", b = "") {
   const left = Buffer.from(String(a || ""), "utf8");
   const right = Buffer.from(String(b || ""), "utf8");
@@ -263,8 +290,12 @@ async function writeAccessLog(entry = {}) {
     tokenRequired: entry.tokenRequired === true,
     tokenProvided: entry.tokenProvided === true,
     tokenOk: entry.tokenOk === true,
+    tokenProvidedLast5: text(entry.tokenProvidedLast5, 16),
+    tokenExpectedLast5: text(entry.tokenExpectedLast5, 16),
+    tokenSuffixMatch: entry.tokenSuffixMatch === true,
     reason: text(entry.reason, 240),
     pageUrl: text(entry.pageUrl, 500),
+    pageUrlRedacted: text(entry.pageUrlRedacted, 500),
     userAgent: text(entry.userAgent, 400),
     screenFormatId: text(entry.screenFormatId, 80),
     language: text(entry.language, 40),
@@ -310,9 +341,13 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
   const reason = text(entry.reason, 240) || "denied";
   if (!locationId) return {notified: false, reason: "missing_location"};
 
+  const providedLast5 = text(entry.tokenProvidedLast5, 16) || "(none)";
+  const expectedLast5 = text(entry.tokenExpectedLast5, 16) || "(none)";
+  const pageUrlRedacted = text(entry.pageUrlRedacted, 500);
+  // Include token suffixes in cooldown so retests with a different ?k= still alert.
   const coolKey = crypto
     .createHash("sha1")
-    .update(`${locationId}|${displayBoard}|${clientIp}|${reason}`)
+    .update(`${locationId}|${displayBoard}|${clientIp}|${reason}|${providedLast5}|${expectedLast5}`)
     .digest("hex")
     .slice(0, 40);
   const coolRef = db.collection("displayDenialAlerts").doc(coolKey);
@@ -326,11 +361,18 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
   const boardLabel = displayBoard === "secondary" ? "Display 2 (supRstar)" : "Display 1 (ShoutOut)";
   const locationName = text(entry.locationName, 200) || locationId;
   const title = "Display access denied";
+  const suffixCompare = `Token last5 provided=${providedLast5} expect=${expectedLast5}${entry.tokenSuffixMatch === true ? " (suffix match)" : " (suffix mismatch)"}`;
+  // Put compare into denialReason so live Pages Security Messages (which render denialReason) show it without a Pages publish.
+  const denialReason = [
+    reason,
+    suffixCompare,
+    pageUrlRedacted ? `URL ${pageUrlRedacted}` : ""
+  ].filter(Boolean).join(". ");
   const body = [
     `${boardLabel} blocked for ${locationName}.`,
     clientIp ? `IP ${clientIp}.` : "",
     entry.hostname ? `Host ${text(entry.hostname, 120)}.` : "",
-    `Reason: ${reason}.`,
+    `Reason: ${denialReason}.`,
     "Device was shown the Floq Media / FloqR not-configured message."
   ].filter(Boolean).join(" ");
 
@@ -361,7 +403,11 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
     clientIp,
     hostname: text(entry.hostname, 200),
     macAddress: text(entry.macAddress, 80) || "n/a",
-    denialReason: reason,
+    denialReason,
+    tokenProvidedLast5: providedLast5,
+    tokenExpectedLast5: expectedLast5,
+    tokenSuffixMatch: entry.tokenSuffixMatch === true,
+    pageUrlRedacted,
     accessLogId: text(entry.logId, 120),
     read: false,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -440,16 +486,17 @@ exports.checkDisplayAccess = onCall({
   }
 
   const expectedToken = text(secrets[tokenFieldForBoard(displayBoard)] || "", 120);
-  // Feature: token lock and IP allowlist are independent.
-  // - Token OFF (displayTokenRequired === false): idle/live allowed without ?k= (IP rules still apply).
-  // - Token ON (default / true): require ?k= for idle and live; deny if board token missing.
+  // Feature: IP allowlist and board token are independent unlocks (OR).
+  // Whichever control is configured and passes unlocks the board — not AND.
+  // - Token OFF (displayTokenRequired === false): no token gate (IP rules still apply if enabled).
+  // - Token ON (default / true): valid ?k= unlocks even when IP fails (or IP unlocks without ?k=).
   const tokenRequiredFlag = !isProbe && club.displayTokenRequired !== false;
   const tokenRequired = tokenRequiredFlag && !!expectedToken;
   const tokenProvided = !!accessToken;
   let tokenOk = true;
   let tokenReason = "token_off";
   if (tokenRequiredFlag && !expectedToken) {
-    // Locked mode but no token provisioned yet → deny (forces Master to re-issue tokens).
+    // Locked mode but no token provisioned yet → this gate cannot pass (IP may still unlock).
     tokenOk = false;
     tokenReason = "token_not_configured";
   } else if (tokenRequired) {
@@ -459,16 +506,38 @@ exports.checkDisplayAccess = onCall({
     tokenReason = "token_ignored_not_required";
   }
 
-  const allowed = isProbe ? true : (ipOk && tokenOk);
+  const tokenProvidedLast5 = tokenLastN(accessToken, 5);
+  const tokenExpectedLast5 = tokenLastN(expectedToken, 5);
+  const tokenSuffixMatch = tokenProvidedLast5 !== "(none)"
+    && tokenExpectedLast5 !== "(none)"
+    && tokenProvidedLast5 === tokenExpectedLast5;
+  const pageUrlRedacted = redactPageUrlToken(data.pageUrl);
+
+  const ipGateConfigured = !isProbe && ipRestrictionWanted;
+  const tokenGateConfigured = !isProbe && tokenRequiredFlag;
+  const ipPass = ipGateConfigured && ipOk;
+  const tokenPass = tokenGateConfigured && tokenOk;
+  let allowed = true;
   let reason = "ok";
-  if (isProbe) reason = "ip_probe";
-  else if (!ipOk && !tokenOk) reason = `${ipReason}+${tokenReason}`;
-  else if (!ipOk) reason = ipReason;
-  else if (!tokenOk) reason = tokenReason;
-  else if (ipRestrictionEnabled && tokenRequired) reason = "ip_and_token_ok";
-  else if (ipRestrictionEnabled) reason = ipReason;
-  else if (tokenRequired) reason = tokenReason;
-  else reason = "open";
+  if (isProbe) {
+    reason = "ip_probe";
+  } else if (!ipGateConfigured && !tokenGateConfigured) {
+    reason = "open";
+  } else {
+    // OR: any configured gate that passes unlocks the board.
+    allowed = ipPass || tokenPass;
+    if (allowed) {
+      if (ipPass && tokenPass) reason = "ip_or_token_ok";
+      else if (ipPass) reason = ipReason;
+      else reason = tokenReason;
+    } else if (ipGateConfigured && tokenGateConfigured) {
+      reason = `${ipReason}+${tokenReason}`;
+    } else if (ipGateConfigured) {
+      reason = ipReason;
+    } else {
+      reason = tokenReason;
+    }
+  }
 
   const hostname = reportedHostname || await lookupHostname(clientIp);
   const macAddress = reportedMac || "n/a";
@@ -486,8 +555,12 @@ exports.checkDisplayAccess = onCall({
     tokenRequired,
     tokenProvided,
     tokenOk,
+    tokenProvidedLast5,
+    tokenExpectedLast5,
+    tokenSuffixMatch,
     reason,
     pageUrl: data.pageUrl,
+    pageUrlRedacted,
     userAgent: data.userAgent,
     screenFormatId: data.screenFormatId,
     language: data.language,
@@ -506,6 +579,10 @@ exports.checkDisplayAccess = onCall({
         hostname,
         macAddress,
         reason,
+        tokenProvidedLast5,
+        tokenExpectedLast5,
+        tokenSuffixMatch,
+        pageUrlRedacted,
         logId: log.id,
         masterAdminUids: Array.isArray(club.masterAdminUids) ? club.masterAdminUids : []
       });
@@ -521,6 +598,10 @@ exports.checkDisplayAccess = onCall({
     restrictionEnabled: ipRestrictionEnabled,
     tokenRequired: tokenRequiredFlag,
     tokenOk,
+    tokenProvidedLast5,
+    tokenExpectedLast5,
+    tokenSuffixMatch,
+    pageUrlRedacted,
     reason,
     observedIp: clientIp,
     hostname,
