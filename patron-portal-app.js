@@ -215,34 +215,77 @@
   function applyPortalAuthUi(user) {
     const login = byId("portalLogin");
     const panel = byId("portalPanel");
-    if (!login || !panel) return;
+    const googleBtn = byId("portalGoogleLoginBtn");
+    const title = byId("portalLoginTitle");
+    const hint = byId("portalLoginHint");
+    if (!login || !panel) return false;
     if (!user) {
       login.classList.remove("hidden");
       panel.classList.add("hidden");
+      if (title) title.textContent = "Sign in";
+      if (hint) hint.textContent = "Sign in to view and update your patron profile.";
+      googleBtn?.classList.remove("hidden");
       setText("portalStatus", "Please sign in to continue.");
-      return;
+      return true;
     }
     login.classList.add("hidden");
     panel.classList.remove("hidden");
+    googleBtn?.classList.add("hidden");
     setText("portalStatus", "");
+    return true;
+  }
+
+  function syncPortalAuthFromFirebase(reason = "") {
+    const user = auth.currentUser;
+    applyPortalAuthUi(user);
+    return user;
   }
 
   function bootPortalForUser(user) {
-    applyPortalAuthUi(user);
-    if (!user) return;
-    handleMemberConnectReturn();
-    loadPortal(user).catch(err => {
-      setText("portalStatus", err?.message || "Could not load your profile.");
-    });
+    try {
+      applyPortalAuthUi(user);
+      if (!user) return;
+      handleMemberConnectReturn();
+      loadPortal(user).catch(err => {
+        setText("portalStatus", err?.message || "Could not load your profile.");
+        // Keep the signed-in shell visible even if profile load fails.
+        applyPortalAuthUi(auth.currentUser);
+      });
+    } catch (err) {
+      console.warn("[patron-portal] bootPortalForUser failed", err);
+      applyPortalAuthUi(auth.currentUser);
+      setText("portalStatus", err?.message || "Could not open your profile shell.");
+    }
   }
 
-  // Wire auth immediately so an existing session is recognized even if later DOM setup throws.
+  // Wire auth immediately. Also re-sync from currentUser so the Sign-in card cannot
+  // stay visible when the global profile avatar already shows a signed-in member.
   auth.onAuthStateChanged(user => bootPortalForUser(user));
+  const finishAuthGate = () => {
+    const user = syncPortalAuthFromFirebase("auth-gate");
+    if (user) bootPortalForUser(user);
+  };
   if (typeof auth.authStateReady === "function") {
-    auth.authStateReady().then(() => {
-      if (auth.currentUser) applyPortalAuthUi(auth.currentUser);
-    }).catch(() => {});
+    auth.authStateReady().then(finishAuthGate).catch(finishAuthGate);
+  } else {
+    setTimeout(finishAuthGate, 500);
   }
+  window.addEventListener("floqr:profile-access-ready", () => {
+    const user = syncPortalAuthFromFirebase("profile-access-ready");
+    if (user) bootPortalForUser(user);
+  });
+  let authSyncTries = 0;
+  const authSyncTimer = setInterval(() => {
+    authSyncTries += 1;
+    const user = auth.currentUser;
+    const login = byId("portalLogin");
+    if (user && login && !login.classList.contains("hidden")) {
+      bootPortalForUser(user);
+    }
+    if (authSyncTries >= 20 || (user && login?.classList.contains("hidden"))) {
+      clearInterval(authSyncTimer);
+    }
+  }, 250);
 
   async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
 
@@ -3054,7 +3097,12 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function whenDomReady(fn) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn, {once: true});
+    else fn();
+  }
+
+  whenDomReady(() => {
     setupTabs();
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("saveProfileBtn", saveProfile);

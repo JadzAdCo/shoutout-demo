@@ -26,6 +26,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Logs | `displayAccessLogs` (90-day); Master Admin **Security Logs** + **Security System Messages** (`inboxNotifications` type `displayAccessDenied`) |
 | URL contract | Display 1: `display.html?location={id}&k={token}` — **no `?v=`**. Display 2: `display2.html?location={id}&k={token}`. Token lock default ON unless `displayTokenRequired === false`. |
 | Deny reasons | `token_missing` (secret exists, URL has no/empty `k`); `token_denied` (wrong `k`); `token_not_configured` (lock ON, no secret stored); `ip_denied` / `restriction_enabled_empty_allowlist` |
+| Token compare | Access logs + Security System Messages record **last 5** of provided `?k=` vs expected secret, plus redacted `pageUrl` (`k=…xxxxx`). Full secrets never logged. |
 | Help | `help-display-security-setting` in `floqai-help-repository.js` |
 
 **Ops notes**
@@ -87,7 +88,18 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## Registry maintenance
+## Patron Portal auth shell
+
+**Purpose:** My Profile and Settings must hide the Sign-in card whenever Firebase already has a session (global profile avatar is the signal).
+
+| Layer | Wiring |
+|---|---|
+| UI | `patron-portal.html` — `#portalLogin` / `#portalPanel` |
+| Client | `patron-portal-app.js` — `applyPortalAuthUi`, `bootPortalForUser`, `auth.onAuthStateChanged`, `auth.authStateReady`, `floqr:profile-access-ready`, short sync interval |
+| Guard | `profile-access-guard.js` (does not own the Sign-in card on this page) |
+| Global chrome | `global-profile-status.js` — avatar menu uses the same Firebase auth |
+
+**Bug fixed (v29.09.119):** Signed-in avatar could show while Sign-in card stayed visible — portal shell now re-syncs from `auth.currentUser` and keeps the panel open if profile load fails.
 
 When adding a section, use this skeleton:
 

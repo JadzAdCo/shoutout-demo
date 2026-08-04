@@ -21,9 +21,9 @@
     </header>
 
     <div id="portalLogin" class="card">
-      <h2>Sign in</h2>
-      <p class="sub">Sign in to view and update your patron profile.</p>
-      <button id="portalGoogleLoginBtn" type="button">Continue with Google</button>
+      <h2 id="portalLoginTitle">Checking sign-in…</h2>
+      <p id="portalLoginHint" class="sub">Looking for your existing FLOQR session. One moment.</p>
+      <button id="portalGoogleLoginBtn" class="hidden" type="button">Continue with Google</button>
     </div>
 
     <div id="portalPanel" class="hidden">
@@ -592,7 +592,7 @@
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./floqr-i18n.js?v=29.09.13"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.106"></script>
+<script src="./patron-portal-app.js?v=29.09.118"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
