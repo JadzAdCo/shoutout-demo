@@ -150,8 +150,11 @@
     {
       id: "floqai-ask-floqr",
       title: "Ask FloqR with FloqAi",
-      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
-      searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
+      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Short cues work too — throw/shou → ShoutOut, sho → Shows or ShoutOut, hai/hail → RydR. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      searchPhrases: [
+        "ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar",
+        "throw", "shou", "sho", "hail", "hai"
+      ],
       links: [
         {label: "Open FloqAi", href: `./?v=${APP_V}&start=intent`},
         {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}

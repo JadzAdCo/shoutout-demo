@@ -134,6 +134,64 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Heartbeat | Preview emits `live_heartbeat` every 10s while broadcast handle is open |
 | Cache bust | Preview scripts `?v=29.09.121` |
 
+---
+
+## FloqAi intent search (plain-language router)
+
+**Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR).
+
+| Layer | Wiring |
+|---|---|
+| UI | Search / FloqAi (`index.html` intent panel) |
+| Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
+| Help seed | `floqai-help-repository.js` (loaded before `intent-search.js`) |
+| Cache bust | `intent-search.js?v=` on `index.html` |
+
+---
+
+## VIP / Table reservations + Hail a Waitress (planned)
+
+**Purpose:** Map-based VIP/table booking with VCC pricing/staffing; patron hail/chat to assigned waitress with shareable service refs.
+
+### Pilot floor plans (assets received 2026-08-04)
+
+Stored under `assets/table-maps/`:
+
+| Venue map | File | Tables / sections (seed cutouts) |
+|---|---|---|
+| **Decades** | `decades-floor-plan.png` | **C1–C11**. Sections: Top VIP (C1–C5); Main floor (C6–C9, C6 by DJ); Bottom VIP (C10–C11). Landmarks: Bar, DJ Booth, Stairs, Emergency Exit |
+| **Lima Twist DC** | `lima-twist-table-map.png` | Series cutouts: **200s** (209→201), **100s** (106→101), **500s** circular (503→501), **300s** U-booth (307–301), **400s** (403→401), **BAR1/BAR2** (service landmarks, not bookable by default) |
+
+VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/pan on patron + admin views.
+
+### Locked product calls (2026-08-04)
+
+| Topic | Decision |
+|---|---|
+| Club cancel after pay | **Stripe auto-refund** on cancel (no manual Stripe console step for the happy path) |
+| Friend with shared ref | **Join table party** is granted from the **original table reservation** (booker shares ref). Friend gets party access / chat as designed — **waitress does not accept** the join |
+| Outside club hours | **Hard closed** for waitress hail/chat. Offer fallback: **text on-duty or assigned venue CSR** only |
+| Hours source of truth | Club hours must be **structured and correct** in VCC/onboarding (`hoursStructured` / profile hours) — hail gating uses venue timezone + those hours |
+
+### Surfaces (to build)
+
+| Layer | Wiring |
+|---|---|
+| UI (VCC) | Table map upload, section cutouts, prices, staff↔section, reservation Approve / Cancel+auto-refund |
+| UI (patron) | Zoomable floor/section views; reserve+pay; **Hail a Waitress** → Existing purchased (auto-ref) \| New service; share ref (Mingl / SMS / WhatsApp / email) |
+| Backend | Reservation callables; cancel → Stripe refund; hours gate; party-join via ref (no waitress accept) |
+| Data | Table maps/sections/reservations; section→waitress/CSR; activity `referenceNumber` on receipt + inbox |
+| Hours | Require structured club hours before enabling live hail during “open” |
+| Help / FloqAi | “VIP table”, “hail waitress”, “table reservation”, “join table party” |
+
+### Test methodology (abbrev.)
+
+1. Pay → pending; Approve → active + ref on receipt.  
+2. Cancel → **automatic Stripe refund** + notify; chat closed.  
+3. Share ref → friend **Join table party** without waitress accept.  
+4. Outside hours → hard block + CSR/on-duty text option; fix hours in VCC and retest open window.  
+5. Existing hail auto-attaches ref; New-service hail allowed without prior VIP purchase.
+
 When adding a section, use this skeleton:
 
 ```markdown

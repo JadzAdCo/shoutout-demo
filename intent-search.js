@@ -16,6 +16,8 @@
       label: "Mingl",
       blurb: "Meet people, chat, and social discovery.",
       href: `./?v=${APP_V}&start=mingl`,
+      aliases: ["mingl", "meet", "social", "chat", "friend", "date"],
+      searchPhrases: ["mingl", "meet people", "social", "chat", "friend", "date"],
       patterns: [/meet/, /mingl/, /date/, /social/, /someone/, /people/, /friend/, /chat/, /connect/, /match/]
     },
     {
@@ -24,7 +26,12 @@
       label: "RydR",
       blurb: "Robotaxi or ultra-luxury ride to the venue.",
       href: vUrl("./rydr.html", {from: "search"}),
-      patterns: [/ride/, /rydr/, /taxi/, /uber/, /lyft/, /pickup/, /\bcar\b/, /driver/, /robotaxi/, /chauffeur/, /luxury\s*ride/, /get\s*(me\s*)?(there|home)/]
+      aliases: ["rydr", "ride", "hail", "hai", "taxi", "uber", "lyft", "robotaxi", "chauffeur"],
+      searchPhrases: ["rydr", "ride", "hail", "hai", "hail a ride", "taxi", "uber", "lyft", "robotaxi", "chauffeur", "get me there"],
+      patterns: [
+        /ride/, /rydr/, /taxi/, /uber/, /lyft/, /pickup/, /\bcar\b/, /driver/, /robotaxi/, /chauffeur/,
+        /luxury\s*ride/, /get\s*(me\s*)?(there|home)/, /\bhail?\b/, /hail\s*(a\s*)?(ride|cab|taxi|rydr)/
+      ]
     },
     {
       id: "bartr",
@@ -32,7 +39,9 @@
       label: "Trade by BartR",
       blurb: "Marketplace — barter and swag.",
       href: vUrl("./commerce.html", {from: "search"}),
-      patterns: [/trade/, /bartr/, /buy/, /shop/, /swag/, /marketplace/, /sell/, /merch/, /product/]
+      aliases: ["bartr", "trade", "swag", "marketplace", "merch"],
+      searchPhrases: ["bartr", "trade", "swag", "marketplace", "sell", "merch", "buy"],
+      patterns: [/trade/, /bartr/, /buy/, /\bshop/, /swag/, /marketplace/, /sell/, /merch/, /product/]
     },
     {
       id: "shoutout",
@@ -41,7 +50,15 @@
       blurb: "Send a live message to a FloqR display.",
       href: `./?v=${APP_V}&start=search`,
       action: "shoutout",
-      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/]
+      aliases: ["throw", "shout", "shou", "sho", "shoutout", "led"],
+      searchPhrases: [
+        "throw a shoutout", "throw", "shout", "shou", "sho", "shoutout", "led", "display",
+        "birthday", "congrats", "announce", "message board"
+      ],
+      patterns: [
+        /\bthrow\b/, /shout/, /\bshou\b/, /\bsho\b/, /display/, /led/,
+        /message\s*board/, /birthday/, /congrats/, /announce/
+      ]
     },
     {
       id: "suprstr",
@@ -49,6 +66,8 @@
       label: "supRstar — go live / be a superstar",
       blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.",
       href: vUrl("./suprstr-search.html", {from: "floqai"}),
+      aliases: ["suprstr", "superstar", "suprstar", "go live"],
+      searchPhrases: ["suprstr", "superstar", "super star", "go live", "live stream", "make me a superstar"],
       patterns: [
         /supr\s*str/, /suprstr/, /supr\s*star/, /suprstar/, /super\s*-?\s*star/, /superstar/,
         /make\s+me\s+(a\s+)?(super\s*-?\s*star|superstar|suprstr|suprstar|supr\s*str|supr\s*star)/,
@@ -60,10 +79,18 @@
     {
       id: "clubs",
       kind: "product",
-      label: "Clubs & venues",
-      blurb: "Browse clubs, lounges, beach clubs, and events.",
+      label: "Shows, events & clubs",
+      blurb: "Browse clubs, lounges, beach clubs, shows, and events.",
       href: `./?v=${APP_V}&start=search`,
-      patterns: [/club/, /lounge/, /beach/, /event/, /nightlife/, /venue/, /party/, /tonight/]
+      aliases: ["shows", "show", "events", "event", "sho", "clubs", "venues", "nightlife"],
+      searchPhrases: [
+        "shows", "show", "events", "event", "sho", "clubs", "venues", "nightlife",
+        "lounge", "beach", "party", "tonight"
+      ],
+      patterns: [
+        /\bshows?\b/, /\bsho\b/, /\bevents?\b/, /club/, /lounge/, /beach/,
+        /nightlife/, /venue/, /party/, /tonight/
+      ]
     }
   ];
 
@@ -273,7 +300,14 @@
         {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
         {label: "Ask FloqAi for templates", href: `./?v=${APP_V}&start=intent`}
       ],
-      patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
+      searchPhrases: [
+        "how to throw a shoutout", "throw a shoutout", "throw", "shout", "shou", "shoutout", "send a shoutout"
+      ],
+      patterns: [
+        /how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/,
+        /want\s+to\s+(throw|send)\s*(a\s*)?shout/,
+        /\bthrow\b.*\bshout/, /\bshout\s*out\b/
+      ]
     },
     {
       id: "help-sell-bartr",
@@ -364,14 +398,44 @@
       const phrase = normalizePhrase(raw);
       if (!phrase) return;
       if (q === phrase) score += 5;
-      else if (q.includes(phrase)) score += 3;
-      else if (phrase.includes(q) && q.length >= 4) score += 2;
+      else if (q.includes(phrase) && phrase.length >= 2) {
+        const asWord = new RegExp(`(?:^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:$|[^a-z0-9])`).test(q);
+        if (asWord || phrase.length >= 4) score += 3;
+      } else if (phrase.startsWith(q) && q.length >= 2) score += 2.5;
+      else if (phrase.includes(q) && q.length >= 2) score += 2;
       else {
-        const qWords = q.split(/[^a-z0-9+]+/).filter(w => w.length > 2);
-        const pWords = phrase.split(/[^a-z0-9+]+/).filter(w => w.length > 2);
-        const hits = pWords.filter(w => qWords.includes(w)).length;
-        if (hits >= 2) score += hits;
-        else if (hits === 1 && pWords.length === 1) score += 1.5;
+        const qWords = q.split(/[^a-z0-9+]+/).filter(w => w.length >= 2);
+        const pWords = phrase.split(/[^a-z0-9+]+/).filter(w => w.length >= 2);
+        const exactHits = pWords.filter(w => qWords.includes(w)).length;
+        if (exactHits >= 2) score += exactHits;
+        else if (exactHits === 1) score += pWords.length === 1 ? 1.5 : 1.25;
+        else {
+          // Prefix cues: query is a stem of a phrase word ("sho"→"show", "hai"→"hail").
+          const prefixHits = pWords.filter(w => q.length >= 2 && w.startsWith(q)).length;
+          if (prefixHits) score += Math.min(2.5, 1.5 + prefixHits * 0.5);
+        }
+      }
+    });
+    return score;
+  }
+
+  function aliasScore(query, aliases = []) {
+    const q = normalizePhrase(query);
+    if (!q || !aliases.length) return 0;
+    let score = 0;
+    aliases.forEach(raw => {
+      const alias = normalizePhrase(raw);
+      if (!alias) return;
+      if (q === alias) score += 4.5;
+      else if (alias.startsWith(q) && q.length >= 2) {
+        // Strong for "shou"→"shout", "hai"→"hail"; avoid "sho"→"shop".
+        if (q.length >= 4 || (alias.length <= 4 && alias.length <= q.length + 1)) score += 3;
+      } else if (q.startsWith(alias) && alias.length >= 4) {
+        // Longer typed query continuing a stem ("shout" from "shou") — not "shop" from "sho".
+        score += 2.5;
+      } else if (alias.length >= 3) {
+        const asWord = new RegExp(`(?:^|[^a-z0-9])${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:$|[^a-z0-9])`).test(q);
+        if (asWord) score += 2;
       }
     });
     return score;
@@ -417,13 +481,24 @@
       (intent.patterns || []).forEach(re => { if (re.test(q)) score += intent.kind === "help" ? helpBias : 1; });
       const labelKey = normalizePhrase(intent.label).replace(/^trade by /, "");
       if (labelKey && q.includes(labelKey)) score += 2.5;
+      else if (labelKey && q.length >= 2) {
+        const labelWords = labelKey.split(/[^a-z0-9+]+/).filter(w => w.length >= 2);
+        if (labelWords.some(w => w === q || w.startsWith(q) || (q.length >= 3 && q.startsWith(w)))) {
+          score += intent.kind === "product" ? 2.25 : 1.5;
+        }
+      }
       score += phraseScore(q, intent.searchPhrases || []);
+      score += aliasScore(q, intent.aliases || []);
       if (intent.source === "help-popout" && score > 0) score += 0.75;
       if (intent.kind === "help" && /i\s+want\s+to\s+be\s+able/.test(q) && score > 0) score += 1;
+      // Short product cues should surface products ahead of generic help with the same stem.
+      if (intent.kind === "product" && q.length <= 5 && score > 0) score += 0.35;
       return {intent, score};
     }).filter(row => row.score > 0);
     scored.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
+      if (a.intent.kind === "product" && b.intent.kind !== "product" && q.length <= 5) return -1;
+      if (b.intent.kind === "product" && a.intent.kind !== "product" && q.length <= 5) return 1;
       if (a.intent.kind === "help" && b.intent.kind !== "help") return -1;
       if (b.intent.kind === "help" && a.intent.kind !== "help") return 1;
       return 0;
