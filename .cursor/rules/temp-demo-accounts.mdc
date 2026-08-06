@@ -1,0 +1,44 @@
+---
+description: Temporary FLOQR demo accounts (temp_*) — create, route mail/SMS, tear down
+alwaysApply: true
+---
+
+# Temporary demo accounts (`temp_*` / `@floqr-demo.com`)
+
+## Naming
+
+- Email: `temp_{role}_{n}@floqr-demo.com` where `n` is `1`–`4`
+- Roles (human): `dj`, `waitress`, `bottlegirl`, `busboy`, `security`, `host`, `barman`, `clubadmin`, `promoter`
+- Businesses: `promogroup`, `democlub`
+- Display names may be friendly; Firebase Auth email is the source of truth
+
+## Delivery routing (demo only)
+
+- **SMS / WhatsApp / voice demos:** all demo phones externally may show fake E.164, but outbound test traffic must target **+1 202-733-0274**
+- **Email:** UI may show `temp_*@floqr-demo.com`; outbound mail must go to **bans.don@gmail.com** with subject prefix like `[FLOQR demo → temp_waitress_1@floqr-demo.com] …`
+- Implement routing in the mail/SMS send path behind a clear `isFloqrDemoAccount(email)` / `demoDeliveryRedirect` helper — not scattered one-offs
+
+## Master Admin
+
+- Temporal **Demo accounts** tab (or panel) must be easy to remove: one HTML section + one JS module + one help id
+- Tab holds one-time / rotating login codes for these accounts only
+- Do not mix with production SOS2FA long-term secrets
+
+## Tear-down / “undelete” notes
+
+To remove the demo pack:
+
+1. Delete or disable Auth users matching `temp_*@floqr-demo.com`
+2. Delete Firestore `users/{uid}` (and mirrors: associations, designations, scheduling, etc.)
+3. Delete Storage avatar/icon paths under the demo prefix (e.g. `demo-avatars/temp_*`)
+4. Remove Master Admin temporal tab: `master-admin.html` section, script include, `floqai-help-repository.js` entry, any `FEATURE-WIRING.md` demo section
+5. Remove cursor rule `.cursor/rules/temp-demo-accounts.mdc` when the pack is retired
+6. Soft-disable option: set `demoTemporary: true` + `active: false` / Auth disabled without hard delete so accounts can be re-enabled for another QA pass
+
+To restore after soft-disable: re-enable Auth, flip `active`/`demoTemporary`, re-issue Master Admin demo login codes.
+
+## Do not
+
+- Use `@floqr-demo.com` for real venues or paying Club Admins
+- Commit real passwords in git; codes live in Master Admin demo tab + optional Firestore `demoAccountCodes` with short TTL
+- Leave the temporal Master Admin tab in production forever after QA

@@ -2,6 +2,7 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const {redirectDemoEmail, redirectDemoSms} = require("./demo-delivery");
 
 function text(value = "", max = 500) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -238,15 +239,21 @@ async function deliverFinalPaidShoutoutReceipt({
 
   let emailStatus = null;
   let emailError = "";
-  if (ownerEmail && sendgridApiKey) {
+  const receiptSubject = `FLOQR receipt ${receipt.invoiceNumber || receipt.referenceNumber || ""}`.trim();
+  const emailRoute = redirectDemoEmail(ownerEmail, receiptSubject);
+  if (emailRoute.to && sendgridApiKey) {
     try {
       emailStatus = await sendgridMailWithAttachment({
         apiKey: sendgridApiKey,
-        to: ownerEmail,
+        to: emailRoute.to,
         from: fromEmail,
-        subject: `FLOQR receipt ${receipt.invoiceNumber || receipt.referenceNumber || ""}`.trim(),
-        textBody,
-        htmlBody,
+        subject: emailRoute.subject,
+        textBody: emailRoute.redirected
+          ? [`Intended recipient: ${emailRoute.intended}`, "", textBody].join("\n")
+          : textBody,
+        htmlBody: emailRoute.redirected
+          ? `<p><em>Intended: ${String(emailRoute.intended).replace(/</g, "&lt;")}</em></p>${htmlBody}`
+          : htmlBody,
         filename,
         pdfBase64
       });
@@ -256,7 +263,8 @@ async function deliverFinalPaidShoutoutReceipt({
   }
 
   let smsStatus = null;
-  const phone = text(twilio.toPhone, 40);
+  const phoneRoute = redirectDemoSms(text(twilio.toPhone, 40));
+  const phone = phoneRoute.to;
   if (phone && twilio.accountSid && twilio.authToken && twilio.fromNumber) {
     smsStatus = await sendTwilioSms({
       accountSid: twilio.accountSid,

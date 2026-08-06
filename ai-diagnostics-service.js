@@ -1912,6 +1912,21 @@
       extractedTags:categories,
       categories,
       genres,
+      // Parse + normalize free-text hours into atomic datapoints before review UI.
+      ...(function () {
+        const ST = window.FLOQRStructuredTime;
+        if (!ST) return {};
+        const hoursMatch = text.match(/(?:hours?|open(?:ing)?(?:\s*times?)?)[:\s]+([^\n]{8,180})/i);
+        const hoursBlob = hoursMatch ? hoursMatch[1] : "";
+        if (!hoursBlob && !/\b(mon|tue|wed|thu|fri|sat|sun)/i.test(text)) return {};
+        const structured = ST.normalizeCrawledHoursText(hoursBlob || text.slice(0, 500), "America/New_York");
+        return {
+          proposedHours: hoursBlob || "",
+          hoursStructured: structured,
+          hoursDisplayLines: ST.formatWeekHoursLines(structured),
+          hoursSource: "crawl-normalized"
+        };
+      })(),
       searchLanguage:market.language || "",
       searchQuery:title,
       aiSummary:"Extracted from a followed public source page. Master Admin must verify before approval.",

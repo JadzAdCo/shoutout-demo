@@ -8,7 +8,53 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-08-04 |
+| Last registry touch | 2026-08-06 |
+
+---
+
+## Temp demo accounts (`temp_*@floqr-demo.com`)
+
+**Purpose:** Removable QA pack for scheduling, public profiles, and delivery sinks.
+
+| Layer | Wiring |
+|---|---|
+| Seed | `functions/scripts/seed-temp-demo-pack.js` + callable `seedTempDemoPack` (`functions/demo-seed-functions.js`) |
+| Rule | `.cursor/rules/temp-demo-accounts.mdc` |
+| Auth / profiles | Firebase Auth + `userProfiles` / `users`; codes in `system/demoAccounts` |
+| Clubs | `clubLocations/temp-democlub-{1..4}` full public profile + structured hours |
+| Schedule | `schedulingSubscriptions/club:temp-democlub-1` active; `scheduleShifts` + `clubEmployeeDesignations` |
+| Events | Featured genre nights on democlub_1 for `temp_dj_1..4` (Hip Hop / Afro House / EDM / Reggaeton·Latin) |
+| Delivery | `functions/demo-delivery.js` → email `bans.don@gmail.com`, SMS `+12027330274` (wired in receipt + Twilio messaging) |
+| UI | Master Admin → **Demo Accounts** (`master-admin-demo-accounts.js`) — removable |
+| Assets | `assets/demo-temp/avatars|icons/*.svg` + `manifest.json` |
+
+---
+
+## Structured club hours + crawl normalize
+
+**Purpose:** Hour / minute / AM|PM stay as separate datapoints for scheduling, hail, and discovery — never a single opaque wall-clock string as the source of truth.
+
+| Layer | Wiring |
+|---|---|
+| Shared | `shared-time.js` — `makeClock`, `normalizeWeekHours`, `normalizeCrawledHoursText`, `formatWeekHoursLines` |
+| Public profile | `club-profile-app.js` Details → Monday–Sunday opening lines from `hoursStructured` |
+| Crawl | `ai-diagnostics-service.js` extract + `ai-discovery-service.js` approve write `hoursStructured` / `hoursSource: crawl-normalized` |
+| Data shape | `{ hour, minute, meridiem, hour24, display }` per open/close; week under `hoursStructured.days.{monday..sunday}` |
+
+---
+
+## Staff Scheduling ($20/mo)
+
+**Purpose:** Club / promoter / DJ shift create + notify/approve.
+
+| Layer | Wiring |
+|---|---|
+| UI | Club Admin Scheduling tab (`admin.html` + `admin-scheduling.js`); `scheduling.html` portal |
+| Backend | `functions/scheduling-functions.js` — `getSchedulingAccess`, `createScheduleShift`, `listScheduleShifts`, `respondToScheduleShift` |
+| Notify | `scheduleNotifyQueue` → `onScheduleNotifyQueued` (SMS/WhatsApp); inbox on create/respond |
+| Data | `schedulingSubscriptions/{ownerType}:{ownerId}`; `scheduleShifts`; workers from `clubEmployeeDesignations` |
+| Demo | `temp-democlub-1` pre-subscribed + seeded shifts (see Demo Accounts) |
+| QA hub | `feature-tests-v29-09-122.html#scheduling` |
 
 ---
 
@@ -191,6 +237,8 @@ VCC editor will place hotspots on these JPEGs (full plan + section crops); zoom/
 3. Share ref → friend **Join table party** without waitress accept.  
 4. Outside hours → hard block + CSR/on-duty text option; fix hours in VCC and retest open window.  
 5. Existing hail auto-attaches ref; New-service hail allowed without prior VIP purchase.
+
+**Manual QA hub (layouts, scheduling, today’s ship):** `feature-tests-v29-09-122.html` on the feature branch — deep links for Shôko Scheduling, birthday layouts, supRstar timer, display IP-or-token, FloqAi cues.
 
 When adding a section, use this skeleton:
 

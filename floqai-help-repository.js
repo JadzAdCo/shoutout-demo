@@ -194,6 +194,22 @@
       page: "master-admin.html#displaySecurity"
     },
     {
+      id: "help-demo-accounts",
+      title: "Demo Accounts (temporal)",
+      body: "Removable QA pack of temp_*@floqr-demo.com users, demo clubs, and promo groups. Master Admin → Demo Accounts shows login codes. Outbound email redirects to bans.don@gmail.com with subject [FLOQR demo → intended@…]; SMS to +1 202-733-0274. temp-democlub-1 ships with structured Monday–Sunday hours, featured genre events (Hip Hop / Afro House / EDM / Reggaeton·Latin), and seeded staff schedules.",
+      searchPhrases: [
+        "demo accounts", "temp demo", "temp_democlub", "floqr-demo.com", "demo login codes",
+        "temporary demo club", "QA demo accounts"
+      ],
+      links: [
+        {label: "Master Admin Demo Accounts", href: vUrl("./master-admin.html", {from: "floqai"}) + "#demoAccounts"},
+        {label: "temp_democlub_1 profile", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
+        {label: "Scheduling test guide", href: vUrl("./feature-tests-v29-09-122.html", {from: "floqai"}) + "#scheduling"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#demoAccounts"
+    },
+    {
       id: "help-display-trigger-on-error-url",
       title: "Trigger on Error URL",
       body: "Xibo’s Trigger on page load error is usually a trigger code, not a URL. Copy the Trigger on Error URL from Display Security (or Diagnostics → Display / Xibo Load Errors) into a fallback Webpage layout that runs when that trigger fires. The URL opens display-error.html and logs under Diagnostics — not Security. Do not add ?v= or a board token.",

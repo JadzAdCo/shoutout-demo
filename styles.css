@@ -414,6 +414,10 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .club-profile-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:20px}
 .club-profile-facts>div{border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;background:rgba(255,255,255,.035)}
 .club-profile-facts span,.club-profile-facts strong{display:block}.club-profile-facts span{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.club-profile-facts strong{margin-top:5px}
+.club-hours-details ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.club-hours-details li{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:14px}
+.club-hours-details li strong{margin:0;font-size:13px;min-width:6.5rem}
+.club-hours-details li span{color:var(--text,inherit);text-transform:none;letter-spacing:0;font-size:14px}
 .club-profile-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
 .club-event-card,.club-promoter-card{overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:rgba(255,255,255,.035);text-align:left;color:inherit}
 .club-event-card img{width:100%;height:160px;object-fit:cover}.club-event-card>div{padding:16px}.club-event-card h3{font-size:21px;margin:5px 0}.club-event-card small{color:var(--muted)}

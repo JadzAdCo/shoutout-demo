@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>FLOQR — Feature tests (v29.09.122)</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.122"/>
+  <style>
+    .ft-shell{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+    .ft-shell h1{font-size:clamp(28px,7vw,42px);margin:0 0 8px}
+    .ft-shell .lede{color:var(--muted);margin:0 0 22px;line-height:1.45}
+    .ft-card{border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04))}
+    .ft-card h2{margin:0 0 6px;font-size:18px}
+    .ft-card ol,.ft-card ul{margin:8px 0 12px;padding-left:1.2em;color:var(--muted);font-size:14px;line-height:1.45}
+    .ft-card a.buttonlike,.ft-card a.ft-link{
+      display:inline-block;margin:4px 8px 4px 0;padding:10px 14px;border-radius:12px;
+      background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c;font-weight:900;text-decoration:none
+    }
+    .ft-card a.ghost{
+      background:transparent;border:1px solid var(--line);color:var(--text)
+    }
+    .ft-tag{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
+      padding:3px 8px;border-radius:999px;margin:0 6px 8px 0;background:rgba(223,255,90,.18);color:var(--lime)}
+    code{font-size:12px;word-break:break-all}
+  </style>
+</head>
+<body>
+<main class="ft-shell">
+  <p class="eyebrow">FLOQR · manual QA</p>
+  <h1>Feature tests</h1>
+  <p class="lede">Package focus: birthday layouts, supRstar live timer, display IP <strong>or</strong> token, FloqAi short cues, Staff Scheduling ($20/mo). Live base: <code>https://jadzadco.github.io/shoutout-demo/</code>. Prefer cache-bust <code>?v=29.09.122</code> on app pages (not on display URLs).</p>
+
+  <article class="ft-card" id="scheduling">
+    <span class="ft-tag">Scheduling</span>
+    <h2>Staff Scheduling (paid club + temp demo)</h2>
+    <p class="sub small">Subscription doc key is <code>club:{locationId}</code> in Firestore <code>schedulingSubscriptions</code>. Demo club: <code>temp-democlub-1</code> (seeded active). Live club example: <code>shoko-barcelona-spain</code>.</p>
+    <ol>
+      <li><strong>Codes</strong> — Master Admin → <em>Demo Accounts</em> → note <code>temp_clubadmin_1</code> login code. Sign in with that email (password from seed / <code>FLOQR_DEMO_PASSWORD</code>).</li>
+      <li><strong>Unlock</strong> — Open Club Admin for <code>temp-democlub-1</code>. Scheduling badge should show subscribed; workspace unlocked (no Stripe gate).</li>
+      <li><strong>Expect seeded shifts</strong> — Shift list shows Waitress / Bottle Girl / Busboy / Security / Host / Barman / DJ for Wed–Sun nights, start <strong>10:35 PM</strong> → end <strong>2:00 AM</strong> (atomic hour/minute/AM|PM on docs).</li>
+      <li><strong>Create one more</strong> — Pick a worker from the assignee list → set start/end → create with approval on → status <code>pending</code>.</li>
+      <li><strong>Worker approve</strong> — Sign in as that worker (e.g. <code>temp_waitress_1</code>) → Scheduling portal → My assignments → Approve. Expect status <code>approved</code> + Club Admin inbox note.</li>
+      <li><strong>Notify sink</strong> — If SMS channels enabled, message lands on <strong>+1 202-733-0274</strong> (not a fake demo number). Email subject prefixed <code>[FLOQR demo → temp_…@floqr-demo.com]</code> to <strong>bans.don@gmail.com</strong>.</li>
+      <li><strong>Public profile</strong> — Club profile shows Monday–Sunday opening times in Details; Featured events for Hip Hop / Afro House / EDM / Reggaeton·Latin DJs.</li>
+    </ol>
+    <a class="ft-link" href="./admin.html?location=temp-democlub-1&v=29.09.122#panelScheduling">temp_democlub_1 · Scheduling</a>
+    <a class="ft-link" href="./club-profile.html?location=temp-democlub-1&v=29.09.122">temp_democlub_1 · Public profile</a>
+    <a class="ft-link ghost" href="./scheduling.html?v=29.09.122&from=admin">Scheduling portal</a>
+    <a class="ft-link ghost" href="./master-admin.html?v=29.09.122">Master Admin · Demo Accounts</a>
+    <a class="ft-link ghost" href="./admin.html?location=shoko-barcelona-spain&v=29.09.122#panelScheduling">Shôko VCC · Scheduling</a>
+  </article>
+
+  <article class="ft-card" id="birthday-layout">
+    <span class="ft-tag">Layout · Birthday</span>
+    <h2>Birthday media layouts</h2>
+    <ol>
+      <li><strong>96×48</strong> — portrait photo fills the media slot (cover, no letterbox bars).</li>
+      <li><strong>64×48</strong> — fullscreen picture ↔ 4-line text rotate loop; photo contain + decorative fill.</li>
+      <li><strong>64×32</strong> — same rotate on landscape panel.</li>
+    </ol>
+    <a class="ft-link" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-96x48&main=HAPPY%20BIRTHDAY%20ALEX&mediaFit=cover&v=29.09.122">Preview 96×48 split</a>
+    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x48&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain&v=29.09.122">Preview 64×48 rotate</a>
+    <a class="ft-link ghost" href="./display.html?location=lima-twist-washington-dc&template=birthdayMedia&screenFormatId=led-64x32&main=HAPPY%20BIRTHDAY%20ALEX%20TONIGHT&mediaFit=contain&v=29.09.122">Preview 64×32 rotate</a>
+    <p class="sub small">Add <code>&amp;media=</code> with a portrait image URL for a real cover/contain check. Local layout mocks: <code>previews/birthday-media-layout-preview.html</code>.</p>
+  </article>
+
+  <article class="ft-card" id="suprstar-live">
+    <span class="ft-tag">supRstar</span>
+    <h2>Live duration (ICE-arm)</h2>
+    <ol>
+      <li>Start a paid+approved live → timer must <strong>not</strong> start until board ICE-connects.</li>
+      <li>Status should say waiting for board / WebRTC; after connect, full venue seconds run.</li>
+      <li>Master Admin / Firestore <code>appLogs</code> category <code>suprstar</code>: look for <code>live_timer_arm_ok</code>, <code>live_heartbeat</code>, <code>live_timer_fire</code>.</li>
+    </ol>
+    <a class="ft-link" href="./suprstr-search.html?v=29.09.122&from=test">Open supRstar</a>
+    <a class="ft-link ghost" href="./display2.html?location=shoko-barcelona-spain">Display 2 (stable, no ?v=)</a>
+  </article>
+
+  <article class="ft-card" id="display-security">
+    <span class="ft-tag">Display security</span>
+    <h2>IP <strong>or</strong> token unlock</h2>
+    <ol>
+      <li>Master Admin → Display Security → load Shôko (or test club). Confirm badge “Unlock: IP or token”.</li>
+      <li>With both ON: wrong IP + correct <code>?k=</code> → board opens; allowlisted IP without <code>k</code> → opens; both wrong → deny.</li>
+      <li>Security logs / messages show token last5 got/expect (not full secret).</li>
+    </ol>
+    <a class="ft-link" href="./master-admin.html?v=29.09.122#displaySecurity">Master Admin · Display Security</a>
+  </article>
+
+  <article class="ft-card" id="floqai">
+    <span class="ft-tag">FloqAi</span>
+    <h2>Short-cue intent search</h2>
+    <ul>
+      <li><code>throw</code> / <code>shou</code> → Throw a ShoutOut</li>
+      <li><code>sho</code> → ShoutOut + Shows/events</li>
+      <li><code>hai</code> / <code>hail</code> → RydR</li>
+    </ul>
+    <a class="ft-link" href="./?v=29.09.122&start=intent">Open FloqAi / Intent Search</a>
+  </article>
+
+  <article class="ft-card" id="vip-maps">
+    <span class="ft-tag">VIP maps · seed only</span>
+    <h2>Table maps (not bookable yet)</h2>
+    <p class="sub small">Decades + Lima Twist JPEGs are in-repo for the upcoming VIP/table feature — no patron booking UI yet.</p>
+    <a class="ft-link ghost" href="./assets/table-maps/decades-floor-plan.png">Decades map</a>
+    <a class="ft-link ghost" href="./assets/table-maps/lima-twist-table-map.png">Lima Twist map</a>
+  </article>
+
+  <p class="sub small">If a link looks stale, hard-refresh or bump <code>v=</code>. Display board URLs stay without <code>v=</code> for Xibo.</p>
+</main>
+</body>
+</html>

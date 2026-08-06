@@ -379,12 +379,30 @@
       publicSearchKeywords:[edited.proposedTitle, edited.proposedLocationName, edited.city, edited.country, ...(edited.categories || []), ...(edited.genres || [])].filter(Boolean),
       approvedFromDiscoveryQueueId:item.id,
       sourceUrl:edited.sourceUrl || "",
+      // Normalize crawled hours into atomic hour/minute/AM|PM before persist.
+      ...(function normalizeHoursForVenue() {
+        const ST = window.FLOQRStructuredTime;
+        const rawHours = edited.hours || edited.openingHours || edited.proposedHours || "";
+        if (!ST) return rawHours ? {hours: String(rawHours)} : {};
+        const structured = typeof rawHours === "object" && rawHours
+          ? ST.normalizeWeekHours(rawHours)
+          : ST.normalizeCrawledHoursText(String(rawHours || edited.proposedDescription || ""), "America/New_York");
+        const lines = ST.formatWeekHoursLines(structured);
+        return {
+          hoursStructured: structured,
+          openingHours: structured,
+          hoursDisplayLines: lines,
+          hours: lines.join("; "),
+          hoursSource: "crawl-normalized"
+        };
+      })(),
       updatedAt:nowField()
     } : {
       eventName:edited.proposedTitle || id,
       eventDate:edited.proposedDate || "",
       eventTime:edited.proposedTime || "",
       eventDay:edited.proposedDate || "",
+      eventTimeStructured:(window.FLOQRStructuredTime?.parseLooseClock?.(edited.proposedTime) || null),
       locationId:edited.locationId || "",
       locationName:edited.proposedLocationName || "",
       description:edited.proposedDescription || edited.aiSummary || "",

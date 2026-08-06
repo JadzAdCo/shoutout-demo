@@ -17,6 +17,7 @@ const {
   twilioWhatsAppAddress,
   selectOutboundTargets
 } = require("./messaging-core");
+const {redirectDemoSms} = require("./demo-delivery");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -159,7 +160,8 @@ async function logDelivery(entry = {}) {
 
 async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId = "", purpose = "alert"}) {
   const creds = twilioCredentials();
-  const phone = normalizeE164(to);
+  const routed = redirectDemoSms(to);
+  const phone = normalizeE164(routed.to || to);
   if (!phone) {
     await logDelivery({clubLocationId, channel, to, body, status: "invalid-to", dryRun: true, purpose, shoutoutId});
     return {ok: false, dryRun: true, status: "invalid-to"};

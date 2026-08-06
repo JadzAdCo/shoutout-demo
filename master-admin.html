@@ -93,6 +93,7 @@
         </div>
         <button class="admin-tab" data-panel="partnerIntegrations" type="button">Ticketing Partners</button>
         <button class="admin-tab" data-panel="aiCrawling" type="button">AI Crawling</button>
+        <button class="admin-tab" data-panel="demoAccounts" type="button">Demo Accounts</button>
       </nav>
 
       <section id="networkDashboard" class="admin-panel-section active">
@@ -891,6 +892,38 @@
         </div>
       </section>
 
+      <section id="demoAccounts" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Temporal · QA only</p>
+          <h2 class="help-label">
+            <span class="help-label-text">Demo Accounts</span>
+            <details class="help-popout inline-help-popout">
+              <summary>?</summary>
+              <div>
+                Removable pack of <code>temp_*@floqr-demo.com</code> accounts. Login codes live here.
+                Outbound email redirects to <strong>bans.don@gmail.com</strong> with subject prefix
+                <code>[FLOQR demo → intended@…]</code>. SMS redirects to <strong>+1 202-733-0274</strong>.
+                Tear down with <code>node functions/scripts/seed-temp-demo-pack.js --purge</code>.
+              </div>
+            </details>
+          </h2>
+          <p class="sub small">
+            Human roles ×4, promo groups ×4, demo clubs ×4. DJs map to Hip Hop / Afro House / EDM / Reggaeton·Latin.
+            Club <code>temp-democlub-1</code> has an active scheduling subscription and seeded worker shifts.
+          </p>
+          <div class="button-row">
+            <button id="seedDemoAccountsBtn" class="primary" type="button">Seed / refresh demo pack</button>
+            <button id="refreshDemoAccountsBtn" type="button">Refresh codes</button>
+            <button id="purgeDemoAccountsBtn" type="button">Purge demo pack</button>
+            <a class="buttonlike" href="./club-profile.html?location=temp-democlub-1&v=29.09.122" target="_blank" rel="noopener">Open temp_democlub_1 profile</a>
+            <a class="buttonlike" href="./admin.html?location=temp-democlub-1&v=29.09.122" target="_blank" rel="noopener">Club Admin scheduling</a>
+          </div>
+          <p id="demoAccountsStatus" class="status"></p>
+          <div id="demoAccountsMeta" class="metric-grid"></div>
+          <div id="demoAccountsTable" class="report-block"></div>
+        </div>
+      </section>
+
       <section id="staleRecordCleanup" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Reports · cleanup</p>
@@ -1107,7 +1140,8 @@
 <script src="./floqr-nav.js?v=29.09.22"></script>
 <script src="./global-profile-status.js?v=29.09.22"></script>
 <script src="./shared-data.js?v=29.09.103"></script>
-<script src="./feature-gates.js?v=29.09.103"></script>
+  <script src="./shared-time.js?v=29.09.122"></script>
+  <script src="./feature-gates.js?v=29.09.103"></script>
 <script src="./sos2fa.js?v=29.09.108"></script>
 <script src="./entity-management.js?v=29.09.97"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
@@ -1122,7 +1156,8 @@
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=29.09.115"></script>
-<script src="./master-display-security.js?v=29.09.122"></script>
+  <script src="./master-admin-demo-accounts.js?v=29.09.122"></script>
+  <script src="./master-display-security.js?v=29.09.122"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.98"></script>
 <script src="./admin-user-management.js?v=29.09.103"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
