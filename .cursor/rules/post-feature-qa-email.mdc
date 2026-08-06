@@ -1,0 +1,48 @@
+---
+description: After shipping features — email QA guide, track Succeed/Failed in Diagnostics, include troubleshooting prompts
+alwaysApply: true
+---
+
+# Post-feature QA email + Diagnostics (always)
+
+After any iteration that **adds, changes, or fixes** a user-visible FLOQR feature (or ships a new demo/test surface):
+
+## 1. Email the tester (required)
+
+Send **bans.don@gmail.com** a concise QA brief (SendGrid via `emailFloqrPreviewLinks` / Diagnostics **Email mobile preview links**, or an equivalent preview/QA mailer):
+
+| Section | Content |
+|---|---|
+| **Status** | Pages `main` SHA + live base URL; Functions deploy status if backend changed |
+| **Step-by-step test** | Ordered steps with exact live URLs (`?v=` on app pages; **no `?v=`** on display boards) |
+| **What success looks like** | One clear expected result per step |
+| **Track results** | Point to Master Admin → Diagnostics → **Manual Feature Tests** — mark **Succeed** / **Failed** + failure note |
+| **Troubleshoot** | If Failed: copy **Resolution Prompt**, check listed symptoms, confirm remotes/CI before re-emailing |
+
+Do **not** send the preview/QA email until the post-deploy CI gate is green when Functions/rules changed (`post-deploy-qc.mdc`). If CI cannot be checked, say so in the email and ask the tester to skim Actions for the published SHA.
+
+## 2. Mirror tests in Diagnostics (required)
+
+Same iteration as the code:
+
+1. Add/update entries in `ai-diagnostics-service.js` → `MANUAL_FEATURE_TESTS` with:
+   - `id`, `area`, `feature`, `changed`, `howToTest`, `expected`
+   - `troubleshoot` — short “if this fails, check…” prompts (include in UI + Codex resolution prompt)
+2. Add `PACKAGE_INSTALL_CHECKS` markers for new files / cache-bust strings when a package version ships.
+3. Bump `CURRENT_DIAGNOSTICS_PACKAGE_VERSION` / `PREVIEW_LINKS_PACKAGE` and cache-bust `ai-diagnostics-service.js` on `master-admin.html` when diagnostics content changes.
+4. Keep the hub page (`feature-tests-*.html`) in sync for deep links when useful.
+
+## 3. Foolproof bar
+
+A feature is not “done” for QA until:
+
+- [ ] Live URLs work on the published environment
+- [ ] Manual Feature Test row exists with Succeed/Failed tracking
+- [ ] Troubleshooting text exists for the common failure modes
+- [ ] Email sent to `bans.don@gmail.com` with steps + track/troubleshoot pointers
+- [ ] `docs/FEATURE-WIRING.md` updated (feature-wiring-records rule)
+
+## 4. Do not
+
+- Ship popout-only or chat-only test instructions without Diagnostics + email
+- Mark Fixed without asking the tester to re-run the Manual Feature Test and flip Succeed

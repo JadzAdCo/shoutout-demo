@@ -1790,19 +1790,18 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.52") {
+function defaultFloqrPreviewLinks(v = "29.09.123") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
+    ["Master Admin — Demo Accounts (Seed first)", `${base}/master-admin.html?v=${v}`],
+    ["Manual Feature Tests (Succeed / Failed tracking)", `${base}/master-admin.html?v=${v}`],
+    ["temp_democlub_1 — Club Admin Scheduling", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
+    ["temp_democlub_1 — Public profile", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+    ["Scheduling portal", `${base}/scheduling.html?v=${v}`],
+    ["Feature tests hub", `${base}/feature-tests-v29-09-122.html`],
     ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
-    ["Search / choose club (template page = free B&W + FloqAi)", `${base}/?v=${v}&location=heist-washington-dc`],
     ["Idle board — Use ShoutOut @ Clubname", `${base}/display.html?location=heist-washington-dc&screen=led-64x32`],
-    ["Soccer Jersey $30 — pick team in editor (Morocco preview)", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerMorocco&main=FLOQR&sub=%F0%9F%94%A5&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Jersey — Real Madrid crest", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerRealMadrid&jerseyTeamLabel=REAL%20MADRID&jerseyPrimary=%23FFFFFF&jerseySecondary=%23FEBE10&jerseyCssBack=1&main=VINI&sub=7&screen=led-64x32&preview=1&v=${v}`],
-    ["NBA Lakers jersey $30", `${base}/display.html?location=heist-washington-dc&template=nbaLosAngelesLakers&main=KING&sub=23&screen=led-64x32&preview=1&v=${v}`],
-    ["NFL Chiefs jersey $30", `${base}/display.html?location=heist-washington-dc&template=nflKansasCityChiefs&main=MAHOMES&sub=15&screen=led-64x32&preview=1&v=${v}`],
-    ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-    ["Staff Scheduling portal", `${base}/scheduling.html?v=${v}`],
-    ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
+    ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`]
   ];
 }
 
@@ -1814,29 +1813,39 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.40") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = ""} = {}) {
+function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = "", qaGuide = ""} = {}) {
   const v = String(packageVersion || "29.09.40").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
-  const subject = `FLOQR v${v} — mobile preview links`;
+  const subject = `FLOQR v${v} — QA brief + mobile preview links`;
   const intro = String(note || "").trim();
+  const guide = String(qaGuide || "").trim();
   const textBody = [
     subject,
     "",
     intro ? `${intro}\n` : "",
+    guide ? `${guide}\n` : "",
     "Open these on your phone. Admin/portal URLs include ?v= for cache-bust. Display board URLs stay stable (no version query).",
     "",
     ...rows.map(([label, url], i) => `${i + 1}. ${label}\n   ${url}`),
     "",
+    "Track results: Master Admin → Diagnostics → Manual Feature Tests → mark Succeed or Failed.",
+    "If Failed: add a failure note and Copy Resolution Prompt for Codex.",
+    "",
     "— FLOQR emailFloqrPreviewLinks"
   ].join("\n");
+  const htmlGuide = guide
+    ? `<pre style="white-space:pre-wrap;background:#f6f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px">${guide.replace(/</g, "&lt;")}</pre>`
+    : "";
   const htmlBody = `
     <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:680px">
       <h2 style="margin:0 0 8px">${subject}</h2>
-      ${intro ? `<p style="margin:0 0 12px">${intro.replace(/</g, "&lt;")}</p>` : ""}
-      <p style="margin:0 0 14px">Open on your phone. <strong>Admin/portal</strong> links use <code>?v=</code> for cache-bust. <strong>Display board</strong> links stay stable (no version query) for LED devices and external embeds.</p>
+      ${intro ? `<p style="margin:0 0 12px">${intro.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</p>` : ""}
+      ${htmlGuide}
+      <p style="margin:12px 0 14px">Open on your phone. <strong>Admin/portal</strong> links use <code>?v=</code> for cache-bust. <strong>Display board</strong> links stay stable (no version query) for LED devices and external embeds.</p>
       <ul style="margin:0;padding-left:18px">
         ${rows.map(([label, url]) => `<li style="margin:0 0 10px"><a href="${url}">${label.replace(/</g, "&lt;")}</a><br/><span style="color:#555;font-size:12px;word-break:break-all">${url}</span></li>`).join("")}
       </ul>
+      <p style="margin:16px 0 0"><strong>Track results:</strong> Master Admin → Diagnostics → Manual Feature Tests → mark <em>Succeed</em> or <em>Failed</em>. If Failed, add a note and use <em>Copy Resolution Prompt</em>.</p>
       <p style="color:#666;font-size:12px;margin-top:16px">Sent by FLOQR emailFloqrPreviewLinks</p>
     </div>`;
   return {subject, textBody, htmlBody, links: rows, packageVersion: v};
@@ -1860,8 +1869,9 @@ exports.emailFloqrPreviewLinks = onRequest({
     const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
     const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.34").trim();
     const note = String(body.note || query.note || "").trim();
+    const qaGuide = String(body.qaGuide || query.qaGuide || "").trim();
     const links = Array.isArray(body.links) ? body.links : [];
-    const mail = buildPreviewLinksEmail({packageVersion, links, note});
+    const mail = buildPreviewLinksEmail({packageVersion, links, note, qaGuide});
     const status = await sendgridMail({
       to: toEmail,
       from: PREVIEW_LINKS_DEFAULT_FROM,
@@ -1892,8 +1902,9 @@ exports.sendFloqrPreviewLinksEmail = onCall({
   const toEmail = String(data.to || email || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
   const packageVersion = String(data.package || data.v || "29.09.34").trim();
   const note = String(data.note || "").trim();
+  const qaGuide = String(data.qaGuide || "").trim();
   const links = Array.isArray(data.links) ? data.links : [];
-  const mail = buildPreviewLinksEmail({packageVersion, links, note});
+  const mail = buildPreviewLinksEmail({packageVersion, links, note, qaGuide});
   const status = await sendgridMail({
     to: toEmail,
     from: PREVIEW_LINKS_DEFAULT_FROM,

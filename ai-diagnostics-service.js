@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.9 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.123 */
 (function () {
   "use strict";
 
@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.52";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.123";
+  const PREVIEW_LINKS_PACKAGE = "29.09.123";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -879,10 +879,59 @@
         {label:"Script cache bust", file:"index.html", includes:["intent-search.js?v=29.09.9", "patron-app.js?v=29.09.9"]},
         {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.9", "floqr-nav.js?v=29.09.9"]}
       ]
+    },
+    {
+      version:"v29.09.123",
+      title:"Demo accounts + structured hours + scheduling QA diagnostics",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.123\""]},
+        {label:"Manual tests include demo seed + scheduling + hours", file:"ai-diagnostics-service.js", includes:["v29-09-123-demo-accounts-seed", "v29-09-123-democlub1-scheduling", "troubleshoot"]},
+        {label:"Demo Accounts Master Admin tab", file:"master-admin.html", includes:["data-panel=\"demoAccounts\"", "master-admin-demo-accounts.js", "seedDemoAccountsBtn"]},
+        {label:"Structured time shared module", file:"shared-time.js", includes:["normalizeCrawledHoursText", "makeClock", "FLOQRStructuredTime"]},
+        {label:"Seed callable exported", file:"functions/index.js", includes:["demo-seed-functions"]},
+        {label:"Post-feature QA email rule", file:".cursor/rules/post-feature-qa-email.mdc", includes:["Manual Feature Tests", "bans.don@gmail.com"]},
+        {label:"Script cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.123"]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-123-demo-accounts-seed",
+      area:"Demo Accounts / QA pack",
+      feature:"Seed temp_*@floqr-demo.com pack + login codes",
+      changed:"Master Admin → Demo Accounts seeds Auth users, temp-democlub-1..4, featured genre events, and scheduleShifts. Outbound email/SMS redirect to bans.don@gmail.com / +1 202-733-0274.",
+      howToTest:"Open master-admin.html?v=29.09.123 → Demo Accounts (hard refresh if missing). Click Seed / refresh demo pack. Confirm account table + login codes + shiftCount. Sign in as temp_clubadmin_1@floqr-demo.com with FloqrDemo2026!.",
+      expected:"Seed succeeds without permission errors. Codes visible. system/demoAccounts doc exists. Club Admin for temp-democlub-1 opens Scheduling subscribed.",
+      troubleshoot:"If Seed fails: confirm seedTempDemoPack is deployed; sign in as Master Admin (bans.don@gmail.com). If tab missing: hard refresh / confirm Pages SHA includes master-admin-demo-accounts.js. If login fails: re-seed (resets password to FloqrDemo2026!)."
+    },
+    {
+      id:"v29-09-123-democlub1-scheduling",
+      area:"Staff Scheduling",
+      feature:"temp-democlub-1 worker schedule + approve flow",
+      changed:"Demo club has active schedulingSubscriptions/club:temp-democlub-1, designated workers, and seeded Wed–Sun shifts 10:35 PM–2:00 AM with atomic startClock/endClock.",
+      howToTest:"admin.html?location=temp-democlub-1&v=29.09.123#panelScheduling as temp_clubadmin_1 → confirm subscribed + seeded shifts. Create one pending shift for temp_waitress_1 → sign in as waitress → scheduling.html My assignments → Approve.",
+      expected:"Workspace unlocked (no $20 gate). Seeded roles listed. New shift pending→approved; Club Admin gets inbox note. SMS (if enabled) hits +1 202-733-0274; email subject prefixed [FLOQR demo → …].",
+      troubleshoot:"Subscribe gate still showing: check Firestore schedulingSubscriptions/club:temp-democlub-1 status=active. Empty assignee list: re-seed (clubEmployeeDesignations). Callable errors: confirm scheduling-functions deployed. No SMS: channels off is Soft Fail — still pass if in-app approve works."
+    },
+    {
+      id:"v29-09-123-democlub1-public-profile-hours",
+      area:"Club Public Profile",
+      feature:"temp-democlub-1 Details hours + featured genre events",
+      changed:"Public profile shows Monday–Sunday opening times from hoursStructured (hour/minute/meridiem). Featured events for Hip Hop / Afro House / EDM / Reggaeton·Latin (temp_dj_1..4).",
+      howToTest:"Open club-profile.html?location=temp-democlub-1&v=29.09.123. In About/Details confirm day names spelled out and times like 10:35 PM. Confirm upcoming featured events and Featured DJs section.",
+      expected:"Mon/Tue Closed (club 1); other days show open–close. Four genre nights / DJs visible. No raw object dumps for eventTime.",
+      troubleshoot:"Blank hours: confirm clubLocations/temp-democlub-1 has hoursStructured + hoursDisplayLines after Seed. Stale UI: hard refresh ?v=29.09.123 and shared-time.js loaded. Missing events: re-seed; check events where locationId==temp-democlub-1."
+    },
+    {
+      id:"v29-09-123-structured-hours-crawl",
+      area:"AI Crawling",
+      feature:"Crawl hours normalize to atomic datapoints",
+      changed:"Source extract / approve path uses FLOQRStructuredTime.normalizeCrawledHoursText before presenting/persisting hours (hoursStructured, hoursSource crawl-normalized).",
+      howToTest:"Master Admin → AI Crawling → paste source text containing e.g. Fri–Sat 10:35 PM–3:00 AM → Extract Source Details. Confirm hoursStructured / hoursDisplayLines on the review record. Approve a venue and confirm club doc keeps structured open/close clocks.",
+      expected:"Parsed days show separate hour, minute, meridiem — not a single opaque wall-clock string as the only source of truth.",
+      troubleshoot:"No structured fields: confirm shared-time.js is loaded on master-admin.html before ai-discovery/ai-diagnostics scripts. Approve without hours: Soft Fail if source had no hours text — use a paste that includes day+time ranges."
+    },
     {
       id:"v29-09-9-ask-floqr-intent-search",
       area:"Search",
@@ -2567,6 +2616,7 @@
       lines.push(`Changed feature: ${cleanText(row.changed)}`);
       lines.push(`How to test: ${cleanText(row.howToTest)}`);
       lines.push(`Expected result: ${cleanText(row.expected)}`);
+      if (row.troubleshoot) lines.push(`Troubleshoot: ${cleanText(row.troubleshoot)}`);
       lines.push(`Master Admin note: ${cleanText(row.note || "-")}`);
       lines.push(`Updated: ${row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-"}`);
     });
@@ -2577,7 +2627,7 @@
     const failed = rows.filter(row => row.result === "failed");
     const notTested = rows.filter(row => !row.result);
     const failedText = failed.length
-      ? failed.map((row, index) => `${index + 1}. ${row.area}: ${row.feature}\n   What changed: ${cleanText(row.changed)}\n   How I tested: ${cleanText(row.howToTest)}\n   Expected: ${cleanText(row.expected)}\n   Failure note from Master Admin: ${cleanText(row.note || "Marked Failed without additional notes.")}`).join("\n")
+      ? failed.map((row, index) => `${index + 1}. ${row.area}: ${row.feature}\n   What changed: ${cleanText(row.changed)}\n   How I tested: ${cleanText(row.howToTest)}\n   Expected: ${cleanText(row.expected)}\n   Troubleshoot hints: ${cleanText(row.troubleshoot || "None listed.")}\n   Failure note from Master Admin: ${cleanText(row.note || "Marked Failed without additional notes.")}`).join("\n")
       : "No manual feature tests were marked Failed.";
     const notTestedText = notTested.length
       ? notTested.map(row => `- ${row.area}: ${row.feature}`).join("\n")
@@ -2630,6 +2680,7 @@
         <p><strong>Changed feature:</strong> ${esc(row.changed)}</p>
         <p><strong>How to test:</strong> ${esc(row.howToTest)}</p>
         <p><strong>Expected:</strong> ${esc(row.expected)}</p>
+        ${row.troubleshoot ? `<p><strong>If this fails:</strong> ${esc(row.troubleshoot)}</p>` : ""}
         <div class="manual-test-actions">
           <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="succeed" ${row.result === "succeed" ? "checked" : ""}/> Succeed</label>
           <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="failed" ${row.result === "failed" ? "checked" : ""}/> Failed</label>

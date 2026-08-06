@@ -91,9 +91,10 @@ After every iteration that changes patron/admin UX, **and after the CI quality g
 
 1. Publish the package to GitHub Pages (or confirm the live site reflects the change).
 2. Master Admin → **Diagnostics** → **Email mobile preview links** (SendGrid via `sendFloqrPreviewLinksEmail` when signed in).
-3. Or POST to Cloud Function `emailFloqrPreviewLinks` (defaults to `bans.don@gmail.com` if not signed in).
+3. Or POST to Cloud Function `emailFloqrPreviewLinks` (defaults to `bans.don@gmail.com` if not signed in). Include a **QA brief**: status table, step-by-step tests, success expectations, Manual Feature Tests Succeed/Failed tracking, and troubleshoot prompts (`qaGuide` / `note` fields).
 4. Update `PREVIEW_LINKS_PACKAGE` in `ai-diagnostics-service.js` and `defaultFloqrPreviewLinks()` in `functions/ai-discovery-functions.js` when the package version changes.
 5. Include **stable display URLs** (no `?v=`) for LED/embed links; admin/portal links may include `?v=`.
+6. Mirror the same scenarios in Diagnostics → **Manual Feature Tests** (`MANUAL_FEATURE_TESTS` + `troubleshoot` field). See `.cursor/rules/post-feature-qa-email.mdc`.
 
 Confirm the email arrived before marking the deploy complete.
 

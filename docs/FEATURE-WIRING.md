@@ -12,6 +12,20 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 
 ---
 
+## Post-feature QA email + Manual Feature Diagnostics
+
+**Purpose:** After shipping features, email a test brief and track Succeed/Failed in Master Admin Diagnostics.
+
+| Layer | Wiring |
+|---|---|
+| Rule | `.cursor/rules/post-feature-qa-email.mdc` |
+| Email | `emailFloqrPreviewLinks` / `sendFloqrPreviewLinksEmail` — `note`, `qaGuide`, live links → `bans.don@gmail.com` |
+| Diagnostics UI | Master Admin → Diagnostics → **Manual Feature Tests** (`#diagnosticsManualTests`) |
+| Client | `ai-diagnostics-service.js` — `MANUAL_FEATURE_TESTS` (+ `troubleshoot`), Succeed/Failed + Codex resolution prompt |
+| Package | `CURRENT_DIAGNOSTICS_PACKAGE_VERSION` / `PACKAGE_INSTALL_CHECKS` |
+
+---
+
 ## Temp demo accounts (`temp_*@floqr-demo.com`)
 
 **Purpose:** Removable QA pack for scheduling, public profiles, and delivery sinks.
