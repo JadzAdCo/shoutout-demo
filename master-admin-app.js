@@ -193,8 +193,16 @@
       btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
     });
 
-    // Deep-link: #securityLogs / #displaySecurity / etc.
-    const hashPanel = String(location.hash || "").replace(/^#/, "");
+    // Deep-link: #securityLogs / #displaySecurity / #demoAccounts / kebab aliases
+    const hashRaw = String(location.hash || "").replace(/^#/, "");
+    const hashAliases = {
+      "demo-accounts": "demoAccounts",
+      "demo_accounts": "demoAccounts",
+      "manual-feature-tests": "diagnosticsManualTests",
+      "display-security": "displaySecurity",
+      "ai-crawling": "aiCrawling"
+    };
+    const hashPanel = hashAliases[hashRaw] || hashRaw;
     if (hashPanel && byId(hashPanel)) activatePanel(hashPanel);
 
     window.FLOQRMasterTabs = {activatePanel};

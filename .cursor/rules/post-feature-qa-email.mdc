@@ -1,5 +1,5 @@
 ---
-description: After shipping features — email QA guide, track Succeed/Failed in Diagnostics, include troubleshooting prompts
+description: After shipping features — verify live links yourself, then email QA; track Succeed/Failed in Diagnostics
 alwaysApply: true
 ---
 
@@ -7,13 +7,35 @@ alwaysApply: true
 
 After any iteration that **adds, changes, or fixes** a user-visible FLOQR feature (or ships a new demo/test surface):
 
-## 1. Email the tester (required)
+## 0. Agent verifies BEFORE emailing (required — no exceptions)
+
+**Do not email Master Admin until you have personally verified the live surface.** Wasting admin time with broken / missing tabs or 404 links is a process failure.
+
+For every URL you plan to put in the email:
+
+1. **Open or fetch the live Pages URL** (not only local disk) — e.g. `https://jadzadco.github.io/shoutout-demo/...`
+2. **Confirm the UI control exists** — tab label, button, panel `id`, script include. Example: “Demo Accounts” must appear in Master Admin nav HTML **and** activate the panel.
+3. **Confirm deep links** — hash/panel ids match (`#demoAccounts` not a guessed `#demo-accounts` unless you added an alias).
+4. **Confirm cache-bust** — `?v=` matches published files; hard-refresh expectation is documented only after the string is in the live HTML.
+5. **Smoke the happy path once** when credentials allow (Seed button present, profile loads, scheduling gate state). If Auth/Firestore seed cannot run from the agent, still verify **static presence** of the tab/links and say so explicitly in the email (“Seed not executed by agent — tab verified live”).
+
+If verification fails: **fix and re-publish**, then re-verify. Only then send mail.
+
+Checklist before send:
+
+- [ ] Live fetch/browser shows each promised nav item / CTA
+- [ ] Each emailed URL returns 200 (or expected auth gate — not a missing feature)
+- [ ] Hash/panel deep-links resolve to the intended section
+- [ ] Broken links removed or fixed — never “hope hard refresh fixes it” as the only plan
+
+## 1. Email the tester (required — only after §0)
 
 Send **bans.don@gmail.com** a concise QA brief (SendGrid via `emailFloqrPreviewLinks` / Diagnostics **Email mobile preview links**, or an equivalent preview/QA mailer):
 
 | Section | Content |
 |---|---|
 | **Status** | Pages `main` SHA + live base URL; Functions deploy status if backend changed |
+| **Verified** | One line: “Agent verified live: …” listing checks that passed |
 | **Step-by-step test** | Ordered steps with exact live URLs (`?v=` on app pages; **no `?v=`** on display boards) |
 | **What success looks like** | One clear expected result per step |
 | **Track results** | Point to Master Admin → Diagnostics → **Manual Feature Tests** — mark **Succeed** / **Failed** + failure note |
@@ -36,6 +58,7 @@ Same iteration as the code:
 
 A feature is not “done” for QA until:
 
+- [ ] **Agent verified live links/UI** (§0) — not only committed locally
 - [ ] Live URLs work on the published environment
 - [ ] Manual Feature Test row exists with Succeed/Failed tracking
 - [ ] Troubleshooting text exists for the common failure modes
@@ -44,5 +67,6 @@ A feature is not “done” for QA until:
 
 ## 4. Do not
 
+- Email Master Admin untested or guessed links
 - Ship popout-only or chat-only test instructions without Diagnostics + email
 - Mark Fixed without asking the tester to re-run the Manual Feature Test and flip Succeed
