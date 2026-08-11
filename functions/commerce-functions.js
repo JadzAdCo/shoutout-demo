@@ -2570,7 +2570,15 @@ exports.sendTestPaidShoutoutReceipt = onCall({
   const temp = buildTempShoutoutReceipt({
     shoutout:{
       referenceNumber,
-      locationName:text(request.data?.locationName, 160) || "Zebbies Garden",
+      locationName:text(request.data?.locationName, 160) || "Zebbies Garden DC",
+      brandName:text(request.data?.brandName, 160) || "Zebbies Garden",
+      streetAddress:text(request.data?.streetAddress, 160) || "1223 Connecticut Avenue NW",
+      city:text(request.data?.city, 80) || "Washington",
+      region:text(request.data?.region, 80) || "District of Columbia",
+      postalCode:text(request.data?.postalCode, 20) || "20036",
+      country:text(request.data?.country, 80) || "United States",
+      screenFormatId:text(request.data?.screenFormatId, 40) || "led-96x48",
+      screenFormatLabel:text(request.data?.screenFormatLabel, 120) || "",
       templateName:text(request.data?.templateName, 160) || "Soccer Jersey",
       mainText:text(request.data?.mainText, 80) || "TEST",
       subText:text(request.data?.subText, 8) || "99"

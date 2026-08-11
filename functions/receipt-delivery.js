@@ -4,12 +4,49 @@
 const admin = require("firebase-admin");
 const {redirectDemoEmail, redirectDemoSms} = require("./demo-delivery");
 
+/** Human labels for display formats (keep in sync with shared-data FLOQR_DISPLAY_FORMATS). */
+const SCREEN_FORMAT_LABELS = {
+  "p125-96x48": "P1.25 - 96 x 48 cm",
+  "p125-64x48": "P1.25 - 64 x 48 cm",
+  "p125-64x32": "P1.25 - 64 x 32 cm",
+  "led-96x48": "96 x 48 cm",
+  "led-64x48": "64 x 48 cm",
+  "led-64x32": "64 x 32 cm"
+};
+
 function text(value = "", max = 500) {
   return String(value == null ? "" : value).trim().slice(0, max);
 }
 
 function money(cents = 0) {
   return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
+}
+
+function screenFormatLabel(shoutout = {}) {
+  const id = text(shoutout.screenFormatId || shoutout.displayScreenFormatId, 40);
+  const explicit = text(shoutout.screenFormatLabel || shoutout.displayScreenFormatLabel, 120);
+  if (explicit) return explicit;
+  if (id && SCREEN_FORMAT_LABELS[id]) return SCREEN_FORMAT_LABELS[id];
+  return id || "";
+}
+
+function venueAddress(shoutout = {}) {
+  const full = text(shoutout.fullAddress || shoutout.locationAddress || shoutout.venueAddress, 300);
+  if (full) return full;
+  const street = text(shoutout.streetAddress || shoutout.addressLine1 || shoutout.address, 160);
+  const city = text(shoutout.city, 80);
+  const region = text(shoutout.region || shoutout.state || shoutout.regionLabel, 80);
+  const postal = text(shoutout.postalCode || shoutout.zip, 20);
+  const country = text(shoutout.country, 80);
+  const line = [street, [city, region].filter(Boolean).join(", "), postal, country].filter(Boolean).join(", ");
+  return text(line, 300);
+}
+
+function venueDisplayName(shoutout = {}) {
+  return text(
+    shoutout.locationName || shoutout.clubName || shoutout.brandName || shoutout.venueName,
+    160
+  );
 }
 
 function pdfEscape(value = "") {
@@ -60,11 +97,24 @@ function formatPaidAt(value) {
 }
 
 function buildTempShoutoutReceipt({shoutout = {}, orderId = "", invoiceNumber = "", amountCents = 0} = {}) {
+  const formatId = text(shoutout.screenFormatId || shoutout.displayScreenFormatId, 40);
+  const formatLabel = screenFormatLabel(shoutout);
+  const address = venueAddress(shoutout);
   return {
     status: "temp",
     kind: "shoutout",
     referenceNumber: text(shoutout.referenceNumber, 80),
-    locationName: text(shoutout.locationName || shoutout.clubName, 160),
+    locationId: text(shoutout.clubLocationId || shoutout.location || shoutout.club, 120),
+    brandName: text(shoutout.brandName, 160),
+    locationName: venueDisplayName(shoutout),
+    locationAddress: address,
+    streetAddress: text(shoutout.streetAddress || shoutout.addressLine1 || shoutout.address, 160),
+    city: text(shoutout.city, 80),
+    region: text(shoutout.region || shoutout.state, 80),
+    postalCode: text(shoutout.postalCode || shoutout.zip, 20),
+    country: text(shoutout.country, 80),
+    screenFormatId: formatId,
+    screenFormatLabel: formatLabel,
     templateName: text(shoutout.templateName || shoutout.template, 160),
     statusLabel: "Pending Location Approval",
     mainText: text(shoutout.mainText, 400),
@@ -95,10 +145,17 @@ function promoteShoutoutReceipt(tempReceipt = {}, payment = {}) {
 }
 
 function receiptBodyLines(receipt = {}) {
+  const screen = text(receipt.screenFormatLabel, 120) || text(receipt.screenFormatId, 40);
+  const address = text(receipt.locationAddress || venueAddress(receipt), 300);
+  const venue = text(receipt.locationName || venueDisplayName(receipt), 160);
   return [
     `Reference: ${receipt.referenceNumber || "—"}`,
-    `Location: ${receipt.locationName || "—"}`,
+    `Venue: ${venue || "—"}`,
+    address ? `Address: ${address}` : "",
+    screen ? `Screen size: ${screen}` : "",
     `Template: ${receipt.templateName || "—"}`,
+    receipt.mainText ? `Message: ${text(receipt.mainText, 120)}` : "",
+    receipt.subText ? `Sub: ${text(receipt.subText, 40)}` : "",
     `Status: ${receipt.statusLabel || "Pending Location Approval"}`,
     `Paid at: ${receipt.paidAtIso || "—"}`,
     `Invoice: ${receipt.invoiceNumber || "—"}`,
@@ -217,7 +274,7 @@ async function deliverFinalPaidShoutoutReceipt({
 } = {}) {
   const ownerUid = text(order.ownerUid, 160);
   const ownerEmail = text(order.customerEmail || order.ownerEmail, 200);
-  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}&v=29.09.56`;
+  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}`;
   const inboxId = await writeFloqrInboxReceipt({
     recipientUid: ownerUid,
     recipientEmail: ownerEmail,
@@ -287,5 +344,9 @@ module.exports = {
   receiptBodyLines,
   formatPaidAt,
   money,
+  screenFormatLabel,
+  venueAddress,
+  venueDisplayName,
+  SCREEN_FORMAT_LABELS,
   sendTwilioSms
 };

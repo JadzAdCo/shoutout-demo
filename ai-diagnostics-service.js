@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.123";
-  const PREVIEW_LINKS_PACKAGE = "29.09.123";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.125";
+  const PREVIEW_LINKS_PACKAGE = "29.09.125";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -896,6 +896,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-125-shoutout-receipt-screen-venue",
+      area:"ShoutOut / Payments",
+      feature:"Receipt includes screen size + venue address",
+      changed:"Confirmation splash, payment-return, FloqR Inbox, and email PDF list Venue, Address, and Screen size from the chosen display format and club location.",
+      howToTest:"Submit a paid ShoutOut (e.g. birthday media or jersey) at Zebbies Garden DC after choosing a screen size. On the confirmation splash and payment-return page, confirm Venue / Address / Screen size. Check FloqR Inbox paid receipt body and email PDF for the same lines.",
+      expected:"Screen size shows a human label (e.g. 96 x 48 cm or P1.25 - 96 x 48 cm). Address includes street (1223 Connecticut Avenue NW for Zebbies). Venue name matches the club. Unpaid free submissions also show Venue/Address/Screen on the confirmation splash.",
+      troubleshoot:"Missing screen/address on paid receipt only: Functions must be redeployed (receipt-delivery.js). Missing on confirmation splash: hard-refresh index.html with patron-app.js?v=29.09.125. Empty address: clubLocations doc needs streetAddress/fullAddress (shared-data seed). Old Inbox rows will not backfill — submit a new order."
+    },
     {
       id:"v29-09-123-demo-accounts-seed",
       area:"Demo Accounts / QA pack",

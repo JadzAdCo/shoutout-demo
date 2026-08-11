@@ -94,10 +94,24 @@
 
     if (paid && isShoutout) {
       const paidAt = paidAtLabel(order) || "—";
+      const shout = order.payload?.shoutout || {};
+      const screen = receipt.screenFormatLabel
+        || shout.screenFormatLabel
+        || window.FLOQR_DISPLAY_FORMATS?.[receipt.screenFormatId || shout.screenFormatId]?.label
+        || receipt.screenFormatId
+        || shout.screenFormatId
+        || "—";
+      const address = receipt.locationAddress
+        || shout.fullAddress
+        || shout.locationAddress
+        || [shout.streetAddress, [shout.city, shout.region].filter(Boolean).join(", "), shout.postalCode, shout.country].filter(Boolean).join(", ")
+        || "—";
       byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
-        <p><strong>Reference:</strong> ${esc(receipt.referenceNumber || order.payload?.shoutout?.referenceNumber || "—")}</p>
-        <p><strong>Location:</strong> ${esc(receipt.locationName || order.payload?.shoutout?.locationName || "—")}</p>
-        <p><strong>Template:</strong> ${esc(receipt.templateName || order.payload?.shoutout?.templateName || order.itemName || "—")}</p>
+        <p><strong>Reference:</strong> ${esc(receipt.referenceNumber || shout.referenceNumber || "—")}</p>
+        <p><strong>Venue:</strong> ${esc(receipt.locationName || shout.locationName || shout.brandName || "—")}</p>
+        <p><strong>Address:</strong> ${esc(address)}</p>
+        <p><strong>Screen size:</strong> ${esc(screen)}</p>
+        <p><strong>Template:</strong> ${esc(receipt.templateName || shout.templateName || order.itemName || "—")}</p>
         <p><strong>Status:</strong> ${esc(receipt.statusLabel || "Pending Location Approval")}</p>
         <p><strong>Paid at:</strong> ${esc(paidAt)}</p>
         <p><strong>Invoice:</strong> ${esc(receipt.invoiceNumber || order.invoiceNumber || "—")}</p>

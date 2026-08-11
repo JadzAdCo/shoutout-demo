@@ -167,6 +167,23 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
+## ShoutOut paid receipt (screen + venue)
+
+**Purpose:** Confirmation splash, Stripe return page, FloqR Inbox, email PDF, and SMS carry the chosen display screen size plus venue name/address — not only reference/template.
+
+| Layer | Wiring |
+|---|---|
+| Patron confirm UI | `index.html` `#confirmationPage` — Venue, Address, Screen size; `patron-app.js` `showShoutoutConfirmation` |
+| Payment return | `payment-return-app.js` shoutout receipt block |
+| Submit payload | `patron-app.js` — `screenFormatId` / `screenFormatLabel`, `streetAddress`, `fullAddress` / `locationAddress`, city/region/postal/country |
+| Backend | `functions/receipt-delivery.js` — `buildTempShoutoutReceipt`, `receiptBodyLines`, `screenFormatLabel`, `venueAddress` |
+| Checkout | `functions/commerce-functions.js` stores `order.receipt` at checkout create; promotes on paid |
+| Delivery | Inbox `paidShoutoutReceipt` + SendGrid PDF + optional Twilio SMS |
+
+**Contract:** Screen label prefers `FLOQR_DISPLAY_FORMATS` / `SCREEN_FORMAT_LABELS` (e.g. `led-96x48` → `96 x 48 cm`). Address prefers `fullAddress`, else street + city/region + postal + country.
+
+---
+
 ## Birthday media template (split + rotate)
 
 **Purpose:** Birthday ShoutOut with patron photo/video — readable on large panels and compact LEDs.
