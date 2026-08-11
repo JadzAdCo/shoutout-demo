@@ -55,14 +55,21 @@
       return;
     }
     const c = await counts(db, user.uid);
+    const nav = window.FLOQRNav;
+    const profileHref = nav?.portalHome?.({ tab: "profile" }) || "./patron-portal.html?tab=profile";
+    const inboxHref = nav?.portalHome?.({ tab: "messages" }) || "./patron-portal.html?tab=messages";
+    const minglHref = nav?.minglChatHome?.() || nav?.portalLink?.("./mingl-chat.html") || "./mingl-chat.html?from=portal";
+    const bartrHref = nav?.commerceHome?.() || "./commerce.html?from=search";
+    const rydrHref = nav?.rydrHome?.() || "./rydr.html?from=search";
+    const floqaiHref = nav?.intentSearchHome?.() || "./?start=intent";
     dropdown.innerHTML = `<strong>${esc(profile.displayName || user.displayName || user.email || "FLOQR Member")}</strong>
       <small>${esc(user.email || "")}</small>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=profile&v=29.09.8">My Profile and Settings</a>
-      <a class="profile-menu-link" href="./patron-portal.html?tab=messages&v=29.09.8">FloqR Inbox (${esc(c.messages)})</a>
-      <a class="profile-menu-link" href="./mingl-chat.html?v=29.09.9&from=portal">Mingl Chat (${esc(c.chats)})</a>
-      <a class="profile-menu-link" href="./commerce.html?v=29.09.9&from=search">BartR</a>
-      <a class="profile-menu-link" href="./rydr.html?v=29.09.9&from=search">RydR</a>
-      <a class="profile-menu-link" href="./?v=29.09.39&start=intent">FloqAi</a>
+      <a class="profile-menu-link" href="${esc(profileHref)}">My Profile and Settings</a>
+      <a class="profile-menu-link" href="${esc(inboxHref)}">FloqR Inbox (${esc(c.messages)})</a>
+      <a class="profile-menu-link" href="${esc(minglHref)}">Mingl Chat (${esc(c.chats)})</a>
+      <a class="profile-menu-link" href="${esc(bartrHref)}">BartR</a>
+      <a class="profile-menu-link" href="${esc(rydrHref)}">RydR</a>
+      <a class="profile-menu-link" href="${esc(floqaiHref)}">FloqAi</a>
       <button id="floqrGlobalSignOutBtn" type="button">Sign out</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
   }

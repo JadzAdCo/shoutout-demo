@@ -720,6 +720,7 @@
     if (location.hash === "#sms-notifications") {
       setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
     }
+  }
 
   function connectStatusMessage(result = {}) {
     if (result.transfersReady) return `Stripe payouts are ready (${result.livemode ? "live mode" : "test mode"}).`;

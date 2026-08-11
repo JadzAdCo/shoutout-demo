@@ -158,9 +158,12 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | UI | `patron-portal.html` — `#portalLogin` / `#portalPanel` |
 | Client | `patron-portal-app.js` — `applyPortalAuthUi`, `bootPortalForUser`, `auth.onAuthStateChanged`, `auth.authStateReady`, `floqr:profile-access-ready`, short sync interval |
 | Guard | `profile-access-guard.js` (does not own the Sign-in card on this page) |
-| Global chrome | `global-profile-status.js` — avatar menu uses the same Firebase auth |
+| Global chrome | `global-profile-status.js` — avatar menu builds hrefs via `FLOQRNav.portalHome` / `minglChatHome` / etc. (no hardcoded `?v=`) |
+| Nav | `floqr-nav.js` — `packageVersion()` from page `?v=` or `floqr-nav.js` script cache-bust; `stampAppAnchors()` on portal DOM ready |
 
-**Bug fixed (v29.09.119):** Signed-in avatar could show while Sign-in card stayed visible — portal shell now re-syncs from `auth.currentUser` and keeps the panel open if profile load fails.
+**Bug fixed (v29.09.119):** Signed-in avatar could show while Sign-in card stayed visible — portal shell re-syncs from `auth.currentUser`.
+
+**Bug fixed (v29.09.124):** `patron-portal-app.js` had a missing `}` after `fillProfileForm`, so the whole IIFE failed to parse and the UI stayed on “Checking sign-in…”. Profile-card links also pointed at stale hardcoded `?v=29.09.8`; they now go through `FLOQRNav`.
 
 ---
 

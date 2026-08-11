@@ -1,0 +1,31 @@
+---
+description: Never hardcode package ?v= versions in navigation or menu hrefs
+alwaysApply: true
+---
+
+# No hardcoded `?v=` in links (always)
+
+Do **not** paste package version numbers into user-facing navigation links, menu items, CTAs, redirects, or back buttons.
+
+## Why
+
+Hardcoded `href="./patron-portal.html?tab=profile&v=29.09.8"` (and similar) go stale on `main` while the live package moves on. Patrons then open old cached shells (e.g. stuck “Checking sign-in…”) even though a fix already shipped.
+
+## Do this instead
+
+1. **Build URLs with `FLOQRNav`** — `portalHome()`, `searchHome()`, `portalLink()`, `adminHome()`, `intentSearchHome()`, `stableDisplayUrl()`, etc.
+2. **Let version come from the nav helper** — `FLOQRNav` resolves `v` from the current page `?v=`, else from the `floqr-nav.js` script `src` cache-bust, else a single fallback inside `floqr-nav.js` only.
+3. **Static HTML placeholders** may omit `v` or use a non-versioned path; stamp with `FLOQRNav` on DOM ready (`applyGlobalBack`, or set `href` from `FLOQRNav.*` in the page’s app script). Prefer `data-from` / meaningful query keys (`tab=`, `location=`) without embedding a package id.
+4. **Display boards** — never add cache-bust `?v=` (`stableDisplayUrl` / `stableSecondaryDisplayUrl`).
+
+## Allowed version stamps (not “links”)
+
+- **Asset cache-bust** on `<script src>` / `<link rel="stylesheet">` when you change that file for a publish — that is deploy hygiene, not navigation.
+- **One** fallback constant inside `floqr-nav.js` (or equivalent single source), never scattered across HTML/JS href strings.
+- **QA / preview emails / Diagnostics steps** may cite an exact live `?v=` for a test pass — that is documentation for testers, not product chrome.
+
+## Checklist before commit
+
+- [ ] No new `href` / `location.href` / `link:` fields with a literal `v=29.…`
+- [ ] Profile card, FloqAi, category cards, and portal tab links go through `FLOQRNav` (or inherit page `v`)
+- [ ] Display URLs stay stable (no `v=`)

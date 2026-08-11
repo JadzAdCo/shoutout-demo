@@ -2,17 +2,37 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.44";
+  // Single fallback only — never copy package ids into href strings elsewhere.
+  // Prefer page ?v=, then the floqr-nav.js script src cache-bust.
+  const FALLBACK_APP_V = "29.09.124";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
     catch (e) { return ""; }
   }
 
-  function buildUrl(path, params = {}) {
+  function packageVersion() {
+    const fromPage = qs("v");
+    if (fromPage) return fromPage;
+    try {
+      const scripts = global.document?.getElementsByTagName?.("script") || [];
+      for (let i = scripts.length - 1; i >= 0; i -= 1) {
+        const src = scripts[i].src || "";
+        if (!/floqr-nav\.js/i.test(src)) continue;
+        const v = new URL(src, global.location.href).searchParams.get("v");
+        if (v) return v;
+      }
+    } catch (e) {}
+    return FALLBACK_APP_V;
+  }
+
+  function buildUrl(path, params = {}, options = {}) {
     try {
       const next = new URL(path, global.location.href);
-      Object.entries(params).forEach(([key, value]) => {
+      const stampVersion = options.stampVersion !== false;
+      const merged = stampVersion ? { v: packageVersion(), ...params } : { ...params };
+      if (!stampVersion) delete merged.v;
+      Object.entries(merged).forEach(([key, value]) => {
         if (value != null && value !== "") next.searchParams.set(key, String(value));
       });
       const file = next.pathname.split("/").pop() || path.replace(/^\.\//, "");
@@ -32,35 +52,44 @@
   }
 
   const FLOQRNav = {
-    appVersion: APP_V,
+    get appVersion() { return packageVersion(); },
     portalHome(extra = {}) {
-      return buildUrl("./patron-portal.html", { v: APP_V, ...extra });
+      return buildUrl("./patron-portal.html", { ...extra });
     },
     searchHome() {
-      return `./?v=${APP_V}&start=search`;
+      return buildUrl("./index.html", { start: "search" }).replace(/^\.\/index\.html/, "./");
     },
     adminHome(extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
       const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");
-      const params = { v: APP_V, location: locationId, ...extra };
+      const params = { location: locationId, ...extra };
       if (from) params.from = from;
       else delete params.from;
       return buildUrl("./admin.html", params);
     },
     masterHome() {
-      return `./master-admin.html?v=${APP_V}`;
+      return buildUrl("./master-admin.html");
     },
     suprstrHome(extra = {}) {
-      return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
+      return buildUrl("./suprstr-search.html", { from: "master", ...extra });
     },
     /** Satellite page under My Profile and Settings */
     portalLink(path, extra = {}) {
-      return buildUrl(path, { v: APP_V, from: "portal", ...extra });
+      return buildUrl(path, { from: "portal", ...extra });
     },
     /** Satellite page under Club Admin — always stamp from=admin (+ location). */
     adminLink(path, extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
-      return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
+      return buildUrl(path, { from: "admin", location: locationId, ...extra });
+    },
+    commerceHome(extra = {}) {
+      return buildUrl("./commerce.html", { from: "search", ...extra });
+    },
+    rydrHome(extra = {}) {
+      return buildUrl("./rydr.html", { from: "search", ...extra });
+    },
+    minglChatHome(extra = {}) {
+      return buildUrl("./mingl-chat.html", { from: "portal", ...extra });
     },
     /** Stable venue board URL — no cache-bust ?v= (for LED devices and external embeds). */
     stableDisplayUrl(locationId = "", extra = {}) {
@@ -72,7 +101,7 @@
       delete params.board;
       delete params.displayBoard;
       const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";
-      return buildUrl(page, id ? {location: id, ...params} : params);
+      return buildUrl(page, id ? {location: id, ...params} : params, { stampVersion: false });
     },
     /** Second LED/board per club — display2.html?location=… */
     stableSecondaryDisplayUrl(locationId = "", extra = {}) {
@@ -103,10 +132,10 @@
         return { href: this.masterHome(), label: "← Back to Master Admin" };
       }
       if (from === "mingl") {
-        return { href: `./?v=${APP_V}&start=mingl`, label: "← Back to Mingl" };
+        return { href: buildUrl("./index.html", { start: "mingl" }).replace(/^\.\/index\.html/, "./"), label: "← Back to Mingl" };
       }
       if (from === "bartr" || from === "commerce") {
-        return { href: `./commerce.html?v=${APP_V}`, label: "← Back to BartR" };
+        return { href: this.commerceHome({ from: "search" }), label: "← Back to BartR" };
       }
       return { href: this.searchHome(), label: "← Back to Search" };
     },
@@ -142,7 +171,34 @@
       else if (start === "mingl") showPage("minglLandingPage");
     },
     intentSearchHome() {
-      return `./?v=${APP_V}&start=intent`;
+      return buildUrl("./index.html", { start: "intent" }).replace(/^\.\/index\.html/, "./");
+    },
+    /** Stamp ?v= on in-app anchors from packageVersion(). Never use on display boards. */
+    stampAppAnchors(root = global.document) {
+      if (!root?.querySelectorAll) return 0;
+      const v = packageVersion();
+      let count = 0;
+      root.querySelectorAll("a[href]").forEach(anchor => {
+        const raw = anchor.getAttribute("href") || "";
+        if (!raw || /^(https?:|mailto:|tel:|#)/i.test(raw)) return;
+        if (/display2?\.html/i.test(raw)) return;
+        try {
+          const next = new URL(raw, global.location.href);
+          const file = (next.pathname.split("/").pop() || "").toLowerCase();
+          if (file && !file.endsWith(".html") && file !== "index.html") return;
+          next.searchParams.set("v", v);
+          const search = next.searchParams.toString();
+          const hash = next.hash || "";
+          const normalized = (!file || file === "index.html")
+            ? `./${search ? `?${search}` : ""}${hash}`
+            : `./${file}${search ? `?${search}` : ""}${hash}`;
+          if (anchor.getAttribute("href") !== normalized) {
+            anchor.setAttribute("href", normalized);
+            count += 1;
+          }
+        } catch (e) {}
+      });
+      return count;
     }
   };
 
