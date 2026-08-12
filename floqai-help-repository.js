@@ -196,10 +196,10 @@
     {
       id: "help-demo-accounts",
       title: "Demo Accounts (temporal)",
-      body: "Removable QA pack of temp_*@floqr-demo.com users, demo clubs, and promo groups. Master Admin → Demo Accounts shows login codes. Outbound email redirects to bans.don@gmail.com with subject [FLOQR demo → intended@…]; SMS to +1 202-733-0274. temp-democlub-1 ships with structured Monday–Sunday hours, featured genre events (Hip Hop / Afro House / EDM / Reggaeton·Latin), and seeded staff schedules.",
+      body: "Removable QA pack of temp_*@floqr-demo.com users, demo clubs, and promo groups. Sign in from the home page with Email OTP for that temp email — the 8-character code is emailed to bans.don@gmail.com with subject [FLOQR demo → intended@…]. SMS sinks to +1 202-733-0274. Master Admin → Demo Accounts lists the personas (QA ref is tracking only). temp-democlub-1 ships with structured Monday–Sunday hours, featured genre events (Hip Hop / Afro House / EDM / Reggaeton·Latin), and seeded staff schedules.",
       searchPhrases: [
         "demo accounts", "temp demo", "temp_democlub", "floqr-demo.com", "demo login codes",
-        "temporary demo club", "QA demo accounts"
+        "temporary demo club", "QA demo accounts", "temp waitress", "how do I sign in as demo", "demo email otp"
       ],
       links: [
         {label: "Master Admin Demo Accounts", href: vUrl("./master-admin.html", {from: "floqai"}) + "#demoAccounts"},

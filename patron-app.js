@@ -1029,11 +1029,22 @@
     modal.setAttribute("aria-hidden", "true");
   }
 
-  function showEmailOtpSentModal(email = "") {
+  function showEmailOtpSentModal(email = "", delivery = {}) {
     const modal = byId("emailOtpSentModal");
     if (!modal) return;
     const emailLine = byId("emailOtpSentEmail");
-    if (emailLine) emailLine.textContent = email ? `Sent to ${email}` : "";
+    if (emailLine) {
+      const deliveredTo = String(delivery.deliveredTo || email || "").trim();
+      const redirected = !!delivery.redirected;
+      const intended = String(delivery.intendedEmail || email || "").trim();
+      if (redirected && deliveredTo && intended && deliveredTo.toLowerCase() !== intended.toLowerCase()) {
+        emailLine.textContent = `Sent to ${deliveredTo} (demo → ${intended})`;
+      } else if (deliveredTo) {
+        emailLine.textContent = `Sent to ${deliveredTo}`;
+      } else {
+        emailLine.textContent = "";
+      }
+    }
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
     byId("emailOtpSentCloseBtn")?.focus?.();
@@ -1056,13 +1067,17 @@
     try {
       setText("emailOtpStatus", "Sending your secure sign-in code...");
       const response = await functions.httpsCallable("requestEmailOtp")({email});
-      emailOtpChallengeId = response.data?.challengeId || "";
+      const data = response.data || {};
+      emailOtpChallengeId = data.challengeId || "";
       if (!emailOtpChallengeId) throw new Error("The email code could not be confirmed. Please try again.");
-      emailOtpExpiresAt = Date.now() + Number(response.data?.expiresInSeconds || 360) * 1000;
+      emailOtpExpiresAt = Date.now() + Number(data.expiresInSeconds || 360) * 1000;
       clearInterval(emailOtpTimer);
       emailOtpTimer = setInterval(updateEmailOtpCountdown, 1000);
       updateEmailOtpCountdown();
-      showEmailOtpSentModal(email);
+      showEmailOtpSentModal(email, data);
+      if (data.redirected && data.deliveredTo) {
+        setText("emailOtpStatus", `Code sent to ${data.deliveredTo}. Enter the 8-character code from that inbox.`);
+      }
       byId("emailOtpCode")?.focus();
     } catch (error) {
       setText("emailOtpStatus", error?.message || "The email code could not be sent.");

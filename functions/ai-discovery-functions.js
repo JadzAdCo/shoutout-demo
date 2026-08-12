@@ -20,6 +20,7 @@ const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+const {redirectDemoEmail} = require("./demo-delivery");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -564,20 +565,33 @@ function createOtpCode() {
 async function sendEmailOtp(email, code) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
   if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
+  // temp_*@floqr-demo.com has no real inbox — deliver OTP to the QA sink (same as receipts).
+  const route = redirectDemoEmail(email, "Your FLOQR sign-in code");
+  const bodyLines = [
+    `Your FLOQR sign-in code is ${code}.`,
+    "It expires in 6 minutes.",
+    route.redirected ? `Requested for demo account ${route.intended}.` : "",
+    "If you did not request this code, ignore this email."
+  ].filter(Boolean);
   const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method:"POST",
     headers:{authorization:`Bearer ${key}`, "content-type":"application/json"},
     body:JSON.stringify({
-      personalizations:[{to:[{email}]}],
+      personalizations:[{to:[{email: route.to}]}],
       from:{email:EMAIL_OTP_FROM, name:"FLOQR"},
-      subject:"Your FLOQR sign-in code",
-      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`}]
+      subject: route.subject,
+      content:[{type:"text/plain", value: bodyLines.join(" ")}]
     })
   });
   if (!response.ok) {
     const errText = await response.text().catch(() => "");
     throw new HttpsError("internal", `Email provider returned HTTP ${response.status}${errText ? `: ${errText.slice(0, 180)}` : ""}.`);
   }
+  return {
+    deliveredTo: route.to,
+    redirected: !!route.redirected,
+    intendedEmail: route.intended || email
+  };
 }
 
 async function assertMasterAdmin(request) {
@@ -1019,8 +1033,15 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
     expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
   });
-  await sendEmailOtp(email, code);
-  return {challengeId, expiresInSeconds:360, delivery:"email"};
+  const delivery = await sendEmailOtp(email, code);
+  return {
+    challengeId,
+    expiresInSeconds:360,
+    delivery:"email",
+    deliveredTo: delivery.deliveredTo,
+    redirected: delivery.redirected,
+    intendedEmail: delivery.intendedEmail
+  };
 });
 
 exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {

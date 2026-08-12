@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.125";
-  const PREVIEW_LINKS_PACKAGE = "29.09.125";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.130";
+  const PREVIEW_LINKS_PACKAGE = "29.09.130";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -910,9 +910,9 @@
       area:"Demo Accounts / QA pack",
       feature:"Seed temp_*@floqr-demo.com pack + login codes",
       changed:"Master Admin → Demo Accounts seeds Auth users, temp-democlub-1..4, featured genre events, and scheduleShifts. Outbound email/SMS redirect to bans.don@gmail.com / +1 202-733-0274.",
-      howToTest:"Open master-admin.html?v=29.09.123 → Demo Accounts (hard refresh if missing). Click Seed / refresh demo pack. Confirm account table + login codes + shiftCount. Sign in as temp_clubadmin_1@floqr-demo.com with FloqrDemo2026!.",
-      expected:"Seed succeeds without permission errors. Codes visible. system/demoAccounts doc exists. Club Admin for temp-democlub-1 opens Scheduling subscribed.",
-      troubleshoot:"If Seed shows “Master Admin only” after 1–3 min but you are signed in: deploy Firestore rules v29.09.127-demo-accounts-manifest-read (system/{docId} Master Admin read), hard-refresh, click Refresh codes. If Seed fails immediately: confirm seedTempDemoPack deployed; check Functions logs. If tab missing: hard refresh master-admin-demo-accounts.js. Login fails: re-seed (resets password FloqrDemo2026!)."
+      howToTest:"Open master-admin.html → Demo Accounts. Note temp_waitress_1 (or clubadmin) email. On home page: Email sign-in → that temp email → Send 6-minute code. Open bans.don@gmail.com for subject [FLOQR demo → …] and the 8-character code. Verify → confirm signed in as that persona. Run role workflow.",
+      expected:"OTP email lands in bans.don@gmail.com (not the fake @floqr-demo.com inbox). Verify signs in as the temp user. Codes table QA ref is not used for OTP.",
+      troubleshoot:"If no email: confirm Functions requestEmailOtp deployed with demo-delivery redirect; check SendGrid; wait 1 min between resends. If verify fails: use the 8-char code from Gmail, not the Master Admin QA ref. If tab missing: hard refresh master-admin-demo-accounts.js."
     },
     {
       id:"v29-09-123-democlub1-scheduling",

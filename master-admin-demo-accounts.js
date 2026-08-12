@@ -62,7 +62,7 @@
     ].join("");
     byId("demoAccountsTable").innerHTML = accounts.length
       ? `<table class="report-table compact">
-        <thead><tr><th>Role</th><th>Email</th><th>Login code</th><th>Genre / club</th></tr></thead>
+        <thead><tr><th>Role</th><th>Email</th><th>QA ref</th><th>Genre / club</th></tr></thead>
         <tbody>
           ${accounts.map(a => `<tr>
             <td>${esc(a.role)}</td>
@@ -73,7 +73,7 @@
         </tbody>
       </table>`
       : "<p class='sub'>Empty.</p>";
-    setStatus(`Loaded ${accounts.length} temp demo accounts. Default password FloqrDemo2026! · mail/SMS → sinks.`);
+    setStatus(`Loaded ${accounts.length} temp demo accounts. Sign in via Email OTP → code arrives at bans.don@gmail.com.`);
     return data;
   }
 
@@ -100,7 +100,7 @@
       const count = data.accounts?.length || 0;
       const shifts = data.shiftCount || 0;
       renderManifest(data);
-      setStatus(`Seeded ${count} accounts · ${shifts} shifts on temp-democlub-1. Default password FloqrDemo2026!`);
+      setStatus(`Seeded ${count} accounts · ${shifts} shifts on temp-democlub-1. Sign in via Email OTP → bans.don@gmail.com.`);
       try {
         await loadManifest();
       } catch (err) {
