@@ -226,6 +226,7 @@
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
       if (target.closest("#demoAccounts")) setText("demoAccountsStatus", message);
+    }, true);
   }
 
   function getProviderIds(user) {
