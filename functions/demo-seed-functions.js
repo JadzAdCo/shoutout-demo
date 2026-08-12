@@ -11,6 +11,9 @@ const {
   DAYS
 } = require("./shared-time.js");
 
+if (!admin.apps.length) admin.initializeApp();
+const db = admin.firestore();
+
 const SINK_EMAIL = "bans.don@gmail.com";
 const SINK_SMS = "+12027330274";
 const DEMO_DOMAIN = "floqr-demo.com";

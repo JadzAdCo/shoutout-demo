@@ -3,6 +3,8 @@
   "use strict";
   const byId = id => document.getElementById(id);
   const META = "system/demoAccounts";
+  // Seed creates dozens of Auth users; match Cloud Function timeout (300s).
+  const CALLABLE_TIMEOUT_MS = 300000;
 
   function esc(value) {
     return String(value || "")
@@ -13,12 +15,30 @@
   }
 
   function setStatus(msg) {
+    const text = msg || "";
     const el = byId("demoAccountsStatus");
-    if (el) el.textContent = msg || "";
+    if (el) el.textContent = text;
+    const feedback = byId("masterActionFeedback");
+    if (feedback && text) feedback.textContent = text;
   }
 
   function callable(name) {
-    return firebase.app().functions("us-central1").httpsCallable(name);
+    return firebase.app().functions("us-central1").httpsCallable(name, {timeout: CALLABLE_TIMEOUT_MS});
+  }
+
+  function formatCallableError(err) {
+    const code = err?.code || err?.details?.code || "";
+    const message = err?.message || String(err || "Unknown error");
+    if (/deadline-exceeded|timeout/i.test(code) || /timeout/i.test(message)) {
+      return "Seed timed out. Wait a minute, click Refresh codes — partial data may already exist. If empty, retry Seed.";
+    }
+    if (/not-found|NOT_FOUND/i.test(code) || /not found/i.test(message)) {
+      return "seedTempDemoPack is not deployed. Deploy Firebase Functions, then retry Seed.";
+    }
+    if (/permission-denied/i.test(code)) {
+      return "Master Admin only — sign in with an approved Master Admin email.";
+    }
+    return message;
   }
 
   async function loadManifest() {
@@ -57,7 +77,7 @@
   }
 
   async function seedPack() {
-    setStatus("Seeding temp demo pack (Auth + clubs + schedule)…");
+    setStatus("Seeding temp demo pack (Auth + clubs + schedule). This can take 1–3 minutes…");
     const result = await callable("seedTempDemoPack")({action: "seed"});
     const data = result?.data || {};
     setStatus(`Seeded ${data.accounts?.length || 0} accounts · ${data.shiftCount || 0} shifts on temp-democlub-1.`);
@@ -75,16 +95,16 @@
 
   function wire() {
     byId("refreshDemoAccountsBtn")?.addEventListener("click", () => {
-      loadManifest().catch(err => setStatus(err.message || String(err)));
+      loadManifest().catch(err => setStatus(formatCallableError(err)));
     });
     byId("seedDemoAccountsBtn")?.addEventListener("click", () => {
-      seedPack().catch(err => setStatus(err?.message || String(err)));
+      seedPack().catch(err => setStatus(formatCallableError(err)));
     });
     byId("purgeDemoAccountsBtn")?.addEventListener("click", () => {
-      purgePack().catch(err => setStatus(err?.message || String(err)));
+      purgePack().catch(err => setStatus(formatCallableError(err)));
     });
     document.querySelector('[data-panel="demoAccounts"]')?.addEventListener("click", () => {
-      loadManifest().catch(err => setStatus(err.message || String(err)));
+      loadManifest().catch(err => setStatus(formatCallableError(err)));
     });
     if (window.firebase?.auth) {
       firebase.auth().onAuthStateChanged(user => {

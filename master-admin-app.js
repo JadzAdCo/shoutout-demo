@@ -225,7 +225,7 @@
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
-    }, true);
+      if (target.closest("#demoAccounts")) setText("demoAccountsStatus", message);
   }
 
   function getProviderIds(user) {
