@@ -1087,15 +1087,26 @@
     const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
     const code = String(byId("emailOtpCode")?.value || "").trim().toUpperCase();
     if (!functions || !emailOtpChallengeId) { setText("emailOtpStatus", "Request a new code first."); return; }
+    if (!/^[A-Z2-9]{8}$/.test(code)) {
+      setText("emailOtpStatus", "Enter the 8-character code from the email (not the Master Admin QA ref).");
+      return;
+    }
     try {
       setText("emailOtpStatus", "Verifying code...");
       const response = await functions.httpsCallable("verifyEmailOtp")({email, code, challengeId:emailOtpChallengeId});
       await auth.signInWithCustomToken(response.data.customToken);
       clearInterval(emailOtpTimer);
       emailOtpTimer = null;
+      emailOtpChallengeId = "";
       setText("emailOtpStatus", "Email verified. You are signed in.");
     } catch (error) {
-      setText("emailOtpStatus", error?.message || "The email code could not be verified.");
+      const message = error?.message || "The email code could not be verified.";
+      setText("emailOtpStatus", message);
+      if (/already used|incorrect|expired|different email/i.test(message)) {
+        // Force a fresh challenge for the next attempt.
+        emailOtpChallengeId = "";
+        emailOtpExpiresAt = 0;
+      }
     }
   }
   async function logout() { await auth.signOut(); window.location.href = "./"; }

@@ -1050,29 +1050,63 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
   const code = String(request.data?.code || "").trim().toUpperCase();
   if (!challengeId || !/^[A-Z2-9]{8}$/.test(code)) throw new HttpsError("invalid-argument", "Enter the 8-character email code.");
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
-  const token = await db.runTransaction(async transaction => {
+
+  await db.runTransaction(async transaction => {
     const snap = await transaction.get(ref);
     if (!snap.exists) throw new HttpsError("not-found", "The sign-in code was not found. Request a new code.");
     const data = snap.data() || {};
-    if (data.email !== email || data.used) throw new HttpsError("permission-denied", "This code cannot be used.");
-    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
-    if (Number(data.attempts || 0) >= 5) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
-    if (!crypto.timingSafeEqual(Buffer.from(data.codeHash, "hex"), Buffer.from(otpHash(email, code), "hex"))) {
-      transaction.update(ref, {attempts:admin.firestore.FieldValue.increment(1)});
-      throw new HttpsError("permission-denied", "The email code is incorrect.");
+    if (data.used) {
+      throw new HttpsError(
+        "permission-denied",
+        "This code was already used. Wait one minute, click Send 6-minute code again, and enter the newest code from bans.don@gmail.com."
+      );
     }
-    transaction.update(ref, {used:true, verifiedAt:admin.firestore.FieldValue.serverTimestamp()});
-    return true;
+    if (data.email !== email) {
+      throw new HttpsError(
+        "permission-denied",
+        "This code was requested for a different email. Request a new code for the address in the form."
+      );
+    }
+    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) {
+      throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
+    }
+    if (Number(data.attempts || 0) >= 5) {
+      throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
+    }
+    const expected = Buffer.from(String(data.codeHash || ""), "hex");
+    const actual = Buffer.from(otpHash(email, code), "hex");
+    if (expected.length !== actual.length || !crypto.timingSafeEqual(expected, actual)) {
+      transaction.update(ref, {attempts: admin.firestore.FieldValue.increment(1)});
+      throw new HttpsError("permission-denied", "The email code is incorrect. Use the newest 8-character code from the sign-in email.");
+    }
+    // Mark used only after the code matches; if Auth token creation fails below we reopen the challenge.
+    transaction.update(ref, {
+      used: true,
+      verifiedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
   });
-  if (!token) throw new HttpsError("internal", "Email verification failed.");
-  let user;
-  try { user = await admin.auth().getUserByEmail(email); }
-  catch (error) {
-    if (error.code !== "auth/user-not-found") throw error;
-    user = await admin.auth().createUser({email, emailVerified:true});
+
+  try {
+    let user;
+    try {
+      user = await admin.auth().getUserByEmail(email);
+    } catch (error) {
+      if (error.code !== "auth/user-not-found") throw error;
+      user = await admin.auth().createUser({email, emailVerified: true});
+    }
+    if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified: true});
+    const customToken = await admin.auth().createCustomToken(user.uid, {emailOtp: true});
+    return {customToken, expiresInSeconds: 300};
+  } catch (error) {
+    // Allow one more try with the same code if sign-in token creation failed after a valid match.
+    await ref.set({
+      used: false,
+      verifyError: String(error?.message || error).slice(0, 300),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true}).catch(() => {});
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError("internal", `Sign-in failed after code matched: ${String(error?.message || error).slice(0, 160)}`);
   }
-  if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified:true});
-  return {customToken:await admin.auth().createCustomToken(user.uid, {emailOtp:true}), expiresInSeconds:300};
 });
 
 exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
