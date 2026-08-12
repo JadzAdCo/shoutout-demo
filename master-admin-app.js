@@ -225,7 +225,7 @@
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
-      if (target.closest("#demoAccounts")) setText("demoAccountsStatus", message);
+      // Demo Accounts panel manages its own status (seed can run 1–3 minutes).
     }, true);
   }
 

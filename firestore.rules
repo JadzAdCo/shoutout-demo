@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.66-suprstar-approval-flow
+// FLOQR FIRESTORE RULES VERSION: v29.09.127-demo-accounts-manifest-read
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
@@ -1099,6 +1099,12 @@ service cloud.firestore {
           !isExistingMinglMessage() ||
           (isExistingMinglMessage() && isDiagnosticParticipantResource())
         );
+    }
+
+    // Master Admin manifest docs (demo account codes, etc.) — Admin SDK writes; client read for Master Admin.
+    match /system/{docId} {
+      allow read: if isMasterAdmin();
+      allow write: if false;
     }
 
     // iPhone mobile test checklist runs (Admin SDK writes; client merge when signed in)

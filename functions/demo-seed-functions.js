@@ -20,6 +20,8 @@ const DEMO_DOMAIN = "floqr-demo.com";
 const PASSWORD = process.env.FLOQR_DEMO_PASSWORD || "FloqrDemo2026!";
 const META_DOC = "system/demoAccounts";
 const ORIGIN = "https://jadzadco.github.io/shoutout-demo";
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
+  .split(",").map((v) => v.trim().toLowerCase()).filter(Boolean);
 
 const HUMAN_ROLES = [
   "dj", "waitress", "bottlegirl", "busboy", "security", "host", "barman", "clubadmin", "promoter"
@@ -43,15 +45,16 @@ function text(value = "", max = 200) {
 async function assertMasterAdmin(auth) {
   if (!auth?.uid) throw new HttpsError("unauthenticated", "Sign in required.");
   const email = String(auth.token?.email || "").toLowerCase();
+  if (auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email)) return;
   const snap = await db.collection("platformSettings").doc("masterAdmins").get();
   const emails = snap.exists && Array.isArray(snap.data()?.emails)
     ? snap.data().emails.map((v) => String(v).toLowerCase())
     : [];
-  const envList = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
-    .split(",").map((v) => v.trim().toLowerCase()).filter(Boolean);
-  if (![...emails, ...envList].includes(email)) {
-    throw new HttpsError("permission-denied", "Master Admin only.");
-  }
+  if (emails.includes(email)) return;
+  const record = await db.collection("users").doc(auth.uid).get();
+  const data = record.exists ? record.data() || {} : {};
+  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return;
+  throw new HttpsError("permission-denied", `Master Admin only (${email || "no email on token"}).`);
 }
 
 function dayHours(openH, openM, openMer, closeH, closeM, closeMer, closed = false) {

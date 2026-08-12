@@ -912,7 +912,7 @@
       changed:"Master Admin → Demo Accounts seeds Auth users, temp-democlub-1..4, featured genre events, and scheduleShifts. Outbound email/SMS redirect to bans.don@gmail.com / +1 202-733-0274.",
       howToTest:"Open master-admin.html?v=29.09.123 → Demo Accounts (hard refresh if missing). Click Seed / refresh demo pack. Confirm account table + login codes + shiftCount. Sign in as temp_clubadmin_1@floqr-demo.com with FloqrDemo2026!.",
       expected:"Seed succeeds without permission errors. Codes visible. system/demoAccounts doc exists. Club Admin for temp-democlub-1 opens Scheduling subscribed.",
-      troubleshoot:"If Seed fails: confirm seedTempDemoPack is deployed; sign in as Master Admin (bans.don@gmail.com). If tab missing: hard refresh / confirm Pages SHA includes master-admin-demo-accounts.js. If login fails: re-seed (resets password to FloqrDemo2026!)."
+      troubleshoot:"If Seed shows “Master Admin only” after 1–3 min but you are signed in: deploy Firestore rules v29.09.127-demo-accounts-manifest-read (system/{docId} Master Admin read), hard-refresh, click Refresh codes. If Seed fails immediately: confirm seedTempDemoPack deployed; check Functions logs. If tab missing: hard refresh master-admin-demo-accounts.js. Login fails: re-seed (resets password FloqrDemo2026!)."
     },
     {
       id:"v29-09-123-democlub1-scheduling",

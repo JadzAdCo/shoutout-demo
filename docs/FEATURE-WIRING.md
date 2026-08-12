@@ -41,6 +41,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Delivery | `functions/demo-delivery.js` → email `bans.don@gmail.com`, SMS `+12027330274` (wired in receipt + Twilio messaging) |
 | UI | Master Admin → **Demo Accounts** (`master-admin-demo-accounts.js`) — removable |
 | Callable bugfix | `demo-seed-functions.js` must init `const db = admin.firestore()` (missing `db` left Seed hanging on “Waiting…”); client uses 300s callable timeout + writes result to `masterActionFeedback` |
+| Firestore rules | `system/{docId}` — Master Admin read for `system/demoAccounts` manifest (Admin SDK writes only); without this, Seed can succeed but Refresh shows misleading “Master Admin only” |
 | Assets | `assets/demo-temp/avatars|icons/*.svg` + `manifest.json` |
 
 ---
