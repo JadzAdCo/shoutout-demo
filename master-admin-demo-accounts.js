@@ -54,10 +54,10 @@
     if (!data) return null;
     const accounts = Array.isArray(data.accounts) ? data.accounts : [];
     byId("demoAccountsMeta").innerHTML = [
-      `<div class="metric-card"><span>Pack</span><strong>${esc(data.pack || "—")}</strong></div>`,
-      `<div class="metric-card"><span>Email sink</span><strong>${esc(data.sinkEmail || "bans.don@gmail.com")}</strong></div>`,
-      `<div class="metric-card"><span>SMS sink</span><strong>${esc(data.sinkSms || "+12027330274")}</strong></div>`,
-      `<div class="metric-card"><span>Schedule club</span><strong>${esc(data.scheduleLocationId || "temp-democlub-1")}</strong></div>`,
+      `<div class="metric-card metric-card-text"><span>Pack</span><strong>${esc(data.pack || "—")}</strong></div>`,
+      `<div class="metric-card metric-card-text"><span>Email sink</span><strong>${esc(data.sinkEmail || "bans.don@gmail.com")}</strong></div>`,
+      `<div class="metric-card metric-card-text"><span>SMS sink</span><strong>${esc(data.sinkSms || "+12027330274")}</strong></div>`,
+      `<div class="metric-card metric-card-text"><span>Schedule club</span><strong>${esc(data.scheduleLocationId || "temp-democlub-1")}</strong></div>`,
       `<div class="metric-card"><span>Shifts</span><strong>${esc(String(data.shiftCount ?? "—"))}</strong></div>`
     ].join("");
     byId("demoAccountsTable").innerHTML = accounts.length
