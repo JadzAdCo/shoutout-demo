@@ -1,4 +1,4 @@
-/* helper-popouts.js v28.98 */
+/* helper-popouts.js — legacy p.sub.small conversion; ALWAYS delegates to FLOQRHelpAttach */
 (function(){
   "use strict";
 
@@ -11,32 +11,27 @@
     return node.matches("p.sub.small, p.helper-text, .helper-text");
   }
 
-  function labelFor(node) {
-    const container = node.closest(".card, section, header, .admin-panel-section, .topbar") || node.parentElement;
-    const heading = container?.querySelector("h1,h2,h3,.eyebrow");
-    const clean = (heading?.textContent || "Help").replace(/\s+/g, " ").trim();
-    return clean ? `About ${clean}` : "Help";
-  }
-
   function convert(node) {
     if (!shouldConvert(node)) return;
-    const details = document.createElement("details");
-    details.className = "help-popout inline-help-popout";
-    const summary = document.createElement("summary");
-    const helpTitle = labelFor(node);
-    summary.setAttribute("aria-label", helpTitle);
-    summary.textContent = "?";
-    const body = document.createElement("div");
-    body.className = "help-popout-body";
-    body.innerHTML = node.innerHTML;
-    details.append(summary, body);
-    node.dataset.helpPopoutConverted = "1";
-    node.replaceWith(details);
-    window.FLOQRHelpRepository?.registerFromHelpNode?.(details, {
-      title: helpTitle,
-      source: "help-popout-converted",
-      page: location.pathname || ""
+    const attach = window.FLOQRHelpAttach;
+    if (!attach?.attachBesideHeading) {
+      node.dataset.helpPopoutConverted = "1";
+      return;
+    }
+    const bodyHtml = node.innerHTML;
+    const title = (node.closest(".card, section, header, .admin-panel-section, .topbar")?.querySelector("h1,h2,h3,.eyebrow")?.textContent || "Help")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\?$/g, "")
+      .trim();
+    const result = attach.attachBesideHeading(node, {
+      title: title ? `About ${title}` : "Help",
+      bodyHtml,
+      source: "help-popout-converted"
     });
+    node.dataset.helpPopoutConverted = "1";
+    if (result) node.remove();
+    else node.dataset.keepVisible = "true";
   }
 
   function convertAll(root = document) {
@@ -66,6 +61,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    window.FLOQRHelpAttach?.ensureCss?.();
+    window.FLOQRHelpAttach?.mountAll?.(document);
     convertAll(document);
     window.FLOQRHelpRepository?.registerDomHelpPopouts?.(document);
     bindDismissBehavior();
@@ -75,6 +72,7 @@
           if (node.nodeType !== 1) return;
           if (shouldConvert(node)) convert(node);
           convertAll(node);
+          window.FLOQRHelpAttach?.mountAll?.(node);
           if (node.matches?.("details.help-popout, .floqai-help-popout, [data-floqai-help-entry]") || node.querySelector?.("details.help-popout, .floqai-help-popout")) {
             window.FLOQRHelpRepository?.registerDomHelpPopouts?.(node);
           }

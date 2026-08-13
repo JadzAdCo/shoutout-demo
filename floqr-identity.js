@@ -115,6 +115,17 @@
   function attachHelpPopout(anchor, text) {
     if (!anchor || anchor.dataset.helpBound === "1") return;
     anchor.dataset.helpBound = "1";
+    if (global.FLOQRHelpAttach?.attach) {
+      const host = anchor.parentElement;
+      const target = host?.classList?.contains("help-label") ? host : anchor;
+      global.FLOQRHelpAttach.attach({
+        target,
+        title: anchor.getAttribute("aria-label") || "Help",
+        body: text,
+        source: "floqr-identity-attachHelpPopout"
+      });
+      return;
+    }
     anchor.setAttribute("type", "button");
     anchor.setAttribute("aria-label", "Help");
     anchor.classList.add("floqr-help-popout");

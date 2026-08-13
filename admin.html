@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.46"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.87"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.98"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.98"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -29,9 +29,8 @@
     <div id="adminLogin" class="card">
       <h2>Club admin sign-in</h2>
       <p class="sub">Sign in with the account elected as Club Admin for this location. Master / Super Admins should use <strong>master-admin.html</strong> for network-wide entity search and management.</p>
-      <p class="sub small"><strong>Temp / Email OTP accounts:</strong> use the home page Email sign-in (all methods), then you return here automatically. Do not use Google for <code>temp_*@floqr-demo.com</code>.</p>
+      <p class="sub small"><strong>Sign-in note:</strong> Admin login uses the same popup configuration as the patron page. Use auth-debug.html if Microsoft still fails.</p>
       <div class="auth-grid">
-        <a id="adminHomeLoginLink" class="buttonlike primary" href="./">Sign in on home page (all methods)</a>
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
         <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
         <button id="adminFacebookLoginBtn" type="button">Admin Facebook Login</button>
@@ -438,17 +437,23 @@
       <section id="panelScheduling" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Staff calendars</p>
-          <h2>Scheduling <span id="schedulingSubBadge" class="tag">$20/mo</span></h2>
-          <p class="sub small">Create work schedules for elected staff and talent. Assignees get in-app plus Email/SMS/WhatsApp notify-and-approve when channels are enabled. Promoting companies and DJs use <a href="./scheduling.html?v=29.09.46&from=admin">Scheduling portal</a> — not events.</p>
+          <h2
+            id="schedulingHelpHost"
+            data-floqr-help-id="help-staff-scheduling-admin"
+            data-floqr-help-title="Staff Scheduling"
+            data-floqr-help-search="staff scheduling|staffSchedulingPaid|resubscribe|paid this month"
+            data-floqr-help-body="clubLocations.staffSchedulingPaid is 1 or 0. schedulingSubscriptions status is paid this month or not paid this month. When 1 / paid this month: calendar unlocked. When 0 / not paid this month: show Subscribe (never paid) or Resubscribe (was subscribed before)."
+          >Scheduling <span id="schedulingSubBadge" class="tag">checking…</span></h2>
+          <p class="sub small" data-keep-visible="true">Create work schedules for elected staff and talent. Assignees get in-app plus Email/SMS/WhatsApp notify-and-approve when channels are enabled. Promoting companies and DJs use the Scheduling portal — not events.</p>
           <div class="queue-actions">
             <button id="refreshSchedulingBtn" type="button">Refresh</button>
-            <a class="buttonlike" href="./scheduling.html?v=29.09.46&from=admin">Open full Scheduling portal</a>
+            <a id="openSchedulingPortalLink" class="buttonlike hidden" href="./scheduling.html?v=29.09.98&from=admin">Open full calendar / Scheduling portal</a>
           </div>
           <p id="schedulingStatus" class="status"></p>
         </div>
         <div id="schedulingSubscribeGate" class="card">
-          <h2>Subscribe · $20 / month</h2>
-          <p class="sub small">Club members unlock Staff Scheduling with a FloqR subscription. Charged to FloqR via Stripe (recurring).</p>
+          <h2 id="schedulingSubscribeTitle">Subscribe · $20 / month</h2>
+          <p id="schedulingSubscribeCopy" class="sub small" data-keep-visible="true">Unlock Staff Scheduling for this venue. Checkout sets <code>staffSchedulingPaid=1</code> and subscription status to <code>paid this month</code>.</p>
           <button id="buySchedulingSubBtn" class="primary" type="button">Subscribe $20/mo</button>
         </div>
         <div id="schedulingWorkspace" class="hidden">
@@ -483,16 +488,10 @@
       </section>
 
       <section id="panelNotifications" class="admin-panel-section">
-        <div class="card" id="sms-consent">
+        <div class="card">
           <p class="eyebrow">Club ops</p>
           <h2>Notifications</h2>
           <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong> from the alert phone. SMS ($10) and WhatsApp ($10) service packs also grant message credits for marketing (see Advertising).</p>
-          <p class="sub small" data-keep-visible="true">
-            Before enabling SMS alerts, review and grant consent on the
-            <a href="./sms-consent.html?v=29.09.106&from=admin">SMS Consent Grant</a> page.
-            Admins and patrons manage ongoing SMS preference under
-            <a href="./patron-portal.html?v=29.09.106&tab=privacy#sms-notifications">My Privacy → SMS notifications</a>.
-          </p>
           <div class="privacy-datapoint-grid">
             <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
             <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
@@ -605,8 +604,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.124"></script>
-<script src="./global-profile-status.js?v=29.09.124"></script>
+<script src="./floqr-nav.js?v=29.09.46"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.33"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
@@ -615,22 +614,24 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./helper-popouts.js?v=29.09.8"></script>
-<script src="./floqr-identity.js?v=29.09.8"></script>
+<script src="./floqai-help-repository.js?v=29.09.98"></script>
+<script src="./help-attach.js?v=29.09.98"></script>
+<script src="./helper-popouts.js?v=29.09.98"></script>
+<script src="./floqr-identity.js?v=29.09.98"></script>
 <script src="./floqr-logger.js?v=29.09.8"></script>
 <script src="./payment-service.js?v=29.09.46"></script>
 <script src="./messaging-credits.js?v=29.09.12"></script>
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.131"></script>
+<script src="./admin-app.js?v=29.09.87"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.46"></script>
+<script src="./admin-scheduling.js?v=29.09.98"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
-<script src="./profile-access-guard.js?v=29.09.131"></script>
+<script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

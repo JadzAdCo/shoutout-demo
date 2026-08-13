@@ -134,27 +134,10 @@
   /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
   registerMany([
     {
-      id: "help-sos2fa-critical-access",
-      title: "SOS2FA Entity Management unlock",
-      body: "SOS2FA unlocks Entity Management for Super Admins. Request a one-time code by SMS, email, or both (recommended when Twilio SMS fails). You can also enroll an authenticator app (Google Authenticator, Authy, Microsoft Authenticator) and unlock with a 6-digit TOTP code. Sessions last one hour and activity is audited.",
-      searchPhrases: [
-        "sos2fa", "sos 2fa", "social os 2fa", "entity management critical access",
-        "authenticator", "totp", "google authenticator", "sms and email code", "request sos2fa"
-      ],
-      links: [
-        {label: "Master Admin Entity Management", href: vUrl("./master-admin.html", {from: "floqai"})}
-      ],
-      source: "help-repository-seed",
-      page: "master-admin.html#sos2faGate"
-    },
-    {
       id: "floqai-ask-floqr",
       title: "Ask FloqR with FloqAi",
-      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Short cues work too — throw/shou → ShoutOut, sho → Shows or ShoutOut, hai/hail → RydR. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
-      searchPhrases: [
-        "ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar",
-        "throw", "shou", "sho", "hail", "hai"
-      ],
+      body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
+      searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
         {label: "Open FloqAi", href: `./?v=${APP_V}&start=intent`},
         {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
@@ -175,54 +158,6 @@
         {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed"
-    },
-    {
-      id: "help-display-security-setting",
-      title: "Display Security Setting",
-      body: "Restrict onboarded venue display.html / display2.html (Xibo boards) with approved public IPs and/or a secret board token (?k=). When both are ON, either unlocks the board (OR — not both required). This panel is not onboarding — if a venue is missing from the list, onboard it under Entity Management (SOS2FA) first. Admin saves and token rotates are written to Security → Security Logs. Trigger on Error URL builds the stable display-error.html Webpage for Xibo’s page-load-error fallback layout.",
-      searchPhrases: [
-        "display security", "display security setting", "approved display ips", "ip restriction",
-        "token lock", "xibo token", "venue not onboarded", "display board security",
-        "trigger on error", "trigger on page load error", "xibo error url", "display-error",
-        "ip or token", "either ip or token"
-      ],
-      links: [
-        {label: "Master Admin Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},
-        {label: "Entity Onboarding", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubOnboarding"}
-      ],
-      source: "help-repository-seed",
-      page: "master-admin.html#displaySecurity"
-    },
-    {
-      id: "help-demo-accounts",
-      title: "Demo Accounts (temporal)",
-      body: "Removable QA pack of temp_*@floqr-demo.com users, demo clubs, and promo groups. Sign in from the home page with Email OTP for that temp email — the 8-character code is emailed to bans.don@gmail.com with subject [FLOQR demo → intended@…]. SMS sinks to +1 202-733-0274. Master Admin → Demo Accounts lists the personas (QA ref is tracking only). temp-democlub-1 ships with structured Monday–Sunday hours, featured genre events (Hip Hop / Afro House / EDM / Reggaeton·Latin), and seeded staff schedules.",
-      searchPhrases: [
-        "demo accounts", "temp demo", "temp_democlub", "floqr-demo.com", "demo login codes",
-        "temporary demo club", "QA demo accounts", "temp waitress", "how do I sign in as demo", "demo email otp"
-      ],
-      links: [
-        {label: "Master Admin Demo Accounts", href: vUrl("./master-admin.html", {from: "floqai"}) + "#demoAccounts"},
-        {label: "temp_democlub_1 profile", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
-        {label: "Scheduling test guide", href: vUrl("./feature-tests-v29-09-122.html", {from: "floqai"}) + "#scheduling"}
-      ],
-      source: "help-repository-seed",
-      page: "master-admin.html#demoAccounts"
-    },
-    {
-      id: "help-display-trigger-on-error-url",
-      title: "Trigger on Error URL",
-      body: "Xibo’s Trigger on page load error is usually a trigger code, not a URL. Copy the Trigger on Error URL from Display Security (or Diagnostics → Display / Xibo Load Errors) into a fallback Webpage layout that runs when that trigger fires. The URL opens display-error.html and logs under Diagnostics — not Security. Do not add ?v= or a board token.",
-      searchPhrases: [
-        "trigger on error url", "trigger on page load error", "xibo fallback url", "display-error.html",
-        "xibo page load error", "error layout webpage"
-      ],
-      links: [
-        {label: "Display Security", href: vUrl("./master-admin.html", {from: "floqai"}) + "#displaySecurity"},
-        {label: "Display / Xibo Load Errors", href: vUrl("./master-admin.html", {from: "floqai"}) + "#diagnosticsDisplayErrors"}
-      ],
-      source: "help-repository-seed",
-      page: "master-admin.html#displaySecurity"
     },
     {
       id: "help-become-club-admin",
@@ -255,6 +190,21 @@
       searchPhrases: ["role profiles", "role profiles overview", "how roles work", "service roles"],
       links: [{label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})}],
       source: "help-repository-seed"
+    },
+    {
+      id: "help-staff-scheduling",
+      title: "Staff Scheduling subscription",
+      body: "Venue field clubLocations.staffSchedulingPaid is 1 or 0. schedulingSubscriptions status is paid this month or not paid this month. When 1 / paid this month: calendar unlocked. When 0 / not paid this month: Subscribe (new) or Resubscribe (prior subscriber).",
+      searchPhrases: [
+        "staff scheduling", "scheduling subscription", "subscribe $20", "resubscribe", "staffSchedulingPaid",
+        "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule"
+      ],
+      links: [
+        {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
+        {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "club admin scheduling", blurb: "Venue staff calendar and subscribe gate"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelScheduling"
     },
     {
       id: "help-my-profile",
