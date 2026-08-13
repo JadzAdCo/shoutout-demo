@@ -207,7 +207,20 @@
       page: "admin.html#panelScheduling"
     },
     {
-      id: "help-staff-schedule-grid",
+      id: "help-club-notification-subscriptions",
+      title: "Club SMS and WhatsApp notification subscriptions",
+      body: "Club Admin → Notifications stores SMS and WhatsApp subscription status on the club in Firebase (smsSubscribed / whatsappSubscribed, plus paid timestamps and credits). The first $10 payment for a channel subscribes that club. Saving notification choices later keeps the subscription and does not reopen Stripe. Uncheck SMS or WhatsApp to pause alerts without losing the paid subscription. A new checkout starts only if that channel is not yet subscribed.",
+      searchPhrases: [
+        "sms notification subscription", "whatsapp notification subscription", "save notification choices",
+        "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
+        "club notifications", "alert phone", "sms subscribed"
+      ],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
       title: "Staff week calendar",
       body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Copy previous week stores last week as new drafts. Public holidays for the venue country are highlighted. Publish notifies workers.",
       searchPhrases: [
@@ -248,6 +261,20 @@
       ],
       source: "help-repository-seed",
       page: "master-admin.html"
+    },
+    {
+      id: "help-network-promoters",
+      title: "Network Promoter Data",
+      body: "Master Admin → Promoters shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub Temp Promoter N Collective cards), and promoter onboarding records. Empty referrals does not mean there are no club promoters.",
+      searchPhrases: [
+        "promoters", "promoter network", "guest list referrals", "temp promoter",
+        "promotion groups", "network promoter data"
+      ],
+      links: [
+        {label: "Master Admin Promoters", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#promoterNetwork"
     },
     {
       id: "help-club-admin-affiliation",

@@ -612,13 +612,13 @@
         <div class="card">
           <p class="eyebrow">Club ops</p>
           <h2>Notifications</h2>
-          <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong> from the alert phone. SMS ($10) and WhatsApp ($10) service packs also grant message credits for marketing (see Advertising).</p>
+          <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp each keep a Firebase subscription after the first $10 payment — saving again does not reopen Stripe. Uncheck a channel to pause alerts without losing the paid subscription. New credits are only charged when that channel is not yet subscribed.</p>
           <div class="privacy-datapoint-grid">
             <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
             <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
             <label><input id="repNotifyEmail" type="checkbox"/> Email</label>
-            <label><input id="repNotifySms" type="checkbox"/> SMS Notification Services ($10 → 466 credits)</label>
-            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp Notification Services ($10 → 233 credits)</label>
+            <label><input id="repNotifySms" type="checkbox"/> SMS Notification Services ($10 → 466 credits)<span id="repNotifySmsSubStatus"></span></label>
+            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp Notification Services ($10 → 233 credits)<span id="repNotifyWhatsappSubStatus"></span></label>
           </div>
           <div class="profile-grid" style="margin-top:12px">
             <label>Alert phone (E.164)<input id="repAlertPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
@@ -736,7 +736,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.103"></script>
+<script src="./floqai-help-repository.js?v=29.09.109"></script>
 <script src="./help-attach.js?v=29.09.101"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -750,7 +750,7 @@
 <script src="./admin-app.js?v=29.09.103"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.18"></script>
+<script src="./admin-notifications.js?v=29.09.109"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./admin-scheduling.js?v=29.09.108"></script>

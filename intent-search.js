@@ -121,6 +121,31 @@
       ]
     },
     {
+      id: "help-club-notification-subscriptions",
+      kind: "help",
+      label: "Club SMS and WhatsApp notification subscriptions",
+      blurb: "Each club stores SMS and WhatsApp subscription status in Firebase after the first $10 payment. Saving Notifications again does not reopen Stripe for a channel that is already subscribed. Uncheck a channel to pause alerts without losing the paid subscription.",
+      steps: [
+        "Open Club Admin → Notifications.",
+        "Check SMS and/or WhatsApp. The first save for an unsubscribed channel opens the $10 Stripe checkout.",
+        "After payment, Firebase marks that channel subscribed. Later saves keep settings and skip checkout.",
+        "Uncheck a subscribed channel to pause alerts; you will not be charged again when you re-check it."
+      ],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      searchPhrases: [
+        "sms notification subscription", "whatsapp notification subscription", "save notification choices",
+        "sms already paid", "notification stripe again", "sms credits", "club notifications"
+      ],
+      patterns: [
+        /sms\s*(notification|subscription|already\s*paid)/,
+        /whatsapp\s*(notification|subscription)/,
+        /save\s*notification/,
+        /notification\s*(stripe|checkout|payment)/
+      ]
+    },
+    {
       id: "help-role-profiles",
       kind: "help",
       label: "Role profiles overview",

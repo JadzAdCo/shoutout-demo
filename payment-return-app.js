@@ -14,6 +14,7 @@
   let confirmInFlight = false;
   let confirmAttempts = 0;
   let closeArmed = false;
+  let subscriptionPersisted = false;
 
   function money(cents) {
     return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
@@ -25,6 +26,48 @@
     const ts = order.paidAt;
     if (ts?.toDate) return ts.toDate().toISOString();
     return "";
+  }
+
+  function notifyOpenerMessagingSubscribed(order = {}) {
+    const type = String(order.orderType || "");
+    const channel = type.startsWith("whatsapp") ? "whatsapp" : type.startsWith("sms") ? "sms" : "";
+    if (!channel) return;
+    const clubLocationId = order.clubLocationId || order.payload?.clubLocationId || "";
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          type: "floqr-notification-subscribed",
+          orderId,
+          clubLocationId,
+          channel
+        }, "*");
+      }
+    } catch (_) {}
+  }
+
+  async function persistMessagingSubscription(order = {}) {
+    if (order.paymentStatus !== "paid") return;
+    const type = String(order.orderType || "");
+    const clubId = String(order.clubLocationId || order.payload?.clubLocationId || "").trim();
+    if (!clubId) return;
+    const patch = {updatedAt: firebase.firestore.FieldValue.serverTimestamp()};
+    if (type === "smsNotifications" || type === "smsMessageBundle") {
+      patch.smsSubscribed = true;
+      patch.smsEnabled = true;
+      patch.smsRequested = true;
+      patch.smsServiceOrderId = orderId;
+      if (order.paidAt) patch.smsPaidAt = order.paidAt;
+      else patch.smsPaidAt = firebase.firestore.FieldValue.serverTimestamp();
+    } else if (type === "whatsappNotifications" || type === "whatsappMessageBundle") {
+      patch.whatsappSubscribed = true;
+      patch.whatsappEnabled = true;
+      patch.whatsappRequested = true;
+      patch.whatsappServiceOrderId = orderId;
+      if (order.paidAt) patch.whatsappPaidAt = order.paidAt;
+      else patch.whatsappPaidAt = firebase.firestore.FieldValue.serverTimestamp();
+    } else return;
+    await db.collection("clubNotificationSettings").doc(clubId).set(patch, {merge: true});
+    notifyOpenerMessagingSubscribed(order);
   }
 
   function notifyOpenerPaid(order = {}) {
@@ -94,24 +137,10 @@
 
     if (paid && isShoutout) {
       const paidAt = paidAtLabel(order) || "—";
-      const shout = order.payload?.shoutout || {};
-      const screen = receipt.screenFormatLabel
-        || shout.screenFormatLabel
-        || window.FLOQR_DISPLAY_FORMATS?.[receipt.screenFormatId || shout.screenFormatId]?.label
-        || receipt.screenFormatId
-        || shout.screenFormatId
-        || "—";
-      const address = receipt.locationAddress
-        || shout.fullAddress
-        || shout.locationAddress
-        || [shout.streetAddress, [shout.city, shout.region].filter(Boolean).join(", "), shout.postalCode, shout.country].filter(Boolean).join(", ")
-        || "—";
       byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
-        <p><strong>Reference:</strong> ${esc(receipt.referenceNumber || shout.referenceNumber || "—")}</p>
-        <p><strong>Venue:</strong> ${esc(receipt.locationName || shout.locationName || shout.brandName || "—")}</p>
-        <p><strong>Address:</strong> ${esc(address)}</p>
-        <p><strong>Screen size:</strong> ${esc(screen)}</p>
-        <p><strong>Template:</strong> ${esc(receipt.templateName || shout.templateName || order.itemName || "—")}</p>
+        <p><strong>Reference:</strong> ${esc(receipt.referenceNumber || order.payload?.shoutout?.referenceNumber || "—")}</p>
+        <p><strong>Location:</strong> ${esc(receipt.locationName || order.payload?.shoutout?.locationName || "—")}</p>
+        <p><strong>Template:</strong> ${esc(receipt.templateName || order.payload?.shoutout?.templateName || order.itemName || "—")}</p>
         <p><strong>Status:</strong> ${esc(receipt.statusLabel || "Pending Location Approval")}</p>
         <p><strong>Paid at:</strong> ${esc(paidAt)}</p>
         <p><strong>Invoice:</strong> ${esc(receipt.invoiceNumber || order.invoiceNumber || "—")}</p>
@@ -191,6 +220,10 @@
       async snap => {
         let order = snap.exists ? snap.data() : {status: "not found"};
         order = await confirmPaymentIfNeeded(order);
+        if (order.paymentStatus === "paid" && !subscriptionPersisted) {
+          subscriptionPersisted = true;
+          persistMessagingSubscription(order).catch(() => { subscriptionPersisted = false; });
+        }
         render(order);
       },
       error => { byId("paymentReturnStatus").textContent = error.message; }
