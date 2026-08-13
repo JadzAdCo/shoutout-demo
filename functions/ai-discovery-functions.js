@@ -1804,19 +1804,17 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.106") {
+function defaultFloqrPreviewLinks(v = "29.09.108") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
-    ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
-    ["Temp Club Admin 1 → Command Center", `${base}/admin.html?v=${v}`],
-    ["Temp Demo Club 1 — public profile (hours grid)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
-    ["Staff Scheduling (open−2h / close+1h)", `${base}/admin.html?location=temp-democlub-1&v=${v}#panelScheduling`],
-    ["Master Admin Discovery / AI crawl", `${base}/master-admin.html?v=${v}`],
-    ["Search / choose club", `${base}/?v=${v}&location=temp-democlub-1`],
-    ["Idle board — Temp Demo 1", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`],
-    ["Heist Club Admin (prod sample)", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-    ["Staff Scheduling portal", `${base}/scheduling.html?v=${v}`],
-    ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
+    ["Aurelia club profile (logo, staff photos, hours grid)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+    ["Volt Room club profile", `${base}/club-profile.html?location=temp-democlub-2&v=${v}`],
+    ["Temp Club Admin 1 Command Center", `${base}/admin.html?v=${v}`],
+    ["Scheduling grid avatars", `${base}/admin.html?location=temp-democlub-1&v=${v}#panelScheduling`],
+    ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
+    ["Master Admin Discovery", `${base}/master-admin.html?v=${v}`],
+    ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+    ["Aurelia display board", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
   ];
 }
 

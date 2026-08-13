@@ -5,202 +5,111 @@ const path = require("path");
 const admin = require("../functions/node_modules/firebase-admin");
 const fauth = require(path.join(process.env.APPDATA, "npm/node_modules/firebase-tools/lib/auth"));
 
-const BASE = "https://jadzadco.github.io/shoutout-demo/images/temp-qa";
-
-function hoursStructured() {
-  return {
-    sun: {closed: true, open: "", close: ""},
-    mon: {closed: true, open: "", close: ""},
-    tue: {closed: true, open: "", close: ""},
-    wed: {closed: true, open: "", close: ""},
-    thu: {closed: false, open: "22:00", close: "03:00"},
-    fri: {closed: false, open: "22:00", close: "03:00"},
-    sat: {closed: false, open: "22:00", close: "03:00"}
-  };
-}
+const showcase = require("../floqr-temp-qa-showcase.js");
 
 function clubPayload(n) {
-  const id = `temp-democlub-${n}`;
+  const {people, ...row} = showcase.clubRecord(n, true);
   return {
-    brandName: `Temp Demo Club ${n}`,
-    locationName: `Temp Demo Club ${n}`,
-    type: "club",
-    categories: ["Clubs", "Lounge", "Nightlife", "Events", "ShoutOut", "QA Demo"],
-    country: "United States",
-    regionType: "District",
-    region: "District of Columbia",
-    city: "Washington",
-    streetAddress: `${1000 + n} Demo Plaza NW`,
-    postalCode: "20001",
-    locationLabel: "Washington, District of Columbia",
-    brand: `TEMP DEMO CLUB ${n} x FLOQR`,
-    defaultMain: `USE ShoutOut @ TEMP DEMO ${n}`,
-    defaultSub: "QA Venue",
-    tagline: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights.`,
-    description: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights. Hours use atomic hour / minute / AM|PM datapoints.`,
-    genres: ["Hip Hop", "Open Format", "House"],
-    artists: [`Temp DJ ${n}`, "Temp DJ Guest"],
-    artistsOrDjs: [`Temp DJ ${n}`, "Temp DJ Guest"],
-    promoters: [`Temp Promoter ${n} Collective`],
-    amenities: ["VIP tables", "Bottle service", "Coat check", "Dance floor"],
-    agePolicy: "21+",
-    dressCode: "Upscale / smart casual",
-    cuisine: "Nightlife small plates",
-    telephone: `+12025550${String(100 + n).slice(-3)}`,
-    email: `temp_clubadmin_${n}@floqr-demo.com`,
-    officialWebsite: `https://jadzadco.github.io/shoutout-demo/club-profile.html?location=${id}`,
-    socialMediaHandles: {
-      instagram: `@tempdemoclub${n}`,
-      facebook: "",
-      x: `@tempdemoclub${n}`,
-      tiktok: `@tempdemoclub${n}`,
-      floqrHandle: `@tempdemoclub${n}`
-    },
-    logoUrl: `${BASE}/club-${n}-logo.svg`,
-    mainImageUrl: `${BASE}/club-${n}-venue.svg`,
-    mainMediaUrl: `${BASE}/club-${n}-venue.svg`,
-    mainMediaType: "image",
-    publicGallery: [
-      {mediaUrl: `${BASE}/club-${n}-gallery-a.svg`, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 1},
-      {mediaUrl: `${BASE}/club-${n}-gallery-b.svg`, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 2}
-    ],
-    featuredDjs: [
-      {
-        name: `Temp DJ ${n}`,
-        role: "Resident DJ",
-        email: `temp_dj_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/dj-${n}.svg`,
-        bio: `QA resident DJ for Temp Demo Club ${n}.`,
-        instagram: `@temp_dj_${n}`
-      },
-      {
-        name: "Temp DJ Guest",
-        role: "Guest DJ",
-        email: `temp_dj_guest_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/dj-${n}.svg`,
-        bio: "Rotating guest talent for QA nights."
-      }
-    ],
-    featuredStaff: [
-      {
-        name: `Temp Waitress ${n}`,
-        role: "Waitress",
-        email: `temp_waitress_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/waitress-${n}.svg`,
-        bio: "QA service staff — hail a waitress flows."
-      },
-      {
-        name: `Temp Waiter ${n}`,
-        role: "Waiter",
-        email: `temp_waiter_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/waiter-${n}.svg`,
-        bio: "QA floor service for VIP tables."
-      },
-      {
-        name: `Temp Bottle ${n}`,
-        role: "Bottle Service",
-        email: `temp_bottle_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/bottle-${n}.svg`,
-        bio: "QA bottle service specialist."
-      },
-      {
-        name: `Temp Club Admin ${n}`,
-        role: "Club Admin",
-        email: `temp_clubadmin_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/admin-${n}.svg`,
-        bio: `QA Club Admin mapped to ${id}.`
-      }
-    ],
-    promotionGroups: [
-      {
-        name: `Temp Promoter ${n} Collective`,
-        role: "Promotion Group",
-        email: `temp_promoter_${n}@floqr-demo.com`,
-        photoUrl: `${BASE}/promoter-${n}.svg`,
-        bio: "QA promotion group for guest list and genre nights."
-      }
-    ],
-    hours: "Thu–Sat 22:00–03:00",
-    hoursStructured: hoursStructured(),
-    hoursExceptions: [],
-    timeZone: "America/New_York",
-    activityStatus: "Demo Club Admin training venue",
-    activityDates: ["Friday Demo Night", "Saturday Demo Night"],
-    templates: ["birthday", "vip", "bottle", "neon"],
-    demo: true,
-    isDemo: true,
-    qaTemp: true,
-    staffSchedulingPaid: 1,
+    ...row,
     displayScreenFormatIds: ["led-96x48", "led-64x32"],
     primaryDisplayScreenFormatId: "led-96x48",
-    publicProfilePublished: true,
-    visibility: "public",
-    active: true,
     publicProfileSections: {
-      about: true,
-      contact: true,
-      upcomingEvents: true,
-      pastEvents: true,
-      featuredDjs: true,
-      featuredStaff: true,
-      promotionGroups: true,
-      gallery: true
+      about: true, contact: true, upcomingEvents: true, pastEvents: true,
+      featuredDjs: true, featuredStaff: true, promotionGroups: true, gallery: true
     },
     updatedBy: "seed-temp-qa-venues"
   };
 }
 
 (async () => {
-  const access = await fauth.getAccessToken(true);
-  const token = typeof access === "string" ? access : (access && (access.access_token || access.token));
-  if (!token) throw new Error("No Firebase CLI access token available");
+  const fs = require("fs");
+  const os = require("os");
+  const scopes = require(path.join(process.env.APPDATA, "npm/node_modules/firebase-tools/lib/scopes"));
+  const api = require(path.join(process.env.APPDATA, "npm/node_modules/firebase-tools/lib/api"));
+  const account = fauth.getGlobalDefaultAccount();
+  const refreshToken = account && account.tokens && account.tokens.refresh_token;
+  if (!refreshToken) throw new Error("Firebase CLI has no refresh token. Run: firebase login");
 
-  admin.initializeApp({
-    projectId: "shoutoutdemo-5b402",
-    credential: {
-      getAccessToken: async () => ({access_token: token, expires_in: 3500})
+  // Prove token refresh works, then build a temporary ADC file for Admin SDK.
+  const tokenInfo = await fauth.getAccessToken(refreshToken, [scopes.CLOUD_PLATFORM, scopes.FIREBASE_PLATFORM]);
+  if (!tokenInfo || !tokenInfo.access_token) throw new Error("Unable to refresh Firebase CLI access token");
+
+  const adcPath = path.join(os.tmpdir(), `floqr-temp-qa-adc-${process.pid}.json`);
+  const adc = {
+    type: "authorized_user",
+    client_id: api.clientId(),
+    client_secret: api.clientSecret(),
+    refresh_token: refreshToken
+  };
+  fs.writeFileSync(adcPath, JSON.stringify(adc), {encoding: "utf8", mode: 0o600});
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = adcPath;
+  process.env.GCLOUD_PROJECT = "shoutoutdemo-5b402";
+  process.env.GOOGLE_CLOUD_PROJECT = "shoutoutdemo-5b402";
+
+  try {
+    admin.initializeApp({
+      projectId: "shoutoutdemo-5b402",
+      credential: admin.credential.applicationDefault()
+    });
+
+    const db = admin.firestore();
+    const preserveKeys = [
+      "adminEmails", "adminUids", "clubAdminEmails", "clubAdminUids",
+      "createdAt", "createdBy", "ownerUid", "ownerEmail"
+    ];
+
+    let clubsUpdated = 0;
+    for (let n = 1; n <= 10; n += 1) {
+      const id = `temp-democlub-${n}`;
+      const ref = db.collection("clubLocations").doc(id);
+      const existing = await ref.get();
+      const keep = {};
+      if (existing.exists) {
+        const data = existing.data() || {};
+        preserveKeys.forEach(key => {
+          if (data[key] !== undefined) keep[key] = data[key];
+        });
+      }
+      const payload = {
+        ...clubPayload(n),
+        ...keep,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+      // Force document to match QA payload (preserve only admin/owner wiring).
+      await ref.set(payload, {merge: false});
+      clubsUpdated += 1;
     }
-  });
 
-  const db = admin.firestore();
-  let clubsUpdated = 0;
-  for (let n = 1; n <= 10; n += 1) {
-    const id = `temp-democlub-${n}`;
-    const payload = {
-      ...clubPayload(n),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-    await db.collection("clubLocations").doc(id).set(payload, {merge: true});
-    clubsUpdated += 1;
+    let usersUpdated = 0;
+    let lastDoc = null;
+    for (;;) {
+      let query = db.collection("users").orderBy(admin.firestore.FieldPath.documentId()).limit(300);
+      if (lastDoc) query = query.startAfter(lastDoc);
+      const usersSnap = await query.get();
+      if (!usersSnap.docs.length) break;
+      for (const doc of usersSnap.docs) {
+        const data = doc.data() || {};
+        const email = String(data.email || "").toLowerCase();
+        const match = email.match(/^temp_(clubadmin|dj|waitress|waiter|bottle|promoter)_(\d+)@floqr-demo\.com$/);
+        if (!match) continue;
+        const role = match[1];
+        const n = Number(match[2]);
+        const patch = showcase.userProfilePatch(role, n, doc.id);
+        await doc.ref.set({
+          ...patch,
+          email: data.email || patch.email,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }, {merge: true});
+        usersUpdated += 1;
+      }
+      lastDoc = usersSnap.docs[usersSnap.docs.length - 1];
+      if (usersSnap.docs.length < 300) break;
+    }
+
+    console.log(JSON.stringify({ok: true, clubsUpdated, usersUpdated}, null, 2));
+  } finally {
+    try { fs.unlinkSync(adcPath); } catch (_e) {}
   }
-
-  let usersUpdated = 0;
-  const usersSnap = await db.collection("users").limit(500).get();
-  for (const doc of usersSnap.docs) {
-    const data = doc.data() || {};
-    const email = String(data.email || "").toLowerCase();
-    const match = email.match(/^temp_(clubadmin|dj|waitress|waiter|bottle|promoter)_(\d+)@floqr-demo\.com$/);
-    if (!match) continue;
-    const role = match[1];
-    const n = Number(match[2]);
-    const file = role === "clubadmin" ? `admin-${n}.svg` : `${role}-${n}.svg`;
-    const photoURL = `${BASE}/${file}`;
-    const displayName = role === "clubadmin"
-      ? `Temp Club Admin ${n}`
-      : `Temp ${role.charAt(0).toUpperCase()}${role.slice(1)} ${n}`;
-    await doc.ref.set({
-      displayName: data.displayName || displayName,
-      fullName: data.fullName || displayName,
-      photoURL,
-      profilePhotoUrl: photoURL,
-      avatarUrl: photoURL,
-      qaTemp: true,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
-    usersUpdated += 1;
-  }
-
-  console.log(JSON.stringify({ok: true, clubsUpdated, usersUpdated}, null, 2));
   process.exit(0);
 })().catch(err => {
   console.error(String(err && err.message ? err.message : err));

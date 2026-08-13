@@ -1,4 +1,4 @@
-/* master-admin-app.js v29.09.22
+/* master-admin-app.js v29.09.94
    Clean Master Admin app.
    Domain enforcement is disabled during development.
    Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.22";
+  const CURRENT_VERSION = "29.09.108";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 
@@ -113,22 +113,90 @@
   }
 
   function setupTabs() {
-    document.querySelectorAll(".admin-tab").forEach(btn => {
+    const hideAllSubtabs = () => {
+      document.querySelectorAll(".admin-subtabs").forEach((el) => el.classList.add("hidden"));
+      document.querySelectorAll(".admin-tab-parent").forEach((el) => el.setAttribute("aria-expanded", "false"));
+    };
+
+    const activatePanel = (panelId, opts = {}) => {
+      if (!panelId || !byId(panelId)) return;
+      document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tab:not(.admin-tab-parent)").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-subtab").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-parent").forEach((x) => x.classList.remove("active"));
+      byId(panelId).classList.add("active");
+
+      const sub = document.querySelector(`.admin-subtab[data-panel="${panelId}"]`);
+      if (sub) {
+        sub.classList.add("active");
+        const group = sub.closest(".admin-tab-group");
+        const parent = group?.querySelector(".admin-tab-parent");
+        const subtabs = group?.querySelector(".admin-subtabs");
+        parent?.classList.add("active");
+        parent?.setAttribute("aria-expanded", "true");
+        hideAllSubtabs();
+        subtabs?.classList.remove("hidden");
+      } else if (!opts.keepSubtabs) {
+        hideAllSubtabs();
+        document.querySelector(`.admin-tab[data-panel="${panelId}"]`)?.classList.add("active");
+      }
+
+      if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
+      if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
+      if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+      if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
+      if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
+      if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
+      if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
+        window.FLOQRDiagnosticsPanels?.ensureMounted?.();
+      }
+      if (window.FLOQRSOS2FA?.isEntityMgmtPanel?.(panelId)) {
+        window.FLOQRSOS2FA.mount({
+          scope: "entityManagement",
+          onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
+        });
+        window.FLOQRSOS2FA.onPanelActivate(panelId);
+      } else {
+        window.FLOQRSOS2FA?.onPanelActivate?.(panelId);
+      }
+      try {
+        if (location.hash !== `#${panelId}`) history.replaceState(null, "", `#${panelId}`);
+      } catch (_) {}
+    };
+
+    document.querySelectorAll(".admin-tab[data-panel]").forEach((btn) => {
+      btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
+    });
+
+    document.querySelectorAll(".admin-tab-parent[data-group]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".admin-tab").forEach(x => x.classList.remove("active"));
-        document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
-        btn.classList.add("active");
-        byId(btn.dataset.panel)?.classList.add("active");
-        if (btn.dataset.panel === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
-        if (btn.dataset.panel === "networkReconciliation") loadNetworkPaymentLedger();
-        if (btn.dataset.panel === "entityManagement" && window.FLOQRSOS2FA) {
-          window.FLOQRSOS2FA.mount({
-            scope: "entityManagement",
-            onUnlocked: () => window.FLOQREntityManagement?.onSos2faUnlocked?.()
-          });
+        const group = btn.closest(".admin-tab-group");
+        const subtabs = group?.querySelector(".admin-subtabs");
+        const open = !subtabs?.classList.contains("hidden");
+        if (open) {
+          // Keep group open; jump to first sub-page if none active in this group.
+          const activeSub = group?.querySelector(".admin-subtab.active");
+          activatePanel(activeSub?.dataset.panel || group?.querySelector(".admin-subtab")?.dataset.panel);
+          return;
         }
+        hideAllSubtabs();
+        subtabs?.classList.remove("hidden");
+        btn.classList.add("active");
+        btn.setAttribute("aria-expanded", "true");
+        const first = group?.querySelector(".admin-subtab")?.dataset.panel;
+        if (first) activatePanel(first, {keepSubtabs: true});
       });
     });
+
+    document.querySelectorAll(".admin-subtab[data-panel]").forEach((btn) => {
+      btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
+    });
+
+    // Deep-link: #securityLogs / #displaySecurity / etc.
+    const hashPanel = String(location.hash || "").replace(/^#/, "");
+    if (hashPanel && byId(hashPanel)) activatePanel(hashPanel);
+
+    window.FLOQRMasterTabs = {activatePanel};
   }
 
   function setupActionFeedback() {
@@ -143,6 +211,7 @@
         : `Clicked action: ${label}. Waiting for the feature-specific result message...`;
       setText("masterActionFeedback", message);
       if (target.closest("#diagnostics")) setText("diagnosticsStatus", message);
+      if (target.closest("#diagnosticsDisplayErrors")) setText("displayLoadErrorsStatus", message);
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
@@ -238,9 +307,13 @@
   }
 
   function clubAdminUrl(id = "") {
+    if (window.FLOQRNav?.adminHome) {
+      return window.FLOQRNav.adminHome({location: id, from: "master"});
+    }
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
     url.searchParams.set("v", CURRENT_VERSION);
+    url.searchParams.set("from", "master");
     return url.toString();
   }
 
@@ -250,6 +323,37 @@
 
   function secondaryDisplayUrl(id = "") {
     return window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
+  }
+
+  function mergeClubSnapshots(locationRows = [], clubRows = []) {
+    const merged = new Map();
+    locationRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || "").trim();
+      if (!id) return;
+      merged.set(id, {...row, id});
+    });
+    clubRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || row.primaryLocationId || "").trim();
+      if (!id) return;
+      const prev = merged.get(id) || {id};
+      merged.set(id, {
+        ...row,
+        ...prev,
+        id,
+        // Prefer display settings + address profile from clubLocations when present.
+        displayScreenFormatIds: prev.displayScreenFormatIds || row.displayScreenFormatIds,
+        primaryDisplayScreenFormatId: prev.primaryDisplayScreenFormatId || row.primaryDisplayScreenFormatId,
+        secondaryDisplayScreenFormatId: prev.secondaryDisplayScreenFormatId || row.secondaryDisplayScreenFormatId,
+        displayFooterBrand: prev.displayFooterBrand || row.displayFooterBrand,
+        streetAddress: prev.streetAddress || row.streetAddress,
+        address: prev.address || row.address,
+        city: prev.city || row.city,
+        region: prev.region || row.region,
+        country: prev.country || row.country,
+        sourceCollection: prev.sourceCollection || "clubs+clubLocations"
+      });
+    });
+    return Array.from(merged.values());
   }
 
   function slugify(value = "") {
@@ -402,6 +506,10 @@
     });
   }
 
+  /**
+   * Feature: Club onboarding — persist venue + provision Display 1/2 Xibo tokens.
+   * Tokens are generated server-side and returned once for the onboarding preview warning.
+   */
   async function saveClubOnboarding(payload) {
     if (!payload.locationName) throw new Error("Club Name is required.");
     if (!payload.streetAddress || !payload.city || !payload.region || !payload.country) throw new Error("Street address, city, state/region, and country are required.");
@@ -427,19 +535,56 @@
       const indexRecord = window.FLOQRAIIndex.clubLocationIndexRecord(payload.id, payload);
       await window.FLOQRAIIndex.upsertAiIndex(db, `clubLocation_${payload.id}`, indexRecord);
     }
-    return payload;
+
+    // Provision private board secrets (?k=). Cleartext returned only when newly created.
+    let displaySecrets = null;
+    try {
+      const fn = firebase.app().functions("us-central1").httpsCallable("provisionVenueDisplayTokens");
+      const result = await fn({
+        locationId: payload.id,
+        tokenRequired: true,
+        onlyIfMissing: true
+      });
+      displaySecrets = result?.data || null;
+    } catch (err) {
+      console.warn("[onboarding display tokens]", err?.message || err);
+      displaySecrets = {ok: false, error: err?.message || "Token provision failed"};
+    }
+
+    return {...payload, displaySecrets};
   }
 
+  /**
+   * Feature: One-time Xibo token reveal on Master Admin club onboarding results.
+   * Warns operators to paste into Xibo before leaving — Security portal only shows obfuscated values later.
+   */
   function renderOnboardingResult(payload, targetId = "clubOnboardingPreview") {
     const wrap = byId(targetId);
     if (!wrap) return;
+    const secrets = payload.displaySecrets || {};
+    const reveal = secrets.revealOnce === true && secrets.primaryUrl && secrets.secondaryUrl;
+    const tokenBlock = reveal ? `
+      <div class="display-token-onetime" style="margin-top:12px;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)">
+        <p><strong>⚠️ Copy into Xibo NOW — one-time full display tokens</strong></p>
+        <p class="sub small">After you leave this onboarding result, Master Admin → Display Security only shows <em>obfuscated</em> tokens. You will need <strong>Rotate</strong> to get a new full URL.</p>
+        <p><strong>Display 1 (ShoutOut) Xibo URL</strong></p>
+        <p><code style="word-break:break-all">${esc(secrets.primaryUrl)}</code></p>
+        <p><strong>Display 2 (supRstar) Xibo URL</strong></p>
+        <p><code style="word-break:break-all">${esc(secrets.secondaryUrl)}</code></p>
+        <p class="sub small">${esc(secrets.warning || "")}</p>
+      </div>` : (secrets.primaryTokenObfuscated || secrets.warning ? `
+      <div class="sub small" style="margin-top:10px">
+        Display tokens: already provisioned (obfuscated D1 ${esc(secrets.primaryTokenObfuscated || "—")} · D2 ${esc(secrets.secondaryTokenObfuscated || "—")}).
+        ${esc(secrets.warning || "Use Display Security → Rotate for a new one-time Xibo URL.")}
+      </div>` : secrets.error ? `<p class="sub small">Display token provision warning: ${esc(secrets.error)}</p>` : "");
     wrap.innerHTML = `<div class="queue-item">
       <strong>${esc(payload.locationName)}</strong>
       <p>${esc(payload.fullAddress || "")}</p>
       <p><strong>Club Location ID:</strong> ${esc(payload.id)}</p>
       <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(clubAdminUrl(payload.id))}">${esc(clubAdminUrl(payload.id))}</a></p>
-      <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
-      <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
+      <p><strong>ShoutOut URL (no token — do not use in Xibo when token required):</strong> <a class="message-inline-link" href="${esc(displayUrl(payload.id))}">${esc(displayUrl(payload.id))}</a></p>
+      <p><strong>SupRStar URL (no token):</strong> <a class="message-inline-link" href="${esc(secondaryDisplayUrl(payload.id))}">${esc(secondaryDisplayUrl(payload.id))}</a></p>
+      ${tokenBlock}
     </div>`;
   }
 
@@ -506,13 +651,19 @@
     setText("clubOnboardingStatus", `Importing ${previewedClubCsvRows.length} club(s)...`);
     const imported = [];
     for (const row of previewedClubCsvRows) {
+      // Each new club gets one-time display tokens in displaySecrets (show in import report).
       imported.push(await saveClubOnboarding(row));
     }
     if (report) {
-      report.innerHTML = imported.map(row => `<div class="queue-item">
+      report.innerHTML = imported.map(row => {
+        const secrets = row.displaySecrets || {};
+        const reveal = secrets.revealOnce === true;
+        return `<div class="queue-item">
         <strong>${esc(row.locationName)}</strong>
         <p>Created: <a class="message-inline-link" href="${esc(clubAdminUrl(row.id))}">${esc(clubAdminUrl(row.id))}</a></p>
-      </div>`).join("");
+        ${reveal ? `<p class="sub small"><strong>⚠️ Copy Xibo URLs now</strong><br/>D1: <code style="word-break:break-all">${esc(secrets.primaryUrl)}</code><br/>D2: <code style="word-break:break-all">${esc(secrets.secondaryUrl)}</code></p>` : `<p class="sub small">Display tokens: ${esc(secrets.primaryTokenObfuscated || "see Display Security")}</p>`}
+      </div>`;
+      }).join("");
     }
     setText("clubOnboardingStatus", `Imported ${imported.length} club(s).`);
     await loadNetworkReports();
@@ -692,7 +843,8 @@
     let backendActivated = false;
     if (functions) {
       try {
-        const result = await functions.httpsCallable("assignClubAdmin")({clubId:club.id, clubLocationId:club.id, patronUid:uid});
+        const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+        const result = await functions.httpsCallable("assignClubAdmin")({clubId:club.id, clubLocationId:club.id, patronUid:uid, sos2faSessionId: sessionId});
         backendActivated = result?.data?.status === "active";
       } catch (error) {
         console.warn("assignClubAdmin callable unavailable; using assignment-record fallback:", error?.message || error);
@@ -1080,8 +1232,6 @@
       .sort((a,b) => locationName(a).localeCompare(locationName(b)));
     wrap.innerHTML = rows.length ? rows.map(row => {
       const admin = clubAdminUrl(row.id);
-      const shoutout = displayUrl(row.id);
-      const suprstar = secondaryDisplayUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       return `<div class="queue-item">
         <div class="message-envelope-head">
@@ -1090,8 +1240,6 @@
         </div>
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
         <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
-        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
-        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
       </div>`;
     }).join("") : "<p class='sub'>No club locations found yet.</p>";
     populateClubDisplaySetupOptions(locationRows);
@@ -1421,19 +1569,49 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords, promoterOnboarding] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("clubLocations"),
+      getCollectionSafe("clubs"),
       getCollectionSafe("events"),
       getCollectionSafe("guestListRequests"),
       getCollectionSafe("clubOnboardingRecords"),
-      getCollectionSafe("aiDiscoveryQueue")
+      getCollectionSafe("aiDiscoveryQueue"),
+      getCollectionSafe("promoterOnboardingRecords")
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
-    const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => [row.id, row]));
+    const staticById = new Map(fallbackLocations.map(row => [row.id, row]));
+    const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => {
+      const staticRow = staticById.get(row.id) || {};
+      // Prefer live Firestore fields, but keep static QA promoter/media datapoints when missing.
+      return [row.id, {
+        ...staticRow,
+        ...row,
+        promotionGroups: (Array.isArray(row.promotionGroups) && row.promotionGroups.length)
+          ? row.promotionGroups
+          : (staticRow.promotionGroups || []),
+        promoters: (Array.isArray(row.promoters) && row.promoters.length)
+          ? row.promoters
+          : (staticRow.promoters || []),
+        featuredStaff: (Array.isArray(row.featuredStaff) && row.featuredStaff.length)
+          ? row.featuredStaff
+          : (staticRow.featuredStaff || []),
+        featuredDjs: (Array.isArray(row.featuredDjs) && row.featuredDjs.length)
+          ? row.featuredDjs
+          : (staticRow.featuredDjs || []),
+        qaTemp: row.qaTemp ?? staticRow.qaTemp,
+        demo: row.demo ?? staticRow.demo
+      }];
+    }));
+    // Ensure QA static temp clubs appear even if Firestore has no docs yet.
+    fallbackLocations.forEach(row => {
+      if (!locationMap.has(row.id) && (row.qaTemp || row.demo || /^temp-democlub-/.test(row.id))) {
+        locationMap.set(row.id, row);
+      }
+    });
     onboardingRecords.forEach(row => {
       const id = slugify(row.clubLocationId || row.id || row.clubName || row.locationName || "imported-club");
       if (!locationMap.has(id)) locationMap.set(id, {...row, id, sourceCollection:"clubOnboardingRecords", sourceRecordId:row.id, onboardingSource:row.onboardingSource || "CSV/manual onboarding"});
@@ -1442,7 +1620,7 @@
       const id = slugify(`${row.proposedTitle || row.proposedLocationName || "discovered-club"}-${row.city || row.country || row.id}`);
       if (!locationMap.has(id)) locationMap.set(id, {...row, id, locationName:row.proposedTitle || row.proposedLocationName, address:row.proposedAddress || row.address || "", sourceCollection:"aiDiscoveryQueue", sourceRecordId:row.id, onboardingSource:"AI crawl discovery"});
     });
-    const locationRows = Array.from(locationMap.values());
+    const locationRows = mergeClubSnapshots(Array.from(locationMap.values()), clubs);
     networkUsers = users.map(row => ({...row, uid:row.uid || row.id}));
     networkLocations = locationRows;
     renderEntityClubResults();
@@ -1528,17 +1706,62 @@
       const promoterCounts = {};
       guestLists.forEach(x => {
         const key = x.promoterName || x.promoterId || "Unknown promoter";
-        promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0};
+        promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0, clubs:new Set()};
         promoterCounts[key].requests += 1;
         promoterCounts[key].guests += Number(x.partySize || 0);
+        const club = x.locationName || x.clubLocationId || "";
+        if (club) promoterCounts[key].clubs.add(club);
       });
-      const rows = Object.entries(promoterCounts)
+      const referralRows = Object.entries(promoterCounts)
         .sort((a,b) => b[1].requests - a[1].requests)
-        .map(([promoter,v]) => [promoter, `${v.requests} guest list requests / ${v.guests} guests`]);
-      byId("promoterNetworkReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter referrals yet.</p>";
+        .map(([promoter,v]) => [promoter, `${v.requests} guest list requests / ${v.guests} guests${v.clubs.size ? ` · ${Array.from(v.clubs).slice(0,3).join(", ")}` : ""}`]);
+      byId("promoterNetworkReport").innerHTML = referralRows.length
+        ? `<p class="sub small"><strong>Guest-list referrals</strong></p>${simpleRows(referralRows)}`
+        : "<p class='sub'>No guest-list promoter referrals yet. Club promotion groups below still list affiliated promoters (including QA temp clubs).</p>";
     }
 
-    byId("allQueueList").innerHTML = pending.length ? pending.map(item => `
+    if (byId("promoterClubGroupsReport")) {
+      const groupRows = [];
+      locationRows.forEach(loc => {
+        const groups = Array.isArray(loc.promotionGroups) ? loc.promotionGroups : [];
+        const promoters = Array.isArray(loc.promoters) ? loc.promoters : [];
+        if (!groups.length && !promoters.length) return;
+        const names = [
+          ...groups.map(g => (typeof g === "string" ? g : (g.name || g.displayName || ""))),
+          ...promoters.map(p => (typeof p === "string" ? p : (p.name || p.displayName || "")))
+        ].filter(Boolean);
+        if (!names.length) return;
+        const emails = groups.map(g => g?.email).filter(Boolean);
+        groupRows.push([
+          loc.locationName || loc.brandName || loc.id,
+          `${names.join(" · ")}${emails.length ? ` (${emails.join(", ")})` : ""}${loc.qaTemp || loc.demo ? " · QA temp" : ""}`
+        ]);
+      });
+      groupRows.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+      byId("promoterClubGroupsReport").innerHTML = groupRows.length
+        ? simpleRows(groupRows)
+        : "<p class='sub'>No club promotion groups published yet.</p>";
+    }
+
+    if (byId("promoterOnboardingNetworkReport")) {
+      const rows = (promoterOnboarding || []).slice(0, 40).map(row => [
+        row.promoterName || row.name || row.id || "Promoter",
+        `${row.promoterCompany || row.company || "Independent"} · ${row.identity || row.email || row.username || "no identity"}${row.clubId || row.clubLocationId ? ` · club ${row.clubId || row.clubLocationId}` : ""}`
+      ]);
+      byId("promoterOnboardingNetworkReport").innerHTML = rows.length
+        ? simpleRows(rows)
+        : "<p class='sub'>No promoter onboarding records yet.</p>";
+    }
+
+    if (byId("masterActionFeedback") && /Promoters/i.test(byId("masterActionFeedback").textContent || "")) {
+      const groupCount = (byId("promoterClubGroupsReport")?.querySelectorAll(".report-table > div, .report-row") || []).length;
+      setText("masterActionFeedback", `Promoters loaded. ${guestLists.length} guest-list referral(s); club promotion groups listed below.`);
+    }
+
+    byId("allQueueList").innerHTML = pending.length ? pending.map(item => {
+      const paidCents = Math.max(0, Math.round(Number(item.amountCents || item.priceCents || item.receipt?.amountCents || 0)));
+      const paid = String(item.paymentStatus || "").toLowerCase() === "paid" || paidCents > 0;
+      return `
       <div class="queue-item">
         <strong>${esc(item.mainText || "Untitled ShoutOut")}</strong>
         <p>${esc(item.subText || "")}</p>
@@ -1546,8 +1769,42 @@
           ${esc(item.locationName || item.clubName || item.clubLocationId || "Unknown location")}
           • ${esc(item.referenceNumber || "")}
           • ${esc(item.submittedBy || "unknown")}
+          ${paid ? ` • paid ${esc(money(paidCents / 100))}` : ""}
         </small>
-      </div>`).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+      </div>`;
+    }).join("") : "<p class='sub'>No pending ShoutOuts across the network.</p>";
+  }
+
+  async function purgeAllPendingShoutoutQueues() {
+    const statusEl = byId("allQueueStatus");
+    if (!window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
+      if (statusEl) statusEl.textContent = "Unlock Entity Management with SOS2FA before purging queues.";
+      document.querySelector('[data-panel="entityManagement"]')?.click();
+      return;
+    }
+    const pendingCount = Number(byId("netPending")?.textContent?.replace(/,/g, "") || 0);
+    const ok = window.confirm(`Purge ALL pending ShoutOuts across every venue?\n\nPaid pending items will be refunded via Stripe, then removed from the queue.\nThis cannot be undone.`);
+    if (!ok) return;
+    const confirmWord = window.prompt('Type PURGE to confirm.', "");
+    if (String(confirmWord || "").trim().toUpperCase() !== "PURGE") {
+      if (statusEl) statusEl.textContent = "Purge cancelled — confirmation word not entered.";
+      return;
+    }
+    try {
+      if (statusEl) statusEl.textContent = `Purging pending queues${pendingCount ? ` (${pendingCount} shown)` : ""}…`;
+      const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+      const result = await firebase.app().functions("us-central1").httpsCallable("purgePendingShoutoutQueues")({
+        confirm: "purge",
+        sos2faSessionId: sessionId
+      });
+      const data = result?.data || {};
+      if (statusEl) {
+        statusEl.textContent = `Purged ${data.purged || 0} pending ShoutOut(s); refunded ${data.refunded || 0}. Errors: ${(data.errors || []).length}.`;
+      }
+      await loadNetworkReports();
+    } catch (error) {
+      if (statusEl) statusEl.textContent = error?.message || String(error);
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1572,6 +1829,8 @@
     bind("assignEntityClubAdminBtn", assignSelectedEntityClubAdmin);
     bind("refreshNetworkReconBtn", loadNetworkPaymentLedger);
     bind("purgeTestPaymentsReconBtn", purgeNetworkTestPayments);
+    bind("refreshAllQueuesBtn", loadNetworkReports);
+    bind("purgePendingShoutoutQueuesBtn", purgeAllPendingShoutoutQueues);
     bind("previewManagedTemplateBtn", () => viewManagedTemplate(currentManagedTemplateDraft()));
     bind("saveManagedTemplateBtn", saveManagedTemplate);
     bind("clearManagedTemplateBtn", clearManagedTemplateForm);

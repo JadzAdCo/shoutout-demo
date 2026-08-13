@@ -213,7 +213,7 @@
     byId("clubPersonName").textContent = name;
     byId("clubPersonRole").textContent = person.role || person.title || "Featured at this venue";
     byId("clubPersonBio").textContent = person.bio || person.description || "Featured by this club on FLOQR.";
-    byId("clubPersonPhoto").innerHTML = person.photoUrl || person.imageUrl ? `<img src="${esc(person.photoUrl || person.imageUrl)}" alt="${esc(name)}"/>` : `<span>${esc(name.slice(0,1).toUpperCase())}</span>`;
+    byId("clubPersonPhoto").innerHTML = person.photoUrl || person.photoURL || person.imageUrl ? `<img src="${esc(person.photoUrl || person.photoURL || person.imageUrl)}" alt="${esc(name)}"/>` : `<span>${esc(name.slice(0,1).toUpperCase())}</span>`;
     const instagram = String(person.instagram || person.instagramHandle || "").replace(/^@/, "");
     const profileUrl = safeExternal(person.profileUrl);
     byId("clubPersonLinks").innerHTML = [
@@ -226,7 +226,7 @@
   function personCard(person) {
     const name = person.name || person.displayName || "Featured Member";
     return `<button class="club-person-card" type="button" data-person="${esc(encodeURIComponent(JSON.stringify(person)))}">
-      <span class="club-person-card-photo">${person.photoUrl || person.imageUrl ? `<img src="${esc(person.photoUrl || person.imageUrl)}" alt=""/>` : esc(name.slice(0,1).toUpperCase())}</span>
+      <span class="club-person-card-photo">${person.photoUrl || person.photoURL || person.imageUrl ? `<img src="${esc(person.photoUrl || person.photoURL || person.imageUrl)}" alt=""/>` : esc(name.slice(0,1).toUpperCase())}</span>
       <strong>${esc(name)}</strong><small>${esc(person.role || person.title || "Featured")}</small>
     </button>`;
   }
