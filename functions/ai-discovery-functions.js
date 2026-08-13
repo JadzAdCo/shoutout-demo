@@ -1804,17 +1804,17 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.52") {
+function defaultFloqrPreviewLinks(v = "29.09.106") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
-    ["Search / choose club (template page = free B&W + FloqAi)", `${base}/?v=${v}&location=heist-washington-dc`],
-    ["Idle board — Use ShoutOut @ Clubname", `${base}/display.html?location=heist-washington-dc&screen=led-64x32`],
-    ["Soccer Jersey $30 — pick team in editor (Morocco preview)", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerMorocco&main=FLOQR&sub=%F0%9F%94%A5&screen=led-64x32&preview=1&v=${v}`],
-    ["Soccer Jersey — Real Madrid crest", `${base}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerRealMadrid&jerseyTeamLabel=REAL%20MADRID&jerseyPrimary=%23FFFFFF&jerseySecondary=%23FEBE10&jerseyCssBack=1&main=VINI&sub=7&screen=led-64x32&preview=1&v=${v}`],
-    ["NBA Lakers jersey $30", `${base}/display.html?location=heist-washington-dc&template=nbaLosAngelesLakers&main=KING&sub=23&screen=led-64x32&preview=1&v=${v}`],
-    ["NFL Chiefs jersey $30", `${base}/display.html?location=heist-washington-dc&template=nflKansasCityChiefs&main=MAHOMES&sub=15&screen=led-64x32&preview=1&v=${v}`],
-    ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
+    ["Temp Club Admin 1 → Command Center", `${base}/admin.html?v=${v}`],
+    ["Temp Demo Club 1 — public profile (hours grid)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+    ["Staff Scheduling (open−2h / close+1h)", `${base}/admin.html?location=temp-democlub-1&v=${v}#panelScheduling`],
+    ["Master Admin Discovery / AI crawl", `${base}/master-admin.html?v=${v}`],
+    ["Search / choose club", `${base}/?v=${v}&location=temp-democlub-1`],
+    ["Idle board — Temp Demo 1", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`],
+    ["Heist Club Admin (prod sample)", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
     ["Staff Scheduling portal", `${base}/scheduling.html?v=${v}`],
     ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
   ];

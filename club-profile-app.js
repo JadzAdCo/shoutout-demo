@@ -253,7 +253,17 @@
   }
 
   function renderGallery(media) {
-    const gallery = media.filter(item => item.slotType === "gallery").sort((a,b) => Number(a.galleryOrder ?? 0) - Number(b.galleryOrder ?? 0)).slice(0,10);
+    const fromClub = Array.isArray(club.publicGallery) ? club.publicGallery : [];
+    const gallery = [...media, ...fromClub]
+      .filter(item => item && (item.slotType === "gallery" || item.mediaUrl) && item.slotType !== "main")
+      .map((item, idx) => ({
+        ...item,
+        slotType: item.slotType || "gallery",
+        galleryOrder: item.galleryOrder ?? idx
+      }))
+      .filter(item => item.slotType === "gallery")
+      .sort((a,b) => Number(a.galleryOrder ?? 0) - Number(b.galleryOrder ?? 0))
+      .slice(0,10);
     byId("clubProfileGallery").innerHTML = gallery.length ? gallery.map(item => `<figure>${mediaMarkup(item.mediaUrl, item.mediaType, item.title || "Club gallery media", item)}${item.title ? `<figcaption>${esc(item.title)}</figcaption>` : ""}</figure>`).join("") : '<p class="sub">No public gallery media has been published.</p>';
     enforceClubVideoTrims(byId("clubProfileGallery"));
     toggleSection("clubGallerySection", sectionEnabled("gallery") && gallery.length);

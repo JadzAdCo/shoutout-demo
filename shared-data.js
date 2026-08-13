@@ -83,6 +83,68 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     primaryDisplayScreenFormatId:"p125-96x48",
     active:true
   },
+  "temp-democlub-1": {
+    brandName:"Temp Demo Club 1", locationName:"Temp Demo Club 1", type:"club",
+    categories:["Clubs","Lounge","Nightlife","Events","ShoutOut","QA Demo"],
+    country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
+    streetAddress:"1001 Demo Plaza NW", postalCode:"20001",
+    locationLabel:"Washington, District of Columbia",
+    brand:"TEMP DEMO CLUB 1 x FLOQR",
+    defaultMain:"USE ShoutOut @ TEMP DEMO 1", defaultSub:"QA Venue",
+    tagline:"Full-profile demo venue 1 for FLOQR scheduling, hail a waitress, and featured genre nights.",
+    description:"Full-profile demo venue 1 for FLOQR scheduling, hail a waitress, and featured genre nights. Hours use atomic hour / minute / AM|PM datapoints.",
+    genres:["Hip Hop","Open Format","House"], artists:["Temp DJ 1","Temp DJ Guest"],
+    artistsOrDjs:["Temp DJ 1","Temp DJ Guest"],
+    promoters:["Temp Promoter 1 Collective"],
+    amenities:["VIP tables","Bottle service","Coat check","Dance floor"],
+    agePolicy:"21+",
+    dressCode:"Upscale / smart casual",
+    cuisine:"Nightlife small plates",
+    telephone:"+12025550101",
+    email:"temp_clubadmin_1@floqr-demo.com",
+    officialWebsite:"https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1",
+    socialMediaHandles:{instagram:"@tempdemoclub1", facebook:"", x:"@tempdemoclub1", tiktok:"@tempdemoclub1", floqrHandle:"@tempdemoclub1"},
+    logoUrl:"./images/temp-qa/club-1-logo.svg",
+    mainImageUrl:"./images/temp-qa/club-1-venue.svg",
+    mainMediaUrl:"./images/temp-qa/club-1-venue.svg",
+    mainMediaType:"image",
+    publicGallery:[
+      {mediaUrl:"./images/temp-qa/club-1-gallery-a.svg", mediaType:"image", slotType:"gallery", title:"VIP Room", galleryOrder:1},
+      {mediaUrl:"./images/temp-qa/club-1-gallery-b.svg", mediaType:"image", slotType:"gallery", title:"Entrance", galleryOrder:2}
+    ],
+    featuredDjs:[
+      {name:"Temp DJ 1", role:"Resident DJ", email:"temp_dj_1@floqr-demo.com", photoUrl:"./images/temp-qa/dj-1.svg", bio:"QA resident DJ for Temp Demo Club 1.", instagram:"@temp_dj_1"},
+      {name:"Temp DJ Guest", role:"Guest DJ", email:"temp_dj_guest_1@floqr-demo.com", photoUrl:"./images/temp-qa/dj-1.svg", bio:"Rotating guest talent for QA nights."}
+    ],
+    featuredStaff:[
+      {name:"Temp Waitress 1", role:"Waitress", email:"temp_waitress_1@floqr-demo.com", photoUrl:"./images/temp-qa/waitress-1.svg", bio:"QA service staff — hail a waitress flows."},
+      {name:"Temp Waiter 1", role:"Waiter", email:"temp_waiter_1@floqr-demo.com", photoUrl:"./images/temp-qa/waiter-1.svg", bio:"QA floor service for VIP tables."},
+      {name:"Temp Bottle 1", role:"Bottle Service", email:"temp_bottle_1@floqr-demo.com", photoUrl:"./images/temp-qa/bottle-1.svg", bio:"QA bottle service specialist."}
+    ],
+    promotionGroups:[
+      {name:"Temp Promoter 1 Collective", role:"Promotion Group", email:"temp_promoter_1@floqr-demo.com", photoUrl:"./images/temp-qa/promoter-1.svg", bio:"QA promotion group for guest list and genre nights."}
+    ],
+    hours:"Thu–Sat 22:00–03:00",
+    hoursStructured:{
+      sun:{closed:true,open:"",close:""},
+      mon:{closed:true,open:"",close:""},
+      tue:{closed:true,open:"",close:""},
+      wed:{closed:true,open:"",close:""},
+      thu:{closed:false,open:"22:00",close:"03:00"},
+      fri:{closed:false,open:"22:00",close:"03:00"},
+      sat:{closed:false,open:"22:00",close:"03:00"}
+    },
+    hoursExceptions:[],
+    timeZone:"America/New_York",
+    activityStatus:"Demo Club Admin training venue",
+    activityDates:["Friday Demo Night","Saturday Demo Night"],
+    templates:["birthday","vip","bottle","neon"],
+    demo:true, isDemo:true, qaTemp:true, staffSchedulingPaid:1,
+    displayScreenFormatIds:["led-96x48","led-64x32"],
+    primaryDisplayScreenFormatId:"led-96x48",
+    publicProfilePublished:true, visibility:"public",
+    active:true
+  },
   "heist-washington-dc": {
     brandName:"Heist", locationName:"Heist Washington DC", type:"club",
     categories:["Clubs","Lounge","Nightlife","Events","ShoutOut"],
@@ -698,6 +760,112 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
   }
 
 };
+
+(function seedTempDemoClubs(locations) {
+  const template = locations["temp-democlub-1"] || {};
+  const asset = (n, file) => `./images/temp-qa/${file.replace("{n}", String(n))}`;
+  for (let n = 1; n <= 10; n += 1) {
+    const id = `temp-democlub-${n}`;
+    const base = n === 1 ? template : {...template};
+    const streetNum = 1000 + n;
+    locations[id] = {
+      ...base,
+      brandName: `Temp Demo Club ${n}`,
+      locationName: `Temp Demo Club ${n}`,
+      brand: `TEMP DEMO CLUB ${n} x FLOQR`,
+      defaultMain: `USE ShoutOut @ TEMP DEMO ${n}`,
+      defaultSub: "QA Venue",
+      tagline: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights.`,
+      description: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights. Hours use atomic hour / minute / AM|PM datapoints.`,
+      streetAddress: `${streetNum} Demo Plaza NW`,
+      postalCode: "20001",
+      telephone: `+12025550${String(100 + n).slice(-3)}`,
+      email: `temp_clubadmin_${n}@floqr-demo.com`,
+      officialWebsite: `https://jadzadco.github.io/shoutout-demo/club-profile.html?location=${id}`,
+      socialMediaHandles: {
+        instagram: `@tempdemoclub${n}`,
+        facebook: "",
+        x: `@tempdemoclub${n}`,
+        tiktok: `@tempdemoclub${n}`,
+        floqrHandle: `@tempdemoclub${n}`
+      },
+      logoUrl: asset(n, "club-{n}-logo.svg"),
+      mainImageUrl: asset(n, "club-{n}-venue.svg"),
+      mainMediaUrl: asset(n, "club-{n}-venue.svg"),
+      mainMediaType: "image",
+      publicGallery: [
+        {mediaUrl: asset(n, "club-{n}-gallery-a.svg"), mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 1},
+        {mediaUrl: asset(n, "club-{n}-gallery-b.svg"), mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 2}
+      ],
+      artists: [`Temp DJ ${n}`, "Temp DJ Guest"],
+      artistsOrDjs: [`Temp DJ ${n}`, "Temp DJ Guest"],
+      promoters: [`Temp Promoter ${n} Collective`],
+      featuredDjs: [
+        {
+          name: `Temp DJ ${n}`,
+          role: "Resident DJ",
+          email: `temp_dj_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "dj-{n}.svg"),
+          bio: `QA resident DJ for Temp Demo Club ${n}.`,
+          instagram: `@temp_dj_${n}`
+        },
+        {
+          name: "Temp DJ Guest",
+          role: "Guest DJ",
+          email: `temp_dj_guest_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "dj-{n}.svg"),
+          bio: "Rotating guest talent for QA nights."
+        }
+      ],
+      featuredStaff: [
+        {
+          name: `Temp Waitress ${n}`,
+          role: "Waitress",
+          email: `temp_waitress_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "waitress-{n}.svg"),
+          bio: "QA service staff — hail a waitress flows."
+        },
+        {
+          name: `Temp Waiter ${n}`,
+          role: "Waiter",
+          email: `temp_waiter_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "waiter-{n}.svg"),
+          bio: "QA floor service for VIP tables."
+        },
+        {
+          name: `Temp Bottle ${n}`,
+          role: "Bottle Service",
+          email: `temp_bottle_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "bottle-{n}.svg"),
+          bio: "QA bottle service specialist."
+        },
+        {
+          name: `Temp Club Admin ${n}`,
+          role: "Club Admin",
+          email: `temp_clubadmin_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "admin-{n}.svg"),
+          bio: `QA Club Admin mapped to ${id}.`
+        }
+      ],
+      promotionGroups: [
+        {
+          name: `Temp Promoter ${n} Collective`,
+          role: "Promotion Group",
+          email: `temp_promoter_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "promoter-{n}.svg"),
+          bio: "QA promotion group for guest list and genre nights."
+        }
+      ],
+      demo: true,
+      isDemo: true,
+      qaTemp: true,
+      staffSchedulingPaid: 1,
+      publicProfilePublished: true,
+      visibility: "public",
+      active: true
+    };
+  }
+})(window.SHOUTOUT_CLUB_LOCATIONS);
 
 window.SHOUTOUT_EVENTS = {
   "shoko-fucking-monday-2026-07-27": {
