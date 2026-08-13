@@ -1,4 +1,4 @@
-/* admin-app.js v29.09.43 - Venue Command Center; elected Club Admins only (no club-entity search bar) */
+/* admin-app.js v29.09.99 - Venue Command Center; affiliated Club Admins only (no Zebbies default) */
 (function () {
   "use strict";
 
@@ -8,7 +8,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.8";
+  const CURRENT_VERSION = "29.09.99";
 
   if (!window.firebaseConfig) { setText("adminStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
@@ -17,7 +17,8 @@
   const db = firebase.firestore();
   const storage = firebase.storage ? firebase.storage() : null;
 
-  let locationId = canonicalStaticLocationId(qs("location", qs("club", "zebbies-garden-washington-dc")));
+  const requestedLocationId = canonicalStaticLocationId(qs("location", qs("club", "")));
+  let locationId = requestedLocationId;
   const profileImportDraftId = qs("profileImportDraft", "");
   let loc = getStaticLocation(locationId);
   let publicClubProfile = {...loc};
@@ -40,7 +41,8 @@
   let clubConnectRefreshHandled = false;
 
   function canonicalStaticLocationId(id = "") {
-    const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
+    const key = String(id || "").trim().toLowerCase();
+    if (!key) return "";
     const row = (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || {};
     return String(row.canonicalLocationId || row.aliasOf || row.mergedInto || key).toLowerCase();
   }
@@ -52,6 +54,7 @@
 
   async function resolveAdminLocationId(id = "") {
     let key = canonicalStaticLocationId(id);
+    if (!key) return "";
     try {
       const alias = await db.collection("clubLocationAliases").doc(key).get();
       if (alias.exists && alias.data()?.canonicalLocationId) {
@@ -81,17 +84,60 @@
 
   function refreshLocationShell() {
     loc = getStaticLocation(locationId);
-    setText("clubName", loc.locationName || locationId);
+    setText("clubName", locationId ? (loc.locationName || locationId) : "No venue selected");
     const displayLink = byId("displayLink");
     if (displayLink) displayLink.href = stableVenueDisplayUrl();
     const display2Link = byId("display2Link");
     if (display2Link) display2Link.href = stableVenueSecondaryDisplayUrl();
     const liveFrame = byId("liveFrame");
-    if (liveFrame) liveFrame.src = stableVenueDisplayUrl();
+    if (liveFrame) liveFrame.src = locationId ? stableVenueDisplayUrl() : "about:blank";
     const publicLink = byId("clubPublicProfileLink");
     if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");
     if (roleProfilesLink) roleProfilesLink.href = window.FLOQRNav?.adminLink("./role-profiles.html") || `./role-profiles.html?v=29.09.8&from=admin&location=${encodeURIComponent(locationId)}`;
+    const d1 = byId("clubDisplaySecurityDisplay1Link");
+    if (d1) d1.href = stableVenueDisplayUrl();
+    const d2 = byId("clubDisplaySecurityDisplay2Link");
+    if (d2) d2.href = stableVenueSecondaryDisplayUrl();
+    loadClubDisplaySecurityStatus();
+  }
+
+  /** Feature: Club Admin read-only Display Security status (Master Admin owns edits). */
+  async function loadClubDisplaySecurityStatus() {
+    const preview = byId("clubDisplaySecurityPreview");
+    const noteEl = byId("clubDisplaySecurityNote");
+    const statusEl = byId("clubDisplaySecurityActionStatus");
+    if (!preview) return;
+    preview.innerHTML = `<p class="sub small">Loading display security status…</p>`;
+    if (statusEl) statusEl.textContent = "";
+    try {
+      const snap = await db.collection("clubLocations").doc(locationId).get();
+      const data = snap.exists ? snap.data() || {} : {};
+      const ips = Array.isArray(data.approvedDisplayIps) ? data.approvedDisplayIps : [];
+      const ipOn = data.displayIpRestrictionEnabled === true;
+      const tokenOn = data.displayTokenRequired !== false;
+      const name = data.locationName || loc.locationName || locationId;
+      preview.innerHTML = `
+        <div class="display-security-status-row">
+          <strong class="display-security-status-venue">${esc(name)}</strong>
+          <span class="display-security-badge ${ipOn ? "is-on" : "is-off"}">IP restriction ${ipOn ? "ON" : "OFF"}</span>
+          <span class="display-security-badge ${tokenOn ? "is-on" : "is-off"}">Token lock ${tokenOn ? "ON" : "OFF"}</span>
+          <span class="display-security-badge">${ips.length} approved IP${ips.length === 1 ? "" : "s"}</span>
+        </div>`;
+      if (noteEl) {
+        noteEl.textContent = data.displayIpNotes
+          ? `Notes: ${data.displayIpNotes}`
+          : "Master Admin manages allowlist IPs and board tokens. Contact Master Admin to change lock settings.";
+      }
+      if (statusEl) {
+        statusEl.textContent = snap.exists
+          ? `Display security loaded for ${locationId}.`
+          : `No saved display security doc yet for ${locationId}.`;
+      }
+    } catch (err) {
+      preview.innerHTML = `<p class="sub small">${esc(err?.message || "Could not load display security status.")}</p>`;
+      if (statusEl) statusEl.textContent = err?.message || "Load failed.";
+    }
   }
 
   async function enforceVenueFeatureGates() {
@@ -292,6 +338,7 @@
     if (byId("clubProfileGenres")) byId("clubProfileGenres").value = (publicClubProfile.genres || loc.genres || []).join(", ");
     if (byId("clubProfileHours")) byId("clubProfileHours").value = publicClubProfile.hours || publicClubProfile.operatingHours || "";
     if (byId("clubProfileAgePolicy")) byId("clubProfileAgePolicy").value = publicClubProfile.agePolicy || "";
+    window.FLOQRAdminVenueHours?.fillFromClub?.(publicClubProfile);
     if (byId("clubProfileDressCode")) byId("clubProfileDressCode").value = publicClubProfile.dressCode || "";
     if (byId("clubProfileAmenities")) byId("clubProfileAmenities").value = (publicClubProfile.amenities || []).join(", ");
     if (byId("clubProfileServices")) byId("clubProfileServices").value = (publicClubProfile.publicServices || publicClubProfile.services || []).join(", ");
@@ -425,6 +472,7 @@
       floqrHandle,
       genres: splitCSV(byId("clubProfileGenres")?.value || ""),
       hours:byId("clubProfileHours")?.value.trim() || "",
+      ...(window.FLOQRAdminVenueHours?.collectPayload?.() || {}),
       agePolicy:byId("clubProfileAgePolicy")?.value.trim() || "",
       dressCode:byId("clubProfileDressCode")?.value.trim() || "",
       amenities:splitCSV(byId("clubProfileAmenities")?.value || ""),
@@ -778,6 +826,116 @@
   }
   async function logout() { await auth.signOut(); window.location.reload(); }
 
+  function demoClubIdForEmail(email = "") {
+    const match = String(email || "").toLowerCase().match(/^temp_clubadmin_(\d+)@floqr-demo\.com$/);
+    return match ? `temp-democlub-${Number(match[1])}` : "";
+  }
+
+  function uniqueLocationIds(values = []) {
+    const out = [];
+    values.forEach(value => {
+      const id = canonicalStaticLocationId(value);
+      if (id && !out.includes(id)) out.push(id);
+    });
+    return out;
+  }
+
+  async function listAffiliatedVenueIds(user) {
+    if (!user) return [];
+    const email = safeUser(user);
+    const found = [];
+    try {
+      const profile = await db.collection("users").doc(user.uid).get();
+      const data = profile.exists ? profile.data() || {} : {};
+      found.push(
+        ...(Array.isArray(data.clubAdminLocationIds) ? data.clubAdminLocationIds : []),
+        ...(Array.isArray(data.approvedLocations) ? data.approvedLocations : []),
+        data.clubLocationId,
+        data.pendingClubLocationId
+      );
+    } catch (error) {}
+    try {
+      const snap = await db.collection("clubAdminAssignments").where("patronUid", "==", user.uid).limit(50).get();
+      snap.docs.forEach(doc => {
+        const row = doc.data() || {};
+        if (String(row.status || "").toLowerCase() !== "active") return;
+        found.push(row.clubId || row.clubLocationId || row.locationId);
+      });
+    } catch (error) {}
+    try {
+      const byEmail = await db.collection("clubLocations").where("adminEmails", "array-contains", email).limit(20).get();
+      byEmail.docs.forEach(doc => found.push(doc.id));
+    } catch (error) {}
+    try {
+      const byUid = await db.collection("clubLocations").where("adminUids", "array-contains", user.uid).limit(20).get();
+      byUid.docs.forEach(doc => found.push(doc.id));
+    } catch (error) {}
+    const demoId = demoClubIdForEmail(email);
+    if (demoId) found.unshift(demoId);
+    return uniqueLocationIds(found);
+  }
+
+  function pickAffiliatedVenue(ids = [], email = "") {
+    const demoId = demoClubIdForEmail(email);
+    if (demoId && ids.includes(demoId)) return demoId;
+    const withoutDefault = ids.filter(id => id !== "zebbies-garden-washington-dc");
+    return withoutDefault[0] || ids[0] || "";
+  }
+
+  function redirectToVenue(id) {
+    const next = canonicalStaticLocationId(id);
+    if (!next) return false;
+    const url = new URL(location.href);
+    if (canonicalStaticLocationId(url.searchParams.get("location") || url.searchParams.get("club") || "") === next) {
+      return false;
+    }
+    url.searchParams.set("location", next);
+    url.searchParams.delete("club");
+    if (!url.searchParams.get("v")) url.searchParams.set("v", CURRENT_VERSION);
+    location.replace(url.toString());
+    return true;
+  }
+
+  function showVenueGate(copy) {
+    byId("adminLogin")?.classList.add("hidden");
+    byId("adminPanel")?.classList.add("hidden");
+    const gate = byId("adminVenueGate");
+    if (gate) gate.classList.remove("hidden");
+    const copyEl = byId("adminVenueGateCopy");
+    if (copyEl) copyEl.textContent = copy;
+    setText("adminStatus", copy);
+    setText("clubName", "No affiliated venue");
+  }
+
+  function hideVenueGate() {
+    byId("adminVenueGate")?.classList.add("hidden");
+  }
+
+  async function requestMasterAdminAssignment(user) {
+    const statusEl = byId("adminVenueGateStatus");
+    const setGate = message => {
+      if (statusEl) statusEl.textContent = message;
+      setText("adminStatus", message);
+    };
+    if (!user) {
+      setGate("Sign in first.");
+      return;
+    }
+    setGate("Sending assignment request to Master Admin…");
+    await db.collection("roleRequests").add({
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.displayName || "",
+      roleType: "clubAdmin",
+      requestKind: "masterAdminAssignment",
+      publicName: user.displayName || user.email || "Club Admin",
+      notes: "Unaffiliated Club Admin requested venue assignment from Master Admin (admin.html had no affiliated club).",
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    setGate("Request sent. Master Admin can assign you from Manage Entity. Demo Club Admins (temp_clubadmin_N) should already map to temp-democlub-N.");
+  }
+
   async function hasClubAdminAccess(user) {
     if (!user) return false;
     const email = safeUser(user);
@@ -801,6 +959,10 @@
       if ((locationData.masterAdminUids || []).includes(user.uid)) return true;
     } catch (error) {}
 
+    // Demo Club Admin emails are pre-wired to temp-democlub-N.
+    const demoId = demoClubIdForEmail(email);
+    if (demoId && locationId === demoId) return true;
+
     // Workers / REP designations do not unlock the full Club Admin portal.
     return false;
   }
@@ -822,6 +984,20 @@
   }
 
   let suprstarQueueUnsub = null;
+  let suprstarRepairBound = false;
+  async function repairSuprstarQueue() {
+    try {
+      setText("suprstarQueueStatus", "Repairing paid requests into the approval queue...");
+      const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
+      const res = await callable("repairSuprstarPaidOrders")({locationId});
+      const repaired = Number(res?.data?.repaired || 0);
+      setText("suprstarQueueStatus", repaired
+        ? ("Moved " + repaired + " paid request(s) into the queue.")
+        : "No stuck paid requests found for this venue.");
+    } catch (e) {
+      setText("suprstarQueueStatus", e.message || String(e));
+    }
+  }
   function renderSuprstarQueue() {
     const list = byId("suprstarQueueList");
     if (!list) return;
@@ -831,19 +1007,23 @@
       suprstarQueueUnsub = null;
     }
     const callable = name => firebase.app().functions("us-central1").httpsCallable(name);
+    if (!suprstarRepairBound) {
+      byId("suprstarRepairBtn")?.addEventListener("click", () => repairSuprstarQueue());
+      suprstarRepairBound = true;
+    }
     suprstarQueueUnsub = db.collection("suprstarRequests")
       .where("locationId", "==", locationId)
-      .where("status", "in", ["pending_approval", "approved", "live"])
       .onSnapshot(snapshot => {
         const rows = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+          .filter(r => r.paymentStatus === "paid" || ["pending_approval", "approved", "live"].includes(String(r.status || "")))
           .sort((a, b) => (b.paidAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) - (a.paidAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0));
-        const pending = rows.filter(r => r.status === "pending_approval");
+        const pending = rows.filter(r => r.status === "pending_approval" || (r.paymentStatus === "paid" && !["approved", "live", "ended", "rejected"].includes(String(r.status || ""))));
         const live = rows.filter(r => r.status === "live");
         setText("metricSuprstarPending", String(pending.length));
         setText("metricSuprstarLive", String(live.length));
         setText("metricSuprstarDash", String(pending.length));
         if (!rows.length) {
-          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval.</p>";
+          list.innerHTML = "<p class='sub'>No paid supRstar requests yet. When a patron pays, it appears here for approval. If payment already happened, use Repair paid requests.</p>";
           return;
         }
         list.innerHTML = "";
@@ -861,7 +1041,7 @@
               · ${esc(item.locationName || locationId)}
             </small>
             <div class="queue-actions">
-              ${status === "pending_approval" ? `<button class="approve" type="button">Approve — allow go live</button>
+              ${status === "pending_approval" || (paid && (status === "awaiting_payment" || status === "preview")) ? `<button class="approve" type="button">Approve — allow go live</button>
               <button class="reject" type="button">Reject</button>` : ""}
               ${status === "live" ? `<span class="sub small">Live on venue SupRStar board</span>` : ""}
               ${status === "approved" ? `<span class="sub small">Approved — waiting for patron to go live from their private preview tab</span>` : ""}
@@ -869,6 +1049,7 @@
           div.querySelector(".approve")?.addEventListener("click", async () => {
             try {
               setText("suprstarQueueStatus", "Approving…");
+              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
               await callable("approveSuprstarRequest")({requestId: item.id});
               setText("suprstarQueueStatus", "Approved. Patron can go live from their preview tab.");
             } catch (e) {
@@ -879,6 +1060,7 @@
             if (!confirm("Reject this paid supRstar request?")) return;
             try {
               setText("suprstarQueueStatus", "Rejecting…");
+              if (status !== "pending_approval") await callable("repairSuprstarPaidOrders")({locationId});
               await callable("rejectSuprstarRequest")({requestId: item.id, reason: "Rejected by venue"});
               setText("suprstarQueueStatus", "Rejected.");
             } catch (e) {
@@ -2156,15 +2338,20 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-    locationId = await resolveAdminLocationId(locationId);
+    if (locationId) locationId = await resolveAdminLocationId(locationId);
     setupTabs();
-    setText("adminStatus", "Admin app loaded. Sign in to continue.");
+    setText("adminStatus", locationId
+      ? "Admin app loaded. Sign in to continue."
+      : "Sign in. Club Admins are routed to their assigned venue — this page no longer defaults to Zebbies.");
     refreshLocationShell();
 
     bind("adminGoogleLoginBtn", loginGoogle);
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+    bind("requestVenueAssignmentBtn", () => requestMasterAdminAssignment(auth.currentUser).catch(error => {
+      setText("adminVenueGateStatus", error?.message || String(error));
+    }));
     bind("adminMfaSendBtn", sendAdminMfaCode);
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
@@ -2192,6 +2379,7 @@
       window.FLOQRActionFeedback?.hide(3200);
     });
     bind("resetDisplayDefaultBtn", resetDisplayToClubDefault);
+    bind("refreshClubDisplaySecurityBtn", loadClubDisplaySecurityStatus);
     bind("saveClubMediaBtn", saveClubMedia);
     bind("cancelClubMediaEditBtn", () => resetClubMediaEditor("Media edit cancelled."));
     bind("electClubRoleBtn", electClubRole);
@@ -2233,21 +2421,46 @@
       const email = safeUser(user);
 
       if (!user) {
+        hideVenueGate();
         byId("adminLogin").classList.toggle("hidden", !!adminMfaResolver);
         byId("adminPanel").classList.add("hidden");
         if (adminMfaResolver) showAdminMfaPanel();
         return;
       }
 
-      if (!(await hasClubAdminAccess(user))) {
-        byId("adminLogin").classList.remove("hidden");
-        byId("adminPanel").classList.add("hidden");
-        setText("adminStatus", `${email || "This account"} is not an elected Club Admin for ${locationId}. Ask a Master/Super Admin to assign this venue.`);
+      const isMasterAdmin = MASTER_ADMIN_EMAILS.includes(email);
+      const affiliated = await listAffiliatedVenueIds(user);
+
+      if (!locationId) {
+        const home = pickAffiliatedVenue(affiliated, email);
+        if (home) {
+          if (redirectToVenue(home)) return;
+          locationId = home;
+          refreshLocationShell();
+        } else if (isMasterAdmin) {
+          hideVenueGate();
+          byId("adminLogin").classList.remove("hidden");
+          byId("adminPanel").classList.add("hidden");
+          setText("adminStatus", "Master Admin: open a venue from Master Admin → Venue Links. Club Admin no longer defaults to Zebbies.");
+          return;
+        } else {
+          showVenueGate("This Club Admin account is not affiliated with a venue. Request assignment from Master Admin. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N.");
+          return;
+        }
+      }
+
+      const allowedHere = await hasClubAdminAccess(user);
+      if (!allowedHere) {
+        const fallback = pickAffiliatedVenue(affiliated.filter(id => id !== locationId), email)
+          || affiliated.find(id => id && id !== locationId);
+        if (fallback && redirectToVenue(fallback)) return;
+        showVenueGate(`${email || "This account"} is not an elected Club Admin for ${locationId || "this URL"}. Request Master Admin assignment, or open the club you administer.`);
         return;
       }
 
-      const isMasterAdmin = MASTER_ADMIN_EMAILS.includes(email);
-      if (!isMasterAdmin && !(user.multiFactor?.enrolledFactors || []).length) {
+      hideVenueGate();
+      const isDemoClubAdmin = /@floqr-demo\.com$/i.test(email);
+      if (!isMasterAdmin && !isDemoClubAdmin && !(user.multiFactor?.enrolledFactors || []).length) {
         showAdminMfaPanel("First-time Club Admin setup: enroll the patron's mobile phone as the required SMS second factor.");
         return;
       }

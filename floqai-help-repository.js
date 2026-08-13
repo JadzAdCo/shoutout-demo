@@ -209,16 +209,31 @@
     {
       id: "help-staff-schedule-grid",
       title: "Staff week calendar",
-      body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips (optional Apply-to days). Round Robin: fill selected days fairly (fewest shifts this week first). Publish schedule notifies workers. Click a worker photo for SMS number, contact, and public profile link.",
+      body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Copy previous week stores last week as new drafts. Public holidays for the venue country are highlighted. Publish notifies workers.",
       searchPhrases: [
         "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
-        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift"
+        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
+        "open minus two hours", "copy previous week", "public holiday"
       ],
       links: [
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelScheduling"
+    },
+    {
+      id: "help-venue-hours-calendar",
+      title: "Venue opening hours",
+      body: "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. Hours appear on the public club page. Staff Scheduling uses open − 2h through close + 1h. Guest List can suggest open nights. Public holidays for US, FR, DE, NL, ES, IT, PT, BE, GB, CA venues highlight on calendars.",
+      searchPhrases: [
+        "club hours", "opening times", "venue schedule", "hours exception", "period override",
+        "public holiday", "open closed days", "venue calendar"
+      ],
+      links: [
+        {label: "Club Public Profile", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#clubVenueHoursCard"
     },
     {
       id: "help-club-admin-affiliation",

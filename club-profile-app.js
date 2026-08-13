@@ -158,8 +158,21 @@
 
   function renderAbout() {
     byId("clubProfileDescription").textContent = club.description || club.publicDescription || club.about || "Discover this venue through FLOQR.";
+    const hoursHtml = window.FLOQRVenueCalendar?.renderHoursHtml?.(club);
+    const hoursFact = hoursHtml
+      ? `<div class="profile-grid-wide"><span>Opening hours</span>${hoursHtml}</div>`
+      : fact("Hours", club.hours || club.operatingHours);
+    const holidayBits = (() => {
+      const api = window.FLOQRVenueCalendar;
+      if (!api) return "";
+      const start = new Date();
+      const upcoming = api.holidaysInRange(club.country || "United States", start, api.addDays(start, 45)).slice(0, 4);
+      if (!upcoming.length) return "";
+      return `<div class="profile-grid-wide"><span>Upcoming public holidays</span><strong>${upcoming.map(h => `${h.date} · ${h.name}`).join(" · ")}</strong></div>`;
+    })();
     byId("clubProfileQuickFacts").innerHTML = [
-      fact("Hours", club.hours || club.operatingHours),
+      hoursFact,
+      holidayBits,
       fact("Age policy", club.agePolicy),
       fact("Dress code", club.dressCode),
       fact("Amenities", club.amenities),
