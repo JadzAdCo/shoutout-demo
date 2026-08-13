@@ -1903,7 +1903,7 @@
       email:extractEmail(text),
       telephone:extractPhone(text),
       phone:extractPhone(text),
-      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
       ticketUrl:sourceUrl,
       sourceUrl,
       sourceName:sourceNameForUrl(sourceUrl),
@@ -1929,6 +1929,7 @@
       createdAt:fieldValue(),
       updatedAt:fieldValue()
     };
+    Object.assign(record, window.FLOQRVenueDatapoints?.enrichVenueRecord?.(record, {html: "", text}) || {});
     record.missingDatapoints = sourceRecordMissingDatapoints(record);
     record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     return attachCrawlAudit(record, {

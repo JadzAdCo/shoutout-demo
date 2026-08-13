@@ -192,6 +192,20 @@
       patterns: [/venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /period\s*override/, /open\/closed/]
     },
     {
+      id: "help-venue-crawl-datapoints",
+      kind: "help",
+      label: "AI crawl venue datapoints",
+      blurb: "Discovery crawl parses Club Public Profile fields: contact, socials, genres/DJs/promoters, amenities, dress/age, hoursStructured + timeZone, media, and display formats before approval.",
+      links: [
+        {label: "Master Admin Discovery", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
+        "crawl ingest", "parse venue", "hoursStructured"
+      ],
+      patterns: [/ai\s*crawl/, /discovery\s*crawl/, /venue\s*datapoints?/, /impactful\s*datapoints?/, /crawl\s*ingest/]
+    },
+    {
       id: "help-my-profile",
       kind: "help",
       label: "My Profile & Settings",

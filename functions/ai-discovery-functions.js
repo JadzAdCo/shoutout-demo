@@ -19,7 +19,9 @@ const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+const venueDatapoints = require("./venue-datapoint-extract");
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-2.5-flash";
@@ -275,11 +277,11 @@ function extractAddress(text = "") {
 }
 
 function extractPhone(text = "") {
-  const matches = String(text || "").match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
-  return (matches.find(item => {
-    const digits = item.replace(/\D/g, "");
-    return digits.length >= 8 && digits.length <= 15 && !/^\d{6}$/.test(digits);
-  }) || "").trim();
+  return venueDatapoints.extractPhone(text);
+}
+
+function extractEmail(text = "") {
+  return venueDatapoints.extractEmail(text);
 }
 
 function addressFromJsonLd(location = {}) {
@@ -405,7 +407,7 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
     email:"",
     telephone:phone,
     phone,
-    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
     ticketUrl:event?.offers?.url || sourceUrl,
     sourceUrl,
     sourceName:sourceNameForUrl(sourceUrl),
@@ -427,8 +429,11 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
     discoveryMode:"source-detail-extraction",
     extractionMethod:event ? "server-json-ld" : "server-html-text"
   };
+  Object.assign(record, venueDatapoints.enrichVenueRecord(record, {html, text: visibleText}));
+  if (!record.email) record.email = extractEmail(visibleText) || extractEmail(html);
   record.missingDatapoints = missingDatapoints(record);
   record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  record.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
   return record;
 }
 
@@ -481,17 +486,19 @@ async function searchGooglePlaces(job, apiKey) {
     headers:{
       "content-type":"application/json",
       "x-goog-api-key":apiKey,
-      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types"
+      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types,places.regularOpeningHours,places.editorialSummary,places.rating,places.userRatingCount,places.businessStatus"
     },
     body:JSON.stringify({textQuery:String(job.query || "").slice(0, 500), languageCode:languageCode(job.language), maxResultCount:20})
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();
   return (payload.places || []).map(place => {
+    const hoursStructured = venueDatapoints.hoursStructuredFromPlaces(place.regularOpeningHours || {});
+    const editorial = place.editorialSummary?.text || "";
     const baseRecord = {
       proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
       proposedTitle:place.displayName?.text || "Discovered nightlife venue",
-      proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+      proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
       proposedLocationName:place.displayName?.text || "",
       proposedAddress:place.formattedAddress || "",
       city:job.city || "",
@@ -501,28 +508,36 @@ async function searchGooglePlaces(job, apiKey) {
       phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
       officialWebsite:place.websiteUri || place.googleMapsUri || "",
       website:place.websiteUri || place.googleMapsUri || "",
-      sourceUrl:place.googleMapsUri || place.websiteUri || "",
+      sourceUrl:place.websiteUri || place.googleMapsUri || "",
       sourceName:"Google Places API",
       email:"",
       artistsOrDjs:[],
       promoters:[],
       promotionGroup:"",
-      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
+      hoursStructured: hoursStructured || null,
+      hours: hoursStructured ? venueDatapoints.hoursBlurbFromStructured(hoursStructured) : "",
+      timeZone: venueDatapoints.guessTimeZone(job.country || ""),
+      placesRating: place.rating || null,
+      placesUserRatingCount: place.userRatingCount || null,
+      businessStatus: place.businessStatus || "",
       sourceConfirmations:{googlePlaces:true, ticketmaster:"later", publicPage:false, eventbrite:false},
       categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
       genres:job.genre ? [job.genre] : [],
       searchQuery:job.query || "",
       searchLanguage:job.language || "",
-      aiSummary:"Localized venue discovery candidate. Complete DJ/artist, promoter, email, and Instagram before approval.",
+      aiSummary:"Localized venue discovery candidate with Places hours/summary when available. Complete DJ/artist, promoter, email, and Instagram before approval.",
       aiConfidenceScore:0.86,
       aiStarRating:4,
-      aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
+      aiRatingReasons:["Google Places structured record", "Localized market-language query", hoursStructured ? "Opening hours captured" : "Master Admin review required"],
       status:"pendingReview",
       discoveryMode:"master-admin-refined-discovery-crawl",
       extractionMethod:"google-places-text-search"
     };
+    Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
     baseRecord.missingDatapoints = missingDatapoints(baseRecord);
     baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    baseRecord.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
     return baseRecord;
   });
 }
@@ -1054,7 +1069,7 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
 });
 
 exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
-  await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubId = String(request.data?.clubId || request.data?.clubLocationId || "").trim();
   const patronUid = String(request.data?.patronUid || "").trim();
   if (!clubId || !patronUid) throw new HttpsError("invalid-argument", "clubId and patronUid are required.");
@@ -1074,16 +1089,34 @@ exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
     patron.roleType,
     patron.role
   ].filter(Boolean).map(value => String(value).toLowerCase());
-  if (!electedServiceRoles.some(value => /promoter|\bdj\b|disc jockey|waiter|waitress|hospitality|bottle|bartender|barman|bar man|videographer|camera operator|cameraman|camera man|photographer|cinematographer|media ?creator/.test(value))) {
-    throw new HttpsError("failed-precondition", "The selected patron must first elect an eligible service role, including videographer/camera operator when applicable.");
-  }
+  // Master Admin may assign Club Admin without prior self-election.
   const email = String(patron.email || "").toLowerCase();
   const assignmentId = `${clubId}_${patronUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
   const batch = db.batch();
-  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, electedServiceRoles, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubAdminAssignments").doc(assignmentId), {clubId, patronUid, patronEmail:email, electedServiceRoles, status:"active", assignedByUid:request.auth.uid, assignedAt:admin.firestore.FieldValue.serverTimestamp(), assignedWithoutSelfElection:true}, {merge:true});
   batch.set(db.collection("clubLocations").doc(clubId), {adminUids:admin.firestore.FieldValue.arrayUnion(patronUid), adminEmails:admin.firestore.FieldValue.arrayUnion(email), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
-  batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("users").doc(patronUid), {roles:admin.firestore.FieldValue.arrayUnion("clubAdmin"), approvedRoles:admin.firestore.FieldValue.arrayUnion("Club Admin"), clubAdminLocationIds:admin.firestore.FieldValue.arrayUnion(clubId), approvedLocations:admin.firestore.FieldValue.arrayUnion(clubId), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  batch.set(db.collection("clubEmployeeDesignations").doc(assignmentId), {
+    clubLocationId: clubId,
+    clubLocationName: clubSnap.data()?.locationName || clubId,
+    workerUid: patronUid,
+    workerEmail: email,
+    workerName: patron.displayName || patron.fullName || email || "Club Admin",
+    workerRoles: admin.firestore.FieldValue.arrayUnion("Club Admin"),
+    roleElectionType: "Club Admin",
+    status: "active",
+    assignedByUid: request.auth.uid,
+    assignedWithoutSelfElection: true,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
   await batch.commit();
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "assign_club_admin",
+    detail: {clubId, patronUid, patronEmail: email, withoutSelfElection: true},
+    sessionId
+  });
   return {assignmentId, clubId, patronUid, patronEmail:email, status:"active"};
 });
 

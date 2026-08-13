@@ -61,6 +61,7 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Refined Discovery Search** | Master Admin panel where city, genre, and venue/event type are defined before a crawl | Generic AI Crawling tab label |
 | **Discovery crawl** | Callable or scheduled run that queries Google Places and public pages and writes review queue records | Manual source paste only |
 | **Impactful datapoints** | Required review fields: name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, address | Optional marketing fields |
+| **Venue public-profile datapoints** | Full crawl/ingest checklist aligned to Club Public Profile: identity, address/contact, socials, genres/DJs/promoters, amenities, age/dress, hoursStructured + exceptions + timeZone, featured people, logo/images, display formats | Free-text hours only |
 | **Source confirmation** | Flags showing which upstream source verified a record (Google Places, public page, Eventbrite; Ticketmaster later) | Live publish status |
 | **Ticketmaster (later)** | Planned Ticketmaster Discovery API confirmation — optional research link today, not required for crawl | Live Ticketmaster API confirmation |
 
