@@ -44,6 +44,33 @@
     return String(byId("portalOwnerName")?.value || "").trim() || ownerId();
   }
 
+  function isPaidAccess(access) {
+    if (!access) return false;
+    const flag = access.staffSchedulingPaid ?? access.paid;
+    if (flag === 1 || flag === "1" || flag === true) return true;
+    if (flag === 0 || flag === "0" || flag === false) return false;
+    return access.subscribed === true;
+  }
+
+  async function readClubPaidFlag(id) {
+    if (ownerType() !== "club" || !id || !window.firebase) return null;
+    try {
+      const snap = await firebase.firestore().collection("clubLocations").doc(id).get();
+      if (!snap.exists) return null;
+      const raw = snap.data()?.staffSchedulingPaid;
+      if (raw === 0 || raw === "0" || raw === false) return 0;
+      if (raw === 1 || raw === "1" || raw === true) return 1;
+      await snap.ref.set({
+        staffSchedulingPaid: 1,
+        schedulingEntitlementSource: "demo",
+        schedulingPaidUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+      return 1;
+    } catch (_error) {
+      return null;
+    }
+  }
+
   async function refresh() {
     if (!auth.currentUser) {
       setStatus("Sign in to manage schedules.");
@@ -55,25 +82,70 @@
       return;
     }
     setStatus("Loading subscription…");
-    const access = (await callable("getSchedulingAccess")({
-      ownerType: ownerType(),
-      ownerId: id
-    }))?.data || {};
-    byId("portalSubBadge").textContent = access.subscribed
-      ? `Active · $${((access.priceCents || 2000) / 100).toFixed(0)}/mo`
-      : `Not subscribed · $20/mo`;
-    byId("portalSubscribeGate")?.classList.toggle("hidden", !!access.subscribed);
-    byId("portalWorkspace")?.classList.toggle("hidden", !access.subscribed);
-    setStatus(access.subscribed ? "Subscription active. Manage shifts below." : "Subscribe to create shifts.");
+    const venuePaid = await readClubPaidFlag(id);
+    let access = {};
+    try {
+      access = (await callable("getSchedulingAccess")({
+        ownerType: ownerType(),
+        ownerId: id
+      }))?.data || {};
+    } catch (error) {
+      setStatus(error?.message || String(error));
+    }
+    let paid = isPaidAccess(access);
+    if (venuePaid === 1) paid = true;
+    if (venuePaid === 0) paid = false;
+    const monthStatus = access.monthStatus || access.status || (paid ? "paid this month" : "not paid this month");
+    const ever = access.everSubscribed === true || access.cta === "resubscribe";
+    const cta = paid ? "none" : (access.cta || (ever ? "resubscribe" : "subscribe"));
+    byId("portalSubBadge").textContent = paid
+      ? `staffSchedulingPaid=1 · ${monthStatus}`
+      : `staffSchedulingPaid=0 · ${monthStatus}`;
+    byId("portalSubscribeGate")?.classList.toggle("hidden", paid);
+    byId("portalBuySubBtn")?.classList.toggle("hidden", paid);
+    if (byId("portalBuySubBtn")) {
+      byId("portalBuySubBtn").textContent = cta === "resubscribe" ? "Resubscribe $20/mo" : "Subscribe $20/mo";
+    }
+    if (byId("portalSubscribeTitle")) {
+      byId("portalSubscribeTitle").textContent = cta === "resubscribe"
+        ? "Resubscribe · not paid this month"
+        : "Activate Staff Scheduling";
+    }
+    if (byId("portalSubscribeCopy")) {
+      byId("portalSubscribeCopy").innerHTML = cta === "resubscribe"
+        ? "Prior subscriber detected. Status is <code>not paid this month</code>. Resubscribe to restore <code>paid this month</code> and the calendar."
+        : "Subscribe to publish shifts. Payment sets <code>staffSchedulingPaid=1</code> and status <code>paid this month</code>.";
+    }
+    byId("portalWorkspace")?.classList.toggle("hidden", !paid);
+    byId("portalCalendarHint")?.classList.toggle("hidden", !paid);
+    setStatus(
+      paid
+        ? `Calendar unlocked · ${monthStatus}.`
+        : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus}.`
+    );
 
-    const listResult = (await callable("listScheduleShifts")({
-      ownerType: ownerType(),
-      ownerId: id
-    }))?.data || {};
-    renderShiftList(byId("portalShiftList"), listResult.shifts || [], {manager: !!listResult.canManage});
+    if (paid) {
+      try {
+        const listResult = (await callable("listScheduleShifts")({
+          ownerType: ownerType(),
+          ownerId: id
+        }))?.data || {};
+        renderShiftList(byId("portalShiftList"), listResult.shifts || [], {manager: !!listResult.canManage});
+      } catch (error) {
+        if (byId("portalShiftList")) {
+          byId("portalShiftList").innerHTML = `<p class='sub'>${esc(error?.message || error)}</p>`;
+        }
+      }
+    } else if (byId("portalShiftList")) {
+      byId("portalShiftList").innerHTML = "<p class='sub'>Subscribe to unlock the calendar engine.</p>";
+    }
 
-    const mine = (await callable("listScheduleShifts")({mineOnly: true}))?.data?.shifts || [];
-    renderShiftList(byId("portalMyShifts"), mine, {assignee: true});
+    try {
+      const mine = (await callable("listScheduleShifts")({mineOnly: true}))?.data?.shifts || [];
+      renderShiftList(byId("portalMyShifts"), mine, {assignee: true});
+    } catch (_error) {
+      /* assignees can still open portal before manage entitlement */
+    }
 
     const focusShift = params.get("shift");
     if (focusShift) setStatus(`Focused shift ${focusShift}. Use Approve / Decline on My assignments if it is yours.`);

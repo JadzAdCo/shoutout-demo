@@ -66,15 +66,238 @@ async function canManageOwner(ownerType, ownerId, authContext = {}) {
   return (worker.rolePermissions || []).some(permission => permission === "manageSchedules");
 }
 
-async function requireActiveSubscription(ownerType, ownerId) {
-  const key = ownerKey(ownerType, ownerId);
-  const snap = await db.collection("schedulingSubscriptions").doc(key).get();
-  if (!snap.exists) throw new HttpsError("failed-precondition", "Staff Scheduling requires an active $20/month subscription.");
-  const status = text(snap.data()?.status, 40).toLowerCase();
-  if (!["active", "trialing"].includes(status)) {
-    throw new HttpsError("failed-precondition", "Staff Scheduling subscription is not active. Renew the $20/month plan to continue.");
+/** Explicit venue/portal gate: staffSchedulingPaid === 1 means calendar unlocked (no Subscribe CTA). */
+function paidFlagFromValue(value) {
+  if (value === true || value === 1 || value === "1") return 1;
+  if (value === false || value === 0 || value === "0") return 0;
+  return null;
+}
+
+function isDemoFirebaseProject() {
+  const project = String(process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT || "").toLowerCase();
+  try {
+    const cfg = JSON.parse(process.env.FIREBASE_CONFIG || "{}");
+    const id = String(cfg.projectId || project || "").toLowerCase();
+    return id.includes("shoutoutdemo");
+  } catch (_error) {
+    return project.includes("shoutoutdemo");
   }
-  return {key, data: snap.data() || {}};
+}
+
+function looksLikeDemoClub(club = {}, ownerId = "") {
+  if (club.demo === true || club.isDemo === true) return true;
+  if (paidFlagFromValue(club.staffSchedulingPaid) === 1 && text(club.schedulingEntitlementSource, 40) === "demo") return true;
+  const blob = [
+    ownerId,
+    club.id,
+    club.activityStatus,
+    club.onboardingSource,
+    club.brand,
+    club.locationName,
+    club.clubName
+  ].map(v => String(v || "")).join(" ").toLowerCase();
+  if (/\bdemo\b/.test(blob) || /shoutout-demo|floqr demo|active demo location/.test(blob)) return true;
+  // Entire shoutoutdemo Firebase catalog is demo-entitled until production cutover.
+  if (isDemoFirebaseProject() && club && Object.keys(club).length) return true;
+  return false;
+}
+
+const MONTH_STATUS_PAID = "paid this month";
+const MONTH_STATUS_UNPAID = "not paid this month";
+
+function currentBillingMonthKey(date = new Date()) {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function hasEverSubscribed(sub = {}, club = null) {
+  if (sub.everSubscribed === true || sub.wasSubscriber === true) return true;
+  if (sub.activatedAt || sub.lastPaidAt || sub.stripeSubscriptionId || sub.serviceOrderId) return true;
+  if (text(sub.status, 80) === MONTH_STATUS_PAID || text(sub.status, 80) === MONTH_STATUS_UNPAID) return true;
+  if (["active", "trialing", "canceled", "past_due", "unpaid"].includes(text(sub.status, 40).toLowerCase()) && Object.keys(sub).length > 2) {
+    return true;
+  }
+  if (club && (club.schedulingEverSubscribed === true || club.schedulingLastPaidAt)) return true;
+  return false;
+}
+
+function monthStatusForPaid(paid) {
+  return paid === 1 ? MONTH_STATUS_PAID : MONTH_STATUS_UNPAID;
+}
+
+async function writeStaffSchedulingPaid(ownerType, ownerId, paid, extra = {}) {
+  const key = ownerKey(ownerType, ownerId);
+  const flag = paid ? 1 : 0;
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  const monthStatus = text(extra.status, 80) || monthStatusForPaid(flag);
+  const subPayload = {
+    ownerKey: key,
+    ownerType,
+    ownerId,
+    paid: flag,
+    staffSchedulingPaid: flag,
+    status: monthStatus,
+    monthStatus,
+    billingMonthKey: text(extra.billingMonthKey, 20) || (flag === 1 ? currentBillingMonthKey() : text(extra.priorBillingMonthKey, 20) || ""),
+    everSubscribed: flag === 1 ? true : (extra.everSubscribed === false ? false : true),
+    updatedAt: now,
+    ...extra,
+    status: monthStatus,
+    monthStatus
+  };
+  if (flag === 1) {
+    subPayload.lastPaidAt = now;
+    subPayload.lastPaidMonthKey = currentBillingMonthKey();
+    subPayload.everSubscribed = true;
+  }
+  await db.collection("schedulingSubscriptions").doc(key).set(subPayload, {merge: true});
+  if (ownerType === "club" && ownerId) {
+    const clubPayload = {
+      staffSchedulingPaid: flag,
+      schedulingMonthStatus: monthStatus,
+      schedulingEntitlementSource: text(extra.source || extra.schedulingEntitlementSource, 40) || (flag === 1 ? "subscription" : "none"),
+      schedulingPaidUpdatedAt: now
+    };
+    if (flag === 1) {
+      clubPayload.schedulingEverSubscribed = true;
+      clubPayload.schedulingLastPaidAt = now;
+      clubPayload.schedulingLastPaidMonthKey = currentBillingMonthKey();
+    } else if (extra.everSubscribed !== false) {
+      clubPayload.schedulingEverSubscribed = true;
+    }
+    await db.collection("clubLocations").doc(ownerId).set(clubPayload, {merge: true});
+  }
+  return {key, paid: flag, status: monthStatus};
+}
+
+/**
+ * Entitlement source of truth:
+ * 1) clubLocations.staffSchedulingPaid (0|1) for clubs
+ * 2) schedulingSubscriptions.paid + status "paid this month" | "not paid this month"
+ * 3) demo venues → auto-set staffSchedulingPaid=1 once
+ *
+ * CTA: paid=1 → calendar; paid=0 + everSubscribed → Resubscribe; else Subscribe
+ */
+async function resolveSchedulingEntitlement(ownerType, ownerId) {
+  const key = ownerKey(ownerType, ownerId);
+  const subRef = db.collection("schedulingSubscriptions").doc(key);
+  const subSnap = await subRef.get();
+  const sub = subSnap.exists ? subSnap.data() || {} : {};
+  const subPaid = paidFlagFromValue(sub.paid ?? sub.staffSchedulingPaid);
+  const legacyActive = ["active", "trialing"].includes(text(sub.status, 40).toLowerCase());
+  const monthPaid = text(sub.status, 80) === MONTH_STATUS_PAID
+    || text(sub.monthStatus, 80) === MONTH_STATUS_PAID
+    || (subPaid === 1)
+    || legacyActive;
+
+  let clubPaid = null;
+  let club = null;
+  if (ownerType === "club" && ownerId) {
+    const clubSnap = await db.collection("clubLocations").doc(ownerId).get();
+    if (clubSnap.exists) {
+      club = clubSnap.data() || {};
+      clubPaid = paidFlagFromValue(club.staffSchedulingPaid);
+    }
+  }
+
+  const ever = hasEverSubscribed(sub, club);
+
+  // Explicit venue/sub unpaid → Resubscribe if they were ever on the plan.
+  if (clubPaid === 0 || (subPaid === 0 && clubPaid !== 1) || ((text(sub.status, 80) === MONTH_STATUS_UNPAID || text(sub.monthStatus, 80) === MONTH_STATUS_UNPAID) && clubPaid !== 1)) {
+    return {
+      key,
+      paid: 0,
+      subscribed: false,
+      status: MONTH_STATUS_UNPAID,
+      monthStatus: MONTH_STATUS_UNPAID,
+      everSubscribed: ever,
+      cta: ever ? "resubscribe" : "subscribe",
+      source: ever ? "not-paid-this-month" : "never-subscribed",
+      data: sub,
+      club
+    };
+  }
+
+  if (clubPaid === 1 || monthPaid) {
+    if (ownerType === "club" && clubPaid !== 1) {
+      await writeStaffSchedulingPaid(ownerType, ownerId, true, {
+        source: legacyActive ? "subscription" : "backfill",
+        status: MONTH_STATUS_PAID,
+        stripeSubscriptionId: text(sub.stripeSubscriptionId, 160),
+        ownerName: text(sub.ownerName || club?.locationName || club?.clubName, 160),
+        everSubscribed: true
+      });
+    } else if (subPaid !== 1 || text(sub.status, 80) !== MONTH_STATUS_PAID) {
+      await subRef.set({
+        paid: 1,
+        staffSchedulingPaid: 1,
+        status: MONTH_STATUS_PAID,
+        monthStatus: MONTH_STATUS_PAID,
+        everSubscribed: true,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    }
+    return {
+      key,
+      paid: 1,
+      subscribed: true,
+      status: MONTH_STATUS_PAID,
+      monthStatus: MONTH_STATUS_PAID,
+      everSubscribed: true,
+      cta: "none",
+      source: clubPaid === 1 ? "clubLocations.staffSchedulingPaid" : "schedulingSubscriptions.paid",
+      data: sub,
+      club
+    };
+  }
+
+  // Demo venues: entitle once so portal shows calendar (not Subscribe $20).
+  if (ownerType === "club" && club && looksLikeDemoClub(club, ownerId)) {
+    await writeStaffSchedulingPaid(ownerType, ownerId, true, {
+      source: "demo",
+      schedulingEntitlementSource: "demo",
+      status: MONTH_STATUS_PAID,
+      ownerName: text(club.locationName || club.clubName || club.brandName, 160),
+      priceCents: SCHEDULING_PRICE_CENTS,
+      billingInterval: "month",
+      everSubscribed: true,
+      activatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    return {
+      key,
+      paid: 1,
+      subscribed: true,
+      status: MONTH_STATUS_PAID,
+      monthStatus: MONTH_STATUS_PAID,
+      everSubscribed: true,
+      cta: "none",
+      source: "demo",
+      data: sub,
+      club
+    };
+  }
+
+  return {
+    key,
+    paid: 0,
+    subscribed: false,
+    status: MONTH_STATUS_UNPAID,
+    monthStatus: MONTH_STATUS_UNPAID,
+    everSubscribed: ever,
+    cta: ever ? "resubscribe" : "subscribe",
+    source: "unpaid",
+    data: sub,
+    club
+  };
+}
+
+async function requireActiveSubscription(ownerType, ownerId) {
+  const entitlement = await resolveSchedulingEntitlement(ownerType, ownerId);
+  if (!entitlement.subscribed || entitlement.paid !== 1) {
+    throw new HttpsError("failed-precondition", "Staff Scheduling requires an active $20/month subscription (staffSchedulingPaid=1).");
+  }
+  return {key: entitlement.key, data: entitlement.data || {}, paid: 1};
 }
 
 async function writeInbox(recipientUid, payload = {}) {
@@ -135,19 +358,24 @@ exports.getSchedulingAccess = onCall({region: "us-central1", timeoutSeconds: 20,
   const ownerType = text(request.data?.ownerType, 40);
   const ownerId = text(request.data?.ownerId, 160);
   if (!OWNER_TYPES.has(ownerType) || !ownerId) throw new HttpsError("invalid-argument", "ownerType and ownerId are required.");
-  const key = ownerKey(ownerType, ownerId);
-  const snap = await db.collection("schedulingSubscriptions").doc(key).get();
-  const data = snap.exists ? snap.data() || {} : {};
+  const entitlement = await resolveSchedulingEntitlement(ownerType, ownerId);
   const canManage = await canManageOwner(ownerType, ownerId, request.auth);
   return {
-    ownerKey: key,
+    ownerKey: entitlement.key,
     ownerType,
     ownerId,
     canManage,
-    subscribed: ["active", "trialing"].includes(text(data.status, 40).toLowerCase()),
-    status: text(data.status, 40) || "none",
+    /** Portal/UI gate: paid===1 → calendar; paid===0 → Subscribe or Resubscribe */
+    staffSchedulingPaid: entitlement.paid,
+    paid: entitlement.paid,
+    subscribed: entitlement.subscribed === true && entitlement.paid === 1,
+    status: entitlement.status,
+    monthStatus: entitlement.monthStatus || entitlement.status,
+    everSubscribed: entitlement.everSubscribed === true,
+    cta: entitlement.cta || (entitlement.paid === 1 ? "none" : (entitlement.everSubscribed ? "resubscribe" : "subscribe")),
+    entitlementSource: entitlement.source,
     priceCents: SCHEDULING_PRICE_CENTS,
-    currentPeriodEnd: data.currentPeriodEnd || null
+    currentPeriodEnd: entitlement.data?.currentPeriodEnd || null
   };
 });
 

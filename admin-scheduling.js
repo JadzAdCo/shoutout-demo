@@ -32,6 +32,35 @@
       .replace(/"/g, "&quot;");
   }
 
+  function isPaidAccess(access) {
+    if (!access) return false;
+    const flag = access.staffSchedulingPaid ?? access.paid;
+    if (flag === 1 || flag === "1" || flag === true) return true;
+    if (flag === 0 || flag === "0" || flag === false) return false;
+    return access.subscribed === true;
+  }
+
+  /** Venue source of truth: clubLocations.staffSchedulingPaid (0|1). Seeds 1 when unset (demo). */
+  async function readOrSeedVenuePaidFlag() {
+    if (!locationId || !db) return null;
+    const ref = db.collection("clubLocations").doc(locationId);
+    const snap = await ref.get();
+    if (!snap.exists) return null;
+    const raw = snap.data()?.staffSchedulingPaid;
+    if (raw === 0 || raw === "0" || raw === false) return 0;
+    if (raw === 1 || raw === "1" || raw === true) return 1;
+    try {
+      await ref.set({
+        staffSchedulingPaid: 1,
+        schedulingEntitlementSource: "demo",
+        schedulingPaidUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+      return 1;
+    } catch (_error) {
+      return null;
+    }
+  }
+
   async function loadAccess() {
     if (!locationId || !auth.currentUser) return null;
     const result = await callable("getSchedulingAccess")({
@@ -45,17 +74,55 @@
     const gate = byId("schedulingSubscribeGate");
     const workspace = byId("schedulingWorkspace");
     const badge = byId("schedulingSubBadge");
+    const buyBtn = byId("buySchedulingSubBtn");
+    const portalLink = byId("openSchedulingPortalLink");
+    const gateTitle = byId("schedulingSubscribeTitle");
+    const gateCopy = byId("schedulingSubscribeCopy");
     try {
-      const access = await loadAccess();
-      if (!access) return;
-      if (badge) {
-        badge.textContent = access.subscribed
-          ? `Subscribed · $${((access.priceCents || 2000) / 100).toFixed(0)}/mo`
-          : `Not subscribed · $${((access.priceCents || 2000) / 100).toFixed(0)}/mo`;
+      const venuePaid = await readOrSeedVenuePaidFlag();
+      let access = null;
+      try {
+        access = await loadAccess();
+      } catch (error) {
+        setStatus(error?.message || String(error));
       }
-      if (gate) gate.classList.toggle("hidden", !!access.subscribed);
-      if (workspace) workspace.classList.toggle("hidden", !access.subscribed);
-      if (access.subscribed) await Promise.all([loadWorkers(), loadShifts()]);
+      let paid = isPaidAccess(access);
+      if (venuePaid === 1) paid = true;
+      if (venuePaid === 0) paid = false;
+      const monthStatus = access?.monthStatus || access?.status || (paid ? "paid this month" : "not paid this month");
+      const ever = access?.everSubscribed === true || access?.cta === "resubscribe";
+      const cta = paid ? "none" : (access?.cta || (ever ? "resubscribe" : "subscribe"));
+      if (badge) {
+        badge.textContent = paid
+          ? `staffSchedulingPaid=1 · ${monthStatus}`
+          : `staffSchedulingPaid=0 · ${monthStatus}`;
+      }
+      if (gate) gate.classList.toggle("hidden", paid);
+      if (workspace) workspace.classList.toggle("hidden", !paid);
+      if (buyBtn) {
+        buyBtn.classList.toggle("hidden", paid);
+        buyBtn.textContent = cta === "resubscribe" ? "Resubscribe $20/mo" : "Subscribe $20/mo";
+      }
+      if (gateTitle) {
+        gateTitle.textContent = cta === "resubscribe"
+          ? "Resubscribe · $20 / month"
+          : "Subscribe · $20 / month";
+      }
+      if (gateCopy) {
+        gateCopy.innerHTML = cta === "resubscribe"
+          ? "This venue was subscribed before, but status is <code>not paid this month</code> (<code>staffSchedulingPaid=0</code>). Resubscribe to set <code>paid this month</code> and unlock the calendar."
+          : "Unlock Staff Scheduling for this venue. Checkout sets <code>staffSchedulingPaid=1</code> and subscription status to <code>paid this month</code>.";
+      }
+      if (portalLink) {
+        portalLink.classList.toggle("hidden", !paid);
+        portalLink.textContent = "Open full calendar / Scheduling portal";
+      }
+      setStatus(
+        paid
+          ? `Calendar unlocked · ${monthStatus} (staffSchedulingPaid=1).`
+          : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus} (staffSchedulingPaid=0).`
+      );
+      if (paid) await Promise.all([loadWorkers(), loadShifts()]);
     } catch (error) {
       setStatus(error?.message || String(error));
     }

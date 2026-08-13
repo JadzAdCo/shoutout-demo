@@ -256,7 +256,7 @@
       id: "help-scheduling",
       kind: "help",
       label: "Staff Scheduling help",
-      blurb: "Clubs, promoting companies, and DJs can subscribe to Scheduling ($20/mo) — not individual events. Notify workers and collect approvals.",
+      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace.",
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"})},
         {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},

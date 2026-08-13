@@ -192,6 +192,21 @@
       source: "help-repository-seed"
     },
     {
+      id: "help-staff-scheduling",
+      title: "Staff Scheduling subscription",
+      body: "Venue field clubLocations.staffSchedulingPaid is 1 or 0. schedulingSubscriptions status is paid this month or not paid this month. When 1 / paid this month: calendar unlocked. When 0 / not paid this month: Subscribe (new) or Resubscribe (prior subscriber).",
+      searchPhrases: [
+        "staff scheduling", "scheduling subscription", "subscribe $20", "resubscribe", "staffSchedulingPaid",
+        "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule"
+      ],
+      links: [
+        {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
+        {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "club admin scheduling", blurb: "Venue staff calendar and subscribe gate"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelScheduling"
+    },
+    {
       id: "help-my-profile",
       title: "My Profile & Settings",
       body: "Open My Profile & Settings for roles, seller tools, and account options.",

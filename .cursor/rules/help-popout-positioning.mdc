@@ -1,0 +1,60 @@
+---
+description: Standard FLOQR "?" help attach module — positioning + verbiage (always)
+alwaysApply: true
+---
+
+# Help popout `?` — use `FLOQRHelpAttach` only
+
+Do **not** hand-place `details.help-popout`, invent flex/CSS positioning, or convert helper paragraphs ad-hoc.
+
+## Required module
+
+File: `help-attach.js`  
+API: `window.FLOQRHelpAttach`
+
+Script order on pages that show `?`:
+
+1. `floqai-help-repository.js` (if FloqAi search is used)
+2. `help-attach.js`
+3. `helper-popouts.js` (legacy converters call HelpAttach; do not bypass)
+
+## Attach API (only way to add `?`)
+
+```js
+FLOQRHelpAttach.attach({
+  target: headingOrLabelEl,   // verbiage host (h2, label, span…)
+  title: "Display Security Setting",
+  body: "Plain-text help…",          // or bodyHtml: "<p>…</p>"
+  searchPhrases: ["display security", "ip allowlist"],
+  links: [{ label: "Security Logs", href: "…" }],
+  id: "help-display-security"
+});
+```
+
+Effects (guaranteed by the module):
+
+- Wraps verbiage in `.help-label` > `.help-label-text`
+- Appends `?` as a sibling **immediately beside** the text (`width: fit-content`, no far-right drift)
+- Registers copy into `FLOQRHelpRepository` when present
+
+Declarative alternative:
+
+```html
+<h2 data-floqr-help-title="…" data-floqr-help-body="…" data-floqr-help-search="phrase|phrase">Title</h2>
+```
+
+(`FLOQRHelpAttach.mountAll()` runs on DOMContentLoaded.)
+
+## Forbidden
+
+- Lone `details.help-popout` not created via `FLOQRHelpAttach`
+- Stretching `.help-label` with `flex: 1` / `width: 100%` (pushes `?` to the far edge)
+- Orphan `?` replacing `p.sub.small` without attaching beside the heading
+- One-off CSS “fixes” for `?` position — fix/extend `help-attach.js` instead
+
+## Checklist
+
+- [ ] Called `FLOQRHelpAttach.attach` (or `data-floqr-help-*` + mountAll)
+- [ ] `help-attach.js` loaded before any help conversion
+- [ ] Verbiage mirrored in `floqai-help-repository.js` when it is a new patron/admin help topic
+- [ ] Previewed: `?` sits beside the label on PC / tablet / phone
