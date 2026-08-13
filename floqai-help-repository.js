@@ -224,7 +224,7 @@
     {
       id: "help-venue-hours-calendar",
       title: "Venue opening hours",
-      body: "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. Hours appear on the public club page. Staff Scheduling uses open − 2h through close + 1h. Guest List can suggest open nights. Public holidays for US, FR, DE, NL, ES, IT, PT, BE, GB, CA venues highlight on calendars.",
+      body: "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. The public club page shows a Sun–Sat week grid with the date range (e.g. Sun 9 – Sat 15, Aug 2026) and calendar coloring. Upcoming public holidays list open/close hours and call out when they differ from the usual weekday. Staff Scheduling uses open − 2h through close + 1h. Guest List can suggest open nights.",
       searchPhrases: [
         "club hours", "opening times", "venue schedule", "hours exception", "period override",
         "public holiday", "open closed days", "venue calendar"

@@ -440,19 +440,128 @@
     return map[code] || "America/New_York";
   }
 
-  function renderHoursHtml(club) {
+  /** Sunday-start week containing `anchor` (local date). */
+  function startOfWeekSunday(anchor = new Date()) {
+    const d = anchor instanceof Date ? new Date(anchor) : (parseYmd(anchor) || new Date());
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+  }
+
+  function formatWeekDayLabel(date) {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${DAY_LABELS[date.getDay()].slice(0, 3)} ${date.getDate()} ${months[date.getMonth()]}`;
+  }
+
+  /**
+   * Weekly range caption, always Sun → Sat (e.g. "Sun 9 – Sat 15, Aug 2026").
+   * Cross-month: "Sun 30 Aug – Sat 5 Sep 2026".
+   */
+  function weekRangeLabel(sundayDate = startOfWeekSunday()) {
+    const sun = startOfWeekSunday(sundayDate);
+    const sat = addDays(sun, 6);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const sameMonth = sun.getMonth() === sat.getMonth() && sun.getFullYear() === sat.getFullYear();
+    if (sameMonth) {
+      return `Sun ${sun.getDate()} – Sat ${sat.getDate()}, ${months[sun.getMonth()]} ${sun.getFullYear()}`;
+    }
+    return `Sun ${sun.getDate()} ${months[sun.getMonth()]} – Sat ${sat.getDate()} ${months[sat.getMonth()]} ${sat.getFullYear()}`;
+  }
+
+  function hoursCellLabel(hours) {
+    if (!hours || hours.closed) return "Closed";
+    return `${hours.open} – ${hours.close}`;
+  }
+
+  function defaultHoursForWeekday(club, weekdayIndex) {
     const structured = normalizeHoursStructured(club?.hoursStructured);
-    const rows = DAY_KEYS.map((key, idx) => {
-      const day = structured[key];
-      const value = day.closed ? "Closed" : `${day.open} – ${day.close}`;
-      return `<div><span>${DAY_LABELS[idx]}</span><strong>${value}</strong></div>`;
-    }).join("");
+    const key = DAY_KEYS[weekdayIndex];
+    return structured[key] || {closed: true, open: "", close: ""};
+  }
+
+  /**
+   * Public profile: 7-column × 2-row week grid (Sun→Sat) with calendar coloring.
+   * Shows the week containing `anchor` (defaults to today).
+   */
+  function renderHoursHtml(club, opts = {}) {
+    const sunday = startOfWeekSunday(opts.anchor || new Date());
+    const todayKey = ymd(new Date());
+    const country = club?.country || "US";
+    const headerCells = [];
+    const hourCells = [];
+    for (let i = 0; i < 7; i += 1) {
+      const day = addDays(sunday, i);
+      const key = ymd(day);
+      const holiday = holidayOn(country, day);
+      const hours = hoursForDate(club, day, club?.hoursExceptions);
+      const classes = [
+        "venue-week-cell",
+        hours.closed ? "is-closed" : "is-open",
+        key === todayKey ? "is-today" : "",
+        holiday ? "is-holiday" : ""
+      ].filter(Boolean).join(" ");
+      const dayAbbr = DAY_LABELS[i].slice(0, 3).toUpperCase();
+      headerCells.push(
+        `<div class="venue-week-head ${classes}" title="${holiday ? holiday.name : ""}">` +
+        `<span class="venue-week-dow">${dayAbbr}</span>` +
+        `<span class="venue-week-date">${day.getDate()}</span>` +
+        `${holiday ? `<small class="venue-week-holiday">${holiday.name}</small>` : ""}` +
+        `</div>`
+      );
+      hourCells.push(
+        `<div class="venue-week-hours ${classes}">` +
+        `<strong>${hoursCellLabel(hours)}</strong>` +
+        `${hours.source === "exception" ? `<small class="venue-week-special">${hours.label || "Special"}</small>` : ""}` +
+        `</div>`
+      );
+    }
     const exceptions = normalizeExceptions(club?.hoursExceptions).slice(0, 8).map(ex => {
       const span = ex.startDate === ex.endDate ? ex.startDate : `${ex.startDate} → ${ex.endDate}`;
       const value = ex.closed ? "Closed" : `${ex.open} – ${ex.close}`;
-      return `<div><span>${span}${ex.label ? ` · ${ex.label}` : ""}</span><strong>${value}</strong></div>`;
+      return `<div class="venue-hours-exception"><span>${span}${ex.label ? ` · ${ex.label}` : ""}</span><strong>${value}</strong></div>`;
     }).join("");
-    return `<div class="report-table venue-hours-table">${rows}${exceptions}</div>`;
+    return (
+      `<div class="venue-week-block">` +
+      `<p class="venue-week-range">Week of ${weekRangeLabel(sunday)}</p>` +
+      `<div class="venue-week-grid" role="table" aria-label="Opening hours ${weekRangeLabel(sunday)}">` +
+      `<div class="venue-week-row venue-week-row-head" role="row">${headerCells.join("")}</div>` +
+      `<div class="venue-week-row venue-week-row-hours" role="row">${hourCells.join("")}</div>` +
+      `</div>` +
+      `${exceptions ? `<div class="venue-hours-exceptions">${exceptions}</div>` : ""}` +
+      `</div>`
+    );
+  }
+
+  /**
+   * Upcoming holidays with effective open/close vs the usual weekday schedule.
+   */
+  function renderUpcomingHolidaysHtml(club, opts = {}) {
+    const start = opts.start instanceof Date ? opts.start : new Date();
+    const end = opts.end instanceof Date ? opts.end : addDays(start, opts.daysAhead || 45);
+    const limit = opts.limit || 4;
+    const upcoming = holidaysInRange(club?.country || "United States", start, end).slice(0, limit);
+    if (!upcoming.length) return "";
+    const rows = upcoming.map(h => {
+      const date = parseYmd(h.date);
+      const effective = hoursForDate(club, date || h.date, club?.hoursExceptions);
+      const weekday = date ? date.getDay() : 0;
+      const usual = defaultHoursForWeekday(club, weekday);
+      const effectiveLabel = hoursCellLabel(effective);
+      const usualLabel = hoursCellLabel(usual);
+      const differs = effective.closed !== usual.closed
+        || (!effective.closed && !usual.closed && (effective.open !== usual.open || effective.close !== usual.close))
+        || effective.source === "exception";
+      let note = `Hours: ${effectiveLabel}`;
+      if (differs) {
+        note += effective.source === "exception"
+          ? ` (special schedule; usual ${DAY_LABELS[weekday].slice(0, 3)}: ${usualLabel})`
+          : ` (usual ${DAY_LABELS[weekday].slice(0, 3)}: ${usualLabel})`;
+      } else {
+        note += ` (same as usual ${DAY_LABELS[weekday].slice(0, 3)})`;
+      }
+      return `<div class="venue-holiday-row${differs ? " is-differ" : ""}"><span>${h.date} · ${h.name}</span><strong>${note}</strong></div>`;
+    }).join("");
+    return `<div class="venue-holiday-hours">${rows}</div>`;
   }
 
   global.FLOQRVenueCalendar = {
@@ -461,6 +570,8 @@
     ymd,
     parseYmd,
     addDays,
+    startOfWeekSunday,
+    weekRangeLabel,
     normalizeCountry,
     holidaysForYear,
     holidaysInRange,
@@ -475,6 +586,7 @@
     openDayIndexes,
     guessTimeZone,
     renderHoursHtml,
+    renderUpcomingHolidaysHtml,
     shiftMinutes
   };
 })(typeof window !== "undefined" ? window : globalThis);

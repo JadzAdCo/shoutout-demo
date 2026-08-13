@@ -160,15 +160,14 @@
     byId("clubProfileDescription").textContent = club.description || club.publicDescription || club.about || "Discover this venue through FLOQR.";
     const hoursHtml = window.FLOQRVenueCalendar?.renderHoursHtml?.(club);
     const hoursFact = hoursHtml
-      ? `<div class="profile-grid-wide"><span>Opening hours</span>${hoursHtml}</div>`
+      ? `<div class="profile-grid-wide club-hours-fact"><span>Opening hours</span>${hoursHtml}</div>`
       : fact("Hours", club.hours || club.operatingHours);
     const holidayBits = (() => {
       const api = window.FLOQRVenueCalendar;
-      if (!api) return "";
-      const start = new Date();
-      const upcoming = api.holidaysInRange(club.country || "United States", start, api.addDays(start, 45)).slice(0, 4);
-      if (!upcoming.length) return "";
-      return `<div class="profile-grid-wide"><span>Upcoming public holidays</span><strong>${upcoming.map(h => `${h.date} · ${h.name}`).join(" · ")}</strong></div>`;
+      if (!api?.renderUpcomingHolidaysHtml) return "";
+      const html = api.renderUpcomingHolidaysHtml(club, {daysAhead: 45, limit: 4});
+      if (!html) return "";
+      return `<div class="profile-grid-wide club-holiday-fact"><span>Upcoming public holidays</span>${html}</div>`;
     })();
     byId("clubProfileQuickFacts").innerHTML = [
       hoursFact,
