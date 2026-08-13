@@ -984,8 +984,9 @@
 
   function mediaSlotDefaults(profile) {
     const existing = Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots : [];
+    const fallback = profile.photoURL || profile.profilePhotoUrl || profile.publicPhotoUrl || profile.avatarUrl || "";
     return Array.from({length:10}, (_, i) => {
-      const previous = existing[i] || {};
+      const previous = existing[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
       const type = i < 8 ? "image" : "video";
       return {slot:i + 1, type, url:"", storagePath:"", metadata:null, travelDatapointAdded:false, ...previous, type};
     });

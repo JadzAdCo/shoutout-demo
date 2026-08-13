@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.97";
+  const CURRENT_VERSION = "29.09.108";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 
@@ -145,7 +145,6 @@
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
-      if (panelId === "adminUserManagement") window.FLOQRAdminUserManagement?.mount?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
@@ -193,16 +192,8 @@
       btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
     });
 
-    // Deep-link: #securityLogs / #displaySecurity / #demoAccounts / kebab aliases
-    const hashRaw = String(location.hash || "").replace(/^#/, "");
-    const hashAliases = {
-      "demo-accounts": "demoAccounts",
-      "demo_accounts": "demoAccounts",
-      "manual-feature-tests": "diagnosticsManualTests",
-      "display-security": "displaySecurity",
-      "ai-crawling": "aiCrawling"
-    };
-    const hashPanel = hashAliases[hashRaw] || hashRaw;
+    // Deep-link: #securityLogs / #displaySecurity / etc.
+    const hashPanel = String(location.hash || "").replace(/^#/, "");
     if (hashPanel && byId(hashPanel)) activatePanel(hashPanel);
 
     window.FLOQRMasterTabs = {activatePanel};
@@ -225,7 +216,6 @@
       if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling")) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
-      // Demo Accounts panel manages its own status (seed can run 1–3 minutes).
     }, true);
   }
 
@@ -399,13 +389,11 @@
     };
   }
 
-  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut", suprstarLiveDurationSeconds = 90} = {}) {
+  function normalizeClubDisplayConfig({displayScreenFormatIds = [], primaryDisplayScreenFormatId = "", displayFooterBrand = "FLOQR ShoutOut"} = {}) {
     const formats = Array.from(new Set((displayScreenFormatIds || []).map(String).filter(id => DISPLAY_FORMAT_IDS.includes(id))));
     const selected = formats.length ? formats : ["led-96x48"];
     const primary = selected.includes(primaryDisplayScreenFormatId) ? primaryDisplayScreenFormatId : selected[0];
     const panel = ledPanelFromFormatId(primary);
-    const durationRaw = Number(suprstarLiveDurationSeconds);
-    const duration = [15, 30, 45, 60, 90].includes(durationRaw) ? durationRaw : 90;
     return {
       displayScreenFormatIds: selected,
       primaryDisplayScreenFormatId: primary,
@@ -422,8 +410,7 @@
         formatId: primary,
         label: panel.label
       },
-      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut",
-      suprstarLiveDurationSeconds: duration
+      displayFooterBrand: String(displayFooterBrand || "FLOQR ShoutOut").trim() || "FLOQR ShoutOut"
     };
   }
 
@@ -1287,7 +1274,6 @@
     });
     if (byId("clubDisplaySetupPrimaryFormat")) byId("clubDisplaySetupPrimaryFormat").value = config.primaryDisplayScreenFormatId || "led-96x48";
     if (byId("clubDisplaySetupFooterBrand")) byId("clubDisplaySetupFooterBrand").value = config.displayFooterBrand || "FLOQR ShoutOut";
-    if (byId("clubDisplaySetupSuprstarDuration")) byId("clubDisplaySetupSuprstarDuration").value = String(config.suprstarLiveDurationSeconds || 60);
     if (byId("clubDisplaySetupLocationId")) byId("clubDisplaySetupLocationId").value = locationId || "";
     clubDisplaySetupLocationId = locationId || "";
   }
@@ -1308,8 +1294,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: data.displayScreenFormatIds || staticLoc.displayScreenFormatIds || ["led-96x48"],
       primaryDisplayScreenFormatId: data.primaryDisplayScreenFormatId || data.displayType || data.screenFormatId || staticLoc.primaryDisplayScreenFormatId || "led-96x48",
-      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut",
-      suprstarLiveDurationSeconds: data.suprstarLiveDurationSeconds || staticLoc.suprstarLiveDurationSeconds || 60
+      displayFooterBrand: data.displayFooterBrand || "FLOQR ShoutOut"
     });
     if (byId("clubDisplaySetupSearch")) byId("clubDisplaySetupSearch").value = locationId;
     applyClubDisplaySetupForm(config, locationId);
@@ -1319,7 +1304,6 @@
         <p>Primary: ${esc(config.primaryDisplayScreenFormatId)} · Panel ${esc(config.ledPanel.widthCm || "?")}×${esc(config.ledPanel.heightCm || "?")} cm</p>
         <p>Formats: ${esc(config.displayScreenFormatIds.join(", "))}</p>
         <p>Footer brand: ${esc(config.displayFooterBrand)}</p>
-        <p>supRstar live duration: ${esc(String(config.suprstarLiveDurationSeconds))}s</p>
         <p><a class="message-inline-link" href="${esc(displayUrl(locationId))}" target="_blank" rel="noopener">Open Display 1</a>
            · <a class="message-inline-link" href="${esc(secondaryDisplayUrl(locationId))}" target="_blank" rel="noopener">Open Display 2</a></p>`;
     }
@@ -1350,8 +1334,7 @@
     const config = normalizeClubDisplayConfig({
       displayScreenFormatIds: formats,
       primaryDisplayScreenFormatId: byId("clubDisplaySetupPrimaryFormat")?.value || formats[0],
-      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut",
-      suprstarLiveDurationSeconds: byId("clubDisplaySetupSuprstarDuration")?.value || 60
+      displayFooterBrand: byId("clubDisplaySetupFooterBrand")?.value || "FLOQR ShoutOut"
     });
     setText("clubDisplaySetupStatus", `Saving display type setup for ${locationId}...`);
     const staticLoc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[locationId] || {};
@@ -1586,7 +1569,7 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords, promoterOnboarding] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
@@ -1595,20 +1578,39 @@
       getCollectionSafe("events"),
       getCollectionSafe("guestListRequests"),
       getCollectionSafe("clubOnboardingRecords"),
-      getCollectionSafe("aiDiscoveryQueue")
+      getCollectionSafe("aiDiscoveryQueue"),
+      getCollectionSafe("promoterOnboardingRecords")
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
-    // Always merge seeded catalog venues (e.g. Decades) — do not drop them when Firestore
-    // already has a partial clubLocations set (that left display-setup lists incomplete).
-    const locationMap = new Map();
+    const staticById = new Map(fallbackLocations.map(row => [row.id, row]));
+    const locationMap = new Map((locations.length ? locations : fallbackLocations).map(row => {
+      const staticRow = staticById.get(row.id) || {};
+      // Prefer live Firestore fields, but keep static QA promoter/media datapoints when missing.
+      return [row.id, {
+        ...staticRow,
+        ...row,
+        promotionGroups: (Array.isArray(row.promotionGroups) && row.promotionGroups.length)
+          ? row.promotionGroups
+          : (staticRow.promotionGroups || []),
+        promoters: (Array.isArray(row.promoters) && row.promoters.length)
+          ? row.promoters
+          : (staticRow.promoters || []),
+        featuredStaff: (Array.isArray(row.featuredStaff) && row.featuredStaff.length)
+          ? row.featuredStaff
+          : (staticRow.featuredStaff || []),
+        featuredDjs: (Array.isArray(row.featuredDjs) && row.featuredDjs.length)
+          ? row.featuredDjs
+          : (staticRow.featuredDjs || []),
+        qaTemp: row.qaTemp ?? staticRow.qaTemp,
+        demo: row.demo ?? staticRow.demo
+      }];
+    }));
+    // Ensure QA static temp clubs appear even if Firestore has no docs yet.
     fallbackLocations.forEach(row => {
-      if (row?.id) locationMap.set(row.id, {...row});
-    });
-    locations.forEach(row => {
-      if (!row?.id) return;
-      const prev = locationMap.get(row.id) || {};
-      locationMap.set(row.id, {...prev, ...row, id: row.id});
+      if (!locationMap.has(row.id) && (row.qaTemp || row.demo || /^temp-democlub-/.test(row.id))) {
+        locationMap.set(row.id, row);
+      }
     });
     onboardingRecords.forEach(row => {
       const id = slugify(row.clubLocationId || row.id || row.clubName || row.locationName || "imported-club");
@@ -1704,14 +1706,56 @@
       const promoterCounts = {};
       guestLists.forEach(x => {
         const key = x.promoterName || x.promoterId || "Unknown promoter";
-        promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0};
+        promoterCounts[key] = promoterCounts[key] || {requests:0, guests:0, clubs:new Set()};
         promoterCounts[key].requests += 1;
         promoterCounts[key].guests += Number(x.partySize || 0);
+        const club = x.locationName || x.clubLocationId || "";
+        if (club) promoterCounts[key].clubs.add(club);
       });
-      const rows = Object.entries(promoterCounts)
+      const referralRows = Object.entries(promoterCounts)
         .sort((a,b) => b[1].requests - a[1].requests)
-        .map(([promoter,v]) => [promoter, `${v.requests} guest list requests / ${v.guests} guests`]);
-      byId("promoterNetworkReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter referrals yet.</p>";
+        .map(([promoter,v]) => [promoter, `${v.requests} guest list requests / ${v.guests} guests${v.clubs.size ? ` · ${Array.from(v.clubs).slice(0,3).join(", ")}` : ""}`]);
+      byId("promoterNetworkReport").innerHTML = referralRows.length
+        ? `<p class="sub small"><strong>Guest-list referrals</strong></p>${simpleRows(referralRows)}`
+        : "<p class='sub'>No guest-list promoter referrals yet. Club promotion groups below still list affiliated promoters (including QA temp clubs).</p>";
+    }
+
+    if (byId("promoterClubGroupsReport")) {
+      const groupRows = [];
+      locationRows.forEach(loc => {
+        const groups = Array.isArray(loc.promotionGroups) ? loc.promotionGroups : [];
+        const promoters = Array.isArray(loc.promoters) ? loc.promoters : [];
+        if (!groups.length && !promoters.length) return;
+        const names = [
+          ...groups.map(g => (typeof g === "string" ? g : (g.name || g.displayName || ""))),
+          ...promoters.map(p => (typeof p === "string" ? p : (p.name || p.displayName || "")))
+        ].filter(Boolean);
+        if (!names.length) return;
+        const emails = groups.map(g => g?.email).filter(Boolean);
+        groupRows.push([
+          loc.locationName || loc.brandName || loc.id,
+          `${names.join(" · ")}${emails.length ? ` (${emails.join(", ")})` : ""}${loc.qaTemp || loc.demo ? " · QA temp" : ""}`
+        ]);
+      });
+      groupRows.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+      byId("promoterClubGroupsReport").innerHTML = groupRows.length
+        ? simpleRows(groupRows)
+        : "<p class='sub'>No club promotion groups published yet.</p>";
+    }
+
+    if (byId("promoterOnboardingNetworkReport")) {
+      const rows = (promoterOnboarding || []).slice(0, 40).map(row => [
+        row.promoterName || row.name || row.id || "Promoter",
+        `${row.promoterCompany || row.company || "Independent"} · ${row.identity || row.email || row.username || "no identity"}${row.clubId || row.clubLocationId ? ` · club ${row.clubId || row.clubLocationId}` : ""}`
+      ]);
+      byId("promoterOnboardingNetworkReport").innerHTML = rows.length
+        ? simpleRows(rows)
+        : "<p class='sub'>No promoter onboarding records yet.</p>";
+    }
+
+    if (byId("masterActionFeedback") && /Promoters/i.test(byId("masterActionFeedback").textContent || "")) {
+      const groupCount = (byId("promoterClubGroupsReport")?.querySelectorAll(".report-table > div, .report-row") || []).length;
+      setText("masterActionFeedback", `Promoters loaded. ${guestLists.length} guest-list referral(s); club promotion groups listed below.`);
     }
 
     byId("allQueueList").innerHTML = pending.length ? pending.map(item => {

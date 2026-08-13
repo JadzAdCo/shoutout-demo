@@ -660,7 +660,24 @@
       </section>
 
       <section id="promoterNetwork" class="admin-panel-section">
-        <div class="card"><h2>Network Promoter Data</h2><div id="promoterNetworkReport" class="report-block"></div></div>
+        <div class="card">
+          <h2
+            data-floqr-help-id="help-network-promoters"
+            data-floqr-help-title="Network Promoter Data"
+            data-floqr-help-search="promoters|promoter network|guest list referrals|temp promoter"
+            data-floqr-help-body="Shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub promoters), and Master Admin promoter onboarding records."
+          >Network Promoter Data</h2>
+          <p class="sub small" data-keep-visible="true">Guest-list referral rollups plus club-affiliated promotion groups. QA temp clubs seed Temp Promoter N Collective cards even before live referrals exist.</p>
+          <div id="promoterNetworkReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Club promotion groups</h2>
+          <div id="promoterClubGroupsReport" class="report-block"></div>
+        </div>
+        <div class="card">
+          <h2>Promoter onboarding records</h2>
+          <div id="promoterOnboardingNetworkReport" class="report-block"></div>
+        </div>
       </section>
       <section id="networkReconciliation" class="admin-panel-section">
         <div class="metric-grid">
@@ -1020,7 +1037,8 @@
 <script src="./firebase-config.js?v=29.09.22"></script>
 <script src="./floqr-nav.js?v=29.09.22"></script>
 <script src="./global-profile-status.js?v=29.09.22"></script>
-<script src="./shared-data.js?v=29.09.33"></script>
+<script src="./floqr-temp-qa-showcase.js?v=29.09.108"></script>
+<script src="./shared-data.js?v=29.09.108"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./sos2fa.js?v=29.09.96"></script>
 <script src="./entity-management.js?v=29.09.96"></script>
@@ -1034,11 +1052,11 @@
 <script src="./help-attach.js?v=29.09.98"></script>
 <script src="./helper-popouts.js?v=29.09.98"></script>
 <script src="./ad-campaigns.js?v=29.09.22"></script>
-<script src="./ai-diagnostics-service.js?v=29.09.104"></script>
+<script src="./ai-diagnostics-service.js?v=29.09.108"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.96"></script>
+<script src="./master-admin-app.js?v=29.09.108"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>

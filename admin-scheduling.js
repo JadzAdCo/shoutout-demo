@@ -250,9 +250,14 @@
   }
 
   function mainPhoto(user = {}) {
+    const slotPhoto = Array.isArray(user.profileMediaSlots)
+      && user.profileMediaSlots.find(slot => slot && slot.url && String(slot.type || "image").toLowerCase() !== "video")?.url;
     return user.photoURL
       || user.profilePhotoUrl
       || user.publicPhotoUrl
+      || user.avatarUrl
+      || user.photoUrl
+      || slotPhoto
       || (Array.isArray(user.publicMedia) && user.publicMedia[0]?.url)
       || (Array.isArray(user.media) && user.media.find(m => m?.kind === "photo" || m?.type === "image")?.url)
       || "";

@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.52";
+  const PREVIEW_LINKS_PACKAGE = "29.09.108";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -879,10 +879,29 @@
         {label:"Script cache bust", file:"index.html", includes:["intent-search.js?v=29.09.9", "patron-app.js?v=29.09.9"]},
         {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.9", "floqr-nav.js?v=29.09.9"]}
       ]
+    },
+    {
+      version:"v29.09.108",
+      title:"QA temp clubs photoreal photos + full shared datapoints",
+      checks:[
+        {label:"Showcase catalog", file:"floqr-temp-qa-showcase.js", includes:["FLOQRTempQaShowcase", "clubRecord", "userProfilePatch", "extractedImages", "hoursExceptions"]},
+        {label:"Shared-data showcase seed", file:"shared-data.js", includes:["FLOQRTempQaShowcase", "temp-democlub-"]},
+        {label:"Photoreal PNG paths", file:"floqr-temp-qa-showcase.js", includes:["club-1-logo.png", "dj-jordan.png", "staff-sienna.png"]},
+        {label:"Club profile cache bust", file:"club-profile.html", includes:["floqr-temp-qa-showcase.js?v=29.09.108", "shared-data.js?v=29.09.108"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.108\""]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-108-temp-qa-photoreal-datapoints",
+      area:"QA / Club Public Profile",
+      feature:"Temp QA clubs use photoreal photos and full shared datapoints",
+      changed:"temp-democlub-1..10 (Aurelia–Northstar) now share PNG logos/venue/gallery plus DJ/staff/bottle/promoter/admin portraits. Club records fill the Club Public Profile datapoints (identity, address, socials, hours grid + Labor Day exception, featured people, media). Service-member users get public photo + gallery slots.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html (no Zebbies). Open club-profile.html?location=temp-democlub-1&v=29.09.108 and confirm logo, hero, gallery, DJ/staff photos, hours grid, Labor Day hours. Scheduling grid shows worker avatars. Sign in as temp_dj_1 / temp_bottle_1 → patron-portal public preview photos.",
+      expected:"Photos are photoreal PNGs (not SVG placeholders). Club Admin 1 lands on Aurelia. Shared datapoints appear on the public profile and in Firestore clubLocations."
+    },
     {
       id:"v29-09-9-ask-floqr-intent-search",
       area:"Search",
