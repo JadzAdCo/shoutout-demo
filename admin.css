@@ -567,6 +567,19 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sched-grid th,.sched-grid td{border-bottom:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.06);padding:8px;vertical-align:top}
 .sched-grid th{position:sticky;top:0;background:#121826;z-index:2;font-size:12px;font-weight:900;text-align:left}
 .sched-grid th.is-today{box-shadow:inset 0 3px 0 #f59e0b}
+.sched-grid th.is-holiday{background:rgba(255,120,80,.22)}
+.sched-grid th.is-venue-closed{opacity:.72}
+.sched-holiday-mark,.sched-closed-mark{display:block;font-size:10px;font-weight:700;color:#ffd0b8;margin-top:2px}
+.sched-holiday-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.sched-holiday-tag{background:rgba(255,120,80,.28)!important}
+.sched-holiday-hint{color:#ffb08a;font-weight:700}
+.venue-hours-weekly{display:grid;gap:8px;margin-top:10px}
+.venue-hours-row{display:grid;grid-template-columns:110px 90px 1fr auto 1fr;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.14)}
+.venue-hours-row strong{font-size:13px}
+@media(max-width:720px){
+  .venue-hours-row{grid-template-columns:1fr 1fr;gap:6px}
+  .venue-hours-row strong{grid-column:1 / -1}
+}
 .sched-grid .sched-person{position:sticky;left:0;background:#0f1524;z-index:1;min-width:168px}
 .sched-person-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;padding:0}
 .sched-avatar{width:40px;height:40px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.12);flex:0 0 auto}

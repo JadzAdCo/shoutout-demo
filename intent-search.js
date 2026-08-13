@@ -176,8 +176,20 @@
       ],
       patterns: [
         /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,
-        /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/
+        /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/, /open\s*minus/, /copy\s*previous\s*week/,
+        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/
       ]
+    },
+    {
+      id: "help-venue-hours-calendar",
+      kind: "help",
+      label: "Venue opening hours / public holidays",
+      blurb: "Set default weekly club hours and period overrides on Club Public Profile. Staff Scheduling uses open−2h to close+1h. Holidays highlight for US, FR, DE, NL, ES and other venue countries.",
+      links: [
+        {label: "Club Public Profile hours", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
+      ],
+      searchPhrases: ["venue hours", "opening hours", "club schedule", "public holiday", "period override"],
+      patterns: [/venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /period\s*override/, /open\/closed/]
     },
     {
       id: "help-my-profile",

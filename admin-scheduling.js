@@ -26,7 +26,8 @@
     applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
     rrDays: new Set([1, 2, 3, 4, 5]),
     assignContext: null,
-    rrCursor: 0
+    rrCursor: 0,
+    venue: null
   };
 
   function callable(name) {
@@ -133,6 +134,88 @@
       ownerId: locationId
     });
     return result?.data || null;
+  }
+
+  function venueApi() {
+    return window.FLOQRVenueCalendar;
+  }
+
+  async function loadVenueHours() {
+    if (!locationId || !db) return null;
+    try {
+      const snap = await db.collection("clubLocations").doc(locationId).get();
+      state.venue = snap.exists ? (snap.data() || {}) : {};
+    } catch (_error) {
+      state.venue = {};
+    }
+    applyVenueDefaultsToControls();
+    return state.venue;
+  }
+
+  function applyVenueDefaultsToControls() {
+    const api = venueApi();
+    const venue = state.venue || {};
+    if (!api) return;
+    const openIdx = api.openDayIndexes(venue);
+    state.rrDays = new Set(openIdx);
+    renderDayPills("schedRrDays", state.rrDays);
+
+    // Pick next open day in the visible week (or first open weekday) for default times
+    const days = weekDays();
+    let windowInfo = null;
+    for (const day of days) {
+      const win = api.staffWindowForDate(venue, day);
+      if (!win.closed) {
+        windowInfo = win;
+        break;
+      }
+    }
+    if (!windowInfo) {
+      const probe = days[openIdx[0] || 5] || days[0];
+      windowInfo = api.staffWindowForDate(venue, probe);
+    }
+    if (windowInfo && !windowInfo.closed) {
+      if (byId("schedDefaultStart") && windowInfo.start) byId("schedDefaultStart").value = windowInfo.start;
+      if (byId("schedDefaultEnd") && windowInfo.end) byId("schedDefaultEnd").value = windowInfo.end;
+    }
+    const hint = byId("schedVenueWindowHint");
+    if (hint) {
+      if (windowInfo && !windowInfo.closed) {
+        hint.textContent = `Staff window from venue hours: open ${windowInfo.open} (−2h → ${windowInfo.start}) through close ${windowInfo.close} (+1h → ${windowInfo.end}). Apply-to days follow club open nights.`;
+      } else {
+        hint.textContent = "Venue closed this week (or hours not set). Set Venue opening hours on Club Public Profile, or enter times manually.";
+      }
+    }
+    renderHolidayLegend();
+  }
+
+  function renderHolidayLegend() {
+    const host = byId("schedHolidayLegend");
+    const api = venueApi();
+    if (!host || !api) return;
+    const days = weekDays();
+    const holidays = api.holidaysInRange(state.venue?.country || "United States", days[0], days[6]);
+    if (!holidays.length) {
+      host.innerHTML = "";
+      return;
+    }
+    host.innerHTML = `<span class="tag">Public holidays</span> ${holidays.map(h =>
+      `<span class="tag sched-holiday-tag">${esc(h.date)} · ${esc(h.name)}</span>`
+    ).join(" ")}`;
+  }
+
+  function staffTimesForDay(dayDate) {
+    const api = venueApi();
+    if (api && state.venue) {
+      const win = api.staffWindowForDate(state.venue, dayDate);
+      if (!win.closed && win.start && win.end) return {start: win.start, end: win.end, closed: false};
+      if (win.closed) return {start: "", end: "", closed: true};
+    }
+    return {
+      start: byId("schedDefaultStart")?.value || "18:00",
+      end: byId("schedDefaultEnd")?.value || "02:00",
+      closed: false
+    };
   }
 
   function chipClass(roleLabel = "") {
@@ -282,14 +365,19 @@
     const startTime = byId("schedDefaultStart")?.value || "18:00";
     const endTime = byId("schedDefaultEnd")?.value || "02:00";
     const baseDay = day || (shift?.startsAtMs ? new Date(Number(shift.startsAtMs)) : new Date());
+    const dayTimes = staffTimesForDay(baseDay);
+    const useStart = (!shift && dayTimes.start) ? dayTimes.start : startTime;
+    const useEnd = (!shift && dayTimes.end) ? dayTimes.end : endTime;
     const startDate = shift?.startsAt
       ? new Date(shift.startsAt)
-      : combineDayAndTime(baseDay, startTime, false);
+      : combineDayAndTime(baseDay, useStart, false);
     const endDate = shift?.endsAt
       ? new Date(shift.endsAt)
-      : combineDayAndTime(baseDay, endTime, defaultEndIsNextDay(startTime, endTime));
+      : combineDayAndTime(baseDay, useEnd, defaultEndIsNextDay(useStart, useEnd));
     if (byId("scheduleStartsAt")) byId("scheduleStartsAt").value = toLocalInputValue(startDate);
     if (byId("scheduleEndsAt")) byId("scheduleEndsAt").value = toLocalInputValue(endDate);
+    if (!shift && dayTimes.start && byId("schedDefaultStart")) byId("schedDefaultStart").value = dayTimes.start;
+    if (!shift && dayTimes.end && byId("schedDefaultEnd")) byId("schedDefaultEnd").value = dayTimes.end;
     if (byId("scheduleNotes")) byId("scheduleNotes").value = shift?.notes || "";
     if (byId("scheduleRequireApproval")) {
       byId("scheduleRequireApproval").checked = shift
@@ -319,6 +407,7 @@
     if (!host) return;
     updateWeekLabel();
     updateDraftCount();
+    renderHolidayLegend();
     const days = weekDays();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -333,7 +422,18 @@
         <th class="sched-person">Team</th>
         ${days.map(day => {
           const isToday = day.getTime() === today.getTime();
-          return `<th class="${isToday ? "is-today" : ""}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}</th>`;
+          const holiday = venueApi()?.holidayOn?.(state.venue?.country || "US", day);
+          const closed = staffTimesForDay(day).closed;
+          const classes = [
+            isToday ? "is-today" : "",
+            holiday ? "is-holiday" : "",
+            closed ? "is-venue-closed" : ""
+          ].filter(Boolean).join(" ");
+          const title = [
+            holiday ? holiday.name : "",
+            closed ? "Venue closed" : ""
+          ].filter(Boolean).join(" · ");
+          return `<th class="${classes}" title="${esc(title)}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}${holiday ? `<small class="sched-holiday-mark">${esc(holiday.name)}</small>` : ""}${closed && !holiday ? `<small class="sched-closed-mark">Closed</small>` : ""}</th>`;
         }).join("")}
       </tr></thead>
     `;
@@ -427,7 +527,7 @@
           ? `Calendar unlocked · ${monthStatus} (staffSchedulingPaid=1).`
           : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus} (staffSchedulingPaid=0).`
       );
-      if (paid) await Promise.all([loadWorkers(), loadShifts()]);
+      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts()]);
     } catch (error) {
       setStatus(error?.message || String(error));
     }
@@ -661,10 +761,7 @@
     const days = [...state.rrDays].sort((a, b) => a - b);
     if (!days.length) throw new Error("Select at least one day to fill.");
     const roleLabel = byId("schedDefaultRole")?.value?.trim() || byId("schedRrRoleFilter")?.value?.trim() || "Shift";
-    const startTime = byId("schedDefaultStart")?.value || "18:00";
-    const endTime = byId("schedDefaultEnd")?.value || "02:00";
     const requireApproval = byId("schedRequireApproval")?.checked !== false;
-    const overnight = defaultEndIsNextDay(startTime, endTime);
 
     setStatus("Round Robin filling drafts…");
     let created = 0;
@@ -673,6 +770,11 @@
     for (const dayIdx of days) {
       const day = weekDays()[dayIdx];
       if (!day) continue;
+      const dayTimes = staffTimesForDay(day);
+      if (dayTimes.closed) continue;
+      const startTime = dayTimes.start || byId("schedDefaultStart")?.value || "18:00";
+      const endTime = dayTimes.end || byId("schedDefaultEnd")?.value || "02:00";
+      const overnight = defaultEndIsNextDay(startTime, endTime);
       const already = state.shifts.some(s =>
         sameDay(Number(s.startsAtMs || 0), day)
         && String(s.roleLabel || "").toLowerCase() === roleLabel.toLowerCase()
@@ -708,7 +810,43 @@
     state.rrCursor = cursor;
     setStatus(created
       ? `Round Robin created ${created} draft shift${created === 1 ? "" : "s"}. Review the grid, then Publish.`
-      : "No new slots filled (days may already have that role).");
+      : "No new slots filled (days may be closed or already have that role).");
+    await loadShifts();
+  }
+
+  async function copyPreviousWeek() {
+    const prevStart = addDays(state.weekStart, -7);
+    const prevEnd = state.weekStart.getTime();
+    const prevShifts = state.shifts.filter(s => {
+      const ms = Number(s.startsAtMs || 0);
+      return ms >= prevStart.getTime() && ms < prevEnd && String(s.status || "") !== "declined";
+    });
+    if (!prevShifts.length) throw new Error("No shifts found in the previous week to copy.");
+    if (!window.confirm(`Copy ${prevShifts.length} shift(s) from the previous week into this week as drafts?`)) return;
+    setStatus("Copying previous week into drafts…");
+    let created = 0;
+    for (const shift of prevShifts) {
+      const start = new Date(Number(shift.startsAtMs || Date.parse(shift.startsAt)));
+      const end = new Date(Number(shift.endsAtMs || Date.parse(shift.endsAt)));
+      if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) continue;
+      const nextStart = addDays(start, 7);
+      const nextEnd = addDays(end, 7);
+      await createShiftPayload({
+        assigneeUid: shift.assigneeUid,
+        assigneeName: shift.assigneeName,
+        assigneeEmail: shift.assigneeEmail,
+        assigneePhone: shift.assigneePhone,
+        roleLabel: shift.roleLabel || "Shift",
+        startsAt: nextStart,
+        endsAt: nextEnd,
+        notes: shift.notes ? `${shift.notes} (copied)` : "Copied from previous week",
+        asDraft: true,
+        requireApproval: shift.requireApproval !== false,
+        assignMode: "copyPreviousWeek"
+      });
+      created += 1;
+    }
+    setStatus(`Copied ${created} draft shift${created === 1 ? "" : "s"} from previous week.`);
     await loadShifts();
   }
 
@@ -747,7 +885,10 @@
       refreshSubscriptionUi().catch(error => setStatus(error.message));
     });
     byId("schedRefreshGridBtn")?.addEventListener("click", () => {
-      Promise.all([loadWorkers(), loadShifts()]).catch(error => setStatus(error.message));
+      Promise.all([loadVenueHours(), loadWorkers(), loadShifts()]).catch(error => setStatus(error.message));
+    });
+    byId("schedCopyPrevWeekBtn")?.addEventListener("click", () => {
+      copyPreviousWeek().catch(error => setStatus(error.message));
     });
     byId("schedPublishBtn")?.addEventListener("click", () => {
       publishWeek().catch(error => setStatus(error.message));
@@ -759,14 +900,17 @@
     byId("schedModeRrBtn")?.addEventListener("click", () => setMode("roundRobin"));
     byId("schedPrevWeekBtn")?.addEventListener("click", () => {
       state.weekStart = addDays(state.weekStart, -7);
+      applyVenueDefaultsToControls();
       renderGrid();
     });
     byId("schedNextWeekBtn")?.addEventListener("click", () => {
       state.weekStart = addDays(state.weekStart, 7);
+      applyVenueDefaultsToControls();
       renderGrid();
     });
     byId("schedTodayWeekBtn")?.addEventListener("click", () => {
       state.weekStart = startOfWeek(new Date());
+      applyVenueDefaultsToControls();
       renderGrid();
     });
 

@@ -156,29 +156,23 @@
     return value ? `<div><span>${esc(label)}</span><strong>${esc(Array.isArray(value) ? value.join(", ") : value)}</strong></div>` : "";
   }
 
-  function hoursDetailsMarkup() {
-    const ST = window.FLOQRStructuredTime;
-    const structured = club.hoursStructured || club.openingHours;
-    let lines = Array.isArray(club.hoursDisplayLines) ? club.hoursDisplayLines.filter(Boolean) : [];
-    if (!lines.length && ST && structured) {
-      try { lines = ST.formatWeekHoursLines(structured); } catch (e) { lines = []; }
-    }
-    if (lines.length) {
-      return `<div class="club-hours-details"><span>Details · Opening times</span><ul>${lines.map(line => {
-        const parts = String(line).split(/:\s(.+)/);
-        if (parts.length >= 2) {
-          return `<li><strong>${esc(parts[0])}</strong> <span>${esc(parts[1])}</span></li>`;
-        }
-        return `<li>${esc(line)}</li>`;
-      }).join("")}</ul></div>`;
-    }
-    return fact("Hours", club.hours || club.operatingHours);
-  }
-
   function renderAbout() {
     byId("clubProfileDescription").textContent = club.description || club.publicDescription || club.about || "Discover this venue through FLOQR.";
+    const hoursHtml = window.FLOQRVenueCalendar?.renderHoursHtml?.(club);
+    const hoursFact = hoursHtml
+      ? `<div class="profile-grid-wide"><span>Opening hours</span>${hoursHtml}</div>`
+      : fact("Hours", club.hours || club.operatingHours);
+    const holidayBits = (() => {
+      const api = window.FLOQRVenueCalendar;
+      if (!api) return "";
+      const start = new Date();
+      const upcoming = api.holidaysInRange(club.country || "United States", start, api.addDays(start, 45)).slice(0, 4);
+      if (!upcoming.length) return "";
+      return `<div class="profile-grid-wide"><span>Upcoming public holidays</span><strong>${upcoming.map(h => `${h.date} · ${h.name}`).join(" · ")}</strong></div>`;
+    })();
     byId("clubProfileQuickFacts").innerHTML = [
-      hoursDetailsMarkup(),
+      hoursFact,
+      holidayBits,
       fact("Age policy", club.agePolicy),
       fact("Dress code", club.dressCode),
       fact("Amenities", club.amenities),
@@ -190,17 +184,11 @@
   function eventCard(event, past = false) {
     const name = event.eventName || event.title || "Club Event";
     const date = event.eventDate || event.date || event.startDate || "Date announced soon";
-    const talentRaw = event.artists || event.featuredDjs || event.djs || [];
-    const talent = (Array.isArray(talentRaw) ? talentRaw : []).map(item =>
-      typeof item === "string" ? item : (item?.name || item?.displayName || "")
-    ).filter(Boolean);
-    const timeLabel = typeof event.eventTime === "string"
-      ? event.eventTime
-      : (event.eventTimeStructured?.display || event.eventTime?.display || "");
+    const talent = event.artists || event.featuredDjs || event.djs || [];
     const link = safeExternal(event.ticketUrl || event.officialUrl || event.sourceUrl);
     return `<article class="club-event-card ${past ? "past" : ""}">
       ${event.imageUrl ? `<img src="${esc(event.imageUrl)}" alt="${esc(name)}"/>` : ""}
-      <div><small>${esc(date)}${timeLabel ? ` · ${esc(timeLabel)}` : ""}</small><h3>${esc(name)}</h3>
+      <div><small>${esc(date)}${event.eventTime ? ` · ${esc(event.eventTime)}` : ""}</small><h3>${esc(name)}</h3>
       ${talent.length ? `<p>${esc(talent.slice(0,4).join(" · "))}</p>` : ""}
       ${link && !past ? `<a class="buttonlike" target="_blank" rel="noopener" href="${esc(link)}">Tickets / Details</a>` : ""}</div>
     </article>`;

@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.102"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.102"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.103"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.103"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -162,7 +162,24 @@
             <label>TikTok<input id="clubProfileTiktok" placeholder="@club"/></label>
             <label>Facebook<input id="clubProfileFacebook" placeholder="facebook.com/club"/></label>
             <label>Genres (public and search)<input id="clubProfileGenres" placeholder="Latin, Reggaeton, Afrobeats, Hip Hop"/></label>
-            <label>Venue hours<input id="clubProfileHours" placeholder="Thu–Sat, 10 PM–3 AM"/></label>
+            <label>Venue hours (summary)<input id="clubProfileHours" placeholder="Auto-filled from weekly schedule below"/></label>
+            <label>Venue time zone
+              <select id="clubProfileTimeZone">
+                <option value="America/New_York">America/New_York</option>
+                <option value="America/Chicago">America/Chicago</option>
+                <option value="America/Denver">America/Denver</option>
+                <option value="America/Los_Angeles">America/Los_Angeles</option>
+                <option value="America/Toronto">America/Toronto</option>
+                <option value="Europe/London">Europe/London</option>
+                <option value="Europe/Paris">Europe/Paris</option>
+                <option value="Europe/Berlin">Europe/Berlin</option>
+                <option value="Europe/Amsterdam">Europe/Amsterdam</option>
+                <option value="Europe/Madrid">Europe/Madrid</option>
+                <option value="Europe/Rome">Europe/Rome</option>
+                <option value="Europe/Lisbon">Europe/Lisbon</option>
+                <option value="Europe/Brussels">Europe/Brussels</option>
+              </select>
+            </label>
             <label>Age policy<input id="clubProfileAgePolicy" placeholder="21+ with valid ID"/></label>
             <label>Dress code<input id="clubProfileDressCode" placeholder="Upscale nightlife attire"/></label>
             <label>Amenities<input id="clubProfileAmenities" placeholder="VIP tables, coat check, outdoor garden"/></label>
@@ -178,6 +195,34 @@
               </div>
               <p class="sub small">Patron ShoutOuts are charged to <strong>FloqR</strong>, not this club’s Stripe account. This club earns a tracked <strong>20% share</strong> of paid ShoutOuts under Account Reconciliation. Use club Stripe onboarding only for club subscription billing or club-sold Commerce products.</p>
             </div>
+          </div>
+          <div class="card nested-card" id="clubVenueHoursCard">
+            <h3
+              data-floqr-help-id="help-venue-hours-calendar"
+              data-floqr-help-title="Venue opening hours"
+              data-floqr-help-search="club hours|opening times|venue schedule|hours exception"
+              data-floqr-help-body="Set the default weekly open/closed hours shown on the Club Public Profile. Add period overrides for special weeks. Staff Scheduling uses open minus 2 hours through close plus 1 hour. Public holidays for the venue country highlight on calendars."
+            >Venue opening hours</h3>
+            <p class="sub small" data-keep-visible="true">Default weekly schedule first. Later, alter specific date ranges without losing the default. Public profile and Staff Scheduling both use this calendar. Staff shift defaults = open − 2h through close + 1h.</p>
+            <div id="clubHoursWeeklyEditor" class="venue-hours-weekly"></div>
+            <div class="queue-actions" style="margin-top:10px">
+              <button type="button" id="clubHoursSyncSummaryBtn">Refresh hours summary</button>
+            </div>
+            <h4 style="margin-top:16px">Period overrides</h4>
+            <p class="sub small" data-keep-visible="true">Calendar-style ranges (holiday week, festival, temporary close). Overrides win over the weekly default for those dates.</p>
+            <div class="profile-grid">
+              <label>Start date<input id="clubHoursExStart" type="date"/></label>
+              <label>End date<input id="clubHoursExEnd" type="date"/></label>
+              <label>Label<input id="clubHoursExLabel" placeholder="Holiday week / Soft open"/></label>
+              <label><input id="clubHoursExClosed" type="checkbox"/> Closed all day</label>
+              <label>Open<input id="clubHoursExOpen" type="time" value="22:00"/></label>
+              <label>Close<input id="clubHoursExClose" type="time" value="03:00"/></label>
+            </div>
+            <div class="queue-actions">
+              <button type="button" id="clubHoursExAddBtn">Add period override</button>
+            </div>
+            <div id="clubHoursExceptionsList" class="report-block"></div>
+            <div id="clubHoursHolidayPreview" class="report-block" style="margin-top:12px"></div>
           </div>
           <div class="card nested-card">
             <h3>FLOQR display screens</h3>
@@ -418,7 +463,7 @@
       <section id="panelGuestLists" class="admin-panel-section">
         <div class="card">
           <h2>Guest List Campaigns</h2>
-          <p class="sub small">Create up to 6 active guest list campaigns. Campaigns can be disabled, archived, and reused for similar nights.</p>
+          <p class="sub small" data-keep-visible="true">Create up to 6 active guest list campaigns. Campaign dates can use club open nights; public holidays for the venue country are flagged under Event Date.</p>
           <div class="profile-grid">
             <label>Campaign Name<input id="guestCampaignName" placeholder="Friday Latin Night Guest List"/></label>
             <label>Event Type<select id="guestCampaignType">
@@ -427,6 +472,12 @@
               <option value="Ticketed">Ticketed</option>
             </select></label>
             <label>Event Date<input id="guestCampaignDate" type="date"/></label>
+            <label>Suggest open night
+              <select id="guestCampaignOpenNightSuggest">
+                <option value="">Pick from club open nights…</option>
+              </select>
+            </label>
+            <p id="guestCampaignHolidayHint" class="sub small profile-grid-wide" data-keep-visible="true"></p>
             <label>Capacity<input id="guestCampaignCapacity" type="number" min="1" placeholder="150"/></label>
             <label>Promoter / Group<input id="guestCampaignPromoter" placeholder="Optional"/></label>
             <label>Ticket / RSVP URL<input id="guestCampaignUrl" placeholder="Optional"/></label>
@@ -476,10 +527,10 @@
             <h2
               data-floqr-help-id="help-staff-schedule-grid"
               data-floqr-help-title="Staff week calendar"
-              data-floqr-help-search="schedule grid|round robin|publish schedule|people days"
-              data-floqr-help-body="People × days week grid like 7shifts. Manual: click a cell to place draft shift chips. Round Robin: fill selected days fairly across eligible workers. Publish sends drafts to workers (Email/SMS/WhatsApp + in-app). Click a worker photo for contact, SMS, and public profile."
+              data-floqr-help-search="schedule grid|round robin|publish schedule|people days|open minus two hours"
+              data-floqr-help-body="People × days week grid like 7shifts. Manual: click a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Publish sends drafts to workers. Public holidays for the venue country are highlighted."
             >Week schedule</h2>
-            <p class="sub small" data-keep-visible="true">People × days grid. Save drafts first, then <strong>Publish schedule</strong>. Click a worker photo for contact / SMS / public profile.</p>
+            <p class="sub small" data-keep-visible="true">People × days grid wired to <strong>Venue opening hours</strong> on Club Public Profile. Default shift window = club open − 2h through close + 1h. Public holidays highlight by venue country.</p>
             <div class="sched-toolbar">
               <div class="sched-mode-toggle" role="group" aria-label="Assign mode">
                 <button type="button" id="schedModeManualBtn" class="sched-mode-btn active" data-mode="manual">Manual</button>
@@ -498,11 +549,12 @@
               <label>Default end<input id="schedDefaultEnd" type="time" value="02:00"/></label>
               <label>Require approval<input id="schedRequireApproval" type="checkbox" checked/></label>
             </div>
+            <p id="schedVenueWindowHint" class="sub small" data-keep-visible="true">Staff window follows venue hours when set.</p>
             <div id="schedRoundRobinPanel" class="sched-rr-panel hidden">
-              <p class="sub small" data-keep-visible="true">Fills selected days with one draft shift per day, rotating eligible workers (fewest shifts this week first).</p>
+              <p class="sub small" data-keep-visible="true"><strong>Round Robin algorithm:</strong> eligible workers (optional role filter) are ordered by fewest shifts this week, then oldest last assignment, then name. Selected days (default = club open nights) each get one draft shift; the next worker in that order is assigned and counts update so the week stays balanced. Closed venue days and already-filled role/day slots are skipped. Review drafts, then Publish.</p>
               <div class="profile-grid">
                 <label>Role filter (optional)<input id="schedRrRoleFilter" placeholder="Leave blank = all workers"/></label>
-                <label class="profile-grid-wide">Apply to days
+                <label class="profile-grid-wide">Apply to days (club open nights pre-selected)
                   <div id="schedRrDays" class="sched-day-pills" aria-label="Days to fill"></div>
                 </label>
               </div>
@@ -510,9 +562,11 @@
             </div>
             <div class="queue-actions" style="margin-top:12px">
               <button type="button" id="schedPublishBtn" class="primary">Publish schedule</button>
+              <button type="button" id="schedCopyPrevWeekBtn">Copy previous week → drafts</button>
               <button type="button" id="schedRefreshGridBtn">Refresh grid</button>
               <span id="schedDraftCount" class="tag">0 drafts</span>
             </div>
+            <div id="schedHolidayLegend" class="sched-holiday-legend"></div>
             <div id="scheduleWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
           </div>
 
@@ -681,7 +735,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.101"></script>
+<script src="./floqai-help-repository.js?v=29.09.103"></script>
 <script src="./help-attach.js?v=29.09.101"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -691,12 +745,14 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.99"></script>
+<script src="./floqr-venue-calendar.js?v=29.09.103"></script>
+<script src="./admin-app.js?v=29.09.103"></script>
+<script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.102"></script>
+<script src="./admin-scheduling.js?v=29.09.103"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
