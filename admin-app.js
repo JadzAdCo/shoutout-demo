@@ -2228,6 +2228,16 @@
     bind("adminFacebookLoginBtn", loginFacebook);
     bind("adminMicrosoftLoginBtn", loginMicrosoft);
     bind("adminLogoutBtn", logout);
+    const homeLogin = byId("adminHomeLoginLink");
+    if (homeLogin) {
+      const ret = `admin.html?location=${encodeURIComponent(locationId || "")}${location.hash || "#panelScheduling"}`;
+      const params = new URLSearchParams({returnTo: ret, authRequired: "club-admin"});
+      try {
+        const v = window.FLOQRNav?.appVersion;
+        if (v) params.set("v", v);
+      } catch (_) {}
+      homeLogin.href = `./?${params.toString()}`;
+    }
     bind("adminMfaSendBtn", sendAdminMfaCode);
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
@@ -2311,7 +2321,9 @@
       }
 
       const isMasterAdmin = MASTER_ADMIN_EMAILS.includes(email);
-      if (!isMasterAdmin && !(user.multiFactor?.enrolledFactors || []).length) {
+      const isDemoTemp = /@floqr-demo\.com$/i.test(email);
+      // Temp QA pack signs in via Email OTP and has no real MFA device — skip enrollment.
+      if (!isMasterAdmin && !isDemoTemp && !(user.multiFactor?.enrolledFactors || []).length) {
         showAdminMfaPanel("First-time Club Admin setup: enroll the patron's mobile phone as the required SMS second factor.");
         return;
       }

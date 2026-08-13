@@ -23,7 +23,11 @@
       blocker.remove();
       return;
     }
-    const query = new URLSearchParams({v:"29.04", profileRequired:reason, returnTo:returnPath()});
+    const query = new URLSearchParams({profileRequired: reason, returnTo: returnPath()});
+    try {
+      const v = window.FLOQRNav?.appVersion;
+      if (v) query.set("v", v);
+    } catch (_) {}
     window.location.replace(`./?${query.toString()}`);
   }
 

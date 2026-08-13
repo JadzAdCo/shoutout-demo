@@ -166,10 +166,6 @@
         byId("portalOwnerId").value = rest.join(":");
       }
     }
-    byId("portalGoogleLoginBtn")?.addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(error => setStatus(error.message));
-    });
     byId("portalBuySubBtn")?.addEventListener("click", () => subscribe().catch(error => setStatus(error.message)));
     byId("portalRefreshBtn")?.addEventListener("click", () => refresh().catch(error => setStatus(error.message)));
     byId("portalCreateShiftBtn")?.addEventListener("click", () => createShift().catch(error => setStatus(error.message)));
@@ -183,7 +179,7 @@
         byId("portalOwnerId").value = user.uid;
       }
       if (user) refresh().catch(error => setStatus(error.message));
-      else setStatus("Sign in to continue.");
+      else setStatus("Redirecting to home sign-in…");
     });
   });
 })();

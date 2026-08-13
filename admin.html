@@ -29,8 +29,9 @@
     <div id="adminLogin" class="card">
       <h2>Club admin sign-in</h2>
       <p class="sub">Sign in with the account elected as Club Admin for this location. Master / Super Admins should use <strong>master-admin.html</strong> for network-wide entity search and management.</p>
-      <p class="sub small"><strong>Sign-in note:</strong> Admin login uses the same popup configuration as the patron page. Use auth-debug.html if Microsoft still fails.</p>
+      <p class="sub small"><strong>Temp / Email OTP accounts:</strong> use the home page Email sign-in (all methods), then you return here automatically. Do not use Google for <code>temp_*@floqr-demo.com</code>.</p>
       <div class="auth-grid">
+        <a id="adminHomeLoginLink" class="buttonlike primary" href="./">Sign in on home page (all methods)</a>
         <button id="adminGoogleLoginBtn" type="button">Admin Google Login</button>
         <button id="adminMicrosoftLoginBtn" type="button">Admin Microsoft Login</button>
         <button id="adminFacebookLoginBtn" type="button">Admin Facebook Login</button>
@@ -622,14 +623,14 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
-<script src="./admin-app.js?v=29.09.110"></script>
+<script src="./admin-app.js?v=29.09.131"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./admin-scheduling.js?v=29.09.46"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
-<script src="./profile-access-guard.js?v=29.09.8"></script>
+<script src="./profile-access-guard.js?v=29.09.131"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

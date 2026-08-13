@@ -400,6 +400,7 @@ async function runSeed() {
       roles: [account.role],
       approvedRoles: [ROLE_LABELS[account.role] || account.role],
       phone: SINK_SMS,
+      profileCompleted: true,
       demoTemp: true,
       demoPack: "temp-v1",
       loginCode: account.loginCode,
@@ -420,6 +421,7 @@ async function runSeed() {
       displayName: account.displayName,
       approvedRoles: profile.approvedRoles,
       phone: SINK_SMS,
+      profileCompleted: true,
       demoTemp: true,
       demoPack: "temp-v1",
       updatedAt: admin.firestore.FieldValue.serverTimestamp()

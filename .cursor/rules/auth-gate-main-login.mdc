@@ -1,0 +1,39 @@
+---
+description: Private pages redirect to main login (all methods); no Google-only gates
+alwaysApply: true
+---
+
+# Auth gate for private FLOQR pages (always)
+
+## Rule
+
+Private app pages (Club Admin, Scheduling, portal satellites, commerce, guest list, services, pickup, role request, Mingl chat/gist, etc.) must **not** offer a Google-only (or single-provider) sign-in button as the way in.
+
+If Firebase Auth has **no signed-in user**:
+
+1. **Redirect** to the main home login (`index.html` / `./`) with `returnTo=<current relative path+query+hash>`.
+2. The home page shows **all** sign-in methods (Google, Microsoft, Facebook, Email OTP, SMS OTP).
+3. After a successful login + completed patron profile, `patron-app.js` returns the user to `returnTo`.
+
+Do **not** embed a second incomplete login card on private pages.
+
+## Exceptions (do not redirect / do not require full home login)
+
+- Public / display surfaces: `display.html`, `display2.html`, `club-profile.html`, marketing/landing cards, FloqAi search as public browse
+- Popouts / previews / frame previews (`*-preview*.html`, `suprstar-live-popout.html`, etc.)
+- Master Admin: keep allow-listed Google/Microsoft policy (not Email OTP for production Master Admin)
+- Pages that already host the full multi-method login card as their primary job (`index.html`)
+
+## Demo / temp QA accounts
+
+- `temp_*@floqr-demo.com` sign in via **Email OTP on the home page** (code → `bans.don@gmail.com`).
+- Skip Club Admin SMS MFA enrollment for `@floqr-demo.com` / `demoTemp` profiles so QA can enter Venue Command Center.
+- Never tell testers to use Google sign-in for temp_* emails.
+
+## Implementation checklist
+
+- [ ] Include shared auth gate (`profile-access-guard.js` or `floqr-auth-gate.js`) on private HTML pages
+- [ ] Remove lone “Continue with Google” / “Google sign-in” CTAs used as the only auth entry
+- [ ] `returnTo` is a same-origin relative path (no open redirect)
+- [ ] No hardcoded `?v=` in the redirect URL (use FLOQRNav / omit or inherit)
+- [ ] After login, private page content stays hidden until `auth.currentUser` is present
