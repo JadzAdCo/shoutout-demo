@@ -100,12 +100,12 @@
       id: "help-club-admin",
       kind: "help",
       label: "Become a Club Admin",
-      blurb: "Patrons can request Club Admin access. A venue must approve your association before you can manage that club.",
+      blurb: "Club Admins only open the Venue Command Center for a venue they are assigned to. admin.html no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com go to temp-democlub-N. Unassigned admins request Master Admin assignment.",
       steps: [
         "Sign in as a FLOQR patron (everyone starts here).",
-        "Open Role Request and choose Club Admin.",
-        "Select the club(s) you work with and submit.",
-        "After approval, open Club Admin for that location."
+        "Open Role Request and choose Club Admin, or wait for Master Admin assignment.",
+        "After assignment, open Club Admin — you are redirected to your venue.",
+        "Demo: temp_clubadmin_1 maps to temp-democlub-1 (same pattern for 2, 3, …)."
       ],
       links: [
         {label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
@@ -131,6 +131,53 @@
       ],
       searchPhrases: ["role profiles", "role profiles overview", "how roles work", "service roles"],
       patterns: [/role\s*profiles?/, /how\s+roles\s+work/, /service\s*roles/]
+    },
+    {
+      id: "help-app-language",
+      kind: "help",
+      label: "App language / Dutch / browser language",
+      blurb: "First visit uses the browser language when FloqR supports it (including Dutch / Nederlands). Otherwise English. Change it anytime under My Profile → App language.",
+      steps: [
+        "On first use, FloqR reads navigator.language (nl-NL becomes Dutch).",
+        "If that language is not in the app list, chrome stays English.",
+        "Open My Profile & Settings → App language to switch later (saved on this device and on your profile)."
+      ],
+      links: [
+        {label: "App language (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "app language", "dutch", "nederlands", "browser language", "first use language",
+        "change language", "switch language", "ui language", "detect language"
+      ],
+      patterns: [
+        /app\s*language/, /dutch/, /nederlands/, /browser\s*language/,
+        /change\s*(the\s*)?(app\s*)?language/, /switch\s*(to\s*)?(dutch|nederlands|english)/,
+        /detect\s*(my\s*)?language/, /first\s*use\s*language/
+      ]
+    },
+    {
+      id: "help-staff-schedule-grid",
+      kind: "help",
+      label: "Staff week calendar / Round Robin",
+      blurb: "Club Admin → Scheduling: people × days grid. Manual place draft chips, or Round Robin fill days fairly. Publish notifies workers. Click worker photos for SMS and public profile.",
+      steps: [
+        "Open Club Admin → Scheduling (after paid this month).",
+        "Manual: click + on a person/day cell, set times, Save as draft.",
+        "Round Robin: pick days + role, Fill → drafts, review chips.",
+        "Publish schedule to notify workers.",
+        "Click a worker photo for contact, SMS, and public profile."
+      ],
+      links: [
+        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      searchPhrases: [
+        "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
+        "staff schedule", "assign shift", "worker photo", "7shifts"
+      ],
+      patterns: [
+        /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,
+        /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/
+      ]
     },
     {
       id: "help-my-profile",

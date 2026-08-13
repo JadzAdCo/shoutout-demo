@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "29.09.13";
+  const VERSION = "29.09.100";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -16,6 +16,7 @@
     {code: "ru", label: "Russian", native: "Русский", dir: "ltr"},
     {code: "el", label: "Greek", native: "Ελληνικά", dir: "ltr"},
     {code: "pl", label: "Polish", native: "Polski", dir: "ltr"},
+    {code: "nl", label: "Dutch", native: "Nederlands", dir: "ltr"},
     {code: "ar", label: "Arabic", native: "العربية", dir: "rtl"}
   ];
 
@@ -254,6 +255,32 @@
       "mingl.matchReasonCount": "Dopasowanie w {n} obszarach zainteresowań",
       "bartr.categoryTemplate": "Szablon układu sprzedawcy"
     },
+    nl: {
+      "app.welcome": "Welkom",
+      "app.continue": "Doorgaan",
+      "app.signOut": "Uitloggen",
+      "app.signIn": "Log in of maak een account:",
+      "app.search": "Zoeken",
+      "app.back": "Terug",
+      "app.save": "Opslaan",
+      "app.language": "Taal",
+      "app.languageSettings": "App-taal",
+      "app.languageHint": "Kies de taal voor FloqR-menu's en schermen.",
+      "nav.mingl": "Mingl",
+      "nav.bartr": "BartR",
+      "nav.shoutout": "ShoutOut",
+      "nav.profile": "Mijn profiel",
+      "nav.settings": "Instellingen",
+      "nav.inbox": "Inbox",
+      "prompt.title": "Jouw taal gebruiken?",
+      "prompt.body": "Je apparaat geeft de voorkeur aan {lang}. FloqR openen in het {native}?",
+      "prompt.yes": "Ja, schakel over naar {native}",
+      "prompt.no": "Engels houden",
+      "prompt.later": "Later vragen",
+      "mingl.matchReason": "Overeenkomst op gedeelde interesses",
+      "mingl.matchReasonCount": "Overeenkomst op {n} interessegebieden",
+      "bartr.categoryTemplate": "Verkoper-lay-outsjabloon"
+    },
     ar: {
       "app.welcome": "مرحباً",
       "app.continue": "متابعة",
@@ -299,7 +326,7 @@
   function browserPreferred() {
     const list = Array.isArray(navigator.languages) && navigator.languages.length
       ? navigator.languages
-      : [navigator.language || "en"];
+      : [navigator.language || navigator.userLanguage || "en"];
     for (const item of list) {
       const code = normalizeCode(item);
       if (code) return code;
@@ -336,7 +363,10 @@
       const attr = el.getAttribute("data-i18n-attr");
       const value = t(key);
       if (attr) el.setAttribute(attr, value);
-      else el.textContent = value;
+      else {
+        const textHost = el.querySelector(":scope > .help-label-text") || el;
+        textHost.textContent = value;
+      }
     });
     const info = meta(current);
     document.documentElement.lang = current;
@@ -427,25 +457,31 @@
   }
 
   /**
-   * Returning non-English patrons: if browser (or profile preferredLanguage) is a supported
-   * non-en language and they have not chosen a UI language yet, ask once.
+   * First use: adopt the browser language when supported, otherwise English.
+   * Returning patrons with a profile language keep that choice (wins over this-device localStorage).
+   * Returning patrons with no saved UI language are asked once if the browser is not English.
    */
   async function maybePromptReturningPatron(profile = {}) {
-    if (promptDone()) return;
-    if (storedLanguage()) return;
     const fromProfile = normalizeCode(profile.uiLanguage);
+    const saved = storedLanguage();
     if (fromProfile) {
       await setLanguage(fromProfile, {persist: false, markPrompt: true});
       return;
     }
+    if (saved) {
+      await setLanguage(saved, {persist: true, markPrompt: true});
+      return;
+    }
     const preferred = normalizeCode(profile.languageSettings?.preferredLanguage || profile.preferredLanguage);
     const browser = browserPreferred();
-    const suggested = (preferred && preferred !== "en" ? preferred : "") || (browser !== "en" ? browser : "");
-    if (!suggested || suggested === "en") return;
-    // Already-onboarded signal: has uid / createdAt / memberLevel
+    const suggested = (preferred && preferred !== "en" ? preferred : "") || browser;
+    const firstUse = !promptDone() && !profile.createdAt && !profile.profileCompleted;
+    if (firstUse || !suggested || suggested === "en") {
+      await setLanguage(suggested || "en", {persist: true, markPrompt: true});
+      return;
+    }
     const onboarded = !!(profile.uid || profile.email || profile.memberLevel || profile.createdAt);
     if (!onboarded) {
-      // First visit: adopt browser default quietly
       await setLanguage(suggested, {persist: true, markPrompt: true});
       return;
     }
@@ -460,19 +496,24 @@
 
   async function init(profile = {}) {
     await loadOverrides();
-    const saved = storedLanguage() || normalizeCode(profile.uiLanguage);
-    if (saved) {
-      current = saved;
+    const fromProfile = normalizeCode(profile.uiLanguage);
+    const saved = storedLanguage();
+    if (fromProfile) {
+      current = fromProfile;
+      try { localStorage.setItem(STORAGE_KEY, current); } catch (_) {}
       applyDom();
       return current;
     }
-    const browser = browserPreferred();
-    const firstVisit = !promptDone() && !profile.uiLanguage && !profile.createdAt;
-    if (firstVisit && browser) {
-      current = browser;
-      try { localStorage.setItem(STORAGE_KEY, browser); } catch (_) {}
+    if (saved) {
+      current = saved;
+      applyDom();
+      persistToUser(saved);
+      return current;
     }
+    current = browserPreferred() || "en";
+    try { localStorage.setItem(STORAGE_KEY, current); } catch (_) {}
     applyDom();
+    persistToUser(current);
     return current;
   }
 
@@ -493,4 +534,12 @@
     loadOverrides,
     markPromptDone
   };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      init({}).then(() => applyDom()).catch(() => {});
+    });
+  } else {
+    init({}).then(() => applyDom()).catch(() => {});
+  }
 })(typeof window !== "undefined" ? window : globalThis);

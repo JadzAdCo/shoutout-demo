@@ -5,12 +5,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.106"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.106"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.19"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.19"/>
 </head>
 <body>
 <main class="app admin-shell">
-  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&larr; Back to Search</a>
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
   <section class="page active">
     <header class="topbar">
       <div>
@@ -21,9 +21,9 @@
     </header>
 
     <div id="portalLogin" class="card">
-      <h2 id="portalLoginTitle">Checking sign-in…</h2>
-      <p id="portalLoginHint" class="sub">Looking for your existing FLOQR session. One moment.</p>
-      <button id="portalGoogleLoginBtn" class="hidden" type="button">Continue with Google</button>
+      <h2>Sign in</h2>
+      <p class="sub">Sign in to view and update your patron profile.</p>
+      <button id="portalGoogleLoginBtn" type="button">Continue with Google</button>
     </div>
 
     <div id="portalPanel" class="hidden">
@@ -41,9 +41,9 @@
         <button class="admin-tab" data-panel="portalBartrStore" type="button">BartR Store</button>
         <button class="admin-tab" data-panel="portalMessages" type="button">FloqR Inbox</button>
         <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
-        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?from=portal">Mingl Chat</a>
-        <a class="admin-tab-link buttonlike" href="./services.html?from=portal">Follow Services</a>
-        <a class="admin-tab-link buttonlike" href="./commerce.html?from=portal">Open BartR</a>
+        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat</a>
+        <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal">Follow Services</a>
+        <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal">Open BartR</a>
         <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
       </nav>
 
@@ -57,8 +57,8 @@
         <div class="card">
           <h2>Profile Summary</h2>
           <div id="profileSummary" class="report-block"></div>
-          <p><a href="./role-request.html?from=portal">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
-          <p><a href="./services.html?from=portal">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
+          <p><a href="./role-request.html?v=29.09.8&from=portal">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
+          <p><a href="./services.html?v=29.09.8&from=portal">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
         </div>
       </section>
 
@@ -73,13 +73,7 @@
             <label>FloqR / Mingl handle
               <span class="label-inline-row"><input id="editFloqrHandle" maxlength="28" placeholder="@your_handle"/><button type="button" id="editFloqrHandleHelp" class="floqr-help-popout" aria-label="Help">?</button></span>
             </label>
-            <label class="profile-grid-wide">Mobile #
-              <div class="phone-row mobile-number-row">
-                <select id="editPhoneCountryCode" autocomplete="tel-country-code" aria-label="Country code"></select>
-                <input id="editPhoneNational" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="2025550123" aria-label="Mobile number"/>
-                <input id="editPhone" type="hidden"/>
-              </div>
-            </label>
+            <label>Phone Number <input id="editPhone"/></label>
             <label>Taxi pickup address <input id="editTaxiPickupAddress" autocomplete="street-address" placeholder="Used privately by Pickup"/></label>
             <label>City <input id="editCity"/></label>
             <label>Country <input id="editCountry"/></label>
@@ -253,7 +247,7 @@
       <section id="portalBartrStore" class="admin-panel-section">
         <div class="card">
           <h2>BartR seller backend</h2>
-          <p class="sub small">US patrons and service members only. You manage products here; shoppers discover them on the shared <a href="./commerce.html?from=portal">BartR</a> frontend. FloqR is Merchant of Record; you ship fulfilled orders.</p>
+          <p class="sub small">US patrons and service members only. You manage products here; shoppers discover them on the shared <a href="./commerce.html?v=29.09.8&from=portal">BartR</a> frontend. FloqR is Merchant of Record; you ship fulfilled orders.</p>
           <p id="bartrEligibilityStatus" class="status"></p>
           <div id="bartrStoreSummary" class="report-block"></div>
         </div>
@@ -418,8 +412,12 @@
             </div>
           </div>
           <div class="card nested-card" style="margin-bottom:14px">
-            <h3 data-i18n="app.languageSettings">App language</h3>
-            <p class="sub small" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
+            <h3 data-i18n="app.languageSettings"
+                data-floqr-help-id="help-app-language"
+                data-floqr-help-title="App language"
+                data-floqr-help-body="On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported. Unsupported languages stay in English. After that, this setting and your saved profile language win. Dutch is included with German, French, Spanish, Italian, Portuguese, Russian, Greek, Polish, and Arabic."
+                data-floqr-help-search="dutch|nederlands|app language|browser language|first use language">App language</h3>
+            <p class="sub small" data-keep-visible="true" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
             <label>FloqR webapp language
               <select id="uiAppLanguage"></select>
             </label>
@@ -442,6 +440,7 @@
                 <option value="ru">Russian</option>
                 <option value="el">Greek</option>
                 <option value="pl">Polish</option>
+                <option value="nl">Dutch</option>
               </select>
             </label>
             <label>Tone Preference
@@ -527,22 +526,6 @@
               </select>
             </label>
           </div>
-          <div id="sms-notifications" class="card-subsection sms-privacy-block">
-            <h3>SMS notifications</h3>
-            <p class="sub small" data-keep-visible="true">
-              Opt in to receive FLOQR SMS (text) notifications on the mobile number in your profile.
-              Read the full consent language on the
-              <a href="./sms-consent.html?from=privacy">SMS Consent Grant</a> page before enabling.
-              Reply <strong>STOP</strong> anytime to opt out by text.
-            </p>
-            <label class="consent-checkbox">
-              <input id="privacySmsNotifications" type="checkbox"/>
-              <span>I consent to SMS notifications from FLOQR / Social OS and participating venues for account and service messages I request.</span>
-            </label>
-            <p class="sub small" data-keep-visible="true">
-              <a href="./sms-consent.html?from=privacy#sms-consent-grant">View / grant SMS consent →</a>
-            </p>
-          </div>
           <div class="card-subsection">
             <h3>Public Datapoints for Mingl and Matching</h3>
             <div id="privacyDatapointChoices" class="privacy-datapoint-grid"></div>
@@ -574,8 +557,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.124"></script>
-<script src="./global-profile-status.js?v=29.09.124"></script>
+<script src="./floqr-nav.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=29.09.8"></script>
 <script src="./shared-data.js?v=29.09.8"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
@@ -585,20 +568,18 @@
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./floqai-help-repository.js?v=29.09.100"></script>
+<script src="./help-attach.js?v=29.09.100"></script>
+<script src="./helper-popouts.js?v=29.09.100"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
-  <script src="./phone-country-codes.js?v=29.09.103"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=29.09.13"></script>
+<script src="./floqr-i18n.js?v=29.09.100"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.124"></script>
+<script src="./patron-portal-app.js?v=29.09.100"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    window.FLOQRNav?.stampAppAnchors?.();
-    window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
-  });
+  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>
 </body>
 </html>

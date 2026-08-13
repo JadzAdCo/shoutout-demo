@@ -130,7 +130,7 @@
 
   if (!window.firebaseConfig) { setText("portalStatus", "firebase-config.js missing window.firebaseConfig."); return; }
 
-  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+  firebase.initializeApp(window.firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
   const storage = firebase.storage();
@@ -197,95 +197,13 @@
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
-      if (map[tab] === "portalPrivacy" && location.hash === "#sms-notifications") {
-        setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 120);
-      }
     }
   }
 
   async function loginGoogle() {
-    try {
-      setText("portalStatus", "Opening Google sign-in...");
-      await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    } catch (e) {
-      setText("portalStatus", `${e.code || "error"}: ${e.message}`);
-    }
+    try { setText("portalStatus", "Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+    catch(e) { setText("portalStatus", `${e.code || "error"}: ${e.message}`); }
   }
-
-  function applyPortalAuthUi(user) {
-    const login = byId("portalLogin");
-    const panel = byId("portalPanel");
-    const googleBtn = byId("portalGoogleLoginBtn");
-    const title = byId("portalLoginTitle");
-    const hint = byId("portalLoginHint");
-    if (!login || !panel) return false;
-    if (!user) {
-      login.classList.remove("hidden");
-      panel.classList.add("hidden");
-      if (title) title.textContent = "Sign in";
-      if (hint) hint.textContent = "Sign in to view and update your patron profile.";
-      googleBtn?.classList.remove("hidden");
-      setText("portalStatus", "Please sign in to continue.");
-      return true;
-    }
-    login.classList.add("hidden");
-    panel.classList.remove("hidden");
-    googleBtn?.classList.add("hidden");
-    setText("portalStatus", "");
-    return true;
-  }
-
-  function syncPortalAuthFromFirebase(reason = "") {
-    const user = auth.currentUser;
-    applyPortalAuthUi(user);
-    return user;
-  }
-
-  function bootPortalForUser(user) {
-    try {
-      applyPortalAuthUi(user);
-      if (!user) return;
-      handleMemberConnectReturn();
-      loadPortal(user).catch(err => {
-        setText("portalStatus", err?.message || "Could not load your profile.");
-        // Keep the signed-in shell visible even if profile load fails.
-        applyPortalAuthUi(auth.currentUser);
-      });
-    } catch (err) {
-      console.warn("[patron-portal] bootPortalForUser failed", err);
-      applyPortalAuthUi(auth.currentUser);
-      setText("portalStatus", err?.message || "Could not open your profile shell.");
-    }
-  }
-
-  // Wire auth immediately. Also re-sync from currentUser so the Sign-in card cannot
-  // stay visible when the global profile avatar already shows a signed-in member.
-  auth.onAuthStateChanged(user => bootPortalForUser(user));
-  const finishAuthGate = () => {
-    const user = syncPortalAuthFromFirebase("auth-gate");
-    if (user) bootPortalForUser(user);
-  };
-  if (typeof auth.authStateReady === "function") {
-    auth.authStateReady().then(finishAuthGate).catch(finishAuthGate);
-  } else {
-    setTimeout(finishAuthGate, 500);
-  }
-  window.addEventListener("floqr:profile-access-ready", () => {
-    const user = syncPortalAuthFromFirebase("profile-access-ready");
-    if (user) bootPortalForUser(user);
-  });
-  let authSyncTries = 0;
-  const authSyncTimer = setInterval(() => {
-    authSyncTries += 1;
-    const user = auth.currentUser;
-    const login = byId("portalLogin");
-    if (user && login && !login.classList.contains("hidden")) {
-      bootPortalForUser(user);
-    }
-    if (authSyncTries >= 20 || (user && login?.classList.contains("hidden"))) {
-      clearInterval(authSyncTimer);
-    }
-  }, 250);
 
   async function logout() { await auth.signOut(); window.location.href = window.FLOQRNav?.searchHome() || "./?v=29.09.8&start=search"; }
 
@@ -669,16 +587,7 @@
     byId("editLastName").value = profile.lastName || "";
     byId("editDisplayName").value = profile.displayName || user.displayName || "";
     byId("editFloqrHandle").value = window.FLOQRIdentity?.floqrHandleFromProfile?.(profile) || "";
-    const phoneRaw = profile.phone || profile.mobile || user.phoneNumber || "";
-    const split = window.FLOQRPhoneCountries?.splitPhone?.(phoneRaw) || {dial: "+1", national: String(phoneRaw || "").replace(/[^\d]/g, "")};
-    const countrySel = byId("editPhoneCountryCode");
-    if (countrySel && window.FLOQRPhoneCountries?.populateSelect) {
-      window.FLOQRPhoneCountries.populateSelect(countrySel, split.dial || profile.phoneCountryCode || "+1");
-    } else if (countrySel && split.dial) {
-      countrySel.value = split.dial;
-    }
-    if (byId("editPhoneNational")) byId("editPhoneNational").value = split.national || profile.phoneNationalNumber || "";
-    if (byId("editPhone")) byId("editPhone").value = phoneRaw;
+    byId("editPhone").value = profile.phone || user.phoneNumber || "";
     if (byId("editTaxiPickupAddress")) byId("editTaxiPickupAddress").value = profile.taxiPickupAddress || profile.pickupAddress || "";
     byId("editCity").value = profile.city || "";
     byId("editCountry").value = profile.country || "";
@@ -710,16 +619,10 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
-    if (byId("privacySmsNotifications")) {
-      byId("privacySmsNotifications").checked = !!(profile.smsNotificationConsent || profile.marketingSmsConsent);
-    }
     if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
-    if (location.hash === "#sms-notifications") {
-      setTimeout(() => byId("sms-notifications")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
-    }
   }
 
   function connectStatusMessage(result = {}) {
@@ -963,21 +866,13 @@
       return;
     }
     const username = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("editFloqrHandle").value, {requireAt:false}) || "";
-    const phoneDial = byId("editPhoneCountryCode")?.value || "+1";
-    const phoneNational = String(byId("editPhoneNational")?.value || "").replace(/[^\d]/g, "");
-    const mobileE164 = window.FLOQRPhoneCountries?.joinPhone?.(phoneDial, phoneNational)
-      || (phoneNational ? `${phoneDial}${phoneNational}` : "");
-    if (byId("editPhone")) byId("editPhone").value = mobileE164;
     const updates = {
       firstName: byId("editFirstName").value.trim(),
       lastName: byId("editLastName").value.trim(),
       displayName: byId("editDisplayName").value.trim(),
       floqrHandle,
       username,
-      phone: mobileE164,
-      mobile: mobileE164,
-      phoneCountryCode: phoneDial,
-      phoneNationalNumber: phoneNational,
+      phone: byId("editPhone").value.trim(),
       taxiPickupAddress:byId("editTaxiPickupAddress")?.value.trim() || "",
       city: byId("editCity").value.trim(),
       country: byId("editCountry").value.trim(),
@@ -1051,16 +946,12 @@
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
-      smsNotificationConsent: !!byId("privacySmsNotifications")?.checked,
-      smsNotificationConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
-      smsNotificationConsentSource: "patron-portal-privacy",
       birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
       birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
-    if (prefs.smsNotificationConsent) prefs.marketingSmsConsent = true;
     await db.collection("users").doc(user.uid).set(prefs, {merge:true});
     await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...prefs, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
     setText("portalStatus", "Privacy preferences saved.");
@@ -1547,33 +1438,6 @@
     };
   }
 
-  function inboxRelatedLinkLabel(message = {}) {
-    const type = String(message.type || message.messageType || "").toLowerCase();
-    const subject = String(message.subject || message.title || "").toLowerCase();
-    const body = String(message.body || "").toLowerCase();
-    const link = String(message.link || "").toLowerCase();
-    const hay = `${type} ${subject} ${body} ${link}`;
-    if (/supr\s*star|suprstar|suprstr/.test(hay) || link.includes("suprstar-preview")) {
-      return "Open related supRstar";
-    }
-    if (/mingl/.test(hay) || link.includes("mingl-chat")) {
-      return "Open related Mingl";
-    }
-    if (/display access|security|token_missing|access denied/.test(hay)) {
-      return "Open related details";
-    }
-    if (/bartr|commerce|order/.test(hay) || link.includes("commerce")) {
-      return "Open related BartR order";
-    }
-    if (/rydr|pickup/.test(hay) || link.includes("pickup")) {
-      return "Open related RydR";
-    }
-    if (/shoutout|shout-out/.test(hay) || link.includes("shoutout") || link.includes("tab=shoutouts")) {
-      return "Open related ShoutOut";
-    }
-    return "Open related item";
-  }
-
   function renderMessages(messages, user) {
     currentMessages = messages
       .filter(x => !x.deleted)
@@ -1598,7 +1462,7 @@
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">${esc(inboxRelatedLinkLabel(x))}</a></p>` : ""}
+      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
         ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
         ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
@@ -2923,6 +2787,10 @@
       await ref.set({displayName:user.displayName || "", email:user.email || "", photoURL:user.photoURL || "", memberLevel:"Patron", createdAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     }
 
+    try {
+      await window.FLOQRI18n?.init?.(currentProfile);
+      window.FLOQRI18n?.applyDom?.();
+    } catch (_) {}
     fillProfileForm(profile, user);
     renderMediaSlots(profile);
     renderProfilePreview(profile, user);
@@ -3044,7 +2912,6 @@
     }
     byId("privacyReport").innerHTML = simpleRows([
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
-      ["SMS notification consent", profile.smsNotificationConsent || profile.marketingSmsConsent ? "Yes" : "No"],
       ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
       ["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"],
       ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]
@@ -3098,12 +2965,7 @@
     });
   }
 
-  function whenDomReady(fn) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn, {once: true});
-    else fn();
-  }
-
-  whenDomReady(() => {
+  document.addEventListener("DOMContentLoaded", () => {
     setupTabs();
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("saveProfileBtn", saveProfile);
@@ -3211,7 +3073,18 @@
       button.addEventListener("click", () => insertPortalEmoji(button.dataset.portalMinglEmoji || ""));
     });
 
-    // DOM may not have existed on the first auth event — re-apply visibility only.
-    applyPortalAuthUi(auth.currentUser);
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        byId("portalLogin").classList.remove("hidden");
+        byId("portalPanel").classList.add("hidden");
+        setText("portalStatus", "Please sign in to continue.");
+        return;
+      }
+      byId("portalLogin").classList.add("hidden");
+      byId("portalPanel").classList.remove("hidden");
+      setText("portalStatus", "");
+      handleMemberConnectReturn();
+      loadPortal(user);
+    });
   });
 })();
