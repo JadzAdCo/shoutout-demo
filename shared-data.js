@@ -3,16 +3,15 @@
   Truth source for demo categories, templates, club locations, and demo events.
   New model: club/location records are unique. A brand can have many locations.
 */
-/* Master Admin = Super Admin (hard-coded platform owners). */
 window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
+  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
 
-/* Super Admin is the same set as Master Admin. */
+/* Super Admin = primary Master Admin; exempt from global patron feature disables and offboard/disable via entity tools. */
 window.SHOUTOUT_SUPER_ADMIN_EMAILS = [
-  "bans.don@gmail.com",
-  "don.b@jadzholdings.com"
+  "bands.don@gmail.com"
 ];
 
 /*
@@ -49,6 +48,7 @@ window.FLOQR_AI_GRAMMAR_FUNCTION = "aiSuggestGrammarCorrection";
 window.FLOQR_OBSOLETE_LOCATION_IDS = ["heist-houston-tx", "heist-houston", "heist-houston-texas"];
 
 window.SHOUTOUT_ADMIN_EMAILS = [
+  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
@@ -83,6 +83,68 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     primaryDisplayScreenFormatId:"p125-96x48",
     active:true
   },
+  "temp-democlub-1": {
+    brandName:"Temp Demo Club 1", locationName:"Temp Demo Club 1", type:"club",
+    categories:["Clubs","Lounge","Nightlife","Events","ShoutOut","QA Demo"],
+    country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
+    streetAddress:"1001 Demo Plaza NW", postalCode:"20001",
+    locationLabel:"Washington, District of Columbia",
+    brand:"TEMP DEMO CLUB 1 x FLOQR",
+    defaultMain:"USE ShoutOut @ TEMP DEMO 1", defaultSub:"QA Venue",
+    tagline:"Full-profile demo venue 1 for FLOQR scheduling, hail a waitress, and featured genre nights.",
+    description:"Full-profile demo venue 1 for FLOQR scheduling, hail a waitress, and featured genre nights. Hours use atomic hour / minute / AM|PM datapoints.",
+    genres:["Hip Hop","Open Format","House"], artists:["Temp DJ 1","Temp DJ Guest"],
+    artistsOrDjs:["Temp DJ 1","Temp DJ Guest"],
+    promoters:["Temp Promoter 1 Collective"],
+    amenities:["VIP tables","Bottle service","Coat check","Dance floor"],
+    agePolicy:"21+",
+    dressCode:"Upscale / smart casual",
+    cuisine:"Nightlife small plates",
+    telephone:"+12025550101",
+    email:"temp_clubadmin_1@floqr-demo.com",
+    officialWebsite:"https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1",
+    socialMediaHandles:{instagram:"@tempdemoclub1", facebook:"", x:"@tempdemoclub1", tiktok:"@tempdemoclub1", floqrHandle:"@tempdemoclub1"},
+    logoUrl:"./images/temp-qa/club-1-logo.svg",
+    mainImageUrl:"./images/temp-qa/club-1-venue.svg",
+    mainMediaUrl:"./images/temp-qa/club-1-venue.svg",
+    mainMediaType:"image",
+    publicGallery:[
+      {mediaUrl:"./images/temp-qa/club-1-gallery-a.svg", mediaType:"image", slotType:"gallery", title:"VIP Room", galleryOrder:1},
+      {mediaUrl:"./images/temp-qa/club-1-gallery-b.svg", mediaType:"image", slotType:"gallery", title:"Entrance", galleryOrder:2}
+    ],
+    featuredDjs:[
+      {name:"Temp DJ 1", role:"Resident DJ", email:"temp_dj_1@floqr-demo.com", photoUrl:"./images/temp-qa/dj-1.svg", bio:"QA resident DJ for Temp Demo Club 1.", instagram:"@temp_dj_1"},
+      {name:"Temp DJ Guest", role:"Guest DJ", email:"temp_dj_guest_1@floqr-demo.com", photoUrl:"./images/temp-qa/dj-1.svg", bio:"Rotating guest talent for QA nights."}
+    ],
+    featuredStaff:[
+      {name:"Temp Waitress 1", role:"Waitress", email:"temp_waitress_1@floqr-demo.com", photoUrl:"./images/temp-qa/waitress-1.svg", bio:"QA service staff — hail a waitress flows."},
+      {name:"Temp Waiter 1", role:"Waiter", email:"temp_waiter_1@floqr-demo.com", photoUrl:"./images/temp-qa/waiter-1.svg", bio:"QA floor service for VIP tables."},
+      {name:"Temp Bottle 1", role:"Bottle Service", email:"temp_bottle_1@floqr-demo.com", photoUrl:"./images/temp-qa/bottle-1.svg", bio:"QA bottle service specialist."}
+    ],
+    promotionGroups:[
+      {name:"Temp Promoter 1 Collective", role:"Promotion Group", email:"temp_promoter_1@floqr-demo.com", photoUrl:"./images/temp-qa/promoter-1.svg", bio:"QA promotion group for guest list and genre nights."}
+    ],
+    hours:"Thu–Sat 22:00–03:00",
+    hoursStructured:{
+      sun:{closed:true,open:"",close:""},
+      mon:{closed:true,open:"",close:""},
+      tue:{closed:true,open:"",close:""},
+      wed:{closed:true,open:"",close:""},
+      thu:{closed:false,open:"22:00",close:"03:00"},
+      fri:{closed:false,open:"22:00",close:"03:00"},
+      sat:{closed:false,open:"22:00",close:"03:00"}
+    },
+    hoursExceptions:[],
+    timeZone:"America/New_York",
+    activityStatus:"Demo Club Admin training venue",
+    activityDates:["Friday Demo Night","Saturday Demo Night"],
+    templates:["birthday","vip","bottle","neon"],
+    demo:true, isDemo:true, qaTemp:true, staffSchedulingPaid:1,
+    displayScreenFormatIds:["led-96x48","led-64x32"],
+    primaryDisplayScreenFormatId:"led-96x48",
+    publicProfilePublished:true, visibility:"public",
+    active:true
+  },
   "heist-washington-dc": {
     brandName:"Heist", locationName:"Heist Washington DC", type:"club",
     categories:["Clubs","Lounge","Nightlife","Events","ShoutOut"],
@@ -111,7 +173,6 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     screenFormatId:"led-64x32",
     ledPanel:{width:64,height:32,widthCm:64,heightCm:32,pixelWidth:416,pixelHeight:208,formatId:"led-64x32",label:"64 x 32 cm"},
     displayFooterBrand:"FLOQR ShoutOut",
-    suprstarLiveDurationSeconds:90,
     active:true
   },
   "gaia-supperclub-washington-dc": {
@@ -200,18 +261,11 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     categories:["Clubs","Retro","Nightlife","Events","ShoutOut"],
     country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
     streetAddress:"1219 Connecticut Avenue NW", postalCode:"20036",
-    fullAddress:"1219 Connecticut Avenue NW, Washington, DC 20036, United States",
     locationLabel:"Washington, District of Columbia, United States",
     telephone:"+12026507326",
     phoneDisplay:"(202) 650-7326",
     officialWebsite:"https://decadesdc.com/",
-    eventsUrl:"https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-    eventsUrlAliases:[
-      "https://decadesdc.com/weekly-events/",
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/"
-    ],
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    bottleServiceUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
+    eventsUrl:"https://decadesdc.com/weekly-events/",
     logoUrl:"https://decadesdc.com/wp-content/uploads/2024/02/Logo-p-500x97-1-1.png",
     mainMediaUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/02/722A8852.jpg?ssl=1",
     mainMediaType:"image",
@@ -220,22 +274,11 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     defaultMain:"USE ShoutOut @ DECADES", defaultSub:"Connecticut Ave",
     tagline:"DC's only multi-level retro nightclub",
     description:"Located in the heart of Dupont Circle / Connecticut Ave, Decades is a 15,000 sq ft retro-themed nightclub with 6 floors, 8 bars, and 5 DJs — plus a retractable rooftop, VIP passes, bottle service, and weekly themed nights (Summer Beach Club, Fridays, Saturdays, Sueño Sundays).",
-    genres:["Hip Hop","Top 40","Throwbacks","EDM","House","Reggaeton","Techno","International"],
-    artists:["Decades resident DJs","Guest DJs","DCClubbing DJs"],
-    featuredDjs:["Decades resident DJs (5 rooms)","Guest DJs (Saturdays)","DCClubbing DJs (Summer Beach Club)"],
-    promoters:["DCClubbing","Decades","Decades DC","EG Productions","City Socials"],
-    amenities:["6 floors","8 bars","5 DJs","Retractable rooftop","VIP passes","Bottle service","Private events","Birthday experiences","Free entry with VIP RSVP"],
+    genres:["Hip Hop","Top 40","Throwbacks","EDM","House","Reggaeton","Techno","International"], artists:["5 DJs","Guest DJs"],
+    amenities:["6 floors","8 bars","5 DJs","Retractable rooftop","VIP passes","Bottle service","Private events","Birthday experiences"],
     hours:"Event-driven (typically Thu–Sun late night; confirm each event)",
     activityStatus:"Active multi-level retro nightclub — weekly Beach Club / Fridays / Saturdays / Sueño Sundays",
     activityDates:["Thu Summer Beach Club (18+)","Fri Fridays at Decades (21+)","Sat Saturdays at Decades (21+)","Sun Sueño Sundays rooftop"],
-    weeklyLineupSummary:"Thu Summer Beach Club (DCClubbing, 18+) · Fri Fridays at Decades (21+) · Sat Saturdays at Decades / guest DJs (21+) · Sun Sueño Sundays rooftop (EG Productions x City Socials)",
-    sourceUrls:[
-      "https://decadesdc.com/",
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/weekly-events/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-      "https://posh.vip/e/sueo-decades-58"
-    ],
     templates:["hiphop","edm","vip","bottle","neon","birthday"],
     onboardingSource:"website-extract-decadesdc.com",
     active:true
@@ -718,6 +761,112 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
 
 };
 
+(function seedTempDemoClubs(locations) {
+  const template = locations["temp-democlub-1"] || {};
+  const asset = (n, file) => `./images/temp-qa/${file.replace("{n}", String(n))}`;
+  for (let n = 1; n <= 10; n += 1) {
+    const id = `temp-democlub-${n}`;
+    const base = n === 1 ? template : {...template};
+    const streetNum = 1000 + n;
+    locations[id] = {
+      ...base,
+      brandName: `Temp Demo Club ${n}`,
+      locationName: `Temp Demo Club ${n}`,
+      brand: `TEMP DEMO CLUB ${n} x FLOQR`,
+      defaultMain: `USE ShoutOut @ TEMP DEMO ${n}`,
+      defaultSub: "QA Venue",
+      tagline: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights.`,
+      description: `Full-profile demo venue ${n} for FLOQR scheduling, hail a waitress, and featured genre nights. Hours use atomic hour / minute / AM|PM datapoints.`,
+      streetAddress: `${streetNum} Demo Plaza NW`,
+      postalCode: "20001",
+      telephone: `+12025550${String(100 + n).slice(-3)}`,
+      email: `temp_clubadmin_${n}@floqr-demo.com`,
+      officialWebsite: `https://jadzadco.github.io/shoutout-demo/club-profile.html?location=${id}`,
+      socialMediaHandles: {
+        instagram: `@tempdemoclub${n}`,
+        facebook: "",
+        x: `@tempdemoclub${n}`,
+        tiktok: `@tempdemoclub${n}`,
+        floqrHandle: `@tempdemoclub${n}`
+      },
+      logoUrl: asset(n, "club-{n}-logo.svg"),
+      mainImageUrl: asset(n, "club-{n}-venue.svg"),
+      mainMediaUrl: asset(n, "club-{n}-venue.svg"),
+      mainMediaType: "image",
+      publicGallery: [
+        {mediaUrl: asset(n, "club-{n}-gallery-a.svg"), mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 1},
+        {mediaUrl: asset(n, "club-{n}-gallery-b.svg"), mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 2}
+      ],
+      artists: [`Temp DJ ${n}`, "Temp DJ Guest"],
+      artistsOrDjs: [`Temp DJ ${n}`, "Temp DJ Guest"],
+      promoters: [`Temp Promoter ${n} Collective`],
+      featuredDjs: [
+        {
+          name: `Temp DJ ${n}`,
+          role: "Resident DJ",
+          email: `temp_dj_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "dj-{n}.svg"),
+          bio: `QA resident DJ for Temp Demo Club ${n}.`,
+          instagram: `@temp_dj_${n}`
+        },
+        {
+          name: "Temp DJ Guest",
+          role: "Guest DJ",
+          email: `temp_dj_guest_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "dj-{n}.svg"),
+          bio: "Rotating guest talent for QA nights."
+        }
+      ],
+      featuredStaff: [
+        {
+          name: `Temp Waitress ${n}`,
+          role: "Waitress",
+          email: `temp_waitress_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "waitress-{n}.svg"),
+          bio: "QA service staff — hail a waitress flows."
+        },
+        {
+          name: `Temp Waiter ${n}`,
+          role: "Waiter",
+          email: `temp_waiter_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "waiter-{n}.svg"),
+          bio: "QA floor service for VIP tables."
+        },
+        {
+          name: `Temp Bottle ${n}`,
+          role: "Bottle Service",
+          email: `temp_bottle_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "bottle-{n}.svg"),
+          bio: "QA bottle service specialist."
+        },
+        {
+          name: `Temp Club Admin ${n}`,
+          role: "Club Admin",
+          email: `temp_clubadmin_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "admin-{n}.svg"),
+          bio: `QA Club Admin mapped to ${id}.`
+        }
+      ],
+      promotionGroups: [
+        {
+          name: `Temp Promoter ${n} Collective`,
+          role: "Promotion Group",
+          email: `temp_promoter_${n}@floqr-demo.com`,
+          photoUrl: asset(n, "promoter-{n}.svg"),
+          bio: "QA promotion group for guest list and genre nights."
+        }
+      ],
+      demo: true,
+      isDemo: true,
+      qaTemp: true,
+      staffSchedulingPaid: 1,
+      publicProfilePublished: true,
+      visibility: "public",
+      active: true
+    };
+  }
+})(window.SHOUTOUT_CLUB_LOCATIONS);
+
 window.SHOUTOUT_EVENTS = {
   "shoko-fucking-monday-2026-07-27": {
     eventName:"FUCKING MONDAY BY SHÔKO MONDAZE", locationId:"shoko-barcelona-spain",
@@ -837,173 +986,61 @@ window.SHOUTOUT_EVENTS = {
     eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"23:00-Late", active:true,
     ticketUrl:"#"
   },
-  "decades-summer-beach-club-2026-07-30": {
+  "decades-summer-beach-club-2026-07-23": {
     eventName:"Summer Beach Club", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Throwbacks","Hip Hop","Top 40","90s","2000s","2010s"],
-    artists:["DCClubbing DJs","Decades resident DJs"],
-    featuredDjs:["DCClubbing DJs"],
-    presentedBy:["DCClubbing"],
-    promoters:["DCClubbing"],
-    description:"Throwback Thursday mid-week escape — ’90s / ’00s / ’10s classics. VIP RSVP grants free entry + first drink on the house (entry valid until 11:00 PM for 18+, before 11:30 PM for 21+).",
-    eventDate:"2026-07-30", eventDay:"Thursday", eventTime:"10:00 PM",
-    entryCutoffNotes:"VIP free entry until 11:00 PM (18+) / before 11:30 PM (21+)",
-    agePolicy:"18+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    bottleServiceUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    genres:["Throwbacks","Hip Hop","Top 40"], artists:["DCClubbing DJs"],
+    eventDate:"2026-07-23", eventDay:"Thursday", eventTime:"10:00 PM",
+    agePolicy:"18+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
   },
-  "decades-fridays-2026-07-31": {
-    eventName:"Fridays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+  "decades-jello-shot-night-2026-07-24": {
+    eventName:"Jell-O Shot Night", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Hip Hop","Throwbacks","90s","2000s","2010s"],
-    artists:["Decades resident DJs"],
-    featuredDjs:["Decades resident DJs"],
-    presentedBy:["Decades"],
-    promoters:["Decades"],
-    description:"Weekend kickoff inspired by the cult-classic Friday — 90s / 2000s / 2010s Hip-Hop anthems. VIP RSVP grants free entry until 12:30 AM plus drink specials.",
-    eventDate:"2026-07-31", eventDay:"Friday", eventTime:"10:00 PM",
-    entryCutoffNotes:"VIP free entry until 12:30 AM",
-    agePolicy:"21+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    bottleServiceUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    genres:["Hip Hop","Throwbacks","Top 40"], artists:["Decades DJs"],
+    eventDate:"2026-07-24", eventDay:"Friday", eventTime:"10:00 PM",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
   },
-  "decades-saturdays-2026-08-01": {
-    eventName:"Saturdays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
+  "decades-ladies-night-2026-07-25": {
+    eventName:"Pretty Girls Like to Party — Ladies Night", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Hip Hop","EDM","Open Format","Guest DJs"],
-    artists:["Guest DJs","Decades resident DJs"],
-    featuredDjs:["Guest DJs","Decades resident DJs"],
-    presentedBy:["Decades DC"],
-    promoters:["Decades DC"],
-    description:"Legendary Saturday nights with themed parties and special guest DJs. VIP RSVP grants free entry until 11:30 PM plus VIP drink specials.",
-    eventDate:"2026-08-01", eventDay:"Saturday", eventTime:"9:30 PM",
-    entryCutoffNotes:"VIP free entry until 11:30 PM",
-    agePolicy:"21+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    bottleServiceUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    genres:["Hip Hop","Open Format","Top 40"], artists:["Decades DJs"],
+    eventDate:"2026-07-25", eventDay:"Saturday", eventTime:"9:30 PM",
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/", active:true
   },
   "decades-summer-beach-club-weekly": {
     eventName:"Summer Beach Club", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Throwbacks","Hip Hop","Top 40","90s","2000s","2010s"],
-    artists:["DCClubbing DJs","Decades resident DJs"],
-    featuredDjs:["DCClubbing DJs"],
-    presentedBy:["DCClubbing"],
-    promoters:["DCClubbing"],
-    description:"Recurring throwback Thursday at Decades — ’90s / ’00s / ’10s. Presented by DCClubbing. VIP pass / RSVP for free entry + drink specials.",
+    genres:["Throwbacks","Hip Hop","Top 40"], artists:["DCClubbing DJs"],
     eventDate:"Recurring Thursday", eventDay:"Thursday", eventTime:"Late",
-    entryCutoffNotes:"VIP free entry until 11:00 PM (18+) / before 11:30 PM (21+)",
-    agePolicy:"18+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    eventsPageUrl:"https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    agePolicy:"18+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/beachclub-ig-1.jpg?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
   },
   "decades-fridays": {
     eventName:"Fridays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Hip Hop","Throwbacks","90s","2000s","2010s"],
-    artists:["Decades resident DJs"],
-    featuredDjs:["Decades resident DJs"],
-    presentedBy:["Decades"],
-    promoters:["Decades"],
-    description:"Recurring Friday night Hip-Hop throwbacks (90s–2010s). VIP RSVP for free entry until 12:30 AM and drink specials.",
+    genres:["Hip Hop","Throwbacks","90s","2000s","2010s"], artists:["Decades DJs"],
     eventDate:"Recurring Friday", eventDay:"Friday", eventTime:"Late",
-    entryCutoffNotes:"VIP free entry until 12:30 AM",
-    agePolicy:"21+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    eventsPageUrl:"https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/JELLOSHOT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
   },
   "decades-saturdays": {
     eventName:"Saturdays at Decades", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    genres:["Hip Hop","EDM","Open Format","Guest DJs"],
-    artists:["Guest DJs","Decades resident DJs"],
-    featuredDjs:["Guest DJs","Decades resident DJs"],
-    presentedBy:["Decades DC"],
-    promoters:["Decades DC"],
-    description:"Recurring Saturday nights with themed parties and special guest DJs. VIP RSVP for free entry until 11:30 PM and VIP drink specials.",
+    genres:["Hip Hop","EDM","Open Format","Guest DJs"], artists:["Guest DJs","Decades DJs"],
     eventDate:"Recurring Saturday", eventDay:"Saturday", eventTime:"Late",
-    entryCutoffNotes:"VIP free entry until 11:30 PM",
-    agePolicy:"21+",
-    flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
-    ticketUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    vipPassUrl:"https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/",
-    eventsPageUrl:"https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://decadesdc.com/vip-passes-exclusive-decades-nightclubdc-freeentry/"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    agePolicy:"21+", flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2026/07/LADIESNIGHT-IG.png?ssl=1",
+    ticketUrl:"https://decadesdc.com/weekly-events/", active:true
   },
   "decades-sueno-sundays": {
     eventName:"Sueño Sundays", locationId:"decades-washington-dc", clubLocationId:"decades-washington-dc",
     country:"United States", region:"District of Columbia", city:"Washington",
-    streetAddress:"1219 Connecticut Avenue NW",
-    venueSpace:"Rooftop",
-    genres:["International","Techno","Reggaeton","Top 40"],
-    artists:["Sueño / City Socials DJs","Guest DJs"],
-    featuredDjs:["Sueño / City Socials DJs","Guest DJs"],
-    presentedBy:["EG Productions","City Socials"],
-    promoters:["EG Productions","City Socials"],
-    description:"Wrap the weekend on the Decades rooftop — international, techno, reggaeton, and Top 40. Presented by EG Productions x City Socials. Tickets / RSVP on Posh.",
+    genres:["International","Techno","Reggaeton","Top 40"], artists:["EG Productions","City Socials"],
     eventDate:"Recurring Sunday", eventDay:"Sunday", eventTime:"Rooftop late",
-    agePolicy:"21+",
     flyerUrl:"https://i0.wp.com/decadesdc.com/wp-content/uploads/2024/08/SUENO-FEATURED.jpg?ssl=1",
-    ticketUrl:"https://posh.vip/e/sueo-decades-58",
-    externalTicketProvider:"posh",
-    eventsPageUrl:"https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-    sourceUrls:[
-      "https://decadesdc.com/weekly-events-decades-dc-events-decades-dc/",
-      "https://posh.vip/e/sueo-decades-58"
-    ],
-    onboardingSource:"website-extract-decadesdc.com",
-    active:true
+    ticketUrl:"https://posh.vip/e/sueo-decades-58", active:true
   },
   "mayflower-friday-late": {
     eventName:"Mayflower Friday Dinner & Late Night", locationId:"mayflower-washington-dc", clubLocationId:"mayflower-washington-dc",
@@ -1078,8 +1115,8 @@ window.SHOUTOUT_EVENTS = {
   Remove this exception in production.
 */
 window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS = [
-  "bans.don@gmail.com",
-  "don.b@jadzholdings.com"
+  "bands.don@gmail.com",
+  "bans.don@gmail.com"
 ];
 
 
@@ -1196,7 +1233,7 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
   blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR ShoutOut so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
-  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', textProfileId:'birthdayMedia', screenFormatIds:['p125-96x48','led-96x48','p125-64x48','led-64x48','p125-64x32','led-64x32'], defaultMain:'HAPPY BIRTHDAY', defaultSub:'', defaultMediaFit:'cover', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, hideSecondary:true, mediaColumnScale:1.2, primaryTextScale:1.15, description:'Birthday media rule notes: On 96×48, split layout with cover-filled media (~60/40), no secondary line, FloqR burst card, 45-char main (3×15). On 64×48 (boxed) and 64×32 (landscape), picture and verbiage rotate fullscreen in a loop; text is 4 lines sized for ~4 m LED readability; photos use contain with a decorative slot background so they are not stretched ugly.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration","45 characters","floqr card","burst animation","no secondary","identity rail","96x48","64x48","64x32","rotate","cover","4 lines"] },
+  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
   anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
   engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
   fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
@@ -1481,17 +1518,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."}
     }
   },
-  birthdayMedia: {
-    label:"Birthday media with FloqR card / rotate on compact panels",
-    formats:{
-      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:54,displayMode:"split"},
-      "p125-64x48": {supported:true,lineCount:4,maxCharactersPerLine:8,maxMainCharacters:32,maxSubCharacters:20,minimumFontPixels:56,displayMode:"rotate",advice:"64×48 boxed: picture and message rotate fullscreen; 4×8 for ~4 m LED readability."},
-      "p125-64x32": {supported:true,lineCount:4,maxCharactersPerLine:10,maxMainCharacters:40,maxSubCharacters:20,minimumFontPixels:48,displayMode:"rotate",advice:"64×32 landscape: picture and message rotate fullscreen; 4×10 for ~4 m LED readability."},
-      "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:44,displayMode:"split"},
-      "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:8,maxMainCharacters:32,maxSubCharacters:20,minimumFontPixels:52,displayMode:"rotate",advice:"64×48 boxed: picture and message rotate fullscreen; 4×8 for ~4 m LED readability."},
-      "led-64x32": {supported:true,lineCount:4,maxCharactersPerLine:10,maxMainCharacters:40,maxSubCharacters:20,minimumFontPixels:44,displayMode:"rotate",advice:"64×32 landscape: picture and message rotate fullscreen; 4×10 for ~4 m LED readability."}
-    }
-  },
   car: {
     label:"Illustrated car message",
     formats:{
@@ -1544,11 +1570,10 @@ window.FLOQRTextLayout = {
     const id = String(template.id || "");
     if (template.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || template.jerseyNumberField) return "soccerJersey";
     if (template.textOverlay === true) return "textOverlayFrame";
-    if (id === "birthdayMedia" || template.textProfileId === "birthdayMedia") return "birthdayMedia";
+    if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
     if (id === "car" || template.className === "car") return "car";
     if (template.layout === "split-media") return "splitMedia";
-    if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
     return String(template.textProfileId || "full");
   },
   resolve(templateOrId = {}, formatId = "") {
