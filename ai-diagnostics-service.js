@@ -1,4 +1,4 @@
-/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.123 */
+/* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.9 */
 (function () {
   "use strict";
 
@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.130";
-  const PREVIEW_LINKS_PACKAGE = "29.09.130";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
+  const PREVIEW_LINKS_PACKAGE = "29.09.52";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -879,68 +879,10 @@
         {label:"Script cache bust", file:"index.html", includes:["intent-search.js?v=29.09.9", "patron-app.js?v=29.09.9"]},
         {label:"Master Admin cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.9", "floqr-nav.js?v=29.09.9"]}
       ]
-    },
-    {
-      version:"v29.09.123",
-      title:"Demo accounts + structured hours + scheduling QA diagnostics",
-      checks:[
-        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.123\""]},
-        {label:"Manual tests include demo seed + scheduling + hours", file:"ai-diagnostics-service.js", includes:["v29-09-123-demo-accounts-seed", "v29-09-123-democlub1-scheduling", "troubleshoot"]},
-        {label:"Demo Accounts Master Admin tab", file:"master-admin.html", includes:["data-panel=\"demoAccounts\"", "master-admin-demo-accounts.js", "seedDemoAccountsBtn"]},
-        {label:"Structured time shared module", file:"shared-time.js", includes:["normalizeCrawledHoursText", "makeClock", "FLOQRStructuredTime"]},
-        {label:"Seed callable exported", file:"functions/index.js", includes:["demo-seed-functions"]},
-        {label:"Post-feature QA email rule", file:".cursor/rules/post-feature-qa-email.mdc", includes:["Manual Feature Tests", "bans.don@gmail.com"]},
-        {label:"Script cache bust", file:"master-admin.html", includes:["ai-diagnostics-service.js?v=29.09.123"]}
-      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
-    {
-      id:"v29-09-125-shoutout-receipt-screen-venue",
-      area:"ShoutOut / Payments",
-      feature:"Receipt includes screen size + venue address",
-      changed:"Confirmation splash, payment-return, FloqR Inbox, and email PDF list Venue, Address, and Screen size from the chosen display format and club location.",
-      howToTest:"Submit a paid ShoutOut (e.g. birthday media or jersey) at Zebbies Garden DC after choosing a screen size. On the confirmation splash and payment-return page, confirm Venue / Address / Screen size. Check FloqR Inbox paid receipt body and email PDF for the same lines.",
-      expected:"Screen size shows a human label (e.g. 96 x 48 cm or P1.25 - 96 x 48 cm). Address includes street (1223 Connecticut Avenue NW for Zebbies). Venue name matches the club. Unpaid free submissions also show Venue/Address/Screen on the confirmation splash.",
-      troubleshoot:"Missing screen/address on paid receipt only: Functions must be redeployed (receipt-delivery.js). Missing on confirmation splash: hard-refresh index.html with patron-app.js?v=29.09.125. Empty address: clubLocations doc needs streetAddress/fullAddress (shared-data seed). Old Inbox rows will not backfill — submit a new order."
-    },
-    {
-      id:"v29-09-123-demo-accounts-seed",
-      area:"Demo Accounts / QA pack",
-      feature:"Seed temp_*@floqr-demo.com pack + login codes",
-      changed:"Master Admin → Demo Accounts seeds Auth users, temp-democlub-1..4, featured genre events, and scheduleShifts. Outbound email/SMS redirect to bans.don@gmail.com / +1 202-733-0274.",
-      howToTest:"Open master-admin.html → Demo Accounts. Note temp_waitress_1 (or clubadmin) email. On home page: Email sign-in → that temp email → Send 6-minute code. Open bans.don@gmail.com for subject [FLOQR demo → …] and the 8-character code. Verify → confirm signed in as that persona. Run role workflow.",
-      expected:"OTP email lands in bans.don@gmail.com (not the fake @floqr-demo.com inbox). Verify signs in as the temp user. Codes table QA ref is not used for OTP.",
-      troubleshoot:"If no email: confirm Functions requestEmailOtp deployed with demo-delivery redirect; check SendGrid; wait 1 min between resends. If verify fails: use the 8-char code from Gmail, not the Master Admin QA ref. If tab missing: hard refresh master-admin-demo-accounts.js."
-    },
-    {
-      id:"v29-09-123-democlub1-scheduling",
-      area:"Staff Scheduling",
-      feature:"temp-democlub-1 worker schedule + approve flow",
-      changed:"Demo club has active schedulingSubscriptions/club:temp-democlub-1, designated workers, and seeded Wed–Sun shifts 10:35 PM–2:00 AM with atomic startClock/endClock.",
-      howToTest:"admin.html?location=temp-democlub-1&v=29.09.123#panelScheduling as temp_clubadmin_1 → confirm subscribed + seeded shifts. Create one pending shift for temp_waitress_1 → sign in as waitress → scheduling.html My assignments → Approve.",
-      expected:"Workspace unlocked (no $20 gate). Seeded roles listed. New shift pending→approved; Club Admin gets inbox note. SMS (if enabled) hits +1 202-733-0274; email subject prefixed [FLOQR demo → …].",
-      troubleshoot:"Subscribe gate still showing: check Firestore schedulingSubscriptions/club:temp-democlub-1 status=active. Empty assignee list: re-seed (clubEmployeeDesignations). Callable errors: confirm scheduling-functions deployed. No SMS: channels off is Soft Fail — still pass if in-app approve works."
-    },
-    {
-      id:"v29-09-123-democlub1-public-profile-hours",
-      area:"Club Public Profile",
-      feature:"temp-democlub-1 Details hours + featured genre events",
-      changed:"Public profile shows Monday–Sunday opening times from hoursStructured (hour/minute/meridiem). Featured events for Hip Hop / Afro House / EDM / Reggaeton·Latin (temp_dj_1..4).",
-      howToTest:"Open club-profile.html?location=temp-democlub-1&v=29.09.123. In About/Details confirm day names spelled out and times like 10:35 PM. Confirm upcoming featured events and Featured DJs section.",
-      expected:"Mon/Tue Closed (club 1); other days show open–close. Four genre nights / DJs visible. No raw object dumps for eventTime.",
-      troubleshoot:"Blank hours: confirm clubLocations/temp-democlub-1 has hoursStructured + hoursDisplayLines after Seed. Stale UI: hard refresh ?v=29.09.123 and shared-time.js loaded. Missing events: re-seed; check events where locationId==temp-democlub-1."
-    },
-    {
-      id:"v29-09-123-structured-hours-crawl",
-      area:"AI Crawling",
-      feature:"Crawl hours normalize to atomic datapoints",
-      changed:"Source extract / approve path uses FLOQRStructuredTime.normalizeCrawledHoursText before presenting/persisting hours (hoursStructured, hoursSource crawl-normalized).",
-      howToTest:"Master Admin → AI Crawling → paste source text containing e.g. Fri–Sat 10:35 PM–3:00 AM → Extract Source Details. Confirm hoursStructured / hoursDisplayLines on the review record. Approve a venue and confirm club doc keeps structured open/close clocks.",
-      expected:"Parsed days show separate hour, minute, meridiem — not a single opaque wall-clock string as the only source of truth.",
-      troubleshoot:"No structured fields: confirm shared-time.js is loaded on master-admin.html before ai-discovery/ai-diagnostics scripts. Approve without hours: Soft Fail if source had no hours text — use a paste that includes day+time ranges."
-    },
     {
       id:"v29-09-9-ask-floqr-intent-search",
       area:"Search",
@@ -1961,7 +1903,7 @@
       email:extractEmail(text),
       telephone:extractPhone(text),
       phone:extractPhone(text),
-      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
       ticketUrl:sourceUrl,
       sourceUrl,
       sourceName:sourceNameForUrl(sourceUrl),
@@ -1970,21 +1912,6 @@
       extractedTags:categories,
       categories,
       genres,
-      // Parse + normalize free-text hours into atomic datapoints before review UI.
-      ...(function () {
-        const ST = window.FLOQRStructuredTime;
-        if (!ST) return {};
-        const hoursMatch = text.match(/(?:hours?|open(?:ing)?(?:\s*times?)?)[:\s]+([^\n]{8,180})/i);
-        const hoursBlob = hoursMatch ? hoursMatch[1] : "";
-        if (!hoursBlob && !/\b(mon|tue|wed|thu|fri|sat|sun)/i.test(text)) return {};
-        const structured = ST.normalizeCrawledHoursText(hoursBlob || text.slice(0, 500), "America/New_York");
-        return {
-          proposedHours: hoursBlob || "",
-          hoursStructured: structured,
-          hoursDisplayLines: ST.formatWeekHoursLines(structured),
-          hoursSource: "crawl-normalized"
-        };
-      })(),
       searchLanguage:market.language || "",
       searchQuery:title,
       aiSummary:"Extracted from a followed public source page. Master Admin must verify before approval.",
@@ -2002,6 +1929,7 @@
       createdAt:fieldValue(),
       updatedAt:fieldValue()
     };
+    Object.assign(record, window.FLOQRVenueDatapoints?.enrichVenueRecord?.(record, {html: "", text}) || {});
     record.missingDatapoints = sourceRecordMissingDatapoints(record);
     record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     return attachCrawlAudit(record, {
@@ -2625,7 +2553,6 @@
       lines.push(`Changed feature: ${cleanText(row.changed)}`);
       lines.push(`How to test: ${cleanText(row.howToTest)}`);
       lines.push(`Expected result: ${cleanText(row.expected)}`);
-      if (row.troubleshoot) lines.push(`Troubleshoot: ${cleanText(row.troubleshoot)}`);
       lines.push(`Master Admin note: ${cleanText(row.note || "-")}`);
       lines.push(`Updated: ${row.updatedAt ? new Date(row.updatedAt).toLocaleString() : "-"}`);
     });
@@ -2636,7 +2563,7 @@
     const failed = rows.filter(row => row.result === "failed");
     const notTested = rows.filter(row => !row.result);
     const failedText = failed.length
-      ? failed.map((row, index) => `${index + 1}. ${row.area}: ${row.feature}\n   What changed: ${cleanText(row.changed)}\n   How I tested: ${cleanText(row.howToTest)}\n   Expected: ${cleanText(row.expected)}\n   Troubleshoot hints: ${cleanText(row.troubleshoot || "None listed.")}\n   Failure note from Master Admin: ${cleanText(row.note || "Marked Failed without additional notes.")}`).join("\n")
+      ? failed.map((row, index) => `${index + 1}. ${row.area}: ${row.feature}\n   What changed: ${cleanText(row.changed)}\n   How I tested: ${cleanText(row.howToTest)}\n   Expected: ${cleanText(row.expected)}\n   Failure note from Master Admin: ${cleanText(row.note || "Marked Failed without additional notes.")}`).join("\n")
       : "No manual feature tests were marked Failed.";
     const notTestedText = notTested.length
       ? notTested.map(row => `- ${row.area}: ${row.feature}`).join("\n")
@@ -2689,7 +2616,6 @@
         <p><strong>Changed feature:</strong> ${esc(row.changed)}</p>
         <p><strong>How to test:</strong> ${esc(row.howToTest)}</p>
         <p><strong>Expected:</strong> ${esc(row.expected)}</p>
-        ${row.troubleshoot ? `<p><strong>If this fails:</strong> ${esc(row.troubleshoot)}</p>` : ""}
         <div class="manual-test-actions">
           <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="succeed" ${row.result === "succeed" ? "checked" : ""}/> Succeed</label>
           <label class="manual-test-choice"><input type="checkbox" data-manual-feature-result="${safeId}" data-result="failed" ${row.result === "failed" ? "checked" : ""}/> Failed</label>
@@ -3442,7 +3368,6 @@
     await capture("Firestore: shoutouts lifecycle", () => firestoreDocLifecycle("shoutouts", {
       uid:user.uid,
       submittedByUid:user.uid,
-      template:"neon",
       mainText:"Diagnostics ShoutOut",
       status:"pending"
     }, runId));

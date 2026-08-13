@@ -215,10 +215,22 @@
       artistsOrDjs:item.artistsOrDjs || item.artists || item.djs || [],
       promoters:item.promoters || [],
       promotionGroup:item.promotionGroup || "",
-      socialMediaHandles:item.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
+      socialMediaHandles:item.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
       sourceConfirmations:item.sourceConfirmations || {},
+      amenities:item.amenities || [],
+      agePolicy:item.agePolicy || "",
+      dressCode:item.dressCode || "",
+      cuisine:item.cuisine || "",
+      tagline:item.tagline || "",
+      hours:item.hours || "",
+      hoursStructured:item.hoursStructured || null,
+      timeZone:item.timeZone || "",
+      menuUrl:item.menuUrl || "",
+      reservationsUrl:item.reservationsUrl || "",
+      contactUrl:item.contactUrl || "",
       missingDatapoints:item.missingDatapoints || [],
-      crawlResultStatus:item.crawlResultStatus || ""
+      crawlResultStatus:item.crawlResultStatus || "",
+      venueDatapointsCaptured:item.venueDatapointsCaptured || null
     };
   }
 
@@ -258,11 +270,14 @@
       ${sourceConfirmationsHtml(item)}
       ${auditDetailsHtml(item)}
       ${datapointChecklist(item)}
+      ${item.venueDatapointsCaptured ? `<p class="sub small"><strong>Venue public-profile datapoints captured:</strong> ${esc(item.venueDatapointsCaptured.capturedCount || 0)} / ${(window.FLOQRVenueDatapoints?.VENUE_PUBLIC_PROFILE_DATAPOINTS || []).length || 40}</p>` : ""}
+      ${window.FLOQRVenueDatapoints?.checklistHtml ? window.FLOQRVenueDatapoints.checklistHtml() : ""}
       ${sourceLinksHtml(item)}
       <div class="profile-grid">
         ${queueField(item, "proposedType", "Type")}
         ${queueField(item, "proposedTitle", "Name")}
         ${queueTextArea(item, "description", "Description")}
+        ${queueField(item, "tagline", "Tagline")}
         ${queueField(item, "proposedDate", "Date")}
         ${queueField(item, "proposedTime", "Time")}
         ${queueField(item, "proposedLocationName", "Location name")}
@@ -279,6 +294,18 @@
         ${queueField(item, "artistsOrDjs", "DJ(s)/Artist(s)", true, artistsOrDjsDisplay(item))}
         ${queueField(item, "promoters", "Promoter(s)", true, promotersDisplay(item))}
         ${queueField(item, "instagram", "Instagram", false, item.socialMediaHandles?.instagram || item.instagramHandle || "")}
+        ${queueField(item, "facebook", "Facebook", false, item.socialMediaHandles?.facebook || "")}
+        ${queueField(item, "tiktok", "TikTok", false, item.socialMediaHandles?.tiktok || "")}
+        ${queueField(item, "x", "X / Twitter", false, item.socialMediaHandles?.x || "")}
+        ${queueField(item, "amenities", "Amenities", true, Array.isArray(item.amenities) ? item.amenities.join(", ") : item.amenities || "")}
+        ${queueField(item, "agePolicy", "Age policy")}
+        ${queueField(item, "dressCode", "Dress code")}
+        ${queueField(item, "cuisine", "Cuisine / concept")}
+        ${queueField(item, "hours", "Hours summary", true)}
+        ${queueField(item, "timeZone", "Time zone")}
+        ${queueField(item, "menuUrl", "Menu URL", true)}
+        ${queueField(item, "reservationsUrl", "Reservations URL", true)}
+        ${queueField(item, "contactUrl", "Contact URL", true)}
         ${queueField(item, "sourceUrl", "Source URL", true)}
         ${queueField(item, "ticketUrl", "Ticket URL", true)}
       </div>
@@ -298,10 +325,10 @@
     card.querySelectorAll("[data-queue-field]").forEach(input => {
       const field = input.dataset.queueField;
       const value = input.value.trim();
-      if (["categories", "genres", "artistsOrDjs", "promoters"].includes(field)) next[field] = splitCSV(value);
-      else if (field === "instagram") {
-        next.socialMediaHandles = {...(next.socialMediaHandles || {}), instagram:value};
-        next.instagramHandle = value;
+      if (["categories", "genres", "artistsOrDjs", "promoters", "amenities"].includes(field)) next[field] = splitCSV(value);
+      else if (field === "instagram" || field === "facebook" || field === "tiktok" || field === "x") {
+        next.socialMediaHandles = {...(next.socialMediaHandles || {}), [field]: value};
+        if (field === "instagram") next.instagramHandle = value;
       } else if (field === "description") {
         next.proposedDescription = value;
         next.aiSummary = value || next.aiSummary;
@@ -345,29 +372,12 @@
     const proposedType = String(edited.proposedType || "").toLowerCase();
     const isVenue = /club|venue|lounge|beach|bar|rooftop/.test(proposedType);
     const id = slug(`${edited.proposedTitle || edited.proposedLocationName || "listing"}-${edited.city || ""}-${edited.country || ""}`);
+    const venueType = proposedType.includes("beach") ? "beach-club" : proposedType.includes("rooftop") ? (proposedType.includes("bar") ? "rooftop-bar" : "rooftop-lounge") : proposedType.includes("lounge") ? "lounge" : proposedType.includes("bar") ? "bar" : "club";
+    const enriched = window.FLOQRVenueDatapoints?.enrichVenueRecord?.(edited, {html: "", text: `${edited.proposedDescription || ""} ${edited.hours || ""}`}) || edited;
+    const venueCore = window.FLOQRVenueDatapoints?.clubLocationPayloadFromDiscovery?.(enriched, {type: venueType}) || {};
     const payload = isVenue ? {
-      locationName:edited.proposedTitle || edited.proposedLocationName || id,
-      brandName:edited.proposedLocationName || edited.proposedTitle || id,
-      type:proposedType.includes("beach") ? "beach-club" : proposedType.includes("rooftop") ? (proposedType.includes("bar") ? "rooftop-bar" : "rooftop-lounge") : proposedType.includes("lounge") ? "lounge" : proposedType.includes("bar") ? "bar" : "club",
-      categories:edited.categories || [],
-      genres:edited.genres || [],
-      description:edited.proposedDescription || edited.aiSummary || "",
-      country:edited.country || "",
-      region:edited.stateRegion || "",
-      stateRegion:edited.stateRegion || "",
-      city:edited.city || "",
-      address:edited.proposedAddress || "",
-      streetAddress:edited.streetAddress || edited.proposedAddress || "",
-      addressLine1:edited.streetAddress || edited.proposedAddress || "",
-      fullAddress:edited.fullAddress || edited.proposedAddress || "",
-      postalCode:edited.postalCode || "",
-      officialWebsite:edited.officialWebsite || "",
-      website:edited.officialWebsite || "",
-      email:edited.email || "",
-      telephone:edited.telephone || "",
-      phone:edited.telephone || "",
-      socialMediaHandles:edited.socialMediaHandles || {instagram:"", x:"", tiktok:"", facebook:""},
-      locationLabel:window.FLOQRAddress?.publicLocation(edited) || [edited.city, edited.country].filter(Boolean).join(", "),
+      ...venueCore,
+      locationLabel:window.FLOQRAddress?.publicLocation(enriched) || [enriched.city, enriched.country].filter(Boolean).join(", "),
       activityStatus:"Approved from AI discovery",
       active:true,
       status:"active",
@@ -376,33 +386,15 @@
       publicProfileType:"club",
       subscriptionRequiredForPublicProfileEdits:true,
       requiredProfileDatapointsComplete:true,
-      publicSearchKeywords:[edited.proposedTitle, edited.proposedLocationName, edited.city, edited.country, ...(edited.categories || []), ...(edited.genres || [])].filter(Boolean),
+      publicSearchKeywords:[enriched.proposedTitle, enriched.proposedLocationName, enriched.city, enriched.country, ...(enriched.categories || []), ...(enriched.genres || []), ...(enriched.amenities || [])].filter(Boolean),
       approvedFromDiscoveryQueueId:item.id,
-      sourceUrl:edited.sourceUrl || "",
-      // Normalize crawled hours into atomic hour/minute/AM|PM before persist.
-      ...(function normalizeHoursForVenue() {
-        const ST = window.FLOQRStructuredTime;
-        const rawHours = edited.hours || edited.openingHours || edited.proposedHours || "";
-        if (!ST) return rawHours ? {hours: String(rawHours)} : {};
-        const structured = typeof rawHours === "object" && rawHours
-          ? ST.normalizeWeekHours(rawHours)
-          : ST.normalizeCrawledHoursText(String(rawHours || edited.proposedDescription || ""), "America/New_York");
-        const lines = ST.formatWeekHoursLines(structured);
-        return {
-          hoursStructured: structured,
-          openingHours: structured,
-          hoursDisplayLines: lines,
-          hours: lines.join("; "),
-          hoursSource: "crawl-normalized"
-        };
-      })(),
+      sourceUrl:enriched.sourceUrl || "",
       updatedAt:nowField()
     } : {
       eventName:edited.proposedTitle || id,
       eventDate:edited.proposedDate || "",
       eventTime:edited.proposedTime || "",
       eventDay:edited.proposedDate || "",
-      eventTimeStructured:(window.FLOQRStructuredTime?.parseLooseClock?.(edited.proposedTime) || null),
       locationId:edited.locationId || "",
       locationName:edited.proposedLocationName || "",
       description:edited.proposedDescription || edited.aiSummary || "",

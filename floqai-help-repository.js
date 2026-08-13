@@ -236,6 +236,20 @@
       page: "admin.html#clubVenueHoursCard"
     },
     {
+      id: "help-venue-crawl-datapoints",
+      title: "AI crawl venue datapoints",
+      body: "AI Crawling ingests public pages and Google Places, then parses venue public-profile datapoints: name, brand, tagline, description, address, phone, email, website, menu/reservations URLs, Instagram/Facebook/X/TikTok, genres, DJs/artists, promoters, amenities, age policy, dress code, hoursStructured + timeZone, featured people, logo/images, and display formats. Approval writes these into clubLocations for the Club Public Profile.",
+      searchPhrases: [
+        "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
+        "crawl ingest", "parse venue", "hoursStructured crawl"
+      ],
+      links: [
+        {label: "Master Admin Diagnostics / Discovery", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
       id: "help-club-admin-affiliation",
       title: "Club Admin venue assignment",
       body: "Club Admins only open the Venue Command Center for a club they are assigned to. Opening admin.html without a venue no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N. Unassigned admins request assignment from Master Admin.",

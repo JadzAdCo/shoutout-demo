@@ -21,13 +21,10 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Club** | Venue entity (e.g. Zebbies) with Club Admin | Patron vendor store |
 | **Entity** | Any onboarded actor: patron, club, promoter, etc. | Template |
 | **Club Admin** | Operator of one club’s backend | Master Admin |
-| **Master Admin** | Network operator (FloqR); same as Super Admin. Allowlist: `bans.don@gmail.com`, `don.b@jadzholdings.com` | Club Admin |
-| **Super Admin** | Same as Master Admin. Allowlist: `bans.don@gmail.com`, `don.b@jadzholdings.com`. Elevated SOS2FA-gated tools | Club Admin |
+| **Master Admin** | Network operator (FloqR) | Club Admin |
+| **Super Admin** | Primary Master Admin account (e.g. `bands.don@gmail.com`) with elevated SOS2FA-gated tools | Other Master Admins |
 | **Social OS / SocOS / SOS** | FloqR’s Social OS layer: the algorithms, features, and controls that power the WebApp | FloqR product brand alone; a single feature (Mingl, BartR, etc.) |
-| **SOS2FA** | Social OS second-factor module for Super Admin Entity Management: SMS and/or email one-time codes, plus optional authenticator-app (TOTP) unlock | Firebase login MFA alone; Club Admin phone MFA |
-| **FloqMedia** | Media brand mark for ShoutOut bumpers and social creatives — chrome FloqR tile cluster fused with media identity | FloqAi mark; FloqR chrome logo alone |
-| **supRstar live duration** | Per-venue Master Admin setting (15 / 30 / 45 / 60 seconds) controlling how long an approved live session runs after the cinema countdown | ShoutOut display duration |
-| **SMS Consent Grant** | Public page where patrons/admins opt in to FLOQR SMS notifications; preference also lives under My Privacy | SOS2FA one-time codes; marketing email consent alone |
+| **SOS2FA** | Social OS SMS two-factor confirmation module used to unlock sensitive Super Admin surfaces (e.g. Entity Management) | Firebase login MFA alone; Club Admin MFA |
 | **Public profile** | Outward-facing page for a patron or club | Private portal settings |
 | **Profile layout** | Chosen visual arrangement for a club’s public profile page | ShoutOut template |
 | **Profile background** | Image/color backdrop for a public profile | ShoutOut template background |
@@ -64,6 +61,7 @@ Use these terms exactly when we plan or build. Prefer the **Term** column in cha
 | **Refined Discovery Search** | Master Admin panel where city, genre, and venue/event type are defined before a crawl | Generic AI Crawling tab label |
 | **Discovery crawl** | Callable or scheduled run that queries Google Places and public pages and writes review queue records | Manual source paste only |
 | **Impactful datapoints** | Required review fields: name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, address | Optional marketing fields |
+| **Venue public-profile datapoints** | Full crawl/ingest checklist aligned to Club Public Profile: identity, address/contact, socials, genres/DJs/promoters, amenities, age/dress, hoursStructured + exceptions + timeZone, featured people, logo/images, display formats | Free-text hours only |
 | **Source confirmation** | Flags showing which upstream source verified a record (Google Places, public page, Eventbrite; Ticketmaster later) | Live publish status |
 | **Ticketmaster (later)** | Planned Ticketmaster Discovery API confirmation — optional research link today, not required for crawl | Live Ticketmaster API confirmation |
 
