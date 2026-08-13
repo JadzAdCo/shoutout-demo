@@ -184,7 +184,7 @@
       id: "help-venue-hours-calendar",
       kind: "help",
       label: "Venue opening hours / public holidays",
-      blurb: "Set default weekly club hours and period overrides on Club Public Profile. Staff Scheduling uses open−2h to close+1h. Holidays highlight for US, FR, DE, NL, ES and other venue countries.",
+      blurb: "Club Public Profile shows a Sun–Sat week grid with the covered dates. Upcoming holidays list open/close hours, especially when they differ from the usual weekday.",
       links: [
         {label: "Club Public Profile hours", href: vUrl("./admin.html", {from: "floqai", tab: "publicProfile"})}
       ],

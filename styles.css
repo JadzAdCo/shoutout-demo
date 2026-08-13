@@ -424,6 +424,36 @@ html.floqr-desktop-browser .mingl-chat-popout .mingl-compose-menu-panel{width:mi
 .club-profile-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:20px}
 .club-profile-facts>div{border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;background:rgba(255,255,255,.035)}
 .club-profile-facts span,.club-profile-facts strong{display:block}.club-profile-facts span{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.club-profile-facts strong{margin-top:5px}
+.club-hours-fact,.club-holiday-fact{grid-column:1/-1}
+.venue-week-block{margin-top:10px}
+.venue-week-range{margin:0 0 10px;font-size:13px;font-weight:800;color:rgba(255,255,255,.82)}
+.venue-week-grid{border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;background:rgba(0,0,0,.22)}
+.venue-week-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.venue-week-head,.venue-week-hours{border-right:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;min-height:54px}
+.venue-week-head:last-child,.venue-week-hours:last-child{border-right:0}
+.venue-week-head{background:#121826;display:grid;gap:2px;align-content:start}
+.venue-week-dow{font-size:11px;font-weight:900;letter-spacing:.04em;color:rgba(255,255,255,.78)}
+.venue-week-date{font-size:18px;font-weight:900;line-height:1.1}
+.venue-week-holiday,.venue-week-special,.sched-holiday-mark{display:block;font-size:10px;font-weight:700;color:#ffd0b8;margin-top:2px;line-height:1.2}
+.venue-week-hours{background:rgba(15,21,36,.92);display:grid;align-content:center;gap:2px}
+.venue-week-hours strong{margin:0;font-size:12px;font-weight:800;line-height:1.25}
+.venue-week-cell.is-today,.venue-week-head.is-today{box-shadow:inset 0 3px 0 #f59e0b}
+.venue-week-cell.is-holiday,.venue-week-head.is-holiday,.venue-week-hours.is-holiday{background:rgba(255,120,80,.22)}
+.venue-week-hours.is-closed{opacity:.72}
+.venue-week-hours.is-open strong{color:#9dffb0}
+.venue-hours-exceptions{margin-top:10px;display:grid;gap:6px}
+.venue-hours-exception,.venue-holiday-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.035)}
+.venue-hours-exception span,.venue-holiday-row span{font-size:13px;color:rgba(255,255,255,.78)}
+.venue-hours-exception strong,.venue-holiday-row strong{font-size:13px;margin:0;display:inline}
+.venue-holiday-hours{margin-top:10px;display:grid;gap:8px}
+.venue-holiday-row.is-differ{border-color:rgba(255,120,80,.45);background:rgba(255,120,80,.12)}
+.venue-holiday-row.is-differ strong{color:#ffd0b8}
+@media(max-width:720px){
+  .venue-week-head,.venue-week-hours{padding:8px 4px;min-height:48px}
+  .venue-week-date{font-size:15px}
+  .venue-week-hours strong{font-size:11px}
+  .venue-week-holiday{font-size:9px}
+}
 .club-profile-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
 .club-event-card,.club-promoter-card{overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:rgba(255,255,255,.035);text-align:left;color:inherit}
 .club-event-card img{width:100%;height:160px;object-fit:cover}.club-event-card>div{padding:16px}.club-event-card h3{font-size:21px;margin:5px 0}.club-event-card small{color:var(--muted)}
