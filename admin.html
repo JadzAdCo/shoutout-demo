@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.101"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.101"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.102"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.102"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -533,17 +533,13 @@
               </div>
               <div class="queue-actions">
                 <button type="button" id="createScheduleShiftBtn" class="primary">Save shift</button>
+                <button type="button" id="scheduleDeleteShiftBtn" class="ghost hidden">Delete shift</button>
                 <button type="button" id="scheduleAssignCancelBtn" class="ghost">Cancel</button>
               </div>
             </div>
           </div>
 
           <div id="scheduleWorkerPopout" class="sched-worker-popout hidden" role="dialog" aria-label="Worker contact"></div>
-
-          <div class="card">
-            <h2>Upcoming &amp; pending shifts</h2>
-            <div id="schedulingShiftList" class="report-block"></div>
-          </div>
         </div>
       </section>
 
@@ -700,7 +696,7 @@
 <script src="./admin-notifications.js?v=29.09.18"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.101"></script>
+<script src="./admin-scheduling.js?v=29.09.102"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

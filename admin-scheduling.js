@@ -298,6 +298,12 @@
     }
     if (byId("scheduleSaveAsDraft")) byId("scheduleSaveAsDraft").checked = !shift || String(shift.status) === "draft";
 
+    const deleteBtn = byId("scheduleDeleteShiftBtn");
+    if (deleteBtn) {
+      const canDelete = !!(shift?.id && ["draft", "pending", "declined"].includes(String(shift.status || "")));
+      deleteBtn.classList.toggle("hidden", !canDelete);
+    }
+
     state.applyDays = new Set([baseDay.getDay()]);
     renderDayPills("schedApplyDays", state.applyDays);
     modal.classList.remove("hidden");
@@ -501,7 +507,6 @@
   }
 
   async function loadShifts() {
-    const list = byId("schedulingShiftList");
     if (!locationId) return;
     const result = await callable("listScheduleShifts")({
       ownerType: "club",
@@ -509,23 +514,6 @@
     });
     state.shifts = result?.data?.shifts || [];
     renderGrid();
-
-    if (!list) return;
-    if (!state.shifts.length) {
-      list.innerHTML = "<p class='sub'>No shifts yet. Use the week grid above to place drafts, then Publish.</p>";
-      return;
-    }
-    list.innerHTML = state.shifts.map(shift => `
-      <div class="report-row">
-        <strong>${esc(shift.roleLabel || "Shift")} · ${esc(shift.assigneeName || "Unassigned")}</strong>
-        <span>${esc(shift.startsAtLabel || shift.startsAt || "")} → ${esc(shift.endsAtLabel || shift.endsAt || "")}</span>
-        <span class="tag">${esc(shift.status || "")}</span>
-        ${shift.notes ? `<small>${esc(shift.notes)}</small>` : ""}
-        ${String(shift.status) === "draft" || String(shift.status) === "pending" || String(shift.status) === "declined"
-          ? `<button type="button" class="ghost" data-delete-shift="${esc(shift.id)}">Delete</button>`
-          : ""}
-      </div>
-    `).join("");
   }
 
   async function createShiftPayload({
@@ -748,6 +736,13 @@
       createShift().catch(error => setStatus(error.message));
     });
     byId("scheduleAssignCancelBtn")?.addEventListener("click", closeAssignModal);
+    byId("scheduleDeleteShiftBtn")?.addEventListener("click", () => {
+      const shiftId = state.assignContext?.shift?.id;
+      if (!shiftId) return;
+      deleteShift(shiftId)
+        .then(() => closeAssignModal())
+        .catch(error => setStatus(error.message));
+    });
     byId("refreshSchedulingBtn")?.addEventListener("click", () => {
       refreshSubscriptionUi().catch(error => setStatus(error.message));
     });
@@ -796,12 +791,6 @@
         const day = weekDays()[Number(chip.dataset.day)] || state.weekStart;
         openAssignModal({worker, day, shift});
       }
-    });
-
-    byId("schedulingShiftList")?.addEventListener("click", event => {
-      const btn = event.target.closest("[data-delete-shift]");
-      if (!btn) return;
-      deleteShift(btn.dataset.deleteShift).catch(error => setStatus(error.message));
     });
 
     byId("scheduleAssignModal")?.addEventListener("click", event => {
