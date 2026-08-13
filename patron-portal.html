@@ -412,8 +412,12 @@
             </div>
           </div>
           <div class="card nested-card" style="margin-bottom:14px">
-            <h3 data-i18n="app.languageSettings">App language</h3>
-            <p class="sub small" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
+            <h3 data-i18n="app.languageSettings"
+                data-floqr-help-id="help-app-language"
+                data-floqr-help-title="App language"
+                data-floqr-help-body="On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported. Unsupported languages stay in English. After that, this setting and your saved profile language win. Dutch is included with German, French, Spanish, Italian, Portuguese, Russian, Greek, Polish, and Arabic."
+                data-floqr-help-search="dutch|nederlands|app language|browser language|first use language">App language</h3>
+            <p class="sub small" data-keep-visible="true" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
             <label>FloqR webapp language
               <select id="uiAppLanguage"></select>
             </label>
@@ -436,6 +440,7 @@
                 <option value="ru">Russian</option>
                 <option value="el">Greek</option>
                 <option value="pl">Polish</option>
+                <option value="nl">Dutch</option>
               </select>
             </label>
             <label>Tone Preference
@@ -563,13 +568,15 @@
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./helper-popouts.js?v=29.09.8"></script>
+<script src="./floqai-help-repository.js?v=29.09.100"></script>
+<script src="./help-attach.js?v=29.09.100"></script>
+<script src="./helper-popouts.js?v=29.09.100"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=29.09.13"></script>
+<script src="./floqr-i18n.js?v=29.09.100"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.57"></script>
+<script src="./patron-portal-app.js?v=29.09.100"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

@@ -403,12 +403,16 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   const roleLabel = text(request.data?.roleLabel || request.data?.role, 80) || "Shift";
   const notes = text(request.data?.notes, 1000);
   const venueName = text(request.data?.venueName, 160);
-  const notify = request.data?.notify !== false;
+  const asDraft = request.data?.asDraft === true || request.data?.draft === true || text(request.data?.status, 40) === "draft";
+  const notify = asDraft ? false : request.data?.notify !== false;
   const requireApproval = request.data?.requireApproval !== false;
 
   const ref = db.collection("scheduleShifts").doc();
   const key = sub.key;
   const now = admin.firestore.FieldValue.serverTimestamp();
+  const status = asDraft
+    ? "draft"
+    : (requireApproval && assigneeUid ? "pending" : "confirmed");
   const shift = {
     id: ref.id,
     ownerKey: key,
@@ -429,8 +433,10 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
     endsAtLabel: text(request.data?.endsAtLabel, 80) || new Date(endMs).toLocaleString(),
     venueName,
     notes,
-    status: requireApproval && assigneeUid ? "pending" : "confirmed",
+    status,
+    published: !asDraft,
     requireApproval: !!requireApproval,
+    assignMode: text(request.data?.assignMode, 40) || (asDraft ? "manual" : "manual"),
     createdByUid: request.auth.uid,
     createdByEmail: text(request.auth.token?.email, 200).toLowerCase(),
     createdAt: now,
@@ -450,6 +456,76 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   return {shiftId: ref.id, status: shift.status, notifyResult};
 });
 
+exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 60, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const ownerType = text(request.data?.ownerType, 40);
+  const ownerId = text(request.data?.ownerId, 160);
+  if (!OWNER_TYPES.has(ownerType) || !ownerId) throw new HttpsError("invalid-argument", "ownerType and ownerId are required.");
+  if (!await canManageOwner(ownerType, ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot publish schedules for this member.");
+  }
+  await requireActiveSubscription(ownerType, ownerId);
+  const key = ownerKey(ownerType, ownerId);
+  const ids = Array.isArray(request.data?.shiftIds)
+    ? request.data.shiftIds.map(id => text(id, 120)).filter(Boolean).slice(0, 80)
+    : [];
+  const weekStartMs = Number(request.data?.weekStartMs || 0);
+  const weekEndMs = Number(request.data?.weekEndMs || 0);
+  const snap = await db.collection("scheduleShifts").where("ownerKey", "==", key).limit(120).get();
+  const candidates = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).filter(row => {
+    if (text(row.status, 40) !== "draft") return false;
+    if (ids.length) return ids.includes(row.id);
+    if (Number.isFinite(weekStartMs) && Number.isFinite(weekEndMs) && weekEndMs > weekStartMs) {
+      const start = Number(row.startsAtMs || 0);
+      return start >= weekStartMs && start < weekEndMs;
+    }
+    return false;
+  });
+  if (!candidates.length) return {published: 0, results: []};
+  const results = [];
+  for (const shift of candidates) {
+    const requireApproval = shift.requireApproval !== false;
+    const nextStatus = requireApproval && text(shift.assigneeUid, 160) ? "pending" : "confirmed";
+    const ref = db.collection("scheduleShifts").doc(shift.id);
+    await ref.set({
+      status: nextStatus,
+      published: true,
+      publishedAt: admin.firestore.FieldValue.serverTimestamp(),
+      publishedByUid: request.auth.uid,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    let notifyResult = null;
+    if (text(shift.assigneeUid, 160)) {
+      notifyResult = await notifyAssigneeChannels({...shift, status: nextStatus}, "schedule-invite");
+      await ref.set({
+        notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+        notifyResult
+      }, {merge: true});
+    }
+    results.push({shiftId: shift.id, status: nextStatus, notifyResult});
+  }
+  return {published: results.length, results};
+});
+
+exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const shiftId = text(request.data?.shiftId, 120);
+  if (!shiftId) throw new HttpsError("invalid-argument", "shiftId is required.");
+  const ref = db.collection("scheduleShifts").doc(shiftId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
+  const shift = snap.data() || {};
+  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot delete this shift.");
+  }
+  const status = text(shift.status, 40);
+  if (!["draft", "pending", "declined"].includes(status)) {
+    throw new HttpsError("failed-precondition", "Only draft, pending, or declined shifts can be deleted.");
+  }
+  await ref.delete();
+  return {shiftId, deleted: true};
+});
+
 exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const shiftId = text(request.data?.shiftId, 120);
@@ -465,6 +541,9 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
   const isAssignee = text(shift.assigneeUid, 160) === uid;
   const isManager = await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth);
   if (!isAssignee && !isManager) throw new HttpsError("permission-denied", "Only the assigned worker or schedule manager can respond.");
+  if (text(shift.status, 40) === "draft") {
+    throw new HttpsError("failed-precondition", "Draft shifts must be published before workers can respond.");
+  }
   if (text(shift.status, 40) !== "pending" && !isManager) {
     throw new HttpsError("failed-precondition", "This shift is no longer awaiting approval.");
   }

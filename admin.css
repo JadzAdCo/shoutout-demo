@@ -551,3 +551,47 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .display-access-log-table tbody tr.is-denied td:nth-child(9){color:#ff8a9a;font-weight:800}
 .display-access-log-table code{font-size:11.5px}
 .display-access-log-ua{max-width:280px}
+
+/* Staff Scheduling week grid (Club Admin) */
+.sched-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+.sched-mode-toggle{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.sched-mode-btn{border:0;border-radius:0;background:transparent;padding:8px 14px;font-weight:800}
+.sched-mode-btn.active{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c}
+.sched-defaults{margin-top:8px}
+.sched-rr-panel{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.16)}
+.sched-day-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.sched-day-pill{width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-weight:900;cursor:pointer}
+.sched-day-pill.active{background:rgba(80,220,160,.35);border-color:rgba(80,220,160,.7)}
+.sched-grid-wrap{overflow:auto;margin-top:16px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.2)}
+.sched-grid{min-width:720px;border-collapse:separate;border-spacing:0;width:100%}
+.sched-grid th,.sched-grid td{border-bottom:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.06);padding:8px;vertical-align:top}
+.sched-grid th{position:sticky;top:0;background:#121826;z-index:2;font-size:12px;font-weight:900;text-align:left}
+.sched-grid th.is-today{box-shadow:inset 0 3px 0 #f59e0b}
+.sched-grid .sched-person{position:sticky;left:0;background:#0f1524;z-index:1;min-width:168px}
+.sched-person-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;padding:0}
+.sched-avatar{width:40px;height:40px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.12);flex:0 0 auto}
+.sched-avatar.initials{display:grid;place-items:center;font-weight:900;font-size:13px}
+.sched-person-meta{min-width:0}
+.sched-person-meta strong{display:block;font-size:13px;line-height:1.2}
+.sched-person-meta small{display:block;color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sched-cell{min-height:72px}
+.sched-cell-add{display:block;width:100%;margin-top:6px;border:1px dashed rgba(255,255,255,.22);border-radius:10px;background:transparent;color:var(--muted);font-weight:800;padding:6px;cursor:pointer}
+.sched-chip{display:block;width:100%;text-align:left;border:0;border-radius:12px;padding:8px 9px;margin:0 0 6px;cursor:pointer;color:#041018;font-weight:800;font-size:12px;line-height:1.25}
+.sched-chip.role-a{background:#7ddea8}
+.sched-chip.role-b{background:#c7b7f2}
+.sched-chip.role-c{background:#8ec5ff}
+.sched-chip.role-d{background:#ffd28a}
+.sched-chip.is-draft{opacity:.72;outline:1px dashed rgba(0,0,0,.35)}
+.sched-chip small{display:block;font-weight:700;opacity:.85}
+.sched-modal{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:18px;background:rgba(4,8,20,.72)}
+.sched-modal.hidden{display:none}
+.sched-modal-card{width:min(520px,100%);padding:20px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:#101937;color:#fff;display:grid;gap:12px;max-height:90vh;overflow:auto}
+.sched-worker-popout{position:fixed;z-index:12100;width:min(320px,calc(100vw - 24px));padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:#121a33;color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.sched-worker-popout.hidden{display:none}
+.sched-worker-popout .pop-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.sched-worker-popout .pop-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sched-worker-popout a,.sched-worker-popout button{font-size:13px}
+@media(max-width:720px){
+  .sched-grid{min-width:640px}
+  .sched-toolbar{align-items:stretch}
+}

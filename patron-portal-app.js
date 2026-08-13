@@ -2787,6 +2787,10 @@
       await ref.set({displayName:user.displayName || "", email:user.email || "", photoURL:user.photoURL || "", memberLevel:"Patron", createdAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     }
 
+    try {
+      await window.FLOQRI18n?.init?.(currentProfile);
+      window.FLOQRI18n?.applyDom?.();
+    } catch (_) {}
     fillProfileForm(profile, user);
     renderMediaSlots(profile);
     renderProfilePreview(profile, user);

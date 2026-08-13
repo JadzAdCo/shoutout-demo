@@ -207,6 +207,49 @@
       page: "admin.html#panelScheduling"
     },
     {
+      id: "help-staff-schedule-grid",
+      title: "Staff week calendar",
+      body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips (optional Apply-to days). Round Robin: fill selected days fairly (fewest shifts this week first). Publish schedule notifies workers. Click a worker photo for SMS number, contact, and public profile link.",
+      searchPhrases: [
+        "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
+        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift"
+      ],
+      links: [
+        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelScheduling"
+    },
+    {
+      id: "help-club-admin-affiliation",
+      title: "Club Admin venue assignment",
+      body: "Club Admins only open the Venue Command Center for a club they are assigned to. Opening admin.html without a venue no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N. Unassigned admins request assignment from Master Admin.",
+      searchPhrases: [
+        "club admin assignment", "affiliated club", "request venue assignment", "temp_clubadmin",
+        "temp-democlub", "not an elected club admin", "zebbies default"
+      ],
+      links: [
+        {label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
+        {label: "Club Admin portal", href: vUrl("./admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#adminVenueGate"
+    },
+    {
+      id: "help-app-language",
+      title: "App language",
+      body: "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Dutch is included with German, French, Spanish, Italian, Portuguese, Russian, Greek, Polish, and Arabic.",
+      searchPhrases: [
+        "app language", "dutch", "nederlands", "browser language", "first use language",
+        "change language", "ui language", "floqr language", "switch to dutch", "detect language"
+      ],
+      links: [
+        {label: "App language (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai"}), search: "app language", blurb: "Choose FloqR chrome language, including Dutch"}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#uiAppLanguage"
+    },
+    {
       id: "help-my-profile",
       title: "My Profile & Settings",
       body: "Open My Profile & Settings for roles, seller tools, and account options.",
