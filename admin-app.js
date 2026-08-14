@@ -980,16 +980,22 @@
     const wanted = String(new URL(location.href).searchParams.get("panel") || new URL(location.href).searchParams.get("tab") || location.hash.replace(/^#/, "") || "").toLowerCase();
     if (wanted === "suprstar" || wanted === "panelsuprstar") {
       document.querySelector('[data-panel="panelSuprstar"]')?.click();
-    } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "scheduserguide") {
+    } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "scheduserguide" || wanted === "schedwebsiteingest" || wanted === "schedgridheading") {
       document.querySelector('[data-panel="panelScheduling"]')?.click();
-      if (wanted === "scheduserguide") {
-        setTimeout(() => byId("schedUserGuide")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+      const scrollId = wanted === "schedwebsiteingest" ? "schedWebsiteIngest"
+        : wanted === "scheduserguide" || wanted === "schedgridheading" ? "schedGridHeading"
+        : "";
+      if (scrollId) {
+        setTimeout(() => byId(scrollId)?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
       }
     }
-    if (location.hash === "#schedUserGuide" || location.hash === "#panelScheduling") {
+    if (location.hash === "#schedUserGuide" || location.hash === "#panelScheduling" || location.hash === "#schedWebsiteIngest" || location.hash === "#schedGridHeading") {
       document.querySelector('[data-panel="panelScheduling"]')?.click();
-      if (location.hash === "#schedUserGuide") {
-        setTimeout(() => byId("schedUserGuide")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+      const hashId = location.hash === "#schedWebsiteIngest" ? "schedWebsiteIngest"
+        : location.hash === "#schedUserGuide" || location.hash === "#schedGridHeading" ? "schedGridHeading"
+        : "";
+      if (hashId) {
+        setTimeout(() => byId(hashId)?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
       }
     }
   }

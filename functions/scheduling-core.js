@@ -22,6 +22,27 @@ function canDeleteShiftStatus(raw = "") {
   return ["draft", "pending", "confirmed", "approved", "declined"].includes(normalizeShiftStatus(raw) || text(raw, 40).toLowerCase());
 }
 
+function isPublishedShiftStatus(raw = "") {
+  const status = normalizeShiftStatus(raw) || text(raw, 40).toLowerCase();
+  return status === "pending" || status === "confirmed" || status === "declined";
+}
+
+function publicShiftView(shift = {}, {includeNotes = false} = {}) {
+  const status = normalizeShiftStatus(shift.status) || text(shift.status, 40) || "pending";
+  const row = {
+    id: text(shift.id, 120),
+    roleLabel: text(shift.roleLabel || shift.role, 80) || "Shift",
+    assigneeName: text(shift.assigneeName, 120),
+    startsAtMs: Number(shift.startsAtMs || 0) || 0,
+    endsAtMs: Number(shift.endsAtMs || 0) || 0,
+    startsAt: text(shift.startsAt, 80),
+    endsAt: text(shift.endsAt, 80),
+    status
+  };
+  if (includeNotes) row.notes = text(shift.notes, 240);
+  return row;
+}
+
 function sanitizeShiftIds(raw = [], max = 80) {
   const seen = new Set();
   const ids = [];
@@ -85,6 +106,8 @@ module.exports = {
   normalizeShiftStatus,
   publishedShiftStatus,
   canDeleteShiftStatus,
+  isPublishedShiftStatus,
+  publicShiftView,
   sanitizeShiftIds,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,

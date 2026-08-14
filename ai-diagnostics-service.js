@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.114";
+  const PREVIEW_LINKS_PACKAGE = "29.09.115";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,11 +892,24 @@
       ]
     },
     {
+      version:"v29.09.115",
+      title:"Scheduler help + Work Sheet + website ingest API",
+      checks:[
+        {label:"Scheduler heading (no User Guide card)", file:"admin.html", includes:["id=\"schedGridHeading\"", ">Scheduler</h2>", "schedWebsiteIngest", "schedIngestRotateBtn"]},
+        {label:"Website ingest functions", file:"functions/venue-ingest-functions.js", includes:["rotateVenueIngestSecret", "venuePublicFeed", "getVenueIngestEndpoints"]},
+        {label:"Work Sheet callable + page", file:"functions/scheduling-functions.js", includes:["listStaffWorksheet"]},
+        {label:"Work Sheet UI", file:"staff-worksheet.html", includes:["Work Sheet - Weekly Staff Calendar"]},
+        {label:"Embed iframe page", file:"schedule-embed.html", includes:["embedWeekGrid"]},
+        {label:"Help repository ingest + worksheet", file:"floqai-help-repository.js", includes:["help-staff-worksheet", "help-venue-website-ingest"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.115\""]}
+      ]
+    },
+    {
       version:"v29.09.114",
       title:"Schedule multi-delete + User Guide create/publish",
       checks:[
         {label:"Batch delete callable", file:"functions/scheduling-functions.js", includes:["deleteScheduleShifts", "sanitizeShiftIds"]},
-        {label:"Select shifts toolbar", file:"admin.html", includes:["schedSelectBtn", "schedUserGuide", "Delete selected"]},
+        {label:"Select shifts toolbar", file:"admin.html", includes:["schedSelectBtn", "Delete selected"]},
         {label:"FloqAi User Guide catalog", file:"index.html", includes:["User Guide", "Create and publish a staff schedule", "Delete multiple shifts"]},
         {label:"Help repository steps", file:"floqai-help-repository.js", includes:["help-staff-schedule-user-guide", "help-create-publish-schedule", "help-multi-delete-shifts"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.114\""]}
@@ -938,6 +951,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-115-scheduler-worksheet-ingest",
+      area:"Club Admin / Staff Calendar / Club websites",
+      feature:"Scheduler help, Work Sheet calendar, website ingest API",
+      changed:"User Guide lives in the ? beside Scheduler (heading renamed from Week schedule). Elected staff open Staff Calendar → Work Sheet for a read-only published grid. Clubs generate a one-time ingest secret for JSON, RSS, and iframe on their official site (published shifts only).",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.115&tab=scheduling. Confirm Scheduler ? has create/publish + multi-delete. Generate ingest secret and copy JSON/RSS/iframe. As an elected temp staff account, open patron-portal.html → Staff Calendar → Work Sheet.",
+      expected:"No standalone User Guide card. Scheduler ? sits beside the heading. Website ingest reveals the secret once. Work Sheet shows colleagues’ published chips, highlights you, hides drafts. iframe/JSON omit email/phone/drafts."
+    },
     {
       id:"v29-09-114-schedule-multi-delete-user-guide",
       area:"Club Admin / Scheduling / FloqAi",
@@ -5708,6 +5729,8 @@
         ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
         ["Club Admin Notifications (SMS green / WhatsApp red)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
         ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
+        ["Scheduler + website ingest", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling#schedWebsiteIngest`],
+        ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
         ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
         ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
         ["Search / FloqAi", `${base}/?v=${v}&start=intent`],

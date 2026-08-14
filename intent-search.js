@@ -208,17 +208,18 @@
     {
       id: "help-staff-schedule-grid",
       kind: "help",
-      label: "Staff week calendar / Round Robin",
-      blurb: "Club Admin → Scheduling: people × days grid. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Select shifts to multi-delete drafts or confirmed chips. Round Robin fills days fairly. Publish notifies workers.",
+      label: "Scheduler / Round Robin",
+      blurb: "Club Admin → Scheduling → Scheduler. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Select shifts to multi-delete. Website ingest publishes JSON / RSS / iframe. Round Robin fills days fairly.",
       steps: [
         "Open Club Admin → Scheduling (after paid this month).",
         "Manual: click + on a person/day cell, set times, Save as draft.",
         "Round Robin: pick days + role, Fill → drafts, review chips.",
         "Publish schedule to notify workers. Shifts stay pending until they confirm.",
-        "Select shifts to delete several at once (day header + chips), or open a chip for single Delete."
+        "Select shifts to delete several at once (day header + chips), or open a chip for single Delete.",
+        "Website ingest: rotate a secret and paste JSON, RSS, or iframe onto the club site."
       ],
       links: [
-        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
@@ -229,14 +230,15 @@
       patterns: [
         /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,
         /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/, /open\s*minus/, /copy\s*previous\s*week/,
-        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /select\s*shifts/, /multi[\s-]?delete/
+        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /select\s*shifts/, /multi[\s-]?delete/,
+        /website\s*ingest/, /iframe\s*schedule/, /rss\s*(feed|schedule)/
       ]
     },
     {
       id: "help-staff-schedule-user-guide",
       kind: "help",
       label: "Staff Scheduling User Guide",
-      blurb: "Step-by-step: create drafts, publish so workers confirm, then select and delete several shifts (for example all Wednesday drafts plus a Thursday confirmed chip).",
+      blurb: "Open the ? beside Scheduler: create drafts, publish so workers confirm, then select and delete several shifts (for example all Wednesday drafts plus a Thursday confirmed chip).",
       steps: [
         "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
         "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin or Copy previous week.",
@@ -245,7 +247,7 @@
         "Tap Select shifts. Filter Drafts + Wednesday header, then tap a Thursday confirmed chip, then Delete selected."
       ],
       links: [
-        {label: "Scheduling User Guide", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "user guide", "staff scheduling user guide", "create a schedule", "publish schedule",
@@ -268,7 +270,7 @@
         "The worker uses the confirm link. The chip then shows confirmed."
       ],
       links: [
-        {label: "Create and publish (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
@@ -291,7 +293,7 @@
         "Tap Delete selected and confirm."
       ],
       links: [
-        {label: "Multi-delete (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
@@ -300,6 +302,53 @@
       patterns: [
         /multi[\s-]?delete/, /delete\s+multiple/, /delete\s+(all\s+)?(wednesday|thursday|friday)?\s*drafts/,
         /delete\s+(a\s+)?confirmed\s+shift/, /select\s+shifts/, /bulk\s+delete\s+shifts/
+      ]
+    },
+    {
+      id: "help-staff-worksheet",
+      kind: "help",
+      label: "Work Sheet - Weekly Staff Calendar",
+      blurb: "Elected staff open Staff Calendar from My Profile for a read-only people × days grid of published shifts for every colleague at the venue.",
+      steps: [
+        "Sign in as an elected service member.",
+        "Open My Profile → Staff Calendar, or Work Sheet - Weekly Staff Calendar.",
+        "Pick the club if you work at more than one venue.",
+        "Your row is highlighted. Drafts are not shown."
+      ],
+      links: [
+        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
+        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
+        "colleague schedule", "who is working"
+      ],
+      patterns: [
+        /staff\s*calendar/, /work\s*sheet/, /weekly\s*staff\s*calendar/,
+        /who\s+is\s+working/, /colleague\s+schedule/
+      ]
+    },
+    {
+      id: "help-venue-website-ingest",
+      kind: "help",
+      label: "Club website ingest (API, RSS, iframe)",
+      blurb: "Generate a venue secret in Club Admin Scheduling, then pull published shifts onto the official website with JSON, RSS, or an iframe. Drafts never appear.",
+      steps: [
+        "Open Club Admin → Scheduling → Website ingest.",
+        "Tap Generate / rotate secret and copy the yellow URLs immediately.",
+        "Paste the JSON URL, RSS feed, or iframe snippet onto the club website.",
+        "Optional datasets: schedule, hours, profile, or all."
+      ],
+      links: [
+        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+      ],
+      searchPhrases: [
+        "website ingest", "club website schedule", "rss feed", "iframe schedule",
+        "schedule api", "ingest secret", "embed staff schedule", "official website"
+      ],
+      patterns: [
+        /website\s*ingest/, /schedule\s*api/, /rss\s*(feed|schedule)/,
+        /iframe\s*(schedule|embed)/, /ingest\s*secret/, /official\s*website/
       ]
     },
     {

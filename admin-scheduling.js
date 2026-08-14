@@ -18,20 +18,153 @@
   const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
   const ROLE_CHIP = ["role-a", "role-b", "role-c", "role-d"];
 
-  const state = {
-    workers: [],
-    shifts: [],
-    weekStart: startOfWeek(new Date()),
-    mode: "manual",
-    applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
-    rrDays: new Set([1, 2, 3, 4, 5]),
-    assignContext: null,
-    rrCursor: 0,
-    venue: null,
-    selecting: false,
-    selectFilter: "all",
-    selectedShiftIds: new Set()
-  };
+  let ingestReveal = null;
+
+  const SCHEDULER_HELP_HTML = `
+    <p>People × days week grid. Default shift window = club open − 2 hours through club close + 1 hour. Round Robin fills selected open days fairly.</p>
+    <p><strong>Create and publish</strong></p>
+    <ol>
+      <li>Tap <strong>+</strong> on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week.</li>
+      <li>Review dashed draft chips, then tap <strong>Publish schedule</strong>. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.</li>
+      <li>Published chips stay <strong>pending</strong> until the worker confirms. Confirmed has a green outline.</li>
+    </ol>
+    <p><strong>Delete multiple shifts</strong></p>
+    <ol>
+      <li>Tap <strong>Select shifts</strong>.</li>
+      <li>Filter Drafts and tap a day header (e.g. Wednesday), then tap other chips (e.g. a Thursday confirmed shift).</li>
+      <li>Tap <strong>Delete selected</strong> and confirm. Escape or Done exits select mode.</li>
+    </ol>
+    <p>Put published shifts (never drafts) on your club website with <strong>Website ingest</strong> below — JSON API, RSS, or iframe, using a one-time secret.</p>
+  `;
+
+  const INGEST_HELP_HTML = `
+    <p>Clubs can pull published scheduling (and hours / profile) onto their official website.</p>
+    <ol>
+      <li>Tap Generate / rotate secret. Copy the yellow URLs immediately — the full secret is not stored in FLOQR, only a hash.</li>
+      <li>JSON: <code>venuePublicFeed?location=&amp;secret=&amp;format=json&amp;dataset=schedule|hours|profile|all</code></li>
+      <li>RSS: same URL with <code>format=rss</code> for a staff-schedule feed.</li>
+      <li>Iframe: paste the snippet into your site. It loads schedule-embed.html with the secret.</li>
+    </ol>
+    <p>Treat the secret like an API key. Rotate it if it leaks. Payload never includes drafts, worker email, or phone.</p>
+  `;
+
+  function attachSchedulingHelp() {
+    const attach = window.FLOQRHelpAttach?.attach;
+    if (!attach) return;
+    const schedTarget = byId("schedGridHeading");
+    if (schedTarget) {
+      attach({
+        target: schedTarget,
+        id: "help-staff-schedule-grid",
+        title: "Scheduler",
+        bodyHtml: SCHEDULER_HELP_HTML,
+        body: "People × days week grid. Create drafts, Publish schedule so workers confirm pending→confirmed. Select shifts to multi-delete (day header + chips). Website ingest publishes JSON, RSS, or iframe with a one-time secret. Drafts never appear on the club site.",
+        searchPhrases: [
+          "scheduler", "schedule grid", "user guide", "create a schedule", "publish schedule",
+          "how to schedule staff", "select shifts", "multi delete", "round robin",
+          "website ingest", "staff calendar"
+        ],
+        links: [
+          {label: "Club Admin Scheduling", href: "./admin.html?from=floqai&tab=scheduling"},
+          {label: "Work Sheet", href: "./staff-worksheet.html?from=floqai"}
+        ]
+      });
+    }
+    const ingestTarget = byId("schedIngestHelpHost");
+    if (ingestTarget) {
+      attach({
+        target: ingestTarget,
+        id: "help-venue-website-ingest",
+        title: "Website ingest",
+        bodyHtml: INGEST_HELP_HTML,
+        body: "Generate a venue ingest secret to pull published staff shifts onto your official website via JSON API, RSS, or iframe. Hash only is stored; full secret is revealed once per rotate. Drafts, email, and phone are omitted.",
+        searchPhrases: [
+          "website ingest", "club website schedule", "rss feed", "iframe schedule",
+          "schedule api", "ingest secret", "embed staff schedule", "official website"
+        ],
+        links: [
+          {label: "Website ingest", href: "./admin.html?from=floqai&tab=scheduling#schedWebsiteIngest"}
+        ]
+      });
+    }
+  }
+
+  function setIngestStatus(message) {
+    const el = byId("schedIngestStatus");
+    if (el) el.textContent = message || "";
+  }
+
+  async function copyText(value, okMsg) {
+    const text = String(value || "");
+    if (!text) {
+      setIngestStatus("Generate / rotate a secret first so the URLs include the key.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setIngestStatus(okMsg);
+    } catch (_error) {
+      setIngestStatus("Copy failed — select the yellow text and copy it manually.");
+    }
+  }
+
+  function ingestUrls() {
+    return ingestReveal?.urls || {};
+  }
+
+  function renderIngestReveal() {
+    const host = byId("schedIngestReveal");
+    if (!host) return;
+    if (!ingestReveal?.secret) {
+      host.classList.add("hidden");
+      host.innerHTML = "";
+      return;
+    }
+    host.classList.remove("hidden");
+    host.innerHTML = `
+      <p><strong>ONE-TIME secret and URLs</strong></p>
+      <p class="sub small">Paste these onto your website now. The full secret will not be shown again until you rotate.</p>
+      <p>Secret</p><code>${esc(ingestReveal.secret)}</code>
+      <p>JSON</p><code>${esc(ingestReveal.urls?.json || "")}</code>
+      <p>RSS</p><code>${esc(ingestReveal.urls?.rss || "")}</code>
+      <p>Iframe</p><code>${esc(ingestReveal.iframeSnippet || "")}</code>
+    `;
+  }
+
+  async function loadIngestEndpoints() {
+    if (!locationId) {
+      setIngestStatus("Choose a venue to generate website ingest URLs.");
+      return;
+    }
+    try {
+      const result = await callable("getVenueIngestEndpoints")({locationId});
+      const data = result?.data || {};
+      const prefix = byId("schedIngestPrefix");
+      if (prefix) {
+        prefix.textContent = data.configured
+          ? `Secret: ${data.secretPrefix || "configured (obfuscated)"}`
+          : "Secret: not generated yet.";
+      }
+      setIngestStatus(data.hint || "");
+    } catch (error) {
+      setIngestStatus(error?.message || String(error));
+    }
+  }
+
+  async function rotateIngestSecret() {
+    if (!locationId) {
+      setIngestStatus("Choose a venue first.");
+      return;
+    }
+    if (!window.confirm("Rotate the website ingest secret? Existing JSON, RSS, and iframe URLs stop working immediately.")) return;
+    setIngestStatus("Generating secret…");
+    const result = await callable("rotateVenueIngestSecret")({locationId});
+    ingestReveal = result?.data || null;
+    const prefix = byId("schedIngestPrefix");
+    if (prefix) prefix.textContent = `Secret: ${ingestReveal?.secretPrefix || "rotated"}`;
+    renderIngestReveal();
+    setIngestStatus(ingestReveal?.warning || "Copy the yellow URLs now.");
+  }
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
@@ -63,6 +196,21 @@
     d.setDate(d.getDate() + n);
     return d;
   }
+
+  const state = {
+    workers: [],
+    shifts: [],
+    weekStart: startOfWeek(new Date()),
+    mode: "manual",
+    applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
+    rrDays: new Set([1, 2, 3, 4, 5]),
+    assignContext: null,
+    rrCursor: 0,
+    venue: null,
+    selecting: false,
+    selectFilter: "all",
+    selectedShiftIds: new Set()
+  };
 
   function sameDay(aMs, dayDate) {
     const a = new Date(aMs);
@@ -608,7 +756,7 @@
           ? `Calendar unlocked · ${monthStatus} (staffSchedulingPaid=1).`
           : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus} (staffSchedulingPaid=0).`
       );
-      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts()]);
+      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts(), loadIngestEndpoints()]);
     } catch (error) {
       setStatus(error?.message || String(error));
     }
@@ -957,6 +1105,7 @@
     setMode("manual");
     updateWeekLabel();
 
+    attachSchedulingHelp();
     byId("buySchedulingSubBtn")?.addEventListener("click", () => {
       startSubscription().catch(error => setStatus(error.message));
     });
@@ -1016,6 +1165,21 @@
       state.weekStart = startOfWeek(new Date());
       applyVenueDefaultsToControls();
       renderGrid();
+    });
+    byId("schedIngestRotateBtn")?.addEventListener("click", () => {
+      rotateIngestSecret().catch(error => setIngestStatus(error.message));
+    });
+    byId("schedIngestCopyJsonBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().json, "JSON URL copied.");
+    });
+    byId("schedIngestCopyRssBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().rss, "RSS URL copied.");
+    });
+    byId("schedIngestCopyIframeBtn")?.addEventListener("click", () => {
+      copyText(ingestReveal?.iframeSnippet || "", "Iframe snippet copied.");
+    });
+    byId("schedIngestCopyAllBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().all, "All-data JSON URL copied.");
     });
 
     byId("scheduleWeekGrid")?.addEventListener("click", event => {

@@ -9,6 +9,7 @@ module.exports = {
   ...require("./messaging-functions"),
   ...require("./marketing-campaign-functions"),
   ...require("./scheduling-functions"),
+  ...require("./venue-ingest-functions"),
   ...require("./demo-seed-functions"),
   ...require("./suprstr-functions"),
   setPatronFeatureGates: featureGateFns.setPatronFeatureGates,

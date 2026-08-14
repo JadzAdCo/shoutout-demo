@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.114"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -524,13 +524,8 @@
         </div>
         <div id="schedulingWorkspace" class="hidden">
           <div class="card">
-            <h2
-              data-floqr-help-id="help-staff-schedule-grid"
-              data-floqr-help-title="Staff week calendar"
-            data-floqr-help-search="schedule grid|round robin|publish schedule|people days|open minus two hours|select shifts|multi delete"
-            data-floqr-help-body="People × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp. Select shifts, then tap chips or a day header (Drafts / Pending / Confirmed filter) to multi-delete — e.g. all Wednesday drafts plus a Thursday confirmed chip. Default shift window = club open − 2 hours through club close + 1 hour."
-            >Week schedule</h2>
-            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Use <strong>Select shifts</strong> to delete several drafts or confirmed chips at once. Default window = club open − 2h through close + 1h.</p>
+            <h2 id="schedGridHeading">Scheduler</h2>
+            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Use <strong>Select shifts</strong> to delete several drafts or confirmed chips at once. Default window = club open − 2h through close + 1h. Open the <strong>?</strong> beside Scheduler for create/publish and multi-delete steps.</p>
             <div class="sched-toolbar">
               <div class="sched-mode-toggle" role="group" aria-label="Assign mode">
                 <button type="button" id="schedModeManualBtn" class="sched-mode-btn active" data-mode="manual">Manual</button>
@@ -583,28 +578,19 @@
             <div id="scheduleWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
           </div>
 
-          <div id="schedUserGuide" class="card sched-user-guide">
-            <p class="eyebrow">Club Admin</p>
-            <h2
-              data-floqr-help-id="help-staff-schedule-user-guide"
-              data-floqr-help-title="Staff Scheduling User Guide"
-              data-floqr-help-search="user guide|create a schedule|publish schedule|how to schedule staff|multi delete shifts|delete wednesday drafts"
-              data-floqr-help-body="Create drafts on the week grid, then Publish schedule so workers confirm pending shifts. Select shifts to delete several at once: filter Drafts and tap Wednesday’s header, then tap a Thursday confirmed chip, then Delete selected."
-            >User Guide</h2>
-            <h3>Create and publish a schedule</h3>
-            <ol>
-              <li>Open Club Admin → Scheduling (unlocked when <code>staffSchedulingPaid=1</code> / paid this month).</li>
-              <li>Manual: tap <strong>+</strong> on a person/day cell, set role and times, leave <strong>Save as draft</strong> checked, then Save shift. Repeat for other people or days. Optional: Round Robin fill → drafts, or Copy previous week → drafts.</li>
-              <li>Review dashed <strong>draft</strong> chips. Tap <strong>Publish schedule</strong>. Workers get Inbox / Email / SMS / WhatsApp with a confirm link (per their privacy settings and this club’s notification channels).</li>
-              <li>Published chips stay <strong>pending</strong> until the worker confirms. Confirmed = green outline. Declined stays on the grid until you delete it.</li>
-            </ol>
-            <h3>Delete multiple shifts</h3>
-            <ol>
-              <li>Tap <strong>Select shifts</strong>.</li>
-              <li>Example — all Wednesday drafts plus one Thursday confirmed: choose <strong>Drafts</strong>, tap the Wednesday column header, switch the filter to <strong>All</strong> (or Confirmed), then tap the Thursday confirmed chip.</li>
-              <li>Tap <strong>Delete selected</strong> and confirm. Drafts disappear quietly. Pending and confirmed workers get a cancelled notice if they were already notified. Escape or Done exits select mode.</li>
-            </ol>
-            <p class="sub small" data-keep-visible="true">Single-shift delete is still on each chip’s edit dialog. FloqAi answers “create a schedule”, “publish schedule”, and “delete Wednesday drafts”.</p>
+          <div id="schedWebsiteIngest" class="card">
+            <h2 id="schedIngestHelpHost">Website ingest</h2>
+            <p class="sub small" data-keep-visible="true">Put published staff shifts on your official website. Generate a secret, then paste the JSON API URL, RSS feed, or iframe. The full secret is shown once per rotate (hash only is stored). Drafts, worker email, and phone never leave FLOQR.</p>
+            <p id="schedIngestStatus" class="status"></p>
+            <p id="schedIngestPrefix" class="sub small" data-keep-visible="true">Secret: not generated yet.</p>
+            <div class="queue-actions">
+              <button type="button" id="schedIngestRotateBtn" class="primary">Generate / rotate secret</button>
+              <button type="button" id="schedIngestCopyJsonBtn">Copy JSON URL</button>
+              <button type="button" id="schedIngestCopyRssBtn">Copy RSS URL</button>
+              <button type="button" id="schedIngestCopyIframeBtn">Copy iframe snippet</button>
+              <button type="button" id="schedIngestCopyAllBtn">Copy all-data JSON URL</button>
+            </div>
+            <div id="schedIngestReveal" class="sched-ingest-onetime hidden"></div>
           </div>
 
           <div id="scheduleAssignModal" class="sched-modal hidden" role="dialog" aria-modal="true" aria-labelledby="scheduleAssignTitle">
@@ -777,8 +763,8 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.114"></script>
-<script src="./help-attach.js?v=29.09.101"></script>
+<script src="./floqai-help-repository.js?v=29.09.115"></script>
+<script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
 <script src="./floqr-logger.js?v=29.09.8"></script>
@@ -788,13 +774,13 @@
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=29.09.114"></script>
+<script src="./admin-app.js?v=29.09.115"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.112"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.114"></script>
+<script src="./admin-scheduling.js?v=29.09.115"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

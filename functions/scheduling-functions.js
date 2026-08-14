@@ -8,6 +8,8 @@ const {
   publishedShiftStatus,
   canDeleteShiftStatus,
   sanitizeShiftIds,
+  isPublishedShiftStatus,
+  publicShiftView,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
@@ -693,4 +695,109 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
     return row;
   }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
   return {shifts, canManage: true};
+});
+
+async function isElectedClubWorker(ownerId, authContext = {}) {
+  const uid = authContext.uid || "";
+  if (!uid || !ownerId) return false;
+  if (await canManageOwner("club", ownerId, authContext)) return true;
+  const safeId = `${ownerId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const designation = await db.collection("clubEmployeeDesignations").doc(safeId).get();
+  if (designation.exists && text(designation.data()?.status, 40).toLowerCase() !== "rejected") return true;
+  const snap = await db.collection("clubEmployeeDesignations")
+    .where("clubLocationId", "==", ownerId)
+    .limit(200)
+    .get();
+  return snap.docs.some(doc => {
+    const row = doc.data() || {};
+    return text(row.workerUid, 160) === uid && text(row.status, 40).toLowerCase() !== "rejected";
+  });
+}
+
+async function listMyElectedVenues(uid) {
+  const venues = [];
+  const seen = new Set();
+  try {
+    const mine = await db.collection("clubEmployeeDesignations")
+      .where("workerUid", "==", uid)
+      .limit(40)
+      .get();
+    mine.docs.forEach(doc => {
+      const row = doc.data() || {};
+      if (text(row.status, 40).toLowerCase() === "rejected") return;
+      const id = text(row.clubLocationId, 160);
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      venues.push({
+        locationId: id,
+        locationName: text(row.clubLocationName, 160) || id,
+        role: text(row.roleElectionType, 80)
+      });
+    });
+  } catch (_error) {}
+  return venues;
+}
+
+exports.listStaffWorksheet = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const uid = request.auth.uid;
+  const venues = await listMyElectedVenues(uid);
+  let ownerId = text(request.data?.ownerId || request.data?.locationId, 160);
+  if (!ownerId && venues.length) ownerId = venues[0].locationId;
+  if (!ownerId) {
+    throw new HttpsError("permission-denied", "Only elected service members can open the Work Sheet.");
+  }
+  if (!await isElectedClubWorker(ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "Only elected service members at this venue can open the Work Sheet.");
+  }
+  const key = ownerKey("club", ownerId);
+  const [desigSnap, shiftSnap, clubSnap] = await Promise.all([
+    db.collection("clubEmployeeDesignations").where("clubLocationId", "==", ownerId).limit(200).get(),
+    db.collection("scheduleShifts").where("ownerKey", "==", key).limit(120).get(),
+    db.collection("clubLocations").doc(ownerId).get()
+  ]);
+  const workers = [];
+  const seenUid = new Set();
+  desigSnap.docs.forEach(doc => {
+    const row = doc.data() || {};
+    if (text(row.status, 40).toLowerCase() === "rejected") return;
+    const workerUid = text(row.workerUid, 160);
+    if (!workerUid || seenUid.has(workerUid)) return;
+    seenUid.add(workerUid);
+    workers.push({
+      uid: workerUid,
+      name: text(row.workerName, 120) || workerUid,
+      role: text(row.roleElectionType, 80) || "Staff",
+      photoURL: ""
+    });
+  });
+  await Promise.all(workers.slice(0, 80).map(async worker => {
+    try {
+      const userSnap = await db.collection("users").doc(worker.uid).get();
+      if (!userSnap.exists) return;
+      const user = userSnap.data() || {};
+      worker.name = text(user.displayName || user.fullName || worker.name, 120);
+      worker.photoURL = text(user.photoURL || user.profilePhotoUrl || user.publicPhotoUrl, 500);
+    } catch (_error) {}
+  }));
+  workers.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const shifts = shiftSnap.docs.map(doc => {
+    const row = {id: doc.id, ...doc.data()};
+    row.status = normalizeShiftStatus(row.status) || row.status || "";
+    return row;
+  }).filter(row => isPublishedShiftStatus(row.status))
+    .map(row => ({
+      ...publicShiftView(row, {includeNotes: true}),
+      assigneeUid: text(row.assigneeUid, 160)
+    }))
+    .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+  const club = clubSnap.exists ? clubSnap.data() || {} : {};
+  return {
+    locationId: ownerId,
+    locationName: text(club.locationName || club.brandName, 160) || ownerId,
+    workers,
+    shifts,
+    viewerUid: uid,
+    venues: venues.length ? venues : [{locationId: ownerId, locationName: text(club.locationName || club.brandName, 160) || ownerId, role: ""}]
+  };
 });

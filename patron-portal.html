@@ -60,11 +60,22 @@
           <p><a href="./role-request.html?v=29.09.8&from=portal">Request Club Admin / DJ / Promoter / Hospitality Access</a></p>
           <p><a href="./services.html?v=29.09.8&from=portal">Follow a promoter, DJ, waitress, bottle girl, or bartender</a></p>
         </div>
+        <div id="staffCalendarCard" class="card hidden">
+          <h2
+            data-floqr-help-id="help-staff-worksheet"
+            data-floqr-help-title="Staff Calendar"
+            data-floqr-help-search="staff calendar|work sheet|weekly staff calendar|colleague schedule"
+            data-floqr-help-body="Open Work Sheet - Weekly Staff Calendar to see published shifts for every elected colleague at your venue. Drafts stay in Club Admin only."
+          >Staff Calendar</h2>
+          <p class="sub small" data-keep-visible="true">Work Sheet — Weekly Staff Calendar. Read-only published schedule for your club.</p>
+          <p><a id="staffCalendarLink" class="buttonlike" href="./staff-worksheet.html?v=29.09.115">Open Work Sheet</a></p>
+        </div>
       </section>
 
       <section id="portalProfile" class="admin-panel-section">
         <div class="card">
           <h2>Edit Profile</h2>
+          <p id="staffCalendarProfileWrap" class="hidden"><a id="staffCalendarProfileLink" href="./staff-worksheet.html?v=29.09.115">Staff Calendar — Work Sheet - Weekly Staff Calendar</a></p>
           <p class="sub small">Use legal first and last name for guest lists where ID checks are required.</p>
           <div class="profile-grid">
             <label>First Name <input id="editFirstName"/></label>
@@ -569,15 +580,15 @@
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.100"></script>
-<script src="./help-attach.js?v=29.09.100"></script>
+<script src="./floqai-help-repository.js?v=29.09.115"></script>
+<script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.100"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./floqr-i18n.js?v=29.09.100"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=29.09.108"></script>
+<script src="./patron-portal-app.js?v=29.09.115"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
