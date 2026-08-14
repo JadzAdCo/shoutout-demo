@@ -149,11 +149,15 @@ function text(value = "", max = 500) {
 function secretValueSafe(secret, envName = "") {
   try {
     const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
-    if (fromSecret) return String(fromSecret);
+    if (fromSecret) {
+      const raw = String(fromSecret);
+      return /^TWILIO_/.test(envName) ? require("./messaging-core").sanitizeTwilioSecret(raw) : raw;
+    }
   } catch (_) {
     /* Secret not bound in this runtime. */
   }
-  return envName ? String(process.env[envName] || "") : "";
+  const fallback = envName ? String(process.env[envName] || "") : "";
+  return /^TWILIO_/.test(envName) ? require("./messaging-core").sanitizeTwilioSecret(fallback) : fallback;
 }
 
 function checkoutTextCaps(templateId = "", formatId = "") {

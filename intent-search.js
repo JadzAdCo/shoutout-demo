@@ -124,25 +124,50 @@
       id: "help-club-notification-subscriptions",
       kind: "help",
       label: "Club SMS and WhatsApp notification subscriptions",
-      blurb: "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the paid subscription.",
+      blurb: "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the paid subscription. If Send test alert returns Authentication Error - invalid username, TWILIO_ACCOUNT_SID must be the Account SID starting with AC, not an Auth Token or API Key (SK).",
       steps: [
         "Open Club Admin → Notifications.",
         "Check SMS and/or WhatsApp. The first save for an unsubscribed channel opens the $10 Stripe checkout.",
         "After payment, Firebase marks that channel subscribed. Later saves keep settings and skip checkout.",
-        "Uncheck a subscribed channel to pause alerts; you will not be charged again when you re-check it."
+        "Uncheck a subscribed channel to pause alerts; you will not be charged again when you re-check it.",
+        "If a test alert says invalid username, set Firebase secret TWILIO_ACCOUNT_SID to the AC… Account SID from Twilio Console."
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
-        "sms already paid", "notification stripe again", "sms credits", "club notifications"
+        "sms already paid", "notification stripe again", "sms credits", "club notifications",
+        "invalid username", "twilio account sid", "send test alert", "authentication error"
       ],
       patterns: [
         /sms\s*(notification|subscription|already\s*paid)/,
         /whatsapp\s*(notification|subscription)/,
         /save\s*notification/,
-        /notification\s*(stripe|checkout|payment)/
+        /notification\s*(stripe|checkout|payment)/,
+        /invalid\s*username/,
+        /twilio\s*(account\s*sid|auth)/
+      ]
+    },
+    {
+      id: "help-donpapi-led-wall",
+      kind: "help",
+      label: "DonPapi ShoutOut LED wall",
+      blurb: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen.",
+      steps: [
+        "Open a club public profile gallery to see busboys holding the DonPapi wall.",
+        "VIP ShoutOut text appears on the center LED; club name sits at the top of the scalloped frame.",
+        "Table LEDs and portrait walls are separate formats."
+      ],
+      links: [
+        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      searchPhrases: [
+        "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
+        "bus boys carry", "shoutout led"
+      ],
+      patterns: [
+        /don\s*papi/, /led\s*wall/, /bus\s*boys?/, /handheld\s*led/, /vip\s*sign/
       ]
     },
     {

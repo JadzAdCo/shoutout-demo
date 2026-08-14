@@ -309,7 +309,13 @@
     }
     if (delivered > 0) return `Test alert sent to ${delivered} channel(s).`;
     if (attempted > 0) {
-      return `Test reached ${attempted} channel(s) but none delivered.${uniqueErrors.length ? " " + uniqueErrors.join("; ") : ""}`;
+      const health = data.twilio || {};
+      const sidHint = health.looksLikeApiKey
+        ? " TWILIO_ACCOUNT_SID is an API Key (SK…); it must be the Account SID starting with AC."
+        : health.looksLikeAccountSid === false && health.accountSidPrefix
+          ? ` TWILIO_ACCOUNT_SID prefix is ${health.accountSidPrefix} (${health.accountSidLength || 0} chars); it must start with AC and be 34 characters.`
+          : "";
+      return `Test reached ${attempted} channel(s) but none delivered.${uniqueErrors.length ? " " + uniqueErrors.join("; ") : ""}${sidHint}`;
     }
     return "Test alert sent to 0 channel(s). Save an alert phone and keep SMS and/or WhatsApp checked, then Save before testing.";
   }

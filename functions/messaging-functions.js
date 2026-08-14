@@ -16,7 +16,11 @@ const {
   buildPendingShoutoutMessage,
   twilioWhatsAppAddress,
   selectOutboundTargets,
-  describeOutboundSkip
+  describeOutboundSkip,
+  sanitizeTwilioSecret,
+  describeTwilioAccountSid,
+  twilioCredentialHealth,
+  explainTwilioDeliveryError
 } = require("./messaging-core");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -43,19 +47,24 @@ function text(value, max = 200) {
 function secretValue(secret, envName = "") {
   try {
     const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
-    if (fromSecret) return String(fromSecret);
+    if (fromSecret) return sanitizeTwilioSecret(fromSecret);
   } catch (error) {
     /* Secret not bound in this runtime (local dry-run / missing config). */
   }
-  return envName ? String(process.env[envName] || "") : "";
+  return envName ? sanitizeTwilioSecret(process.env[envName] || "") : "";
 }
 
 function twilioCredentials() {
+  const accountSid = secretValue(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID");
+  const authToken = secretValue(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN");
+  const whatsappFromRaw = secretValue(TWILIO_WHATSAPP_FROM, "TWILIO_WHATSAPP_FROM");
   return {
-    accountSid: secretValue(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
-    authToken: secretValue(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
+    accountSid,
+    authToken,
     fromNumber: normalizeE164(secretValue(TWILIO_FROM_NUMBER, "TWILIO_FROM_NUMBER")),
-    whatsappFrom: secretValue(TWILIO_WHATSAPP_FROM, "TWILIO_WHATSAPP_FROM")
+    whatsappFrom: whatsappFromRaw.startsWith("whatsapp:")
+      ? whatsappFromRaw
+      : (twilioWhatsAppAddress(whatsappFromRaw) || whatsappFromRaw)
   };
 }
 
@@ -181,6 +190,15 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
     return {ok: true, dryRun: true, status: "dry-run"};
   }
 
+  const sidInfo = describeTwilioAccountSid(creds.accountSid);
+  if (!sidInfo.looksLikeAccountSid) {
+    const error = explainTwilioDeliveryError("Authentication Error - invalid username", sidInfo);
+    await logDelivery({
+      clubLocationId, channel, to: destination, body, status: "failed", dryRun: false, purpose, shoutoutId, error
+    });
+    return {ok: false, dryRun: false, status: "invalid-sid", error};
+  }
+
   const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(creds.accountSid)}/Messages.json`;
   const params = new URLSearchParams({To: destination, From: from, Body: String(body || "").slice(0, 1500)});
   const auth = Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString("base64");
@@ -195,7 +213,8 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = text(payload.message || `HTTP ${response.status}`, 500);
+      const rawError = text(payload.message || payload.error_message || `HTTP ${response.status}`, 500);
+      const error = explainTwilioDeliveryError(rawError, sidInfo);
       await logDelivery({
         clubLocationId, channel, to: destination, body, status: "failed", dryRun: false, purpose, shoutoutId, error
       });
@@ -389,7 +408,7 @@ exports.sendClubTestMessage = onCall({
   }
   const errors = (delivery.results || [])
     .filter(row => !row.ok)
-    .map(row => text(row.error || row.status, 200))
+    .map(row => text(row.error || row.status, 280))
     .filter(Boolean);
   return {
     clubLocationId,
@@ -399,7 +418,8 @@ exports.sendClubTestMessage = onCall({
     skipped: skip || "",
     dryRun: (delivery.results || []).some(row => row.dryRun),
     errors,
-    results: delivery.results
+    results: delivery.results,
+    twilio: twilioCredentialHealth(twilioCredentials())
   };
 });
 

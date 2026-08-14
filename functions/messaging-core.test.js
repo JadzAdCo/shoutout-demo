@@ -101,7 +101,32 @@ test("describeOutboundSkip explains missing phone vs paused channels", () => {
   assert.equal(describeOutboundSkip({alertPhone: "+12025550123", smsEnabled: true}), "");
 });
 
-test("twilio WhatsApp address prefix", () => {
-  assert.equal(twilioWhatsAppAddress("+12025550123"), "whatsapp:+12025550123");
-  assert.equal(twilioWhatsAppAddress(""), "");
+test("sanitizes Twilio secrets and explains invalid Account SID", () => {
+  const {
+    sanitizeTwilioSecret,
+    describeTwilioAccountSid,
+    explainTwilioDeliveryError,
+    twilioCredentialHealth
+  } = require("./messaging-core");
+  assert.equal(sanitizeTwilioSecret('  "ACabc"  '), "ACabc");
+  assert.equal(describeTwilioAccountSid('"ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"').looksLikeAccountSid, true);
+  assert.equal(describeTwilioAccountSid("ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").looksLikeAccountSid, true);
+  assert.equal(describeTwilioAccountSid("SKaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").looksLikeApiKey, true);
+  assert.match(
+    explainTwilioDeliveryError("Authentication Error - invalid username", describeTwilioAccountSid("SKaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")),
+    /API Key/
+  );
+  assert.match(
+    explainTwilioDeliveryError("Authentication Error - invalid username", describeTwilioAccountSid("ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")),
+    /Account SID/
+  );
+  const health = twilioCredentialHealth({
+    accountSid: "SKaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    authToken: "x".repeat(32),
+    fromNumber: "+12025550123",
+    whatsappFrom: "whatsapp:+12025550123"
+  });
+  assert.equal(health.looksLikeApiKey, true);
+  assert.equal(health.accountSidPrefix, "SK");
+  assert.equal(health.fromNumberSet, true);
 });

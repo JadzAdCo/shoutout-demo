@@ -611,7 +611,12 @@
       <section id="panelNotifications" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Club ops</p>
-          <h2>Notifications</h2>
+          <h2
+            data-floqr-help-id="help-club-notification-subscriptions"
+            data-floqr-help-title="Club SMS and WhatsApp notification subscriptions"
+            data-floqr-help-search="sms notification|whatsapp notification|twilio|invalid username|account sid|send test alert"
+            data-floqr-help-body="SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits, and Subscribe live in each channel ?. Save does not reopen Stripe for a subscribed channel. Send test alert needs an E.164 alert phone plus SMS and/or WhatsApp left on. If the test returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID that starts with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
+          >Notifications</h2>
           <p class="sub small">Choose how this club receives pending-ShoutOut alerts. Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp colors follow the Firebase subscription (green = paid, red = not subscribed). Payment and credit details are in each channel's ?.</p>
           <div class="notify-channel-grid">
             <label class="notify-channel"><input id="repNotifyInApp" type="checkbox" checked/> In-app</label>
@@ -727,7 +732,7 @@
 <script src="./firebase-config.js?v=29.09.8"></script>
 <script src="./floqr-nav.js?v=29.09.46"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
-<script src="./floqr-temp-qa-showcase.js?v=29.09.110"></script>
+<script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.110"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
@@ -736,7 +741,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.111"></script>
+<script src="./floqai-help-repository.js?v=29.09.112"></script>
 <script src="./help-attach.js?v=29.09.101"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -750,7 +755,7 @@
 <script src="./admin-app.js?v=29.09.103"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.111"></script>
+<script src="./admin-notifications.js?v=29.09.112"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./admin-scheduling.js?v=29.09.108"></script>

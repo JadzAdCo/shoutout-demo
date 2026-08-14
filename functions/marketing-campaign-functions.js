@@ -4,7 +4,7 @@
 const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
-const {normalizeE164} = require("./messaging-core");
+const {normalizeE164, sanitizeTwilioSecret, describeTwilioAccountSid, explainTwilioDeliveryError, twilioWhatsAppAddress} = require("./messaging-core");
 const {creditField: messagingCreditField, SMS_MESSAGES_PER_PACK, WHATSAPP_MESSAGES_PER_PACK, FLOQR_PROFIT_CENTS, TWILIO_BUDGET_CENTS} = require("./messaging-credits");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -50,17 +50,20 @@ async function canManageClubMessaging(clubLocationId, authContext = {}) {
 function secretValue(secret, envName = "") {
   try {
     const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
-    if (fromSecret) return String(fromSecret);
+    if (fromSecret) return sanitizeTwilioSecret(fromSecret);
   } catch (error) { /* missing in local */ }
-  return envName ? String(process.env[envName] || "") : "";
+  return envName ? sanitizeTwilioSecret(process.env[envName] || "") : "";
 }
 
 function twilioCredentials() {
+  const whatsappFromRaw = secretValue(TWILIO_WHATSAPP_FROM, "TWILIO_WHATSAPP_FROM");
   return {
     accountSid: secretValue(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
     authToken: secretValue(TWILIO_AUTH_TOKEN, "TWILIO_AUTH_TOKEN"),
     fromNumber: normalizeE164(secretValue(TWILIO_FROM_NUMBER, "TWILIO_FROM_NUMBER")),
-    whatsappFrom: secretValue(TWILIO_WHATSAPP_FROM, "TWILIO_WHATSAPP_FROM")
+    whatsappFrom: whatsappFromRaw.startsWith("whatsapp:")
+      ? whatsappFromRaw
+      : (twilioWhatsAppAddress(whatsappFromRaw) || whatsappFromRaw)
   };
 }
 
@@ -84,6 +87,12 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, purpose, sh
     await db.collection("clubMessageDeliveries").add({...delivery, status: "dry-run", dryRun: true});
     return {ok: true, dryRun: true, status: "dry-run"};
   }
+  const sidInfo = describeTwilioAccountSid(creds.accountSid);
+  if (!sidInfo.looksLikeAccountSid) {
+    const error = explainTwilioDeliveryError("Authentication Error - invalid username", sidInfo);
+    await db.collection("clubMessageDeliveries").add({...delivery, status: "failed", dryRun: false, error});
+    return {ok: false, dryRun: false, status: "invalid-sid", error};
+  }
   try {
     const auth = Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString("base64");
     const params = new URLSearchParams({To: destination, From: from, Body: String(body || "").slice(0, 1500)});
@@ -94,7 +103,10 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, purpose, sh
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = text(payload.message || payload.error_message || `Twilio ${response.status}`, 500);
+      const error = text(
+        explainTwilioDeliveryError(payload.message || payload.error_message || `Twilio ${response.status}`, sidInfo),
+        500
+      );
       await db.collection("clubMessageDeliveries").add({...delivery, status: "failed", dryRun: false, error});
       return {ok: false, dryRun: false, status: "failed", error};
     }

@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.111";
+  const PREVIEW_LINKS_PACKAGE = "29.09.112";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,17 @@
       ]
     },
     {
+      version:"v29.09.112",
+      title:"Twilio SID health + diverse staff + DonPapi LED-carry VIP",
+      checks:[
+        {label:"Twilio SID sanitize + 20003 copy", file:"functions/messaging-core.js", includes:["sanitizeTwilioSecret", "describeTwilioAccountSid", "explainTwilioDeliveryError"]},
+        {label:"Test alert returns SID health", file:"functions/messaging-functions.js", includes:["invalid-sid", "twilioCredentialHealth"]},
+        {label:"Unique waitresses + Black busboys", file:"floqr-temp-qa-showcase.js", includes:["staff-imani.png", "staff-sofia.png", "staff-malik.png", "staff-andre.png", "staff-jamal.png"]},
+        {label:"DonPapi LED-carry gallery", file:"floqr-temp-qa-showcase.js", includes:["vip-donpapi-led-hbd.png", "vip-donpapi-led-checking-in.png", "busboys hold it in the air"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.112\""]}
+      ]
+    },
+    {
       version:"v29.09.111",
       title:"Compact notification pills + SMS/WhatsApp subscription deploy",
       checks:[
@@ -905,6 +916,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-112-twilio-staff-donpapi",
+      area:"Club Admin / QA staff / VIP ShoutOut",
+      feature:"Twilio Account SID health, unique diverse waitresses, DonPapi LED wall carried by busboys",
+      changed:"Test alerts map Twilio 20003 to Account SID (AC…) instructions and report SID prefix without leaking secrets. Waitress 1 remains Priya Shah; waitress 2 is Imani Cole; waitress 3 is Sofia Alvarez. Waiters cycle Luis, Malik, and Andre; featured busboys Andre/Jamal. VIP gallery shows busboys holding the handheld DonPapi LED wall in the air.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.112 → Notifications → Send test alert. If it still fails, the status must mention AC Account SID (not a raw invalid username only). Open Employee/Workers and club-profile.html?location=temp-democlub-1,2,3 and confirm Priya / Imani / Sofia are different faces. Gallery first shots are busboys holding the LED wall.",
+      expected:"Clear Twilio SID guidance. Unique waitress photos per club 1–3. VIP ShoutOut photos show the sign held overhead in front of patrons."
+    },
     {
       id:"v29-09-111-notification-pills-and-test-alert",
       area:"Club Admin / Notifications",

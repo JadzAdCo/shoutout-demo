@@ -209,11 +209,12 @@
     {
       id: "help-club-notification-subscriptions",
       title: "Club SMS and WhatsApp notification subscriptions",
-      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on.",
+      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK).",
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
         "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
-        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp"
+        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp",
+        "invalid username", "twilio account sid", "send test alert", "authentication error"
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
@@ -242,6 +243,21 @@
       ],
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-donpapi-led-wall",
+      title: "DonPapi ShoutOut LED wall",
+      body: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other formats.",
+      searchPhrases: [
+        "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
+        "bus boys carry", "shoutout led", "checking in", "we're outside"
+      ],
+      links: [
+        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
+        {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      source: "help-repository-seed",
+      page: "club-profile.html"
     },
     {
       id: "help-staff-week-calendar",

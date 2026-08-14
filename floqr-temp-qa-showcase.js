@@ -24,17 +24,20 @@
     galleryA: "club-gallery-vip.png",
     galleryB: "club-gallery-entrance.png",
     dualLed: "club-aurelia-dual-led.png",
-    vipShoutout: "club-aurelia-vip-shoutout.png",
-    vipShoutoutLed: "club-aurelia-vip-shoutout-led.png",
+    vipShoutout: "vip-donpapi-led-hbd.png",
+    vipShoutoutLed: "vip-donpapi-led-checking-in.png",
+    vipShoutoutCarry: "vip-donpapi-led-carry.png",
+    vipShoutoutTable: "club-aurelia-vip-shoutout.png",
     portraitBirthday: "club-aurelia-portrait-birthday.png",
     promo: "promo-collective-logo.png",
     dj: n => ["dj-jordan.png", "dj-maya.png", "dj-rico.png"][(n - 1) % 3],
     djBooth: n => ["dj-jordan-booth.png", "dj-maya-booth.png", "dj-rico-booth.png"][(n - 1) % 3],
-    waitress: "staff-priya.png",
-    waitressFloor: "staff-priya-floor.png",
-    waitressVip: "staff-priya-vip.png",
-    waiter: "staff-luis.png",
-    waiterTable: "staff-luis-table.png",
+    waitress: n => ["staff-priya.png", "staff-imani.png", "staff-sofia.png"][(n - 1) % 3],
+    waitressFloor: n => ["staff-priya-floor.png", "staff-imani-floor.png", "staff-sofia-floor.png"][(n - 1) % 3],
+    waitressVip: n => ["staff-priya-vip.png", "staff-imani-vip.png", "staff-sofia-vip.png"][(n - 1) % 3],
+    waiter: n => ["staff-luis.png", "staff-malik.png", "staff-andre.png"][(n - 1) % 3],
+    waiterTable: n => ["staff-luis-table.png", "staff-malik-table.png", "staff-andre.png"][(n - 1) % 3],
+    busboy: n => ((n - 1) % 3 === 2 ? "staff-jamal.png" : ["staff-andre.png", "staff-jamal.png"][(n - 1) % 2]),
     bottle: n => (n % 2 ? "staff-sienna.png" : "staff-amara.png"),
     bottleExtra: n => (n % 2 ? "staff-sienna-sparkler.png" : "staff-amara-door.png"),
     bartender: "staff-barman.png",
@@ -55,18 +58,22 @@
       music: ["House", "Hip Hop", "Afrobeats"],
       lookingToMeet: "Promoters who actually pack rooms."
     }),
-    waitress: n => ({
-      first: "Priya", last: "Shah", role: "Waitress", type: "waiterWaitress",
-      nightlifeStyle: "Fast floor, warm table, never miss a hail.",
-      music: ["R&B", "Open Format"],
-      lookingToMeet: "Regulars who tip and DJs who keep the energy up."
-    }),
-    waiter: n => ({
-      first: "Luis", last: "Ortega", role: "Waiter", type: "waiterWaitress",
-      nightlifeStyle: "VIP tables, water before the third round.",
-      music: ["Latin", "House"],
-      lookingToMeet: "Bottle teams who move as one."
-    }),
+    waitress: n => ([
+      {first: "Priya", last: "Shah", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Fast floor, warm table, never miss a hail.", music: ["R&B", "Open Format"], lookingToMeet: "Regulars who tip and DJs who keep the energy up."},
+      {first: "Imani", last: "Cole", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Black-girl magic on the floor — tray up, eyes on the hail.", music: ["Afrobeats", "R&B"], lookingToMeet: "Tables that celebrate and hosts who share the section."},
+      {first: "Sofia", last: "Alvarez", role: "Waitress", type: "waiterWaitress", nightlifeStyle: "Spanish-first greetings, champagne before the second song.", music: ["Latin", "Open Format"], lookingToMeet: "VIP hosts who call the bottle early."}
+    ][(n - 1) % 3]),
+    waiter: n => ([
+      {first: "Luis", last: "Ortega", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "VIP tables, water before the third round.", music: ["Latin", "House"], lookingToMeet: "Bottle teams who move as one."},
+      {first: "Malik", last: "Brooks", role: "Waiter", type: "waiterWaitress", nightlifeStyle: "Quiet luxury service — glasses full, never hovering.", music: ["Hip Hop", "R&B"], lookingToMeet: "Busboys who time the LED walk with the toast."},
+      {first: "Andre", last: "Wells", role: "Busboy", type: "busBoy", nightlifeStyle: "DonPapi LED wall in the air before the toast lands.", music: ["Open Format", "Hip Hop"], lookingToMeet: "Wait staff who cue the ShoutOut walk."}
+    ][(n - 1) % 3]),
+    busboy: n => ((n - 1) % 3 === 2
+      ? {first: "Jamal", last: "Price", role: "Busboy", type: "busBoy", nightlifeStyle: "Two hands on the DonPapi wall, message facing the table.", music: ["Hip Hop", "Afrobeats"], lookingToMeet: "Photographers who catch the lift."}
+      : [
+        {first: "Andre", last: "Wells", role: "Busboy", type: "busBoy", nightlifeStyle: "DonPapi LED wall in the air before the toast lands.", music: ["Open Format", "Hip Hop"], lookingToMeet: "Wait staff who cue the ShoutOut walk."},
+        {first: "Jamal", last: "Price", role: "Busboy", type: "busBoy", nightlifeStyle: "Two hands on the DonPapi wall, message facing the table.", music: ["Hip Hop", "Afrobeats"], lookingToMeet: "Photographers who catch the lift."}
+      ][(n - 1) % 2]),
     bottle: n => ({
       first: n % 2 ? "Sienna" : "Amara",
       last: n % 2 ? "Vale" : "Quinn",
@@ -116,10 +123,13 @@
       return uniqueFiles([PHOTOS.dj(n), PHOTOS.djBooth(n), venue, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryA, PHOTOS.galleryB]);
     }
     if (roleKey === "waitress") {
-      return uniqueFiles([PHOTOS.waitress, PHOTOS.waitressFloor, PHOTOS.waitressVip, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday]);
+      return uniqueFiles([PHOTOS.waitress(n), PHOTOS.waitressFloor(n), PHOTOS.waitressVip(n), venue, PHOTOS.galleryA, PHOTOS.vipShoutout, PHOTOS.vipShoutoutLed, PHOTOS.portraitBirthday]);
     }
     if (roleKey === "waiter") {
-      return uniqueFiles([PHOTOS.waiter, PHOTOS.waiterTable, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
+      return uniqueFiles([PHOTOS.waiter(n), PHOTOS.waiterTable(n), venue, PHOTOS.galleryA, PHOTOS.vipShoutout, PHOTOS.vipShoutoutLed, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
+    }
+    if (roleKey === "busboy") {
+      return uniqueFiles([PHOTOS.busboy(n), PHOTOS.vipShoutout, PHOTOS.vipShoutoutLed, PHOTOS.vipShoutoutCarry, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.portraitBirthday]);
     }
     if (roleKey === "bottle") {
       return uniqueFiles([PHOTOS.bottle(n), PHOTOS.bottleExtra(n), venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
@@ -174,6 +184,7 @@
     guestDj.title = "Guest DJ";
     const waitress = personRecord("waitress", n, absolute);
     const waiter = personRecord("waiter", n, absolute);
+    const busboy = personRecord("busboy", n, absolute);
     const bottle = personRecord("bottle", n, absolute);
     const bartender = personRecord("bartender", n, absolute);
     const admin = personRecord("clubadmin", n, absolute);
@@ -208,12 +219,12 @@
       defaultSub: row.vibe,
       tagline: row.tagline,
       publicTagline: row.tagline,
-      description: `${row.brand} is a ${row.vibe} in DC built to showcase FLOQR public profiles: VIP ShoutOut on table LEDs (64×32) and full-size portrait LED walls (960×1900) for birthday-style ShoutOuts. ${row.tagline}`,
+      description: `${row.brand} is a ${row.vibe} in DC built to showcase FLOQR public profiles: VIP ShoutOut on the handheld DonPapi LED wall (busboys carry it in the air in front of patrons), table LEDs (64×32), and full-size portrait LED walls (960×1900) for birthday-style ShoutOuts. ${row.tagline}`,
       genres: row.genres,
       artists: [dj.name, guestDj.name],
       artistsOrDjs: [dj.name, guestDj.name],
       promoters: [`${row.brand} Collective`],
-      amenities: ["VIP tables", "Bottle service", "Coat check", "Dance floor", "DJ booth", "VIP ShoutOut LED", "Portrait LED wall 960×1900"],
+      amenities: ["VIP tables", "Bottle service", "Coat check", "Dance floor", "DJ booth", "DonPapi ShoutOut LED wall", "VIP ShoutOut LED", "Portrait LED wall 960×1900"],
       publicServices: ["ShoutOut", "VIP ShoutOut", "Guest List / RSVP", "Hail a Waitress", "Staff Scheduling"],
       agePolicy: "21+",
       dressCode: "Upscale / nightlife attire",
@@ -240,18 +251,21 @@
       mainMediaUrl: venue,
       mainMediaType: "image",
       publicGallery: [
-        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table LED + portrait wall in one room", galleryOrder: 1},
-        {mediaUrl: url(PHOTOS.vipShoutout), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut — FloqR....the App. We're Outside", galleryOrder: 2},
-        {mediaUrl: url(PHOTOS.vipShoutoutLed), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut close-up", galleryOrder: 3},
-        {mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", slotType: "gallery", title: "Portrait LED wall 960×1900 — Happy Birthday", galleryOrder: 4},
-        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 5},
-        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 6},
-        {mediaUrl: venue, mediaType: "image", slotType: "gallery", title: "Main room", galleryOrder: 7},
-        {mediaUrl: url(PHOTOS.bartenderPour), mediaType: "image", slotType: "gallery", title: "Barman", galleryOrder: 8},
-        {mediaUrl: url(PHOTOS.waitressFloor), mediaType: "image", slotType: "gallery", title: "Waitress on the floor", galleryOrder: 9},
-        {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 10},
-        {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 11},
-        {mediaUrl: url(PHOTOS.waiterTable), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 12}
+        {mediaUrl: url(PHOTOS.vipShoutout), mediaType: "image", slotType: "gallery", title: "DonPapi LED wall — busboys hold it in the air", galleryOrder: 1},
+        {mediaUrl: url(PHOTOS.vipShoutoutLed), mediaType: "image", slotType: "gallery", title: "DonPapi ShoutOut — DON CHECKING IN", galleryOrder: 2},
+        {mediaUrl: url(PHOTOS.vipShoutoutCarry), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut — FloqR....the App. We're Outside", galleryOrder: 3},
+        {mediaUrl: url(PHOTOS.vipShoutoutTable), mediaType: "image", slotType: "gallery", title: "VIP table LED — FloqR....the App. We're Outside", galleryOrder: 4},
+        {mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", slotType: "gallery", title: "Portrait LED wall 960×1900 — Happy Birthday", galleryOrder: 5},
+        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table LED + portrait wall in one room", galleryOrder: 6},
+        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 7},
+        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 8},
+        {mediaUrl: venue, mediaType: "image", slotType: "gallery", title: "Main room", galleryOrder: 9},
+        {mediaUrl: url(PHOTOS.bartenderPour), mediaType: "image", slotType: "gallery", title: "Barman", galleryOrder: 10},
+        {mediaUrl: url(PHOTOS.waitressFloor(n)), mediaType: "image", slotType: "gallery", title: "Waitress on the floor", galleryOrder: 11},
+        {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 12},
+        {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 13},
+        {mediaUrl: url(PHOTOS.waiterTable(n)), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 14},
+        {mediaUrl: url(PHOTOS.busboy(n)), mediaType: "image", slotType: "gallery", title: "Busboy — DonPapi LED wall", galleryOrder: 15}
       ],
       extractedImages: [
         {url: logo, mediaUrl: logo, mediaType: "image", title: "Logo", slotType: "logo"},
@@ -260,7 +274,7 @@
         {url: url(PHOTOS.portraitBirthday), mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", title: "Portrait LED 960×1900", slotType: "gallery"}
       ],
       featuredDjs: [dj, guestDj],
-      featuredStaff: [waitress, waiter, bottle, bartender, admin],
+      featuredStaff: [waitress, waiter, busboy, bottle, bartender, admin],
       promotionGroups: [{
         ...promoter,
         name: `${row.brand} Collective`,
@@ -306,7 +320,7 @@
       publicProfilePublished: true,
       visibility: "public",
       active: true,
-      people: {dj, guestDj, waitress, waiter, bottle, bartender, admin, promoter}
+      people: {dj, guestDj, waitress, waiter, busboy, bottle, bartender, admin, promoter}
     };
   }
 
