@@ -15,9 +15,9 @@ const {
   parseOpsReply,
   buildPendingShoutoutMessage,
   twilioWhatsAppAddress,
-  selectOutboundTargets
+  selectOutboundTargets,
+  describeOutboundSkip
 } = require("./messaging-core");
-const {redirectDemoSms} = require("./demo-delivery");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -160,8 +160,7 @@ async function logDelivery(entry = {}) {
 
 async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId = "", purpose = "alert"}) {
   const creds = twilioCredentials();
-  const routed = redirectDemoSms(to);
-  const phone = normalizeE164(routed.to || to);
+  const phone = normalizeE164(to);
   if (!phone) {
     await logDelivery({clubLocationId, channel, to, body, status: "invalid-to", dryRun: true, purpose, shoutoutId});
     return {ok: false, dryRun: true, status: "invalid-to"};
@@ -378,14 +377,28 @@ exports.sendClubTestMessage = onCall({
   const clubName = text(clubSnap.data()?.locationName || clubSnap.data()?.brandName || clubLocationId, 80);
   const body = `FloqR test alert for ${clubName}. Today's club code is ${auth.code}. Reply APPROVE {code} or REJECT {code} on real pending ShoutOuts.`;
   const delivery = await deliverToClubTargets(clubLocationId, settings, body, {purpose: "test"});
-  if (!delivery.delivered && delivery.skipped === "no-targets") {
-    throw new HttpsError("failed-precondition", "Save an alert phone and enable SMS (paid) and/or WhatsApp before sending a test.");
+  const attempted = (delivery.results || []).length;
+  const skip = delivery.skipped || describeOutboundSkip(settings);
+  if (!attempted) {
+    const message = skip === "missing-phone"
+      ? "Save an alert phone (E.164) before sending a test."
+      : skip === "channels-paused"
+        ? "SMS and WhatsApp alerts are paused. Check SMS and/or WhatsApp, Save, then send a test. Paid subscriptions stay on file."
+        : "Save an alert phone and enable SMS (paid) and/or WhatsApp before sending a test.";
+    throw new HttpsError("failed-precondition", message);
   }
+  const errors = (delivery.results || [])
+    .filter(row => !row.ok)
+    .map(row => text(row.error || row.status, 200))
+    .filter(Boolean);
   return {
     clubLocationId,
     dayKey: auth.dayKey,
     delivered: delivery.delivered,
+    attempted,
+    skipped: skip || "",
     dryRun: (delivery.results || []).some(row => row.dryRun),
+    errors,
     results: delivery.results
   };
 });

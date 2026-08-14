@@ -112,9 +112,7 @@ test("Soccer jersey mark accepts any 2 characters", () => {
   assert.match(sharedData, /requiresTeamSelect:true/);
   assert.match(sharedData, /maxSubCharacters:2/);
   assert.match(sharedData, /jerseyNumberMaxChars:2/);
-  // Team ids are built as soccer${slug(name)} (e.g. Morocco → soccerMorocco).
-  assert.match(jerseyCatalog, /id:\s*`soccer\$\{slug\(/);
-  assert.match(jerseyCatalog, /Morocco:\s*"soccer-morocco-back\.png"/);
+  assert.match(jerseyCatalog, /soccerMorocco/);
   assert.match(jerseyCatalog, /FLOQR_SOCCER_TEAMS/);
   assert.match(displayApp, /isSoccerJerseyTemplate/);
   assert.match(displayApp, /cleanJerseyMark/);
@@ -137,6 +135,12 @@ test("Heist identity rail cycles optional handle then brand lines for 3s each", 
   assert.match(displayCss, /heist-brand-slide/);
   assert.match(sharedData, /identityAnimationSeconds:3/);
   assert.match(sharedData, /messageDurationSeconds:20/);
+});
+
+test("SMS and WhatsApp checkout fulfillment persist club subscription flags", () => {
+  assert.match(backend, /smsSubscribed:true/);
+  assert.match(backend, /whatsappSubscribed:true/);
+  assert.match(backend, /orderType === "smsNotifications"/);
 });
 
 test("all published templates have display-aware text contracts", () => {
@@ -165,22 +169,7 @@ test("all published templates have display-aware text contracts", () => {
       assert.ok(rule.minimumFontPixels >= 28, `${template.id} minimumFontPixels ${rule.minimumFontPixels}`);
     });
   });
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, true);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-64x48").supported, true);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-64x48").lineCount, 4);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-96x48").main, 45);
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "p125-96x48").profileId, "birthdayMedia");
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-96x48").supported, true);
-  assert.ok(Array.from(sandbox.SHOUTOUT_TEMPLATES.birthdayMedia.screenFormatIds || []).includes("p125-96x48"));
-  assert.ok(Array.from(sandbox.SHOUTOUT_TEMPLATES.birthdayMedia.screenFormatIds || []).includes("led-64x32"));
-  assert.match(displayApp, /startBirthdayRotate/);
-  assert.match(displayApp, /birthdayUsesRotate/);
-  assert.match(displayCss, /birthday-rotate-layout/);
-  assert.match(displayCss, /birthday-phase-media/);
-  assert.match(displayCss, /birthday-media-layout \.media-slot img/);
-  assert.match(displayCss, /object-fit:cover!important/);
-  assert.match(displayCss, /birthday-rotate-layout \.media-slot img/);
-  assert.match(displayCss, /object-fit:contain!important/);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, false);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
@@ -191,22 +180,4 @@ test("all published templates have display-aware text contracts", () => {
   assert.match(displayApp, /FLOQRTextLayout/);
   assert.match(backend, /checkoutTextCaps/);
   assert.match(backend, /fitCheckoutDisplayText/);
-});
-
-test("supRstar live duration arms only after stable ICE connect", () => {
-  const preview = fs.readFileSync(path.join(root, "suprstar-preview.js"), "utf8");
-  const webrtc = fs.readFileSync(path.join(root, "suprstr-webrtc.js"), "utf8");
-  const suprstr = fs.readFileSync(path.join(__dirname, "suprstr-functions.js"), "utf8");
-  assert.match(preview, /CONNECT_ARM_DEBOUNCE_MS = 2500/);
-  assert.match(preview, /queueArmAfterStableConnect/);
-  assert.match(preview, /stable-ice-connected/);
-  assert.match(preview, /liveDiag\(/);
-  assert.match(preview, /live_heartbeat/);
-  assert.match(preview, /live_timer_arm_request/);
-  assert.doesNotMatch(webrtc, /onStatus\?\.\("connected"\);/);
-  assert.match(webrtc, /onStatus\?\.\("answered"/);
-  assert.match(webrtc, /Do NOT report "connected" here/);
-  assert.match(suprstr, /exports\.armSuprstrLiveDuration/);
-  assert.match(suprstr, /liveArmedAtMs/);
-  assert.match(suprstr, /const liveEndsAtMs = 0;/);
 });

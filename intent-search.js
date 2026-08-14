@@ -124,7 +124,7 @@
       id: "help-club-notification-subscriptions",
       kind: "help",
       label: "Club SMS and WhatsApp notification subscriptions",
-      blurb: "Each club stores SMS and WhatsApp subscription status in Firebase after the first $10 payment. Saving Notifications again does not reopen Stripe for a channel that is already subscribed. Uncheck a channel to pause alerts without losing the paid subscription.",
+      blurb: "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the paid subscription.",
       steps: [
         "Open Club Admin → Notifications.",
         "Check SMS and/or WhatsApp. The first save for an unsubscribed channel opens the $10 Stripe checkout.",

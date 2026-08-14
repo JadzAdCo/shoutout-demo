@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.108";
+  const PREVIEW_LINKS_PACKAGE = "29.09.111";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -890,10 +890,29 @@
         {label:"Club profile cache bust", file:"club-profile.html", includes:["floqr-temp-qa-showcase.js?v=29.09.108", "shared-data.js?v=29.09.108"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.108\""]}
       ]
+    },
+    {
+      version:"v29.09.111",
+      title:"Compact notification pills + SMS/WhatsApp subscription deploy",
+      checks:[
+        {label:"Compact SMS/WhatsApp pills", file:"admin.html", includes:["notify-channel-grid", "repNotifySmsCard", "> SMS</label>", "> WhatsApp</label>"]},
+        {label:"Subscription color + HelpAttach", file:"admin-notifications.js", includes:["is-subscribed", "is-unsubscribed", "FLOQRHelpAttach", "data-notify-subscribe"]},
+        {label:"Webhook writes subscribed flags", file:"functions/commerce-functions.js", includes:["smsSubscribed:true", "whatsappSubscribed:true"]},
+        {label:"Test alert skip reasons", file:"functions/messaging-core.js", includes:["describeOutboundSkip", "channelAlertOn"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.111\""]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-111-notification-pills-and-test-alert",
+      area:"Club Admin / Notifications",
+      feature:"Compact SMS/WhatsApp pills, Firebase subscription color, test alert",
+      changed:"Notifications channel tiles are compact. SMS and WhatsApp labels are short. Green = Firebase subscribed (1); red/flashing = not subscribed (0). Payment, prepaid vs monthly/yearly, credits remaining, and Subscribe live in each channel ?. Test alerts explain missing phone, paused channels, or Twilio delivery errors.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.111 → Notifications. Confirm SMS pill is green after the $10 SMS payment and Save does not reopen Stripe. WhatsApp stays red until paid; ? offers Subscribe $10. Send test alert with +12027330274 saved — expect a dry-run or delivered count, not a silent 0.",
+      expected:"SMS green and no second Stripe checkout. WhatsApp red until paid. Test alert names the skip/error instead of 'sent to 0 channel(s)' when nothing can send."
+    },
     {
       id:"v29-09-108-temp-qa-photoreal-datapoints",
       area:"QA / Club Public Profile",
@@ -5626,20 +5645,16 @@
     const v = PREVIEW_LINKS_PACKAGE;
     return {
       package: v,
-      note: note || `FLOQR v${v} — open on iPhone after this deploy.`,
+      note: note || `FLOQR v${v} — photoreal QA clubs, compact Notifications, SMS subscription persist. Open on iPhone after this deploy.`,
       links: [
-        ["Search / Mingl entry", `${base}/?v=${v}&start=search`],
-        ["Shôko Club Admin — public profile + logo upload", `${base}/admin.html?location=shoko-barcelona-beach-club-spain&v=${v}`],
-        ["Shôko stable display URL (no ?v=)", `${base}/display.html?location=shoko-barcelona-spain`],
-        ["Heist DC Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`],
-        ["Locked Up (Jail Bars) — no handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&screen=led-64x32&preview=1&v=${v}`],
-        ["Locked Up — with patron handle", `${base}/display.html?location=heist-washington-dc&template=heistVaultNight&main=LOCKED%20UP&sub=%40mingl.don&screen=led-64x32&preview=1&v=${v}`],
-        ["Police Car Arrest", `${base}/display.html?location=heist-washington-dc&template=heistPoliceCar&main=IN%20CUSTODY&screen=led-64x32&preview=1&v=${v}`],
-        ["I Aint No Snitch — with name", `${base}/display.html?location=heist-washington-dc&template=heistInterrogation&main=NO%20COMMENT&sub=Don&screen=led-64x32&preview=1&v=${v}`],
-        ["Tengo muchos dólares (Vault Night)", `${base}/display.html?location=heist-washington-dc&template=heistVaultDollars&main=TENGO%20MUCHO&screen=led-64x32&preview=1&v=${v}`],
-        ["Heist preview gallery", `${base}/heist-frame-preview.html?v=${v}`],
-        ["Mobile test checklist", `${base}/mobile-test-checklist.html?v=${v}`],
-        ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`]
+        ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+        ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
+        ["Club Admin Notifications (SMS green / WhatsApp red)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
+        ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
+        ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
+        ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
+        ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+        ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
       ]
     };
   }

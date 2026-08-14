@@ -104,12 +104,32 @@ function twilioWhatsAppAddress(e164 = "") {
   return phone ? `whatsapp:${phone}` : "";
 }
 
-/** Resolve SMS/WhatsApp targets from clubNotificationSettings (additive; keeps existing smsEnabled/smsPaidAt). */
+function channelAlertOn(settings = {}, channel = "sms") {
+  const enabledKey = channel === "whatsapp" ? "whatsappEnabled" : "smsEnabled";
+  const notifyKey = channel === "whatsapp" ? "notifyWhatsapp" : "notifySms";
+  const requestedKey = channel === "whatsapp" ? "whatsappRequested" : "smsRequested";
+  const subscribedKey = channel === "whatsapp" ? "whatsappSubscribed" : "smsSubscribed";
+  const paidKey = channel === "whatsapp" ? "whatsappPaidAt" : "smsPaidAt";
+  if (settings[enabledKey] === true || settings[notifyKey] === true) return true;
+  if (settings[enabledKey] === false) return false;
+  return settings[requestedKey] !== false && !!(settings[subscribedKey] || settings[paidKey]);
+}
+
+function describeOutboundSkip(settings = {}) {
+  const phone = normalizeE164(settings.alertPhone || settings.smsPhone || settings.phone || "");
+  if (!phone) return "missing-phone";
+  const smsOn = channelAlertOn(settings, "sms");
+  const waOn = channelAlertOn(settings, "whatsapp");
+  if (!smsOn && !waOn) return "channels-paused";
+  return "";
+}
+
+/** Resolve SMS/WhatsApp targets from clubNotificationSettings. Paid subscription is stored separately; alerts follow smsEnabled / whatsappEnabled, with a legacy fallback when those flags were never written after payment. */
 function selectOutboundTargets(settings = {}) {
   const phone = normalizeE164(settings.alertPhone || settings.smsPhone || settings.phone || "");
   if (!phone) return [];
-  const smsOn = settings.smsEnabled === true || settings.smsPaidAt || settings.notifySms === true;
-  const waOn = settings.whatsappEnabled === true || settings.notifyWhatsapp === true;
+  const smsOn = channelAlertOn(settings, "sms");
+  const waOn = channelAlertOn(settings, "whatsapp");
   if (!smsOn && !waOn) return [];
   let pref = normalizeChannelPreference(settings.channelPreference || "");
   if (!settings.channelPreference) {
@@ -133,5 +153,7 @@ module.exports = {
   parseOpsReply,
   buildPendingShoutoutMessage,
   twilioWhatsAppAddress,
+  channelAlertOn,
+  describeOutboundSkip,
   selectOutboundTargets
 };

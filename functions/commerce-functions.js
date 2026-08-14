@@ -65,10 +65,6 @@ const SHOUTOUT_TEXT_LIMITS = {
     "p125-96x48":[3,10,30,20],"p125-64x48":[2,12,24,18],"p125-64x32":null,
     "led-96x48":[3,10,30,20],"led-64x48":[2,12,24,18],"led-64x32":null
   },
-  birthdayMedia:{
-    "p125-96x48":[3,15,45,20],"p125-64x48":[4,8,32,20],"p125-64x32":[4,10,40,20],
-    "led-96x48":[3,15,45,20],"led-64x48":[4,8,32,20],"led-64x32":[4,10,40,20]
-  },
   car:{
     "p125-96x48":[2,14,28,22],"p125-64x48":[2,10,20,18],"p125-64x32":[2,12,24,18],
     "led-96x48":[2,14,28,22],"led-64x48":[2,10,20,18],"led-64x32":[2,12,24,16]
@@ -167,13 +163,11 @@ function checkoutTextCaps(templateId = "", formatId = "") {
       ? "soccerJersey"
       : templateId === "car"
         ? "car"
-        : templateId === "birthdayMedia"
-          ? "birthdayMedia"
-          : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
-            ? "splitMedia"
-            : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
-              ? "classicBoard"
-              : "full";
+        : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+          ? "splitMedia"
+          : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+            ? "classicBoard"
+            : "full";
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[formatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
   return {
@@ -1822,7 +1816,14 @@ async function finalizePaidOrder(orderId, session) {
   }
 
   if (order.orderType === "smsNotifications" && order.clubLocationId) {
-    await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({smsEnabled:true, smsServiceOrderId:orderId, smsPaidAt:paidAt, updatedAt:paidAt}, {merge:true});
+    await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({
+      smsEnabled:true,
+      smsRequested:true,
+      smsSubscribed:true,
+      smsServiceOrderId:orderId,
+      smsPaidAt:paidAt,
+      updatedAt:paidAt
+    }, {merge:true});
     await ref.set({fulfillmentStatus:"sms-enabled"}, {merge:true});
   }
 
@@ -1861,6 +1862,8 @@ async function finalizePaidOrder(orderId, session) {
       if (pack.channel === "whatsapp") {
         await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({
           whatsappEnabled:true,
+          whatsappRequested:true,
+          whatsappSubscribed:true,
           whatsappServiceOrderId:orderId,
           whatsappPaidAt:paidAt,
           updatedAt:paidAt
@@ -1886,7 +1889,11 @@ async function finalizePaidOrder(orderId, session) {
       ownerName:text(order.ownerName || order.payload?.ownerName, 160),
       ownerUid:text(order.ownerUid, 160),
       ownerEmail:text(order.ownerEmail || order.customerEmail, 200),
-      status:"active",
+      status:"paid this month",
+      monthStatus:"paid this month",
+      paid:1,
+      staffSchedulingPaid:1,
+      everSubscribed:true,
       priceCents:Number(order.amountCents || 2000),
       billingInterval:"month",
       serviceOrderId:orderId,
@@ -1894,9 +1901,22 @@ async function finalizePaidOrder(orderId, session) {
       stripeSubscriptionId:subscriptionId,
       stripeCustomerId:text(session?.customer, 160),
       clubLocationId:ownerType === "club" ? ownerId : text(order.clubLocationId, 120),
+      source:"subscription",
       activatedAt:paidAt,
+      lastPaidAt:paidAt,
       updatedAt:paidAt
     }, {merge:true});
+    // Venue gate used by Club Admin / Scheduling portal UI (1 = calendar, 0 = Subscribe/Resubscribe)
+    if (ownerType === "club" && ownerId) {
+      await db.collection("clubLocations").doc(ownerId).set({
+        staffSchedulingPaid:1,
+        schedulingMonthStatus:"paid this month",
+        schedulingEverSubscribed:true,
+        schedulingEntitlementSource:"subscription",
+        schedulingLastPaidAt:paidAt,
+        schedulingPaidUpdatedAt:paidAt
+      }, {merge:true});
+    }
     await ref.set({
       fulfillmentStatus:"scheduling-subscription-active",
       stripeSubscriptionId:subscriptionId,
@@ -2092,14 +2112,32 @@ async function syncSchedulingSubscriptionFromStripe(subscription = {}) {
   if (!key) return;
   const statusRaw = text(subscription.status, 40).toLowerCase();
   const active = ["active", "trialing"].includes(statusRaw);
+  const paid = active ? 1 : 0;
+  const monthStatus = active ? "paid this month" : "not paid this month";
+  const now = admin.firestore.FieldValue.serverTimestamp();
   await db.collection("schedulingSubscriptions").doc(key).set({
-    status: active ? statusRaw || "active" : (statusRaw || "canceled"),
+    status: monthStatus,
+    monthStatus,
+    stripeStatus: statusRaw || (active ? "active" : "canceled"),
+    paid,
+    staffSchedulingPaid: paid,
+    everSubscribed: true,
     stripeSubscriptionId: text(subscription.id, 160),
     stripeCustomerId: text(subscription.customer, 160),
     cancelAtPeriodEnd: subscription.cancel_at_period_end === true,
     currentPeriodEnd: Number(subscription.current_period_end || 0) || null,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    updatedAt: now
   }, {merge: true});
+  const parsed = key.includes(":") ? {ownerType: key.slice(0, key.indexOf(":")), ownerId: key.slice(key.indexOf(":") + 1)} : {};
+  if (parsed.ownerType === "club" && parsed.ownerId) {
+    await db.collection("clubLocations").doc(parsed.ownerId).set({
+      staffSchedulingPaid: paid,
+      schedulingMonthStatus: monthStatus,
+      schedulingEverSubscribed: true,
+      schedulingEntitlementSource: active ? "subscription" : "none",
+      schedulingPaidUpdatedAt: now
+    }, {merge: true});
+  }
 }
 
 exports.stripeFloqrWebhook = onRequest({
@@ -2181,21 +2219,6 @@ exports.expireLiveShoutouts = onSchedule({
       mediaFileName:"",
       mediaStoragePath:"",
       teamMembers:[],
-      // Clear sports-jersey leftovers so idle never ghosts a prior Cameroon/etc. photo.
-      backgroundUrl:"",
-      backgroundColor:"",
-      backgroundGradient:"",
-      backgroundType:"",
-      backgroundStoragePath:"",
-      jerseyTeamId:"",
-      jerseyTeamLabel:"",
-      jerseyPrimary:"",
-      jerseySecondary:"",
-      jerseyAccent:"",
-      jerseyCssBack:admin.firestore.FieldValue.delete(),
-      templateVariantId:"",
-      templateVariantName:"",
-      lockedBaseTemplateId:"",
       status:"default",
       source:"automaticTenMinuteReset",
       previousReferenceNumber:text(data.referenceNumber, 120),
@@ -2570,15 +2593,7 @@ exports.sendTestPaidShoutoutReceipt = onCall({
   const temp = buildTempShoutoutReceipt({
     shoutout:{
       referenceNumber,
-      locationName:text(request.data?.locationName, 160) || "Zebbies Garden DC",
-      brandName:text(request.data?.brandName, 160) || "Zebbies Garden",
-      streetAddress:text(request.data?.streetAddress, 160) || "1223 Connecticut Avenue NW",
-      city:text(request.data?.city, 80) || "Washington",
-      region:text(request.data?.region, 80) || "District of Columbia",
-      postalCode:text(request.data?.postalCode, 20) || "20036",
-      country:text(request.data?.country, 80) || "United States",
-      screenFormatId:text(request.data?.screenFormatId, 40) || "led-96x48",
-      screenFormatLabel:text(request.data?.screenFormatLabel, 120) || "",
+      locationName:text(request.data?.locationName, 160) || "Zebbies Garden",
       templateName:text(request.data?.templateName, 160) || "Soccer Jersey",
       mainText:text(request.data?.mainText, 80) || "TEST",
       subText:text(request.data?.subText, 8) || "99"

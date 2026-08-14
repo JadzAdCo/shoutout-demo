@@ -1,4 +1,4 @@
-/* FLOQR Club Admin Notifications tab — SMS/WhatsApp ops alerts + $10 service packs. */
+/* FLOQR Club Admin Notifications tab — compact SMS/WhatsApp ops alerts + $10 packs. */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -16,7 +16,11 @@
     return;
   }
   let notificationSettings = {};
+  let messagingCredits = {};
   let subscription = {sms: false, whatsapp: false, smsPaidAt: null, whatsappPaidAt: null};
+
+  const SMS_PACK = 466;
+  const WA_PACK = 233;
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
@@ -61,6 +65,23 @@
       || Number(credits.smsPurchasedTotal || 0) > 0;
   }
 
+  function stampToDate(value) {
+    if (!value) return null;
+    if (typeof value.toDate === "function") return value.toDate();
+    if (typeof value === "string" || typeof value === "number") {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+    if (typeof value.seconds === "number") return new Date(value.seconds * 1000);
+    return null;
+  }
+
+  function formatStamp(value) {
+    const date = stampToDate(value);
+    if (!date) return "";
+    return date.toLocaleString();
+  }
+
   async function paidOrderFallback(channel) {
     const types = channel === "whatsapp"
       ? ["whatsappNotifications", "whatsappMessageBundle"]
@@ -98,11 +119,69 @@
     };
   }
 
-  function renderSubscriptionLabels() {
-    const smsHint = byId("repNotifySmsSubStatus");
-    const waHint = byId("repNotifyWhatsappSubStatus");
-    if (smsHint) smsHint.textContent = subscription.sms ? " — subscribed (already paid)" : "";
-    if (waHint) waHint.textContent = subscription.whatsapp ? " — subscribed (already paid)" : "";
+  function paintChannelCard(channel, subscribed) {
+    const card = byId(channel === "whatsapp" ? "repNotifyWhatsappCard" : "repNotifySmsCard");
+    if (!card) return;
+    card.classList.toggle("is-subscribed", !!subscribed);
+    card.classList.toggle("is-unsubscribed", !subscribed);
+  }
+
+  function channelHelpCopy(channel) {
+    const isWa = channel === "whatsapp";
+    const subscribed = isWa ? subscription.whatsapp : subscription.sms;
+    const paidAt = isWa ? subscription.whatsappPaidAt : subscription.smsPaidAt;
+    const pack = isWa ? WA_PACK : SMS_PACK;
+    const remaining = Number((isWa ? messagingCredits.whatsappBalance : messagingCredits.smsBalance) || 0) || 0;
+    const purchased = Number((isWa ? messagingCredits.whatsappPurchasedTotal : messagingCredits.smsPurchasedTotal) || 0) || 0;
+    const label = isWa ? "WhatsApp" : "SMS";
+    const orderType = isWa ? "whatsappNotifications" : "smsNotifications";
+    if (subscribed) {
+      const paid = formatStamp(paidAt);
+      return {
+        title: `${label} notification subscription`,
+        body: [
+          `${label} subscription status in Firebase is 1 (paid).`,
+          "This is a prepaid $10 credit pack, not a monthly or yearly plan. Credits stay until they are used — there is no calendar expiry.",
+          paid ? `Last paid: ${paid}.` : "Paid timestamp is on file.",
+          `${label} credits remaining: ${remaining}${purchased ? ` of ${purchased} purchased` : ` (pack size ${pack})`}.`,
+          "Uncheck the box and Save to pause alerts. That does not cancel the paid subscription or reopen Stripe."
+        ].join(" "),
+        searchPhrases: [`${label.toLowerCase()} credits`, `${label.toLowerCase()} subscribed`, "notification subscription"]
+      };
+    }
+    return {
+      title: `${label} notification subscription`,
+      body: [
+        `${label} subscription status in Firebase is 0 (not subscribed).`,
+        `This is a prepaid $10 pack (${pack} ${label} credits), not monthly or yearly.`,
+        "Use Subscribe below to pay once. After payment the pill turns green and Save will not reopen Stripe."
+      ].join(" "),
+      bodyHtml: `<p>${label} subscription status in Firebase is 0 (not subscribed).</p><p>This is a prepaid $10 pack (${pack} ${label} credits), not a monthly or yearly plan.</p><p><button type="button" data-notify-subscribe="${orderType}">Subscribe $10 — ${pack} ${label} credits</button></p>`,
+      searchPhrases: [`${label.toLowerCase()} subscribe`, `${label.toLowerCase()} credits`, "notification subscription"]
+    };
+  }
+
+  function attachChannelHelp(channel) {
+    const card = byId(channel === "whatsapp" ? "repNotifyWhatsappCard" : "repNotifySmsCard");
+    if (!card || !window.FLOQRHelpAttach?.attach) return;
+    const copy = channelHelpCopy(channel);
+    window.FLOQRHelpAttach.attach({
+      target: card,
+      title: copy.title,
+      body: copy.body,
+      bodyHtml: copy.bodyHtml || "",
+      searchPhrases: copy.searchPhrases,
+      id: channel === "whatsapp" ? "help-club-whatsapp-notification" : "help-club-sms-notification",
+      links: [{label: "Club Admin Notifications", href: "./admin.html?from=floqai&tab=notifications"}],
+      replace: true
+    });
+  }
+
+  function renderSubscriptionUi() {
+    paintChannelCard("sms", subscription.sms);
+    paintChannelCard("whatsapp", subscription.whatsapp);
+    attachChannelHelp("sms");
+    attachChannelHelp("whatsapp");
   }
 
   async function startMessagingCheckout(orderType, openingMessage) {
@@ -121,6 +200,7 @@
     if (!locationId) return;
     const live = await readSubscriptionStatus();
     notificationSettings = live.settings;
+    messagingCredits = live.credits;
     subscription = {
       sms: live.sms,
       whatsapp: live.whatsapp,
@@ -142,7 +222,7 @@
     }
     if (byId("repAlertPhone")) byId("repAlertPhone").value = notificationSettings.alertPhone || notificationSettings.smsPhone || "";
     if (byId("repChannelPreference")) byId("repChannelPreference").value = notificationSettings.channelPreference || "sms";
-    renderSubscriptionLabels();
+    renderSubscriptionUi();
   }
 
   async function saveNotifications() {
@@ -150,6 +230,7 @@
     if (!auth.currentUser) throw new Error("Sign in before saving notification choices.");
     const live = await readSubscriptionStatus();
     notificationSettings = live.settings;
+    messagingCredits = live.credits;
     subscription = {
       sms: live.sms,
       whatsapp: live.whatsapp,
@@ -178,7 +259,7 @@
     if (subscription.smsPaidAt) patch.smsPaidAt = subscription.smsPaidAt;
     if (subscription.whatsappPaidAt) patch.whatsappPaidAt = subscription.whatsappPaidAt;
     await db.collection("clubNotificationSettings").doc(locationId).set(patch, {merge: true});
-    renderSubscriptionLabels();
+    renderSubscriptionUi();
     if (wantsSms && !subscription.sms) {
       await startMessagingCheckout(
         "smsNotifications",
@@ -194,9 +275,9 @@
       return;
     }
     const bits = [];
-    if (wantsSms && subscription.sms) bits.push("SMS subscribed");
-    if (wantsWhatsapp && subscription.whatsapp) bits.push("WhatsApp subscribed");
-    setStatus(bits.length ? `Notification choices saved. ${bits.join("; ")} — checkout skipped.` : "Notification choices saved.");
+    if (wantsSms && subscription.sms) bits.push("SMS on");
+    if (wantsWhatsapp && subscription.whatsapp) bits.push("WhatsApp on");
+    setStatus(bits.length ? `Notification choices saved. ${bits.join("; ")}.` : "Notification choices saved.");
     await loadNotifications();
   }
 
@@ -215,17 +296,30 @@
     }
   }
 
+  function formatTestResult(data = {}) {
+    const attempted = Number(data.attempted || (data.results || []).length || 0);
+    const delivered = Number(data.delivered || data.sent || 0);
+    const errors = (data.errors || [])
+      .concat((data.results || []).map(row => row?.error || (!row?.ok && row?.status) || ""))
+      .map(item => String(item || "").trim())
+      .filter(Boolean);
+    const uniqueErrors = [...new Set(errors)];
+    if (data.dryRun) {
+      return `Test logged as dry-run (${attempted || delivered} target(s)). Configure Twilio secrets to send live.`;
+    }
+    if (delivered > 0) return `Test alert sent to ${delivered} channel(s).`;
+    if (attempted > 0) {
+      return `Test reached ${attempted} channel(s) but none delivered.${uniqueErrors.length ? " " + uniqueErrors.join("; ") : ""}`;
+    }
+    return "Test alert sent to 0 channel(s). Save an alert phone and keep SMS and/or WhatsApp checked, then Save before testing.";
+  }
+
   async function sendTestMessage() {
     const status = statusEl();
     try {
       if (status) status.textContent = "Sending test alert…";
       const result = await callable("sendClubTestMessage")({clubLocationId: locationId});
-      const data = result?.data || {};
-      if (status) {
-        status.textContent = data.dryRun
-          ? `Test logged as dry-run (${data.delivered || data.sent || 0} target(s)). Configure Twilio secrets to send live.`
-          : `Test alert sent to ${data.delivered || data.sent || 0} channel(s).`;
-      }
+      if (status) status.textContent = formatTestResult(result?.data || {});
     } catch (error) {
       if (status) status.textContent = error?.message || String(error);
     }
@@ -238,6 +332,17 @@
     }));
     byId("showClubDailyAuthCodeBtn")?.addEventListener("click", () => showDailyAuthCode());
     byId("sendClubTestMessageBtn")?.addEventListener("click", () => sendTestMessage());
+    byId("panelNotifications")?.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-notify-subscribe]");
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const orderType = btn.getAttribute("data-notify-subscribe");
+      const label = orderType === "whatsappNotifications" ? "WhatsApp" : "SMS";
+      startMessagingCheckout(orderType, `${label} is not subscribed. Opening the $10 checkout…`).catch(error => {
+        setStatus(error.message);
+      });
+    });
     window.addEventListener("message", event => {
       const data = event?.data || {};
       if (data.type !== "floqr-notification-subscribed") return;

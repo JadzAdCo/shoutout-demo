@@ -209,11 +209,11 @@
     {
       id: "help-club-notification-subscriptions",
       title: "Club SMS and WhatsApp notification subscriptions",
-      body: "Club Admin → Notifications stores SMS and WhatsApp subscription status on the club in Firebase (smsSubscribed / whatsappSubscribed, plus paid timestamps and credits). The first $10 payment for a channel subscribes that club. Saving notification choices later keeps the subscription and does not reopen Stripe. Uncheck SMS or WhatsApp to pause alerts without losing the paid subscription. A new checkout starts only if that channel is not yet subscribed.",
+      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on.",
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
         "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
-        "club notifications", "alert phone", "sms subscribed"
+        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp"
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
@@ -221,6 +221,30 @@
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
     },
+    {
+      id: "help-club-sms-notification",
+      title: "SMS notification subscription",
+      body: "The SMS pill is green when Firebase smsSubscribed is 1 (prepaid $10 pack, 466 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck SMS and Save to pause alerts without losing the paid pack.",
+      searchPhrases: ["sms", "sms credits", "sms subscribe", "green sms", "466 credits"],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-club-whatsapp-notification",
+      title: "WhatsApp notification subscription",
+      body: "The WhatsApp pill is green when Firebase whatsappSubscribed is 1 (prepaid $10 pack, 233 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck WhatsApp and Save to pause alerts without losing the paid pack.",
+      searchPhrases: ["whatsapp", "whatsapp credits", "whatsapp subscribe", "red whatsapp", "233 credits"],
+      links: [
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-staff-week-calendar",
       title: "Staff week calendar",
       body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Copy previous week stores last week as new drafts. Public holidays for the venue country are highlighted. Publish notifies workers.",
       searchPhrases: [

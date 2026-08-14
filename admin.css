@@ -125,6 +125,66 @@ h3.help-label{
   width:fit-content;
   max-width:100%;
 }
+.notify-channel-grid{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+}
+.notify-channel{
+  display:inline-flex !important;
+  align-items:center;
+  gap:6px;
+  width:fit-content !important;
+  max-width:100%;
+  min-width:0;
+  margin:0;
+  padding:6px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(0,0,0,.16);
+  font-size:13px;
+  font-weight:800;
+  line-height:1.2;
+  box-sizing:border-box;
+}
+.notify-channel input[type="checkbox"]{
+  width:16px;
+  min-width:16px;
+  max-width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#1597ff;
+}
+.notify-channel-check{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:fit-content;
+  margin:0;
+  cursor:pointer;
+}
+.notify-channel.is-subscribed{
+  background:rgba(80,255,180,.18);
+  border-color:rgba(80,255,180,.75);
+  box-shadow:0 0 0 1px rgba(80,255,180,.25);
+}
+.notify-channel.is-unsubscribed{
+  background:rgba(255,80,80,.16);
+  border-color:rgba(255,90,110,.75);
+  animation:notifyUnpaidPulse 1.15s ease-in-out infinite;
+}
+@keyframes notifyUnpaidPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,90,110,0); border-color:rgba(255,90,110,.55)}
+  50%{box-shadow:0 0 0 4px rgba(255,138,80,.28); border-color:rgba(255,168,80,.95); background:rgba(255,120,60,.2)}
+}
+.notify-channel.help-label{
+  width:fit-content !important;
+}
+.notify-channel .help-popout-body [data-notify-subscribe]{
+  margin-top:8px;
+}
 /* Display Security layout — checkbox rows + relocated actions */
 .display-security-card .display-security-check{
   display:flex;

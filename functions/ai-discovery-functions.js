@@ -20,7 +20,7 @@ const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
-const {redirectDemoEmail} = require("./demo-delivery");
+const venueDatapoints = require("./venue-datapoint-extract");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -277,11 +277,11 @@ function extractAddress(text = "") {
 }
 
 function extractPhone(text = "") {
-  const matches = String(text || "").match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
-  return (matches.find(item => {
-    const digits = item.replace(/\D/g, "");
-    return digits.length >= 8 && digits.length <= 15 && !/^\d{6}$/.test(digits);
-  }) || "").trim();
+  return venueDatapoints.extractPhone(text);
+}
+
+function extractEmail(text = "") {
+  return venueDatapoints.extractEmail(text);
 }
 
 function addressFromJsonLd(location = {}) {
@@ -407,7 +407,7 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
     email:"",
     telephone:phone,
     phone,
-    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+    socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
     ticketUrl:event?.offers?.url || sourceUrl,
     sourceUrl,
     sourceName:sourceNameForUrl(sourceUrl),
@@ -429,8 +429,11 @@ function extractDiscoveryRecordFromHtml(sourceUrl = "", html = "", fallbackText 
     discoveryMode:"source-detail-extraction",
     extractionMethod:event ? "server-json-ld" : "server-html-text"
   };
+  Object.assign(record, venueDatapoints.enrichVenueRecord(record, {html, text: visibleText}));
+  if (!record.email) record.email = extractEmail(visibleText) || extractEmail(html);
   record.missingDatapoints = missingDatapoints(record);
   record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+  record.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
   return record;
 }
 
@@ -483,17 +486,19 @@ async function searchGooglePlaces(job, apiKey) {
     headers:{
       "content-type":"application/json",
       "x-goog-api-key":apiKey,
-      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types"
+      "x-goog-fieldmask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.primaryType,places.types,places.regularOpeningHours,places.editorialSummary,places.rating,places.userRatingCount,places.businessStatus"
     },
     body:JSON.stringify({textQuery:String(job.query || "").slice(0, 500), languageCode:languageCode(job.language), maxResultCount:20})
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();
   return (payload.places || []).map(place => {
+    const hoursStructured = venueDatapoints.hoursStructuredFromPlaces(place.regularOpeningHours || {});
+    const editorial = place.editorialSummary?.text || "";
     const baseRecord = {
       proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
       proposedTitle:place.displayName?.text || "Discovered nightlife venue",
-      proposedDescription:`Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
+      proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
       proposedLocationName:place.displayName?.text || "",
       proposedAddress:place.formattedAddress || "",
       city:job.city || "",
@@ -503,28 +508,36 @@ async function searchGooglePlaces(job, apiKey) {
       phone:place.internationalPhoneNumber || place.nationalPhoneNumber || "",
       officialWebsite:place.websiteUri || place.googleMapsUri || "",
       website:place.websiteUri || place.googleMapsUri || "",
-      sourceUrl:place.googleMapsUri || place.websiteUri || "",
+      sourceUrl:place.websiteUri || place.googleMapsUri || "",
       sourceName:"Google Places API",
       email:"",
       artistsOrDjs:[],
       promoters:[],
       promotionGroup:"",
-      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:""},
+      socialMediaHandles:{instagram:"", x:"", tiktok:"", facebook:"", floqrHandle:""},
+      hoursStructured: hoursStructured || null,
+      hours: hoursStructured ? venueDatapoints.hoursBlurbFromStructured(hoursStructured) : "",
+      timeZone: venueDatapoints.guessTimeZone(job.country || ""),
+      placesRating: place.rating || null,
+      placesUserRatingCount: place.userRatingCount || null,
+      businessStatus: place.businessStatus || "",
       sourceConfirmations:{googlePlaces:true, ticketmaster:"later", publicPage:false, eventbrite:false},
       categories:[job.eventType || place.primaryType || "nightclub", ...(place.types || []).slice(0, 8)],
       genres:job.genre ? [job.genre] : [],
       searchQuery:job.query || "",
       searchLanguage:job.language || "",
-      aiSummary:"Localized venue discovery candidate. Complete DJ/artist, promoter, email, and Instagram before approval.",
+      aiSummary:"Localized venue discovery candidate with Places hours/summary when available. Complete DJ/artist, promoter, email, and Instagram before approval.",
       aiConfidenceScore:0.86,
       aiStarRating:4,
-      aiRatingReasons:["Google Places structured record", "Localized market-language query", "Master Admin review required"],
+      aiRatingReasons:["Google Places structured record", "Localized market-language query", hoursStructured ? "Opening hours captured" : "Master Admin review required"],
       status:"pendingReview",
       discoveryMode:"master-admin-refined-discovery-crawl",
       extractionMethod:"google-places-text-search"
     };
+    Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
     baseRecord.missingDatapoints = missingDatapoints(baseRecord);
     baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
+    baseRecord.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
     return baseRecord;
   });
 }
@@ -565,33 +578,20 @@ function createOtpCode() {
 async function sendEmailOtp(email, code) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
   if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
-  // temp_*@floqr-demo.com has no real inbox — deliver OTP to the QA sink (same as receipts).
-  const route = redirectDemoEmail(email, "Your FLOQR sign-in code");
-  const bodyLines = [
-    `Your FLOQR sign-in code is ${code}.`,
-    "It expires in 6 minutes.",
-    route.redirected ? `Requested for demo account ${route.intended}.` : "",
-    "If you did not request this code, ignore this email."
-  ].filter(Boolean);
   const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method:"POST",
     headers:{authorization:`Bearer ${key}`, "content-type":"application/json"},
     body:JSON.stringify({
-      personalizations:[{to:[{email: route.to}]}],
+      personalizations:[{to:[{email}]}],
       from:{email:EMAIL_OTP_FROM, name:"FLOQR"},
-      subject: route.subject,
-      content:[{type:"text/plain", value: bodyLines.join(" ")}]
+      subject:"Your FLOQR sign-in code",
+      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`}]
     })
   });
   if (!response.ok) {
     const errText = await response.text().catch(() => "");
     throw new HttpsError("internal", `Email provider returned HTTP ${response.status}${errText ? `: ${errText.slice(0, 180)}` : ""}.`);
   }
-  return {
-    deliveredTo: route.to,
-    redirected: !!route.redirected,
-    intendedEmail: route.intended || email
-  };
 }
 
 async function assertMasterAdmin(request) {
@@ -1033,15 +1033,8 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
     expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
   });
-  const delivery = await sendEmailOtp(email, code);
-  return {
-    challengeId,
-    expiresInSeconds:360,
-    delivery:"email",
-    deliveredTo: delivery.deliveredTo,
-    redirected: delivery.redirected,
-    intendedEmail: delivery.intendedEmail
-  };
+  await sendEmailOtp(email, code);
+  return {challengeId, expiresInSeconds:360, delivery:"email"};
 });
 
 exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {
@@ -1050,63 +1043,29 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
   const code = String(request.data?.code || "").trim().toUpperCase();
   if (!challengeId || !/^[A-Z2-9]{8}$/.test(code)) throw new HttpsError("invalid-argument", "Enter the 8-character email code.");
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
-
-  await db.runTransaction(async transaction => {
+  const token = await db.runTransaction(async transaction => {
     const snap = await transaction.get(ref);
     if (!snap.exists) throw new HttpsError("not-found", "The sign-in code was not found. Request a new code.");
     const data = snap.data() || {};
-    if (data.used) {
-      throw new HttpsError(
-        "permission-denied",
-        "This code was already used. Wait one minute, click Send 6-minute code again, and enter the newest code from bans.don@gmail.com."
-      );
+    if (data.email !== email || data.used) throw new HttpsError("permission-denied", "This code cannot be used.");
+    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
+    if (Number(data.attempts || 0) >= 5) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
+    if (!crypto.timingSafeEqual(Buffer.from(data.codeHash, "hex"), Buffer.from(otpHash(email, code), "hex"))) {
+      transaction.update(ref, {attempts:admin.firestore.FieldValue.increment(1)});
+      throw new HttpsError("permission-denied", "The email code is incorrect.");
     }
-    if (data.email !== email) {
-      throw new HttpsError(
-        "permission-denied",
-        "This code was requested for a different email. Request a new code for the address in the form."
-      );
-    }
-    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) {
-      throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
-    }
-    if (Number(data.attempts || 0) >= 5) {
-      throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
-    }
-    const expected = Buffer.from(String(data.codeHash || ""), "hex");
-    const actual = Buffer.from(otpHash(email, code), "hex");
-    if (expected.length !== actual.length || !crypto.timingSafeEqual(expected, actual)) {
-      transaction.update(ref, {attempts: admin.firestore.FieldValue.increment(1)});
-      throw new HttpsError("permission-denied", "The email code is incorrect. Use the newest 8-character code from the sign-in email.");
-    }
-    // Mark used only after the code matches; if Auth token creation fails below we reopen the challenge.
-    transaction.update(ref, {
-      used: true,
-      verifiedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
+    transaction.update(ref, {used:true, verifiedAt:admin.firestore.FieldValue.serverTimestamp()});
+    return true;
   });
-
-  try {
-    let user;
-    try {
-      user = await admin.auth().getUserByEmail(email);
-    } catch (error) {
-      if (error.code !== "auth/user-not-found") throw error;
-      user = await admin.auth().createUser({email, emailVerified: true});
-    }
-    if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified: true});
-    const customToken = await admin.auth().createCustomToken(user.uid, {emailOtp: true});
-    return {customToken, expiresInSeconds: 300};
-  } catch (error) {
-    // Allow one more try with the same code if sign-in token creation failed after a valid match.
-    await ref.set({
-      used: false,
-      verifyError: String(error?.message || error).slice(0, 300),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, {merge: true}).catch(() => {});
-    if (error instanceof HttpsError) throw error;
-    throw new HttpsError("internal", `Sign-in failed after code matched: ${String(error?.message || error).slice(0, 160)}`);
+  if (!token) throw new HttpsError("internal", "Email verification failed.");
+  let user;
+  try { user = await admin.auth().getUserByEmail(email); }
+  catch (error) {
+    if (error.code !== "auth/user-not-found") throw error;
+    user = await admin.auth().createUser({email, emailVerified:true});
   }
+  if (!user.emailVerified) await admin.auth().updateUser(user.uid, {emailVerified:true});
+  return {customToken:await admin.auth().createCustomToken(user.uid, {emailOtp:true}), expiresInSeconds:300};
 });
 
 exports.assignClubAdmin = onCall({region:"us-central1"}, async request => {
@@ -1845,18 +1804,18 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.123") {
+function defaultFloqrPreviewLinks(v = "29.09.111") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
-    ["Master Admin — Demo Accounts (Seed first)", `${base}/master-admin.html?v=${v}`],
-    ["Manual Feature Tests (Succeed / Failed tracking)", `${base}/master-admin.html?v=${v}`],
-    ["temp_democlub_1 — Club Admin Scheduling", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
-    ["temp_democlub_1 — Public profile", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
-    ["Scheduling portal", `${base}/scheduling.html?v=${v}`],
-    ["Feature tests hub", `${base}/feature-tests-v29-09-122.html`],
-    ["FloqAi — Ask FloqR intent", `${base}/?v=${v}&start=intent`],
-    ["Idle board — Use ShoutOut @ Clubname", `${base}/display.html?location=heist-washington-dc&screen=led-64x32`],
-    ["Heist Club Admin", `${base}/admin.html?location=heist-washington-dc&v=${v}`]
+    ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+    ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
+    ["Club Admin Notifications (compact SMS/WhatsApp pills)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
+    ["Temp Club Admin 1 Command Center (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
+    ["Scheduling grid avatars", `${base}/admin.html?location=temp-democlub-1&v=${v}#panelScheduling`],
+    ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
+    ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
+    ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
+    ["Aurelia display board", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
   ];
 }
 
@@ -1868,39 +1827,29 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.40") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = "", qaGuide = ""} = {}) {
+function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = ""} = {}) {
   const v = String(packageVersion || "29.09.40").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
-  const subject = `FLOQR v${v} — QA brief + mobile preview links`;
+  const subject = `FLOQR v${v} — mobile preview links`;
   const intro = String(note || "").trim();
-  const guide = String(qaGuide || "").trim();
   const textBody = [
     subject,
     "",
     intro ? `${intro}\n` : "",
-    guide ? `${guide}\n` : "",
     "Open these on your phone. Admin/portal URLs include ?v= for cache-bust. Display board URLs stay stable (no version query).",
     "",
     ...rows.map(([label, url], i) => `${i + 1}. ${label}\n   ${url}`),
     "",
-    "Track results: Master Admin → Diagnostics → Manual Feature Tests → mark Succeed or Failed.",
-    "If Failed: add a failure note and Copy Resolution Prompt for Codex.",
-    "",
     "— FLOQR emailFloqrPreviewLinks"
   ].join("\n");
-  const htmlGuide = guide
-    ? `<pre style="white-space:pre-wrap;background:#f6f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px">${guide.replace(/</g, "&lt;")}</pre>`
-    : "";
   const htmlBody = `
     <div style="font-family:Arial,sans-serif;line-height:1.45;color:#111;max-width:680px">
       <h2 style="margin:0 0 8px">${subject}</h2>
-      ${intro ? `<p style="margin:0 0 12px">${intro.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</p>` : ""}
-      ${htmlGuide}
-      <p style="margin:12px 0 14px">Open on your phone. <strong>Admin/portal</strong> links use <code>?v=</code> for cache-bust. <strong>Display board</strong> links stay stable (no version query) for LED devices and external embeds.</p>
+      ${intro ? `<p style="margin:0 0 12px">${intro.replace(/</g, "&lt;")}</p>` : ""}
+      <p style="margin:0 0 14px">Open on your phone. <strong>Admin/portal</strong> links use <code>?v=</code> for cache-bust. <strong>Display board</strong> links stay stable (no version query) for LED devices and external embeds.</p>
       <ul style="margin:0;padding-left:18px">
         ${rows.map(([label, url]) => `<li style="margin:0 0 10px"><a href="${url}">${label.replace(/</g, "&lt;")}</a><br/><span style="color:#555;font-size:12px;word-break:break-all">${url}</span></li>`).join("")}
       </ul>
-      <p style="margin:16px 0 0"><strong>Track results:</strong> Master Admin → Diagnostics → Manual Feature Tests → mark <em>Succeed</em> or <em>Failed</em>. If Failed, add a note and use <em>Copy Resolution Prompt</em>.</p>
       <p style="color:#666;font-size:12px;margin-top:16px">Sent by FLOQR emailFloqrPreviewLinks</p>
     </div>`;
   return {subject, textBody, htmlBody, links: rows, packageVersion: v};
@@ -1922,11 +1871,10 @@ exports.emailFloqrPreviewLinks = onRequest({
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const query = req.query || {};
     const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
-    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.34").trim();
+    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.111").trim();
     const note = String(body.note || query.note || "").trim();
-    const qaGuide = String(body.qaGuide || query.qaGuide || "").trim();
     const links = Array.isArray(body.links) ? body.links : [];
-    const mail = buildPreviewLinksEmail({packageVersion, links, note, qaGuide});
+    const mail = buildPreviewLinksEmail({packageVersion, links, note});
     const status = await sendgridMail({
       to: toEmail,
       from: PREVIEW_LINKS_DEFAULT_FROM,
@@ -1957,9 +1905,8 @@ exports.sendFloqrPreviewLinksEmail = onCall({
   const toEmail = String(data.to || email || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
   const packageVersion = String(data.package || data.v || "29.09.34").trim();
   const note = String(data.note || "").trim();
-  const qaGuide = String(data.qaGuide || "").trim();
   const links = Array.isArray(data.links) ? data.links : [];
-  const mail = buildPreviewLinksEmail({packageVersion, links, note, qaGuide});
+  const mail = buildPreviewLinksEmail({packageVersion, links, note});
   const status = await sendgridMail({
     to: toEmail,
     from: PREVIEW_LINKS_DEFAULT_FROM,
