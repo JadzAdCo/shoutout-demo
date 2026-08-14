@@ -209,14 +209,13 @@
       id: "help-staff-schedule-grid",
       kind: "help",
       label: "Staff week calendar / Round Robin",
-      blurb: "Club Admin → Scheduling: people × days grid. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Delete works on pending and confirmed. Round Robin fills days fairly. Publish notifies workers.",
+      blurb: "Club Admin → Scheduling: people × days grid. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Select shifts to multi-delete drafts or confirmed chips. Round Robin fills days fairly. Publish notifies workers.",
       steps: [
         "Open Club Admin → Scheduling (after paid this month).",
         "Manual: click + on a person/day cell, set times, Save as draft.",
         "Round Robin: pick days + role, Fill → drafts, review chips.",
         "Publish schedule to notify workers. Shifts stay pending until they confirm.",
-        "Click a worker photo for contact, SMS, and public profile.",
-        "Edit a pending or confirmed chip and use Delete shift."
+        "Select shifts to delete several at once (day header + chips), or open a chip for single Delete."
       ],
       links: [
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
@@ -224,12 +223,83 @@
       searchPhrases: [
         "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
         "staff schedule", "assign shift", "worker photo", "7shifts",
-        "pending shift", "confirmed shift", "delete shift", "require approval"
+        "pending shift", "confirmed shift", "delete shift", "require approval",
+        "select shifts", "multi delete", "user guide"
       ],
       patterns: [
         /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,
         /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/, /open\s*minus/, /copy\s*previous\s*week/,
-        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/
+        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /select\s*shifts/, /multi[\s-]?delete/
+      ]
+    },
+    {
+      id: "help-staff-schedule-user-guide",
+      kind: "help",
+      label: "Staff Scheduling User Guide",
+      blurb: "Step-by-step: create drafts, publish so workers confirm, then select and delete several shifts (for example all Wednesday drafts plus a Thursday confirmed chip).",
+      steps: [
+        "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin or Copy previous week.",
+        "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
+        "Published chips stay pending until the worker confirms.",
+        "Tap Select shifts. Filter Drafts + Wednesday header, then tap a Thursday confirmed chip, then Delete selected."
+      ],
+      links: [
+        {label: "Scheduling User Guide", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+      ],
+      searchPhrases: [
+        "user guide", "staff scheduling user guide", "create a schedule", "publish schedule",
+        "how to schedule staff", "scheduling help"
+      ],
+      patterns: [
+        /user\s*guide/, /staff\s*scheduling\s*user\s*guide/, /how\s+to\s+(create|publish)\s+(a\s+)?schedule/,
+        /create\s+(a\s+)?(staff\s+)?schedule/, /publish\s+(the\s+)?schedule/
+      ]
+    },
+    {
+      id: "help-create-publish-schedule",
+      kind: "help",
+      label: "Create and publish a staff schedule",
+      blurb: "Add draft shifts on the week grid, then Publish schedule. Workers confirm pending shifts before they become confirmed.",
+      steps: [
+        "Open Club Admin → Scheduling after the venue is paid this month.",
+        "Tap + on a cell, set worker/role/times, Save as draft. Repeat, or Round Robin / Copy previous week.",
+        "Tap Publish schedule. Shifts become pending and workers are notified to confirm.",
+        "The worker uses the confirm link. The chip then shows confirmed."
+      ],
+      links: [
+        {label: "Create and publish (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+      ],
+      searchPhrases: [
+        "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
+        "how to schedule staff", "make a work schedule", "save as draft"
+      ],
+      patterns: [
+        /create\s+(a\s+)?(work\s+|staff\s+)?schedule/, /publish\s+(a\s+|the\s+)?schedule/,
+        /how\s+to\s+schedule\s+staff/, /save\s+as\s+draft/, /make\s+(me\s+)?(a\s+)?schedule/
+      ]
+    },
+    {
+      id: "help-multi-delete-shifts",
+      kind: "help",
+      label: "Delete multiple scheduled or draft shifts",
+      blurb: "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
+      steps: [
+        "On the week grid, tap Select shifts.",
+        "Choose Drafts, then tap the Wednesday column header to select every Wednesday draft.",
+        "Switch the filter to All or Confirmed and tap the Thursday confirmed chip.",
+        "Tap Delete selected and confirm."
+      ],
+      links: [
+        {label: "Multi-delete (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+      ],
+      searchPhrases: [
+        "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
+        "select shifts", "bulk delete shifts", "delete drafts"
+      ],
+      patterns: [
+        /multi[\s-]?delete/, /delete\s+multiple/, /delete\s+(all\s+)?(wednesday|thursday|friday)?\s*drafts/,
+        /delete\s+(a\s+)?confirmed\s+shift/, /select\s+shifts/, /bulk\s+delete\s+shifts/
       ]
     },
     {
@@ -381,7 +451,7 @@
       id: "help-scheduling",
       kind: "help",
       label: "Staff Scheduling help",
-      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace.",
+      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed), Select shifts to multi-delete.",
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"})},
         {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
@@ -522,15 +592,23 @@
     // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
     [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
       const key = intent.id || intent.label;
-      if (seen.has(key)) return;
+      if (seen.has(key)) {
+        const existing = merged.find(row => (row.id || row.label) === key);
+        if (existing) {
+          existing.patterns = [...(existing.patterns || []), ...(intent.patterns || [])];
+          if (!(existing.steps || []).length && (intent.steps || []).length) existing.steps = intent.steps;
+          existing.searchPhrases = Array.from(new Set([...(existing.searchPhrases || []), ...(intent.searchPhrases || [])]));
+        }
+        return;
+      }
       seen.add(key);
-      merged.push(intent);
+      merged.push({...intent, patterns: [...(intent.patterns || [])]});
     });
     return merged;
   }
 
   function looksLikeHelpQuery(q) {
-    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings/.test(q);
+    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings|user\s*guide|multi[\s-]?delete|publish\s*schedule/.test(q);
   }
 
   function matchIntents(raw) {

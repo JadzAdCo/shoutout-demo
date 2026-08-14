@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.113";
+  const PREVIEW_LINKS_PACKAGE = "29.09.114";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,17 @@
       ]
     },
     {
+      version:"v29.09.114",
+      title:"Schedule multi-delete + User Guide create/publish",
+      checks:[
+        {label:"Batch delete callable", file:"functions/scheduling-functions.js", includes:["deleteScheduleShifts", "sanitizeShiftIds"]},
+        {label:"Select shifts toolbar", file:"admin.html", includes:["schedSelectBtn", "schedUserGuide", "Delete selected"]},
+        {label:"FloqAi User Guide catalog", file:"index.html", includes:["User Guide", "Create and publish a staff schedule", "Delete multiple shifts"]},
+        {label:"Help repository steps", file:"floqai-help-repository.js", includes:["help-staff-schedule-user-guide", "help-create-publish-schedule", "help-multi-delete-shifts"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.114\""]}
+      ]
+    },
+    {
       version:"v29.09.113",
       title:"Schedule pending→confirmed + delete pending/confirmed",
       checks:[
@@ -927,6 +938,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-114-schedule-multi-delete-user-guide",
+      area:"Club Admin / Scheduling / FloqAi",
+      feature:"Multi-delete shifts + User Guide create/publish",
+      changed:"Select shifts on the week grid (day header + Drafts/Pending/Confirmed filter, mix chips across days) then Delete selected. User Guide card under Scheduling. FloqAi ? catalog User Guide plus create a schedule / publish schedule / delete Wednesday drafts.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.114 → Scheduling. Tap Select shifts → Drafts → Wednesday header, tap a Thursday confirmed chip → Delete selected. Scroll to User Guide. FloqAi: type create a schedule and publish schedule.",
+      expected:"Mixed selection deletes in one confirm. User Guide lists create/publish and multi-delete steps. FloqAi returns those step cards with Scheduling User Guide links."
+    },
     {
       id:"v29-09-113-schedule-pending-confirm-delete",
       area:"Club Admin / Scheduling",

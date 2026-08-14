@@ -6,6 +6,7 @@ const {
   normalizeShiftStatus,
   publishedShiftStatus,
   canDeleteShiftStatus,
+  sanitizeShiftIds,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
@@ -31,6 +32,12 @@ test("worker and club channel gates default on unless explicitly off", () => {
   assert.equal(workerAllowsNotifyChannel({notifySms: false}, "sms"), false);
   assert.equal(clubAllowsNotifyChannel({smsEnabled: true}, "sms"), true);
   assert.equal(clubAllowsNotifyChannel({whatsappEnabled: false}, "whatsapp"), false);
+});
+
+test("sanitizeShiftIds de-dupes and caps at 80", () => {
+  assert.deepEqual(sanitizeShiftIds(["a", " a ", "", "a", "b"]), ["a", "b"]);
+  assert.equal(sanitizeShiftIds(Array.from({length: 100}, (_, i) => `s${i}`)).length, 80);
+  assert.deepEqual(sanitizeShiftIds("not-an-array"), []);
 });
 
 test("invite body includes a confirm link", () => {

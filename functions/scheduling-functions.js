@@ -7,6 +7,7 @@ const {
   normalizeShiftStatus,
   publishedShiftStatus,
   canDeleteShiftStatus,
+  sanitizeShiftIds,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
@@ -357,7 +358,7 @@ async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
     await writeInbox(shift.assigneeUid, {
       title: normalizeShiftStatus(shift.status) === "pending" ? "New shift needs your confirmation" : "Schedule update",
       body,
-      link: `./scheduling.html?shift=${encodeURIComponent(shift.id || "")}&from=schedule-notify&v=29.09.113`,
+      link: `./scheduling.html?shift=${encodeURIComponent(shift.id || "")}&from=schedule-notify&v=29.09.114`,
       shiftId: shift.id,
       ownerKey: shift.ownerKey
     });
@@ -545,20 +546,27 @@ exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 6
   return {published: results.length, results};
 });
 
-exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
-  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  const shiftId = text(request.data?.shiftId, 120);
-  if (!shiftId) throw new HttpsError("invalid-argument", "shiftId is required.");
-  const ref = db.collection("scheduleShifts").doc(shiftId);
+async function deleteManagedShift(shiftId, authContext, {throwOnError = true} = {}) {
+  const id = text(shiftId, 120);
+  if (!id) {
+    if (throwOnError) throw new HttpsError("invalid-argument", "shiftId is required.");
+    return {shiftId: "", deleted: false, error: "shiftId is required."};
+  }
+  const ref = db.collection("scheduleShifts").doc(id);
   const snap = await ref.get();
-  if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
+  if (!snap.exists) {
+    if (throwOnError) throw new HttpsError("not-found", "Shift not found.");
+    return {shiftId: id, deleted: false, error: "Shift not found."};
+  }
   const shift = snap.data() || {};
-  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth)) {
-    throw new HttpsError("permission-denied", "You cannot delete this shift.");
+  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), authContext)) {
+    if (throwOnError) throw new HttpsError("permission-denied", "You cannot delete this shift.");
+    return {shiftId: id, deleted: false, error: "You cannot delete this shift."};
   }
   const status = normalizeShiftStatus(shift.status) || text(shift.status, 40);
   if (!canDeleteShiftStatus(status)) {
-    throw new HttpsError("failed-precondition", "This shift cannot be deleted.");
+    if (throwOnError) throw new HttpsError("failed-precondition", "This shift cannot be deleted.");
+    return {shiftId: id, deleted: false, error: "This shift cannot be deleted."};
   }
   const wasPublished = status === "pending" || status === "confirmed";
   await ref.delete();
@@ -566,7 +574,7 @@ exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20,
     try {
       await notifyAssigneeChannels({
         ...shift,
-        id: shiftId,
+        id,
         status: "cancelled",
         roleLabel: `${shift.roleLabel || "Shift"} (cancelled)`
       }, "schedule-cancelled");
@@ -574,7 +582,27 @@ exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20,
       /* Deletion still succeeds if notify fails. */
     }
   }
-  return {shiftId, deleted: true};
+  return {shiftId: id, deleted: true};
+}
+
+exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  return deleteManagedShift(request.data?.shiftId, request.auth, {throwOnError: true});
+});
+
+exports.deleteScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 120, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const ids = sanitizeShiftIds(request.data?.shiftIds, 80);
+  if (!ids.length) throw new HttpsError("invalid-argument", "shiftIds is required.");
+  const results = [];
+  for (const id of ids) {
+    results.push(await deleteManagedShift(id, request.auth, {throwOnError: false}));
+  }
+  return {
+    deleted: results.filter(row => row.deleted).length,
+    failed: results.filter(row => !row.deleted).length,
+    results
+  };
 });
 
 exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {

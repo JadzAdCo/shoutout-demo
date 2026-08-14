@@ -977,9 +977,20 @@
         if (btn.dataset.panel === "panelReconciliation") loadClubPaymentLedger();
       });
     });
-    const wanted = new URL(location.href).searchParams.get("panel") || "";
-    if (wanted === "suprstar" || wanted === "panelSuprstar") {
+    const wanted = String(new URL(location.href).searchParams.get("panel") || new URL(location.href).searchParams.get("tab") || location.hash.replace(/^#/, "") || "").toLowerCase();
+    if (wanted === "suprstar" || wanted === "panelsuprstar") {
       document.querySelector('[data-panel="panelSuprstar"]')?.click();
+    } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "scheduserguide") {
+      document.querySelector('[data-panel="panelScheduling"]')?.click();
+      if (wanted === "scheduserguide") {
+        setTimeout(() => byId("schedUserGuide")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+      }
+    }
+    if (location.hash === "#schedUserGuide" || location.hash === "#panelScheduling") {
+      document.querySelector('[data-panel="panelScheduling"]')?.click();
+      if (location.hash === "#schedUserGuide") {
+        setTimeout(() => byId("schedUserGuide")?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
+      }
     }
   }
 

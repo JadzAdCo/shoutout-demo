@@ -36,10 +36,14 @@
       title,
       ...links.map(link => normalize(link.label))
     ].map(normalize).filter(Boolean)));
+    const steps = Array.isArray(entry.steps)
+      ? entry.steps.map(normalize).filter(Boolean)
+      : (existing.steps || []);
     const next = {
       id,
       title: title || existing.title || id,
       body: normalize(entry.body || existing.body || ""),
+      steps,
       links: links.length ? links : (existing.links || []),
       searchPhrases,
       source: entry.source || existing.source || "help-repository",
@@ -123,6 +127,7 @@
       source: entry.source,
       label: entry.title,
       blurb: entry.body || entry.title,
+      steps: entry.steps || [],
       links: (entry.links || []).length
         ? entry.links
         : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
@@ -262,18 +267,83 @@
     {
       id: "help-staff-week-calendar",
       title: "Staff week calendar",
-      body: "Club Admin Scheduling uses a people × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp (worker privacy settings plus this club's notification channels). Confirm link is in the message. Delete works on pending and confirmed shifts. Default shift window = club open − 2 hours through close + 1 hour.",
+      body: "Club Admin Scheduling uses a people × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp (worker privacy settings plus this club's notification channels). Confirm link is in the message. Select shifts to multi-delete drafts, pending, or confirmed chips (tap a day header with the Drafts filter, then add chips from other days). Default shift window = club open − 2 hours through close + 1 hour.",
       searchPhrases: [
         "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
         "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
         "open minus two hours", "copy previous week", "public holiday",
-        "pending shift", "confirmed shift", "delete shift", "require approval"
+        "pending shift", "confirmed shift", "delete shift", "select shifts", "multi delete"
       ],
       links: [
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelScheduling"
+    },
+    {
+      id: "help-staff-schedule-user-guide",
+      title: "Staff Scheduling User Guide",
+      body: "Club Admin User Guide: create draft shifts on the week grid, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip.",
+      steps: [
+        "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week into drafts.",
+        "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
+        "Published chips stay pending until the worker confirms. Confirmed has a green outline.",
+        "To delete several: tap Select shifts. Filter Drafts, tap Wednesday’s column header, switch to All or Confirmed, tap a Thursday confirmed chip, then Delete selected."
+      ],
+      searchPhrases: [
+        "user guide", "staff scheduling user guide", "create a schedule", "create schedule",
+        "publish schedule", "how to schedule staff", "how to publish a schedule",
+        "make a schedule", "staff schedule steps", "scheduling help"
+      ],
+      links: [
+        {label: "Scheduling User Guide", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"},
+        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedUserGuide"
+    },
+    {
+      id: "help-create-publish-schedule",
+      title: "Create and publish a staff schedule",
+      body: "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff.",
+      steps: [
+        "Open Club Admin → Scheduling after the venue is paid this month.",
+        "Manual: tap + on a cell, set worker/role/times, Save as draft. Repeat, or use Round Robin / Copy previous week.",
+        "Tap Publish schedule. Shifts become pending and workers are notified to confirm.",
+        "The worker uses the Inbox / Email / SMS / WhatsApp confirm link. The chip then shows confirmed."
+      ],
+      searchPhrases: [
+        "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
+        "how to schedule staff", "make a work schedule", "assign shifts", "save as draft",
+        "pending until confirmed", "worker confirm shift"
+      ],
+      links: [
+        {label: "Create and publish (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedUserGuide"
+    },
+    {
+      id: "help-multi-delete-shifts",
+      title: "Delete multiple scheduled or draft shifts",
+      body: "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
+      steps: [
+        "On the week grid, tap Select shifts.",
+        "Choose Drafts, then tap the Wednesday column header to select every Wednesday draft.",
+        "Switch the filter to All or Confirmed and tap the Thursday confirmed chip (or any other chips you want gone).",
+        "Tap Delete selected and confirm. Drafts vanish quietly; pending and confirmed workers get a cancelled notice if they were already notified."
+      ],
+      searchPhrases: [
+        "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
+        "select shifts", "bulk delete shifts", "delete drafts", "delete thursday shift",
+        "remove several shifts", "multi-delete schedule"
+      ],
+      links: [
+        {label: "Multi-delete (User Guide)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedUserGuide"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedUserGuide"
     },
     {
       id: "help-venue-hours-calendar",

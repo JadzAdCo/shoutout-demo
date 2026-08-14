@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.113"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.114"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -527,10 +527,10 @@
             <h2
               data-floqr-help-id="help-staff-schedule-grid"
               data-floqr-help-title="Staff week calendar"
-              data-floqr-help-search="schedule grid|round robin|publish schedule|people days|open minus two hours"
-              data-floqr-help-body="People × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp (per their privacy settings and this club's notification channels). Delete works on pending and confirmed shifts. Default shift window = club open − 2 hours through club close + 1 hour."
+            data-floqr-help-search="schedule grid|round robin|publish schedule|people days|open minus two hours|select shifts|multi delete"
+            data-floqr-help-body="People × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp. Select shifts, then tap chips or a day header (Drafts / Pending / Confirmed filter) to multi-delete — e.g. all Wednesday drafts plus a Thursday confirmed chip. Default shift window = club open − 2 hours through club close + 1 hour."
             >Week schedule</h2>
-            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Confirmed and pending shifts can be deleted. Default window = club open − 2h through close + 1h.</p>
+            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Use <strong>Select shifts</strong> to delete several drafts or confirmed chips at once. Default window = club open − 2h through close + 1h.</p>
             <div class="sched-toolbar">
               <div class="sched-mode-toggle" role="group" aria-label="Assign mode">
                 <button type="button" id="schedModeManualBtn" class="sched-mode-btn active" data-mode="manual">Manual</button>
@@ -561,12 +561,50 @@
             </div>
             <div class="queue-actions" style="margin-top:12px">
               <button type="button" id="schedPublishBtn" class="primary">Publish schedule</button>
+              <button type="button" id="schedSelectBtn">Select shifts</button>
               <button type="button" id="schedCopyPrevWeekBtn">Copy previous week → drafts</button>
               <button type="button" id="schedRefreshGridBtn">Refresh grid</button>
               <span id="schedDraftCount" class="tag">0 drafts</span>
             </div>
+            <div id="schedSelectBar" class="sched-select-bar hidden">
+              <p class="sub small" data-keep-visible="true">Tap chips to mix statuses. Tap a day header to select that day’s shifts using the filter (example: Drafts + Wednesday header, then tap a Thursday confirmed chip).</p>
+              <div id="schedSelectFilters" class="sched-select-filters" role="group" aria-label="Select by status">
+                <button type="button" data-sched-filter="all" class="active">All</button>
+                <button type="button" data-sched-filter="draft">Drafts</button>
+                <button type="button" data-sched-filter="pending">Pending</button>
+                <button type="button" data-sched-filter="confirmed">Confirmed</button>
+              </div>
+              <div class="queue-actions">
+                <button type="button" id="schedDeleteSelectedBtn" class="danger" disabled>Delete selected</button>
+                <button type="button" id="schedSelectCancelBtn" class="ghost">Done</button>
+              </div>
+            </div>
             <div id="schedHolidayLegend" class="sched-holiday-legend"></div>
             <div id="scheduleWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
+          </div>
+
+          <div id="schedUserGuide" class="card sched-user-guide">
+            <p class="eyebrow">Club Admin</p>
+            <h2
+              data-floqr-help-id="help-staff-schedule-user-guide"
+              data-floqr-help-title="Staff Scheduling User Guide"
+              data-floqr-help-search="user guide|create a schedule|publish schedule|how to schedule staff|multi delete shifts|delete wednesday drafts"
+              data-floqr-help-body="Create drafts on the week grid, then Publish schedule so workers confirm pending shifts. Select shifts to delete several at once: filter Drafts and tap Wednesday’s header, then tap a Thursday confirmed chip, then Delete selected."
+            >User Guide</h2>
+            <h3>Create and publish a schedule</h3>
+            <ol>
+              <li>Open Club Admin → Scheduling (unlocked when <code>staffSchedulingPaid=1</code> / paid this month).</li>
+              <li>Manual: tap <strong>+</strong> on a person/day cell, set role and times, leave <strong>Save as draft</strong> checked, then Save shift. Repeat for other people or days. Optional: Round Robin fill → drafts, or Copy previous week → drafts.</li>
+              <li>Review dashed <strong>draft</strong> chips. Tap <strong>Publish schedule</strong>. Workers get Inbox / Email / SMS / WhatsApp with a confirm link (per their privacy settings and this club’s notification channels).</li>
+              <li>Published chips stay <strong>pending</strong> until the worker confirms. Confirmed = green outline. Declined stays on the grid until you delete it.</li>
+            </ol>
+            <h3>Delete multiple shifts</h3>
+            <ol>
+              <li>Tap <strong>Select shifts</strong>.</li>
+              <li>Example — all Wednesday drafts plus one Thursday confirmed: choose <strong>Drafts</strong>, tap the Wednesday column header, switch the filter to <strong>All</strong> (or Confirmed), then tap the Thursday confirmed chip.</li>
+              <li>Tap <strong>Delete selected</strong> and confirm. Drafts disappear quietly. Pending and confirmed workers get a cancelled notice if they were already notified. Escape or Done exits select mode.</li>
+            </ol>
+            <p class="sub small" data-keep-visible="true">Single-shift delete is still on each chip’s edit dialog. FloqAi answers “create a schedule”, “publish schedule”, and “delete Wednesday drafts”.</p>
           </div>
 
           <div id="scheduleAssignModal" class="sched-modal hidden" role="dialog" aria-modal="true" aria-labelledby="scheduleAssignTitle">
@@ -739,7 +777,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.113"></script>
+<script src="./floqai-help-repository.js?v=29.09.114"></script>
 <script src="./help-attach.js?v=29.09.101"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -750,13 +788,13 @@
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=29.09.103"></script>
+<script src="./admin-app.js?v=29.09.114"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=29.09.112"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.113"></script>
+<script src="./admin-scheduling.js?v=29.09.114"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

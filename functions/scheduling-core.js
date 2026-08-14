@@ -22,6 +22,19 @@ function canDeleteShiftStatus(raw = "") {
   return ["draft", "pending", "confirmed", "approved", "declined"].includes(normalizeShiftStatus(raw) || text(raw, 40).toLowerCase());
 }
 
+function sanitizeShiftIds(raw = [], max = 80) {
+  const seen = new Set();
+  const ids = [];
+  (Array.isArray(raw) ? raw : []).forEach(value => {
+    const id = text(value, 120);
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    ids.push(id);
+  });
+  const cap = Number.isFinite(Number(max)) ? Math.max(1, Math.min(80, Number(max))) : 80;
+  return ids.slice(0, cap);
+}
+
 function workerAllowsNotifyChannel(user = {}, channel = "") {
   const row = user && typeof user === "object" ? user : {};
   const privacy = row.privacy && typeof row.privacy === "object" ? row.privacy : {};
@@ -52,7 +65,7 @@ function shiftApproveUrl(shift = {}, origin = DEFAULT_ORIGIN) {
   if (shift.id) url.searchParams.set("shift", String(shift.id));
   if (shift.ownerKey) url.searchParams.set("owner", String(shift.ownerKey));
   url.searchParams.set("from", "schedule-notify");
-  url.searchParams.set("v", "29.09.113");
+  url.searchParams.set("v", "29.09.114");
   return url.toString();
 }
 
@@ -72,6 +85,7 @@ module.exports = {
   normalizeShiftStatus,
   publishedShiftStatus,
   canDeleteShiftStatus,
+  sanitizeShiftIds,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,

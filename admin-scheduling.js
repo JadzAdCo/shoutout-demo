@@ -27,7 +27,10 @@
     rrDays: new Set([1, 2, 3, 4, 5]),
     assignContext: null,
     rrCursor: 0,
-    venue: null
+    venue: null,
+    selecting: false,
+    selectFilter: "all",
+    selectedShiftIds: new Set()
   };
 
   function callable(name) {
@@ -308,6 +311,68 @@
     byId("schedRoundRobinPanel")?.classList.toggle("hidden", state.mode !== "roundRobin");
   }
 
+  function shiftStatusKey(shift) {
+    const status = String(shift?.status || "") === "approved" ? "confirmed" : String(shift?.status || "");
+    return status || "draft";
+  }
+
+  function matchesSelectFilter(shift) {
+    const filter = state.selectFilter || "all";
+    if (filter === "all") return true;
+    return shiftStatusKey(shift) === filter;
+  }
+
+  function updateSelectUi() {
+    const bar = byId("schedSelectBar");
+    const wrap = byId("scheduleWeekGrid");
+    const btn = byId("schedSelectBtn");
+    const countBtn = byId("schedDeleteSelectedBtn");
+    bar?.classList.toggle("hidden", !state.selecting);
+    wrap?.classList.toggle("is-selecting", state.selecting);
+    btn?.classList.toggle("active", state.selecting);
+    if (btn) btn.textContent = state.selecting ? "Selecting…" : "Select shifts";
+    document.querySelectorAll("[data-sched-filter]").forEach(el => {
+      el.classList.toggle("active", el.dataset.schedFilter === state.selectFilter);
+    });
+    const n = state.selectedShiftIds.size;
+    if (countBtn) {
+      countBtn.textContent = n ? `Delete selected (${n})` : "Delete selected";
+      countBtn.disabled = n === 0;
+    }
+  }
+
+  function setSelectMode(on) {
+    state.selecting = !!on;
+    if (!state.selecting) state.selectedShiftIds.clear();
+    renderGrid();
+    updateSelectUi();
+  }
+
+  function toggleShiftSelected(shiftId) {
+    if (!shiftId) return;
+    if (state.selectedShiftIds.has(shiftId)) state.selectedShiftIds.delete(shiftId);
+    else state.selectedShiftIds.add(shiftId);
+    renderGrid();
+    updateSelectUi();
+  }
+
+  function toggleDaySelection(dayIdx) {
+    const day = weekDays()[dayIdx];
+    if (!day) return;
+    const ids = state.shifts
+      .filter(shift => matchesSelectFilter(shift) && sameDay(Number(shift.startsAtMs || Date.parse(shift.startsAt) || 0), day))
+      .map(shift => shift.id)
+      .filter(Boolean);
+    if (!ids.length) return;
+    const allOn = ids.every(id => state.selectedShiftIds.has(id));
+    ids.forEach(id => {
+      if (allOn) state.selectedShiftIds.delete(id);
+      else state.selectedShiftIds.add(id);
+    });
+    renderGrid();
+    updateSelectUi();
+  }
+
   function closeWorkerPopout() {
     const pop = byId("scheduleWorkerPopout");
     if (pop) {
@@ -421,20 +486,25 @@
     const head = `
       <thead><tr>
         <th class="sched-person">Team</th>
-        ${days.map(day => {
+        ${days.map((day, dayIdx) => {
           const isToday = day.getTime() === today.getTime();
           const holiday = venueApi()?.holidayOn?.(state.venue?.country || "US", day);
           const closed = staffTimesForDay(day).closed;
           const classes = [
+            "sched-day-head",
             isToday ? "is-today" : "",
             holiday ? "is-holiday" : "",
             closed ? "is-venue-closed" : ""
           ].filter(Boolean).join(" ");
           const title = [
             holiday ? holiday.name : "",
-            closed ? "Venue closed" : ""
+            closed ? "Venue closed" : "",
+            state.selecting ? "Tap to select this day's shifts (uses Drafts / Pending / Confirmed filter)" : ""
           ].filter(Boolean).join(" · ");
-          return `<th class="${classes}" title="${esc(title)}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}${holiday ? `<small class="sched-holiday-mark">${esc(holiday.name)}</small>` : ""}${closed && !holiday ? `<small class="sched-closed-mark">Closed</small>` : ""}</th>`;
+          const filterHint = state.selecting
+            ? `<small class="sched-select-day-hint">Select ${state.selectFilter === "all" ? "all" : state.selectFilter}</small>`
+            : "";
+          return `<th class="${classes}" data-day-idx="${dayIdx}" title="${esc(title)}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}${holiday ? `<small class="sched-holiday-mark">${esc(holiday.name)}</small>` : ""}${closed && !holiday ? `<small class="sched-closed-mark">Closed</small>` : ""}${filterHint}</th>`;
         }).join("")}
       </tr></thead>
     `;
@@ -448,15 +518,17 @@
           String(s.assigneeUid || "") === worker.uid && sameDay(Number(s.startsAtMs || Date.parse(s.startsAt) || 0), day)
         );
         const chips = dayShifts.map(shift => {
-          const status = String(shift.status || "") === "approved" ? "confirmed" : String(shift.status || "");
+          const status = shiftStatusKey(shift);
           const statusClass = status === "draft" ? "is-draft"
             : status === "pending" ? "is-pending"
             : status === "confirmed" ? "is-confirmed"
             : status === "declined" ? "is-declined"
             : "";
+          const selected = state.selecting && state.selectedShiftIds.has(shift.id);
           return `
-          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}"
-            data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
+          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}${selected ? " is-selected" : ""}"
+            data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}" data-status="${esc(status)}"
+            aria-pressed="${selected ? "true" : "false"}">
             <strong>${esc(shift.roleLabel || "Shift")}</strong>
             <small>${esc(formatChipTime(shift))} · ${esc(status)}</small>
           </button>`;
@@ -481,6 +553,7 @@
     }).join("");
 
     host.innerHTML = `<table class="sched-grid">${head}<tbody>${body}</tbody></table>`;
+    updateSelectUi();
   }
 
   async function refreshSubscriptionUi() {
@@ -860,6 +933,22 @@
     await loadShifts();
   }
 
+  async function deleteSelectedShifts() {
+    const ids = [...state.selectedShiftIds];
+    if (!ids.length) throw new Error("Select at least one shift to delete.");
+    if (!window.confirm(`Delete ${ids.length} selected shift${ids.length === 1 ? "" : "s"}? Drafts disappear quietly. Pending and confirmed workers get a cancelled notice if they were already notified.`)) return;
+    setStatus(`Deleting ${ids.length} shift${ids.length === 1 ? "" : "s"}…`);
+    const result = await callable("deleteScheduleShifts")({shiftIds: ids});
+    const deleted = Number(result?.data?.deleted || 0);
+    const failed = Number(result?.data?.failed || 0);
+    state.selectedShiftIds.clear();
+    setSelectMode(false);
+    setStatus(failed
+      ? `Deleted ${deleted} shift${deleted === 1 ? "" : "s"}; ${failed} could not be removed.`
+      : `Deleted ${deleted} shift${deleted === 1 ? "" : "s"}.`);
+    await loadShifts();
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     renderDayPills("schedApplyDays", state.applyDays);
     renderDayPills("schedRrDays", state.rrDays);
@@ -894,6 +983,20 @@
     byId("schedPublishBtn")?.addEventListener("click", () => {
       publishWeek().catch(error => setStatus(error.message));
     });
+    byId("schedSelectBtn")?.addEventListener("click", () => {
+      setSelectMode(!state.selecting);
+    });
+    byId("schedSelectCancelBtn")?.addEventListener("click", () => setSelectMode(false));
+    byId("schedDeleteSelectedBtn")?.addEventListener("click", () => {
+      deleteSelectedShifts().catch(error => setStatus(error.message));
+    });
+    byId("schedSelectFilters")?.addEventListener("click", event => {
+      const btn = event.target.closest("[data-sched-filter]");
+      if (!btn) return;
+      state.selectFilter = btn.dataset.schedFilter || "all";
+      updateSelectUi();
+      if (state.selecting) renderGrid();
+    });
     byId("schedRrFillBtn")?.addEventListener("click", () => {
       roundRobinFill().catch(error => setStatus(error.message));
     });
@@ -916,6 +1019,19 @@
     });
 
     byId("scheduleWeekGrid")?.addEventListener("click", event => {
+      if (state.selecting) {
+        const dayHead = event.target.closest("[data-day-idx]");
+        if (dayHead) {
+          toggleDaySelection(Number(dayHead.dataset.dayIdx));
+          return;
+        }
+        const chip = event.target.closest("[data-shift-id]");
+        if (chip) {
+          toggleShiftSelected(chip.dataset.shiftId);
+          return;
+        }
+        return;
+      }
       const personBtn = event.target.closest("[data-worker-uid]");
       if (personBtn) {
         const worker = state.workers.find(w => w.uid === personBtn.dataset.workerUid);
@@ -946,6 +1062,7 @@
       if (event.key === "Escape") {
         closeAssignModal();
         closeWorkerPopout();
+        if (state.selecting) setSelectMode(false);
       }
     });
 
