@@ -72,7 +72,7 @@ test("platformSettings feature gates are Master Admin write / public read", () =
   const block = blockFor("/platformSettings/{docId}");
   assert.match(block, /allow read: if true;/);
   assert.match(block, /allow write: if isMasterAdmin\(\);/);
-  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.66-suprstar-approval-flow/);
+  assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.23-entity-feature-gates/);
 });
 
 test("recommendation moderation is Master Admin controlled", () => {
