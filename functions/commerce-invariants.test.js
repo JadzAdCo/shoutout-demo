@@ -137,6 +137,12 @@ test("Heist identity rail cycles optional handle then brand lines for 3s each", 
   assert.match(sharedData, /messageDurationSeconds:20/);
 });
 
+test("SMS and WhatsApp checkout fulfillment persist club subscription flags", () => {
+  assert.match(backend, /smsSubscribed:true/);
+  assert.match(backend, /whatsappSubscribed:true/);
+  assert.match(backend, /orderType === "smsNotifications"/);
+});
+
 test("all published templates have display-aware text contracts", () => {
   const sandbox = {};
   sandbox.window = sandbox;

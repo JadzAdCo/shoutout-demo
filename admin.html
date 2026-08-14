@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.103"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.103"/>
+  <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.111"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -612,13 +612,13 @@
         <div class="card">
           <p class="eyebrow">Club ops</p>
           <h2>Notifications</h2>
-          <p class="sub small">Choose how this club receives system alerts (pending ShoutOuts, etc.). Reply <strong>APPROVE {daily code}</strong> or <strong>REJECT {daily code}</strong> from the alert phone. SMS ($10) and WhatsApp ($10) service packs also grant message credits for marketing (see Advertising).</p>
-          <div class="privacy-datapoint-grid">
-            <label><input id="repNotifyInApp" type="checkbox" checked/> In-app system message</label>
-            <label><input id="repNotifyPush" type="checkbox"/> Push notification</label>
-            <label><input id="repNotifyEmail" type="checkbox"/> Email</label>
-            <label><input id="repNotifySms" type="checkbox"/> SMS Notification Services ($10 → 466 credits)</label>
-            <label><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp Notification Services ($10 → 233 credits)</label>
+          <p class="sub small">Choose how this club receives pending-ShoutOut alerts. Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp colors follow the Firebase subscription (green = paid, red = not subscribed). Payment and credit details are in each channel's ?.</p>
+          <div class="notify-channel-grid">
+            <label class="notify-channel"><input id="repNotifyInApp" type="checkbox" checked/> In-app</label>
+            <label class="notify-channel"><input id="repNotifyPush" type="checkbox"/> Push</label>
+            <label class="notify-channel"><input id="repNotifyEmail" type="checkbox"/> Email</label>
+            <div class="notify-channel notify-paid-channel" id="repNotifySmsCard"><label class="notify-channel-check"><input id="repNotifySms" type="checkbox"/> SMS</label></div>
+            <div class="notify-channel notify-paid-channel" id="repNotifyWhatsappCard"><label class="notify-channel-check"><input id="repNotifyWhatsapp" type="checkbox"/> WhatsApp</label></div>
           </div>
           <div class="profile-grid" style="margin-top:12px">
             <label>Alert phone (E.164)<input id="repAlertPhone" type="tel" placeholder="+12025550123" autocomplete="tel"/></label>
@@ -727,8 +727,8 @@
 <script src="./firebase-config.js?v=29.09.8"></script>
 <script src="./floqr-nav.js?v=29.09.46"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
-<script src="./floqr-temp-qa-showcase.js?v=29.09.108"></script>
-<script src="./shared-data.js?v=29.09.108"></script>
+<script src="./floqr-temp-qa-showcase.js?v=29.09.110"></script>
+<script src="./shared-data.js?v=29.09.110"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./media-source-picker.js?v=29.09.52"></script>
@@ -736,7 +736,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.103"></script>
+<script src="./floqai-help-repository.js?v=29.09.111"></script>
 <script src="./help-attach.js?v=29.09.101"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -750,7 +750,7 @@
 <script src="./admin-app.js?v=29.09.103"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.18"></script>
+<script src="./admin-notifications.js?v=29.09.111"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./admin-scheduling.js?v=29.09.108"></script>

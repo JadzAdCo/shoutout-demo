@@ -57,10 +57,18 @@ test("builds pending shoutout alert copy", () => {
   assert.match(body, /Preview:/);
 });
 
-test("selectOutboundTargets honors paid SMS and WhatsApp flags", () => {
+test("selectOutboundTargets honors enabled channels and paid-but-paused SMS", () => {
   assert.deepEqual(selectOutboundTargets({alertPhone: "+12025550123"}), []);
   assert.deepEqual(
     selectOutboundTargets({alertPhone: "2025550123", smsEnabled: true, smsPaidAt: "x"}),
+    [{channel: "sms", to: "+12025550123"}]
+  );
+  assert.deepEqual(
+    selectOutboundTargets({alertPhone: "+12025550123", smsPaidAt: "paid", smsSubscribed: true, smsEnabled: false}),
+    []
+  );
+  assert.deepEqual(
+    selectOutboundTargets({alertPhone: "+12025550123", smsPaidAt: "paid", smsSubscribed: true}),
     [{channel: "sms", to: "+12025550123"}]
   );
   assert.deepEqual(
@@ -84,6 +92,13 @@ test("selectOutboundTargets honors paid SMS and WhatsApp flags", () => {
       {channel: "whatsapp", to: "+12025550123"}
     ]
   );
+});
+
+test("describeOutboundSkip explains missing phone vs paused channels", () => {
+  const {describeOutboundSkip} = require("./messaging-core");
+  assert.equal(describeOutboundSkip({smsEnabled: true}), "missing-phone");
+  assert.equal(describeOutboundSkip({alertPhone: "+12025550123", smsSubscribed: true, smsEnabled: false}), "channels-paused");
+  assert.equal(describeOutboundSkip({alertPhone: "+12025550123", smsEnabled: true}), "");
 });
 
 test("twilio WhatsApp address prefix", () => {

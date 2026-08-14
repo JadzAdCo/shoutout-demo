@@ -1804,15 +1804,16 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.108") {
+function defaultFloqrPreviewLinks(v = "29.09.111") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
-    ["Aurelia club profile (logo, staff photos, hours grid)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
-    ["Volt Room club profile", `${base}/club-profile.html?location=temp-democlub-2&v=${v}`],
-    ["Temp Club Admin 1 Command Center", `${base}/admin.html?v=${v}`],
+    ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
+    ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
+    ["Club Admin Notifications (compact SMS/WhatsApp pills)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
+    ["Temp Club Admin 1 Command Center (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
     ["Scheduling grid avatars", `${base}/admin.html?location=temp-democlub-1&v=${v}#panelScheduling`],
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
-    ["Master Admin Discovery", `${base}/master-admin.html?v=${v}`],
+    ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
     ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
     ["Aurelia display board", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
   ];
@@ -1870,7 +1871,7 @@ exports.emailFloqrPreviewLinks = onRequest({
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const query = req.query || {};
     const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
-    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.34").trim();
+    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.111").trim();
     const note = String(body.note || query.note || "").trim();
     const links = Array.isArray(body.links) ? body.links : [];
     const mail = buildPreviewLinksEmail({packageVersion, links, note});

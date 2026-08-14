@@ -1816,7 +1816,14 @@ async function finalizePaidOrder(orderId, session) {
   }
 
   if (order.orderType === "smsNotifications" && order.clubLocationId) {
-    await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({smsEnabled:true, smsServiceOrderId:orderId, smsPaidAt:paidAt, updatedAt:paidAt}, {merge:true});
+    await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({
+      smsEnabled:true,
+      smsRequested:true,
+      smsSubscribed:true,
+      smsServiceOrderId:orderId,
+      smsPaidAt:paidAt,
+      updatedAt:paidAt
+    }, {merge:true});
     await ref.set({fulfillmentStatus:"sms-enabled"}, {merge:true});
   }
 
@@ -1855,6 +1862,8 @@ async function finalizePaidOrder(orderId, session) {
       if (pack.channel === "whatsapp") {
         await db.collection("clubNotificationSettings").doc(order.clubLocationId).set({
           whatsappEnabled:true,
+          whatsappRequested:true,
+          whatsappSubscribed:true,
           whatsappServiceOrderId:orderId,
           whatsappPaidAt:paidAt,
           updatedAt:paidAt
