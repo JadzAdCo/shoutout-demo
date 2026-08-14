@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.115";
+  const PREVIEW_LINKS_PACKAGE = "29.09.116";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,17 @@
       ]
     },
     {
+      version:"v29.09.116",
+      title:"Schedule card save: in-place update, success popout, no duplicate chips",
+      checks:[
+        {label:"Update shift callable", file:"functions/scheduling-functions.js", includes:["updateScheduleShift", "nextStatusForShiftUpdate"]},
+        {label:"Save lock and success popout", file:"admin-scheduling.js", includes:["Schedule card successfully saved", "savingShift", "updateOrReplaceShift"]},
+        {label:"Admin scheduling cache bust", file:"admin.html", includes:["admin-scheduling.js?v=29.09.116"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.116\""]},
+        {label:"Preview email default version", file:"functions/ai-discovery-functions.js", includes:["defaultFloqrPreviewLinks(v = \"29.09.116\")"]}
+      ]
+    },
+    {
       version:"v29.09.115",
       title:"Scheduler help + Work Sheet + website ingest API",
       checks:[
@@ -951,6 +962,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-116-schedule-card-save",
+      area:"Club Admin / Scheduling",
+      feature:"Save schedule card closes editor, success popout, no duplicate chips",
+      changed:"Editing a confirmed chip to draft updates that same card. Save is locked against double-click, closes the assign window, shows Schedule card successfully saved, then refreshes the week grid after the popout closes.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.116&tab=scheduling. Open a confirmed chip (e.g. Andre Wells), check Save as draft, tap Save shift once. Confirm the editor closes, the success popout appears, and after it closes there is one draft chip — not two.",
+      expected:"One chip. Assign modal gone. Popout text is Schedule card successfully saved. Second Save click while saving does nothing."
+    },
     {
       id:"v29-09-115-scheduler-worksheet-ingest",
       area:"Club Admin / Staff Calendar / Club websites",

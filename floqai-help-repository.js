@@ -267,13 +267,13 @@
     {
       id: "help-staff-week-calendar",
       title: "Scheduler",
-      body: "Club Admin Scheduler is a people × days week grid. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club site. Default shift window = club open − 2 hours through close + 1 hour.",
+      body: "Club Admin Scheduler is a people × days week grid. Save shift closes the editor with Schedule card successfully saved. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club site. Default shift window = club open − 2 hours through close + 1 hour.",
       searchPhrases: [
         "scheduler", "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
         "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
         "open minus two hours", "copy previous week", "public holiday",
         "pending shift", "confirmed shift", "delete shift", "select shifts", "multi delete",
-        "user guide", "create a schedule"
+        "user guide", "create a schedule", "schedule card successfully saved", "save shift"
       ],
       links: [
         {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
@@ -287,7 +287,7 @@
       body: "Open the ? beside Scheduler on Club Admin Scheduling. Create draft shifts, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip.",
       steps: [
         "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
-        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week into drafts.",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Save closes the editor and shows Schedule card successfully saved. Optional: Round Robin fill or Copy previous week into drafts.",
         "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
         "Published chips stay pending until the worker confirms. Confirmed has a green outline.",
         "To delete several: tap Select shifts. Filter Drafts, tap Wednesday’s column header, switch to All or Confirmed, tap a Thursday confirmed chip, then Delete selected."

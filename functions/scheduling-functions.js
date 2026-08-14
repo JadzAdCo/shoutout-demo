@@ -6,6 +6,8 @@ const admin = require("firebase-admin");
 const {
   normalizeShiftStatus,
   publishedShiftStatus,
+  parseShiftBounds,
+  nextStatusForShiftUpdate,
   canDeleteShiftStatus,
   sanitizeShiftIds,
   isPublishedShiftStatus,
@@ -496,6 +498,77 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   }
 
   return {shiftId: ref.id, status: shift.status, notifyResult};
+});
+
+exports.updateScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const shiftId = text(request.data?.shiftId, 120);
+  if (!shiftId) throw new HttpsError("invalid-argument", "shiftId is required.");
+  const ref = db.collection("scheduleShifts").doc(shiftId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
+  const existing = snap.data() || {};
+  const ownerType = text(existing.ownerType, 40);
+  const ownerId = text(existing.ownerId, 160);
+  if (!OWNER_TYPES.has(ownerType) || !ownerId) {
+    throw new HttpsError("failed-precondition", "This shift is missing owner data.");
+  }
+  if (!await canManageOwner(ownerType, ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot update this shift.");
+  }
+  await requireActiveSubscription(ownerType, ownerId);
+
+  const bounds = parseShiftBounds(request.data?.startsAt, request.data?.endsAt);
+  if (!bounds) throw new HttpsError("invalid-argument", "Shift end must be after start.");
+
+  const assigneeUid = text(request.data?.assigneeUid, 160) || text(existing.assigneeUid, 160);
+  const asDraft = request.data?.asDraft === true || request.data?.draft === true || text(request.data?.status, 40) === "draft";
+  const status = nextStatusForShiftUpdate({
+    asDraft,
+    assigneeUid,
+    previousStatus: existing.status,
+    startMs: bounds.startMs,
+    endMs: bounds.endMs,
+    previousStartMs: Number(existing.startsAtMs || 0),
+    previousEndMs: Number(existing.endsAtMs || 0),
+    previousAssigneeUid: text(existing.assigneeUid, 160)
+  });
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  const patch = {
+    roleLabel: text(request.data?.roleLabel || request.data?.role, 80) || text(existing.roleLabel, 80) || "Shift",
+    assigneeUid,
+    assigneeName: text(request.data?.assigneeName, 120) || text(existing.assigneeName, 120) || "Team member",
+    assigneeEmail: text(request.data?.assigneeEmail, 200).toLowerCase() || text(existing.assigneeEmail, 200).toLowerCase(),
+    assigneePhone: text(request.data?.assigneePhone, 40) || text(existing.assigneePhone, 40),
+    startsAt: bounds.startsAt,
+    endsAt: bounds.endsAt,
+    startsAtMs: bounds.startMs,
+    endsAtMs: bounds.endMs,
+    startsAtLabel: text(request.data?.startsAtLabel, 80) || new Date(bounds.startMs).toLocaleString(),
+    endsAtLabel: text(request.data?.endsAtLabel, 80) || new Date(bounds.endMs).toLocaleString(),
+    venueName: text(request.data?.venueName, 160) || text(existing.venueName, 160),
+    notes: text(request.data?.notes, 1000),
+    status,
+    published: status !== "draft",
+    assignMode: text(request.data?.assignMode, 40) || text(existing.assignMode, 40) || "manual",
+    updatedAt: now,
+    updatedByUid: request.auth.uid
+  };
+  await ref.set(patch, {merge: true});
+
+  const prevStatus = normalizeShiftStatus(existing.status);
+  const shouldNotify = status === "pending" && prevStatus !== "pending" && assigneeUid && request.data?.notify !== false;
+  let notifyResult = null;
+  if (shouldNotify) {
+    const merged = {...existing, ...patch, id: shiftId};
+    notifyResult = await notifyAssigneeChannels(merged, "schedule-invite");
+    await ref.set({
+      notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      notifyResult
+    }, {merge: true});
+  }
+
+  return {shiftId, status, notifyResult, updated: true};
 });
 
 exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 60, memory: "256MiB"}, async request => {
