@@ -58,13 +58,37 @@ function formatPaidAt(value) {
   return String(value);
 }
 
+function screenFormatLabelFromId(formatId = "") {
+  const id = text(formatId, 40);
+  const match = id.match(/(\d+)x(\d+)/i);
+  return match ? `${match[1]} x ${match[2]} cm` : "";
+}
+
+function locationAddressFromShoutout(shoutout = {}) {
+  const full = text(shoutout.fullAddress || shoutout.locationAddress, 400);
+  if (full) return full;
+  return [
+    text(shoutout.streetAddress, 160),
+    text(shoutout.city, 80),
+    text(shoutout.region, 80),
+    text(shoutout.postalCode, 20),
+    text(shoutout.country, 80)
+  ].filter(Boolean).join(", ");
+}
+
 function buildTempShoutoutReceipt({shoutout = {}, orderId = "", invoiceNumber = "", amountCents = 0} = {}) {
+  const screenFormatId = text(shoutout.screenFormatId, 40);
+  const screenFormatLabel = text(shoutout.screenFormatLabel, 80) || screenFormatLabelFromId(screenFormatId);
   return {
     status: "temp",
     kind: "shoutout",
     referenceNumber: text(shoutout.referenceNumber, 80),
     locationName: text(shoutout.locationName || shoutout.clubName, 160),
+    brandName: text(shoutout.brandName, 160),
+    locationAddress: locationAddressFromShoutout(shoutout),
     templateName: text(shoutout.templateName || shoutout.template, 160),
+    screenFormatId,
+    screenFormatLabel,
     statusLabel: "Pending Location Approval",
     mainText: text(shoutout.mainText, 400),
     subText: text(shoutout.subText, 80),
@@ -97,7 +121,10 @@ function receiptBodyLines(receipt = {}) {
   return [
     `Reference: ${receipt.referenceNumber || "—"}`,
     `Location: ${receipt.locationName || "—"}`,
+    receipt.locationName ? `Venue: ${receipt.locationName}` : "",
+    receipt.locationAddress ? `Address: ${receipt.locationAddress}` : "",
     `Template: ${receipt.templateName || "—"}`,
+    receipt.screenFormatLabel ? `Screen size: ${receipt.screenFormatLabel}` : "",
     `Status: ${receipt.statusLabel || "Pending Location Approval"}`,
     `Paid at: ${receipt.paidAtIso || "—"}`,
     `Invoice: ${receipt.invoiceNumber || "—"}`,
