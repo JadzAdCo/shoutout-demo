@@ -31,6 +31,7 @@ const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
 const TWILIO_WHATSAPP_FROM = defineSecret("TWILIO_WHATSAPP_FROM");
 const CLUB_AUTH_CODE_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
+const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
@@ -39,6 +40,7 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
 
 const DEFAULT_ORIGIN = process.env.FLOQR_PUBLIC_ORIGIN || "https://jadzadco.github.io/shoutout-demo";
 const MESSAGING_SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, TWILIO_WHATSAPP_FROM, CLUB_AUTH_CODE_PEPPER];
+const SCHEDULE_NOTIFY_SECRETS = [...MESSAGING_SECRETS, SENDGRID_API_KEY];
 
 function text(value, max = 200) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -454,11 +456,11 @@ exports.onShoutoutCreatedNotifyClub = onDocumentCreated({
   await deliverToClubTargets(clubLocationId, settings, body, {purpose: "pending-shoutout", shoutoutId: snap.id});
 });
 
-/** Drain Staff Scheduling notify queue → SMS/WhatsApp (Email/in-app already handled at create). */
+/** Drain Staff Scheduling notify queue → worker SMS/WhatsApp/email (Inbox already written at create). */
 exports.onScheduleNotifyQueued = onDocumentCreated({
   document: "scheduleNotifyQueue/{id}",
   region: "us-central1",
-  secrets: MESSAGING_SECRETS,
+  secrets: SCHEDULE_NOTIFY_SECRETS,
   timeoutSeconds: 30,
   memory: "256MiB"
 }, async event => {
@@ -468,40 +470,53 @@ exports.onScheduleNotifyQueued = onDocumentCreated({
   if (text(row.status, 40) !== "queued") return;
   const body = text(row.body, 900);
   const clubLocationId = text(row.clubLocationId, 160);
+  const requested = Array.isArray(row.channels) && row.channels.length
+    ? row.channels.map(value => text(value, 20).toLowerCase())
+    : ["sms", "whatsapp", "email"];
   const results = [];
   const assigneePhone = normalizeE164(row.assigneePhone || "");
-  if (assigneePhone) {
-    const settingsSnap = clubLocationId ? await db.collection("clubNotificationSettings").doc(clubLocationId).get() : null;
-    const settings = settingsSnap?.exists ? settingsSnap.data() || {} : {};
-    const pref = text(settings.channelPreference, 20) || "sms";
-    if ((pref === "sms" || pref === "both") && (settings.smsEnabled || !clubLocationId)) {
-      results.push(await sendTwilioMessage({
-        channel: "sms",
-        to: assigneePhone,
-        body,
-        clubLocationId,
-        purpose: text(row.purpose, 80) || "schedule-invite"
-      }));
-    }
-    if ((pref === "whatsapp" || pref === "both") && settings.whatsappEnabled) {
-      results.push(await sendTwilioMessage({
-        channel: "whatsapp",
-        to: assigneePhone,
-        body,
-        clubLocationId,
-        purpose: text(row.purpose, 80) || "schedule-invite"
-      }));
-    }
-  } else if (clubLocationId) {
-    const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
-    if (settingsSnap.exists) {
-      const delivery = await deliverToClubTargets(
-        clubLocationId,
-        settingsSnap.data() || {},
-        body,
-        {purpose: text(row.purpose, 80) || "schedule-invite"}
-      );
-      results.push(delivery);
+  const assigneeEmail = text(row.assigneeEmail, 200).toLowerCase();
+  const settingsSnap = clubLocationId ? await db.collection("clubNotificationSettings").doc(clubLocationId).get() : null;
+  const settings = settingsSnap?.exists ? settingsSnap.data() || {} : {};
+
+  if (assigneePhone && requested.includes("sms") && (settings.smsEnabled !== false)) {
+    results.push(await sendTwilioMessage({
+      channel: "sms",
+      to: assigneePhone,
+      body,
+      clubLocationId,
+      purpose: text(row.purpose, 80) || "schedule-invite"
+    }));
+  }
+  if (assigneePhone && requested.includes("whatsapp")) {
+    results.push(await sendTwilioMessage({
+      channel: "whatsapp",
+      to: assigneePhone,
+      body,
+      clubLocationId,
+      purpose: text(row.purpose, 80) || "schedule-invite"
+    }));
+  }
+  if (assigneeEmail && requested.includes("email")) {
+    const key = secretValue(SENDGRID_API_KEY, "SENDGRID_API_KEY");
+    if (key) {
+      try {
+        const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+          method: "POST",
+          headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+          body: JSON.stringify({
+            personalizations: [{to: [{email: assigneeEmail}]}],
+            from: {email: "login@floqr.com", name: "FLOQR Scheduling"},
+            subject: "Confirm your FLOQR shift",
+            content: [{type: "text/plain", value: body}]
+          })
+        });
+        results.push({ok: response.ok || response.status === 202, channel: "email", status: response.status});
+      } catch (error) {
+        results.push({ok: false, channel: "email", error: text(error?.message || error, 200)});
+      }
+    } else {
+      results.push({ok: false, channel: "email", status: "missing-sendgrid"});
     }
   }
   await snap.ref.set({

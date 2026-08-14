@@ -384,16 +384,12 @@
     if (!shift && dayTimes.start && byId("schedDefaultStart")) byId("schedDefaultStart").value = dayTimes.start;
     if (!shift && dayTimes.end && byId("schedDefaultEnd")) byId("schedDefaultEnd").value = dayTimes.end;
     if (byId("scheduleNotes")) byId("scheduleNotes").value = shift?.notes || "";
-    if (byId("scheduleRequireApproval")) {
-      byId("scheduleRequireApproval").checked = shift
-        ? shift.requireApproval !== false
-        : byId("schedRequireApproval")?.checked !== false;
-    }
     if (byId("scheduleSaveAsDraft")) byId("scheduleSaveAsDraft").checked = !shift || String(shift.status) === "draft";
 
     const deleteBtn = byId("scheduleDeleteShiftBtn");
     if (deleteBtn) {
-      const canDelete = !!(shift?.id && ["draft", "pending", "declined"].includes(String(shift.status || "")));
+      const status = String(shift?.status || "").toLowerCase();
+      const canDelete = !!(shift?.id && ["draft", "pending", "confirmed", "approved", "declined"].includes(status));
       deleteBtn.classList.toggle("hidden", !canDelete);
     }
 
@@ -451,13 +447,20 @@
         const dayShifts = state.shifts.filter(s =>
           String(s.assigneeUid || "") === worker.uid && sameDay(Number(s.startsAtMs || Date.parse(s.startsAt) || 0), day)
         );
-        const chips = dayShifts.map(shift => `
-          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${String(shift.status) === "draft" ? "is-draft" : ""}"
+        const chips = dayShifts.map(shift => {
+          const status = String(shift.status || "") === "approved" ? "confirmed" : String(shift.status || "");
+          const statusClass = status === "draft" ? "is-draft"
+            : status === "pending" ? "is-pending"
+            : status === "confirmed" ? "is-confirmed"
+            : status === "declined" ? "is-declined"
+            : "";
+          return `
+          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}"
             data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
             <strong>${esc(shift.roleLabel || "Shift")}</strong>
-            <small>${esc(formatChipTime(shift))} · ${esc(shift.status || "")}</small>
-          </button>
-        `).join("");
+            <small>${esc(formatChipTime(shift))} · ${esc(status)}</small>
+          </button>`;
+        }).join("");
         return `<td class="sched-cell" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
           ${chips}
           <button type="button" class="sched-cell-add" data-add-uid="${esc(worker.uid)}" data-day="${dayIdx}">+</button>
@@ -631,7 +634,6 @@
     endsAt,
     notes,
     asDraft,
-    requireApproval,
     assignMode
   }) {
     return callable("createScheduleShift")({
@@ -649,7 +651,6 @@
       venueName: byId("clubName")?.textContent || "",
       asDraft: !!asDraft,
       notify: !asDraft,
-      requireApproval: !!requireApproval,
       assignMode: assignMode || "manual"
     });
   }
@@ -662,8 +663,7 @@
     const startsAt = byId("scheduleStartsAt")?.value;
     const endsAt = byId("scheduleEndsAt")?.value;
     if (!startsAt || !endsAt) throw new Error("Set shift start and end.");
-    const asDraft = byId("scheduleSaveAsDraft")?.checked !== false;
-    const requireApproval = byId("scheduleRequireApproval")?.checked !== false;
+    const asDraft = byId("scheduleSaveAsDraft")?.checked === true;
     const roleLabel = byId("scheduleRole")?.value?.trim() || option?.dataset?.role || "Shift";
     const notes = byId("scheduleNotes")?.value?.trim() || "";
     const worker = state.workers.find(w => w.uid === assigneeUid);
@@ -674,8 +674,8 @@
     const durationMs = endLocal.getTime() - startLocal.getTime();
     if (!(durationMs > 0)) throw new Error("Shift end must be after start.");
 
-    setStatus(asDraft ? "Saving draft shift(s)…" : "Creating shift and notifying…");
-    if (state.assignContext?.shift?.id && ["draft", "pending", "declined"].includes(String(state.assignContext.shift.status || ""))) {
+    setStatus(asDraft ? "Saving draft shift(s)…" : "Creating pending shift and notifying the worker…");
+    if (state.assignContext?.shift?.id) {
       try {
         await callable("deleteScheduleShift")({shiftId: state.assignContext.shift.id});
       } catch (_error) {}
@@ -696,14 +696,13 @@
         endsAt: dayEnd,
         notes,
         asDraft,
-        requireApproval,
         assignMode: "manual"
       });
       created += 1;
     }
     setStatus(asDraft
-      ? `Saved ${created} draft shift${created === 1 ? "" : "s"}. Publish when ready.`
-      : `Saved ${created} shift${created === 1 ? "" : "s"} and queued notify where enabled.`);
+      ? `Saved ${created} draft shift${created === 1 ? "" : "s"}. Publish when ready — workers confirm after publish.`
+      : `Saved ${created} pending shift${created === 1 ? "" : "s"}. Workers were asked to confirm via Inbox / Email / SMS / WhatsApp.`);
     if (byId("scheduleNotes")) byId("scheduleNotes").value = "";
     closeAssignModal();
     await loadShifts();
@@ -717,7 +716,7 @@
       && Number(s.startsAtMs || 0) < weekEndMs
     );
     if (!drafts.length) throw new Error("No draft shifts in this week to publish.");
-    if (!window.confirm(`Publish ${drafts.length} draft shift${drafts.length === 1 ? "" : "s"} and notify workers?`)) return;
+    if (!window.confirm(`Publish ${drafts.length} draft shift${drafts.length === 1 ? "" : "s"}? Workers must confirm before a shift becomes confirmed.`)) return;
     setStatus("Publishing schedule…");
     const result = await callable("publishScheduleShifts")({
       ownerType: "club",
@@ -725,7 +724,7 @@
       weekStartMs,
       weekEndMs
     });
-    setStatus(`Published ${result?.data?.published || 0} shift(s). Workers notified when channels are enabled.`);
+    setStatus(`Published ${result?.data?.published || 0} pending shift(s). Workers confirm via Inbox / Email / SMS / WhatsApp.`);
     await loadShifts();
   }
 
@@ -766,7 +765,6 @@
     const days = [...state.rrDays].sort((a, b) => a - b);
     if (!days.length) throw new Error("Select at least one day to fill.");
     const roleLabel = byId("schedDefaultRole")?.value?.trim() || byId("schedRrRoleFilter")?.value?.trim() || "Shift";
-    const requireApproval = byId("schedRequireApproval")?.checked !== false;
 
     setStatus("Round Robin filling drafts…");
     let created = 0;
@@ -800,7 +798,6 @@
         endsAt,
         notes: "Round Robin auto-fill",
         asDraft: true,
-        requireApproval,
         assignMode: "roundRobin"
       });
       created += 1;
@@ -846,7 +843,6 @@
         endsAt: nextEnd,
         notes: shift.notes ? `${shift.notes} (copied)` : "Copied from previous week",
         asDraft: true,
-        requireApproval: shift.requireApproval !== false,
         assignMode: "copyPreviousWeek"
       });
       created += 1;
@@ -857,7 +853,7 @@
 
   async function deleteShift(shiftId) {
     if (!shiftId) return;
-    if (!window.confirm("Delete this shift?")) return;
+    if (!window.confirm("Delete this shift? Pending and confirmed shifts can both be removed. The worker is notified if it was already sent.")) return;
     setStatus("Deleting shift…");
     await callable("deleteScheduleShift")({shiftId});
     setStatus("Shift deleted.");

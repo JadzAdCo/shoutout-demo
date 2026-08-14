@@ -209,20 +209,22 @@
       id: "help-staff-schedule-grid",
       kind: "help",
       label: "Staff week calendar / Round Robin",
-      blurb: "Club Admin → Scheduling: people × days grid. Manual place draft chips, or Round Robin fill days fairly. Publish notifies workers. Click worker photos for SMS and public profile.",
+      blurb: "Club Admin → Scheduling: people × days grid. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Delete works on pending and confirmed. Round Robin fills days fairly. Publish notifies workers.",
       steps: [
         "Open Club Admin → Scheduling (after paid this month).",
         "Manual: click + on a person/day cell, set times, Save as draft.",
         "Round Robin: pick days + role, Fill → drafts, review chips.",
-        "Publish schedule to notify workers.",
-        "Click a worker photo for contact, SMS, and public profile."
+        "Publish schedule to notify workers. Shifts stay pending until they confirm.",
+        "Click a worker photo for contact, SMS, and public profile.",
+        "Edit a pending or confirmed chip and use Delete shift."
       ],
       links: [
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
-        "staff schedule", "assign shift", "worker photo", "7shifts"
+        "staff schedule", "assign shift", "worker photo", "7shifts",
+        "pending shift", "confirmed shift", "delete shift", "require approval"
       ],
       patterns: [
         /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,

@@ -3,6 +3,16 @@
 
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {
+  normalizeShiftStatus,
+  publishedShiftStatus,
+  canDeleteShiftStatus,
+  workerAllowsNotifyChannel,
+  clubAllowsNotifyChannel,
+  shiftApproveUrl,
+  buildShiftInviteBody,
+  DEFAULT_ORIGIN
+} = require("./scheduling-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -66,15 +76,238 @@ async function canManageOwner(ownerType, ownerId, authContext = {}) {
   return (worker.rolePermissions || []).some(permission => permission === "manageSchedules");
 }
 
-async function requireActiveSubscription(ownerType, ownerId) {
-  const key = ownerKey(ownerType, ownerId);
-  const snap = await db.collection("schedulingSubscriptions").doc(key).get();
-  if (!snap.exists) throw new HttpsError("failed-precondition", "Staff Scheduling requires an active $20/month subscription.");
-  const status = text(snap.data()?.status, 40).toLowerCase();
-  if (!["active", "trialing"].includes(status)) {
-    throw new HttpsError("failed-precondition", "Staff Scheduling subscription is not active. Renew the $20/month plan to continue.");
+/** Explicit venue/portal gate: staffSchedulingPaid === 1 means calendar unlocked (no Subscribe CTA). */
+function paidFlagFromValue(value) {
+  if (value === true || value === 1 || value === "1") return 1;
+  if (value === false || value === 0 || value === "0") return 0;
+  return null;
+}
+
+function isDemoFirebaseProject() {
+  const project = String(process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT || "").toLowerCase();
+  try {
+    const cfg = JSON.parse(process.env.FIREBASE_CONFIG || "{}");
+    const id = String(cfg.projectId || project || "").toLowerCase();
+    return id.includes("shoutoutdemo");
+  } catch (_error) {
+    return project.includes("shoutoutdemo");
   }
-  return {key, data: snap.data() || {}};
+}
+
+function looksLikeDemoClub(club = {}, ownerId = "") {
+  if (club.demo === true || club.isDemo === true) return true;
+  if (paidFlagFromValue(club.staffSchedulingPaid) === 1 && text(club.schedulingEntitlementSource, 40) === "demo") return true;
+  const blob = [
+    ownerId,
+    club.id,
+    club.activityStatus,
+    club.onboardingSource,
+    club.brand,
+    club.locationName,
+    club.clubName
+  ].map(v => String(v || "")).join(" ").toLowerCase();
+  if (/\bdemo\b/.test(blob) || /shoutout-demo|floqr demo|active demo location/.test(blob)) return true;
+  // Entire shoutoutdemo Firebase catalog is demo-entitled until production cutover.
+  if (isDemoFirebaseProject() && club && Object.keys(club).length) return true;
+  return false;
+}
+
+const MONTH_STATUS_PAID = "paid this month";
+const MONTH_STATUS_UNPAID = "not paid this month";
+
+function currentBillingMonthKey(date = new Date()) {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function hasEverSubscribed(sub = {}, club = null) {
+  if (sub.everSubscribed === true || sub.wasSubscriber === true) return true;
+  if (sub.activatedAt || sub.lastPaidAt || sub.stripeSubscriptionId || sub.serviceOrderId) return true;
+  if (text(sub.status, 80) === MONTH_STATUS_PAID || text(sub.status, 80) === MONTH_STATUS_UNPAID) return true;
+  if (["active", "trialing", "canceled", "past_due", "unpaid"].includes(text(sub.status, 40).toLowerCase()) && Object.keys(sub).length > 2) {
+    return true;
+  }
+  if (club && (club.schedulingEverSubscribed === true || club.schedulingLastPaidAt)) return true;
+  return false;
+}
+
+function monthStatusForPaid(paid) {
+  return paid === 1 ? MONTH_STATUS_PAID : MONTH_STATUS_UNPAID;
+}
+
+async function writeStaffSchedulingPaid(ownerType, ownerId, paid, extra = {}) {
+  const key = ownerKey(ownerType, ownerId);
+  const flag = paid ? 1 : 0;
+  const now = admin.firestore.FieldValue.serverTimestamp();
+  const monthStatus = text(extra.status, 80) || monthStatusForPaid(flag);
+  const subPayload = {
+    ownerKey: key,
+    ownerType,
+    ownerId,
+    paid: flag,
+    staffSchedulingPaid: flag,
+    status: monthStatus,
+    monthStatus,
+    billingMonthKey: text(extra.billingMonthKey, 20) || (flag === 1 ? currentBillingMonthKey() : text(extra.priorBillingMonthKey, 20) || ""),
+    everSubscribed: flag === 1 ? true : (extra.everSubscribed === false ? false : true),
+    updatedAt: now,
+    ...extra,
+    status: monthStatus,
+    monthStatus
+  };
+  if (flag === 1) {
+    subPayload.lastPaidAt = now;
+    subPayload.lastPaidMonthKey = currentBillingMonthKey();
+    subPayload.everSubscribed = true;
+  }
+  await db.collection("schedulingSubscriptions").doc(key).set(subPayload, {merge: true});
+  if (ownerType === "club" && ownerId) {
+    const clubPayload = {
+      staffSchedulingPaid: flag,
+      schedulingMonthStatus: monthStatus,
+      schedulingEntitlementSource: text(extra.source || extra.schedulingEntitlementSource, 40) || (flag === 1 ? "subscription" : "none"),
+      schedulingPaidUpdatedAt: now
+    };
+    if (flag === 1) {
+      clubPayload.schedulingEverSubscribed = true;
+      clubPayload.schedulingLastPaidAt = now;
+      clubPayload.schedulingLastPaidMonthKey = currentBillingMonthKey();
+    } else if (extra.everSubscribed !== false) {
+      clubPayload.schedulingEverSubscribed = true;
+    }
+    await db.collection("clubLocations").doc(ownerId).set(clubPayload, {merge: true});
+  }
+  return {key, paid: flag, status: monthStatus};
+}
+
+/**
+ * Entitlement source of truth:
+ * 1) clubLocations.staffSchedulingPaid (0|1) for clubs
+ * 2) schedulingSubscriptions.paid + status "paid this month" | "not paid this month"
+ * 3) demo venues → auto-set staffSchedulingPaid=1 once
+ *
+ * CTA: paid=1 → calendar; paid=0 + everSubscribed → Resubscribe; else Subscribe
+ */
+async function resolveSchedulingEntitlement(ownerType, ownerId) {
+  const key = ownerKey(ownerType, ownerId);
+  const subRef = db.collection("schedulingSubscriptions").doc(key);
+  const subSnap = await subRef.get();
+  const sub = subSnap.exists ? subSnap.data() || {} : {};
+  const subPaid = paidFlagFromValue(sub.paid ?? sub.staffSchedulingPaid);
+  const legacyActive = ["active", "trialing"].includes(text(sub.status, 40).toLowerCase());
+  const monthPaid = text(sub.status, 80) === MONTH_STATUS_PAID
+    || text(sub.monthStatus, 80) === MONTH_STATUS_PAID
+    || (subPaid === 1)
+    || legacyActive;
+
+  let clubPaid = null;
+  let club = null;
+  if (ownerType === "club" && ownerId) {
+    const clubSnap = await db.collection("clubLocations").doc(ownerId).get();
+    if (clubSnap.exists) {
+      club = clubSnap.data() || {};
+      clubPaid = paidFlagFromValue(club.staffSchedulingPaid);
+    }
+  }
+
+  const ever = hasEverSubscribed(sub, club);
+
+  // Explicit venue/sub unpaid → Resubscribe if they were ever on the plan.
+  if (clubPaid === 0 || (subPaid === 0 && clubPaid !== 1) || ((text(sub.status, 80) === MONTH_STATUS_UNPAID || text(sub.monthStatus, 80) === MONTH_STATUS_UNPAID) && clubPaid !== 1)) {
+    return {
+      key,
+      paid: 0,
+      subscribed: false,
+      status: MONTH_STATUS_UNPAID,
+      monthStatus: MONTH_STATUS_UNPAID,
+      everSubscribed: ever,
+      cta: ever ? "resubscribe" : "subscribe",
+      source: ever ? "not-paid-this-month" : "never-subscribed",
+      data: sub,
+      club
+    };
+  }
+
+  if (clubPaid === 1 || monthPaid) {
+    if (ownerType === "club" && clubPaid !== 1) {
+      await writeStaffSchedulingPaid(ownerType, ownerId, true, {
+        source: legacyActive ? "subscription" : "backfill",
+        status: MONTH_STATUS_PAID,
+        stripeSubscriptionId: text(sub.stripeSubscriptionId, 160),
+        ownerName: text(sub.ownerName || club?.locationName || club?.clubName, 160),
+        everSubscribed: true
+      });
+    } else if (subPaid !== 1 || text(sub.status, 80) !== MONTH_STATUS_PAID) {
+      await subRef.set({
+        paid: 1,
+        staffSchedulingPaid: 1,
+        status: MONTH_STATUS_PAID,
+        monthStatus: MONTH_STATUS_PAID,
+        everSubscribed: true,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    }
+    return {
+      key,
+      paid: 1,
+      subscribed: true,
+      status: MONTH_STATUS_PAID,
+      monthStatus: MONTH_STATUS_PAID,
+      everSubscribed: true,
+      cta: "none",
+      source: clubPaid === 1 ? "clubLocations.staffSchedulingPaid" : "schedulingSubscriptions.paid",
+      data: sub,
+      club
+    };
+  }
+
+  // Demo venues: entitle once so portal shows calendar (not Subscribe $20).
+  if (ownerType === "club" && club && looksLikeDemoClub(club, ownerId)) {
+    await writeStaffSchedulingPaid(ownerType, ownerId, true, {
+      source: "demo",
+      schedulingEntitlementSource: "demo",
+      status: MONTH_STATUS_PAID,
+      ownerName: text(club.locationName || club.clubName || club.brandName, 160),
+      priceCents: SCHEDULING_PRICE_CENTS,
+      billingInterval: "month",
+      everSubscribed: true,
+      activatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    return {
+      key,
+      paid: 1,
+      subscribed: true,
+      status: MONTH_STATUS_PAID,
+      monthStatus: MONTH_STATUS_PAID,
+      everSubscribed: true,
+      cta: "none",
+      source: "demo",
+      data: sub,
+      club
+    };
+  }
+
+  return {
+    key,
+    paid: 0,
+    subscribed: false,
+    status: MONTH_STATUS_UNPAID,
+    monthStatus: MONTH_STATUS_UNPAID,
+    everSubscribed: ever,
+    cta: ever ? "resubscribe" : "subscribe",
+    source: "unpaid",
+    data: sub,
+    club
+  };
+}
+
+async function requireActiveSubscription(ownerType, ownerId) {
+  const entitlement = await resolveSchedulingEntitlement(ownerType, ownerId);
+  if (!entitlement.subscribed || entitlement.paid !== 1) {
+    throw new HttpsError("failed-precondition", "Staff Scheduling requires an active $20/month subscription (staffSchedulingPaid=1).");
+  }
+  return {key: entitlement.key, data: entitlement.data || {}, paid: 1};
 }
 
 async function writeInbox(recipientUid, payload = {}) {
@@ -93,40 +326,72 @@ async function writeInbox(recipientUid, payload = {}) {
 }
 
 async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
-  const body = text(
-    `${shift.ownerName || "FLOQR"} schedule: ${shift.roleLabel || shift.role || "Shift"} ` +
-    `${shift.startsAtLabel || ""} – ${shift.endsAtLabel || ""}. ` +
-    `Open FLOQR Scheduling to ${shift.status === "pending" ? "Approve or Decline" : "View"}.`,
-    900
-  );
-  const results = {inApp: false, channelsQueued: false};
+  const origin = process.env.FLOQR_PUBLIC_ORIGIN || DEFAULT_ORIGIN;
+  const approveUrl = shiftApproveUrl({...shift, id: shift.id}, origin);
+  const body = buildShiftInviteBody({...shift, id: shift.id}, origin);
+  const results = {inApp: false, channelsQueued: false, approveUrl};
 
-  await writeInbox(shift.assigneeUid, {
-    title: shift.status === "pending" ? "New shift needs your approval" : "Schedule update",
-    body,
-    link: `scheduling.html?owner=${encodeURIComponent(shift.ownerKey)}&shift=${encodeURIComponent(shift.id || "")}`,
-    shiftId: shift.id,
-    ownerKey: shift.ownerKey
-  });
-  results.inApp = true;
+  let worker = {};
+  if (text(shift.assigneeUid, 160)) {
+    try {
+      const snap = await db.collection("users").doc(text(shift.assigneeUid, 160)).get();
+      worker = snap.exists ? snap.data() || {} : {};
+    } catch (_error) {
+      worker = {};
+    }
+  }
 
-  // Queue for Notification Fabric (SMS/WhatsApp/email workers pick up; also visible in Club Admin).
-  await db.collection("scheduleNotifyQueue").add({
-    shiftId: text(shift.id, 120),
-    ownerKey: text(shift.ownerKey, 220),
-    ownerType: text(shift.ownerType, 40),
-    ownerId: text(shift.ownerId, 160),
-    clubLocationId: text(shift.clubLocationId, 160),
-    assigneeUid: text(shift.assigneeUid, 160),
-    assigneeEmail: text(shift.assigneeEmail, 200),
-    assigneePhone: text(shift.assigneePhone, 40),
-    purpose: text(purpose, 80),
-    body,
-    status: "queued",
-    channels: ["email", "sms", "whatsapp"],
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
-  results.channelsQueued = true;
+  let clubSettings = {};
+  const clubLocationId = text(shift.clubLocationId, 160);
+  if (clubLocationId) {
+    try {
+      const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
+      clubSettings = settingsSnap.exists ? settingsSnap.data() || {} : {};
+    } catch (_error) {
+      clubSettings = {};
+    }
+  }
+
+  const channels = [];
+  if (workerAllowsNotifyChannel(worker, "inapp") && clubAllowsNotifyChannel(clubSettings, "inapp")) {
+    await writeInbox(shift.assigneeUid, {
+      title: normalizeShiftStatus(shift.status) === "pending" ? "New shift needs your confirmation" : "Schedule update",
+      body,
+      link: `./scheduling.html?shift=${encodeURIComponent(shift.id || "")}&from=schedule-notify&v=29.09.113`,
+      shiftId: shift.id,
+      ownerKey: shift.ownerKey
+    });
+    results.inApp = true;
+    channels.push("inapp");
+  }
+
+  const phone = text(shift.assigneePhone || worker.phone || worker.phoneNumber || worker.mobile, 40);
+  const email = text(shift.assigneeEmail || worker.email, 200).toLowerCase();
+  if (phone && workerAllowsNotifyChannel(worker, "sms") && clubAllowsNotifyChannel(clubSettings, "sms")) channels.push("sms");
+  if (phone && workerAllowsNotifyChannel(worker, "whatsapp") && clubAllowsNotifyChannel(clubSettings, "whatsapp")) channels.push("whatsapp");
+  if (email && workerAllowsNotifyChannel(worker, "email") && clubAllowsNotifyChannel(clubSettings, "email")) channels.push("email");
+  if (workerAllowsNotifyChannel(worker, "push")) channels.push("push");
+
+  if (channels.includes("sms") || channels.includes("whatsapp") || channels.includes("email")) {
+    await db.collection("scheduleNotifyQueue").add({
+      shiftId: text(shift.id, 120),
+      ownerKey: text(shift.ownerKey, 220),
+      ownerType: text(shift.ownerType, 40),
+      ownerId: text(shift.ownerId, 160),
+      clubLocationId,
+      assigneeUid: text(shift.assigneeUid, 160),
+      assigneeEmail: email,
+      assigneePhone: phone,
+      purpose: text(purpose, 80),
+      body,
+      approveUrl,
+      status: "queued",
+      channels,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    results.channelsQueued = true;
+  }
+  results.channels = channels;
   return results;
 }
 
@@ -135,19 +400,24 @@ exports.getSchedulingAccess = onCall({region: "us-central1", timeoutSeconds: 20,
   const ownerType = text(request.data?.ownerType, 40);
   const ownerId = text(request.data?.ownerId, 160);
   if (!OWNER_TYPES.has(ownerType) || !ownerId) throw new HttpsError("invalid-argument", "ownerType and ownerId are required.");
-  const key = ownerKey(ownerType, ownerId);
-  const snap = await db.collection("schedulingSubscriptions").doc(key).get();
-  const data = snap.exists ? snap.data() || {} : {};
+  const entitlement = await resolveSchedulingEntitlement(ownerType, ownerId);
   const canManage = await canManageOwner(ownerType, ownerId, request.auth);
   return {
-    ownerKey: key,
+    ownerKey: entitlement.key,
     ownerType,
     ownerId,
     canManage,
-    subscribed: ["active", "trialing"].includes(text(data.status, 40).toLowerCase()),
-    status: text(data.status, 40) || "none",
+    /** Portal/UI gate: paid===1 → calendar; paid===0 → Subscribe or Resubscribe */
+    staffSchedulingPaid: entitlement.paid,
+    paid: entitlement.paid,
+    subscribed: entitlement.subscribed === true && entitlement.paid === 1,
+    status: entitlement.status,
+    monthStatus: entitlement.monthStatus || entitlement.status,
+    everSubscribed: entitlement.everSubscribed === true,
+    cta: entitlement.cta || (entitlement.paid === 1 ? "none" : (entitlement.everSubscribed ? "resubscribe" : "subscribe")),
+    entitlementSource: entitlement.source,
     priceCents: SCHEDULING_PRICE_CENTS,
-    currentPeriodEnd: data.currentPeriodEnd || null
+    currentPeriodEnd: entitlement.data?.currentPeriodEnd || null
   };
 });
 
@@ -175,12 +445,13 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   const roleLabel = text(request.data?.roleLabel || request.data?.role, 80) || "Shift";
   const notes = text(request.data?.notes, 1000);
   const venueName = text(request.data?.venueName, 160);
-  const notify = request.data?.notify !== false;
-  const requireApproval = request.data?.requireApproval !== false;
+  const asDraft = request.data?.asDraft === true || request.data?.draft === true || text(request.data?.status, 40) === "draft";
+  const notify = asDraft ? false : request.data?.notify !== false;
 
   const ref = db.collection("scheduleShifts").doc();
   const key = sub.key;
   const now = admin.firestore.FieldValue.serverTimestamp();
+  const status = publishedShiftStatus({asDraft, assigneeUid});
   const shift = {
     id: ref.id,
     ownerKey: key,
@@ -201,8 +472,10 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
     endsAtLabel: text(request.data?.endsAtLabel, 80) || new Date(endMs).toLocaleString(),
     venueName,
     notes,
-    status: requireApproval && assigneeUid ? "pending" : "confirmed",
-    requireApproval: !!requireApproval,
+    status,
+    published: !asDraft,
+    requireApproval: true,
+    assignMode: text(request.data?.assignMode, 40) || (asDraft ? "manual" : "manual"),
     createdByUid: request.auth.uid,
     createdByEmail: text(request.auth.token?.email, 200).toLowerCase(),
     createdAt: now,
@@ -222,6 +495,88 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   return {shiftId: ref.id, status: shift.status, notifyResult};
 });
 
+exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 60, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const ownerType = text(request.data?.ownerType, 40);
+  const ownerId = text(request.data?.ownerId, 160);
+  if (!OWNER_TYPES.has(ownerType) || !ownerId) throw new HttpsError("invalid-argument", "ownerType and ownerId are required.");
+  if (!await canManageOwner(ownerType, ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot publish schedules for this member.");
+  }
+  await requireActiveSubscription(ownerType, ownerId);
+  const key = ownerKey(ownerType, ownerId);
+  const ids = Array.isArray(request.data?.shiftIds)
+    ? request.data.shiftIds.map(id => text(id, 120)).filter(Boolean).slice(0, 80)
+    : [];
+  const weekStartMs = Number(request.data?.weekStartMs || 0);
+  const weekEndMs = Number(request.data?.weekEndMs || 0);
+  const snap = await db.collection("scheduleShifts").where("ownerKey", "==", key).limit(120).get();
+  const candidates = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).filter(row => {
+    if (text(row.status, 40) !== "draft") return false;
+    if (ids.length) return ids.includes(row.id);
+    if (Number.isFinite(weekStartMs) && Number.isFinite(weekEndMs) && weekEndMs > weekStartMs) {
+      const start = Number(row.startsAtMs || 0);
+      return start >= weekStartMs && start < weekEndMs;
+    }
+    return false;
+  });
+  if (!candidates.length) return {published: 0, results: []};
+  const results = [];
+  for (const shift of candidates) {
+    const nextStatus = text(shift.assigneeUid, 160) ? "pending" : "draft";
+    const ref = db.collection("scheduleShifts").doc(shift.id);
+    await ref.set({
+      status: nextStatus,
+      published: true,
+      publishedAt: admin.firestore.FieldValue.serverTimestamp(),
+      publishedByUid: request.auth.uid,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    let notifyResult = null;
+    if (text(shift.assigneeUid, 160)) {
+      notifyResult = await notifyAssigneeChannels({...shift, status: nextStatus}, "schedule-invite");
+      await ref.set({
+        notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+        notifyResult
+      }, {merge: true});
+    }
+    results.push({shiftId: shift.id, status: nextStatus, notifyResult});
+  }
+  return {published: results.length, results};
+});
+
+exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const shiftId = text(request.data?.shiftId, 120);
+  if (!shiftId) throw new HttpsError("invalid-argument", "shiftId is required.");
+  const ref = db.collection("scheduleShifts").doc(shiftId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
+  const shift = snap.data() || {};
+  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot delete this shift.");
+  }
+  const status = normalizeShiftStatus(shift.status) || text(shift.status, 40);
+  if (!canDeleteShiftStatus(status)) {
+    throw new HttpsError("failed-precondition", "This shift cannot be deleted.");
+  }
+  const wasPublished = status === "pending" || status === "confirmed";
+  await ref.delete();
+  if (wasPublished && text(shift.assigneeUid, 160)) {
+    try {
+      await notifyAssigneeChannels({
+        ...shift,
+        id: shiftId,
+        status: "cancelled",
+        roleLabel: `${shift.roleLabel || "Shift"} (cancelled)`
+      }, "schedule-cancelled");
+    } catch (_error) {
+      /* Deletion still succeeds if notify fails. */
+    }
+  }
+  return {shiftId, deleted: true};
+});
+
 exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const shiftId = text(request.data?.shiftId, 120);
@@ -237,10 +592,14 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
   const isAssignee = text(shift.assigneeUid, 160) === uid;
   const isManager = await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth);
   if (!isAssignee && !isManager) throw new HttpsError("permission-denied", "Only the assigned worker or schedule manager can respond.");
-  if (text(shift.status, 40) !== "pending" && !isManager) {
-    throw new HttpsError("failed-precondition", "This shift is no longer awaiting approval.");
+  const current = normalizeShiftStatus(shift.status) || text(shift.status, 40);
+  if (current === "draft") {
+    throw new HttpsError("failed-precondition", "Draft shifts must be published before workers can respond.");
   }
-  const nextStatus = decision === "approve" ? "approved" : "declined";
+  if (current !== "pending" && !isManager) {
+    throw new HttpsError("failed-precondition", "This shift is no longer awaiting confirmation.");
+  }
+  const nextStatus = decision === "approve" ? "confirmed" : "declined";
   const now = admin.firestore.FieldValue.serverTimestamp();
   await ref.set({
     status: nextStatus,
@@ -273,8 +632,11 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
       .where("assigneeUid", "==", uid)
       .limit(80)
       .get();
-    const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+    const shifts = snap.docs.map(doc => {
+      const row = {id: doc.id, ...doc.data()};
+      row.status = normalizeShiftStatus(row.status) || row.status || "";
+      return row;
+    }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
     return {shifts};
   }
 
@@ -286,15 +648,21 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
       .where("ownerKey", "==", key)
       .limit(120)
       .get();
-    const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      .filter(row => text(row.assigneeUid, 160) === uid);
+    const shifts = snap.docs.map(doc => {
+      const row = {id: doc.id, ...doc.data()};
+      row.status = normalizeShiftStatus(row.status) || row.status || "";
+      return row;
+    }).filter(row => text(row.assigneeUid, 160) === uid);
     return {shifts, canManage: false};
   }
   const snap = await db.collection("scheduleShifts")
     .where("ownerKey", "==", key)
     .limit(120)
     .get();
-  const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-    .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+  const shifts = snap.docs.map(doc => {
+    const row = {id: doc.id, ...doc.data()};
+    row.status = normalizeShiftStatus(row.status) || row.status || "";
+    return row;
+  }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
   return {shifts, canManage: true};
 });

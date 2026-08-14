@@ -262,11 +262,12 @@
     {
       id: "help-staff-week-calendar",
       title: "Staff week calendar",
-      body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Copy previous week stores last week as new drafts. Public holidays for the venue country are highlighted. Publish notifies workers.",
+      body: "Club Admin Scheduling uses a people × days week grid. Manual: click a cell to place a shift. Round Robin fills selected open days fairly. Published shifts stay pending until the worker confirms via FloqR Inbox, Email, SMS, or WhatsApp (worker privacy settings plus this club's notification channels). Confirm link is in the message. Delete works on pending and confirmed shifts. Default shift window = club open − 2 hours through close + 1 hour.",
       searchPhrases: [
         "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
         "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
-        "open minus two hours", "copy previous week", "public holiday"
+        "open minus two hours", "copy previous week", "public holiday",
+        "pending shift", "confirmed shift", "delete shift", "require approval"
       ],
       links: [
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}

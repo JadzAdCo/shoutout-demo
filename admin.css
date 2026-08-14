@@ -655,6 +655,9 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sched-chip.role-c{background:#8ec5ff}
 .sched-chip.role-d{background:#ffd28a}
 .sched-chip.is-draft{opacity:.72;outline:1px dashed rgba(0,0,0,.35)}
+.sched-chip.is-pending{box-shadow:inset 0 0 0 2px #f5c542}
+.sched-chip.is-confirmed{box-shadow:inset 0 0 0 2px #1f8a4c}
+.sched-chip.is-declined{opacity:.55;filter:grayscale(.35)}
 .sched-chip small{display:block;font-weight:700;opacity:.85}
 .sched-modal{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:18px;background:rgba(4,8,20,.72)}
 .sched-modal.hidden{display:none}

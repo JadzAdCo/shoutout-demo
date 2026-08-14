@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.112";
+  const PREVIEW_LINKS_PACKAGE = "29.09.113";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,17 @@
       ]
     },
     {
+      version:"v29.09.113",
+      title:"Schedule pending→confirmed + delete pending/confirmed",
+      checks:[
+        {label:"Published shifts start pending", file:"functions/scheduling-core.js", includes:["publishedShiftStatus", "pending"]},
+        {label:"Delete pending and confirmed", file:"functions/scheduling-functions.js", includes:["canDeleteShiftStatus", "schedule-cancelled"]},
+        {label:"No require-approval checkbox", file:"admin.html", includes:["Save as draft (publish later — no worker notify yet)"]},
+        {label:"Worker confirm link", file:"functions/scheduling-core.js", includes:["Confirm or decline this shift"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.113\""]}
+      ]
+    },
+    {
       version:"v29.09.112",
       title:"Twilio SID health + diverse staff + DonPapi LED-carry VIP",
       checks:[
@@ -916,6 +927,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"v29-09-113-schedule-pending-confirm-delete",
+      area:"Club Admin / Scheduling",
+      feature:"Pending until worker confirms; delete pending and confirmed",
+      changed:"Published shifts are pending until the worker confirms via Inbox / Email / SMS / WhatsApp (confirm link in the message). Require-approval checkboxes removed because every published shift needs worker confirmation. Club Admin can delete pending and confirmed shifts.",
+      howToTest:"Sign in as temp_clubadmin_1@floqr-demo.com → admin.html?location=temp-democlub-1&v=29.09.113 → Scheduling. Uncheck Save as draft, save a shift for Andre Wells. Chip should say pending, not confirmed. Open the chip: Delete shift is visible. Sign in as that worker on scheduling.html?shift=… and Confirm. Chip becomes confirmed. Delete still works.",
+      expected:"No Require approval checkbox. New published shifts pending. Worker confirm → confirmed. Delete visible for pending and confirmed."
+    },
     {
       id:"v29-09-112-twilio-staff-donpapi",
       area:"Club Admin / QA staff / VIP ShoutOut",

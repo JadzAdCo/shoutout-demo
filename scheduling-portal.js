@@ -148,7 +148,7 @@
     }
 
     const focusShift = params.get("shift");
-    if (focusShift) setStatus(`Focused shift ${focusShift}. Use Approve / Decline on My assignments if it is yours.`);
+    if (focusShift) setStatus(`Open shift ${focusShift}. Confirm or decline it under My assignments if it is yours.`);
   }
 
   function renderShiftList(el, shifts, opts = {}) {
@@ -158,17 +158,20 @@
       return;
     }
     el.innerHTML = shifts.map(shift => {
-      const actions = opts.assignee && shift.status === "pending"
+      const status = String(shift.status || "") === "approved" ? "confirmed" : String(shift.status || "");
+      const actions = opts.assignee && status === "pending"
         ? `<div class="queue-actions">
-            <button type="button" data-approve="${esc(shift.id)}">Approve</button>
+            <button type="button" data-approve="${esc(shift.id)}">Confirm shift</button>
             <button type="button" data-decline="${esc(shift.id)}">Decline</button>
           </div>`
-        : "";
-      return `<div class="report-row">
+        : opts.manager && ["draft", "pending", "confirmed", "declined"].includes(status) && shift.id
+          ? `<div class="queue-actions"><button type="button" data-delete="${esc(shift.id)}">Delete</button></div>`
+          : "";
+      return `<div class="report-row${params.get("shift") === shift.id ? " is-focused" : ""}">
         <strong>${esc(shift.roleLabel || "Shift")} · ${esc(shift.assigneeName || "")}</strong>
         <span>${esc(shift.ownerName || shift.ownerKey || "")}</span>
         <span>${esc(shift.startsAtLabel || shift.startsAt || "")} → ${esc(shift.endsAtLabel || shift.endsAt || "")}</span>
-        <span class="tag">${esc(shift.status || "")}</span>
+        <span class="tag">${esc(status)}</span>
         ${actions}
       </div>`;
     }).join("");
@@ -178,12 +181,23 @@
     el.querySelectorAll("[data-decline]").forEach(btn => {
       btn.addEventListener("click", () => respond(btn.getAttribute("data-decline"), "decline"));
     });
+    el.querySelectorAll("[data-delete]").forEach(btn => {
+      btn.addEventListener("click", () => deleteShift(btn.getAttribute("data-delete")));
+    });
   }
 
   async function respond(shiftId, decision) {
     setStatus(`${decision === "approve" ? "Approving" : "Declining"}…`);
     await callable("respondToScheduleShift")({shiftId, decision});
     setStatus(`Shift ${decision}d.`);
+    await refresh();
+  }
+
+  async function deleteShift(shiftId) {
+    if (!shiftId || !window.confirm("Delete this shift?")) return;
+    setStatus("Deleting shift…");
+    await callable("deleteScheduleShift")({shiftId});
+    setStatus("Shift deleted.");
     await refresh();
   }
 
@@ -222,10 +236,9 @@
       startsAt: new Date(startsAt).toISOString(),
       endsAt: new Date(endsAt).toISOString(),
       notes: byId("portalNotes")?.value?.trim() || "",
-      notify: true,
-      requireApproval: byId("portalRequireApproval")?.checked !== false
+      notify: true
     });
-    setStatus("Shift created. Notifications queued.");
+    setStatus("Pending shift created. Worker must confirm via Inbox / Email / SMS / WhatsApp.");
     await refresh();
   }
 
