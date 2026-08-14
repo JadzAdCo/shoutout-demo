@@ -655,7 +655,25 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sched-chip.role-c{background:#8ec5ff}
 .sched-chip.role-d{background:#ffd28a}
 .sched-chip.is-draft{opacity:.72;outline:1px dashed rgba(0,0,0,.35)}
+.sched-chip.is-pending{box-shadow:inset 0 0 0 2px #f5c542}
+.sched-chip.is-confirmed{box-shadow:inset 0 0 0 2px #1f8a4c}
+.sched-chip.is-declined{opacity:.55;filter:grayscale(.35)}
+.sched-chip.is-selected{outline:3px solid #fff;box-shadow:0 0 0 3px #26d8ff}
 .sched-chip small{display:block;font-weight:700;opacity:.85}
+.sched-person.is-self{box-shadow:inset 3px 0 0 #26d8ff}
+.sched-grid-wrap.is-readonly .sched-chip{cursor:default}
+.sched-ingest-onetime{margin:12px 0 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)}
+.sched-ingest-onetime code{display:block;word-break:break-all;margin:6px 0 10px}
+.sched-select-bar{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding:12px;border:1px solid rgba(38,216,255,.35);border-radius:16px;background:rgba(8,18,32,.55)}
+.sched-select-filters{display:flex;flex-wrap:wrap;gap:8px}
+.sched-select-filters button{border:0;border-radius:999px;padding:7px 12px;font-weight:800;background:rgba(255,255,255,.08);color:#d7e7ff}
+.sched-select-filters button.active{background:linear-gradient(90deg,var(--hot),var(--accent));color:#06101c}
+.sched-grid-wrap.is-selecting .sched-cell-add{visibility:hidden}
+.sched-grid-wrap.is-selecting .sched-day-head{cursor:pointer}
+.sched-grid-wrap.is-selecting .sched-day-head:hover{background:rgba(38,216,255,.16)}
+.sched-select-day-hint{display:block;font-size:10px;font-weight:800;color:#26d8ff;margin-top:4px}
+.help-popout-body ol{margin:0 0 8px;padding-left:22px}
+.help-popout-body li{margin:0 0 8px;line-height:1.45}
 .sched-modal{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:18px;background:rgba(4,8,20,.72)}
 .sched-modal.hidden{display:none}
 .sched-modal-card{width:min(520px,100%);padding:20px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:#101937;color:#fff;display:grid;gap:12px;max-height:90vh;overflow:auto}

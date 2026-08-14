@@ -36,10 +36,14 @@
       title,
       ...links.map(link => normalize(link.label))
     ].map(normalize).filter(Boolean)));
+    const steps = Array.isArray(entry.steps)
+      ? entry.steps.map(normalize).filter(Boolean)
+      : (existing.steps || []);
     const next = {
       id,
       title: title || existing.title || id,
       body: normalize(entry.body || existing.body || ""),
+      steps,
       links: links.length ? links : (existing.links || []),
       searchPhrases,
       source: entry.source || existing.source || "help-repository",
@@ -123,6 +127,7 @@
       source: entry.source,
       label: entry.title,
       blurb: entry.body || entry.title,
+      steps: entry.steps || [],
       links: (entry.links || []).length
         ? entry.links
         : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
@@ -209,11 +214,12 @@
     {
       id: "help-club-notification-subscriptions",
       title: "Club SMS and WhatsApp notification subscriptions",
-      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on.",
+      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK).",
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
         "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
-        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp"
+        "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp",
+        "invalid username", "twilio account sid", "send test alert", "authentication error"
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
@@ -244,19 +250,131 @@
       page: "admin.html#panelNotifications"
     },
     {
-      id: "help-staff-week-calendar",
-      title: "Staff week calendar",
-      body: "Club Admin Scheduling uses a people × days week grid. Manual mode: click + on a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Copy previous week stores last week as new drafts. Public holidays for the venue country are highlighted. Publish notifies workers.",
+      id: "help-donpapi-led-wall",
+      title: "DonPapi ShoutOut LED wall",
+      body: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other formats.",
       searchPhrases: [
-        "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
-        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
-        "open minus two hours", "copy previous week", "public holiday"
+        "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
+        "bus boys carry", "shoutout led", "checking in", "we're outside"
       ],
       links: [
+        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
+        {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      source: "help-repository-seed",
+      page: "club-profile.html"
+    },
+    {
+      id: "help-staff-week-calendar",
+      title: "Scheduler",
+      body: "Club Admin Scheduler is a people × days week grid. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club site. Default shift window = club open − 2 hours through close + 1 hour.",
+      searchPhrases: [
+        "scheduler", "schedule grid", "week calendar", "round robin", "publish schedule", "people days",
+        "shift chips", "worker photo", "staff schedule", "7shifts", "assign shift",
+        "open minus two hours", "copy previous week", "public holiday",
+        "pending shift", "confirmed shift", "delete shift", "select shifts", "multi delete",
+        "user guide", "create a schedule"
+      ],
+      links: [
+        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-staff-schedule-user-guide",
+      title: "Staff Scheduling User Guide",
+      body: "Open the ? beside Scheduler on Club Admin Scheduling. Create draft shifts, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip.",
+      steps: [
+        "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week into drafts.",
+        "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
+        "Published chips stay pending until the worker confirms. Confirmed has a green outline.",
+        "To delete several: tap Select shifts. Filter Drafts, tap Wednesday’s column header, switch to All or Confirmed, tap a Thursday confirmed chip, then Delete selected."
+      ],
+      searchPhrases: [
+        "user guide", "staff scheduling user guide", "create a schedule", "create schedule",
+        "publish schedule", "how to schedule staff", "how to publish a schedule",
+        "make a schedule", "staff schedule steps", "scheduling help", "scheduler"
+      ],
+      links: [
+        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
         {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       source: "help-repository-seed",
-      page: "admin.html#panelScheduling"
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-create-publish-schedule",
+      title: "Create and publish a staff schedule",
+      body: "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff.",
+      steps: [
+        "Open Club Admin → Scheduling after the venue is paid this month.",
+        "Manual: tap + on a cell, set worker/role/times, Save as draft. Repeat, or use Round Robin / Copy previous week.",
+        "Tap Publish schedule. Shifts become pending and workers are notified to confirm.",
+        "The worker uses the Inbox / Email / SMS / WhatsApp confirm link. The chip then shows confirmed."
+      ],
+      searchPhrases: [
+        "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
+        "how to schedule staff", "make a work schedule", "assign shifts", "save as draft",
+        "pending until confirmed", "worker confirm shift"
+      ],
+      links: [
+        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-multi-delete-shifts",
+      title: "Delete multiple scheduled or draft shifts",
+      body: "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
+      steps: [
+        "On the week grid, tap Select shifts.",
+        "Choose Drafts, then tap the Wednesday column header to select every Wednesday draft.",
+        "Switch the filter to All or Confirmed and tap the Thursday confirmed chip (or any other chips you want gone).",
+        "Tap Delete selected and confirm. Drafts vanish quietly; pending and confirmed workers get a cancelled notice if they were already notified."
+      ],
+      searchPhrases: [
+        "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
+        "select shifts", "bulk delete shifts", "delete drafts", "delete thursday shift",
+        "remove several shifts", "multi-delete schedule"
+      ],
+      links: [
+        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedGridHeading"
+    },
+    {
+      id: "help-staff-worksheet",
+      title: "Work Sheet - Weekly Staff Calendar",
+      body: "Elected service members open Staff Calendar from My Profile to see a read-only people × days grid of published shifts for every colleague at that venue. Drafts stay in Club Admin. If you work at more than one club, pick the venue on the Work Sheet.",
+      searchPhrases: [
+        "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
+        "colleague schedule", "who is working", "my shifts this week", "elected staff schedule"
+      ],
+      links: [
+        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
+        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "staff-worksheet.html"
+    },
+    {
+      id: "help-venue-website-ingest",
+      title: "Club website ingest (API, RSS, iframe)",
+      body: "Club Admin → Scheduling → Website ingest. Generate a secret (shown once; only a hash is stored). Pull published staff shifts onto the official club website with JSON (?format=json&dataset=schedule|hours|profile|all), RSS, or an iframe snippet. Drafts, worker email, and phone are never included. Rotate the secret if it leaks.",
+      searchPhrases: [
+        "website ingest", "club website schedule", "rss feed", "iframe schedule",
+        "schedule api", "ingest secret", "embed staff schedule", "official website",
+        "json schedule feed", "pull schedule onto website"
+      ],
+      links: [
+        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#schedWebsiteIngest"
     },
     {
       id: "help-venue-hours-calendar",

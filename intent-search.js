@@ -124,25 +124,50 @@
       id: "help-club-notification-subscriptions",
       kind: "help",
       label: "Club SMS and WhatsApp notification subscriptions",
-      blurb: "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the paid subscription.",
+      blurb: "SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits remaining, and Subscribe live in the channel ?. Saving again does not reopen Stripe for a subscribed channel. Uncheck a channel to pause alerts without losing the paid subscription. If Send test alert returns Authentication Error - invalid username, TWILIO_ACCOUNT_SID must be the Account SID starting with AC, not an Auth Token or API Key (SK).",
       steps: [
         "Open Club Admin → Notifications.",
         "Check SMS and/or WhatsApp. The first save for an unsubscribed channel opens the $10 Stripe checkout.",
         "After payment, Firebase marks that channel subscribed. Later saves keep settings and skip checkout.",
-        "Uncheck a subscribed channel to pause alerts; you will not be charged again when you re-check it."
+        "Uncheck a subscribed channel to pause alerts; you will not be charged again when you re-check it.",
+        "If a test alert says invalid username, set Firebase secret TWILIO_ACCOUNT_SID to the AC… Account SID from Twilio Console."
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
       ],
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
-        "sms already paid", "notification stripe again", "sms credits", "club notifications"
+        "sms already paid", "notification stripe again", "sms credits", "club notifications",
+        "invalid username", "twilio account sid", "send test alert", "authentication error"
       ],
       patterns: [
         /sms\s*(notification|subscription|already\s*paid)/,
         /whatsapp\s*(notification|subscription)/,
         /save\s*notification/,
-        /notification\s*(stripe|checkout|payment)/
+        /notification\s*(stripe|checkout|payment)/,
+        /invalid\s*username/,
+        /twilio\s*(account\s*sid|auth)/
+      ]
+    },
+    {
+      id: "help-donpapi-led-wall",
+      kind: "help",
+      label: "DonPapi ShoutOut LED wall",
+      blurb: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen.",
+      steps: [
+        "Open a club public profile gallery to see busboys holding the DonPapi wall.",
+        "VIP ShoutOut text appears on the center LED; club name sits at the top of the scalloped frame.",
+        "Table LEDs and portrait walls are separate formats."
+      ],
+      links: [
+        {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})}
+      ],
+      searchPhrases: [
+        "donpapi", "don papi", "led wall", "vip sign", "handheld led", "busboy shoutout",
+        "bus boys carry", "shoutout led"
+      ],
+      patterns: [
+        /don\s*papi/, /led\s*wall/, /bus\s*boys?/, /handheld\s*led/, /vip\s*sign/
       ]
     },
     {
@@ -183,26 +208,147 @@
     {
       id: "help-staff-schedule-grid",
       kind: "help",
-      label: "Staff week calendar / Round Robin",
-      blurb: "Club Admin → Scheduling: people × days grid. Manual place draft chips, or Round Robin fill days fairly. Publish notifies workers. Click worker photos for SMS and public profile.",
+      label: "Scheduler / Round Robin",
+      blurb: "Club Admin → Scheduling → Scheduler. Published shifts stay pending until the worker confirms via Inbox / Email / SMS / WhatsApp. Select shifts to multi-delete. Website ingest publishes JSON / RSS / iframe. Round Robin fills days fairly.",
       steps: [
         "Open Club Admin → Scheduling (after paid this month).",
         "Manual: click + on a person/day cell, set times, Save as draft.",
         "Round Robin: pick days + role, Fill → drafts, review chips.",
-        "Publish schedule to notify workers.",
-        "Click a worker photo for contact, SMS, and public profile."
+        "Publish schedule to notify workers. Shifts stay pending until they confirm.",
+        "Select shifts to delete several at once (day header + chips), or open a chip for single Delete.",
+        "Website ingest: rotate a secret and paste JSON, RSS, or iframe onto the club site."
       ],
       links: [
-        {label: "Club Admin Scheduling", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+        {label: "Club Admin Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
       ],
       searchPhrases: [
         "schedule grid", "round robin", "publish schedule", "week calendar", "shift chips",
-        "staff schedule", "assign shift", "worker photo", "7shifts"
+        "staff schedule", "assign shift", "worker photo", "7shifts",
+        "pending shift", "confirmed shift", "delete shift", "require approval",
+        "select shifts", "multi delete", "user guide"
       ],
       patterns: [
         /round\s*robin/, /publish\s*schedule/, /schedule\s*grid/, /week\s*calendar/,
         /shift\s*chips?/, /staff\s*schedule/, /assign\s*shift/, /open\s*minus/, /copy\s*previous\s*week/,
-        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/
+        /venue\s*hours/, /opening\s*hours/, /public\s*holiday/, /select\s*shifts/, /multi[\s-]?delete/,
+        /website\s*ingest/, /iframe\s*schedule/, /rss\s*(feed|schedule)/
+      ]
+    },
+    {
+      id: "help-staff-schedule-user-guide",
+      kind: "help",
+      label: "Staff Scheduling User Guide",
+      blurb: "Open the ? beside Scheduler: create drafts, publish so workers confirm, then select and delete several shifts (for example all Wednesday drafts plus a Thursday confirmed chip).",
+      steps: [
+        "Open Club Admin → Scheduling (unlocked when staffSchedulingPaid=1 / paid this month).",
+        "Tap + on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin or Copy previous week.",
+        "Review dashed draft chips, then tap Publish schedule. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.",
+        "Published chips stay pending until the worker confirms.",
+        "Tap Select shifts. Filter Drafts + Wednesday header, then tap a Thursday confirmed chip, then Delete selected."
+      ],
+      links: [
+        {label: "Scheduler help", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      searchPhrases: [
+        "user guide", "staff scheduling user guide", "create a schedule", "publish schedule",
+        "how to schedule staff", "scheduling help"
+      ],
+      patterns: [
+        /user\s*guide/, /staff\s*scheduling\s*user\s*guide/, /how\s+to\s+(create|publish)\s+(a\s+)?schedule/,
+        /create\s+(a\s+)?(staff\s+)?schedule/, /publish\s+(the\s+)?schedule/
+      ]
+    },
+    {
+      id: "help-create-publish-schedule",
+      kind: "help",
+      label: "Create and publish a staff schedule",
+      blurb: "Add draft shifts on the week grid, then Publish schedule. Workers confirm pending shifts before they become confirmed.",
+      steps: [
+        "Open Club Admin → Scheduling after the venue is paid this month.",
+        "Tap + on a cell, set worker/role/times, Save as draft. Repeat, or Round Robin / Copy previous week.",
+        "Tap Publish schedule. Shifts become pending and workers are notified to confirm.",
+        "The worker uses the confirm link. The chip then shows confirmed."
+      ],
+      links: [
+        {label: "Create and publish (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      searchPhrases: [
+        "create a schedule", "create schedule", "publish schedule", "how to publish a schedule",
+        "how to schedule staff", "make a work schedule", "save as draft"
+      ],
+      patterns: [
+        /create\s+(a\s+)?(work\s+|staff\s+)?schedule/, /publish\s+(a\s+|the\s+)?schedule/,
+        /how\s+to\s+schedule\s+staff/, /save\s+as\s+draft/, /make\s+(me\s+)?(a\s+)?schedule/
+      ]
+    },
+    {
+      id: "help-multi-delete-shifts",
+      kind: "help",
+      label: "Delete multiple scheduled or draft shifts",
+      blurb: "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift.",
+      steps: [
+        "On the week grid, tap Select shifts.",
+        "Choose Drafts, then tap the Wednesday column header to select every Wednesday draft.",
+        "Switch the filter to All or Confirmed and tap the Thursday confirmed chip.",
+        "Tap Delete selected and confirm."
+      ],
+      links: [
+        {label: "Multi-delete (Scheduler)", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})}
+      ],
+      searchPhrases: [
+        "multi delete", "delete multiple shifts", "delete wednesday drafts", "delete confirmed shift",
+        "select shifts", "bulk delete shifts", "delete drafts"
+      ],
+      patterns: [
+        /multi[\s-]?delete/, /delete\s+multiple/, /delete\s+(all\s+)?(wednesday|thursday|friday)?\s*drafts/,
+        /delete\s+(a\s+)?confirmed\s+shift/, /select\s+shifts/, /bulk\s+delete\s+shifts/
+      ]
+    },
+    {
+      id: "help-staff-worksheet",
+      kind: "help",
+      label: "Work Sheet - Weekly Staff Calendar",
+      blurb: "Elected staff open Staff Calendar from My Profile for a read-only people × days grid of published shifts for every colleague at the venue.",
+      steps: [
+        "Sign in as an elected service member.",
+        "Open My Profile → Staff Calendar, or Work Sheet - Weekly Staff Calendar.",
+        "Pick the club if you work at more than one venue.",
+        "Your row is highlighted. Drafts are not shown."
+      ],
+      links: [
+        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
+        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
+        "colleague schedule", "who is working"
+      ],
+      patterns: [
+        /staff\s*calendar/, /work\s*sheet/, /weekly\s*staff\s*calendar/,
+        /who\s+is\s+working/, /colleague\s+schedule/
+      ]
+    },
+    {
+      id: "help-venue-website-ingest",
+      kind: "help",
+      label: "Club website ingest (API, RSS, iframe)",
+      blurb: "Generate a venue secret in Club Admin Scheduling, then pull published shifts onto the official website with JSON, RSS, or an iframe. Drafts never appear.",
+      steps: [
+        "Open Club Admin → Scheduling → Website ingest.",
+        "Tap Generate / rotate secret and copy the yellow URLs immediately.",
+        "Paste the JSON URL, RSS feed, or iframe snippet onto the club website.",
+        "Optional datasets: schedule, hours, profile, or all."
+      ],
+      links: [
+        {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}
+      ],
+      searchPhrases: [
+        "website ingest", "club website schedule", "rss feed", "iframe schedule",
+        "schedule api", "ingest secret", "embed staff schedule", "official website"
+      ],
+      patterns: [
+        /website\s*ingest/, /schedule\s*api/, /rss\s*(feed|schedule)/,
+        /iframe\s*(schedule|embed)/, /ingest\s*secret/, /official\s*website/
       ]
     },
     {
@@ -354,7 +500,7 @@
       id: "help-scheduling",
       kind: "help",
       label: "Staff Scheduling help",
-      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace.",
+      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed), Select shifts to multi-delete.",
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"})},
         {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
@@ -495,15 +641,23 @@
     // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
     [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
       const key = intent.id || intent.label;
-      if (seen.has(key)) return;
+      if (seen.has(key)) {
+        const existing = merged.find(row => (row.id || row.label) === key);
+        if (existing) {
+          existing.patterns = [...(existing.patterns || []), ...(intent.patterns || [])];
+          if (!(existing.steps || []).length && (intent.steps || []).length) existing.steps = intent.steps;
+          existing.searchPhrases = Array.from(new Set([...(existing.searchPhrases || []), ...(intent.searchPhrases || [])]));
+        }
+        return;
+      }
       seen.add(key);
-      merged.push(intent);
+      merged.push({...intent, patterns: [...(intent.patterns || [])]});
     });
     return merged;
   }
 
   function looksLikeHelpQuery(q) {
-    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings/.test(q);
+    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings|user\s*guide|multi[\s-]?delete|publish\s*schedule/.test(q);
   }
 
   function matchIntents(raw) {

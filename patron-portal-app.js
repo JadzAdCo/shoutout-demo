@@ -2778,6 +2778,27 @@
     byId("composeBody").disabled = false;
   }
 
+  function renderStaffCalendarLinks(user, designations = []) {
+    const uid = user?.uid || "";
+    const mine = (Array.isArray(designations) ? designations : []).filter(row => {
+      if (!uid) return false;
+      if (String(row.workerUid || row.uid || "") !== uid) return false;
+      return String(row.status || "").toLowerCase() !== "rejected";
+    });
+    const href = mine[0]?.clubLocationId
+      ? `./staff-worksheet.html?v=29.09.115&location=${encodeURIComponent(mine[0].clubLocationId)}`
+      : "./staff-worksheet.html?v=29.09.115";
+    const show = mine.length > 0;
+    const card = byId("staffCalendarCard");
+    const overviewLink = byId("staffCalendarLink");
+    const profileWrap = byId("staffCalendarProfileWrap");
+    const profileLink = byId("staffCalendarProfileLink");
+    card?.classList.toggle("hidden", !show);
+    profileWrap?.classList.toggle("hidden", !show);
+    if (overviewLink) overviewLink.href = href;
+    if (profileLink) profileLink.href = href;
+  }
+
   async function loadPortal(user) {
     const ref = db.collection("users").doc(user.uid);
     const snap = await ref.get();
@@ -2891,9 +2912,10 @@
     setText("portalStatus", "");
     Promise.all([
       getCollectionSafe("users", null, 500),
-      getCollectionSafe("clubEmployeeDesignations", x => x.isCSR !== false, 300)
+      getCollectionSafe("clubEmployeeDesignations", null, 300)
     ]).then(async ([allUsers, employeeDesignations]) => {
       currentPortalUsers = allUsers;
+      renderStaffCalendarLinks(user, employeeDesignations);
       if (!currentMinglConnections.length) currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
       renderMinglFriendSettings(allUsers);
       renderPortalMinglRequests(currentMinglConnections, user);
@@ -2901,7 +2923,7 @@
         const legacyChats = await getPortalMinglRooms(user, allUsers, queriedChats);
         renderPortalMinglChats(legacyChats, user);
       }
-      messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations);
+      messageRecipients = buildMessageRecipients(user, allUsers, employeeDesignations.filter(x => x.isCSR !== false));
       renderRecipientSearchResults();
       setText("portalStatus", "");
     }).catch(() => setText("portalStatus", "Some directory tools may still be loading."));

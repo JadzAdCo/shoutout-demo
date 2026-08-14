@@ -3,6 +3,19 @@
 
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {
+  normalizeShiftStatus,
+  publishedShiftStatus,
+  canDeleteShiftStatus,
+  sanitizeShiftIds,
+  isPublishedShiftStatus,
+  publicShiftView,
+  workerAllowsNotifyChannel,
+  clubAllowsNotifyChannel,
+  shiftApproveUrl,
+  buildShiftInviteBody,
+  DEFAULT_ORIGIN
+} = require("./scheduling-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -316,40 +329,72 @@ async function writeInbox(recipientUid, payload = {}) {
 }
 
 async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
-  const body = text(
-    `${shift.ownerName || "FLOQR"} schedule: ${shift.roleLabel || shift.role || "Shift"} ` +
-    `${shift.startsAtLabel || ""} – ${shift.endsAtLabel || ""}. ` +
-    `Open FLOQR Scheduling to ${shift.status === "pending" ? "Approve or Decline" : "View"}.`,
-    900
-  );
-  const results = {inApp: false, channelsQueued: false};
+  const origin = process.env.FLOQR_PUBLIC_ORIGIN || DEFAULT_ORIGIN;
+  const approveUrl = shiftApproveUrl({...shift, id: shift.id}, origin);
+  const body = buildShiftInviteBody({...shift, id: shift.id}, origin);
+  const results = {inApp: false, channelsQueued: false, approveUrl};
 
-  await writeInbox(shift.assigneeUid, {
-    title: shift.status === "pending" ? "New shift needs your approval" : "Schedule update",
-    body,
-    link: `scheduling.html?owner=${encodeURIComponent(shift.ownerKey)}&shift=${encodeURIComponent(shift.id || "")}`,
-    shiftId: shift.id,
-    ownerKey: shift.ownerKey
-  });
-  results.inApp = true;
+  let worker = {};
+  if (text(shift.assigneeUid, 160)) {
+    try {
+      const snap = await db.collection("users").doc(text(shift.assigneeUid, 160)).get();
+      worker = snap.exists ? snap.data() || {} : {};
+    } catch (_error) {
+      worker = {};
+    }
+  }
 
-  // Queue for Notification Fabric (SMS/WhatsApp/email workers pick up; also visible in Club Admin).
-  await db.collection("scheduleNotifyQueue").add({
-    shiftId: text(shift.id, 120),
-    ownerKey: text(shift.ownerKey, 220),
-    ownerType: text(shift.ownerType, 40),
-    ownerId: text(shift.ownerId, 160),
-    clubLocationId: text(shift.clubLocationId, 160),
-    assigneeUid: text(shift.assigneeUid, 160),
-    assigneeEmail: text(shift.assigneeEmail, 200),
-    assigneePhone: text(shift.assigneePhone, 40),
-    purpose: text(purpose, 80),
-    body,
-    status: "queued",
-    channels: ["email", "sms", "whatsapp"],
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
-  results.channelsQueued = true;
+  let clubSettings = {};
+  const clubLocationId = text(shift.clubLocationId, 160);
+  if (clubLocationId) {
+    try {
+      const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
+      clubSettings = settingsSnap.exists ? settingsSnap.data() || {} : {};
+    } catch (_error) {
+      clubSettings = {};
+    }
+  }
+
+  const channels = [];
+  if (workerAllowsNotifyChannel(worker, "inapp") && clubAllowsNotifyChannel(clubSettings, "inapp")) {
+    await writeInbox(shift.assigneeUid, {
+      title: normalizeShiftStatus(shift.status) === "pending" ? "New shift needs your confirmation" : "Schedule update",
+      body,
+      link: `./scheduling.html?shift=${encodeURIComponent(shift.id || "")}&from=schedule-notify&v=29.09.114`,
+      shiftId: shift.id,
+      ownerKey: shift.ownerKey
+    });
+    results.inApp = true;
+    channels.push("inapp");
+  }
+
+  const phone = text(shift.assigneePhone || worker.phone || worker.phoneNumber || worker.mobile, 40);
+  const email = text(shift.assigneeEmail || worker.email, 200).toLowerCase();
+  if (phone && workerAllowsNotifyChannel(worker, "sms") && clubAllowsNotifyChannel(clubSettings, "sms")) channels.push("sms");
+  if (phone && workerAllowsNotifyChannel(worker, "whatsapp") && clubAllowsNotifyChannel(clubSettings, "whatsapp")) channels.push("whatsapp");
+  if (email && workerAllowsNotifyChannel(worker, "email") && clubAllowsNotifyChannel(clubSettings, "email")) channels.push("email");
+  if (workerAllowsNotifyChannel(worker, "push")) channels.push("push");
+
+  if (channels.includes("sms") || channels.includes("whatsapp") || channels.includes("email")) {
+    await db.collection("scheduleNotifyQueue").add({
+      shiftId: text(shift.id, 120),
+      ownerKey: text(shift.ownerKey, 220),
+      ownerType: text(shift.ownerType, 40),
+      ownerId: text(shift.ownerId, 160),
+      clubLocationId,
+      assigneeUid: text(shift.assigneeUid, 160),
+      assigneeEmail: email,
+      assigneePhone: phone,
+      purpose: text(purpose, 80),
+      body,
+      approveUrl,
+      status: "queued",
+      channels,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    results.channelsQueued = true;
+  }
+  results.channels = channels;
   return results;
 }
 
@@ -405,14 +450,11 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   const venueName = text(request.data?.venueName, 160);
   const asDraft = request.data?.asDraft === true || request.data?.draft === true || text(request.data?.status, 40) === "draft";
   const notify = asDraft ? false : request.data?.notify !== false;
-  const requireApproval = request.data?.requireApproval !== false;
 
   const ref = db.collection("scheduleShifts").doc();
   const key = sub.key;
   const now = admin.firestore.FieldValue.serverTimestamp();
-  const status = asDraft
-    ? "draft"
-    : (requireApproval && assigneeUid ? "pending" : "confirmed");
+  const status = publishedShiftStatus({asDraft, assigneeUid});
   const shift = {
     id: ref.id,
     ownerKey: key,
@@ -435,7 +477,7 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
     notes,
     status,
     published: !asDraft,
-    requireApproval: !!requireApproval,
+    requireApproval: true,
     assignMode: text(request.data?.assignMode, 40) || (asDraft ? "manual" : "manual"),
     createdByUid: request.auth.uid,
     createdByEmail: text(request.auth.token?.email, 200).toLowerCase(),
@@ -484,8 +526,7 @@ exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 6
   if (!candidates.length) return {published: 0, results: []};
   const results = [];
   for (const shift of candidates) {
-    const requireApproval = shift.requireApproval !== false;
-    const nextStatus = requireApproval && text(shift.assigneeUid, 160) ? "pending" : "confirmed";
+    const nextStatus = text(shift.assigneeUid, 160) ? "pending" : "draft";
     const ref = db.collection("scheduleShifts").doc(shift.id);
     await ref.set({
       status: nextStatus,
@@ -507,23 +548,63 @@ exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 6
   return {published: results.length, results};
 });
 
+async function deleteManagedShift(shiftId, authContext, {throwOnError = true} = {}) {
+  const id = text(shiftId, 120);
+  if (!id) {
+    if (throwOnError) throw new HttpsError("invalid-argument", "shiftId is required.");
+    return {shiftId: "", deleted: false, error: "shiftId is required."};
+  }
+  const ref = db.collection("scheduleShifts").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    if (throwOnError) throw new HttpsError("not-found", "Shift not found.");
+    return {shiftId: id, deleted: false, error: "Shift not found."};
+  }
+  const shift = snap.data() || {};
+  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), authContext)) {
+    if (throwOnError) throw new HttpsError("permission-denied", "You cannot delete this shift.");
+    return {shiftId: id, deleted: false, error: "You cannot delete this shift."};
+  }
+  const status = normalizeShiftStatus(shift.status) || text(shift.status, 40);
+  if (!canDeleteShiftStatus(status)) {
+    if (throwOnError) throw new HttpsError("failed-precondition", "This shift cannot be deleted.");
+    return {shiftId: id, deleted: false, error: "This shift cannot be deleted."};
+  }
+  const wasPublished = status === "pending" || status === "confirmed";
+  await ref.delete();
+  if (wasPublished && text(shift.assigneeUid, 160)) {
+    try {
+      await notifyAssigneeChannels({
+        ...shift,
+        id,
+        status: "cancelled",
+        roleLabel: `${shift.roleLabel || "Shift"} (cancelled)`
+      }, "schedule-cancelled");
+    } catch (_error) {
+      /* Deletion still succeeds if notify fails. */
+    }
+  }
+  return {shiftId: id, deleted: true};
+}
+
 exports.deleteScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  const shiftId = text(request.data?.shiftId, 120);
-  if (!shiftId) throw new HttpsError("invalid-argument", "shiftId is required.");
-  const ref = db.collection("scheduleShifts").doc(shiftId);
-  const snap = await ref.get();
-  if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
-  const shift = snap.data() || {};
-  if (!await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth)) {
-    throw new HttpsError("permission-denied", "You cannot delete this shift.");
+  return deleteManagedShift(request.data?.shiftId, request.auth, {throwOnError: true});
+});
+
+exports.deleteScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 120, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const ids = sanitizeShiftIds(request.data?.shiftIds, 80);
+  if (!ids.length) throw new HttpsError("invalid-argument", "shiftIds is required.");
+  const results = [];
+  for (const id of ids) {
+    results.push(await deleteManagedShift(id, request.auth, {throwOnError: false}));
   }
-  const status = text(shift.status, 40);
-  if (!["draft", "pending", "declined"].includes(status)) {
-    throw new HttpsError("failed-precondition", "Only draft, pending, or declined shifts can be deleted.");
-  }
-  await ref.delete();
-  return {shiftId, deleted: true};
+  return {
+    deleted: results.filter(row => row.deleted).length,
+    failed: results.filter(row => !row.deleted).length,
+    results
+  };
 });
 
 exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
@@ -541,13 +622,14 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
   const isAssignee = text(shift.assigneeUid, 160) === uid;
   const isManager = await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth);
   if (!isAssignee && !isManager) throw new HttpsError("permission-denied", "Only the assigned worker or schedule manager can respond.");
-  if (text(shift.status, 40) === "draft") {
+  const current = normalizeShiftStatus(shift.status) || text(shift.status, 40);
+  if (current === "draft") {
     throw new HttpsError("failed-precondition", "Draft shifts must be published before workers can respond.");
   }
-  if (text(shift.status, 40) !== "pending" && !isManager) {
-    throw new HttpsError("failed-precondition", "This shift is no longer awaiting approval.");
+  if (current !== "pending" && !isManager) {
+    throw new HttpsError("failed-precondition", "This shift is no longer awaiting confirmation.");
   }
-  const nextStatus = decision === "approve" ? "approved" : "declined";
+  const nextStatus = decision === "approve" ? "confirmed" : "declined";
   const now = admin.firestore.FieldValue.serverTimestamp();
   await ref.set({
     status: nextStatus,
@@ -580,8 +662,11 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
       .where("assigneeUid", "==", uid)
       .limit(80)
       .get();
-    const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+    const shifts = snap.docs.map(doc => {
+      const row = {id: doc.id, ...doc.data()};
+      row.status = normalizeShiftStatus(row.status) || row.status || "";
+      return row;
+    }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
     return {shifts};
   }
 
@@ -593,15 +678,126 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
       .where("ownerKey", "==", key)
       .limit(120)
       .get();
-    const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      .filter(row => text(row.assigneeUid, 160) === uid);
+    const shifts = snap.docs.map(doc => {
+      const row = {id: doc.id, ...doc.data()};
+      row.status = normalizeShiftStatus(row.status) || row.status || "";
+      return row;
+    }).filter(row => text(row.assigneeUid, 160) === uid);
     return {shifts, canManage: false};
   }
   const snap = await db.collection("scheduleShifts")
     .where("ownerKey", "==", key)
     .limit(120)
     .get();
-  const shifts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-    .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+  const shifts = snap.docs.map(doc => {
+    const row = {id: doc.id, ...doc.data()};
+    row.status = normalizeShiftStatus(row.status) || row.status || "";
+    return row;
+  }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
   return {shifts, canManage: true};
+});
+
+async function isElectedClubWorker(ownerId, authContext = {}) {
+  const uid = authContext.uid || "";
+  if (!uid || !ownerId) return false;
+  if (await canManageOwner("club", ownerId, authContext)) return true;
+  const safeId = `${ownerId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const designation = await db.collection("clubEmployeeDesignations").doc(safeId).get();
+  if (designation.exists && text(designation.data()?.status, 40).toLowerCase() !== "rejected") return true;
+  const snap = await db.collection("clubEmployeeDesignations")
+    .where("clubLocationId", "==", ownerId)
+    .limit(200)
+    .get();
+  return snap.docs.some(doc => {
+    const row = doc.data() || {};
+    return text(row.workerUid, 160) === uid && text(row.status, 40).toLowerCase() !== "rejected";
+  });
+}
+
+async function listMyElectedVenues(uid) {
+  const venues = [];
+  const seen = new Set();
+  try {
+    const mine = await db.collection("clubEmployeeDesignations")
+      .where("workerUid", "==", uid)
+      .limit(40)
+      .get();
+    mine.docs.forEach(doc => {
+      const row = doc.data() || {};
+      if (text(row.status, 40).toLowerCase() === "rejected") return;
+      const id = text(row.clubLocationId, 160);
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      venues.push({
+        locationId: id,
+        locationName: text(row.clubLocationName, 160) || id,
+        role: text(row.roleElectionType, 80)
+      });
+    });
+  } catch (_error) {}
+  return venues;
+}
+
+exports.listStaffWorksheet = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const uid = request.auth.uid;
+  const venues = await listMyElectedVenues(uid);
+  let ownerId = text(request.data?.ownerId || request.data?.locationId, 160);
+  if (!ownerId && venues.length) ownerId = venues[0].locationId;
+  if (!ownerId) {
+    throw new HttpsError("permission-denied", "Only elected service members can open the Work Sheet.");
+  }
+  if (!await isElectedClubWorker(ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "Only elected service members at this venue can open the Work Sheet.");
+  }
+  const key = ownerKey("club", ownerId);
+  const [desigSnap, shiftSnap, clubSnap] = await Promise.all([
+    db.collection("clubEmployeeDesignations").where("clubLocationId", "==", ownerId).limit(200).get(),
+    db.collection("scheduleShifts").where("ownerKey", "==", key).limit(120).get(),
+    db.collection("clubLocations").doc(ownerId).get()
+  ]);
+  const workers = [];
+  const seenUid = new Set();
+  desigSnap.docs.forEach(doc => {
+    const row = doc.data() || {};
+    if (text(row.status, 40).toLowerCase() === "rejected") return;
+    const workerUid = text(row.workerUid, 160);
+    if (!workerUid || seenUid.has(workerUid)) return;
+    seenUid.add(workerUid);
+    workers.push({
+      uid: workerUid,
+      name: text(row.workerName, 120) || workerUid,
+      role: text(row.roleElectionType, 80) || "Staff",
+      photoURL: ""
+    });
+  });
+  await Promise.all(workers.slice(0, 80).map(async worker => {
+    try {
+      const userSnap = await db.collection("users").doc(worker.uid).get();
+      if (!userSnap.exists) return;
+      const user = userSnap.data() || {};
+      worker.name = text(user.displayName || user.fullName || worker.name, 120);
+      worker.photoURL = text(user.photoURL || user.profilePhotoUrl || user.publicPhotoUrl, 500);
+    } catch (_error) {}
+  }));
+  workers.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const shifts = shiftSnap.docs.map(doc => {
+    const row = {id: doc.id, ...doc.data()};
+    row.status = normalizeShiftStatus(row.status) || row.status || "";
+    return row;
+  }).filter(row => isPublishedShiftStatus(row.status))
+    .map(row => ({
+      ...publicShiftView(row, {includeNotes: true}),
+      assigneeUid: text(row.assigneeUid, 160)
+    }))
+    .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+  const club = clubSnap.exists ? clubSnap.data() || {} : {};
+  return {
+    locationId: ownerId,
+    locationName: text(club.locationName || club.brandName, 160) || ownerId,
+    workers,
+    shifts,
+    viewerUid: uid,
+    venues: venues.length ? venues : [{locationId: ownerId, locationName: text(club.locationName || club.brandName, 160) || ownerId, role: ""}]
+  };
 });

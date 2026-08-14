@@ -7,7 +7,7 @@
   <title>ShoutOut App</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.52"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.52"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=29.09.115"/>
 </head>
 <body>
 
@@ -273,7 +273,7 @@
           <button id="floqAiHelpClose" class="floqai-help-close" type="button" aria-label="Close help">&times;</button>
           <p class="eyebrow">FloqAi</p>
           <p><strong>Ask FloqR</strong> with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words.</p>
-          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em> or <em>make me a superstar</em>.</p>
+          <p class="sub small">Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say <em>“I want to be able to…”</em> (e.g. become a Club Admin) for steps and links. Type any help-link phrase below — including <em>Onboarding</em>, <em>make me a superstar</em>, User Guide phrases like <em>create a schedule</em> / <em>publish schedule</em>, or <em>website ingest</em> / <em>staff calendar</em>.</p>
           <div class="floqai-help-links" data-floqai-search-catalog="1">
             <a href="./suprstr-search.html?v=29.09.66&from=floqai" data-search="make me a superstar|make me a suprstr|make me a suprstar|superstar|super star|super-star|suprstr|suprstar|go live|live stream to display|buy suprstr" data-blurb="Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.">Make me a supRstar / superstar</a>
             <a href="./role-request.html?v=29.09.48&from=floqai&type=clubAdmin" data-search="become a club admin|club admin|be an admin|I want to be a club admin" data-blurb="Request Club Admin access, then get venue approval.">Become a Club Admin</a>
@@ -284,14 +284,21 @@
             <a href="./role-request.html?v=29.09.48&from=floqai" data-search="onboarding|link to onboarding|patron onboarding|role onboarding|service member onboarding|request access" data-blurb="Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access.">Onboarding (role / service access)</a>
             <a href="./onboard-dc-venues.html?v=29.09.48&from=floqai" data-search="venue onboarding|onboard clubs|onboard venues|dc venues|link to onboarding venues|master admin onboarding" data-blurb="Master Admin venue onboarding — push crawled club profiles into Firestore.">Venue onboarding (Master Admin)</a>
           </div>
+          <p class="eyebrow floqai-catalog-heading">User Guide</p>
+          <div class="floqai-help-links" data-floqai-search-catalog="1">
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling" data-search="user guide|create a schedule|publish schedule|how to schedule staff|staff scheduling user guide|make a schedule|scheduler" data-blurb="Open the ? beside Scheduler: add drafts on the week grid, Publish schedule, workers confirm pending until confirmed.">Create and publish a staff schedule</a>
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling" data-search="multi delete|delete multiple shifts|delete wednesday drafts|delete confirmed shift|select shifts|bulk delete shifts" data-blurb="Tap Select shifts, filter Drafts and tap Wednesday’s header, tap a Thursday confirmed chip, then Delete selected.">Delete multiple shifts</a>
+            <a href="./staff-worksheet.html?v=29.09.115&from=floqai" data-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working" data-blurb="Elected staff: read-only people × days grid of published shifts for every colleague at the venue.">Work Sheet - Weekly Staff Calendar</a>
+            <a href="./admin.html?v=29.09.115&from=floqai&tab=scheduling#schedWebsiteIngest" data-search="website ingest|rss feed|iframe schedule|schedule api|club website|ingest secret|embed staff schedule" data-blurb="Generate a secret, then pull published shifts onto the official club website with JSON, RSS, or iframe. Drafts never appear.">Club website ingest (API / RSS / iframe)</a>
+          </div>
         </div>
 
         <div id="floqAiSearchPanel" class="floqai-search-panel" aria-hidden="true">
           <label class="intent-search-label" for="intentSearchInput">
             <span id="floqAiHelpText" class="intent-help">Tell me what you want to do</span>
-            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Make me a superstar · Onboarding · Mingl / RydR / ShoutOut" aria-describedby="intentSearchHint"/>
+            <input id="intentSearchInput" type="search" autocomplete="off" placeholder="Create a schedule · website ingest · Staff Calendar · Mingl / RydR / ShoutOut" aria-describedby="intentSearchHint"/>
           </label>
-          <p id="intentSearchHint" class="sub small intent-hint">Try: make me a superstar · Onboarding · I want to be a Club Admin · become a DJ · meet someone · throw a ShoutOut</p>
+          <p id="intentSearchHint" class="sub small intent-hint">Try: create a schedule · website ingest · staff calendar · make me a superstar · Onboarding · I want to be a Club Admin</p>
           <div id="intentSearchResults" class="intent-search-results" aria-live="polite"></div>
         </div>
       </div>
@@ -703,12 +710,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.33"></script>
 <script src="./floqr-nav.js?v=29.09.39"></script>
-<script src="./floqai-help-repository.js?v=29.09.111"></script>
-<script src="./intent-search.js?v=29.09.111"></script>
+<script src="./floqai-help-repository.js?v=29.09.115"></script>
+<script src="./intent-search.js?v=29.09.115"></script>
 <script src="./floqai-search.js?v=29.09.52"></script>
 <script src="./global-profile-status.js?v=29.09.45"></script>
 <script src="./floqr-i18n.js?v=29.09.100"></script>
-<script src="./floqr-temp-qa-showcase.js?v=29.09.110"></script>
+<script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.110"></script>
 <script src="./national-teams-data.js?v=29.09.59"></script>
 <script src="./jersey-catalog.js?v=29.09.59"></script>

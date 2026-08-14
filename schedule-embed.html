@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Staff schedule</title>
+  <link rel="stylesheet" href="./styles.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
+  <style>
+    body.sched-embed{margin:0;background:#0b1220;color:#e8f0ff}
+    .sched-embed-shell{padding:16px 18px 24px}
+    .sched-embed-shell h1{margin:0 0 8px;font-size:22px}
+  </style>
+</head>
+<body class="sched-embed">
+<main class="sched-embed-shell">
+  <p class="eyebrow">FLOQR</p>
+  <h1 id="embedVenueName">Staff schedule</h1>
+  <p id="embedStatus" class="status">Loading published schedule…</p>
+  <div class="sched-toolbar">
+    <div class="queue-actions">
+      <button type="button" id="embedPrevWeekBtn">← Prev</button>
+      <strong id="embedWeekLabel">This week</strong>
+      <button type="button" id="embedNextWeekBtn">Next →</button>
+      <button type="button" id="embedTodayWeekBtn">This week</button>
+    </div>
+  </div>
+  <div id="embedWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
+</main>
+<script src="./staff-week-grid.js?v=29.09.115"></script>
+<script src="./schedule-embed.js?v=29.09.115"></script>
+</body>
+</html>

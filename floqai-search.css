@@ -110,7 +110,14 @@
   font-weight:800;
   text-decoration:none;
 }
-.floqai-help-links a:hover{text-decoration:underline}
+.floqai-help-popout .floqai-catalog-heading{
+  margin:16px 0 0;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-size:11px;
+  font-weight:900;
+  color:#9fd9ff;
+}
 
 .floqai-invite{
   margin:8px 0 0;

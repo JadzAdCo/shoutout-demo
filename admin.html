@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.111"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -524,13 +524,8 @@
         </div>
         <div id="schedulingWorkspace" class="hidden">
           <div class="card">
-            <h2
-              data-floqr-help-id="help-staff-schedule-grid"
-              data-floqr-help-title="Staff week calendar"
-              data-floqr-help-search="schedule grid|round robin|publish schedule|people days|open minus two hours"
-              data-floqr-help-body="People × days week grid like 7shifts. Manual: click a cell to place draft shift chips. Round Robin: fill selected open days fairly (fewest shifts this week, then oldest last assignment). Default shift window = club open − 2 hours through club close + 1 hour from Venue opening hours. Publish sends drafts to workers. Public holidays for the venue country are highlighted."
-            >Week schedule</h2>
-            <p class="sub small" data-keep-visible="true">People × days grid wired to <strong>Venue opening hours</strong> on Club Public Profile. Default shift window = club open − 2h through close + 1h. Public holidays highlight by venue country.</p>
+            <h2 id="schedGridHeading">Scheduler</h2>
+            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Use <strong>Select shifts</strong> to delete several drafts or confirmed chips at once. Default window = club open − 2h through close + 1h. Open the <strong>?</strong> beside Scheduler for create/publish and multi-delete steps.</p>
             <div class="sched-toolbar">
               <div class="sched-mode-toggle" role="group" aria-label="Assign mode">
                 <button type="button" id="schedModeManualBtn" class="sched-mode-btn active" data-mode="manual">Manual</button>
@@ -547,7 +542,6 @@
               <label>Default role / title<input id="schedDefaultRole" placeholder="Bartender · Door · Host · DJ support" value="Shift"/></label>
               <label>Default start<input id="schedDefaultStart" type="time" value="18:00"/></label>
               <label>Default end<input id="schedDefaultEnd" type="time" value="02:00"/></label>
-              <label>Require approval<input id="schedRequireApproval" type="checkbox" checked/></label>
             </div>
             <p id="schedVenueWindowHint" class="sub small" data-keep-visible="true">Staff window follows venue hours when set.</p>
             <div id="schedRoundRobinPanel" class="sched-rr-panel hidden">
@@ -562,12 +556,41 @@
             </div>
             <div class="queue-actions" style="margin-top:12px">
               <button type="button" id="schedPublishBtn" class="primary">Publish schedule</button>
+              <button type="button" id="schedSelectBtn">Select shifts</button>
               <button type="button" id="schedCopyPrevWeekBtn">Copy previous week → drafts</button>
               <button type="button" id="schedRefreshGridBtn">Refresh grid</button>
               <span id="schedDraftCount" class="tag">0 drafts</span>
             </div>
+            <div id="schedSelectBar" class="sched-select-bar hidden">
+              <p class="sub small" data-keep-visible="true">Tap chips to mix statuses. Tap a day header to select that day’s shifts using the filter (example: Drafts + Wednesday header, then tap a Thursday confirmed chip).</p>
+              <div id="schedSelectFilters" class="sched-select-filters" role="group" aria-label="Select by status">
+                <button type="button" data-sched-filter="all" class="active">All</button>
+                <button type="button" data-sched-filter="draft">Drafts</button>
+                <button type="button" data-sched-filter="pending">Pending</button>
+                <button type="button" data-sched-filter="confirmed">Confirmed</button>
+              </div>
+              <div class="queue-actions">
+                <button type="button" id="schedDeleteSelectedBtn" class="danger" disabled>Delete selected</button>
+                <button type="button" id="schedSelectCancelBtn" class="ghost">Done</button>
+              </div>
+            </div>
             <div id="schedHolidayLegend" class="sched-holiday-legend"></div>
             <div id="scheduleWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
+          </div>
+
+          <div id="schedWebsiteIngest" class="card">
+            <h2 id="schedIngestHelpHost">Website ingest</h2>
+            <p class="sub small" data-keep-visible="true">Put published staff shifts on your official website. Generate a secret, then paste the JSON API URL, RSS feed, or iframe. The full secret is shown once per rotate (hash only is stored). Drafts, worker email, and phone never leave FLOQR.</p>
+            <p id="schedIngestStatus" class="status"></p>
+            <p id="schedIngestPrefix" class="sub small" data-keep-visible="true">Secret: not generated yet.</p>
+            <div class="queue-actions">
+              <button type="button" id="schedIngestRotateBtn" class="primary">Generate / rotate secret</button>
+              <button type="button" id="schedIngestCopyJsonBtn">Copy JSON URL</button>
+              <button type="button" id="schedIngestCopyRssBtn">Copy RSS URL</button>
+              <button type="button" id="schedIngestCopyIframeBtn">Copy iframe snippet</button>
+              <button type="button" id="schedIngestCopyAllBtn">Copy all-data JSON URL</button>
+            </div>
+            <div id="schedIngestReveal" class="sched-ingest-onetime hidden"></div>
           </div>
 
           <div id="scheduleAssignModal" class="sched-modal hidden" role="dialog" aria-modal="true" aria-labelledby="scheduleAssignTitle">
@@ -582,8 +605,7 @@
                   <div id="schedApplyDays" class="sched-day-pills"></div>
                 </label>
                 <label class="profile-grid-wide">Notes<textarea id="scheduleNotes" rows="2" placeholder="Station, dress code, call time…"></textarea></label>
-                <label><input id="scheduleRequireApproval" type="checkbox" checked/> Require worker approval</label>
-                <label><input id="scheduleSaveAsDraft" type="checkbox" checked/> Save as draft (publish later)</label>
+                <label><input id="scheduleSaveAsDraft" type="checkbox" checked/> Save as draft (publish later — no worker notify yet)</label>
               </div>
               <div class="queue-actions">
                 <button type="button" id="createScheduleShiftBtn" class="primary">Save shift</button>
@@ -611,7 +633,12 @@
       <section id="panelNotifications" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Club ops</p>
-          <h2>Notifications</h2>
+          <h2
+            data-floqr-help-id="help-club-notification-subscriptions"
+            data-floqr-help-title="Club SMS and WhatsApp notification subscriptions"
+            data-floqr-help-search="sms notification|whatsapp notification|twilio|invalid username|account sid|send test alert"
+            data-floqr-help-body="SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits, and Subscribe live in each channel ?. Save does not reopen Stripe for a subscribed channel. Send test alert needs an E.164 alert phone plus SMS and/or WhatsApp left on. If the test returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID that starts with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
+          >Notifications</h2>
           <p class="sub small">Choose how this club receives pending-ShoutOut alerts. Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp colors follow the Firebase subscription (green = paid, red = not subscribed). Payment and credit details are in each channel's ?.</p>
           <div class="notify-channel-grid">
             <label class="notify-channel"><input id="repNotifyInApp" type="checkbox" checked/> In-app</label>
@@ -727,7 +754,7 @@
 <script src="./firebase-config.js?v=29.09.8"></script>
 <script src="./floqr-nav.js?v=29.09.46"></script>
 <script src="./global-profile-status.js?v=29.09.8"></script>
-<script src="./floqr-temp-qa-showcase.js?v=29.09.110"></script>
+<script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.110"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
@@ -736,8 +763,8 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.111"></script>
-<script src="./help-attach.js?v=29.09.101"></script>
+<script src="./floqai-help-repository.js?v=29.09.115"></script>
+<script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
 <script src="./floqr-logger.js?v=29.09.8"></script>
@@ -747,13 +774,13 @@
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=29.09.103"></script>
+<script src="./admin-app.js?v=29.09.115"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.111"></script>
+<script src="./admin-notifications.js?v=29.09.112"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.108"></script>
+<script src="./admin-scheduling.js?v=29.09.115"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

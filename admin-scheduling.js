@@ -18,17 +18,153 @@
   const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
   const ROLE_CHIP = ["role-a", "role-b", "role-c", "role-d"];
 
-  const state = {
-    workers: [],
-    shifts: [],
-    weekStart: startOfWeek(new Date()),
-    mode: "manual",
-    applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
-    rrDays: new Set([1, 2, 3, 4, 5]),
-    assignContext: null,
-    rrCursor: 0,
-    venue: null
-  };
+  let ingestReveal = null;
+
+  const SCHEDULER_HELP_HTML = `
+    <p>People × days week grid. Default shift window = club open − 2 hours through club close + 1 hour. Round Robin fills selected open days fairly.</p>
+    <p><strong>Create and publish</strong></p>
+    <ol>
+      <li>Tap <strong>+</strong> on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week.</li>
+      <li>Review dashed draft chips, then tap <strong>Publish schedule</strong>. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.</li>
+      <li>Published chips stay <strong>pending</strong> until the worker confirms. Confirmed has a green outline.</li>
+    </ol>
+    <p><strong>Delete multiple shifts</strong></p>
+    <ol>
+      <li>Tap <strong>Select shifts</strong>.</li>
+      <li>Filter Drafts and tap a day header (e.g. Wednesday), then tap other chips (e.g. a Thursday confirmed shift).</li>
+      <li>Tap <strong>Delete selected</strong> and confirm. Escape or Done exits select mode.</li>
+    </ol>
+    <p>Put published shifts (never drafts) on your club website with <strong>Website ingest</strong> below — JSON API, RSS, or iframe, using a one-time secret.</p>
+  `;
+
+  const INGEST_HELP_HTML = `
+    <p>Clubs can pull published scheduling (and hours / profile) onto their official website.</p>
+    <ol>
+      <li>Tap Generate / rotate secret. Copy the yellow URLs immediately — the full secret is not stored in FLOQR, only a hash.</li>
+      <li>JSON: <code>venuePublicFeed?location=&amp;secret=&amp;format=json&amp;dataset=schedule|hours|profile|all</code></li>
+      <li>RSS: same URL with <code>format=rss</code> for a staff-schedule feed.</li>
+      <li>Iframe: paste the snippet into your site. It loads schedule-embed.html with the secret.</li>
+    </ol>
+    <p>Treat the secret like an API key. Rotate it if it leaks. Payload never includes drafts, worker email, or phone.</p>
+  `;
+
+  function attachSchedulingHelp() {
+    const attach = window.FLOQRHelpAttach?.attach;
+    if (!attach) return;
+    const schedTarget = byId("schedGridHeading");
+    if (schedTarget) {
+      attach({
+        target: schedTarget,
+        id: "help-staff-schedule-grid",
+        title: "Scheduler",
+        bodyHtml: SCHEDULER_HELP_HTML,
+        body: "People × days week grid. Create drafts, Publish schedule so workers confirm pending→confirmed. Select shifts to multi-delete (day header + chips). Website ingest publishes JSON, RSS, or iframe with a one-time secret. Drafts never appear on the club site.",
+        searchPhrases: [
+          "scheduler", "schedule grid", "user guide", "create a schedule", "publish schedule",
+          "how to schedule staff", "select shifts", "multi delete", "round robin",
+          "website ingest", "staff calendar"
+        ],
+        links: [
+          {label: "Club Admin Scheduling", href: "./admin.html?from=floqai&tab=scheduling"},
+          {label: "Work Sheet", href: "./staff-worksheet.html?from=floqai"}
+        ]
+      });
+    }
+    const ingestTarget = byId("schedIngestHelpHost");
+    if (ingestTarget) {
+      attach({
+        target: ingestTarget,
+        id: "help-venue-website-ingest",
+        title: "Website ingest",
+        bodyHtml: INGEST_HELP_HTML,
+        body: "Generate a venue ingest secret to pull published staff shifts onto your official website via JSON API, RSS, or iframe. Hash only is stored; full secret is revealed once per rotate. Drafts, email, and phone are omitted.",
+        searchPhrases: [
+          "website ingest", "club website schedule", "rss feed", "iframe schedule",
+          "schedule api", "ingest secret", "embed staff schedule", "official website"
+        ],
+        links: [
+          {label: "Website ingest", href: "./admin.html?from=floqai&tab=scheduling#schedWebsiteIngest"}
+        ]
+      });
+    }
+  }
+
+  function setIngestStatus(message) {
+    const el = byId("schedIngestStatus");
+    if (el) el.textContent = message || "";
+  }
+
+  async function copyText(value, okMsg) {
+    const text = String(value || "");
+    if (!text) {
+      setIngestStatus("Generate / rotate a secret first so the URLs include the key.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setIngestStatus(okMsg);
+    } catch (_error) {
+      setIngestStatus("Copy failed — select the yellow text and copy it manually.");
+    }
+  }
+
+  function ingestUrls() {
+    return ingestReveal?.urls || {};
+  }
+
+  function renderIngestReveal() {
+    const host = byId("schedIngestReveal");
+    if (!host) return;
+    if (!ingestReveal?.secret) {
+      host.classList.add("hidden");
+      host.innerHTML = "";
+      return;
+    }
+    host.classList.remove("hidden");
+    host.innerHTML = `
+      <p><strong>ONE-TIME secret and URLs</strong></p>
+      <p class="sub small">Paste these onto your website now. The full secret will not be shown again until you rotate.</p>
+      <p>Secret</p><code>${esc(ingestReveal.secret)}</code>
+      <p>JSON</p><code>${esc(ingestReveal.urls?.json || "")}</code>
+      <p>RSS</p><code>${esc(ingestReveal.urls?.rss || "")}</code>
+      <p>Iframe</p><code>${esc(ingestReveal.iframeSnippet || "")}</code>
+    `;
+  }
+
+  async function loadIngestEndpoints() {
+    if (!locationId) {
+      setIngestStatus("Choose a venue to generate website ingest URLs.");
+      return;
+    }
+    try {
+      const result = await callable("getVenueIngestEndpoints")({locationId});
+      const data = result?.data || {};
+      const prefix = byId("schedIngestPrefix");
+      if (prefix) {
+        prefix.textContent = data.configured
+          ? `Secret: ${data.secretPrefix || "configured (obfuscated)"}`
+          : "Secret: not generated yet.";
+      }
+      setIngestStatus(data.hint || "");
+    } catch (error) {
+      setIngestStatus(error?.message || String(error));
+    }
+  }
+
+  async function rotateIngestSecret() {
+    if (!locationId) {
+      setIngestStatus("Choose a venue first.");
+      return;
+    }
+    if (!window.confirm("Rotate the website ingest secret? Existing JSON, RSS, and iframe URLs stop working immediately.")) return;
+    setIngestStatus("Generating secret…");
+    const result = await callable("rotateVenueIngestSecret")({locationId});
+    ingestReveal = result?.data || null;
+    const prefix = byId("schedIngestPrefix");
+    if (prefix) prefix.textContent = `Secret: ${ingestReveal?.secretPrefix || "rotated"}`;
+    renderIngestReveal();
+    setIngestStatus(ingestReveal?.warning || "Copy the yellow URLs now.");
+  }
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
@@ -60,6 +196,21 @@
     d.setDate(d.getDate() + n);
     return d;
   }
+
+  const state = {
+    workers: [],
+    shifts: [],
+    weekStart: startOfWeek(new Date()),
+    mode: "manual",
+    applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
+    rrDays: new Set([1, 2, 3, 4, 5]),
+    assignContext: null,
+    rrCursor: 0,
+    venue: null,
+    selecting: false,
+    selectFilter: "all",
+    selectedShiftIds: new Set()
+  };
 
   function sameDay(aMs, dayDate) {
     const a = new Date(aMs);
@@ -308,6 +459,68 @@
     byId("schedRoundRobinPanel")?.classList.toggle("hidden", state.mode !== "roundRobin");
   }
 
+  function shiftStatusKey(shift) {
+    const status = String(shift?.status || "") === "approved" ? "confirmed" : String(shift?.status || "");
+    return status || "draft";
+  }
+
+  function matchesSelectFilter(shift) {
+    const filter = state.selectFilter || "all";
+    if (filter === "all") return true;
+    return shiftStatusKey(shift) === filter;
+  }
+
+  function updateSelectUi() {
+    const bar = byId("schedSelectBar");
+    const wrap = byId("scheduleWeekGrid");
+    const btn = byId("schedSelectBtn");
+    const countBtn = byId("schedDeleteSelectedBtn");
+    bar?.classList.toggle("hidden", !state.selecting);
+    wrap?.classList.toggle("is-selecting", state.selecting);
+    btn?.classList.toggle("active", state.selecting);
+    if (btn) btn.textContent = state.selecting ? "Selecting…" : "Select shifts";
+    document.querySelectorAll("[data-sched-filter]").forEach(el => {
+      el.classList.toggle("active", el.dataset.schedFilter === state.selectFilter);
+    });
+    const n = state.selectedShiftIds.size;
+    if (countBtn) {
+      countBtn.textContent = n ? `Delete selected (${n})` : "Delete selected";
+      countBtn.disabled = n === 0;
+    }
+  }
+
+  function setSelectMode(on) {
+    state.selecting = !!on;
+    if (!state.selecting) state.selectedShiftIds.clear();
+    renderGrid();
+    updateSelectUi();
+  }
+
+  function toggleShiftSelected(shiftId) {
+    if (!shiftId) return;
+    if (state.selectedShiftIds.has(shiftId)) state.selectedShiftIds.delete(shiftId);
+    else state.selectedShiftIds.add(shiftId);
+    renderGrid();
+    updateSelectUi();
+  }
+
+  function toggleDaySelection(dayIdx) {
+    const day = weekDays()[dayIdx];
+    if (!day) return;
+    const ids = state.shifts
+      .filter(shift => matchesSelectFilter(shift) && sameDay(Number(shift.startsAtMs || Date.parse(shift.startsAt) || 0), day))
+      .map(shift => shift.id)
+      .filter(Boolean);
+    if (!ids.length) return;
+    const allOn = ids.every(id => state.selectedShiftIds.has(id));
+    ids.forEach(id => {
+      if (allOn) state.selectedShiftIds.delete(id);
+      else state.selectedShiftIds.add(id);
+    });
+    renderGrid();
+    updateSelectUi();
+  }
+
   function closeWorkerPopout() {
     const pop = byId("scheduleWorkerPopout");
     if (pop) {
@@ -384,16 +597,12 @@
     if (!shift && dayTimes.start && byId("schedDefaultStart")) byId("schedDefaultStart").value = dayTimes.start;
     if (!shift && dayTimes.end && byId("schedDefaultEnd")) byId("schedDefaultEnd").value = dayTimes.end;
     if (byId("scheduleNotes")) byId("scheduleNotes").value = shift?.notes || "";
-    if (byId("scheduleRequireApproval")) {
-      byId("scheduleRequireApproval").checked = shift
-        ? shift.requireApproval !== false
-        : byId("schedRequireApproval")?.checked !== false;
-    }
     if (byId("scheduleSaveAsDraft")) byId("scheduleSaveAsDraft").checked = !shift || String(shift.status) === "draft";
 
     const deleteBtn = byId("scheduleDeleteShiftBtn");
     if (deleteBtn) {
-      const canDelete = !!(shift?.id && ["draft", "pending", "declined"].includes(String(shift.status || "")));
+      const status = String(shift?.status || "").toLowerCase();
+      const canDelete = !!(shift?.id && ["draft", "pending", "confirmed", "approved", "declined"].includes(status));
       deleteBtn.classList.toggle("hidden", !canDelete);
     }
 
@@ -425,20 +634,25 @@
     const head = `
       <thead><tr>
         <th class="sched-person">Team</th>
-        ${days.map(day => {
+        ${days.map((day, dayIdx) => {
           const isToday = day.getTime() === today.getTime();
           const holiday = venueApi()?.holidayOn?.(state.venue?.country || "US", day);
           const closed = staffTimesForDay(day).closed;
           const classes = [
+            "sched-day-head",
             isToday ? "is-today" : "",
             holiday ? "is-holiday" : "",
             closed ? "is-venue-closed" : ""
           ].filter(Boolean).join(" ");
           const title = [
             holiday ? holiday.name : "",
-            closed ? "Venue closed" : ""
+            closed ? "Venue closed" : "",
+            state.selecting ? "Tap to select this day's shifts (uses Drafts / Pending / Confirmed filter)" : ""
           ].filter(Boolean).join(" · ");
-          return `<th class="${classes}" title="${esc(title)}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}${holiday ? `<small class="sched-holiday-mark">${esc(holiday.name)}</small>` : ""}${closed && !holiday ? `<small class="sched-closed-mark">Closed</small>` : ""}</th>`;
+          const filterHint = state.selecting
+            ? `<small class="sched-select-day-hint">Select ${state.selectFilter === "all" ? "all" : state.selectFilter}</small>`
+            : "";
+          return `<th class="${classes}" data-day-idx="${dayIdx}" title="${esc(title)}">${esc(day.toLocaleDateString([], {weekday: "short", month: "short", day: "numeric"}))}${holiday ? `<small class="sched-holiday-mark">${esc(holiday.name)}</small>` : ""}${closed && !holiday ? `<small class="sched-closed-mark">Closed</small>` : ""}${filterHint}</th>`;
         }).join("")}
       </tr></thead>
     `;
@@ -451,13 +665,22 @@
         const dayShifts = state.shifts.filter(s =>
           String(s.assigneeUid || "") === worker.uid && sameDay(Number(s.startsAtMs || Date.parse(s.startsAt) || 0), day)
         );
-        const chips = dayShifts.map(shift => `
-          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${String(shift.status) === "draft" ? "is-draft" : ""}"
-            data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
+        const chips = dayShifts.map(shift => {
+          const status = shiftStatusKey(shift);
+          const statusClass = status === "draft" ? "is-draft"
+            : status === "pending" ? "is-pending"
+            : status === "confirmed" ? "is-confirmed"
+            : status === "declined" ? "is-declined"
+            : "";
+          const selected = state.selecting && state.selectedShiftIds.has(shift.id);
+          return `
+          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}${selected ? " is-selected" : ""}"
+            data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}" data-status="${esc(status)}"
+            aria-pressed="${selected ? "true" : "false"}">
             <strong>${esc(shift.roleLabel || "Shift")}</strong>
-            <small>${esc(formatChipTime(shift))} · ${esc(shift.status || "")}</small>
-          </button>
-        `).join("");
+            <small>${esc(formatChipTime(shift))} · ${esc(status)}</small>
+          </button>`;
+        }).join("");
         return `<td class="sched-cell" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
           ${chips}
           <button type="button" class="sched-cell-add" data-add-uid="${esc(worker.uid)}" data-day="${dayIdx}">+</button>
@@ -478,6 +701,7 @@
     }).join("");
 
     host.innerHTML = `<table class="sched-grid">${head}<tbody>${body}</tbody></table>`;
+    updateSelectUi();
   }
 
   async function refreshSubscriptionUi() {
@@ -532,7 +756,7 @@
           ? `Calendar unlocked · ${monthStatus} (staffSchedulingPaid=1).`
           : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus} (staffSchedulingPaid=0).`
       );
-      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts()]);
+      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts(), loadIngestEndpoints()]);
     } catch (error) {
       setStatus(error?.message || String(error));
     }
@@ -631,7 +855,6 @@
     endsAt,
     notes,
     asDraft,
-    requireApproval,
     assignMode
   }) {
     return callable("createScheduleShift")({
@@ -649,7 +872,6 @@
       venueName: byId("clubName")?.textContent || "",
       asDraft: !!asDraft,
       notify: !asDraft,
-      requireApproval: !!requireApproval,
       assignMode: assignMode || "manual"
     });
   }
@@ -662,8 +884,7 @@
     const startsAt = byId("scheduleStartsAt")?.value;
     const endsAt = byId("scheduleEndsAt")?.value;
     if (!startsAt || !endsAt) throw new Error("Set shift start and end.");
-    const asDraft = byId("scheduleSaveAsDraft")?.checked !== false;
-    const requireApproval = byId("scheduleRequireApproval")?.checked !== false;
+    const asDraft = byId("scheduleSaveAsDraft")?.checked === true;
     const roleLabel = byId("scheduleRole")?.value?.trim() || option?.dataset?.role || "Shift";
     const notes = byId("scheduleNotes")?.value?.trim() || "";
     const worker = state.workers.find(w => w.uid === assigneeUid);
@@ -674,8 +895,8 @@
     const durationMs = endLocal.getTime() - startLocal.getTime();
     if (!(durationMs > 0)) throw new Error("Shift end must be after start.");
 
-    setStatus(asDraft ? "Saving draft shift(s)…" : "Creating shift and notifying…");
-    if (state.assignContext?.shift?.id && ["draft", "pending", "declined"].includes(String(state.assignContext.shift.status || ""))) {
+    setStatus(asDraft ? "Saving draft shift(s)…" : "Creating pending shift and notifying the worker…");
+    if (state.assignContext?.shift?.id) {
       try {
         await callable("deleteScheduleShift")({shiftId: state.assignContext.shift.id});
       } catch (_error) {}
@@ -696,14 +917,13 @@
         endsAt: dayEnd,
         notes,
         asDraft,
-        requireApproval,
         assignMode: "manual"
       });
       created += 1;
     }
     setStatus(asDraft
-      ? `Saved ${created} draft shift${created === 1 ? "" : "s"}. Publish when ready.`
-      : `Saved ${created} shift${created === 1 ? "" : "s"} and queued notify where enabled.`);
+      ? `Saved ${created} draft shift${created === 1 ? "" : "s"}. Publish when ready — workers confirm after publish.`
+      : `Saved ${created} pending shift${created === 1 ? "" : "s"}. Workers were asked to confirm via Inbox / Email / SMS / WhatsApp.`);
     if (byId("scheduleNotes")) byId("scheduleNotes").value = "";
     closeAssignModal();
     await loadShifts();
@@ -717,7 +937,7 @@
       && Number(s.startsAtMs || 0) < weekEndMs
     );
     if (!drafts.length) throw new Error("No draft shifts in this week to publish.");
-    if (!window.confirm(`Publish ${drafts.length} draft shift${drafts.length === 1 ? "" : "s"} and notify workers?`)) return;
+    if (!window.confirm(`Publish ${drafts.length} draft shift${drafts.length === 1 ? "" : "s"}? Workers must confirm before a shift becomes confirmed.`)) return;
     setStatus("Publishing schedule…");
     const result = await callable("publishScheduleShifts")({
       ownerType: "club",
@@ -725,7 +945,7 @@
       weekStartMs,
       weekEndMs
     });
-    setStatus(`Published ${result?.data?.published || 0} shift(s). Workers notified when channels are enabled.`);
+    setStatus(`Published ${result?.data?.published || 0} pending shift(s). Workers confirm via Inbox / Email / SMS / WhatsApp.`);
     await loadShifts();
   }
 
@@ -766,7 +986,6 @@
     const days = [...state.rrDays].sort((a, b) => a - b);
     if (!days.length) throw new Error("Select at least one day to fill.");
     const roleLabel = byId("schedDefaultRole")?.value?.trim() || byId("schedRrRoleFilter")?.value?.trim() || "Shift";
-    const requireApproval = byId("schedRequireApproval")?.checked !== false;
 
     setStatus("Round Robin filling drafts…");
     let created = 0;
@@ -800,7 +1019,6 @@
         endsAt,
         notes: "Round Robin auto-fill",
         asDraft: true,
-        requireApproval,
         assignMode: "roundRobin"
       });
       created += 1;
@@ -846,7 +1064,6 @@
         endsAt: nextEnd,
         notes: shift.notes ? `${shift.notes} (copied)` : "Copied from previous week",
         asDraft: true,
-        requireApproval: shift.requireApproval !== false,
         assignMode: "copyPreviousWeek"
       });
       created += 1;
@@ -857,10 +1074,26 @@
 
   async function deleteShift(shiftId) {
     if (!shiftId) return;
-    if (!window.confirm("Delete this shift?")) return;
+    if (!window.confirm("Delete this shift? Pending and confirmed shifts can both be removed. The worker is notified if it was already sent.")) return;
     setStatus("Deleting shift…");
     await callable("deleteScheduleShift")({shiftId});
     setStatus("Shift deleted.");
+    await loadShifts();
+  }
+
+  async function deleteSelectedShifts() {
+    const ids = [...state.selectedShiftIds];
+    if (!ids.length) throw new Error("Select at least one shift to delete.");
+    if (!window.confirm(`Delete ${ids.length} selected shift${ids.length === 1 ? "" : "s"}? Drafts disappear quietly. Pending and confirmed workers get a cancelled notice if they were already notified.`)) return;
+    setStatus(`Deleting ${ids.length} shift${ids.length === 1 ? "" : "s"}…`);
+    const result = await callable("deleteScheduleShifts")({shiftIds: ids});
+    const deleted = Number(result?.data?.deleted || 0);
+    const failed = Number(result?.data?.failed || 0);
+    state.selectedShiftIds.clear();
+    setSelectMode(false);
+    setStatus(failed
+      ? `Deleted ${deleted} shift${deleted === 1 ? "" : "s"}; ${failed} could not be removed.`
+      : `Deleted ${deleted} shift${deleted === 1 ? "" : "s"}.`);
     await loadShifts();
   }
 
@@ -872,6 +1105,7 @@
     setMode("manual");
     updateWeekLabel();
 
+    attachSchedulingHelp();
     byId("buySchedulingSubBtn")?.addEventListener("click", () => {
       startSubscription().catch(error => setStatus(error.message));
     });
@@ -898,6 +1132,20 @@
     byId("schedPublishBtn")?.addEventListener("click", () => {
       publishWeek().catch(error => setStatus(error.message));
     });
+    byId("schedSelectBtn")?.addEventListener("click", () => {
+      setSelectMode(!state.selecting);
+    });
+    byId("schedSelectCancelBtn")?.addEventListener("click", () => setSelectMode(false));
+    byId("schedDeleteSelectedBtn")?.addEventListener("click", () => {
+      deleteSelectedShifts().catch(error => setStatus(error.message));
+    });
+    byId("schedSelectFilters")?.addEventListener("click", event => {
+      const btn = event.target.closest("[data-sched-filter]");
+      if (!btn) return;
+      state.selectFilter = btn.dataset.schedFilter || "all";
+      updateSelectUi();
+      if (state.selecting) renderGrid();
+    });
     byId("schedRrFillBtn")?.addEventListener("click", () => {
       roundRobinFill().catch(error => setStatus(error.message));
     });
@@ -918,8 +1166,36 @@
       applyVenueDefaultsToControls();
       renderGrid();
     });
+    byId("schedIngestRotateBtn")?.addEventListener("click", () => {
+      rotateIngestSecret().catch(error => setIngestStatus(error.message));
+    });
+    byId("schedIngestCopyJsonBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().json, "JSON URL copied.");
+    });
+    byId("schedIngestCopyRssBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().rss, "RSS URL copied.");
+    });
+    byId("schedIngestCopyIframeBtn")?.addEventListener("click", () => {
+      copyText(ingestReveal?.iframeSnippet || "", "Iframe snippet copied.");
+    });
+    byId("schedIngestCopyAllBtn")?.addEventListener("click", () => {
+      copyText(ingestUrls().all, "All-data JSON URL copied.");
+    });
 
     byId("scheduleWeekGrid")?.addEventListener("click", event => {
+      if (state.selecting) {
+        const dayHead = event.target.closest("[data-day-idx]");
+        if (dayHead) {
+          toggleDaySelection(Number(dayHead.dataset.dayIdx));
+          return;
+        }
+        const chip = event.target.closest("[data-shift-id]");
+        if (chip) {
+          toggleShiftSelected(chip.dataset.shiftId);
+          return;
+        }
+        return;
+      }
       const personBtn = event.target.closest("[data-worker-uid]");
       if (personBtn) {
         const worker = state.workers.find(w => w.uid === personBtn.dataset.workerUid);
@@ -950,6 +1226,7 @@
       if (event.key === "Escape") {
         closeAssignModal();
         closeWorkerPopout();
+        if (state.selecting) setSelectMode(false);
       }
     });
 
