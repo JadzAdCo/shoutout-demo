@@ -18,6 +18,35 @@ function publishedShiftStatus({asDraft = false, assigneeUid = ""} = {}) {
   return text(assigneeUid, 160) ? "pending" : "draft";
 }
 
+function parseShiftBounds(startsAt, endsAt) {
+  const start = text(startsAt, 40);
+  const end = text(endsAt, 40);
+  const startMs = Date.parse(start);
+  const endMs = Date.parse(end);
+  if (!start || !end || !Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) {
+    return null;
+  }
+  return {startsAt: start, endsAt: end, startMs, endMs};
+}
+
+function nextStatusForShiftUpdate({
+  asDraft = false,
+  assigneeUid = "",
+  previousStatus = "",
+  startMs = 0,
+  endMs = 0,
+  previousStartMs = 0,
+  previousEndMs = 0,
+  previousAssigneeUid = ""
+} = {}) {
+  if (asDraft || !text(assigneeUid, 160)) return "draft";
+  const prev = normalizeShiftStatus(previousStatus);
+  const timesChanged = Number(startMs) !== Number(previousStartMs) || Number(endMs) !== Number(previousEndMs);
+  const assigneeChanged = text(assigneeUid, 160) !== text(previousAssigneeUid, 160);
+  if (prev === "confirmed" && !timesChanged && !assigneeChanged) return "confirmed";
+  return "pending";
+}
+
 function canDeleteShiftStatus(raw = "") {
   return ["draft", "pending", "confirmed", "approved", "declined"].includes(normalizeShiftStatus(raw) || text(raw, 40).toLowerCase());
 }
@@ -105,6 +134,8 @@ module.exports = {
   DEFAULT_ORIGIN,
   normalizeShiftStatus,
   publishedShiftStatus,
+  parseShiftBounds,
+  nextStatusForShiftUpdate,
   canDeleteShiftStatus,
   isPublishedShiftStatus,
   publicShiftView,

@@ -5,6 +5,8 @@ const assert = require("node:assert/strict");
 const {
   normalizeShiftStatus,
   publishedShiftStatus,
+  parseShiftBounds,
+  nextStatusForShiftUpdate,
   canDeleteShiftStatus,
   isPublishedShiftStatus,
   publicShiftView,
@@ -19,6 +21,41 @@ test("published shifts are pending until the worker confirms", () => {
   assert.equal(publishedShiftStatus({asDraft: true, assigneeUid: "u1"}), "draft");
   assert.equal(publishedShiftStatus({asDraft: false, assigneeUid: "u1"}), "pending");
   assert.equal(publishedShiftStatus({asDraft: false, assigneeUid: ""}), "draft");
+});
+
+test("editing a confirmed card to draft keeps one card; same-slot confirmed stays confirmed", () => {
+  assert.equal(parseShiftBounds("2026-08-13T22:35:00.000Z", "2026-08-14T02:00:00.000Z")?.startMs > 0, true);
+  assert.equal(parseShiftBounds("bad", "also-bad"), null);
+  assert.equal(nextStatusForShiftUpdate({
+    asDraft: true,
+    assigneeUid: "u1",
+    previousStatus: "confirmed",
+    startMs: 1,
+    endMs: 2,
+    previousStartMs: 1,
+    previousEndMs: 2,
+    previousAssigneeUid: "u1"
+  }), "draft");
+  assert.equal(nextStatusForShiftUpdate({
+    asDraft: false,
+    assigneeUid: "u1",
+    previousStatus: "confirmed",
+    startMs: 1,
+    endMs: 2,
+    previousStartMs: 1,
+    previousEndMs: 2,
+    previousAssigneeUid: "u1"
+  }), "confirmed");
+  assert.equal(nextStatusForShiftUpdate({
+    asDraft: false,
+    assigneeUid: "u1",
+    previousStatus: "confirmed",
+    startMs: 10,
+    endMs: 20,
+    previousStartMs: 1,
+    previousEndMs: 2,
+    previousAssigneeUid: "u1"
+  }), "pending");
 });
 
 test("approved is an alias of confirmed; pending and confirmed can be deleted", () => {

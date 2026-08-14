@@ -24,7 +24,7 @@
     <p>People × days week grid. Default shift window = club open − 2 hours through club close + 1 hour. Round Robin fills selected open days fairly.</p>
     <p><strong>Create and publish</strong></p>
     <ol>
-      <li>Tap <strong>+</strong> on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Optional: Round Robin fill or Copy previous week.</li>
+      <li>Tap <strong>+</strong> on a person/day cell, set role and times, leave Save as draft checked, then Save shift. Save closes the editor and shows <strong>Schedule card successfully saved</strong>. Optional: Round Robin fill or Copy previous week.</li>
       <li>Review dashed draft chips, then tap <strong>Publish schedule</strong>. Workers get Inbox / Email / SMS / WhatsApp with a confirm link.</li>
       <li>Published chips stay <strong>pending</strong> until the worker confirms. Confirmed has a green outline.</li>
     </ol>
@@ -58,11 +58,11 @@
         id: "help-staff-schedule-grid",
         title: "Scheduler",
         bodyHtml: SCHEDULER_HELP_HTML,
-        body: "People × days week grid. Create drafts, Publish schedule so workers confirm pending→confirmed. Select shifts to multi-delete (day header + chips). Website ingest publishes JSON, RSS, or iframe with a one-time secret. Drafts never appear on the club site.",
+        body: "People × days week grid. Save shift closes the editor and shows Schedule card successfully saved. Create drafts, Publish schedule so workers confirm pending→confirmed. Select shifts to multi-delete (day header + chips). Website ingest publishes JSON, RSS, or iframe with a one-time secret. Drafts never appear on the club site.",
         searchPhrases: [
           "scheduler", "schedule grid", "user guide", "create a schedule", "publish schedule",
           "how to schedule staff", "select shifts", "multi delete", "round robin",
-          "website ingest", "staff calendar"
+          "website ingest", "staff calendar", "schedule card successfully saved", "save shift"
         ],
         links: [
           {label: "Club Admin Scheduling", href: "./admin.html?from=floqai&tab=scheduling"},
@@ -205,6 +205,7 @@
     applyDays: new Set([0, 1, 2, 3, 4, 5, 6]),
     rrDays: new Set([1, 2, 3, 4, 5]),
     assignContext: null,
+    savingShift: false,
     rrCursor: 0,
     venue: null,
     selecting: false,
@@ -845,7 +846,7 @@
     renderGrid();
   }
 
-  async function createShiftPayload({
+  function shiftPayloadFields({
     assigneeUid,
     assigneeName,
     assigneeEmail,
@@ -857,7 +858,7 @@
     asDraft,
     assignMode
   }) {
-    return callable("createScheduleShift")({
+    return {
       ownerType: "club",
       ownerId: locationId,
       ownerName: byId("clubName")?.textContent || locationId,
@@ -873,10 +874,98 @@
       asDraft: !!asDraft,
       notify: !asDraft,
       assignMode: assignMode || "manual"
-    });
+    };
+  }
+
+  async function createShiftPayload(fields) {
+    return callable("createScheduleShift")(shiftPayloadFields(fields));
+  }
+
+  function isMissingCallable(error) {
+    const code = String(error?.code || "").toLowerCase();
+    const msg = String(error?.message || "").toLowerCase();
+    if (msg.includes("shift not found")) return false;
+    return code === "functions/not-found"
+      || code === "not-found"
+      || msg.includes("does not exist")
+      || (msg.includes("not found") && !msg.includes("shift"));
+  }
+
+  async function updateOrReplaceShift(shiftId, fields) {
+    try {
+      return await callable("updateScheduleShift")({shiftId, ...shiftPayloadFields(fields)});
+    } catch (error) {
+      if (!isMissingCallable(error)) throw error;
+      await callable("deleteScheduleShift")({shiftId});
+      return createShiftPayload(fields);
+    }
+  }
+
+  function setSaveBusy(busy) {
+    state.savingShift = !!busy;
+    const btn = byId("createScheduleShiftBtn");
+    if (!btn) return;
+    btn.disabled = !!busy;
+    btn.textContent = busy ? "Saving…" : "Save shift";
+  }
+
+  function waitMs(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function announceShiftSaved(count) {
+    closeAssignModal();
+    closeWorkerPopout();
+    const n = Number(count) || 1;
+    const title = "Schedule card successfully saved";
+    const body = n === 1
+      ? "The week grid refreshes when this message closes."
+      : `${n} schedule cards saved. The week grid refreshes when this message closes.`;
+    const feedback = window.FLOQRActionFeedback;
+    if (feedback?.show) {
+      feedback.show(title, body, {status: "success"});
+      const hideMs = 1800;
+      feedback.hide(hideMs);
+      await waitMs(hideMs + 80);
+    } else {
+      setStatus(title);
+      await waitMs(1200);
+    }
+  }
+
+  async function pruneIdenticalDuplicates(saved) {
+    const rows = Array.isArray(saved) ? saved : [saved];
+    let removed = 0;
+    for (const keep of rows) {
+      if (!keep) continue;
+      const extras = (state.shifts || []).filter(shift =>
+        shift.id
+        && shift.id !== keep.id
+        && String(shift.assigneeUid || "") === String(keep.assigneeUid || "")
+        && Number(shift.startsAtMs || 0) === Number(keep.startsAtMs || 0)
+        && Number(shift.endsAtMs || 0) === Number(keep.endsAtMs || 0)
+      );
+      for (const extra of extras) {
+        try {
+          await callable("deleteScheduleShift")({shiftId: extra.id});
+          removed += 1;
+        } catch (_error) {}
+      }
+    }
+    return removed;
+  }
+
+  function boundsForDay(dayIdx, startLocal, durationMs) {
+    const day = weekDays()[dayIdx] || addDays(state.weekStart, dayIdx);
+    const dayStart = new Date(day);
+    dayStart.setHours(startLocal.getHours(), startLocal.getMinutes(), 0, 0);
+    return {startsAt: dayStart, endsAt: new Date(dayStart.getTime() + durationMs)};
   }
 
   async function createShift() {
+    if (state.savingShift) return;
+    setSaveBusy(true);
+    try {
     const select = byId("scheduleAssignee");
     const option = select?.selectedOptions?.[0];
     const assigneeUid = select?.value || "";
@@ -888,45 +977,72 @@
     const roleLabel = byId("scheduleRole")?.value?.trim() || option?.dataset?.role || "Shift";
     const notes = byId("scheduleNotes")?.value?.trim() || "";
     const worker = state.workers.find(w => w.uid === assigneeUid);
-    const applyDays = state.applyDays.size ? [...state.applyDays] : [new Date(startsAt).getDay()];
-
+    const applyDays = (state.applyDays.size ? [...state.applyDays] : [new Date(startsAt).getDay()])
+      .sort((a, b) => a - b);
     const startLocal = new Date(startsAt);
     const endLocal = new Date(endsAt);
     const durationMs = endLocal.getTime() - startLocal.getTime();
     if (!(durationMs > 0)) throw new Error("Shift end must be after start.");
 
-    setStatus(asDraft ? "Saving draft shift(s)…" : "Creating pending shift and notifying the worker…");
-    if (state.assignContext?.shift?.id) {
-      try {
-        await callable("deleteScheduleShift")({shiftId: state.assignContext.shift.id});
-      } catch (_error) {}
+    const existing = state.assignContext?.shift || null;
+    const existingId = existing?.id || "";
+    const existingDayIdx = existingId
+      ? new Date(existing.startsAtMs || existing.startsAt || startLocal).getDay()
+      : -1;
+    const baseFields = {
+      assigneeUid,
+      assigneeName: option?.dataset?.name || worker?.name || option?.textContent || "",
+      assigneeEmail: option?.dataset?.email || worker?.email || "",
+      assigneePhone: option?.dataset?.phone || worker?.phone || "",
+      roleLabel,
+      notes,
+      asDraft,
+      assignMode: "manual"
+    };
+
+    setStatus(asDraft ? "Saving draft shift(s)…" : "Saving shift and notifying the worker…");
+    const saved = [];
+      const updateDay = existingId
+        ? (applyDays.includes(existingDayIdx) ? existingDayIdx : applyDays[0])
+        : null;
+      for (const dayIdx of applyDays) {
+        const bounds = boundsForDay(dayIdx, startLocal, durationMs);
+        const fields = {...baseFields, ...bounds};
+        if (existingId && dayIdx === updateDay) {
+          const result = await updateOrReplaceShift(existingId, fields);
+          saved.push({
+            id: result?.data?.shiftId || existingId,
+            assigneeUid,
+            startsAtMs: bounds.startsAt.getTime(),
+            endsAtMs: bounds.endsAt.getTime()
+          });
+        } else {
+          const result = await createShiftPayload(fields);
+          saved.push({
+            id: result?.data?.shiftId || "",
+            assigneeUid,
+            startsAtMs: bounds.startsAt.getTime(),
+            endsAtMs: bounds.endsAt.getTime()
+          });
+        }
+      }
+      if (byId("scheduleNotes")) byId("scheduleNotes").value = "";
+      await announceShiftSaved(saved.length);
+      await loadShifts();
+      const pruned = await pruneIdenticalDuplicates(saved);
+      if (pruned) await loadShifts();
+      setStatus("");
+    } catch (error) {
+      const feedback = window.FLOQRActionFeedback;
+      if (feedback?.show) {
+        feedback.show("Could not save schedule card", error?.message || String(error), {status: "failed"});
+        feedback.hide(4500);
+      }
+      setStatus(error?.message || String(error));
+      throw error;
+    } finally {
+      setSaveBusy(false);
     }
-    let created = 0;
-    for (const dayIdx of applyDays.sort((a, b) => a - b)) {
-      const day = weekDays()[dayIdx] || addDays(state.weekStart, dayIdx);
-      const dayStart = new Date(day);
-      dayStart.setHours(startLocal.getHours(), startLocal.getMinutes(), 0, 0);
-      const dayEnd = new Date(dayStart.getTime() + durationMs);
-      await createShiftPayload({
-        assigneeUid,
-        assigneeName: option?.dataset?.name || worker?.name || option?.textContent || "",
-        assigneeEmail: option?.dataset?.email || worker?.email || "",
-        assigneePhone: option?.dataset?.phone || worker?.phone || "",
-        roleLabel,
-        startsAt: dayStart,
-        endsAt: dayEnd,
-        notes,
-        asDraft,
-        assignMode: "manual"
-      });
-      created += 1;
-    }
-    setStatus(asDraft
-      ? `Saved ${created} draft shift${created === 1 ? "" : "s"}. Publish when ready — workers confirm after publish.`
-      : `Saved ${created} pending shift${created === 1 ? "" : "s"}. Workers were asked to confirm via Inbox / Email / SMS / WhatsApp.`);
-    if (byId("scheduleNotes")) byId("scheduleNotes").value = "";
-    closeAssignModal();
-    await loadShifts();
   }
 
   async function publishWeek() {

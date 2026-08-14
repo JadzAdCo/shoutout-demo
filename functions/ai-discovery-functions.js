@@ -1804,13 +1804,14 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.115") {
+function defaultFloqrPreviewLinks(v = "29.09.116") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
     ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
     ["Club Admin Notifications (compact SMS/WhatsApp pills)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
     ["Temp Club Admin 1 Command Center (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
+    ["Scheduling save (one card, success popout)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
     ["Scheduling Scheduler + website ingest", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling#schedWebsiteIngest`],
     ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
@@ -1872,7 +1873,7 @@ exports.emailFloqrPreviewLinks = onRequest({
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const query = req.query || {};
     const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
-    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.115").trim();
+    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.116").trim();
     const note = String(body.note || query.note || "").trim();
     const links = Array.isArray(body.links) ? body.links : [];
     const mail = buildPreviewLinksEmail({packageVersion, links, note});
