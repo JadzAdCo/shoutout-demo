@@ -23,13 +23,26 @@
     venue: n => (n % 3 === 1 ? "club-1-venue.png" : n % 3 === 2 ? "club-rooftop.png" : "club-speakeasy.png"),
     galleryA: "club-gallery-vip.png",
     galleryB: "club-gallery-entrance.png",
+    dualLed: "club-aurelia-dual-led.png",
+    vipShoutout: "club-aurelia-vip-shoutout.png",
+    vipShoutoutLed: "club-aurelia-vip-shoutout-led.png",
+    portraitBirthday: "club-aurelia-portrait-birthday.png",
     promo: "promo-collective-logo.png",
     dj: n => ["dj-jordan.png", "dj-maya.png", "dj-rico.png"][(n - 1) % 3],
+    djBooth: n => ["dj-jordan-booth.png", "dj-maya-booth.png", "dj-rico-booth.png"][(n - 1) % 3],
     waitress: "staff-priya.png",
+    waitressFloor: "staff-priya-floor.png",
+    waitressVip: "staff-priya-vip.png",
     waiter: "staff-luis.png",
+    waiterTable: "staff-luis-table.png",
     bottle: n => (n % 2 ? "staff-sienna.png" : "staff-amara.png"),
+    bottleExtra: n => (n % 2 ? "staff-sienna-sparkler.png" : "staff-amara-door.png"),
+    bartender: "staff-barman.png",
+    bartenderPour: "staff-barman-pour.png",
     promoter: "staff-nia.png",
-    admin: "staff-marcus.png"
+    promoterDoor: "staff-nia-door.png",
+    admin: "staff-marcus.png",
+    adminOps: "staff-marcus-ops.png"
   };
 
   const PEOPLE = {
@@ -74,18 +87,56 @@
       nightlifeStyle: "Door, staff, and the board all talking to each other.",
       music: ["Open Format"],
       lookingToMeet: "Service members who show up for the schedule."
+    }),
+    bartender: n => ({
+      first: "Devon", last: "Cole", role: "Barman", type: "bartender",
+      nightlifeStyle: "Crystal mixing glass, no wasted motion, every pour a show.",
+      music: ["House", "Open Format"],
+      lookingToMeet: "Wait staff who keep the rail clear."
     })
   };
 
   function relUrl(file) { return `${REL}/${file}`; }
   function absUrl(file) { return `${PAGES}/images/temp-qa/${file}`; }
 
+  function uniqueFiles(files = [], max = 8) {
+    const out = [];
+    const seen = new Set();
+    files.forEach(file => {
+      if (!file || seen.has(file) || out.length >= max) return;
+      seen.add(file);
+      out.push(file);
+    });
+    return out;
+  }
+
+  function personMediaFiles(roleKey, n) {
+    const venue = PHOTOS.venue(n);
+    if (roleKey === "dj") {
+      return uniqueFiles([PHOTOS.dj(n), PHOTOS.djBooth(n), venue, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryA, PHOTOS.galleryB]);
+    }
+    if (roleKey === "waitress") {
+      return uniqueFiles([PHOTOS.waitress, PHOTOS.waitressFloor, PHOTOS.waitressVip, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday]);
+    }
+    if (roleKey === "waiter") {
+      return uniqueFiles([PHOTOS.waiter, PHOTOS.waiterTable, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
+    }
+    if (roleKey === "bottle") {
+      return uniqueFiles([PHOTOS.bottle(n), PHOTOS.bottleExtra(n), venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
+    }
+    if (roleKey === "bartender") {
+      return uniqueFiles([PHOTOS.bartender, PHOTOS.bartenderPour, venue, PHOTOS.galleryA, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryB]);
+    }
+    if (roleKey === "promoter") {
+      return uniqueFiles([PHOTOS.promoter, PHOTOS.promoterDoor, PHOTOS.promo, venue, PHOTOS.galleryB, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday]);
+    }
+    return uniqueFiles([PHOTOS.admin, PHOTOS.adminOps, venue, PHOTOS.dualLed, PHOTOS.vipShoutout, PHOTOS.portraitBirthday, PHOTOS.galleryA, PHOTOS.galleryB]);
+  }
+
   function personRecord(roleKey, n, absolute) {
     const spec = (PEOPLE[roleKey] || PEOPLE.dj)(n);
-    const file = roleKey === "dj" ? PHOTOS.dj(n)
-      : roleKey === "bottle" ? PHOTOS.bottle(n)
-      : roleKey === "clubadmin" ? PHOTOS.admin
-      : PHOTOS[roleKey] || PHOTOS.admin;
+    const files = personMediaFiles(roleKey, n);
+    const file = files[0];
     const url = absolute ? absUrl(file) : relUrl(file);
     const name = `${spec.first} ${spec.last}`;
     const email = `temp_${roleKey === "clubadmin" ? "clubadmin" : roleKey}_${n}@floqr-demo.com`;
@@ -108,7 +159,9 @@
       nightlifeStyle: spec.nightlifeStyle,
       publicProfileType: spec.type,
       musicInterests: spec.music,
-      lookingToMeet: spec.lookingToMeet
+      lookingToMeet: spec.lookingToMeet,
+      galleryUrls: files.map(item => (absolute ? absUrl(item) : relUrl(item))),
+      profileMediaFiles: files
     };
   }
 
@@ -122,6 +175,7 @@
     const waitress = personRecord("waitress", n, absolute);
     const waiter = personRecord("waiter", n, absolute);
     const bottle = personRecord("bottle", n, absolute);
+    const bartender = personRecord("bartender", n, absolute);
     const admin = personRecord("clubadmin", n, absolute);
     const promoter = personRecord("promoter", n, absolute);
     const slug = row.brand.toLowerCase().replace(/\s+/g, "");
@@ -154,12 +208,13 @@
       defaultSub: row.vibe,
       tagline: row.tagline,
       publicTagline: row.tagline,
-      description: `${row.brand} is a ${row.vibe} in DC built to showcase FLOQR: public profile, hours grid, hail-a-waitress, scheduling, and featured talent. ${row.tagline}`,
+      description: `${row.brand} is a ${row.vibe} in DC built to showcase FLOQR public profiles: VIP ShoutOut on table LEDs (64×32) and full-size portrait LED walls (960×1900) for birthday-style ShoutOuts. ${row.tagline}`,
       genres: row.genres,
       artists: [dj.name, guestDj.name],
       artistsOrDjs: [dj.name, guestDj.name],
       promoters: [`${row.brand} Collective`],
-      amenities: ["VIP tables", "Bottle service", "Coat check", "Dance floor", "DJ booth"],
+      amenities: ["VIP tables", "Bottle service", "Coat check", "Dance floor", "DJ booth", "VIP ShoutOut LED", "Portrait LED wall 960×1900"],
+      publicServices: ["ShoutOut", "VIP ShoutOut", "Guest List / RSVP", "Hail a Waitress", "Staff Scheduling"],
       agePolicy: "21+",
       dressCode: "Upscale / nightlife attire",
       cuisine: "Late small plates",
@@ -185,17 +240,27 @@
       mainMediaUrl: venue,
       mainMediaType: "image",
       publicGallery: [
-        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 1},
-        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 2}
+        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table LED + portrait wall in one room", galleryOrder: 1},
+        {mediaUrl: url(PHOTOS.vipShoutout), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut — FloqR....the App. We're Outside", galleryOrder: 2},
+        {mediaUrl: url(PHOTOS.vipShoutoutLed), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut close-up", galleryOrder: 3},
+        {mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", slotType: "gallery", title: "Portrait LED wall 960×1900 — Happy Birthday", galleryOrder: 4},
+        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 5},
+        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 6},
+        {mediaUrl: venue, mediaType: "image", slotType: "gallery", title: "Main room", galleryOrder: 7},
+        {mediaUrl: url(PHOTOS.bartenderPour), mediaType: "image", slotType: "gallery", title: "Barman", galleryOrder: 8},
+        {mediaUrl: url(PHOTOS.waitressFloor), mediaType: "image", slotType: "gallery", title: "Waitress on the floor", galleryOrder: 9},
+        {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 10},
+        {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 11},
+        {mediaUrl: url(PHOTOS.waiterTable), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 12}
       ],
       extractedImages: [
         {url: logo, mediaUrl: logo, mediaType: "image", title: "Logo", slotType: "logo"},
         {url: venue, mediaUrl: venue, mediaType: "image", title: "Venue", slotType: "main"},
-        {url: galleryA, mediaUrl: galleryA, mediaType: "image", title: "VIP Room", slotType: "gallery"},
-        {url: galleryB, mediaUrl: galleryB, mediaType: "image", title: "Entrance", slotType: "gallery"}
+        {url: url(PHOTOS.dualLed), mediaUrl: url(PHOTOS.dualLed), mediaType: "image", title: "Dual LED", slotType: "gallery"},
+        {url: url(PHOTOS.portraitBirthday), mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", title: "Portrait LED 960×1900", slotType: "gallery"}
       ],
       featuredDjs: [dj, guestDj],
-      featuredStaff: [waitress, waiter, bottle, admin],
+      featuredStaff: [waitress, waiter, bottle, bartender, admin],
       promotionGroups: [{
         ...promoter,
         name: `${row.brand} Collective`,
@@ -203,7 +268,6 @@
         logoUrl: promoLogo,
         bio: `The ${row.brand} guest-list and genre-night crew.`
       }],
-      publicServices: ["ShoutOut", "Guest List / RSVP", "Hail a Waitress", "Staff Scheduling"],
       hours: "Thu–Sat 22:00–03:00",
       hoursStructured: {
         sun:{closed:true,open:"",close:""},
@@ -226,6 +290,8 @@
       timeZone: "America/New_York",
       displayScreenFormatIds: ["led-96x48", "led-64x32"],
       primaryDisplayScreenFormatId: "led-96x48",
+      vipShoutoutFormatId: "led-64x32",
+      portraitLedWall: {enabled: true, widthPx: 960, heightPx: 1900, use: "Birthday and full-size ShoutOuts"},
       publicProfileSections: {
         about: true, contact: true, upcomingEvents: true, pastEvents: true,
         featuredDjs: true, featuredStaff: true, promotionGroups: true, gallery: true
@@ -240,7 +306,7 @@
       publicProfilePublished: true,
       visibility: "public",
       active: true,
-      people: {dj, guestDj, waitress, waiter, bottle, admin, promoter}
+      people: {dj, guestDj, waitress, waiter, bottle, bartender, admin, promoter}
     };
   }
 
@@ -282,14 +348,18 @@
       approvedRoles: [person.publicProfileType],
       profileCompleted: true,
       qaTemp: true,
-      profileMediaSlots: [
-        {slot:1, order:1, type:"image", url:photo, fileName:`${roleKey}-${n}.png`, travelDatapointAdded:false},
-        {slot:2, order:2, type:"image", url: absUrl(PHOTOS.venue(n)), fileName:"venue.png", travelDatapointAdded:false}
-      ]
+      profileMediaSlots: personMediaFiles(roleKey, n).map((file, idx) => ({
+        slot: idx + 1,
+        order: idx + 1,
+        type: "image",
+        url: absUrl(file),
+        fileName: file,
+        travelDatapointAdded: false
+      }))
     };
   }
 
-  const api = {PAGES, REL, CLUBS, PHOTOS, personRecord, clubRecord, userProfilePatch, relUrl, absUrl};
+  const api = {PAGES, REL, CLUBS, PHOTOS, personRecord, clubRecord, userProfilePatch, personMediaFiles, relUrl, absUrl};
   root.FLOQRTempQaShowcase = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -263,7 +263,7 @@
       }))
       .filter(item => item.slotType === "gallery")
       .sort((a,b) => Number(a.galleryOrder ?? 0) - Number(b.galleryOrder ?? 0))
-      .slice(0,10);
+      .slice(0,16);
     byId("clubProfileGallery").innerHTML = gallery.length ? gallery.map(item => `<figure>${mediaMarkup(item.mediaUrl, item.mediaType, item.title || "Club gallery media", item)}${item.title ? `<figcaption>${esc(item.title)}</figcaption>` : ""}</figure>`).join("") : '<p class="sub">No public gallery media has been published.</p>';
     enforceClubVideoTrims(byId("clubProfileGallery"));
     toggleSection("clubGallerySection", sectionEnabled("gallery") && gallery.length);
