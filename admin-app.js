@@ -980,7 +980,7 @@
     const wanted = String(new URL(location.href).searchParams.get("panel") || new URL(location.href).searchParams.get("tab") || location.hash.replace(/^#/, "") || "").toLowerCase();
     if (wanted === "suprstar" || wanted === "panelsuprstar") {
       document.querySelector('[data-panel="panelSuprstar"]')?.click();
-    } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "scheduserguide" || wanted === "schedwebsiteingest" || wanted === "schedgridheading") {
+    } else if (wanted === "scheduling" || wanted === "panelscheduling" || wanted === "calendar" || wanted === "scheduler" || wanted === "scheduserguide" || wanted === "schedwebsiteingest" || wanted === "schedgridheading") {
       document.querySelector('[data-panel="panelScheduling"]')?.click();
       const scrollId = wanted === "schedwebsiteingest" ? "schedWebsiteIngest"
         : wanted === "scheduserguide" || wanted === "schedgridheading" ? "schedGridHeading"
@@ -988,6 +988,10 @@
       if (scrollId) {
         setTimeout(() => byId(scrollId)?.scrollIntoView({behavior: "smooth", block: "start"}), 80);
       }
+    } else if (wanted === "notifications" || wanted === "panelnotifications") {
+      document.querySelector('[data-panel="panelNotifications"]')?.click();
+    } else if (wanted === "employees" || wanted === "panelemployees" || wanted === "workers") {
+      document.querySelector('[data-panel="panelEmployees"]')?.click();
     }
     if (location.hash === "#schedUserGuide" || location.hash === "#panelScheduling" || location.hash === "#schedWebsiteIngest" || location.hash === "#schedGridHeading") {
       document.querySelector('[data-panel="panelScheduling"]')?.click();
@@ -1206,15 +1210,33 @@
     return Number(item.uploadedAt?.toMillis?.() || item.updatedAt?.toMillis?.() || 0);
   }
 
+  function clampClubMediaTrimInputs(originalDuration = null) {
+    const source = Number(originalDuration);
+    const startEl = byId("clubMediaTrimStart");
+    const endEl = byId("clubMediaTrimEnd");
+    let trimStart = Math.max(0, Number(startEl?.value || 0));
+    let trimEnd = Math.max(0, Number(endEl?.value || 15));
+    if (source > 0) {
+      const cap = Math.min(15, source);
+      if (trimStart >= source) trimStart = 0;
+      if (trimEnd > source + .05 || trimEnd > 15) trimEnd = cap;
+      if (trimEnd <= trimStart) trimEnd = Math.min(source, trimStart + cap);
+      if (endEl) {
+        endEl.max = String(source);
+        endEl.value = String(Number(trimEnd.toFixed(1)));
+      }
+      if (startEl) startEl.value = String(Number(trimStart.toFixed(1)));
+    }
+    return {trimStart, trimEnd, source};
+  }
+
   function clubVideoTrimPayload(kind, originalDuration = null) {
     if (kind !== "video") return {trimStart:null, trimEnd:null, trimmedDuration:null, maxVideoSeconds:null};
-    const trimStart = Math.max(0, Number(byId("clubMediaTrimStart")?.value || 0));
-    const trimEnd = Math.max(0, Number(byId("clubMediaTrimEnd")?.value || 15));
+    const {trimStart, trimEnd, source} = clampClubMediaTrimInputs(originalDuration);
     if (!(trimEnd > trimStart)) throw new Error("Video trim end must be greater than the trim start.");
     if (trimEnd - trimStart > 15.0001) throw new Error("A club video clip can be no longer than 15 seconds. Shorten the trim window.");
-    if (Number(originalDuration) > 0 && trimStart >= Number(originalDuration)) throw new Error(`Video trim start must be before the source ends at ${Number(originalDuration).toFixed(1)} seconds.`);
-    if (Number(originalDuration) > 0 && trimEnd > Number(originalDuration) + .05) throw new Error(`Video trim end cannot exceed the source duration of ${Number(originalDuration).toFixed(1)} seconds.`);
-    return {trimStart, trimEnd, trimmedDuration:Number((trimEnd - trimStart).toFixed(2)), maxVideoSeconds:15, originalDuration:Number(originalDuration) || null};
+    if (source > 0 && trimStart >= source) throw new Error(`Video trim start must be before the source ends at ${source.toFixed(1)} seconds.`);
+    return {trimStart, trimEnd, trimmedDuration:Number((trimEnd - trimStart).toFixed(2)), maxVideoSeconds:15, originalDuration:source || null};
   }
 
   function clubMediaMetadata(kind, originalDuration = null) {
@@ -1254,11 +1276,20 @@
     });
   }
 
-  function updateClubMediaTrimVisibility() {
+  async function updateClubMediaTrimVisibility() {
     const target = clubMedia.find(item => item.id === clubMediaEditTargetId);
     const files = Array.from(byId("clubMediaUnifiedFiles")?.files || []);
     const hasVideo = files.some(file => mediaKind(file) === "video") || (!files.length && target?.mediaType === "video");
     document.querySelectorAll("[data-club-video-trim]").forEach(el => el.classList.toggle("hidden", !hasVideo || byId("clubMediaPlacement")?.value === "logo"));
+    const videoFile = files.find(file => mediaKind(file) === "video");
+    if (videoFile) {
+      try {
+        const duration = await readClubVideoDuration(videoFile);
+        clampClubMediaTrimInputs(duration);
+      } catch (_) { /* preview still renders */ }
+    } else if (target?.mediaType === "video") {
+      clampClubMediaTrimInputs(target.originalDuration || target.trimEnd || 15);
+    }
     renderClubMediaInputPreview();
   }
 
@@ -1288,6 +1319,17 @@
     const trimEnd = Math.min(trimStart + 15, Math.max(trimStart + .1, requestedEnd));
     const preview = {mediaUrl, mediaType, mediaFilter:safeClubMediaFilter(byId("clubMediaFilter")?.value || target?.mediaFilter), trimStart, trimEnd, title:target?.title || file?.name || "Media preview"};
     wrap.innerHTML = `<strong>Editor Preview</strong>${clubMediaPreview(preview)}<small>${mediaType === "video" ? `Playback window ${trimStart}s–${trimEnd}s (${(trimEnd - trimStart).toFixed(1)} seconds)` : "Image preview"}${files.length > 1 ? ` • plus ${files.length - 1} more selected file(s)` : ""}</small>`;
+    const previewVideo = wrap.querySelector("video");
+    if (previewVideo) {
+      previewVideo.addEventListener("loadedmetadata", () => {
+        const duration = Number(previewVideo.duration) || 0;
+        if (duration > 0) clampClubMediaTrimInputs(duration);
+        const start = Number(byId("clubMediaTrimStart")?.value || 0);
+        const end = Number(byId("clubMediaTrimEnd")?.value || duration || 15);
+        const note = wrap.querySelector("small");
+        if (note) note.textContent = `Source ${duration.toFixed(1)}s • playback ${start}s–${end}s (${Math.max(0, end - start).toFixed(1)} seconds)${files.length > 1 ? ` • plus ${files.length - 1} more selected file(s)` : ""}`;
+      }, {once:true});
+    }
     wrap.classList.remove("hidden");
     enforceClubMediaPreviewTrims();
   }
@@ -1554,6 +1596,8 @@
       if (x.includes("promoter")) roles.add("Promoter");
       if (x.includes("dj")) roles.add("DJ");
       if (x.includes("waiter") || x.includes("waitress") || x.includes("bottle") || x.includes("hospitality")) roles.add("Waiter / Waitress / Bottle Girl");
+      if (x.includes("bus") || x.includes("security") || x.includes("busboy")) roles.add("Bus Boys or Security");
+      if (x.includes("venue manager") || x.includes("venuemanager")) roles.add("Venue Manager");
       if (x.includes("bartender") || x.includes("barman")) roles.add("Bartender / Barman");
       if (/videographer|camera operator|cameraman|camera man|photographer|cinematographer/.test(x)) roles.add("Videographer / Camera Operator");
     });
@@ -1569,7 +1613,7 @@
       role === "Club Admin" ||
       role === "Promoter" ||
       role === "DJ" ||
-      role === "Waiter / Waitress / Bottle Girl" || role === "Bartender / Barman" || role === "Videographer / Camera Operator"
+      role === "Waiter / Waitress / Bottle Girl" || role === "Bus Boys or Security" || role === "Venue Manager" || role === "Bartender / Barman" || role === "Videographer / Camera Operator"
     ));
   }
 
@@ -1786,6 +1830,8 @@
     if (type === "promoter") return "Promoter";
     if (type === "bartender") return "Bartender / Barman";
     if (type === "mediacreator") return "Videographer / Camera Operator";
+    if (type === "busboyorsecurity" || type === "busboy" || type === "security") return "Bus Boys or Security";
+    if (type === "venuemanager") return "Venue Manager";
     return request.serviceSubtype || "Waiter / Waitress / Bottle Girl";
   }
 

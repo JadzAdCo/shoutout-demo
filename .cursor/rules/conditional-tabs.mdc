@@ -1,0 +1,34 @@
+---
+description: Datapoint-gated tabs — use FLOQRTabGates for show/hide (always)
+alwaysApply: true
+---
+
+# Conditional viewable tabs — `FLOQRTabGates` only
+
+When a tab must appear or disappear from Firebase datapoints (paid flag, role, affiliation):
+
+1. Load `floqr-tab-gates.js` before the page app.
+2. Collect datapoints, then `FLOQRTabGates.bind` / `apply`. Do **not** invent per-page `if (paid) tab.style.display` helpers.
+
+```js
+const datapoints = FLOQRTabGates.fromAffiliation({
+  user, uid: user.uid, designations, clubsById
+});
+FLOQRTabGates.bind([{
+  tab: "#portalWorkCalendarTab",
+  panel: "#portalWorkCalendar",
+  when: [
+    { datapoint: "serviceMember", equals: true },
+    { datapoint: "affiliatedPaidScheduling", equals: true }
+  ],
+  reason: "work-calendar"
+}], datapoints);
+```
+
+**Work Calendar** (patron Settings): visible only when `users.serviceMember` is true **and** the user has a non-rejected `clubEmployeeDesignations` row on a club with `clubLocations.staffSchedulingPaid === 1`. Source datapoints stay on those collections (`workCalendarEligible` is derived, 0|1).
+
+**Service Members → Review & elect** (patron Settings): the Review subtab is visible only when `isClubAdmin` is true (Club Admin member level / roles / `clubAdminLocationIds` / a non-rejected Club Admin designation). The Service Members tab itself stays visible so patrons can request access.
+
+**Forbidden:** hiding tabs with one-off CSS `display:none` in the page app; leaving a gated tab visible and relying on a 404 inside the panel.
+
+Checklist: `floqr-tab-gates.js` loaded; `when` clauses use real datapoint paths; hidden tab is not `.active`; FloqAi/help if the tab is a new patron feature.

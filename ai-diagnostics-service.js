@@ -32,7 +32,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.116";
+  const PREVIEW_LINKS_PACKAGE = "29.09.117";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -889,6 +889,18 @@
         {label:"Photoreal PNG paths", file:"floqr-temp-qa-showcase.js", includes:["club-1-logo.png", "dj-jordan.png", "staff-sienna.png"]},
         {label:"Club profile cache bust", file:"club-profile.html", includes:["floqr-temp-qa-showcase.js?v=29.09.108", "shared-data.js?v=29.09.108"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.108\""]}
+      ]
+    },
+    {
+      version:"v29.09.117",
+      title:"Service Members tab + test alert channels (Inbox) + Work Calendar gates",
+      checks:[
+        {label:"Service Members tab", file:"patron-portal.html", includes:["portalServiceMembers", "Service Members", "serviceMembersAdminSubtab"]},
+        {label:"Tab gates isClubAdmin", file:"floqr-tab-gates.js", includes:["isClubAdmin", "clubAdminLocationIds"]},
+        {label:"Test alert selected channels", file:"admin-notifications.js", includes:["selectedNotifyChannels", "channels"]},
+        {label:"Test alert inbox", file:"functions/messaging-functions.js", includes:["writeClubInboxAlerts", "selectedClubAlertChannels"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.117\""]},
+        {label:"Preview email default version", file:"functions/ai-discovery-functions.js", includes:["defaultFloqrPreviewLinks(v = \"29.09.117\")"]}
       ]
     },
     {
@@ -5742,13 +5754,18 @@
     const v = PREVIEW_LINKS_PACKAGE;
     return {
       package: v,
-      note: note || `FLOQR v${v} — photoreal QA clubs, compact Notifications, SMS subscription persist. Open on iPhone after this deploy.`,
+      note: note || `FLOQR v${v} test notes:
+1) Service Members: Overview no longer has Request Club Admin / Follow links. Open Settings → Service Members to request a role. Club Admins also see Review & elect (isClubAdmin).
+2) Work Calendar tab ON: sign in as temp_busboy_1@floqr-demo.com or a waiter at temp-democlub-1 (serviceMember + staffSchedulingPaid=1). Tab OFF: Club Admin 1 is not a service member.
+3) Notifications: Send test alert follows checked boxes. In-app → FloqR Inbox System Message. Email if checked. SMS/WhatsApp still need paid + E.164 phone.
+4) Calendar & Scheduler: Club Admin → Calendar (confirmed week) | Scheduler.`,
       links: [
         ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
-        ["Temp QA photo gallery", `${base}/temp-qa-images-preview.html?v=${v}`],
-        ["Club Admin Notifications (SMS green / WhatsApp red)", `${base}/admin.html?location=temp-democlub-1&v=${v}`],
+        ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
+        ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
+        ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
+        ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
         ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
-        ["Scheduler + website ingest", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling#schedWebsiteIngest`],
         ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
         ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
         ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],

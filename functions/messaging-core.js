@@ -104,6 +104,61 @@ function twilioWhatsAppAddress(e164 = "") {
   return phone ? `whatsapp:${phone}` : "";
 }
 
+function sanitizeTwilioSecret(raw = "") {
+  return String(raw || "")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/\r|\n/g, "")
+    .trim()
+    .replace(/^['"]+|['"]+$/g, "")
+    .trim();
+}
+
+function describeTwilioAccountSid(raw = "") {
+  const sid = sanitizeTwilioSecret(raw);
+  const prefix = sid.slice(0, 2).toUpperCase();
+  return {
+    prefix,
+    length: sid.length,
+    looksLikeAccountSid: /^AC[0-9a-f]{32}$/i.test(sid),
+    looksLikeApiKey: /^SK[0-9a-f]{32}$/i.test(sid),
+    looksLikeMessagingService: /^MG[0-9a-f]{32}$/i.test(sid),
+    looksLikeAuthToken: /^[0-9a-f]{32}$/i.test(sid)
+  };
+}
+
+function twilioCredentialHealth(creds = {}) {
+  const sidInfo = describeTwilioAccountSid(creds.accountSid);
+  const token = sanitizeTwilioSecret(creds.authToken);
+  return {
+    accountSidPrefix: sidInfo.prefix,
+    accountSidLength: sidInfo.length,
+    looksLikeAccountSid: sidInfo.looksLikeAccountSid,
+    looksLikeApiKey: sidInfo.looksLikeApiKey,
+    looksLikeMessagingService: sidInfo.looksLikeMessagingService,
+    authTokenLength: token.length,
+    fromNumberSet: !!sanitizeTwilioSecret(creds.fromNumber),
+    whatsappFromSet: !!sanitizeTwilioSecret(creds.whatsappFrom)
+  };
+}
+
+function explainTwilioDeliveryError(message = "", sidInfo = {}) {
+  const info = sidInfo && typeof sidInfo === "object" ? sidInfo : describeTwilioAccountSid("");
+  if (info.looksLikeApiKey) {
+    return "TWILIO_ACCOUNT_SID is an API Key (SK…). Set it to the Account SID that starts with AC (34 characters) from console.twilio.com. Keep the Auth Token in TWILIO_AUTH_TOKEN.";
+  }
+  if (info.looksLikeMessagingService) {
+    return "TWILIO_ACCOUNT_SID is a Messaging Service SID (MG…). Use the Account SID that starts with AC.";
+  }
+  if (info.length && !info.looksLikeAccountSid) {
+    return "TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters). Do not paste the Auth Token or an API Key into that Firebase secret.";
+  }
+  const text = String(message || "").trim();
+  if (/authentication error|invalid username|20003/i.test(text)) {
+    return "Twilio rejected the Account SID (Authentication Error - invalid username). In Firebase Secret Manager, TWILIO_ACCOUNT_SID must start with AC and be 34 characters. Do not paste the Auth Token or an API Key (SK).";
+  }
+  return text;
+}
+
 function channelAlertOn(settings = {}, channel = "sms") {
   const enabledKey = channel === "whatsapp" ? "whatsappEnabled" : "smsEnabled";
   const notifyKey = channel === "whatsapp" ? "notifyWhatsapp" : "notifySms";
@@ -122,6 +177,23 @@ function describeOutboundSkip(settings = {}) {
   const waOn = channelAlertOn(settings, "whatsapp");
   if (!smsOn && !waOn) return "channels-paused";
   return "";
+}
+
+function flagOn(value) {
+  return value === true || value === 1 || value === "1" || value === "true";
+}
+
+/** Channels the club wants for an alert. Overlay (test checkboxes) wins when provided. */
+function selectedClubAlertChannels(settings = {}, overlay = null) {
+  const src = overlay && typeof overlay === "object" ? overlay : settings;
+  const fromOverlay = overlay && typeof overlay === "object";
+  return {
+    inApp: flagOn(src.inApp) || flagOn(src.notifyInApp),
+    push: flagOn(src.push) || flagOn(src.notifyPush),
+    email: flagOn(src.email) || flagOn(src.notifyEmail) || flagOn(src.emailEnabled),
+    sms: fromOverlay ? flagOn(src.sms) || flagOn(src.notifySms) : channelAlertOn(settings, "sms"),
+    whatsapp: fromOverlay ? flagOn(src.whatsapp) || flagOn(src.notifyWhatsapp) : channelAlertOn(settings, "whatsapp")
+  };
 }
 
 /** Resolve SMS/WhatsApp targets from clubNotificationSettings. Paid subscription is stored separately; alerts follow smsEnabled / whatsappEnabled, with a legacy fallback when those flags were never written after payment. */
@@ -153,7 +225,12 @@ module.exports = {
   parseOpsReply,
   buildPendingShoutoutMessage,
   twilioWhatsAppAddress,
+  sanitizeTwilioSecret,
+  describeTwilioAccountSid,
+  twilioCredentialHealth,
+  explainTwilioDeliveryError,
   channelAlertOn,
   describeOutboundSkip,
+  selectedClubAlertChannels,
   selectOutboundTargets
 };

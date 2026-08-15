@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./admin.css?v=29.09.117"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -77,7 +77,7 @@
         <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
         <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
-        <button class="admin-tab" data-panel="panelScheduling" type="button">Scheduling</button>
+        <button class="admin-tab" data-panel="panelScheduling" type="button">Calendar &amp; Scheduler</button>
         <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
         <button class="admin-tab" data-panel="panelNotifications" type="button">Notifications</button>
         <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
@@ -501,31 +501,46 @@
         </div>
       </section>
       <section id="panelScheduling" class="admin-panel-section">
-        <div class="card">
-          <p class="eyebrow">Staff calendars</p>
-          <h2
-            id="schedulingHelpHost"
+        <div class="sched-panel-head">
+          <h2 id="schedulingHelpHost"
             data-floqr-help-id="help-staff-scheduling-admin"
-            data-floqr-help-title="Staff Scheduling"
-            data-floqr-help-search="staff scheduling|staffSchedulingPaid|resubscribe|paid this month"
-            data-floqr-help-body="clubLocations.staffSchedulingPaid is 1 or 0. schedulingSubscriptions status is paid this month or not paid this month. When 1 / paid this month: calendar unlocked. When 0 / not paid this month: show Subscribe (never paid) or Resubscribe (was subscribed before)."
-          >Scheduling <span id="schedulingSubBadge" class="tag">checking…</span></h2>
-          <p class="sub small" data-keep-visible="true">Create work schedules for elected staff and talent. Assignees get in-app plus Email/SMS/WhatsApp notify-and-approve when channels are enabled. Promoting companies and DJs use the Scheduling portal — not events.</p>
-          <div class="queue-actions">
-            <button id="refreshSchedulingBtn" type="button">Refresh</button>
-            <a id="openSchedulingPortalLink" class="buttonlike hidden" href="./scheduling.html?v=29.09.101&from=admin">Open full calendar / Scheduling portal</a>
-          </div>
-          <p id="schedulingStatus" class="status"></p>
+            data-floqr-help-title="Calendar &amp; Scheduler"
+            data-floqr-help-search="staff scheduling|staffSchedulingPaid|calendar scheduler|paid this month"
+            data-floqr-help-body="Calendar shows the confirmed week. Scheduler is where Club Admin drafts and publishes. staffSchedulingPaid 1 unlocks both. A green Paid this month pill is shown to Club Admins when the venue is paid."
+          >Calendar &amp; Scheduler</h2>
+          <button type="button" id="schedPaidGreenBtn" class="sched-paid-btn hidden" disabled>Paid this month</button>
+        </div>
+        <div id="schedSubtabs" class="admin-subtabs hidden" role="tablist" aria-label="Calendar and Scheduler">
+          <button type="button" class="admin-subtab active" data-sched-pane="calendar">Calendar</button>
+          <button type="button" class="admin-subtab" data-sched-pane="scheduler">Scheduler</button>
         </div>
         <div id="schedulingSubscribeGate" class="card">
           <h2 id="schedulingSubscribeTitle">Subscribe · $20 / month</h2>
           <p id="schedulingSubscribeCopy" class="sub small" data-keep-visible="true">Unlock Staff Scheduling for this venue. Checkout sets <code>staffSchedulingPaid=1</code> and subscription status to <code>paid this month</code>.</p>
           <button id="buySchedulingSubBtn" class="primary" type="button">Subscribe $20/mo</button>
         </div>
+        <p id="schedulingStatus" class="status hidden"></p>
         <div id="schedulingWorkspace" class="hidden">
+          <div id="schedCalendarPane" class="sched-pane">
+            <div class="card">
+              <h2 id="schedCalendarHeading">Calendar</h2>
+              <div class="queue-actions">
+                <button type="button" id="schedCalPrevWeekBtn">← Prev</button>
+                <strong id="schedCalWeekLabel">This week</strong>
+                <button type="button" id="schedCalNextWeekBtn">Next →</button>
+                <button type="button" id="schedCalTodayWeekBtn">This week</button>
+                <button type="button" id="refreshSchedulingBtn">Refresh</button>
+              </div>
+              <div id="scheduleCalendarGrid" class="sched-grid-wrap is-readonly" aria-live="polite"></div>
+              <div id="scheduleCalendarDayDetail" class="sched-day-detail"></div>
+              <h3 id="schedAuditHeading">Schedule log</h3>
+              <p id="schedAuditStatus" class="status"></p>
+              <div id="scheduleShiftAuditLog" class="report-block"></div>
+            </div>
+          </div>
+          <div id="schedSchedulerPane" class="sched-pane hidden">
           <div class="card">
             <h2 id="schedGridHeading">Scheduler</h2>
-            <p class="sub small" data-keep-visible="true">People × days grid. Published shifts are <strong>pending</strong> until the worker confirms (Inbox / Email / SMS / WhatsApp). Use <strong>Select shifts</strong> to delete several drafts or confirmed chips at once. Default window = club open − 2h through close + 1h. Open the <strong>?</strong> beside Scheduler for create/publish and multi-delete steps.</p>
             <div class="sched-toolbar">
               <div class="sched-mode-toggle" role="group" aria-label="Assign mode">
                 <button type="button" id="schedModeManualBtn" class="sched-mode-btn active" data-mode="manual">Manual</button>
@@ -616,6 +631,7 @@
           </div>
 
           <div id="scheduleWorkerPopout" class="sched-worker-popout hidden" role="dialog" aria-label="Worker contact"></div>
+          </div>
         </div>
       </section>
 
@@ -636,8 +652,8 @@
           <h2
             data-floqr-help-id="help-club-notification-subscriptions"
             data-floqr-help-title="Club SMS and WhatsApp notification subscriptions"
-            data-floqr-help-search="sms notification|whatsapp notification|twilio|invalid username|account sid|send test alert"
-            data-floqr-help-body="SMS and WhatsApp pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. Payment, credits, and Subscribe live in each channel ?. Save does not reopen Stripe for a subscribed channel. Send test alert needs an E.164 alert phone plus SMS and/or WhatsApp left on. If the test returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID that starts with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
+            data-floqr-help-search="sms notification|whatsapp notification|twilio|invalid username|account sid|send test alert|in-app|floqr inbox|system message"
+            data-floqr-help-body="Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. If the test returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID that starts with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
           >Notifications</h2>
           <p class="sub small">Choose how this club receives pending-ShoutOut alerts. Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp colors follow the Firebase subscription (green = paid, red = not subscribed). Payment and credit details are in each channel's ?.</p>
           <div class="notify-channel-grid">
@@ -678,6 +694,9 @@
               <option>DJ</option>
               <option>Promoter</option>
               <option>Waiter / Waitress / Bottle Girl</option>
+              <option>Bus Boy</option>
+              <option>Security</option>
+              <option>Venue Manager</option>
               <option>Bartender / Barman</option>
               <option>Videographer / Camera Operator</option>
             </select></label>
@@ -763,7 +782,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.116"></script>
+<script src="./floqai-help-repository.js?v=29.09.117"></script>
 <script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -773,14 +792,15 @@
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script src="./ad-campaigns.js?v=29.09.14"></script>
+<script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=29.09.116"></script>
+<script src="./admin-app.js?v=29.09.117"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.112"></script>
+<script src="./admin-notifications.js?v=29.09.117"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
-<script src="./admin-scheduling.js?v=29.09.116"></script>
+<script src="./admin-scheduling.js?v=29.09.117"></script>
 <script src="./notification-center.js?v=29.09.8"></script>
 <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>

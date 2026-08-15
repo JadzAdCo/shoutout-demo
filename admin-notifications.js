@@ -304,21 +304,52 @@
       .map(item => String(item || "").trim())
       .filter(Boolean);
     const uniqueErrors = [...new Set(errors)];
+    const okChannels = (data.results || [])
+      .filter(row => row?.ok)
+      .map(row => String(row.channel || "").trim())
+      .filter(Boolean);
+    const uniqueOk = [...new Set(okChannels)];
     if (data.dryRun) {
       return `Test logged as dry-run (${attempted || delivered} target(s)). Configure Twilio secrets to send live.`;
     }
-    if (delivered > 0) return `Test alert sent to ${delivered} channel(s).`;
-    if (attempted > 0) {
-      return `Test reached ${attempted} channel(s) but none delivered.${uniqueErrors.length ? " " + uniqueErrors.join("; ") : ""}`;
+    if (delivered > 0) {
+      const inboxNote = uniqueOk.some(ch => ch === "inapp" || ch === "push")
+        ? " In-app appears in FloqR Inbox as System Message."
+        : "";
+      return `Test alert sent on ${uniqueOk.join(", ") || `${delivered} channel(s)`}.${inboxNote}`;
     }
-    return "Test alert sent to 0 channel(s). Save an alert phone and keep SMS and/or WhatsApp checked, then Save before testing.";
+    if (attempted > 0) {
+      const health = data.twilio || {};
+      const sidHint = health.looksLikeApiKey
+        ? " TWILIO_ACCOUNT_SID is an API Key (SK…); it must be the Account SID starting with AC."
+        : health.looksLikeAccountSid === false && health.accountSidPrefix
+          ? ` TWILIO_ACCOUNT_SID prefix is ${health.accountSidPrefix} (${health.accountSidLength || 0} chars); it must start with AC and be 34 characters.`
+          : "";
+      return `Test reached ${attempted} channel(s) but none delivered.${uniqueErrors.length ? " " + uniqueErrors.join("; ") : ""}${sidHint}`;
+    }
+    return "Test alert sent to 0 channel(s). Check In-app (FloqR Inbox), Email, and/or paid SMS/WhatsApp, then send the test.";
+  }
+
+  function selectedNotifyChannels() {
+    return {
+      inApp: !!byId("repNotifyInApp")?.checked,
+      push: !!byId("repNotifyPush")?.checked,
+      email: !!byId("repNotifyEmail")?.checked,
+      sms: !!byId("repNotifySms")?.checked,
+      whatsapp: !!byId("repNotifyWhatsapp")?.checked
+    };
   }
 
   async function sendTestMessage() {
     const status = statusEl();
     try {
       if (status) status.textContent = "Sending test alert…";
-      const result = await callable("sendClubTestMessage")({clubLocationId: locationId});
+      const channels = selectedNotifyChannels();
+      if (!channels.inApp && !channels.push && !channels.email && !channels.sms && !channels.whatsapp) {
+        if (status) status.textContent = "Check at least one notification option, then send the test.";
+        return;
+      }
+      const result = await callable("sendClubTestMessage")({clubLocationId: locationId, channels});
       if (status) status.textContent = formatTestResult(result?.data || {});
     } catch (error) {
       if (status) status.textContent = error?.message || String(error);
