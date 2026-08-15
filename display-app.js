@@ -440,15 +440,32 @@
     bgEl.style.backgroundSize = "";
     bgEl.style.backgroundPosition = "";
     bgEl.style.backgroundRepeat = "";
+    delete bgEl.dataset.backgroundFit;
   }
 
-  function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "" } = {}) {
+  function resolveBackgroundFit(data = {}, template = {}, backgroundUrl = "") {
+    const explicit = String(data.backgroundFit || "").toLowerCase();
+    if (explicit === "contain" || explicit === "cover") return explicit;
+    const url = String(backgroundUrl || "").trim();
+    if (!url) return "cover";
+    const designed = String(template.defaultBackgroundUrl || "").trim();
+    if (designed && url === designed) return "cover";
+    if (template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
+      return "cover";
+    }
+    if (String(data.mediaFit || "").toLowerCase() === "cover") return "cover";
+    return "contain";
+  }
+
+  function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "", fit = "cover" } = {}) {
     resetBackgroundLayer(bgEl);
     if (backgroundUrl) {
-      bgEl.style.backgroundImage = `url("${String(backgroundUrl).replace(/"/g, "%22")}")`;
-      bgEl.style.backgroundSize = "cover";
+      const size = fit === "contain" ? "contain" : "cover";
+      bgEl.style.backgroundImage = "url(\"" + String(backgroundUrl).replace(/"/g, "%22") + "\")";
+      bgEl.style.backgroundSize = size;
       bgEl.style.backgroundPosition = "center";
       bgEl.style.backgroundRepeat = "no-repeat";
+      bgEl.dataset.backgroundFit = size;
       return true;
     }
     if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) {
@@ -645,6 +662,9 @@
       mediaUrl: params.get("media") || "",
       mediaType: params.get("mediaType") || "",
       mediaFit: params.get("mediaFit") || "contain",
+      backgroundFit: params.has("backgroundFit")
+        ? params.get("backgroundFit")
+        : "",
       screenFormatId: screenFormatOverride || params.get("screenFormatId") || "",
       selectedMediaVersion: params.get("selectedMediaVersion") || "",
       trimStart: params.get("trimStart") || "",
@@ -1050,7 +1070,8 @@
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
     canvas.classList.toggle("custom-background-active", hasCustomBackground);
     const bgEl = byId("displayBackground");
-    const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient });
+    const backgroundFit = resolveBackgroundFit(data, t, backgroundUrl);
+    const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient, fit: backgroundFit });
     canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
     const frameUrl = resolveFrameOverlayUrl(t, data);
     const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);

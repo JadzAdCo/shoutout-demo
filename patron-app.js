@@ -666,10 +666,6 @@
     await loadLocationAliases();
     locations = {};
     try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (visibleLocationEntry([doc.id, data])) locations[doc.id] = {id:doc.id, ...data}; else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) locationAliases[doc.id.toLowerCase()] = {id:doc.id, canonicalLocationId:data.canonicalLocationId || data.aliasOf || data.mergedInto, aliasName:data.locationName || data.brandName || doc.id, status:"active"}; }); } catch(e) {}
-    // Merge seeded catalog venues missing from Firestore so ShoutOut search and admin stay aligned.
-    Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry).forEach(([id, data]) => {
-      if (!locations[id]) locations[id] = {id, ...data};
-    });
     if (Object.keys(locations).length === 0) locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
   }
   async function loadEvents() {
@@ -1029,22 +1025,11 @@
     modal.setAttribute("aria-hidden", "true");
   }
 
-  function showEmailOtpSentModal(email = "", delivery = {}) {
+  function showEmailOtpSentModal(email = "") {
     const modal = byId("emailOtpSentModal");
     if (!modal) return;
     const emailLine = byId("emailOtpSentEmail");
-    if (emailLine) {
-      const deliveredTo = String(delivery.deliveredTo || email || "").trim();
-      const redirected = !!delivery.redirected;
-      const intended = String(delivery.intendedEmail || email || "").trim();
-      if (redirected && deliveredTo && intended && deliveredTo.toLowerCase() !== intended.toLowerCase()) {
-        emailLine.textContent = `Sent to ${deliveredTo} (demo → ${intended})`;
-      } else if (deliveredTo) {
-        emailLine.textContent = `Sent to ${deliveredTo}`;
-      } else {
-        emailLine.textContent = "";
-      }
-    }
+    if (emailLine) emailLine.textContent = email ? `Sent to ${email}` : "";
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
     byId("emailOtpSentCloseBtn")?.focus?.();
@@ -1067,17 +1052,13 @@
     try {
       setText("emailOtpStatus", "Sending your secure sign-in code...");
       const response = await functions.httpsCallable("requestEmailOtp")({email});
-      const data = response.data || {};
-      emailOtpChallengeId = data.challengeId || "";
+      emailOtpChallengeId = response.data?.challengeId || "";
       if (!emailOtpChallengeId) throw new Error("The email code could not be confirmed. Please try again.");
-      emailOtpExpiresAt = Date.now() + Number(data.expiresInSeconds || 360) * 1000;
+      emailOtpExpiresAt = Date.now() + Number(response.data?.expiresInSeconds || 360) * 1000;
       clearInterval(emailOtpTimer);
       emailOtpTimer = setInterval(updateEmailOtpCountdown, 1000);
       updateEmailOtpCountdown();
-      showEmailOtpSentModal(email, data);
-      if (data.redirected && data.deliveredTo) {
-        setText("emailOtpStatus", `Code sent to ${data.deliveredTo}. Enter the 8-character code from that inbox.`);
-      }
+      showEmailOtpSentModal(email);
       byId("emailOtpCode")?.focus();
     } catch (error) {
       setText("emailOtpStatus", error?.message || "The email code could not be sent.");
@@ -1087,47 +1068,26 @@
     const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
     const code = String(byId("emailOtpCode")?.value || "").trim().toUpperCase();
     if (!functions || !emailOtpChallengeId) { setText("emailOtpStatus", "Request a new code first."); return; }
-    if (!/^[A-Z2-9]{8}$/.test(code)) {
-      setText("emailOtpStatus", "Enter the 8-character code from the email (not the Master Admin QA ref).");
-      return;
-    }
     try {
       setText("emailOtpStatus", "Verifying code...");
       const response = await functions.httpsCallable("verifyEmailOtp")({email, code, challengeId:emailOtpChallengeId});
       await auth.signInWithCustomToken(response.data.customToken);
       clearInterval(emailOtpTimer);
       emailOtpTimer = null;
-      emailOtpChallengeId = "";
       setText("emailOtpStatus", "Email verified. You are signed in.");
     } catch (error) {
-      const message = error?.message || "The email code could not be verified.";
-      setText("emailOtpStatus", message);
-      if (/already used|incorrect|expired|different email/i.test(message)) {
-        // Force a fresh challenge for the next attempt.
-        emailOtpChallengeId = "";
-        emailOtpExpiresAt = 0;
-      }
+      setText("emailOtpStatus", error?.message || "The email code could not be verified.");
     }
   }
   async function logout() { await auth.signOut(); window.location.href = "./"; }
   window.jadzPatronLogout = logout;
 
-  function populatePhoneCountrySelect() {
-    if (window.FLOQRPhoneCountries && typeof window.FLOQRPhoneCountries.populateSelect === "function") {
-      window.FLOQRPhoneCountries.populateSelect(byId("phoneCountryCode"));
-    }
-  }
   function showSmsOtpPanel() {
     byId("smsOtpPanel")?.classList.remove("hidden");
-    populatePhoneCountrySelect();
     setupPhoneAuth();
     setStatus("Enter your phone number, then send the SMS OTP.");
   }
-  function setupPhoneAuth() {
-    populatePhoneCountrySelect();
-    if (!byId("recaptcha-container") || window.recaptchaVerifier) return;
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {size:"normal"});
-  }
+  function setupPhoneAuth() { if (!byId("recaptcha-container") || window.recaptchaVerifier) return; window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {size:"normal"}); }
   function buildSmsPhoneNumber() {
     const countryCode = byId("phoneCountryCode")?.value || "";
     const local = (byId("phoneNationalNumber")?.value || byId("phoneNumber")?.value || "").replace(/[^\d]/g, "");
@@ -2785,6 +2745,7 @@
       url.searchParams.set("trimEnd",payload.trimEnd||"");
       url.searchParams.set("trimmedDuration",payload.trimmedDuration||"");
       url.searchParams.set("backgroundUrl",payload.backgroundUrl||"");
+      if (payload.backgroundFit) url.searchParams.set("backgroundFit", payload.backgroundFit);
       url.searchParams.set("backgroundColor",payload.backgroundColor||"");
       url.searchParams.set("backgroundGradient",payload.backgroundGradient||"");
       if (payload.jerseyTeamId) url.searchParams.set("jerseyTeamId", payload.jerseyTeamId);
@@ -2837,6 +2798,9 @@
       mainTextSizePercent:textCaps.mainTextSizePercent,
       subTextSizePercent:textCaps.subTextSizePercent,
       backgroundUrl:jerseyPayload.backgroundUrl || (isFootballTeamIntro() ? (backgroundPayload.backgroundUrl || selectedTemplateVariant?.backgroundUrl || "") : (selectedTemplateVariant?.backgroundUrl || "")),
+      backgroundFit: jerseyPayload.backgroundUrl
+        ? ""
+        : ((selectedTemplateVariant?.backgroundUrl || backgroundPayload.backgroundUrl) ? (byId("shoutoutMediaFit")?.value || "contain") : ""),
       backgroundColor:isFootballTeamIntro() ? (backgroundPayload.backgroundColor || selectedTemplateVariant?.backgroundColor || "") : (selectedTemplateVariant?.backgroundColor || ""),
       backgroundGradient:selectedTemplateVariant?.backgroundGradient || "",
       teamMembers:isFootballTeamIntro() ? footballTeamDraftMembers() : [],
@@ -2921,21 +2885,8 @@
   }
 
   function showShoutoutConfirmation(payload, location, template, options = {}) {
-    const loc = location || {};
-    const formatId = payload.screenFormatId || selectedScreenFormatId || "";
-    const formatLabel = payload.screenFormatLabel
-      || window.FLOQR_DISPLAY_FORMATS?.[formatId]?.label
-      || formatId
-      || "—";
-    const address = payload.fullAddress
-      || payload.locationAddress
-      || window.FLOQRAddress?.fullAddress?.(loc)
-      || [loc.streetAddress, [loc.city, loc.region].filter(Boolean).join(", "), loc.postalCode, loc.country].filter(Boolean).join(", ")
-      || "—";
     setText("confirmRef", payload.referenceNumber);
-    setText("confirmClub", loc.locationName || payload.locationName || loc.brandName || "—");
-    setText("confirmAddress", address || "—");
-    setText("confirmScreenSize", formatLabel);
+    setText("confirmClub", location.locationName || payload.locationName || "—");
     setText("confirmTemplate", template?.name || payload.templateName || "—");
     const paidBlock = byId("confirmPaidBlock");
     if (paidBlock) {
@@ -3509,6 +3460,7 @@
         lockedBaseTemplateId:selectedTemplateVariant.baseTemplateId || selectedTemplate,
         backgroundType:selectedTemplateVariant.backgroundType || "",
         backgroundUrl:selectedTemplateVariant.backgroundUrl || "",
+        backgroundFit: selectedTemplateVariant.backgroundUrl ? (byId("shoutoutMediaFit")?.value || "contain") : "",
         backgroundColor:selectedTemplateVariant.backgroundColor || "",
         backgroundGradient:selectedTemplateVariant.backgroundGradient || "",
         backgroundStoragePath:selectedTemplateVariant.backgroundStoragePath || "",
@@ -3524,7 +3476,7 @@
       }
       const canonicalTemplateId = jerseyFields.template || selectedTemplate;
       const canonicalTemplate = getTemplate(canonicalTemplateId);
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const priceCents = Math.max(0, Math.round(Number(canonicalTemplate.priceCents || t.priceCents || mediaPayload.priceCents || 0)));
       if (priceCents > 0) {
         const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
@@ -3640,12 +3592,6 @@
       if (mediaUrl) mediaUrl.value = "";
       if (mediaType) mediaType.value = "";
       if (legacyUrl) legacyUrl.value = "";
-    }
-    const fitEl = byId("shoutoutMediaFit");
-    if (fitEl && allowsMedia) {
-      const preferredFit = String(t.defaultMediaFit || "").toLowerCase() === "cover" ? "cover" : (fitEl.value || "contain");
-      if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
-      else if (!fitEl.value) fitEl.value = preferredFit;
     }
     if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);
   }
@@ -3768,7 +3714,6 @@
 
 
   document.addEventListener("DOMContentLoaded", function(){
-    populatePhoneCountrySelect();
     window.FLOQRAdCampaigns?.loadFirestoreSpotAds?.(db).catch(() => {});
     detectRenderContext();
     window.FLOQRI18n?.init?.({}).then(() => window.FLOQRI18n?.applyDom?.()).catch(() => {});
