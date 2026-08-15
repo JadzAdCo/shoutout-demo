@@ -60,6 +60,7 @@
   background:rgba(0,0,0,.18);
 }
 .admin-subtabs.hidden{display:none!important}
+.admin-subpanel.hidden{display:none!important}
 .admin-subtab{
   appearance:none;
   border:1px solid rgba(255,255,255,.16);
@@ -75,6 +76,44 @@
   background:linear-gradient(90deg,var(--hot),var(--accent));
   color:#06101c;
   border-color:transparent;
+}
+.sched-panel-head{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px 14px;
+  margin:0 0 10px;
+}
+.sched-panel-head h2{margin:0}
+.sched-paid-btn{
+  appearance:none;
+  border:0;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:800;
+  background:#16a34a;
+  color:#fff;
+  cursor:default;
+  pointer-events:none;
+}
+.sched-paid-btn.hidden{display:none!important}
+.sched-day-detail{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  background:rgba(0,0,0,.18);
+  min-height:48px;
+}
+.sched-day-head.is-cal-selected{box-shadow:inset 0 3px 0 #22c55e}
+.sched-grid-wrap.is-readonly .sched-day-head{cursor:pointer}
+.work-calendar-frame{
+  width:100%;
+  min-height:72vh;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  background:rgba(0,0,0,.2);
 }
 .admin-subtab.is-blink,
 .admin-tab-parent.is-blink{

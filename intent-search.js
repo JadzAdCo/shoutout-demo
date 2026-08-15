@@ -108,7 +108,7 @@
         "Demo: temp_clubadmin_1 maps to temp-democlub-1 (same pattern for 2, 3, …)."
       ],
       links: [
-        {label: "Request Club Admin access", href: vUrl("./role-request.html", {from: "floqai", type: "clubAdmin"})},
+        {label: "Request Club Admin access", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
         {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
         {label: "Role profiles overview", href: vUrl("./role-profiles.html", {from: "floqai"})},
         {label: "Open Club Admin (after approval)", href: vUrl("./admin.html", {from: "floqai"})}
@@ -467,14 +467,15 @@
       id: "help-service-member",
       kind: "help",
       label: "Become a service member",
-      blurb: "All users start as patrons. Elect a service role (DJ, promoter, hospitality, bartender, media, or Club Admin) and request club association.",
+      blurb: "All users start as patrons. Open Settings → Service Members to request a role (DJ, promoter, hospitality, bus boy/security, venue manager, bartender, media, or Club Admin) and club association.",
       steps: [
-        "Open Role Request from your profile.",
+        "Open My Profile & Settings → Service Members.",
         "Pick the role that matches how you work nightlife.",
-        "Select clubs and submit — each club must approve."
+        "Select clubs and submit — each club must approve.",
+        "Club Admins use Review & elect on the same tab to approve or elect patrons."
       ],
       links: [
-        {label: "Request service / role access", href: vUrl("./role-request.html", {from: "floqai"})},
+        {label: "Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
         {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
         {label: "How roles work", href: vUrl("./role-profiles.html", {from: "floqai"})}
       ],

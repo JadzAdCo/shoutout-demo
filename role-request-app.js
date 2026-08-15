@@ -15,6 +15,14 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", busboyOrSecurity:"Bus Boys or Security", venueManager:"Venue Manager", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
+
+  function publicProfileTypeForRole(roleType) {
+    if (roleType === "hospitality" || roleType === "bartender") return "hospitality";
+    if (roleType === "busboyOrSecurity" || roleType === "venueManager" || roleType === "dj" || roleType === "promoter") return roleType;
+    return "patron";
+  }
+
   function getSelectedLocations() {
     const select = byId("relatedLocations");
     if (!select) return [];
@@ -72,7 +80,7 @@
 
     await db.collection("roleRequests").add(request);
 
-    const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
+    const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", busboyOrSecurity:"Bus Boys or Security", venueManager:"Venue Manager", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
     const batch = db.batch();
     relatedLocations.forEach(clubLocationId => {
       const associationRef = db.collection("workerAssociationRequests").doc();
@@ -101,7 +109,7 @@
       serviceMember:roleType !== "clubAdmin",
       requestedRoles:firebase.firestore.FieldValue.arrayUnion(roleLabels[roleType] || roleType),
       requestedClubLocationIds:relatedLocations,
-      publicProfileType:roleType === "hospitality" || roleType === "bartender" ? "hospitality" : roleType,
+      publicProfileType: publicProfileTypeForRole(roleType),
       serviceSubtype,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
@@ -121,7 +129,7 @@
     const type = new URLSearchParams(location.search).get("type") || new URLSearchParams(location.search).get("role") || "";
     const select = byId("requestType");
     if (!select || !type) return;
-    const allowed = new Set(["clubAdmin", "dj", "promoter", "hospitality", "bartender", "mediaCreator"]);
+    const allowed = new Set(["clubAdmin", "dj", "promoter", "hospitality", "bartender", "mediaCreator", "busboyOrSecurity", "venueManager"]);
     if (allowed.has(type)) select.value = type;
   }
 

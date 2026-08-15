@@ -87,6 +87,36 @@
         ]
       });
     }
+    const calTarget = byId("schedCalendarHeading");
+    if (calTarget) {
+      attach({
+        target: calTarget,
+        id: "help-staff-calendar-week",
+        title: "Calendar",
+        body: "Week view of confirmed service-member shifts, using the same week as Scheduler. Tap a day header for that day's confirmed roster. Drafts and pending stay on Scheduler until workers confirm.",
+        searchPhrases: [
+          "staff calendar", "confirmed week", "calendar subtab", "who is working"
+        ],
+        links: [
+          {label: "Calendar & Scheduler", href: "./admin.html?from=floqai&tab=scheduling"}
+        ]
+      });
+    }
+    const auditTarget = byId("schedAuditHeading");
+    if (auditTarget) {
+      attach({
+        target: auditTarget,
+        id: "help-schedule-shift-audit",
+        title: "Schedule log",
+        body: "Each create, publish, notify, and worker confirm/decline is written to scheduleShiftAudit. Use this log when testing Publish schedule and notification channels: who created, who published, which staff confirmed after the Inbox / Email / SMS / WhatsApp message.",
+        searchPhrases: [
+          "schedule log", "who published", "who confirmed", "schedule audit", "publish schedule messages"
+        ],
+        links: [
+          {label: "Calendar & Scheduler", href: "./admin.html?from=floqai&tab=scheduling"}
+        ]
+      });
+    }
   }
 
   function setIngestStatus(message) {
@@ -172,7 +202,10 @@
 
   function setStatus(message) {
     const el = byId("schedulingStatus");
-    if (el) el.textContent = message || "";
+    if (!el) return;
+    el.textContent = message || "";
+    const show = !!String(message || "").trim();
+    el.classList.toggle("hidden", !show);
   }
 
   function esc(value) {
@@ -206,6 +239,8 @@
     rrDays: new Set([1, 2, 3, 4, 5]),
     assignContext: null,
     savingShift: false,
+    schedPane: "calendar",
+    calendarDayIdx: new Date().getDay(),
     rrCursor: 0,
     venue: null,
     selecting: false,
@@ -436,10 +471,13 @@
 
   function updateWeekLabel() {
     const days = weekDays();
-    const label = byId("schedWeekLabel");
-    if (!label || !days.length) return;
+    if (!days.length) return;
     const fmt = {month: "short", day: "numeric", year: "numeric"};
-    label.textContent = `${days[0].toLocaleDateString([], fmt)} → ${days[6].toLocaleDateString([], fmt)}`;
+    const text = `${days[0].toLocaleDateString([], fmt)} → ${days[6].toLocaleDateString([], fmt)}`;
+    const label = byId("schedWeekLabel");
+    const calLabel = byId("schedCalWeekLabel");
+    if (label) label.textContent = text;
+    if (calLabel) calLabel.textContent = text;
   }
 
   function updateDraftCount() {
@@ -703,14 +741,112 @@
 
     host.innerHTML = `<table class="sched-grid">${head}<tbody>${body}</tbody></table>`;
     updateSelectUi();
+    renderCalendarView();
+  }
+
+  function viewerIsAdmin() {
+    const user = auth.currentUser;
+    if (!user) return false;
+    const email = String(user.email || "").toLowerCase();
+    if (/clubadmin|masteradmin|jadzadco/.test(email)) return true;
+    const roles = [].concat(window.FLOQRIdentity?.roles || [], window.FLOQRIdentity?.profile?.roles || []);
+    return roles.some(role => /clubadmin|masteradmin|club admin/i.test(String(role)));
+  }
+
+  function setSchedPane(pane) {
+    state.schedPane = pane === "scheduler" ? "scheduler" : "calendar";
+    document.querySelectorAll("[data-sched-pane]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.schedPane === state.schedPane);
+    });
+    byId("schedCalendarPane")?.classList.toggle("hidden", state.schedPane !== "calendar");
+    byId("schedSchedulerPane")?.classList.toggle("hidden", state.schedPane !== "scheduler");
+  }
+
+  function confirmedWeekShifts() {
+    const {weekStartMs, weekEndMs} = weekRangeMs();
+    return (state.shifts || []).filter(s => {
+      const status = String(s.status || "");
+      if (status !== "confirmed" && status !== "approved") return false;
+      const start = Number(s.startsAtMs || 0);
+      return start >= weekStartMs && start < weekEndMs;
+    });
+  }
+
+  function renderCalendarView() {
+    const host = byId("scheduleCalendarGrid");
+    if (!host) return;
+    updateWeekLabel();
+    const days = weekDays();
+    const confirmed = confirmedWeekShifts();
+    const workers = state.workers.length
+      ? state.workers
+      : [...new Map(confirmed.map(s => [s.assigneeUid, {uid: s.assigneeUid, name: s.assigneeName, role: s.roleLabel}])).values()];
+    const fmtDay = {weekday: "short", month: "short", day: "numeric"};
+    const head = `<thead><tr><th class="sched-person">Team</th>${days.map((day, dayIdx) => {
+      const selected = Number(state.calendarDayIdx) === dayIdx ? " is-cal-selected" : "";
+      return `<th class="sched-day-head${selected}" data-cal-day-idx="${dayIdx}">${esc(day.toLocaleDateString([], fmtDay))}<div class="sched-day-sub">Confirmed</div></th>`;
+    }).join("")}</tr></thead>`;
+    const body = workers.map(worker => {
+      const cells = days.map((day, dayIdx) => {
+        const chips = confirmed.filter(s => String(s.assigneeUid || "") === worker.uid && sameDay(Number(s.startsAtMs || 0), day));
+        if (!chips.length) return `<td class="sched-cell" data-cal-day-idx="${dayIdx}"><span class="sched-empty">—</span></td>`;
+        return `<td class="sched-cell" data-cal-day-idx="${dayIdx}">${chips.map(s =>
+          `<button type="button" class="sched-chip is-confirmed" data-shift-id="${esc(s.id)}">${esc(s.roleLabel || "Shift")}<small>${esc(formatChipTime(s))}</small></button>`
+        ).join("")}</td>`;
+      }).join("");
+      return `<tr><th class="sched-person">${esc(worker.name || "Staff")}<small>${esc(worker.role || "")}</small></th>${cells}</tr>`;
+    }).join("");
+    host.innerHTML = workers.length
+      ? `<table class="sched-grid">${head}<tbody>${body}</tbody></table>`
+      : "<p class='sub'>No confirmed shifts this week yet. Publish on Scheduler, then workers confirm.</p>";
+    renderCalendarDayDetail();
+  }
+
+  function renderCalendarDayDetail() {
+    const host = byId("scheduleCalendarDayDetail");
+    if (!host) return;
+    const days = weekDays();
+    const idx = Number.isFinite(Number(state.calendarDayIdx)) ? Number(state.calendarDayIdx) : new Date().getDay();
+    const day = days[idx] || days[0];
+    const rows = confirmedWeekShifts().filter(s => sameDay(Number(s.startsAtMs || 0), day));
+    const title = day ? day.toLocaleDateString([], {weekday: "long", month: "long", day: "numeric"}) : "";
+    if (!rows.length) {
+      host.innerHTML = `<p class="sub">${esc(title)} — no confirmed service members yet.</p>`;
+      return;
+    }
+    host.innerHTML = `<p class="sub"><strong>${esc(title)}</strong> · confirmed roster</p>` + rows.map(s =>
+      `<div class="queue-item"><strong>${esc(s.assigneeName || "Staff")}</strong> · ${esc(s.roleLabel || "Shift")}<p>${esc(formatChipTime(s))}</p></div>`
+    ).join("");
+  }
+
+  async function loadScheduleAudit() {
+    const host = byId("scheduleShiftAuditLog");
+    if (!host || !locationId) return;
+    try {
+      const result = await callable("listScheduleShiftAudit")({
+        ownerType: "club",
+        ownerId: locationId
+      });
+      const rows = result?.data?.events || result?.data?.rows || [];
+      if (!rows.length) {
+        host.innerHTML = "<p class='sub'>No schedule log rows yet. Publish a week and have a worker confirm to fill this list.</p>";
+        return;
+      }
+      host.innerHTML = rows.slice(0, 40).map(row => {
+        const when = row.createdAtMs ? new Date(Number(row.createdAtMs)).toLocaleString() : "";
+        return `<div class="queue-item"><strong>${esc(row.action || "")}</strong> · ${esc(row.assigneeName || row.actorEmail || "")}<p>${esc(row.message || "")}</p><small>${esc(when)} · actor ${esc(row.actorEmail || row.actorUid || "")}</small></div>`;
+      }).join("");
+    } catch (error) {
+      host.innerHTML = `<p class="sub">${esc(error?.message || "Schedule log unavailable until the audit function is deployed.")}</p>`;
+    }
   }
 
   async function refreshSubscriptionUi() {
     const gate = byId("schedulingSubscribeGate");
     const workspace = byId("schedulingWorkspace");
-    const badge = byId("schedulingSubBadge");
+    const subtabs = byId("schedSubtabs");
+    const paidBtn = byId("schedPaidGreenBtn");
     const buyBtn = byId("buySchedulingSubBtn");
-    const portalLink = byId("openSchedulingPortalLink");
     const gateTitle = byId("schedulingSubscribeTitle");
     const gateCopy = byId("schedulingSubscribeCopy");
     try {
@@ -724,16 +860,15 @@
       let paid = isPaidAccess(access);
       if (venuePaid === 1) paid = true;
       if (venuePaid === 0) paid = false;
-      const monthStatus = access?.monthStatus || access?.status || (paid ? "paid this month" : "not paid this month");
       const ever = access?.everSubscribed === true || access?.cta === "resubscribe";
       const cta = paid ? "none" : (access?.cta || (ever ? "resubscribe" : "subscribe"));
-      if (badge) {
-        badge.textContent = paid
-          ? `staffSchedulingPaid=1 · ${monthStatus}`
-          : `staffSchedulingPaid=0 · ${monthStatus}`;
-      }
       if (gate) gate.classList.toggle("hidden", paid);
       if (workspace) workspace.classList.toggle("hidden", !paid);
+      if (subtabs) subtabs.classList.toggle("hidden", !paid);
+      if (paidBtn) {
+        const showPaid = paid && viewerIsAdmin();
+        paidBtn.classList.toggle("hidden", !showPaid);
+      }
       if (buyBtn) {
         buyBtn.classList.toggle("hidden", paid);
         buyBtn.textContent = cta === "resubscribe" ? "Resubscribe $20/mo" : "Subscribe $20/mo";
@@ -745,19 +880,18 @@
       }
       if (gateCopy) {
         gateCopy.innerHTML = cta === "resubscribe"
-          ? "This venue was subscribed before, but status is <code>not paid this month</code> (<code>staffSchedulingPaid=0</code>). Resubscribe to set <code>paid this month</code> and unlock the calendar."
-          : "Unlock Staff Scheduling for this venue. Checkout sets <code>staffSchedulingPaid=1</code> and subscription status to <code>paid this month</code>.";
+          ? "This venue was subscribed before. Resubscribe to unlock Calendar &amp; Scheduler."
+          : "Unlock Calendar &amp; Scheduler for this venue.";
       }
-      if (portalLink) {
-        portalLink.classList.toggle("hidden", !paid);
-        portalLink.textContent = "Open full calendar / Scheduling portal";
+      if (!paid) {
+        setStatus(`${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required.`);
+      } else {
+        setStatus("");
       }
-      setStatus(
-        paid
-          ? `Calendar unlocked · ${monthStatus} (staffSchedulingPaid=1).`
-          : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus} (staffSchedulingPaid=0).`
-      );
-      if (paid) await Promise.all([loadVenueHours(), loadWorkers(), loadShifts(), loadIngestEndpoints()]);
+      if (paid) {
+        setSchedPane(state.schedPane || "calendar");
+        await Promise.all([loadVenueHours(), loadWorkers(), loadShifts(), loadIngestEndpoints(), loadScheduleAudit()]);
+      }
     } catch (error) {
       setStatus(error?.message || String(error));
     }
@@ -844,6 +978,7 @@
     });
     state.shifts = result?.data?.shifts || [];
     renderGrid();
+    loadScheduleAudit().catch(() => {});
   }
 
   function shiftPayloadFields({
@@ -1063,6 +1198,7 @@
     });
     setStatus(`Published ${result?.data?.published || 0} pending shift(s). Workers confirm via Inbox / Email / SMS / WhatsApp.`);
     await loadShifts();
+    await loadScheduleAudit();
   }
 
   function eligibleForRoundRobin(roleFilter = "") {
@@ -1222,6 +1358,14 @@
     updateWeekLabel();
 
     attachSchedulingHelp();
+    const wantedPane = String(new URL(location.href).searchParams.get("pane") || new URL(location.href).searchParams.get("tab") || "").toLowerCase();
+    if (wantedPane === "scheduler" || wantedPane === "schedgridheading") setSchedPane("scheduler");
+    else setSchedPane("calendar");
+    byId("schedSubtabs")?.addEventListener("click", event => {
+      const btn = event.target.closest("[data-sched-pane]");
+      if (!btn) return;
+      setSchedPane(btn.dataset.schedPane);
+    });
     byId("buySchedulingSubBtn")?.addEventListener("click", () => {
       startSubscription().catch(error => setStatus(error.message));
     });
@@ -1267,20 +1411,22 @@
     });
     byId("schedModeManualBtn")?.addEventListener("click", () => setMode("manual"));
     byId("schedModeRrBtn")?.addEventListener("click", () => setMode("roundRobin"));
-    byId("schedPrevWeekBtn")?.addEventListener("click", () => {
-      state.weekStart = addDays(state.weekStart, -7);
+    function shiftWeek(deltaDays, resetToday) {
+      state.weekStart = resetToday ? startOfWeek(new Date()) : addDays(state.weekStart, deltaDays);
       applyVenueDefaultsToControls();
       renderGrid();
-    });
-    byId("schedNextWeekBtn")?.addEventListener("click", () => {
-      state.weekStart = addDays(state.weekStart, 7);
-      applyVenueDefaultsToControls();
-      renderGrid();
-    });
-    byId("schedTodayWeekBtn")?.addEventListener("click", () => {
-      state.weekStart = startOfWeek(new Date());
-      applyVenueDefaultsToControls();
-      renderGrid();
+    }
+    byId("schedPrevWeekBtn")?.addEventListener("click", () => shiftWeek(-7));
+    byId("schedNextWeekBtn")?.addEventListener("click", () => shiftWeek(7));
+    byId("schedTodayWeekBtn")?.addEventListener("click", () => shiftWeek(0, true));
+    byId("schedCalPrevWeekBtn")?.addEventListener("click", () => shiftWeek(-7));
+    byId("schedCalNextWeekBtn")?.addEventListener("click", () => shiftWeek(7));
+    byId("schedCalTodayWeekBtn")?.addEventListener("click", () => shiftWeek(0, true));
+    byId("scheduleCalendarGrid")?.addEventListener("click", event => {
+      const head = event.target.closest("[data-cal-day-idx]");
+      if (!head) return;
+      state.calendarDayIdx = Number(head.dataset.calDayIdx);
+      renderCalendarView();
     });
     byId("schedIngestRotateBtn")?.addEventListener("click", () => {
       rotateIngestSecret().catch(error => setIngestStatus(error.message));

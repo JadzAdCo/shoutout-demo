@@ -101,6 +101,21 @@ test("describeOutboundSkip explains missing phone vs paused channels", () => {
   assert.equal(describeOutboundSkip({alertPhone: "+12025550123", smsEnabled: true}), "");
 });
 
+test("selectedClubAlertChannels follows test checkboxes and saved settings", () => {
+  const {selectedClubAlertChannels} = require("./messaging-core");
+  assert.deepEqual(
+    selectedClubAlertChannels({inApp: true, email: false, smsEnabled: true, alertPhone: "+12025550123"}),
+    {inApp: true, push: false, email: false, sms: true, whatsapp: false}
+  );
+  assert.deepEqual(
+    selectedClubAlertChannels(
+      {smsEnabled: true, whatsappEnabled: true},
+      {inApp: true, push: false, email: true, sms: false, whatsapp: true}
+    ),
+    {inApp: true, push: false, email: true, sms: false, whatsapp: true}
+  );
+});
+
 test("sanitizes Twilio secrets and explains invalid Account SID", () => {
   const {
     sanitizeTwilioSecret,

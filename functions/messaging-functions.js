@@ -16,7 +16,8 @@ const {
   buildPendingShoutoutMessage,
   twilioWhatsAppAddress,
   selectOutboundTargets,
-  describeOutboundSkip,
+  selectedClubAlertChannels,
+  channelAlertOn,
   sanitizeTwilioSecret,
   describeTwilioAccountSid,
   twilioCredentialHealth,
@@ -161,6 +162,7 @@ async function logDelivery(entry = {}) {
       providerSid: text(entry.providerSid, 80),
       error: text(entry.error, 500),
       shoutoutId: text(entry.shoutoutId, 160),
+      shiftId: text(entry.shiftId, 120),
       purpose: text(entry.purpose, 80),
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -169,11 +171,11 @@ async function logDelivery(entry = {}) {
   }
 }
 
-async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId = "", purpose = "alert"}) {
+async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId = "", shiftId = "", purpose = "alert"}) {
   const creds = twilioCredentials();
   const phone = normalizeE164(to);
   if (!phone) {
-    await logDelivery({clubLocationId, channel, to, body, status: "invalid-to", dryRun: true, purpose, shoutoutId});
+    await logDelivery({clubLocationId, channel, to, body, status: "invalid-to", dryRun: true, purpose, shoutoutId, shiftId});
     return {ok: false, dryRun: true, status: "invalid-to"};
   }
 
@@ -187,7 +189,7 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
   if (!twilioReady(creds) || !from || !destination) {
     console.info("messaging dry-run (Twilio secrets missing)", {clubLocationId, channel, purpose});
     await logDelivery({
-      clubLocationId, channel, to: destination || phone, body, status: "dry-run", dryRun: true, purpose, shoutoutId
+      clubLocationId, channel, to: destination || phone, body, status: "dry-run", dryRun: true, purpose, shoutoutId, shiftId
     });
     return {ok: true, dryRun: true, status: "dry-run"};
   }
@@ -231,6 +233,7 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
       dryRun: false,
       purpose,
       shoutoutId,
+      shiftId,
       providerSid: text(payload.sid, 80)
     });
     return {ok: true, dryRun: false, status: "sent", sid: text(payload.sid, 80)};
@@ -258,6 +261,79 @@ async function deliverToClubTargets(clubLocationId, settings, body, meta = {}) {
     }));
   }
   return {delivered: results.filter(row => row.ok).length, results};
+}
+
+async function resolveClubAdminUids(clubLocationId, club = {}, actorUid = "") {
+  const uids = new Set([
+    ...(Array.isArray(club.adminUids) ? club.adminUids : []),
+    ...(Array.isArray(club.masterAdminUids) ? club.masterAdminUids : [])
+  ].map(value => text(value, 160)).filter(Boolean));
+  if (actorUid) uids.add(text(actorUid, 160));
+  try {
+    const snap = await db.collection("clubEmployeeDesignations").where("clubLocationId", "==", clubLocationId).limit(80).get();
+    snap.forEach(doc => {
+      const row = doc.data() || {};
+      if (text(row.status, 40).toLowerCase() === "rejected") return;
+      const roles = `${row.roleElectionType || ""} ${(row.workerRoles || []).join(" ")}`;
+      if (/club\s*admin/i.test(roles) && row.workerUid) uids.add(text(row.workerUid, 160));
+    });
+  } catch (_error) {
+    /* designation query optional */
+  }
+  return [...uids].filter(Boolean);
+}
+
+async function resolveClubAdminEmails(club = {}, actorEmail = "") {
+  const emails = new Set((club.adminEmails || [])
+    .concat(club.email || club.contactEmail || "")
+    .map(value => text(value, 200).toLowerCase())
+    .filter(value => value.includes("@")));
+  if (actorEmail && actorEmail.includes("@")) emails.add(text(actorEmail, 200).toLowerCase());
+  return [...emails];
+}
+
+async function sendClubAlertEmail({to, subject, body}) {
+  const key = secretValue(SENDGRID_API_KEY, "SENDGRID_API_KEY");
+  if (!key) return {ok: false, channel: "email", status: "missing-sendgrid"};
+  try {
+    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+      body: JSON.stringify({
+        personalizations: [{to: to.map(email => ({email}))}],
+        from: {email: "login@floqr.com", name: "FLOQR Club Ops"},
+        subject,
+        content: [{type: "text/plain", value: body}]
+      })
+    });
+    return {ok: response.ok || response.status === 202, channel: "email", status: response.status, recipients: to.length};
+  } catch (error) {
+    return {ok: false, channel: "email", error: text(error?.message || error, 200)};
+  }
+}
+
+async function writeClubInboxAlerts({uids, body, clubLocationId, clubName, purpose, shoutoutId, actorUid}) {
+  const recipients = [...new Set((uids || []).filter(Boolean))];
+  if (!recipients.length) return {ok: false, channel: "inapp", error: "no-admin-recipients"};
+  const note = {
+    type: purpose === "test" ? "clubTestAlert" : "pendingShoutout",
+    title: purpose === "test" ? "FloqR test alert" : "Pending ShoutOut",
+    body,
+    clubLocationId,
+    locationName: clubName,
+    shoutoutId: shoutoutId || "",
+    senderUid: "system",
+    senderName: "System Message",
+    messageCategory: "system",
+    read: false,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    link: `./admin.html?location=${encodeURIComponent(clubLocationId)}&tab=notifications`
+  };
+  await Promise.all(recipients.map(uid => db.collection("inboxNotifications").add({
+    ...note,
+    recipientUid: uid
+  })));
+  return {ok: true, channel: "inapp", status: "inbox", recipients: recipients.length, actorIncluded: recipients.includes(actorUid)};
 }
 
 function previewUrlForShoutout(shoutout = {}, clubLocationId = "") {
@@ -381,7 +457,7 @@ exports.getClubDailyAuthCode = onCall({
 
 exports.sendClubTestMessage = onCall({
   region: "us-central1",
-  secrets: MESSAGING_SECRETS,
+  secrets: [...MESSAGING_SECRETS, SENDGRID_API_KEY],
   timeoutSeconds: 30,
   memory: "256MiB"
 }, async request => {
@@ -393,34 +469,111 @@ exports.sendClubTestMessage = onCall({
   }
   const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
   const settings = settingsSnap.exists ? settingsSnap.data() || {} : {};
+  const overlay = request.data?.channels && typeof request.data.channels === "object" ? request.data.channels : null;
+  const wanted = selectedClubAlertChannels(settings, overlay);
+  if (!wanted.inApp && !wanted.push && !wanted.email && !wanted.sms && !wanted.whatsapp) {
+    throw new HttpsError("failed-precondition", "Check at least one notification option (In-app, Email, SMS, or WhatsApp), then send the test.");
+  }
   const auth = await ensureDailyAuthCode(clubLocationId);
   const clubSnap = await db.collection("clubLocations").doc(clubLocationId).get();
-  const clubName = text(clubSnap.data()?.locationName || clubSnap.data()?.brandName || clubLocationId, 80);
+  const club = clubSnap.exists ? clubSnap.data() || {} : {};
+  const clubName = text(club.locationName || club.brandName || clubLocationId, 80);
   const body = `FloqR test alert for ${clubName}. Today's club code is ${auth.code}. Reply APPROVE {code} or REJECT {code} on real pending ShoutOuts.`;
-  const delivery = await deliverToClubTargets(clubLocationId, settings, body, {purpose: "test"});
-  const attempted = (delivery.results || []).length;
-  const skip = delivery.skipped || describeOutboundSkip(settings);
-  if (!attempted) {
-    const message = skip === "missing-phone"
-      ? "Save an alert phone (E.164) before sending a test."
-      : skip === "channels-paused"
-        ? "SMS and WhatsApp alerts are paused. Check SMS and/or WhatsApp, Save, then send a test. Paid subscriptions stay on file."
-        : "Save an alert phone and enable SMS (paid) and/or WhatsApp before sending a test.";
+  const actorUid = text(request.auth.uid, 160);
+  const actorEmail = text(request.auth.token?.email, 200).toLowerCase();
+  const results = [];
+
+  if (wanted.inApp || wanted.push) {
+    const uids = await resolveClubAdminUids(clubLocationId, club, actorUid);
+    const inbox = await writeClubInboxAlerts({
+      uids,
+      body,
+      clubLocationId,
+      clubName,
+      purpose: "test",
+      actorUid
+    });
+    results.push(inbox);
+    if (wanted.push) {
+      results.push({
+        ok: inbox.ok,
+        channel: "push",
+        status: wanted.inApp ? "inbox" : "inbox-fallback",
+        recipients: inbox.recipients || 0
+      });
+    }
+  }
+
+  if (wanted.email) {
+    const emails = await resolveClubAdminEmails(club, actorEmail);
+    if (!emails.length) {
+      results.push({ok: false, channel: "email", error: "no-admin-email"});
+    } else {
+      results.push(await sendClubAlertEmail({
+        to: emails,
+        subject: `FloqR test alert — ${clubName}`,
+        body
+      }));
+    }
+  }
+
+  if (wanted.sms || wanted.whatsapp) {
+    const phone = normalizeE164(settings.alertPhone || settings.smsPhone || settings.phone || "");
+    if (!phone) {
+      if (wanted.sms) results.push({ok: false, channel: "sms", error: "missing-phone"});
+      if (wanted.whatsapp) results.push({ok: false, channel: "whatsapp", error: "missing-phone"});
+    } else {
+      if (wanted.sms && !channelAlertOn(settings, "sms")) {
+        results.push({ok: false, channel: "sms", error: "SMS is not subscribed (paid)."});
+      } else if (wanted.sms) {
+        results.push(await sendTwilioMessage({
+          channel: "sms",
+          to: phone,
+          body,
+          clubLocationId,
+          purpose: "test"
+        }));
+      }
+      if (wanted.whatsapp && !channelAlertOn(settings, "whatsapp")) {
+        results.push({ok: false, channel: "whatsapp", error: "WhatsApp is not subscribed (paid)."});
+      } else if (wanted.whatsapp) {
+        results.push(await sendTwilioMessage({
+          channel: "whatsapp",
+          to: phone,
+          body,
+          clubLocationId,
+          purpose: "test"
+        }));
+      }
+    }
+  }
+
+  const attempted = results.length;
+  const delivered = results.filter(row => row.ok).length;
+  if (!attempted || !delivered) {
+    const firstError = results.map(row => row.error || row.status).filter(Boolean)[0] || "";
+    const message = firstError === "missing-phone"
+      ? "Save an alert phone (E.164) before sending SMS or WhatsApp, or check In-app / Email."
+      : firstError === "no-admin-recipients"
+        ? "In-app test needs a Club Admin recipient. Sign in as Club Admin and try again."
+        : firstError
+          ? String(firstError)
+          : "Check at least one notification option that can deliver (In-app → FloqR Inbox, Email, or paid SMS/WhatsApp).";
     throw new HttpsError("failed-precondition", message);
   }
-  const errors = (delivery.results || [])
+  const errors = results
     .filter(row => !row.ok)
     .map(row => text(row.error || row.status, 280))
     .filter(Boolean);
   return {
     clubLocationId,
     dayKey: auth.dayKey,
-    delivered: delivery.delivered,
+    delivered,
     attempted,
-    skipped: skip || "",
-    dryRun: (delivery.results || []).some(row => row.dryRun),
+    skipped: "",
+    dryRun: results.some(row => row.dryRun),
     errors,
-    results: delivery.results,
+    results,
     twilio: twilioCredentialHealth(twilioCredentials())
   };
 });
@@ -485,6 +638,7 @@ exports.onScheduleNotifyQueued = onDocumentCreated({
       to: assigneePhone,
       body,
       clubLocationId,
+      shiftId: text(row.shiftId, 120),
       purpose: text(row.purpose, 80) || "schedule-invite"
     }));
   }
@@ -494,6 +648,7 @@ exports.onScheduleNotifyQueued = onDocumentCreated({
       to: assigneePhone,
       body,
       clubLocationId,
+      shiftId: text(row.shiftId, 120),
       purpose: text(row.purpose, 80) || "schedule-invite"
     }));
   }

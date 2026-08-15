@@ -81,7 +81,9 @@
     dj: "DJ",
     hospitality: "Waiter / Waitress / Bottle Girl",
     clubAdmin: "Club Admin",
-    masterAdmin: "Master Admin"
+    masterAdmin: "Master Admin",
+    busboyOrSecurity: "Bus Boys or Security",
+    venueManager: "Venue Manager"
   };
 
   const PROFILE_TEMPLATES = {
@@ -104,6 +106,16 @@
       title: "Hospitality Profile",
       headline: "Bottle service, waiter/waitress, table support, and venue experience.",
       sections: ["Venue experience", "Service style", "Languages", "Available nights", "Bottle service specialties", "Professional media"]
+    },
+    busboyOrSecurity: {
+      title: "Bus Boys or Security Profile",
+      headline: "Floor support, door, and security presence for the venue.",
+      sections: ["Venue experience", "Stations", "Available nights", "Languages", "Professional media"]
+    },
+    venueManager: {
+      title: "Venue Manager Profile",
+      headline: "Ops, staff coordination, and club-night management.",
+      sections: ["Venues managed", "Ops specialties", "Available nights", "Team size", "Professional media"]
     }
   };
 
@@ -145,6 +157,7 @@
   let currentMinglConnections = [];
   let currentMinglFriendRows = [];
   let currentPortalUsers = [];
+  let currentPortalDesignations = [];
   let currentUserBlocks = [];
   let currentBlockedUids = new Set();
   let portalMinglAttachmentFile = null;
@@ -193,7 +206,7 @@
         window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
         return;
       }
-      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy", bartr:"portalBartrStore", commerce:"portalBartrStore", store:"portalBartrStore", "mingl-friends":"portalMinglFriends", friends:"portalMinglFriends", unmingl:"portalMinglFriends"};
+      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy", bartr:"portalBartrStore", commerce:"portalBartrStore", store:"portalBartrStore", "mingl-friends":"portalMinglFriends", friends:"portalMinglFriends", unmingl:"portalMinglFriends", "work-calendar":"portalWorkCalendar", workcalendar:"portalWorkCalendar", "staff-calendar":"portalWorkCalendar", "service-members":"portalServiceMembers", servicemembers:"portalServiceMembers", "role-request":"portalServiceMembers"};
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
@@ -456,13 +469,15 @@
       if (x.includes("promoter")) roles.add("promoter");
       if (x.includes("dj")) roles.add("dj");
       if (x.includes("waiter") || x.includes("waitress") || x.includes("bottle") || x.includes("hospitality")) roles.add("hospitality");
+      if (x.includes("bus") || x.includes("security")) roles.add("busboyOrSecurity");
+      if (x.includes("venue manager") || x.includes("venuemanager")) roles.add("venueManager");
     });
     if (!roles.size) roles.add("patron");
     return Array.from(roles);
   }
 
   function canSendDirectInbox(profile = currentProfile) {
-    return getApprovedRoles(profile).some(role => ["masterAdmin","clubAdmin","promoter","dj","hospitality"].includes(role));
+    return getApprovedRoles(profile).some(role => ["masterAdmin","clubAdmin","promoter","dj","hospitality","busboyOrSecurity","venueManager"].includes(role));
   }
 
   function normalizeSearchText(value) {
@@ -2778,25 +2793,330 @@
     byId("composeBody").disabled = false;
   }
 
-  function renderStaffCalendarLinks(user, designations = []) {
-    const uid = user?.uid || "";
-    const mine = (Array.isArray(designations) ? designations : []).filter(row => {
-      if (!uid) return false;
-      if (String(row.workerUid || row.uid || "") !== uid) return false;
-      return String(row.status || "").toLowerCase() !== "rejected";
+  const SERVICE_ROLE_LABELS = {
+    clubAdmin: "Club Admin",
+    dj: "DJ",
+    promoter: "Promoter",
+    hospitality: "Waiter / Waitress / Bottle Girl",
+    busboyOrSecurity: "Bus Boys or Security",
+    venueManager: "Venue Manager",
+    bartender: "Bartender / Barman",
+    mediaCreator: "Videographer / Camera Operator"
+  };
+
+  function publicProfileTypeForRole(roleType) {
+    if (roleType === "hospitality" || roleType === "bartender") return "hospitality";
+    if (roleType === "busboyOrSecurity" || roleType === "venueManager" || roleType === "dj" || roleType === "promoter") return roleType;
+    return "patron";
+  }
+
+  function clubLocationLabel(id) {
+    const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || {};
+    return [loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" - ") || id;
+  }
+
+  function populateServiceMemberLocations() {
+    const select = byId("smRelatedLocations");
+    if (!select) return;
+    const locations = window.SHOUTOUT_CLUB_LOCATIONS || {};
+    select.innerHTML = Object.entries(locations).map(([id, loc]) => {
+      const label = [loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" - ");
+      return `<option value="${esc(id)}">${esc(label)}</option>`;
+    }).join("");
+  }
+
+  function smWorkerRoleLabel(request = {}) {
+    const type = String(request.roleType || "").toLowerCase();
+    if (SERVICE_ROLE_LABELS[type]) return SERVICE_ROLE_LABELS[type];
+    if (type === "busboy" || type === "security") return "Bus Boys or Security";
+    return request.serviceSubtype || request.roleLabel || "Waiter / Waitress / Bottle Girl";
+  }
+
+  function smDesignationId(clubLocationId, uid) {
+    return `${clubLocationId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  }
+
+  function smAdminClubIds(profile = {}, designations = [], uid = "") {
+    const ids = new Set();
+    (Array.isArray(profile.clubAdminLocationIds) ? profile.clubAdminLocationIds : []).forEach(id => { if (id) ids.add(String(id)); });
+    (Array.isArray(designations) ? designations : []).forEach(row => {
+      if (String(row.workerUid || row.uid || "") !== String(uid)) return;
+      if (String(row.status || "").toLowerCase() === "rejected") return;
+      const roles = `${row.roleElectionType || ""} ${(row.workerRoles || []).join(" ")}`;
+      if (/club\s*admin/i.test(roles) && row.clubLocationId) ids.add(String(row.clubLocationId));
     });
-    const href = mine[0]?.clubLocationId
-      ? `./staff-worksheet.html?v=29.09.115&location=${encodeURIComponent(mine[0].clubLocationId)}`
-      : "./staff-worksheet.html?v=29.09.115";
-    const show = mine.length > 0;
+    return [...ids];
+  }
+
+  function showServiceMemberPane(paneId) {
+    ["serviceMembersRequestPane", "serviceMembersAdminPane"].forEach(id => {
+      byId(id)?.classList.toggle("hidden", id !== paneId);
+    });
+    document.querySelectorAll("#serviceMembersSubtabs .admin-subtab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.smPane === paneId);
+    });
+  }
+
+  async function submitServiceMemberRequest() {
+    const user = auth.currentUser;
+    if (!user) {
+      setText("smRoleStatus", "Please sign in first.");
+      return;
+    }
+    const roleType = (byId("smRequestType")?.value || "").trim();
+    const publicName = (byId("smPublicName")?.value || "").trim();
+    const serviceSubtype = (byId("smServiceSubtype")?.value || "").trim();
+    const instagram = (byId("smInstagram")?.value || "").trim();
+    const phone = (byId("smPhone")?.value || "").trim();
+    const website = (byId("smWebsite")?.value || "").trim();
+    const notes = (byId("smRoleNotes")?.value || "").trim();
+    const relatedLocations = Array.from(byId("smRelatedLocations")?.selectedOptions || []).map(option => option.value).filter(Boolean);
+    if (!roleType || !publicName) {
+      setText("smRoleStatus", "Role and public name are required.");
+      return;
+    }
+    if (!relatedLocations.length) {
+      setText("smRoleStatus", "Select at least one club for the association request.");
+      return;
+    }
+    const request = {
+      uid: user.uid,
+      email: user.email || "",
+      roleType,
+      publicName,
+      serviceSubtype,
+      instagram,
+      phone,
+      website,
+      notes,
+      relatedLocations,
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    await db.collection("roleRequests").add(request);
+    const batch = db.batch();
+    relatedLocations.forEach(clubLocationId => {
+      const associationRef = db.collection("workerAssociationRequests").doc();
+      batch.set(associationRef, {
+        ...request,
+        clubLocationId,
+        roleLabel: SERVICE_ROLE_LABELS[roleType] || roleType,
+        workerUid: user.uid,
+        status: "pending",
+        requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const notificationRef = db.collection("clubAdminNotifications").doc();
+      batch.set(notificationRef, {
+        type: "workerAssociationRequest",
+        clubLocationId,
+        workerAssociationRequestId: associationRef.id,
+        workerUid: user.uid,
+        workerName: publicName || user.displayName || user.email || "FLOQR patron",
+        roleLabel: SERVICE_ROLE_LABELS[roleType] || roleType,
+        serviceSubtype,
+        status: "unread",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    batch.set(db.collection("users").doc(user.uid), {
+      serviceMember: roleType !== "clubAdmin",
+      requestedRoles: firebase.firestore.FieldValue.arrayUnion(SERVICE_ROLE_LABELS[roleType] || roleType),
+      requestedClubLocationIds: relatedLocations,
+      publicProfileType: publicProfileTypeForRole(roleType),
+      serviceSubtype,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    await batch.commit();
+    if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
+    if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
+    setText("smRoleStatus", `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
+  }
+
+  async function loadServiceMemberAdmin(clubLocationId) {
+    const wrap = byId("smPendingRequests");
+    if (!wrap) return;
+    if (!clubLocationId) {
+      wrap.innerHTML = "<p class='sub'>No Club Admin club is linked to this account yet.</p>";
+      return;
+    }
+    const requests = await getCollectionSafe("workerAssociationRequests", x => x.clubLocationId === clubLocationId, 400);
+    const pending = requests.filter(request => String(request.status || "pending").toLowerCase() === "pending");
+    wrap.innerHTML = pending.length ? pending.map(request => `<div class="queue-item">
+      <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
+      <p>${esc(request.roleLabel || smWorkerRoleLabel(request))}${request.serviceSubtype ? ` - ${esc(request.serviceSubtype)}` : ""}</p>
+      <small>${esc(request.email || request.instagram || "")}</small>
+      <div class="queue-actions"><button type="button" data-sm-request="${esc(request.id)}" data-sm-status="approved">Approve</button><button type="button" data-sm-request="${esc(request.id)}" data-sm-status="rejected">Reject</button></div>
+    </div>`).join("") : "<p class='sub'>No pending worker requests for this club yet.</p>";
+    wrap.querySelectorAll("[data-sm-request]").forEach(button => {
+      button.addEventListener("click", () => setServiceMemberRequest(button.dataset.smRequest, button.dataset.smStatus, clubLocationId));
+    });
+  }
+
+  async function setServiceMemberRequest(requestId, status, clubLocationId) {
+    const requests = await getCollectionSafe("workerAssociationRequests", x => x.id === requestId, 50);
+    const request = requests.find(item => item.id === requestId);
+    if (!request) return;
+    const role = smWorkerRoleLabel(request);
+    const uid = request.uid || request.workerUid;
+    if (status === "approved" && uid) {
+      await db.collection("clubEmployeeDesignations").doc(smDesignationId(clubLocationId, uid)).set({
+        clubLocationId,
+        clubLocationName: clubLocationLabel(clubLocationId),
+        workerUid: uid,
+        workerEmail: request.email || "",
+        workerName: request.publicName || request.displayName || request.email || "Club worker",
+        workerRoles: firebase.firestore.FieldValue.arrayUnion(role),
+        roleElectionType: role,
+        status: "approved",
+        approvedByUid: auth.currentUser?.uid || "",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+      const userPatch = {
+        approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
+        approvedLocations: firebase.firestore.FieldValue.arrayUnion(clubLocationId),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (role !== "Club Admin") userPatch.serviceMember = true;
+      await db.collection("users").doc(uid).set(userPatch, {merge: true});
+      await db.collection("inboxNotifications").add({
+        recipientUid: uid,
+        type: "workerAssociation",
+        title: "Club association approved",
+        body: `${clubLocationLabel(clubLocationId)} approved your ${role} association.`,
+        clubLocationId,
+        senderUid: "system",
+        senderName: "System Message",
+        read: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    await db.collection("workerAssociationRequests").doc(requestId).set({
+      status,
+      reviewedByUid: auth.currentUser?.uid || "",
+      reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    setText("smAdminStatus", `Worker association ${status}.`);
+    await loadServiceMemberAdmin(clubLocationId);
+  }
+
+  function renderServiceMemberElectMatches() {
+    const query = String(byId("smElectSearch")?.value || "").trim().toLowerCase();
+    const wrap = byId("smElectMatches");
+    if (!wrap) return;
+    if (query.length < 2) {
+      wrap.innerHTML = "<p class='sub'>Type at least two characters to search patrons.</p>";
+      return;
+    }
+    const matches = currentPortalUsers.filter(profile => {
+      const hay = [profile.displayName, profile.fullName, profile.username, profile.email].filter(Boolean).join(" ").toLowerCase();
+      return hay.includes(query);
+    }).slice(0, 12);
+    wrap.innerHTML = matches.length ? matches.map(profile => {
+      const uid = profile.uid || profile.id;
+      return `<div class="queue-item">
+        <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Patron")}</strong>
+        <p>${esc(profile.username ? `@${profile.username}` : profile.email || "")}</p>
+        <button type="button" data-sm-elect-uid="${esc(uid)}">Elect this patron</button>
+      </div>`;
+    }).join("") : "<p class='sub'>No patron matched that search. They must have a FloqR profile first.</p>";
+    wrap.querySelectorAll("[data-sm-elect-uid]").forEach(button => {
+      button.addEventListener("click", () => electServiceMember(button.dataset.smElectUid));
+    });
+  }
+
+  async function electServiceMember(forcedUid) {
+    const clubLocationId = byId("smAdminClubSelect")?.value || "";
+    if (!clubLocationId) {
+      setText("smAdminStatus", "Select a club first.");
+      return;
+    }
+    const query = byId("smElectSearch")?.value || "";
+    const role = byId("smElectRole")?.value || "Club Admin";
+    const match = forcedUid
+      ? currentPortalUsers.find(profile => (profile.uid || profile.id) === forcedUid)
+      : currentPortalUsers.find(profile => {
+        const hay = [profile.displayName, profile.fullName, profile.username, profile.email].filter(Boolean).join(" ").toLowerCase();
+        return hay.includes(String(query).toLowerCase());
+      });
+    if (!match || !(match.uid || match.id)) {
+      setText("smAdminStatus", "No patron matched the role election search. The person must be a patron first.");
+      return;
+    }
+    const uid = match.uid || match.id;
+    await db.collection("clubEmployeeDesignations").doc(smDesignationId(clubLocationId, uid)).set({
+      clubLocationId,
+      clubLocationName: clubLocationLabel(clubLocationId),
+      workerUid: uid,
+      workerEmail: match.email || "",
+      workerName: match.displayName || match.fullName || match.username || match.email || "Club worker",
+      workerUsername: match.username || "",
+      workerRoles: firebase.firestore.FieldValue.arrayUnion(role),
+      roleElectionType: role,
+      promoterCompany: byId("smElectCompany")?.value.trim() || "",
+      independentPromoter: !!byId("smElectIndependent")?.checked,
+      electedByUid: auth.currentUser?.uid || "",
+      electedByEmail: auth.currentUser?.email || "",
+      status: "elected",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    const electPatch = {
+      approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
+      approvedLocations: firebase.firestore.FieldValue.arrayUnion(clubLocationId),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (role !== "Club Admin") electPatch.serviceMember = true;
+    await db.collection("users").doc(uid).set(electPatch, {merge: true});
+    setText("smAdminStatus", `${match.displayName || match.email || "Patron"} elected as ${role} for ${clubLocationLabel(clubLocationId)}.`);
+  }
+
+  async function renderStaffCalendarLinks(user, designations = []) {
+    const uid = user?.uid || "";
+    const clubIds = [...new Set((Array.isArray(designations) ? designations : [])
+      .filter(row => String(row.workerUid || row.uid || "") === uid && String(row.status || "").toLowerCase() !== "rejected")
+      .map(row => String(row.clubLocationId || ""))
+      .filter(Boolean))];
+    const clubsById = {};
+    await Promise.all(clubIds.map(async id => {
+      try {
+        const snap = await db.collection("clubLocations").doc(id).get();
+        clubsById[id] = snap.exists ? (snap.data() || {}) : {};
+      } catch (_error) {
+        clubsById[id] = {};
+      }
+    }));
+    const datapoints = window.FLOQRTabGates?.fromAffiliation
+      ? window.FLOQRTabGates.fromAffiliation({user: currentProfile || user, uid, designations, clubsById})
+      : {serviceMember: false, affiliatedPaidScheduling: false, workCalendarEligible: 0, isClubAdmin: false};
+    window.FLOQRTabGates?.bind?.([{
+      tab: "#portalWorkCalendarTab",
+      panel: "#portalWorkCalendar",
+      when: [
+        {datapoint: "serviceMember", equals: true},
+        {datapoint: "affiliatedPaidScheduling", equals: true}
+      ],
+      reason: "work-calendar"
+    }, {
+      tab: "#serviceMembersAdminSubtab",
+      when: {datapoint: "isClubAdmin", equals: true},
+      reason: "service-members-admin"
+    }], datapoints);
+    const href = datapoints.affiliatedPaidSchedulingClubIds?.[0]
+      ? `./staff-worksheet.html?v=29.09.117&location=${encodeURIComponent(datapoints.affiliatedPaidSchedulingClubIds[0])}`
+      : "./staff-worksheet.html?v=29.09.117";
+    const frame = byId("portalWorkCalendarFrame");
+    if (frame && datapoints.workCalendarEligible) frame.src = href;
     const card = byId("staffCalendarCard");
-    const overviewLink = byId("staffCalendarLink");
-    const profileWrap = byId("staffCalendarProfileWrap");
-    const profileLink = byId("staffCalendarProfileLink");
-    card?.classList.toggle("hidden", !show);
-    profileWrap?.classList.toggle("hidden", !show);
-    if (overviewLink) overviewLink.href = href;
-    if (profileLink) profileLink.href = href;
+    card?.classList.toggle("hidden", !datapoints.workCalendarEligible);
+    populateServiceMemberLocations();
+    const adminIds = datapoints.clubAdminLocationIds?.length
+      ? datapoints.clubAdminLocationIds
+      : smAdminClubIds(currentProfile || user, designations, uid);
+    const clubSelect = byId("smAdminClubSelect");
+    if (clubSelect) {
+      clubSelect.innerHTML = adminIds.map(id => `<option value="${esc(id)}">${esc(clubLocationLabel(id))}</option>`).join("");
+      if (adminIds[0]) loadServiceMemberAdmin(adminIds[0]).catch(() => {});
+    }
+    if (!datapoints.isClubAdmin) showServiceMemberPane("serviceMembersRequestPane");
   }
 
   async function loadPortal(user) {
@@ -2915,7 +3235,8 @@
       getCollectionSafe("clubEmployeeDesignations", null, 300)
     ]).then(async ([allUsers, employeeDesignations]) => {
       currentPortalUsers = allUsers;
-      renderStaffCalendarLinks(user, employeeDesignations);
+      currentPortalDesignations = employeeDesignations;
+      await renderStaffCalendarLinks(user, employeeDesignations);
       if (!currentMinglConnections.length) currentMinglConnections = await getPortalMinglConnections(user, allUsers, queriedConnections);
       renderMinglFriendSettings(allUsers);
       renderPortalMinglRequests(currentMinglConnections, user);
@@ -3005,6 +3326,17 @@
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
+    bind("smSubmitRoleRequestBtn", submitServiceMemberRequest);
+    bind("smElectBtn", () => electServiceMember());
+    byId("smElectSearch")?.addEventListener("input", renderServiceMemberElectMatches);
+    byId("smAdminClubSelect")?.addEventListener("change", () => {
+      loadServiceMemberAdmin(byId("smAdminClubSelect")?.value || "").catch(() => {});
+    });
+    document.getElementById("serviceMembersSubtabs")?.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-sm-pane]");
+      if (!btn || btn.classList.contains("hidden") || btn.hidden) return;
+      showServiceMemberPane(btn.dataset.smPane);
+    });
     bind("commerceSaveProductBtn", publishBartrProduct);
     window.FLOQRUrlMediaField?.bind?.({
       urlInputId:"commerceProductImage",

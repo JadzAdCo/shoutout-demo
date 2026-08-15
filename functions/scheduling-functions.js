@@ -330,6 +330,31 @@ async function writeInbox(recipientUid, payload = {}) {
   });
 }
 
+async function writeScheduleAudit(entry = {}) {
+  try {
+    await db.collection("scheduleShiftAudit").add({
+      action: text(entry.action, 40),
+      shiftId: text(entry.shiftId, 120),
+      ownerKey: text(entry.ownerKey, 220),
+      ownerType: text(entry.ownerType, 40),
+      ownerId: text(entry.ownerId, 160),
+      clubLocationId: text(entry.clubLocationId, 160),
+      actorUid: text(entry.actorUid, 160),
+      actorEmail: text(entry.actorEmail, 200).toLowerCase(),
+      assigneeUid: text(entry.assigneeUid, 160),
+      assigneeName: text(entry.assigneeName, 120),
+      status: text(entry.status, 40),
+      source: text(entry.source, 80),
+      channels: Array.isArray(entry.channels) ? entry.channels.map(v => text(v, 20)).filter(Boolean).slice(0, 8) : [],
+      message: text(entry.message, 500),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtMs: Date.now()
+    });
+  } catch (error) {
+    console.error("scheduleShiftAudit write failed", error?.message || error);
+  }
+}
+
 async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
   const origin = process.env.FLOQR_PUBLIC_ORIGIN || DEFAULT_ORIGIN;
   const approveUrl = shiftApproveUrl({...shift, id: shift.id}, origin);
@@ -397,6 +422,21 @@ async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
     results.channelsQueued = true;
   }
   results.channels = channels;
+  await writeScheduleAudit({
+    action: purpose === "schedule-cancelled" ? "notified-cancel" : "notified",
+    shiftId: shift.id,
+    ownerKey: shift.ownerKey,
+    ownerType: shift.ownerType,
+    ownerId: shift.ownerId,
+    clubLocationId,
+    actorUid: text(shift.createdByUid || shift.publishedByUid, 160),
+    assigneeUid: shift.assigneeUid,
+    assigneeName: shift.assigneeName,
+    status: shift.status,
+    source: "notify",
+    channels,
+    message: `${purpose} via ${channels.join("/") || "none"}`
+  });
   return results;
 }
 
@@ -487,6 +527,22 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
     updatedAt: now
   };
   await ref.set(shift);
+
+  await writeScheduleAudit({
+    action: "created",
+    shiftId: ref.id,
+    ownerKey: key,
+    ownerType,
+    ownerId,
+    clubLocationId: shift.clubLocationId,
+    actorUid: request.auth.uid,
+    actorEmail: request.auth.token?.email,
+    assigneeUid,
+    assigneeName,
+    status: shift.status,
+    source: asDraft ? "draft" : "create",
+    message: `${assigneeName} ${roleLabel} ${asDraft ? "draft" : "pending"}`
+  });
 
   let notifyResult = null;
   if (notify && assigneeUid) {
@@ -606,8 +662,24 @@ exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 6
       published: true,
       publishedAt: admin.firestore.FieldValue.serverTimestamp(),
       publishedByUid: request.auth.uid,
+      publishedByEmail: text(request.auth.token?.email, 200).toLowerCase(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
+    await writeScheduleAudit({
+      action: "published",
+      shiftId: shift.id,
+      ownerKey: key,
+      ownerType,
+      ownerId,
+      clubLocationId: text(shift.clubLocationId, 160) || (ownerType === "club" ? ownerId : ""),
+      actorUid: request.auth.uid,
+      actorEmail: request.auth.token?.email,
+      assigneeUid: shift.assigneeUid,
+      assigneeName: shift.assigneeName,
+      status: nextStatus,
+      source: "publish-week",
+      message: `Published ${shift.roleLabel || "shift"} for ${shift.assigneeName || "staff"}`
+    });
     let notifyResult = null;
     if (text(shift.assigneeUid, 160)) {
       notifyResult = await notifyAssigneeChannels({...shift, status: nextStatus}, "schedule-invite");
@@ -708,9 +780,26 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
     status: nextStatus,
     responseDecision: decision,
     respondedByUid: uid,
+    respondedByEmail: text(request.auth.token?.email, 200).toLowerCase(),
     respondedAt: now,
     updatedAt: now
   }, {merge: true});
+
+  await writeScheduleAudit({
+    action: nextStatus,
+    shiftId,
+    ownerKey: shift.ownerKey,
+    ownerType: shift.ownerType,
+    ownerId: shift.ownerId,
+    clubLocationId: shift.clubLocationId,
+    actorUid: uid,
+    actorEmail: request.auth.token?.email,
+    assigneeUid: shift.assigneeUid,
+    assigneeName: shift.assigneeName,
+    status: nextStatus,
+    source: text(request.data?.from, 80) || "callable",
+    message: `${shift.assigneeName || "Worker"} ${nextStatus} after notify`
+  });
 
   await writeInbox(shift.createdByUid, {
     title: `Shift ${nextStatus}`,
@@ -768,6 +857,21 @@ exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, 
     return row;
   }).sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
   return {shifts, canManage: true};
+});
+
+exports.listScheduleShiftAudit = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const ownerType = text(request.data?.ownerType, 40);
+  const ownerId = text(request.data?.ownerId, 160);
+  if (!OWNER_TYPES.has(ownerType) || !ownerId) throw new HttpsError("invalid-argument", "ownerType and ownerId are required.");
+  if (!await canManageOwner(ownerType, ownerId, request.auth)) {
+    throw new HttpsError("permission-denied", "You cannot read this schedule log.");
+  }
+  const key = ownerKey(ownerType, ownerId);
+  const snap = await db.collection("scheduleShiftAudit").where("ownerKey", "==", key).limit(120).get();
+  const events = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
+    .sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+  return {events};
 });
 
 async function isElectedClubWorker(ownerId, authContext = {}) {

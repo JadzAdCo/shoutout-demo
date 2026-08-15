@@ -179,6 +179,23 @@ function describeOutboundSkip(settings = {}) {
   return "";
 }
 
+function flagOn(value) {
+  return value === true || value === 1 || value === "1" || value === "true";
+}
+
+/** Channels the club wants for an alert. Overlay (test checkboxes) wins when provided. */
+function selectedClubAlertChannels(settings = {}, overlay = null) {
+  const src = overlay && typeof overlay === "object" ? overlay : settings;
+  const fromOverlay = overlay && typeof overlay === "object";
+  return {
+    inApp: flagOn(src.inApp) || flagOn(src.notifyInApp),
+    push: flagOn(src.push) || flagOn(src.notifyPush),
+    email: flagOn(src.email) || flagOn(src.notifyEmail) || flagOn(src.emailEnabled),
+    sms: fromOverlay ? flagOn(src.sms) || flagOn(src.notifySms) : channelAlertOn(settings, "sms"),
+    whatsapp: fromOverlay ? flagOn(src.whatsapp) || flagOn(src.notifyWhatsapp) : channelAlertOn(settings, "whatsapp")
+  };
+}
+
 /** Resolve SMS/WhatsApp targets from clubNotificationSettings. Paid subscription is stored separately; alerts follow smsEnabled / whatsappEnabled, with a legacy fallback when those flags were never written after payment. */
 function selectOutboundTargets(settings = {}) {
   const phone = normalizeE164(settings.alertPhone || settings.smsPhone || settings.phone || "");
@@ -214,5 +231,6 @@ module.exports = {
   explainTwilioDeliveryError,
   channelAlertOn,
   describeOutboundSkip,
+  selectedClubAlertChannels,
   selectOutboundTargets
 };

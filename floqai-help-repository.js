@@ -198,15 +198,15 @@
     },
     {
       id: "help-staff-scheduling",
-      title: "Staff Scheduling subscription",
-      body: "Venue field clubLocations.staffSchedulingPaid is 1 or 0. schedulingSubscriptions status is paid this month or not paid this month. When 1 / paid this month: calendar unlocked. When 0 / not paid this month: Subscribe (new) or Resubscribe (prior subscriber).",
+      title: "Calendar & Scheduler",
+      body: "Club Admin Calendar shows confirmed service-member shifts for the week. Scheduler is the people × days draft/publish grid. A green Paid this month pill is shown to Club Admins when staffSchedulingPaid=1. Open Scheduler ? for create/publish and multi-delete. Calendar ? and Schedule log ? cover the confirmed week and who created, published, and confirmed.",
       searchPhrases: [
         "staff scheduling", "scheduling subscription", "subscribe $20", "resubscribe", "staffSchedulingPaid",
         "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule"
       ],
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
-        {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "club admin scheduling", blurb: "Venue staff calendar and subscribe gate"}
+        {label: "Club Admin Calendar & Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Confirmed week calendar plus Scheduler drafts"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelScheduling"
@@ -214,12 +214,13 @@
     {
       id: "help-club-notification-subscriptions",
       title: "Club SMS and WhatsApp notification subscriptions",
-      body: "Club Admin → Notifications stores SMS and WhatsApp as compact pills. Green means Firebase subscription is 1 (paid $10 prepaid pack). Red/flashing means 0 (not subscribed). Labels are SMS and WhatsApp; monthly/yearly, credits remaining, and Subscribe live in the channel ?. Uncheck pauses alerts without losing the paid subscription. Save does not reopen Stripe for a subscribed channel. Test alerts need an E.164 alert phone plus SMS and/or WhatsApp left on. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK).",
+      body: "Club Admin → Notifications: Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Green pill = Firebase subscription 1 (prepaid $10 pack); red = 0. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK).",
       searchPhrases: [
         "sms notification subscription", "whatsapp notification subscription", "save notification choices",
         "sms already paid", "notification stripe again", "sms credits", "whatsapp credits",
         "club notifications", "alert phone", "sms subscribed", "green sms", "red whatsapp",
-        "invalid username", "twilio account sid", "send test alert", "authentication error"
+        "invalid username", "twilio account sid", "send test alert", "authentication error",
+        "in-app notification", "system message", "floqr inbox test"
       ],
       links: [
         {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
@@ -349,17 +350,33 @@
     {
       id: "help-staff-worksheet",
       title: "Work Sheet - Weekly Staff Calendar",
-      body: "Elected service members open Staff Calendar from My Profile to see a read-only people × days grid of published shifts for every colleague at that venue. Drafts stay in Club Admin. If you work at more than one club, pick the venue on the Work Sheet.",
+      body: "Elected service members open the Work Calendar tab in Settings when users.serviceMember is true and they are affiliated to a club with staffSchedulingPaid=1. The week grid shows published colleague shifts. Drafts stay in Club Admin.",
       searchPhrases: [
         "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
         "colleague schedule", "who is working", "my shifts this week", "elected staff schedule"
       ],
       links: [
-        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
-        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
+        {label: "Work Calendar tab", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "staff-worksheet.html"
+    },
+    {
+      id: "help-service-members",
+      title: "Service Members",
+      body: "Settings → Service Members. Patrons who are not yet approved request Club Admin, DJ, Promoter, hospitality, bus boy/security, venue manager, bartender, or media access and pick clubs. Each club gets an association request. Club Admins (isClubAdmin) also see Review & elect: accept pending requests or search and elect a patron as a service member. Follow Services stays on its own tab.",
+      searchPhrases: [
+        "service members", "request club admin", "request access", "elect service member",
+        "worker association", "request dj access", "request promoter", "bus boys or security",
+        "venue manager", "approve worker request"
+      ],
+      links: [
+        {label: "Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalServiceMembers"
     },
     {
       id: "help-venue-website-ingest",

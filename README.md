@@ -1,6 +1,10 @@
-# CURRENT PACKAGE: FLOQR ShoutOut v29.09.8 (workspace)
+# CURRENT PACKAGE: FLOQR ShoutOut v29.09.117 (workspace)
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
+
+Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=29.09.117&start=search`
+
+v29.09.117: Settings → **Service Members** (request + Club Admin review/elect). **Work Calendar** tab gated by `serviceMember` + paid scheduling. Notifications **Send test alert** follows checked channels; In-app → FloqR Inbox System Message.
 
 ## UI media input convention (required)
 
