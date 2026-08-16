@@ -352,11 +352,20 @@
     document.querySelectorAll("[data-club-section]").forEach(input => {
       input.checked = sectionSettings[input.dataset.clubSection] === undefined ? true : sectionSettings[input.dataset.clubSection] !== false;
     });
-    const displayFormats = new Set(publicClubProfile.displayScreenFormatIds || ["led-96x48"]);
+    const displayFlags = window.FLOQRScreenDatapoints?.applyVenue?.({
+      displayScreenFormatIds: publicClubProfile.displayScreenFormatIds,
+      VenueSupports96x48: publicClubProfile.VenueSupports96x48,
+      VenueSupports64x48: publicClubProfile.VenueSupports64x48,
+      VenueSupports64x32: publicClubProfile.VenueSupports64x32,
+      primaryDisplayScreenFormatId: publicClubProfile.primaryDisplayScreenFormatId,
+      secondaryDisplayScreenFormatId: publicClubProfile.secondaryDisplayScreenFormatId
+    }) || {};
+    const displayFormats = new Set(displayFlags.displayScreenFormatIds || publicClubProfile.displayScreenFormatIds || ["led-96x48"]);
     document.querySelectorAll("[data-club-display-format]").forEach(input => {
       input.checked = displayFormats.has(input.dataset.clubDisplayFormat);
     });
-    if (byId("clubPrimaryDisplayFormat")) byId("clubPrimaryDisplayFormat").value = publicClubProfile.primaryDisplayScreenFormatId || [...displayFormats][0] || "led-96x48";
+    if (byId("clubPrimaryDisplayFormat")) byId("clubPrimaryDisplayFormat").value = displayFlags.primaryDisplayScreenFormatId || publicClubProfile.primaryDisplayScreenFormatId || [...displayFormats][0] || "led-96x48";
+    if (byId("clubSecondaryDisplayFormat")) byId("clubSecondaryDisplayFormat").value = displayFlags.secondaryDisplayScreenFormatId || publicClubProfile.secondaryDisplayScreenFormatId || byId("clubPrimaryDisplayFormat")?.value || [...displayFormats][0] || "led-96x48";
     if (byId("patronTemplateBackgroundEditingEnabled")) byId("patronTemplateBackgroundEditingEnabled").checked = publicClubProfile.patronTemplateBackgroundEditingEnabled !== false;
     if (byId("clubPublicProfileReport")) {
       byId("clubPublicProfileReport").innerHTML = simpleRows([
@@ -434,6 +443,21 @@
     const primaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubPrimaryDisplayFormat")?.value)
       ? byId("clubPrimaryDisplayFormat").value
       : displayScreenFormatIds[0];
+    const secondaryDisplayScreenFormatId = displayScreenFormatIds.includes(byId("clubSecondaryDisplayFormat")?.value)
+      ? byId("clubSecondaryDisplayFormat").value
+      : primaryDisplayScreenFormatId;
+    const screenFlags = window.FLOQRScreenDatapoints?.venueFirestoreFields?.({
+      ...(window.FLOQRScreenDatapoints?.flagsFromLedIds?.(displayScreenFormatIds, "venueKey") || {}),
+      primaryDisplayScreenFormatId,
+      secondaryDisplayScreenFormatId
+    }) || {
+      VenueSupports96x48: displayScreenFormatIds.includes("led-96x48") ? 1 : 0,
+      VenueSupports64x48: displayScreenFormatIds.includes("led-64x48") ? 1 : 0,
+      VenueSupports64x32: displayScreenFormatIds.includes("led-64x32") ? 1 : 0,
+      displayScreenFormatIds,
+      primaryDisplayScreenFormatId,
+      secondaryDisplayScreenFormatId
+    };
     const streetAddress = byId("clubProfileStreetAddress")?.value.trim() || loc.streetAddress || "";
     const city = byId("clubProfileCity")?.value.trim() || loc.city || "";
     const stateRegion = byId("clubProfileRegion")?.value.trim() || loc.region || loc.stateRegion || "";
@@ -482,8 +506,12 @@
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
       featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
-      displayScreenFormatIds,
-      primaryDisplayScreenFormatId,
+      VenueSupports96x48: screenFlags.VenueSupports96x48,
+      VenueSupports64x48: screenFlags.VenueSupports64x48,
+      VenueSupports64x32: screenFlags.VenueSupports64x32,
+      displayScreenFormatIds: screenFlags.displayScreenFormatIds || displayScreenFormatIds,
+      primaryDisplayScreenFormatId: screenFlags.primaryDisplayScreenFormatId || primaryDisplayScreenFormatId,
+      secondaryDisplayScreenFormatId: screenFlags.secondaryDisplayScreenFormatId || secondaryDisplayScreenFormatId,
       patronTemplateBackgroundEditingEnabled:byId("patronTemplateBackgroundEditingEnabled")?.checked !== false,
       publicProfileSections:publicSectionSettings(),
       publicProfilePublished:!!byId("clubProfilePublished")?.checked,
@@ -528,7 +556,8 @@
     const assignedIds = new Set(publicClubProfile.templates || loc.templates || []);
     const rows = Object.values(clubTemplates)
       .filter(template => String(template.status || "active") === "active")
-      .filter(template => (template.screenFormatIds || formats).some(id => formats.includes(id)))
+      .map(template => window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template)
+      .filter(template => window.FLOQRScreenDatapoints?.templateFitsVenue?.(template, publicClubProfile || loc) !== false)
       .filter(template => !query || templateBackgroundSearchText(template).includes(query))
       .sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
     wrap.innerHTML = rows.map(template => {
@@ -2211,12 +2240,13 @@
   }
 
   async function loadReports() {
-    const [users, shoutouts, liveDocs, events, guestLists] = await Promise.all([
+    const [users, shoutouts, liveDocs, events, guestLists, templateDocs] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("events"),
-      getCollectionSafe("guestListRequests")
+      getCollectionSafe("guestListRequests"),
+      getCollectionSafe("templates")
     ]);
 
     const locationShoutouts = shoutouts.filter(x => (x.clubLocationId || x.location || x.club) === locationId);
@@ -2333,6 +2363,16 @@
         .sort((a,b) => b[1].requests - a[1].requests)
         .map(([promoter,v]) => [promoter, `${v.requests} requests / ${v.guests} guests`]);
       byId("clubPromoterReport").innerHTML = rows.length ? simpleRows(rows) : "<p class='sub'>No promoter guest-list data yet.</p>";
+    }
+
+    if (byId("clubTemplateCatalogReport") && window.FLOQRScreenDatapoints?.catalogReportHtml) {
+      const catalog = window.FLOQRScreenDatapoints.mergeCatalog(window.SHOUTOUT_TEMPLATES, templateDocs);
+      const venue = window.FLOQRScreenDatapoints.applyVenue({...(publicClubProfile || loc)});
+      byId("clubTemplateCatalogReport").innerHTML = window.FLOQRScreenDatapoints.catalogReportHtml({
+        templates: catalog,
+        venue,
+        showVenueColumn: true
+      });
     }
 
     byId("reportsList").innerHTML = `
