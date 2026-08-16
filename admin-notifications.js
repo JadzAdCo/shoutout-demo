@@ -21,6 +21,72 @@
 
   const SMS_PACK = 466;
   const WA_PACK = 233;
+  const MESSAGE_TEMPLATE_IDS = ["schedule-invite", "schedule-update", "shift-confirmed", "shift-declined"];
+  const DEFAULT_MESSAGE_TEMPLATES = {
+    "schedule-invite": {
+      title: "New shift needs your confirmation",
+      body: "{club} schedule: {role} {when}. Confirm or decline this shift: {link}"
+    },
+    "schedule-update": {
+      title: "Schedule update",
+      body: "{club} updated your {role} {when}. Review it here: {link}"
+    },
+    "shift-confirmed": {
+      title: "Shift confirmed",
+      body: "{worker} confirmed the {role} on {when}."
+    },
+    "shift-declined": {
+      title: "Shift declined",
+      body: "{worker} declined the {role} on {when}."
+    }
+  };
+
+  function showNotifyPane(paneId) {
+    document.querySelectorAll("#notifySubtabs .admin-subtab").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-notify-pane") === paneId);
+    });
+    document.querySelectorAll("#panelNotifications .admin-subpanel").forEach(pane => {
+      pane.classList.toggle("hidden", pane.id !== paneId);
+    });
+  }
+
+  function templateField(id, part) {
+    return byId(`notifyTpl-${id}-${part}`);
+  }
+
+  function fillMessageTemplates(templates = {}) {
+    MESSAGE_TEMPLATE_IDS.forEach(id => {
+      const row = templates[id] && typeof templates[id] === "object" ? templates[id] : {};
+      const fallback = DEFAULT_MESSAGE_TEMPLATES[id];
+      if (templateField(id, "title")) templateField(id, "title").value = String(row.title || fallback.title);
+      if (templateField(id, "body")) templateField(id, "body").value = String(row.body || fallback.body);
+    });
+  }
+
+  function readMessageTemplatesFromForm() {
+    const out = {};
+    MESSAGE_TEMPLATE_IDS.forEach(id => {
+      const fallback = DEFAULT_MESSAGE_TEMPLATES[id];
+      out[id] = {
+        title: String(templateField(id, "title")?.value || "").trim() || fallback.title,
+        body: String(templateField(id, "body")?.value || "").trim() || fallback.body
+      };
+    });
+    return out;
+  }
+
+  async function saveMessageTemplates() {
+    if (!locationId) throw new Error("Add ?location=<club-id> to the Club Admin URL before saving message templates.");
+    if (!auth.currentUser) throw new Error("Sign in before saving message templates.");
+    const status = byId("notifyTemplatesStatus");
+    if (status) status.textContent = "Saving message templates…";
+    await db.collection("clubNotificationSettings").doc(locationId).set({
+      messageTemplates: readMessageTemplatesFromForm(),
+      updatedByUid: auth.currentUser.uid,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    if (status) status.textContent = "Message templates saved. New shift notices use this copy.";
+  }
 
   function callable(name) {
     return firebase.app().functions("us-central1").httpsCallable(name);
@@ -222,6 +288,7 @@
     }
     if (byId("repAlertPhone")) byId("repAlertPhone").value = notificationSettings.alertPhone || notificationSettings.smsPhone || "";
     if (byId("repChannelPreference")) byId("repChannelPreference").value = notificationSettings.channelPreference || "sms";
+    fillMessageTemplates(notificationSettings.messageTemplates || {});
     renderSubscriptionUi();
   }
 
@@ -361,6 +428,20 @@
       const status = statusEl();
       if (status) status.textContent = error.message;
     }));
+    byId("saveNotifyTemplatesBtn")?.addEventListener("click", () => saveMessageTemplates().catch(error => {
+      const status = byId("notifyTemplatesStatus");
+      if (status) status.textContent = error.message;
+    }));
+    byId("resetNotifyTemplatesBtn")?.addEventListener("click", () => {
+      fillMessageTemplates(DEFAULT_MESSAGE_TEMPLATES);
+      const status = byId("notifyTemplatesStatus");
+      if (status) status.textContent = "Defaults restored in the form. Save message templates to keep them.";
+    });
+    document.querySelectorAll("#notifySubtabs [data-notify-pane]").forEach(btn => {
+      btn.addEventListener("click", () => showNotifyPane(btn.getAttribute("data-notify-pane")));
+    });
+    const notifyPane = new URL(location.href).searchParams.get("notify") || "";
+    if (notifyPane === "templates") showNotifyPane("notifyTemplatesPane");
     byId("showClubDailyAuthCodeBtn")?.addEventListener("click", () => showDailyAuthCode());
     byId("sendClubTestMessageBtn")?.addEventListener("click", () => sendTestMessage());
     byId("panelNotifications")?.addEventListener("click", event => {

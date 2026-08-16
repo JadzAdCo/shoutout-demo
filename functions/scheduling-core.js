@@ -290,25 +290,85 @@ function clubAllowsNotifyChannel(settings = {}, channel = "") {
   return true;
 }
 
+const SCHEDULE_MESSAGE_TEMPLATE_IDS = ["schedule-invite", "schedule-update", "shift-confirmed", "shift-declined"];
+
+const DEFAULT_SCHEDULE_MESSAGE_TEMPLATES = {
+  "schedule-invite": {
+    title: "New shift needs your confirmation",
+    body: "{club} schedule: {role} {when}. Confirm or decline this shift: {link}"
+  },
+  "schedule-update": {
+    title: "Schedule update",
+    body: "{club} updated your {role} {when}. Review it here: {link}"
+  },
+  "shift-confirmed": {
+    title: "Shift confirmed",
+    body: "{worker} confirmed the {role} on {when}."
+  },
+  "shift-declined": {
+    title: "Shift declined",
+    body: "{worker} declined the {role} on {when}."
+  }
+};
+
 function shiftApproveUrl(shift = {}, origin = DEFAULT_ORIGIN) {
   const base = String(origin || DEFAULT_ORIGIN).replace(/\/$/, "");
-  const url = new URL(`${base}/scheduling.html`);
+  const url = new URL(`${base}/patron-portal.html`);
+  url.searchParams.set("tab", "work-calendar");
   if (shift.id) url.searchParams.set("shift", String(shift.id));
   if (shift.ownerKey) url.searchParams.set("owner", String(shift.ownerKey));
   url.searchParams.set("from", "schedule-notify");
-  url.searchParams.set("v", "s3.0.0");
+  url.searchParams.set("v", "s3.0.1");
   return url.toString();
 }
 
-function buildShiftInviteBody(shift = {}, origin = DEFAULT_ORIGIN) {
-  const when = [shift.startsAtLabel, shift.endsAtLabel].filter(Boolean).join(" – ");
-  const role = shift.roleLabel || shift.role || "Shift";
-  const club = shift.ownerName || shift.venueName || "FLOQR";
-  const link = shiftApproveUrl(shift, origin);
-  return text(
-    `${club} schedule: ${role}${when ? ` ${when}` : ""}. Confirm or decline this shift: ${link}`,
-    900
+function shiftApprovePath(shift = {}) {
+  const url = new URL(shiftApproveUrl(shift, DEFAULT_ORIGIN));
+  return `.${url.pathname}${url.search}`;
+}
+
+function resolveScheduleMessageTemplate(kind = "", clubTemplates = {}) {
+  const id = SCHEDULE_MESSAGE_TEMPLATE_IDS.includes(text(kind, 40)) ? text(kind, 40) : "schedule-invite";
+  const fallback = DEFAULT_SCHEDULE_MESSAGE_TEMPLATES[id];
+  const override = clubTemplates && typeof clubTemplates === "object" ? clubTemplates[id] : null;
+  return {
+    id,
+    title: text(override?.title, 160) || fallback.title,
+    body: text(override?.body, 1500) || fallback.body
+  };
+}
+
+function fillScheduleMessageTemplate(template = {}, vars = {}) {
+  const replace = value => String(value || "").replace(/\{(club|role|when|link|worker)\}/g, (_, key) => String(vars[key] ?? ""));
+  return {
+    title: text(replace(template.title), 160),
+    body: text(replace(template.body), 1500)
+  };
+}
+
+function scheduleMessageVars(shift = {}, origin = DEFAULT_ORIGIN) {
+  const when = [shift.startsAtLabel, shift.endsAtLabel].filter(Boolean).join(" – ")
+    || [shift.startsAt, shift.endsAt].filter(Boolean).join(" – ");
+  return {
+    club: shift.ownerName || shift.venueName || "FLOQR",
+    role: shift.roleLabel || shift.role || "Shift",
+    when,
+    link: shiftApproveUrl(shift, origin),
+    worker: shift.assigneeName || "Worker"
+  };
+}
+
+function buildShiftInviteMessage(shift = {}, origin = DEFAULT_ORIGIN, clubTemplates = {}) {
+  const pending = normalizeShiftStatus(shift.status) === "pending" || !normalizeShiftStatus(shift.status);
+  const kind = pending ? "schedule-invite" : "schedule-update";
+  return fillScheduleMessageTemplate(
+    resolveScheduleMessageTemplate(kind, clubTemplates),
+    scheduleMessageVars(shift, origin)
   );
+}
+
+function buildShiftInviteBody(shift = {}, origin = DEFAULT_ORIGIN, clubTemplates = {}) {
+  return buildShiftInviteMessage(shift, origin, clubTemplates).body;
 }
 
 module.exports = {
@@ -337,6 +397,13 @@ module.exports = {
   sanitizeShiftIds,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
+  SCHEDULE_MESSAGE_TEMPLATE_IDS,
+  DEFAULT_SCHEDULE_MESSAGE_TEMPLATES,
   shiftApproveUrl,
+  shiftApprovePath,
+  resolveScheduleMessageTemplate,
+  fillScheduleMessageTemplate,
+  scheduleMessageVars,
+  buildShiftInviteMessage,
   buildShiftInviteBody
 };

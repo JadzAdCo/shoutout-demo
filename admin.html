@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Club Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.0"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.1"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -676,6 +676,11 @@
             data-floqr-help-search="sms notification|whatsapp notification|twilio|invalid username|account sid|send test alert|in-app|floqr inbox|system message"
             data-floqr-help-body="Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Pills turn green when Firebase subscription is 1 (prepaid $10 pack) and red when 0. If the test returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID that starts with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
           >Notifications</h2>
+          <div class="admin-subtabs" id="notifySubtabs" role="tablist" aria-label="Notification pages">
+            <button type="button" class="admin-subtab active" data-notify-pane="notifyChannelsPane">Channels</button>
+            <button type="button" class="admin-subtab" data-notify-pane="notifyTemplatesPane">Message templates</button>
+          </div>
+          <div id="notifyChannelsPane" class="admin-subpanel">
           <p class="sub small">Choose how this club receives pending-ShoutOut alerts. Reply APPROVE or REJECT with today's club code from the alert phone. SMS and WhatsApp colors follow the Firebase subscription (green = paid, red = not subscribed). Payment and credit details are in each channel's ?.</p>
           <div class="notify-channel-grid">
             <label class="notify-channel"><input id="repNotifyInApp" type="checkbox" checked/> In-app</label>
@@ -701,6 +706,48 @@
           </div>
           <p id="repMessagingStatus" class="status"></p>
           <p id="repDailyAuthCode" class="sub small"></p>
+          </div>
+          <div id="notifyTemplatesPane" class="admin-subpanel hidden">
+            <h3
+              id="notifyTemplatesHeading"
+              data-floqr-help-id="help-schedule-message-templates"
+              data-floqr-help-title="Schedule message templates"
+              data-floqr-help-search="system message|message template|shift confirmation message|open related shoutout|schedule invite"
+              data-floqr-help-body="These are System Messages, not ShoutOuts. Club Admins edit title and body for shift invite, update, confirmed, and declined notices. Placeholders: {club} {role} {when} {link} {worker}. Inbox uses Review & confirm shift — never Open Related ShoutOut."
+            >Message templates</h3>
+            <p class="sub small" data-keep-visible="true">System Messages for staff scheduling (Inbox / Email / SMS / WhatsApp). They are not ShoutOuts. Placeholders: {club}, {role}, {when}, {link}, {worker}.</p>
+            <div class="profile-grid">
+              <label class="profile-grid-wide">New shift needs confirmation (worker)
+                <input id="notifyTpl-schedule-invite-title" placeholder="Title"/>
+              </label>
+              <label class="profile-grid-wide">Body
+                <textarea id="notifyTpl-schedule-invite-body" rows="3"></textarea>
+              </label>
+              <label class="profile-grid-wide">Schedule update (worker)
+                <input id="notifyTpl-schedule-update-title" placeholder="Title"/>
+              </label>
+              <label class="profile-grid-wide">Body
+                <textarea id="notifyTpl-schedule-update-body" rows="3"></textarea>
+              </label>
+              <label class="profile-grid-wide">Shift confirmed (manager)
+                <input id="notifyTpl-shift-confirmed-title" placeholder="Title"/>
+              </label>
+              <label class="profile-grid-wide">Body
+                <textarea id="notifyTpl-shift-confirmed-body" rows="2"></textarea>
+              </label>
+              <label class="profile-grid-wide">Shift declined (manager)
+                <input id="notifyTpl-shift-declined-title" placeholder="Title"/>
+              </label>
+              <label class="profile-grid-wide">Body
+                <textarea id="notifyTpl-shift-declined-body" rows="2"></textarea>
+              </label>
+            </div>
+            <div class="queue-actions" style="margin-top:10px">
+              <button id="saveNotifyTemplatesBtn" class="primary" type="button">Save message templates</button>
+              <button id="resetNotifyTemplatesBtn" type="button">Restore defaults</button>
+            </div>
+            <p id="notifyTemplatesStatus" class="status"></p>
+          </div>
         </div>
       </section>
       <section id="panelEmployees" class="admin-panel-section">
@@ -813,7 +860,7 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=s3.0.0"></script>
+<script src="./floqai-help-repository.js?v=s3.0.1"></script>
 <script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.101"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -828,7 +875,7 @@
 <script src="./admin-app.js?v=29.09.120"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
-<script src="./admin-notifications.js?v=29.09.117"></script>
+<script src="./admin-notifications.js?v=s3.0.1"></script>
 <script src="./admin-marketing.js?v=29.09.18"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>

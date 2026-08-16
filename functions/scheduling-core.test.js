@@ -14,7 +14,10 @@ const {
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
-  buildShiftInviteBody
+  buildShiftInviteBody,
+  resolveScheduleMessageTemplate,
+  fillScheduleMessageTemplate,
+  DEFAULT_SCHEDULE_MESSAGE_TEMPLATES
 } = require("./scheduling-core");
 
 test("published unassigned slots are open; assigned unpublished are pending", () => {
@@ -193,15 +196,28 @@ test("sanitizeShiftIds de-dupes and caps at 80", () => {
 
 test("invite body includes a confirm link", () => {
   const url = shiftApproveUrl({id: "s1", ownerKey: "club:temp-democlub-1"});
-  assert.match(url, /scheduling\.html/);
+  assert.match(url, /patron-portal\.html/);
+  assert.match(url, /tab=work-calendar/);
   assert.match(url, /shift=s1/);
+  assert.match(url, /from=schedule-notify/);
   const body = buildShiftInviteBody({
     id: "s1",
     ownerName: "Aurelia",
     roleLabel: "Busboy",
     startsAtLabel: "4:00 PM",
-    endsAtLabel: "10:00 PM"
+    endsAtLabel: "10:00 PM",
+    status: "pending"
   });
   assert.match(body, /Confirm or decline/);
-  assert.match(body, /scheduling\.html/);
+  assert.match(body, /patron-portal\.html/);
+});
+
+test("club message templates fill placeholders without changing defaults", () => {
+  const custom = resolveScheduleMessageTemplate("schedule-invite", {
+    "schedule-invite": {title: "Please confirm", body: "{club} needs you for {role}. {link}"}
+  });
+  assert.equal(custom.title, "Please confirm");
+  const filled = fillScheduleMessageTemplate(custom, {club: "Aurelia", role: "Door", link: "https://example"});
+  assert.equal(filled.body, "Aurelia needs you for Door. https://example");
+  assert.match(DEFAULT_SCHEDULE_MESSAGE_TEMPLATES["schedule-invite"].body, /\{link\}/);
 });

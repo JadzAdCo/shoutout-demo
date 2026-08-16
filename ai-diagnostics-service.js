@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "v29.09.9";
-  const PREVIEW_LINKS_PACKAGE = "29.09.117";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.1";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.1";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,20 @@
       ]
     },
     {
+      version:"s3.0.1",
+      title:"Worker shift confirm on Work Calendar + schedule message templates",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.1\""]},
+        {label:"Worker confirm checkboxes", file:"worker-confirm.js", includes:["FLOQRWorkerConfirm", "Select all", "Approve selected"]},
+        {label:"Work Calendar confirm panel", file:"staff-worksheet.html", includes:["worksheetConfirmHost", "Approve selected"]},
+        {label:"Inbox confirm CTA", file:"patron-portal-app.js", includes:["Review & confirm shift", "scheduleConfirmHref"]},
+        {label:"Message templates tab", file:"admin.html", includes:["notifyTemplatesPane", "Message templates"]},
+        {label:"Confirm link is Work Calendar", file:"functions/scheduling-core.js", includes:["patron-portal.html", "tab", "work-calendar", "from", "schedule-notify"]},
+        {label:"Assignee-only respond", file:"functions/scheduling-functions.js", includes:["respondToScheduleShifts", "Only the assigned service member"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.1\""]}
+      ]
+    },
+    {
       version:"v29.09.117",
       title:"Service Members tab + test alert channels (Inbox) + Work Calendar gates",
       checks:[
@@ -974,6 +988,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-1-schedule-confirm-templates",
+      area:"Inbox / Work Calendar / Club Admin Notifications",
+      feature:"Shift confirm is tick + Approve selected; System Message templates",
+      changed:"Inbox schedule links open Work Calendar (not the DJ scheduling portal). Opening the link does not confirm. Worker ticks shifts or Select all, then Approve selected. Only the assignee can confirm. Inbox CTA is Review & confirm shift, not Open Related ShoutOut. Club Admin Notifications has a Message templates tab for these System Messages.",
+      howToTest:"Sign in as temp_busboy_1@floqr-demo.com on patron-portal.html?v=s3.0.1&tab=messages. Open New shift needs your confirmation. Tap Review & confirm shift. Confirm you land on Work Calendar with the assignment, checkboxes, Select all, and Approve selected. Do not expect the shift to flip to confirmed until Approve selected. As temp_clubadmin_1@floqr-demo.com open admin.html?location=temp-democlub-1&v=s3.0.1&tab=notifications&notify=templates and edit a template.",
+      expected:"No Google-only scheduling.html DJ form. No Open Related ShoutOut on a schedule System Message. Pending stays pending until Approve selected. Message templates save to clubNotificationSettings.messageTemplates."
+    },
     {
       id:"v29-09-116-schedule-card-save",
       area:"Club Admin / Scheduling",
@@ -5754,17 +5776,17 @@
     const v = PREVIEW_LINKS_PACKAGE;
     return {
       package: v,
-      note: note || `FLOQR v${v} test notes:
-1) Service Members: Overview no longer has Request Club Admin / Follow links. Open Settings → Service Members to request a role. Club Admins also see Review & elect (isClubAdmin).
-2) Work Calendar tab ON: sign in as temp_busboy_1@floqr-demo.com or a waiter at temp-democlub-1 (serviceMember + staffSchedulingPaid=1). Tab OFF: Club Admin 1 is not a service member.
-3) Notifications: Send test alert follows checked boxes. In-app → FloqR Inbox System Message. Email if checked. SMS/WhatsApp still need paid + E.164 phone.
-4) Calendar & Scheduler: Club Admin → Calendar (confirmed week) | Scheduler.`,
+      note: note || `FLOQR s3.0.1 test notes:
+1) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
+2) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.
+3) Only the assigned service member can confirm. Club Admin cannot confirm on their behalf.`,
       links: [
         ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
         ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
         ["Calendar & Scheduler", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=scheduling`],
         ["Patron Service Members tab", `${base}/patron-portal.html?v=${v}&tab=service-members`],
         ["Work Calendar tab (service member + paid club)", `${base}/patron-portal.html?v=${v}&tab=work-calendar`],
+        ["Message templates (Notifications)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications&notify=templates`],
         ["Temp Club Admin 1 (Aurelia, not Zebbies)", `${base}/admin.html?v=${v}`],
         ["Work Sheet staff calendar", `${base}/staff-worksheet.html?v=${v}&location=temp-democlub-1`],
         ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
