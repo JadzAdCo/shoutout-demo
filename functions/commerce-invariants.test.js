@@ -213,7 +213,7 @@ test("screen datapoints are Firebase 0|1 flags and filter templates by venue ove
   assert.equal(persisted.VenueSupports64x48, 1);
   assert.equal(persisted.VenueSupports96x48, 0);
   assert.equal(persisted.VenueSupports64x32, 0);
-  assert.match(adminApp, /VenueSupports96x48: screenFlags.VenueSupports96x48/);
+  assert.match(adminApp, /VenueSupports96x48: screenFlags.VenueSupports96x48/); // persist from Club Public Profile save
   assert.match(displayApp, /resolvePlaybackFormat/);
   assert.doesNotMatch(displayApp, /searchParams\.set\("screen"/);
   const neon = dp.classify({...sandbox.SHOUTOUT_TEMPLATES.neon});
