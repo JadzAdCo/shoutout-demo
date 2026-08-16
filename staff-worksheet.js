@@ -199,6 +199,10 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     byId("worksheetGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.isEmbedded?.()) {
+        setStatus("Sign in on My Profile & Settings (parent page), then return here. Google popups are not used inside this panel.");
+        return;
+      }
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).catch(error => setStatus(error.message));
     });
@@ -221,9 +225,23 @@
       state.locationId = String(event.target.value || "").trim();
       loadWorksheet().catch(error => setStatus(error.message));
     });
-    auth.onAuthStateChanged(user => {
-      if (user) loadWorksheet().catch(error => setStatus(error.message || String(error)));
-      else setStatus("Sign in to continue.");
-    });
+    const shell = window.FLOQRSessionShell;
+    if (shell?.bind) {
+      shell.bind({
+        auth,
+        chrome: "[data-floqr-auth-chrome]",
+        loginButtons: "[data-floqr-login-btn]",
+        statusEl: "#worksheetStatus",
+        onUser: () => loadWorksheet().catch(error => setStatus(error.message || String(error))),
+        onSignedOut: () => {
+          /* shell sets status / chrome */
+        }
+      });
+    } else {
+      auth.onAuthStateChanged(user => {
+        if (user) loadWorksheet().catch(error => setStatus(error.message || String(error)));
+        else setStatus("Sign in to continue.");
+      });
+    }
   });
 })();

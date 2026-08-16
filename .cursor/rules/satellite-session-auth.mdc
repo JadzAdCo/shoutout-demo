@@ -1,0 +1,70 @@
+---
+description: Satellite/iframe pages must inherit FLOQR session — never Google-only gates (always)
+alwaysApply: true
+---
+
+# Satellite session auth — inherit FLOQR login (always)
+
+Patrons sign in once on Search / My Profile / Club Admin. **Deep-linked and embedded pages must reuse that Firebase session.** Do not present a fresh “Google sign-in” gate that ignores the parent login.
+
+## Required module
+
+File: `floqr-session-shell.js`  
+API: `window.FLOQRSessionShell`
+
+Load **after** `firebase-config.js` and **before** the page app:
+
+```html
+<script src="./firebase-config.js?v=…"></script>
+<script src="./floqr-session-shell.js?v=s3.0.2"></script>
+<script src="./my-satellite-app.js?v=s3.0.2"></script>
+```
+
+Mark auth chrome so the shell can hide it when signed in:
+
+```html
+<div class="card" id="myAuthChrome" data-floqr-auth-chrome>
+  <button type="button" id="myGoogleLoginBtn" data-floqr-login-btn>Google sign-in</button>
+</div>
+```
+
+Wire the page app:
+
+```js
+FLOQRSessionShell.bind({
+  auth: firebase.auth(),
+  chrome: "[data-floqr-auth-chrome]",
+  loginButtons: "[data-floqr-login-btn]",
+  statusEl: "#myStatus",
+  onUser: user => loadPage(user),
+  onSignedOut: () => {/* status already set by shell */}
+});
+```
+
+## Embed / portal iframe rules
+
+1. When embedding a satellite in patron/admin (`iframe`), set **`embed=1`** on the `src` query (and keep `v=`).
+2. Embedded pages **must not** offer Google/Microsoft popups as the primary path — popups fail or confuse inside iframes. The shell hides login buttons and points to **My Profile & Settings** (`target="_parent"`).
+3. Hide standalone Back / duplicate account chrome in embed mode (shell adds `floqr-embed-mode`).
+4. Prefer rendering signed-in flows **inside** the portal when possible; if you must iframe, the child still uses `FLOQRSessionShell`.
+
+## Deep links (Inbox, Email, SMS)
+
+- Confirmation / worker flows → already-authenticated **patron-portal** tabs (e.g. Work Calendar), not a manager Google gate.
+- Old satellite URLs may redirect into the portal; new links must not invent a second login screen.
+
+## Forbidden
+
+- Satellite page whose only sign-in is Google when FLOQR also supports email/phone
+- Iframe child that shows “Sign in to continue” + Google while the parent portal is clearly signed in
+- Assuming `auth.currentUser` is ready on first paint — wait via `FLOQRSessionShell.bind` / `waitForUser`
+- One-off `if (iframe) hide button` copies — extend `floqr-session-shell.js` instead
+
+## Checklist (new or edited satellite pages)
+
+- [ ] `floqr-session-shell.js` loaded
+- [ ] Auth card / Google buttons marked `data-floqr-auth-chrome` / `data-floqr-login-btn` (or passed to `bind`)
+- [ ] `FLOQRSessionShell.bind({ auth, chrome, loginButtons, statusEl, onUser })`
+- [ ] Portal iframes use `embed=1`
+- [ ] Embedded path does not rely on `signInWithPopup`
+- [ ] Status copy says restoring FLOQR session / open My Profile — not “Google only”

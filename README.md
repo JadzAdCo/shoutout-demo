@@ -1,10 +1,10 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.1 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.2 (stable)
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
 
-Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.1&start=search`
+Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.2&start=search`
 
-s3.0.1: Inbox schedule links open Work Calendar for tick / Select all / Approve selected (the link does not confirm). Club Admin Notifications → Message templates for System Messages. s3.0.0: Internal Calendar AssignmentCards; website schedule API is Confirmed-only; birthday LED loop. Version channel **s** = stable.
+s3.0.2: Satellite / iframe pages inherit the FLOQR session via `floqr-session-shell.js` (no Google-only gate when My Profile is already signed in). s3.0.1: Work Calendar tick-then-approve + message templates. Version channel **s** = stable.
 
 ## UI media input convention (required)
 

@@ -810,3 +810,11 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .worker-confirm-row.is-focused{outline:2px solid #f5c542}
 .worker-confirm-row .assignment-card{margin:0;cursor:default}
 .worker-confirm-actions{margin-top:12px}
+
+/* Satellite embed: inherit parent portal session — hide duplicate chrome */
+html.floqr-embed-mode #floqrGlobalBack,
+html.floqr-embed-mode .global-back-btn,
+body.floqr-embed-mode #floqrGlobalBack,
+body.floqr-embed-mode .global-back-btn{display:none!important}
+html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
+html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75}
