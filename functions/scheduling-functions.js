@@ -12,6 +12,7 @@ const {
   sanitizeShiftIds,
   isPublishedShiftStatus,
   publicShiftView,
+  touchesPublicScheduleCache,
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
@@ -38,6 +39,15 @@ function parseOwnerKey(key = "") {
   const idx = raw.indexOf(":");
   if (idx < 1) return {ownerType: "", ownerId: ""};
   return {ownerType: raw.slice(0, idx), ownerId: raw.slice(idx + 1)};
+}
+
+async function bumpPublicScheduleRevision(ownerType, ownerId, previousStatus, nextStatus) {
+  if (ownerType !== "club" || !ownerId) return;
+  if (!touchesPublicScheduleCache(previousStatus, nextStatus)) return;
+  await db.collection("clubLocations").doc(ownerId).set({
+    publicScheduleRevision: admin.firestore.FieldValue.increment(1),
+    publicScheduleUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
 }
 
 async function isMasterAdminAuth(authContext = {}) {
@@ -528,6 +538,8 @@ exports.createScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   };
   await ref.set(shift);
 
+  await bumpPublicScheduleRevision(ownerType, ownerId, "", status);
+
   await writeScheduleAudit({
     action: "created",
     shiftId: ref.id,
@@ -612,6 +624,8 @@ exports.updateScheduleShift = onCall({region: "us-central1", timeoutSeconds: 30,
   };
   await ref.set(patch, {merge: true});
 
+  await bumpPublicScheduleRevision(ownerType, ownerId, existing.status, status);
+
   const prevStatus = normalizeShiftStatus(existing.status);
   const shouldNotify = status === "pending" && prevStatus !== "pending" && assigneeUid && request.data?.notify !== false;
   let notifyResult = null;
@@ -655,7 +669,7 @@ exports.publishScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 6
   if (!candidates.length) return {published: 0, results: []};
   const results = [];
   for (const shift of candidates) {
-    const nextStatus = text(shift.assigneeUid, 160) ? "pending" : "draft";
+    const nextStatus = text(shift.assigneeUid, 160) ? "pending" : "open";
     const ref = db.collection("scheduleShifts").doc(shift.id);
     await ref.set({
       status: nextStatus,
@@ -717,6 +731,7 @@ async function deleteManagedShift(shiftId, authContext, {throwOnError = true} = 
   }
   const wasPublished = status === "pending" || status === "confirmed";
   await ref.delete();
+  await bumpPublicScheduleRevision(text(shift.ownerType, 40), text(shift.ownerId, 160), status, "deleted");
   if (wasPublished && text(shift.assigneeUid, 160)) {
     try {
       await notifyAssigneeChannels({
@@ -784,6 +799,8 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
     respondedAt: now,
     updatedAt: now
   }, {merge: true});
+
+  await bumpPublicScheduleRevision(text(shift.ownerType, 40), text(shift.ownerId, 160), current, nextStatus);
 
   await writeScheduleAudit({
     action: nextStatus,

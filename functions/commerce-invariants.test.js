@@ -171,7 +171,9 @@ test("all published templates have display-aware text contracts", () => {
       assert.ok(rule.minimumFontPixels >= 28, `${template.id} minimumFontPixels ${rule.minimumFontPixels}`);
     });
   });
-  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, false);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").supported, true);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x32").lineCount, 3);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x48").lineCount, 3);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
@@ -182,4 +184,71 @@ test("all published templates have display-aware text contracts", () => {
   assert.match(displayApp, /FLOQRTextLayout/);
   assert.match(backend, /checkoutTextCaps/);
   assert.match(backend, /fitCheckoutDisplayText/);
+});
+
+test("screen datapoints are Firebase 0|1 flags and filter templates by venue overlap", () => {
+  const sandbox = {};
+  sandbox.window = sandbox;
+  vm.runInNewContext(sharedData, sandbox, {filename:"shared-data.js"});
+  const dp = sandbox.FLOQRScreenDatapoints;
+  const birthday = dp.applyTemplate({...sandbox.SHOUTOUT_TEMPLATES.birthdayMedia});
+  assert.equal(birthday.Is96x48, 1);
+  assert.equal(birthday.Is64x48, 1);
+  assert.equal(birthday.Is64x32, 1);
+  const only64x32 = dp.applyVenue({VenueSupports96x48: 0, VenueSupports64x48: 0, VenueSupports64x32: 1});
+  const only64x48 = dp.applyVenue({VenueSupports96x48: 0, VenueSupports64x48: 1, VenueSupports64x32: 0});
+  assert.equal(dp.templateFitsVenue(birthday, only64x32), true);
+  assert.equal(dp.templateFitsVenue(birthday, only64x48), true);
+  const playback = dp.resolvePlaybackFormat({
+    venue: only64x48,
+    template: birthday,
+    shoutout: {screenFormatId: "led-64x48"},
+    board: "primary"
+  });
+  assert.equal(dp.familyOf(playback), "64x48");
+  const persisted = dp.venueFirestoreFields({
+    ...dp.flagsFromLedIds(["led-64x48"], "venueKey"),
+    primaryDisplayScreenFormatId: "led-64x48"
+  });
+  assert.equal(persisted.VenueSupports64x48, 1);
+  assert.equal(persisted.VenueSupports96x48, 0);
+  assert.equal(persisted.VenueSupports64x32, 0);
+  assert.match(adminApp, /VenueSupports96x48: screenFlags.VenueSupports96x48/);
+  assert.match(displayApp, /resolvePlaybackFormat/);
+  assert.doesNotMatch(displayApp, /searchParams\.set\("screen"/);
+  const neon = dp.classify({...sandbox.SHOUTOUT_TEMPLATES.neon});
+  assert.equal(neon.templateKind, "full");
+  assert.equal(neon.Is64x32, 1);
+  assert.equal(dp.classify({...sandbox.SHOUTOUT_TEMPLATES.birthdayMedia}).templateKind, "splitMedia");
+  assert.equal(dp.classify({...sandbox.SHOUTOUT_TEMPLATES.heistVaultNight}).templateKind, "textOverlayFrame");
+  assert.equal(dp.classify({...sandbox.SHOUTOUT_TEMPLATES.soccerJersey}).templateKind, "soccerJersey");
+  const catalogRows = dp.catalogRows(sandbox.SHOUTOUT_TEMPLATES);
+  assert.ok(!catalogRows.some(row => row.catalogKey === "heistRedLux"));
+  const html = dp.catalogReportHtml({templates: sandbox.SHOUTOUT_TEMPLATES, venue: only64x32, showVenueColumn: true});
+  assert.match(html, /Is64x32 = 1/);
+  assert.match(html, /Hidden/);
+  assert.match(html, /birthdayMedia/);
+  assert.match(adminHtml, /clubTemplateCatalogReport/);
+  assert.match(adminApp, /catalogReportHtml/);
+});
+
+test("birthday split-media loops on 64x48/64x32 and AssignmentCards spell status", () => {
+  assert.match(displayApp, /startSplitMediaLoop/);
+  assert.match(displayApp, /SPLIT_MEDIA_LOOP_MS = 4000/);
+  assert.match(displayApp, /kicker: "FLOQR"/);
+  assert.match(displayCss, /split-media-loop/);
+  assert.match(displayCss, /split-media-phase-media/);
+  const adminScheduling = fs.readFileSync(path.join(root, "admin-scheduling.js"), "utf8");
+  const assignmentCard = fs.readFileSync(path.join(root, "assignment-card.js"), "utf8");
+  const ingest = fs.readFileSync(path.join(__dirname, "venue-ingest-functions.js"), "utf8");
+  assert.match(assignmentCard, /assignment-card is-\$\{meta\.key\}/);
+  assert.match(assignmentCard, /status-label/);
+  assert.match(adminScheduling, /FLOQRAssignmentCard/);
+  assert.match(adminHtml, /assignment-card\.js/);
+  assert.match(adminHtml, /Draft \(purple\)/);
+  assert.match(ingest, /where\("status", "in", publicWebsiteQueryStatuses\(\)\)/);
+  assert.match(ingest, /publicStatusQueryDecision\(req\.query\.status\)/);
+  assert.match(ingest, /exports\.publicVenueCalendar/);
+  assert.doesNotMatch(ingest, /isPublishedShiftStatus/);
+  assert.match(ingest, /Cache-Control", "public, max-age=15, must-revalidate"/);
 });

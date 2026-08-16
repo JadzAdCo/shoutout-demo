@@ -699,6 +699,50 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sched-chip.is-declined{opacity:.55;filter:grayscale(.35)}
 .sched-chip.is-selected{outline:3px solid #fff;box-shadow:0 0 0 3px #26d8ff}
 .sched-chip small{display:block;font-weight:700;opacity:.85}
+.sched-grid-wrap.is-readonly .sched-chip{cursor:default}
+
+/* s3 AssignmentCard — identical geometry; status via token + written label */
+.assignment-card{
+  display:flex;flex-direction:column;justify-content:space-between;gap:6px;
+  width:100%;min-height:92px;box-sizing:border-box;text-align:left;
+  margin:0 0 8px;padding:10px 12px;border-radius:14px;border:1.5px solid transparent;
+  font:inherit;cursor:pointer;color:inherit;
+}
+.assignment-card-head{display:flex;align-items:center;gap:8px;min-height:20px}
+.assignment-card-icon,.assignment-card-status-icon{width:16px;height:16px;flex:0 0 16px;display:grid;place-items:center}
+.assignment-card-icon svg,.assignment-card-status-icon svg{width:16px;height:16px;display:block}
+.assignment-card-name{font-size:13px;font-weight:800;line-height:1.2}
+.assignment-card-time{margin:0;font-size:12px;font-weight:700;opacity:.9}
+.assignment-card-status{display:flex;align-items:center;gap:6px;margin:0;font-size:12px;font-weight:800}
+.assignment-card.is-draft{
+  border-color:#a855f7;
+  background:rgba(88,28,135,.42);
+  color:#d8b4fe;
+}
+.assignment-card.is-pending{
+  border-color:#f59e0b;
+  background:rgba(120,53,15,.45);
+  color:#fcd34d;
+}
+.assignment-card.is-confirmed{
+  border-color:#22c55e;
+  background:rgba(20,83,45,.45);
+  color:#86efac;
+}
+.assignment-card.is-open{
+  border-color:#f59e0b;
+  background:rgba(24,24,27,.88);
+  color:#fcd34d;
+  box-shadow:inset 0 0 0 1px rgba(245,158,11,.25);
+}
+.assignment-view-more{display:block;width:100%;border:0;background:transparent;color:#7dd3fc;font-size:12px;font-weight:800;padding:0;margin:0;cursor:pointer;text-align:left}
+.sched-job-meta{display:block;color:var(--muted);font-size:11px;font-weight:700;margin-top:2px}
+.sched-empty-group{color:var(--muted);font-size:12px;font-weight:700;text-align:center;padding:18px 8px}
+.sched-cal-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.sched-cal-filters select{min-width:140px}
+.sched-day-head .sched-today-pill{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#2563eb;color:#fff;font-size:10px;font-weight:800;vertical-align:middle}
+.sched-chip.is-selected{outline:3px solid #fff;box-shadow:0 0 0 3px #26d8ff}
+.sched-chip small{display:block;font-weight:700;opacity:.85}
 .sched-person.is-self{box-shadow:inset 3px 0 0 #26d8ff}
 .sched-grid-wrap.is-readonly .sched-chip{cursor:default}
 .sched-ingest-onetime{margin:12px 0 0;padding:12px;border:2px solid #dfff5a;border-radius:12px;background:rgba(223,255,90,.08)}
@@ -721,7 +765,35 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sched-worker-popout .pop-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
 .sched-worker-popout .pop-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .sched-worker-popout a,.sched-worker-popout button{font-size:13px}
+.template-catalog-scroll{
+  width:100%;
+  max-width:100%;
+  overflow:auto;
+  margin-top:14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(0,0,0,.22);
+}
+.template-catalog-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12.5px;
+  line-height:1.35;
+}
+.template-catalog-table th,.template-catalog-table td{
+  padding:8px 10px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.template-catalog-table thead th{
+  position:sticky;
+  top:0;
+  background:#141414;
+  z-index:1;
+}
+.template-catalog-table .flag-1{color:#9dffb0;font-weight:800}
+.template-catalog-table .flag-0{color:var(--muted);font-weight:800}
 @media(max-width:720px){
-  .sched-grid{min-width:640px}
-  .sched-toolbar{align-items:stretch}
+  .template-catalog-table th,.template-catalog-table td{white-space:normal}
 }

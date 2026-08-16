@@ -1,5 +1,5 @@
-/* display-app.js v29.09.78 — supports display.html (primary) + display2.html (secondary)
- * Features: liveContent player, secondary board idle (supRstar), Display Security gate (IP + ?k= token).
+/* display-app.js v29.09.119 — Xibo stays display.html?location= / display2.html?location=
+ * Screen size comes from clubLocations VenueSupports* + templates Is* + the composed ShoutOut.
  */
 (function () {
   "use strict";
@@ -9,20 +9,6 @@
     try { return JSON.parse(new URL(window.location.href).searchParams.get(name) || ""); }
     catch (error) { return fallback; }
   };
-
-  /** Board secret from ?k= / ?token=, or #k= / #token= (Xibo often rewrites query and drops unknown params). */
-  function displayAccessKeyFromUrl() {
-    const fromQuery = String(qs("k", qs("token", "")) || "").trim();
-    if (fromQuery) return fromQuery;
-    try {
-      const rawHash = String(window.location.hash || "").replace(/^#/, "");
-      if (!rawHash) return "";
-      const hashParams = new URLSearchParams(rawHash.includes("=") ? rawHash : `k=${rawHash}`);
-      return String(hashParams.get("k") || hashParams.get("token") || "").trim();
-    } catch (_) {
-      return "";
-    }
-  }
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 
   function resolveDisplayBoard() {
@@ -59,7 +45,7 @@
   const requestedLocationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
   let locationId = canonicalStaticLocationId(requestedLocationId);
   let loc = getStaticLocation(locationId);
-  const templates = window.SHOUTOUT_TEMPLATES || {};
+  let templates = Object.assign({}, window.SHOUTOUT_TEMPLATES || {});
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
@@ -69,6 +55,8 @@
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
+  let splitMediaLoopTimer = null;
+  const SPLIT_MEDIA_LOOP_MS = 4000;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -81,6 +69,17 @@
     return (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
   }
 
+  async function hydrateTemplatesFromFirestore() {
+    try {
+      const snap = await db.collection("templates").get();
+      snap.forEach(doc => {
+        const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
+        const merged = {...packaged, id: doc.id, ...doc.data()};
+        templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
+      });
+    } catch (e) {}
+  }
+
   function normalizeScreenFormatId(raw = "") {
     const value = String(raw || "").trim().toLowerCase();
     if (!value) return "";
@@ -89,6 +88,62 @@
     if (value === "96x48" || value === "led-96x48") return "led-96x48";
     if ((window.FLOQR_DISPLAY_FORMATS || {})[value]) return value;
     return "";
+  }
+
+  function clubSupportedFormatIds(location = loc) {
+    if (window.FLOQRScreenDatapoints?.applyVenue) {
+      window.FLOQRScreenDatapoints.applyVenue(location);
+      return window.FLOQRScreenDatapoints.venueLedIds(location);
+    }
+    const ids = Array.isArray(location?.displayScreenFormatIds) ? location.displayScreenFormatIds : [];
+    const normalized = ids.map(normalizeScreenFormatId).filter(Boolean);
+    return Array.from(new Set(normalized));
+  }
+
+  function boardAssignedFormatId(location = loc) {
+    const supported = clubSupportedFormatIds(location);
+    const assignedRaw = DISPLAY_BOARD === "secondary"
+      ? (location?.secondaryDisplayScreenFormatId || location?.primaryDisplayScreenFormatId || location?.displayType || location?.screenFormatId)
+      : (location?.primaryDisplayScreenFormatId || location?.displayType || location?.screenFormatId);
+    const assigned = normalizeScreenFormatId(assignedRaw);
+    if (assigned && (!supported.length || supported.includes(assigned))) return assigned;
+    return supported[0] || "led-96x48";
+  }
+
+  function templateSupportsFormat(template = {}, formatId = "") {
+    if (!formatId) return false;
+    if (window.FLOQRScreenDatapoints) {
+      const family = window.FLOQRScreenDatapoints.familyOf(formatId);
+      if (family && window.FLOQRScreenDatapoints.as01(template[`Is${family}`]) === 0) return false;
+    }
+    const rule = window.FLOQRTextLayout?.resolve?.(template, formatId);
+    if (rule && rule.supported === false) return false;
+    const listed = Array.isArray(template.screenFormatIds) ? template.screenFormatIds.map(normalizeScreenFormatId) : [];
+    if (listed.length && !listed.includes(formatId)) return false;
+    return true;
+  }
+
+  function resolvePlaybackScreenFormat(data = {}, template = {}) {
+    const previewFormat = isUrlPreviewMode()
+      ? normalizeScreenFormatId(data.screenFormatId || urlSearchParams().get("screenFormatId") || urlSearchParams().get("screen"))
+      : "";
+    if (previewFormat) return previewFormat;
+    if (window.FLOQRScreenDatapoints?.resolvePlaybackFormat) {
+      return window.FLOQRScreenDatapoints.resolvePlaybackFormat({
+        venue: loc,
+        template,
+        shoutout: data,
+        board: DISPLAY_BOARD
+      });
+    }
+    const boardFormat = boardAssignedFormatId();
+    const clubFormats = clubSupportedFormatIds();
+    const itemFormat = normalizeScreenFormatId(data.screenFormatId);
+    if (templateSupportsFormat(template, boardFormat)) return boardFormat;
+    if (itemFormat && (!clubFormats.length || clubFormats.includes(itemFormat)) && templateSupportsFormat(template, itemFormat)) {
+      return itemFormat;
+    }
+    return clubFormats.find(id => templateSupportsFormat(template, id)) || boardFormat;
   }
 
   function displayDeviceDocId(ip = "") {
@@ -287,59 +342,6 @@
     return (rows.length ? rows : [""]).slice(0, maxRows);
   }
 
-  function fitBirthdayMainText(mainEl, {minPx = 34, maxPx = 108} = {}) {
-    if (!mainEl) return;
-    const spans = Array.from(mainEl.querySelectorAll("span"));
-    if (!spans.length) return;
-    const availableWidth = Math.max(1, mainEl.clientWidth);
-    const availableHeight = Math.max(1, mainEl.clientHeight);
-    spans.forEach(span => { span.style.transform = ""; });
-    mainEl.style.fontSize = "10px";
-    const widestLineAt10 = Math.max(1, ...spans.map(span => span.scrollWidth || 1));
-    const blockHeightAt10 = Math.max(1, mainEl.scrollHeight || 1);
-    const widthLimitedPx = (availableWidth / widestLineAt10) * 10;
-    const heightLimitedPx = (availableHeight / blockHeightAt10) * 10;
-    const rowCount = spans.length;
-    const rowBoost = rowCount <= 1 ? 1.22 : (rowCount === 2 ? 1.1 : 1);
-    const fittedPx = Math.max(minPx, Math.min(maxPx, Math.min(widthLimitedPx, heightLimitedPx) * rowBoost));
-    mainEl.style.fontSize = `${fittedPx}px`;
-    // Final overflow guard: shrink only the lines that still spill after fitting.
-    spans.forEach(span => {
-      const needed = span.scrollWidth || availableWidth;
-      const scale = needed > availableWidth ? Math.max(0.55, availableWidth / needed) : 1;
-      span.style.transform = scale < 0.999 ? `scale(${scale})` : "";
-    });
-  }
-
-  const BIRTHDAY_ROTATE_FORMATS = new Set(["p125-64x48", "led-64x48", "p125-64x32", "led-64x32"]);
-  const BIRTHDAY_ROTATE_MS = 5500;
-
-  function stopBirthdayRotate() {
-    if (window.__floqrBirthdayRotateTimer) {
-      window.clearInterval(window.__floqrBirthdayRotateTimer);
-      window.__floqrBirthdayRotateTimer = null;
-    }
-  }
-
-  function birthdayUsesRotate(formatId = "") {
-    return BIRTHDAY_ROTATE_FORMATS.has(String(formatId || ""));
-  }
-
-  function startBirthdayRotate(canvas, {phaseMs = BIRTHDAY_ROTATE_MS} = {}) {
-    stopBirthdayRotate();
-    if (!canvas) return;
-    canvas.classList.add("birthday-rotate-layout");
-    let phase = "media";
-    const apply = () => {
-      const showMedia = phase === "media";
-      canvas.classList.toggle("birthday-phase-media", showMedia);
-      canvas.classList.toggle("birthday-phase-text", !showMedia);
-      phase = showMedia ? "text" : "media";
-    };
-    apply();
-    window.__floqrBirthdayRotateTimer = window.setInterval(apply, Math.max(2500, Number(phaseMs) || BIRTHDAY_ROTATE_MS));
-  }
-
   function classicBoardRows(mainText, caps = {}) {
     return displayTextRows(mainText, {
       lineCount:Number(caps.lineCount || 3),
@@ -461,7 +463,7 @@
     resetBackgroundLayer(bgEl);
     if (backgroundUrl) {
       const size = fit === "contain" ? "contain" : "cover";
-      bgEl.style.backgroundImage = "url(\"" + String(backgroundUrl).replace(/"/g, "%22") + "\")";
+      bgEl.style.backgroundImage = `url("${String(backgroundUrl).replace(/"/g, "%22")}")`;
       bgEl.style.backgroundSize = size;
       bgEl.style.backgroundPosition = "center";
       bgEl.style.backgroundRepeat = "no-repeat";
@@ -538,6 +540,52 @@
       window.clearTimeout(heistPhaseLoopTimer);
       heistPhaseLoopTimer = null;
     }
+  }
+
+  function stopSplitMediaLoop() {
+    if (splitMediaLoopTimer) {
+      window.clearInterval(splitMediaLoopTimer);
+      splitMediaLoopTimer = null;
+    }
+    byId("displayCanvas")?.classList.remove("split-media-loop", "split-media-phase-media", "split-media-phase-copy");
+  }
+
+  function splitMediaIdentityPresentation(data = {}, subText = "") {
+    const attrib = glyphSlice(cleanBoardText(data.attribution || ""), 0, 20);
+    const sub = glyphSlice(cleanBoardText(subText), 0, 20);
+    const celebration = /^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i.test(sub);
+    const handle = attrib || (!celebration && sub) || "";
+    return {
+      kicker: "FLOQR",
+      value: handle || "ShoutOut",
+      extraCopy: handle ? "" : sub
+    };
+  }
+
+  function renderSplitMediaIdentityRail(identity) {
+    const rail = byId("displayIdentityRail");
+    if (!rail) return;
+    rail.className = "display-identity-rail split-media-identity" + (identity.value === "ShoutOut" ? " uses-brand-fallback" : " has-attribution");
+    rail.setAttribute("aria-hidden", "false");
+    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+  }
+
+  function startSplitMediaLoop(canvas) {
+    stopSplitMediaLoop();
+    if (!canvas) return;
+    canvas.classList.add("split-media-loop", "split-media-phase-media");
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduced) {
+      canvas.classList.add("split-media-phase-copy");
+      canvas.classList.remove("split-media-phase-media");
+      return;
+    }
+    splitMediaLoopTimer = window.setInterval(() => {
+      const onMedia = canvas.classList.contains("split-media-phase-media");
+      canvas.classList.toggle("split-media-phase-media", !onMedia);
+      canvas.classList.toggle("split-media-phase-copy", onMedia);
+    }, SPLIT_MEDIA_LOOP_MS);
   }
 
   function heistBrandLogoUrl() {
@@ -664,7 +712,7 @@
       mediaFit: params.get("mediaFit") || "contain",
       backgroundFit: params.has("backgroundFit")
         ? params.get("backgroundFit")
-        : "",
+        : (params.get("backgroundUrl") ? (params.get("mediaFit") || "contain") : ""),
       screenFormatId: screenFormatOverride || params.get("screenFormatId") || "",
       selectedMediaVersion: params.get("selectedMediaVersion") || "",
       trimStart: params.get("trimStart") || "",
@@ -772,6 +820,7 @@
     const rail = byId("displayIdentityRail");
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
+    stopSplitMediaLoop();
     hideHeistBrandSlide();
     hideJerseyMount();
     if (canvas) {
@@ -1011,6 +1060,7 @@
   }
 
   function render(data) {
+    stopSplitMediaLoop();
     if (isSuprstarIdlePayload(data)) {
       renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
@@ -1026,17 +1076,15 @@
     if (isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId)) {
       t = resolveJerseyStyle(t, data);
     }
-    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || (t.identityRail === true && t.layout !== "split-media" && templateId !== "birthdayMedia");
-    const isBirthdayMedia = templateId === "birthdayMedia" || t.id === "birthdayMedia";
+    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const screenFormatId = String(
-      data.screenFormatId
-      || screenFormatOverride
-      || loc.primaryDisplayScreenFormatId
+      resolvePlaybackScreenFormat(data, t)
+      || boardAssignedFormatId()
       || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0]
-      || "p125-96x48"
+      || "led-96x48"
     );
     const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
       supported:true,
@@ -1048,6 +1096,13 @@
       subTextSizePercent:Number(data.subTextSizePercent || t.subTextSizePercent || 7.8),
       teamTextSizePercent:Number(data.teamTextSizePercent || t.teamTextSizePercent || 7.2)
     };
+    if (textCaps.supported === false && !isUrlPreviewMode() && String(data.status || "") !== "preview") {
+      const idle = defaultClubDisplayPayload();
+      if (idle && idle.template !== templateId) {
+        render(idle);
+        return;
+      }
+    }
     const mainSize = Math.min(40, Math.max(4, Number(textCaps.mainTextSizePercent || 20.8)));
     const subSize = Math.min(20, Math.max(2, Number(textCaps.subTextSizePercent || 7.8)));
     const mainLimit = Math.max(1, Number(textCaps.maxMainCharacters || textCaps.main || 60));
@@ -1063,6 +1118,10 @@
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
+    const screenFlags = window.FLOQRScreenDatapoints?.canvasFlags?.(screenFormatId) || {};
+    canvas.dataset.is96x48 = screenFlags.is96x48 || "0";
+    canvas.dataset.is64x48 = screenFlags.is64x48 || "0";
+    canvas.dataset.is64x32 = screenFlags.is64x32 || "0";
     canvas.dataset.textProfile = textCaps.profileId || "custom";
     const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
@@ -1133,37 +1192,16 @@
     const mediaUrl = data.mediaUrl || "";
     const mediaType = data.mediaType || "";
     const usesSplitMedia = t.layout === "split-media" || (t.supportsMedia && mediaUrl);
-    const birthdayRotate = isBirthdayMedia && birthdayUsesRotate(screenFormatId);
-    stopBirthdayRotate();
-    const birthdayPrimaryScale = isBirthdayMedia ? Number(t.primaryTextScale || 1.15) : 1;
-    const splitMainScale = (usesSplitMedia ? 0.78 : 1) * birthdayPrimaryScale;
-    if (isBirthdayMedia) {
-      // CSS clamp / rotate fit carries readability; clear inline size so layout CSS wins.
-      byId("displayMain").style.removeProperty("font-size");
-      byId("displaySub").style.removeProperty("font-size");
-    } else {
-      byId("displayMain").style.setProperty("font-size", `${mainSize * splitMainScale}vh`, "important");
-      byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
-    }
-    if (center) {
-      center.classList.toggle("split-media-layout", usesSplitMedia && !birthdayRotate);
-      center.classList.toggle("birthday-media-layout", isBirthdayMedia && usesSplitMedia && !birthdayRotate);
-    }
-    canvas.classList.remove("birthday-rotate-layout", "birthday-phase-media", "birthday-phase-text");
-    if (usesSplitMedia || birthdayRotate) {
+    byId("displayMain").style.setProperty("font-size", `${usesSplitMedia ? mainSize * .78 : mainSize}vh`, "important");
+    byId("displaySub").style.setProperty("font-size", `${usesSplitMedia ? subSize * .85 : subSize}vh`, "important");
+    if (center) center.classList.toggle("split-media-layout", usesSplitMedia);
+    if (usesSplitMedia) {
       mediaSlot.classList.remove("hidden");
       if (mediaUrl) {
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) {
-          // Birthday 96×48 split: cover fills the media frame (no letterbox bars).
-          // Birthday 64× rotate: contain + decorative slot background (no ugly stretch).
-          const fit = isBirthdayMedia
-            ? (birthdayRotate ? "contain" : "cover")
-            : (data.mediaFit === "cover" ? "cover" : "contain");
-          mediaElement.style.objectFit = fit;
-        }
+        if (mediaElement) mediaElement.style.objectFit = data.mediaFit === "cover" ? "cover" : "contain";
         if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
@@ -1327,30 +1365,24 @@
       const rows = displayTextRows(mainText, textCaps);
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
-      if (isBirthdayMedia) {
-        requestAnimationFrame(() => {
-          const maxPx = birthdayRotate ? 120 : 108;
-          const minPx = birthdayRotate ? Number(textCaps.minimumFontPixels || 48) : 34;
-          fitBirthdayMainText(byId("displayMain"), {minPx, maxPx});
-        });
-        if (birthdayRotate) startBirthdayRotate(canvas);
-      }
-      if (isBirthdayMedia || (usesSplitMedia && t.identityRail === true)) {
-        const identity = classicIdentityPresentation(subText);
-        byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
-        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-        byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      const identity = usesSplitMedia ? splitMediaIdentityPresentation(data, subText) : null;
+      if (usesSplitMedia && identity) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").textContent = identity.extraCopy || "";
+        renderSplitMediaIdentityRail(identity);
+        const family = window.FLOQRScreenDatapoints?.familyOf?.(screenFormatId) || "";
+        if (family === "64x48" || family === "64x32") startSplitMediaLoop(canvas);
       } else {
-        byId("displaySub").textContent = t.hideSecondary ? "" : subText;
+        byId("displaySub").textContent = subText;
       }
     }
     markDisplayReady();
   }
   function showDisplayAccessDenied(info = {}) {
     // Feature: locked display — never show idle/venue marketing to unauthorized clients.
-    stopBirthdayRotate();
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
+    stopSplitMediaLoop();
     hideHeistBrandSlide();
     hideJerseyMount();
     const canvas = byId("displayCanvas");
@@ -1383,11 +1415,6 @@
    */
   async function enforceDisplayAccess() {
     const accessKey = String(qs("k", qs("token", "")) || "").trim();
-    // Local URL preview only — never unlock venue players on the public host.
-    try {
-      const host = String(location.hostname || "").toLowerCase();
-      if (isUrlPreviewMode() && (host === "localhost" || host === "127.0.0.1")) return true;
-    } catch (_) {}
     try {
       if (!firebase?.app || !firebase.functions) {
         showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
@@ -1436,35 +1463,44 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
     await persistenceReady;
-    screenFormatOverride = normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")));
+    screenFormatOverride = isUrlPreviewMode()
+      ? normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")))
+      : "";
     if (!explicitLocationRequested) {
       const ipBoundLocation = await resolveLocationFromIpParam();
       if (ipBoundLocation) locationId = canonicalStaticLocationId(ipBoundLocation);
     }
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
+    await hydrateTemplatesFromFirestore();
     try {
       const clubDoc = await db.collection("clubLocations").doc(locationId).get();
       if (clubDoc.exists) {
         const live = clubDoc.data() || {};
+        const liveHasVenueFlags = ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"]
+          .some(key => live[key] === 0 || live[key] === 1 || live[key] === "0" || live[key] === "1");
         loc = {
           ...loc,
           ...live,
           primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
+          secondaryDisplayScreenFormatId: live.secondaryDisplayScreenFormatId || loc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId,
           displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
           displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
           ledPanel: live.ledPanel || loc.ledPanel,
           approvedDisplayIps: live.approvedDisplayIps || [],
           displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
-          // Preserve undefined as lock-default; only explicit false unlocks idle.
           displayTokenRequired: live.displayTokenRequired
         };
+        if (!liveHasVenueFlags) {
+          delete loc.VenueSupports96x48;
+          delete loc.VenueSupports64x48;
+          delete loc.VenueSupports64x32;
+        }
+        if (window.FLOQRScreenDatapoints?.applyVenue) window.FLOQRScreenDatapoints.applyVenue(loc);
       }
     } catch (e) {}
-    if (!screenFormatOverride) {
-      const secondaryFmt = loc.secondaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
-      const primaryFmt = loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
-      screenFormatOverride = normalizeScreenFormatId(DISPLAY_BOARD === "secondary" ? secondaryFmt : primaryFmt);
+    if (!screenFormatOverride && isUrlPreviewMode()) {
+      screenFormatOverride = boardAssignedFormatId(loc);
     }
     try {
       document.title = DISPLAY_BOARD === "secondary"
@@ -1483,7 +1519,7 @@
         const status = String(data.status || "").toLowerCase();
         const hasLiveMessage = !!(String(data.mainText || "").trim() || data.mediaUrl);
         if (status === "approved" && hasLiveMessage) {
-          if (screenFormatOverride && !data.screenFormatId) data.screenFormatId = screenFormatOverride;
+          if (!data.screenFormatId) data.screenFormatId = boardAssignedFormatId(loc);
           renderTimedLiveContent(data);
         }
       }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
@@ -1491,19 +1527,14 @@
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
-      const status = String(payload.status || "").toLowerCase();
-      const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
-      // Primary + secondary: expired/default docs must not keep jersey/background ghosts.
-      if (!doc.exists
-        || status === "default"
-        || payload.idleCta
-        || (!status && !hasLiveMessage)
-        || isLegacyShoutOutIdleText(payload.mainText)) {
-        payload = defaultClubDisplayPayload();
-      } else if (DISPLAY_BOARD === "secondary" && status !== "approved" && status !== "live") {
-        payload = defaultClubDisplayPayload();
+      if (DISPLAY_BOARD === "secondary") {
+        const status = String(payload.status || "").toLowerCase();
+        const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
+        if (!doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage) || isLegacyShoutOutIdleText(payload.mainText)) {
+          payload = defaultClubDisplayPayload();
+        }
       }
-      if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
+      if (!payload.screenFormatId) payload.screenFormatId = boardAssignedFormatId(loc);
       renderTimedLiveContent(payload);
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });

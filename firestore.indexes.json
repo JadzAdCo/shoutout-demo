@@ -9,11 +9,11 @@
       ]
     },
     {
-      "collectionGroup": "displayAccessLogs",
+      "collectionGroup": "scheduleShifts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "locationId", "order": "ASCENDING" },
-        { "fieldPath": "createdAtMs", "order": "DESCENDING" }
+        { "fieldPath": "ownerKey", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
       ]
     }
   ],

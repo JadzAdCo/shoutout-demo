@@ -199,14 +199,16 @@
     {
       id: "help-staff-scheduling",
       title: "Calendar & Scheduler",
-      body: "Club Admin Calendar shows confirmed service-member shifts for the week. Scheduler is the people × days draft/publish grid. A green Paid this month pill is shown to Club Admins when staffSchedulingPaid=1. Open Scheduler ? for create/publish and multi-delete. Calendar ? and Schedule log ? cover the confirmed week and who created, published, and confirmed.",
+      body: "Club Admin Calendar shows Draft (purple), Pending (amber), Confirmed (green), and Open/unfilled cards — each with a written status, not color alone. Scheduler is the people × days draft/publish grid. Website ingest / publicVenueCalendar returns Confirmed assignments only. A green Paid this month pill is shown to Club Admins when staffSchedulingPaid=1.",
       searchPhrases: [
         "staff scheduling", "scheduling subscription", "subscribe $20", "resubscribe", "staffSchedulingPaid",
-        "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule"
+        "paid this month", "not paid this month", "staff calendar", "schedule shifts", "scheduling portal", "work schedule",
+        "draft shift", "purple card", "pending shift", "confirmed shift", "open shift", "unfilled", "assignment card",
+        "website ingest", "confirmed only", "public calendar"
       ],
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"}), search: "scheduling portal", blurb: "DJ / promoter / club shift calendar"},
-        {label: "Club Admin Calendar & Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Confirmed week calendar plus Scheduler drafts"}
+        {label: "Club Admin Calendar & Scheduler", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}), search: "calendar scheduler", blurb: "Draft / Pending / Confirmed / Open cards plus Scheduler drafts"}
       ],
       source: "help-repository-seed",
       page: "admin.html#panelScheduling"
@@ -249,6 +251,37 @@
       ],
       source: "help-repository-seed",
       page: "admin.html#panelNotifications"
+    },
+    {
+      id: "help-template-catalog-report",
+      title: "Template catalog report",
+      body: "Lists every ShoutOut template type and which LED sizes it supports (Is96x48, Is64x48, Is64x32). A venue only offers a template when at least one of those flags is 1 and the matching VenueSupports* flag is 1. Birthday / split-media templates are 1 on 96×48, 64×48, and 64×32. 96×48 is 3-line side-by-side; 64×48 and 64×32 loop the photo then the 3-line shoutout with a FLOQR + handle card.",
+      searchPhrases: [
+        "template catalog", "template types", "Is96x48", "display sizes", "which templates",
+        "split media", "birthday 64x32", "template report"
+      ],
+      links: [
+        {label: "Club Admin Reports", href: vUrl("./admin.html", {from: "floqai", tab: "reports"})},
+        {label: "Master Admin Template Catalog", href: vUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelReports"
+    },
+    {
+      id: "help-club-display-screens",
+      title: "FLOQR display screens",
+      body: "Firebase clubLocations stores VenueSupports96x48, VenueSupports64x48, and VenueSupports64x32 as 0 or 1. templates stores Is96x48, Is64x48, and Is64x32 the same way. A venue only lists a template when at least one pair is 1. Xibo URLs stay display.html?location=id and display2.html?location=id — screen size is not in the URL. Birthday is offered on all three sizes (3-line side-by-side on 96×48; photo/shoutout loop on 64×48 and 64×32). Primary is display.html. Secondary is display2.html.",
+      searchPhrases: [
+        "display screens", "64x48", "96x48", "64x32", "primary shoutout led",
+        "birthday template screen", "VenueSupports96x48", "Is96x48", "xibo display url",
+        "screen datapoint", "led size"
+      ],
+      links: [
+        {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
+        {label: "Display 1 (Xibo)", href: "./display.html"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelPublicProfile"
     },
     {
       id: "help-donpapi-led-wall",
