@@ -4,11 +4,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Work Sheet - Weekly Staff Calendar</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.115"/>
-  <link rel="stylesheet" href="./admin.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.1"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.1"/>
 </head>
 <body>
-<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=29.09.115">&larr; Back</a>
+<a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=s3.0.1">&larr; Back</a>
 <main class="app admin-shell">
   <section class="page active">
     <header class="topbar">
@@ -18,10 +18,10 @@
           id="worksheetTitle"
           data-floqr-help-id="help-staff-worksheet"
           data-floqr-help-title="Work Sheet - Weekly Staff Calendar"
-          data-floqr-help-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working"
-          data-floqr-help-body="Read-only people × days grid of published shifts for everyone elected at this venue. Drafts are hidden. Open Staff Calendar from My Profile when you are an elected service member. Pick another club if you work at more than one."
+          data-floqr-help-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected"
+          data-floqr-help-body="Inbox / Email / SMS links open this Work Calendar. Review pending assignments, tick each shift (or Select all), then Approve selected. Opening the message does not confirm the shift. The week grid shows published colleague shifts. Drafts stay in Club Admin."
         >Work Sheet - Weekly Staff Calendar</h1>
-        <p class="sub" data-keep-visible="true">Published shifts only (pending / confirmed / declined). Your row is highlighted.</p>
+        <p class="sub" data-keep-visible="true">Pending shifts need your Approve selected. Opening a confirmation link does not confirm. Published colleague shifts are below.</p>
         <p id="worksheetStatus" class="status">Sign in to continue.</p>
       </div>
       <div class="card">
@@ -31,6 +31,19 @@
         </div>
       </div>
     </header>
+
+    <div class="card" id="worksheetConfirmCard">
+      <h2
+        id="worksheetConfirmHeading"
+        data-floqr-help-id="help-schedule-confirm"
+        data-floqr-help-title="Confirm assigned shifts"
+        data-floqr-help-search="confirm shift|approve shift|select all shifts|pending assignment|schedule notify"
+        data-floqr-help-body="Look at each pending shift, tick the ones you accept (or Select all), then Approve selected. Decline selected turns the rest down. The Inbox / Email / SMS link only opens this page — it does not confirm for you. Only the assigned service member can approve."
+      >My assigned shifts</h2>
+      <p class="sub small" data-keep-visible="true">Review the assignment, tick individual shifts or Select all, then Approve selected. The confirmation link does not approve the shift by itself.</p>
+      <p id="worksheetConfirmNote" class="status"></p>
+      <div id="worksheetConfirmHost"></div>
+    </div>
 
     <div class="card">
       <h2 id="worksheetVenueHeading">Venue</h2>
@@ -58,13 +71,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqai-help-repository.js?v=29.09.115"></script>
+<script src="./floqai-help-repository.js?v=s3.0.1"></script>
 <script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.115"></script>
 <script src="./floqr-nav.js?v=29.09.98"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
+<script src="./worker-confirm.js?v=s3.0.1"></script>
 <script src="./staff-week-grid.js?v=s3.0.0"></script>
-<script src="./staff-worksheet.js?v=29.09.115"></script>
+<script src="./staff-worksheet.js?v=s3.0.1"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

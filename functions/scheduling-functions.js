@@ -16,7 +16,12 @@ const {
   workerAllowsNotifyChannel,
   clubAllowsNotifyChannel,
   shiftApproveUrl,
+  shiftApprovePath,
+  buildShiftInviteMessage,
   buildShiftInviteBody,
+  fillScheduleMessageTemplate,
+  resolveScheduleMessageTemplate,
+  scheduleMessageVars,
   DEFAULT_ORIGIN
 } = require("./scheduling-core");
 
@@ -329,7 +334,7 @@ async function writeInbox(recipientUid, payload = {}) {
   if (!recipientUid) return;
   await db.collection("inboxNotifications").add({
     recipientUid,
-    type: "scheduleShift",
+    type: text(payload.type, 40) || "scheduleShift",
     title: text(payload.title, 160) || "Schedule update",
     body: text(payload.body, 1500),
     link: text(payload.link, 500),
@@ -368,7 +373,18 @@ async function writeScheduleAudit(entry = {}) {
 async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
   const origin = process.env.FLOQR_PUBLIC_ORIGIN || DEFAULT_ORIGIN;
   const approveUrl = shiftApproveUrl({...shift, id: shift.id}, origin);
-  const body = buildShiftInviteBody({...shift, id: shift.id}, origin);
+  let clubSettings = {};
+  const clubLocationId = text(shift.clubLocationId, 160);
+  if (clubLocationId) {
+    try {
+      const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
+      clubSettings = settingsSnap.exists ? settingsSnap.data() || {} : {};
+    } catch (_error) {
+      clubSettings = {};
+    }
+  }
+  const message = buildShiftInviteMessage({...shift, id: shift.id}, origin, clubSettings.messageTemplates);
+  const body = message.body;
   const results = {inApp: false, channelsQueued: false, approveUrl};
 
   let worker = {};
@@ -381,23 +397,12 @@ async function notifyAssigneeChannels(shift, purpose = "schedule-invite") {
     }
   }
 
-  let clubSettings = {};
-  const clubLocationId = text(shift.clubLocationId, 160);
-  if (clubLocationId) {
-    try {
-      const settingsSnap = await db.collection("clubNotificationSettings").doc(clubLocationId).get();
-      clubSettings = settingsSnap.exists ? settingsSnap.data() || {} : {};
-    } catch (_error) {
-      clubSettings = {};
-    }
-  }
-
   const channels = [];
   if (workerAllowsNotifyChannel(worker, "inapp") && clubAllowsNotifyChannel(clubSettings, "inapp")) {
     await writeInbox(shift.assigneeUid, {
-      title: normalizeShiftStatus(shift.status) === "pending" ? "New shift needs your confirmation" : "Schedule update",
+      title: message.title,
       body,
-      link: `./scheduling.html?shift=${encodeURIComponent(shift.id || "")}&from=schedule-notify&v=29.09.114`,
+      link: shiftApprovePath({...shift, id: shift.id}),
       shiftId: shift.id,
       ownerKey: shift.ownerKey
     });
@@ -771,6 +776,34 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const shiftId = text(request.data?.shiftId, 120);
   const decision = text(request.data?.decision, 20).toLowerCase();
+  return respondAsAssignee(shiftId, decision, request.auth, text(request.data?.from, 80));
+});
+
+exports.respondToScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 60, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const decision = text(request.data?.decision, 20).toLowerCase();
+  const ids = sanitizeShiftIds(request.data?.shiftIds || request.data?.shiftId);
+  if (!ids.length || !["approve", "decline"].includes(decision)) {
+    throw new HttpsError("invalid-argument", "shiftIds and decision (approve|decline) are required.");
+  }
+  const results = [];
+  for (const shiftId of ids) {
+    try {
+      results.push({ok: true, ...(await respondAsAssignee(shiftId, decision, request.auth, text(request.data?.from, 80) || "batch"))});
+    } catch (error) {
+      results.push({ok: false, shiftId, error: error?.message || String(error)});
+    }
+  }
+  return {
+    decision,
+    confirmed: results.filter(row => row.ok && row.status === "confirmed").length,
+    declined: results.filter(row => row.ok && row.status === "declined").length,
+    failed: results.filter(row => !row.ok).length,
+    results
+  };
+});
+
+async function respondAsAssignee(shiftId, decision, authContext, source = "callable") {
   if (!shiftId || !["approve", "decline"].includes(decision)) {
     throw new HttpsError("invalid-argument", "shiftId and decision (approve|decline) are required.");
   }
@@ -778,15 +811,16 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
   const snap = await ref.get();
   if (!snap.exists) throw new HttpsError("not-found", "Shift not found.");
   const shift = snap.data() || {};
-  const uid = request.auth.uid;
+  const uid = authContext.uid;
   const isAssignee = text(shift.assigneeUid, 160) === uid;
-  const isManager = await canManageOwner(text(shift.ownerType, 40), text(shift.ownerId, 160), request.auth);
-  if (!isAssignee && !isManager) throw new HttpsError("permission-denied", "Only the assigned worker or schedule manager can respond.");
+  if (!isAssignee) {
+    throw new HttpsError("permission-denied", "Only the assigned service member can confirm or decline this shift.");
+  }
   const current = normalizeShiftStatus(shift.status) || text(shift.status, 40);
   if (current === "draft") {
     throw new HttpsError("failed-precondition", "Draft shifts must be published before workers can respond.");
   }
-  if (current !== "pending" && !isManager) {
+  if (current !== "pending") {
     throw new HttpsError("failed-precondition", "This shift is no longer awaiting confirmation.");
   }
   const nextStatus = decision === "approve" ? "confirmed" : "declined";
@@ -795,7 +829,7 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
     status: nextStatus,
     responseDecision: decision,
     respondedByUid: uid,
-    respondedByEmail: text(request.auth.token?.email, 200).toLowerCase(),
+    respondedByEmail: text(authContext.token?.email, 200).toLowerCase(),
     respondedAt: now,
     updatedAt: now
   }, {merge: true});
@@ -810,24 +844,39 @@ exports.respondToScheduleShift = onCall({region: "us-central1", timeoutSeconds: 
     ownerId: shift.ownerId,
     clubLocationId: shift.clubLocationId,
     actorUid: uid,
-    actorEmail: request.auth.token?.email,
+    actorEmail: authContext.token?.email,
     assigneeUid: shift.assigneeUid,
     assigneeName: shift.assigneeName,
     status: nextStatus,
-    source: text(request.data?.from, 80) || "callable",
+    source: text(source, 80) || "callable",
     message: `${shift.assigneeName || "Worker"} ${nextStatus} after notify`
   });
 
+  let clubTemplates = {};
+  if (text(shift.clubLocationId, 160)) {
+    try {
+      const settingsSnap = await db.collection("clubNotificationSettings").doc(text(shift.clubLocationId, 160)).get();
+      clubTemplates = settingsSnap.exists ? (settingsSnap.data() || {}).messageTemplates || {} : {};
+    } catch (_error) {
+      clubTemplates = {};
+    }
+  }
+  const managerNote = managerResponseMessage(nextStatus === "confirmed" ? "shift-confirmed" : "shift-declined", shift, clubTemplates);
   await writeInbox(shift.createdByUid, {
-    title: `Shift ${nextStatus}`,
-    body: `${shift.assigneeName || "Worker"} ${nextStatus} the ${shift.roleLabel || "shift"} on ${shift.startsAtLabel || shift.startsAt || ""}.`,
-    link: `scheduling.html?owner=${encodeURIComponent(shift.ownerKey || "")}&shift=${encodeURIComponent(shiftId)}`,
+    title: managerNote.title,
+    body: managerNote.body,
+    type: nextStatus === "confirmed" ? "scheduleShiftConfirmed" : "scheduleShiftDeclined",
+    link: `./admin.html?location=${encodeURIComponent(text(shift.ownerId, 160))}&tab=scheduling&shift=${encodeURIComponent(shiftId)}&v=s3.0.1`,
     shiftId,
     ownerKey: shift.ownerKey
   });
 
   return {shiftId, status: nextStatus};
-});
+}
+
+function managerResponseMessage(kind, shift, clubTemplates) {
+  return fillScheduleMessageTemplate(resolveScheduleMessageTemplate(kind, clubTemplates), scheduleMessageVars({...shift, id: shift.id}));
+}
 
 exports.listScheduleShifts = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");

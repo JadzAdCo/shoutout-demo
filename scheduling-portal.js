@@ -142,13 +142,49 @@
 
     try {
       const mine = (await callable("listScheduleShifts")({mineOnly: true}))?.data?.shifts || [];
-      renderShiftList(byId("portalMyShifts"), mine, {assignee: true});
+      renderMyAssignments(byId("portalMyShifts"), mine);
     } catch (_error) {
       /* assignees can still open portal before manage entitlement */
     }
 
     const focusShift = params.get("shift");
-    if (focusShift) setStatus(`Open shift ${focusShift}. Confirm or decline it under My assignments if it is yours.`);
+    if (focusShift) setStatus("Review the highlighted shift under My assignments, tick it, then Approve selected. Opening this page does not confirm.");
+  }
+
+  function renderMyAssignments(el, shifts) {
+    const api = window.FLOQRWorkerConfirm;
+    if (el && api) {
+      api.render(el, {
+        shifts,
+        focusId: params.get("shift") || "",
+        emptyMessage: "No pending assignments for this account."
+      });
+      api.bind(el, {
+        onApprove: ids => respondSelected(ids, "approve"),
+        onDecline: ids => respondSelected(ids, "decline")
+      });
+      return;
+    }
+    renderShiftList(el, shifts, {assignee: true});
+  }
+
+  async function respondSelected(ids, decision) {
+    if (!ids.length) {
+      setStatus("Tick at least one pending shift, then Approve selected or Decline selected.");
+      return;
+    }
+    setStatus(`${decision === "approve" ? "Approving" : "Declining"} ${ids.length}…`);
+    try {
+      await callable("respondToScheduleShifts")({shiftIds: ids, decision, from: "scheduling-portal"});
+    } catch (error) {
+      const message = error?.message || String(error);
+      if (!/not found|does not exist|unimplemented/i.test(message)) throw error;
+      for (const shiftId of ids) {
+        await callable("respondToScheduleShift")({shiftId, decision, from: "scheduling-portal"});
+      }
+    }
+    setStatus(decision === "approve" ? "Selected shifts confirmed." : "Selected shifts declined.");
+    await refresh();
   }
 
   function renderShiftList(el, shifts, opts = {}) {

@@ -150,6 +150,52 @@
       ]
     },
     {
+      id: "help-schedule-message-templates",
+      kind: "help",
+      label: "Schedule message templates",
+      blurb: "Club Admin → Notifications → Message templates. Edit System Messages for shift invite, update, confirmed, and declined. They are not ShoutOuts. Placeholders: {club} {role} {when} {link} {worker}.",
+      steps: [
+        "Open Club Admin → Notifications → Message templates.",
+        "Edit title and body for each System Message type.",
+        "Use {club}, {role}, {when}, {link}, and {worker} placeholders.",
+        "Save. New Inbox / Email / SMS / WhatsApp notices use this copy. Worker inbox shows Review & confirm shift, not Open Related ShoutOut."
+      ],
+      links: [
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
+      ],
+      searchPhrases: [
+        "message template", "system message", "schedule invite", "shift confirmation message",
+        "open related shoutout", "edit system message", "notification templates"
+      ],
+      patterns: [
+        /message\s*templates?/, /system\s*message/, /open\s*related\s*shout/,
+        /schedule\s*(invite|message\s*template)/, /edit\s*(the\s*)?(system|shift)\s*message/
+      ]
+    },
+    {
+      id: "help-schedule-confirm",
+      kind: "help",
+      label: "Confirm assigned shifts",
+      blurb: "Inbox links open Work Calendar. Tick pending shifts (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve.",
+      steps: [
+        "Stay signed in and open Review & confirm shift from Inbox (not Open Related ShoutOut).",
+        "Look at the assigned shift on Work Calendar.",
+        "Tick that shift or Select all.",
+        "Tap Approve selected or Decline selected."
+      ],
+      links: [
+        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})}
+      ],
+      searchPhrases: [
+        "confirm shift", "approve shift", "select all shifts", "pending assignment",
+        "review and confirm shift", "my assigned shifts"
+      ],
+      patterns: [
+        /confirm\s*(my\s*)?(assigned\s*)?shift/, /approve\s*(selected|shift)/,
+        /select\s*all\s*shifts/, /pending\s*assignment/
+      ]
+    },
+    {
       id: "help-donpapi-led-wall",
       kind: "help",
       label: "DonPapi ShoutOut LED wall",
@@ -353,24 +399,25 @@
       id: "help-staff-worksheet",
       kind: "help",
       label: "Work Sheet - Weekly Staff Calendar",
-      blurb: "Elected staff open Staff Calendar from My Profile for a read-only people × days grid of published shifts for every colleague at the venue.",
+      blurb: "Elected staff open Work Calendar for pending assignments (tick / Select all / Approve selected) plus a people × days grid of published colleague shifts.",
       steps: [
-        "Sign in as an elected service member.",
-        "Open My Profile → Staff Calendar, or Work Sheet - Weekly Staff Calendar.",
-        "Pick the club if you work at more than one venue.",
-        "Your row is highlighted. Drafts are not shown."
+        "Sign in as the assigned service member.",
+        "Open the Inbox link or My Profile → Work Calendar.",
+        "Review pending shifts, tick them or Select all, then Approve selected. The link itself does not confirm.",
+        "Pick the club if you work at more than one venue. Your row is highlighted. Drafts are not shown."
       ],
       links: [
+        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
         {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})},
         {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai"})}
       ],
       searchPhrases: [
         "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
-        "colleague schedule", "who is working"
+        "colleague schedule", "who is working", "confirm shift", "approve selected"
       ],
       patterns: [
         /staff\s*calendar/, /work\s*sheet/, /weekly\s*staff\s*calendar/,
-        /who\s+is\s+working/, /colleague\s+schedule/
+        /who\s+is\s+working/, /colleague\s+schedule/, /confirm\s*(my\s*)?shift/, /approve\s*selected/
       ]
     },
     {
@@ -546,10 +593,11 @@
       id: "help-scheduling",
       kind: "help",
       label: "Staff Scheduling help",
-      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed), Select shifts to multi-delete.",
+      blurb: "Clubs, promoting companies, and DJs unlock Staff Scheduling when staffSchedulingPaid=1 (demo venues or $20/mo Stripe). Unpaid (0) shows Subscribe; paid shows the calendar workspace. Create drafts, Publish schedule (workers confirm pending→confirmed on Work Calendar), Select shifts to multi-delete. Edit System Message copy under Notifications → Message templates.",
       links: [
         {label: "Scheduling portal", href: vUrl("./scheduling.html", {from: "floqai"})},
         {label: "Club Admin Scheduling tab", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"})},
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
         {label: "Role profiles (who can subscribe)", href: vUrl("./role-profiles.html", {from: "floqai"})}
       ],
       patterns: [/schedul/, /shift/, /staff\s*calendar/, /notify\s*(and\s*)?approve/]

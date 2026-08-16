@@ -253,6 +253,37 @@
       page: "admin.html#panelNotifications"
     },
     {
+      id: "help-schedule-message-templates",
+      title: "Schedule message templates",
+      body: "Club Admin → Notifications → Message templates. These are System Messages (Inbox / Email / SMS / WhatsApp), not ShoutOuts. Edit title and body for New shift needs confirmation, Schedule update, Shift confirmed, and Shift declined. Placeholders: {club} {role} {when} {link} {worker}. Worker inbox uses Review & confirm shift — never Open Related ShoutOut.",
+      searchPhrases: [
+        "message template", "system message", "schedule invite", "shift confirmation message",
+        "open related shoutout", "new shift needs your confirmation", "edit system message",
+        "notification templates", "confirm or decline this shift"
+      ],
+      links: [
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})},
+        {label: "Club Admin Notifications", href: vUrl("./admin.html", {from: "floqai", tab: "notifications"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#notifyTemplatesPane"
+    },
+    {
+      id: "help-schedule-confirm",
+      title: "Confirm assigned shifts",
+      body: "Inbox / Email / SMS links open Work Calendar. Look at each pending assignment, tick it (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve — Club Admin cannot confirm on their behalf.",
+      searchPhrases: [
+        "confirm shift", "approve shift", "select all shifts", "pending assignment",
+        "schedule notify", "review and confirm shift", "my assigned shifts", "decline shift"
+      ],
+      links: [
+        {label: "Work Calendar", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},
+        {label: "Message templates", href: vUrl("./admin.html", {from: "floqai", tab: "notifications", notify: "templates"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalWorkCalendar"
+    },
+    {
       id: "help-template-catalog-report",
       title: "Template catalog report",
       body: "Lists every ShoutOut template type and which LED sizes it supports (Is96x48, Is64x48, Is64x32). A venue only offers a template when at least one of those flags is 1 and the matching VenueSupports* flag is 1. Birthday / split-media templates are 1 on 96×48, 64×48, and 64×32. 96×48 is 3-line side-by-side; 64×48 and 64×32 loop the photo then the 3-line shoutout with a FLOQR + handle card.",
@@ -383,10 +414,11 @@
     {
       id: "help-staff-worksheet",
       title: "Work Sheet - Weekly Staff Calendar",
-      body: "Elected service members open the Work Calendar tab in Settings when users.serviceMember is true and they are affiliated to a club with staffSchedulingPaid=1. The week grid shows published colleague shifts. Drafts stay in Club Admin.",
+      body: "Elected service members open Work Calendar in Settings. Inbox / Email / SMS confirmation links land here. Review pending assignments, tick each shift (or Select all), then Approve selected — opening the message does not confirm. The week grid shows published colleague shifts. Drafts stay in Club Admin.",
       searchPhrases: [
         "staff calendar", "work sheet", "worksheet", "weekly staff calendar",
-        "colleague schedule", "who is working", "my shifts this week", "elected staff schedule"
+        "colleague schedule", "who is working", "my shifts this week", "elected staff schedule",
+        "confirm shift", "approve selected", "my assigned shifts"
       ],
       links: [
         {label: "Work Calendar tab", href: vUrl("./patron-portal.html", {from: "floqai", tab: "work-calendar"})},

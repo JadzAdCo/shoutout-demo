@@ -36,6 +36,64 @@
     .filter(line => line !== "->")
     .join("\n");
   const linkify = value => esc(value).replace(/(https?:\/\/[^\s<]+|\.\/[^\s<]+)/g, match => `<a href="${match}" class="message-inline-link">${match}</a>`);
+
+  function isScheduleInboxMessage(x = {}) {
+    const href = String(x.link || x.body || "");
+    if (/admin\.html/.test(href) && /tab=scheduling/.test(href)) return false;
+    return x.type === "scheduleShift"
+      || !!x.shiftId
+      || /from=schedule-notify/.test(href)
+      || (/scheduling\.html/.test(href) && /shift=/.test(href))
+      || (/patron-portal\.html/.test(href) && /tab=work-calendar/.test(href));
+  }
+
+  function scheduleConfirmHref(x = {}) {
+    const raw = String(x.link || "").trim();
+    if (/admin\.html/.test(raw)) return raw;
+    let shift = String(x.shiftId || "").trim();
+    let owner = "";
+    try {
+      if (raw) {
+        const src = new URL(raw, location.href);
+        shift = src.searchParams.get("shift") || shift;
+        owner = src.searchParams.get("owner") || "";
+      }
+    } catch (_error) {
+      /* keep parsed shift */
+    }
+    if (!isScheduleInboxMessage(x) || !shift) return raw;
+    const next = new URL("./patron-portal.html", location.href);
+    next.searchParams.set("tab", "work-calendar");
+    next.searchParams.set("shift", shift);
+    if (owner) next.searchParams.set("owner", owner);
+    next.searchParams.set("from", "schedule-notify");
+    next.searchParams.set("v", "s3.0.1");
+    return `${next.pathname}${next.search}`;
+  }
+
+  function rewriteScheduleNotifyBody(body = "") {
+    return String(body || "").replace(
+      /(https?:\/\/[^\s<]*\/)?scheduling\.html\?([^\s<]+)/g,
+      (full, _host, query) => {
+        const params = new URLSearchParams(String(query || "").replace(/&amp;/g, "&"));
+        if (params.get("from") !== "schedule-notify" && !params.get("shift")) return full;
+        const next = new URLSearchParams();
+        next.set("tab", "work-calendar");
+        if (params.get("shift")) next.set("shift", params.get("shift"));
+        if (params.get("owner")) next.set("owner", params.get("owner"));
+        next.set("from", "schedule-notify");
+        next.set("v", "s3.0.1");
+        return `./patron-portal.html?${next.toString()}`;
+      }
+    );
+  }
+
+  function inboxLinkLabel(x = {}) {
+    const href = String(x.link || "");
+    if (/admin\.html/.test(href) && /tab=scheduling/.test(href)) return "Open Calendar & Scheduler";
+    if (isScheduleInboxMessage(x)) return "Review & confirm shift";
+    return "Open Related ShoutOut";
+  }
   const fmtDate = value => {
     if (!value) return "-";
     const d = value.toDate ? value.toDate() : value.seconds ? new Date(value.seconds * 1000) : new Date(value);
@@ -1478,7 +1536,7 @@
       </div>
       <p><b>Sender:</b> ${esc(x.senderName)}</p>
       <p><b>Timestamp:</b> ${esc(fmtDate(x.createdAt))}</p>
-      <div class="message-body hidden">${linkify(x.body)}${x.link ? `<p><a href="${esc(x.link)}" class="buttonlike">Open Related ShoutOut</a></p>` : ""}
+      <div class="message-body hidden">${linkify(rewriteScheduleNotifyBody(x.body))}${x.link ? `<p><a href="${esc(isScheduleInboxMessage(x) ? scheduleConfirmHref(x) : x.link)}" class="buttonlike">${esc(inboxLinkLabel(x))}</a></p>` : ""}
         ${canAcceptMingl ? `<p class="queue-actions"><button type="button" class="primary accept-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Accept Mingl</button><button type="button" class="deny-mingl-inbox-btn" data-connection-id="${esc(connection?.connectionId || connection?.id || x.connectionId)}">Deny</button></p>` : ""}
         ${alreadyMutual ? `<p><a class="buttonlike" href="${esc(window.FLOQRNav?.portalLink("./mingl-chat.html", { room: `mingl_${connection.id || connection.connectionId || ""}` }) || `./mingl-chat.html?room=mingl_${connection.id || connection.connectionId || ""}&v=29.09.57&from=portal`)}">Open Mingl Chat</a></p>` : ""}
         ${canDelete ? `<p class="queue-actions"><button type="button" class="ghost delete-inbox-btn" data-message-index="${index}">Delete</button></p>` : ""}
@@ -3100,11 +3158,28 @@
       when: {datapoint: "isClubAdmin", equals: true},
       reason: "service-members-admin"
     }], datapoints);
-    const href = datapoints.affiliatedPaidSchedulingClubIds?.[0]
-      ? `./staff-worksheet.html?v=29.09.117&location=${encodeURIComponent(datapoints.affiliatedPaidSchedulingClubIds[0])}`
-      : "./staff-worksheet.html?v=29.09.117";
+    const pageParams = new URL(location.href).searchParams;
+    const confirmDeepLink = pageParams.get("from") === "schedule-notify" || !!pageParams.get("shift");
+    if (confirmDeepLink) {
+      window.FLOQRTabGates?.apply?.({
+        tab: "#portalWorkCalendarTab",
+        panel: "#portalWorkCalendar",
+        visible: true,
+        reason: "schedule-confirm-link"
+      });
+      showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
+    }
+    const frameQuery = new URLSearchParams({v: "s3.0.1"});
+    let locationId = datapoints.affiliatedPaidSchedulingClubIds?.[0] || "";
+    const owner = String(pageParams.get("owner") || "").trim();
+    if (owner.startsWith("club:")) locationId = owner.slice(5) || locationId;
+    if (locationId) frameQuery.set("location", locationId);
+    if (pageParams.get("shift")) frameQuery.set("shift", pageParams.get("shift"));
+    if (owner) frameQuery.set("owner", owner);
+    if (pageParams.get("from")) frameQuery.set("from", pageParams.get("from"));
+    const href = `./staff-worksheet.html?${frameQuery.toString()}`;
     const frame = byId("portalWorkCalendarFrame");
-    if (frame && datapoints.workCalendarEligible) frame.src = href;
+    if (frame && (datapoints.workCalendarEligible || confirmDeepLink)) frame.src = href;
     const card = byId("staffCalendarCard");
     card?.classList.toggle("hidden", !datapoints.workCalendarEligible);
     populateServiceMemberLocations();

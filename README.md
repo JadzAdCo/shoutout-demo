@@ -1,10 +1,10 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.0 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.1 (stable)
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
 
-Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.0&start=search`
+Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.1&start=search`
 
-s3.0.0: Internal Calendar AssignmentCards (Draft / Pending / Confirmed / Open). Website schedule API is Confirmed-only. Birthday-with-photo loops on 64×48 and 64×32. Version channel **s** = stable.
+s3.0.1: Inbox schedule links open Work Calendar for tick / Select all / Approve selected (the link does not confirm). Club Admin Notifications → Message templates for System Messages. s3.0.0: Internal Calendar AssignmentCards; website schedule API is Confirmed-only; birthday LED loop. Version channel **s** = stable.
 
 ## UI media input convention (required)
 
