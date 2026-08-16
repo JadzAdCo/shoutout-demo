@@ -45,7 +45,7 @@
       <li>RSS: same URL with <code>format=rss</code> for a staff-schedule feed.</li>
       <li>Iframe: paste the snippet into your site. It loads schedule-embed.html with the secret.</li>
     </ol>
-    <p>Treat the secret like an API key. Rotate it if it leaks. Payload never includes drafts, worker email, or phone.</p>
+    <p>Treat the secret like an API key. Rotate it if it leaks. The website feed is Confirmed assignments only — never Draft, Pending, Open, cancelled, staffing requirements, or private employee fields.</p>
   `;
 
   function attachSchedulingHelp() {
@@ -77,7 +77,7 @@
         id: "help-venue-website-ingest",
         title: "Website ingest",
         bodyHtml: INGEST_HELP_HTML,
-        body: "Generate a venue ingest secret to pull published staff shifts onto your official website via JSON API, RSS, or iframe. Hash only is stored; full secret is revealed once per rotate. Drafts, email, and phone are omitted.",
+        body: "Generate a venue ingest secret to pull Confirmed staff shifts onto your official website via JSON API, RSS, or iframe. Hash only is stored. Draft, Pending, Open, cancelled, staffing requirements, email, phone, and user ids are omitted.",
         searchPhrases: [
           "website ingest", "club website schedule", "rss feed", "iframe schedule",
           "schedule api", "ingest secret", "embed staff schedule", "official website"
@@ -245,7 +245,11 @@
     venue: null,
     selecting: false,
     selectFilter: "all",
-    selectedShiftIds: new Set()
+    selectedShiftIds: new Set(),
+    calendarJobFilter: "all",
+    calendarStatusFilter: "all",
+    staffingRequirements: [],
+    expandedCalCells: new Set()
   };
 
   function sameDay(aMs, dayDate) {
@@ -332,8 +336,10 @@
     try {
       const snap = await db.collection("clubLocations").doc(locationId).get();
       state.venue = snap.exists ? (snap.data() || {}) : {};
+      state.staffingRequirements = Array.isArray(state.venue.staffingRequirements) ? state.venue.staffingRequirements : [];
     } catch (_error) {
       state.venue = {};
+      state.staffingRequirements = [];
     }
     applyVenueDefaultsToControls();
     return state.venue;
@@ -501,6 +507,77 @@
   function shiftStatusKey(shift) {
     const status = String(shift?.status || "") === "approved" ? "confirmed" : String(shift?.status || "");
     return status || "draft";
+  }
+
+  function cardApi() {
+    return window.FLOQRAssignmentCard || null;
+  }
+
+  function statusClassFor(status) {
+    if (status === "draft") return "is-draft";
+    if (status === "pending") return "is-pending";
+    if (status === "confirmed") return "is-confirmed";
+    if (status === "open") return "is-open";
+    if (status === "declined") return "is-declined";
+    return "";
+  }
+
+  function jobTypeNames() {
+    const names = new Set();
+    state.workers.forEach(worker => {
+      if (worker.role) names.add(String(worker.role));
+    });
+    state.shifts.forEach(shift => {
+      if (shift.roleLabel) names.add(String(shift.roleLabel));
+    });
+    (state.staffingRequirements || []).forEach(row => {
+      if (row.roleLabel) names.add(String(row.roleLabel));
+    });
+    return [...names].sort((a, b) => a.localeCompare(b));
+  }
+
+  function neededFor(roleLabel, day) {
+    const weekday = day instanceof Date ? day.getDay() : -1;
+    const row = (state.staffingRequirements || []).find(item =>
+      String(item.roleLabel || "") === String(roleLabel || "") && Number(item.weekday ?? item.dayOfWeek) === weekday
+    );
+    return Number(row?.neededCount || row?.needed || 0) || 0;
+  }
+
+  function populateCalendarFilters() {
+    const jobSelect = byId("schedCalJobFilter");
+    if (jobSelect) {
+      const current = state.calendarJobFilter || "all";
+      const names = jobTypeNames();
+      jobSelect.innerHTML = `<option value="all">All job types</option>` + names.map(name =>
+        `<option value="${esc(name)}"${name === current ? " selected" : ""}>${esc(name)}</option>`
+      ).join("");
+    }
+    const statusSelect = byId("schedCalStatusFilter");
+    if (statusSelect) statusSelect.value = state.calendarStatusFilter || "all";
+  }
+
+  async function saveStaffingRequirements() {
+    if (!locationId || !db) return;
+    await db.collection("clubLocations").doc(locationId).set({
+      staffingRequirements: state.staffingRequirements,
+      staffingRequirementsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  }
+
+  function editStaffingRequirements() {
+    const role = window.prompt("Job type for staffing need (example: Busboy)", jobTypeNames()[0] || "Busboy");
+    if (!role) return;
+    const weekday = Number(window.prompt("Weekday 0=Sun … 6=Sat", String(new Date().getDay())));
+    if (!Number.isFinite(weekday) || weekday < 0 || weekday > 6) return;
+    const needed = Number(window.prompt("How many people are needed that day?", "1"));
+    if (!Number.isFinite(needed) || needed < 0) return;
+    state.staffingRequirements = (state.staffingRequirements || []).filter(row =>
+      !(String(row.roleLabel) === role && Number(row.weekday ?? row.dayOfWeek) === weekday)
+    );
+    if (needed > 0) state.staffingRequirements.push({roleLabel: role, weekday, neededCount: needed});
+    saveStaffingRequirements().catch(error => setStatus(error.message));
+    renderCalendarView();
   }
 
   function matchesSelectFilter(shift) {
@@ -706,19 +783,11 @@
         );
         const chips = dayShifts.map(shift => {
           const status = shiftStatusKey(shift);
-          const statusClass = status === "draft" ? "is-draft"
-            : status === "pending" ? "is-pending"
-            : status === "confirmed" ? "is-confirmed"
-            : status === "declined" ? "is-declined"
-            : "";
+          const kind = cardApi()?.kindFromShift?.(shift) || status;
           const selected = state.selecting && state.selectedShiftIds.has(shift.id);
-          return `
-          <button type="button" class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}${selected ? " is-selected" : ""}"
-            data-shift-id="${esc(shift.id)}" data-uid="${esc(worker.uid)}" data-day="${dayIdx}" data-status="${esc(status)}"
-            aria-pressed="${selected ? "true" : "false"}">
-            <strong>${esc(shift.roleLabel || "Shift")}</strong>
-            <small>${esc(formatChipTime(shift))} · ${esc(status)}</small>
-          </button>`;
+          const html = cardApi()?.render?.(shift, {kind, selected, interactive: true})
+            || `<button type="button" class="sched-chip ${statusClassFor(status)}${selected ? " is-selected" : ""}" data-shift-id="${esc(shift.id)}"><strong>${esc(shift.roleLabel || "Shift")}</strong><small>${esc(formatChipTime(shift))} · ${esc(status)}</small></button>`;
+          return html.replace("<button", `<button data-uid="${esc(worker.uid)}" data-day="${dayIdx}"`);
         }).join("");
         return `<td class="sched-cell" data-uid="${esc(worker.uid)}" data-day="${dayIdx}">
           ${chips}
@@ -775,30 +844,76 @@
   function renderCalendarView() {
     const host = byId("scheduleCalendarGrid");
     if (!host) return;
+    populateCalendarFilters();
     updateWeekLabel();
     const days = weekDays();
-    const confirmed = confirmedWeekShifts();
-    const workers = state.workers.length
-      ? state.workers
-      : [...new Map(confirmed.map(s => [s.assigneeUid, {uid: s.assigneeUid, name: s.assigneeName, role: s.roleLabel}])).values()];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const jobFilter = state.calendarJobFilter || "all";
+    const statusFilter = state.calendarStatusFilter || "all";
+    const jobs = jobTypeNames().filter(name => jobFilter === "all" || name === jobFilter);
+    const internalShifts = (state.shifts || []).filter(shift => {
+      const kind = cardApi()?.kindFromShift?.(shift) || shiftStatusKey(shift);
+      if (!["open", "draft", "pending", "confirmed"].includes(kind)) return false;
+      if (statusFilter !== "all" && kind !== statusFilter) return false;
+      return true;
+    });
+    const isActiveDay = day => internalShifts.some(shift => sameDay(Number(shift.startsAtMs || 0), day))
+      || (state.staffingRequirements || []).some(row => Number(row.weekday ?? row.dayOfWeek) === day.getDay() && Number(row.neededCount || 0) > 0);
+    const columns = [];
+    days.forEach((day, idx) => {
+      const active = isActiveDay(day);
+      const prev = columns[columns.length - 1];
+      if (!active && prev && prev.inactive) {
+        prev.endIdx = idx;
+        prev.days.push(day);
+        return;
+      }
+      columns.push({startIdx: idx, endIdx: idx, days: [day], inactive: !active});
+    });
     const fmtDay = {weekday: "short", month: "short", day: "numeric"};
-    const head = `<thead><tr><th class="sched-person">Team</th>${days.map((day, dayIdx) => {
-      const selected = Number(state.calendarDayIdx) === dayIdx ? " is-cal-selected" : "";
-      return `<th class="sched-day-head${selected}" data-cal-day-idx="${dayIdx}">${esc(day.toLocaleDateString([], fmtDay))}<div class="sched-day-sub">Confirmed</div></th>`;
+    const head = `<thead><tr><th class="sched-person">Job type</th>${columns.map(col => {
+      if (col.inactive) {
+        const a = col.days[0].toLocaleDateString([], {weekday: "short", day: "numeric"});
+        const b = col.days[col.days.length - 1].toLocaleDateString([], {weekday: "short", day: "numeric"});
+        return `<th class="sched-day-head is-empty-group">${esc(a)} – ${esc(b)}</th>`;
+      }
+      const day = col.days[0];
+      const isToday = day.getTime() === today.getTime();
+      const selected = Number(state.calendarDayIdx) === col.startIdx ? " is-cal-selected" : "";
+      return `<th class="sched-day-head${selected}${isToday ? " is-today" : ""}" data-cal-day-idx="${col.startIdx}">${esc(day.toLocaleDateString([], fmtDay))}${isToday ? `<span class="sched-today-pill">Today</span>` : ""}</th>`;
     }).join("")}</tr></thead>`;
-    const body = workers.map(worker => {
-      const cells = days.map((day, dayIdx) => {
-        const chips = confirmed.filter(s => String(s.assigneeUid || "") === worker.uid && sameDay(Number(s.startsAtMs || 0), day));
-        if (!chips.length) return `<td class="sched-cell" data-cal-day-idx="${dayIdx}"><span class="sched-empty">—</span></td>`;
-        return `<td class="sched-cell" data-cal-day-idx="${dayIdx}">${chips.map(s =>
-          `<button type="button" class="sched-chip is-confirmed" data-shift-id="${esc(s.id)}">${esc(s.roleLabel || "Shift")}<small>${esc(formatChipTime(s))}</small></button>`
-        ).join("")}</td>`;
+    const body = (jobs.length ? jobs : ["Shift"]).map(job => {
+      const weekCount = internalShifts.filter(s => String(s.roleLabel || s.role || "") === job).length;
+      const needed = days.reduce((sum, day) => sum + neededFor(job, day), 0);
+      const cells = columns.map(col => {
+        if (col.inactive) {
+          return `<td class="sched-cell"><span class="sched-empty-group">No shifts scheduled</span></td>`;
+        }
+        const day = col.days[0];
+        const cellShifts = internalShifts.filter(s =>
+          String(s.roleLabel || s.role || "") === job && sameDay(Number(s.startsAtMs || 0), day)
+        );
+        const picked = cardApi()?.pickVisible?.(cellShifts, {website: false}) || {visible: cellShifts[0] || null, hiddenCount: Math.max(0, cellShifts.length - 1)};
+        if (!picked.visible) {
+          const need = neededFor(job, day);
+          if (need > 0) {
+            return `<td class="sched-cell" data-cal-day-idx="${col.startIdx}">${cardApi()?.render?.({roleLabel: job, startsAtMs: day.getTime(), endsAtMs: day.getTime()}, {kind: "open"}) || `<span class="sched-empty">Unfilled</span>`}</td>`;
+          }
+          return `<td class="sched-cell" data-cal-day-idx="${col.startIdx}"><span class="sched-empty">—</span></td>`;
+        }
+        const cellKey = `${job}|${col.startIdx}`;
+        const expanded = state.expandedCalCells.has(cellKey);
+        const shown = expanded ? (picked.pool || cellShifts) : [picked.visible];
+        const cards = shown.map(shift => cardApi()?.render?.(shift, {kind: cardApi()?.kindFromShift?.(shift) || shiftStatusKey(shift)}) || "").join("");
+        const more = !expanded && picked.hiddenCount
+          ? (cardApi()?.viewMoreLink?.(picked.hiddenCount) || "").replace("<button", `<button data-expand-cell="${esc(cellKey)}"`)
+          : "";
+        return `<td class="sched-cell" data-cal-day-idx="${col.startIdx}">${cards}${more}</td>`;
       }).join("");
-      return `<tr><th class="sched-person">${esc(worker.name || "Staff")}<small>${esc(worker.role || "")}</small></th>${cells}</tr>`;
+      return `<tr><th class="sched-person">${esc(job)}<small class="sched-job-meta">${weekCount} shift${weekCount === 1 ? "" : "s"}${needed ? `, ${needed} needed` : ""}</small></th>${cells}</tr>`;
     }).join("");
-    host.innerHTML = workers.length
-      ? `<table class="sched-grid">${head}<tbody>${body}</tbody></table>`
-      : "<p class='sub'>No confirmed shifts this week yet. Publish on Scheduler, then workers confirm.</p>";
+    host.innerHTML = `<table class="sched-grid sched-calendar-grid">${head}<tbody>${body}</tbody></table>`;
     renderCalendarDayDetail();
   }
 
@@ -808,15 +923,19 @@
     const days = weekDays();
     const idx = Number.isFinite(Number(state.calendarDayIdx)) ? Number(state.calendarDayIdx) : new Date().getDay();
     const day = days[idx] || days[0];
-    const rows = confirmedWeekShifts().filter(s => sameDay(Number(s.startsAtMs || 0), day));
+    const rows = (state.shifts || []).filter(s => {
+      const kind = cardApi()?.kindFromShift?.(s) || shiftStatusKey(s);
+      return ["open", "draft", "pending", "confirmed"].includes(kind) && sameDay(Number(s.startsAtMs || 0), day);
+    });
     const title = day ? day.toLocaleDateString([], {weekday: "long", month: "long", day: "numeric"}) : "";
     if (!rows.length) {
-      host.innerHTML = `<p class="sub">${esc(title)} — no confirmed service members yet.</p>`;
+      host.innerHTML = `<p class="sub">${esc(title)} — no scheduled assignments this day.</p>`;
       return;
     }
-    host.innerHTML = `<p class="sub"><strong>${esc(title)}</strong> · confirmed roster</p>` + rows.map(s =>
-      `<div class="queue-item"><strong>${esc(s.assigneeName || "Staff")}</strong> · ${esc(s.roleLabel || "Shift")}<p>${esc(formatChipTime(s))}</p></div>`
-    ).join("");
+    host.innerHTML = `<p class="sub"><strong>${esc(title)}</strong> · internal roster</p>` + rows.map(s => {
+      const kind = cardApi()?.kindFromShift?.(s) || shiftStatusKey(s);
+      return `<div class="queue-item">${cardApi()?.render?.(s, {kind, interactive: false}) || `<strong>${esc(s.assigneeName || "Staff")}</strong> · ${esc(kind)}`}</div>`;
+    }).join("");
   }
 
   async function loadScheduleAudit() {
@@ -1423,11 +1542,32 @@
     byId("schedCalNextWeekBtn")?.addEventListener("click", () => shiftWeek(7));
     byId("schedCalTodayWeekBtn")?.addEventListener("click", () => shiftWeek(0, true));
     byId("scheduleCalendarGrid")?.addEventListener("click", event => {
+      const more = event.target.closest("[data-expand-cell]");
+      if (more) {
+        state.expandedCalCells.add(more.dataset.expandCell);
+        renderCalendarView();
+        return;
+      }
+      const card = event.target.closest("[data-shift-id]");
+      if (card?.dataset.shiftId) {
+        const shift = state.shifts.find(s => s.id === card.dataset.shiftId);
+        if (shift) openAssignModal({shift});
+        return;
+      }
       const head = event.target.closest("[data-cal-day-idx]");
       if (!head) return;
       state.calendarDayIdx = Number(head.dataset.calDayIdx);
       renderCalendarView();
     });
+    byId("schedCalJobFilter")?.addEventListener("change", event => {
+      state.calendarJobFilter = event.target.value || "all";
+      renderCalendarView();
+    });
+    byId("schedCalStatusFilter")?.addEventListener("change", event => {
+      state.calendarStatusFilter = event.target.value || "all";
+      renderCalendarView();
+    });
+    byId("schedStaffingReqBtn")?.addEventListener("click", () => editStaffingRequirements());
     byId("schedIngestRotateBtn")?.addEventListener("click", () => {
       rotateIngestSecret().catch(error => setIngestStatus(error.message));
     });

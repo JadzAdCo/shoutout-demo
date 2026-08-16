@@ -62,8 +62,8 @@ const SHOUTOUT_TEXT_LIMITS = {
     "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,10,30,14]
   },
   splitMedia:{
-    "p125-96x48":[3,10,30,20],"p125-64x48":[2,12,24,18],"p125-64x32":null,
-    "led-96x48":[3,10,30,20],"led-64x48":[2,12,24,18],"led-64x32":null
+    "p125-96x48":[3,10,30,20],"p125-64x48":[3,10,30,18],"p125-64x32":[3,10,30,16],
+    "led-96x48":[3,10,30,20],"led-64x48":[3,10,30,18],"led-64x32":[3,10,30,16]
   },
   car:{
     "p125-96x48":[2,14,28,22],"p125-64x48":[2,10,20,18],"p125-64x32":[2,12,24,18],
@@ -149,11 +149,15 @@ function text(value = "", max = 500) {
 function secretValueSafe(secret, envName = "") {
   try {
     const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
-    if (fromSecret) return String(fromSecret);
+    if (fromSecret) {
+      const raw = String(fromSecret);
+      return /^TWILIO_/.test(envName) ? require("./messaging-core").sanitizeTwilioSecret(raw) : raw;
+    }
   } catch (_) {
     /* Secret not bound in this runtime. */
   }
-  return envName ? String(process.env[envName] || "") : "";
+  const fallback = envName ? String(process.env[envName] || "") : "";
+  return /^TWILIO_/.test(envName) ? require("./messaging-core").sanitizeTwilioSecret(fallback) : fallback;
 }
 
 function checkoutTextCaps(templateId = "", formatId = "") {

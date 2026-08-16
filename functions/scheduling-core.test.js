@@ -17,10 +17,10 @@ const {
   buildShiftInviteBody
 } = require("./scheduling-core");
 
-test("published shifts are pending until the worker confirms", () => {
+test("published unassigned slots are open; assigned unpublished are pending", () => {
   assert.equal(publishedShiftStatus({asDraft: true, assigneeUid: "u1"}), "draft");
   assert.equal(publishedShiftStatus({asDraft: false, assigneeUid: "u1"}), "pending");
-  assert.equal(publishedShiftStatus({asDraft: false, assigneeUid: ""}), "draft");
+  assert.equal(publishedShiftStatus({asDraft: false, assigneeUid: ""}), "open");
 });
 
 test("editing a confirmed card to draft keeps one card; same-slot confirmed stays confirmed", () => {
@@ -73,24 +73,116 @@ test("worker and club channel gates default on unless explicitly off", () => {
   assert.equal(clubAllowsNotifyChannel({whatsappEnabled: false}, "whatsapp"), false);
 });
 
-test("public website feed omits drafts and private worker fields", () => {
-  assert.equal(isPublishedShiftStatus("draft"), false);
-  assert.equal(isPublishedShiftStatus("pending"), true);
-  assert.equal(isPublishedShiftStatus("confirmed"), true);
-  const view = publicShiftView({
+test("website DTO is Confirmed-only and strips private employee fields", () => {
+  const {
+    isPublicWebsiteShiftStatus,
+    publicStatusQueryDecision,
+    publicWebsiteAssignmentDto,
+    publicDtoLeaksPrivateFields,
+    mapConfirmedPublicAssignments,
+    pickInternalVisibleAssignment,
+    viewMoreHiddenCount,
+    dateHasInternalActivity,
+    dateHasPublicActivity,
+    groupCollapsedDayColumns,
+    touchesPublicScheduleCache,
+    assignmentKind
+  } = require("./scheduling-core");
+
+  assert.equal(isPublicWebsiteShiftStatus("draft"), false);
+  assert.equal(isPublicWebsiteShiftStatus("pending"), false);
+  assert.equal(isPublicWebsiteShiftStatus("cancelled"), false);
+  assert.equal(isPublicWebsiteShiftStatus("open"), false);
+  assert.equal(isPublicWebsiteShiftStatus("confirmed"), true);
+  assert.equal(isPublicWebsiteShiftStatus("approved"), true);
+
+  const ignored = publicStatusQueryDecision("draft");
+  assert.equal(ignored.ignored, true);
+  assert.equal(ignored.enforcedStatus, "confirmed");
+
+  const draftDto = publicWebsiteAssignmentDto({
+    id: "d1", status: "draft", roleLabel: "Busboy", assigneeName: "Hidden Person",
+    assigneeEmail: "hidden@example.com", notes: "secret", startsAtMs: Date.parse("2026-08-14T18:35:00")
+  });
+  assert.equal(draftDto, null);
+
+  const pendingDto = publicWebsiteAssignmentDto({id: "p1", status: "pending", roleLabel: "DJ", assigneeName: "Jordan Vee"});
+  assert.equal(pendingDto, null);
+
+  const openDto = publicWebsiteAssignmentDto({id: "o1", status: "open", roleLabel: "Barman"});
+  assert.equal(openDto, null);
+
+  const ok = publicWebsiteAssignmentDto({
     id: "s1",
     status: "confirmed",
-    roleLabel: "Host",
-    assigneeName: "Priya Shah",
-    assigneeEmail: "priya@example.com",
+    roleLabel: "Busboy",
+    assigneeName: "Andre Wells",
+    assigneeEmail: "andre@example.com",
     assigneePhone: "+12025550111",
-    notes: "VIP section",
-    startsAtMs: 1
-  });
-  assert.equal(view.assigneeName, "Priya Shah");
-  assert.equal(view.status, "confirmed");
-  assert.equal(view.assigneeEmail, undefined);
-  assert.equal(view.notes, undefined);
+    assigneeUid: "uid-private",
+    notes: "VIP section — internal",
+    startsAtMs: Date.parse("2026-08-14T18:35:00"),
+    endsAtMs: Date.parse("2026-08-14T22:00:00"),
+    clubLocationId: "temp-democlub-1",
+    venueName: "Aurelia"
+  }, {id: "temp-democlub-1", name: "Aurelia"});
+  assert.equal(ok.status, "CONFIRMED");
+  assert.equal(ok.displayName, "Andre W.");
+  assert.equal(ok.jobType.name, "Busboy");
+  assert.equal(ok.startTime, "18:35");
+  assert.equal(ok.endTime, "22:00");
+  assert.equal(ok.venue.id, "temp-democlub-1");
+  assert.equal(publicDtoLeaksPrivateFields(ok), false);
+  assert.equal(ok.assigneeEmail, undefined);
+  assert.equal(ok.notes, undefined);
+  assert.equal(ok.assigneeUid, undefined);
+
+  const mapped = mapConfirmedPublicAssignments([
+    {id: "d1", status: "draft", roleLabel: "Busboy", assigneeName: "X", startsAtMs: Date.parse("2026-08-14T18:00:00")},
+    {id: "p1", status: "pending", roleLabel: "DJ", assigneeName: "Y", startsAtMs: Date.parse("2026-08-14T19:00:00")},
+    {id: "c1", status: "confirmed", roleLabel: "Waitress", assigneeName: "Priya Shah", startsAtMs: Date.parse("2026-08-14T18:35:00"), endsAtMs: Date.parse("2026-08-14T22:00:00")},
+    {id: "c2", status: "confirmed", roleLabel: "Waitress", assigneeName: "Sofia Lane", startsAtMs: Date.parse("2026-08-14T18:40:00"), endsAtMs: Date.parse("2026-08-14T22:00:00")},
+    {id: "x1", status: "cancelled", roleLabel: "DJ", assigneeName: "Nope", startsAtMs: Date.parse("2026-08-14T20:00:00")},
+    {id: "r1", status: "rejected", roleLabel: "DJ", assigneeName: "Nope", startsAtMs: Date.parse("2026-08-14T20:00:00")},
+    {id: "o1", status: "open", roleLabel: "Barman", startsAtMs: Date.parse("2026-08-15T18:00:00")}
+  ], {id: "temp-democlub-1", name: "Aurelia"});
+  assert.equal(mapped.length, 2);
+  assert.ok(mapped.every(row => row.status === "CONFIRMED"));
+  assert.equal(viewMoreHiddenCount(mapped, {website: true}), 1);
+
+  const mixed = [
+    {id: "c", status: "confirmed", assigneeName: "Ann", startsAtMs: 30, assigneeUid: "a"},
+    {id: "p", status: "pending", assigneeName: "Ben", startsAtMs: 20, assigneeUid: "b"},
+    {id: "d", status: "draft", assigneeName: "Cara", startsAtMs: 10, assigneeUid: "c"},
+    {id: "o", status: "open", startsAtMs: 5}
+  ];
+  assert.equal(pickInternalVisibleAssignment(mixed).id, "o");
+  assert.equal(assignmentKind(mixed[3]), "open");
+  assert.equal(viewMoreHiddenCount(mixed, {website: false}), 3);
+  assert.equal(viewMoreHiddenCount(mixed, {website: true}), 0);
+
+  const friday = new Date(2026, 7, 14);
+  const sunday = new Date(2026, 7, 9);
+  assert.equal(dateHasInternalActivity({
+    shifts: [{status: "draft", startsAtMs: Date.parse("2026-08-14T18:00:00"), assigneeUid: "u"}],
+    dayDate: friday
+  }), true);
+  assert.equal(dateHasPublicActivity({
+    assignments: mapped,
+    dayDate: friday
+  }), true);
+  assert.equal(dateHasPublicActivity({
+    assignments: mapped,
+    dayDate: sunday
+  }), false);
+
+  const week = [0, 1, 2, 3, 4, 5, 6].map(n => new Date(2026, 7, 9 + n));
+  const cols = groupCollapsedDayColumns(week, day => dateHasPublicActivity({assignments: mapped, dayDate: day}));
+  assert.equal(cols[0].inactive, true);
+  assert.equal(cols[0].days.length >= 4, true);
+  assert.equal(touchesPublicScheduleCache("confirmed", "draft"), true);
+  assert.equal(touchesPublicScheduleCache("pending", "draft"), false);
+  assert.equal(touchesPublicScheduleCache("pending", "confirmed"), true);
 });
 
 test("sanitizeShiftIds de-dupes and caps at 80", () => {

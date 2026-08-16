@@ -54,9 +54,26 @@
       return;
     }
     state.venueName = data.venueName || "";
-    state.shifts = Array.isArray(data.shifts) ? data.shifts : [];
+    const rows = Array.isArray(data.assignments) ? data.assignments : (Array.isArray(data.shifts) ? data.shifts : []);
+    state.shifts = rows
+      .filter(row => String(row.status || "").toUpperCase() === "CONFIRMED" || String(row.status || "").toLowerCase() === "confirmed")
+      .map(row => {
+        if (row.jobType) {
+          const start = Date.parse(`${row.date}T${row.startTime || "00:00"}`);
+          const end = Date.parse(`${row.date}T${row.endTime || "00:00"}`);
+          return {
+            id: row.id,
+            roleLabel: row.jobType.name,
+            assigneeName: row.displayName,
+            status: "confirmed",
+            startsAtMs: Number.isFinite(start) ? start : 0,
+            endsAtMs: Number.isFinite(end) ? end : 0
+          };
+        }
+        return {...row, status: "confirmed"};
+      });
     render();
-    setStatus("Published shifts only. Drafts are never included.");
+    setStatus("Confirmed shifts only.");
   }
 
   document.addEventListener("DOMContentLoaded", () => {

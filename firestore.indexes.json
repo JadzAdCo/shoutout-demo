@@ -7,6 +7,14 @@
         { "fieldPath": "locationId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "scheduleShifts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerKey", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

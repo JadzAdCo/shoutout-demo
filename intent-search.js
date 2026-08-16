@@ -206,6 +206,51 @@
       ]
     },
     {
+      id: "help-template-catalog-report",
+      kind: "help",
+      label: "Template catalog / which templates fit which LED",
+      blurb: "Reports → Template catalog lists template types and Is96x48 / Is64x48 / Is64x32. Split-media birthday templates are offered on 64×32 as a photo/shoutout loop. A club only shows templates that overlap its VenueSupports* flags.",
+      steps: [
+        "Open Club Admin → Reports for this venue’s offered vs hidden templates.",
+        "Open Master Admin → Reports → Template Catalog for the full network catalog.",
+        "Is* flags live on templates; VenueSupports* live on clubLocations."
+      ],
+      links: [
+        {label: "Club Admin Reports", href: vUrl("./admin.html", {from: "floqai", tab: "reports"})},
+        {label: "Master Admin Template Catalog", href: vUrl("./master-admin.html", {from: "floqai", tab: "templateCatalogReport"})}
+      ],
+      searchPhrases: [
+        "template catalog", "template types", "which templates", "Is96x48", "display sizes",
+        "template report", "split media templates"
+      ],
+      patterns: [
+        /template\s*catalog/, /which\s+templates/, /template\s*types/, /is96x48/, /display\s*sizes/
+      ]
+    },
+    {
+      id: "help-club-display-screens",
+      kind: "help",
+      label: "FLOQR display screens / LED sizes",
+      blurb: "Club Public Profile stores VenueSupports96x48 / 64x48 / 64x32 on clubLocations. Templates store Is96x48 / Is64x48 / Is64x32. A club only offers templates that share a 1. Xibo stays display.html?location=id — never ?screen=.",
+      steps: [
+        "Open Club Admin → Club Public Profile → FLOQR display screens.",
+        "Check only the LED sizes installed at the venue. Save writes VenueSupports* 0|1 to Firebase.",
+        "Master Admin template save writes matching Is* flags on templates.",
+        "Paste display.html?location=<id> (and display2.html for Display 2) into Xibo. Do not add ?screen=."
+      ],
+      links: [
+        {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})}
+      ],
+      searchPhrases: [
+        "display screens", "64x48", "96x48", "64x32", "xibo url", "led size",
+        "VenueSupports96x48", "Is96x48", "birthday template screen", "screen datapoint"
+      ],
+      patterns: [
+        /display\s*screens?/, /venue\s*supports/, /is96x48/, /64\s*[x×]\s*48/, /96\s*[x×]\s*48/,
+        /xibo\s*(url|display)/, /screen\s*datapoint/
+      ]
+    },
+    {
       id: "help-staff-schedule-grid",
       kind: "help",
       label: "Scheduler / Round Robin",
@@ -332,12 +377,12 @@
       id: "help-venue-website-ingest",
       kind: "help",
       label: "Club website ingest (API, RSS, iframe)",
-      blurb: "Generate a venue secret in Club Admin Scheduling, then pull published shifts onto the official website with JSON, RSS, or an iframe. Drafts never appear.",
+      blurb: "Generate a venue secret in Club Admin Scheduling, then pull Confirmed assignments onto the official website with JSON, RSS, or an iframe. Draft, Pending, Open, cancelled, and staffing requirements never appear.",
       steps: [
         "Open Club Admin → Scheduling → Website ingest.",
         "Tap Generate / rotate secret and copy the yellow URLs immediately.",
         "Paste the JSON URL, RSS feed, or iframe snippet onto the club website.",
-        "Optional datasets: schedule, hours, profile, or all."
+        "The feed ignores any status= query and returns Confirmed only. Optional datasets: schedule, hours, profile, or all."
       ],
       links: [
         {label: "Website ingest", href: vUrl("./admin.html", {from: "floqai", tab: "scheduling"}) + "#schedWebsiteIngest"}

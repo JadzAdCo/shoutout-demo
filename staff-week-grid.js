@@ -122,14 +122,18 @@
           return uid === String(worker.uid) && sameDay(Number(shift.startsAtMs || Date.parse(shift.startsAt) || 0), day);
         });
         const chips = dayShifts.map(shift => {
-          const status = shiftStatusKey(shift);
-          const statusClass = status === "pending" ? "is-pending"
-            : status === "confirmed" ? "is-confirmed"
-            : status === "declined" ? "is-declined"
+          const card = global.FLOQRAssignmentCard;
+          const kind = card?.kindFromShift?.(shift) || shiftStatusKey(shift);
+          if (card?.render) return card.render(shift, {kind, interactive: false});
+          const statusClass = kind === "pending" ? "is-pending"
+            : kind === "confirmed" ? "is-confirmed"
+            : kind === "draft" ? "is-draft"
+            : kind === "open" ? "is-open"
+            : kind === "declined" ? "is-declined"
             : "";
           return `<div class="sched-chip ${chipClass(shift.roleLabel)} ${statusClass}">
             <strong>${esc(shift.roleLabel || "Shift")}</strong>
-            <small>${esc(formatChipTime(shift))} · ${esc(status)}</small>
+            <small>${esc(formatChipTime(shift))} · ${esc(kind)}</small>
           </div>`;
         }).join("");
         return `<td class="sched-cell">${chips || ""}</td>`;

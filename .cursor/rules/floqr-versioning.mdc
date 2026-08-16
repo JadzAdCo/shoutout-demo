@@ -1,0 +1,36 @@
+---
+description: FLOQR package versioning — stable (s), standard, hotfix channels
+alwaysApply: true
+---
+
+# FLOQR package versions
+
+Format: `{channel}{major}.{minor}.{patch}` — example `s3.0.0`.
+
+Cache-bust interactive pages with `?v=s3.0.0`. **Never** add `?v=` (or `?screen=`) to Xibo Display URLs (`display.html?location=` / `display2.html?location=`).
+
+## Channels
+
+| Prefix | Name | When to use |
+|---|---|---|
+| **s** | **Stable** | Production-ready major line. Current line is **s3**. |
+| **r** | Standard release | Optional label for a minor inside the stable line (`s3.1.0` is enough; do not invent a second number). |
+| **h** | Hotfix | Emergency patch on the current stable (`s3.0.1`). |
+| **d** | Development | Workspace-only experiments. Do not publish Pages as `d*`. |
+
+Retired: `v29.09.N`. Treat those strings as historical cache keys only.
+
+## What to bump
+
+- **Major (`s3` → `s4`)** — breaking public API / DTO, named “major release”, or a new stable product line.
+- **Minor (`s3.1.0`)** — new user-visible feature that stays compatible.
+- **Patch (`s3.0.1`)** — fix, copy, help, diagnostics, CSS.
+
+This workspace’s current stable is **s3.0.0**.
+
+## Checklist
+
+- [ ] `?v=` on patron/admin/help scripts matches the package
+- [ ] Display Xibo URLs stay location-only
+- [ ] Functions `package.json` / preview-email `package` use the same id
+- [ ] README “CURRENT PACKAGE” line updated when publishing

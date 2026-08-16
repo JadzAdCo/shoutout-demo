@@ -1,4 +1,6 @@
-/* display-app.js v29.09.63 — supports display.html (primary) + display2.html (secondary) */
+/* display-app.js v29.09.119 — Xibo stays display.html?location= / display2.html?location=
+ * Screen size comes from clubLocations VenueSupports* + templates Is* + the composed ShoutOut.
+ */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -43,15 +45,18 @@
   const requestedLocationId = qs("location", qs("club", "zebbies-garden-washington-dc"));
   let locationId = canonicalStaticLocationId(requestedLocationId);
   let loc = getStaticLocation(locationId);
-  const templates = window.SHOUTOUT_TEMPLATES || {};
+  let templates = Object.assign({}, window.SHOUTOUT_TEMPLATES || {});
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
+  const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
+  let splitMediaLoopTimer = null;
+  const SPLIT_MEDIA_LOOP_MS = 4000;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -64,6 +69,17 @@
     return (window.SHOUTOUT_CLUB_LOCATIONS || {})[key] || (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
   }
 
+  async function hydrateTemplatesFromFirestore() {
+    try {
+      const snap = await db.collection("templates").get();
+      snap.forEach(doc => {
+        const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
+        const merged = {...packaged, id: doc.id, ...doc.data()};
+        templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
+      });
+    } catch (e) {}
+  }
+
   function normalizeScreenFormatId(raw = "") {
     const value = String(raw || "").trim().toLowerCase();
     if (!value) return "";
@@ -72,6 +88,62 @@
     if (value === "96x48" || value === "led-96x48") return "led-96x48";
     if ((window.FLOQR_DISPLAY_FORMATS || {})[value]) return value;
     return "";
+  }
+
+  function clubSupportedFormatIds(location = loc) {
+    if (window.FLOQRScreenDatapoints?.applyVenue) {
+      window.FLOQRScreenDatapoints.applyVenue(location);
+      return window.FLOQRScreenDatapoints.venueLedIds(location);
+    }
+    const ids = Array.isArray(location?.displayScreenFormatIds) ? location.displayScreenFormatIds : [];
+    const normalized = ids.map(normalizeScreenFormatId).filter(Boolean);
+    return Array.from(new Set(normalized));
+  }
+
+  function boardAssignedFormatId(location = loc) {
+    const supported = clubSupportedFormatIds(location);
+    const assignedRaw = DISPLAY_BOARD === "secondary"
+      ? (location?.secondaryDisplayScreenFormatId || location?.primaryDisplayScreenFormatId || location?.displayType || location?.screenFormatId)
+      : (location?.primaryDisplayScreenFormatId || location?.displayType || location?.screenFormatId);
+    const assigned = normalizeScreenFormatId(assignedRaw);
+    if (assigned && (!supported.length || supported.includes(assigned))) return assigned;
+    return supported[0] || "led-96x48";
+  }
+
+  function templateSupportsFormat(template = {}, formatId = "") {
+    if (!formatId) return false;
+    if (window.FLOQRScreenDatapoints) {
+      const family = window.FLOQRScreenDatapoints.familyOf(formatId);
+      if (family && window.FLOQRScreenDatapoints.as01(template[`Is${family}`]) === 0) return false;
+    }
+    const rule = window.FLOQRTextLayout?.resolve?.(template, formatId);
+    if (rule && rule.supported === false) return false;
+    const listed = Array.isArray(template.screenFormatIds) ? template.screenFormatIds.map(normalizeScreenFormatId) : [];
+    if (listed.length && !listed.includes(formatId)) return false;
+    return true;
+  }
+
+  function resolvePlaybackScreenFormat(data = {}, template = {}) {
+    const previewFormat = isUrlPreviewMode()
+      ? normalizeScreenFormatId(data.screenFormatId || urlSearchParams().get("screenFormatId") || urlSearchParams().get("screen"))
+      : "";
+    if (previewFormat) return previewFormat;
+    if (window.FLOQRScreenDatapoints?.resolvePlaybackFormat) {
+      return window.FLOQRScreenDatapoints.resolvePlaybackFormat({
+        venue: loc,
+        template,
+        shoutout: data,
+        board: DISPLAY_BOARD
+      });
+    }
+    const boardFormat = boardAssignedFormatId();
+    const clubFormats = clubSupportedFormatIds();
+    const itemFormat = normalizeScreenFormatId(data.screenFormatId);
+    if (templateSupportsFormat(template, boardFormat)) return boardFormat;
+    if (itemFormat && (!clubFormats.length || clubFormats.includes(itemFormat)) && templateSupportsFormat(template, itemFormat)) {
+      return itemFormat;
+    }
+    return clubFormats.find(id => templateSupportsFormat(template, id)) || boardFormat;
   }
 
   function displayDeviceDocId(ip = "") {
@@ -370,15 +442,32 @@
     bgEl.style.backgroundSize = "";
     bgEl.style.backgroundPosition = "";
     bgEl.style.backgroundRepeat = "";
+    delete bgEl.dataset.backgroundFit;
   }
 
-  function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "" } = {}) {
+  function resolveBackgroundFit(data = {}, template = {}, backgroundUrl = "") {
+    const explicit = String(data.backgroundFit || "").toLowerCase();
+    if (explicit === "contain" || explicit === "cover") return explicit;
+    const url = String(backgroundUrl || "").trim();
+    if (!url) return "cover";
+    const designed = String(template.defaultBackgroundUrl || "").trim();
+    if (designed && url === designed) return "cover";
+    if (template.sport || template.jerseyCssBack || String(template.id || "").startsWith("heist") || /jersey/i.test(String(template.id || ""))) {
+      return "cover";
+    }
+    if (String(data.mediaFit || "").toLowerCase() === "cover") return "cover";
+    return "contain";
+  }
+
+  function applyBackgroundLayer(bgEl, { backgroundUrl = "", backgroundColor = "", backgroundGradient = "", fit = "cover" } = {}) {
     resetBackgroundLayer(bgEl);
     if (backgroundUrl) {
+      const size = fit === "contain" ? "contain" : "cover";
       bgEl.style.backgroundImage = `url("${String(backgroundUrl).replace(/"/g, "%22")}")`;
-      bgEl.style.backgroundSize = "cover";
+      bgEl.style.backgroundSize = size;
       bgEl.style.backgroundPosition = "center";
       bgEl.style.backgroundRepeat = "no-repeat";
+      bgEl.dataset.backgroundFit = size;
       return true;
     }
     if (backgroundGradient && /^linear-gradient\(/.test(backgroundGradient)) {
@@ -451,6 +540,52 @@
       window.clearTimeout(heistPhaseLoopTimer);
       heistPhaseLoopTimer = null;
     }
+  }
+
+  function stopSplitMediaLoop() {
+    if (splitMediaLoopTimer) {
+      window.clearInterval(splitMediaLoopTimer);
+      splitMediaLoopTimer = null;
+    }
+    byId("displayCanvas")?.classList.remove("split-media-loop", "split-media-phase-media", "split-media-phase-copy");
+  }
+
+  function splitMediaIdentityPresentation(data = {}, subText = "") {
+    const attrib = glyphSlice(cleanBoardText(data.attribution || ""), 0, 20);
+    const sub = glyphSlice(cleanBoardText(subText), 0, 20);
+    const celebration = /^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i.test(sub);
+    const handle = attrib || (!celebration && sub) || "";
+    return {
+      kicker: "FLOQR",
+      value: handle || "ShoutOut",
+      extraCopy: handle ? "" : sub
+    };
+  }
+
+  function renderSplitMediaIdentityRail(identity) {
+    const rail = byId("displayIdentityRail");
+    if (!rail) return;
+    rail.className = "display-identity-rail split-media-identity" + (identity.value === "ShoutOut" ? " uses-brand-fallback" : " has-attribution");
+    rail.setAttribute("aria-hidden", "false");
+    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+  }
+
+  function startSplitMediaLoop(canvas) {
+    stopSplitMediaLoop();
+    if (!canvas) return;
+    canvas.classList.add("split-media-loop", "split-media-phase-media");
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduced) {
+      canvas.classList.add("split-media-phase-copy");
+      canvas.classList.remove("split-media-phase-media");
+      return;
+    }
+    splitMediaLoopTimer = window.setInterval(() => {
+      const onMedia = canvas.classList.contains("split-media-phase-media");
+      canvas.classList.toggle("split-media-phase-media", !onMedia);
+      canvas.classList.toggle("split-media-phase-copy", onMedia);
+    }, SPLIT_MEDIA_LOOP_MS);
   }
 
   function heistBrandLogoUrl() {
@@ -575,6 +710,9 @@
       mediaUrl: params.get("media") || "",
       mediaType: params.get("mediaType") || "",
       mediaFit: params.get("mediaFit") || "contain",
+      backgroundFit: params.has("backgroundFit")
+        ? params.get("backgroundFit")
+        : (params.get("backgroundUrl") ? (params.get("mediaFit") || "contain") : ""),
       screenFormatId: screenFormatOverride || params.get("screenFormatId") || "",
       selectedMediaVersion: params.get("selectedMediaVersion") || "",
       trimStart: params.get("trimStart") || "",
@@ -607,12 +745,33 @@
     return String(value || "").trim();
   }
 
+  function clubVenueName(location = {}) {
+    return String(location.locationName || location.brandName || location.name || "Club").trim() || "Club";
+  }
+
   function clubDefaultMainText(location = {}) {
-    const clubName = String(location.locationName || location.brandName || location.name || "Club").trim() || "Club";
+    const clubName = clubVenueName(location);
+    if (DISPLAY_BOARD === "secondary") {
+      // display2 / Xibo SupRStar board idle CTA
+      return `Awaiting live Feed. Be a SupRstar @ ${clubName}`;
+    }
     const configured = String(location.defaultMain || "").trim();
     if (configured && !/^USE\s*SHOUT\s*OUT\b/i.test(configured)) return configured;
     // Typical club idle board: Use ShoutOut @ Clubname
     return `Use ShoutOut @ ${clubName}`;
+  }
+
+  function isLegacyShoutOutIdleText(value = "") {
+    return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
+  }
+
+  function isSuprstarIdlePayload(data = {}) {
+    if (DISPLAY_BOARD !== "secondary") return false;
+    if (isUrlPreviewMode() && (urlSearchParams().has("template") || urlSearchParams().has("main"))) return false;
+    const status = String(data.status || "").toLowerCase();
+    if (status === "approved" || status === "live" || status === "preview") return false;
+    if (data.idleCta || status === "default" || !status) return true;
+    return isLegacyShoutOutIdleText(data.mainText);
   }
 
   function defaultClubDisplayPayload() {
@@ -625,6 +784,17 @@
         subText: urlSearchParams().get("sub") || "",
         template: previewTemplate,
         status: "preview"
+      };
+    }
+    if (DISPLAY_BOARD === "secondary") {
+      return {
+        locationName: loc.locationName,
+        mainText: clubDefaultMainText(loc),
+        subText: "",
+        template: "blackwhite",
+        status: "default",
+        idleCta: true,
+        suprstarIdle: true
       };
     }
     const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
@@ -640,6 +810,66 @@
       status: "default",
       idleCta: true
     };
+  }
+
+  function renderSuprstarIdleScreen(location = {}) {
+    const clubName = clubVenueName(location);
+    const canvas = byId("displayCanvas");
+    const mediaSlot = byId("mediaSlot");
+    const center = document.querySelector(".display-center");
+    const rail = byId("displayIdentityRail");
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    stopSplitMediaLoop();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    if (canvas) {
+      canvas.className = "display-canvas display-board-secondary suprstar-idle-canvas";
+      canvas.classList.remove("has-background-layer", "custom-background-active", "frame-overlay-template", "soccer-jersey-template", "sports-jersey-template", "heist-brand-slide-active");
+      canvas.style.backgroundImage = "";
+      canvas.style.background = "";
+    }
+    const bgEl = byId("displayBackground");
+    if (bgEl) {
+      bgEl.style.backgroundImage = "";
+      bgEl.style.background = "";
+      bgEl.style.backgroundColor = "";
+    }
+    const frame = byId("displayFrameOverlay");
+    if (frame) {
+      frame.className = "display-frame-overlay hidden";
+      frame.setAttribute("aria-hidden", "true");
+      frame.innerHTML = "";
+    }
+    if (center) center.className = "display-center suprstar-idle-center";
+    byId("displayBrand").textContent = "";
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot suprstar-idle-logo-slot";
+      mediaSlot.innerHTML = `<img src="${esc(SUPRSTAR_LOGO)}" alt="supRstar" class="suprstar-idle-logo" decoding="async"/>`;
+    }
+    byId("displayMain").className = "suprstar-idle-copy";
+    byId("displayMain").style.removeProperty("font-size");
+    byId("displayMain").innerHTML = [
+      `<span class="suprstar-idle-line">Awaiting live Feed.</span>`,
+      `<span class="suprstar-idle-line">Be a SupRstar @ ${esc(clubName)}</span>`,
+      // Feature: make clear this is the idle/default board, not an IP/security block.
+      `<span class="suprstar-idle-note">Idle board · no guest is live right now</span>`
+    ].join("");
+    byId("displaySub").className = "hidden";
+    byId("displaySub").removeAttribute("aria-label");
+    byId("displaySub").textContent = "";
+    byId("displaySub").style.removeProperty("font-size");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+    }
+    const teamReset = byId("displayJerseyTeam");
+    if (teamReset) {
+      teamReset.className = "soccer-jersey-team hidden";
+      teamReset.textContent = "";
+      teamReset.setAttribute("aria-hidden", "true");
+    }
+    markDisplayReady();
   }
 
   function renderTimedLiveContent(data = {}) {
@@ -830,6 +1060,11 @@
   }
 
   function render(data) {
+    stopSplitMediaLoop();
+    if (isSuprstarIdlePayload(data)) {
+      renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
+      return;
+    }
     const rawTemplateId = data.template || "neon";
     const baseTemplate = templates[rawTemplateId] || templates.neon || {};
     const consolidatedId = baseTemplate.consolidatedTemplateId || baseTemplate.aliasOf || rawTemplateId;
@@ -846,11 +1081,10 @@
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
     const screenFormatId = String(
-      data.screenFormatId
-      || screenFormatOverride
-      || loc.primaryDisplayScreenFormatId
+      resolvePlaybackScreenFormat(data, t)
+      || boardAssignedFormatId()
       || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0]
-      || "p125-96x48"
+      || "led-96x48"
     );
     const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
       supported:true,
@@ -862,6 +1096,13 @@
       subTextSizePercent:Number(data.subTextSizePercent || t.subTextSizePercent || 7.8),
       teamTextSizePercent:Number(data.teamTextSizePercent || t.teamTextSizePercent || 7.2)
     };
+    if (textCaps.supported === false && !isUrlPreviewMode() && String(data.status || "") !== "preview") {
+      const idle = defaultClubDisplayPayload();
+      if (idle && idle.template !== templateId) {
+        render(idle);
+        return;
+      }
+    }
     const mainSize = Math.min(40, Math.max(4, Number(textCaps.mainTextSizePercent || 20.8)));
     const subSize = Math.min(20, Math.max(2, Number(textCaps.subTextSizePercent || 7.8)));
     const mainLimit = Math.max(1, Number(textCaps.maxMainCharacters || textCaps.main || 60));
@@ -877,6 +1118,10 @@
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
+    const screenFlags = window.FLOQRScreenDatapoints?.canvasFlags?.(screenFormatId) || {};
+    canvas.dataset.is96x48 = screenFlags.is96x48 || "0";
+    canvas.dataset.is64x48 = screenFlags.is64x48 || "0";
+    canvas.dataset.is64x32 = screenFlags.is64x32 || "0";
     canvas.dataset.textProfile = textCaps.profileId || "custom";
     const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
@@ -884,7 +1129,8 @@
     const hasCustomBackground = !!(backgroundUrl || backgroundColor || backgroundGradient);
     canvas.classList.toggle("custom-background-active", hasCustomBackground);
     const bgEl = byId("displayBackground");
-    const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient });
+    const backgroundFit = resolveBackgroundFit(data, t, backgroundUrl);
+    const hasBackgroundLayer = applyBackgroundLayer(bgEl, { backgroundUrl, backgroundColor, backgroundGradient, fit: backgroundFit });
     canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
     const frameUrl = resolveFrameOverlayUrl(t, data);
     const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);
@@ -1052,11 +1298,18 @@
       if (rail && t.identityRail !== false) {
         const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
         const identity = classicIdentityPresentation(data.attribution || "");
-        const idleValue = glyphSlice(cleanBoardText(`Use ShoutOut @ ${clubName}`), 0, 28) || identity.value;
+        const idleCta = DISPLAY_BOARD === "secondary"
+          ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
+          : `Use ShoutOut @ ${clubName}`;
+        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || identity.value;
         const showIdle = !subText && !mainText;
         rail.className = "display-identity-rail classic-bw-identity soccer-jersey-rail" + (showIdle || !identity.supplied ? " uses-brand-fallback" : " has-attribution");
-        rail.setAttribute("aria-label", showIdle ? `Use ShoutOut @ ${clubName}` : `${identity.kicker} ${identity.value}`);
-        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? "USE" : identity.kicker)}</small><strong>${esc(showIdle ? idleValue.replace(/^USE\s*/i, "") : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+        rail.setAttribute("aria-label", showIdle ? idleCta : `${identity.kicker} ${identity.value}`);
+        const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
+        const idleStrong = showIdle
+          ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
+          : identity.value;
+        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? idleKicker : identity.kicker)}</small><strong>${esc(showIdle ? idleStrong : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
       } else if (rail) {
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
@@ -1112,45 +1365,152 @@
       const rows = displayTextRows(mainText, textCaps);
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
-      byId("displaySub").textContent = subText;
+      const identity = usesSplitMedia ? splitMediaIdentityPresentation(data, subText) : null;
+      if (usesSplitMedia && identity) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").textContent = identity.extraCopy || "";
+        renderSplitMediaIdentityRail(identity);
+        const family = window.FLOQRScreenDatapoints?.familyOf?.(screenFormatId) || "";
+        if (family === "64x48" || family === "64x32") startSplitMediaLoop(canvas);
+      } else {
+        byId("displaySub").textContent = subText;
+      }
     }
     markDisplayReady();
   }
+  function showDisplayAccessDenied(info = {}) {
+    // Feature: locked display — never show idle/venue marketing to unauthorized clients.
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    stopSplitMediaLoop();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    const canvas = byId("displayCanvas");
+    if (canvas) {
+      canvas.className = "display-canvas display-access-denied";
+    }
+    const mediaSlot = byId("mediaSlot");
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot hidden";
+      mediaSlot.innerHTML = "";
+    }
+    const rail = byId("displayIdentityRail");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+    }
+    byId("displayBrand").textContent = "Floq Media / FloqR";
+    byId("displayMain").className = "display-denied-message";
+    byId("displayMain").textContent =
+      "This device has not been configured to work with Floq Media or FloqR. Please contact Floq Media or FloqR to get device properly configured";
+    byId("displaySub").className = "display-denied-sub";
+    byId("displaySub").textContent = "";
+    markDisplayReady();
+  }
+
+  /**
+   * Feature: Display Security gate — runs BEFORE idle or live content.
+   * Protects display.html / display2.html equally (idle board included).
+   * Always fail closed on venue players — never show idle when the check fails.
+   */
+  async function enforceDisplayAccess() {
+    const accessKey = String(qs("k", qs("token", "")) || "").trim();
+    try {
+      if (!firebase?.app || !firebase.functions) {
+        showDisplayAccessDenied({observedIp: "", reason: "security_helper_missing"});
+        return false;
+      }
+      const fn = firebase.app().functions("us-central1").httpsCallable("checkDisplayAccess");
+      const result = await fn({
+        locationId,
+        displayBoard: DISPLAY_BOARD,
+        accessToken: accessKey,
+        k: accessKey,
+        pageUrl: String(location.href || "").slice(0, 500),
+        userAgent: String(navigator.userAgent || "").slice(0, 400),
+        screenFormatId: screenFormatOverride || "",
+        // reportedIp is observational only — server must not allowlist from client-supplied IP.
+        reportedIp: String(qs("ip", "") || "").trim(),
+        reportedHostname: String(qs("host", qs("hostname", "")) || "").trim(),
+        reportedMac: String(qs("mac", qs("macAddress", "")) || "").trim(),
+        language: String(navigator.language || "").slice(0, 40),
+        timezone: (() => {
+          try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (_) { return ""; }
+        })(),
+        platform: String(navigator.platform || "").slice(0, 120)
+      });
+      const data = result?.data || {};
+      window.__FLOQR_DISPLAY_CLIENT_IP = data.observedIp || "";
+      if (data.allowed !== true) {
+        showDisplayAccessDenied({
+          observedIp: data.observedIp || "",
+          reason: data.reason || "denied"
+        });
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.warn("[display access]", err?.message || err);
+      showDisplayAccessDenied({
+        observedIp: "",
+        reason: "check_failed"
+      });
+      return false;
+    }
+  }
+
   window.renderShoutOutDisplay = render;
 
   document.addEventListener("DOMContentLoaded", async () => {
     await persistenceReady;
-    screenFormatOverride = normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")));
+    screenFormatOverride = isUrlPreviewMode()
+      ? normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")))
+      : "";
     if (!explicitLocationRequested) {
       const ipBoundLocation = await resolveLocationFromIpParam();
       if (ipBoundLocation) locationId = canonicalStaticLocationId(ipBoundLocation);
     }
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
+    await hydrateTemplatesFromFirestore();
     try {
       const clubDoc = await db.collection("clubLocations").doc(locationId).get();
       if (clubDoc.exists) {
         const live = clubDoc.data() || {};
+        const liveHasVenueFlags = ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"]
+          .some(key => live[key] === 0 || live[key] === 1 || live[key] === "0" || live[key] === "1");
         loc = {
           ...loc,
           ...live,
           primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
+          secondaryDisplayScreenFormatId: live.secondaryDisplayScreenFormatId || loc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId,
           displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
           displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
-          ledPanel: live.ledPanel || loc.ledPanel
+          ledPanel: live.ledPanel || loc.ledPanel,
+          approvedDisplayIps: live.approvedDisplayIps || [],
+          displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
+          displayTokenRequired: live.displayTokenRequired
         };
+        if (!liveHasVenueFlags) {
+          delete loc.VenueSupports96x48;
+          delete loc.VenueSupports64x48;
+          delete loc.VenueSupports64x32;
+        }
+        if (window.FLOQRScreenDatapoints?.applyVenue) window.FLOQRScreenDatapoints.applyVenue(loc);
       }
     } catch (e) {}
-    if (!screenFormatOverride) {
-      const secondaryFmt = loc.secondaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
-      const primaryFmt = loc.primaryDisplayScreenFormatId || loc.displayType || loc.screenFormatId || "";
-      screenFormatOverride = normalizeScreenFormatId(DISPLAY_BOARD === "secondary" ? secondaryFmt : primaryFmt);
+    if (!screenFormatOverride && isUrlPreviewMode()) {
+      screenFormatOverride = boardAssignedFormatId(loc);
     }
     try {
       document.title = DISPLAY_BOARD === "secondary"
         ? `FLOQR Display 2 · ${loc.locationName || locationId}`
         : `FLOQR ShoutOut Display · ${loc.locationName || locationId}`;
     } catch (_) {}
+
+    const accessOk = await enforceDisplayAccess();
+    if (!accessOk) return;
+
     if (isUrlPreviewMode()) {
       render(buildUrlPreviewPayload());
       db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
@@ -1159,15 +1519,22 @@
         const status = String(data.status || "").toLowerCase();
         const hasLiveMessage = !!(String(data.mainText || "").trim() || data.mediaUrl);
         if (status === "approved" && hasLiveMessage) {
-          if (screenFormatOverride && !data.screenFormatId) data.screenFormatId = screenFormatOverride;
+          if (!data.screenFormatId) data.screenFormatId = boardAssignedFormatId(loc);
           renderTimedLiveContent(data);
         }
       }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
       return;
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
-      const payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
-      if (screenFormatOverride && !payload.screenFormatId) payload.screenFormatId = screenFormatOverride;
+      let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
+      if (DISPLAY_BOARD === "secondary") {
+        const status = String(payload.status || "").toLowerCase();
+        const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
+        if (!doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage) || isLegacyShoutOutIdleText(payload.mainText)) {
+          payload = defaultClubDisplayPayload();
+        }
+      }
+      if (!payload.screenFormatId) payload.screenFormatId = boardAssignedFormatId(loc);
       renderTimedLiveContent(payload);
     }, e => render({mainText:"DISPLAY ERROR", subText:e.message, template:"fire", locationName: loc.locationName}));
   });

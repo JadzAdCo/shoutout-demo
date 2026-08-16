@@ -54,17 +54,17 @@ window.SHOUTOUT_ADMIN_EMAILS = [
 ];
 
 window.SHOUTOUT_TEMPLATES = {
-  neon: { id: "neon", name: "Neon ShoutOut", scope: "Shared", className: "neon", tags:["neon","nightclub","general","live display","party","glow"] },
-  birthday: { id: "birthday", name: "Birthday Glow", scope: "Shared", className: "neon", tags:["birthday","happy birthday","flowers","celebration","cake","party"] },
-  vip: { id: "vip", name: "VIP Table", scope: "Shared", className: "gold", tags:["vip","table","bottle service","luxury","reservation","premium"] },
-  bottle: { id: "bottle", name: "Bottle Service", scope: "Club", className: "fire", tags:["bottle","champagne","vip","table","celebration"] },
-  gold: { id: "gold", name: "Gold Celebration", scope: "Shared", className: "gold", tags:["gold","luxury","anniversary","celebration","premium"] },
-  ice: { id: "ice", name: "Ice Blue", scope: "Club", className: "ice", tags:["ice","blue","cool","pool","summer","beach"] },
-  fire: { id: "fire", name: "Fire Night", scope: "Club", className: "fire", tags:["fire","hot","tattoo","ink","urban","night"] },
-  latin: { id: "latin", name: "Latin Night", scope: "Club", className: "gold", tags:["latin","reggaeton","salsa","bachata","dance"] },
-  hiphop: { id: "hiphop", name: "Hip Hop Night", scope: "Club", className: "fire", tags:["hip hop","hiphop","rap","trap","urban","tattoo"] },
-  afrohouse: { id: "afrohouse", name: "Afro House / Amapiano", scope: "Shared", className: "gold", tags:["afro house","afrohouse","amapiano","afrobeats","dance"] },
-  edm: { id: "edm", name: "EDM / House", scope: "Shared", className: "ice", tags:["edm","house","deep house","tech house","dance"] }
+  neon: { id: "neon", name: "Neon ShoutOut", scope: "Shared", className: "neon", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["neon","nightclub","general","live display","party","glow"] },
+  birthday: { id: "birthday", name: "Birthday Glow", scope: "Shared", className: "neon", category: "Milestone", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["birthday","happy birthday","flowers","celebration","cake","party"] },
+  vip: { id: "vip", name: "VIP Table", scope: "Shared", className: "gold", category: "VIP", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["vip","table","bottle service","luxury","reservation","premium"] },
+  bottle: { id: "bottle", name: "Bottle Service", scope: "Club", className: "fire", category: "VIP", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["bottle","champagne","vip","table","celebration"] },
+  gold: { id: "gold", name: "Gold Celebration", scope: "Shared", className: "gold", category: "VIP", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["gold","luxury","anniversary","celebration","premium"] },
+  ice: { id: "ice", name: "Ice Blue", scope: "Club", className: "ice", category: "Seasonal", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["ice","blue","cool","pool","summer","beach"] },
+  fire: { id: "fire", name: "Fire Night", scope: "Club", className: "fire", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["fire","hot","tattoo","ink","urban","night"] },
+  latin: { id: "latin", name: "Latin Night", scope: "Club", className: "gold", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["latin","reggaeton","salsa","bachata","dance"] },
+  hiphop: { id: "hiphop", name: "Hip Hop Night", scope: "Club", className: "fire", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["hip hop","hiphop","rap","trap","urban","tattoo"] },
+  afrohouse: { id: "afrohouse", name: "Afro House / Amapiano", scope: "Shared", className: "gold", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["afro house","afrohouse","amapiano","afrobeats","dance"] },
+  edm: { id: "edm", name: "EDM / House", scope: "Shared", className: "ice", category: "Nightclub", mediaMode: "No image/video", supportsMedia: false, Is96x48: 1, Is64x48: 1, Is64x32: 1, tags:["edm","house","deep house","tech house","dance"] }
 };
 
 window.SHOUTOUT_CLUB_LOCATIONS = {
@@ -1076,18 +1076,18 @@ window.SHOUTOUT_STATUS_FLOW = ["draft","pending","approved","rejected","schedule
 
 /* v28.4 enhanced templates, AI suggestions, and role request config */
 Object.assign(window.SHOUTOUT_TEMPLATES, {
-  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR ShoutOut so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
-  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'Half-screen media area with half-screen birthday message.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
-  anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'Half-screen media area with half-screen anniversary message.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
-  engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'Half-screen media area with half-screen engagement message.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
-  fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'Half-screen media area for fiance or proposal celebrations.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
-  summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal', tags:["summer","pool party","beach","cabana","day party","vacation"] },
-  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired layout for luxury ride or car meet ShoutOuts. Patrons may replace its background while the car silhouette, text geometry, and readability limits remain locked.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride","background editable","locked layout"] },
-  champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP', tags:["champagne","bottle","vip","toast","celebration","luxury"] },
-  beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach', tags:["beach","pool","summer","cabana","day party","vacation"] },
-  graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', tags:["graduation","grad","school","college","achievement"] },
-  wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone', tags:["wedding","marriage","love","bride","groom","celebration"] },
-  sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', tags:["sports","game night","team","championship","watch party"] },
+  blackwhite: { id:'blackwhite', name:'Traditional Black and White ShoutOut', scope:'Shared', className:'classic-bw', category:'Classic', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'', lineCount:3, maxCharactersPerLine:15, maxMainCharacters:45, maxSubCharacters:20, identityRail:true, identityAnimation:'burst-away', identityAnimationSeconds:20, description:'Default shared marquee lightbox for every club. The main message is centered in a raised three-line board, while an optional name or social handle uses a fixed identity rail below and bursts away during playback. Without patron attribution, the same rail presents FLOQR ShoutOut so the composition never shifts. Patrons may change the background while the board, rail, text geometry, and timing remain locked.', tags:["traditional","classic","black and white","physical sign","letter board","birthday","no media","3 lines","15 characters per line","45 characters total","optional name","social handle","identity rail","burst animation","background editable","locked layout"] },
+  birthdayMedia: { id:'birthdayMedia', name:'Happy Birthday with image/video placeholder', scope:'Shared', className:'celebration-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY BIRTHDAY', defaultSub:'CELEBRATE BIG', description:'96×48: 3-line side-by-side photo + shoutout. 64×48 and 64×32: GIF loop of the photo then 3-line shoutout, with a FLOQR + handle card on every frame.', tags:["birthday","happy birthday","image","video","photo","flowers","placeholder","celebration"] },
+  anniversaryMedia: { id:'anniversaryMedia', name:'Happy Anniversary with image/video placeholder', scope:'Shared', className:'anniversary-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY ANNIVERSARY', defaultSub:'LOVE ALL NIGHT', description:'96×48 side-by-side; 64×48 and 64×32 loop photo then 3-line copy with FLOQR + handle card.', tags:["anniversary","love","image","video","photo","placeholder","romance"] },
+  engagementMedia: { id:'engagementMedia', name:'Happy Engagement with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'HAPPY ENGAGEMENT', defaultSub:'FOREVER STARTS TONIGHT', description:'96×48 side-by-side; 64×48 and 64×32 loop photo then 3-line copy with FLOQR + handle card.', tags:["engagement","proposal","fiance","image","video","photo","placeholder","love"] },
+  fianceMedia: { id:'fianceMedia', name:'Fiance Celebration with image/video placeholder', scope:'Shared', className:'engagement-media', category:'Milestone', mediaMode:'Image/video placeholder', supportsMedia:true, layout:'split-media', Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'FIANCE CELEBRATION', defaultSub:'SHE SAID YES', description:'96×48 side-by-side; 64×48 and 64×32 loop photo then 3-line copy with FLOQR + handle card.', tags:["fiance","proposal","engagement","image","video","photo","placeholder","love"] },
+  summer: { id:'summer', name:'Summer Vibes', scope:'Shared', className:'summer', category:'Seasonal', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["summer","pool party","beach","cabana","day party","vacation"] },
+  car: { id:'car', name:'Luxury Car Celebration', scope:'Shared', className:'car', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, backgroundEditable:true, Is96x48:1, Is64x48:1, Is64x32:1, defaultMain:'LUXURY RIDE CREW', defaultSub:'PULL UP CLEAN', description:'Car-inspired layout for luxury ride or car meet ShoutOuts. Patrons may replace its background while the car silhouette, text geometry, and readability limits remain locked.', tags:["car","coupe","fast cars","ferrari","lamborghini","luxury ride","automotive","ride","background editable","locked layout"] },
+  champagne: { id:'champagne', name:'Champagne Celebration', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["champagne","bottle","vip","toast","celebration","luxury"] },
+  beach: { id:'beach', name:'Beach Party', scope:'Shared', className:'summer', category:'Beach', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["beach","pool","summer","cabana","day party","vacation"] },
+  graduation: { id:'graduation', name:'Graduation Night', scope:'Shared', className:'classic-bw', category:'Milestone', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["graduation","grad","school","college","achievement"] },
+  wedding: { id:'wedding', name:'Wedding Celebration', scope:'Shared', className:'gold', category:'Milestone', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["wedding","marriage","love","bride","groom","celebration"] },
+  sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["sports","game night","team","championship","watch party"] },
   zebbiesFootballTeamIntro: {
     id:'zebbiesFootballTeamIntro',
     name:'Football Intro',
@@ -1104,6 +1104,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     durationSeconds:20,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['p125-96x48','p125-64x48','p125-64x32','led-96x48','led-64x48','led-64x32'],
     preferredP125FormatIds:['p125-96x48','p125-64x48','p125-64x32'],
     defaultMain:'ZEBBIES ALL-STARS',
@@ -1113,8 +1114,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:'Football Intro: a Zebbies-only, 20-second American football stadium sequence with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
     tags:["football intro","zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
-  luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', tags:["luxury","gold","vip","premium","bottle service"] },
-  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', tags:["corporate","business","company","brand","event"] },
+  luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },
+  corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {
     id:'heistVaultNight',
     name:'Locked Up',
@@ -1138,6 +1139,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1171,6 +1173,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1204,6 +1207,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1237,6 +1241,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1271,6 +1276,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1303,6 +1309,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     sport:'soccer',
     priceCents:3000,
     priceLabel:'$30',
+    Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'',
     defaultSub:'',
@@ -1355,11 +1362,11 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
     label:"Media and message split",
     formats:{
       "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:54},
-      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:58},
-      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."},
+      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:18,minimumFontPixels:46},
+      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:36},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:44},
-      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:46},
-      "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Choose a 96 x 48 cm or 64 x 48 cm display; media plus enlarged text is not reliably readable on a 64 x 32 cm panel."}
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:18,minimumFontPixels:40},
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:32}
     }
   },
   car: {
@@ -1408,6 +1415,241 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   }
 };
 
+window.FLOQRScreenDatapoints = {
+  version: "29.09.119",
+  sizes: [
+    {family: "96x48", led: "led-96x48", p125: "p125-96x48", isKey: "Is96x48", venueKey: "VenueSupports96x48"},
+    {family: "64x48", led: "led-64x48", p125: "p125-64x48", isKey: "Is64x48", venueKey: "VenueSupports64x48"},
+    {family: "64x32", led: "led-64x32", p125: "p125-64x32", isKey: "Is64x32", venueKey: "VenueSupports64x32"}
+  ],
+  hasExplicit(record = {}, keyName = "venueKey") {
+    return this.sizes.some(size => {
+      const value = record[size[keyName]];
+      return value === 0 || value === 1 || value === "0" || value === "1";
+    });
+  },
+  flagsFromLedIds(ids = [], keyName = "venueKey") {
+    const listed = (Array.isArray(ids) ? ids : []).map(String);
+    const next = {};
+    this.sizes.forEach(size => {
+      next[size[keyName]] = listed.some(id => id === size.led || id === size.p125 || String(id).endsWith(size.family)) ? 1 : 0;
+    });
+    return next;
+  },
+  as01(value, fallback = 0) {
+    if (value === 1 || value === "1" || value === true) return 1;
+    if (value === 0 || value === "0" || value === false) return 0;
+    return fallback;
+  },
+  familyOf(formatId = "") {
+    const raw = String(formatId || "").toLowerCase();
+    const row = this.sizes.find(size => raw === size.led || raw === size.p125 || raw.endsWith(size.family));
+    return row ? row.family : "";
+  },
+  sizeByFamily(family = "") {
+    return this.sizes.find(size => size.family === family) || null;
+  },
+  templateFormatIds(template = {}) {
+    return this.sizes.flatMap(size => this.as01(template[size.isKey]) === 1 ? [size.led, size.p125] : []);
+  },
+  venueLedIds(venue = {}) {
+    return this.sizes.flatMap(size => this.as01(venue[size.venueKey]) === 1 ? [size.led, size.p125] : []);
+  },
+  overlappingFormatIds(template = {}, venue = {}) {
+    return this.sizes.flatMap(size => (
+      this.as01(template[size.isKey]) === 1 && this.as01(venue[size.venueKey]) === 1 ? [size.led, size.p125] : []
+    ));
+  },
+  templateFitsVenue(template = {}, venue = {}) {
+    return this.sizes.some(size => this.as01(template[size.isKey]) === 1 && this.as01(venue[size.venueKey]) === 1);
+  },
+  applyTemplate(template = {}) {
+    const listed = Array.isArray(template.screenFormatIds) ? template.screenFormatIds.map(String) : [];
+    const explicit = this.hasExplicit(template, "isKey");
+    this.sizes.forEach(size => {
+      if (explicit) {
+        template[size.isKey] = this.as01(template[size.isKey], 0);
+        return;
+      }
+      const familyIds = [size.led, size.p125];
+      const listedHit = !listed.length || listed.some(id => familyIds.includes(id));
+      const layoutOk = familyIds.some(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
+      template[size.isKey] = listedHit && layoutOk ? 1 : 0;
+    });
+    template.screenFormatIds = this.templateFormatIds(template);
+    return template;
+  },
+  applyVenue(venue = {}) {
+    const listed = Array.isArray(venue.displayScreenFormatIds) ? venue.displayScreenFormatIds.map(String) : [];
+    const explicit = this.hasExplicit(venue, "venueKey");
+    this.sizes.forEach(size => {
+      if (explicit) {
+        venue[size.venueKey] = this.as01(venue[size.venueKey], 0);
+        return;
+      }
+      const familyIds = [size.led, size.p125, size.family];
+      venue[size.venueKey] = listed.some(id => familyIds.includes(String(id))) ? 1 : 0;
+    });
+    if (!explicit && !listed.length) {
+      this.sizes.forEach(size => { venue[size.venueKey] = 1; });
+    }
+    venue.displayScreenFormatIds = this.sizes.filter(size => venue[size.venueKey] === 1).map(size => size.led);
+    if (venue.primaryDisplayScreenFormatId && !venue.displayScreenFormatIds.includes(venue.primaryDisplayScreenFormatId)) {
+      venue.primaryDisplayScreenFormatId = venue.displayScreenFormatIds[0] || "led-96x48";
+    }
+    if (venue.secondaryDisplayScreenFormatId && venue.displayScreenFormatIds.length && !venue.displayScreenFormatIds.includes(venue.secondaryDisplayScreenFormatId)) {
+      venue.secondaryDisplayScreenFormatId = venue.primaryDisplayScreenFormatId || venue.displayScreenFormatIds[0] || "";
+    }
+    if (!venue.primaryDisplayScreenFormatId) {
+      venue.primaryDisplayScreenFormatId = venue.displayScreenFormatIds[0] || "led-96x48";
+    }
+    if (!venue.secondaryDisplayScreenFormatId) {
+      venue.secondaryDisplayScreenFormatId = venue.primaryDisplayScreenFormatId;
+    }
+    return venue;
+  },
+  venueFirestoreFields(venue = {}) {
+    this.applyVenue(venue);
+    return {
+      VenueSupports96x48: venue.VenueSupports96x48,
+      VenueSupports64x48: venue.VenueSupports64x48,
+      VenueSupports64x32: venue.VenueSupports64x32,
+      displayScreenFormatIds: venue.displayScreenFormatIds,
+      primaryDisplayScreenFormatId: venue.primaryDisplayScreenFormatId,
+      secondaryDisplayScreenFormatId: venue.secondaryDisplayScreenFormatId
+    };
+  },
+  templateFirestoreFields(template = {}) {
+    this.applyTemplate(template);
+    return {
+      Is96x48: template.Is96x48,
+      Is64x48: template.Is64x48,
+      Is64x32: template.Is64x32,
+      screenFormatIds: template.screenFormatIds
+    };
+  },
+  resolvePlaybackFormat({venue = {}, template = {}, shoutout = {}, board = "primary"} = {}) {
+    this.applyVenue(venue);
+    this.applyTemplate(template);
+    const assigned = board === "secondary"
+      ? (venue.secondaryDisplayScreenFormatId || venue.primaryDisplayScreenFormatId)
+      : (venue.primaryDisplayScreenFormatId || venue.displayScreenFormatIds?.[0]);
+    const overlap = this.overlappingFormatIds(template, venue);
+    const item = String(shoutout.screenFormatId || "");
+    const itemFamily = this.familyOf(item);
+    const boardFamily = this.familyOf(assigned);
+    const pickFamily = family => overlap.find(id => id === item && this.familyOf(id) === family)
+      || overlap.find(id => id === assigned && this.familyOf(id) === family)
+      || overlap.find(id => this.familyOf(id) === family);
+    if (itemFamily && itemFamily === boardFamily && this.as01(template[`Is${itemFamily}`]) === 1 && this.as01(venue[`VenueSupports${itemFamily}`]) === 1) {
+      return pickFamily(itemFamily) || assigned || overlap[0] || "led-96x48";
+    }
+    if (boardFamily && this.as01(template[`Is${boardFamily}`]) === 1 && this.as01(venue[`VenueSupports${boardFamily}`]) === 1) {
+      return pickFamily(boardFamily) || assigned || overlap[0] || "led-96x48";
+    }
+    return overlap[0] || assigned || "led-96x48";
+  },
+  classify(template = {}) {
+    this.applyTemplate(template);
+    const kind = window.FLOQRTextLayout?.profileId?.(template) || "full";
+    const profile = window.FLOQR_TEMPLATE_TEXT_PROFILES?.[kind] || {};
+    template.templateKind = kind;
+    template.templateKindLabel = profile.label || kind;
+    template.category = template.category || "Nightclub";
+    template.mediaMode = template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video");
+    return template;
+  },
+  catalogRows(templates = {}, venue = null) {
+    if (venue) this.applyVenue(venue);
+    return Object.entries(templates || {})
+      .filter(([key, row]) => row && String(row.id || key) === key && String(row.status || "active") !== "deleted")
+      .map(([key, raw]) => {
+        const template = this.classify({...raw, id: raw.id || key});
+        return {
+          ...template,
+          catalogKey: key,
+          fitsVenue: venue ? this.templateFitsVenue(template, venue) : true
+        };
+      })
+      .sort((a, b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+  },
+  mergeCatalog(packaged = {}, storedRows = []) {
+    const map = {};
+    Object.entries(packaged || {}).forEach(([id, row]) => {
+      if (row && String(row.id || id) === id) map[id] = this.classify({...row, id});
+    });
+    (storedRows || []).forEach(row => {
+      const id = row.id;
+      if (!id) return;
+      map[id] = this.classify({...(map[id] || {}), ...row, id});
+    });
+    return map;
+  },
+  catalogReportHtml({templates = {}, venue = null, showVenueColumn = false} = {}) {
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+    const flag = value => this.as01(value) === 1
+      ? `<span class="flag-1">1</span>`
+      : `<span class="flag-0">0</span>`;
+    const rows = this.catalogRows(templates, venue);
+    const kindCounts = {};
+    const sizeCounts = {Is96x48: 0, Is64x48: 0, Is64x32: 0};
+    rows.forEach(row => {
+      kindCounts[row.templateKindLabel] = (kindCounts[row.templateKindLabel] || 0) + 1;
+      if (row.Is96x48 === 1) sizeCounts.Is96x48 += 1;
+      if (row.Is64x48 === 1) sizeCounts.Is64x48 += 1;
+      if (row.Is64x32 === 1) sizeCounts.Is64x32 += 1;
+    });
+    const available = venue ? rows.filter(row => row.fitsVenue) : rows;
+    const blocked = venue ? rows.filter(row => !row.fitsVenue) : [];
+    const kindRows = Object.entries(kindCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const summary = `<div class="report-table">
+      <div><span>Catalog templates</span><strong>${rows.length}</strong></div>
+      <div><span>Is96x48 = 1</span><strong>${sizeCounts.Is96x48}</strong></div>
+      <div><span>Is64x48 = 1</span><strong>${sizeCounts.Is64x48}</strong></div>
+      <div><span>Is64x32 = 1</span><strong>${sizeCounts.Is64x32}</strong></div>
+      ${venue ? `<div><span>Available at this venue</span><strong>${available.length}</strong></div>
+      <div><span>Hidden (no overlapping screen)</span><strong>${blocked.length}</strong></div>` : ""}
+      ${kindRows.map(([label, count]) => `<div><span>${esc(label)}</span><strong>${count}</strong></div>`).join("")}
+    </div>`;
+    const sizeLists = this.sizes.map(size => {
+      const list = rows.filter(row => row[size.isKey] === 1).map(row => row.name || row.id);
+      return `<div><span>${esc(size.isKey)} templates</span><strong>${esc(list.join(", ") || "none")}</strong></div>`;
+    }).join("");
+    const venueCol = showVenueColumn ? "<th>At this venue</th>" : "";
+    const body = rows.map(row => `<tr>
+      <td>${esc(row.name || row.id)}</td>
+      <td><code>${esc(row.id)}</code></td>
+      <td>${esc(row.templateKindLabel)}</td>
+      <td>${esc(row.category || "—")}</td>
+      <td>${esc(row.scope || "Shared")}</td>
+      <td>${esc(row.mediaMode || "—")}</td>
+      <td>${flag(row.Is96x48)}</td>
+      <td>${flag(row.Is64x48)}</td>
+      <td>${flag(row.Is64x32)}</td>
+      ${showVenueColumn ? `<td>${row.fitsVenue ? "Offered" : "Hidden"}</td>` : ""}
+    </tr>`).join("");
+    return `${summary}
+      <div class="report-table" style="margin-top:12px">${sizeLists}</div>
+      <div class="template-catalog-scroll">
+        <table class="template-catalog-table">
+          <thead><tr>
+            <th>Template</th><th>ID</th><th>Type</th><th>Category</th><th>Scope</th><th>Media</th>
+            <th>Is96x48</th><th>Is64x48</th><th>Is64x32</th>${venueCol}
+          </tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>`;
+  },
+  canvasFlags(formatId = "") {
+    const family = this.familyOf(formatId);
+    return {
+      is96x48: family === "96x48" ? "1" : "0",
+      is64x48: family === "64x48" ? "1" : "0",
+      is64x32: family === "64x32" ? "1" : "0"
+    };
+  }
+};
+
 window.FLOQRTextLayout = {
   version:"29.09.30",
   profileId(template = {}) {
@@ -1449,11 +1691,16 @@ window.FLOQRTextLayout = {
   }
 };
 
-Object.values(window.SHOUTOUT_TEMPLATES || {}).forEach(template => {
-  template.screenFormatIds = Array.from(new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
-  template.textProfileId = window.FLOQRTextLayout.profileId(template);
+Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
+  if (String(template.id || key) !== key) {
+    template.catalogKey = key;
+    template.aliasOf = template.aliasOf || template.id;
+    return;
+  }
+  window.FLOQRScreenDatapoints.classify(template);
+  template.textProfileId = template.templateKind;
   template.textLayoutVersion = window.FLOQRTextLayout.version;
-  template.textCompatibleScreenFormatIds = window.FLOQRTextLayout.supportedFormatIds(template, template.screenFormatIds);
+  template.textCompatibleScreenFormatIds = window.FLOQRScreenDatapoints.templateFormatIds(template);
   const primaryTextRule = window.FLOQRTextLayout.resolve(template, template.textCompatibleScreenFormatIds[0] || template.screenFormatIds[0]);
   template.maxMainCharacters = primaryTextRule.main;
   template.maxSubCharacters = primaryTextRule.sub;
@@ -1488,7 +1735,7 @@ window.FLOQRAddress = {
 
 Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   const loc = window.SHOUTOUT_CLUB_LOCATIONS[id];
-  loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]));
+  loc.templates = Array.from(new Set(loc.templates || []));
   loc.visibility = loc.visibility || "public";
   loc.publicProfileType = "club";
   loc.publicProfilePublished = loc.publicProfilePublished !== false;
@@ -1518,6 +1765,14 @@ Object.keys(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(id => {
   loc.displayScreenFormatIds = Array.from(new Set(loc.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS));
   loc.primaryDisplayScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds[0] || "led-96x48";
   loc.secondaryDisplayScreenFormatId = loc.secondaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId;
+  window.FLOQRScreenDatapoints.applyVenue(loc);
+  loc.templates = Array.from(new Set([...(loc.templates || []), ...window.SHOUTOUT_STANDARD_TEMPLATE_IDS]))
+    .filter(templateId => {
+      const template = window.SHOUTOUT_TEMPLATES?.[templateId];
+      if (!template) return false;
+      if (Array.isArray(template.venueIds) && template.venueIds.length && !template.venueIds.includes(id)) return false;
+      return window.FLOQRScreenDatapoints.templateFitsVenue(template, loc);
+    });
   loc.displayUrl = loc.displayUrl || `./display.html?location=${encodeURIComponent(id)}`;
   loc.secondaryDisplayUrl = loc.secondaryDisplayUrl || `./display2.html?location=${encodeURIComponent(id)}`;
   loc.patronTemplateBackgroundEditingEnabled = loc.patronTemplateBackgroundEditingEnabled !== false;

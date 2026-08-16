@@ -1,0 +1,27 @@
+---
+description: LED screen size is a Firebase datapoint — never put ?screen= on Xibo URLs
+alwaysApply: true
+---
+
+# Screen datapoints (always)
+
+Xibo widgets stay **`display.html?location=<id>`** and **`display2.html?location=<id>`**. Do **not** add `?screen=`, `?screenFormatId=`, or `?v=`. Do **not** move or rewrite those Display URLs in Club Admin — Show Display URL stays on Club Public Profile.
+
+Physical size is **not** in the URL. The same URL shape is pasted onto many different LEDs. Size comes from Firebase:
+
+| Collection | Fields (`0` or `1`) | Writer |
+|---|---|---|
+| `clubLocations/{id}` | `VenueSupports96x48`, `VenueSupports64x48`, `VenueSupports64x32` | Club Admin → Club Public Profile → FLOQR display screens |
+| `templates/{id}` | `Is96x48`, `Is64x48`, `Is64x32` | Master Admin → template save |
+
+Also persist the sync fields: venue `displayScreenFormatIds`, `primaryDisplayScreenFormatId` (display.html), `secondaryDisplayScreenFormatId` (display2.html); template `screenFormatIds`. Firestore `0|1` wins over catalog arrays. Helper: `window.FLOQRScreenDatapoints` in `shared-data.js`.
+
+## Offer and play
+
+1. Show a template at a venue only when at least one size pair is both `1` (`templateFitsVenue`).
+2. Composer screen list = `overlappingFormatIds(template, venue)`. Store the chosen size on the ShoutOut as `screenFormatId`.
+3. `display.html` = primary LED; `display2.html` = secondary. Playback format = that board’s assigned size ∩ venue flags ∩ template `Is*` ∩ the composed ShoutOut’s family. Layout CSS uses `data-is-96x48|64x48|64x32`.
+4. Birthday / split-media: **96×48** = 3-line side-by-side; **64×48** and **64×32** = 3-line GIF loop (photo then shoutout) with a FLOQR + handle card on every frame. `Is64x32=1`. `?screen=` is composer **preview only**.
+5. Template kinds (`templateKind` from `FLOQRTextLayout.profileId`): `full`, `classicBoard`, `splitMedia`, `car`, `footballIntro`, `textOverlayFrame`, `soccerJersey`. Reports → Template Catalog lists types and `Is*` flags.
+
+Forbidden: inventing a Display Settings tab just to relocate URLs; driving Xibo layout from the query string; filtering templates by catalog arrays when Firestore flags exist.

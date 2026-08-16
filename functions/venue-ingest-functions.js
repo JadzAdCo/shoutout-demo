@@ -4,16 +4,15 @@
 const {onRequest, onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {
-  isPublishedShiftStatus,
-  publicShiftView,
-  normalizeShiftStatus
+  publicWebsiteQueryStatuses,
+  publicStatusQueryDecision,
+  mapConfirmedPublicAssignments
 } = require("./scheduling-core");
 const {
   hashIngestSecret,
   newIngestSecret,
   secretsMatch,
   obfuscateSecret,
-  opaqueAssigneeKey,
   feedUrls,
   iframeSnippet,
   buildScheduleRss,
@@ -84,25 +83,132 @@ function publicHoursView(club = {}) {
   };
 }
 
-async function loadPublishedShifts(locationId) {
-  const snap = await db.collection("scheduleShifts")
-    .where("ownerKey", "==", ownerKey(locationId))
-    .limit(120)
-    .get();
-  return snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-    .filter(row => isPublishedShiftStatus(normalizeShiftStatus(row.status) || row.status))
-    .map(row => ({
-      ...publicShiftView(row),
-      assigneeKey: opaqueAssigneeKey(text(row.assigneeUid, 160) || row.id)
-    }))
-    .sort((a, b) => Number(a.startsAtMs || 0) - Number(b.startsAtMs || 0));
+const PUBLIC_FEED_RATE = new Map();
+const PUBLIC_FEED_RATE_WINDOW_MS = 60 * 1000;
+const PUBLIC_FEED_RATE_MAX = 60;
+
+function publicFeedClientKey(req, locationId) {
+  const ip = text(req.get("x-forwarded-for") || req.ip || "unknown", 80).split(",")[0];
+  return `${ip}|${locationId}`;
 }
 
-function setCors(res) {
+function publicFeedRateLimited(req, locationId) {
+  const key = publicFeedClientKey(req, locationId);
+  const now = Date.now();
+  const row = PUBLIC_FEED_RATE.get(key) || {count: 0, windowStart: now};
+  if (now - row.windowStart > PUBLIC_FEED_RATE_WINDOW_MS) {
+    row.count = 0;
+    row.windowStart = now;
+  }
+  row.count += 1;
+  PUBLIC_FEED_RATE.set(key, row);
+  return row.count > PUBLIC_FEED_RATE_MAX;
+}
+
+async function loadConfirmedPublicAssignments(locationId, venue = {}) {
+  const snap = await db.collection("scheduleShifts")
+    .where("ownerKey", "==", ownerKey(locationId))
+    .where("status", "in", publicWebsiteQueryStatuses())
+    .limit(120)
+    .get();
+  const rows = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+  return mapConfirmedPublicAssignments(rows, venue);
+}
+
+function setCors(res, revision = 0) {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type, X-Floqr-Ingest-Secret");
-  res.set("Cache-Control", "public, max-age=60");
+  res.set("Cache-Control", "public, max-age=15, must-revalidate");
+  if (revision) res.set("ETag", `"sched-${revision}"`);
+}
+
+async function handlePublicVenueCalendar(req, res) {
+  setCors(res);
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "GET") {
+    res.status(405).json({ok: false, error: "GET only"});
+    return;
+  }
+  const locationId = text(req.query.location || req.query.locationId, 160);
+  const secret = text(req.query.secret || req.query.k || req.get("x-floqr-ingest-secret"), 80);
+  const format = text(req.query.format, 20).toLowerCase() || "json";
+  const dataset = text(req.query.dataset, 20).toLowerCase() || "schedule";
+  publicStatusQueryDecision(req.query.status);
+  if (!locationId || !secret) {
+    res.status(400).json({ok: false, error: "location and secret are required."});
+    return;
+  }
+  if (publicFeedRateLimited(req, locationId)) {
+    res.status(429).json({ok: false, error: "Too many calendar requests."});
+    return;
+  }
+  const secretSnap = await db.collection("venueIngestSecrets").doc(locationId).get();
+  const stored = secretSnap.exists ? secretSnap.data() || {} : {};
+  if (!secretsMatch(secret, stored.secretHash)) {
+    console.info("publicVenueCalendar.denied", {locationId, reason: "invalid-secret"});
+    res.status(401).json({ok: false, error: "Invalid ingest secret."});
+    return;
+  }
+  const clubSnap = await db.collection("clubLocations").doc(locationId).get();
+  if (!clubSnap.exists) {
+    res.status(404).json({ok: false, error: "Unknown venue."});
+    return;
+  }
+  const club = clubSnap.data() || {};
+  const venueName = text(club.locationName || club.brandName || locationId, 160);
+  const revision = Number(club.publicScheduleRevision || 0) || 0;
+  const etag = `"sched-${locationId}-${revision}"`;
+  setCors(res, revision);
+  res.set("ETag", etag);
+  if (text(req.get("if-none-match"), 80) === etag) {
+    res.status(304).send("");
+    return;
+  }
+  const wantSchedule = dataset === "schedule" || dataset === "all" || dataset === "calendar";
+  const wantHours = dataset === "hours" || dataset === "all";
+  const wantProfile = dataset === "profile" || dataset === "all";
+  const assignments = wantSchedule
+    ? await loadConfirmedPublicAssignments(locationId, {id: locationId, name: venueName})
+    : [];
+  const urls = feedUrls({locationId, secret, origin: DEFAULT_ORIGIN, apiBase: DEFAULT_API});
+  console.info("publicVenueCalendar.ok", {locationId, dataset, count: assignments.length, revision});
+  if (format === "rss") {
+    res.set("Content-Type", "application/rss+xml; charset=utf-8");
+    res.status(200).send(buildScheduleRss({
+      venueName,
+      feedUrl: urls.rss,
+      shifts: assignments.map(row => ({
+        id: row.id,
+        roleLabel: row.jobType?.name,
+        assigneeName: row.displayName,
+        status: "confirmed",
+        startsAt: row.startTime,
+        endsAt: row.endTime
+      }))
+    }));
+    return;
+  }
+  res.status(200).json({
+    ok: true,
+    locationId,
+    venueName,
+    dataset,
+    generatedAt: new Date().toISOString(),
+    revision,
+    assignments: wantSchedule ? assignments : undefined,
+    shifts: wantSchedule ? assignments : undefined,
+    hours: wantHours ? publicHoursView(club) : undefined,
+    profile: wantProfile ? publicProfileView(club, locationId) : undefined,
+    embeds: {
+      iframe: urls.iframe,
+      rss: urls.rss,
+      json: urls.json
+    }
+  });
 }
 
 exports.rotateVenueIngestSecret = onCall({region: "us-central1", timeoutSeconds: 20, memory: "256MiB"}, async request => {
@@ -158,62 +264,20 @@ exports.getVenueIngestEndpoints = onCall({region: "us-central1", timeoutSeconds:
   };
 });
 
-/** Public GET: ?location=&secret=&format=json|rss&dataset=schedule|hours|profile|all */
+/** Public GET: Confirmed assignments only. ?location=&secret=&format=json|rss&dataset=schedule|hours|profile|all
+ * status= query is ignored. Never returns Draft / Pending / Open / cancelled.
+ */
 exports.venuePublicFeed = onRequest({
   region: "us-central1",
   cors: true,
   timeoutSeconds: 30,
   memory: "256MiB"
-}, async (req, res) => {
-  setCors(res);
-  if (req.method === "OPTIONS") {
-    res.status(204).send("");
-    return;
-  }
-  if (req.method !== "GET") {
-    res.status(405).json({ok: false, error: "GET only"});
-    return;
-  }
-  const locationId = text(req.query.location || req.query.locationId, 160);
-  const secret = text(req.query.secret || req.query.k || req.get("x-floqr-ingest-secret"), 80);
-  const format = text(req.query.format, 20).toLowerCase() || "json";
-  const dataset = text(req.query.dataset, 20).toLowerCase() || "schedule";
-  if (!locationId || !secret) {
-    res.status(400).json({ok: false, error: "location and secret are required."});
-    return;
-  }
-  const secretSnap = await db.collection("venueIngestSecrets").doc(locationId).get();
-  const stored = secretSnap.exists ? secretSnap.data() || {} : {};
-  if (!secretsMatch(secret, stored.secretHash)) {
-    res.status(401).json({ok: false, error: "Invalid ingest secret."});
-    return;
-  }
-  const clubSnap = await db.collection("clubLocations").doc(locationId).get();
-  const club = clubSnap.exists ? clubSnap.data() || {} : {};
-  const venueName = text(club.locationName || club.brandName || locationId, 160);
-  const wantSchedule = dataset === "schedule" || dataset === "all";
-  const wantHours = dataset === "hours" || dataset === "all";
-  const wantProfile = dataset === "profile" || dataset === "all";
-  const shifts = wantSchedule ? await loadPublishedShifts(locationId) : [];
-  const urls = feedUrls({locationId, secret, origin: DEFAULT_ORIGIN, apiBase: DEFAULT_API});
-  if (format === "rss") {
-    res.set("Content-Type", "application/rss+xml; charset=utf-8");
-    res.status(200).send(buildScheduleRss({venueName, feedUrl: urls.rss, shifts}));
-    return;
-  }
-  res.status(200).json({
-    ok: true,
-    locationId,
-    venueName,
-    dataset,
-    generatedAt: new Date().toISOString(),
-    shifts: wantSchedule ? shifts : undefined,
-    hours: wantHours ? publicHoursView(club) : undefined,
-    profile: wantProfile ? publicProfileView(club, locationId) : undefined,
-    embeds: {
-      iframe: urls.iframe,
-      rss: urls.rss,
-      json: urls.json
-    }
-  });
-});
+}, handlePublicVenueCalendar);
+
+/** Alias for website widgets: same Confirmed-only contract as venuePublicFeed. */
+exports.publicVenueCalendar = onRequest({
+  region: "us-central1",
+  cors: true,
+  timeoutSeconds: 30,
+  memory: "256MiB"
+}, handlePublicVenueCalendar);
