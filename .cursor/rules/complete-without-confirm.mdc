@@ -1,0 +1,37 @@
+---
+description: Finish every requested task in one pass; do not idle until the output exists.
+alwaysApply: true
+---
+
+# Complete work — output must exist before idle
+
+The user gives a task **once**. Do the whole job. Do not stop to ask “want me to…?”, “should I continue?”, or “confirm and I’ll proceed.”
+
+**The task is incomplete until its output is established.** Checking git, remotes, or CI is not the deliverable. If you would have left commit / publish / deploy / email hanging unless the user asked “is it done?”, you idled too soon.
+
+## Output that must exist (when the thread asked for it)
+
+| They asked for | Not done until |
+|---|---|
+| A fix / feature | The files are saved in the workspace |
+| A commit / “ship” / major release | `git commit` exists on the working branch |
+| Publish / go live / Pages | The commit is on `origin/main` (GitHub Pages) |
+| Backend / functions change | Functions tests run; Functions deploy when that is how this repo ships |
+| Email / “track the test” | Preview email sent **after** CI is green |
+
+Do not end a turn with “I’ll check whether it’s committed/published.” If it is not, **commit and publish in that same turn.**
+
+## Do
+
+- Infer remaining work from the latest request plus prior turns in this chat.
+- If they asked for stills, a fix, publish, CI, and email in one thread, finish every unfinished piece without a new prompt.
+- Report what you **did** (SHA, Pages URL, Functions deploy yes/no), not a menu of next options.
+
+## Do not
+
+- End with “I can do X next if you want.”
+- Re-ask for details they already gave.
+- Treat an interrupted tool run as “waiting for the user” — resume and finish.
+- Investigate status as a substitute for producing the output.
+
+Commit / push / Pages publish when they already asked for that in this thread (including an earlier message in the same conversation), including words like **release**, **ship**, **publish**, **go live**, or **major version**.
