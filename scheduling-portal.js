@@ -288,6 +288,10 @@
       }
     }
     byId("portalGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.isEmbedded?.()) {
+        setStatus("Sign in on My Profile & Settings first. Google popups are not used inside embedded panels.");
+        return;
+      }
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).catch(error => setStatus(error.message));
     });
@@ -299,12 +303,28 @@
         byId("portalOwnerId").value = auth.currentUser.uid;
       }
     });
-    auth.onAuthStateChanged(user => {
-      if (user && ownerType() === "dj" && !byId("portalOwnerId")?.value) {
-        byId("portalOwnerId").value = user.uid;
-      }
-      if (user) refresh().catch(error => setStatus(error.message));
-      else setStatus("Sign in to continue.");
-    });
+    const shell = window.FLOQRSessionShell;
+    if (shell?.bind) {
+      shell.bind({
+        auth,
+        chrome: "[data-floqr-auth-chrome]",
+        loginButtons: "[data-floqr-login-btn]",
+        statusEl: "#schedulingPortalStatus",
+        onUser: user => {
+          if (ownerType() === "dj" && !byId("portalOwnerId")?.value) {
+            byId("portalOwnerId").value = user.uid;
+          }
+          refresh().catch(error => setStatus(error.message));
+        }
+      });
+    } else {
+      auth.onAuthStateChanged(user => {
+        if (user && ownerType() === "dj" && !byId("portalOwnerId")?.value) {
+          byId("portalOwnerId").value = user.uid;
+        }
+        if (user) refresh().catch(error => setStatus(error.message));
+        else setStatus("Sign in to continue.");
+      });
+    }
   });
 })();

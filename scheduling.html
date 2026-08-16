@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Scheduling</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.1"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.1"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.2"/>
   <script>
     (function () {
       var p = new URLSearchParams(location.search);
@@ -34,13 +34,13 @@
           data-floqr-help-body="staffSchedulingPaid is 1 or 0 on the venue. schedulingSubscriptions status is paid this month or not paid this month. Paid this month unlocks the calendar. Not paid this month shows Subscribe (new) or Resubscribe (prior subscriber)."
         >FLOQR Scheduling</h1>
         <p class="sub" data-keep-visible="true">Clubs, promoting companies, and DJs manage shifts with Email / SMS / WhatsApp notify-and-approve. <strong>$20/month</strong> when not paid this month. Events are not included.</p>
-        <p id="schedulingPortalStatus" class="status">Sign in to continue.</p>
+        <p id="schedulingPortalStatus" class="status">Restoring your FLOQR session…</p>
       </div>
-      <div class="card">
+      <div class="card" id="portalAuthChrome" data-floqr-auth-chrome>
         <p class="eyebrow">Subscription</p>
         <h2 id="portalSubBadge">checking…</h2>
         <div class="queue-actions">
-          <button id="portalGoogleLoginBtn" type="button">Google sign-in</button>
+          <button id="portalGoogleLoginBtn" class="primary" type="button" data-floqr-login-btn>Google sign-in</button>
           <button id="portalBuySubBtn" class="primary" type="button">Subscribe $20/mo</button>
         </div>
       </div>
@@ -109,6 +109,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-session-shell.js?v=s3.0.2"></script>
 <script src="./floqai-help-repository.js?v=s3.0.1"></script>
 <script src="./help-attach.js?v=29.09.98"></script>
 <script src="./helper-popouts.js?v=29.09.98"></script>
@@ -116,7 +117,7 @@
 <script src="./payment-service.js?v=29.09.98"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./worker-confirm.js?v=s3.0.1"></script>
-<script src="./scheduling-portal.js?v=s3.0.1"></script>
+<script src="./scheduling-portal.js?v=s3.0.2"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

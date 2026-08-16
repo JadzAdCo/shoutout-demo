@@ -3169,14 +3169,14 @@
       });
       showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
     }
-    const frameQuery = new URLSearchParams({v: "s3.0.1"});
+    const frameQuery = new URLSearchParams({v: "s3.0.2", embed: "1", from: "portal"});
     let locationId = datapoints.affiliatedPaidSchedulingClubIds?.[0] || "";
     const owner = String(pageParams.get("owner") || "").trim();
     if (owner.startsWith("club:")) locationId = owner.slice(5) || locationId;
     if (locationId) frameQuery.set("location", locationId);
     if (pageParams.get("shift")) frameQuery.set("shift", pageParams.get("shift"));
     if (owner) frameQuery.set("owner", owner);
-    if (pageParams.get("from")) frameQuery.set("from", pageParams.get("from"));
+    if (pageParams.get("from") === "schedule-notify") frameQuery.set("from", "schedule-notify");
     const href = `./staff-worksheet.html?${frameQuery.toString()}`;
     const frame = byId("portalWorkCalendarFrame");
     if (frame && (datapoints.workCalendarEligible || confirmDeepLink)) frame.src = href;

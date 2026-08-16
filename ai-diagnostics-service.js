@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.1";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.1";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.2";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.2";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,18 @@
       ]
     },
     {
+      version:"s3.0.2",
+      title:"Satellite pages inherit FLOQR session (no Google-only iframe gate)",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.2\""]},
+        {label:"Session shell module", file:"floqr-session-shell.js", includes:["FLOQRSessionShell", "isEmbedded", "Restoring your FLOQR session"]},
+        {label:"Work Sheet uses session shell", file:"staff-worksheet.html", includes:["floqr-session-shell.js", "data-floqr-auth-chrome", "embed=1"]},
+        {label:"Portal iframe embed=1", file:"patron-portal-app.js", includes:["embed: \"1\"", "from: \"portal\""]},
+        {label:"Satellite session rule", file:".cursor/rules/satellite-session-auth.mdc", includes:["FLOQRSessionShell", "embed=1"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.2\""]}
+      ]
+    },
+    {
       version:"s3.0.1",
       title:"Worker shift confirm on Work Calendar + schedule message templates",
       checks:[
@@ -988,6 +1000,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-2-satellite-session-shell",
+      area:"Work Calendar / satellite pages",
+      feature:"Iframe and deep-linked pages inherit FLOQR login",
+      changed:"Work Calendar iframe loads staff-worksheet with embed=1 and floqr-session-shell.js. When My Profile is signed in, the child restores that session and hides Google. Embedded panels do not use signInWithPopup.",
+      howToTest:"Sign in on patron-portal.html?v=s3.0.2 as temp_busboy_1@floqr-demo.com → Work Calendar. Confirm no Google gate in the panel; pending assignments and week grid load. Open Inbox confirm link with ?v=s3.0.2 — same session, tick / Approve selected.",
+      expected:"No Google-only card while parent is signed in. Status may briefly say Restoring your FLOQR session… then assignments appear."
+    },
     {
       id:"s3-0-1-schedule-confirm-templates",
       area:"Inbox / Work Calendar / Club Admin Notifications",
