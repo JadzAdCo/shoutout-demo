@@ -552,6 +552,20 @@
       source: "help-repository-seed"
     },
     {
+      id: "help-venue-links",
+      title: "Venue Links",
+      body: "Venue Admin Portal URLs are generated when you search — they are not stored with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the latest release. Opening Master Admin with an old ?v= bookmark does not freeze these links. Display board URLs stay location-only with no ?v=.",
+      searchPhrases: [
+        "venue links", "venue admin portal url", "club admin url", "admin.html version",
+        "hardcoded version", "club admin link", "master admin venue links"
+      ],
+      links: [
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#clubAdminUrls"
+    },
+    {
       id: "help-venue-onboarding",
       title: "Venue onboarding (Master Admin)",
       body: "Master Admin venue onboarding — push crawled club profiles into Firestore.",

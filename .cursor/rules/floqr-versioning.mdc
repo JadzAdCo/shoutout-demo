@@ -32,5 +32,6 @@ This workspace’s current stable is **s3.0.0**.
 
 - [ ] `?v=` on patron/admin/help scripts matches the package
 - [ ] Display Xibo URLs stay location-only
+- [ ] Generated in-app links (Venue Links, FloqAi, Inbox landings) use `FLOQRNav.appVersion` — never a hardcoded `29.09.N` and never the current page's `?v=` (old bookmarks would keep minting old URLs)
 - [ ] Functions `package.json` / preview-email `package` use the same id
 - [ ] README “CURRENT PACKAGE” line updated when publishing

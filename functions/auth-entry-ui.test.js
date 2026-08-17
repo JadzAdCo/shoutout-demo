@@ -87,3 +87,39 @@ test("main message typing preserves spaces instead of live-fitting on every keys
   );
   assert.match(html, /patron-app\.js\?v=\d+\.\d+\.\d+/);
 });
+
+test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29.09 or page ?v=", () => {
+  const vm = require("node:vm");
+  const navSource = readReleaseFile("floqr-nav.js");
+  assert.match(navSource, /const APP_V = "s3\.\d+\.\d+"/);
+  assert.match(navSource, /adminPortalUrl/);
+  assert.match(navSource, /Never copy the page's \?v=/);
+
+  const entity = readReleaseFile("entity-management.js");
+  assert.match(entity, /adminPortalUrl/);
+  assert.doesNotMatch(entity, /masterAdminUrl[\s\S]{0,420}v=29\.09\./);
+
+  const master = readReleaseFile("master-admin-app.js");
+  assert.match(master, /FLOQRNav\?\.adminPortalUrl/);
+  assert.doesNotMatch(master, /CURRENT_VERSION = "29\.09\./);
+
+  const html = readReleaseFile("master-admin.html");
+  assert.match(html, /floqr-nav\.js\?v=s3\.\d+\.\d+/);
+  assert.match(html, /help-venue-links/);
+
+  const sandbox = {
+    window: {},
+    location: { href: "https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.22" },
+    URL,
+    URLSearchParams
+  };
+  sandbox.global = sandbox;
+  sandbox.window = sandbox;
+  vm.runInNewContext(navSource, sandbox);
+  const href = sandbox.FLOQRNav.adminPortalUrl("zebbies-garden-washington-dc");
+  assert.match(href, /admin\.html/);
+  assert.match(href, /location=zebbies-garden-washington-dc/);
+  assert.match(href, /v=s3\.\d+\.\d+/);
+  assert.doesNotMatch(href, /v=29\.09\.22/);
+  assert.match(href, /from=master/);
+});

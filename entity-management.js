@@ -19,9 +19,48 @@
     if (el) el.textContent = msg || "";
   }
 
-  function callable(name) {
+  function masterAdminUrl(locationId = "") {
+    const id = String(locationId || "").trim();
+    if (window.FLOQRNav?.adminPortalUrl) return window.FLOQRNav.adminPortalUrl(id);
+    if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
+    const v = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
+    return `./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
+  }
+
+  function mergeClubRows(locationRows = [], clubRows = []) {
+    const merged = new Map();
+    locationRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || "").trim();
+      if (!id) return;
+      merged.set(id, {...row, id});
+    });
+    clubRows.forEach((row = {}) => {
+      const id = String(row.id || row.clubId || row.primaryLocationId || "").trim();
+      if (!id) return;
+      const prev = merged.get(id) || {id};
+      merged.set(id, {
+        ...row,
+        ...prev,
+        id,
+        displayScreenFormatIds: prev.displayScreenFormatIds || row.displayScreenFormatIds,
+        primaryDisplayScreenFormatId: prev.primaryDisplayScreenFormatId || row.primaryDisplayScreenFormatId,
+        displayFooterBrand: prev.displayFooterBrand || row.displayFooterBrand,
+        city: prev.city || row.city,
+        region: prev.region || row.region,
+        country: prev.country || row.country
+      });
+    });
+    return Array.from(merged.values());
+  }
+
+  function callableFn(name) {
     if (!functions) functions = firebase.app().functions("us-central1");
     return functions.httpsCallable(name);
+  }
+
+  async function invokeCallable(name, data = {}) {
+    const sessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+    return callableFn(name)({...data, sos2faSessionId: sessionId});
   }
 
   function entityTitle(row, type) {
@@ -58,18 +97,24 @@
   }
 
   async function refreshCatalog(existingLocations = null) {
-    const clubs = existingLocations && existingLocations.length
+    let locationRows = existingLocations && existingLocations.length
       ? existingLocations.map(row => ({...row, id:row.id}))
       : [];
-    if (!clubs.length) {
+    if (!locationRows.length) {
       try {
         const snap = await db.collection("clubLocations").limit(500).get();
-        snap.forEach(doc => clubs.push({id:doc.id, ...doc.data()}));
+        snap.forEach(doc => locationRows.push({id:doc.id, ...doc.data()}));
       } catch (e) {}
       Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, data]) => {
-        if (!clubs.some(c => c.id === id)) clubs.push({id, ...data});
+        if (!locationRows.some(c => c.id === id)) locationRows.push({id, ...data});
       });
     }
+    const clubDocs = [];
+    try {
+      const snap = await db.collection("clubs").limit(500).get();
+      snap.forEach(doc => clubDocs.push({id:doc.id, ...doc.data()}));
+    } catch (e) {}
+    const clubs = mergeClubRows(locationRows, clubDocs);
 
     const events = [];
     try {
@@ -169,10 +214,14 @@
     const enabled = g?.entityIsAppEnabled(row);
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
-    const adminUrl = type === "club" ? `./admin.html?location=${encodeURIComponent(id)}&v=29.09.22&from=master` : "";
+    const adminUrl = type === "club" ? masterAdminUrl(id) : "";
     const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
     const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
-    const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.22` : "";
+    const profileUrl = type === "club"
+      ? (window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
+        || window.FLOQRNav?.adminLink?.("./club-profile.html", {location: id})
+        || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`)
+      : "";
 
     wrap.innerHTML = `
       <div class="entity-manage-head">
@@ -219,7 +268,7 @@
       const next = !!event.target.checked;
       try {
         setStatus(next ? "Enabling entity..." : "Disabling entity...");
-        await callable("setEntityAppEnabled")({entityType:type, entityId:id, enabled:next, email:row.email || ""});
+        await invokeCallable("setEntityAppEnabled", {entityType:type, entityId:id, enabled:next, email:row.email || ""});
         row.appEnabled = next;
         row.active = next;
         row.status = next ? "active" : "disabled";
@@ -241,7 +290,7 @@
       });
       try {
         setStatus("Saving venue feature gates...");
-        await callable("setVenueFeatureGates")({clubId:id, gates:nextGates});
+        await invokeCallable("setVenueFeatureGates", {clubId:id, gates:nextGates});
         row.featureGates = nextGates;
         gates()?.invalidateVenueCache?.(id);
         setStatus("Venue feature gates saved.");
@@ -259,7 +308,7 @@
       if (!window.confirm(`Offboard "${entityTitle(row, type)}"? Public profile fields will be cleared. This cannot be undone from this tool.`)) return;
       try {
         setStatus("Offboarding entity...");
-        await callable("offboardEntity")({entityType:type, entityId:id, confirmName, email:row.email || ""});
+        await invokeCallable("offboardEntity", {entityType:type, entityId:id, confirmName, email:row.email || ""});
         row.offboarded = true;
         row.appEnabled = false;
         row.active = false;
@@ -291,7 +340,7 @@
     });
     try {
       setStatus("Saving global patron feature gates...");
-      await callable("setPatronFeatureGates")({gates:next});
+      await invokeCallable("setPatronFeatureGates", {gates:next});
       gates()?.setCachedPatronGates?.(next);
       setStatus("Global patron feature gates saved. Super Admin remains exempt.");
       renderGlobalPatronGates();
@@ -311,9 +360,7 @@
       .filter(row => !q || matchesQuery(row, "club", q))
       .sort((a, b) => entityTitle(a, "club").localeCompare(entityTitle(b, "club")));
     wrap.innerHTML = rows.length ? rows.map(row => {
-      const admin = `./admin.html?location=${encodeURIComponent(row.id)}&v=29.09.22&from=master`;
-      const shoutout = window.FLOQRNav?.stableDisplayUrl?.(row.id) || `./display.html?location=${encodeURIComponent(row.id)}`;
-      const suprstar = window.FLOQRNav?.stableSecondaryDisplayUrl?.(row.id) || `./display2.html?location=${encodeURIComponent(row.id)}`;
+      const admin = masterAdminUrl(row.id);
       const where = [row.city, row.region || row.state || row.province, row.country].filter(Boolean).join(", ");
       const g = gates();
       const enabled = g?.entityIsAppEnabled(row);
@@ -325,8 +372,6 @@
         ${statusBadge(row)}
         <p>${esc(where || row.locationLabel || "Location details not added yet")}</p>
         <p><strong>Venue Admin Portal URL:</strong> <a class="message-inline-link" href="${esc(admin)}" target="_blank" rel="noopener">${esc(admin)}</a></p>
-        <p><strong>ShoutOut URL:</strong> <a class="message-inline-link" href="${esc(shoutout)}" target="_blank" rel="noopener">${esc(shoutout)}</a></p>
-        <p><strong>SupRStar URL:</strong> <a class="message-inline-link" href="${esc(suprstar)}" target="_blank" rel="noopener">${esc(suprstar)}</a></p>
         <div class="queue-actions">
           <button type="button" data-manage-club="${esc(row.id)}">Manage entity</button>
         </div>

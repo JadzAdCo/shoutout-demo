@@ -2,7 +2,10 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.44";
+  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
+     Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
+     Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
+  const APP_V = "s3.0.3";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
@@ -31,8 +34,18 @@
     }
   }
 
+  function currentVersion() {
+    return APP_V;
+  }
+
+  function isDisplayFile(path) {
+    const file = String(path || "").split("?")[0].split("/").pop() || "";
+    return file === "display.html" || file === "display2.html";
+  }
+
   const FLOQRNav = {
     appVersion: APP_V,
+    currentVersion,
     portalHome(extra = {}) {
       return buildUrl("./patron-portal.html", { v: APP_V, ...extra });
     },
@@ -40,12 +53,29 @@
       return `./?v=${APP_V}&start=search`;
     },
     adminHome(extra = {}) {
-      const locationId = qs("location") || qs("club") || extra.location || "";
+      const extraLocation = extra.location;
+      const locationId = extraLocation != null && String(extraLocation).trim() !== ""
+        ? String(extraLocation).trim()
+        : (qs("location") || qs("club") || "");
       const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");
-      const params = { v: APP_V, location: locationId, ...extra };
+      const params = { ...extra, location: locationId, v: APP_V };
       if (from) params.from = from;
       else delete params.from;
       return buildUrl("./admin.html", params);
+    },
+    /** Club Admin URL for Venue Links / onboarding — always current package, never page ?v=. */
+    adminPortalUrl(locationId = "", extra = {}) {
+      return this.adminHome({ location: locationId, from: "master", ...extra });
+    },
+    /** Stamp current package on a relative app URL. Display boards stay location-only. */
+    stampCurrentVersion(href = "", extra = {}) {
+      if (!href) return href;
+      if (isDisplayFile(href)) {
+        const params = { ...extra };
+        delete params.v;
+        return buildUrl(href, params);
+      }
+      return buildUrl(href, { v: APP_V, ...extra });
     },
     masterHome() {
       return `./master-admin.html?v=${APP_V}`;
