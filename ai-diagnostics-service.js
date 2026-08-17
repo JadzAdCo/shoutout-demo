@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.2";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.2";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.3";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.3";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,21 @@
       ]
     },
     {
+      version:"s3.0.3",
+      title:"All satellite pages inherit FLOQR session (no auto Google popup)",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.3\""]},
+        {label:"Session shell module", file:"floqr-session-shell.js", includes:["FLOQRSessionShell", "popupBlocked", "Restoring your FLOQR session"]},
+        {label:"Work Sheet uses session shell", file:"staff-worksheet.html", includes:["floqr-session-shell.js", "data-floqr-auth-chrome", "embed=1"]},
+        {label:"BartR satellite shell", file:"commerce.html", includes:["floqr-session-shell.js", "data-floqr-auth-chrome"]},
+        {label:"Payment return no auto popup", file:"payment-return-app.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {})"]},
+        {label:"supRstar preview no auto popup", file:"suprstar-preview.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message))"]},
+        {label:"Portal iframe embed=1", file:"patron-portal-app.js", includes:["embed: \"1\"", "from: \"portal\""]},
+        {label:"Satellite session rule", file:".cursor/rules/satellite-session-auth.mdc", includes:["FLOQRSessionShell", "embed=1"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.3\""]}
+      ]
+    },
+    {
       version:"s3.0.2",
       title:"Satellite pages inherit FLOQR session (no Google-only iframe gate)",
       checks:[
@@ -1000,6 +1015,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-3-all-satellites-session-shell",
+      area:"Satellite / iframe pages",
+      feature:"Every satellite inherits FLOQR login; no auto Google popup",
+      changed:"role-request, BartR, guest list, Mingl, RydR, services, promoter admin, payment-return, and supRstar all load floqr-session-shell.js. Payment return and private preview no longer call signInWithPopup on signed-out. Embedded panels use popupBlocked and Open My Profile.",
+      howToTest:"Sign in on patron-portal.html?v=s3.0.3 as temp_busboy_1@floqr-demo.com. Open Work Calendar (iframe). Then open commerce.html, guest-list.html, mingl-chat.html, pickup.html, role-request.html, suprstr-search.html from Search while still signed in. Confirm each restores the session and does not force a Google popup.",
+      expected:"Signed-in parent/session is reused. No Google-only gate. Iframe Work Calendar still has tick / Approve selected."
+    },
     {
       id:"s3-0-2-satellite-session-shell",
       area:"Work Calendar / satellite pages",
@@ -5796,10 +5819,10 @@
     const v = PREVIEW_LINKS_PACKAGE;
     return {
       package: v,
-      note: note || `FLOQR s3.0.1 test notes:
-1) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
-2) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.
-3) Only the assigned service member can confirm. Club Admin cannot confirm on their behalf.`,
+      note: note || `FLOQR s3.0.3 test notes:
+1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, supRstar. Each must restore the FLOQR session — no Google-only gate, no auto popup.
+2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
+3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,
       links: [
         ["Aurelia club profile (photoreal + VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
         ["Club Admin Notifications (test alert → Inbox)", `${base}/admin.html?location=temp-democlub-1&v=${v}&tab=notifications`],
@@ -5812,7 +5835,7 @@
         ["Patron public profile (temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
         ["Master Admin diagnostics", `${base}/master-admin.html?v=${v}`],
         ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
-        ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
+        ["Aurelia display board (stable, no ?v=)", `${base}/display.html?location=temp-democlub-1`]
       ]
     };
   }

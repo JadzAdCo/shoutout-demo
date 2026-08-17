@@ -136,7 +136,16 @@
   document.addEventListener("DOMContentLoaded", () => {
     populateLocations();
     applyTypeFromQuery();
-    byId("roleGoogleLoginBtn")?.addEventListener("click", () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#roleStatus"
+    });
+    byId("roleGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#roleStatus")) return;
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    });
     byId("submitRoleRequestBtn")?.addEventListener("click", submitRoleRequest);
   });
 

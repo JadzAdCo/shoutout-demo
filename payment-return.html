@@ -10,6 +10,11 @@
 <body>
 <main class="app admin-shell">
   <section class="page active">
+    <div class="card" id="paymentReturnAuth" data-floqr-auth-chrome>
+      <h2>Sign in to view payment</h2>
+      <p class="sub small">Use the same FLOQR account as Search / My Profile. This page restores that session.</p>
+      <button id="paymentReturnGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button>
+    </div>
     <div class="card payment-return-card">
       <p class="eyebrow">FLOQR Payments</p>
       <h1 id="paymentReturnTitle">Checking payment…</h1>
@@ -27,8 +32,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.56"></script>
+<script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqr-logger.js?v=29.09.56"></script>
-<script src="./payment-service.js?v=29.09.56"></script>
-<script src="./payment-return-app.js?v=29.09.66"></script>
+<script src="./payment-service.js?v=29.09.72"></script>
+<script src="./payment-return-app.js?v=s3.0.3"></script>
 </body>
 </html>

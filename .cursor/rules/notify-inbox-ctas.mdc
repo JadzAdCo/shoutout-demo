@@ -1,0 +1,36 @@
+---
+description: Inbox/Email/SMS CTAs are type-aware; notify links never confirm or look like ShoutOuts (always)
+alwaysApply: true
+---
+
+# Notify and Inbox CTAs (always)
+
+System Messages are **not** ShoutOuts. A schedule invite, worker confirm, or club ops alert must not use ShoutOut chrome, ShoutOut buttons, or mutate data when the link is opened.
+
+## Landing page
+
+| Message kind | Lands on | Does on click |
+|---|---|---|
+| Shift invite / pending confirm | `patron-portal.html?tab=work-calendar&shift=&from=schedule-notify` | **Review only.** Tick / Select all / Approve selected |
+| Shift confirmed/declined (manager) | `admin.html?tab=scheduling` | Open calendar |
+| ShoutOut related | The actual ShoutOut / display / queue URL | Open that ShoutOut |
+| Everything else | The `link` on the row, with a label that matches the type | Navigate only |
+
+**Forbidden:** `Open Related ShoutOut` as the default label for any `x.link`. Branch on `type` / `shiftId` / `from=schedule-notify`.
+
+## Confirm is an explicit action
+
+- Publish → **pending**. Inbox/Email/SMS link **does not** set confirmed.
+- Only the **assignee** may approve/decline (`respondToScheduleShift` / `respondToScheduleShifts`). Managers do not confirm on the worker’s behalf.
+- UI: checkbox per pending shift, **Select all**, **Approve selected** / **Decline selected**.
+
+## Club Admin copy
+
+Schedule System Message wording lives under **Notifications → Message templates** (`clubNotificationSettings.messageTemplates`), placeholders `{club} {role} {when} {link} {worker}`. Admins edit templates there — not by treating Inbox rows as ShoutOuts.
+
+## When you add a new notify
+
+1. Pick a **hub** landing URL (portal/admin tab), not a Google-gated satellite.
+2. Set Inbox `type` and a type-aware button label.
+3. Seed the same copy in Club Admin message templates + `floqai-help-repository.js`.
+4. Cache-bust the landing page `?v=` (never on Xibo Display URLs).

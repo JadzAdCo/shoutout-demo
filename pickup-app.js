@@ -576,7 +576,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    byId("pickupGoogleLoginBtn")?.addEventListener("click", () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#pickupStatus"
+    });
+    byId("pickupGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#pickupStatus")) return;
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    });
     byId("pickupContinueAddressBtn")?.addEventListener("click", () => {
       continueFromAddress().catch(error => setStatus(error?.message || String(error)));
     });

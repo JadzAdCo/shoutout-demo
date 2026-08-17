@@ -211,7 +211,6 @@
   auth.onAuthStateChanged(user => {
     if (!user) {
       byId("paymentReturnTitle").textContent = "Sign in to view payment";
-      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {});
       return;
     }
     if (!orderId) return render({ status: "missing order" });
@@ -228,5 +227,20 @@
       },
       error => { byId("paymentReturnStatus").textContent = error.message; }
     );
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#paymentReturnStatus"
+    });
+    byId("paymentReturnGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#paymentReturnStatus")) return;
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(error => {
+        byId("paymentReturnStatus").textContent = error?.message || "Sign-in failed.";
+      });
+    });
   });
 })();

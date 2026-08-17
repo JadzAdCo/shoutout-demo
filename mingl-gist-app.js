@@ -425,10 +425,18 @@
   }
 
   function bindAuth() {
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#minglGistStatus"
+    });
     byId("minglGistGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#minglGistStatus")) return;
       auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch((error) => setStatus(error.message));
     });
     byId("minglGistMicrosoftLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#minglGistStatus")) return;
       const provider = new firebase.auth.OAuthProvider("microsoft.com");
       auth.signInWithPopup(provider).catch((error) => {
         auth.signInWithRedirect(provider).catch((redirectError) => setStatus(redirectError.message || error.message));

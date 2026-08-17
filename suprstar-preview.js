@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const APP_V = "29.09.66";
+  const APP_V = "29.09.75";
   let requestDoc = null;
   let requestUnsub = null;
   let localStream = null;
@@ -36,23 +36,95 @@
     return firebase.app().functions("us-central1").httpsCallable(name);
   }
 
+  function cameraReady() {
+    try {
+      return !!(localStream && localStream.getVideoTracks().some((t) => t.readyState === "live"));
+    } catch (_) {
+      return !!localStream;
+    }
+  }
+
+  /** One CTA that advances: camera → pay → wait → go live → end. */
   function updateButtons() {
+    const btn = byId("suprstarStageBtn");
+    if (!btn) return;
     const row = requestDoc || {};
     const status = String(row.status || "");
     const paid = row.paymentStatus === "paid";
     const live = !!broadcastHandle || status === "live";
-    const payBtn = byId("suprstarPayBtn");
-    const goBtn = byId("suprstarGoLiveBtn");
-    const endBtn = byId("suprstarEndLiveBtn");
-    if (payBtn) {
-      payBtn.disabled = paid || live || !["preview", "awaiting_payment"].includes(status);
-      payBtn.textContent = paid ? "Paid — waiting for venue approval" : "Pay $20 — become a supRstar";
+
+    btn.classList.remove("ghost");
+    btn.classList.add("primary");
+    btn.removeAttribute("aria-busy");
+
+    if (!requestDoc) {
+      btn.disabled = true;
+      btn.textContent = "Unavailable";
+      btn.dataset.stage = "done";
+      return;
     }
-    if (goBtn) {
-      goBtn.disabled = !paid || status !== "approved" || live;
-      goBtn.textContent = live ? "Live…" : "Go live, be a supRstar";
+
+    if (status === "rejected") {
+      btn.disabled = true;
+      btn.textContent = "Not approved — start a new supRstar";
+      btn.dataset.stage = "done";
+      return;
     }
-    endBtn?.classList.toggle("hidden", !live);
+
+    if (status === "ended" && !live) {
+      btn.disabled = true;
+      btn.textContent = "Session ended — start a new supRstar";
+      btn.dataset.stage = "done";
+      return;
+    }
+
+    if (live) {
+      btn.disabled = false;
+      btn.classList.remove("primary");
+      btn.classList.add("ghost");
+      btn.textContent = "End live stream";
+      btn.dataset.stage = "end";
+      return;
+    }
+
+    if (paid && status === "approved") {
+      btn.disabled = false;
+      btn.textContent = "Go live, be a supRstar";
+      btn.dataset.stage = "live";
+      return;
+    }
+
+    if (paid || status === "pending_approval") {
+      btn.disabled = true;
+      btn.textContent = "Paid — waiting for venue approval";
+      btn.dataset.stage = "wait";
+      return;
+    }
+
+    if (["preview", "awaiting_payment"].includes(status)) {
+      if (!cameraReady()) {
+        btn.disabled = false;
+        btn.textContent = "Start camera preview";
+        btn.dataset.stage = "camera";
+        return;
+      }
+      btn.disabled = false;
+      btn.textContent = "Go pay $20 — become a supRstar";
+      btn.dataset.stage = "pay";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Preparing…";
+    btn.dataset.stage = "idle";
+  }
+
+  function onStageClick() {
+    const stage = String(byId("suprstarStageBtn")?.dataset?.stage || "");
+    if (stage === "camera") return startCamera();
+    if (stage === "pay") return startPayment();
+    if (stage === "live") return goLive();
+    if (stage === "end") return endLive();
   }
 
   function applyRequest(data) {
@@ -65,14 +137,20 @@
     const venue = requestDoc.locationName || requestDoc.locationId || "venue";
     byId("suprstarVenueLabel").textContent = `Venue: ${venue} · Ref ${requestDoc.referenceNumber || requestDoc.requestId || ""}`;
     const status = String(requestDoc.status || "");
-    if (status === "preview" || status === "awaiting_payment") {
-      setGate("Private preview ready. Start your camera, then pay $20.");
-      setStatus(status === "awaiting_payment" ? "Checkout opened — finish payment in the Stripe window." : "");
+    if (status === "preview") {
+      setGate(cameraReady()
+        ? "Preview on. Tap Go pay $20 when ready."
+        : "Private preview ready. Start your camera, then pay $20.");
+      if (!cameraReady()) setStatus("");
+    } else if (status === "awaiting_payment") {
+      setGate("Finish payment in Stripe, or wait a moment while we confirm your payment.");
+      setStatus("If you already paid, this page will update automatically.");
+      maybeConfirmAwaitingPayment();
     } else if (status === "pending_approval") {
       setGate("Payment received. Waiting for Club Admin approval in the supRstar Queue.");
-      setStatus("Do not close this tab. You will unlock Go live when approved.");
+      setStatus("Do not close this tab. Go live unlocks when the venue approves.");
     } else if (status === "approved") {
-      setGate("Approved! You can Go live — your stream will reach the venue SupRStar board.");
+      setGate("Approved! Tap Go live — your stream will reach the venue SupRStar board.");
       setStatus("Club Admin approved. Tap Go live when ready.");
     } else if (status === "live") {
       setGate("You are live on the venue SupRStar board.");
@@ -86,6 +164,22 @@
     updateButtons();
   }
 
+  async function maybeConfirmAwaitingPayment() {
+    if (!requestDoc) return;
+    const status = String(requestDoc.status || "");
+    if (!["awaiting_payment", "preview"].includes(status) && requestDoc.paymentStatus === "paid") return;
+    if (requestDoc.paymentStatus === "paid" && status === "pending_approval") return;
+    let orderId = "";
+    try { orderId = sessionStorage.getItem("floqr_suprstar_order") || ""; } catch (_) {}
+    if (!orderId) return;
+    try {
+      if (global.FLOQRPayments?.confirmCheckoutSession) {
+        const result = await global.FLOQRPayments.confirmCheckoutSession({orderId, status: setStatus});
+        if (result?.ok) setStatus("Payment confirmed. Waiting for Club Admin approval…");
+      }
+    } catch (_) {}
+  }
+
   async function startCamera() {
     try {
       if (!global.FLOQRSuprstrRtc) throw new Error("Camera helper failed to load.");
@@ -96,21 +190,59 @@
         video.classList.add("is-on");
         video.muted = true;
       }
+      setGate("Preview on. Tap Go pay $20 when ready.");
       setStatus("Local preview only — not on the club board yet.");
       updateButtons();
     } catch (err) {
       setStatus(err?.message || "Camera failed.");
+      updateButtons();
     }
+  }
+
+  async function logPopup(action, message, details = {}) {
+    try {
+      if (global.FLOQRPayments?.logPopupEvent) {
+        await global.FLOQRPayments.logPopupEvent(action, message, {
+          flow: "suprstar_preview",
+          requestId: requestDoc?.requestId || "",
+          accessToken: accessToken ? `${accessToken.slice(0, 6)}…` : "",
+          ...details
+        });
+      } else if (global.FLOQRLog?.write) {
+        await global.FLOQRLog.write({
+          level: action === "popup_blocked" ? "warn" : "info",
+          category: "checkout",
+          action,
+          message,
+          details: {flow: "suprstar_preview", ...details},
+          source: "suprstar-preview"
+        });
+      }
+    } catch (_) {}
   }
 
   async function startPayment() {
     if (!requestDoc?.requestId) return;
+    if (!cameraReady()) {
+      setStatus("Start camera preview before paying.");
+      updateButtons();
+      return;
+    }
     if (!global.FLOQRPayments?.startCheckout) {
       setStatus("Payment service failed to load.");
       return;
     }
+    // Open popup synchronously on click — before any await — or browsers block it.
+    checkoutPopup = global.FLOQRPayments.openUserGesturePopup
+      ? global.FLOQRPayments.openUserGesturePopup("floqr_suprstar_pay")
+      : window.open("about:blank", "floqr_suprstar_pay", "width=540,height=780");
+    const popupBlocked = !checkoutPopup;
+    if (!popupBlocked) {
+      try { checkoutPopup.opener = null; } catch (_) {}
+    }
     try {
-      setStatus("Opening Stripe checkout in a pop-out… keep this preview open.");
+      try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
+      setStatus(popupBlocked ? "Preparing Stripe checkout…" : "Opening Stripe checkout in a pop-out… keep this preview open.");
       const result = await global.FLOQRPayments.startCheckout({
         orderType: "suprstarRequest",
         payload: {
@@ -122,15 +254,30 @@
       });
       const url = result?.checkoutUrl;
       if (!url) throw new Error("No checkout URL.");
-      checkoutPopup = window.open(url, "floqr_suprstar_pay", "popup=yes,width=520,height=760");
-      if (!checkoutPopup) {
-        setStatus("Pop-up blocked. Allow pop-ups, or continue in this tab.");
-        window.location.assign(url);
+      try {
+        if (result?.orderId) sessionStorage.setItem("floqr_suprstar_order", result.orderId);
+      } catch (_) {}
+      if (!popupBlocked && checkoutPopup && !checkoutPopup.closed) {
+        checkoutPopup.location.href = url;
+        await logPopup("popup_opened", "supRstar Stripe checkout opened in pop-out", {
+          orderId: result?.orderId || "",
+          popupName: "floqr_suprstar_pay"
+        });
+        setStatus("Complete payment in the Stripe pop-out. This preview tab stays open — do not close it.");
         return;
       }
-      setStatus("Complete payment in the Stripe window. This preview stays active.");
+      await logPopup("popup_blocked", "supRstar checkout pop-out unavailable; using same-tab fallback", {
+        orderId: result?.orderId || "",
+        popupBlocked,
+        popupClosed: popupBlocked ? true : !!checkoutPopup?.closed
+      });
+      try { checkoutPopup?.close(); } catch (_) {}
+      setStatus("Pop-up unavailable — opening Stripe in this tab. Use Return to preview after payment.");
+      window.location.assign(url);
     } catch (err) {
+      try { checkoutPopup?.close(); } catch (_) {}
       setStatus(err?.message || "Checkout failed.");
+      await logPopup("checkout_failed", err?.message || "Checkout failed.", {requestId: requestDoc?.requestId || ""});
     }
   }
 
@@ -205,31 +352,64 @@
   }
 
   function bindUi() {
-    byId("suprstarStartCamBtn")?.addEventListener("click", () => startCamera());
-    byId("suprstarPayBtn")?.addEventListener("click", () => startPayment());
-    byId("suprstarGoLiveBtn")?.addEventListener("click", () => goLive());
-    byId("suprstarEndLiveBtn")?.addEventListener("click", () => endLive());
+    byId("suprstarStageBtn")?.addEventListener("click", () => onStageClick());
+    byId("suprstarPreviewGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#suprstarPreviewGate")) return;
+      firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message));
+    });
+    byId("suprstarPreviewMicrosoftLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#suprstarPreviewGate")) return;
+      firebase.auth().signInWithPopup(new firebase.auth.OAuthProvider("microsoft.com")).catch(e => setGate(e.message));
+    });
     window.addEventListener("message", (ev) => {
       if (ev?.data?.type === "floqr-suprstar-paid") {
         setStatus("Payment confirmed. Waiting for Club Admin approval…");
         try { checkoutPopup?.close(); } catch (_) {}
+        maybeConfirmAwaitingPayment();
       }
     });
   }
 
+  function recoverAccessToken() {
+    let token = qs("t");
+    if (token && token.length >= 24) return token;
+    try {
+      token = sessionStorage.getItem("floqr_suprstar_token") || "";
+    } catch (_) {}
+    if (token && token.length >= 24) {
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set("t", token);
+        if (!url.searchParams.get("v")) url.searchParams.set("v", APP_V);
+        history.replaceState(null, "", url.toString());
+      } catch (_) {}
+      return token;
+    }
+    return "";
+  }
+
   function boot() {
     global.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
-    accessToken = qs("t");
-    if (!accessToken || accessToken.length < 24) {
-      setGate("Missing private preview token. Start again from Search → supRstar.");
-      return;
-    }
     if (!global.firebase?.apps?.length && global.firebaseConfig) firebase.initializeApp(global.firebaseConfig);
     bindUi();
-    firebase.auth().onAuthStateChanged(user => {
+    accessToken = recoverAccessToken();
+    if (!accessToken || accessToken.length < 24) {
+      setGate("Missing private preview token. Start again from Search → supRstar, or open the preview link from your payment receipt.");
+      byId("suprstarRecoverActions")?.classList.remove("hidden");
+      updateButtons();
+      return;
+    }
+    try { sessionStorage.setItem("floqr_suprstar_token", accessToken); } catch (_) {}
+    const auth = firebase.auth();
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#suprstarPreviewGate"
+    });
+    auth.onAuthStateChanged(user => {
       if (!user) {
-        setGate("Sign in to open your private preview.");
-        firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message));
+        setGate("Sign in with the same FLOQR account you use on Search / My Profile.");
         return;
       }
       watchRequest(user.uid);

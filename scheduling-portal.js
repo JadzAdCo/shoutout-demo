@@ -288,10 +288,7 @@
       }
     }
     byId("portalGoogleLoginBtn")?.addEventListener("click", () => {
-      if (window.FLOQRSessionShell?.isEmbedded?.()) {
-        setStatus("Sign in on My Profile & Settings first. Google popups are not used inside embedded panels.");
-        return;
-      }
+      if (window.FLOQRSessionShell?.popupBlocked?.("#schedulingPortalStatus")) return;
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).catch(error => setStatus(error.message));
     });

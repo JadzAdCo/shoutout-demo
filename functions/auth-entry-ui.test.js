@@ -26,6 +26,53 @@ test("email verification explicitly prompts for the eight-character code", () =>
   assert.match(html, /id="emailOtpStatus"[^>]+aria-live="polite"/);
 });
 
+test("satellite pages inherit FLOQR session via FLOQRSessionShell", () => {
+  const pages = [
+    "staff-worksheet.html",
+    "scheduling.html",
+    "role-request.html",
+    "commerce.html",
+    "guest-list.html",
+    "mingl-chat.html",
+    "mingl-gist.html",
+    "services.html",
+    "promoter-admin.html",
+    "pickup.html",
+    "payment-return.html",
+    "suprstr-search.html",
+    "suprstar-preview.html"
+  ];
+  for (const file of pages) {
+    const html = readReleaseFile(file);
+    assert.match(html, /floqr-session-shell\.js/, `${file} must load floqr-session-shell.js`);
+    assert.match(html, /data-floqr-auth-chrome/, `${file} must mark auth chrome`);
+  }
+  const apps = [
+    "staff-worksheet.js",
+    "scheduling-portal.js",
+    "role-request-app.js",
+    "commerce-app.js",
+    "guest-list-app.js",
+    "mingl-chat-app.js",
+    "mingl-gist-app.js",
+    "services-app.js",
+    "promoter-admin-app.js",
+    "pickup-app.js",
+    "payment-return-app.js",
+    "suprstr-search.js",
+    "suprstar-preview.js"
+  ];
+  for (const file of apps) {
+    const js = readReleaseFile(file);
+    assert.match(js, /FLOQRSessionShell/, `${file} must bind FLOQRSessionShell`);
+    assert.match(js, /popupBlocked/, `${file} must block iframe Google popups`);
+  }
+  const payment = readReleaseFile("payment-return-app.js");
+  assert.doesNotMatch(payment, /if \(!user\)[\s\S]{0,240}signInWithPopup/);
+  const preview = readReleaseFile("suprstar-preview.js");
+  assert.doesNotMatch(preview, /if \(!user\)[\s\S]{0,280}signInWithPopup/);
+});
+
 test("main message typing preserves spaces instead of live-fitting on every keystroke", () => {
   const app = readReleaseFile("patron-app.js");
   const html = readReleaseFile("index.html");

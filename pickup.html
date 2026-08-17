@@ -25,7 +25,7 @@
         <span>Vehicle matching and dispatch are simulated. Trip fare payment is real Stripe Checkout through onboarded FloqR.</span>
       </div>
 
-      <div id="pickupLogin" class="card"><button id="pickupGoogleLoginBtn" type="button">Continue with Google</button></div>
+      <div id="pickupLogin" class="card" data-floqr-auth-chrome><button id="pickupGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button></div>
       <div id="pickupPanel" class="hidden pickup-layout">
         <section class="card pickup-map-card" aria-label="Simulated ride map">
           <div class="section-title-row"><div><p class="eyebrow">Fictitious live map</p><h2>Nearby vehicle</h2></div><span class="live-pill">SIMULATED LIVE</span></div>
@@ -178,6 +178,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
   <script src="./firebase-config.js?v=29.09.19"></script>
+  <script src="./floqr-session-shell.js?v=s3.0.3"></script>
   <script src="./floqr-nav.js?v=29.09.19"></script>
   <script src="./global-profile-status.js?v=29.09.19"></script>
   <script src="./shared-data.js?v=29.09.19"></script>
@@ -187,7 +188,7 @@
   <script src="./dc-spot-ad-campaigns.js?v=29.09.19"></script>
   <script src="./ad-campaigns.js?v=29.09.19"></script>
   <script src="./payment-service.js?v=29.09.19"></script>
-  <script src="./pickup-app.js?v=29.09.19"></script>
+  <script src="./pickup-app.js?v=s3.0.3"></script>
   <script src="./profile-access-guard.js?v=29.09.19"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
