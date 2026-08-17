@@ -318,7 +318,7 @@ function shiftApproveUrl(shift = {}, origin = DEFAULT_ORIGIN) {
   if (shift.id) url.searchParams.set("shift", String(shift.id));
   if (shift.ownerKey) url.searchParams.set("owner", String(shift.ownerKey));
   url.searchParams.set("from", "schedule-notify");
-  url.searchParams.set("v", "s3.0.2");
+  url.searchParams.set("v", "s3.0.3");
   return url.toString();
 }
 

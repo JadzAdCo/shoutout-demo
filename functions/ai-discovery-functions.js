@@ -1804,7 +1804,7 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "29.09.117") {
+function defaultFloqrPreviewLinks(v = "s3.0.3") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
@@ -1818,7 +1818,7 @@ function defaultFloqrPreviewLinks(v = "29.09.117") {
     ["Patron public profile (sign in as temp_dj_1)", `${base}/patron-portal.html?v=${v}`],
     ["Master Admin Diagnostics", `${base}/master-admin.html?v=${v}`],
     ["Search / FloqAi", `${base}/?v=${v}&start=intent`],
-    ["Aurelia display board", `${base}/display.html?location=temp-democlub-1&screen=led-64x32`]
+    ["Aurelia display board", `${base}/display.html?location=temp-democlub-1`]
   ];
 }
 

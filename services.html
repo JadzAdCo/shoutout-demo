@@ -10,7 +10,7 @@
   <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./patron-portal.html?v=29.09.8">&larr; Back to My Profile and Settings</a>
   <section class="page active">
     <header class="topbar"><div><p class="eyebrow">FLOQR Services</p><h1>Follow a Service</h1><p class="sub">Follow promoters, DJs, waitresses, bottle girls, bartenders, videographers, camera operators, and other approved service members in their role capacity.</p><p id="serviceStatus" class="status">Loading...</p></div></header>
-    <div id="serviceLogin" class="card"><button id="serviceGoogleLoginBtn" type="button">Continue with Google</button></div>
+    <div id="serviceLogin" class="card" data-floqr-auth-chrome><button id="serviceGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button></div>
     <div id="servicePanel" class="hidden">
       <section class="card"><div class="profile-grid"><label>Search services<input id="serviceSearch" placeholder="Name, role, club, city, genre"/></label><label>Role<select id="serviceRoleFilter"><option value="">All roles</option><option value="promoter">Promoters</option><option value="dj">DJs</option><option value="hospitality">Waitresses / Bottle Girls / Bartenders</option><option value="mediaCreator">Videographers / Camera Operators</option></select></label></div></section>
       <section id="serviceDirectory" class="service-directory"></section>
@@ -33,7 +33,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=29.09.8"></script><script src="./floqr-nav.js?v=29.09.124"></script><script src="./global-profile-status.js?v=29.09.124"></script><script src="./floqr-action-feedback.js?v=29.09.8"></script><script src="./helper-popouts.js?v=29.09.8"></script><script src="./payment-service.js?v=29.09.8"></script><script src="./floqr-blocks.js?v=29.09.57"></script><script src="./services-app.js?v=29.09.57"></script><script src="./profile-access-guard.js?v=29.09.8"></script>
+<script src="./firebase-config.js?v=29.09.8"></script><script src="./floqr-session-shell.js?v=s3.0.3"></script><script src="./floqr-nav.js?v=29.09.8"></script><script src="./global-profile-status.js?v=29.09.8"></script><script src="./floqr-action-feedback.js?v=29.09.8"></script><script src="./helper-popouts.js?v=29.09.8"></script><script src="./payment-service.js?v=29.09.8"></script><script src="./floqr-blocks.js?v=29.09.57"></script><script src="./services-app.js?v=s3.0.3"></script><script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const back = document.getElementById("floqrGlobalBack");

@@ -98,7 +98,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    byId("serviceGoogleLoginBtn")?.addEventListener("click", () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#serviceStatus"
+    });
+    byId("serviceGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#serviceStatus")) return;
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    });
     byId("serviceSearch")?.addEventListener("input", render);
     byId("serviceRoleFilter")?.addEventListener("change", render);
     byId("serviceCampaignAudience")?.addEventListener("change", event => byId("serviceTargetCountLabel").classList.toggle("hidden", event.currentTarget.value !== "targetedFloqr"));

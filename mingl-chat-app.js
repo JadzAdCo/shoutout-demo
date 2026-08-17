@@ -965,15 +965,23 @@
   }
 
   function loginGoogle() {
+    if (window.FLOQRSessionShell?.popupBlocked?.("#minglChatStatus")) return;
     auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(error => setText("minglChatStatus", error.message));
   }
 
   function loginMicrosoft() {
+    if (window.FLOQRSessionShell?.popupBlocked?.("#minglChatStatus")) return;
     const provider = new firebase.auth.OAuthProvider("microsoft.com");
     auth.signInWithPopup(provider).catch(error => setText("minglChatStatus", error.message));
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#minglChatStatus"
+    });
     ensureCleanComposer();
     bindComposerActions();
     bindGlobalPopoutDismissal();

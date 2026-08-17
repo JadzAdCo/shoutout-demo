@@ -51,11 +51,17 @@
   }
 
   function portalSignInHref() {
-    const v = params().get("v") || "s3.0.2";
+    const v = params().get("v") || "s3.0.3";
     const next = new URL("./patron-portal.html", location.href);
     next.searchParams.set("v", v);
     next.searchParams.set("from", "session-shell");
     return `${next.pathname}${next.search}`;
+  }
+
+  function popupBlocked(statusEl) {
+    if (!isEmbedded()) return false;
+    setStatus(statusEl, "Sign in on My Profile & Settings first. Google popups are not used inside this panel.");
+    return true;
   }
 
   function applyEmbedChrome() {
@@ -169,6 +175,7 @@
     waitForUser,
     bind,
     applyEmbedChrome,
-    portalSignInHref
+    portalSignInHref,
+    popupBlocked
   };
 })(typeof window !== "undefined" ? window : globalThis);

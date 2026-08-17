@@ -26,7 +26,7 @@
         </div>
         <h1 class="visually-hidden">BartR</h1>
         <p class="sub">One shared storefront for US FloqR vendors — including DJ merch, playlist curation (streaming links), Mixcloud-linked mixes, and consultation. FloqR takes payment; the vendor fulfills. Manage listings in My Profile and Settings.</p>
-        <p id="commerceStatus" class="status hidden" aria-live="polite"></p>
+        <p id="commerceStatus" class="status" aria-live="polite"></p>
       </div>
       <div class="card commerce-payment-card">
         <strong>Secure checkout</strong>
@@ -34,10 +34,10 @@
       </div>
     </header>
 
-    <div id="commerceLogin" class="card">
+    <div id="commerceLogin" class="card" data-floqr-auth-chrome>
       <h2>Sign in to shop BartR</h2>
       <p class="sub small">Browse randomly featured products from US-based patrons and service members.</p>
-      <button id="commerceGoogleLoginBtn" type="button">Continue with Google</button>
+      <button id="commerceGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button>
     </div>
 
     <div id="commercePanel" class="hidden">
@@ -74,8 +74,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.9"></script>
-<script src="./floqr-nav.js?v=29.09.124"></script>
-<script src="./global-profile-status.js?v=29.09.124"></script>
+<script src="./floqr-session-shell.js?v=s3.0.3"></script>
+<script src="./floqr-nav.js?v=29.09.9"></script>
+<script src="./global-profile-status.js?v=29.09.9"></script>
 <script src="./shared-data.js?v=29.09.9"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./floqr-action-feedback.js?v=29.09.9"></script>
@@ -83,7 +84,7 @@
 <script src="./payment-service.js?v=29.09.9"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
-<script src="./commerce-app.js?v=29.09.57"></script>
+<script src="./commerce-app.js?v=s3.0.3"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {

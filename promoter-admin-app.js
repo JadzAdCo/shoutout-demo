@@ -14,6 +14,7 @@
 
   function bind(id, fn) { byId(id)?.addEventListener("click", fn); }
   async function loginGoogle() {
+    if (window.FLOQRSessionShell?.popupBlocked?.("#promoterStatus")) return;
     try { setText("promoterStatus", "Opening Google sign-in..."); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
     catch(e) { setText("promoterStatus", `${e.code || "error"}: ${e.message}`); }
   }
@@ -87,6 +88,12 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#promoterStatus"
+    });
     bind("promoterGoogleLoginBtn", loginGoogle);
     byId("periodFilter")?.addEventListener("change", loadReports);
     auth.onAuthStateChanged(user => {

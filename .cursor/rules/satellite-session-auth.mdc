@@ -5,7 +5,38 @@ alwaysApply: true
 
 # Satellite session auth — inherit FLOQR login (always)
 
-Patrons sign in once on Search / My Profile / Club Admin. **Deep-linked and embedded pages must reuse that Firebase session.** Do not present a fresh “Google sign-in” gate that ignores the parent login.
+Patrons sign in **once** on Search / My Profile / Club Admin. Firebase persistence is shared on this origin. **Deep-linked and embedded pages must reuse that session.** A second “Google sign-in” card is a product bug, not a new login surface.
+
+This failed in production as: parent `patron-portal.html` signed in, child iframe `staff-worksheet.html` showing Google / “Sign in to continue.” Same class of bug as Inbox → `scheduling.html`.
+
+## Hub vs satellite
+
+**Hubs** (allowed to show full FLOQR auth: email / phone / Google / Microsoft):
+
+- `index.html` (Search)
+- `patron-portal.html` (My Profile)
+- `admin.html` (Club Admin)
+- `master-admin.html` (Master Admin)
+
+**Satellites** (must use `FLOQRSessionShell`; never Google-only):
+
+| Page | Typical entry |
+|---|---|
+| `staff-worksheet.html` | Portal Work Calendar iframe + Inbox confirm |
+| `scheduling.html` | Manager portal; worker notify must redirect to Work Calendar |
+| `role-request.html` | Service Members / FloqAi |
+| `commerce.html` / BartR | Portal store / Search tile |
+| `guest-list.html` | Club / Search |
+| `mingl-chat.html` / `mingl-gist.html` | Portal / Inbox |
+| `pickup.html` / RydR | Search |
+| `services.html` | Follow Services |
+| `payment-return.html` | Stripe return |
+| `promoter-admin.html` | Promoter tools |
+| `suprstr-search.html` / `suprstar-preview.html` | SupRstR |
+
+**Exceptions (no patron session UI):** `display.html` / `display2.html` (Xibo), seed/debug/onboarding tools.
+
+When you **create or edit** a satellite, wire the shell **in that same change** even if auth was not the ticket. Do not leave a Google-only gate “for later.”
 
 ## Required module
 
@@ -16,19 +47,15 @@ Load **after** `firebase-config.js` and **before** the page app:
 
 ```html
 <script src="./firebase-config.js?v=…"></script>
-<script src="./floqr-session-shell.js?v=s3.0.2"></script>
-<script src="./my-satellite-app.js?v=s3.0.2"></script>
+<script src="./floqr-session-shell.js?v=s3.0.3"></script>
+<script src="./my-satellite-app.js?v=s3.0.3"></script>
 ```
-
-Mark auth chrome so the shell can hide it when signed in:
 
 ```html
-<div class="card" id="myAuthChrome" data-floqr-auth-chrome>
-  <button type="button" id="myGoogleLoginBtn" data-floqr-login-btn>Google sign-in</button>
+<div class="card" data-floqr-auth-chrome>
+  <button type="button" data-floqr-login-btn>Google sign-in</button>
 </div>
 ```
-
-Wire the page app:
 
 ```js
 FLOQRSessionShell.bind({
@@ -36,35 +63,39 @@ FLOQRSessionShell.bind({
   chrome: "[data-floqr-auth-chrome]",
   loginButtons: "[data-floqr-login-btn]",
   statusEl: "#myStatus",
-  onUser: user => loadPage(user),
-  onSignedOut: () => {/* status already set by shell */}
+  onUser: user => loadPage(user)
 });
 ```
 
-## Embed / portal iframe rules
+Standalone (not iframe): Google may remain as **one** option after the shell restores session and finds no user. Copy must say restore FLOQR session / open My Profile — not “Google only.”
 
-1. When embedding a satellite in patron/admin (`iframe`), set **`embed=1`** on the `src` query (and keep `v=`).
-2. Embedded pages **must not** offer Google/Microsoft popups as the primary path — popups fail or confuse inside iframes. The shell hides login buttons and points to **My Profile & Settings** (`target="_parent"`).
-3. Hide standalone Back / duplicate account chrome in embed mode (shell adds `floqr-embed-mode`).
-4. Prefer rendering signed-in flows **inside** the portal when possible; if you must iframe, the child still uses `FLOQRSessionShell`.
+## Embed / iframe
 
-## Deep links (Inbox, Email, SMS)
+1. Portal/admin iframes: `embed=1` on `src` (keep `v=`).
+2. Embedded path **must not** call `signInWithPopup`. Shell hides login buttons and links **My Profile & Settings** (`target="_parent"`).
+3. Shell adds `floqr-embed-mode` and hides duplicate Back chrome.
+4. Prefer rendering inside the portal; if you iframe, the child still uses the shell.
 
-- Confirmation / worker flows → already-authenticated **patron-portal** tabs (e.g. Work Calendar), not a manager Google gate.
-- Old satellite URLs may redirect into the portal; new links must not invent a second login screen.
+## Deep links (Inbox / Email / SMS)
+
+- Worker confirm → `patron-portal.html?tab=work-calendar&shift=&from=schedule-notify`, not manager `scheduling.html`.
+- Opening a notify link **must not** mutate status (pending stays pending until Approve selected).
+- Old satellite URLs may redirect into the portal; new links must not invent a second login.
 
 ## Forbidden
 
-- Satellite page whose only sign-in is Google when FLOQR also supports email/phone
-- Iframe child that shows “Sign in to continue” + Google while the parent portal is clearly signed in
-- Assuming `auth.currentUser` is ready on first paint — wait via `FLOQRSessionShell.bind` / `waitForUser`
-- One-off `if (iframe) hide button` copies — extend `floqr-session-shell.js` instead
+- Satellite whose only sign-in is Google while FLOQR also has email/phone
+- Iframe child showing “Sign in to continue” + Google while the parent is signed in
+- Assuming `auth.currentUser` on first paint — wait via `bind` / `waitForUser`
+- One-off `if (iframe) hide button` — extend `floqr-session-shell.js`
+- Inbox CTA **Open Related ShoutOut** on a non-ShoutOut System Message (use type-aware labels)
 
-## Checklist (new or edited satellite pages)
+## Checklist (new or edited satellite)
 
-- [ ] `floqr-session-shell.js` loaded
-- [ ] Auth card / Google buttons marked `data-floqr-auth-chrome` / `data-floqr-login-btn` (or passed to `bind`)
+- [ ] `floqr-session-shell.js` loaded after firebase-config
+- [ ] Auth chrome / login buttons marked (or passed to `bind`)
 - [ ] `FLOQRSessionShell.bind({ auth, chrome, loginButtons, statusEl, onUser })`
 - [ ] Portal iframes use `embed=1`
-- [ ] Embedded path does not rely on `signInWithPopup`
-- [ ] Status copy says restoring FLOQR session / open My Profile — not “Google only”
+- [ ] Embedded path does not `signInWithPopup`
+- [ ] Status: restoring session / open My Profile — not Google-only
+- [ ] If this is a notify/Inbox landing: already-authenticated hub tab, no confirm-on-click

@@ -3169,7 +3169,7 @@
       });
       showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
     }
-    const frameQuery = new URLSearchParams({v: "s3.0.2", embed: "1", from: "portal"});
+    const frameQuery = new URLSearchParams({v: "s3.0.3", embed: "1", from: "portal"});
     let locationId = datapoints.affiliatedPaidSchedulingClubIds?.[0] || "";
     const owner = String(pageParams.get("owner") || "").trim();
     if (owner.startsWith("club:")) locationId = owner.slice(5) || locationId;

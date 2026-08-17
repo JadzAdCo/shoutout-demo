@@ -137,7 +137,16 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    byId("commerceGoogleLoginBtn")?.addEventListener("click", () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+    window.FLOQRSessionShell?.bind?.({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#commerceStatus"
+    });
+    byId("commerceGoogleLoginBtn")?.addEventListener("click", () => {
+      if (window.FLOQRSessionShell?.popupBlocked?.("#commerceStatus")) return;
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    });
     byId("commerceSearch")?.addEventListener("input", renderProducts);
     byId("commerceCategory")?.addEventListener("change", renderProducts);
     auth.onAuthStateChanged(async user => {
