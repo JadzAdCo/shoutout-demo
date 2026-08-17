@@ -903,6 +903,8 @@
         {label:"supRstar preview no auto popup", file:"suprstar-preview.js", includes:["FLOQRSessionShell", "popupBlocked"], notIncludes:["firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => setGate(e.message))"]},
         {label:"Portal iframe embed=1", file:"patron-portal-app.js", includes:["embed: \"1\"", "from: \"portal\""]},
         {label:"Satellite session rule", file:".cursor/rules/satellite-session-auth.mdc", includes:["FLOQRSessionShell", "embed=1"]},
+        {label:"Venue Links use current package", file:"floqr-nav.js", includes:["adminPortalUrl", "currentVersion", "Never copy the page's ?v="]},
+        {label:"Venue Links not hardcoded 29.09", file:"entity-management.js", includes:["adminPortalUrl"], notIncludes:["v=29.09.95"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.3\""]}
       ]
     },
@@ -1015,6 +1017,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-3-venue-links-current-package",
+      area:"Master Admin / Venue Links",
+      feature:"Venue Admin Portal URLs always use the current package",
+      changed:"Venue Links generate admin.html URLs from FLOQRNav.appVersion at search time. They do not copy the Master Admin page ?v= and do not keep a hardcoded 29.09.N. Display URLs stay location-only.",
+      howToTest:"Open master-admin.html?v=29.09.22#clubAdminUrls (old bookmark on purpose). Search Zeb. Confirm Venue Admin Portal URL uses ?v=s3.0.3 (current package), not 29.09.22. Open the link and confirm Club Admin loads.",
+      expected:"Link is ./admin.html?location=zebbies-garden-washington-dc&v=s3.0.3&from=master (order of query keys may vary). Display URLs on the same club still have no ?v=."
+    },
     {
       id:"s3-0-3-all-satellites-session-shell",
       area:"Satellite / iframe pages",

@@ -2,37 +2,20 @@
 (function (global) {
   "use strict";
 
-  // Single fallback only — never copy package ids into href strings elsewhere.
-  // Prefer page ?v=, then the floqr-nav.js script src cache-bust.
-  const FALLBACK_APP_V = "29.09.124";
+  /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
+     Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
+     Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
+  const APP_V = "s3.0.3";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
     catch (e) { return ""; }
   }
 
-  function packageVersion() {
-    const fromPage = qs("v");
-    if (fromPage) return fromPage;
-    try {
-      const scripts = global.document?.getElementsByTagName?.("script") || [];
-      for (let i = scripts.length - 1; i >= 0; i -= 1) {
-        const src = scripts[i].src || "";
-        if (!/floqr-nav\.js/i.test(src)) continue;
-        const v = new URL(src, global.location.href).searchParams.get("v");
-        if (v) return v;
-      }
-    } catch (e) {}
-    return FALLBACK_APP_V;
-  }
-
-  function buildUrl(path, params = {}, options = {}) {
+  function buildUrl(path, params = {}) {
     try {
       const next = new URL(path, global.location.href);
-      const stampVersion = options.stampVersion !== false;
-      const merged = stampVersion ? { v: packageVersion(), ...params } : { ...params };
-      if (!stampVersion) delete merged.v;
-      Object.entries(merged).forEach(([key, value]) => {
+      Object.entries(params).forEach(([key, value]) => {
         if (value != null && value !== "") next.searchParams.set(key, String(value));
       });
       const file = next.pathname.split("/").pop() || path.replace(/^\.\//, "");
@@ -51,45 +34,63 @@
     }
   }
 
+  function currentVersion() {
+    return APP_V;
+  }
+
+  function isDisplayFile(path) {
+    const file = String(path || "").split("?")[0].split("/").pop() || "";
+    return file === "display.html" || file === "display2.html";
+  }
+
   const FLOQRNav = {
-    get appVersion() { return packageVersion(); },
+    appVersion: APP_V,
+    currentVersion,
     portalHome(extra = {}) {
-      return buildUrl("./patron-portal.html", { ...extra });
+      return buildUrl("./patron-portal.html", { v: APP_V, ...extra });
     },
     searchHome() {
-      return buildUrl("./index.html", { start: "search" }).replace(/^\.\/index\.html/, "./");
+      return `./?v=${APP_V}&start=search`;
     },
     adminHome(extra = {}) {
-      const locationId = qs("location") || qs("club") || extra.location || "";
+      const extraLocation = extra.location;
+      const locationId = extraLocation != null && String(extraLocation).trim() !== ""
+        ? String(extraLocation).trim()
+        : (qs("location") || qs("club") || "");
       const from = extra.from != null ? extra.from : (qs("from") === "master" ? "master" : "");
-      const params = { location: locationId, ...extra };
+      const params = { ...extra, location: locationId, v: APP_V };
       if (from) params.from = from;
       else delete params.from;
       return buildUrl("./admin.html", params);
     },
+    /** Club Admin URL for Venue Links / onboarding — always current package, never page ?v=. */
+    adminPortalUrl(locationId = "", extra = {}) {
+      return this.adminHome({ location: locationId, from: "master", ...extra });
+    },
+    /** Stamp current package on a relative app URL. Display boards stay location-only. */
+    stampCurrentVersion(href = "", extra = {}) {
+      if (!href) return href;
+      if (isDisplayFile(href)) {
+        const params = { ...extra };
+        delete params.v;
+        return buildUrl(href, params);
+      }
+      return buildUrl(href, { v: APP_V, ...extra });
+    },
     masterHome() {
-      return buildUrl("./master-admin.html");
+      return `./master-admin.html?v=${APP_V}`;
     },
     suprstrHome(extra = {}) {
-      return buildUrl("./suprstr-search.html", { from: "master", ...extra });
+      return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
     },
     /** Satellite page under My Profile and Settings */
     portalLink(path, extra = {}) {
-      return buildUrl(path, { from: "portal", ...extra });
+      return buildUrl(path, { v: APP_V, from: "portal", ...extra });
     },
     /** Satellite page under Club Admin — always stamp from=admin (+ location). */
     adminLink(path, extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
-      return buildUrl(path, { from: "admin", location: locationId, ...extra });
-    },
-    commerceHome(extra = {}) {
-      return buildUrl("./commerce.html", { from: "search", ...extra });
-    },
-    rydrHome(extra = {}) {
-      return buildUrl("./rydr.html", { from: "search", ...extra });
-    },
-    minglChatHome(extra = {}) {
-      return buildUrl("./mingl-chat.html", { from: "portal", ...extra });
+      return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
     },
     /** Stable venue board URL — no cache-bust ?v= (for LED devices and external embeds). */
     stableDisplayUrl(locationId = "", extra = {}) {
@@ -101,7 +102,7 @@
       delete params.board;
       delete params.displayBoard;
       const page = (board === "secondary" || board === "2" || board === "display2" || board === "displays") ? "./display2.html" : "./display.html";
-      return buildUrl(page, id ? {location: id, ...params} : params, { stampVersion: false });
+      return buildUrl(page, id ? {location: id, ...params} : params);
     },
     /** Second LED/board per club — display2.html?location=… */
     stableSecondaryDisplayUrl(locationId = "", extra = {}) {
@@ -132,10 +133,10 @@
         return { href: this.masterHome(), label: "← Back to Master Admin" };
       }
       if (from === "mingl") {
-        return { href: buildUrl("./index.html", { start: "mingl" }).replace(/^\.\/index\.html/, "./"), label: "← Back to Mingl" };
+        return { href: `./?v=${APP_V}&start=mingl`, label: "← Back to Mingl" };
       }
       if (from === "bartr" || from === "commerce") {
-        return { href: this.commerceHome({ from: "search" }), label: "← Back to BartR" };
+        return { href: `./commerce.html?v=${APP_V}`, label: "← Back to BartR" };
       }
       return { href: this.searchHome(), label: "← Back to Search" };
     },
@@ -171,34 +172,7 @@
       else if (start === "mingl") showPage("minglLandingPage");
     },
     intentSearchHome() {
-      return buildUrl("./index.html", { start: "intent" }).replace(/^\.\/index\.html/, "./");
-    },
-    /** Stamp ?v= on in-app anchors from packageVersion(). Never use on display boards. */
-    stampAppAnchors(root = global.document) {
-      if (!root?.querySelectorAll) return 0;
-      const v = packageVersion();
-      let count = 0;
-      root.querySelectorAll("a[href]").forEach(anchor => {
-        const raw = anchor.getAttribute("href") || "";
-        if (!raw || /^(https?:|mailto:|tel:|#)/i.test(raw)) return;
-        if (/display2?\.html/i.test(raw)) return;
-        try {
-          const next = new URL(raw, global.location.href);
-          const file = (next.pathname.split("/").pop() || "").toLowerCase();
-          if (file && !file.endsWith(".html") && file !== "index.html") return;
-          next.searchParams.set("v", v);
-          const search = next.searchParams.toString();
-          const hash = next.hash || "";
-          const normalized = (!file || file === "index.html")
-            ? `./${search ? `?${search}` : ""}${hash}`
-            : `./${file}${search ? `?${search}` : ""}${hash}`;
-          if (anchor.getAttribute("href") !== normalized) {
-            anchor.setAttribute("href", normalized);
-            count += 1;
-          }
-        } catch (e) {}
-      });
-      return count;
+      return `./?v=${APP_V}&start=intent`;
     }
   };
 

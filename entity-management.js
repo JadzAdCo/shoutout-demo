@@ -21,8 +21,10 @@
 
   function masterAdminUrl(locationId = "") {
     const id = String(locationId || "").trim();
+    if (window.FLOQRNav?.adminPortalUrl) return window.FLOQRNav.adminPortalUrl(id);
     if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
-    return `./admin.html?location=${encodeURIComponent(id)}&v=29.09.95&from=master`;
+    const v = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
+    return `./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
   }
 
   function mergeClubRows(locationRows = [], clubRows = []) {
@@ -215,7 +217,11 @@
     const adminUrl = type === "club" ? masterAdminUrl(id) : "";
     const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
     const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
-    const profileUrl = type === "club" ? `./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.94` : "";
+    const profileUrl = type === "club"
+      ? (window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
+        || window.FLOQRNav?.adminLink?.("./club-profile.html", {location: id})
+        || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`)
+      : "";
 
     wrap.innerHTML = `
       <div class="entity-manage-head">

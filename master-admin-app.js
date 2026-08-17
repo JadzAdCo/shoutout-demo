@@ -11,7 +11,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
-  const CURRENT_VERSION = "29.09.108";
+  const CURRENT_VERSION = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
   const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
   let clubDisplaySetupLocationId = "";
 
@@ -307,14 +307,13 @@
   }
 
   function clubAdminUrl(id = "") {
-    if (window.FLOQRNav?.adminHome) {
-      return window.FLOQRNav.adminHome({location: id, from: "master"});
-    }
+    if (window.FLOQRNav?.adminPortalUrl) return window.FLOQRNav.adminPortalUrl(id);
+    if (window.FLOQRNav?.adminHome) return window.FLOQRNav.adminHome({location: id, from: "master"});
     const url = new URL("./admin.html", window.location.href);
     url.searchParams.set("location", id);
     url.searchParams.set("v", CURRENT_VERSION);
     url.searchParams.set("from", "master");
-    return url.toString();
+    return `./admin.html?${url.searchParams.toString()}`;
   }
 
   function displayUrl(id = "") {
@@ -931,8 +930,11 @@
       byId("templateManageBackgroundEditable").checked = isPublishedTemplate || template.backgroundEditable !== false;
       byId("templateManageBackgroundEditable").disabled = isPublishedTemplate;
     }
-    const formats = new Set(template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || []);
-    document.querySelectorAll("[data-template-screen-format]").forEach(el => { el.checked = formats.has(el.dataset.templateScreenFormat); });
+    const flags = window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template;
+    document.querySelectorAll("[data-template-screen-format]").forEach(el => {
+      const family = window.FLOQRScreenDatapoints?.familyOf?.(el.dataset.templateScreenFormat);
+      el.checked = family ? window.FLOQRScreenDatapoints.as01(flags[`Is${family}`]) === 1 : false;
+    });
     byId("templateManageId")?.scrollIntoView?.({behavior:"smooth", block:"center"});
   }
 
@@ -941,7 +943,8 @@
     const rows = await getCollectionSafe("templates", 500);
     rows.forEach(row => {
       const packaged = window.SHOUTOUT_TEMPLATES?.[row.id];
-      managedTemplates[row.id] = {...managedTemplates[row.id], ...row, id:row.id, source:"Firestore", backgroundEditable:packaged ? true : row.backgroundEditable !== false};
+      const merged = {...managedTemplates[row.id], ...row, id:row.id, source:"Firestore", backgroundEditable:packaged ? true : row.backgroundEditable !== false};
+      managedTemplates[row.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
     });
     renderTemplateManagement();
   }
@@ -988,6 +991,9 @@
     const maxCharactersPerLine = Math.round(templateNumber(byId("templateManageLineLimit")?.value, 15, 1, 160));
     const requestedTotal = Math.round(templateNumber(byId("templateManageMainLimit")?.value, lineCount * maxCharactersPerLine, 1, 1000));
     const screenFormatIds = managedTemplateScreenIds();
+    const screenFlags = window.FLOQRScreenDatapoints?.templateFirestoreFields?.({
+      ...(window.FLOQRScreenDatapoints?.flagsFromLedIds?.(screenFormatIds, "isKey") || {})
+    }) || {};
     return {
       id,
       name:String(byId("templateManageName")?.value || "Unsaved Template").trim() || "Unsaved Template",
@@ -1005,7 +1011,10 @@
       maxCharactersPerLine,
       mainTextSizePercent:templateNumber(byId("templateManageMainTextSize")?.value, 20.8, 4, 40),
       subTextSizePercent:templateNumber(byId("templateManageSubTextSize")?.value, 7.8, 2, 20),
-      screenFormatIds:screenFormatIds.length ? screenFormatIds : [...(window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [])],
+      Is96x48: screenFlags.Is96x48,
+      Is64x48: screenFlags.Is64x48,
+      Is64x32: screenFlags.Is64x32,
+      screenFormatIds: screenFlags.screenFormatIds || (screenFormatIds.length ? screenFormatIds : [...(window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [])]),
       status:managedTemplates[id]?.status || "active"
     };
   }
@@ -1092,6 +1101,15 @@
     const supportsMedia = !!byId("templateManageSupportsMedia")?.checked;
     const screenFormatIds = managedTemplateScreenIds();
     if (!screenFormatIds.length) { setText("templateManagementStatus", "Select at least one compatible screen format."); return; }
+    const screenFlags = window.FLOQRScreenDatapoints?.templateFirestoreFields?.({
+      ...(managedTemplates[id] || {}),
+      ...(window.FLOQRScreenDatapoints?.flagsFromLedIds?.(screenFormatIds, "isKey") || {})
+    }) || {
+      Is96x48: screenFormatIds.includes("led-96x48") ? 1 : 0,
+      Is64x48: screenFormatIds.includes("led-64x48") ? 1 : 0,
+      Is64x32: screenFormatIds.includes("led-64x32") ? 1 : 0,
+      screenFormatIds
+    };
     const lineCount = Math.round(templateNumber(byId("templateManageLineCount")?.value, 3, 1, 8));
     const maxCharactersPerLine = Math.round(templateNumber(byId("templateManageLineLimit")?.value, 15, 1, 160));
     const requestedTotal = Math.round(templateNumber(byId("templateManageMainLimit")?.value, lineCount * maxCharactersPerLine, 1, 1000));
@@ -1119,7 +1137,10 @@
       subTextSizePercent,
       defaultMain:String(byId("templateManagePreviewMain")?.value || "SHOUTOUT").trim(),
       defaultSub:String(byId("templateManagePreviewSub")?.value || "FLOQR").trim(),
-      screenFormatIds,
+      Is96x48: screenFlags.Is96x48,
+      Is64x48: screenFlags.Is64x48,
+      Is64x32: screenFlags.Is64x32,
+      screenFormatIds: screenFlags.screenFormatIds || screenFormatIds,
       status:managedTemplates[id]?.status || "active",
       scope:"Shared",
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -1569,7 +1590,7 @@
   }
 
   async function loadNetworkReports() {
-    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords, promoterOnboarding] = await Promise.all([
+    const [users, shoutouts, liveDocs, locations, clubs, events, guestLists, onboardingRecords, discoveryRecords, promoterOnboarding, templateDocs] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
@@ -1579,7 +1600,8 @@
       getCollectionSafe("guestListRequests"),
       getCollectionSafe("clubOnboardingRecords"),
       getCollectionSafe("aiDiscoveryQueue"),
-      getCollectionSafe("promoterOnboardingRecords")
+      getCollectionSafe("promoterOnboardingRecords"),
+      getCollectionSafe("templates")
     ]);
 
     const fallbackLocations = Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).map(([id, data]) => ({id, ...data}));
@@ -1679,6 +1701,11 @@
       ["Top sponsor categories", "Spirits, fashion, fragrance, sneakers, luxury, rideshare"],
       ["Best media units", "Splash ads, LED display wall, portable displays, window displays"]
     ]);
+
+    if (byId("networkTemplateCatalogReport") && window.FLOQRScreenDatapoints?.catalogReportHtml) {
+      const catalog = window.FLOQRScreenDatapoints.mergeCatalog(window.SHOUTOUT_TEMPLATES, templateDocs);
+      byId("networkTemplateCatalogReport").innerHTML = window.FLOQRScreenDatapoints.catalogReportHtml({templates: catalog});
+    }
 
     renderPatronDiagnostics(users);
     renderAdCampaignManagement(users);

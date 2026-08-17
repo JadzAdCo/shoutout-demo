@@ -141,8 +141,13 @@
       <section id="clubAdminUrls" class="admin-panel-section" data-entity-mgmt-gated="true">
         <div class="card">
           <p class="eyebrow">Entity management · URLs</p>
-          <h2>Venue Links</h2>
-          <p class="sub small">Search a club, then open or copy the <strong>Venue Admin Portal URL</strong> (<code>admin.html</code>) for each venue.</p>
+          <h2
+            data-floqr-help-id="help-venue-links"
+            data-floqr-help-title="Venue Links"
+            data-floqr-help-search="venue links|venue admin portal url|club admin url|admin.html version|hardcoded version"
+            data-floqr-help-body="Venue Admin Portal URLs are generated when you search — they are not stored with an old package number. Each link stamps the current FLOQR package from FLOQRNav so Club Admin cache-busts to the latest release. Opening Master Admin with an old ?v= bookmark does not freeze these links. Display board URLs stay location-only with no ?v=."
+          >Venue Links</h2>
+          <p class="sub small" data-keep-visible="true">Search a club, then open or copy the <strong>Venue Admin Portal URL</strong> (<code>admin.html</code>) for each venue.</p>
           <div class="profile-grid club-admin-url-search-row">
             <label>Search club entity
               <input id="clubAdminUrlSearch" autocomplete="off" placeholder="Search by club, city, ID, or address"/>
@@ -1050,20 +1055,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
-<script src="./floqr-nav.js?v=29.09.22"></script>
+<script src="./floqr-nav.js?v=s3.0.3"></script>
 <script src="./global-profile-status.js?v=29.09.22"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
 <script src="./sos2fa.js?v=29.09.96"></script>
-<script src="./entity-management.js?v=29.09.96"></script>
+<script src="./entity-management.js?v=s3.0.3"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
 <script src="./ai-search-service.js?v=29.09.22"></script>
 <script src="./floqr-venue-datapoints.js?v=29.09.119"></script>
 <script src="./ai-discovery-service.js?v=29.09.104"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=29.09.120"></script>
+<script src="./floqai-help-repository.js?v=s3.0.3"></script>
 <script src="./help-attach.js?v=29.09.98"></script>
 <script src="./helper-popouts.js?v=29.09.98"></script>
 <script src="./ad-campaigns.js?v=29.09.22"></script>
@@ -1071,7 +1076,7 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=29.09.120"></script>
+<script src="./master-admin-app.js?v=s3.0.3"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
