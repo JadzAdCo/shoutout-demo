@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FLOQR Scheduling</title>
+  <title data-i18n="page.scheduling.heading">FLOQR Scheduling</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.1"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
   <script>
@@ -15,7 +15,7 @@
       if (p.get("shift")) n.searchParams.set("shift", p.get("shift"));
       if (p.get("owner")) n.searchParams.set("owner", p.get("owner"));
       n.searchParams.set("from", "schedule-notify");
-      n.searchParams.set("v", "s3.0.3");
+      n.searchParams.set("v", "s3.0.5");
       location.replace(n.href);
     })();
   </script>
@@ -32,15 +32,16 @@
           data-floqr-help-title="FLOQR Scheduling"
           data-floqr-help-search="staffSchedulingPaid|paid this month|not paid this month|resubscribe"
           data-floqr-help-body="staffSchedulingPaid is 1 or 0 on the venue. schedulingSubscriptions status is paid this month or not paid this month. Paid this month unlocks the calendar. Not paid this month shows Subscribe (new) or Resubscribe (prior subscriber)."
+          data-i18n="page.scheduling.heading"
         >FLOQR Scheduling</h1>
-        <p class="sub" data-keep-visible="true">Clubs, promoting companies, and DJs manage shifts with Email / SMS / WhatsApp notify-and-approve. <strong>$20/month</strong> when not paid this month. Events are not included.</p>
+        <p class="sub" data-keep-visible="true" data-i18n="page.scheduling.sub">Clubs, promoting companies, and DJs manage shifts with Email / SMS / WhatsApp notify-and-approve. <strong>$20/month</strong> when not paid this month. Events are not included.</p>
         <p id="schedulingPortalStatus" class="status">Restoring your FLOQR session…</p>
       </div>
       <div class="card" id="portalAuthChrome" data-floqr-auth-chrome>
         <p class="eyebrow">Subscription</p>
         <h2 id="portalSubBadge">checking…</h2>
         <div class="queue-actions">
-          <button id="portalGoogleLoginBtn" class="primary" type="button" data-floqr-login-btn>Google sign-in</button>
+          <button id="portalGoogleLoginBtn" class="primary" type="button" data-floqr-login-btn data-i18n="app.googleSignIn">Google sign-in</button>
           <button id="portalBuySubBtn" class="primary" type="button">Subscribe $20/mo</button>
         </div>
       </div>
@@ -109,6 +110,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqai-help-repository.js?v=s3.0.1"></script>
 <script src="./help-attach.js?v=29.09.98"></script>

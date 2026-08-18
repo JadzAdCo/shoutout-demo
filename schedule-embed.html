@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Staff schedule</title>
+  <title data-i18n="page.scheduleEmbed.title">Staff schedule</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.0"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.0"/>
   <style>
@@ -15,8 +15,8 @@
 <body class="sched-embed">
 <main class="sched-embed-shell">
   <p class="eyebrow">FLOQR</p>
-  <h1 id="embedVenueName">Staff schedule</h1>
-  <p id="embedStatus" class="status">Loading published schedule…</p>
+  <h1 id="embedVenueName" data-i18n="page.scheduleEmbed.title">Staff schedule</h1>
+  <p id="embedStatus" class="status" data-i18n="page.scheduleEmbed.loading">Loading published schedule…</p>
   <div class="sched-toolbar">
     <div class="queue-actions">
       <button type="button" id="embedPrevWeekBtn">← Prev</button>
@@ -27,6 +27,7 @@
   </div>
   <div id="embedWeekGrid" class="sched-grid-wrap" aria-live="polite"></div>
 </main>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./staff-week-grid.js?v=s3.0.0"></script>
 <script src="./schedule-embed.js?v=s3.0.0"></script>

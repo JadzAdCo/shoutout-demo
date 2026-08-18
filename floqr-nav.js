@@ -5,7 +5,18 @@
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
      Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
-  const APP_V = "s3.0.4";
+  const APP_V = "s3.0.5";
+
+  function navT(key, fallback) {
+    try {
+      const fn = global.FLOQRI18n?.t;
+      if (typeof fn === "function") {
+        const out = fn(key);
+        if (out && out !== key) return out;
+      }
+    } catch (_) {}
+    return fallback;
+  }
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }
@@ -116,29 +127,28 @@
       // Club Admin landing: never dump managers onto the patron Search site.
       if (file === "admin.html") {
         if (from === "master") {
-          return { href: this.masterHome(), label: "← Back to Master Admin" };
+          return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
         }
-        return { href: this.adminHome({ from: "" }), label: "← Venue Command Center", stay: true };
+        return { href: this.adminHome({ from: "" }), label: navT("nav.backToVenueCommand", "← Venue Command Center"), stay: true };
       }
 
       if (from === "portal" || from === "profile") {
-        return { href: this.portalHome(), label: "← Back to My Profile and Settings" };
+        return { href: this.portalHome(), label: navT("nav.backToPortal", "← Back to My Profile and Settings") };
       }
       if (from === "admin" || from === "club") {
-        return { href: this.adminHome({ from: "" }), label: "← Back to Venue Command Center" };
+        return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };
       }
       if (from === "master") {
-        // Satellite opened from Master via Club Admin URL still returns to Master when stamped.
-        if (file === "admin.html") return { href: this.masterHome(), label: "← Back to Master Admin" };
-        return { href: this.masterHome(), label: "← Back to Master Admin" };
+        if (file === "admin.html") return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
+        return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
       }
       if (from === "mingl") {
-        return { href: `./?v=${APP_V}&start=mingl`, label: "← Back to Mingl" };
+        return { href: `./?v=${APP_V}&start=mingl`, label: navT("nav.backToMingl", "← Back to Mingl") };
       }
       if (from === "bartr" || from === "commerce") {
-        return { href: `./commerce.html?v=${APP_V}`, label: "← Back to BartR" };
+        return { href: `./commerce.html?v=${APP_V}`, label: navT("nav.backToBartr", "← Back to BartR") };
       }
-      return { href: this.searchHome(), label: "← Back to Search" };
+      return { href: this.searchHome(), label: navT("nav.backToSearchArrow", "← Back to Search") };
     },
     /**
      * Prefer URL ?from= over hardcoded data-from so Club Admin deep links win.
@@ -177,4 +187,10 @@
   };
 
   global.FLOQRNav = FLOQRNav;
-})(window);
+
+  if (typeof global.addEventListener === "function") {
+    global.addEventListener("floqr:ui-language", () => {
+      try { FLOQRNav.applyGlobalBack("floqrGlobalBack"); } catch (_) {}
+    });
+  }
+})(typeof window !== "undefined" ? window : globalThis);

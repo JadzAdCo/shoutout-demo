@@ -440,7 +440,7 @@
             <label class="consent-checkbox"><input id="languageHighlightGrammarSuggestions" type="checkbox"/><span data-i18n="lang.highlightGrammar">Highlight grammar suggestions in yellow or underline</span></label>
             <label><span class="i18n-text" data-i18n="lang.preferredGrammar">Preferred Language (grammar / bio)</span>
               <select id="languagePreferredLanguage">
-                <option value="auto">Auto-detect</option>
+                <option value="auto" data-i18n="lang.autoDetect">Auto-detect</option>
                 <option value="en">English</option>
                 <option value="ar">Arabic</option>
                 <option value="fr">French</option>
@@ -456,29 +456,29 @@
             </label>
             <label><span class="i18n-text" data-i18n="lang.tone">Tone Preference</span>
               <select id="languageTonePreference">
-                <option value="keepTone">Keep my tone</option>
-                <option value="friendly">Friendly</option>
-                <option value="professional">Professional</option>
-                <option value="flirty">Flirty</option>
-                <option value="casual">Casual</option>
-                <option value="formal">Formal</option>
+                <option value="keepTone" data-i18n="lang.toneKeep">Keep my tone</option>
+                <option value="friendly" data-i18n="lang.toneFriendly">Friendly</option>
+                <option value="professional" data-i18n="lang.toneProfessional">Professional</option>
+                <option value="flirty" data-i18n="lang.toneFlirty">Flirty</option>
+                <option value="casual" data-i18n="lang.toneCasual">Casual</option>
+                <option value="formal" data-i18n="lang.toneFormal">Formal</option>
               </select>
             </label>
             <label><span class="i18n-text" data-i18n="lang.emojiSkin">Emoji Skin Tone</span>
               <select id="languageEmojiSkinTone">
-                <option value="yellow">Yellow/default</option>
-                <option value="light-brown">Light brown</option>
-                <option value="dark-brown">Dark brown</option>
+                <option value="yellow" data-i18n="lang.emojiYellow">Yellow/default</option>
+                <option value="light-brown" data-i18n="lang.emojiLight">Light brown</option>
+                <option value="dark-brown" data-i18n="lang.emojiDark">Dark brown</option>
               </select>
             </label>
             <label><span class="i18n-text" data-i18n="lang.wordList">My Word List</span>
-              <textarea id="languagePersonalDictionary" rows="3" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
+              <textarea id="languagePersonalDictionary" rows="3" data-i18n-placeholder="lang.wordListPlaceholder" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
             </label>
             <label><span class="i18n-text" data-i18n="lang.personalCorrections">My Personal Corrections</span>
               <textarea id="languagePersonalCorrections" rows="4" placeholder="watz -> what's&#10;weakend -> weekend"></textarea>
             </label>
           </div>
-          <p class="sub small">To test: add `watz -> what's` and `weakend -> weekend`, save, open Mingl Chat, type those words, then use Correct Grammar/Spelling. Gemini is tried first; if unavailable, only your saved personal corrections are applied.</p>
+          <p class="sub small" data-i18n="lang.testHint">To test: add `watz -> what's` and `weakend -> weekend`, save, open Mingl Chat, type those words, then use Correct Grammar/Spelling. Gemini is tried first; if unavailable, only your saved personal corrections are applied.</p>
           <button id="saveLanguageSettingsBtn" class="primary" type="button" data-i18n="lang.saveLanguageSettings">Save Language Settings</button>
           <div id="languageSettingsReport" class="report-block"></div>
         </div>
@@ -563,7 +563,7 @@
         <div class="card">
           <h2 id="portalWorkCalendarHeading">Work Calendar</h2>
           <p class="sub small" data-keep-visible="true">Pending assignments need your tick + Approve selected. The Inbox link only opens this page. The week grid shows published colleague shifts; drafts stay in Club Admin.</p>
-          <iframe id="portalWorkCalendarFrame" class="work-calendar-frame" title="Work Calendar" src="./staff-worksheet.html?v=s3.0.3&embed=1&from=portal"></iframe>
+          <iframe id="portalWorkCalendarFrame" class="work-calendar-frame" title="Work Calendar" src="./staff-worksheet.html?v=s3.0.5&embed=1&from=portal"></iframe>
         </div>
       </section>
       <section id="portalServiceMembers" class="admin-panel-section">
@@ -645,8 +645,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=29.09.8"></script>
-<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./floqr-nav.js?v=s3.0.5"></script>
+<script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
@@ -664,9 +664,9 @@
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.4"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=s3.0.4"></script>
+<script src="./patron-portal-app.js?v=s3.0.5"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

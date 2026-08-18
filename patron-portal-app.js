@@ -320,8 +320,10 @@
   }
 
   function languageLabel(code) {
-    if (code === "auto") return "Auto-detect";
-    return LANGUAGE_LABELS[code] || code || "Not selected";
+    if (code === "auto") return tt("lang.autoDetect", {}, "Auto-detect");
+    const native = window.FLOQRI18n?.meta?.(code)?.native;
+    if (native) return native;
+    return LANGUAGE_LABELS[code] || code || tt("lang.notSelected", {}, "Not selected");
   }
 
   function publicProfileBio(profile = {}, template = PROFILE_TEMPLATES.patron) {
@@ -407,18 +409,61 @@
     };
   }
 
+  function tt(key, vars, fallback) {
+    try {
+      const fn = window.FLOQRI18n?.t;
+      if (typeof fn === "function") {
+        const out = fn(key, vars || {});
+        if (out && out !== key) return out;
+      }
+    } catch (_) {}
+    return fallback != null ? fallback : key;
+  }
+
+  function correctionModeLabel(mode) {
+    const map = {
+      suggestionsOnly: "lang.suggestionsOnly",
+      approvalRequired: "lang.approvalRequired",
+      autoFixMinor: "lang.autoFixMinor"
+    };
+    return tt(map[mode] || "lang.approvalRequired", {}, mode || "approvalRequired");
+  }
+
+  function toneLabel(value) {
+    const map = {
+      keepTone: "lang.toneKeep",
+      friendly: "lang.toneFriendly",
+      professional: "lang.toneProfessional",
+      flirty: "lang.toneFlirty",
+      casual: "lang.toneCasual",
+      formal: "lang.toneFormal"
+    };
+    return tt(map[value] || "lang.toneKeep", {}, value || "keepTone");
+  }
+
+  function emojiSkinLabel(value) {
+    const map = {
+      yellow: "lang.emojiYellow",
+      "light-brown": "lang.emojiLight",
+      "dark-brown": "lang.emojiDark"
+    };
+    return tt(map[value] || "lang.emojiYellow", {}, value || "yellow");
+  }
+
   function renderLanguageSettingsReport(settings = currentLanguageSettings) {
     const report = byId("languageSettingsReport");
     if (!report) return;
+    const words = (settings.personalDictionary || []).length;
+    const fixes = (settings.personalCorrections || []).length;
     report.innerHTML = simpleRows([
-      ["AI Grammar", settings.aiGrammarEnabled ? "Enabled" : "Disabled"],
-      ["Correction Mode", settings.correctionMode || "approvalRequired"],
-      ["Preferred Language", languageLabel(settings.preferredLanguage || "auto")],
-      ["Tone Preference", settings.tonePreference || "keepTone"],
-      ["Emoji Skin Tone", settings.emojiSkinTone || "yellow"],
-      ["My Word List", `${(settings.personalDictionary || []).length} saved words`],
-      ["My Personal Corrections", `${(settings.personalCorrections || []).length} saved typo fixes`],
-      ["Draft Privacy", "Draft text is processed only when you request correction and is not indexed."]
+      [tt("lang.aiGrammar", {}, "AI Grammar"), settings.aiGrammarEnabled ? tt("lang.enabled", {}, "Enabled") : tt("lang.disabled", {}, "Disabled")],
+      [tt("lang.correctionMode", {}, "Correction Mode"), correctionModeLabel(settings.correctionMode)],
+      [tt("lang.preferredGrammar", {}, "Preferred Language (grammar / bio)"), languageLabel(settings.preferredLanguage || "auto")],
+      [tt("lang.tone", {}, "Tone Preference"), toneLabel(settings.tonePreference)],
+      [tt("lang.emojiSkin", {}, "Emoji Skin Tone"), emojiSkinLabel(settings.emojiSkinTone)],
+      [tt("lang.wordList", {}, "My Word List"), tt("lang.savedWords", {n: words}, `${words} saved words`)],
+      [tt("lang.personalCorrections", {}, "My Personal Corrections"), tt("lang.savedFixes", {n: fixes}, `${fixes} saved typo fixes`)],
+      [tt("lang.draftPrivacy", {}, "Draft Privacy"), tt("lang.draftPrivacyBody", {}, "Draft text is processed only when you request correction and is not indexed.")]
     ]);
   }
 
@@ -3170,7 +3215,11 @@
       });
       showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
     }
-    const frameQuery = new URLSearchParams({v: "s3.0.3", embed: "1", from: "portal"});
+    const frameQuery = new URLSearchParams({
+      v: window.FLOQRNav?.appVersion || "s3.0.5",
+      embed: "1",
+      from: "portal"
+    });
     let locationId = datapoints.affiliatedPaidSchedulingClubIds?.[0] || "";
     const owner = String(pageParams.get("owner") || "").trim();
     if (owner.startsWith("club:")) locationId = owner.slice(5) || locationId;
@@ -3399,6 +3448,9 @@
     bind("savePrivacyBtn", savePrivacy);
     bind("saveLanguageSettingsBtn", saveLanguageSettings);
     bind("saveUiAppLanguageBtn", saveUiAppLanguage);
+    window.addEventListener("floqr:ui-language", () => {
+      renderLanguageSettingsReport(currentLanguageSettings);
+    });
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);

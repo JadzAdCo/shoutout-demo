@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Request Club Service Access</title>
+  <title data-i18n="page.roleRequest.title">Request Club Service Access</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.8"/>
   <link rel="stylesheet" href="./admin.css"/>
 </head>
@@ -14,13 +14,13 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Role Request</p>
-        <h1>Request additional access</h1>
-        <p class="sub">All users start as patrons. Elect yourself as a service member and request association with one or more clubs.</p>
+        <h1 data-i18n="page.roleRequest.title">Request additional access</h1>
+        <p class="sub" data-i18n="page.roleRequest.sub">All users start as patrons. Elect yourself as a service member and request association with one or more clubs.</p>
         <p id="roleStatus" class="status">Loading...</p>
       </div>
     </header>
     <div id="roleLogin" class="card" data-floqr-auth-chrome>
-      <button id="roleGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button>
+      <button id="roleGoogleLoginBtn" type="button" data-floqr-login-btn data-i18n="app.google">Continue with Google</button>
     </div>
     <div id="roleForm" class="card hidden">
       <h2>Additional Access Request</h2>
@@ -56,9 +56,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqr-nav.js?v=29.09.8"></script>
-<script src="./global-profile-status.js?v=29.09.8"></script>
+<script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./shared-data.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./helper-popouts.js?v=29.09.8"></script>

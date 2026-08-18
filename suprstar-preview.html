@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
-  <title>supRstar Preview | FLOQR</title>
+  <title data-i18n="page.suprstarPreview.title">supRstar Preview | FLOQR</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.66"/>
   <link rel="stylesheet" href="./admin.css?v=29.09.66"/>
   <link rel="stylesheet" href="./suprstr-search.css?v=29.09.75"/>
@@ -21,17 +21,17 @@
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img src="./images/suprstr-logo.png?v=29.09.66" alt="supRstar" class="product-logo suprstr-hero-logo"/>
         </div>
-        <h1>Private camera preview</h1>
-        <p class="sub">This page is private — it is <strong>not</strong> on the club board yet. Pay $20, wait for Club Admin approval, then go live.</p>
+        <h1 data-i18n="page.suprstarPreview.title">Private camera preview</h1>
+        <p class="sub" data-i18n="page.suprstarPreview.sub">This page is private — it is <strong>not</strong> on the club board yet. Pay $20, wait for Club Admin approval, then go live.</p>
       </div>
     </header>
 
     <div class="card" data-floqr-auth-chrome>
-      <h2>Sign in to continue</h2>
-      <p class="sub small">Use the same FLOQR account as Search / My Profile. This private preview restores that session.</p>
+      <h2 data-i18n="app.signInToContinue">Sign in to continue</h2>
+      <p class="sub small" data-i18n="page.payment.restoreHint">Use the same FLOQR account as Search / My Profile. This private preview restores that session.</p>
       <div class="auth-grid">
-        <button id="suprstarPreviewGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button>
-        <button id="suprstarPreviewMicrosoftLoginBtn" type="button" data-floqr-login-btn>Continue with Microsoft</button>
+        <button id="suprstarPreviewGoogleLoginBtn" type="button" data-floqr-login-btn data-i18n="app.google">Continue with Google</button>
+        <button id="suprstarPreviewMicrosoftLoginBtn" type="button" data-floqr-login-btn data-i18n="app.microsoft">Continue with Microsoft</button>
       </div>
     </div>
 
@@ -70,6 +70,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.66"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqr-nav.js?v=29.09.66"></script>
 <script src="./floqr-logger.js?v=29.09.66"></script>

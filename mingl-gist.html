@@ -4,7 +4,7 @@
   <!-- FLOQR Mingl Gist v29.09.14 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Mingl Gist</title>
+  <title data-i18n="page.minglGist.title">Mingl Gist</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.14"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.14"/>
 </head>
@@ -15,17 +15,17 @@
   <header class="mingl-gist-topbar">
     <div>
       <p class="eyebrow">MINGL / GIST</p>
-      <h1>Mingl Gist</h1>
-      <p class="sub small">Stories from ShoutOuts, spots, and the night around you.</p>
+      <h1 data-i18n="page.minglGist.title">Mingl Gist</h1>
+      <p class="sub small" data-i18n="page.minglGist.sub">Stories from ShoutOuts, spots, and the night around you.</p>
       <p id="minglGistStatus" class="mingl-gist-status"></p>
     </div>
   </header>
 
   <div id="minglGistLogin" class="card mingl-gist-login hidden" data-floqr-auth-chrome>
-    <h2>Sign in</h2>
-    <p class="sub small">Sign in to load ShoutOut stories for Mingl Gist.</p>
-    <button id="minglGistGoogleLoginBtn" class="auth-btn" type="button" data-floqr-login-btn>Continue with Google</button>
-    <button id="minglGistMicrosoftLoginBtn" class="auth-btn" type="button" data-floqr-login-btn>Continue with Microsoft</button>
+    <h2 data-i18n="portal.signInTitle">Sign in</h2>
+    <p class="sub small" data-i18n="page.minglGist.signInHint">Sign in to load ShoutOut stories for Mingl Gist.</p>
+    <button id="minglGistGoogleLoginBtn" class="auth-btn" type="button" data-floqr-login-btn data-i18n="app.google">Continue with Google</button>
+    <button id="minglGistMicrosoftLoginBtn" class="auth-btn" type="button" data-floqr-login-btn data-i18n="app.microsoft">Continue with Microsoft</button>
   </div>
 
   <div class="mingl-gist-ring-wrap">
@@ -63,6 +63,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.14"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqr-nav.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>

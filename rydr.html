@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>RydR | FLOQR</title>
+  <title data-i18n="page.rydr.title">RydR | FLOQR</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.9"/>
   <link rel="stylesheet" href="./admin.css?v=29.09.9"/>
 </head>
@@ -18,8 +18,8 @@
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img src="./images/rydr-logo.png?v=29.09.9-merge9" alt="RydR" class="product-logo rydr-hero-logo"/>
         </div>
-        <h1 class="visually-hidden brand-mixed-case">RydR</h1>
-        <p class="sub">Robotaxi convenience and ultra-luxury chauffeur rides — get to the club, lounge, or event without the parking theater.</p>
+        <h1 class="visually-hidden brand-mixed-case" data-i18n="page.rydr.title">RydR</h1>
+        <p class="sub" data-i18n="page.rydr.sub">Robotaxi convenience and ultra-luxury chauffeur rides — get to the club, lounge, or event without the parking theater.</p>
       </div>
       <div class="card commerce-payment-card">
         <strong>Two modes</strong>
@@ -38,8 +38,9 @@
     </div>
   </section>
 </main>
-<script src="./floqr-nav.js?v=29.09.124"></script>
-<script src="./global-profile-status.js?v=29.09.124"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
+<script src="./floqr-nav.js?v=29.09.9"></script>
+<script src="./global-profile-status.js?v=s3.0.5"></script>
 <script>
   window.FLOQRNav?.applyGlobalBack("floqrGlobalBack");
   document.getElementById("rydrLuxurySoonBtn")?.addEventListener("click", () => {

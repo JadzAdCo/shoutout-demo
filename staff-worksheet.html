@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Work Sheet - Weekly Staff Calendar</title>
+  <title data-i18n="page.worksheet.title">Work Sheet - Weekly Staff Calendar</title>
   <!-- Portal iframe: staff-worksheet.html?v=s3.0.3&embed=1&from=portal -->
   <link rel="stylesheet" href="./styles.css?v=s3.0.3"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
@@ -21,14 +21,15 @@
           data-floqr-help-title="Work Sheet - Weekly Staff Calendar"
           data-floqr-help-search="staff calendar|work sheet|weekly staff calendar|colleague schedule|who is working|confirm shift|approve selected"
           data-floqr-help-body="Inbox / Email / SMS links open this Work Calendar. Review pending assignments, tick each shift (or Select all), then Approve selected. Opening the message does not confirm the shift. The week grid shows published colleague shifts. Drafts stay in Club Admin."
+          data-i18n="page.worksheet.title"
         >Work Sheet - Weekly Staff Calendar</h1>
-        <p class="sub" data-keep-visible="true">Pending shifts need your Approve selected. Opening a confirmation link does not confirm. Published colleague shifts are below.</p>
+        <p class="sub" data-keep-visible="true" data-i18n="page.worksheet.sub">Pending shifts need your Approve selected. Opening a confirmation link does not confirm. Published colleague shifts are below.</p>
         <p id="worksheetStatus" class="status">Restoring your FLOQR session…</p>
       </div>
       <div class="card" id="worksheetAuthChrome" data-floqr-auth-chrome>
         <p class="eyebrow">Account</p>
         <div class="queue-actions">
-          <button id="worksheetGoogleLoginBtn" type="button" data-floqr-login-btn>Google sign-in</button>
+          <button id="worksheetGoogleLoginBtn" type="button" data-floqr-login-btn data-i18n="app.googleSignIn">Google sign-in</button>
         </div>
       </div>
     </header>
@@ -72,6 +73,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./floqai-help-repository.js?v=s3.0.1"></script>
 <script src="./help-attach.js?v=29.09.115"></script>

@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="description" content="Official club profile on FLOQR"/>
-  <title>Club Profile | FLOQR</title>
+  <title data-i18n="page.clubProfile.title">Club Profile | FLOQR</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.105"/>
 </head>
 <body class="club-profile-body">
@@ -14,14 +14,14 @@
       <a id="clubProfileBrandLink" class="club-profile-brand" href="./?v=29.09.44&start=search" aria-label="FLOQR home"><img src="./images/floqr-color.png" alt="FLOQR"/></a>
       <div class="club-profile-nav-actions">
         <a id="floqrGlobalBack" class="buttonlike" href="./admin.html?v=29.09.44">← Back</a>
-        <a id="clubProfileExploreLink" class="buttonlike" href="./?v=29.09.44&start=search">Explore FLOQR</a>
-        <button id="clubProfileShareBtn" type="button">Copy Link</button>
+        <a id="clubProfileExploreLink" class="buttonlike" href="./?v=29.09.44&start=search" data-i18n="page.clubProfile.explore">Explore FLOQR</a>
+        <button id="clubProfileShareBtn" type="button" data-i18n="page.clubProfile.share">Copy Link</button>
       </div>
     </header>
 
     <section id="clubProfileLoading" class="card club-profile-loading">
-      <h1>Loading club profile…</h1>
-      <p class="sub">Checking your FLOQR profile and loading venue information.</p>
+      <h1 data-i18n="page.clubProfile.loading">Loading club profile…</h1>
+      <p class="sub" data-i18n="page.clubProfile.loadingSub">Checking your FLOQR profile and loading venue information.</p>
     </section>
 
     <div id="clubProfileContent" class="hidden">
@@ -39,13 +39,13 @@
       </section>
 
       <nav class="club-profile-actions" aria-label="Club actions">
-        <a id="clubShoutoutLink" class="buttonlike primary" href="#">Throw a ShoutOut</a>
-        <a id="clubGuestListLink" class="buttonlike" href="#">Guest List / RSVP</a>
-        <a id="clubDirectionsLink" class="buttonlike" target="_blank" rel="noopener" href="#">Directions</a>
-        <a id="clubPickupLink" class="buttonlike" href="#">Pickup</a>
-        <a id="clubCommerceLink" class="buttonlike hidden" href="#">Shop</a>
-        <button id="clubFollowBtn" type="button">Follow Club</button>
-        <a id="clubWebsiteLink" class="buttonlike hidden" target="_blank" rel="noopener" href="#">Official Website</a>
+        <a id="clubShoutoutLink" class="buttonlike primary" href="#" data-i18n="page.clubProfile.shoutout">Throw a ShoutOut</a>
+        <a id="clubGuestListLink" class="buttonlike" href="#" data-i18n="page.clubProfile.guestList">Guest List / RSVP</a>
+        <a id="clubDirectionsLink" class="buttonlike" target="_blank" rel="noopener" href="#" data-i18n="page.clubProfile.directions">Directions</a>
+        <a id="clubPickupLink" class="buttonlike" href="#" data-i18n="page.clubProfile.pickup">Pickup</a>
+        <a id="clubCommerceLink" class="buttonlike hidden" href="#" data-i18n="page.clubProfile.shop">Shop</a>
+        <button id="clubFollowBtn" type="button" data-i18n="page.clubProfile.follow">Follow Club</button>
+        <a id="clubWebsiteLink" class="buttonlike hidden" target="_blank" rel="noopener" href="#" data-i18n="page.clubProfile.website">Official Website</a>
       </nav>
 
       <section id="clubAboutSection" class="card club-profile-section">
@@ -109,10 +109,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="./firebase-config.js?v=29.09.8"></script>
+  <script src="./floqr-i18n.js?v=s3.0.5"></script>
   <script src="./floqr-nav.js?v=29.09.44"></script>
-  <script src="./global-profile-status.js?v=29.09.8"></script>
+  <script src="./global-profile-status.js?v=s3.0.5"></script>
   <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
-  <script src="./shared-data.js?v=29.09.110"></script>
+  <script src="./shared-data.js?v=29.09.120"></script>
   <script src="./feature-gates.js?v=29.09.23"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
   <script src="./helper-popouts.js?v=29.09.8"></script>
