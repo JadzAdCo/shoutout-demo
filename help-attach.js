@@ -12,12 +12,13 @@
 .help-label{
   display:inline-flex !important;
   align-items:center;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:6px 8px;
   width:fit-content !important;
   max-width:100%;
   min-width:0;
   box-sizing:border-box;
+  justify-content:flex-start !important;
 }
 .help-label-text{
   flex:0 1 auto;
@@ -36,6 +37,46 @@
 h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
   width:fit-content !important;
   max-width:100%;
+}
+.section-title-row,
+.template-heading-row,
+.section-heading-row{
+  justify-content:flex-start !important;
+  align-items:center;
+  gap:8px 12px;
+  flex-wrap:wrap;
+}
+.section-title-inline{
+  display:inline-flex !important;
+  align-items:center;
+  gap:8px;
+  width:fit-content !important;
+  max-width:100%;
+}
+.section-title-row > .help-label,
+.section-title-row > .section-title-inline,
+.template-heading-row > .help-label,
+.section-heading-row > .help-label{
+  flex:0 1 auto !important;
+  width:fit-content !important;
+  margin-right:auto;
+}
+@media (max-width:640px){
+  .help-label{flex-wrap:wrap}
+  .help-popout .help-popout-body,
+  .help-popout > div:not(summary){
+    width:min(320px, calc(100vw - 24px)) !important;
+    max-width:calc(100vw - 24px) !important;
+    z-index:100002;
+  }
+  html.floqr-mobile-browser .help-popout,
+  html.floqr-mobile-browser .floqr-help-popout,
+  html.floqr-mobile-browser .help-popout summary{
+    width:auto !important;
+    min-width:22px !important;
+    max-width:22px !important;
+    flex:0 0 auto !important;
+  }
 }
 `;
     document.head.appendChild(style);
@@ -143,6 +184,58 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     return { host, details };
   }
 
+  /** Move a lone "?" that is a flex/grid sibling of a heading into that heading (stops far-right drift on phones). */
+  function glueOrphanPopouts(root = document) {
+    ensureCss();
+    const list = [];
+    if (root.matches?.("details.help-popout, button.floqr-help-popout")) list.push(root);
+    if (root.querySelectorAll) list.push(...root.querySelectorAll("details.help-popout, button.floqr-help-popout"));
+    list.forEach(pop => {
+      if (!pop.isConnected) return;
+      if (pop.closest(".label-inline-row")) return;
+      if (pop.parentElement?.classList.contains("help-label")) return;
+      const parent = pop.parentElement;
+      if (!parent) return;
+      let target = pop.previousElementSibling;
+      if (target && /^(INPUT|SELECT|TEXTAREA|BUTTON|A)$/.test(target.tagName)) target = null;
+      if (target && !/^(H1|H2|H3|H4|LABEL|LEGEND|STRONG)$/.test(target.tagName) && !target.classList.contains("eyebrow") && !target.classList.contains("help-label")) {
+        target = null;
+      }
+      if (!target && parent.matches(".section-title-row, .section-title-inline, .template-heading-row, .section-heading-row")) {
+        target = parent.querySelector("h1,h2,h3,h4,label,legend");
+      }
+      if (!target || target === pop || target.contains(pop)) return;
+      const host = ensureLabelShell(target);
+      if (!host) return;
+      const existing = host.querySelector(":scope > details.help-popout, :scope > .floqr-help-popout");
+      if (existing && existing !== pop) {
+        pop.remove();
+        return;
+      }
+      pop.classList.add("inline-help-popout");
+      pop.dataset.floqrHelpAttached = "1";
+      host.appendChild(pop);
+    });
+  }
+
+  function bindPanelPosition() {
+    if (document.documentElement.dataset.floqrHelpPosBound === "1") return;
+    document.documentElement.dataset.floqrHelpPosBound = "1";
+    document.addEventListener("toggle", event => {
+      const details = event.target;
+      if (!(details instanceof HTMLDetailsElement) || !details.classList.contains("help-popout") || !details.open) return;
+      const body = details.querySelector(":scope > .help-popout-body, :scope > div:not(summary)");
+      if (!body) return;
+      body.style.transform = "";
+      const rect = body.getBoundingClientRect();
+      const pad = 12;
+      let shift = 0;
+      if (rect.right > window.innerWidth - pad) shift = window.innerWidth - pad - rect.right;
+      if (rect.left + shift < pad) shift = pad - rect.left;
+      if (shift) body.style.transform = `translateX(${Math.round(shift)}px)`;
+    }, true);
+  }
+
   /** Attach "?" to the nearest preceding heading inside a card/section when converting helper copy. */
   function attachBesideHeading(fromNode, opts = {}) {
     if (!fromNode) return null;
@@ -170,6 +263,8 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
   /** Declarative: elements with data-floqr-help-body (and optional data-floqr-help-title). */
   function mountAll(root = document) {
     ensureCss();
+    bindPanelPosition();
+    glueOrphanPopouts(root);
     root.querySelectorAll?.("[data-floqr-help-body]").forEach(node => {
       if (node.dataset.floqrHelpMounted === "1") return;
       node.dataset.floqrHelpMounted = "1";
@@ -196,6 +291,7 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
   global.FLOQRHelpAttach = {
     attach,
     attachBesideHeading,
+    glueOrphanPopouts,
     mountAll,
     ensureLabelShell,
     ensureCss

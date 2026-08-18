@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.52"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.6"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=29.09.115"/>
 </head>
@@ -142,7 +142,7 @@
   <section id="signupProfilePage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeFromProfileBtn" type="button">&larr; Back to welcome</button>
+        <button id="backToWelcomeFromProfileBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
         <h1>Create your profile</h1>
         <p class="sub">Help personalize nightlife discovery, ShoutOuts, events, and future recommendations. Optional fields can be skipped.</p>
       </div>
@@ -237,7 +237,7 @@
   <section id="categoryPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToWelcomeBtn" type="button">&larr; Back to welcome</button>
+        <button id="backToWelcomeBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
         <p class="sub category-sentence">
           <strong data-i18n="nav.searchFor">Search for</strong>
         </p>
@@ -355,11 +355,10 @@
       <div class="card mingl-discovery-card">
         <div id="minglSelfCard" class="mingl-self-card"></div>
         <div class="section-title-row">
-          <h2>Mingl Social Playground</h2>
-          <details class="help-popout">
-            <summary aria-label="About Mingl search">?</summary>
-            <div>Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.</div>
-          </details>
+          <h2 data-floqr-help-id="help-mingl-search"
+              data-floqr-help-title="About Mingl search"
+              data-floqr-help-search="mingl search|search people|mingl social playground|find people"
+              data-floqr-help-body="Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.">Mingl Social Playground</h2>
         </div>
         <input id="minglSearch" class="search" placeholder="Try: girls interested in fast cars and Latina events"/>
         <div id="minglPeopleGrid" class="mingl-people-grid"></div>
@@ -367,11 +366,10 @@
       <div class="card mingl-requests-card">
         <div class="section-title-row">
           <div class="section-title-inline">
-            <h2>Mingl Requests</h2>
-            <details class="help-popout">
-            <summary aria-label="About Mingl Requests">?</summary>
-            <div>Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.</div>
-            </details>
+            <h2 data-floqr-help-id="help-mingl-requests"
+                data-floqr-help-title="About Mingl Requests"
+                data-floqr-help-search="mingl requests|friend request|mingl chat"
+                data-floqr-help-body="Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.">Mingl Requests</h2>
           </div>
           <button id="minglRequestStatusBtn" class="mingl-request-status-btn" type="button" aria-label="Mingl request status">(0/0)</button>
         </div>
@@ -711,12 +709,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.33"></script>
-<script src="./floqr-nav.js?v=s3.0.5"></script>
-<script src="./floqai-help-repository.js?v=s3.0.1"></script>
+<script src="./floqr-nav.js?v=s3.0.6"></script>
+<script src="./floqai-help-repository.js?v=s3.0.6"></script>
 <script src="./intent-search.js?v=s3.0.1"></script>
 <script src="./floqai-search.js?v=29.09.52"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
-<script src="./floqr-i18n.js?v=s3.0.5"></script>
+<script src="./floqr-i18n.js?v=s3.0.6"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=s3.0.0"></script>
 <script src="./national-teams-data.js?v=29.09.59"></script>
@@ -731,14 +729,15 @@
 <script src="./ai-template-studio.js?v=29.09.33"></script>
 <script src="./floqr-action-feedback.js?v=29.09.33"></script>
 <script src="./ai-grammar-service.js?v=29.09.33"></script>
-<script src="./helper-popouts.js?v=29.09.49"></script>
+<script src="./help-attach.js?v=s3.0.6"></script>
+<script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.33"></script>
 <script src="./ad-campaigns.js?v=29.09.33"></script>
 <script src="./floqr-identity.js?v=29.09.33"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./payment-service.js?v=29.09.56"></script>
-<script src="./patron-app.js?v=29.09.119"></script>
+<script src="./patron-app.js?v=s3.0.6"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>
