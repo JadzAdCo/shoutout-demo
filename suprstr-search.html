@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>supRstar | FLOQR</title>
+  <title data-i18n="page.suprstr.title">supRstar | FLOQR</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.66"/>
   <link rel="stylesheet" href="./admin.css?v=29.09.66"/>
   <link rel="stylesheet" href="./floqai-search.css?v=29.09.66"/>
@@ -21,18 +21,18 @@
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img src="./images/suprstr-logo.png?v=29.09.66" alt="supRstar" class="product-logo suprstr-hero-logo"/>
         </div>
-        <h1 class="visually-hidden">supRstar</h1>
-        <p class="sub">Be a superstar — pick a venue, preview yourself privately, pay $20, get Club Admin approval, then go live on the SupRStar board.</p>
+        <h1 class="visually-hidden" data-i18n="page.suprstr.title">supRstar</h1>
+        <p class="sub" data-i18n="page.suprstr.sub">Be a superstar — pick a venue, preview yourself privately, pay $20, get Club Admin approval, then go live on the SupRStar board.</p>
       </div>
     </header>
     <div class="card" data-floqr-auth-chrome>
-      <h2>Sign in to continue</h2>
+      <h2 data-i18n="app.signInToContinue">Sign in to continue</h2>
       <p id="suprstrGateStatus" class="status">Checking access…</p>
       <div class="auth-grid">
-        <button id="suprstrGoogleLoginBtn" type="button" data-floqr-login-btn>Continue with Google</button>
-        <button id="suprstrMicrosoftLoginBtn" type="button" data-floqr-login-btn>Continue with Microsoft</button>
+        <button id="suprstrGoogleLoginBtn" type="button" data-floqr-login-btn data-i18n="app.google">Continue with Google</button>
+        <button id="suprstrMicrosoftLoginBtn" type="button" data-floqr-login-btn data-i18n="app.microsoft">Continue with Microsoft</button>
       </div>
-      <button id="suprstrLogoutBtn" class="ghost" type="button">Sign out / Switch account</button>
+      <button id="suprstrLogoutBtn" class="ghost" type="button" data-i18n="app.signOutSwitch">Sign out / Switch account</button>
     </div>
   </section>
 
@@ -76,6 +76,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.66"></script>
+<script src="./floqr-i18n.js?v=s3.0.5"></script>
 <script src="./floqr-session-shell.js?v=s3.0.3"></script>
 <script src="./shared-data.js?v=29.09.66"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>

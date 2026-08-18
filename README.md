@@ -1,10 +1,10 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.4 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.5 (stable)
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
 
-Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.4&start=search`
+Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.5&start=search`
 
-s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). App language translates Search, My Profile, Club Admin, and Master Admin chrome. s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
+s3.0.5: App language covers Language Settings report values, satellite page chrome, and the profile status menu. From Club Admin / Master Admin, patron links open in a new tab and show an in-app hold notice so the admin portal stays on this session. s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
 
 ## UI media input convention (required)
 

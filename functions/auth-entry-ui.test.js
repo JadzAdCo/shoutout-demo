@@ -111,7 +111,8 @@ test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29
     window: {},
     location: { href: "https://jadzadco.github.io/shoutout-demo/master-admin.html?v=29.09.22" },
     URL,
-    URLSearchParams
+    URLSearchParams,
+    addEventListener() {}
   };
   sandbox.global = sandbox;
   sandbox.window = sandbox;
@@ -146,16 +147,62 @@ test("SOS2FA request UI is channel-neutral and puts status below the request but
 
 test("App language chrome keys cover portal tabs and language settings radios", () => {
   const i18n = readReleaseFile("floqr-i18n.js");
-  ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved"].forEach(key => {
+  ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved", "lang.aiGrammar", "lang.draftPrivacy", "profile.menu.adminPatronHint", "profile.menu.adminPatronHold"].forEach(key => {
     assert.match(i18n, new RegExp(`"${key}"`));
   });
   const portal = readReleaseFile("patron-portal.html");
   assert.match(portal, /data-i18n="lang.suggestionsOnly"/);
   assert.match(portal, /data-i18n="nav.overview"/);
   assert.match(portal, /data-i18n="lang.webappLanguage"/);
+  assert.match(portal, /data-i18n="lang.testHint"/);
   const index = readReleaseFile("index.html");
   assert.match(index, /data-i18n="cat.events"/);
   const admin = readReleaseFile("admin.html");
   assert.match(admin, /floqr-i18n\.js\?v=s3\./);
   assert.match(admin, /data-i18n="admin.dashboard"/);
+  assert.match(admin, /data-i18n="admin.locationView"/);
+  const portalApp = readReleaseFile("patron-portal-app.js");
+  assert.match(portalApp, /lang\.aiGrammar/);
+  assert.match(portalApp, /floqr:ui-language/);
+});
+
+test("production pages load floqr-i18n and the profile status card is translated", () => {
+  const pages = [
+    "index.html",
+    "patron-portal.html",
+    "admin.html",
+    "master-admin.html",
+    "commerce.html",
+    "guest-list.html",
+    "mingl-chat.html",
+    "mingl-gist.html",
+    "pickup.html",
+    "role-request.html",
+    "staff-worksheet.html",
+    "services.html",
+    "promoter-admin.html",
+    "scheduling.html",
+    "club-profile.html",
+    "suprstr-search.html",
+    "suprstar-preview.html",
+    "payment-return.html",
+    "rydr.html",
+    "role-profiles.html"
+  ];
+  for (const file of pages) {
+    const html = readReleaseFile(file);
+    assert.match(html, /floqr-i18n\.js/, `${file} must load floqr-i18n.js`);
+    assert.doesNotMatch(html, /display\.html\?[^\s"']*(v=|screen=)/, `${file} must not stamp Display URLs`);
+  }
+  const gps = readReleaseFile("global-profile-status.js");
+  assert.match(gps, /portal\.title/);
+  assert.match(gps, /floqr:ui-language/);
+  assert.match(gps, /target="_blank"/);
+  assert.match(gps, /admin\.html/);
+  assert.match(gps, /FLOQRNav\?\.portalHome/);
+  assert.match(gps, /FLOQRActionFeedback/);
+  assert.match(gps, /Please hold/);
+  assert.doesNotMatch(gps, /warnedOpenTab/);
+  assert.doesNotMatch(gps, /My Profile and Settings<\/a>/);
+  assert.doesNotMatch(gps, /IsServiceMember/);
 });
