@@ -590,6 +590,12 @@ service cloud.firestore {
  allow create, update, delete: if false;
  }
 
+ // System-generated mail (SendGrid). Functions write; Master Admin search/view.
+ match /systemMailLogs/{id} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
+ }
+
  // SOS2FA challenges, sessions, and authenticator secrets (Admin SDK / Functions only).
  match /sos2faChallenges/{uid} {
  allow read, write: if false;

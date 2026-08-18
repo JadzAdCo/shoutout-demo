@@ -1,0 +1,11 @@
+{
+  "to": "bans.don@gmail.com",
+  "package": "s3.0.7",
+  "v": "s3.0.7",
+  "note": "FLOQR s3.0.7 (stable) — this email is the tracker and the first mail written to Diagnostics → Mail Logging.\n\nWhat shipped\n- Master Admin → Diagnostics → Mail Logging. Every system-generated SendGrid email is logged: accepted/failed, headers, body, TLS 1.3 on the API hop, then delivery events.\n- Preview-link subjects are FLOQR s3.0.7 (not FLOQR vs3.0.7). Empty requests no longer default to v29.09.117.\n\nHow to confirm this send\n1. Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.0.7#mailLogging\n2. Find this preview-links row for bans.don@gmail.com. Status should be accepted (delivered after the SendGrid event webhook is attached).\n3. Open the row: request/response headers, body, and TLS min TLSv1.3.\n\nXibo URLs stay location-only (no ?v= / ?screen=)\n- https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1\n- https://jadzadco.github.io/shoutout-demo/display2.html?location=temp-democlub-1",
+  "links": [
+    {"label": "Mail Logging (Master Admin)", "url": "https://jadzadco.github.io/shoutout-demo/master-admin.html?v=s3.0.7#mailLogging"},
+    {"label": "Patron Search", "url": "https://jadzadco.github.io/shoutout-demo/?v=s3.0.7&start=search"},
+    {"label": "Aurelia display.html (Xibo, no screen query)", "url": "https://jadzadco.github.io/shoutout-demo/display.html?location=temp-democlub-1"}
+  ]
+}

@@ -580,6 +580,20 @@
       page: "master-admin.html#clubAdminUrls"
     },
     {
+      id: "help-mail-logging",
+      title: "Mail Logging",
+      body: "Every FLOQR system-generated email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days. This is not Application Logging and not Security Logs.",
+      searchPhrases: [
+        "mail logging", "email log", "sendgrid", "system mail", "preview links email",
+        "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
+      ],
+      links: [
+        {label: "Mail Logging", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#mailLogging"
+    },
+    {
       id: "help-venue-onboarding",
       title: "Venue onboarding (Master Admin)",
       body: "Master Admin venue onboarding — push crawled club profiles into Firestore.",

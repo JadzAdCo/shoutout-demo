@@ -2,6 +2,7 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const {sendSystemMail} = require("./mail-log");
 
 function text(value = "", max = 500) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -58,13 +59,37 @@ function formatPaidAt(value) {
   return String(value);
 }
 
+function screenFormatLabelFromId(formatId = "") {
+  const id = text(formatId, 40);
+  const match = id.match(/(\d+)x(\d+)/i);
+  return match ? `${match[1]} x ${match[2]} cm` : "";
+}
+
+function locationAddressFromShoutout(shoutout = {}) {
+  const full = text(shoutout.fullAddress || shoutout.locationAddress, 400);
+  if (full) return full;
+  return [
+    text(shoutout.streetAddress, 160),
+    text(shoutout.city, 80),
+    text(shoutout.region, 80),
+    text(shoutout.postalCode, 20),
+    text(shoutout.country, 80)
+  ].filter(Boolean).join(", ");
+}
+
 function buildTempShoutoutReceipt({shoutout = {}, orderId = "", invoiceNumber = "", amountCents = 0} = {}) {
+  const screenFormatId = text(shoutout.screenFormatId, 40);
+  const screenFormatLabel = text(shoutout.screenFormatLabel, 80) || screenFormatLabelFromId(screenFormatId);
   return {
     status: "temp",
     kind: "shoutout",
     referenceNumber: text(shoutout.referenceNumber, 80),
     locationName: text(shoutout.locationName || shoutout.clubName, 160),
+    brandName: text(shoutout.brandName, 160),
+    locationAddress: locationAddressFromShoutout(shoutout),
     templateName: text(shoutout.templateName || shoutout.template, 160),
+    screenFormatId,
+    screenFormatLabel,
     statusLabel: "Pending Location Approval",
     mainText: text(shoutout.mainText, 400),
     subText: text(shoutout.subText, 80),
@@ -97,7 +122,10 @@ function receiptBodyLines(receipt = {}) {
   return [
     `Reference: ${receipt.referenceNumber || "—"}`,
     `Location: ${receipt.locationName || "—"}`,
+    receipt.locationName ? `Venue: ${receipt.locationName}` : "",
+    receipt.locationAddress ? `Address: ${receipt.locationAddress}` : "",
     `Template: ${receipt.templateName || "—"}`,
+    receipt.screenFormatLabel ? `Screen size: ${receipt.screenFormatLabel}` : "",
     `Status: ${receipt.statusLabel || "Pending Location Approval"}`,
     `Paid at: ${receipt.paidAtIso || "—"}`,
     `Invoice: ${receipt.invoiceNumber || "—"}`,
@@ -147,46 +175,41 @@ async function sendgridMailWithAttachment({
     err.code = "missing-key";
     throw err;
   }
-  const payload = {
-    personalizations: [{to: [{email: to}]}],
-    from: {email: from, name: "FLOQR"},
-    reply_to: {email: from},
+  const result = await sendSystemMail({
+    apiKey,
+    kind: "receipt",
+    source: "deliverPaidShoutoutReceipt",
+    trigger: "function",
+    to,
+    from,
     subject,
-    content: [
-      {type: "text/plain", value: textBody},
-      {type: "text/html", value: htmlBody}
-    ]
-  };
-  if (pdfBase64 && filename) {
-    payload.attachments = [{
+    textBody,
+    htmlBody,
+    attachments: (pdfBase64 && filename) ? [{
       content: pdfBase64,
       filename,
       type: "application/pdf",
       disposition: "attachment"
-    }];
-  }
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {authorization: `Bearer ${apiKey}`, "content-type": "application/json"},
-    body: JSON.stringify(payload)
+    }] : []
   });
-  if (!(response.ok || response.status === 202)) {
-    const errText = await response.text().catch(() => "");
-    const err = new Error(errText.slice(0, 500) || `SendGrid ${response.status}`);
-    err.status = response.status;
-    throw err;
-  }
-  return response.status;
+  return result.status;
 }
 
 async function sendTwilioSms({accountSid, authToken, fromNumber, to, body}) {
+  const {sanitizeTwilioSecret, describeTwilioAccountSid, explainTwilioDeliveryError} = require("./messaging-core");
+  const sid = sanitizeTwilioSecret(accountSid);
+  const token = sanitizeTwilioSecret(authToken);
   const toPhone = text(to, 40);
   const from = text(fromNumber, 40);
-  if (!accountSid || !authToken || !from || !toPhone) {
+  if (!sid || !token || !from || !toPhone) {
     return {ok: false, dryRun: true, status: "missing-config"};
   }
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/Messages.json`;
-  const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+  const sidInfo = describeTwilioAccountSid(sid);
+  if (!sidInfo.looksLikeAccountSid) {
+    return {ok: false, status: "invalid-sid", error: explainTwilioDeliveryError("Authentication Error - invalid username", sidInfo)};
+  }
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(sid)}/Messages.json`;
+  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -278,5 +301,6 @@ module.exports = {
   writeFloqrInboxReceipt,
   receiptBodyLines,
   formatPaidAt,
-  money
+  money,
+  sendTwilioSms
 };

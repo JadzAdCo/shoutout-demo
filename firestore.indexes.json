@@ -9,11 +9,10 @@
       ]
     },
     {
-      "collectionGroup": "scheduleShifts",
+      "collectionGroup": "systemMailLogs",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "ownerKey", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
+        { "fieldPath": "createdAtMs", "order": "DESCENDING" }
       ]
     }
   ],

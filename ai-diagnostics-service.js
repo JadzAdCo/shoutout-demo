@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.6";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.6";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.7";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.7";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,18 @@
       ]
     },
     {
+      version:"s3.0.7",
+      title:"Mail Logging for system-generated SendGrid mail + TLS 1.3",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.7\""]},
+        {label:"Mail Logging tab", file:"master-admin.html", includes:["data-panel=\"mailLogging\"", "id=\"mailLogging\"", "id=\"mailLogSearch\""]},
+        {label:"Mail log module", file:"master-mail-logging.js", includes:["FLOQRMailLogging", "systemMailLogs", "tlsMinRequested"]},
+        {label:"Send path TLS 1.3", file:"functions/mail-log.js", includes:["TLSv1.3", "minVersion: TLS_MIN", "systemMailLogs"]},
+        {label:"Event webhook export", file:"functions/index.js", includes:["sendgridMailEvents"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.7\""]}
+      ]
+    },
+    {
       version:"s3.0.6",
       title:"Search profile menu containment + mobile help beside labels",
       checks:[
@@ -1029,6 +1041,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-7-mail-logging",
+      area:"Master Admin / Diagnostics",
+      feature:"Mail Logging records every system-generated email",
+      changed:"Diagnostics → Mail Logging lists SendGrid system mail with status, headers, body, TLS 1.3, and delivery events. Preview emails no longer use a v29.09.117 default or FLOQR vs3 subject.",
+      howToTest:"Hard-refresh master-admin.html?v=s3.0.7#mailLogging. Confirm the preview email for s3.0.7 appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row: headers, body, and TLS 1.3 are visible.",
+      expected:"A row exists for bans.don@gmail.com, kind preview-links, send ok, TLS min TLSv1.3. Subject is FLOQR s3.0.7 — mobile preview links, not FLOQR vs3.0.7."
+    },
     {
       id:"s3-0-6-search-menu-help-mobile",
       area:"Search / phones",
@@ -5849,7 +5869,7 @@
     const v = PREVIEW_LINKS_PACKAGE;
     return {
       package: v,
-      note: note || `FLOQR s3.0.3 test notes:
+      note: note || `FLOQR s3.0.7 test notes:
 1) Stay signed in on My Profile. Open Work Calendar, BartR, Guest List, Mingl Chat, RydR, role request, supRstar. Each must restore the FLOQR session — no Google-only gate, no auto popup.
 2) Inbox “New shift needs your confirmation” → Review & confirm shift → Work Calendar. Tick / Select all / Approve selected. The link does not confirm.
 3) Club Admin → Notifications → Message templates: edit System Messages ({club} {role} {when} {link} {worker}). Not ShoutOuts.`,

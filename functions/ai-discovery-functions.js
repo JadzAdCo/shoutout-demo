@@ -21,6 +21,7 @@ const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
 const venueDatapoints = require("./venue-datapoint-extract");
+const {sendSystemMail} = require("./mail-log");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -578,19 +579,22 @@ function createOtpCode() {
 async function sendEmailOtp(email, code) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
   if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method:"POST",
-    headers:{authorization:`Bearer ${key}`, "content-type":"application/json"},
-    body:JSON.stringify({
-      personalizations:[{to:[{email}]}],
-      from:{email:EMAIL_OTP_FROM, name:"FLOQR"},
-      subject:"Your FLOQR sign-in code",
-      content:[{type:"text/plain", value:`Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`}]
-    })
-  });
-  if (!response.ok) {
-    const errText = await response.text().catch(() => "");
-    throw new HttpsError("internal", `Email provider returned HTTP ${response.status}${errText ? `: ${errText.slice(0, 180)}` : ""}.`);
+  const body = `Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`;
+  try {
+    await sendSystemMail({
+      apiKey: key,
+      kind: "email-otp",
+      source: "requestEmailOtp",
+      trigger: "callable",
+      to: email,
+      from: EMAIL_OTP_FROM,
+      subject: "Your FLOQR sign-in code",
+      textBody: body,
+      htmlBody: `<p>${body.replace(/</g, "&lt;")}</p>`,
+      redactBody: true
+    });
+  } catch (err) {
+    throw new HttpsError("internal", `Email provider returned ${err?.status || "error"}${err?.message ? `: ${String(err.message).slice(0, 180)}` : ""}.`);
   }
 }
 
@@ -1440,34 +1444,19 @@ exports.emailV290914TestLinks = onRequest({
         </ul>
         <p style="color:#666;font-size:12px">Sent by FLOQR emailV290914TestLinks</p>
       </div>`;
-    const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
-    if (!key) {
-      res.status(500).json({ok: false, error: "SENDGRID_API_KEY missing"});
-      return;
-    }
-    // Verified Single Sender Identity in SendGrid (Domain Auth not required).
     const fromEmail = "bans.don@gmail.com";
-    const replyTo = {email: "bans.don@gmail.com"};
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-      body: JSON.stringify({
-        personalizations: [{to: [{email: toEmail}]}],
-        from: {email: fromEmail, name: "FLOQR"},
-        reply_to: replyTo,
-        subject: "FLOQR v29.09.14 - your test links",
-        content: [
-          {type: "text/plain", value: textBody},
-          {type: "text/html", value: htmlBody}
-        ]
-      })
+    const sent = await sendgridMail({
+      to: toEmail,
+      from: fromEmail,
+      subject: "FLOQR v29.09.14 - your test links",
+      textBody,
+      htmlBody,
+      kind: "test-links",
+      source: "emailV290914TestLinks",
+      trigger: req.method,
+      packageVersion: v
     });
-    if (!(response.ok || response.status === 202)) {
-      const errText = await response.text().catch(() => "");
-      res.status(502).json({ok: false, status: response.status, from: fromEmail, error: errText.slice(0, 500)});
-      return;
-    }
-    res.status(200).json({ok: true, to: toEmail, from: fromEmail, reply_to: replyTo.email, links: links.length, package: v, status: response.status});
+    res.status(200).json({ok: true, to: toEmail, from: fromEmail, reply_to: fromEmail, links: links.length, package: v, status: sent.status, mailLogId: sent.mailLogId});
   } catch (error) {
     res.status(500).json({ok: false, error: error?.message || String(error)});
   }
@@ -1580,71 +1569,46 @@ exports.emailFloqrThreeDayTestPlan = onRequest({
           </div>`).join("")}
         <p style="color:#666;font-size:12px">Sent by FLOQR emailFloqrThreeDayTestPlan · From ${fromEmail}</p>
       </div>`;
-    const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
-    if (!key) {
-      res.status(500).json({ok: false, error: "SENDGRID_API_KEY missing"});
-      return;
-    }
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-      body: JSON.stringify({
-        personalizations: [{to: [{email: toEmail}]}],
-        from: {email: fromEmail, name: "FLOQR"},
-        reply_to: {email: fromEmail},
-        subject: "FLOQR — 3-day feature test checklist",
-        content: [
-          {type: "text/plain", value: textBody},
-          {type: "text/html", value: htmlBody}
-        ]
-      })
+    const sent = await sendgridMail({
+      to: toEmail,
+      from: fromEmail,
+      subject: "FLOQR — 3-day feature test checklist",
+      textBody,
+      htmlBody,
+      kind: "three-day-checklist",
+      source: "emailFloqrThreeDayTestPlan",
+      trigger: req.method
     });
-    if (!(response.ok || response.status === 202)) {
-      const errText = await response.text().catch(() => "");
-      res.status(502).json({ok: false, status: response.status, from: fromEmail, error: errText.slice(0, 500)});
-      return;
-    }
     res.status(200).json({
       ok: true,
       to: toEmail,
       from: fromEmail,
       subject: "FLOQR — 3-day feature test checklist",
       items: items.length,
-      status: response.status
+      status: sent.status,
+      mailLogId: sent.mailLogId
     });
   } catch (error) {
     res.status(500).json({ok: false, error: error?.message || String(error)});
   }
 });
 
-async function sendgridMail({to, from, subject, textBody, htmlBody}) {
+async function sendgridMail({to, from, subject, textBody, htmlBody, kind = "system", source = "sendgridMail", trigger = "function", extra = {}, packageVersion = ""}) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
-  if (!key) {
-    const err = new Error("SENDGRID_API_KEY missing");
-    err.code = "missing-key";
-    throw err;
-  }
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-    body: JSON.stringify({
-      personalizations: [{to: [{email: to}]}],
-      from: {email: from, name: "FLOQR"},
-      reply_to: {email: from},
-      subject,
-      content: [
-        {type: "text/plain", value: textBody},
-        {type: "text/html", value: htmlBody}
-      ]
-    })
+  const result = await sendSystemMail({
+    apiKey: key,
+    kind,
+    source,
+    trigger,
+    to,
+    from,
+    subject,
+    textBody,
+    htmlBody,
+    extra,
+    packageVersion
   });
-  if (!(response.ok || response.status === 202)) {
-    const errText = await response.text().catch(() => "");
-    const err = new Error(errText.slice(0, 500) || `SendGrid ${response.status}`);
-    err.status = response.status;
-    throw err;
-  }
-  return response.status;
+  return result;
 }
 
 /** Email iPhone mobile test checklist link (no RydR). */
@@ -1703,8 +1667,17 @@ exports.emailMobileTestChecklist = onRequest({
         <p style="margin:16px 0 0">Feedback: <strong>Submit</strong> on the page emails a summary here, or just reply to this message.</p>
         <p style="color:#666;font-size:12px;margin-top:18px">Sent by FLOQR emailMobileTestChecklist · From ${fromEmail}</p>
       </div>`;
-    const status = await sendgridMail({to: toEmail, from: fromEmail, subject, textBody, htmlBody});
-    res.status(200).json({ok: true, to: toEmail, from: fromEmail, subject, checklistUrl, status});
+    const sent = await sendgridMail({
+      to: toEmail,
+      from: fromEmail,
+      subject,
+      textBody,
+      htmlBody,
+      kind: "mobile-checklist",
+      source: "emailMobileTestChecklist",
+      trigger: req.method
+    });
+    res.status(200).json({ok: true, to: toEmail, from: fromEmail, subject, checklistUrl, status: sent.status, mailLogId: sent.mailLogId});
   } catch (error) {
     const code = error?.code === "missing-key" ? 500 : (error?.status ? 502 : 500);
     res.status(code).json({ok: false, error: error?.message || String(error)});
@@ -1774,7 +1747,17 @@ exports.submitMobileTestResults = onCall({
 
   let emailStatus = 0;
   try {
-    emailStatus = await sendgridMail({to: toEmail, from: fromEmail, subject, textBody, htmlBody});
+    const sent = await sendgridMail({
+      to: toEmail,
+      from: fromEmail,
+      subject,
+      textBody,
+      htmlBody,
+      kind: "mobile-test-results",
+      source: "submitMobileTestResults",
+      trigger: "callable"
+    });
+    emailStatus = sent.status;
   } catch (error) {
     throw new HttpsError("internal", error?.message || "email failed");
   }
@@ -1804,7 +1787,7 @@ const PREVIEW_LINKS_DEFAULT_TO = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_FROM = "bans.don@gmail.com";
 const PREVIEW_LINKS_DEFAULT_BASE = "https://jadzadco.github.io/shoutout-demo";
 
-function defaultFloqrPreviewLinks(v = "s3.0.3") {
+function defaultFloqrPreviewLinks(v = "s3.0.7") {
   const base = PREVIEW_LINKS_DEFAULT_BASE;
   return [
     ["Aurelia club profile (photoreal logo, staff, VIP/portrait LED)", `${base}/club-profile.html?location=temp-democlub-1&v=${v}`],
@@ -1830,10 +1813,16 @@ function normalizePreviewLinks(raw = [], fallbackVersion = "29.09.40") {
   }).filter((row) => row[0] && row[1]);
 }
 
-function buildPreviewLinksEmail({packageVersion = "29.09.40", links = [], note = ""} = {}) {
-  const v = String(packageVersion || "29.09.40").replace(/^v/i, "");
+function formatPreviewPackageLabel(packageVersion = "") {
+  const raw = String(packageVersion || "").replace(/^v/i, "").trim();
+  if (/^s\d/i.test(raw)) return raw;
+  return raw ? `v${raw}` : "s3.0.7";
+}
+
+function buildPreviewLinksEmail({packageVersion = "s3.0.7", links = [], note = ""} = {}) {
+  const v = String(packageVersion || "s3.0.7").replace(/^v/i, "");
   const rows = normalizePreviewLinks(links, v);
-  const subject = `FLOQR v${v} — mobile preview links`;
+  const subject = `FLOQR ${formatPreviewPackageLabel(v)} — mobile preview links`;
   const intro = String(note || "").trim();
   const textBody = [
     subject,
@@ -1874,18 +1863,37 @@ exports.emailFloqrPreviewLinks = onRequest({
     const body = req.body && typeof req.body === "object" ? req.body : {};
     const query = req.query || {};
     const toEmail = String(body.to || query.to || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
-    const packageVersion = String(body.package || body.v || query.package || query.v || "29.09.117").trim();
+    const packageVersion = String(body.package || body.v || query.package || query.v || "s3.0.7").trim();
     const note = String(body.note || query.note || "").trim();
     const links = Array.isArray(body.links) ? body.links : [];
     const mail = buildPreviewLinksEmail({packageVersion, links, note});
-    const status = await sendgridMail({
+    const sent = await sendgridMail({
       to: toEmail,
       from: PREVIEW_LINKS_DEFAULT_FROM,
       subject: mail.subject,
       textBody: mail.textBody,
-      htmlBody: mail.htmlBody
+      htmlBody: mail.htmlBody,
+      kind: "preview-links",
+      source: "emailFloqrPreviewLinks",
+      trigger: req.method,
+      packageVersion,
+      extra: {
+        ip: String(req.ip || req.headers?.["x-forwarded-for"] || "").slice(0, 120),
+        userAgent: String(req.get?.("user-agent") || req.headers?.["user-agent"] || "").slice(0, 300)
+      }
     });
-    res.status(200).json({ok: true, to: toEmail, from: PREVIEW_LINKS_DEFAULT_FROM, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status});
+    res.status(200).json({
+      ok: true,
+      to: toEmail,
+      from: PREVIEW_LINKS_DEFAULT_FROM,
+      subject: mail.subject,
+      links: mail.links.length,
+      package: mail.packageVersion,
+      status: sent.status,
+      mailLogId: sent.mailLogId,
+      tlsProtocol: sent.tlsProtocol,
+      tlsApiOk: sent.tlsApiOk
+    });
   } catch (error) {
     const code = error?.code === "missing-key" ? 500 : (error?.status ? 502 : 500);
     res.status(code).json({ok: false, error: error?.message || String(error)});
@@ -1906,16 +1914,20 @@ exports.sendFloqrPreviewLinksEmail = onCall({
   }
   const data = request.data || {};
   const toEmail = String(data.to || email || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
-  const packageVersion = String(data.package || data.v || "29.09.34").trim();
+  const packageVersion = String(data.package || data.v || "s3.0.7").trim();
   const note = String(data.note || "").trim();
   const links = Array.isArray(data.links) ? data.links : [];
   const mail = buildPreviewLinksEmail({packageVersion, links, note});
-  const status = await sendgridMail({
+  const sent = await sendgridMail({
     to: toEmail,
     from: PREVIEW_LINKS_DEFAULT_FROM,
     subject: mail.subject,
     textBody: mail.textBody,
-    htmlBody: mail.htmlBody
+    htmlBody: mail.htmlBody,
+    kind: "preview-links",
+    source: "sendFloqrPreviewLinksEmail",
+    trigger: "callable",
+    packageVersion
   });
-  return {ok: true, to: toEmail, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status};
+  return {ok: true, to: toEmail, subject: mail.subject, links: mail.links.length, package: mail.packageVersion, status: sent.status, mailLogId: sent.mailLogId, tlsProtocol: sent.tlsProtocol};
 });
