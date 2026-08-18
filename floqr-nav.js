@@ -5,7 +5,7 @@
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
      Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
-  const APP_V = "s3.0.3";
+  const APP_V = "s3.0.4";
 
   function qs(name) {
     try { return new URL(global.location.href).searchParams.get(name) || ""; }

@@ -1,15 +1,11 @@
-/* SOS2FA — Super Admin gate for Entity Management (SMS/email OTP + authenticator TOTP). */
+/* SOS2FA — Super Admin SMS gate for Entity Management (server-side Twilio OTP). */
 (function (root) {
   "use strict";
 
   const STORAGE_PREFIX = "floqr_sos2fa_";
   const DEFAULT_TTL_MS = 60 * 60 * 1000;
   const WRONG_CODE_MESSAGE = "Wrong code entered, please enter the correct code to proceed";
-  const SUPER_ADMIN_EMAILS = (
-    root.SHOUTOUT_SUPER_ADMIN_EMAILS ||
-    root.SHOUTOUT_MASTER_ADMIN_EMAILS ||
-    ["bans.don@gmail.com", "don.b@jadzholdings.com"]
-  ).map(x => String(x).toLowerCase());
+  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com"]).map(x => String(x).toLowerCase());
   const ENTITY_MGMT_PANELS = [
     "clubAdminUrls",
     "entityManagement",
@@ -22,7 +18,6 @@
   let uiBound = false;
   let functions = null;
   let challengeRequested = false;
-  let methodsCache = null;
   const unlockCallbacks = new Map();
 
   function byId(id) {
@@ -102,48 +97,6 @@
     if (el) el.textContent = message || "";
   }
 
-  function selectedChannel() {
-    const checked = document.querySelector('input[name="sos2faChannel"]:checked');
-    return String(checked?.value || "both").toLowerCase();
-  }
-
-  function showSentConfirmToast({phoneLast5 = "", emailMasked = "", failed = false, delivery = null} = {}) {
-    document.querySelectorAll(".sos2fa-sent-toast").forEach((el) => el.remove());
-    const toast = document.createElement("div");
-    toast.className = "sos2fa-sent-toast";
-    toast.setAttribute("role", "status");
-    toast.setAttribute("aria-live", "polite");
-    const digits = String(phoneLast5 || "").replace(/\D/g, "").slice(-5);
-    const parts = [];
-    if (digits) parts.push(`mobile •••••${digits}`);
-    if (emailMasked) parts.push(`email ${emailMasked}`);
-    const dest = parts.join(" · ") || "your Super Admin contact";
-    const smsFail = delivery?.smsError ? ` SMS failed (${delivery.smsError}).` : "";
-    const emailFail = delivery?.emailError ? ` Email failed (${delivery.emailError}).` : "";
-    toast.innerHTML = failed
-      ? `<strong>SOS2FA delivery failed</strong><span>Tried ${dest}.${smsFail}${emailFail}</span>`
-      : `<strong>SOS2FA code requested</strong><span>Sent toward ${dest}.${smsFail}${emailFail}</span>`;
-    document.body.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add("is-visible"));
-    setTimeout(() => {
-      toast.classList.remove("is-visible");
-      setTimeout(() => toast.remove(), 280);
-    }, 2600);
-  }
-
-  function phoneLast5FromError(error) {
-    const details = error?.details || error?.customData?.details || error?.customData || {};
-    if (details.phoneLast5) return String(details.phoneLast5);
-    const msg = String(error?.message || "");
-    const match = msg.match(/ending\s+(\d{4,5})/i);
-    return match ? match[1] : "";
-  }
-
-  function emailMaskedFromError(error) {
-    const details = error?.details || error?.customData?.details || error?.customData || {};
-    return details.emailMasked ? String(details.emailMasked) : "";
-  }
-
   function ensureGatedWrappers() {
     ENTITY_MGMT_PANELS.forEach(id => {
       if (id === "entityManagement") return;
@@ -196,31 +149,10 @@
     }
 
     const hint = byId("sos2faPhoneHint");
-    if (hint && !challengeRequested) {
-      hint.textContent = "";
-    }
-  }
-
-  function syncTotpUi(methods) {
-    const enrolled = !!methods?.totpEnrolled;
-    byId("sos2faTotpDisableBtn")?.classList.toggle("hidden", !enrolled);
-    byId("sos2faTotpStartBtn") && (byId("sos2faTotpStartBtn").textContent = enrolled ? "Re-enroll authenticator" : "Enroll authenticator");
-    const status = byId("sos2faTotpStatus");
-    if (status) {
-      status.textContent = enrolled
-        ? "Authenticator enrolled. Enter the current 6-digit app code to unlock."
-        : "Optional. Use Google Authenticator, Authy, or Microsoft Authenticator after you enroll.";
-    }
-  }
-
-  async function refreshMethods() {
-    try {
-      const result = await callable("getSos2faMethods")({});
-      methodsCache = result?.data || {};
-      syncTotpUi(methodsCache);
-      return methodsCache;
-    } catch (_) {
-      return methodsCache;
+    if (hint) {
+      hint.textContent = challengeRequested
+        ? "Enter the six-digit SOS2FA code from SMS or email."
+        : "Request SOS2FA Code. FloqR sends it using your Email and SMS notification settings.";
     }
   }
 
@@ -238,38 +170,13 @@
     if (!isSuperAdminUser(authUser)) {
       throw new Error("SOS2FA Entity Management unlock is limited to Super Admin.");
     }
-    const channel = selectedChannel();
-    setStatus(`Requesting SOS2FA code via ${channel === "both" ? "SMS + email" : channel}…`);
-    try {
-      const result = await callable("requestSos2faCode")({channel});
-      const data = result?.data || {};
-      challengeRequested = true;
-      const last5 = data.phoneLast5 || data.phoneLast4 || "";
-      const emailMasked = data.emailMasked || "";
-      showSentConfirmToast({phoneLast5: last5, emailMasked, delivery: data.delivery || null});
-      const hint = byId("sos2faPhoneHint");
-      if (hint) {
-        const bits = [];
-        if (data.delivery?.sms === "sent" && last5) bits.push(`SMS •••••${last5}`);
-        if (data.delivery?.email === "sent" && emailMasked) bits.push(`Email ${emailMasked}`);
-        if (data.delivery?.smsError) bits.push(`SMS note: ${data.delivery.smsError}`);
-        if (data.delivery?.emailError) bits.push(`Email note: ${data.delivery.emailError}`);
-        hint.textContent = bits.length ? `Delivered / notes: ${bits.join(" · ")}` : "Code requested.";
-      }
-      setStatus("Enter the six-digit SOS2FA code from SMS or email.");
-      syncGateUi("entityManagement", false);
-      return data;
-    } catch (error) {
-      const last5 = phoneLast5FromError(error);
-      const emailMasked = emailMaskedFromError(error);
-      showSentConfirmToast({
-        phoneLast5: last5,
-        emailMasked,
-        failed: true,
-        delivery: error?.details?.delivery || null
-      });
-      throw error;
-    }
+    setStatus("Requesting SOS2FA code…");
+    const result = await callable("requestSos2faCode")({});
+    const data = result?.data || {};
+    challengeRequested = true;
+    setStatus(data.notes || data.delivery || "SOS2FA code sent. Enter the six-digit code.");
+    syncGateUi("entityManagement", false);
+    return data;
   }
 
   async function verifyCode({code} = {}) {
@@ -277,7 +184,7 @@
     if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
     const sms = String(code || byId("sos2faCode")?.value || "").trim();
     if (!/^\d{6}$/.test(sms)) throw new Error("Enter the six-digit SOS2FA code.");
-    if (!challengeRequested) throw new Error("Request a SOS2FA code first (SMS and/or email).");
+    if (!challengeRequested) throw new Error("Request SOS2FA Code first.");
 
     try {
       const result = await callable("verifySos2faCode")({code: sms});
@@ -286,7 +193,7 @@
       challengeRequested = false;
       setStatus("SOS2FA unlocked for this browser session.");
       syncGateUi("entityManagement", true);
-      await logActivity("entity_management_unlocked", {panel: activeEntityPanel()?.id || "entityManagement", method: "code"});
+      await logActivity("entity_management_unlocked", {panel: activeEntityPanel()?.id || "entityManagement"});
       fireUnlock("entityManagement");
       return true;
     } catch (error) {
@@ -297,64 +204,6 @@
       }
       throw error;
     }
-  }
-
-  async function verifyTotp({code} = {}) {
-    const authUser = firebase.auth().currentUser;
-    if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
-    const totp = String(code || byId("sos2faTotpCode")?.value || "").trim();
-    if (!/^\d{6}$/.test(totp)) throw new Error("Enter the six-digit authenticator code.");
-    try {
-      const result = await callable("verifySos2faTotp")({code: totp});
-      const data = result?.data || {};
-      unlock("entityManagement", data);
-      challengeRequested = false;
-      setStatus("SOS2FA unlocked with authenticator for this browser session.");
-      syncGateUi("entityManagement", true);
-      await logActivity("entity_management_unlocked", {panel: activeEntityPanel()?.id || "entityManagement", method: "totp"});
-      fireUnlock("entityManagement");
-      return true;
-    } catch (error) {
-      const message = String(error?.message || error?.details || error || "");
-      if (/wrong code entered/i.test(message)) {
-        setStatus(WRONG_CODE_MESSAGE);
-        throw new Error(WRONG_CODE_MESSAGE);
-      }
-      throw error;
-    }
-  }
-
-  async function startTotpEnrollment() {
-    setStatus("Starting authenticator enrollment…");
-    const result = await callable("startSos2faTotpEnrollment")({});
-    const data = result?.data || {};
-    const panel = byId("sos2faTotpEnrollPanel");
-    const secretEl = byId("sos2faTotpSecret");
-    const qr = byId("sos2faTotpQr");
-    if (secretEl) secretEl.textContent = data.secret || "";
-    if (qr && data.otpauthUrl) {
-      qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data.otpauthUrl)}`;
-      qr.classList.remove("hidden");
-    }
-    panel?.classList.remove("hidden");
-    setStatus("Scan the QR code (or enter the secret), then confirm with the app’s current code.");
-    return data;
-  }
-
-  async function confirmTotpEnrollment() {
-    const code = String(byId("sos2faTotpConfirmCode")?.value || "").trim();
-    if (!/^\d{6}$/.test(code)) throw new Error("Enter the authenticator code to confirm enrollment.");
-    await callable("confirmSos2faTotpEnrollment")({code});
-    byId("sos2faTotpEnrollPanel")?.classList.add("hidden");
-    await refreshMethods();
-    setStatus("Authenticator enrolled. You can unlock with the app code anytime.");
-  }
-
-  async function disableTotp() {
-    await callable("disableSos2faTotp")({});
-    byId("sos2faTotpEnrollPanel")?.classList.add("hidden");
-    await refreshMethods();
-    setStatus("Authenticator disabled for SOS2FA.");
   }
 
   async function requireUnlock(scope, options = {}) {
@@ -373,13 +222,12 @@
     }
     byId("sos2faActions")?.classList.remove("hidden");
     byId("sos2faSendBtn")?.classList.remove("hidden");
-    refreshMethods();
     if (isUnlocked(scope)) {
       syncGateUi(scope, true);
       return true;
     }
     syncGateUi(scope, false);
-    setStatus("Entity Management is locked. Request a SOS2FA code (SMS/email) or use your authenticator.");
+    setStatus("Entity Management is locked. Request SOS2FA Code to continue.");
     return false;
   }
 
@@ -418,7 +266,7 @@
     byId("sos2faLockBtn")?.addEventListener("click", async () => {
       lock(scope);
       syncGateUi(scope, false);
-      setStatus("Entity Management locked. Request a new SOS2FA code or use authenticator.");
+      setStatus("Entity Management locked. Request a new SOS2FA code to continue.");
       try {
         await logActivity("entity_management_locked", {});
       } catch (_) {}
@@ -427,40 +275,6 @@
       if (event.key === "Enter") {
         event.preventDefault();
         byId("sos2faVerifyBtn")?.click();
-      }
-    });
-    byId("sos2faTotpVerifyBtn")?.addEventListener("click", async () => {
-      try {
-        await verifyTotp();
-      } catch (e) {
-        if (e.message !== WRONG_CODE_MESSAGE) setStatus(e.message || String(e));
-      }
-    });
-    byId("sos2faTotpStartBtn")?.addEventListener("click", async () => {
-      try {
-        await startTotpEnrollment();
-      } catch (e) {
-        setStatus(e.message || String(e));
-      }
-    });
-    byId("sos2faTotpConfirmBtn")?.addEventListener("click", async () => {
-      try {
-        await confirmTotpEnrollment();
-      } catch (e) {
-        setStatus(e.message || String(e));
-      }
-    });
-    byId("sos2faTotpDisableBtn")?.addEventListener("click", async () => {
-      try {
-        await disableTotp();
-      } catch (e) {
-        setStatus(e.message || String(e));
-      }
-    });
-    byId("sos2faTotpCode")?.addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        byId("sos2faTotpVerifyBtn")?.click();
       }
     });
   }
@@ -485,10 +299,6 @@
     lock,
     sendCode,
     verifyCode,
-    verifyTotp,
-    startTotpEnrollment,
-    confirmTotpEnrollment,
-    disableTotp,
     requireUnlock,
     onPanelActivate,
     mount,

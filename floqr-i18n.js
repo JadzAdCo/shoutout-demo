@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "29.09.100";
+  const VERSION = "s3.0.4";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -309,6 +309,268 @@
     }
   };
 
+  const CHROME = {
+    en: {
+      "portal.title": "My Profile and Settings",
+      "portal.subtitle": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl.",
+      "portal.signInTitle": "Sign in",
+      "portal.signInHint": "Sign in to view and update your patron profile.",
+      "nav.overview": "Overview",
+      "nav.myProfile": "My Profile",
+      "nav.myPrivacy": "My Privacy",
+      "nav.languageSettings": "Language Settings",
+      "nav.aiNotifications": "AI Notification Preferences",
+      "nav.myTemplates": "My ShoutOut Templates",
+      "nav.publicMedia": "Public Media and Data Sharing",
+      "nav.myShoutouts": "My ShoutOuts",
+      "nav.guestLists": "My Guest Lists",
+      "nav.paidServices": "Paid Services & Orders",
+      "nav.bartrStore": "BartR Store",
+      "nav.inbox": "FloqR Inbox",
+      "nav.minglFriends": "Manage Mingl Friends",
+      "nav.minglChat": "Mingl Chat",
+      "nav.followServices": "Follow Services",
+      "nav.openBartr": "Open BartR",
+      "nav.workCalendar": "Work Calendar",
+      "nav.serviceMembers": "Service Members",
+      "nav.help": "Help",
+      "nav.backToSearch": "Back to Search",
+      "lang.pageTitle": "Language Settings",
+      "lang.pageHint": "Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future BartR descriptions.",
+      "lang.enableGrammar": "Enable grammar and spelling check before sending messages, chats, ShoutOuts, profile updates, and other text inputs.",
+      "lang.correctionMode": "Correction Mode",
+      "lang.suggestionsOnly": "Show suggestions only",
+      "lang.approvalRequired": "Require approval before replacing my text",
+      "lang.autoFixMinor": "Auto-fix minor typos only",
+      "lang.webappLanguage": "FloqR webapp language",
+      "lang.languageSaved": "FloqR language set to {native}.",
+      "lang.highlightSpelling": "Highlight possible spelling errors in red before correction",
+      "lang.highlightGrammar": "Highlight grammar suggestions in yellow or underline",
+      "lang.preferredGrammar": "Preferred Language (grammar / bio)",
+      "lang.tone": "Tone Preference",
+      "lang.emojiSkin": "Emoji Skin Tone",
+      "lang.wordList": "My Word List",
+      "lang.personalCorrections": "My Personal Corrections",
+      "lang.saveLanguageSettings": "Save Language Settings",
+      "app.loginCopy": "Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.",
+      "app.google": "Continue with Google",
+      "app.microsoft": "Continue with Microsoft",
+      "app.facebook": "Continue with Facebook",
+      "app.emailContinue": "Continue with your own Email",
+      "nav.searchFor": "Search for",
+      "cat.events": "Events",
+      "cat.clubs": "Clubs",
+      "cat.beachClubs": "Beach Clubs",
+      "cat.lounges": "Lounges",
+      "cat.loungeClubs": "Lounge-Clubs",
+      "cat.or": "Or",
+      "cat.shoutout": "Throw a ShoutOut",
+      "cat.mingl": "Mingl",
+      "cat.bartr": "Trade by BartR",
+      "cat.rydr": "RydR",
+      "cat.suprstar": "supRstar",
+      "cat.floqai": "FloqAi",
+      "listing.searchClubs": "Search Clubs",
+      "admin.dashboard": "Dashboard",
+      "admin.displaySecurity": "Display Security",
+      "admin.publicProfile": "Club Public Profile",
+      "admin.templateBackgrounds": "Template Backgrounds",
+      "admin.queue": "ShoutOut Queue",
+      "admin.suprstarQueue": "supRstar Queue",
+      "admin.analytics": "Analytics",
+      "admin.advertising": "Advertising",
+      "admin.guestLists": "Guest Lists / Promoters",
+      "admin.employees": "Employee/Workers",
+      "admin.scheduling": "Calendar & Scheduler",
+      "admin.rep": "Role Activity & Permission (REP)",
+      "admin.notifications": "Notifications",
+      "admin.reconciliation": "Account Reconciliation",
+      "admin.reports": "Reports",
+      "admin.venueCommand": "Venue Command Center",
+      "master.networkDashboard": "Network Dashboard",
+      "master.entityManagement": "Entity Management",
+      "master.venueLinks": "Venue Links",
+      "master.manageEntities": "Manage Entities",
+      "master.allQueues": "All ShoutOut Queues",
+      "master.onboarding": "Entity Onboarding",
+      "master.templates": "Template Management",
+      "master.recommendations": "Unapproved Recommendations",
+      "master.security": "Security",
+      "master.reports": "Reports",
+      "master.adCampaigns": "Ad Campaign Management",
+      "master.promoters": "Promoters",
+      "master.reconciliation": "Network Reconciliation",
+      "master.services": "Services & Commerce",
+      "master.diagnostics": "Diagnostics"
+    },
+    fr: {
+      "portal.title": "Mon profil et paramètres",
+      "portal.subtitle": "Gérez votre profil, Ma confidentialité, les notifications IA, les modèles ShoutOut, les médias publics, les ShoutOuts, les guest lists, FloqR Inbox et Mingl.",
+      "portal.signInTitle": "Connexion",
+      "portal.signInHint": "Connectez-vous pour voir et modifier votre profil.",
+      "nav.overview": "Aperçu",
+      "nav.myProfile": "Mon profil",
+      "nav.myPrivacy": "Ma confidentialité",
+      "nav.languageSettings": "Paramètres de langue",
+      "nav.aiNotifications": "Préférences de notification IA",
+      "nav.myTemplates": "Mes modèles ShoutOut",
+      "nav.publicMedia": "Médias publics et partage",
+      "nav.myShoutouts": "Mes ShoutOuts",
+      "nav.guestLists": "Mes guest lists",
+      "nav.paidServices": "Services payants et commandes",
+      "nav.bartrStore": "Boutique BartR",
+      "nav.inbox": "Boîte de réception FloqR",
+      "nav.minglFriends": "Gérer les amis Mingl",
+      "nav.minglChat": "Mingl Chat",
+      "nav.followServices": "Suivre les services",
+      "nav.openBartr": "Ouvrir BartR",
+      "nav.workCalendar": "Calendrier de travail",
+      "nav.serviceMembers": "Membres de service",
+      "nav.help": "Aide",
+      "nav.backToSearch": "Retour à la recherche",
+      "lang.pageTitle": "Paramètres de langue",
+      "lang.pageHint": "Contrôlez la grammaire et l'orthographe pour les chats, messages, ShoutOuts, le profil et BartR.",
+      "lang.enableGrammar": "Activer la vérification grammaticale et orthographique avant d'envoyer des messages, chats, ShoutOuts, mises à jour de profil et autres textes.",
+      "lang.correctionMode": "Mode de correction",
+      "lang.suggestionsOnly": "Afficher uniquement les suggestions",
+      "lang.approvalRequired": "Demander une approbation avant de remplacer mon texte",
+      "lang.autoFixMinor": "Corriger uniquement les fautes mineures",
+      "lang.webappLanguage": "Langue de l'application FloqR",
+      "lang.languageSaved": "Langue FloqR définie sur {native}.",
+      "lang.highlightSpelling": "Surligner les fautes d'orthographe possibles en rouge avant correction",
+      "lang.highlightGrammar": "Surligner les suggestions grammaticales en jaune ou les souligner",
+      "lang.preferredGrammar": "Langue préférée (grammaire / bio)",
+      "lang.tone": "Ton",
+      "lang.emojiSkin": "Teinte d'emoji",
+      "lang.wordList": "Ma liste de mots",
+      "lang.personalCorrections": "Mes corrections personnelles",
+      "lang.saveLanguageSettings": "Enregistrer les paramètres de langue",
+      "app.loginCopy": "Recherchez et réservez des sorties et événements dans le monde, envoyez un ShoutOut en direct, ou Mingl avec de nouvelles personnes, des amis et la famille.",
+      "app.google": "Continuer avec Google",
+      "app.microsoft": "Continuer avec Microsoft",
+      "app.facebook": "Continuer avec Facebook",
+      "app.emailContinue": "Continuer avec votre e-mail",
+      "nav.searchFor": "Rechercher",
+      "cat.events": "Événements",
+      "cat.clubs": "Clubs",
+      "cat.beachClubs": "Beach clubs",
+      "cat.lounges": "Lounges",
+      "cat.loungeClubs": "Lounge-clubs",
+      "cat.or": "Ou",
+      "cat.shoutout": "Lancer un ShoutOut",
+      "cat.mingl": "Mingl",
+      "cat.bartr": "Échanger sur BartR",
+      "cat.rydr": "RydR",
+      "cat.suprstar": "supRstar",
+      "cat.floqai": "FloqAi",
+      "listing.searchClubs": "Rechercher des clubs",
+      "admin.dashboard": "Tableau de bord",
+      "admin.displaySecurity": "Sécurité des écrans",
+      "admin.publicProfile": "Profil public du club",
+      "admin.templateBackgrounds": "Arrière-plans de modèles",
+      "admin.queue": "File ShoutOut",
+      "admin.suprstarQueue": "File supRstar",
+      "admin.analytics": "Analytique",
+      "admin.advertising": "Publicité",
+      "admin.guestLists": "Guest lists / Promoteurs",
+      "admin.employees": "Employés",
+      "admin.scheduling": "Calendrier et planification",
+      "admin.rep": "Activité et permission des rôles (REP)",
+      "admin.notifications": "Notifications",
+      "admin.reconciliation": "Rapprochement de compte",
+      "admin.reports": "Rapports",
+      "admin.venueCommand": "Centre de commande du lieu",
+      "master.networkDashboard": "Tableau de bord réseau",
+      "master.entityManagement": "Gestion des entités",
+      "master.venueLinks": "Liens du lieu",
+      "master.manageEntities": "Gérer les entités",
+      "master.allQueues": "Toutes les files ShoutOut",
+      "master.onboarding": "Onboarding des entités",
+      "master.templates": "Gestion des modèles",
+      "master.recommendations": "Recommandations non approuvées",
+      "master.security": "Sécurité",
+      "master.reports": "Rapports",
+      "master.adCampaigns": "Campagnes publicitaires",
+      "master.promoters": "Promoteurs",
+      "master.reconciliation": "Rapprochement réseau",
+      "master.services": "Services et commerce",
+      "master.diagnostics": "Diagnostics"
+    },
+    de: {
+      "portal.title": "Mein Profil und Einstellungen",
+      "nav.overview": "Übersicht",
+      "nav.myProfile": "Mein Profil",
+      "nav.myPrivacy": "Meine Privatsphäre",
+      "nav.languageSettings": "Spracheinstellungen",
+      "nav.help": "Hilfe",
+      "nav.backToSearch": "Zurück zur Suche",
+      "lang.pageTitle": "Spracheinstellungen",
+      "lang.suggestionsOnly": "Nur Vorschläge anzeigen",
+      "lang.approvalRequired": "Genehmigung vor dem Ersetzen meines Texts",
+      "lang.autoFixMinor": "Nur kleine Tippfehler automatisch korrigieren",
+      "lang.webappLanguage": "FloqR-Webapp-Sprache",
+      "lang.languageSaved": "FloqR-Sprache auf {native} gesetzt.",
+      "nav.searchFor": "Suchen nach",
+      "cat.events": "Events",
+      "cat.clubs": "Clubs",
+      "cat.shoutout": "ShoutOut senden",
+      "admin.dashboard": "Dashboard",
+      "admin.notifications": "Benachrichtigungen",
+      "master.venueLinks": "Venue-Links",
+      "master.entityManagement": "Entitätsverwaltung"
+    },
+    es: {
+      "portal.title": "Mi perfil y ajustes",
+      "nav.overview": "Resumen",
+      "nav.myProfile": "Mi perfil",
+      "nav.myPrivacy": "Mi privacidad",
+      "nav.languageSettings": "Ajustes de idioma",
+      "nav.help": "Ayuda",
+      "nav.backToSearch": "Volver a buscar",
+      "lang.pageTitle": "Ajustes de idioma",
+      "lang.suggestionsOnly": "Mostrar solo sugerencias",
+      "lang.approvalRequired": "Pedir aprobación antes de reemplazar mi texto",
+      "lang.autoFixMinor": "Corregir solo errores menores",
+      "lang.webappLanguage": "Idioma de la webapp FloqR",
+      "lang.languageSaved": "Idioma de FloqR establecido en {native}.",
+      "nav.searchFor": "Buscar",
+      "cat.events": "Eventos",
+      "cat.clubs": "Clubes",
+      "cat.shoutout": "Lanzar un ShoutOut",
+      "admin.dashboard": "Panel",
+      "admin.notifications": "Notificaciones",
+      "master.venueLinks": "Enlaces del local",
+      "master.entityManagement": "Gestión de entidades"
+    },
+    nl: {
+      "portal.title": "Mijn profiel en instellingen",
+      "nav.overview": "Overzicht",
+      "nav.myProfile": "Mijn profiel",
+      "nav.myPrivacy": "Mijn privacy",
+      "nav.languageSettings": "Taalinstellingen",
+      "nav.help": "Help",
+      "nav.backToSearch": "Terug naar zoeken",
+      "lang.pageTitle": "Taalinstellingen",
+      "lang.suggestionsOnly": "Alleen suggesties tonen",
+      "lang.approvalRequired": "Goedkeuring vragen voordat mijn tekst wordt vervangen",
+      "lang.autoFixMinor": "Alleen kleine typfouten automatisch herstellen",
+      "lang.webappLanguage": "FloqR-webapp-taal",
+      "lang.languageSaved": "FloqR-taal ingesteld op {native}.",
+      "nav.searchFor": "Zoeken naar",
+      "cat.events": "Evenementen",
+      "cat.clubs": "Clubs",
+      "cat.shoutout": "Een ShoutOut sturen",
+      "admin.dashboard": "Dashboard",
+      "admin.notifications": "Meldingen",
+      "master.venueLinks": "Venue-links",
+      "master.entityManagement": "Entiteitenbeheer"
+    }
+  };
+
+  Object.keys(CHROME).forEach(lang => {
+    STRINGS[lang] = {...(STRINGS[lang] || {}), ...CHROME[lang]};
+  });
+
   let current = "en";
   let overrides = {};
 
@@ -356,18 +618,43 @@
     return text;
   }
 
+  function applyText(el, value) {
+    const attr = el.getAttribute("data-i18n-attr");
+    if (attr) {
+      el.setAttribute(attr, value);
+      return;
+    }
+    const host = el.querySelector(":scope > .help-label-text, :scope > .i18n-text");
+    if (host) {
+      host.textContent = value;
+      return;
+    }
+    const hasElementChildren = [...el.childNodes].some(n => n.nodeType === 1);
+    if (hasElementChildren) {
+      const textNode = [...el.childNodes].find(n => n.nodeType === 3 && String(n.textContent || "").trim());
+      if (textNode) {
+        const lead = textNode.textContent.match(/^\s*/)[0] || "";
+        const trail = textNode.textContent.match(/\s*$/)[0] || "";
+        textNode.textContent = `${lead}${value}${trail}`;
+        return;
+      }
+    }
+    el.textContent = value;
+  }
+
   function applyDom(root = document) {
     root.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
       if (!key) return;
-      const attr = el.getAttribute("data-i18n-attr");
-      const value = t(key);
-      if (attr) el.setAttribute(attr, value);
-      else {
-        const textHost = el.querySelector(":scope > .help-label-text") || el;
-        textHost.textContent = value;
-      }
+      applyText(el, t(key));
     });
+    root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (key) el.setAttribute("placeholder", t(key));
+    });
+    const titleKey = document.documentElement.getAttribute("data-i18n-title")
+      || document.querySelector("title[data-i18n]")?.getAttribute("data-i18n");
+    if (titleKey) document.title = t(titleKey);
     const info = meta(current);
     document.documentElement.lang = current;
     document.documentElement.dir = info.dir;

@@ -15,7 +15,7 @@
     <header class="topbar admin-topbar">
       <div>
         <p class="eyebrow">FLOQR Club Admin</p>
-        <h1>Venue Command Center</h1>
+        <h1 data-i18n="admin.venueCommand">Venue Command Center</h1>
         <p class="sub">Approve ShoutOuts, review venue performance, and reconcile account activity for this location.</p>
         <p id="adminStatus" class="status">Loading admin app...</p>
       </div>
@@ -67,21 +67,21 @@
 
     <div id="adminPanel" class="hidden">
       <nav class="admin-tabs">
-        <button class="admin-tab active" data-panel="panelDashboard" type="button">Dashboard</button>
-        <button class="admin-tab" data-panel="panelDisplaySecurity" type="button">Display Security</button>
-        <button class="admin-tab" data-panel="panelPublicProfile" type="button">Club Public Profile</button>
-        <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button">Template Backgrounds</button>
-        <button class="admin-tab" data-panel="panelQueue" type="button">ShoutOut Queue</button>
-        <button class="admin-tab" data-panel="panelSuprstar" type="button">supRstar Queue</button>
-        <button class="admin-tab" data-panel="panelAnalytics" type="button">Analytics</button>
-        <button class="admin-tab" data-panel="panelAdvertising" type="button">Advertising</button>
-        <button class="admin-tab" data-panel="panelGuestLists" type="button">Guest Lists / Promoters</button>
-        <button class="admin-tab" data-panel="panelEmployees" type="button">Employee/Workers</button>
-        <button class="admin-tab" data-panel="panelScheduling" type="button">Calendar &amp; Scheduler</button>
-        <button class="admin-tab" data-panel="panelRep" type="button">Role Activity & Permission (REP)</button>
-        <button class="admin-tab" data-panel="panelNotifications" type="button">Notifications</button>
-        <button class="admin-tab" data-panel="panelReconciliation" type="button">Account Reconciliation</button>
-        <button class="admin-tab" data-panel="panelReports" type="button">Reports</button>
+        <button class="admin-tab active" data-panel="panelDashboard" type="button" data-i18n="admin.dashboard">Dashboard</button>
+        <button class="admin-tab" data-panel="panelDisplaySecurity" type="button" data-i18n="admin.displaySecurity">Display Security</button>
+        <button class="admin-tab" data-panel="panelPublicProfile" type="button" data-i18n="admin.publicProfile">Club Public Profile</button>
+        <button class="admin-tab" data-panel="panelTemplateBackgrounds" type="button" data-i18n="admin.templateBackgrounds">Template Backgrounds</button>
+        <button class="admin-tab" data-panel="panelQueue" type="button" data-i18n="admin.queue">ShoutOut Queue</button>
+        <button class="admin-tab" data-panel="panelSuprstar" type="button" data-i18n="admin.suprstarQueue">supRstar Queue</button>
+        <button class="admin-tab" data-panel="panelAnalytics" type="button" data-i18n="admin.analytics">Analytics</button>
+        <button class="admin-tab" data-panel="panelAdvertising" type="button" data-i18n="admin.advertising">Advertising</button>
+        <button class="admin-tab" data-panel="panelGuestLists" type="button" data-i18n="admin.guestLists">Guest Lists / Promoters</button>
+        <button class="admin-tab" data-panel="panelEmployees" type="button" data-i18n="admin.employees">Employee/Workers</button>
+        <button class="admin-tab" data-panel="panelScheduling" type="button" data-i18n="admin.scheduling">Calendar &amp; Scheduler</button>
+        <button class="admin-tab" data-panel="panelRep" type="button" data-i18n="admin.rep">Role Activity & Permission (REP)</button>
+        <button class="admin-tab" data-panel="panelNotifications" type="button" data-i18n="admin.notifications">Notifications</button>
+        <button class="admin-tab" data-panel="panelReconciliation" type="button" data-i18n="admin.reconciliation">Account Reconciliation</button>
+        <button class="admin-tab" data-panel="panelReports" type="button" data-i18n="admin.reports">Reports</button>
       </nav>
 
       <section id="panelDashboard" class="admin-panel-section active">
@@ -872,6 +872,7 @@
 <script src="./ad-campaigns.js?v=29.09.14"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
+<script src="./floqr-i18n.js?v=s3.0.4"></script>
 <script src="./admin-app.js?v=29.09.120"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>

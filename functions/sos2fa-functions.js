@@ -1,6 +1,7 @@
-﻿/**
- * SOS2FA â€” Super Admin second factor for Entity Management
- * (SMS and/or email OTP, plus optional authenticator TOTP).
+/**
+ * SOS2FA — Super Admin one-time codes for Entity Management access.
+ * Delivery uses the Super Admin's FloqR notification channel flags (Email / SMS),
+ * not a hardcoded SMS-only path.
  */
 "use strict";
 
@@ -10,6 +11,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {normalizeE164} = require("./messaging-core");
 const {sendTwilioSms} = require("./receipt-delivery");
+const {resolveSos2faChannels, formatDeliveryNotes, maskEmail} = require("./sos2fa-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -21,13 +23,11 @@ const SOS2FA_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 
 const SOS2FA_SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, SOS2FA_PEPPER, SENDGRID_API_KEY];
-const SOS2FA_TOTP_SECRETS = [SOS2FA_PEPPER];
+const SOS2FA_FROM_EMAIL = "login@floqr.com";
 const SESSION_TTL_MS = 60 * 60 * 1000;
 const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
-const EMAIL_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
-const BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 /* Master Admin = Super Admin */
 const SUPER_ADMIN_EMAILS = String(
@@ -59,9 +59,9 @@ function twilioConfig() {
   const read = (secret, envName) => {
     try {
       const value = secret?.value?.();
-      if (value) return String(value).trim();
+      if (value) return String(value);
     } catch (_) {}
-    return String(process.env[envName] || "").trim();
+    return String(process.env[envName] || "");
   };
   return {
     accountSid: read(TWILIO_ACCOUNT_SID, "TWILIO_ACCOUNT_SID"),
@@ -102,145 +102,6 @@ function resolveProfilePhone(profile = {}) {
   return normalizeE164(profile.phone || profile.smsPhone || profile.phoneNumber || profile.mobile || profile.telephone || "");
 }
 
-function maskEmail(email = "") {
-  const value = text(email, 200).toLowerCase();
-  const at = value.indexOf("@");
-  if (at < 1) return "";
-  const local = value.slice(0, at);
-  const domain = value.slice(at + 1);
-  const visible = local.slice(0, Math.min(2, local.length));
-  return `${visible}${"*".repeat(Math.max(1, local.length - visible.length))}@${domain}`;
-}
-
-function normalizeChannel(raw) {
-  const channel = text(raw, 20).toLowerCase();
-  if (channel === "sms" || channel === "email" || channel === "both") return channel;
-  return "both";
-}
-
-function toBase32(buf) {
-  let bits = 0;
-  let value = 0;
-  let output = "";
-  for (const byte of buf) {
-    value = (value << 8) | byte;
-    bits += 8;
-    while (bits >= 5) {
-      output += BASE32[(value >>> (bits - 5)) & 31];
-      bits -= 5;
-    }
-  }
-  if (bits > 0) output += BASE32[(value << (5 - bits)) & 31];
-  return output;
-}
-
-function fromBase32(value) {
-  const cleaned = String(value || "").toUpperCase().replace(/[^A-Z2-7]/g, "");
-  let bits = 0;
-  let valueBits = 0;
-  const out = [];
-  for (const ch of cleaned) {
-    const idx = BASE32.indexOf(ch);
-    if (idx < 0) continue;
-    valueBits = (valueBits << 5) | idx;
-    bits += 5;
-    if (bits >= 8) {
-      out.push((valueBits >>> (bits - 8)) & 255);
-      bits -= 8;
-    }
-  }
-  return Buffer.from(out);
-}
-
-function hotp(secretBuf, counter) {
-  const buf = Buffer.alloc(8);
-  buf.writeBigUInt64BE(BigInt(counter));
-  const hmac = crypto.createHmac("sha1", secretBuf).update(buf).digest();
-  const offset = hmac[hmac.length - 1] & 0xf;
-  const code = ((hmac[offset] & 0x7f) << 24)
-    | ((hmac[offset + 1] & 0xff) << 16)
-    | ((hmac[offset + 2] & 0xff) << 8)
-    | (hmac[offset + 3] & 0xff);
-  return String(code % 1000000).padStart(6, "0");
-}
-
-function verifyTotpCode(secretBase32, token, window = 1) {
-  const secret = fromBase32(secretBase32);
-  if (!secret.length) return false;
-  const expected = String(token || "").trim();
-  if (!/^\d{6}$/.test(expected)) return false;
-  const counter = Math.floor(Date.now() / 1000 / 30);
-  for (let i = -window; i <= window; i += 1) {
-    if (hotp(secret, counter + i) === expected) return true;
-  }
-  return false;
-}
-
-function encryptTotpSecret(plain) {
-  const key = crypto.createHash("sha256").update(`sos2fa-totp:${pepper()}`).digest();
-  const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const enc = Buffer.concat([cipher.update(String(plain), "utf8"), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return Buffer.concat([iv, tag, enc]).toString("base64");
-}
-
-function decryptTotpSecret(payload) {
-  const raw = Buffer.from(String(payload || ""), "base64");
-  if (raw.length < 29) throw new Error("invalid-totp-secret");
-  const iv = raw.subarray(0, 12);
-  const tag = raw.subarray(12, 28);
-  const enc = raw.subarray(28);
-  const key = crypto.createHash("sha256").update(`sos2fa-totp:${pepper()}`).digest();
-  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
-  decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(enc), decipher.final()]).toString("utf8");
-}
-
-async function sendSos2faEmail(toEmail, code) {
-  let key = "";
-  try {
-    key = String(SENDGRID_API_KEY.value() || "").trim();
-  } catch (_) {}
-  if (!key) key = String(process.env.SENDGRID_API_KEY || "").trim();
-  if (!key) {
-    return {ok: false, status: "missing-config", error: "SENDGRID_API_KEY missing"};
-  }
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-    body: JSON.stringify({
-      personalizations: [{to: [{email: toEmail}]}],
-      from: {email: EMAIL_FROM, name: "FLOQR SOS2FA"},
-      subject: "Your FloqR SOS2FA code",
-      content: [{
-        type: "text/plain",
-        value: `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes. If you did not request this, lock Master Admin and contact security.`
-      }]
-    })
-  });
-  if (!(response.ok || response.status === 202)) {
-    const errText = await response.text().catch(() => "");
-    return {ok: false, status: response.status, error: errText.slice(0, 220)};
-  }
-  return {ok: true, status: response.status || 202};
-}
-
-async function createSos2faSession(transaction, {uid, email, method}) {
-  const sessionId = crypto.randomBytes(24).toString("hex");
-  const sessionRef = db.collection("sos2faSessions").doc(sessionId);
-  const expiresAtMs = Date.now() + SESSION_TTL_MS;
-  transaction.set(sessionRef, {
-    uid,
-    email,
-    scope: "entityManagement",
-    method: text(method, 40),
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAtMs
-  });
-  return {sessionId, expiresAtMs};
-}
-
 async function writeEntityManagementAudit({uid = "", email = "", action = "", detail = null, sessionId = ""} = {}) {
   await db.collection("entityManagementAuditLogs").add({
     uid: text(uid, 120),
@@ -257,55 +118,66 @@ async function assertSos2faSession(request) {
   const email = await assertSuperAdmin(request);
   const sessionId = text(request.data?.sos2faSessionId, 80);
   if (!sessionId) {
-    throw new HttpsError("permission-denied", "Entity Management requires a valid SOS2FA session. Request a code or use your authenticator.");
+    throw new HttpsError("permission-denied", "Entity Management requires a valid SOS2FA session. Request a new SOS2FA code.");
   }
   const snap = await db.collection("sos2faSessions").doc(sessionId).get();
   if (!snap.exists) {
-    throw new HttpsError("permission-denied", "SOS2FA session not found. Request a new code or use your authenticator.");
+    throw new HttpsError("permission-denied", "SOS2FA session not found. Request a new SOS2FA code.");
   }
   const row = snap.data() || {};
   if (row.uid !== request.auth.uid) {
     throw new HttpsError("permission-denied", "SOS2FA session does not match the signed-in Super Admin.");
   }
   if ((row.expiresAtMs || 0) < Date.now()) {
-    throw new HttpsError("permission-denied", "SOS2FA session expired. Request a new code or use your authenticator.");
+    throw new HttpsError("permission-denied", "SOS2FA session expired. Request a new SOS2FA code.");
   }
   return {email, sessionId};
 }
 
-exports.getSos2faMethods = onCall({region: "us-central1", timeoutSeconds: 15, memory: "256MiB"}, async request => {
-  const email = await assertSuperAdmin(request);
-  const uid = request.auth.uid;
-  const userSnap = await db.collection("users").doc(uid).get();
-  const profile = userSnap.exists ? userSnap.data() || {} : {};
-  const phone = resolveProfilePhone(profile);
-  const totpSnap = await db.collection("sos2faTotp").doc(uid).get();
-  const totp = totpSnap.exists ? totpSnap.data() || {} : {};
-  return {
-    ok: true,
-    emailMasked: maskEmail(email),
-    hasPhone: !!phone,
-    phoneLast5: phone ? phone.slice(-5) : "",
-    totpEnrolled: totp.enabled === true && !!totp.secretEnc,
-    channels: ["both", "sms", "email"]
-  };
-});
+async function sendgridMailSos2fa({to, code}) {
+  const key = (() => {
+    try {
+      const value = SENDGRID_API_KEY.value();
+      if (value) return String(value);
+    } catch (_) {}
+    return String(process.env.SENDGRID_API_KEY || "");
+  })();
+  if (!key) return {ok: false, status: "missing-config"};
+  const body = `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes. If you did not request this code, ignore this email.`;
+  try {
+    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
+      body: JSON.stringify({
+        personalizations: [{to: [{email: to}]}],
+        from: {email: SOS2FA_FROM_EMAIL, name: "FLOQR"},
+        reply_to: {email: SOS2FA_FROM_EMAIL},
+        subject: "Your FLOQR SOS2FA code",
+        content: [
+          {type: "text/plain", value: body},
+          {type: "text/html", value: `<p>${body}</p>`}
+        ]
+      })
+    });
+    return {ok: response.ok || response.status === 202, status: response.status};
+  } catch (err) {
+    return {ok: false, status: "sendgrid-error", error: String(err?.message || err).slice(0, 200)};
+  }
+}
+
+function smsSucceeded(sms) {
+  return !!(sms && (sms.ok || sms.dryRun || sms.status === "missing-config"));
+}
 
 exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRETS, timeoutSeconds: 30, memory: "256MiB"}, async request => {
   const email = await assertSuperAdmin(request);
   const uid = request.auth.uid;
-  const channel = normalizeChannel(request.data?.channel);
   const userSnap = await db.collection("users").doc(uid).get();
   const profile = userSnap.exists ? userSnap.data() || {} : {};
   const phone = resolveProfilePhone(profile);
-  const wantSms = channel === "sms" || channel === "both";
-  const wantEmail = channel === "email" || channel === "both";
-
-  if (wantSms && !phone && channel === "sms") {
-    throw new HttpsError("failed-precondition", "Add a mobile number to your Super Admin profile before requesting SOS2FA via SMS.");
-  }
-  if (wantEmail && !email) {
-    throw new HttpsError("failed-precondition", "Signed-in Super Admin email is required for email SOS2FA.");
+  const channels = resolveSos2faChannels(profile, email, phone);
+  if (!channels.sms && !channels.email) {
+    throw new HttpsError("failed-precondition", "Add a mobile number or email to your Super Admin profile, and keep Email or SMS enabled in FloqR notification settings.");
   }
 
   const ref = db.collection("sos2faChallenges").doc(uid);
@@ -317,68 +189,42 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
   }
 
   const code = createSmsCode();
-  const phoneLast5 = phone ? phone.slice(-5) : "";
-  const emailMasked = maskEmail(email);
-  const body = `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes.`;
-  const delivery = {sms: null, email: null};
   const twilio = twilioConfig();
+  const phoneLast5 = phone ? phone.slice(-5) : "";
+  const smsBody = `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes.`;
+  const delivery = {sms: null, email: null};
 
-  if (wantSms && phone) {
+  if (channels.sms) {
     try {
-      const sms = await sendTwilioSms({
+      delivery.sms = await sendTwilioSms({
         accountSid: twilio.accountSid,
         authToken: twilio.authToken,
         fromNumber: twilio.fromNumber,
         to: phone,
-        body
+        body: smsBody
       });
-      if (!sms.ok && !(sms.dryRun || sms.status === "missing-config")) {
-        let twilioHint = "";
-        try {
-          const parsed = JSON.parse(String(sms.error || "{}"));
-          twilioHint = [parsed.code || parsed.status, String(parsed.message || "").slice(0, 160)].filter(Boolean).join(": ");
-        } catch (_) {
-          twilioHint = String(sms.error || sms.status || "twilio-error").slice(0, 160);
-        }
-        if (!twilioHint) {
-          const sidLooksInvalid = !/^AC[a-zA-Z0-9]{32}$/.test(String(twilio.accountSid || ""));
-          if (sidLooksInvalid) twilioHint = "TWILIO_ACCOUNT_SID appears invalid (expected AC...)";
-        }
-        delivery.sms = {ok: false, status: sms.status || "twilio-error", error: twilioHint || "twilio-error"};
-        console.error("requestSos2faCode sms-failed", {uid, phoneLast5, error: delivery.sms.error});
-      } else {
-        delivery.sms = {ok: true, status: sms.status || (sms.ok ? "sent" : "dry-run")};
-      }
     } catch (err) {
-      delivery.sms = {ok: false, status: "exception", error: String(err?.message || err).slice(0, 160)};
-      console.error("requestSos2faCode sms-threw", {uid, phoneLast5, message: delivery.sms.error});
-    }
-  } else if (wantSms && !phone) {
-    delivery.sms = {ok: false, status: "no-phone", error: "No mobile on Super Admin profile"};
-  }
-
-  if (wantEmail) {
-    try {
-      const mail = await sendSos2faEmail(email, code);
-      delivery.email = mail;
-      if (!mail.ok) console.error("requestSos2faCode email-failed", {uid, emailMasked, status: mail.status, error: mail.error});
-    } catch (err) {
-      delivery.email = {ok: false, status: "exception", error: String(err?.message || err).slice(0, 160)};
-      console.error("requestSos2faCode email-threw", {uid, emailMasked, message: delivery.email.error});
+      console.error("requestSos2faCode twilio threw", {
+        uid,
+        phoneLast5,
+        message: String(err?.message || err).slice(0, 200)
+      });
+      delivery.sms = {ok: false, status: "twilio-threw", error: String(err?.message || err).slice(0, 200)};
     }
   }
 
-  const smsOk = delivery.sms?.ok === true;
-  const emailOk = delivery.email?.ok === true;
+  if (channels.email) {
+    delivery.email = await sendgridMailSos2fa({to: email, code});
+  }
+
+  const smsOk = channels.sms ? smsSucceeded(delivery.sms) : false;
+  const emailOk = channels.email ? !!(delivery.email && delivery.email.ok) : false;
   if (!smsOk && !emailOk) {
-    const hints = [];
-    if (delivery.sms?.error) hints.push(`SMS: ${delivery.sms.error}`);
-    if (delivery.email?.error) hints.push(`Email: ${delivery.email.error}`);
-    throw new HttpsError(
-      "internal",
-      `Could not deliver SOS2FA code. ${hints.join(" · ") || "Check Twilio and SendGrid configuration."}`,
-      {phoneLast5, emailMasked, delivery}
-    );
+    throw new HttpsError("internal", "Could not send SOS2FA code. Check FloqR Email/SMS notification settings, Twilio, and SendGrid.", {
+      phoneLast5,
+      smsStatus: delivery.sms?.status || "",
+      emailStatus: delivery.email?.status || ""
+    });
   }
 
   await ref.set({
@@ -386,36 +232,43 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
     email,
     phoneLast4: phone ? phone.slice(-4) : "",
     phoneLast5,
-    emailMasked,
-    channel,
     codeHash: codeHash(uid, code),
     attempts: 0,
     used: false,
     requestedAt: admin.firestore.FieldValue.serverTimestamp(),
     expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + CODE_TTL_MS),
-    delivery
+    channels: {sms: channels.sms, email: channels.email}
+  });
+
+  const notes = formatDeliveryNotes({
+    phone,
+    email,
+    sms: smsOk,
+    mail: emailOk
   });
 
   await writeEntityManagementAudit({
     uid,
     email,
     action: "sos2fa_code_requested",
-    detail: {phoneLast5, emailMasked, channel, delivery: {sms: delivery.sms?.status || null, email: delivery.email?.status || null}}
+    detail: {
+      phoneLast5,
+      phoneLast4: phone ? phone.slice(-4) : "",
+      delivery: notes,
+      sms: delivery.sms?.status || (smsOk ? "sms" : "skipped"),
+      email: delivery.email?.status || (emailOk ? "email" : "skipped")
+    }
   });
 
   return {
     ok: true,
     phoneLast4: phone ? phone.slice(-4) : "",
     phoneLast5,
-    emailMasked,
-    channel,
-    delivery: {
-      sms: smsOk ? "sent" : (delivery.sms?.status || "skipped"),
-      email: emailOk ? "sent" : (delivery.email?.status || "skipped"),
-      smsError: delivery.sms?.ok === false ? (delivery.sms.error || delivery.sms.status) : "",
-      emailError: delivery.email?.ok === false ? (delivery.email.error || String(delivery.email.status || "")) : ""
-    },
-    expiresInSeconds: Math.floor(CODE_TTL_MS / 1000)
+    emailMasked: maskEmail(email),
+    expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
+    channels: {sms: smsOk, email: emailOk},
+    notes,
+    delivery: notes
   };
 });
 
@@ -428,16 +281,18 @@ exports.verifySos2faCode = onCall({region: "us-central1", secrets: [SOS2FA_PEPPE
   }
 
   const ref = db.collection("sos2faChallenges").doc(uid);
-  let sessionPayload = null;
+  const sessionId = crypto.randomBytes(24).toString("hex");
+  const sessionRef = db.collection("sos2faSessions").doc(sessionId);
+  const expiresAtMs = Date.now() + SESSION_TTL_MS;
 
   try {
     await db.runTransaction(async transaction => {
       const snap = await transaction.get(ref);
       if (!snap.exists) throw new HttpsError("not-found", "Request a SOS2FA code first.");
       const data = snap.data() || {};
-      if (data.used) throw new HttpsError("permission-denied", "This SOS2FA code was already used. Request a new code.");
+      if (data.used) throw new HttpsError("permission-denied", "This SOS2FA code was already used. Request a new SOS2FA code.");
       if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) {
-        throw new HttpsError("deadline-exceeded", "This SOS2FA code expired. Request a new code.");
+        throw new HttpsError("deadline-exceeded", "This SOS2FA code expired. Request a new SOS2FA code.");
       }
       if (Number(data.attempts || 0) >= MAX_ATTEMPTS) {
         throw new HttpsError("resource-exhausted", "Too many attempts. Request a new SOS2FA code.");
@@ -449,7 +304,13 @@ exports.verifySos2faCode = onCall({region: "us-central1", secrets: [SOS2FA_PEPPE
         throw new HttpsError("permission-denied", "Wrong code entered, please enter the correct code to proceed");
       }
       transaction.update(ref, {used: true, verifiedAt: admin.firestore.FieldValue.serverTimestamp()});
-      sessionPayload = await createSos2faSession(transaction, {uid, email, method: data.channel || "code"});
+      transaction.set(sessionRef, {
+        uid,
+        email,
+        scope: "entityManagement",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        expiresAtMs
+      });
     });
   } catch (error) {
     if (error instanceof HttpsError && error.message === "Wrong code entered, please enter the correct code to proceed") {
@@ -458,110 +319,9 @@ exports.verifySos2faCode = onCall({region: "us-central1", secrets: [SOS2FA_PEPPE
     throw error;
   }
 
-  await writeEntityManagementAudit({
-    uid,
-    email,
-    action: "sos2fa_verified",
-    detail: {sessionId: sessionPayload.sessionId, method: "code"},
-    sessionId: sessionPayload.sessionId
-  });
+  await writeEntityManagementAudit({uid, email, action: "sos2fa_verified", detail: {sessionId}, sessionId});
 
-  return {ok: true, sessionId: sessionPayload.sessionId, expiresInSeconds: Math.floor(SESSION_TTL_MS / 1000)};
-});
-
-exports.startSos2faTotpEnrollment = onCall({region: "us-central1", secrets: SOS2FA_TOTP_SECRETS, timeoutSeconds: 20, memory: "256MiB"}, async request => {
-  const email = await assertSuperAdmin(request);
-  const uid = request.auth.uid;
-  const secret = toBase32(crypto.randomBytes(20));
-  const issuer = encodeURIComponent("FLOQR SOS2FA");
-  const label = encodeURIComponent(email || uid);
-  const otpauthUrl = `otpauth://totp/${issuer}:${label}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
-  await db.collection("sos2faTotp").doc(uid).set({
-    uid,
-    email,
-    secretEnc: encryptTotpSecret(secret),
-    enabled: false,
-    pending: true,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, {merge: true});
-  await writeEntityManagementAudit({uid, email, action: "sos2fa_totp_enroll_started", detail: {}});
-  return {ok: true, secret, otpauthUrl};
-});
-
-exports.confirmSos2faTotpEnrollment = onCall({region: "us-central1", secrets: SOS2FA_TOTP_SECRETS, timeoutSeconds: 20, memory: "256MiB"}, async request => {
-  const email = await assertSuperAdmin(request);
-  const uid = request.auth.uid;
-  const code = String(request.data?.code || "").trim();
-  const snap = await db.collection("sos2faTotp").doc(uid).get();
-  if (!snap.exists) throw new HttpsError("not-found", "Start authenticator enrollment first.");
-  const row = snap.data() || {};
-  let secret = "";
-  try {
-    secret = decryptTotpSecret(row.secretEnc);
-  } catch (_) {
-    throw new HttpsError("failed-precondition", "Authenticator enrollment is corrupt. Start again.");
-  }
-  if (!verifyTotpCode(secret, code, 1)) {
-    throw new HttpsError("permission-denied", "Wrong authenticator code. Try the current 6-digit code.");
-  }
-  await snap.ref.set({
-    enabled: true,
-    pending: false,
-    enrolledAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, {merge: true});
-  await writeEntityManagementAudit({uid, email, action: "sos2fa_totp_enrolled", detail: {}});
-  return {ok: true, totpEnrolled: true};
-});
-
-exports.verifySos2faTotp = onCall({region: "us-central1", secrets: SOS2FA_TOTP_SECRETS, timeoutSeconds: 20, memory: "256MiB"}, async request => {
-  const email = await assertSuperAdmin(request);
-  const uid = request.auth.uid;
-  const code = String(request.data?.code || "").trim();
-  if (!/^\d{6}$/.test(code)) throw new HttpsError("invalid-argument", "Enter the six-digit authenticator code.");
-
-  const snap = await db.collection("sos2faTotp").doc(uid).get();
-  const row = snap.exists ? snap.data() || {} : {};
-  if (!row.enabled || !row.secretEnc) {
-    throw new HttpsError("failed-precondition", "Authenticator app is not enrolled for this Super Admin.");
-  }
-  let secret = "";
-  try {
-    secret = decryptTotpSecret(row.secretEnc);
-  } catch (_) {
-    throw new HttpsError("failed-precondition", "Authenticator secret could not be read. Re-enroll SOS2FA authenticator.");
-  }
-  if (!verifyTotpCode(secret, code, 1)) {
-    await writeEntityManagementAudit({uid, email, action: "sos2fa_totp_verify_failed", detail: {reason: "wrong_code"}});
-    throw new HttpsError("permission-denied", "Wrong code entered, please enter the correct code to proceed");
-  }
-
-  let sessionPayload = null;
-  await db.runTransaction(async transaction => {
-    sessionPayload = await createSos2faSession(transaction, {uid, email, method: "totp"});
-  });
-  await writeEntityManagementAudit({
-    uid,
-    email,
-    action: "sos2fa_verified",
-    detail: {sessionId: sessionPayload.sessionId, method: "totp"},
-    sessionId: sessionPayload.sessionId
-  });
-  return {ok: true, sessionId: sessionPayload.sessionId, expiresInSeconds: Math.floor(SESSION_TTL_MS / 1000)};
-});
-
-exports.disableSos2faTotp = onCall({region: "us-central1", secrets: SOS2FA_TOTP_SECRETS, timeoutSeconds: 15, memory: "256MiB"}, async request => {
-  const email = await assertSuperAdmin(request);
-  const uid = request.auth.uid;
-  await db.collection("sos2faTotp").doc(uid).set({
-    enabled: false,
-    pending: false,
-    secretEnc: admin.firestore.FieldValue.delete(),
-    disabledAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, {merge: true});
-  await writeEntityManagementAudit({uid, email, action: "sos2fa_totp_disabled", detail: {}});
-  return {ok: true, totpEnrolled: false};
+  return {ok: true, sessionId, expiresInSeconds: Math.floor(SESSION_TTL_MS / 1000)};
 });
 
 exports.logEntityManagementActivity = onCall({region: "us-central1", timeoutSeconds: 15, memory: "256MiB"}, async request => {
@@ -577,6 +337,7 @@ exports.logEntityManagementActivity = onCall({region: "us-central1", timeoutSeco
   });
   return {ok: true};
 });
+
 const STAFF_ROLE_CANONICAL = {
   "club admin": "Club Admin",
   "promoter": "Promoter",

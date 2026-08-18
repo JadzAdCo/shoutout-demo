@@ -1,10 +1,10 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.3 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.4 (stable)
 
 **After every deploy / ready iteration:** follow [`STANDARD-AFTER-DEPLOYMENT.md`](./STANDARD-AFTER-DEPLOYMENT.md) (diagnostics, `?` help, dismiss behavior, live tests, profile pill, command confirmation popouts).
 
-Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.3&start=search`
+Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.4&start=search`
 
-s3.0.3: Every satellite page (Work Calendar iframe, BartR, Guest List, Mingl, RydR, role request, services, promoter admin, payment return, supRstar) inherits the FLOQR session via `floqr-session-shell.js`. No Google-only gate and no auto `signInWithPopup` when My Profile is already signed in. s3.0.2 introduced the shell; s3.0.1: Work Calendar tick-then-approve + message templates. Version channel **s** = stable.
+s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). App language translates Search, My Profile, Club Admin, and Master Admin chrome. s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
 
 ## UI media input convention (required)
 
