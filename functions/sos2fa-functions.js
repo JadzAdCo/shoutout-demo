@@ -11,6 +11,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {normalizeE164} = require("./messaging-core");
 const {sendTwilioSms} = require("./receipt-delivery");
+const {sendSystemMail} = require("./mail-log");
 const {resolveSos2faChannels, formatDeliveryNotes, maskEmail} = require("./sos2fa-core");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -145,23 +146,21 @@ async function sendgridMailSos2fa({to, code}) {
   if (!key) return {ok: false, status: "missing-config"};
   const body = `FloqR SOS2FA: Your Entity Management access code is ${code}. It expires in 10 minutes. If you did not request this code, ignore this email.`;
   try {
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-      body: JSON.stringify({
-        personalizations: [{to: [{email: to}]}],
-        from: {email: SOS2FA_FROM_EMAIL, name: "FLOQR"},
-        reply_to: {email: SOS2FA_FROM_EMAIL},
-        subject: "Your FLOQR SOS2FA code",
-        content: [
-          {type: "text/plain", value: body},
-          {type: "text/html", value: `<p>${body}</p>`}
-        ]
-      })
+    const result = await sendSystemMail({
+      apiKey: key,
+      kind: "sos2fa",
+      source: "requestSos2faCode",
+      trigger: "callable",
+      to,
+      from: SOS2FA_FROM_EMAIL,
+      subject: "Your FLOQR SOS2FA code",
+      textBody: body,
+      htmlBody: `<p>${body.replace(/</g, "&lt;")}</p>`,
+      redactBody: true
     });
-    return {ok: response.ok || response.status === 202, status: response.status};
+    return {ok: true, status: result.status, mailLogId: result.mailLogId};
   } catch (err) {
-    return {ok: false, status: "sendgrid-error", error: String(err?.message || err).slice(0, 200)};
+    return {ok: false, status: "sendgrid-error", error: String(err?.message || err).slice(0, 200), mailLogId: err?.mailLogId || ""};
   }
 }
 

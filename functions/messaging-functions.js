@@ -23,6 +23,7 @@ const {
   twilioCredentialHealth,
   explainTwilioDeliveryError
 } = require("./messaging-core");
+const {sendSystemMail} = require("./mail-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -296,19 +297,20 @@ async function sendClubAlertEmail({to, subject, body}) {
   const key = secretValue(SENDGRID_API_KEY, "SENDGRID_API_KEY");
   if (!key) return {ok: false, channel: "email", status: "missing-sendgrid"};
   try {
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-      body: JSON.stringify({
-        personalizations: [{to: to.map(email => ({email}))}],
-        from: {email: "login@floqr.com", name: "FLOQR Club Ops"},
-        subject,
-        content: [{type: "text/plain", value: body}]
-      })
+    const result = await sendSystemMail({
+      apiKey: key,
+      kind: "club-ops-alert",
+      source: "sendClubAlertEmail",
+      trigger: "function",
+      to,
+      from: "login@floqr.com",
+      fromName: "FLOQR Club Ops",
+      subject,
+      textBody: body
     });
-    return {ok: response.ok || response.status === 202, channel: "email", status: response.status, recipients: to.length};
+    return {ok: true, channel: "email", status: result.status, recipients: to.length, mailLogId: result.mailLogId};
   } catch (error) {
-    return {ok: false, channel: "email", error: text(error?.message || error, 200)};
+    return {ok: false, channel: "email", error: text(error?.message || error, 200), mailLogId: error?.mailLogId || ""};
   }
 }
 
@@ -656,19 +658,20 @@ exports.onScheduleNotifyQueued = onDocumentCreated({
     const key = secretValue(SENDGRID_API_KEY, "SENDGRID_API_KEY");
     if (key) {
       try {
-        const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-          method: "POST",
-          headers: {authorization: `Bearer ${key}`, "content-type": "application/json"},
-          body: JSON.stringify({
-            personalizations: [{to: [{email: assigneeEmail}]}],
-            from: {email: "login@floqr.com", name: "FLOQR Scheduling"},
-            subject: "Confirm your FLOQR shift",
-            content: [{type: "text/plain", value: body}]
-          })
+        const result = await sendSystemMail({
+          apiKey: key,
+          kind: "schedule-invite",
+          source: "onScheduleNotifyQueued",
+          trigger: "firestore",
+          to: assigneeEmail,
+          from: "login@floqr.com",
+          fromName: "FLOQR Scheduling",
+          subject: "Confirm your FLOQR shift",
+          textBody: body
         });
-        results.push({ok: response.ok || response.status === 202, channel: "email", status: response.status});
+        results.push({ok: true, channel: "email", status: result.status, mailLogId: result.mailLogId});
       } catch (error) {
-        results.push({ok: false, channel: "email", error: text(error?.message || error, 200)});
+        results.push({ok: false, channel: "email", error: text(error?.message || error, 200), mailLogId: error?.mailLogId || ""});
       }
     } else {
       results.push({ok: false, channel: "email", status: "missing-sendgrid"});

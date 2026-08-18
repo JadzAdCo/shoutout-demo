@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.98"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.4"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.7"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -86,6 +86,7 @@
             <button class="admin-subtab" data-panel="diagnostics" type="button">Run Diagnostics</button>
             <button class="admin-subtab" data-panel="diagnosticsManualTests" type="button">Manual Feature Tests</button>
             <button class="admin-subtab" id="diagnosticsDisplayErrorsTab" data-panel="diagnosticsDisplayErrors" type="button">Display / Xibo Load Errors</button>
+            <button class="admin-subtab" data-panel="mailLogging" type="button">Mail Logging</button>
             <button class="admin-subtab" data-panel="appLogging" type="button">Application Logging</button>
             <button class="admin-subtab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
             <button class="admin-subtab" data-panel="patronDiagnostics" type="button">Patron Datapoints</button>
@@ -1016,6 +1017,65 @@
         </div>
       </section>
 
+      <section id="mailLogging" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible mails</span><strong id="mailLogCount">0</strong></div>
+          <div class="metric-card"><span>Failed in view</span><strong id="mailLogFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Diagnostics · Mail Logging</p>
+          <h2
+            data-floqr-help-id="help-mail-logging"
+            data-floqr-help-title="Mail Logging"
+            data-floqr-help-search="mail logging|email log|sendgrid|system mail|preview links email|tls 1.3|mail delivery"
+            data-floqr-help-body="Every FLOQR system-generated email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days. This is not Application Logging and not Security Logs."
+          >Mail Logging</h2>
+          <p class="sub small">
+            System-generated SendGrid mail only (preview links, OTP, SOS2FA, receipts, schedule invites, club ops).
+            API send requests <strong>TLS 1.3</strong>. Recipient delivery uses SendGrid Enforced TLS when the account allows it.
+          </p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="mailLogStatusFilter">
+                <option value="">All statuses</option>
+                <option value="sending">sending</option>
+                <option value="accepted">accepted</option>
+                <option value="processed">processed</option>
+                <option value="delivered">delivered</option>
+                <option value="failed">failed</option>
+                <option value="bounced">bounced</option>
+                <option value="dropped">dropped</option>
+                <option value="deferred">deferred</option>
+                <option value="blocked">blocked</option>
+                <option value="complained">complained</option>
+              </select>
+            </label>
+            <label>Kind
+              <select id="mailLogKindFilter">
+                <option value="">All kinds</option>
+              </select>
+            </label>
+            <label>Search
+              <input id="mailLogSearch" placeholder="to, subject, message id, kind, error"/>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="mailLogRefreshBtn" type="button">Refresh mail logs</button>
+          </div>
+          <p id="mailLoggingStatus" class="status">Open this tab while signed in as Master Admin.</p>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Recent system mail</h2>
+            <div id="mailLogList" class="report-block">Sign in as Master Admin to load mail logs.</div>
+          </div>
+          <div class="card">
+            <h2>Headers, body, delivery</h2>
+            <div id="mailLogDetail" class="report-block">Select a mail to view headers, content, TLS, and delivery.</div>
+          </div>
+        </div>
+      </section>
+
       <section id="diagnosticArchives" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Diagnostics · archives</p>
@@ -1057,7 +1117,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./floqr-i18n.js?v=s3.0.6"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
-<script src="./floqr-nav.js?v=s3.0.5"></script>
+<script src="./floqr-nav.js?v=s3.0.7"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
@@ -1070,19 +1130,20 @@
 <script src="./floqr-venue-datapoints.js?v=29.09.119"></script>
 <script src="./ai-discovery-service.js?v=29.09.104"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.4"></script>
+<script src="./floqai-help-repository.js?v=s3.0.7"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./ad-campaigns.js?v=29.09.22"></script>
-<script src="./ai-diagnostics-service.js?v=s3.0.6"></script>
+<script src="./ai-diagnostics-service.js?v=s3.0.7"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.3"></script>
+<script src="./master-admin-app.js?v=s3.0.7"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
+<script src="./master-mail-logging.js?v=s3.0.7"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>

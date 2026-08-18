@@ -663,6 +663,29 @@
       ]
     },
     {
+      id: "help-mail-logging",
+      kind: "help",
+      label: "Mail Logging",
+      blurb: "Master Admin Diagnostics → Mail Logging lists every system-generated SendGrid email (accepted, failed, delivered). Search status, kind, address, subject. Open a row for headers, body, TLS 1.3, and delivery events.",
+      steps: [
+        "Sign in as Master Admin.",
+        "Open Diagnostics → Mail Logging.",
+        "Filter by status or kind, or search to / subject / message id.",
+        "Select a row to view headers, stored content, TLS, and SendGrid delivery events."
+      ],
+      links: [
+        {label: "Mail Logging", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "mail logging", "email log", "sendgrid", "system mail", "preview links email",
+        "tls 1.3", "mail delivery", "who sent that email"
+      ],
+      patterns: [
+        /mail\s*log/, /email\s*log/, /system\s*(generated\s*)?(mail|email)/,
+        /sendgrid/, /tls\s*1\.?3/, /preview\s*links\s*email/
+      ]
+    },
+    {
       id: "help-general",
       kind: "help",
       label: "What can FloqAi help with?",

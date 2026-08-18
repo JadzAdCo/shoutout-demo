@@ -2,6 +2,7 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const {sendSystemMail} = require("./mail-log");
 
 function text(value = "", max = 500) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -174,36 +175,24 @@ async function sendgridMailWithAttachment({
     err.code = "missing-key";
     throw err;
   }
-  const payload = {
-    personalizations: [{to: [{email: to}]}],
-    from: {email: from, name: "FLOQR"},
-    reply_to: {email: from},
+  const result = await sendSystemMail({
+    apiKey,
+    kind: "receipt",
+    source: "deliverPaidShoutoutReceipt",
+    trigger: "function",
+    to,
+    from,
     subject,
-    content: [
-      {type: "text/plain", value: textBody},
-      {type: "text/html", value: htmlBody}
-    ]
-  };
-  if (pdfBase64 && filename) {
-    payload.attachments = [{
+    textBody,
+    htmlBody,
+    attachments: (pdfBase64 && filename) ? [{
       content: pdfBase64,
       filename,
       type: "application/pdf",
       disposition: "attachment"
-    }];
-  }
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: {authorization: `Bearer ${apiKey}`, "content-type": "application/json"},
-    body: JSON.stringify(payload)
+    }] : []
   });
-  if (!(response.ok || response.status === 202)) {
-    const errText = await response.text().catch(() => "");
-    const err = new Error(errText.slice(0, 500) || `SendGrid ${response.status}`);
-    err.status = response.status;
-    throw err;
-  }
-  return response.status;
+  return result.status;
 }
 
 async function sendTwilioSms({accountSid, authToken, fromNumber, to, body}) {

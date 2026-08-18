@@ -142,6 +142,7 @@
       }
 
       if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
+      if (panelId === "mailLogging" && window.FLOQRMailLogging) window.FLOQRMailLogging.mount();
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();

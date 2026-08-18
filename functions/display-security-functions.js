@@ -217,33 +217,6 @@ function obfuscateToken(token = "") {
   return `${"•".repeat(Math.min(20, Math.max(8, t.length - 4)))}${visible}`;
 }
 
-/** Last N chars for operator compare — never log the full board secret. */
-function tokenLastN(token = "", n = 5) {
-  const t = String(token || "");
-  if (!t) return "(none)";
-  const size = Math.max(1, Math.min(Number(n) || 5, 12));
-  return t.slice(-Math.min(size, t.length));
-}
-
-/** Redact ?k= in logged page URLs — keep only last 5 of the token. */
-function redactPageUrlToken(pageUrl = "") {
-  const raw = text(pageUrl, 500);
-  if (!raw) return "";
-  try {
-    const u = new URL(raw);
-    if (u.searchParams.has("k")) {
-      const k = String(u.searchParams.get("k") || "");
-      u.searchParams.set("k", k ? `…${tokenLastN(k, 5)}` : "(empty)");
-    }
-    return u.toString().slice(0, 500);
-  } catch (_) {
-    return raw.replace(/([?&]k=)([^&]*)/gi, (_, prefix, value) => {
-      const v = decodeURIComponent(String(value || ""));
-      return `${prefix}${v ? `…${tokenLastN(v, 5)}` : "(empty)"}`;
-    }).slice(0, 500);
-  }
-}
-
 function timingSafeEqualText(a = "", b = "") {
   const left = Buffer.from(String(a || ""), "utf8");
   const right = Buffer.from(String(b || ""), "utf8");
@@ -290,19 +263,13 @@ async function writeAccessLog(entry = {}) {
     tokenRequired: entry.tokenRequired === true,
     tokenProvided: entry.tokenProvided === true,
     tokenOk: entry.tokenOk === true,
-    tokenProvidedLast5: text(entry.tokenProvidedLast5, 16),
-    tokenExpectedLast5: text(entry.tokenExpectedLast5, 16),
-    tokenSuffixMatch: entry.tokenSuffixMatch === true,
     reason: text(entry.reason, 240),
     pageUrl: text(entry.pageUrl, 500),
-    pageUrlRedacted: text(entry.pageUrlRedacted, 500),
     userAgent: text(entry.userAgent, 400),
     screenFormatId: text(entry.screenFormatId, 80),
     language: text(entry.language, 40),
     timezone: text(entry.timezone, 80),
     platform: text(entry.platform, 120),
-    actorEmail: text(entry.actorEmail, 200),
-    eventType: text(entry.eventType, 80),
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     createdAtMs: Date.now(),
     logCategory: "security",
@@ -341,13 +308,9 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
   const reason = text(entry.reason, 240) || "denied";
   if (!locationId) return {notified: false, reason: "missing_location"};
 
-  const providedLast5 = text(entry.tokenProvidedLast5, 16) || "(none)";
-  const expectedLast5 = text(entry.tokenExpectedLast5, 16) || "(none)";
-  const pageUrlRedacted = text(entry.pageUrlRedacted, 500);
-  // Include token suffixes in cooldown so retests with a different ?k= still alert.
   const coolKey = crypto
     .createHash("sha1")
-    .update(`${locationId}|${displayBoard}|${clientIp}|${reason}|${providedLast5}|${expectedLast5}`)
+    .update(`${locationId}|${displayBoard}|${clientIp}|${reason}`)
     .digest("hex")
     .slice(0, 40);
   const coolRef = db.collection("displayDenialAlerts").doc(coolKey);
@@ -361,18 +324,11 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
   const boardLabel = displayBoard === "secondary" ? "Display 2 (supRstar)" : "Display 1 (ShoutOut)";
   const locationName = text(entry.locationName, 200) || locationId;
   const title = "Display access denied";
-  const suffixCompare = `Token last5 provided=${providedLast5} expect=${expectedLast5}${entry.tokenSuffixMatch === true ? " (suffix match)" : " (suffix mismatch)"}`;
-  // Put compare into denialReason so live Pages Security Messages (which render denialReason) show it without a Pages publish.
-  const denialReason = [
-    reason,
-    suffixCompare,
-    pageUrlRedacted ? `URL ${pageUrlRedacted}` : ""
-  ].filter(Boolean).join(". ");
   const body = [
     `${boardLabel} blocked for ${locationName}.`,
     clientIp ? `IP ${clientIp}.` : "",
     entry.hostname ? `Host ${text(entry.hostname, 120)}.` : "",
-    `Reason: ${denialReason}.`,
+    `Reason: ${reason}.`,
     "Device was shown the Floq Media / FloqR not-configured message."
   ].filter(Boolean).join(" ");
 
@@ -403,11 +359,7 @@ async function notifyMasterAdminsDisplayDenied(entry = {}) {
     clientIp,
     hostname: text(entry.hostname, 200),
     macAddress: text(entry.macAddress, 80) || "n/a",
-    denialReason,
-    tokenProvidedLast5: providedLast5,
-    tokenExpectedLast5: expectedLast5,
-    tokenSuffixMatch: entry.tokenSuffixMatch === true,
-    pageUrlRedacted,
+    denialReason: reason,
     accessLogId: text(entry.logId, 120),
     read: false,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -486,17 +438,16 @@ exports.checkDisplayAccess = onCall({
   }
 
   const expectedToken = text(secrets[tokenFieldForBoard(displayBoard)] || "", 120);
-  // Feature: IP allowlist and board token are independent unlocks (OR).
-  // Whichever control is configured and passes unlocks the board — not AND.
-  // - Token OFF (displayTokenRequired === false): no token gate (IP rules still apply if enabled).
-  // - Token ON (default / true): valid ?k= unlocks even when IP fails (or IP unlocks without ?k=).
+  // Feature: token lock and IP allowlist are independent.
+  // - Token OFF (displayTokenRequired === false): idle/live allowed without ?k= (IP rules still apply).
+  // - Token ON (default / true): require ?k= for idle and live; deny if board token missing.
   const tokenRequiredFlag = !isProbe && club.displayTokenRequired !== false;
   const tokenRequired = tokenRequiredFlag && !!expectedToken;
   const tokenProvided = !!accessToken;
   let tokenOk = true;
   let tokenReason = "token_off";
   if (tokenRequiredFlag && !expectedToken) {
-    // Locked mode but no token provisioned yet → this gate cannot pass (IP may still unlock).
+    // Locked mode but no token provisioned yet → deny (forces Master to re-issue tokens).
     tokenOk = false;
     tokenReason = "token_not_configured";
   } else if (tokenRequired) {
@@ -506,38 +457,16 @@ exports.checkDisplayAccess = onCall({
     tokenReason = "token_ignored_not_required";
   }
 
-  const tokenProvidedLast5 = tokenLastN(accessToken, 5);
-  const tokenExpectedLast5 = tokenLastN(expectedToken, 5);
-  const tokenSuffixMatch = tokenProvidedLast5 !== "(none)"
-    && tokenExpectedLast5 !== "(none)"
-    && tokenProvidedLast5 === tokenExpectedLast5;
-  const pageUrlRedacted = redactPageUrlToken(data.pageUrl);
-
-  const ipGateConfigured = !isProbe && ipRestrictionWanted;
-  const tokenGateConfigured = !isProbe && tokenRequiredFlag;
-  const ipPass = ipGateConfigured && ipOk;
-  const tokenPass = tokenGateConfigured && tokenOk;
-  let allowed = true;
+  const allowed = isProbe ? true : (ipOk && tokenOk);
   let reason = "ok";
-  if (isProbe) {
-    reason = "ip_probe";
-  } else if (!ipGateConfigured && !tokenGateConfigured) {
-    reason = "open";
-  } else {
-    // OR: any configured gate that passes unlocks the board.
-    allowed = ipPass || tokenPass;
-    if (allowed) {
-      if (ipPass && tokenPass) reason = "ip_or_token_ok";
-      else if (ipPass) reason = ipReason;
-      else reason = tokenReason;
-    } else if (ipGateConfigured && tokenGateConfigured) {
-      reason = `${ipReason}+${tokenReason}`;
-    } else if (ipGateConfigured) {
-      reason = ipReason;
-    } else {
-      reason = tokenReason;
-    }
-  }
+  if (isProbe) reason = "ip_probe";
+  else if (!ipOk && !tokenOk) reason = `${ipReason}+${tokenReason}`;
+  else if (!ipOk) reason = ipReason;
+  else if (!tokenOk) reason = tokenReason;
+  else if (ipRestrictionEnabled && tokenRequired) reason = "ip_and_token_ok";
+  else if (ipRestrictionEnabled) reason = ipReason;
+  else if (tokenRequired) reason = tokenReason;
+  else reason = "open";
 
   const hostname = reportedHostname || await lookupHostname(clientIp);
   const macAddress = reportedMac || "n/a";
@@ -555,12 +484,8 @@ exports.checkDisplayAccess = onCall({
     tokenRequired,
     tokenProvided,
     tokenOk,
-    tokenProvidedLast5,
-    tokenExpectedLast5,
-    tokenSuffixMatch,
     reason,
     pageUrl: data.pageUrl,
-    pageUrlRedacted,
     userAgent: data.userAgent,
     screenFormatId: data.screenFormatId,
     language: data.language,
@@ -579,10 +504,6 @@ exports.checkDisplayAccess = onCall({
         hostname,
         macAddress,
         reason,
-        tokenProvidedLast5,
-        tokenExpectedLast5,
-        tokenSuffixMatch,
-        pageUrlRedacted,
         logId: log.id,
         masterAdminUids: Array.isArray(club.masterAdminUids) ? club.masterAdminUids : []
       });
@@ -598,10 +519,6 @@ exports.checkDisplayAccess = onCall({
     restrictionEnabled: ipRestrictionEnabled,
     tokenRequired: tokenRequiredFlag,
     tokenOk,
-    tokenProvidedLast5,
-    tokenExpectedLast5,
-    tokenSuffixMatch,
-    pageUrlRedacted,
     reason,
     observedIp: clientIp,
     hostname,
@@ -633,13 +550,7 @@ exports.setVenueDisplayIps = onCall({
   const notes = text(data.notes, 500);
   const clubRef = db.collection("clubLocations").doc(locationId);
   const clubSnap = await clubRef.get();
-  if (!clubSnap.exists) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Venue not onboarded. Please onboard the venue or club under Entity Management (SOS2FA) before setting display security."
-    );
-  }
-  const existing = clubSnap.data() || {};
+  const existing = clubSnap.exists ? clubSnap.data() || {} : {};
   const payload = {
     approvedDisplayIps,
     displayIpRestrictionEnabled,
@@ -649,6 +560,10 @@ exports.setVenueDisplayIps = onCall({
     displayIpUpdatedBy: email,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
+  if (!clubSnap.exists) {
+    payload.locationName = text(data.locationName, 200) || locationId;
+    payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+  }
   await clubRef.set(payload, {merge: true});
 
   await db.collection("displayBoardSecrets").doc(locationId).set({
@@ -677,26 +592,10 @@ exports.setVenueDisplayIps = onCall({
   });
   await batch.commit();
 
-  const locationName = existing.locationName || existing.brandName || locationId;
-  await writeAccessLog({
-    locationId,
-    locationName,
-    displayBoard: "admin-settings",
-    allowed: true,
-    restrictionEnabled: displayIpRestrictionEnabled,
-    tokenRequired: displayTokenRequired,
-    reason: `admin_display_security_saved by ${email}; IP ${displayIpRestrictionEnabled ? "ON" : "OFF"}; token ${displayTokenRequired ? "ON" : "OFF"}; ${approvedDisplayIps.length} IP(s)`,
-    pageUrl: "master-admin.html#displaySecurity",
-    userAgent: "master-admin",
-    platform: "admin",
-    actorEmail: email,
-    eventType: "admin_display_security_saved"
-  });
-
   return {
     ok: true,
     locationId,
-    locationName,
+    locationName: existing.locationName || existing.brandName || locationId,
     approvedDisplayIps,
     displayIpRestrictionEnabled,
     displayTokenRequired,
@@ -859,13 +758,7 @@ exports.rotateVenueDisplayToken = onCall({
   const clear = data.clear === true;
   const secretsRef = db.collection("displayBoardSecrets").doc(locationId);
   const clubSnap = await db.collection("clubLocations").doc(locationId).get();
-  if (!clubSnap.exists) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Venue not onboarded. Please onboard the venue or club under Entity Management (SOS2FA) before rotating display tokens."
-    );
-  }
-  const club = clubSnap.data() || {};
+  const club = clubSnap.exists ? clubSnap.data() || {} : {};
 
   const patch = {
     locationId,
@@ -893,30 +786,11 @@ exports.rotateVenueDisplayToken = onCall({
   const primaryToken = text(secrets.primaryToken || "", 120);
   const secondaryToken = text(secrets.secondaryToken || "", 120);
   const activeToken = clear ? "" : (board === "secondary" ? secondaryToken : primaryToken);
-  const locationName = club.locationName || club.brandName || locationId;
-  const boardLabel = board === "secondary" ? "Display 2" : "Display 1";
-
-  await writeAccessLog({
-    locationId,
-    locationName,
-    displayBoard: "admin-settings",
-    allowed: true,
-    restrictionEnabled: club.displayIpRestrictionEnabled === true,
-    tokenRequired: secrets.tokenRequired === true || club.displayTokenRequired === true,
-    reason: clear
-      ? `admin_display_token_cleared by ${email}; ${boardLabel}`
-      : `admin_display_token_rotated by ${email}; ${boardLabel}`,
-    pageUrl: "master-admin.html#displaySecurity",
-    userAgent: "master-admin",
-    platform: "admin",
-    actorEmail: email,
-    eventType: clear ? "admin_display_token_cleared" : "admin_display_token_rotated"
-  });
 
   return {
     ok: true,
     locationId,
-    locationName,
+    locationName: club.locationName || club.brandName || locationId,
     board,
     cleared: clear,
     revealOnce: !clear,
@@ -974,8 +848,6 @@ exports.listDisplayAccessLogs = onCall({
       platform: row.platform || "",
       language: row.language || "",
       timezone: row.timezone || "",
-      actorEmail: row.actorEmail || "",
-      eventType: row.eventType || "",
       createdAtMs: Number(row.createdAtMs || 0)
     };
   });
@@ -1078,6 +950,7 @@ async function deleteOldAppLogsByTimestamp(olderThanMs, batchLimit = 400) {
  * Feature: retention sweeper
  * - Diagnostic appLogs: delete after 30 days
  * - Security displayAccessLogs: delete after 90 days
+ * - System mail logs: delete after 90 days
  * - Deleted/expired security system messages (soft-deleted) cleanup after 90 days
  */
 exports.purgeLogRetention = onSchedule({
@@ -1091,6 +964,7 @@ exports.purgeLogRetention = onSchedule({
   let diagnosticDeleted = 0;
   let securityDeleted = 0;
   let securityMessagesDeleted = 0;
+  let mailLogDeleted = 0;
 
   for (let i = 0; i < 5; i += 1) {
     const n = await deleteOldAppLogsByTimestamp(now - DIAGNOSTIC_LOG_RETENTION_MS);
@@ -1106,6 +980,11 @@ exports.purgeLogRetention = onSchedule({
   for (let i = 0; i < 5; i += 1) {
     const n = await deleteOldByCreatedAtMs("entityManagementAuditLogs", now - SECURITY_LOG_RETENTION_MS);
     entityMgmtAuditDeleted += n;
+    if (n < 400) break;
+  }
+  for (let i = 0; i < 5; i += 1) {
+    const n = await deleteOldByCreatedAtMs("systemMailLogs", now - SECURITY_LOG_RETENTION_MS);
+    mailLogDeleted += n;
     if (n < 400) break;
   }
 
@@ -1144,8 +1023,8 @@ exports.purgeLogRetention = onSchedule({
     securityMessagesDeleted = count;
   }
 
-  console.log("purgeLogRetention", {diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted});
-  return {ok: true, diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted};
+  console.log("purgeLogRetention", {diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted});
+  return {ok: true, diagnosticDeleted, securityDeleted, securityMessagesDeleted, entityMgmtAuditDeleted, mailLogDeleted};
 });
 
 exports.__displaySecurityHelpers = {
