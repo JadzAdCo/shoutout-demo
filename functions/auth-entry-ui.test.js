@@ -123,3 +123,39 @@ test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29
   assert.doesNotMatch(href, /v=29\.09\.22/);
   assert.match(href, /from=master/);
 });
+
+test("SOS2FA request UI is channel-neutral and puts status below the request button", () => {
+  const html = readReleaseFile("master-admin.html");
+  const sendIdx = html.indexOf("id=\"sos2faSendBtn\"");
+  const statusIdx = html.indexOf("id=\"sos2faStatus\"");
+  const codeIdx = html.indexOf("id=\"sos2faCode\"");
+  assert.ok(sendIdx > 0 && statusIdx > sendIdx, "status must sit below Request SOS2FA Code");
+  assert.ok(codeIdx > statusIdx, "code field must sit below status");
+  assert.match(html, />Request SOS2FA Code</);
+  assert.doesNotMatch(html, /Request SOS2FA Code via SMS/);
+  assert.match(html, />Enter SOS2FA Code:</);
+  assert.doesNotMatch(html, /SOS2FA SMS code/);
+  assert.match(html, /sos2fa-code-row/);
+  assert.match(html, /help-sos2fa-entity-mgmt/);
+  const css = readReleaseFile("admin.css");
+  assert.match(css, /\.sos2fa-code-row\{display:flex/);
+  const js = readReleaseFile("sos2fa.js");
+  assert.match(js, /data\.notes \|\| data\.delivery/);
+  assert.doesNotMatch(js, /Request SOS2FA Code via SMS/);
+});
+
+test("App language chrome keys cover portal tabs and language settings radios", () => {
+  const i18n = readReleaseFile("floqr-i18n.js");
+  ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved"].forEach(key => {
+    assert.match(i18n, new RegExp(`"${key}"`));
+  });
+  const portal = readReleaseFile("patron-portal.html");
+  assert.match(portal, /data-i18n="lang.suggestionsOnly"/);
+  assert.match(portal, /data-i18n="nav.overview"/);
+  assert.match(portal, /data-i18n="lang.webappLanguage"/);
+  const index = readReleaseFile("index.html");
+  assert.match(index, /data-i18n="cat.events"/);
+  const admin = readReleaseFile("admin.html");
+  assert.match(admin, /floqr-i18n\.js\?v=s3\./);
+  assert.match(admin, /data-i18n="admin.dashboard"/);
+});

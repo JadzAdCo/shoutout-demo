@@ -503,10 +503,11 @@
     const code = byId("uiAppLanguage")?.value || "en";
     const status = byId("uiAppLanguageStatus");
     try {
-      if (status) status.textContent = "Saving FloqR webapp language…";
+      if (status) status.textContent = "…";
       await window.FLOQRI18n?.setLanguage?.(code, {persist: true, markPrompt: true});
       window.FLOQRI18n?.applyDom?.();
-      if (status) status.textContent = `FloqR language set to ${window.FLOQRI18n?.meta?.(code)?.native || code}.`;
+      const native = window.FLOQRI18n?.meta?.(code)?.native || code;
+      if (status) status.textContent = window.FLOQRI18n?.t?.("lang.languageSaved", {native}) || `FloqR language set to ${native}.`;
     } catch (error) {
       if (status) status.textContent = error.message || String(error);
     }

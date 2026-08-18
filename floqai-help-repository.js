@@ -516,9 +516,23 @@
       page: "admin.html#adminVenueGate"
     },
     {
+      id: "help-sos2fa-entity-mgmt",
+      title: "SOS2FA",
+      body: "Entity Management is protected by SOS2FA (Social OS two-factor). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
+      searchPhrases: [
+        "sos2fa", "entity management unlock", "request sos2fa code", "two factor",
+        "sos2fa sms", "entity management 2fa"
+      ],
+      links: [
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#clubAdminUrls"
+    },
+    {
       id: "help-app-language",
       title: "App language",
-      body: "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Dutch is included with German, French, Spanish, Italian, Portuguese, Russian, Greek, Polish, and Arabic.",
+      body: "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card.",
       searchPhrases: [
         "app language", "dutch", "nederlands", "browser language", "first use language",
         "change language", "ui language", "floqr language", "switch to dutch", "detect language"

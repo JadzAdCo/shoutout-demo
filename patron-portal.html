@@ -4,7 +4,7 @@
   <!-- FLOQR Patron Portal v29.07 -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>My Profile and Settings</title>
+  <title data-i18n="portal.title">My Profile and Settings</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.19"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
 </head>
@@ -14,39 +14,39 @@
   <section class="page active">
     <header class="topbar">
       <div>
-        <h1>My Profile and Settings</h1>
-        <p class="sub">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl.</p>
+        <h1 data-i18n="portal.title">My Profile and Settings</h1>
+        <p class="sub" data-i18n="portal.subtitle">Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl.</p>
         <p id="portalStatus" class="status hidden" aria-live="polite"></p>
       </div>
     </header>
 
     <div id="portalLogin" class="card">
-      <h2>Sign in</h2>
-      <p class="sub">Sign in to view and update your patron profile.</p>
+      <h2 data-i18n="portal.signInTitle">Sign in</h2>
+      <p class="sub" data-i18n="portal.signInHint">Sign in to view and update your patron profile.</p>
       <button id="portalGoogleLoginBtn" type="button">Continue with Google</button>
     </div>
 
     <div id="portalPanel" class="hidden">
       <nav class="admin-tabs">
-        <button class="admin-tab active" data-panel="portalOverview" type="button">Overview</button>
-        <button class="admin-tab" data-panel="portalProfile" type="button">My Profile</button>
-        <button class="admin-tab" data-panel="portalPrivacy" type="button">My Privacy</button>
-        <button class="admin-tab" data-panel="portalLanguageSettings" type="button">Language Settings</button>
-        <button class="admin-tab" data-panel="portalAiNotifications" type="button">AI Notification Preferences</button>
-        <button class="admin-tab" data-panel="portalTemplateVariants" type="button">My ShoutOut Templates</button>
-        <button class="admin-tab" data-panel="portalPublicProfile" type="button">Public Media and Data Sharing</button>
-        <button class="admin-tab" data-panel="portalShoutouts" type="button">My ShoutOuts</button>
-        <button class="admin-tab" data-panel="portalGuestLists" type="button">My Guest Lists</button>
-        <button class="admin-tab" data-panel="portalPaidServices" type="button">Paid Services & Orders</button>
-        <button class="admin-tab" data-panel="portalBartrStore" type="button">BartR Store</button>
-        <button class="admin-tab" data-panel="portalMessages" type="button">FloqR Inbox</button>
-        <button class="admin-tab" data-panel="portalMinglFriends" type="button">Manage Mingl Friends</button>
-        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal">Mingl Chat</a>
-        <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal">Follow Services</a>
-        <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal">Open BartR</a>
-        <button class="admin-tab hidden" id="portalWorkCalendarTab" data-panel="portalWorkCalendar" type="button">Work Calendar</button>
-        <button class="admin-tab" id="portalServiceMembersTab" data-panel="portalServiceMembers" type="button">Service Members</button>
-        <button class="admin-tab" data-panel="portalHelp" type="button">Help</button>
+        <button class="admin-tab active" data-panel="portalOverview" type="button" data-i18n="nav.overview">Overview</button>
+        <button class="admin-tab" data-panel="portalProfile" type="button" data-i18n="nav.myProfile">My Profile</button>
+        <button class="admin-tab" data-panel="portalPrivacy" type="button" data-i18n="nav.myPrivacy">My Privacy</button>
+        <button class="admin-tab" data-panel="portalLanguageSettings" type="button" data-i18n="nav.languageSettings">Language Settings</button>
+        <button class="admin-tab" data-panel="portalAiNotifications" type="button" data-i18n="nav.aiNotifications">AI Notification Preferences</button>
+        <button class="admin-tab" data-panel="portalTemplateVariants" type="button" data-i18n="nav.myTemplates">My ShoutOut Templates</button>
+        <button class="admin-tab" data-panel="portalPublicProfile" type="button" data-i18n="nav.publicMedia">Public Media and Data Sharing</button>
+        <button class="admin-tab" data-panel="portalShoutouts" type="button" data-i18n="nav.myShoutouts">My ShoutOuts</button>
+        <button class="admin-tab" data-panel="portalGuestLists" type="button" data-i18n="nav.guestLists">My Guest Lists</button>
+        <button class="admin-tab" data-panel="portalPaidServices" type="button" data-i18n="nav.paidServices">Paid Services & Orders</button>
+        <button class="admin-tab" data-panel="portalBartrStore" type="button" data-i18n="nav.bartrStore">BartR Store</button>
+        <button class="admin-tab" data-panel="portalMessages" type="button" data-i18n="nav.inbox">FloqR Inbox</button>
+        <button class="admin-tab" data-panel="portalMinglFriends" type="button" data-i18n="nav.minglFriends">Manage Mingl Friends</button>
+        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
+        <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal" data-i18n="nav.followServices">Follow Services</a>
+        <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal" data-i18n="nav.openBartr">Open BartR</a>
+        <button class="admin-tab hidden" id="portalWorkCalendarTab" data-panel="portalWorkCalendar" type="button" data-i18n="nav.workCalendar">Work Calendar</button>
+        <button class="admin-tab" id="portalServiceMembersTab" data-panel="portalServiceMembers" type="button" data-i18n="nav.serviceMembers">Service Members</button>
+        <button class="admin-tab" data-panel="portalHelp" type="button" data-i18n="nav.help">Help</button>
       </nav>
 
       <section id="portalOverview" class="admin-panel-section active">
@@ -408,18 +408,18 @@
 
       <section id="portalLanguageSettings" class="admin-panel-section">
         <div class="card">
-          <h2>Language Settings</h2>
-          <p class="sub small">Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future BartR descriptions.</p>
+          <h2 data-i18n="lang.pageTitle">Language Settings</h2>
+          <p class="sub small" data-i18n="lang.pageHint">Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future BartR descriptions.</p>
           <label class="consent-checkbox">
             <input id="languageAiGrammarEnabled" type="checkbox"/>
-            <span>Enable grammar and spelling check before sending messages, chats, ShoutOuts, profile updates, and other text inputs.</span>
+            <span data-i18n="lang.enableGrammar">Enable grammar and spelling check before sending messages, chats, ShoutOuts, profile updates, and other text inputs.</span>
           </label>
           <div class="card-subsection">
-            <h3>Correction Mode</h3>
+            <h3 data-i18n="lang.correctionMode">Correction Mode</h3>
             <div class="language-radio-grid">
-              <label><input type="radio" name="languageCorrectionMode" value="suggestionsOnly"/> <span>Show suggestions only</span></label>
-              <label><input type="radio" name="languageCorrectionMode" value="approvalRequired"/> <span>Require approval before replacing my text</span></label>
-              <label><input type="radio" name="languageCorrectionMode" value="autoFixMinor"/> <span>Auto-fix minor typos only</span></label>
+              <label><input type="radio" name="languageCorrectionMode" value="suggestionsOnly"/> <span data-i18n="lang.suggestionsOnly">Show suggestions only</span></label>
+              <label><input type="radio" name="languageCorrectionMode" value="approvalRequired"/> <span data-i18n="lang.approvalRequired">Require approval before replacing my text</span></label>
+              <label><input type="radio" name="languageCorrectionMode" value="autoFixMinor"/> <span data-i18n="lang.autoFixMinor">Auto-fix minor typos only</span></label>
             </div>
           </div>
           <div class="card nested-card" style="margin-bottom:14px">
@@ -429,16 +429,16 @@
                 data-floqr-help-body="On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported. Unsupported languages stay in English. After that, this setting and your saved profile language win. Dutch is included with German, French, Spanish, Italian, Portuguese, Russian, Greek, Polish, and Arabic."
                 data-floqr-help-search="dutch|nederlands|app language|browser language|first use language">App language</h3>
             <p class="sub small" data-keep-visible="true" data-i18n="app.languageHint">Choose the language for FloqR chrome and menus.</p>
-            <label>FloqR webapp language
+            <label><span class="i18n-text" data-i18n="lang.webappLanguage">FloqR webapp language</span>
               <select id="uiAppLanguage"></select>
             </label>
             <button id="saveUiAppLanguageBtn" class="primary" type="button" data-i18n="app.save">Save</button>
             <p id="uiAppLanguageStatus" class="status"></p>
           </div>
           <div class="profile-grid">
-            <label class="consent-checkbox"><input id="languageHighlightSpellingErrors" type="checkbox"/><span>Highlight possible spelling errors in red before correction</span></label>
-            <label class="consent-checkbox"><input id="languageHighlightGrammarSuggestions" type="checkbox"/><span>Highlight grammar suggestions in yellow or underline</span></label>
-            <label>Preferred Language (grammar / bio)
+            <label class="consent-checkbox"><input id="languageHighlightSpellingErrors" type="checkbox"/><span data-i18n="lang.highlightSpelling">Highlight possible spelling errors in red before correction</span></label>
+            <label class="consent-checkbox"><input id="languageHighlightGrammarSuggestions" type="checkbox"/><span data-i18n="lang.highlightGrammar">Highlight grammar suggestions in yellow or underline</span></label>
+            <label><span class="i18n-text" data-i18n="lang.preferredGrammar">Preferred Language (grammar / bio)</span>
               <select id="languagePreferredLanguage">
                 <option value="auto">Auto-detect</option>
                 <option value="en">English</option>
@@ -454,7 +454,7 @@
                 <option value="nl">Dutch</option>
               </select>
             </label>
-            <label>Tone Preference
+            <label><span class="i18n-text" data-i18n="lang.tone">Tone Preference</span>
               <select id="languageTonePreference">
                 <option value="keepTone">Keep my tone</option>
                 <option value="friendly">Friendly</option>
@@ -464,22 +464,22 @@
                 <option value="formal">Formal</option>
               </select>
             </label>
-            <label>Emoji Skin Tone
+            <label><span class="i18n-text" data-i18n="lang.emojiSkin">Emoji Skin Tone</span>
               <select id="languageEmojiSkinTone">
                 <option value="yellow">Yellow/default</option>
                 <option value="light-brown">Light brown</option>
                 <option value="dark-brown">Dark brown</option>
               </select>
             </label>
-            <label>My Word List
+            <label><span class="i18n-text" data-i18n="lang.wordList">My Word List</span>
               <textarea id="languagePersonalDictionary" rows="3" placeholder="Names, slang, handles, places, or preferred spellings separated by commas"></textarea>
             </label>
-            <label>My Personal Corrections
+            <label><span class="i18n-text" data-i18n="lang.personalCorrections">My Personal Corrections</span>
               <textarea id="languagePersonalCorrections" rows="4" placeholder="watz -> what's&#10;weakend -> weekend"></textarea>
             </label>
           </div>
           <p class="sub small">To test: add `watz -> what's` and `weakend -> weekend`, save, open Mingl Chat, type those words, then use Correct Grammar/Spelling. Gemini is tried first; if unavailable, only your saved personal corrections are applied.</p>
-          <button id="saveLanguageSettingsBtn" class="primary" type="button">Save Language Settings</button>
+          <button id="saveLanguageSettingsBtn" class="primary" type="button" data-i18n="lang.saveLanguageSettings">Save Language Settings</button>
           <div id="languageSettingsReport" class="report-block"></div>
         </div>
       </section>
@@ -658,15 +658,15 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
-<script src="./floqai-help-repository.js?v=s3.0.1"></script>
+<script src="./floqai-help-repository.js?v=s3.0.4"></script>
 <script src="./help-attach.js?v=29.09.115"></script>
 <script src="./helper-popouts.js?v=29.09.100"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=29.09.100"></script>
+<script src="./floqr-i18n.js?v=s3.0.4"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=s3.0.3"></script>
+<script src="./patron-portal-app.js?v=s3.0.4"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

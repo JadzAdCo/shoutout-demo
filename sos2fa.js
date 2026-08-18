@@ -1,17 +1,23 @@
-/* SOS2FA — Social OS SMS second-factor gate for sensitive Master Admin surfaces. */
+/* SOS2FA — Super Admin SMS gate for Entity Management (server-side Twilio OTP). */
 (function (root) {
   "use strict";
 
   const STORAGE_PREFIX = "floqr_sos2fa_";
-  const DEFAULT_TTL_MS = 30 * 60 * 1000;
+  const DEFAULT_TTL_MS = 60 * 60 * 1000;
+  const WRONG_CODE_MESSAGE = "Wrong code entered, please enter the correct code to proceed";
   const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com"]).map(x => String(x).toLowerCase());
-  const SECONDARY_APP_NAME = "floqr-sos2fa";
+  const ENTITY_MGMT_PANELS = [
+    "clubAdminUrls",
+    "entityManagement",
+    "allQueues",
+    "clubOnboarding",
+    "templateManagement",
+    "recommendationModeration"
+  ];
 
-  let recaptcha = null;
-  let verificationId = "";
-  let enrollmentSession = null;
-  let pendingPhone = "";
   let uiBound = false;
+  let functions = null;
+  let challengeRequested = false;
   const unlockCallbacks = new Map();
 
   function byId(id) {
@@ -33,51 +39,57 @@
     return false;
   }
 
+  function isEntityMgmtPanel(panelId) {
+    return ENTITY_MGMT_PANELS.includes(String(panelId || ""));
+  }
+
   function storageKey(scope) {
     return `${STORAGE_PREFIX}${String(scope || "default")}`;
   }
 
-  function isUnlocked(scope) {
+  function readSession(scope) {
     try {
       const raw = sessionStorage.getItem(storageKey(scope));
-      if (!raw) return false;
+      if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (!parsed?.ok || !parsed?.exp) return false;
+      if (!parsed?.sessionId || !parsed?.exp) return null;
       if (Date.now() > Number(parsed.exp)) {
         sessionStorage.removeItem(storageKey(scope));
-        return false;
+        return null;
       }
-      return true;
+      return parsed;
     } catch (_) {
-      return false;
+      return null;
     }
   }
 
-  function unlock(scope, ttlMs) {
-    const exp = Date.now() + (Number(ttlMs) > 0 ? Number(ttlMs) : DEFAULT_TTL_MS);
-    sessionStorage.setItem(storageKey(scope), JSON.stringify({ok:true, exp, at:Date.now()}));
+  function isUnlocked(scope) {
+    return !!readSession(scope)?.sessionId;
+  }
+
+  function getSessionId(scope) {
+    return readSession(scope)?.sessionId || "";
+  }
+
+  function unlock(scope, payload = {}) {
+    const ttlMs = Number(payload.expiresInSeconds) > 0 ? Number(payload.expiresInSeconds) * 1000 : DEFAULT_TTL_MS;
+    const exp = Date.now() + ttlMs;
+    sessionStorage.setItem(storageKey(scope), JSON.stringify({
+      ok: true,
+      sessionId: String(payload.sessionId || ""),
+      exp,
+      at: Date.now()
+    }));
   }
 
   function lock(scope) {
     sessionStorage.removeItem(storageKey(scope));
+    challengeRequested = false;
   }
 
-  function clearVerifier() {
-    try { recaptcha?.clear?.(); } catch (_) {}
-    recaptcha = null;
-  }
-
-  function getVerifier(containerId) {
-    if (recaptcha) return recaptcha;
-    const id = containerId || "sos2fa-recaptcha";
-    if (!byId(id)) {
-      const host = document.createElement("div");
-      host.id = id;
-      host.className = "sos2fa-recaptcha";
-      (byId("sos2faGate") || document.body).appendChild(host);
-    }
-    recaptcha = new firebase.auth.RecaptchaVerifier(id, {size:"normal"});
-    return recaptcha;
+  function callable(name) {
+    if (!functions) functions = firebase.app().functions("us-central1");
+    return functions.httpsCallable(name);
   }
 
   function setStatus(message) {
@@ -85,114 +97,112 @@
     if (el) el.textContent = message || "";
   }
 
-  function phoneHint(user) {
-    try {
-      const factors = user?.multiFactor?.enrolledFactors || [];
-      const phone = factors.find(f => f.factorId === firebase.auth.PhoneMultiFactorGenerator.FACTOR_ID) || factors[0];
-      return phone?.phoneNumber || phone?.displayName || "";
-    } catch (_) {
-      return "";
+  function ensureGatedWrappers() {
+    ENTITY_MGMT_PANELS.forEach(id => {
+      if (id === "entityManagement") return;
+      const section = byId(id);
+      if (!section || section.dataset.entityMgmtWrapped === "1") return;
+      section.dataset.entityMgmtWrapped = "1";
+      section.dataset.entityMgmtGated = "1";
+      const wrap = document.createElement("div");
+      wrap.className = "entity-mgmt-content";
+      while (section.firstChild) wrap.appendChild(section.firstChild);
+      section.appendChild(wrap);
+    });
+    const entitySection = byId("entityManagement");
+    if (entitySection) entitySection.dataset.entityMgmtGated = "1";
+  }
+
+  function parkGate() {
+    const gate = byId("sos2faGate");
+    const parking = byId("entityMgmtSos2faParking");
+    if (gate && parking && gate.parentElement !== parking) parking.appendChild(gate);
+  }
+
+  function activeEntityPanel() {
+    const active = document.querySelector(".admin-panel-section.active");
+    return active && isEntityMgmtPanel(active.id) ? active : null;
+  }
+
+  function syncGateUi(scope, unlocked) {
+    ensureGatedWrappers();
+    const gate = byId("sos2faGate");
+    const active = activeEntityPanel();
+
+    ENTITY_MGMT_PANELS.forEach(id => {
+      const section = byId(id);
+      if (!section) return;
+      if (id === "entityManagement") {
+        byId("entityManageSecureBody")?.classList.toggle("hidden", !unlocked);
+      } else {
+        section.querySelectorAll(".entity-mgmt-content").forEach(el => el.classList.toggle("hidden", !unlocked));
+      }
+    });
+
+    if (!gate) return;
+    if (!unlocked && active) {
+      active.prepend(gate);
+      gate.classList.remove("hidden");
+    } else {
+      gate.classList.add("hidden");
+      parkGate();
+    }
+
+    const hint = byId("sos2faPhoneHint");
+    if (hint) {
+      hint.textContent = challengeRequested
+        ? "Enter the six-digit SOS2FA code from SMS or email."
+        : "Request SOS2FA Code. FloqR sends it using your Email and SMS notification settings.";
     }
   }
 
-  function secondaryAuth() {
-    let app;
+  async function logActivity(action, detail) {
+    const sessionId = getSessionId("entityManagement");
+    if (!sessionId) return;
     try {
-      app = firebase.app(SECONDARY_APP_NAME);
-    } catch (_) {
-      app = firebase.initializeApp(firebase.app().options, SECONDARY_APP_NAME);
-    }
-    return app.auth();
+      await callable("logEntityManagementActivity")({action, detail, sos2faSessionId: sessionId});
+    } catch (_) {}
   }
 
-  async function sendCode({user, phoneNumber, containerId} = {}) {
-    const authUser = user || firebase.auth().currentUser;
+  async function sendCode() {
+    const authUser = firebase.auth().currentUser;
     if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
     if (!isSuperAdminUser(authUser)) {
       throw new Error("SOS2FA Entity Management unlock is limited to Super Admin.");
     }
-
-    clearVerifier();
-    verificationId = "";
-    enrollmentSession = null;
-    pendingPhone = "";
-
-    const provider = new firebase.auth.PhoneAuthProvider(firebase.auth());
-    const verifier = getVerifier(containerId);
-    const enrolled = authUser.multiFactor?.enrolledFactors || [];
-    const phoneFactor = enrolled.find(f => f.factorId === firebase.auth.PhoneMultiFactorGenerator.FACTOR_ID);
-    const enrollFields = byId("sos2faEnrollFields");
-
-    if (phoneFactor?.phoneNumber) {
-      if (enrollFields) enrollFields.classList.add("hidden");
-      pendingPhone = String(phoneFactor.phoneNumber).trim();
-      setStatus(`Sending SOS2FA SMS to Super Admin mobile ${pendingPhone}…`);
-      verificationId = await provider.verifyPhoneNumber(pendingPhone, verifier);
-      setStatus("SOS2FA SMS sent to Super Admin. Enter the six-digit code.");
-      return {mode:"verify", phone:pendingPhone};
-    }
-
-    if (enrollFields) enrollFields.classList.remove("hidden");
-    const enrollPhone = String(phoneNumber || byId("sos2faPhone")?.value || "").trim();
-    if (!/^\+\d{10,15}$/.test(enrollPhone)) {
-      throw new Error("Enter Super Admin mobile in E.164 format (example +12025550123) to enroll SOS2FA.");
-    }
-    pendingPhone = enrollPhone;
-    setStatus("Enrolling SOS2FA on Super Admin mobile…");
-    enrollmentSession = await authUser.multiFactor.getSession();
-    verificationId = await provider.verifyPhoneNumber({phoneNumber:enrollPhone, session:enrollmentSession}, verifier);
-    setStatus("SOS2FA enrollment SMS sent. Enter the six-digit code to finish.");
-    return {mode:"enroll", phone:enrollPhone};
+    setStatus("Requesting SOS2FA code…");
+    const result = await callable("requestSos2faCode")({});
+    const data = result?.data || {};
+    challengeRequested = true;
+    setStatus(data.notes || data.delivery || "SOS2FA code sent. Enter the six-digit code.");
+    syncGateUi("entityManagement", false);
+    return data;
   }
 
   async function verifyCode({code} = {}) {
     const authUser = firebase.auth().currentUser;
     if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
     const sms = String(code || byId("sos2faCode")?.value || "").trim();
-    if (!verificationId || !/^\d{6}$/.test(sms)) throw new Error("Enter the six-digit SOS2FA SMS code.");
+    if (!/^\d{6}$/.test(sms)) throw new Error("Enter the six-digit SOS2FA code.");
+    if (!challengeRequested) throw new Error("Request SOS2FA Code first.");
 
-    const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, sms);
-
-    if (enrollmentSession) {
-      const assertion = firebase.auth.PhoneMultiFactorGenerator.assertion(credential);
-      await authUser.multiFactor.enroll(assertion, "SOS2FA Super Admin");
-      enrollmentSession = null;
-    } else {
-      const alt = secondaryAuth();
-      try {
-        const result = await alt.signInWithCredential(credential);
-        const confirmed = String(result?.user?.phoneNumber || "").trim();
-        if (pendingPhone && confirmed && confirmed !== pendingPhone) {
-          throw new Error("SOS2FA phone confirmation did not match Super Admin mobile.");
-        }
-      } finally {
-        try { await alt.signOut(); } catch (_) {}
+    try {
+      const result = await callable("verifySos2faCode")({code: sms});
+      const data = result?.data || {};
+      unlock("entityManagement", data);
+      challengeRequested = false;
+      setStatus("SOS2FA unlocked for this browser session.");
+      syncGateUi("entityManagement", true);
+      await logActivity("entity_management_unlocked", {panel: activeEntityPanel()?.id || "entityManagement"});
+      fireUnlock("entityManagement");
+      return true;
+    } catch (error) {
+      const message = String(error?.message || error?.details || error || "");
+      if (/wrong code entered/i.test(message)) {
+        setStatus(WRONG_CODE_MESSAGE);
+        throw new Error(WRONG_CODE_MESSAGE);
       }
-    }
-
-    verificationId = "";
-    pendingPhone = "";
-    clearVerifier();
-    setStatus("SOS2FA verified.");
-    return true;
-  }
-
-  function syncGateUi(scope, unlocked) {
-    const gate = byId("sos2faGate");
-    const body = byId("entityManageSecureBody");
-    if (gate) gate.classList.toggle("hidden", !!unlocked);
-    if (body) body.classList.toggle("hidden", !unlocked);
-    const hint = byId("sos2faPhoneHint");
-    if (hint) {
-      const phone = phoneHint(firebase.auth().currentUser);
-      hint.textContent = phone
-        ? `SOS2FA will SMS Super Admin mobile ${phone}.`
-        : "First use: enroll Super Admin mobile for SOS2FA, then confirm with the SMS code.";
-    }
-    const enrollFields = byId("sos2faEnrollFields");
-    if (enrollFields) {
-      const phone = phoneHint(firebase.auth().currentUser);
-      enrollFields.classList.toggle("hidden", !!phone);
+      throw error;
     }
   }
 
@@ -206,20 +216,28 @@
     if (!isSuperAdminUser(authUser, options.profile)) {
       setStatus("Only Super Admin may unlock Entity Management with SOS2FA.");
       syncGateUi(scope, false);
-      byId("sos2faGate")?.classList.remove("hidden");
-      byId("entityManageSecureBody")?.classList.add("hidden");
       byId("sos2faActions")?.classList.add("hidden");
-      byId("sos2faEnrollFields")?.classList.add("hidden");
+      byId("sos2faSendBtn")?.classList.add("hidden");
       return false;
     }
     byId("sos2faActions")?.classList.remove("hidden");
+    byId("sos2faSendBtn")?.classList.remove("hidden");
     if (isUnlocked(scope)) {
       syncGateUi(scope, true);
       return true;
     }
     syncGateUi(scope, false);
-    setStatus("SOS2FA required. Send an SMS code to Super Admin to continue.");
+    setStatus("Entity Management is locked. Request SOS2FA Code to continue.");
     return false;
+  }
+
+  function onPanelActivate(panelId) {
+    if (!isEntityMgmtPanel(panelId)) {
+      parkGate();
+      byId("sos2faGate")?.classList.add("hidden");
+      return;
+    }
+    requireUnlock("entityManagement");
   }
 
   function fireUnlock(scope) {
@@ -232,28 +250,26 @@
     uiBound = true;
     byId("sos2faSendBtn")?.addEventListener("click", async () => {
       try {
-        await sendCode({phoneNumber:byId("sos2faPhone")?.value});
+        await sendCode();
         byId("sos2faCode")?.focus();
       } catch (e) {
-        clearVerifier();
         setStatus(e.message || String(e));
       }
     });
     byId("sos2faVerifyBtn")?.addEventListener("click", async () => {
       try {
         await verifyCode();
-        unlock(scope);
-        syncGateUi(scope, true);
-        setStatus("SOS2FA unlocked for this browser session.");
-        fireUnlock(scope);
       } catch (e) {
-        setStatus(e.message || String(e));
+        if (e.message !== WRONG_CODE_MESSAGE) setStatus(e.message || String(e));
       }
     });
-    byId("sos2faLockBtn")?.addEventListener("click", () => {
+    byId("sos2faLockBtn")?.addEventListener("click", async () => {
       lock(scope);
       syncGateUi(scope, false);
-      setStatus("SOS2FA locked. Send a new SMS code to re-open Entity Management.");
+      setStatus("Entity Management locked. Request a new SOS2FA code to continue.");
+      try {
+        await logActivity("entity_management_locked", {});
+      } catch (_) {}
     });
     byId("sos2faCode")?.addEventListener("keydown", event => {
       if (event.key === "Enter") {
@@ -267,21 +283,28 @@
     const scope = options.scope || "entityManagement";
     if (typeof options.onUnlocked === "function") unlockCallbacks.set(scope, options.onUnlocked);
     bindUi(scope);
+    ensureGatedWrappers();
     return requireUnlock(scope, options);
   }
 
   root.FLOQRSOS2FA = {
     name: "SOS2FA",
     fullName: "Social OS 2FA",
+    ENTITY_MGMT_PANELS,
     isSuperAdminUser,
+    isEntityMgmtPanel,
     isUnlocked,
+    getSessionId,
     unlock,
     lock,
     sendCode,
     verifyCode,
     requireUnlock,
+    onPanelActivate,
     mount,
     syncGateUi,
-    DEFAULT_TTL_MS
+    logActivity,
+    DEFAULT_TTL_MS,
+    WRONG_CODE_MESSAGE
   };
 })(window);

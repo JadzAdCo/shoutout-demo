@@ -25,7 +25,7 @@
         <p id="dropdownUserEmail">Guest</p>
       </div>
     </div>
-    <button id="dropdownSignOutBtn" class="ghost full" type="button">Sign out</button>
+    <button id="dropdownSignOutBtn" class="ghost full" type="button" data-i18n="app.signOut">Sign out</button>
   </div>
 </div>
 
@@ -36,7 +36,7 @@
         <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback hidden">FLOQR</div>
         <h2 data-i18n="app.welcome">Welcome</h2>
-        <p class="login-copy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
+        <p class="login-copy" data-i18n="app.loginCopy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
         <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
 
         <div id="signedInActions" class="hidden">
@@ -45,7 +45,7 @@
         </div>
 
         <div id="loginActions">
-          <button id="googleLoginBtn" class="signin google" type="button">
+          <button id="googleLoginBtn" class="signin google" type="button" data-i18n="app.google">
             <span class="icon google-icon">
               <svg viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -56,10 +56,10 @@
             </span>
             Continue with Google
           </button>
-          <button id="microsoftLoginBtn" class="signin microsoft" type="button"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
-          <button id="facebookLoginBtn" class="signin facebook" type="button"><span class="icon fb-icon">f</span>Continue with Facebook</button>
+          <button id="microsoftLoginBtn" class="signin microsoft" type="button" data-i18n="app.microsoft"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+          <button id="facebookLoginBtn" class="signin facebook" type="button" data-i18n="app.facebook"><span class="icon fb-icon">f</span>Continue with Facebook</button>
 
-          <button id="showEmailOtpBtn" class="signin email" type="button" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false">Continue with your own Email</button>
+          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false">Continue with your own Email</button>
           <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
             <label>Email address
               <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
@@ -239,25 +239,25 @@
       <div>
         <button id="backToWelcomeBtn" type="button">&larr; Back to welcome</button>
         <p class="sub category-sentence">
-          <strong>Search for</strong>
+          <strong data-i18n="nav.searchFor">Search for</strong>
         </p>
       </div>
-      <button id="logoutBtn2" type="button">Sign out</button>
+      <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
 
     <div class="category-grid compact-category-grid">
-      <button id="eventsBtnCard" class="category-card" type="button">Events</button>
-      <button id="clubsBtnCard" class="category-card" type="button">Clubs</button>
-      <button id="beachClubsBtnCard" class="category-card" type="button">Beach Clubs</button>
-      <button id="loungesBtnCard" class="category-card" type="button">Lounges</button>
-      <button id="loungeClubBtnCard" class="category-card" type="button">Lounge-Clubs</button>
-      <div class="category-or">Or</div>
-      <button id="shoutoutBtnCard" class="category-card hot" type="button">Throw a ShoutOut</button>
-      <button id="minglBtnCard" class="category-card mingl-card" type="button">Mingl</button>
-      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.33&from=search">Trade by BartR</a>
-      <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.33&from=search">RydR</a>
-      <a id="suprstrBtnCard" class="category-card suprstr-card" href="./suprstr-search.html?v=29.09.66&from=search">supRstar</a>
-      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.44&start=intent">FloqAi</a>
+      <button id="eventsBtnCard" class="category-card" type="button" data-i18n="cat.events">Events</button>
+      <button id="clubsBtnCard" class="category-card" type="button" data-i18n="cat.clubs">Clubs</button>
+      <button id="beachClubsBtnCard" class="category-card" type="button" data-i18n="cat.beachClubs">Beach Clubs</button>
+      <button id="loungesBtnCard" class="category-card" type="button" data-i18n="cat.lounges">Lounges</button>
+      <button id="loungeClubBtnCard" class="category-card" type="button" data-i18n="cat.loungeClubs">Lounge-Clubs</button>
+      <div class="category-or" data-i18n="cat.or">Or</div>
+      <button id="shoutoutBtnCard" class="category-card hot" type="button" data-i18n="cat.shoutout">Throw a ShoutOut</button>
+      <button id="minglBtnCard" class="category-card mingl-card" type="button" data-i18n="cat.mingl">Mingl</button>
+      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.33&from=search" data-i18n="cat.bartr">Trade by BartR</a>
+      <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.33&from=search" data-i18n="cat.rydr">RydR</a>
+      <a id="suprstrBtnCard" class="category-card suprstr-card" href="./suprstr-search.html?v=29.09.66&from=search" data-i18n="cat.suprstar">supRstar</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.44&start=intent" data-i18n="cat.floqai">FloqAi</a>
     </div>
   </section>
 
@@ -432,7 +432,7 @@
     <header class="topbar">
       <div>
         <button id="backToCategoriesBtn" type="button">&larr; Back to categories</button>
-        <h1 id="listingTitle">Search Clubs</h1>
+        <h1 id="listingTitle" data-i18n="listing.searchClubs">Search Clubs</h1>
         <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
       <button id="logoutBtn3" type="button">Sign out</button>
@@ -716,7 +716,7 @@
 <script src="./intent-search.js?v=s3.0.1"></script>
 <script src="./floqai-search.js?v=29.09.52"></script>
 <script src="./global-profile-status.js?v=29.09.45"></script>
-<script src="./floqr-i18n.js?v=29.09.100"></script>
+<script src="./floqr-i18n.js?v=s3.0.4"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=s3.0.0"></script>
 <script src="./national-teams-data.js?v=29.09.59"></script>
