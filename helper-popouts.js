@@ -63,6 +63,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     window.FLOQRHelpAttach?.ensureCss?.();
     window.FLOQRHelpAttach?.mountAll?.(document);
+    window.FLOQRHelpAttach?.glueOrphanPopouts?.(document);
     convertAll(document);
     window.FLOQRHelpRepository?.registerDomHelpPopouts?.(document);
     bindDismissBehavior();
@@ -73,6 +74,7 @@
           if (shouldConvert(node)) convert(node);
           convertAll(node);
           window.FLOQRHelpAttach?.mountAll?.(node);
+          window.FLOQRHelpAttach?.glueOrphanPopouts?.(node);
           if (node.matches?.("details.help-popout, .floqai-help-popout, [data-floqai-help-entry]") || node.querySelector?.("details.help-popout, .floqai-help-popout")) {
             window.FLOQRHelpRepository?.registerDomHelpPopouts?.(node);
           }

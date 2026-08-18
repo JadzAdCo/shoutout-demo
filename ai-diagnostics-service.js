@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.3";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.3";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.6";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.6";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -892,6 +892,18 @@
       ]
     },
     {
+      version:"s3.0.6",
+      title:"Search profile menu containment + mobile help beside labels",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.6\""]},
+        {label:"Help attach glues orphan popouts", file:"help-attach.js", includes:["glueOrphanPopouts", "justify-content:flex-start !important"]},
+        {label:"Search loads help-attach", file:"index.html", includes:["help-attach.js?v=s3.0.6"]},
+        {label:"Profile menu stays in dropdown", file:"patron-app.js", includes:["const host = byId(\"userDropdown\")"]},
+        {label:"Leaked status links hidden", file:"styles.css", includes:["user-menu > [data-patron-menu]"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.6\""]}
+      ]
+    },
+    {
       version:"s3.0.3",
       title:"All satellite pages inherit FLOQR session (no auto Google popup)",
       checks:[
@@ -1017,6 +1029,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-6-search-menu-help-mobile",
+      area:"Search / phones",
+      feature:"Profile menu stays in the dropdown; help ? sits beside its label",
+      changed:"Status-card links no longer leak under the avatar over Clubs. Help ? is glued to the heading, not parked on the far right. French Search chrome includes Back to welcome, Boîtes de nuit, Clubs de plage, Salons.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.6&start=search on iPhone with App language Français. Confirm the avatar pill shows only initials until tapped. Open the menu: translated profile links stay inside the card. Confirm ? on Mingl / Language Settings sits immediately beside the title.",
+      expected:"No English My Profile stack over Clubs. ? is next to the label. Back to welcome is ← Retour à l'accueil. Beach Clubs is Clubs de plage."
+    },
     {
       id:"s3-0-3-venue-links-current-package",
       area:"Master Admin / Venue Links",

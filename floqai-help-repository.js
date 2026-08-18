@@ -597,6 +597,24 @@
       page: "index.html#mingl"
     },
     {
+      id: "help-default-template",
+      title: "Default Template",
+      body: "Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
+      searchPhrases: ["default template", "black and white", "classic shoutout"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-floqai-template-search",
+      title: "FloqAi template search",
+      body: "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.",
+      searchPhrases: ["floqai template", "sports jersey", "nba nfl cars humor"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
       id: "help-mingl-requests",
       title: "About Mingl Requests",
       body: "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.",

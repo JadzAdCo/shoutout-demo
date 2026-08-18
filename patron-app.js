@@ -16,6 +16,16 @@
   const FOOTBALL_TEAM_MEMBER_COUNT = 4;
   const FOOTBALL_AI_TIMEOUT_MS = 5000;
   const floqrId = () => window.FLOQRIdentity || {};
+  function tt(key, vars, fallback) {
+    try {
+      const fn = window.FLOQRI18n?.t;
+      if (typeof fn === "function") {
+        const out = fn(key, vars || {});
+        if (out && out !== key) return out;
+      }
+    } catch (_) {}
+    return fallback != null ? fallback : key;
+  }
 
   if (!window.firebaseConfig) { setStatus("firebase-config.js missing window.firebaseConfig."); return; }
   firebase.initializeApp(window.firebaseConfig);
@@ -69,9 +79,13 @@
   function locationId() { return canonicalLocationId(selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc"); }
   function getLocation(id = locationId()) {
     const canonical = canonicalLocationId(id);
-    return locations[canonical] || locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+    const row = locations[canonical] || locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+    return window.FLOQRScreenDatapoints?.applyVenue?.(row) || row;
   }
-  function getTemplate(id = selectedTemplate) { return templates[id] || window.SHOUTOUT_TEMPLATES[id] || window.SHOUTOUT_TEMPLATES.neon; }
+  function getTemplate(id = selectedTemplate) {
+    const row = templates[id] || window.SHOUTOUT_TEMPLATES[id] || window.SHOUTOUT_TEMPLATES.neon;
+    return window.FLOQRScreenDatapoints?.applyTemplate?.(row) || row;
+  }
   function currentTemplateSupportsMedia() {
     const t = getTemplate();
     return !!(t.supportsMedia || t.supportsImage || t.supportsVideo);
@@ -614,7 +628,8 @@
       const snap = await db.collection("templates").get();
       snap.forEach(doc => {
         const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
-        templates[doc.id] = {...packaged, id:doc.id, ...doc.data(), backgroundEditable:Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
+        const merged = {...packaged, id:doc.id, ...doc.data(), backgroundEditable:Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
+        templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
       });
     } catch(e) {}
   }
@@ -665,10 +680,10 @@
   async function loadLocations() {
     await loadLocationAliases();
     locations = {};
-    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (visibleLocationEntry([doc.id, data])) locations[doc.id] = {id:doc.id, ...data}; else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) locationAliases[doc.id.toLowerCase()] = {id:doc.id, canonicalLocationId:data.canonicalLocationId || data.aliasOf || data.mergedInto, aliasName:data.locationName || data.brandName || doc.id, status:"active"}; }); } catch(e) {}
+    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (visibleLocationEntry([doc.id, data])) locations[doc.id] = window.FLOQRScreenDatapoints?.applyVenue?.({id:doc.id, ...data}) || {id:doc.id, ...data}; else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) locationAliases[doc.id.toLowerCase()] = {id:doc.id, canonicalLocationId:data.canonicalLocationId || data.aliasOf || data.mergedInto, aliasName:data.locationName || data.brandName || doc.id, status:"active"}; }); } catch(e) {}
     // Merge seeded catalog venues missing from Firestore so ShoutOut search and admin stay aligned.
     Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry).forEach(([id, data]) => {
-      if (!locations[id]) locations[id] = {id, ...data};
+      if (!locations[id]) locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
     });
     if (Object.keys(locations).length === 0) locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
   }
@@ -2624,8 +2639,8 @@
   function templateCard(template, options = {}) {
     const selected = !selectedTemplateVariant && template.id === selectedTemplate;
     const canCustomize = templateBackgroundCanBeCustomized(template);
-    const venueFormats = getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
-    const supportedFormats = window.FLOQRTextLayout?.supportedFormatIds?.(template, venueFormats) || venueFormats;
+    const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
+    const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
     return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}">
       <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
       <div class="name">${esc(template.name)}</div>
@@ -2664,7 +2679,7 @@
       .map(id => (/^soccer/i.test(id) && id !== "soccerJersey" ? "soccerJersey" : id));
     const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter((record, index, arr) => arr.findIndex(row => row.id === record.id) === index)
-      .filter(record => String(record.data.status || "active") === "active" && (record.data.screenFormatIds || locationFormats).some(id => locationFormats.includes(id) && window.FLOQRTextLayout?.resolve?.(record.data, id)?.supported !== false));
+      .filter(record => String(record.data.status || "active") === "active" && window.FLOQRScreenDatapoints?.templateFitsVenue?.(record.data, location) !== false);
     // If search matches a soccer club/nation, ensure Soccer Jersey appears once.
     if (query) {
       const teamHits = window.FLOQRFindSoccerTeamsMatching?.(query) || [];
@@ -2682,15 +2697,19 @@
       grid.innerHTML = `
         <section class="template-section template-section-default">
           <div class="section-heading-row template-heading-row">
-            <h3>Default Template</h3>
-            <details class="help-popout"><summary>?</summary><div class="help-popout-body">Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.</div></details>
+            <h3 data-floqr-help-id="help-default-template"
+                data-floqr-help-title="Default Template"
+                data-floqr-help-search="default template|black and white|classic shoutout"
+                data-floqr-help-body="Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.">Default Template</h3>
           </div>
           <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : '<div class="empty">No default template is available.</div>'}</div>
         </section>
         <section class="template-section template-section-floqai" id="templateFloqAiHost">
           <div class="section-heading-row template-heading-row">
-            <h3>FloqAi template search</h3>
-            <details class="help-popout"><summary>?</summary><div class="help-popout-body">Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.</div></details>
+            <h3 data-floqr-help-id="help-floqai-template-search"
+                data-floqr-help-title="FloqAi template search"
+                data-floqr-help-search="floqai template|sports jersey|nba nfl cars humor"
+                data-floqr-help-body="Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.">FloqAi template search</h3>
           </div>
           <div id="templateFloqAiMount" class="template-floqai-mount"></div>
         </section>
@@ -2715,6 +2734,7 @@
         ${clubAllowsPatronBackgroundEditing() && communityHtml ? `<section class="template-section"><h3>Matching Community Backgrounds</h3><div class="template-grid">${communityHtml}</div></section>` : ""}
         ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization.</p>'}`;
     }
+    window.FLOQRHelpAttach?.mountAll?.(grid);
     grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
       const query = (byId("templateSearch")?.value || "").trim();
@@ -3656,11 +3676,12 @@
   }
 
   function configureTemplateScreenFormats(screenSelect, template, location) {
-    const venueFormats = location.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
-    const templateFormats = template.screenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || venueFormats;
+    const venue = window.FLOQRScreenDatapoints?.applyVenue?.(location) || location;
+    const templateRow = window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template;
+    const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(templateRow, venue) || venue.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
     const preferred = isFootballTeamIntro(template.id) ? (template.preferredP125FormatIds || []) : [];
-    const available = Array.from(new Set([...preferred, ...venueFormats])).filter(id => venueFormats.includes(id) && templateFormats.includes(id));
-    const supported = available.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
+    const available = Array.from(new Set([...preferred, ...venueFormats])).filter(id => venueFormats.includes(id));
+    const supported = available.filter(id => window.FLOQRTextLayout?.resolve?.(templateRow, id)?.supported !== false);
     screenSelect.innerHTML = available.map(id => {
       const format = window.FLOQR_DISPLAY_FORMATS?.[id] || {label:id,pixelWidth:"?",pixelHeight:"?"};
       const caps = window.FLOQRTextLayout?.resolve?.(template, id);
@@ -3687,47 +3708,43 @@
 
 
   function ensureProfileMenuEnhancements(user) {
-    const menus = [
-      byId("profileMenu"),
-      byId("userMenu"),
-      document.querySelector(".profile-menu"),
-      document.querySelector(".user-menu"),
-      document.querySelector(".account-menu")
-    ].filter(Boolean);
+    const host = byId("userDropdown");
+    if (!host || !user) return;
+    document.querySelectorAll("#userMenu > [data-patron-menu], #userMenu > a.profile-menu-link, #userMenu > .profile-menu-line").forEach(node => node.remove());
 
-    const menu = menus[0];
-    if (!menu || !user) return;
+    const signOutButton = host.querySelector("#dropdownSignOutBtn")
+      || host.querySelector("[data-patron-logout]")
+      || host.querySelector("[data-i18n='app.signOut']");
 
-    if (!menu.querySelector("[data-patron-menu='portal']")) {
-      const signOutButton = Array.from(menu.querySelectorAll("button")).find(b => String(b.textContent || "").toLowerCase().includes("sign out")) || null;
-
-      const portalLink = document.createElement("a");
-      portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33";
-      portalLink.textContent = "My Profile and Settings";
-      portalLink.dataset.patronMenu = "portal";
-      portalLink.className = "profile-menu-link";
-      menu.insertBefore(portalLink, signOutButton);
-
-      const level = document.createElement("div");
-      level.textContent = "Member Level: Patron";
-      level.dataset.patronMenu = "level";
-      level.className = "profile-menu-line";
-      menu.insertBefore(level, signOutButton);
-
-      const messages = document.createElement("a");
-      messages.href = window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8";
-      messages.textContent = "FloqR Inbox (0/0)";
-      messages.dataset.patronMenu = "messages";
-      messages.className = "profile-menu-link";
-      menu.insertBefore(messages, signOutButton);
-
-      const chats = document.createElement("a");
-      chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal";
-      chats.textContent = "Mingl (0/0)";
-      chats.dataset.patronMenu = "chats";
-      chats.className = "profile-menu-link";
-      menu.insertBefore(chats, signOutButton);
+    function upsert(key, tag, className) {
+      let el = host.querySelector(`[data-patron-menu='${key}']`);
+      if (!el) {
+        el = document.createElement(tag);
+        el.dataset.patronMenu = key;
+        el.className = className;
+        if (signOutButton) host.insertBefore(el, signOutButton);
+        else host.appendChild(el);
+      }
+      return el;
     }
+
+    const portalLink = upsert("portal", "a", "profile-menu-link");
+    portalLink.href = window.FLOQRNav?.portalHome() || "./patron-portal.html";
+    portalLink.textContent = tt("portal.title", {}, "My Profile and Settings");
+
+    const level = upsert("level", "div", "profile-menu-line");
+    if (!level.dataset.levelValue) level.dataset.levelValue = "Patron";
+    level.textContent = tt("profile.menu.memberLevel", { level: level.dataset.levelValue }, `Member Level: ${level.dataset.levelValue}`);
+
+    const messages = upsert("messages", "a", "profile-menu-link");
+    messages.href = window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox";
+    if (!messages.dataset.count) messages.dataset.count = "0/0";
+    messages.textContent = `${tt("nav.inbox", {}, "FloqR Inbox")} (${messages.dataset.count})`;
+
+    const chats = upsert("chats", "a", "profile-menu-link");
+    chats.href = window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal";
+    if (!chats.dataset.count) chats.dataset.count = "0/0";
+    chats.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chats.dataset.count})`;
 
     updateProfileMenuCounts(user.uid);
   }
@@ -3736,8 +3753,12 @@
     try {
       const profileDoc = await db.collection("users").doc(uid).get();
       const profile = profileDoc.exists ? profileDoc.data() : {};
-      const levelEl = document.querySelector("[data-patron-menu='level']");
-      if (levelEl) levelEl.textContent = `Member Level: ${profile.memberLevel || "Patron"}`;
+      const levelEl = document.querySelector("#userDropdown [data-patron-menu='level']");
+      if (levelEl) {
+        const level = profile.memberLevel || "Patron";
+        levelEl.dataset.levelValue = level;
+        levelEl.textContent = tt("profile.menu.memberLevel", { level }, `Member Level: ${level}`);
+      }
 
       let totalMessages = 0, unreadMessages = 0, totalChats = 0, unreadChats = 0;
 
@@ -3761,11 +3782,17 @@
         });
       } catch(e) {}
 
-      const msgEl = document.querySelector("[data-patron-menu='messages']");
-      if (msgEl) msgEl.textContent = `FloqR Inbox (${unreadMessages}/${totalMessages})`;
+      const msgEl = document.querySelector("#userDropdown [data-patron-menu='messages']");
+      if (msgEl) {
+        msgEl.dataset.count = `${unreadMessages}/${totalMessages}`;
+        msgEl.textContent = `${tt("nav.inbox", {}, "FloqR Inbox")} (${msgEl.dataset.count})`;
+      }
 
-      const chatEl = document.querySelector("[data-patron-menu='chats']");
-      if (chatEl) chatEl.textContent = `Mingl (${unreadChats}/${totalChats})`;
+      const chatEl = document.querySelector("#userDropdown [data-patron-menu='chats']");
+      if (chatEl) {
+        chatEl.dataset.count = `${unreadChats}/${totalChats}`;
+        chatEl.textContent = `${tt("nav.mingl", {}, "Mingl")} (${chatEl.dataset.count})`;
+      }
     } catch(e) {
       console.warn("Could not update profile menu counts", e);
     }
@@ -3918,6 +3945,9 @@
       }
     });
     window.FLOQRNav?.applyStartPage(showPage);
+    window.addEventListener("floqr:ui-language", () => {
+      if (currentUser) ensureProfileMenuEnhancements(currentUser);
+    });
   });
 
   auth.onAuthStateChanged(user => {
@@ -3970,17 +4000,30 @@
 
   async function enhanceMenu(user){
     if(!user) return;
-    const menu = byId("userDropdown") || byId("profileMenu") || byId("userMenu") || document.querySelector(".user-dropdown,.profile-menu,.user-menu,.account-menu");
-    if(!menu) return;
+    document.querySelectorAll("#userMenu > [data-patron-menu], #userMenu > a.profile-menu-link, #userMenu > .profile-menu-line").forEach(node => node.remove());
+    const host = byId("userDropdown");
+    if(!host) return;
+    if (host.querySelector("[data-patron-menu='portal']")) return;
     const c = await counts(user.uid);
-    const photo = user.photoURL ? `<img class="menu-avatar" src="${esc(user.photoURL)}" alt="">` : `<span class="menu-avatar-fallback">${esc(initials(user))}</span>`;
-    menu.innerHTML = `
-      <div class="menu-user-row">${photo}<div><strong>${esc(user.displayName || user.email || "Patron")}</strong><p>${esc(user.email || user.phoneNumber || "")}</p></div></div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html?v=29.09.33"}">My Profile and Settings</a>
-      <div class="profile-menu-line">Member Level: Patron</div>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox&v=29.09.8"}">FloqR Inbox (${c.um}/${c.tm})</a>
-      <a class="profile-menu-link" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?v=29.09.33&from=portal"}">Mingl (${c.uc}/${c.tc})</a>
-      <button class="ghost full" type="button" data-patron-logout="1">Sign out</button>`;
+    if (host.querySelector("[data-patron-menu='portal']")) return;
+    const signOut = host.querySelector("#dropdownSignOutBtn") || host.querySelector("[data-patron-logout]") || host.querySelector("[data-i18n='app.signOut']");
+    const t = (key, fallback, vars) => {
+      try {
+        const out = window.FLOQRI18n?.t?.(key, vars || {});
+        if (out && out !== key) return out;
+      } catch (_) {}
+      return fallback;
+    };
+    const block = document.createElement("div");
+    block.innerHTML = `
+      <a class="profile-menu-link" data-patron-menu="portal" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html"}">${esc(t("portal.title", "My Profile and Settings"))}</a>
+      <div class="profile-menu-line" data-patron-menu="level">${esc(t("profile.menu.memberLevel", "Member Level: Patron", { level: "Patron" }))}</div>
+      <a class="profile-menu-link" data-patron-menu="messages" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox"}">${esc(t("nav.inbox", "FloqR Inbox"))} (${esc(c.um)}/${esc(c.tm)})</a>
+      <a class="profile-menu-link" data-patron-menu="chats" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal"}">${esc(t("nav.mingl", "Mingl"))} (${esc(c.uc)}/${esc(c.tc)})</a>`;
+    while (block.firstChild) {
+      if (signOut) host.insertBefore(block.firstChild, signOut);
+      else host.appendChild(block.firstChild);
+    }
   }
 
   document.addEventListener("click", function(e){

@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.0.5";
+  const VERSION = "s3.0.6";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -448,6 +448,8 @@
       "profile.menu.adminPatronHint": "A new tab / new window is opening. The admin portal will stay open on this browser session. Please hold.",
       "profile.menu.openedTab": "A new tab / new window is opening",
       "profile.menu.adminPatronHold": "The admin portal will stay open on this browser session. Please hold.",
+      "profile.menu.memberLevel": "Member Level: {level}",
+      "nav.backToWelcome": "← Back to welcome",
       "admin.locationView": "Location View",
       "admin.locationHint": "Only Club Admins elected by Master/Super Admin for this venue can open this portal.",
       "admin.subtitle": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location.",
@@ -640,6 +642,8 @@
       "profile.menu.adminPatronHint": "Un nouvel onglet / une nouvelle fenêtre s'ouvre. Le portail admin reste ouvert dans cette session. Veuillez patienter.",
       "profile.menu.openedTab": "Un nouvel onglet / une nouvelle fenêtre s'ouvre",
       "profile.menu.adminPatronHold": "Le portail admin reste ouvert dans cette session du navigateur. Veuillez patienter.",
+      "profile.menu.memberLevel": "Niveau de membre : {level}",
+      "nav.backToWelcome": "← Retour à l'accueil",
       "admin.locationView": "Vue du lieu",
       "admin.locationHint": "Seuls les Club Admins élus par Master/Super Admin pour ce lieu peuvent ouvrir ce portail.",
       "admin.subtitle": "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club.",
@@ -650,10 +654,10 @@
       "app.emailContinue": "Continuer avec votre e-mail",
       "nav.searchFor": "Rechercher",
       "cat.events": "Événements",
-      "cat.clubs": "Clubs",
-      "cat.beachClubs": "Beach clubs",
-      "cat.lounges": "Lounges",
-      "cat.loungeClubs": "Lounge-clubs",
+      "cat.clubs": "Boîtes de nuit",
+      "cat.beachClubs": "Clubs de plage",
+      "cat.lounges": "Salons",
+      "cat.loungeClubs": "Clubs lounge",
       "cat.or": "Ou",
       "cat.shoutout": "Lancer un ShoutOut",
       "cat.mingl": "Mingl",

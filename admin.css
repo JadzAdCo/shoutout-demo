@@ -535,7 +535,7 @@ body[data-guest-theme] .card,body[data-guest-theme] .guest-campaign-hero{border-
 .simulation-banner strong{color:#ffd35e;text-transform:uppercase;white-space:nowrap}
 .pickup-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px}
 .pickup-request-card{grid-column:1/-1}
-.section-title-row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.section-title-row{display:flex;justify-content:flex-start;gap:14px;align-items:center;flex-wrap:wrap}
 .section-title-row h2,.section-title-row p{margin-top:0}
 .live-pill,.eta-badge{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border:1px solid rgba(94,234,255,.45);border-radius:999px;background:rgba(94,234,255,.1);color:#5eeaff;font-weight:1000;white-space:nowrap}
 .pickup-map{position:relative;min-height:390px;margin:12px 0 14px;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:22px;background-color:#111a32;background-image:linear-gradient(rgba(255,255,255,.05) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.05) 2px,transparent 2px);background-size:64px 64px}

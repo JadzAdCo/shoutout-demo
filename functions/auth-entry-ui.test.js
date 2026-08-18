@@ -85,7 +85,7 @@ test("main message typing preserves spaces instead of live-fitting on every keys
     app,
     /byId\("mainText"\)\?\.addEventListener\("input", event => \{ const fitted = fitTemplateText\(event\.currentTarget\.value, "main"\)/
   );
-  assert.match(html, /patron-app\.js\?v=\d+\.\d+\.\d+/);
+  assert.match(html, /patron-app\.js\?v=s3\.\d+\.\d+/);
 });
 
 test("venue admin portal URLs stamp FLOQRNav current package, not a hardcoded 29.09 or page ?v=", () => {
@@ -147,9 +147,11 @@ test("SOS2FA request UI is channel-neutral and puts status below the request but
 
 test("App language chrome keys cover portal tabs and language settings radios", () => {
   const i18n = readReleaseFile("floqr-i18n.js");
-  ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved", "lang.aiGrammar", "lang.draftPrivacy", "profile.menu.adminPatronHint", "profile.menu.adminPatronHold"].forEach(key => {
+  ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved", "lang.aiGrammar", "lang.draftPrivacy", "profile.menu.adminPatronHint", "profile.menu.adminPatronHold", "nav.backToWelcome", "profile.menu.memberLevel"].forEach(key => {
     assert.match(i18n, new RegExp(`"${key}"`));
   });
+  assert.match(i18n, /"cat.beachClubs": "Clubs de plage"/);
+  assert.match(i18n, /"cat.clubs": "Boîtes de nuit"/);
   const portal = readReleaseFile("patron-portal.html");
   assert.match(portal, /data-i18n="lang.suggestionsOnly"/);
   assert.match(portal, /data-i18n="nav.overview"/);
@@ -157,6 +159,16 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   assert.match(portal, /data-i18n="lang.testHint"/);
   const index = readReleaseFile("index.html");
   assert.match(index, /data-i18n="cat.events"/);
+  assert.match(index, /data-i18n="nav.backToWelcome"/);
+  assert.match(index, /help-attach\.js\?v=s3\./);
+  const helpAttach = readReleaseFile("help-attach.js");
+  assert.match(helpAttach, /function glueOrphanPopouts/);
+  assert.match(helpAttach, /justify-content:flex-start !important/);
+  const patronApp = readReleaseFile("patron-app.js");
+  assert.match(patronApp, /const host = byId\("userDropdown"\)/);
+  assert.match(patronApp, /portal\.title/);
+  assert.doesNotMatch(patronApp, /portalLink\.textContent = "My Profile and Settings"/);
+  assert.match(readReleaseFile("styles.css"), /user-menu > \[data-patron-menu\]/);
   const admin = readReleaseFile("admin.html");
   assert.match(admin, /floqr-i18n\.js\?v=s3\./);
   assert.match(admin, /data-i18n="admin.dashboard"/);
