@@ -1512,30 +1512,33 @@
     }
     locationId = await resolveDisplayLocationId(locationId);
     loc = getStaticLocation(locationId);
+    const packagedLoc = loc;
     await hydrateTemplatesFromFirestore();
     try {
       const clubDoc = await db.collection("clubLocations").doc(locationId).get();
       if (clubDoc.exists) {
         const live = clubDoc.data() || {};
-        const liveHasVenueFlags = ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"]
-          .some(key => live[key] === 0 || live[key] === 1 || live[key] === "0" || live[key] === "1");
         loc = {
           ...loc,
           ...live,
-          primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
-          secondaryDisplayScreenFormatId: live.secondaryDisplayScreenFormatId || loc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId,
-          displayScreenFormatIds: live.displayScreenFormatIds || loc.displayScreenFormatIds,
+          primaryDisplayScreenFormatId: packagedLoc.primaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
+          secondaryDisplayScreenFormatId: packagedLoc.secondaryDisplayScreenFormatId || live.secondaryDisplayScreenFormatId || loc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId,
+          displayScreenFormatIds: Array.from(new Set([
+            ...(Array.isArray(packagedLoc.displayScreenFormatIds) ? packagedLoc.displayScreenFormatIds : []),
+            ...(Array.isArray(live.displayScreenFormatIds) ? live.displayScreenFormatIds : loc.displayScreenFormatIds || [])
+          ].map(String).filter(Boolean))),
           displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
           ledPanel: live.ledPanel || loc.ledPanel,
           approvedDisplayIps: live.approvedDisplayIps || [],
           displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
           displayTokenRequired: live.displayTokenRequired
         };
-        if (!liveHasVenueFlags) {
-          delete loc.VenueSupports96x48;
-          delete loc.VenueSupports64x48;
-          delete loc.VenueSupports64x32;
-        }
+        ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"].forEach(key => {
+          const liveVal = live[key];
+          const liveExplicit = liveVal === 0 || liveVal === 1 || liveVal === "0" || liveVal === "1";
+          if (liveExplicit) loc[key] = liveVal;
+          else if (packagedLoc[key] === 1 || packagedLoc[key] === "1") loc[key] = 1;
+        });
         if (window.FLOQRScreenDatapoints?.applyVenue) window.FLOQRScreenDatapoints.applyVenue(loc);
       }
     } catch (e) {}
