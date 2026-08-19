@@ -1089,6 +1089,14 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-0-14-cameroon-64x48-previews",
+      area:"Display / soccer jerseys",
+      feature:"Cameroon jersey 64×32 and 64×48 previews at Shôko, Zebbies, LIMA Twist",
+      changed:"shoko-barcelona-spain offers Cameroon-only soccerJersey with VenueSupports64x32 and VenueSupports64x48. Zebbies and LIMA Twist already have both sizes. Composer preview uses ?screen=led-64x32 or led-64x48 and preview=1. Xibo stays display.html?location= only.",
+      howToTest:"Open composer for shoko-barcelona-spain, zebbies-garden-washington-dc, lima-twist-washington-dc. Search jersey. Confirm Cameroon only. Open display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x48&preview=1 and the 64×32 twin. Xibo URLs stay location-only.",
+      expected:"64×48 and 64×32 composer previews paint the Cameroon PNG with CSS NYX + 99. Picker is Cameroon-only. No ?v= or ?screen= on Xibo Display URLs."
+    },
+    {
       id:"s3-0-12-cameroon-three-venues",
       area:"Display / soccer jerseys",
       feature:"Cameroon jersey test at Heist, Zebbies Garden, and LIMA Twist",

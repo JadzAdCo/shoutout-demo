@@ -334,7 +334,12 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
       "Tue 2026-08-25: KISS KISS BANG BANG",
       "Thu 2026-09-10: YOMO"
     ],
-    templates:["latin","hiphop","vip","neon"], active:true
+    templates:["latin","hiphop","vip","neon","soccerJersey"],
+    soccerJerseyTeamIds:["soccerCameroon"],
+    displayScreenFormatIds:["led-96x48","led-64x48","led-64x32"],
+    VenueSupports96x48:1, VenueSupports64x48:1, VenueSupports64x32:1,
+    primaryDisplayScreenFormatId:"led-64x48",
+    active:true
   },
   "chrystie-cannes-france": {
     brandName:"Chrystie", locationName:"Chrystie Cannes", type:"club",
