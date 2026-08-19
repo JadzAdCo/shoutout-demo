@@ -304,6 +304,26 @@
     return teamEl;
   }
 
+  // Country/club sits on a ~7° collar arch (ends lower, middle follows the neckline).
+  function paintJerseyCollarArch(el, label) {
+    if (!el) return;
+    const chars = glyphs(cleanBoardText(label));
+    if (!chars.length) {
+      el.textContent = "";
+      el.classList.remove("jersey-collar-arch");
+      return;
+    }
+    el.classList.add("jersey-collar-arch");
+    const last = Math.max(1, chars.length - 1);
+    el.innerHTML = chars.map((ch, i) => {
+      const t = chars.length === 1 ? 0 : (i / last) - 0.5;
+      const rot = t * 14;
+      const lift = (1 - Math.abs(t) * 2) * 0.18;
+      const glyph = ch === " " ? "&nbsp;" : esc(ch);
+      return `<span class="jersey-arch-ch" style="transform:translateY(${(-lift).toFixed(3)}em) rotate(${rot.toFixed(2)}deg)">${glyph}</span>`;
+    }).join("");
+  }
+
   function pushWrapped(rows, words, maxRows, maxChars) {
     let line = "";
     words.forEach(word => {
@@ -695,6 +715,17 @@
       || params.has("backgroundColor")
       || params.has("backgroundGradient")
       || params.get("preview") === "1";
+  }
+
+  function isLoopbackHost() {
+    const host = String(location.hostname || "").toLowerCase();
+    return host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host === "::1";
+  }
+
+  function paintUrlPreviewNow() {
+    loc = getStaticLocation(locationId);
+    if (!screenFormatOverride) screenFormatOverride = boardAssignedFormatId(loc);
+    render(buildUrlPreviewPayload());
   }
 
   function buildUrlPreviewPayload() {
@@ -1255,14 +1286,14 @@
       });
       const wrapped = nameRows.filter(Boolean).length > 1;
       const wrapScale = wrapped ? 0.85 : 1;
-      // Sport typography: soccer arched mid, NBA smaller name + huge number, NFL plate + thicker huge number.
-      // Photo soccer: country/club wordmark is in the PNG; CSS team label stays hidden.
+      // Soccer: upright condensed kit type for CSS name + number only. Country/club is in the PNG.
       let baseName = Number(textCaps.mainTextSizePercent || 16.2);
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
+      canvas.classList.remove("jersey-css-country");
       if (sport === "soccer" && usePhotoBack) {
         baseName = Math.min(baseName * 0.68, 11.2);
-        baseNumber = Math.min(baseNumber * 0.62, 40.7);
+        baseNumber = Math.min(baseNumber * 0.72, 46);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1274,7 +1305,7 @@
         baseTeam = Math.min(baseTeam, 5);
       }
       const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 11.2 : 18), Math.max(7, baseName * wrapScale));
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 40.7 : 72), Math.max(16, baseNumber * wrapScale));
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 46 : 72), Math.max(16, baseNumber * wrapScale));
       const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
@@ -1282,7 +1313,9 @@
         const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack);
         teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
-        teamEl.textContent = teamLabel;
+        if (hideCrest) teamEl.textContent = "";
+        else if (sport === "soccer") paintJerseyCollarArch(teamEl, teamLabel);
+        else teamEl.textContent = teamLabel;
         teamEl.style.setProperty("font-size", `${teamSize}vh`, "important");
       }
       canvas.classList.toggle("jersey-name-wrapped", wrapped);
@@ -1320,7 +1353,7 @@
       return;
     }
     hideJerseyMount();
-    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back");
+    canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
       railClear.className = "display-identity-rail hidden";
@@ -1464,10 +1497,15 @@
   window.renderShoutOutDisplay = render;
 
   document.addEventListener("DOMContentLoaded", async () => {
-    await persistenceReady;
     screenFormatOverride = isUrlPreviewMode()
       ? normalizeScreenFormatId(qs("screen", qs("screenFormatId", "")))
       : "";
+    // Composer / QA URLs include template or preview=1. Xibo stays location-only and still uses Display Security.
+    if (isUrlPreviewMode()) {
+      paintUrlPreviewNow();
+      return;
+    }
+    await persistenceReady;
     if (!explicitLocationRequested) {
       const ipBoundLocation = await resolveLocationFromIpParam();
       if (ipBoundLocation) locationId = canonicalStaticLocationId(ipBoundLocation);

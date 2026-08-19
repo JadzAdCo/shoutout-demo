@@ -104,11 +104,13 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     activityStatus:"Active Dupont Circle nightclub / lounge",
     activityDates:["Thursday late night","Friday HEIST","Saturday HEIST"],
     templates:["heistVaultNight","heistPoliceCar","heistInterrogation","heistVaultDollars","soccerJersey"],
+    soccerJerseyTeamIds:["soccerCameroon"],
     restrictTemplatesToLocationSet:true,
     displayScreenFormatIds:["led-64x32"],
     primaryDisplayScreenFormatId:"led-64x32",
     displayType:"led-64x32",
     screenFormatId:"led-64x32",
+    VenueSupports96x48:0, VenueSupports64x48:0, VenueSupports64x32:1,
     ledPanel:{width:64,height:32,widthCm:64,heightCm:32,pixelWidth:416,pixelHeight:208,formatId:"led-64x32",label:"64 x 32 cm"},
     displayFooterBrand:"FLOQR ShoutOut",
     active:true
