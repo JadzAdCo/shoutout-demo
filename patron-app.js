@@ -90,6 +90,14 @@
     if (Array.isArray(packaged.templates) && packaged.templates.includes("soccerJersey")) {
       row.templates = Array.from(new Set([...(row.templates || packaged.templates || []), "soccerJersey"]));
     }
+    ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"].forEach(key => {
+      if (packaged[key] === 1 || packaged[key] === "1") row[key] = 1;
+    });
+    if (Array.isArray(packaged.displayScreenFormatIds) && packaged.displayScreenFormatIds.length) {
+      row.displayScreenFormatIds = Array.from(new Set([...(row.displayScreenFormatIds || []), ...packaged.displayScreenFormatIds]));
+    }
+    if (packaged.primaryDisplayScreenFormatId) row.primaryDisplayScreenFormatId = packaged.primaryDisplayScreenFormatId;
+    if (packaged.secondaryDisplayScreenFormatId) row.secondaryDisplayScreenFormatId = packaged.secondaryDisplayScreenFormatId;
     return window.FLOQRScreenDatapoints?.applyVenue?.(row) || row;
   }
   function getTemplate(id = selectedTemplate) {

@@ -338,7 +338,8 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     soccerJerseyTeamIds:["soccerCameroon"],
     displayScreenFormatIds:["led-96x48","led-64x48","led-64x32"],
     VenueSupports96x48:1, VenueSupports64x48:1, VenueSupports64x32:1,
-    primaryDisplayScreenFormatId:"led-64x48",
+    primaryDisplayScreenFormatId:"led-96x48",
+    secondaryDisplayScreenFormatId:"led-64x48",
     active:true
   },
   "chrystie-cannes-france": {
