@@ -1,18 +1,24 @@
 ---
-description: Soccer photo jersey LED backs — one silhouette plate, recolor only, one kit per cycle
+description: Soccer photo jersey LED backs — plate, photo wins over CSS hanger, publish PNGs
 alwaysApply: true
 ---
 
 # Soccer photo jersey backs (always)
 
-**One silhouette.** Morocco / Spain / Cameroon / PSG is the garment: same camera, crop, slim short-sleeve cut, crew collar shape, sleeve length, drape. Do not invent a new shirt. Per team, **only** recolor body / collar / cuffs / side panels and print that team’s wordmark.
+**One silhouette.** Morocco / Spain / Cameroon / PSG cut. Recolor body / collar / cuffs / sides and print the wordmark. Solid `#000` (LED energy). No hanger on photo backs.
 
-**Plate:** solid `#000000` backdrop (LED energy — black pixels stay off). No gray studio, no locker wood. No hanger.
+**Wordmark:** inner collar, Cameroon arch, ~65% width; two-word names keep the second word on the fabric. Spell IVORY COAST, DR CONGO, MOZAMBIQUE. Tanzania = royal blue + yellow. Ethiopia = green + white collar. Zambia = copper/orange.
 
-**Wordmark:** TOP at inner collar; same Cameroon arch. Same letter height as Cameroon/Morocco. Fill ~65% width unless the name would leave the fabric. Two-word names stop before the second word falls off. Spell IVORY COAST, DR CONGO, MOZAMBIQUE.
+## FIX PROMPT — CSS hanger (Image 1) vs named photo (Image 2)
 
-**Colors (not a new cut):** Tanzania = royal blue + yellow. Ethiopia = green + white collar. Zambia = copper/orange (green is away). Never clone Cameroon’s yellow-red collar onto another nation.
+If the LED shows a CSS hanger (colored blocks, hook, CSS country name clipped by the collar) while a named PNG exists, the board took `jersey-css-back`.
 
-**One kit per cycle:** `*-proposed.png` + `soccer-jersey-review.html`. Replace live only after acknowledge.
+Execute:
+
+1. Catalog: `defaultBackgroundUrl` = `soccer-{slug}-back-with-country.png` or `-with-club.png`, `jerseyCssBack: false`.
+2. `display-app.js`: a photo URL **wins**. Ignore `jerseyCssBack=1` on the query string when that URL is set. `usePhotoBack = !!jerseyBg`.
+3. Gallery / composer: mint `jerseyCssBack=0` whenever a photo URL exists. Never `=1` for photo kits.
+4. Ship the PNGs on **`origin/main`** (GitHub Pages). A workspace-only file is not live.
+5. Cache-bust `display-app.js` / `jersey-catalog.js` `?v=` on composer/preview pages. Xibo stays `display.html?location=` only.
 
 Resume: `@jersey$` / `$jersey@`.

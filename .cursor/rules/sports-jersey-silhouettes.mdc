@@ -7,7 +7,7 @@ alwaysApply: true
 
 When creating or editing **NBA / soccer / NFL** jersey templates or display art:
 
-1. **Photo LED backs (named soccer/NBA/NFL PNGs):** no hanger. Jersey fabric only on a solid `#000000` backdrop (LED energy). CSS hanger mount is only for kits **without** a photo back (`display-app.js` / `display.css`).
+1. **Photo LED backs (named soccer/NBA/NFL PNGs):** no hanger. Jersey fabric only on a solid `#000000` backdrop (LED energy). CSS hanger mount is only for kits **without** a photo back (`display-app.js` / `display.css`). A named PNG **always** wins over `jerseyCssBack=1` — see `.cursor/rules/soccer-jersey-photo-backs.mdc` FIX PROMPT.
 2. **Soccer** — slim short-sleeve shirt; fabric / kit fashion; name + number (name often arched); side accent panels OK. Match the presentation language of Morocco, Spain, Monaco photo backs.
 3. **NBA** — sleeveless / tank cut; athleisure mesh feel; **big number**, name smaller/cleaner and higher on the back.
 4. **NFL** — bulkier cut with yoke/shoulders; name **plate across the shoulders**; **huge number**; armor-adjacent, thicker graphics / heavier text shadow.
