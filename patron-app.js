@@ -79,7 +79,17 @@
   function locationId() { return canonicalLocationId(selectedLocationId || pendingDirectLocation || "zebbies-garden-washington-dc"); }
   function getLocation(id = locationId()) {
     const canonical = canonicalLocationId(id);
-    const row = locations[canonical] || locations[id] || window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[id] || window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"];
+    const packaged = window.SHOUTOUT_CLUB_LOCATIONS[canonical] || window.SHOUTOUT_CLUB_LOCATIONS[id] || {};
+    const live = locations[canonical] || locations[id] || {};
+    const row = Object.keys(live).length
+      ? { ...packaged, ...live }
+      : (packaged.locationName ? packaged : window.SHOUTOUT_CLUB_LOCATIONS["zebbies-garden-washington-dc"]);
+    if (Array.isArray(packaged.soccerJerseyTeamIds) && packaged.soccerJerseyTeamIds.length) {
+      row.soccerJerseyTeamIds = packaged.soccerJerseyTeamIds.slice();
+    }
+    if (Array.isArray(packaged.templates) && packaged.templates.includes("soccerJersey")) {
+      row.templates = Array.from(new Set([...(row.templates || packaged.templates || []), "soccerJersey"]));
+    }
     return window.FLOQRScreenDatapoints?.applyVenue?.(row) || row;
   }
   function getTemplate(id = selectedTemplate) {
@@ -145,14 +155,22 @@
   function populateSoccerTeamSelect(preferredTeamId = "") {
     const select = byId("soccerTeamId");
     if (!select) return;
-    const groups = window.FLOQRSoccerTeamOptions?.() || [];
-    const current = preferredTeamId || select.value || "";
+    const allowed = allowedSoccerTeamIds();
+    const groups = (window.FLOQRSoccerTeamOptions?.() || [])
+      .map(group => ({
+        ...group,
+        teams: (group.teams || []).filter(team => !allowed || allowed.includes(team.id))
+      }))
+      .filter(group => group.teams.length);
+    const fallback = allowed && allowed.length === 1 ? allowed[0] : "";
+    const current = preferredTeamId || select.value || fallback || "";
     select.innerHTML = `<option value="">Select a team…</option>${groups.map(group =>
       `<optgroup label="${esc(group.league)}">${group.teams.map(team =>
         `<option value="${esc(team.id)}">${esc(team.teamName || team.name)}</option>`
       ).join("")}</optgroup>`
     ).join("")}`;
     if (current && [...select.options].some(opt => opt.value === current)) select.value = current;
+    else if (fallback && [...select.options].some(opt => opt.value === fallback)) select.value = fallback;
   }
   function normalizeSoccerTemplateSelection(templateId, query = "") {
     const id = String(templateId || "");
@@ -2648,9 +2666,14 @@
     const kind = template.league === "National teams" ? "Country" : (template.sport === "soccer" ? "Club" : "");
     return Array.from(new Set(["Soccer", "Jersey", kind, team].filter(Boolean))).slice(0, 4);
   }
+  function allowedSoccerTeamIds() {
+    const ids = getLocation()?.soccerJerseyTeamIds;
+    return Array.isArray(ids) && ids.length ? ids.map(String) : null;
+  }
   function matchingSoccerPhotoTeams(query) {
     const q = String(query || "").trim().toLowerCase();
-    const photos = window.FLOQRSoccerPhotoTeams?.() || [];
+    const allowed = allowedSoccerTeamIds();
+    const photos = (window.FLOQRSoccerPhotoTeams?.() || []).filter(team => !allowed || allowed.includes(team.id));
     if (!q) return [];
     if (/^(soccer|jersey|football|kit|jerseys|soccer jersey)$/i.test(q) || (/\bjersey\b/.test(q) && /\b(soccer|football)\b/.test(q))) {
       return photos;
@@ -2852,6 +2875,7 @@
       if (payload.jerseySecondary) url.searchParams.set("jerseySecondary", payload.jerseySecondary);
       if (payload.jerseyAccent) url.searchParams.set("jerseyAccent", payload.jerseyAccent);
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
+      url.searchParams.set("preview", "1");
       if (Array.isArray(payload.teamMembers) && payload.teamMembers.length) url.searchParams.set("teamMembers", JSON.stringify(payload.teamMembers));
       if (payload.stadiumMessage) url.searchParams.set("stadiumMessage", payload.stadiumMessage);
     }

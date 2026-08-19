@@ -497,7 +497,13 @@
             <label>Main text size (% of display height)<input id="templateManageMainTextSize" type="number" min="4" max="40" step="0.1" value="20.8"/></label>
             <label>Subtext size (% of display height)<input id="templateManageSubTextSize" type="number" min="2" max="20" step="0.1" value="7.8"/></label>
             <label>Preview main text<input id="templateManagePreviewMain" value="SHOUTOUT" placeholder="SHOUTOUT"/></label>
-            <label>Preview subtext<input id="templateManagePreviewSub" value="FLOQR" placeholder="FLOQR"/></label>
+            <label>Price (USD)
+              <input id="templateManagePrice" type="number" min="0" step="0.01" value="0" placeholder="0.00"
+                data-floqr-help-id="help-template-price"
+                data-floqr-help-title="Template price"
+                data-floqr-help-search="template price|jersey cost|paid shoutout|soccer jersey price"
+                data-floqr-help-body="Master Admin sets the patron checkout price for this template. Soccer / sports jerseys are paid ShoutOuts (default $30). Checkout charges whatever you save here. $0 means the template is free."/>
+            </label>
           </div>
           <div class="privacy-datapoint-grid">
             <label><input id="templateManageSupportsMedia" type="checkbox"/> Supports image/video</label>
@@ -1117,7 +1123,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./floqr-i18n.js?v=s3.0.6"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
-<script src="./floqr-nav.js?v=s3.0.7"></script>
+<script src="./floqr-nav.js?v=s3.0.10"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
@@ -1134,7 +1140,7 @@
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./ad-campaigns.js?v=29.09.22"></script>
-<script src="./ai-diagnostics-service.js?v=s3.0.8"></script>
+<script src="./ai-diagnostics-service.js?v=s3.0.10"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>

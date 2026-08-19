@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.9";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.9";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.10";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.10";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -904,6 +904,18 @@
       ]
     },
     {
+      version:"s3.0.10",
+      title:"Cameroon jersey baked country + Heist-only test",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.10\""]},
+        {label:"URL preview paints without security hang", file:"display-app.js", includes:["function paintUrlPreviewNow", "if (isUrlPreviewMode())"]},
+        {label:"Heist Cameroon-only kits", file:"shared-data.js", includes:["soccerJerseyTeamIds:[\"soccerCameroon\"]"]},
+        {label:"Cameroon photo back", file:"jersey-catalog.js", includes:["Cameroon: \"soccer-cameroon-back-with-country.png\""]},
+        {label:"Display cache bust", file:"display.html", includes:["display.css?v=s3.0.10", "jersey-catalog.js?v=s3.0.10", "display-app.js?v=s3.0.10"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.10\""]}
+      ]
+    },
+    {
       version:"s3.0.9",
       title:"Tanzania jersey overlay on every photo kit — real LED cards, size chips",
       checks:[
@@ -1065,6 +1077,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-10-cameroon-heist-jersey",
+      area:"Display / soccer jerseys",
+      feature:"Cameroon country baked in PNG; CSS name/number; Heist test only",
+      changed:"CAMEROON is printed on soccer-cameroon-back-with-country.png (collar arch, upright caps). NYX and 99 are CSS only. Heist DC soccer picker is Cameroon-only. URL preview (template/main/preview=1) paints without Display Security.",
+      howToTest:"Open https://jadzadco.github.io/shoutout-demo/index.html?v=s3.0.10&location=heist-washington-dc then search jersey. Confirm only Cameroon. Preview 64×32. Also open display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
+      expected:"Baked CAMEROON on the green kit. CSS NYX and 99 upright, not italic. No other country/club in the Heist picker. Composer preview is not a black Display Security screen."
+    },
     {
       id:"s3-0-8-soccer-photo-jerseys",
       area:"Display / soccer jerseys",

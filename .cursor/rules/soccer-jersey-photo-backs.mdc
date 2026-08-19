@@ -7,9 +7,9 @@ alwaysApply: true
 
 **One silhouette.** Morocco / Spain / Cameroon / PSG cut. Recolor body / collar / cuffs / sides and print the wordmark. Solid `#000` (LED energy). No hanger on photo backs.
 
-**Wordmark:** inner collar, Cameroon arch, ~65% width; two-word names keep the second word on the fabric. Spell IVORY COAST, DR CONGO, MOZAMBIQUE. Tanzania = royal blue + yellow. Ethiopia = green + white collar. Zambia = copper/orange.
+**Wordmark:** baked into the PNG only (country/club, never the patron name or number). Inner collar, Cameroon arch (~7° following the shoulder/neckline), ~65% width; two-word names keep the second word on the fabric. Upright condensed heat-transfer caps — not italic, not cursive. Letter height matches or is slightly larger than the CSS patron name. Spell IVORY COAST, DR CONGO, MOZAMBIQUE. Tanzania = royal blue + yellow. Ethiopia = green + white collar. Zambia = copper/orange. CSS must **not** reprint the team name on photo kits (`.soccer-jersey-team` hidden when `usePhotoBack`).
 
-**Number overlay:** `#displaySub.soccer-jersey-number` is horizontally center-justified on the jersey midline. Italic numbers stay optically centered (`text-align:center` + `translateX(-0.08em)`). Never left- or right-bias the mark. Apply centering before Pages upload.
+**Number overlay:** CSS only. `#displaySub.soccer-jersey-number` is horizontally center-justified on the jersey midline. Soccer numbers are **upright** condensed (not italic / not cursive). Never left- or right-bias the mark. Apply centering before Pages upload. Patron **name** is also CSS only (`#displayMain.soccer-jersey-name`), same upright condensed type.
 
 ## FIX PROMPT — CSS hanger (Image 1) vs named photo (Image 2)
 
