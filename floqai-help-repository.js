@@ -542,10 +542,10 @@
     {
       id: "help-general-notifications",
       title: "General Notifications",
-      body: "My Profile → My Privacy → General Notifications (Email / SMS). These users.notifyEmail and users.notifySms flags control SOS2FA, schedule invites, and other FloqR system messages. Club Admin → Notifications is a separate paid SMS/WhatsApp overlay for a venue, not Super Admin SOS2FA.",
+      body: "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
       searchPhrases: [
         "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
-        "sos2fa email sms", "notification settings"
+        "sos2fa email sms", "notification settings", "twilio", "paid sms"
       ],
       links: [
         {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
