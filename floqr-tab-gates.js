@@ -94,9 +94,17 @@
     uid = ""
   } = {}) {
     const workerUid = String(uid || user.uid || "");
-    const serviceMember = isTruthy(user.serviceMember)
+    const serviceMember = isTruthy(user.IsServiceMember)
+      || isTruthy(user.IsserviceMember)
+      || isTruthy(user.serviceMember)
       || (Array.isArray(user.approvedRoles) && user.approvedRoles.length > 0)
       || (Array.isArray(user.roles) && user.roles.some(role => !["patron", "masterAdmin"].includes(String(role))));
+    const memberType = String(user.memberType || user.memberLevel || "Patron").trim() || "Patron";
+    const hasPatronFlag = user.IsPatron !== undefined && user.IsPatron !== null && String(user.IsPatron).trim() !== "";
+    const isPatron = hasPatronFlag
+      ? isTruthy(user.IsPatron)
+      : (!serviceMember && /^patron$/i.test(memberType));
+    const servicesTabVisible = serviceMember && !isPatron;
     const mine = (Array.isArray(designations) ? designations : []).filter(row => {
       if (!workerUid) return false;
       if (String(row.workerUid || row.uid || "") !== workerUid) return false;
@@ -106,6 +114,7 @@
       .map(row => String(row.clubLocationId || ""))
       .filter(id => isTruthy(clubsById[id]?.staffSchedulingPaid));
     const roleBlob = [
+      user.memberType,
       user.memberLevel,
       user.role,
       ...(Array.isArray(user.roles) ? user.roles : []),
@@ -122,6 +131,10 @@
       || clubAdminLocationIds.length > 0;
     return {
       serviceMember,
+      isPatron,
+      isServiceMember: serviceMember,
+      memberType,
+      servicesTabVisible,
       isClubAdmin,
       clubAdminLocationIds,
       affiliated: mine.length > 0,

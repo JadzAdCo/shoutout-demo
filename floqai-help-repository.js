@@ -437,15 +437,16 @@
     },
     {
       id: "help-service-members",
-      title: "Service Members",
-      body: "Settings → Service Members. Patrons who are not yet approved request Club Admin, DJ, Promoter, hospitality, bus boy/security, venue manager, bartender, or media access and pick clubs. Each club gets an association request. Club Admins (isClubAdmin) also see Review & elect: accept pending requests or search and elect a patron as a service member. Follow Services stays on its own tab.",
+      title: "Services & Service Members",
+      body: "Settings → Services & Service Members is hidden when users.IsPatron is 1/yes. Elect from My Profile to set IsServiceMember (IsserviceMember) to 1/yes and IsPatron to 0/no. Then request Club Admin, DJ, Promoter, hospitality, or other roles. Club Admins also see Review & elect.",
       searchPhrases: [
-        "service members", "request club admin", "request access", "elect service member",
+        "service members", "services and service members", "request club admin", "request access", "elect service member",
         "worker association", "request dj access", "request promoter", "bus boys or security",
-        "venue manager", "approve worker request"
+        "venue manager", "approve worker request", "IsPatron", "IsServiceMember"
       ],
       links: [
-        {label: "Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
         {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
       ],
       source: "help-repository-seed",
@@ -524,6 +525,35 @@
       page: "admin.html#adminVenueGate"
     },
     {
+      id: "help-sos2fa-request-channels",
+      title: "Request SOS2FA Code",
+      body: "Request is sent using your general Notifications settings",
+      searchPhrases: [
+        "request sos2fa code", "sos2fa", "notifications settings", "general notifications",
+        "entity management unlock", "sos2fa email sms", "notifyEmail", "notifySms"
+      ],
+      links: [
+        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#entityManagement"
+    },
+    {
+      id: "help-general-notifications",
+      title: "General Notifications",
+      body: "My Profile → My Privacy → General Notifications (Email / SMS). These users.notifyEmail and users.notifySms flags control SOS2FA, schedule invites, and other FloqR system messages. Club Admin → Notifications is a separate paid SMS/WhatsApp overlay for a venue, not Super Admin SOS2FA.",
+      searchPhrases: [
+        "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
+        "sos2fa email sms", "notification settings"
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPrivacy"
+    },
+    {
       id: "help-sos2fa-entity-mgmt",
       title: "SOS2FA",
       body: "Entity Management is protected by SOS2FA (Social OS two-factor). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
@@ -532,6 +562,7 @@
         "sos2fa sms", "entity management 2fa"
       ],
       links: [
+        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
         {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
       source: "help-repository-seed",

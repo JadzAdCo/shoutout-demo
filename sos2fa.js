@@ -147,13 +147,6 @@
       gate.classList.add("hidden");
       parkGate();
     }
-
-    const hint = byId("sos2faPhoneHint");
-    if (hint) {
-      hint.textContent = challengeRequested
-        ? "Enter the six-digit SOS2FA code from SMS or email."
-        : "Request SOS2FA Code. FloqR sends it using your Email and SMS notification settings.";
-    }
   }
 
   async function logActivity(action, detail) {
@@ -209,7 +202,6 @@
   async function requireUnlock(scope, options = {}) {
     const authUser = firebase.auth().currentUser;
     if (!authUser) {
-      setStatus("Sign in required.");
       syncGateUi(scope, false);
       return false;
     }
@@ -227,7 +219,6 @@
       return true;
     }
     syncGateUi(scope, false);
-    setStatus("Entity Management is locked. Request SOS2FA Code to continue.");
     return false;
   }
 
