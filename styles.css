@@ -80,6 +80,46 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .attribution-controls{margin:12px 0 4px}
 .attribution-controls .consent-line{margin:0 0 10px}
 .template-mini-preview{min-height:108px;border-radius:16px;display:grid;place-items:center;text-align:center;padding:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.16)}
+.template-mini-preview.jersey-shoutout-preview{
+  position:relative;
+  min-height:148px;
+  padding:0;
+  background-color:#000;
+  background-size:88% auto;
+  background-position:center 36%;
+  background-repeat:no-repeat;
+  overflow:hidden;
+  color:#fff;
+}
+.template-mini-preview.jersey-shoutout-preview .jersey-preview-name{
+  position:absolute;
+  left:18%;
+  right:18%;
+  top:36%;
+  margin:0;
+  text-align:center;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  line-height:1;
+  color:#fff;
+}
+.template-mini-preview.jersey-shoutout-preview .jersey-preview-num{
+  position:absolute;
+  left:18%;
+  right:18%;
+  top:50%;
+  margin:0;
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  font-style:italic;
+  line-height:1;
+  transform:translateX(-0.08em);
+  color:#fff;
+}
+.template.soccer-jersey .tag-row span{text-transform:none}
 .template-mini-preview strong{display:block;font-size:22px;line-height:1.05;text-transform:uppercase}
 .template-mini-preview span{display:block;margin-top:6px;font-size:13px;color:rgba(255,255,255,.78);text-transform:uppercase}
 .template.classic-bw{background:linear-gradient(135deg,#060606,#1b1b1b 32%,#e41616 33%,#111 58%,#e41616 74%,#060606);color:#fff}

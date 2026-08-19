@@ -9,6 +9,8 @@ alwaysApply: true
 
 **Wordmark:** inner collar, Cameroon arch, ~65% width; two-word names keep the second word on the fabric. Spell IVORY COAST, DR CONGO, MOZAMBIQUE. Tanzania = royal blue + yellow. Ethiopia = green + white collar. Zambia = copper/orange.
 
+**Number overlay:** `#displaySub.soccer-jersey-number` is horizontally center-justified on the jersey midline. Italic numbers stay optically centered (`text-align:center` + `translateX(-0.08em)`). Never left- or right-bias the mark. Apply centering before Pages upload.
+
 ## FIX PROMPT — CSS hanger (Image 1) vs named photo (Image 2)
 
 If the LED shows a CSS hanger (colored blocks, hook, CSS country name clipped by the collar) while a named PNG exists, the board took `jersey-css-back`.
@@ -20,5 +22,15 @@ Execute:
 3. Gallery / composer: mint `jerseyCssBack=0` whenever a photo URL exists. Never `=1` for photo kits.
 4. Ship the PNGs on **`origin/main`** (GitHub Pages). A workspace-only file is not live.
 5. Cache-bust `display-app.js` / `jersey-catalog.js` `?v=` on composer/preview pages. Xibo stays `display.html?location=` only.
+
+## LAYOUT — Tanzania lock applied to every named photo kit (QA in silhouette before Pages)
+
+Wordmark at inner collar; name `top` ~36% at 11.2vh; number `top` ~50% at 40.7vh, horizontally center-justified. 96×48 uses those defaults; 64×48 name ~35% / number ~49%; 64×32 name ~34% / number ~48%. Do **not** publish to `origin/main` until every photo kit is checked in the Cameroon/Morocco silhouette (no hanger, number on midline, wordmark under collar).
+
+### GenerateImage prompt (PNG wordmark only)
+
+```
+Keep this EXACT jersey BACK: same Cameroon/Morocco silhouette, same camera, solid #000000 backdrop, NO hanger. Recolor only for this team. Print ONLY the country or club wordmark in heat-transfer block caps, gentle shoulder arch. MOVE the wordmark UP so the TOP of the letters sits on the inner collar / green neckline (almost no gap under the collar). Same letter color as the kit secondary. Do not print a player name or number. Empty mid/lower back for CSS NYX + 99 overlay. No person.
+```
 
 Resume: `@jersey$` / `$jersey@`.

@@ -13,6 +13,8 @@ When creating or editing **NBA / soccer / NFL** jersey templates or display art:
 4. **NFL** — bulkier cut with yoke/shoulders; name **plate across the shoulders**; **huge number**; armor-adjacent, thicker graphics / heavier text shadow.
 5. Do **not** ship flat diagonal stripe CSS as the only NBA/NFL/soccer identity — that reads as one generic jersey. Colors alone are not enough; silhouette + typography must differ by sport.
 6. Keep `sport: "soccer" | "nba" | "nfl"` on catalog rows so `display-app.js` can pick `jersey-sport-*` classes.
+7. **Numbers:** horizontally center-justified on the jersey midline (italic optical center). Apply before Pages upload.
+8. **Photo-kit layout** (wordmark at collar; patron name + number up and +7% size; numbers center-justified): `soccer-jersey-photo-backs.mdc`. QA every kit in the silhouette before Pages.
 
 Checklist before commit:
 

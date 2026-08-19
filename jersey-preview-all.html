@@ -85,8 +85,8 @@
       background-repeat: no-repeat;
     }
     .board.photo-back .team { display: none; }
-    .board.photo-back .name { top: 42%; height: 10%; }
-    .board.photo-back .num { top: 54%; height: 26%; font-style: italic; }
+    .board.photo-back .name { top: 36%; height: 10%; }
+    .board.photo-back .num { top: 50%; height: 26%; font-style: italic; text-align: center; transform: translateX(-0.08em); }
     .mount {
       position: absolute;
       inset: 0;
@@ -289,8 +289,8 @@
     </div>
   </header>
   <main id="root"></main>
-  <script src="./national-teams-data.js?v=s3.0.8"></script>
-  <script src="./jersey-catalog.js?v=s3.0.8"></script>
+  <script src="./national-teams-data.js?v=s3.0.9"></script>
+  <script src="./jersey-catalog.js?v=s3.0.9"></script>
   <script>
     // Same-origin local display so photo kits match the catalog (Pages may lag the feature branch).
     const LIVE = ".";
@@ -325,7 +325,7 @@
       const css = row.defaultBackgroundUrl ? "0" : "1";
       const screen = encodeURIComponent(document.getElementById("screen")?.value || "led-64x32");
       if (row.sport === "soccer") {
-        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;
+        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.9`;
       }
       return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;
     }

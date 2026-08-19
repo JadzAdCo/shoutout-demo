@@ -286,9 +286,18 @@
     ].join(" ");
   }
 
+  /** Tanzania LED markup 2026-08-19. PENDING user approve — do not run until they say approve; do not publish first. */
+  const TANZANIA_LED_LOCK_PROMPT = [
+    "Keep this EXACT Tanzania jersey BACK: royal blue body, yellow collar, yellow cuffs, solid #000000 backdrop, NO hanger, same camera and Cameroon silhouette.",
+    "Keep ONLY the word TANZANIA in yellow heat-transfer block caps, gentle shoulder arch.",
+    "MOVE the wordmark UP so the TOP of the letters sits on the inner collar / green neckline (almost no gap under the collar).",
+    "Do not print a player name or number. Empty mid/lower back for CSS overlay. No person."
+  ].join(" ");
+
   global.FLOQR_NATIONAL_TEAMS = NATIONAL_TEAMS;
   global.FLOQR_NATIONAL_TEAM_SLUG = slug;
   global.FLOQR_NATIONAL_TEAM_PROMPT = promptFor;
   global.FLOQR_NATIONAL_TEAM_COUNTRY_NAME_PROMPT = promptForCountryName;
   global.FLOQR_CLUB_NAME_PROMPT = promptForClubName;
+  global.FLOQR_TANZANIA_LED_LOCK_PROMPT = TANZANIA_LED_LOCK_PROMPT;
 })(typeof window !== "undefined" ? window : globalThis);

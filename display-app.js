@@ -1261,8 +1261,8 @@
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
       if (sport === "soccer" && usePhotoBack) {
-        baseName = Math.min(baseName * 0.68, 10.5);
-        baseNumber = Math.min(baseNumber * 0.62, 38);
+        baseName = Math.min(baseName * 0.68, 11.2);
+        baseNumber = Math.min(baseNumber * 0.62, 40.7);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1273,8 +1273,8 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 10.5 : 18), Math.max(7, baseName * wrapScale));
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 38 : 72), Math.max(16, baseNumber * wrapScale));
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 11.2 : 18), Math.max(7, baseName * wrapScale));
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 40.7 : 72), Math.max(16, baseNumber * wrapScale));
       const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
