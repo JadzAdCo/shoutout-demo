@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.10";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.10";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.12";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -904,6 +904,17 @@
       ]
     },
     {
+      version:"s3.0.12",
+      title:"Cameroon jersey test at Heist, Zebbies, and LIMA Twist",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.12\""]},
+        {label:"Heist Cameroon-only kits", file:"shared-data.js", includes:["soccerJerseyTeamIds:[\"soccerCameroon\"]"]},
+        {label:"Zebbies soccer jersey test", file:"shared-data.js", includes:["zebbiesFootballTeamIntro\",\"soccerJersey\"]"]},
+        {label:"LIMA Twist soccer jersey test", file:"shared-data.js", includes:["gold\",\"soccerJersey\"]"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.12\""]}
+      ]
+    },
+    {
       version:"s3.0.10",
       title:"Cameroon jersey baked country + Heist-only test",
       checks:[
@@ -1077,6 +1088,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-12-cameroon-three-venues",
+      area:"Display / soccer jerseys",
+      feature:"Cameroon jersey test at Heist, Zebbies Garden, and LIMA Twist",
+      changed:"soccerJersey is Cameroon-only (soccerJerseyTeamIds) at heist-washington-dc, zebbies-garden-washington-dc, and lima-twist-washington-dc. Composer/URL preview still paints without Display Security.",
+      howToTest:"Open index.html?v=s3.0.12&location=heist-washington-dc, then Zebbies Garden DC, then LIMA Twist. Search jersey. Confirm only Cameroon. Preview 64×32. display.html?location=<id>&template=soccerJersey&jerseyTeamId=soccerCameroon&jerseyCssBack=0&main=NYX&sub=99&screen=led-64x32&preview=1 — Xibo URLs stay location-only.",
+      expected:"Each of the three venues shows only the Cameroon kit. CSS NYX and 99. No other country/club in the picker."
+    },
     {
       id:"s3-0-10-cameroon-heist-jersey",
       area:"Display / soccer jerseys",
