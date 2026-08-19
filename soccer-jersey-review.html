@@ -1,0 +1,69 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Soccer jersey QA — s3.0.8 applied</title>
+<style>
+body{margin:0;background:#000;color:#eee;font:14px/1.35 system-ui;padding:16px}
+h1{font-size:18px;margin:0 0 8px}
+h2{font-size:15px;margin:24px 0 10px;font-weight:600}
+p,li{max-width:58rem;color:#bbb}
+table{border-collapse:collapse;width:100%;max-width:72rem;font-size:13px}
+th,td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#1a1a1a}
+.pass{color:#7d7}
+.note{color:#cc8}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+figure{margin:0;background:#111;border:1px solid #333;padding:6px}
+img{width:100%;height:220px;object-fit:contain;background:#000;display:block}
+figcaption{margin-top:6px;text-align:center;font-size:12px}
+</style></head><body>
+<h1>s3.0.8 soccer photo jerseys — applied to live</h1>
+<p>QA note. Proposed files were copied over the live named PNGs, then every photo kit was reviewed. Composer tests use <code>?screen=</code>. Xibo stays <code>display.html?location=</code> only.</p>
+
+<h2>Replacements (proposed → live)</h2>
+<table>
+<tr><th>Team</th><th>Was live</th><th>Replaced with</th><th>Confirm</th></tr>
+<tr><td>Tanzania</td><td>Cameroon-green clone, small type</td><td>Royal blue, yellow collar/cuffs, TANZANIA, #000</td><td class="pass">PASS — not Cameroon</td></tr>
+<tr><td>Ethiopia</td><td>Cameroon-green clone</td><td>Green, white collar, red cuffs, ETHIOPIA, #000</td><td class="pass">PASS — white collar</td></tr>
+<tr><td>Zambia</td><td>Cameroon-green clone</td><td>Copper/orange, black collar, ZAMBIA, #000</td><td class="pass">PASS — copper home</td></tr>
+<tr><td>Ivory Coast</td><td>Orange kit, both words (same bytes as proposed)</td><td>Orange, white trim, IVORY COAST, #000</td><td class="pass">PASS — both words</td></tr>
+<tr><td>South Africa</td><td>Smaller two-word mark</td><td>Green/gold, SOUTH AFRICA max width, #000</td><td class="pass">PASS — both words</td></tr>
+</table>
+
+<h2>Full catalog (23 photo kits) — ship QA</h2>
+<table>
+<tr><th>Team</th><th>File</th><th>Black</th><th>No hanger</th><th>Wordmark</th><th>Kit identity</th><th>Result</th></tr>
+<tr><td>Cameroon</td><td>soccer-cameroon-back-with-country.png</td><td>Y</td><td>Y</td><td>CAMEROON</td><td>Green, yellow-red collar (plate)</td><td class="pass">PASS</td></tr>
+<tr><td>Morocco</td><td>soccer-morocco-back-with-country.png</td><td>Y</td><td>Y</td><td>MOROCCO</td><td>Red, green letters, white sides</td><td class="pass">PASS</td></tr>
+<tr><td>Spain</td><td>soccer-spain-back-with-country.png</td><td>Y</td><td>Y</td><td>SPAIN</td><td>Red, gold letters</td><td class="pass">PASS</td></tr>
+<tr><td>Nigeria</td><td>soccer-nigeria-back-with-country.png</td><td>Y</td><td>Y</td><td>NIGERIA</td><td>Green, white collar</td><td class="pass">PASS</td></tr>
+<tr><td>Egypt</td><td>soccer-egypt-back-with-country.png</td><td>Y</td><td>Y</td><td>EGYPT</td><td>Red, white/black trim</td><td class="pass">PASS</td></tr>
+<tr><td>Ghana</td><td>soccer-ghana-back-with-country.png</td><td>Y</td><td>Y</td><td>GHANA</td><td>Green, yellow collar, red cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Senegal</td><td>soccer-senegal-back-with-country.png</td><td>Y</td><td>Y</td><td>SENEGAL</td><td>Green, yellow collar, red sides</td><td class="pass">PASS</td></tr>
+<tr><td>Ivory Coast</td><td>soccer-ivorycoast-back-with-country.png</td><td>Y</td><td>Y</td><td>IVORY COAST</td><td>Orange, white, green sides</td><td class="pass">PASS</td></tr>
+<tr><td>South Africa</td><td>soccer-southafrica-back-with-country.png</td><td>Y</td><td>Y</td><td>SOUTH AFRICA</td><td>Green, gold collar, black cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Tunisia</td><td>soccer-tunisia-back-with-country.png</td><td>Y</td><td>Y</td><td>TUNISIA</td><td>Red, white collar</td><td class="pass">PASS</td></tr>
+<tr><td>Kenya</td><td>soccer-kenya-back-with-country.png</td><td>Y</td><td>Y</td><td>KENYA</td><td>Black, red collar, green sides</td><td class="pass">PASS</td></tr>
+<tr><td>Mali</td><td>soccer-mali-back-with-country.png</td><td>Y</td><td>Y</td><td>MALI</td><td>Green, yellow collar, red cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Zambia</td><td>soccer-zambia-back-with-country.png</td><td>Y</td><td>Y</td><td>ZAMBIA</td><td>Copper, black collar</td><td class="pass">PASS</td></tr>
+<tr><td>Angola</td><td>soccer-angola-back-with-country.png</td><td>Y</td><td>Y</td><td>ANGOLA</td><td>Red, yellow letters, black sides</td><td class="pass">PASS</td></tr>
+<tr><td>DR Congo</td><td>soccer-drcongo-back-with-country.png</td><td>Y</td><td>Y</td><td>DR CONGO</td><td>Blue, yellow collar, red cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Ethiopia</td><td>soccer-ethiopia-back-with-country.png</td><td>Y</td><td>Y</td><td>ETHIOPIA</td><td>Green, white collar, red cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Tanzania</td><td>soccer-tanzania-back-with-country.png</td><td>Y</td><td>Y</td><td>TANZANIA</td><td>Royal blue, yellow collar/cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Mozambique</td><td>soccer-mozambique-back-with-country.png</td><td>Y</td><td>Y</td><td>MOZAMBIQUE</td><td>Green, yellow collar, red cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Rwanda</td><td>soccer-rwanda-back-with-country.png</td><td>Y</td><td>Y</td><td>RWANDA</td><td>Blue, yellow collar, green cuffs</td><td class="pass">PASS</td></tr>
+<tr><td>Chelsea</td><td>soccer-chelsea-back-with-club.png</td><td>Y</td><td>Y</td><td>CHELSEA</td><td>Blue, gold letters</td><td class="pass">PASS</td></tr>
+<tr><td>PSG</td><td>soccer-psg-back-with-club.png</td><td>Y</td><td>Y</td><td>PSG</td><td>Navy Hechter stripe</td><td class="pass">PASS</td></tr>
+<tr><td>Monaco</td><td>soccer-monaco-back-with-club.png</td><td>Y</td><td>Y</td><td>MONACO</td><td>Red/white diagonal</td><td class="pass">PASS</td></tr>
+<tr><td>Lille</td><td>soccer-lille-back-with-club.png</td><td>Y</td><td>Y</td><td>LILLE</td><td>Red, white collar/sides</td><td class="pass">PASS</td></tr>
+</table>
+<p class="note">Note (not blocking): Tunisia, Egypt, Kenya, Mali, PSG lettering is flatter than the Cameroon arch. Lille/Zambia/Mali letters are a bit narrower than the Cameroon ~65% band. CSS-only EU clubs (Arsenal, etc.) are unchanged.</p>
+
+<h2>Live named files (after apply)</h2>
+<div class="grid">
+<figure><img src="images/soccer/soccer-tanzania-back-with-country.png" alt="Tanzania"><figcaption>Tanzania</figcaption></figure>
+<figure><img src="images/soccer/soccer-ethiopia-back-with-country.png" alt="Ethiopia"><figcaption>Ethiopia</figcaption></figure>
+<figure><img src="images/soccer/soccer-zambia-back-with-country.png" alt="Zambia"><figcaption>Zambia</figcaption></figure>
+<figure><img src="images/soccer/soccer-ivorycoast-back-with-country.png" alt="Ivory Coast"><figcaption>Ivory Coast</figcaption></figure>
+<figure><img src="images/soccer/soccer-southafrica-back-with-country.png" alt="South Africa"><figcaption>South Africa</figcaption></figure>
+<figure><img src="images/soccer/soccer-cameroon-back-with-country.png" alt="Cameroon"><figcaption>Cameroon plate</figcaption></figure>
+</div>
+</body></html>

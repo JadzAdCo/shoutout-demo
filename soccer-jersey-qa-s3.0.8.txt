@@ -1,0 +1,30 @@
+FLOQR soccer jersey QA — s3.0.8
+Date: 2026-08-18
+
+CATALOG (live named photo kits — 19 nations + 4 clubs = 23)
+Nations: Morocco, Spain, Cameroon, Nigeria, Egypt, Ghana, Senegal, Ivory Coast, South Africa, Tunisia, Kenya, Mali, Zambia, Angola, DR Congo, Ethiopia, Tanzania, Mozambique, Rwanda
+Clubs: Chelsea, Paris Saint-Germain, AS Monaco, Lille
+CSS-only soccer (not photo files): remaining EU league rows (Arsenal, etc.)
+NBA / NFL: CSS silhouettes, no soccer PNGs
+
+REPLACEMENTS THIS CYCLE (proposed → live named file; hashes matched)
+1. Tanzania  soccer-tanzania-back-with-country.png     WAS Cameroon-clone green  NOW royal blue + yellow collar/cuffs, TANZANIA, #000
+2. Ethiopia  soccer-ethiopia-back-with-country.png     WAS Cameroon-clone        NOW green + white collar + red cuffs, ETHIOPIA, #000
+3. Zambia    soccer-zambia-back-with-country.png       WAS Cameroon-clone        NOW copper/orange + black collar, ZAMBIA, #000
+4. Ivory Coast soccer-ivorycoast-back-with-country.png WAS smaller two-word      NOW IVORY COAST both words, orange/white, #000
+5. South Africa soccer-southafrica-back-with-country.png WAS smaller two-word    NOW SOUTH AFRICA both words, green/gold, #000
+
+NOT REPLACED (already on plate: same cut, black field, own colors)
+Morocco, Spain, Cameroon, Nigeria, Egypt, Ghana, Senegal, Tunisia, Kenya, Mali, Angola, DR Congo, Mozambique, Rwanda, Chelsea, PSG, Monaco, Lille
+
+QA SPOT CHECK
+- All 23 live files present, each > 50 KB
+- Five promoted files byte-identical to *-proposed.png
+- Tanzania live: blue/yellow, not Cameroon
+- Ivory Coast live: both words IVORY COAST
+- Cameroon plate: green, yellow-red collar, black field
+- LED CSS: soccer-jersey-template background #000; photo-back #000; lockerRoomBackground #000
+- Xibo URLs stay display.html?location= / display2.html?location= (no ?v= / ?screen=)
+
+CONFIRM 10 × 3 (composer preview only uses ?screen=)
+See preview email. Pass = black field, no hanger, wordmark in PNG, patron name/number lower, country/club not CSS-duplicated.

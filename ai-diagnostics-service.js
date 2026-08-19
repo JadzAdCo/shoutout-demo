@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.7";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.7";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.8";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.8";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -904,6 +904,17 @@
       ]
     },
     {
+      version:"s3.0.8",
+      title:"Soccer photo jerseys — one silhouette, black LED backdrop, proposed kits live",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.8\""]},
+        {label:"Photo back solid black", file:"display.css", includes:["jersey-photo-back .display-background", "background-color:#000!important"]},
+        {label:"CSS kits use black locker", file:"display-app.js", includes:["function lockerRoomBackground", "return \"#000\""]},
+        {label:"Display cache bust", file:"display.html", includes:["display.css?v=s3.0.8", "jersey-catalog.js?v=s3.0.8", "display-app.js?v=s3.0.8"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.8\""]}
+      ]
+    },
+    {
       version:"s3.0.6",
       title:"Search profile menu containment + mobile help beside labels",
       checks:[
@@ -1041,6 +1052,14 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-8-soccer-photo-jerseys",
+      area:"Display / soccer jerseys",
+      feature:"Photo kits on one silhouette, solid black LED backdrop",
+      changed:"Proposed Tanzania (blue/yellow), Ethiopia (green/white collar), Zambia (copper), Ivory Coast (IVORY COAST), and South Africa (SOUTH AFRICA) replaced the live named PNGs. All 23 photo kits use #000 behind the shirt. CSS hanger stays off photo backs.",
+      howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then the 10 composer URLs in the s3.0.8 preview email on led-96x48, led-64x48, and led-64x32. Confirm black field, no hanger, country/club wordmark in the photo, patron name/number lower. Xibo URLs stay display.html?location= only.",
+      expected:"Tanzania is royal blue not Cameroon green. Zambia is copper/orange. Ivory Coast shows both words. Backdrop is black. Name/number do not cover the country wordmark."
+    },
     {
       id:"s3-0-7-mail-logging",
       area:"Master Admin / Diagnostics",

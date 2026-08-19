@@ -388,7 +388,7 @@
   }
 
   function lockerRoomBackground() {
-    return "linear-gradient(90deg,#1a1410 0%,#2a2118 8%,#1a1410 16%,#2c2219 24%,#18120e 32%,#2a2118 40%,#1a1410 48%,#2c2219 56%,#18120e 64%,#2a2118 72%,#1a1410 80%,#2c2219 88%,#18120e 100%),#14100c";
+    return "#000";
   }
 
   function ensureJerseyMount(sport = "soccer", {hangerOnly = false} = {}) {
@@ -1223,7 +1223,7 @@
       canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
       canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
       if (usePhotoBack) {
-        // Flat blank photo kits (Cameroon/Nigeria methodology): no CSS hanger overlay.
+        // Named photo kits (country/club wordmark in PNG): no CSS hanger overlay.
         canvas.classList.remove("jersey-css-back");
         canvas.classList.add("jersey-photo-back");
         hideJerseyMount();
@@ -1234,7 +1234,7 @@
           canvas.classList.add("has-background-layer");
         }
       } else {
-        // CSS hanger mount — same presentation language as photo kits.
+        // CSS hanger mount — kits without a photo back only.
         canvas.classList.add("jersey-css-back");
         canvas.classList.remove("jersey-photo-back");
         ensureJerseyMount(sport, {hangerOnly: false});
@@ -1254,13 +1254,13 @@
       const wrapped = nameRows.filter(Boolean).length > 1;
       const wrapScale = wrapped ? 0.85 : 1;
       // Sport typography: soccer arched mid, NBA smaller name + huge number, NFL plate + thicker huge number.
-      // Photo soccer (Monaco/Lille): shrink overlays ~15% so more kit + ~60% hanger stay visible.
+      // Photo soccer: country/club wordmark is in the PNG; CSS team label stays hidden.
       let baseName = Number(textCaps.mainTextSizePercent || 16.2);
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
       if (sport === "soccer" && usePhotoBack) {
-        baseName = Math.min(baseName * 0.65, 10);
-        baseNumber = Math.min(baseNumber * 0.42, 24);
+        baseName = Math.min(baseName * 0.68, 10.5);
+        baseNumber = Math.min(baseNumber * 0.62, 38);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1271,13 +1271,13 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 10 : 18), Math.max(7, baseName * wrapScale));
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 24 : 72), Math.max(16, baseNumber * wrapScale));
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 10.5 : 18), Math.max(7, baseName * wrapScale));
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 38 : 72), Math.max(16, baseNumber * wrapScale));
       const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
-        const hideCrest = sport === "nfl" || !teamLabel;
+        const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack);
         teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         teamEl.textContent = teamLabel;
