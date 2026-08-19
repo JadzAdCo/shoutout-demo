@@ -911,6 +911,8 @@
         {label:"Photo back solid black", file:"display.css", includes:["jersey-photo-back .display-background", "background-color:#000!important"]},
         {label:"CSS kits use black locker", file:"display-app.js", includes:["function lockerRoomBackground", "return \"#000\""]},
         {label:"Display cache bust", file:"display.html", includes:["display.css?v=s3.0.8", "jersey-catalog.js?v=s3.0.8", "display-app.js?v=s3.0.8"]},
+        {label:"Named PNG beats CSS hanger", file:"display-app.js", includes:["const usePhotoBack = !!jerseyBg"]},
+        {label:"Photo URL forces jerseyCssBack false", file:"display-app.js", includes:["data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.8\""]}
       ]
     },
@@ -1057,8 +1059,8 @@
       area:"Display / soccer jerseys",
       feature:"Photo kits on one silhouette, solid black LED backdrop",
       changed:"Proposed Tanzania (blue/yellow), Ethiopia (green/white collar), Zambia (copper), Ivory Coast (IVORY COAST), and South Africa (SOUTH AFRICA) replaced the live named PNGs. All 23 photo kits use #000 behind the shirt. CSS hanger stays off photo backs.",
-      howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then the 10 composer URLs in the s3.0.8 preview email on led-96x48, led-64x48, and led-64x32. Confirm black field, no hanger, country/club wordmark in the photo, patron name/number lower. Xibo URLs stay display.html?location= only.",
-      expected:"Tanzania is royal blue not Cameroon green. Zambia is copper/orange. Ivory Coast shows both words. Backdrop is black. Name/number do not cover the country wordmark."
+      howToTest:"Open soccer-jersey-preview.html?v=s3.0.8 then a Tanzania composer URL with jerseyCssBack=1 on purpose. The royal-blue photo must still win (no CSS hanger). Repeat 10 kits on led-96x48, led-64x48, led-64x32. Xibo URLs stay display.html?location= only.",
+      expected:"Tanzania is royal blue not CSS green. jerseyCssBack=1 cannot resurrect the hanger when a named PNG exists. Backdrop is black. Name/number do not cover the country wordmark."
     },
     {
       id:"s3-0-7-mail-logging",

@@ -322,7 +322,7 @@
       const label = encodeURIComponent(teamLabel(row));
       const primary = encodeURIComponent(row.jerseyPrimary || "#111111");
       const secondary = encodeURIComponent(row.jerseySecondary || "#ffffff");
-      const css = row.jerseyCssBack || !row.defaultBackgroundUrl ? "1" : "0";
+      const css = row.defaultBackgroundUrl ? "0" : "1";
       const screen = encodeURIComponent(document.getElementById("screen")?.value || "led-64x32");
       if (row.sport === "soccer") {
         return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;

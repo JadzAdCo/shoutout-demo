@@ -268,7 +268,9 @@
       jerseyPrimary: data.jerseyPrimary || source.jerseyPrimary || template.jerseyPrimary,
       jerseySecondary: data.jerseySecondary || source.jerseySecondary || template.jerseySecondary,
       jerseyAccent: data.jerseyAccent || source.jerseyAccent || source.jerseySecondary || template.jerseyAccent,
-      jerseyCssBack: data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.defaultBackgroundUrl ? false : (source.jerseyCssBack !== false)),
+      jerseyCssBack: (data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl)
+        ? false
+        : (data.jerseyCssBack != null ? !!data.jerseyCssBack : (source.jerseyCssBack !== false)),
       defaultBackgroundUrl: data.backgroundUrl || source.defaultBackgroundUrl || template.defaultBackgroundUrl || "",
       jerseyTeamLabel: data.jerseyTeamLabel || source.jerseyTeamLabel || template.jerseyTeamLabel || ""
     };
@@ -1218,7 +1220,7 @@
       canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl");
       canvas.classList.add("soccer-jersey-template", "sports-jersey-template", `jersey-sport-${sport}`);
       const jerseyBg = data.backgroundUrl || t.defaultBackgroundUrl || backgroundUrl;
-      const usePhotoBack = !!(jerseyBg && !t.jerseyCssBack);
+      const usePhotoBack = !!jerseyBg;
       canvas.style.setProperty("--jersey-primary", t.jerseyPrimary || data.jerseyPrimary || "#111111");
       canvas.style.setProperty("--jersey-secondary", t.jerseySecondary || data.jerseySecondary || "#ffffff");
       canvas.style.setProperty("--jersey-accent", t.jerseyAccent || data.jerseyAccent || t.jerseySecondary || "#ffffff");
