@@ -1291,7 +1291,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     id:'soccerJersey',
     name:'Soccer Jersey',
     scope:'Shared',
-    className:'soccer-jersey jersey-css-back sports-jersey jersey-on-hanger',
+    className:'soccer-jersey sports-jersey jersey-photo-back',
     category:'Sports',
     mediaMode:'No image/video',
     supportsMedia:false,
@@ -1299,8 +1299,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     textOverlay:true,
     layout:'soccer-jersey',
     identityRail:true,
-    jerseyCssBack:true,
-    jerseyOnHanger:true,
+    jerseyCssBack:false,
+    jerseyOnHanger:false,
     jerseySilhouette:'short-sleeve',
     jerseyNameField:true,
     jerseyNumberField:true,
@@ -1311,14 +1311,14 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
-    defaultMain:'',
-    defaultSub:'',
+    defaultMain:'NYX',
+    defaultSub:'99',
     lineCount:2,
     maxCharactersPerLine:8,
     maxMainCharacters:14,
     maxSubCharacters:2,
-    description:'One $30 Soccer Jersey template on a hanger (Morocco/Spain presentation). After you select it, choose a national team or European club, then enter the jersey name and mark.',
-    tags:["soccer","football","jersey","Sports","Jersey","name","number","$30","shared","2026/27","team","hanger"]
+    description:'$30 Soccer Jersey. Search a country or club (Tanzania, Chelsea…) to see that kit as it will look on the LED. Sizes: 96×48, 64×48, 64×32.',
+    tags:["soccer","football","jersey","Sports","Jersey","Soccer","Country","Club","name","number","$30","shared","2026/27","team"]
   }
 });
 

@@ -19,17 +19,21 @@
 
   function jerseyTemplate({id, name, league, sport, primary, secondary, accent, bgUrl, extraTags, teamName}) {
     const classSport = sport === "nba" ? "nba-jersey" : sport === "nfl" ? "nfl-jersey" : "soccer-jersey";
+    const isPhoto = !!bgUrl;
+    const kindTag = league === "National teams" ? "Country" : (sport === "soccer" ? "Club" : league);
     const tags = Array.from(new Set([
-      "Sports", "Jersey", sport.toUpperCase(), league, name, teamName,
-      "2026/27", "$30", "shared", "name", "number", "hanger",
+      "Sports", "Jersey", "Soccer", sport.toUpperCase(), league, name, teamName, kindTag,
+      isPhoto ? "photo" : "hanger",
+      "2026/27", "$30", "shared", "name", "number",
       ...(extraTags || [])
     ].filter(Boolean)));
+    const silhouetteNote = sport === "nba" ? "Sleeveless tank, mesh, big number." : sport === "nfl" ? "Yoke + shoulder name plate, huge number." : "Slim short-sleeve kit, fabric fashion.";
     return {
       id,
       name,
-      teamName: teamName || String(name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").trim(),
+      teamName: teamName || String(name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").replace(/\s+Jersey$/i, "").trim(),
       scope: "Shared",
-      className: `sports-jersey ${classSport} jersey-css-back jersey-on-hanger`,
+      className: `sports-jersey ${classSport} ${isPhoto ? "jersey-photo-back" : "jersey-css-back jersey-on-hanger"}`,
       category: "Sports",
       mediaMode: "No image/video",
       supportsMedia: false,
@@ -37,8 +41,8 @@
       textOverlay: true,
       layout: "soccer-jersey",
       identityRail: true,
-      jerseyCssBack: !bgUrl,
-      jerseyOnHanger: true,
+      jerseyCssBack: !isPhoto,
+      jerseyOnHanger: !isPhoto,
       jerseySilhouette: sport === "nba" ? "tank" : sport === "nfl" ? "yoke" : "short-sleeve",
       jerseyPrimary: primary || "#111111",
       jerseySecondary: secondary || "#ffffff",
@@ -46,9 +50,12 @@
       defaultBackgroundUrl: bgUrl || "",
       priceCents: PRICE,
       priceLabel: "$30",
+      Is96x48: 1,
+      Is64x48: 1,
+      Is64x32: 1,
       screenFormatIds: SCREEN.slice(),
-      defaultMain: "",
-      defaultSub: "",
+      defaultMain: "NYX",
+      defaultSub: "99",
       lineCount: 2,
       maxCharactersPerLine: 8,
       maxMainCharacters: 14,
@@ -56,11 +63,13 @@
       jerseyNameField: true,
       jerseyNumberField: true,
       jerseyNumberMaxChars: 2,
-      jerseyTeamLabel: String(teamName || name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").toUpperCase(),
+      jerseyTeamLabel: String(teamName || name || "").replace(/^(Soccer|NBA|NFL)\s+/i, "").replace(/\s+Jersey$/i, "").toUpperCase(),
       season: "2026/27",
       sport,
       league,
-      description: `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${sport === "nba" ? "Sleeveless tank, mesh, big number." : sport === "nfl" ? "Yoke + shoulder name plate, huge number." : "Slim short-sleeve kit, fabric fashion."}`,
+      description: isPhoto
+        ? `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`
+        : `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${silhouetteNote}`,
       tags
     };
   }
@@ -277,7 +286,7 @@
     ]);
     soccerTeams[id] = jerseyTemplate({
       id,
-      name: `Soccer ${teamName}`,
+      name: bgUrl ? `${teamName} Jersey` : `Soccer ${teamName}`,
       teamName,
       league,
       sport: "soccer",
@@ -287,11 +296,13 @@
       bgUrl: bgUrl || "",
       extraTags: [
         "soccer",
+        "jersey",
         "football",
         country,
         league,
         europeLeagues.has(league) ? "Europe" : "",
         league === "National teams" ? "National" : "",
+        league === "National teams" ? "Country" : "Club",
         ...(extra.extraTags || [])
       ].filter(Boolean)
     });
@@ -374,7 +385,16 @@
   global.FLOQR_SOCCER_TEAMS = soccerTeams;
   global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
-  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"]);
+  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"]);
+  global.FLOQRSoccerPhotoTeams = function soccerPhotoTeams() {
+    const seen = new Set();
+    return (global.FLOQR_JERSEY_PHOTO_IDS || []).map(id => soccerTeams[id]).filter(team => {
+      if (!team || !team.defaultBackgroundUrl || seen.has(team.id)) return false;
+      if (team.id === "soccerMonaco" && soccerTeams.soccerASMonaco) return false;
+      seen.add(team.id);
+      return true;
+    });
+  };
   global.FLOQR_ALL_JERSEY_TEMPLATE_IDS = Array.from(new Set([SOCCER_TEMPLATE_ID, ...nbaNflIds]));
   global.FLOQRResolveSoccerTeam = resolveSoccerTeam;
   global.FLOQRSoccerTeamOptions = soccerTeamOptions;
@@ -390,8 +410,8 @@
     const soccer = templates[SOCCER_TEMPLATE_ID];
     if (soccer) {
       const teamNames = Object.values(soccerTeams).map(t => t.teamName || t.name).filter(Boolean);
-      soccer.searchKeywords = Array.from(new Set([...(soccer.searchKeywords || []), ...teamNames, "jersey", "soccer", "football", "premier league", "la liga"]));
-      soccer.tags = Array.from(new Set([...(soccer.tags || []), "Sports", "Jersey", "soccer", "football", "$30", "2026/27", ...teamNames.slice(0, 40)]));
+      soccer.searchKeywords = Array.from(new Set([...(soccer.searchKeywords || []), ...teamNames, "jersey", "soccer", "football", "country", "club", "premier league", "la liga"]));
+      soccer.tags = Array.from(new Set([...(soccer.tags || []), "Sports", "Jersey", "Soccer", "Country", "Club", "football", "$30", "2026/27", ...teamNames.slice(0, 40)]));
     }
     // Keep legacy soccer IDs as thin aliases → consolidated template + team id (for old links / HEIST).
     Object.keys(soccerTeams).forEach(id => {

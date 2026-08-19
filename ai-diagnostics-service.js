@@ -31,8 +31,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.8";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.8";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.9";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.9";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -904,7 +904,18 @@
       ]
     },
     {
-      version:"s3.0.8",
+      version:"s3.0.9",
+      title:"Tanzania jersey overlay on every photo kit — real LED cards, size chips",
+      checks:[
+        {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.9\""]},
+        {label:"Photo soccer name +7%", file:"display-app.js", includes:["usePhotoBack && sport === \"soccer\" ? 11.2"]},
+        {label:"Photo soccer number +7%", file:"display-app.js", includes:["usePhotoBack && sport === \"soccer\" ? 40.7"]},
+        {label:"Number center-justified", file:"display.css", includes:["translateX(-0.08em)"]},
+        {label:"Display cache bust", file:"display.html", includes:["display.css?v=s3.0.9", "jersey-catalog.js?v=s3.0.9", "display-app.js?v=s3.0.9"]},
+        {label:"Photo team cards", file:"patron-app.js", includes:["jersey-shoutout-preview", "FLOQRSoccerPhotoTeams"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.9\""]}
+      ]
+    },
       title:"Soccer photo jerseys — one silhouette, black LED backdrop, proposed kits live",
       checks:[
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.8\""]},

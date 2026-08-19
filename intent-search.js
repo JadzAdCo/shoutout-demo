@@ -614,6 +614,17 @@
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
     {
+      id: "help-soccer-jersey",
+      kind: "help",
+      label: "Soccer jersey ShoutOut",
+      blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
+      links: [
+        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
+        {label: "Ask FloqAi for jersey templates", href: `./?v=${APP_V}&start=intent`}
+      ],
+      patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
+    },
+    {
       id: "help-sell-bartr",
       kind: "help",
       label: "Sell on BartR",

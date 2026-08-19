@@ -2636,16 +2636,43 @@
       }
     });
   }
+  function jerseyMiniPreview(template) {
+    const bg = String(template.defaultBackgroundUrl || "").trim();
+    if (bg && (template.sport === "soccer" || template.layout === "soccer-jersey")) {
+      return `<div class="template-mini-preview jersey-shoutout-preview" style="background-image:url('${esc(bg)}')"><span class="jersey-preview-name">${esc(template.defaultMain || "NYX")}</span><span class="jersey-preview-num">${esc(template.defaultSub || "99")}</span></div>`;
+    }
+    return `<div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>`;
+  }
+  function jerseyPublicTags(template) {
+    const team = template.teamName || String(template.name || "").replace(/\s+Jersey$/i, "");
+    const kind = template.league === "National teams" ? "Country" : (template.sport === "soccer" ? "Club" : "");
+    return Array.from(new Set(["Soccer", "Jersey", kind, team].filter(Boolean))).slice(0, 4);
+  }
+  function matchingSoccerPhotoTeams(query) {
+    const q = String(query || "").trim().toLowerCase();
+    const photos = window.FLOQRSoccerPhotoTeams?.() || [];
+    if (!q) return [];
+    if (/^(soccer|jersey|football|kit|jerseys|soccer jersey)$/i.test(q) || (/\bjersey\b/.test(q) && /\b(soccer|football)\b/.test(q))) {
+      return photos;
+    }
+    return photos.filter(team => {
+      const hay = `${team.id} ${team.name} ${team.teamName} ${team.league} ${(team.tags || []).join(" ")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
   function templateCard(template, options = {}) {
-    const selected = !selectedTemplateVariant && template.id === selectedTemplate;
+    const selected = !selectedTemplateVariant && (template.id === selectedTemplate || (selectedTemplate === "soccerJersey" && template.id === (byId("soccerTeamId")?.value || "")));
     const canCustomize = templateBackgroundCanBeCustomized(template);
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
-    return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}">
-      <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
+    const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32", "p125-96x48": "96×48", "p125-64x48": "64×48", "p125-64x32": "64×32" };
+    const sizeChips = supportedFormats.map(id => sizeLabels[id] || id).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
+    const tags = (template.sport === "soccer" && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
+    return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}" data-soccer-team-id="${esc(template.sport === "soccer" && template.id !== "soccerJersey" ? template.id : "")}">
+      ${jerseyMiniPreview(template)}
       <div class="name">${esc(template.name)}</div>
-      <div class="tag">${esc(template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video"))}</div>
-      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}<span>${supportedFormats.length}/${venueFormats.length} display sizes</span>${(template.tags || []).slice(0,3).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
+      <div class="tag">${esc(template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video")))}</div>
+      <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>
         ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>` : `<span class="template-background-lock">${template.backgroundEditable === false ? "Background locked" : "Club customization off"}</span>`}
@@ -2677,15 +2704,22 @@
     const alwaysInclude = location.restrictTemplatesToLocationSet ? [] : ["blackwhite"];
     const ids = Array.from(new Set([...alwaysInclude, ...(location.templates || []), ...venueSpecificIds, ...standardTemplateIds]))
       .map(id => (/^soccer/i.test(id) && id !== "soccerJersey" ? "soccerJersey" : id));
-    const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
+      const official = ids.map(id => ({id, data:getTemplate(id), title:getTemplate(id).name, searchText:templateSearchText(getTemplate(id)), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"}))
       .filter((record, index, arr) => arr.findIndex(row => row.id === record.id) === index)
       .filter(record => String(record.data.status || "active") === "active" && window.FLOQRScreenDatapoints?.templateFitsVenue?.(record.data, location) !== false);
+    const soccerPhotoHits = matchingSoccerPhotoTeams(query || discoveryQuery);
+    if (soccerPhotoHits.length) {
+      const extra = soccerPhotoHits
+        .filter(team => !official.some(row => row.id === team.id))
+        .map(team => ({id: team.id, data: team, title: team.name, searchText: templateSearchText(team), visibility: "public", type: "officialTemplate", sourceType: "approvedShoutOut"}));
+      official.splice(0, 0, ...extra);
+    }
     // If search matches a soccer club/nation, ensure Soccer Jersey appears once.
     if (query) {
       const teamHits = window.FLOQRFindSoccerTeamsMatching?.(query) || [];
-      if (teamHits.length && !official.some(row => row.id === "soccerJersey")) {
+      if (teamHits.length && !official.some(row => row.id === "soccerJersey" || row.data?.consolidatedTemplateId === "soccerJersey")) {
         const soccer = getTemplate("soccerJersey");
-        if (soccer) official.unshift({id:"soccerJersey", data:soccer, title:soccer.name, searchText:templateSearchText(soccer), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"});
+        if (soccer && !soccerPhotoHits.length) official.unshift({id:"soccerJersey", data:soccer, title:soccer.name, searchText:templateSearchText(soccer), visibility:"public", type:"officialTemplate", sourceType:"approvedShoutOut"});
       }
     }
     const club = (templateVariants.club || []).filter(x => String(x.status || "active") === "active");
@@ -2723,7 +2757,9 @@
         window.floqrSearch(discoveryQuery, {records:mine.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"private", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"}),
         window.floqrSearch(discoveryQuery, {records:community.map(x => ({id:x.id, data:x, title:x.variantName, searchText:variantSearchText(x), visibility:"public", ownerUid:x.ownerUid, type:"publicTemplateVariant", sourceType:"publicTemplateVariant"})), db, currentUser, profile:cachedUserProfile, role:"patron", source:"templates"})
       ]) : [official.filter(record => record.searchText.includes(discoveryQuery)), club.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), mine.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x})), community.filter(x => variantSearchText(x).includes(discoveryQuery)).map(x => ({id:x.id, data:x}))];
-      const officialHtml = officialRecords.map(record => templateCard(record.data)).join("");
+      const officialHtml = officialRecords
+        .filter(record => !(soccerPhotoHits.length && record.id === "soccerJersey"))
+        .map(record => templateCard(record.data)).join("");
       const clubHtml = clubRecords.map(record => variantCard(record.data, "club")).join("");
       const mineHtml = mineRecords.map(record => variantCard(record.data, "mine")).join("");
       const communityHtml = communityRecords.map(record => variantCard(record.data, "community")).join("");
@@ -2741,8 +2777,9 @@
       selectedTemplate = normalizeSoccerTemplateSelection(btn.dataset.templateOpen, query);
       selectedTemplateVariant = null;
       if (selectedTemplate === "soccerJersey") {
+        const teamId = btn.closest("[data-soccer-team-id]")?.dataset.soccerTeamId || btn.dataset.templateOpen;
         const hit = (window.FLOQRFindSoccerTeamsMatching?.(query) || [])[0];
-        populateSoccerTeamSelect(hit?.id || byId("soccerTeamId")?.value || "");
+        populateSoccerTeamSelect((/^soccer/i.test(teamId) && teamId !== "soccerJersey" ? teamId : "") || hit?.id || byId("soccerTeamId")?.value || "");
       }
       renderTemplates();
       updateTemplateSummary();
@@ -2765,8 +2802,9 @@
     grid.querySelectorAll(".template[role='button']").forEach(item => {
       item.addEventListener("click", () => {
         if (item.dataset.templateId) {
-          selectedTemplate = item.dataset.templateId;
+          selectedTemplate = normalizeSoccerTemplateSelection(item.dataset.templateId, byId("templateSearch")?.value || "");
           selectedTemplateVariant = null;
+          if (item.dataset.soccerTeamId) populateSoccerTeamSelect(item.dataset.soccerTeamId);
         } else if (item.dataset.variantId) {
           const variant = allVariants.find(x => (x.id || x.variantId) === item.dataset.variantId);
           selectedTemplate = variant?.baseTemplateId || "blackwhite";

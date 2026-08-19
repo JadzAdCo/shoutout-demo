@@ -151,7 +151,15 @@
       page: "index.html#floqAiHelpPopout"
     },
     {
-      id: "help-suprstr-superstar",
+      id: "help-soccer-jersey",
+      title: "Soccer jersey ShoutOut",
+      body: "Search Soccer, Jersey, or a country/club (Tanzania, Chelsea). Each photo kit card is the LED back you will see on ShoutOut — Soccer · Jersey · Country or Club. Sizes 96×48, 64×48, 64×32. Name and 2-character mark overlay the kit; numbers stay center-justified.",
+      searchPhrases: ["soccer jersey", "jersey", "tanzania jersey", "football kit", "country jersey", "club jersey", "chelsea jersey"],
+      links: [
+        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`}
+      ],
+      source: "help-repository-seed"
+    },
       title: "Make me a supRstar / superstar",
       body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
