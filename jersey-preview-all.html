@@ -75,17 +75,18 @@
     .board {
       position: relative;
       aspect-ratio: 2 / 1;
-      background:
-        linear-gradient(90deg,#1a1410 0%,#2a2118 12%,#1a1410 24%,#2c2219 36%,#18120e 48%,#2a2118 60%,#1a1410 72%,#2c2219 84%,#18120e 100%),
-        #14100c;
+      background: #000;
       overflow: hidden;
     }
     .board.photo-back {
-      background-color: #050505;
-      background-size: cover;
-      background-position: center top;
+      background-color: #000;
+      background-size: 88% auto;
+      background-position: center 36%;
       background-repeat: no-repeat;
     }
+    .board.photo-back .team { display: none; }
+    .board.photo-back .name { top: 42%; height: 10%; }
+    .board.photo-back .num { top: 54%; height: 26%; font-style: italic; }
     .mount {
       position: absolute;
       inset: 0;
@@ -270,7 +271,7 @@
 <body>
   <header>
     <h1>All jersey previews</h1>
-    <p class="sub">Every jersey on a hanger. Soccer = short-sleeve kit · NBA = sleeveless tank · NFL = yoke + name plate. Demo name/mark. Click for live LED URL.</p>
+    <p class="sub">Named soccer kits (country/club wordmark in the photo) plus NBA/NFL silhouettes. Demo name/mark overlays the empty mid-back. Click for live LED URL.</p>
     <div class="toolbar">
       <input id="q" type="search" placeholder="Filter team, league, sport…" autocomplete="off"/>
       <select id="sport">
@@ -279,12 +280,17 @@
         <option value="nba">NBA</option>
         <option value="nfl">NFL</option>
       </select>
+      <select id="screen" title="Composer preview size">
+        <option value="led-64x32">led-64x32</option>
+        <option value="led-64x48">led-64x48</option>
+        <option value="led-96x48">led-96x48</option>
+      </select>
       <span class="count" id="count"></span>
     </div>
   </header>
   <main id="root"></main>
-  <script src="./national-teams-data.js?v=29.09.59"></script>
-  <script src="./jersey-catalog.js?v=29.09.59"></script>
+  <script src="./national-teams-data.js?v=s3.0.8"></script>
+  <script src="./jersey-catalog.js?v=s3.0.8"></script>
   <script>
     // Same-origin local display so photo kits match the catalog (Pages may lag the feature branch).
     const LIVE = ".";
@@ -317,10 +323,11 @@
       const primary = encodeURIComponent(row.jerseyPrimary || "#111111");
       const secondary = encodeURIComponent(row.jerseySecondary || "#ffffff");
       const css = row.jerseyCssBack || !row.defaultBackgroundUrl ? "1" : "0";
+      const screen = encodeURIComponent(document.getElementById("screen")?.value || "led-64x32");
       if (row.sport === "soccer") {
-        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.59`;
+        return `${LIVE}/display.html?location=heist-washington-dc&template=soccerJersey&jerseyTeamId=${encodeURIComponent(row.id)}&jerseyTeamLabel=${label}&jerseyPrimary=${primary}&jerseySecondary=${secondary}&jerseyCssBack=${css}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;
       }
-      return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=led-64x32&preview=1&v=29.09.59`;
+      return `${LIVE}/display.html?location=heist-washington-dc&template=${encodeURIComponent(row.id)}&main=${encodeURIComponent(demo.name)}&sub=${encodeURIComponent(demo.mark)}&screen=${screen}&preview=1&v=s3.0.8`;
     }
 
     function collect() {
@@ -434,6 +441,7 @@
 
     document.getElementById("q").addEventListener("input", render);
     document.getElementById("sport").addEventListener("change", render);
+    document.getElementById("screen").addEventListener("change", render);
     render();
   </script>
 </body>

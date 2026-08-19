@@ -1,7 +1,7 @@
 /* FLOQR Sports Jersey catalog — soccer teams (picker) + NBA/NFL templates.
-   Silhouette rule (always): every jersey on a hanger (photo like Morocco/Spain or CSS mount).
-   Soccer = slim short-sleeve kit; NBA = sleeveless tank + mesh + big number; NFL = yoke + shoulder name plate + huge thick number.
-   See .cursor/rules/sports-jersey-silhouettes.mdc */
+   Photo LED soccer backs: one Cameroon/Morocco silhouette, team colors only, solid #000 backdrop, no hanger.
+   CSS hanger mount only for kits without a photo. Soccer = slim short-sleeve; NBA = tank; NFL = yoke + name plate.
+   See .cursor/rules/sports-jersey-silhouettes.mdc and soccer-jersey-photo-backs.mdc */
 (function (global) {
   "use strict";
 
@@ -138,7 +138,7 @@
       ["Arsenal", "#EF0107", "#FFFFFF"],
       ["Manchester City", "#6CABDD", "#1C2C5B"],
       ["Liverpool", "#C8102E", "#00B2A9"],
-      ["Chelsea", "#034694", "#DBA111", "./images/soccer/soccer-chelsea-back.png"],
+      ["Chelsea", "#034694", "#DBA111", "./images/soccer/soccer-chelsea-back-with-club.png"],
       ["Manchester United", "#DA291C", "#FBE122"]
     ]},
     {league: "La Liga", country: "Spain", teams: [
@@ -163,11 +163,11 @@
       ["Eintracht Frankfurt", "#E1000F", "#000000"]
     ]},
     {league: "Ligue 1", country: "France", teams: [
-      ["Paris Saint-Germain", "#004170", "#DA291C", "./images/soccer/soccer-psg-back.png"],
-      ["AS Monaco", "#E30613", "#FFFFFF", "./images/soccer/soccer-monaco-back.png"],
+      ["Paris Saint-Germain", "#004170", "#DA291C", "./images/soccer/soccer-psg-back-with-club.png"],
+      ["AS Monaco", "#E30613", "#FFFFFF", "./images/soccer/soccer-monaco-back-with-club.png"],
       ["Olympique Marseille", "#2FAEE0", "#FFFFFF"],
       ["Olympique Lyonnais", "#003399", "#FFFFFF"],
-      ["Lille", "#E01E26", "#FFFFFF", "./images/soccer/soccer-lille-back.png"]
+      ["Lille", "#E01E26", "#FFFFFF", "./images/soccer/soccer-lille-back-with-club.png"]
     ]},
     {league: "Eredivisie", country: "Netherlands", teams: [
       ["Ajax", "#D2122E", "#FFFFFF"],
@@ -208,19 +208,23 @@
 
   /** Legacy lowercase filenames already on disk (before slug casing). */
   const PHOTO_FILE_ALIASES = {
-    Morocco: "soccer-morocco-back.png",
-    Spain: "soccer-spain-back.png",
-    Cameroon: "soccer-cameroon-back.png",
-    Nigeria: "soccer-nigeria-back.png"
+    Morocco: "soccer-morocco-back-with-country.png",
+    Spain: "soccer-spain-back-with-country.png",
+    Cameroon: "soccer-cameroon-back-with-country.png",
+    Nigeria: "soccer-nigeria-back-with-country.png"
   };
 
-  /** Nations with confirmed flat blank photo backs (Cameroon/Nigeria methodology). Expanded as batch agents finish. */
-  const PHOTO_READY = new Set(Object.keys(PHOTO_FILE_ALIASES));
+  /** Named LED backs only (country/club wordmark in PNG). Restart with @jersey$ / $jersey@. */
+  const PHOTO_READY = new Set([
+    "Morocco", "Spain", "Cameroon", "Nigeria",
+    "Egypt", "Ghana", "Senegal", "Ivory Coast", "South Africa", "Tunisia", "Kenya",
+    "Mali", "Zambia", "Angola", "DR Congo", "Ethiopia", "Tanzania", "Mozambique", "Rwanda"
+  ]);
 
   function nationalPhotoUrl(teamName) {
     const alias = PHOTO_FILE_ALIASES[teamName];
     if (alias) return `./images/soccer/${alias}`;
-    return `./images/soccer/soccer-${slug(teamName)}-back.png`;
+    return `./images/soccer/soccer-${slug(teamName).toLowerCase()}-back-with-country.png`;
   }
 
   const NATIONAL_SOURCE = Array.isArray(global.FLOQR_NATIONAL_TEAMS) ? global.FLOQR_NATIONAL_TEAMS : [];
@@ -315,6 +319,7 @@
     });
   });
   PHOTO_NATIONALS.forEach(row => {
+    if (!row.bgUrl) return;
     addSoccerTeam(row.id, row.teamName, row.league, row.country, row.primary, row.secondary, row.bgUrl, {
       accent: row.accent,
       extraTags: [row.region, "National", row.region === "Oceania" ? "Australia" : ""].filter(Boolean)
@@ -326,7 +331,7 @@
       ...soccerTeams.soccerASMonaco,
       id: "soccerMonaco",
       name: "Soccer Monaco",
-      defaultBackgroundUrl: "./images/soccer/soccer-monaco-back.png",
+      defaultBackgroundUrl: "./images/soccer/soccer-monaco-back-with-club.png",
       jerseyCssBack: false
     };
   }

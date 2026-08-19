@@ -705,13 +705,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 
 /* Soccer / sports jersey: country|club crest + player name + large number */
 .display-canvas.soccer-jersey-template{
-  background:#050505!important;
+  background:#000!important;
   animation:none!important;
 }
 .display-canvas.soccer-jersey-template .display-background{
   background-size:cover!important;
   background-position:center top!important;
   background-repeat:no-repeat!important;
+  background-color:#000!important;
 }
 .display-canvas.soccer-jersey-template .display-frame-overlay{
   display:none!important;
@@ -835,12 +836,12 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-css-back .display-background{
   background-size:cover!important;
 }
-/* Photo kits (flat blank nationals + club photos): no hanger overlay; kit fills frame */
+/* Photo kits (named national/club backs, no hanger): kit fills frame */
 .display-canvas.soccer-jersey-template.jersey-photo-back .display-background{
-  background-size:78% auto!important;
-  background-position:center 42%!important;
+  background-size:88% auto!important;
+  background-position:center 36%!important;
   background-repeat:no-repeat!important;
-  background-color:#0e0e0e!important;
+  background-color:#000!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back .jersey-hanger-mount{
   display:none!important;
@@ -850,31 +851,28 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back .soccer-jersey-team{
-  top:34%!important;
-  height:5.5%!important;
-  letter-spacing:.14em!important;
-  transform:perspective(520px) rotateX(10deg);
+  display:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:40%!important;
-  height:9%!important;
+  top:42%!important;
+  height:10%!important;
   left:22%!important;
   right:22%!important;
   letter-spacing:.1em!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back #displayMain.soccer-jersey-name.jersey-name-wrap{
-  top:38%!important;
-  height:11%!important;
+  top:40%!important;
+  height:12%!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:49%!important;
-  height:18%!important;
-  left:24%!important;
-  right:24%!important;
+  top:54%!important;
+  height:26%!important;
+  left:22%!important;
+  right:22%!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back.jersey-name-wrapped #displaySub.soccer-jersey-number{
-  top:51%!important;
-  height:16%!important;
+  top:56%!important;
+  height:24%!important;
 }
 .display-canvas.soccer-jersey-template.jersey-photo-back .display-identity-rail.soccer-jersey-rail{
   top:86%!important;
@@ -884,21 +882,19 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-photo-back .soccer-jersey-team,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-photo-back .soccer-jersey-team{
-  top:32%!important;
-  height:6%!important;
-  letter-spacing:.12em!important;
+  display:none!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:38%!important;
-  height:9%!important;
+  top:40%!important;
+  height:10%!important;
   left:20%!important;
   right:20%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:47%!important;
-  height:20%!important;
+  top:52%!important;
+  height:28%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template .soccer-jersey-team,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template .soccer-jersey-team{

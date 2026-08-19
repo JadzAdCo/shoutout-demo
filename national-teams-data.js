@@ -1,7 +1,8 @@
 /**
  * FIFA-style national home kits for photo jersey generation.
  * Colors = typical home primary / secondary / optional collar accents.
- * File: images/soccer/soccer-{slug}-back.png
+ * Named LED files: images/soccer/soccer-{slug}-back-with-country.png (nations)
+ * and soccer-{slug}-back-with-club.png (clubs).
  */
 (function (global) {
   "use strict";
@@ -232,17 +233,62 @@
       ? ` Collar and trim use ${team.collar} (accent ${team.accent}).`
       : ` Collar and trim use ${team.collar}.`;
     return [
-      `Photorealistic BACK of a ${team.name} national football / soccer jersey, blank canvas for name and number overlays.`,
-      `Vertical 3:4 portrait product photo.`,
+      `Photorealistic BACK of a ${team.name} national football / soccer jersey. Solid #000000 black backdrop (LED energy). Vertical 3:4 portrait product photo.`,
+      `NO HANGER: no wooden hanger, no black plastic hanger, no wire hanger, no hook. Jersey fabric only.`,
       `Body fabric color ${team.primary} with secondary ${team.secondary}.${accentBit}`,
-      `Pressed flat for text overlays: no deep folds, soft even studio lighting, subtle fabric texture.`,
-      `NO hanger, NO hanging folds, NO hooks.`,
-      `Completely blank back: no player name, no number, no crest, no logo, no federation badge, no country name text, no FIFA marks.`,
-      `Authentic modern national-team cut, short sleeves, clean collar matching national colors.`
+      `Slim short-sleeve kit. Soft even lighting, subtle athletic mesh texture.`,
+      `Completely blank back for name/number overlays: ZERO letters, ZERO numbers, no country wordmark, no crest, no FIFA marks.`,
+      `Do not print ${team.name} or any translation of the country name on the shirt.`
+    ].join(" ");
+  }
+
+  /**
+   * Country/club wordmark on the jersey BACK. LED uses these files (not the blank).
+   * Locked to Lille LED markup: wordmark at the collar (green neckline), slight shoulder curve, 7% smaller than the old 43% mark.
+   * Output: soccer-{slug}-back-with-country.png or soccer-{slug}-back-with-club.png
+   */
+  function promptForCountryName(team) {
+    const wordmark = String(team.name || "").toUpperCase();
+    const letterColor = team.secondary || "#FFFFFF";
+    const fallback = team.accent || "#FFFFFF";
+    const twoWord = wordmark.includes(" ");
+    const sizeBit = twoWord
+      ? `TWO-WORD name ${wordmark}: one arched line. Same letter height as CAMEROON until the SECOND word would leave the fabric, then stop. Never drop, crop, or omit the second word. Never wrap to two lines.`
+      : `Same letter height and arch as CAMEROON on the plate. Wordmark fills about 65% of jersey width.`;
+    return [
+      `Keep the EXACT Cameroon/Morocco jersey SILHOUETTE: same camera, crop, slim short-sleeve cut, crew collar shape, sleeve length, and fabric drape. Do not design a new shirt.`,
+      `ONLY recolor this same garment for ${team.name}: body ${team.primary}, letter/trim ${letterColor}, collar ${team.collar}. No V-neck, no new sleeve cut, no zoom.`,
+      `NO HANGER: remove any wooden, black plastic, or wire hanger and hook. Solid #000000 black backdrop (LED energy). Jersey fabric only.`,
+      `Add ONLY one line of text: ${wordmark}`,
+      `Heat-transfer athletic block capitals, letter color ${letterColor} (use ${fallback} only if too close to body ${team.primary}).`,
+      sizeBit,
+      `Position: TOP of the letters at the inner collar / green neckline. Almost no gap under the collar. High on the shoulders.`,
+      `Gentle arch following the shoulder curve: center of the word sits highest under the collar; first and last letters sit slightly lower toward the sleeves. Not a deep U, not a flat nameplate, not printed on the collar.`,
+      `ABSOLUTELY NO NUMBERS. No player name, crest, FIFA, or extra text.`,
+      `Empty middle and lower back for patron name/number overlay. No person.`
+    ].join(" ");
+  }
+
+  function promptForClubName(club) {
+    const wordmark = String(club.wordmark || club.name || "").toUpperCase();
+    const letterColor = club.secondary || "#FFFFFF";
+    const fallback = club.accent || "#FFFFFF";
+    return [
+      `Keep the EXACT Cameroon/Morocco/PSG jersey SILHOUETTE: same camera, crop, slim short-sleeve cut, crew collar shape. Do not design a new shirt.`,
+      `ONLY recolor this same garment for ${club.name}. No V-neck, no new sleeve cut, no zoom.`,
+      `NO HANGER: remove any wooden, black plastic, or wire hanger and hook. Solid #000000 black backdrop (LED energy). Jersey fabric only.`,
+      `Add ONLY one line of text: ${wordmark}`,
+      `Heat-transfer athletic block capitals, letter color ${letterColor} (use ${fallback} only if too close to body ${club.primary}).`,
+      `Letter size: about 40% of jersey width (7% smaller than the prior mark).`,
+      `Position: TOP of the letters at the inner collar / green neckline. Almost no gap under the collar.`,
+      `Gentle arch following the shoulder curve: center highest under the collar; ends slightly lower toward the sleeves.`,
+      `NO NUMBERS, no player name, no crest. Empty mid/lower back. No person.`
     ].join(" ");
   }
 
   global.FLOQR_NATIONAL_TEAMS = NATIONAL_TEAMS;
   global.FLOQR_NATIONAL_TEAM_SLUG = slug;
   global.FLOQR_NATIONAL_TEAM_PROMPT = promptFor;
+  global.FLOQR_NATIONAL_TEAM_COUNTRY_NAME_PROMPT = promptForCountryName;
+  global.FLOQR_CLUB_NAME_PROMPT = promptForClubName;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -7,7 +7,7 @@ alwaysApply: true
 
 When creating or editing **NBA / soccer / NFL** jersey templates or display art:
 
-1. **Always show the jersey on a hanger** (Morocco / Spain photo style: hanger + dark locker/wood backdrop). Prefer a real photo back when available; otherwise the CSS hanger mount in `display-app.js` / `display.css`.
+1. **Photo LED backs (named soccer/NBA/NFL PNGs):** no hanger. Jersey fabric only on a solid `#000000` backdrop (LED energy). CSS hanger mount is only for kits **without** a photo back (`display-app.js` / `display.css`).
 2. **Soccer** — slim short-sleeve shirt; fabric / kit fashion; name + number (name often arched); side accent panels OK. Match the presentation language of Morocco, Spain, Monaco photo backs.
 3. **NBA** — sleeveless / tank cut; athleisure mesh feel; **big number**, name smaller/cleaner and higher on the back.
 4. **NFL** — bulkier cut with yoke/shoulders; name **plate across the shoulders**; **huge number**; armor-adjacent, thicker graphics / heavier text shadow.
@@ -16,7 +16,7 @@ When creating or editing **NBA / soccer / NFL** jersey templates or display art:
 
 Checklist before commit:
 
-- [ ] Hanger presentation (photo or CSS mount)
+- [ ] Photo back: no hanger hardware; CSS mount only when there is no photo
 - [ ] Correct sport silhouette class
 - [ ] Sport-appropriate name/number hierarchy
 - [ ] Previewed on `led-64x32` (and gallery if touched)
