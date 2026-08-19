@@ -27,7 +27,7 @@ FLOQRTabGates.bind([{
 
 **Work Calendar** (patron Settings): visible only when `users.serviceMember` is true **and** the user has a non-rejected `clubEmployeeDesignations` row on a club with `clubLocations.staffSchedulingPaid === 1`. Source datapoints stay on those collections (`workCalendarEligible` is derived, 0|1).
 
-**Service Members → Review & elect** (patron Settings): the Review subtab is visible only when `isClubAdmin` is true (Club Admin member level / roles / `clubAdminLocationIds` / a non-rejected Club Admin designation). The Service Members tab itself stays visible so patrons can request access.
+**Services & Service Members** (patron Settings): the tab is hidden when `users.IsPatron` is truthy (`1` / `yes` / `true`). It appears when `users.IsServiceMember` or `users.IsserviceMember` (or legacy `serviceMember`) is truthy **and** `IsPatron` is `0` / `no`. Patrons elect from My Profile; that write sets `IsPatron=0` and `IsServiceMember=1`. **Review & elect** subtab still requires `isClubAdmin`.
 
 **Forbidden:** hiding tabs with one-off CSS `display:none` in the page app; leaving a gated tab visible and relying on a 404 inside the panel.
 

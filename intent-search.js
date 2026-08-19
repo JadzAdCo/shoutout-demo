@@ -559,15 +559,15 @@
       id: "help-service-member",
       kind: "help",
       label: "Become a service member",
-      blurb: "All users start as patrons. Open Settings → Service Members to request a role (DJ, promoter, hospitality, bus boy/security, venue manager, bartender, media, or Club Admin) and club association.",
+      blurb: "All users start as patrons. Elect from My Profile so IsServiceMember is 1 and IsPatron is 0, then open Settings → Services & Service Members to request a role and club association.",
       steps: [
-        "Open My Profile & Settings → Service Members.",
-        "Pick the role that matches how you work nightlife.",
+        "Open My Profile & Settings → My Profile and elect to become a service member if the tab is hidden.",
+        "Open Services & Service Members and pick the role that matches how you work nightlife.",
         "Select clubs and submit — each club must approve.",
         "Club Admins use Review & elect on the same tab to approve or elect patrons."
       ],
       links: [
-        {label: "Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
         {label: "My Profile & Settings", href: vUrl("./patron-portal.html", {from: "floqai"})},
         {label: "How roles work", href: vUrl("./role-profiles.html", {from: "floqai"})}
       ],

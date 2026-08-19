@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.0.6";
+  const VERSION = "s3.0.11";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -332,7 +332,7 @@
       "nav.followServices": "Follow Services",
       "nav.openBartr": "Open BartR",
       "nav.workCalendar": "Work Calendar",
-      "nav.serviceMembers": "Service Members",
+      "nav.serviceMembers": "Services & Service Members",
       "nav.help": "Help",
       "nav.backToSearch": "Back to Search",
       "lang.pageTitle": "Language Settings",
@@ -448,7 +448,7 @@
       "profile.menu.adminPatronHint": "A new tab / new window is opening. The admin portal will stay open on this browser session. Please hold.",
       "profile.menu.openedTab": "A new tab / new window is opening",
       "profile.menu.adminPatronHold": "The admin portal will stay open on this browser session. Please hold.",
-      "profile.menu.memberLevel": "Member Level: {level}",
+      "profile.menu.memberLevel": "Member Type: {level}",
       "nav.backToWelcome": "← Back to welcome",
       "admin.locationView": "Location View",
       "admin.locationHint": "Only Club Admins elected by Master/Super Admin for this venue can open this portal.",
@@ -526,7 +526,7 @@
       "nav.followServices": "Suivre les services",
       "nav.openBartr": "Ouvrir BartR",
       "nav.workCalendar": "Calendrier de travail",
-      "nav.serviceMembers": "Membres de service",
+      "nav.serviceMembers": "Services et membres de service",
       "nav.help": "Aide",
       "nav.backToSearch": "Retour à la recherche",
       "lang.pageTitle": "Paramètres de langue",
@@ -642,7 +642,7 @@
       "profile.menu.adminPatronHint": "Un nouvel onglet / une nouvelle fenêtre s'ouvre. Le portail admin reste ouvert dans cette session. Veuillez patienter.",
       "profile.menu.openedTab": "Un nouvel onglet / une nouvelle fenêtre s'ouvre",
       "profile.menu.adminPatronHold": "Le portail admin reste ouvert dans cette session du navigateur. Veuillez patienter.",
-      "profile.menu.memberLevel": "Niveau de membre : {level}",
+      "profile.menu.memberLevel": "Type de membre : {level}",
       "nav.backToWelcome": "← Retour à l'accueil",
       "admin.locationView": "Vue du lieu",
       "admin.locationHint": "Seuls les Club Admins élus par Master/Super Admin pour ce lieu peuvent ouvrir ce portail.",

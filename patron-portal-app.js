@@ -236,6 +236,25 @@
     {key:"media", label:"Public profile media"}
   ];
 
+  function memberTypeLabel(profile = {}) {
+    return String(profile.memberType || profile.memberLevel || "Patron").trim() || "Patron";
+  }
+
+  function notifyFlagOn(value, defaultOn = true) {
+    if (value === undefined || value === null || value === "") return defaultOn;
+    return window.FLOQRTabGates?.isTruthy?.(value) ?? ["1", "true", "yes", "on"].includes(String(value).trim().toLowerCase());
+  }
+
+  function serviceMembershipPatch(extra = {}) {
+    return {
+      IsPatron: 0,
+      IsServiceMember: 1,
+      IsserviceMember: 1,
+      serviceMember: true,
+      ...extra
+    };
+  }
+
   function actionFeedback(messages, action) {
     if (window.FLOQRActionFeedback?.run) return window.FLOQRActionFeedback.run(messages, action);
     return action();
@@ -740,6 +759,8 @@
     byId("privacySharing").checked = !!profile.dataSharingConsent;
     if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
+    if (byId("privacyNotifyEmail")) byId("privacyNotifyEmail").checked = notifyFlagOn(profile.notifyEmail ?? profile.emailNotifications, true);
+    if (byId("privacyNotifySms")) byId("privacyNotifySms").checked = notifyFlagOn(profile.notifySms ?? profile.smsNotifications, true);
     renderPrivacyDatapoints(profile);
     fillLanguageSettings(profile);
   }
@@ -1067,6 +1088,10 @@
       dataSharingConsent: byId("privacySharing").checked,
       birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
       birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
+      notifyEmail: !!byId("privacyNotifyEmail")?.checked,
+      notifySms: !!byId("privacyNotifySms")?.checked,
+      emailNotifications: !!byId("privacyNotifyEmail")?.checked,
+      smsNotifications: !!byId("privacyNotifySms")?.checked,
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2961,6 +2986,29 @@
     });
   }
 
+  async function electBecomeServiceMember() {
+    const user = auth.currentUser;
+    if (!user) {
+      setText("portalStatus", "Please sign in first.");
+      return;
+    }
+    await db.collection("users").doc(user.uid).set(serviceMembershipPatch({
+      memberType: /^patron$/i.test(memberTypeLabel(currentProfile)) ? "Service Member" : memberTypeLabel(currentProfile),
+      memberLevel: /^patron$/i.test(memberTypeLabel(currentProfile)) ? "Service Member" : (currentProfile.memberLevel || memberTypeLabel(currentProfile)),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }), {merge: true});
+    currentProfile = {
+      ...currentProfile,
+      IsPatron: 0,
+      IsServiceMember: 1,
+      IsserviceMember: 1,
+      serviceMember: true
+    };
+    setText("portalStatus", "You are now a service member. The Services & Service Members tab is available.");
+    await renderStaffCalendarLinks(user, currentPortalDesignations);
+    showPortalPanel("portalServiceMembers", "portalServiceMembers");
+  }
+
   async function submitServiceMemberRequest() {
     const user = auth.currentUser;
     if (!user) {
@@ -3022,14 +3070,15 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     });
-    batch.set(db.collection("users").doc(user.uid), {
-      serviceMember: roleType !== "clubAdmin",
+    batch.set(db.collection("users").doc(user.uid), serviceMembershipPatch({
       requestedRoles: firebase.firestore.FieldValue.arrayUnion(SERVICE_ROLE_LABELS[roleType] || roleType),
       requestedClubLocationIds: relatedLocations,
       publicProfileType: publicProfileTypeForRole(roleType),
       serviceSubtype,
+      memberType: SERVICE_ROLE_LABELS[roleType] || roleType,
+      memberLevel: SERVICE_ROLE_LABELS[roleType] || roleType,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
+    }), {merge: true});
     await batch.commit();
     if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
     if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
@@ -3075,12 +3124,13 @@
         approvedByUid: auth.currentUser?.uid || "",
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, {merge: true});
-      const userPatch = {
+      const userPatch = serviceMembershipPatch({
         approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
         approvedLocations: firebase.firestore.FieldValue.arrayUnion(clubLocationId),
+        memberType: role,
+        memberLevel: role,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if (role !== "Club Admin") userPatch.serviceMember = true;
+      });
       await db.collection("users").doc(uid).set(userPatch, {merge: true});
       await db.collection("inboxNotifications").add({
         recipientUid: uid,
@@ -3163,12 +3213,13 @@
       status: "elected",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
-    const electPatch = {
+    const electPatch = serviceMembershipPatch({
       approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
       approvedLocations: firebase.firestore.FieldValue.arrayUnion(clubLocationId),
+      memberType: role,
+      memberLevel: role,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    if (role !== "Club Admin") electPatch.serviceMember = true;
+    });
     await db.collection("users").doc(uid).set(electPatch, {merge: true});
     setText("smAdminStatus", `${match.displayName || match.email || "Patron"} elected as ${role} for ${clubLocationLabel(clubLocationId)}.`);
   }
@@ -3200,11 +3251,22 @@
       ],
       reason: "work-calendar"
     }, {
+      tab: "#portalServiceMembersTab",
+      panel: "#portalServiceMembers",
+      when: {datapoint: "servicesTabVisible", equals: true},
+      reason: "services-service-members"
+    }, {
       tab: "#serviceMembersAdminSubtab",
       when: {datapoint: "isClubAdmin", equals: true},
       reason: "service-members-admin"
     }], datapoints);
+    byId("becomeServiceMemberCard")?.classList.toggle("hidden", !!datapoints.servicesTabVisible);
     const pageParams = new URL(location.href).searchParams;
+    const wantServices = ["service-members", "servicemembers", "role-request"].includes(String(pageParams.get("tab") || "").toLowerCase());
+    if (wantServices) {
+      if (datapoints.servicesTabVisible) showPortalPanel("portalServiceMembers", "portalServiceMembers");
+      else showPortalPanel("portalProfile", "portalProfile");
+    }
     const confirmDeepLink = pageParams.get("from") === "schedule-notify" || !!pageParams.get("shift");
     if (confirmDeepLink) {
       window.FLOQRTabGates?.apply?.({
@@ -3251,7 +3313,17 @@
     currentProfile = {uid:user.uid, email:user.email || "", ...profile};
 
     if (!snap.exists) {
-      await ref.set({displayName:user.displayName || "", email:user.email || "", photoURL:user.photoURL || "", memberLevel:"Patron", createdAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      await ref.set({
+        displayName:user.displayName || "",
+        email:user.email || "",
+        photoURL:user.photoURL || "",
+        memberLevel:"Patron",
+        memberType:"Patron",
+        IsPatron: 1,
+        IsServiceMember: 0,
+        IsserviceMember: 0,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
     }
 
     try {
@@ -3265,7 +3337,7 @@
     renderRoleGuide();
     renderPolicies(profile);
     await renderBartrSellerBackend(user, profile);
-    setText("metricMemberLevel", profile.memberLevel || "Patron");
+    setText("metricMemberLevel", memberTypeLabel(profile));
     setText("metricMemberSince", fmtDate(profile.createdAt));
 
     setText("portalStatus", "Loading your FloqR Inbox…");
@@ -3312,7 +3384,7 @@
       ["Preferred Language", profile.preferredLanguage || "-"],
       ["Public Profile Language", publicProfileLanguageLabel(profile)],
       ["English Translation", profile.publicProfileTranslationStatus || "not prepared"],
-      ["Member Level", profile.memberLevel || "Patron"],
+      ["Member Type", memberTypeLabel(profile)],
       ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],
       ["Visibility", profile.publicProfileVisibility || "followers"]
     ]);
@@ -3455,6 +3527,7 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("smSubmitRoleRequestBtn", submitServiceMemberRequest);
+    bind("becomeServiceMemberBtn", electBecomeServiceMember);
     bind("smElectBtn", () => electServiceMember());
     byId("smElectSearch")?.addEventListener("input", renderServiceMemberElectMatches);
     byId("smAdminClubSelect")?.addEventListener("change", () => {

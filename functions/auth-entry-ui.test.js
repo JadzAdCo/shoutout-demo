@@ -138,11 +138,16 @@ test("SOS2FA request UI is channel-neutral and puts status below the request but
   assert.doesNotMatch(html, /SOS2FA SMS code/);
   assert.match(html, /sos2fa-code-row/);
   assert.match(html, /help-sos2fa-entity-mgmt/);
+  assert.match(html, /help-sos2fa-request-channels/);
+  assert.match(html, /Request is sent using your general Notifications settings/);
+  assert.doesNotMatch(html, /sos2faPhoneHint/);
   const css = readReleaseFile("admin.css");
   assert.match(css, /\.sos2fa-code-row\{display:flex/);
   const js = readReleaseFile("sos2fa.js");
   assert.match(js, /data\.notes \|\| data\.delivery/);
   assert.doesNotMatch(js, /Request SOS2FA Code via SMS/);
+  assert.doesNotMatch(js, /Sign in required\./);
+  assert.doesNotMatch(js, /Email and SMS notification settings/);
 });
 
 test("App language chrome keys cover portal tabs and language settings radios", () => {

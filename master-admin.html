@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.98"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.7"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.11"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.33&start=search">&larr; Back to Search</a>
@@ -124,7 +124,13 @@
               >Manage Entity - Admin Access</h2>
             </div>
           </div>
-          <div class="queue-actions sos2fa-request-row">
+          <div
+            class="queue-actions sos2fa-request-row"
+            data-floqr-help-id="help-sos2fa-request-channels"
+            data-floqr-help-title="Request SOS2FA Code"
+            data-floqr-help-search="sos2fa|notifications settings|general notifications|request sos2fa code"
+            data-floqr-help-body="Request is sent using your general Notifications settings"
+          >
             <button id="sos2faSendBtn" class="primary" type="button">Request SOS2FA Code</button>
           </div>
           <p id="sos2faStatus" class="status" aria-live="polite"></p>
@@ -136,7 +142,6 @@
             <button id="sos2faVerifyBtn" type="button">Verify &amp; unlock</button>
             <button id="sos2faLockBtn" type="button">Lock panel</button>
           </div>
-          <p id="sos2faPhoneHint" class="sub small"></p>
         </div>
       </div>
 
@@ -1121,14 +1126,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.6"></script>
+<script src="./floqr-i18n.js?v=s3.0.11"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
 <script src="./floqr-nav.js?v=s3.0.10"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./sos2fa.js?v=s3.0.4"></script>
+<script src="./sos2fa.js?v=s3.0.11"></script>
 <script src="./entity-management.js?v=s3.0.3"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
@@ -1136,7 +1141,7 @@
 <script src="./floqr-venue-datapoints.js?v=29.09.119"></script>
 <script src="./ai-discovery-service.js?v=29.09.104"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.7"></script>
+<script src="./floqai-help-repository.js?v=s3.0.11"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./ad-campaigns.js?v=29.09.22"></script>

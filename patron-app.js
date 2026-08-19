@@ -3796,7 +3796,7 @@
 
     const level = upsert("level", "div", "profile-menu-line");
     if (!level.dataset.levelValue) level.dataset.levelValue = "Patron";
-    level.textContent = tt("profile.menu.memberLevel", { level: level.dataset.levelValue }, `Member Level: ${level.dataset.levelValue}`);
+    level.textContent = tt("profile.menu.memberLevel", { level: level.dataset.levelValue }, `Member Type: ${level.dataset.levelValue}`);
 
     const messages = upsert("messages", "a", "profile-menu-link");
     messages.href = window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox";
@@ -3817,9 +3817,9 @@
       const profile = profileDoc.exists ? profileDoc.data() : {};
       const levelEl = document.querySelector("#userDropdown [data-patron-menu='level']");
       if (levelEl) {
-        const level = profile.memberLevel || "Patron";
+        const level = profile.memberType || profile.memberLevel || "Patron";
         levelEl.dataset.levelValue = level;
-        levelEl.textContent = tt("profile.menu.memberLevel", { level }, `Member Level: ${level}`);
+        levelEl.textContent = tt("profile.menu.memberLevel", { level }, `Member Type: ${level}`);
       }
 
       let totalMessages = 0, unreadMessages = 0, totalChats = 0, unreadChats = 0;
@@ -4079,7 +4079,7 @@
     const block = document.createElement("div");
     block.innerHTML = `
       <a class="profile-menu-link" data-patron-menu="portal" href="${window.FLOQRNav?.portalHome() || "./patron-portal.html"}">${esc(t("portal.title", "My Profile and Settings"))}</a>
-      <div class="profile-menu-line" data-patron-menu="level">${esc(t("profile.menu.memberLevel", "Member Level: Patron", { level: "Patron" }))}</div>
+      <div class="profile-menu-line" data-patron-menu="level">${esc(t("profile.menu.memberLevel", "Member Type: Patron", { level: "Patron" }))}</div>
       <a class="profile-menu-link" data-patron-menu="messages" href="${window.FLOQRNav?.portalHome({ tab: "inbox" }) || "./patron-portal.html?tab=inbox"}">${esc(t("nav.inbox", "FloqR Inbox"))} (${esc(c.um)}/${esc(c.tm)})</a>
       <a class="profile-menu-link" data-patron-menu="chats" href="${window.FLOQRNav?.portalLink("./mingl-chat.html") || "./mingl-chat.html?from=portal"}">${esc(t("nav.mingl", "Mingl"))} (${esc(c.uc)}/${esc(c.tc)})</a>`;
     while (block.firstChild) {

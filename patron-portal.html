@@ -45,13 +45,13 @@
         <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal" data-i18n="nav.followServices">Follow Services</a>
         <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal" data-i18n="nav.openBartr">Open BartR</a>
         <button class="admin-tab hidden" id="portalWorkCalendarTab" data-panel="portalWorkCalendar" type="button" data-i18n="nav.workCalendar">Work Calendar</button>
-        <button class="admin-tab" id="portalServiceMembersTab" data-panel="portalServiceMembers" type="button" data-i18n="nav.serviceMembers">Service Members</button>
+        <button class="admin-tab hidden" id="portalServiceMembersTab" data-panel="portalServiceMembers" type="button" data-i18n="nav.serviceMembers">Services &amp; Service Members</button>
         <button class="admin-tab" data-panel="portalHelp" type="button" data-i18n="nav.help">Help</button>
       </nav>
 
       <section id="portalOverview" class="admin-panel-section active">
         <div class="metric-grid">
-          <div class="metric-card"><span>Member Level</span><strong id="metricMemberLevel">Patron</strong></div>
+          <div class="metric-card"><span>Member Type</span><strong id="metricMemberLevel">Patron</strong></div>
           <div class="metric-card"><span>FloqR Inbox</span><strong id="metricMessages">0/0</strong></div>
           <div class="metric-card"><span>Mingl</span><strong id="metricChats">0/0</strong></div>
           <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
@@ -187,6 +187,11 @@
           <button id="prepareProfileTranslationBtn" type="button">Prepare English Translation</button>
           <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
         </div>
+        <div id="becomeServiceMemberCard" class="card hidden">
+          <h2>Services &amp; Service Members</h2>
+          <p class="sub small">This tab stays hidden while <code>IsPatron</code> is yes/1. Elect to become a service member to set <code>IsServiceMember</code> and open the tab.</p>
+          <button id="becomeServiceMemberBtn" class="primary" type="button">Elect to become a service member</button>
+        </div>
       </section>
 
       <section id="portalPublicProfile" class="admin-panel-section">
@@ -203,10 +208,6 @@
           </label>
           <div id="profileMediaSlots" class="profile-media-grid"></div>
           <button id="saveMediaSlotsBtn" class="primary" type="button">Save Media and Order</button>
-        </div>
-        <div class="card">
-          <h2>Profile Template Guide</h2>
-          <div id="roleTemplateGuide" class="role-template-grid"></div>
         </div>
       </section>
 
@@ -538,6 +539,19 @@
             </label>
           </div>
           <div class="card-subsection">
+            <h3
+              data-floqr-help-id="help-general-notifications"
+              data-floqr-help-title="General Notifications"
+              data-floqr-help-search="email notifications|sms notifications|notifyEmail|notifySms|sos2fa|general notifications"
+              data-floqr-help-body="Email and SMS toggles on this card are the general Notifications settings. SOS2FA, schedule invites, and other FloqR system messages use users.notifyEmail and users.notifySms (yes/no or 1/0). Club Admin → Notifications is a separate club overlay for venue SMS subscriptions."
+            >General Notifications (Email / SMS)</h3>
+            <p class="sub small">SOS2FA and other FloqR system messages follow these flags on your user record. Club Admin → Notifications is only for club-paid SMS/WhatsApp, not Super Admin SOS2FA.</p>
+            <div class="profile-grid">
+              <label class="consent-checkbox"><input id="privacyNotifyEmail" type="checkbox"/><span>Email notifications</span></label>
+              <label class="consent-checkbox"><input id="privacyNotifySms" type="checkbox"/><span>SMS notifications</span></label>
+            </div>
+          </div>
+          <div class="card-subsection">
             <h3>Public Datapoints for Mingl and Matching</h3>
             <div id="privacyDatapointChoices" class="privacy-datapoint-grid"></div>
           </div>
@@ -570,10 +584,13 @@
         <div class="card">
           <h2
             data-floqr-help-id="help-service-members"
-            data-floqr-help-title="Service Members"
-            data-floqr-help-search="service members|request club admin|request access|elect service member|worker association"
-            data-floqr-help-body="Patrons request Club Admin, DJ, Promoter, hospitality, bus boy/security, venue manager, bartender, or media access here. Each selected club gets an association request. Club Admins (isClubAdmin) also see Review: accept pending requests or search and elect a patron as a service member."
-          >Service Members</h2>
+            data-floqr-help-title="Services &amp; Service Members"
+            data-floqr-help-search="service members|services and service members|request club admin|request access|elect service member|worker association|IsPatron|IsServiceMember"
+            data-floqr-help-body="Visible when users.IsPatron is no/0 and users.IsServiceMember (or IsserviceMember) is yes/1. Elect from My Profile if you are still a Patron. Request Club Admin, DJ, Promoter, hospitality, or other roles here. Club Admins also see Review & elect."
+          >Services &amp; Service Members</h2>
+          <h3>Profile Template Guide</h3>
+          <p class="sub small">Use these role templates when you are a service member. Patron social profiles stay on Public Media.</p>
+          <div id="roleTemplateGuide" class="role-template-grid"></div>
           <div class="admin-subtabs" id="serviceMembersSubtabs">
             <button class="admin-subtab active" type="button" data-sm-pane="serviceMembersRequestPane">Request access</button>
             <button class="admin-subtab hidden" id="serviceMembersAdminSubtab" type="button" data-sm-pane="serviceMembersAdminPane">Review &amp; elect</button>
@@ -645,7 +662,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=s3.0.5"></script>
+<script src="./floqr-nav.js?v=s3.0.11"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
@@ -657,16 +674,16 @@
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-tab-gates.js?v=29.09.117"></script>
-<script src="./floqai-help-repository.js?v=s3.0.4"></script>
+<script src="./floqr-tab-gates.js?v=s3.0.11"></script>
+<script src="./floqai-help-repository.js?v=s3.0.11"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.6"></script>
+<script src="./floqr-i18n.js?v=s3.0.11"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=s3.0.5"></script>
+<script src="./patron-portal-app.js?v=s3.0.11"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
