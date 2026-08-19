@@ -545,7 +545,8 @@
       body: "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
       searchPhrases: [
         "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
-        "sos2fa email sms", "notification settings", "twilio", "paid sms"
+        "sos2fa email sms", "notification settings", "twilio", "paid sms",
+        "club admin notifications", "whatsapp twilio", "patron user record"
       ],
       links: [
         {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}

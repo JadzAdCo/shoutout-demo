@@ -579,6 +579,28 @@
       ]
     },
     {
+      id: "help-general-notifications",
+      kind: "help",
+      label: "General Notifications (Email / SMS)",
+      blurb: "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services",
+      steps: [
+        "Open My Profile & Settings → My Privacy.",
+        "Use the ? beside General Notifications (Email / SMS) for the full note.",
+        "Tick Email notifications and/or SMS notifications, then Save Privacy Preferences."
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
+      ],
+      searchPhrases: [
+        "general notifications", "email notifications", "sms notifications", "notifyEmail", "notifySms",
+        "sos2fa", "twilio", "paid sms", "whatsapp"
+      ],
+      patterns: [
+        /general\s+notifications/, /email\s+notifications?/, /sms\s+notifications?/,
+        /notify\s*(email|sms)/, /sos2fa/, /twilio/, /paid\s+sms/
+      ]
+    },
+    {
       id: "help-guest-list",
       kind: "help",
       label: "Get on a guest list",
