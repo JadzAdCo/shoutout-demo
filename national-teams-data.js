@@ -109,7 +109,7 @@
     {name: "Poland", region: "Europe", primary: "#FFFFFF", secondary: "#DC143C", collar: "white red"},
     {name: "Portugal", region: "Europe", primary: "#FF0000", secondary: "#006600", accent: "#FFD700", collar: "red green gold"},
     {name: "Romania", region: "Europe", primary: "#002B7F", secondary: "#FCD116", accent: "#CE1126", collar: "blue yellow red"},
-    {name: "Russia", region: "Europe", primary: "#FFFFFF", secondary: "#0039A6", accent: "#D52B1E", collar: "white blue red"},
+    {name: "Russia", region: "Europe", primary: "#C8102E", secondary: "#FFFFFF", accent: "#0039A6", collar: "red white geometric triangles"},
     {name: "San Marino", region: "Europe", primary: "#5EB6E4", secondary: "#FFFFFF", collar: "light blue white"},
     {name: "Scotland", region: "Europe", primary: "#0065BD", secondary: "#FFFFFF", collar: "navy blue white"},
     {name: "Serbia", region: "Europe", primary: "#C6363C", secondary: "#0C4076", accent: "#FFFFFF", collar: "red blue white"},

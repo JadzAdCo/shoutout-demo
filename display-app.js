@@ -1328,6 +1328,14 @@
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
+      // Optical midline: digit 1 has a wide right sidebearing — nudge two-digit 1x marks right.
+      if (usePhotoBack && sport === "soccer" && /^1\d$/.test(String(subText || "").trim())) {
+        byId("displaySub").style.setProperty("padding-left", "0.14em", "important");
+        byId("displaySub").style.setProperty("padding-right", "0", "important");
+      } else {
+        byId("displaySub").style.removeProperty("padding-left");
+        byId("displaySub").style.removeProperty("padding-right");
+      }
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
       // Animated text holder at bottom (same burst rail as classic).

@@ -25,7 +25,7 @@ Execute:
 
 ## LAYOUT — Tanzania lock applied to every named photo kit (QA in silhouette before Pages)
 
-Wordmark at inner collar; patron name and number sit **slightly below** the wordmark (more air under CAMEROON / RUSSIA / UKRAINE), still clear of each other. Photo-back CSS: name `top` ~26% (96×48 / 64×48 ~25%, 64×32 ~23%); number `top` ~47% (96×48 ~46%, 64×32 ~45%), same horizontal inset as the name for midline centering; Impact / Arial Black, tabular nums, tracking ~`-.1em`. Name max ~**9.4vh** — smaller than the PNG wordmark. Do **not** publish to `origin/main` until every photo kit is checked in the Cameroon/Morocco silhouette (no hanger, number on midline, name not kissing the wordmark or number).
+Wordmark at inner collar; patron name and number sit **slightly below** the wordmark (more air under CAMEROON / RUSSIA / UKRAINE), still clear of each other. Photo-back CSS: name `top` ~26% (96×48 / 64×48 ~25%, 64×32 ~23%); number `top` ~47% (96×48 ~46%, 64×32 ~45%), same horizontal inset as the name for midline centering; Number tracking on photo kits is slightly positive (`.05em`) so `13` does not smash; two-digit marks starting with `1` get a small left padding nudge for optical midline. Name max ~**9.4vh**.
 
 ### GenerateImage prompt (PNG wordmark only)
 
