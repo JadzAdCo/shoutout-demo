@@ -227,7 +227,8 @@
   const PHOTO_READY = new Set([
     "Morocco", "Spain", "Cameroon", "Nigeria",
     "Egypt", "Ghana", "Senegal", "Ivory Coast", "South Africa", "Tunisia", "Kenya",
-    "Mali", "Zambia", "Angola", "DR Congo", "Ethiopia", "Tanzania", "Mozambique", "Rwanda"
+    "Mali", "Zambia", "Angola", "DR Congo", "Ethiopia", "Tanzania", "Mozambique", "Rwanda",
+    "Russia", "Ukraine"
   ]);
 
   function nationalPhotoUrl(teamName) {
