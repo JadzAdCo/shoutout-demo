@@ -1292,8 +1292,8 @@
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
       canvas.classList.remove("jersey-css-country");
       if (sport === "soccer" && usePhotoBack) {
-        baseName = Math.min(baseName * 0.68, 11.2);
-        baseNumber = Math.min(baseNumber * 0.72, 46);
+        baseName = Math.min(baseName * 0.56, 9.4);
+        baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1304,8 +1304,8 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 11.2 : 18), Math.max(7, baseName * wrapScale));
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 46 : 72), Math.max(16, baseNumber * wrapScale));
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(7, baseName * wrapScale));
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber * wrapScale));
       const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
@@ -1322,10 +1322,12 @@
       byId("displayMain").classList.add("soccer-jersey-name");
       byId("displayMain").classList.toggle("jersey-name-wrap", wrapped);
       byId("displayMain").style.setProperty("font-size", `${nameSize}vh`, "important");
+      byId("displayMain").style.setProperty("text-align", "center", "important");
       byId("displayMain").innerHTML = nameRows.filter(Boolean).map(row => `<span class="jersey-name-line">${esc(row)}</span>`).join("") || "";
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
+      byId("displaySub").style.setProperty("text-align", "center", "important");
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
       // Animated text holder at bottom (same burst rail as classic).
