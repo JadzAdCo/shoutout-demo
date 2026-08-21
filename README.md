@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.26 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.27 (stable)
 
+- s3.0.27: Full UI chrome packs for ru/nl/de/es (parity with en); patron/venueAdmin/serviceMember help locales (ru/nl); translation rule.
 - s3.0.26: Privilege Admin Access help is SOS2FA-only; deep-link / partition design notes moved to `.cursor/rules/design-notes-*.mdc`.
 - s3.0.25: Master Admin Entity Management defaults to Manage Entities (`#entityManagement`); deep links resume after sign-in then SOS2FA.
 - s3.0.24: trim SOS2FA Privilege Admin Access help copy (Email and/or SMS; drop SMS-only path note).

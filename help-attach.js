@@ -86,6 +86,34 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     return String(value == null ? "" : value).trim();
   }
 
+  function resolveHelpCopy({ id, title, body, bodyHtml }) {
+    const baseTitle = textOf(title);
+    const baseBody = textOf(body);
+    const entryId = textOf(id);
+    if (!entryId) {
+      return { title: baseTitle, body: baseBody, bodyHtml: bodyHtml || "" };
+    }
+    let entry = { id: entryId, title: baseTitle || entryId, body: baseBody };
+    try {
+      if (global.FLOQRHelpRepository?.localizeEntry) {
+        entry = global.FLOQRHelpRepository.localizeEntry(entry) || entry;
+      } else if (global.FLOQRI18nHelp?.localize) {
+        const lang =
+          global.FLOQRI18n?.getLanguage?.()
+          || global.FLOQRI18n?.current
+          || (function () { try { return localStorage.getItem("floqr.uiLanguage") || "en"; } catch (_) { return "en"; } })();
+        entry = global.FLOQRI18nHelp.localize(entry, lang) || entry;
+      }
+    } catch (_error) {
+      /* localization optional */
+    }
+    return {
+      title: textOf(entry.title) || baseTitle || "Help",
+      body: bodyHtml ? baseBody : (textOf(entry.body) || baseBody),
+      bodyHtml: bodyHtml || ""
+    };
+  }
+
   function ensureLabelShell(target) {
     if (!target) return null;
     let host = target;
@@ -148,45 +176,41 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     if (existing && opts.replace !== false) existing.remove();
     else if (existing) return { host, details: existing };
 
-    const title = textOf(opts.title) || textOf(host.querySelector(".help-label-text")?.textContent) || "Help";
+    const helpId = textOf(opts.id);
+    const resolved = resolveHelpCopy({
+      id: helpId,
+      title: textOf(opts.title) || textOf(host.querySelector(".help-label-text")?.textContent) || "Help",
+      body: opts.body || "",
+      bodyHtml: opts.bodyHtml || ""
+    });
+    const title = resolved.title;
     const details = buildDetails({
       title,
-      bodyHtml: opts.bodyHtml || "",
-      bodyText: opts.body || ""
+      bodyHtml: resolved.bodyHtml || "",
+      bodyText: resolved.body || ""
     });
+    if (helpId) details.dataset.helpId = helpId;
     host.appendChild(details);
 
     try {
-      const audienceRaw = opts.audience
-        || host.getAttribute?.("data-floqr-help-audience")
-        || "";
-      const audience = Array.isArray(audienceRaw)
-        ? audienceRaw
-        : String(audienceRaw || "")
-          .split(",")
-          .map(s => s.trim())
-          .filter(Boolean);
-      const regOpts = {
-        id: opts.id || "",
+      global.FLOQRHelpRepository?.registerFromHelpNode?.(details, {
+        id: helpId || "",
         title,
-        body: opts.body || details.querySelector(".help-popout-body")?.textContent || "",
+        body: resolved.body || details.querySelector(".help-popout-body")?.textContent || "",
         searchPhrases: opts.searchPhrases || [title],
         links: opts.links || [],
         source: opts.source || "help-attach",
-        page: location.pathname || "",
-        audience: audience.length ? audience : undefined
-      };
-      global.FLOQRHelpRepository?.registerFromHelpNode?.(details, regOpts);
-      if (opts.id || opts.searchPhrases || opts.links || audience.length) {
+        page: location.pathname || ""
+      });
+      if (helpId || opts.searchPhrases || opts.links) {
         global.FLOQRHelpRepository?.register?.({
-          id: opts.id || `help-attach-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 80),
-          title: regOpts.title,
-          body: regOpts.body,
-          searchPhrases: regOpts.searchPhrases,
-          links: regOpts.links,
-          source: regOpts.source,
-          page: regOpts.page,
-          audience: regOpts.audience
+          id: helpId || `help-attach-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 80),
+          title,
+          body: resolved.body || details.querySelector(".help-popout-body")?.textContent || "",
+          searchPhrases: opts.searchPhrases || [title],
+          links: opts.links || [],
+          source: opts.source || "help-attach",
+          page: location.pathname || ""
         });
       }
     } catch (_error) {
@@ -293,16 +317,33 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
         searchPhrases: String(node.getAttribute("data-floqr-help-search") || "")
           .split("|")
           .map(s => s.trim())
-          .filter(Boolean),
-        audience: String(node.getAttribute("data-floqr-help-audience") || "")
-          .split(",")
-          .map(s => s.trim())
           .filter(Boolean)
       });
     });
+    try { global.FLOQRI18nHelp?.applyHelpDom?.(root); } catch (_error) {}
   }
 
-  document.addEventListener("DOMContentLoaded", () => mountAll(document));
+  function bindLanguageRefresh() {
+    if (document.documentElement.dataset.floqrHelpI18nBound === "1") return;
+    document.documentElement.dataset.floqrHelpI18nBound = "1";
+    global.addEventListener?.("floqr:ui-language", () => {
+      try {
+        if (global.FLOQRI18nHelp?.applyHelpDom) {
+          global.FLOQRI18nHelp.applyHelpDom(document);
+        } else {
+          document.querySelectorAll("[data-floqr-help-mounted='1']").forEach(node => {
+            delete node.dataset.floqrHelpMounted;
+          });
+          mountAll(document);
+        }
+      } catch (_error) {}
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    bindLanguageRefresh();
+    mountAll(document);
+  });
 
   global.FLOQRHelpAttach = {
     attach,
