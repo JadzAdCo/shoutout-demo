@@ -6,7 +6,14 @@
 
   const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.49";
   const byId = new Map();
-  const AUDIENCES = ["masterAdmin", "venueAdmin", "serviceMember", "patron"];
+  /** Canonical FloqAi help partitions (one audience key each). */
+  const HELP_PARTITIONS = {
+    patron: "patronHelpverbiage",
+    serviceMember: "serviceMemberHelpverbiage",
+    venueAdmin: "venueAdminHelpverbiage",
+    masterAdmin: "masterAdminHelpverbiage"
+  };
+  const AUDIENCES = Object.keys(HELP_PARTITIONS);
   const MASTER_ADMIN_EMAILS = new Set(
     String(global.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
       .split(",")
@@ -14,6 +21,12 @@
       .filter(Boolean)
   );
   let viewerAudience = "patron";
+  let viewerAccessFlags = {
+    IsPatron: 0,
+    IsServiceMember: 0,
+    IsVenueAdmin: 0,
+    IsMasterAdmin: 0
+  };
 
   function vUrl(path, params = {}) {
     const qs = new URLSearchParams({v: APP_V, ...params});
@@ -32,29 +45,61 @@
     return normalize(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "help";
   }
 
+  function flagOn(value) {
+    return /^(1|true|yes)$/i.test(String(value ?? "").trim());
+  }
+
   function normalizeAudiences(raw) {
     const list = Array.isArray(raw) ? raw : (raw ? [raw] : []);
-    const cleaned = list
-      .map(value => String(value || "").trim())
-      .filter(value => AUDIENCES.includes(value));
+    const cleaned = list.map(value => {
+      const key = String(value || "").trim();
+      if (AUDIENCES.includes(key)) return key;
+      const fromPartition = Object.entries(HELP_PARTITIONS).find(([, name]) => name === key);
+      return fromPartition ? fromPartition[0] : "";
+    }).filter(Boolean);
     return cleaned.length ? Array.from(new Set(cleaned)) : [];
   }
 
-  /** Infer audience when a seed/popout omits audiences — one section per entry. */
+  /** Infer audience when a seed/popout omits audiences — one partition per entry. */
   function inferAudiences(entry = {}) {
-    const explicit = normalizeAudiences(entry.audiences || entry.audience);
+    const explicit = normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition);
     if (explicit.length) return explicit;
     const blob = `${entry.id || ""} ${entry.title || ""} ${entry.page || ""} ${entry.body || ""} ${entry.source || ""}`.toLowerCase();
-    if (/sos2fa|social os|entity management|master-admin|master admin|purge queue|venue links|diagnostics|mail log|heist.*64\s*x\s*48|64x48.*heist|display setup|privilege admin/.test(blob)) {
+    if (/sos2fa|social os|entity management|master-admin|master admin|purge queue|venue links|diagnostics|mail log|heist.*64\s*x\s*48|64x48.*heist|display setup|privilege admin|masteradminhelpverbiage/.test(blob)) {
       return ["masterAdmin"];
     }
-    if (/admin\.html|club admin|venue admin|club public profile|display screens|venuesupports|scheduling|suprstar queue|template catalog|message template/.test(blob)) {
+    if (/admin\.html|club admin|venue admin|club public profile|display screens|venuesupports|scheduling|suprstar queue|template catalog|message template|venueadminhelpverbiage/.test(blob)) {
       return ["venueAdmin"];
     }
-    if (/service member|work calendar|staff worksheet|role-request|become a dj|become a promoter|bartender|waitress|busboy|elect.*service/.test(blob)) {
+    if (/service member|work calendar|staff worksheet|role-request|become a dj|become a promoter|bartender|waitress|busboy|elect.*service|servicememberhelpverbiage/.test(blob)) {
       return ["serviceMember"];
     }
     return ["patron"];
+  }
+
+  /**
+   * Partition access (datapoint gate):
+   * - patronHelpverbiage     → IsPatron=1 OR IsMasterAdmin=1
+   * - serviceMemberHelpverbiage → IsServiceMember=1 OR IsMasterAdmin=1
+   * - venueAdminHelpverbiage → IsVenueAdmin=1 OR IsMasterAdmin=1
+   * - masterAdminHelpverbiage → IsMasterAdmin=1 only
+   */
+  function canAccessPartition(audienceKey, flags = viewerAccessFlags) {
+    const f = flags || {};
+    if (flagOn(f.IsMasterAdmin)) return true;
+    switch (audienceKey) {
+      case "patron": return flagOn(f.IsPatron);
+      case "serviceMember": return flagOn(f.IsServiceMember);
+      case "venueAdmin": return flagOn(f.IsVenueAdmin);
+      case "masterAdmin": return false;
+      default: return false;
+    }
+  }
+
+  function canAccessHelpEntry(entry, flags = viewerAccessFlags) {
+    const audiences = normalizeAudiences(entry?.audiences || entry?.audience);
+    const keys = audiences.length ? audiences : ["patron"];
+    return keys.some(key => canAccessPartition(key, flags));
   }
 
   function register(entry = {}) {
@@ -72,9 +117,10 @@
     const steps = Array.isArray(entry.steps)
       ? entry.steps.map(normalize).filter(Boolean)
       : (existing.steps || []);
-    const audiences = normalizeAudiences(entry.audiences || entry.audience).length
-      ? normalizeAudiences(entry.audiences || entry.audience)
+    const audiences = normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition).length
+      ? normalizeAudiences(entry.audiences || entry.audience || entry.helpPartition || entry.partition)
       : (existing.audiences?.length ? existing.audiences : inferAudiences({...existing, ...entry, id, title}));
+    const helpPartition = HELP_PARTITIONS[audiences[0]] || HELP_PARTITIONS.patron;
     const next = {
       id,
       title: title || existing.title || id,
@@ -83,6 +129,7 @@
       links: links.length ? links : (existing.links || []),
       searchPhrases,
       audiences,
+      helpPartition,
       source: entry.source || existing.source || "help-repository",
       page: entry.page || existing.page || "",
       kind: entry.kind || existing.kind || "help"
@@ -156,6 +203,9 @@
   function entries(filterAudience) {
     const all = Array.from(byId.values());
     if (!filterAudience) return all;
+    if (filterAudience === true || filterAudience === "accessible") {
+      return all.filter(entry => canAccessHelpEntry(entry, viewerAccessFlags));
+    }
     return all.filter(entry => (entry.audiences || []).includes(filterAudience));
   }
 
@@ -168,46 +218,88 @@
     return viewerAudience;
   }
 
+  function getViewerAccessFlags() {
+    return {...viewerAccessFlags};
+  }
+
+  function setViewerAccessFlags(flags = {}) {
+    viewerAccessFlags = {
+      IsPatron: flagOn(flags.IsPatron) ? 1 : 0,
+      IsServiceMember: flagOn(flags.IsServiceMember) ? 1 : 0,
+      IsVenueAdmin: flagOn(flags.IsVenueAdmin) ? 1 : 0,
+      IsMasterAdmin: flagOn(flags.IsMasterAdmin) ? 1 : 0
+    };
+    if (viewerAccessFlags.IsMasterAdmin) viewerAudience = "masterAdmin";
+    else if (viewerAccessFlags.IsVenueAdmin) viewerAudience = "venueAdmin";
+    else if (viewerAccessFlags.IsServiceMember) viewerAudience = "serviceMember";
+    else if (viewerAccessFlags.IsPatron) viewerAudience = "patron";
+    else viewerAudience = "patron";
+    return getViewerAccessFlags();
+  }
+
+  function resolveAccessFlagsFromProfile({authUser = null, userDoc = null, tokenClaims = null} = {}) {
+    const user = authUser || global.firebase?.auth?.()?.currentUser || null;
+    const profile = userDoc || {};
+    const email = String(user?.email || profile.email || "").trim().toLowerCase();
+    let claims = tokenClaims || {};
+    const isMaster = !!(
+      flagOn(profile.IsMasterAdmin)
+      || flagOn(profile.isMasterAdmin)
+      || claims.masterAdmin === true
+      || claims.IsMasterAdmin === true
+      || (email && MASTER_ADMIN_EMAILS.has(email))
+    );
+    const isVenue = !!(
+      flagOn(profile.IsVenueAdmin)
+      || flagOn(profile.isVenueAdmin)
+      || flagOn(profile.IsClubAdmin)
+      || flagOn(profile.isClubAdmin)
+      || flagOn(profile.clubAdmin)
+      || claims.clubAdmin === true
+      || claims.IsVenueAdmin === true
+      || (Array.isArray(profile.adminClubIds) && profile.adminClubIds.length > 0)
+    );
+    const isService = !!(
+      flagOn(profile.IsServiceMember)
+      || flagOn(profile.IsserviceMember)
+      || flagOn(profile.serviceMember)
+      || claims.serviceMember === true
+    );
+    // Patrons: explicit IsPatron=1, or signed-in user who has not elected service member.
+    let isPatron = flagOn(profile.IsPatron);
+    if (!isPatron && user && !isService && !isVenue && !isMaster && profile.IsPatron == null && profile.IsServiceMember == null) {
+      isPatron = true;
+    }
+    return {
+      IsPatron: isPatron ? 1 : 0,
+      IsServiceMember: isService ? 1 : 0,
+      IsVenueAdmin: isVenue ? 1 : 0,
+      IsMasterAdmin: isMaster ? 1 : 0
+    };
+  }
+
   async function resolveViewerAudience({authUser = null, userDoc = null, tokenClaims = null} = {}) {
     const user = authUser || global.firebase?.auth?.()?.currentUser || null;
-    if (!user) {
-      viewerAudience = "patron";
-      return viewerAudience;
-    }
-    const email = String(user.email || "").trim().toLowerCase();
     let claims = tokenClaims;
-    if (!claims && typeof user.getIdTokenResult === "function") {
+    if (user && !claims && typeof user.getIdTokenResult === "function") {
       try { claims = (await user.getIdTokenResult()).claims || {}; } catch (_) { claims = {}; }
     }
-    claims = claims || {};
-    if (claims.masterAdmin === true || MASTER_ADMIN_EMAILS.has(email)) {
-      viewerAudience = "masterAdmin";
-      return viewerAudience;
-    }
-    const profile = userDoc || {};
-    const isVenueAdmin = !!(
-      profile.isClubAdmin || profile.clubAdmin || profile.IsClubAdmin
-      || (Array.isArray(profile.adminClubIds) && profile.adminClubIds.length)
-      || claims.clubAdmin === true
-    );
-    if (isVenueAdmin) {
-      viewerAudience = "venueAdmin";
-      return viewerAudience;
-    }
-    const isService = /^(1|true|yes)$/i.test(String(
-      profile.IsServiceMember ?? profile.IsserviceMember ?? profile.serviceMember ?? claims.serviceMember ?? ""
-    ));
-    const isPatron = /^(1|true|yes)$/i.test(String(profile.IsPatron ?? ""));
-    if (isService && !isPatron) {
-      viewerAudience = "serviceMember";
-      return viewerAudience;
-    }
-    viewerAudience = "patron";
+    const flags = resolveAccessFlagsFromProfile({authUser: user, userDoc, tokenClaims: claims || {}});
+    setViewerAccessFlags(flags);
     return viewerAudience;
   }
 
-  function toSearchIntents(audience = viewerAudience) {
-    return entries(audience).map(entry => ({
+  function toSearchIntents(audienceOrFlags) {
+    let list;
+    if (audienceOrFlags && typeof audienceOrFlags === "object" && !Array.isArray(audienceOrFlags)) {
+      list = Array.from(byId.values()).filter(entry => canAccessHelpEntry(entry, audienceOrFlags));
+    } else if (typeof audienceOrFlags === "string" && AUDIENCES.includes(audienceOrFlags)) {
+      // Legacy single-audience calls: still apply datapoint gate for the current viewer.
+      list = entries(audienceOrFlags).filter(entry => canAccessHelpEntry(entry, viewerAccessFlags));
+    } else {
+      list = entries("accessible");
+    }
+    return list.map(entry => ({
       id: entry.id,
       kind: "help",
       source: entry.source,
@@ -215,6 +307,7 @@
       blurb: entry.body || entry.title,
       steps: entry.steps || [],
       audiences: entry.audiences || ["patron"],
+      helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
       links: (entry.links || []).length
         ? entry.links
         : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
@@ -260,7 +353,7 @@
         {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
-      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"]
+      audiences: ["patron"]
     },
     {
       id: "help-become-club-admin",
@@ -438,10 +531,12 @@
     {
       id: "help-floqai-audience-sections",
       title: "FloqAi help audiences",
-      body: "FloqAi help is split into four sections: Master Admin, Venue Admin, Service Members, and Patron. Answers are filtered to the signed-in viewer’s primary role — Master Admin topics (for example Heist 64×48 display setup or SOS2FA) stay blank for patrons and service members. Client-side filtering is UX only; do not put secrets in help bodies. Prefer server-side audience checks on any future help API, claim-backed roles (masterAdmin / clubAdmin / serviceMember), and audit of master-only phrases.",
+      body: "FloqAi help is partitioned into patronHelpverbiage, serviceMemberHelpverbiage, venueAdminHelpverbiage, and masterAdminHelpverbiage. Access uses user datapoints: patronHelpverbiage needs IsPatron=1 (or IsMasterAdmin=1); serviceMemberHelpverbiage needs IsServiceMember=1 (after elect + venue approval) or IsMasterAdmin=1; venueAdminHelpverbiage needs IsVenueAdmin=1 (or IsClubAdmin) or IsMasterAdmin=1; masterAdminHelpverbiage needs IsMasterAdmin=1 only. Contextual search returns blank when the signed-in entity lacks the matching flag.",
       searchPhrases: [
         "floqai audience", "help sections", "master admin help", "venue admin help",
-        "service member help", "patron help", "help security", "blank floqai answer"
+        "service member help", "patron help", "help security", "blank floqai answer",
+        "patronHelpverbiage", "serviceMemberHelpverbiage", "venueAdminHelpverbiage", "masterAdminHelpverbiage",
+        "IsPatron", "IsServiceMember", "IsVenueAdmin", "IsMasterAdmin"
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -459,7 +554,7 @@
         {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
         {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
-      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      audiences: ["patron"],
       source: "help-repository-seed",
       page: "club-profile.html"
     },
@@ -678,7 +773,7 @@
       links: [
         {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
       ],
-      audiences: ["patron", "serviceMember", "masterAdmin"],
+      audiences: ["patron"],
       source: "help-repository-seed",
       page: "patron-portal.html#portalPrivacy"
     },
@@ -820,6 +915,7 @@
 
   global.FLOQRHelpRepository = {
     AUDIENCES,
+    HELP_PARTITIONS,
     register,
     registerMany,
     registerFromHelpNode,
@@ -828,7 +924,12 @@
     toSearchIntents,
     setViewerAudience,
     getViewerAudience,
+    getViewerAccessFlags,
+    setViewerAccessFlags,
+    resolveAccessFlagsFromProfile,
     resolveViewerAudience,
+    canAccessPartition,
+    canAccessHelpEntry,
     inferAudiences,
     vUrl
   };

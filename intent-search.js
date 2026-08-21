@@ -788,15 +788,25 @@
   function allIntents() {
     const seen = new Set();
     const merged = [];
-    const audience = global.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
+    const repo = global.FLOQRHelpRepository;
+    const flags = repo?.getViewerAccessFlags?.() || {IsPatron: 0, IsServiceMember: 0, IsVenueAdmin: 0, IsMasterAdmin: 0};
     // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
     [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
       const audiences = Array.isArray(intent.audiences) && intent.audiences.length
         ? intent.audiences
-        : (intent.kind === "help" ? null : ["patron", "serviceMember", "venueAdmin", "masterAdmin"]);
-      // Curated PRODUCT_INTENTS without audiences stay visible to everyone.
-      // Help rows without audiences are already filtered by repository.toSearchIntents(audience).
-      if (audiences && !audiences.includes(audience)) return;
+        : (intent.kind === "help" ? ["patron"] : ["patron"]);
+      // Product + help intents both require partition access from user datapoints.
+      const allowed = typeof repo?.canAccessHelpEntry === "function"
+        ? repo.canAccessHelpEntry({audiences}, flags)
+        : audiences.some(key => {
+          if (flags.IsMasterAdmin) return true;
+          if (key === "patron") return !!flags.IsPatron;
+          if (key === "serviceMember") return !!flags.IsServiceMember;
+          if (key === "venueAdmin") return !!flags.IsVenueAdmin;
+          if (key === "masterAdmin") return !!flags.IsMasterAdmin;
+          return false;
+        });
+      if (!allowed) return;
       const key = intent.id || intent.label;
       if (seen.has(key)) {
         const existing = merged.find(row => (row.id || row.label) === key);
@@ -808,7 +818,7 @@
         return;
       }
       seen.add(key);
-      merged.push({...intent, patterns: [...(intent.patterns || [])]});
+      merged.push({...intent, patterns: [...(intent.patterns || [])], audiences});
     });
     return merged;
   }
