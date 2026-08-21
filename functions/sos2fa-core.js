@@ -35,7 +35,18 @@ function resolveSos2faChannels(profile = {}, email = "", phone = "") {
   return {sms, email: mail};
 }
 
-function formatDeliveryNotes({phone = "", email = "", sms = false, mail = false} = {}) {
+/**
+ * Build status notes from channels that actually sent.
+ * Optional mailError / smsError append when a selected channel failed.
+ */
+function formatDeliveryNotes({
+  phone = "",
+  email = "",
+  sms = false,
+  mail = false,
+  mailError = "",
+  smsError = ""
+} = {}) {
   const parts = [];
   if (mail) {
     const masked = maskEmail(email);
@@ -45,8 +56,13 @@ function formatDeliveryNotes({phone = "", email = "", sms = false, mail = false}
     const masked = maskPhoneLast5(phone);
     if (masked) parts.push(masked);
   }
-  if (!parts.length) return "";
-  return `Delivered / notes: ${parts.join(" / ")}`;
+  const failures = [];
+  if (mailError) failures.push(`email not sent (${String(mailError).slice(0, 80)})`);
+  if (smsError) failures.push(`SMS not sent (${String(smsError).slice(0, 80)})`);
+  if (!parts.length && !failures.length) return "";
+  if (!parts.length) return failures.join("; ");
+  const delivered = `Delivered / notes: ${parts.join(" / ")}`;
+  return failures.length ? `${delivered} — ${failures.join("; ")}` : delivered;
 }
 
 module.exports = {

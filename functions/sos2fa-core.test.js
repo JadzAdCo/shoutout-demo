@@ -41,3 +41,17 @@ test("SOS2FA delivery notes list email and/or SMS after Delivered / notes:", () 
   });
   assert.equal(notes, "Delivered / notes: email B***@gmail.com / SMS ****3-0274");
 });
+
+test("SOS2FA delivery notes omit failed email and append email not sent", () => {
+  const notes = formatDeliveryNotes({
+    phone: "+12025530274",
+    email: "bans.don@gmail.com",
+    sms: true,
+    mail: false,
+    mailError: "sendgrid-error"
+  });
+  assert.equal(
+    notes,
+    "Delivered / notes: SMS ****3-0274 — email not sent (sendgrid-error)"
+  );
+});

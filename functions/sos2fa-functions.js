@@ -165,7 +165,9 @@ async function sendgridMailSos2fa({to, code}) {
 }
 
 function smsSucceeded(sms) {
-  return !!(sms && (sms.ok || sms.dryRun || sms.status === "missing-config"));
+  // Only a real Twilio accept counts. missing-config / dryRun must not fake success
+  // or the UI shows "Delivered" for email/SMS that never left the server.
+  return !!(sms && sms.ok === true);
 }
 
 exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRETS, timeoutSeconds: 30, memory: "256MiB"}, async request => {
@@ -242,9 +244,11 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
   const notes = formatDeliveryNotes({
     phone,
     email,
-    // Show every channel selected by notification methodology (not only the one that succeeded).
-    sms: !!channels.sms,
-    mail: !!channels.email
+    // Only channels that actually sent — never claim email/SMS when the hop failed.
+    sms: smsOk,
+    mail: emailOk,
+    mailError: channels.email && !emailOk ? (delivery.email?.status || delivery.email?.error || "error") : "",
+    smsError: channels.sms && !smsOk ? (delivery.sms?.status || delivery.sms?.error || "error") : ""
   });
 
   await writeEntityManagementAudit({
@@ -256,7 +260,10 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
       phoneLast4: phone ? phone.slice(-4) : "",
       delivery: notes,
       sms: delivery.sms?.status || (smsOk ? "sms" : "skipped"),
-      email: delivery.email?.status || (emailOk ? "email" : "skipped")
+      email: delivery.email?.status || (emailOk ? "email" : "skipped"),
+      mailLogId: delivery.email?.mailLogId || "",
+      emailOk,
+      smsOk
     }
   });
 
@@ -267,6 +274,7 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
     emailMasked: maskEmail(email),
     expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
     channels: {sms: smsOk, email: emailOk},
+    mailLogId: delivery.email?.mailLogId || "",
     notes,
     delivery: notes
   };
