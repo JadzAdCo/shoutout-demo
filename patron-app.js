@@ -648,16 +648,86 @@
   }
 
 
-  async function loadTemplates() {
-    templates = {...window.SHOUTOUT_TEMPLATES};
+  /* Search boot: prefer packaged shared-data, session-cache overlays, bounded Firestore reads. */
+  const SEARCH_BOOT_CACHE_KEY = "floqr_search_boot_v1";
+  const SEARCH_BOOT_CACHE_TTL_MS = 15 * 60 * 1000;
+  const SEARCH_BOOT_TEMPLATE_LIMIT = 200;
+  const SEARCH_BOOT_LOCATION_LIMIT = 250;
+  const SEARCH_BOOT_EVENT_LIMIT = 100;
+  const SEARCH_BOOT_ALIAS_LIMIT = 100;
+
+  function readSearchBootCache() {
     try {
-      const snap = await db.collection("templates").get();
+      const raw = sessionStorage.getItem(SEARCH_BOOT_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.at || (Date.now() - Number(parsed.at)) > SEARCH_BOOT_CACHE_TTL_MS) {
+        sessionStorage.removeItem(SEARCH_BOOT_CACHE_KEY);
+        return null;
+      }
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeSearchBootCache( partial = {}) {
+    try {
+      const prev = readSearchBootCache() || {at: Date.now()};
+      sessionStorage.setItem(SEARCH_BOOT_CACHE_KEY, JSON.stringify({
+        ...prev,
+        ...partial,
+        at: Date.now()
+      }));
+    } catch (_) {}
+  }
+
+  function applyPackagedTemplates() {
+    const next = {};
+    Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([id, data]) => {
+      const row = {id, ...data, backgroundEditable: data.backgroundEditable !== false};
+      next[id] = window.FLOQRScreenDatapoints?.applyTemplate?.(row) || row;
+    });
+    return next;
+  }
+
+  async function loadTemplates() {
+    templates = applyPackagedTemplates();
+    const cached = readSearchBootCache()?.templates;
+    if (cached && typeof cached === "object") {
+      Object.entries(cached).forEach(([id, data]) => {
+        const packaged = window.SHOUTOUT_TEMPLATES?.[id] || {};
+        const merged = {...packaged, id, ...data, backgroundEditable: Object.keys(packaged).length ? true : data.backgroundEditable !== false};
+        templates[id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
+      });
+      return;
+    }
+    // Packaged catalog is enough for Search first paint. Overlay at most SEARCH_BOOT_TEMPLATE_LIMIT remote docs.
+    if (Object.keys(templates).length > 0) {
+      try {
+        const snap = await db.collection("templates").limit(SEARCH_BOOT_TEMPLATE_LIMIT).get();
+        const overlay = {};
+        snap.forEach(doc => {
+          const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
+          const merged = {...packaged, id: doc.id, ...doc.data(), backgroundEditable: Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
+          templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
+          overlay[doc.id] = doc.data() || {};
+        });
+        writeSearchBootCache({templates: overlay});
+      } catch (e) {}
+      return;
+    }
+    try {
+      const snap = await db.collection("templates").limit(SEARCH_BOOT_TEMPLATE_LIMIT).get();
+      const overlay = {};
       snap.forEach(doc => {
         const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
-        const merged = {...packaged, id:doc.id, ...doc.data(), backgroundEditable:Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
+        const merged = {...packaged, id: doc.id, ...doc.data(), backgroundEditable: Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
         templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
+        overlay[doc.id] = doc.data() || {};
       });
-    } catch(e) {}
+      writeSearchBootCache({templates: overlay});
+    } catch (e) {}
   }
   async function loadTemplateVariants() {
     if (!window.FLOQRStudio || !currentUser) {
@@ -671,26 +741,37 @@
   }
   async function loadLocationAliases() {
     locationAliases = {};
-    try {
-      const snap = await db.collection("clubLocationAliases").get();
-      snap.forEach(doc => {
-        const data = doc.data();
-        if (String(data.status || "active") === "active" && data.canonicalLocationId) {
-          locationAliases[doc.id.toLowerCase()] = {id:doc.id, ...data};
-        }
-      });
-    } catch(e) {}
     Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).forEach(([id, loc]) => {
       if (loc.canonicalLocationId || loc.aliasOf || loc.mergedInto) {
         locationAliases[id.toLowerCase()] = {
           id,
-          aliasId:id,
-          canonicalLocationId:loc.canonicalLocationId || loc.aliasOf || loc.mergedInto,
-          aliasName:loc.locationName || loc.brandName || id,
-          status:"active"
+          aliasId: id,
+          canonicalLocationId: loc.canonicalLocationId || loc.aliasOf || loc.mergedInto,
+          aliasName: loc.locationName || loc.brandName || id,
+          status: "active"
         };
       }
     });
+    const cached = readSearchBootCache()?.aliases;
+    if (cached && typeof cached === "object") {
+      Object.entries(cached).forEach(([key, data]) => {
+        if (data?.canonicalLocationId) locationAliases[key] = data;
+      });
+      return;
+    }
+    // Avoid unbounded alias collection scans — resolve missing aliases on demand in resolveLocationAlias.
+    try {
+      const snap = await db.collection("clubLocationAliases").limit(SEARCH_BOOT_ALIAS_LIMIT).get();
+      const overlay = {};
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (String(data.status || "active") === "active" && data.canonicalLocationId) {
+          locationAliases[doc.id.toLowerCase()] = {id: doc.id, ...data};
+          overlay[doc.id.toLowerCase()] = {id: doc.id, ...data};
+        }
+      });
+      writeSearchBootCache({aliases: overlay});
+    } catch (e) {}
   }
   function visibleLocationEntry([id, loc]) {
     const obsoleteIds = new Set((window.FLOQR_OBSOLETE_LOCATION_IDS || []).map(value => String(value || "").toLowerCase()));
@@ -706,16 +787,65 @@
   async function loadLocations() {
     await loadLocationAliases();
     locations = {};
-    try { const snap = await db.collection("clubLocations").where("active","==",true).orderBy("locationName","asc").get(); snap.forEach(doc => { const data = doc.data(); if (visibleLocationEntry([doc.id, data])) locations[doc.id] = window.FLOQRScreenDatapoints?.applyVenue?.({id:doc.id, ...data}) || {id:doc.id, ...data}; else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) locationAliases[doc.id.toLowerCase()] = {id:doc.id, canonicalLocationId:data.canonicalLocationId || data.aliasOf || data.mergedInto, aliasName:data.locationName || data.brandName || doc.id, status:"active"}; }); } catch(e) {}
-    // Merge seeded catalog venues missing from Firestore so ShoutOut search and admin stay aligned.
     Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry).forEach(([id, data]) => {
-      if (!locations[id]) locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
+      locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
     });
-    if (Object.keys(locations).length === 0) locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
+    const cached = readSearchBootCache()?.locations;
+    if (cached && typeof cached === "object") {
+      Object.entries(cached).forEach(([id, data]) => {
+        if (!visibleLocationEntry([id, data])) return;
+        locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
+      });
+      return;
+    }
+    try {
+      const snap = await db.collection("clubLocations")
+        .where("active", "==", true)
+        .orderBy("locationName", "asc")
+        .limit(SEARCH_BOOT_LOCATION_LIMIT)
+        .get();
+      const overlay = {};
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (visibleLocationEntry([doc.id, data])) {
+          locations[doc.id] = window.FLOQRScreenDatapoints?.applyVenue?.({id: doc.id, ...data}) || {id: doc.id, ...data};
+          overlay[doc.id] = data;
+        } else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) {
+          locationAliases[doc.id.toLowerCase()] = {
+            id: doc.id,
+            canonicalLocationId: data.canonicalLocationId || data.aliasOf || data.mergedInto,
+            aliasName: data.locationName || data.brandName || doc.id,
+            status: "active"
+          };
+        }
+      });
+      writeSearchBootCache({locations: overlay});
+    } catch (e) {}
+    if (Object.keys(locations).length === 0) {
+      locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
+    }
   }
   async function loadEvents() {
     events = {...(window.SHOUTOUT_EVENTS || {})};
-    try { const snap = await db.collection("events").where("active","==",true).get(); snap.forEach(doc => { const data = doc.data(); if (String(data.status || "active") !== "deleted") events[doc.id] = {id:doc.id, ...data}; }); } catch(e) {}
+    const cached = readSearchBootCache()?.events;
+    if (cached && typeof cached === "object") {
+      Object.entries(cached).forEach(([id, data]) => {
+        if (String(data.status || "active") !== "deleted") events[id] = {id, ...data};
+      });
+      return;
+    }
+    try {
+      const snap = await db.collection("events").where("active", "==", true).limit(SEARCH_BOOT_EVENT_LIMIT).get();
+      const overlay = {};
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (String(data.status || "active") !== "deleted") {
+          events[doc.id] = {id: doc.id, ...data};
+          overlay[doc.id] = data;
+        }
+      });
+      writeSearchBootCache({events: overlay});
+    } catch (e) {}
   }
   async function resolveLocationAlias(id = "") {
     const key = String(id || "").toLowerCase();
@@ -954,9 +1084,11 @@
 
 
   async function afterLogin() {
-    await loadTemplates();
-    await loadLocations();
-    await loadEvents();
+    await Promise.all([
+      loadTemplates(),
+      loadLocations(),
+      loadEvents()
+    ]);
     await loadTemplateVariants();
 
     let profile = null;
