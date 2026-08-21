@@ -648,39 +648,9 @@
   }
 
 
-  /* Search boot: prefer packaged shared-data, session-cache overlays, bounded Firestore reads. */
-  const SEARCH_BOOT_CACHE_KEY = "floqr_search_boot_v1";
-  const SEARCH_BOOT_CACHE_TTL_MS = 15 * 60 * 1000;
-  const SEARCH_BOOT_TEMPLATE_LIMIT = 200;
-  const SEARCH_BOOT_LOCATION_LIMIT = 250;
-  const SEARCH_BOOT_EVENT_LIMIT = 100;
-  const SEARCH_BOOT_ALIAS_LIMIT = 100;
-
-  function readSearchBootCache() {
-    try {
-      const raw = sessionStorage.getItem(SEARCH_BOOT_CACHE_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed?.at || (Date.now() - Number(parsed.at)) > SEARCH_BOOT_CACHE_TTL_MS) {
-        sessionStorage.removeItem(SEARCH_BOOT_CACHE_KEY);
-        return null;
-      }
-      return parsed;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function writeSearchBootCache( partial = {}) {
-    try {
-      const prev = readSearchBootCache() || {at: Date.now()};
-      sessionStorage.setItem(SEARCH_BOOT_CACHE_KEY, JSON.stringify({
-        ...prev,
-        ...partial,
-        at: Date.now()
-      }));
-    } catch (_) {}
-  }
+  /* Search boot: packaged shared-data only — no Firestore collection overlays.
+   * Live venues beyond the package are loaded by region/country/city query when the user filters. */
+  const REGION_QUERY_LIMIT = 120;
 
   function applyPackagedTemplates() {
     const next = {};
@@ -693,41 +663,6 @@
 
   async function loadTemplates() {
     templates = applyPackagedTemplates();
-    const cached = readSearchBootCache()?.templates;
-    if (cached && typeof cached === "object") {
-      Object.entries(cached).forEach(([id, data]) => {
-        const packaged = window.SHOUTOUT_TEMPLATES?.[id] || {};
-        const merged = {...packaged, id, ...data, backgroundEditable: Object.keys(packaged).length ? true : data.backgroundEditable !== false};
-        templates[id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
-      });
-      return;
-    }
-    // Packaged catalog is enough for Search first paint. Overlay at most SEARCH_BOOT_TEMPLATE_LIMIT remote docs.
-    if (Object.keys(templates).length > 0) {
-      try {
-        const snap = await db.collection("templates").limit(SEARCH_BOOT_TEMPLATE_LIMIT).get();
-        const overlay = {};
-        snap.forEach(doc => {
-          const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
-          const merged = {...packaged, id: doc.id, ...doc.data(), backgroundEditable: Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
-          templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
-          overlay[doc.id] = doc.data() || {};
-        });
-        writeSearchBootCache({templates: overlay});
-      } catch (e) {}
-      return;
-    }
-    try {
-      const snap = await db.collection("templates").limit(SEARCH_BOOT_TEMPLATE_LIMIT).get();
-      const overlay = {};
-      snap.forEach(doc => {
-        const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
-        const merged = {...packaged, id: doc.id, ...doc.data(), backgroundEditable: Object.keys(packaged).length ? true : doc.data().backgroundEditable !== false};
-        templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
-        overlay[doc.id] = doc.data() || {};
-      });
-      writeSearchBootCache({templates: overlay});
-    } catch (e) {}
   }
   async function loadTemplateVariants() {
     if (!window.FLOQRStudio || !currentUser) {
@@ -752,26 +687,6 @@
         };
       }
     });
-    const cached = readSearchBootCache()?.aliases;
-    if (cached && typeof cached === "object") {
-      Object.entries(cached).forEach(([key, data]) => {
-        if (data?.canonicalLocationId) locationAliases[key] = data;
-      });
-      return;
-    }
-    // Avoid unbounded alias collection scans — resolve missing aliases on demand in resolveLocationAlias.
-    try {
-      const snap = await db.collection("clubLocationAliases").limit(SEARCH_BOOT_ALIAS_LIMIT).get();
-      const overlay = {};
-      snap.forEach(doc => {
-        const data = doc.data();
-        if (String(data.status || "active") === "active" && data.canonicalLocationId) {
-          locationAliases[doc.id.toLowerCase()] = {id: doc.id, ...data};
-          overlay[doc.id.toLowerCase()] = {id: doc.id, ...data};
-        }
-      });
-      writeSearchBootCache({aliases: overlay});
-    } catch (e) {}
   }
   function visibleLocationEntry([id, loc]) {
     const obsoleteIds = new Set((window.FLOQR_OBSOLETE_LOCATION_IDS || []).map(value => String(value || "").toLowerCase()));
@@ -786,66 +701,74 @@
   }
   async function loadLocations() {
     await loadLocationAliases();
-    locations = {};
-    Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry).forEach(([id, data]) => {
-      locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
-    });
-    const cached = readSearchBootCache()?.locations;
-    if (cached && typeof cached === "object") {
-      Object.entries(cached).forEach(([id, data]) => {
-        if (!visibleLocationEntry([id, data])) return;
-        locations[id] = window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data};
-      });
-      return;
-    }
-    try {
-      const snap = await db.collection("clubLocations")
-        .where("active", "==", true)
-        .orderBy("locationName", "asc")
-        .limit(SEARCH_BOOT_LOCATION_LIMIT)
-        .get();
-      const overlay = {};
-      snap.forEach(doc => {
-        const data = doc.data();
-        if (visibleLocationEntry([doc.id, data])) {
-          locations[doc.id] = window.FLOQRScreenDatapoints?.applyVenue?.({id: doc.id, ...data}) || {id: doc.id, ...data};
-          overlay[doc.id] = data;
-        } else if (data.canonicalLocationId || data.aliasOf || data.mergedInto) {
-          locationAliases[doc.id.toLowerCase()] = {
-            id: doc.id,
-            canonicalLocationId: data.canonicalLocationId || data.aliasOf || data.mergedInto,
-            aliasName: data.locationName || data.brandName || doc.id,
-            status: "active"
-          };
-        }
-      });
-      writeSearchBootCache({locations: overlay});
-    } catch (e) {}
-    if (Object.keys(locations).length === 0) {
-      locations = Object.fromEntries(Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {}).filter(visibleLocationEntry));
-    }
+    locations = Object.fromEntries(
+      Object.entries(window.SHOUTOUT_CLUB_LOCATIONS || {})
+        .filter(visibleLocationEntry)
+        .map(([id, data]) => [id, window.FLOQRScreenDatapoints?.applyVenue?.({id, ...data}) || {id, ...data}])
+    );
   }
   async function loadEvents() {
     events = {...(window.SHOUTOUT_EVENTS || {})};
-    const cached = readSearchBootCache()?.events;
-    if (cached && typeof cached === "object") {
-      Object.entries(cached).forEach(([id, data]) => {
-        if (String(data.status || "active") !== "deleted") events[id] = {id, ...data};
-      });
-      return;
-    }
+  }
+
+  /** Bounded geo fetch when the patron picks country / region / city — not a full-collection overlay. */
+  async function hydrateLocationsByRegionQuery() {
+    const country = String(byId("countryFilter")?.value || "").trim();
+    const region = String(byId("regionFilter")?.value || "").trim();
+    const city = String(byId("cityFilter")?.value || "").trim();
+    if (!country && !region && !city) return;
     try {
-      const snap = await db.collection("events").where("active", "==", true).limit(SEARCH_BOOT_EVENT_LIMIT).get();
-      const overlay = {};
+      let query = db.collection("clubLocations");
+      // Single equality field avoids composite-index requirements; refine client-side for the rest.
+      if (city) query = query.where("city", "==", city);
+      else if (region) query = query.where("region", "==", region);
+      else query = query.where("country", "==", country);
+      const snap = await query.limit(REGION_QUERY_LIMIT).get();
       snap.forEach(doc => {
-        const data = doc.data();
-        if (String(data.status || "active") !== "deleted") {
-          events[doc.id] = {id: doc.id, ...data};
-          overlay[doc.id] = data;
+        const data = doc.data() || {};
+        if (country && data.country && data.country !== country) return;
+        if (region && data.region && data.region !== region) return;
+        if (city && data.city && data.city !== city) return;
+        if (!visibleLocationEntry([doc.id, data])) {
+          if (data.canonicalLocationId || data.aliasOf || data.mergedInto) {
+            locationAliases[doc.id.toLowerCase()] = {
+              id: doc.id,
+              canonicalLocationId: data.canonicalLocationId || data.aliasOf || data.mergedInto,
+              aliasName: data.locationName || data.brandName || doc.id,
+              status: "active"
+            };
+          }
+          return;
         }
+        locations[doc.id] = window.FLOQRScreenDatapoints?.applyVenue?.({id: doc.id, ...data}) || {id: doc.id, ...data};
       });
-      writeSearchBootCache({events: overlay});
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Region venue query skipped", e?.message || e);
+    }
+  }
+
+  async function hydrateEventsByRegionQuery() {
+    const country = String(byId("countryFilter")?.value || "").trim();
+    const region = String(byId("regionFilter")?.value || "").trim();
+    const city = String(byId("cityFilter")?.value || "").trim();
+    if (!country && !region && !city) return;
+    try {
+      let query = db.collection("events");
+      if (city) query = query.where("city", "==", city);
+      else if (region) query = query.where("region", "==", region);
+      else query = query.where("country", "==", country);
+      const snap = await query.limit(REGION_QUERY_LIMIT).get();
+      snap.forEach(doc => {
+        const data = doc.data() || {};
+        if (String(data.status || "active") === "deleted") return;
+        if (country && data.country && data.country !== country) return;
+        if (region && data.region && data.region !== region) return;
+        if (city && data.city && data.city !== city) return;
+        events[doc.id] = {id: doc.id, ...data};
+      });
+    } catch (e) {
+      console.warn("Region event query skipped", e?.message || e);
+    }
   }
   async function resolveLocationAlias(id = "") {
     const key = String(id || "").toLowerCase();
@@ -1381,7 +1304,19 @@
   function bindFilters() {
     ["locationSearch","countryFilter","regionFilter","cityFilter","genreFilter"].forEach(id => {
       const el = byId(id);
-      if (el && !el.dataset.bound) { el.addEventListener("input", renderGrid); el.addEventListener("change", renderGrid); el.dataset.bound = "1"; }
+      if (el && !el.dataset.bound) {
+        const run = async () => {
+          if (id !== "locationSearch" && id !== "genreFilter") {
+            const listingType = byId("listingType")?.value || "clubs";
+            if (listingType === "events") await hydrateEventsByRegionQuery();
+            else await hydrateLocationsByRegionQuery();
+          }
+          renderGrid();
+        };
+        el.addEventListener("input", () => { if (id === "locationSearch") renderGrid(); });
+        el.addEventListener("change", () => { run().catch(() => renderGrid()); });
+        el.dataset.bound = "1";
+      }
     });
   }
   function showListing() { showPage("listingPage"); populateFilters(); bindFilters(); renderGrid(); }

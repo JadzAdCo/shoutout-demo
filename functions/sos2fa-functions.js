@@ -242,8 +242,9 @@ exports.requestSos2faCode = onCall({region: "us-central1", secrets: SOS2FA_SECRE
   const notes = formatDeliveryNotes({
     phone,
     email,
-    sms: smsOk,
-    mail: emailOk
+    // Show every channel selected by notification methodology (not only the one that succeeded).
+    sms: !!channels.sms,
+    mail: !!channels.email
   });
 
   await writeEntityManagementAudit({
