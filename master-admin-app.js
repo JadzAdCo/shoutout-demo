@@ -78,8 +78,62 @@
     return code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request";
   }
 
+  const MASTER_DEEPLINK_KEY = "floqr_master_admin_deeplink";
+  const ENTITY_MGMT_PANEL_IDS = [
+    "entityManagement",
+    "clubAdminUrls",
+    "allQueues",
+    "clubOnboarding",
+    "templateManagement",
+    "recommendationModeration"
+  ];
+  const PANEL_LABELS = {
+    entityManagement: "Manage Entities",
+    clubAdminUrls: "Venue Links",
+    allQueues: "All ShoutOut Queues",
+    clubOnboarding: "Entity Onboarding",
+    templateManagement: "Template Management",
+    recommendationModeration: "Unapproved Recommendations",
+    networkDashboard: "Network Dashboard"
+  };
+
+  function hashPanelId() {
+    return String(location.hash || "").replace(/^#/, "").trim();
+  }
+
+  function rememberMasterDeepLink(panelId = "") {
+    const panel = String(panelId || hashPanelId() || "").trim();
+    if (!panel || !byId(panel)) return;
+    try {
+      sessionStorage.setItem(MASTER_DEEPLINK_KEY, JSON.stringify({
+        panel,
+        href: `${location.pathname}${location.search}#${panel}`,
+        at: Date.now()
+      }));
+    } catch (_) {}
+  }
+
+  function consumeMasterDeepLink() {
+    try {
+      const raw = sessionStorage.getItem(MASTER_DEEPLINK_KEY);
+      if (raw) {
+        sessionStorage.removeItem(MASTER_DEEPLINK_KEY);
+        const parsed = JSON.parse(raw);
+        const panel = String(parsed?.panel || "").trim();
+        if (panel && byId(panel)) return panel;
+      }
+    } catch (_) {}
+    const hash = hashPanelId();
+    return hash && byId(hash) ? hash : "";
+  }
+
+  function panelLabel(panelId) {
+    return PANEL_LABELS[panelId] || panelId || "Master Admin";
+  }
+
   async function loginGoogle() {
     try {
+      rememberMasterDeepLink();
       setText("masterStatus", "Opening Google sign-in...");
       await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
     } catch(e) {
@@ -90,11 +144,13 @@
   async function loginMicrosoft() {
     const p = buildMicrosoftProvider();
     try {
+      rememberMasterDeepLink();
       setText("masterStatus", "Opening Microsoft sign-in...");
       await auth.signInWithPopup(p);
     } catch(e) {
       if (isMicrosoftPopupIssue(e)) {
         try {
+          rememberMasterDeepLink();
           setText("masterStatus", "Microsoft popup was blocked or closed. Redirecting instead...");
           await auth.signInWithRedirect(p);
           return;
@@ -118,8 +174,15 @@
       document.querySelectorAll(".admin-tab-parent").forEach((el) => el.setAttribute("aria-expanded", "false"));
     };
 
+    const groupDefaultPanel = (group) => {
+      const configured = String(group?.dataset?.defaultPanel || "").trim();
+      if (configured && byId(configured)) return configured;
+      return group?.querySelector(".admin-subtab")?.dataset.panel || "";
+    };
+
     const activatePanel = (panelId, opts = {}) => {
       if (!panelId || !byId(panelId)) return;
+      rememberMasterDeepLink(panelId);
       document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
       document.querySelectorAll(".admin-tab:not(.admin-tab-parent)").forEach((x) => x.classList.remove("active"));
       document.querySelectorAll(".admin-subtab").forEach((x) => x.classList.remove("active"));
@@ -165,6 +228,15 @@
       } catch (_) {}
     };
 
+    const resumeDeepLinkPanel = (preferred = "") => {
+      const panel = String(preferred || consumeMasterDeepLink() || hashPanelId() || "").trim();
+      if (panel && byId(panel)) {
+        activatePanel(panel);
+        return panel;
+      }
+      return "";
+    };
+
     document.querySelectorAll(".admin-tab[data-panel]").forEach((btn) => {
       btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
     });
@@ -173,19 +245,12 @@
       btn.addEventListener("click", () => {
         const group = btn.closest(".admin-tab-group");
         const subtabs = group?.querySelector(".admin-subtabs");
-        const open = !subtabs?.classList.contains("hidden");
-        if (open) {
-          // Keep group open; jump to first sub-page if none active in this group.
-          const activeSub = group?.querySelector(".admin-subtab.active");
-          activatePanel(activeSub?.dataset.panel || group?.querySelector(".admin-subtab")?.dataset.panel);
-          return;
-        }
+        const target = groupDefaultPanel(group);
         hideAllSubtabs();
         subtabs?.classList.remove("hidden");
         btn.classList.add("active");
         btn.setAttribute("aria-expanded", "true");
-        const first = group?.querySelector(".admin-subtab")?.dataset.panel;
-        if (first) activatePanel(first, {keepSubtabs: true});
+        if (target) activatePanel(target, {keepSubtabs: true});
       });
     });
 
@@ -193,11 +258,19 @@
       btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
     });
 
-    // Deep-link: #securityLogs / #displaySecurity / etc.
-    const hashPanel = String(location.hash || "").replace(/^#/, "");
-    if (hashPanel && byId(hashPanel)) activatePanel(hashPanel);
+    // Deep-link: #entityManagement / #clubOnboarding / #securityLogs / etc.
+    const hashPanel = hashPanelId();
+    if (hashPanel && byId(hashPanel)) {
+      rememberMasterDeepLink(hashPanel);
+      activatePanel(hashPanel);
+    }
 
-    window.FLOQRMasterTabs = {activatePanel};
+    window.addEventListener("hashchange", () => {
+      const next = hashPanelId();
+      if (next && byId(next)) activatePanel(next);
+    });
+
+    window.FLOQRMasterTabs = {activatePanel, resumeDeepLinkPanel, entityMgmtPanels: ENTITY_MGMT_PANEL_IDS};
   }
 
   function setupActionFeedback() {
@@ -902,6 +975,7 @@
     if (byId("templateManageSubTextSize")) byId("templateManageSubTextSize").value = "6";
     if (byId("templateManagePreviewMain")) byId("templateManagePreviewMain").value = "SHOUTOUT";
     if (byId("templateManagePreviewSub")) byId("templateManagePreviewSub").value = "FLOQR";
+    if (byId("templateManagePrice")) byId("templateManagePrice").value = "0";
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = false;
     if (byId("templateManageBackgroundEditable")) {
       byId("templateManageBackgroundEditable").checked = true;
@@ -925,6 +999,10 @@
     if (byId("templateManageSubTextSize")) byId("templateManageSubTextSize").value = template.subTextSizePercent || 7.8;
     if (byId("templateManagePreviewMain")) byId("templateManagePreviewMain").value = template.defaultMain || "SHOUTOUT";
     if (byId("templateManagePreviewSub")) byId("templateManagePreviewSub").value = template.defaultSub || template.category || "FLOQR";
+    if (byId("templateManagePrice")) {
+      const cents = Math.max(0, Math.round(Number(template.priceCents || 0)));
+      byId("templateManagePrice").value = (cents / 100).toFixed(2);
+    }
     if (byId("templateManageSupportsMedia")) byId("templateManageSupportsMedia").checked = !!(template.supportsMedia || template.supportsImage || template.supportsVideo);
     if (byId("templateManageBackgroundEditable")) {
       const isPublishedTemplate = !!window.SHOUTOUT_TEMPLATES?.[template.id];
@@ -958,7 +1036,7 @@
     wrap.innerHTML = rows.map(template => `<div class="queue-item managed-template-row ${template.status === "deleted" ? "is-deactivated" : ""}">
       <div class="message-envelope-head"><strong>${esc(template.name || template.id)}</strong><span>${template.status === "deleted" ? "deactivated" : "active"}</span></div>
       <p>${esc(template.description || "No description")}</p>
-      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
+      <small>${esc(template.id)} | ${esc((template.tags || []).join(", "))} | ${Number(template.priceCents) > 0 ? `$${(Number(template.priceCents) / 100).toFixed(2)}` : "Free"} | Screens: ${esc((template.screenFormatIds || []).join(", ") || "not tagged")} | Background: ${template.backgroundEditable === false ? "locked" : "editable"}</small>
       <div class="queue-actions"><button type="button" data-template-view="${esc(template.id)}">View</button><button type="button" data-template-preview="${esc(template.id)}">Preview</button><button type="button" data-template-edit="${esc(template.id)}">Edit</button><button type="button" data-template-toggle="${esc(template.id)}">${template.status === "deleted" ? "Activate" : "Deactivate"}</button><button type="button" data-template-delete="${esc(template.id)}">Delete</button></div>
     </div>`).join("") || "<p class='sub'>No templates matched.</p>";
     wrap.querySelectorAll("[data-template-view]").forEach(button => button.addEventListener("click", () => viewManagedTemplate(managedTemplates[button.dataset.templateView] || {})));
@@ -1118,6 +1196,8 @@
     const maxSubCharacters = Math.round(templateNumber(byId("templateManageSubLimit")?.value, 60, 0, 1000));
     const mainTextSizePercent = templateNumber(byId("templateManageMainTextSize")?.value, 20.8, 4, 40);
     const subTextSizePercent = templateNumber(byId("templateManageSubTextSize")?.value, 7.8, 2, 20);
+    const priceCents = Math.max(0, Math.round(Number(byId("templateManagePrice")?.value || 0) * 100));
+    const priceLabel = priceCents > 0 ? `$${(priceCents / 100).toFixed(priceCents % 100 ? 2 : 0)}` : "Free";
     const payload = {
       id,
       name,
@@ -1138,6 +1218,8 @@
       subTextSizePercent,
       defaultMain:String(byId("templateManagePreviewMain")?.value || "SHOUTOUT").trim(),
       defaultSub:String(byId("templateManagePreviewSub")?.value || "FLOQR").trim(),
+      priceCents,
+      priceLabel,
       Is96x48: screenFlags.Is96x48,
       Is64x48: screenFlags.Is64x48,
       Is64x32: screenFlags.Is64x32,
@@ -1875,9 +1957,6 @@
       document.querySelector('[data-panel="clubOnboarding"]')?.click();
       setTimeout(() => byId("clubDisplayTypeSetup")?.scrollIntoView({behavior:"smooth", block:"start"}), 250);
     }
-    if (location.hash === "#entityManagement" || /entityManagement|entity-manage/i.test(location.hash)) {
-      document.querySelector('[data-panel="entityManagement"]')?.click();
-    }
 
     auth.getRedirectResult().then(result => {
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
@@ -1887,6 +1966,15 @@
       if (!user) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");
+        const intended = hashPanelId() || "";
+        if (intended && byId(intended)) {
+          rememberMasterDeepLink(intended);
+          const entityHint = ENTITY_MGMT_PANEL_IDS.includes(intended)
+            ? " After Google/Microsoft sign-in you will continue to that page; Entity Management still requires SOS2FA unlock."
+            : " After sign-in you will continue to that page.";
+          setText("masterStatus", `Sign in to open ${panelLabel(intended)}.${entityHint}`);
+          byId("masterLogin")?.scrollIntoView?.({behavior: "smooth", block: "start"});
+        }
         return;
       }
 
@@ -1902,6 +1990,12 @@
       byId("masterPanel").classList.remove("hidden");
       setText("masterStatus", check.reason);
       setText("masterPanelSecurityStatus", check.reason);
+      const resumed = window.FLOQRMasterTabs?.resumeDeepLinkPanel?.() || "";
+      if (resumed && ENTITY_MGMT_PANEL_IDS.includes(resumed) && !window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {
+        setText("masterActionFeedback", `${panelLabel(resumed)} is ready after SOS2FA unlock.`);
+      } else if (resumed) {
+        setText("masterActionFeedback", `Opened ${panelLabel(resumed)}.`);
+      }
       loadNetworkReports().then(() => {
         if (window.FLOQREntityManagement) {
           window.FLOQREntityManagement.mount({db, auth, locations: networkLocations});
