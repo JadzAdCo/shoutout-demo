@@ -6,6 +6,14 @@
 
   const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.49";
   const byId = new Map();
+  const AUDIENCES = ["masterAdmin", "venueAdmin", "serviceMember", "patron"];
+  const MASTER_ADMIN_EMAILS = new Set(
+    String(global.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
+      .split(",")
+      .map(value => String(value || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+  let viewerAudience = "patron";
 
   function vUrl(path, params = {}) {
     const qs = new URLSearchParams({v: APP_V, ...params});
@@ -24,6 +32,31 @@
     return normalize(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "help";
   }
 
+  function normalizeAudiences(raw) {
+    const list = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+    const cleaned = list
+      .map(value => String(value || "").trim())
+      .filter(value => AUDIENCES.includes(value));
+    return cleaned.length ? Array.from(new Set(cleaned)) : [];
+  }
+
+  /** Infer audience when a seed/popout omits audiences — one section per entry. */
+  function inferAudiences(entry = {}) {
+    const explicit = normalizeAudiences(entry.audiences || entry.audience);
+    if (explicit.length) return explicit;
+    const blob = `${entry.id || ""} ${entry.title || ""} ${entry.page || ""} ${entry.body || ""} ${entry.source || ""}`.toLowerCase();
+    if (/sos2fa|social os|entity management|master-admin|master admin|purge queue|venue links|diagnostics|mail log|heist.*64\s*x\s*48|64x48.*heist|display setup|privilege admin/.test(blob)) {
+      return ["masterAdmin"];
+    }
+    if (/admin\.html|club admin|venue admin|club public profile|display screens|venuesupports|scheduling|suprstar queue|template catalog|message template/.test(blob)) {
+      return ["venueAdmin"];
+    }
+    if (/service member|work calendar|staff worksheet|role-request|become a dj|become a promoter|bartender|waitress|busboy|elect.*service/.test(blob)) {
+      return ["serviceMember"];
+    }
+    return ["patron"];
+  }
+
   function register(entry = {}) {
     const title = normalize(entry.title || entry.label || "");
     if (!title && !normalize(entry.body)) return null;
@@ -39,6 +72,9 @@
     const steps = Array.isArray(entry.steps)
       ? entry.steps.map(normalize).filter(Boolean)
       : (existing.steps || []);
+    const audiences = normalizeAudiences(entry.audiences || entry.audience).length
+      ? normalizeAudiences(entry.audiences || entry.audience)
+      : (existing.audiences?.length ? existing.audiences : inferAudiences({...existing, ...entry, id, title}));
     const next = {
       id,
       title: title || existing.title || id,
@@ -46,6 +82,7 @@
       steps,
       links: links.length ? links : (existing.links || []),
       searchPhrases,
+      audiences,
       source: entry.source || existing.source || "help-repository",
       page: entry.page || existing.page || "",
       kind: entry.kind || existing.kind || "help"
@@ -116,18 +153,68 @@
     })).filter(Boolean);
   }
 
-  function entries() {
-    return Array.from(byId.values());
+  function entries(filterAudience) {
+    const all = Array.from(byId.values());
+    if (!filterAudience) return all;
+    return all.filter(entry => (entry.audiences || []).includes(filterAudience));
   }
 
-  function toSearchIntents() {
-    return entries().map(entry => ({
+  function setViewerAudience(audience) {
+    viewerAudience = AUDIENCES.includes(audience) ? audience : "patron";
+    return viewerAudience;
+  }
+
+  function getViewerAudience() {
+    return viewerAudience;
+  }
+
+  async function resolveViewerAudience({authUser = null, userDoc = null, tokenClaims = null} = {}) {
+    const user = authUser || global.firebase?.auth?.()?.currentUser || null;
+    if (!user) {
+      viewerAudience = "patron";
+      return viewerAudience;
+    }
+    const email = String(user.email || "").trim().toLowerCase();
+    let claims = tokenClaims;
+    if (!claims && typeof user.getIdTokenResult === "function") {
+      try { claims = (await user.getIdTokenResult()).claims || {}; } catch (_) { claims = {}; }
+    }
+    claims = claims || {};
+    if (claims.masterAdmin === true || MASTER_ADMIN_EMAILS.has(email)) {
+      viewerAudience = "masterAdmin";
+      return viewerAudience;
+    }
+    const profile = userDoc || {};
+    const isVenueAdmin = !!(
+      profile.isClubAdmin || profile.clubAdmin || profile.IsClubAdmin
+      || (Array.isArray(profile.adminClubIds) && profile.adminClubIds.length)
+      || claims.clubAdmin === true
+    );
+    if (isVenueAdmin) {
+      viewerAudience = "venueAdmin";
+      return viewerAudience;
+    }
+    const isService = /^(1|true|yes)$/i.test(String(
+      profile.IsServiceMember ?? profile.IsserviceMember ?? profile.serviceMember ?? claims.serviceMember ?? ""
+    ));
+    const isPatron = /^(1|true|yes)$/i.test(String(profile.IsPatron ?? ""));
+    if (isService && !isPatron) {
+      viewerAudience = "serviceMember";
+      return viewerAudience;
+    }
+    viewerAudience = "patron";
+    return viewerAudience;
+  }
+
+  function toSearchIntents(audience = viewerAudience) {
+    return entries(audience).map(entry => ({
       id: entry.id,
       kind: "help",
       source: entry.source,
       label: entry.title,
       blurb: entry.body || entry.title,
       steps: entry.steps || [],
+      audiences: entry.audiences || ["patron"],
       links: (entry.links || []).length
         ? entry.links
         : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
@@ -160,6 +247,8 @@
       ],
       source: "help-repository-seed"
     },
+    {
+      id: "help-suprstar",
       title: "Make me a supRstar / superstar",
       body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
@@ -170,7 +259,8 @@
       links: [
         {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
-      source: "help-repository-seed"
+      source: "help-repository-seed",
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"]
     },
     {
       id: "help-become-club-admin",
@@ -319,8 +409,43 @@
         {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
         {label: "Display 1 (Xibo)", href: "./display.html"}
       ],
+      audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html#panelPublicProfile"
+    },
+    {
+      id: "help-heist-enable-64x48",
+      title: "Enable 64×48 display choice at Heist",
+      body: "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: (1) Open Master Admin → search club heist-washington-dc (or Club Admin → Club Public Profile while Heist is selected). (2) Under FLOQR display screens, tick VenueSupports64x48 — 64 x 48 cm (keep VenueSupports64x32 if the 64×32 board stays live). (3) Save. (4) Optionally set primaryDisplayScreenFormatId to led-64x48 only if that board is the main Xibo Display 1; otherwise leave primary as led-64x32 and let 64×48 appear as an extra composer choice. (5) Xibo URL stays display.html?location=heist-washington-dc — never add ?screen= or ?v=. Packaged defaults may also list led-64x48 once published; Firestore VenueSupports* flags win when set.",
+      steps: [
+        "Open Club Public Profile (Club Admin) or Master Admin club display setup for heist-washington-dc",
+        "Tick VenueSupports64x48 — 64 x 48 cm and Save",
+        "Confirm composer offers 64×48 for Heist; Xibo stays display.html?location=heist-washington-dc"
+      ],
+      searchPhrases: [
+        "heist 64x48", "64x48 at heist", "set 64x48 heist", "enable 64x48 heist",
+        "heist display choice", "VenueSupports64x48 heist", "heist washington 64x48",
+        "directives to set 64x48 as a display choice at Heist"
+      ],
+      links: [
+        {label: "Club Public Profile (display screens)", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-floqai-audience-sections",
+      title: "FloqAi help audiences",
+      body: "FloqAi help is split into four sections: Master Admin, Venue Admin, Service Members, and Patron. Answers are filtered to the signed-in viewer’s primary role — Master Admin topics (for example Heist 64×48 display setup or SOS2FA) stay blank for patrons and service members. Client-side filtering is UX only; do not put secrets in help bodies. Prefer server-side audience checks on any future help API, claim-backed roles (masterAdmin / clubAdmin / serviceMember), and audit of master-only phrases.",
+      searchPhrases: [
+        "floqai audience", "help sections", "master admin help", "venue admin help",
+        "service member help", "patron help", "help security", "blank floqai answer"
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#floqAiHelpPopout"
     },
     {
       id: "help-donpapi-led-wall",
@@ -334,6 +459,7 @@
         {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
         {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "club-profile.html"
     },
@@ -536,6 +662,7 @@
         {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
         {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
+      audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#entityManagement"
     },
@@ -551,21 +678,23 @@
       links: [
         {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
       ],
+      audiences: ["patron", "serviceMember", "masterAdmin"],
       source: "help-repository-seed",
       page: "patron-portal.html#portalPrivacy"
     },
     {
       id: "help-sos2fa-entity-mgmt",
-      title: "SOS2FA",
-      body: "Entity Management is protected by SOS2FA (Social OS two-factor). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
+      title: "Social OS - 2FA",
+      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
       searchPhrases: [
-        "sos2fa", "entity management unlock", "request sos2fa code", "two factor",
-        "sos2fa sms", "entity management 2fa"
+        "sos2fa", "social os 2fa", "social os - 2fa", "entity management unlock", "request sos2fa code", "two factor",
+        "privilege admin access", "sos2fa sms", "entity management 2fa"
       ],
       links: [
         {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
         {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
+      audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#clubAdminUrls"
     },
@@ -690,12 +819,17 @@
   }
 
   global.FLOQRHelpRepository = {
+    AUDIENCES,
     register,
     registerMany,
     registerFromHelpNode,
     registerDomHelpPopouts,
     entries,
     toSearchIntents,
+    setViewerAudience,
+    getViewerAudience,
+    resolveViewerAudience,
+    inferAudiences,
     vUrl
   };
 })(window);

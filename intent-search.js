@@ -788,8 +788,15 @@
   function allIntents() {
     const seen = new Set();
     const merged = [];
+    const audience = global.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
     // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
     [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
+      const audiences = Array.isArray(intent.audiences) && intent.audiences.length
+        ? intent.audiences
+        : (intent.kind === "help" ? null : ["patron", "serviceMember", "venueAdmin", "masterAdmin"]);
+      // Curated PRODUCT_INTENTS without audiences stay visible to everyone.
+      // Help rows without audiences are already filtered by repository.toSearchIntents(audience).
+      if (audiences && !audiences.includes(audience)) return;
       const key = intent.id || intent.label;
       if (seen.has(key)) {
         const existing = merged.find(row => (row.id || row.label) === key);
@@ -831,6 +838,28 @@
       return 0;
     });
     return scored.map(row => row.intent);
+  }
+
+  async function syncHelpAudienceFromAuth() {
+    const repo = global.FLOQRHelpRepository;
+    if (!repo?.resolveViewerAudience || !global.firebase?.auth) return "patron";
+    const auth = firebase.auth();
+    const user = auth.currentUser;
+    let userDoc = null;
+    if (user && firebase.firestore) {
+      try {
+        const snap = await firebase.firestore().collection("users").doc(user.uid).get();
+        userDoc = snap.exists ? (snap.data() || {}) : null;
+      } catch (_) {}
+    }
+    return repo.resolveViewerAudience({authUser: user, userDoc});
+  }
+
+  function bindHelpAudienceAuth() {
+    if (!global.firebase?.auth) return;
+    const auth = firebase.auth();
+    auth.onAuthStateChanged(() => { syncHelpAudienceFromAuth().catch(() => {}); });
+    syncHelpAudienceFromAuth().catch(() => {});
   }
 
   function esc(value) {
@@ -910,6 +939,7 @@
   }
 
   function bindIntentSearch(opts = {}) {
+    bindHelpAudienceAuth();
     const input = document.getElementById("intentSearchInput");
     const results = document.getElementById("intentSearchResults");
     if (!input) return;
@@ -949,6 +979,8 @@
     bindIntentSearch,
     syncPatronCard,
     collectPopoutIntents,
+    syncHelpAudienceFromAuth,
+    bindHelpAudienceAuth,
     INTENTS,
     HELP_INTENTS,
     PRODUCT_INTENTS,
