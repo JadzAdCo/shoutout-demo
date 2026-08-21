@@ -1328,13 +1328,15 @@
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
-      // Optical midline: digit 1 has a wide right sidebearing — nudge two-digit 1x marks right.
+      // Optical midline: digit 1 is thin — slight left pad so 13 sits on jersey center without a wide gap.
       if (usePhotoBack && sport === "soccer" && /^1\d$/.test(String(subText || "").trim())) {
-        byId("displaySub").style.setProperty("padding-left", "0.14em", "important");
+        byId("displaySub").style.setProperty("padding-left", "0.06em", "important");
         byId("displaySub").style.setProperty("padding-right", "0", "important");
+        byId("displaySub").style.setProperty("letter-spacing", "-.05em", "important");
       } else {
         byId("displaySub").style.removeProperty("padding-left");
         byId("displaySub").style.removeProperty("padding-right");
+        byId("displaySub").style.removeProperty("letter-spacing");
       }
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");

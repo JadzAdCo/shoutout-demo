@@ -1,6 +1,5 @@
 /* FLOQR app-wide help repository — source of truth for FloqAi contextual search.
  * Every "?" help popout verbiage must be registered here (static seed and/or runtime).
- * Audiences: masterAdmin | venueAdmin | serviceMember | patron (strict filter in FloqAi).
  */
 (function (global) {
   "use strict";
@@ -8,9 +7,13 @@
   const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.49";
   const byId = new Map();
   const AUDIENCES = ["masterAdmin", "venueAdmin", "serviceMember", "patron"];
-  const MASTER_ADMIN_EMAILS = ["bans.don@gmail.com", "don.b@jadzholdings.com"];
-  let activeAudience = "patron";
-  let lastMatchDenied = false;
+  const MASTER_ADMIN_EMAILS = new Set(
+    String(global.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
+      .split(",")
+      .map(value => String(value || "").trim().toLowerCase())
+      .filter(Boolean)
+  );
+  let viewerAudience = "patron";
 
   function vUrl(path, params = {}) {
     const qs = new URLSearchParams({v: APP_V, ...params});
@@ -29,25 +32,26 @@
     return normalize(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "help";
   }
 
-  function normalizeAudienceList(value, fallback = ["patron"]) {
-    const raw = Array.isArray(value) ? value : String(value || "").split(/[|,]/);
-    const list = raw.map(v => String(v || "").trim()).filter(v => AUDIENCES.includes(v) || v === "all");
-    if (list.includes("all")) return AUDIENCES.slice();
-    return list.length ? Array.from(new Set(list)) : fallback.slice();
+  function normalizeAudiences(raw) {
+    const list = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+    const cleaned = list
+      .map(value => String(value || "").trim())
+      .filter(value => AUDIENCES.includes(value));
+    return cleaned.length ? Array.from(new Set(cleaned)) : [];
   }
 
-  function inferAudience(entry = {}) {
-    if (entry.audience != null && entry.audience !== "") {
-      return normalizeAudienceList(entry.audience);
-    }
-    const hay = `${entry.id || ""} ${entry.title || ""} ${entry.page || ""} ${entry.body || ""}`.toLowerCase();
-    if (/sos2fa|social os - 2fa|master.?admin|entity management|venue links|purge queue|template catalog|privilege admin|diagnostics|ai crawling|network reconciliation/.test(hay)) {
+  /** Infer audience when a seed/popout omits audiences — one section per entry. */
+  function inferAudiences(entry = {}) {
+    const explicit = normalizeAudiences(entry.audiences || entry.audience);
+    if (explicit.length) return explicit;
+    const blob = `${entry.id || ""} ${entry.title || ""} ${entry.page || ""} ${entry.body || ""} ${entry.source || ""}`.toLowerCase();
+    if (/sos2fa|social os|entity management|master-admin|master admin|purge queue|venue links|diagnostics|mail log|heist.*64\s*x\s*48|64x48.*heist|display setup|privilege admin/.test(blob)) {
       return ["masterAdmin"];
     }
-    if (/club admin|venue admin|public profile|display screens|venuesupports|scheduling portal|notification subscription|suprstar queue|club notification|round robin|staff scheduling/.test(hay)) {
+    if (/admin\.html|club admin|venue admin|club public profile|display screens|venuesupports|scheduling|suprstar queue|template catalog|message template/.test(blob)) {
       return ["venueAdmin"];
     }
-    if (/service member|work calendar|staff worksheet|work sheet|colleague schedule|approve selected|isServiceMember|isservicemember/.test(hay)) {
+    if (/service member|work calendar|staff worksheet|role-request|become a dj|become a promoter|bartender|waitress|busboy|elect.*service/.test(blob)) {
       return ["serviceMember"];
     }
     return ["patron"];
@@ -68,11 +72,9 @@
     const steps = Array.isArray(entry.steps)
       ? entry.steps.map(normalize).filter(Boolean)
       : (existing.steps || []);
-    const audience = inferAudience({
-      ...existing,
-      ...entry,
-      audience: entry.audience != null ? entry.audience : existing.audience
-    });
+    const audiences = normalizeAudiences(entry.audiences || entry.audience).length
+      ? normalizeAudiences(entry.audiences || entry.audience)
+      : (existing.audiences?.length ? existing.audiences : inferAudiences({...existing, ...entry, id, title}));
     const next = {
       id,
       title: title || existing.title || id,
@@ -80,11 +82,10 @@
       steps,
       links: links.length ? links : (existing.links || []),
       searchPhrases,
+      audiences,
       source: entry.source || existing.source || "help-repository",
       page: entry.page || existing.page || "",
-      kind: entry.kind || existing.kind || "help",
-      audience,
-      section: entry.section || existing.section || audience[0] || "patron"
+      kind: entry.kind || existing.kind || "help"
     };
     byId.set(id, next);
     return next;
@@ -152,127 +153,74 @@
     })).filter(Boolean);
   }
 
-  function entries() {
-    return Array.from(byId.values());
+  function entries(filterAudience) {
+    const all = Array.from(byId.values());
+    if (!filterAudience) return all;
+    return all.filter(entry => (entry.audiences || []).includes(filterAudience));
   }
 
-  function toSearchIntents(audienceFilter) {
-    const audience = audienceFilter || activeAudience || "patron";
-    return entries()
-      .filter(entry => audienceAllows(entry, audience))
-      .map(entry => ({
-        id: entry.id,
-        kind: "help",
-        source: entry.source,
-        label: entry.title,
-        blurb: entry.body || entry.title,
-        steps: entry.steps || [],
-        links: (entry.links || []).length
-          ? entry.links
-          : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
-        searchPhrases: entry.searchPhrases || [],
-        patterns: [],
-        audience: entry.audience || ["patron"],
-        section: entry.section || (entry.audience && entry.audience[0]) || "patron"
-      }));
+  function setViewerAudience(audience) {
+    viewerAudience = AUDIENCES.includes(audience) ? audience : "patron";
+    return viewerAudience;
   }
 
-  function audienceAllows(entry, audience) {
-    const want = String(audience || "patron");
-    const list = normalizeAudienceList(entry?.audience, ["patron"]);
-    return list.includes(want);
+  function getViewerAudience() {
+    return viewerAudience;
   }
 
-  function setActiveAudience(audience) {
-    activeAudience = AUDIENCES.includes(audience) ? audience : "patron";
-    return activeAudience;
-  }
-
-  function getActiveAudience() {
-    return activeAudience;
-  }
-
-  function truthyDatapoint(value) {
-    if (value === true || value === 1) return true;
-    const s = String(value == null ? "" : value).trim().toLowerCase();
-    return s === "1" || s === "yes" || s === "true" || s === "y";
-  }
-
-  function resolveAudienceFromProfile(user, profile = {}) {
-    if (!user) return setActiveAudience("patron");
-    const email = String(user.email || profile.email || "").trim().toLowerCase();
-
-    // Highest privilege wins — prefer users.Is* datapoints.
-    if (
-      truthyDatapoint(profile.IsMasterAdmin)
-      || truthyDatapoint(profile.masterAdmin)
-      || MASTER_ADMIN_EMAILS.includes(email)
-    ) {
-      return setActiveAudience("masterAdmin");
+  async function resolveViewerAudience({authUser = null, userDoc = null, tokenClaims = null} = {}) {
+    const user = authUser || global.firebase?.auth?.()?.currentUser || null;
+    if (!user) {
+      viewerAudience = "patron";
+      return viewerAudience;
     }
-
-    if (
-      truthyDatapoint(profile.IsVenueAdmin)
-      || truthyDatapoint(profile.isClubAdmin)
-      || truthyDatapoint(profile.clubAdmin)
-    ) {
-      return setActiveAudience("venueAdmin");
+    const email = String(user.email || "").trim().toLowerCase();
+    let claims = tokenClaims;
+    if (!claims && typeof user.getIdTokenResult === "function") {
+      try { claims = (await user.getIdTokenResult()).claims || {}; } catch (_) { claims = {}; }
     }
-
-    const roles = [].concat(profile.approvedRoles || profile.roles || []).map(r => String(r).toLowerCase());
-    if (roles.some(r => /master/.test(r))) return setActiveAudience("masterAdmin");
-    if (roles.some(r => /clubadmin|venueadmin|venuemanager/.test(r))) return setActiveAudience("venueAdmin");
-
-    const isService = truthyDatapoint(profile.IsServiceMember)
-      || truthyDatapoint(profile.IsserviceMember)
-      || truthyDatapoint(profile.serviceMember);
-    const isPatron = truthyDatapoint(profile.IsPatron);
-
-    if (isService && !isPatron) return setActiveAudience("serviceMember");
-    return setActiveAudience("patron");
-  }
-
-  async function resolveAudienceFromAuth(auth) {
-    try {
-      const user = auth?.currentUser || (typeof firebase !== "undefined" ? firebase.auth()?.currentUser : null);
-      if (!user) return setActiveAudience("patron");
-      let profile = {};
-      try {
-        const snap = await firebase.firestore().collection("users").doc(user.uid).get();
-        profile = snap.exists ? (snap.data() || {}) : {};
-      } catch (_) {}
-      try {
-        const token = await user.getIdTokenResult();
-        if (token?.claims?.masterAdmin === true || token?.claims?.IsMasterAdmin === true) {
-          profile.IsMasterAdmin = 1;
-          profile.masterAdmin = true;
-        }
-        if (token?.claims?.IsVenueAdmin === true || token?.claims?.venueAdmin === true) {
-          profile.IsVenueAdmin = 1;
-        }
-      } catch (_) {}
-      return resolveAudienceFromProfile(user, profile);
-    } catch (_) {
-      return setActiveAudience("patron");
+    claims = claims || {};
+    if (claims.masterAdmin === true || MASTER_ADMIN_EMAILS.has(email)) {
+      viewerAudience = "masterAdmin";
+      return viewerAudience;
     }
+    const profile = userDoc || {};
+    const isVenueAdmin = !!(
+      profile.isClubAdmin || profile.clubAdmin || profile.IsClubAdmin
+      || (Array.isArray(profile.adminClubIds) && profile.adminClubIds.length)
+      || claims.clubAdmin === true
+    );
+    if (isVenueAdmin) {
+      viewerAudience = "venueAdmin";
+      return viewerAudience;
+    }
+    const isService = /^(1|true|yes)$/i.test(String(
+      profile.IsServiceMember ?? profile.IsserviceMember ?? profile.serviceMember ?? claims.serviceMember ?? ""
+    ));
+    const isPatron = /^(1|true|yes)$/i.test(String(profile.IsPatron ?? ""));
+    if (isService && !isPatron) {
+      viewerAudience = "serviceMember";
+      return viewerAudience;
+    }
+    viewerAudience = "patron";
+    return viewerAudience;
   }
 
-  function entriesBySection() {
-    const out = {masterAdmin: [], venueAdmin: [], serviceMember: [], patron: []};
-    entries().forEach(entry => {
-      normalizeAudienceList(entry.audience, ["patron"]).forEach(aud => {
-        if (out[aud]) out[aud].push(entry);
-      });
-    });
-    return out;
-  }
-
-  function wasLastMatchDenied() {
-    return !!lastMatchDenied;
-  }
-
-  function markMatchDenied(flag) {
-    lastMatchDenied = !!flag;
+  function toSearchIntents(audience = viewerAudience) {
+    return entries(audience).map(entry => ({
+      id: entry.id,
+      kind: "help",
+      source: entry.source,
+      label: entry.title,
+      blurb: entry.body || entry.title,
+      steps: entry.steps || [],
+      audiences: entry.audiences || ["patron"],
+      links: (entry.links || []).length
+        ? entry.links
+        : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
+      searchPhrases: entry.searchPhrases || [],
+      patterns: []
+    }));
   }
 
   /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
@@ -297,11 +245,10 @@
       links: [
         {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`}
       ],
-      source: "help-repository-seed",
-      audience: "patron"
+      source: "help-repository-seed"
     },
     {
-      id: "help-suprstr",
+      id: "help-suprstar",
       title: "Make me a supRstar / superstar",
       body: "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL.",
       searchPhrases: [
@@ -313,7 +260,7 @@
         {label: "Open supRstar", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
-      audience: "patron"
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"]
     },
     {
       id: "help-become-club-admin",
@@ -462,41 +409,43 @@
         {label: "Club Public Profile display screens", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile"})},
         {label: "Display 1 (Xibo)", href: "./display.html"}
       ],
+      audiences: ["venueAdmin"],
       source: "help-repository-seed",
-      page: "admin.html#panelPublicProfile",
-      audience: ["venueAdmin", "masterAdmin"],
-      section: "venueAdmin",
-      steps: [
-        "Open Club Admin → Club Public Profile → FLOQR display screens.",
-        "Check VenueSupports64x48 (and any other sizes installed). Save writes 0|1 to Firebase clubLocations.",
-        "Paste display.html?location=<id> into Xibo — never add ?screen= or ?v=."
-      ]
+      page: "admin.html#panelPublicProfile"
     },
     {
       id: "help-heist-enable-64x48",
       title: "Enable 64×48 display choice at Heist",
-      body: "Heist DC is packaged with 64×32 only. To offer 64×48 in the ShoutOut composer, turn on VenueSupports64x48 for heist-washington-dc, keep Xibo on display.html?location=heist-washington-dc (no ?screen=), and confirm soccer/jersey templates already have Is64x48=1.",
-      searchPhrases: [
-        "heist 64x48", "set 64x48 at heist", "heist display choice", "enable 64x48 heist",
-        "heist-washington-dc 64x48", "VenueSupports64x48 heist", "directives heist led"
-      ],
+      body: "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: (1) Open Master Admin → search club heist-washington-dc (or Club Admin → Club Public Profile while Heist is selected). (2) Under FLOQR display screens, tick VenueSupports64x48 — 64 x 48 cm (keep VenueSupports64x32 if the 64×32 board stays live). (3) Save. (4) Optionally set primaryDisplayScreenFormatId to led-64x48 only if that board is the main Xibo Display 1; otherwise leave primary as led-64x32 and let 64×48 appear as an extra composer choice. (5) Xibo URL stays display.html?location=heist-washington-dc — never add ?screen= or ?v=. Packaged defaults may also list led-64x48 once published; Firestore VenueSupports* flags win when set.",
       steps: [
-        "Sign in as Club Admin for Heist (or Master Admin with Entity Management unlocked).",
-        "Open Club Admin → Club Public Profile → FLOQR display screens for Heist Washington DC.",
-        "Check VenueSupports64x48 — 64 x 48 cm (leave VenueSupports64x32 on if that board still exists).",
-        "Save. Firebase clubLocations/heist-washington-dc must show VenueSupports64x48=1.",
-        "Optional packaged catalog: also set displayScreenFormatIds to include led-64x48 so demos match Firebase.",
-        "Xibo webpage URL stays display.html?location=heist-washington-dc only — size is not in the URL.",
-        "In Search → Heist → soccer jersey (or other template with Is64x48=1), confirm 64×48 appears in the screen picker."
+        "Open Club Public Profile (Club Admin) or Master Admin club display setup for heist-washington-dc",
+        "Tick VenueSupports64x48 — 64 x 48 cm and Save",
+        "Confirm composer offers 64×48 for Heist; Xibo stays display.html?location=heist-washington-dc"
+      ],
+      searchPhrases: [
+        "heist 64x48", "64x48 at heist", "set 64x48 heist", "enable 64x48 heist",
+        "heist display choice", "VenueSupports64x48 heist", "heist washington 64x48",
+        "directives to set 64x48 as a display choice at Heist"
       ],
       links: [
-        {label: "Heist Club Public Profile", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
-        {label: "Master Admin Venue Links", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Club Public Profile (display screens)", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
       ],
+      audiences: ["masterAdmin"],
       source: "help-repository-seed",
-      audience: ["masterAdmin", "venueAdmin"],
-      section: "masterAdmin",
-      page: "admin.html#panelPublicProfile"
+      page: "master-admin.html"
+    },
+    {
+      id: "help-floqai-audience-sections",
+      title: "FloqAi help audiences",
+      body: "FloqAi help is split into four sections: Master Admin, Venue Admin, Service Members, and Patron. Answers are filtered to the signed-in viewer’s primary role — Master Admin topics (for example Heist 64×48 display setup or SOS2FA) stay blank for patrons and service members. Client-side filtering is UX only; do not put secrets in help bodies. Prefer server-side audience checks on any future help API, claim-backed roles (masterAdmin / clubAdmin / serviceMember), and audit of master-only phrases.",
+      searchPhrases: [
+        "floqai audience", "help sections", "master admin help", "venue admin help",
+        "service member help", "patron help", "help security", "blank floqai answer"
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#floqAiHelpPopout"
     },
     {
       id: "help-donpapi-led-wall",
@@ -510,6 +459,7 @@
         {label: "Club public profile gallery", href: vUrl("./club-profile.html", {from: "floqai", location: "temp-democlub-1"})},
         {label: "Display (VIP LED)", href: vUrl("./display.html", {from: "floqai", location: "temp-democlub-1"})}
       ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "club-profile.html"
     },
@@ -609,8 +559,7 @@
         {label: "Work Sheet", href: vUrl("./staff-worksheet.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
-      page: "staff-worksheet.html",
-      audience: "serviceMember"
+      page: "staff-worksheet.html"
     },
     {
       id: "help-service-members",
@@ -627,8 +576,7 @@
         {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
       ],
       source: "help-repository-seed",
-      page: "patron-portal.html#portalServiceMembers",
-      audience: ["serviceMember", "patron"]
+      page: "patron-portal.html#portalServiceMembers"
     },
     {
       id: "help-venue-website-ingest",
@@ -708,16 +656,15 @@
       body: "Request is sent using your general Notifications settings",
       searchPhrases: [
         "request sos2fa code", "sos2fa", "notifications settings", "general notifications",
-        "entity management unlock", "sos2fa email sms", "notifyEmail", "notifySms", "privilege admin access"
+        "entity management unlock", "sos2fa email sms", "notifyEmail", "notifySms"
       ],
       links: [
         {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
         {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
+      audiences: ["masterAdmin"],
       source: "help-repository-seed",
-      page: "master-admin.html#entityManagement",
-      audience: "masterAdmin",
-      section: "masterAdmin"
+      page: "master-admin.html#entityManagement"
     },
     {
       id: "help-general-notifications",
@@ -731,25 +678,25 @@
       links: [
         {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})}
       ],
+      audiences: ["patron", "serviceMember", "masterAdmin"],
       source: "help-repository-seed",
-      page: "patron-portal.html#portalPrivacy",
-      audience: "patron"
+      page: "patron-portal.html#portalPrivacy"
     },
     {
       id: "help-sos2fa-entity-mgmt",
       title: "Social OS - 2FA",
-      body: "Entity Management is protected by Social OS 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days. Gate title: Privilege Admin Access.",
+      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS — not a hardcoded SMS-only path. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
       searchPhrases: [
-        "sos2fa", "social os 2fa", "social os - 2fa", "privilege admin access",
-        "entity management unlock", "request sos2fa code", "two factor", "master admin 2fa"
+        "sos2fa", "social os 2fa", "social os - 2fa", "entity management unlock", "request sos2fa code", "two factor",
+        "privilege admin access", "sos2fa sms", "entity management 2fa"
       ],
       links: [
-        {label: "Master Admin Entity Management", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
       ],
+      audiences: ["masterAdmin"],
       source: "help-repository-seed",
-      page: "master-admin.html#entityManagement",
-      audience: "masterAdmin",
-      section: "masterAdmin"
+      page: "master-admin.html#clubAdminUrls"
     },
     {
       id: "help-app-language",
@@ -878,15 +825,11 @@
     registerFromHelpNode,
     registerDomHelpPopouts,
     entries,
-    entriesBySection,
     toSearchIntents,
-    audienceAllows,
-    setActiveAudience,
-    getActiveAudience,
-    resolveAudienceFromProfile,
-    resolveAudienceFromAuth,
-    wasLastMatchDenied,
-    markMatchDenied,
+    setViewerAudience,
+    getViewerAudience,
+    resolveViewerAudience,
+    inferAudiences,
     vUrl
   };
 })(window);

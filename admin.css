@@ -602,11 +602,10 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .club-admin-url-search-row{align-items:end}
 .club-admin-url-search-actions{display:flex;align-items:end}
 .sos2fa-request-row{margin:0 0 8px;width:fit-content;align-items:center;gap:8px}
-.sos2fa-title-row{align-items:center;gap:8px;text-align:left;justify-content:flex-start}
-.sos2fa-gate-head .eyebrow{text-align:left}
-.sos2fa-gate-head h2{text-align:left;margin:0}
+.sos2fa-title-row{align-items:center;gap:8px;text-align:left;justify-content:flex-start;width:fit-content;max-width:100%}
 .sos2fa-gate{border:1px solid rgba(94,234,255,.35);background:linear-gradient(145deg,rgba(8,18,40,.94),rgba(18,8,28,.9))}
-.sos2fa-gate-head{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;margin-bottom:12px}
+.sos2fa-gate-head{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;margin-bottom:12px;text-align:left}
+.sos2fa-gate-head .eyebrow,.sos2fa-gate-head h2{text-align:left;margin-left:0}
 .sos2fa-mark{width:72px;height:72px;border-radius:18px;display:grid;place-items:center;font-size:11px;font-weight:1000;letter-spacing:.04em;color:#06101c;background:linear-gradient(135deg,#26d8ff,#b8ff4a);box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .sos2fa-recaptcha{margin:10px 0}
 .sos2fa-code-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 12px}

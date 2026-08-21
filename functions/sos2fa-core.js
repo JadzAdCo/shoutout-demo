@@ -19,8 +19,8 @@ function maskEmail(email = "") {
   if (at < 1) return "";
   const local = raw.slice(0, at);
   const domain = raw.slice(at + 1);
-  const first = local.slice(0, 1).toUpperCase();
-  return `email ${first}***@${domain}`;
+  const lead = local.slice(0, 1).toUpperCase();
+  return `email ${lead}***@${domain}`;
 }
 
 function resolveSos2faChannels(profile = {}, email = "", phone = "") {

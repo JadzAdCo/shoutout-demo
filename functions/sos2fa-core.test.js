@@ -32,7 +32,7 @@ test("SOS2FA channels follow universal notifyEmail / notifySms flags", () => {
   assert.equal(lockedOut.email, true);
 });
 
-test("SOS2FA delivery notes match Venue Links status copy", () => {
+test("SOS2FA delivery notes list email and/or SMS after Delivered / notes:", () => {
   const notes = formatDeliveryNotes({
     phone: "+12025530274",
     email: "bans.don@gmail.com",
