@@ -78,11 +78,7 @@
   }
 
   /**
-   * Partition access (datapoint gate):
-   * - patronHelpverbiage     → IsPatron=1 OR IsMasterAdmin=1
-   * - serviceMemberHelpverbiage → IsServiceMember=1 OR IsMasterAdmin=1
-   * - venueAdminHelpverbiage → IsVenueAdmin=1 OR IsMasterAdmin=1
-   * - masterAdminHelpverbiage → IsMasterAdmin=1 only
+   * Partition access — design notes: .cursor/rules/design-notes-floqai-partitions.mdc
    */
   function canAccessPartition(audienceKey, flags = viewerAccessFlags) {
     const f = flags || {};
@@ -509,16 +505,15 @@
     {
       id: "help-heist-enable-64x48",
       title: "Enable 64×48 display choice at Heist",
-      body: "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: (1) Open Master Admin → search club heist-washington-dc (or Club Admin → Club Public Profile while Heist is selected). (2) Under FLOQR display screens, tick VenueSupports64x48 — 64 x 48 cm (keep VenueSupports64x32 if the 64×32 board stays live). (3) Save. (4) Optionally set primaryDisplayScreenFormatId to led-64x48 only if that board is the main Xibo Display 1; otherwise leave primary as led-64x32 and let 64×48 appear as an extra composer choice. (5) Xibo URL stays display.html?location=heist-washington-dc — never add ?screen= or ?v=. Packaged defaults may also list led-64x48 once published; Firestore VenueSupports* flags win when set.",
+      body: "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: open Club Public Profile (or Master Admin for that club) → FLOQR display screens → tick 64 x 48 cm (keep 64×32 if that board stays live) → Save. Only set primary display to 64×48 if that board is the main Display 1. The Xibo URL stays display.html?location=heist-washington-dc with no extra query parameters.",
       steps: [
         "Open Club Public Profile (Club Admin) or Master Admin club display setup for heist-washington-dc",
-        "Tick VenueSupports64x48 — 64 x 48 cm and Save",
+        "Tick 64 x 48 cm under FLOQR display screens and Save",
         "Confirm composer offers 64×48 for Heist; Xibo stays display.html?location=heist-washington-dc"
       ],
       searchPhrases: [
         "heist 64x48", "64x48 at heist", "set 64x48 heist", "enable 64x48 heist",
-        "heist display choice", "VenueSupports64x48 heist", "heist washington 64x48",
-        "directives to set 64x48 as a display choice at Heist"
+        "heist display choice", "heist washington 64x48"
       ],
       links: [
         {label: "Club Public Profile (display screens)", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})},
@@ -531,12 +526,10 @@
     {
       id: "help-floqai-audience-sections",
       title: "FloqAi help audiences",
-      body: "FloqAi help is partitioned into patronHelpverbiage, serviceMemberHelpverbiage, venueAdminHelpverbiage, and masterAdminHelpverbiage. Access uses user datapoints: patronHelpverbiage needs IsPatron=1 (or IsMasterAdmin=1); serviceMemberHelpverbiage needs IsServiceMember=1 (after elect + venue approval) or IsMasterAdmin=1; venueAdminHelpverbiage needs IsVenueAdmin=1 (or IsClubAdmin) or IsMasterAdmin=1; masterAdminHelpverbiage needs IsMasterAdmin=1 only. Contextual search returns blank when the signed-in entity lacks the matching flag.",
+      body: "FloqAi shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
       searchPhrases: [
         "floqai audience", "help sections", "master admin help", "venue admin help",
-        "service member help", "patron help", "help security", "blank floqai answer",
-        "patronHelpverbiage", "serviceMemberHelpverbiage", "venueAdminHelpverbiage", "masterAdminHelpverbiage",
-        "IsPatron", "IsServiceMember", "IsVenueAdmin", "IsMasterAdmin"
+        "service member help", "patron help", "help security", "blank floqai answer"
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -780,15 +773,14 @@
     {
       id: "help-sos2fa-entity-mgmt",
       title: "Privilege Admin Access",
-      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days. Shared links use hashes such as #entityManagement (Manage Entities, the Entity Management default) or #clubOnboarding. If you are signed out, Master Admin opens sign-in first, then resumes that tab and still requires SOS2FA before the page content unlocks.",
+      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
       searchPhrases: [
         "sos2fa", "social os 2fa", "social os - 2fa", "entity management unlock", "request sos2fa code", "two factor",
-        "privilege admin access", "sos2fa sms", "entity management 2fa", "entity onboarding deep link", "#entityManagement", "#clubOnboarding"
+        "privilege admin access", "sos2fa sms", "entity management 2fa"
       ],
       links: [
         {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"},
-        {label: "Entity Onboarding", href: `${vUrl("./master-admin.html", {from: "floqai"})}#clubOnboarding`}
+        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
