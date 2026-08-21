@@ -779,19 +779,20 @@
     },
     {
       id: "help-sos2fa-entity-mgmt",
-      title: "Social OS - 2FA",
-      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
+      title: "Privilege Admin Access",
+      body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days. Shared links use hashes such as #entityManagement (Manage Entities, the Entity Management default) or #clubOnboarding. If you are signed out, Master Admin opens sign-in first, then resumes that tab and still requires SOS2FA before the page content unlocks.",
       searchPhrases: [
         "sos2fa", "social os 2fa", "social os - 2fa", "entity management unlock", "request sos2fa code", "two factor",
-        "privilege admin access", "sos2fa sms", "entity management 2fa"
+        "privilege admin access", "sos2fa sms", "entity management 2fa", "entity onboarding deep link", "#entityManagement", "#clubOnboarding"
       ],
       links: [
         {label: "General Notifications (My Privacy)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
-        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}), search: "venue links"}
+        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}), search: "manage entities"},
+        {label: "Entity Onboarding", href: `${vUrl("./master-admin.html", {from: "floqai"})}#clubOnboarding`}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
-      page: "master-admin.html#clubAdminUrls"
+      page: "master-admin.html#entityManagement"
     },
     {
       id: "help-app-language",

@@ -150,6 +150,20 @@ test("SOS2FA request UI is channel-neutral and puts status below the request but
   assert.doesNotMatch(js, /Email and SMS notification settings/);
 });
 
+test("Master Admin Entity Management defaults to Manage Entities and resumes deep links after auth", () => {
+  const html = readReleaseFile("master-admin.html");
+  assert.match(html, /data-tab-group="entityManagement"[^>]*data-default-panel="entityManagement"/);
+  const subtabs = html.slice(html.indexOf('id="entityManagementSubtabs"'), html.indexOf('id="securitySubtabs"'));
+  assert.ok(subtabs.indexOf('data-panel="entityManagement"') < subtabs.indexOf('data-panel="clubAdminUrls"'), "Manage Entities must be first Entity Management subtab");
+  const app = readReleaseFile("master-admin-app.js");
+  assert.match(app, /floqr_master_admin_deeplink/);
+  assert.match(app, /resumeDeepLinkPanel/);
+  assert.match(app, /rememberMasterDeepLink/);
+  assert.match(app, /groupDefaultPanel/);
+  assert.match(app, /Sign in to open/);
+  assert.match(app, /ENTITY_MGMT_PANEL_IDS/);
+});
+
 test("App language chrome keys cover portal tabs and language settings radios", () => {
   const i18n = readReleaseFile("floqr-i18n.js");
   ["lang.suggestionsOnly", "lang.approvalRequired", "lang.autoFixMinor", "nav.overview", "nav.myProfile", "lang.webappLanguage", "lang.languageSaved", "lang.aiGrammar", "lang.draftPrivacy", "profile.menu.adminPatronHint", "profile.menu.adminPatronHold", "nav.backToWelcome", "profile.menu.memberLevel"].forEach(key => {
