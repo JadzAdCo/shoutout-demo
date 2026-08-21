@@ -114,7 +114,10 @@ test("Soccer jersey mark accepts any 2 characters", () => {
   assert.match(sharedData, /jerseyNumberMaxChars:2/);
   // Team ids are built as soccer${slug(name)} (e.g. Morocco → soccerMorocco).
   assert.match(jerseyCatalog, /id:\s*`soccer\$\{slug\(/);
-  assert.match(jerseyCatalog, /Morocco:\s*"soccer-morocco-back\.png"/);
+  assert.match(jerseyCatalog, /Morocco:\s*"soccer-morocco-back-with-country\.png"/);
+  assert.match(jerseyCatalog, /"Ghana"/);
+  assert.match(jerseyCatalog, /"Ivory Coast"/);
+  assert.match(jerseyCatalog, /soccer-\$\{slug\(teamName\)\.toLowerCase\(\)\}-back-with-country\.png/);
   assert.match(jerseyCatalog, /FLOQR_SOCCER_TEAMS/);
   assert.match(displayApp, /isSoccerJerseyTemplate/);
   assert.match(displayApp, /cleanJerseyMark/);
