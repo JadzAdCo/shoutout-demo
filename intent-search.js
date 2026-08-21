@@ -294,7 +294,31 @@
       patterns: [
         /display\s*screens?/, /venue\s*supports/, /is96x48/, /64\s*[x×]\s*48/, /96\s*[x×]\s*48/,
         /xibo\s*(url|display)/, /screen\s*datapoint/
-      ]
+      ],
+      audience: ["venueAdmin", "masterAdmin"]
+    },
+    {
+      id: "help-heist-enable-64x48",
+      kind: "help",
+      label: "Enable 64×48 display choice at Heist",
+      blurb: "Turn on VenueSupports64x48 for Heist DC so the composer offers 64×48. Xibo stays display.html?location=heist-washington-dc with no ?screen=.",
+      steps: [
+        "Open Club Admin for Heist → Club Public Profile → FLOQR display screens.",
+        "Check VenueSupports64x48 — 64 x 48 cm (keep 64×32 if that board remains).",
+        "Save so Firebase clubLocations/heist-washington-dc has VenueSupports64x48=1.",
+        "In Search → Heist, confirm 64×48 appears for templates with Is64x48=1."
+      ],
+      links: [
+        {label: "Heist Club Public Profile", href: vUrl("./admin.html", {from: "floqai", tab: "public-profile", location: "heist-washington-dc"})}
+      ],
+      searchPhrases: [
+        "heist 64x48", "set 64x48 at heist", "enable 64x48 heist", "heist display choice",
+        "directives heist led", "VenueSupports64x48 heist"
+      ],
+      patterns: [
+        /heist.*64\s*[x×]\s*48/, /64\s*[x×]\s*48.*heist/, /enable\s+64\s*[x×]\s*48/
+      ],
+      audience: ["masterAdmin", "venueAdmin"]
     },
     {
       id: "help-staff-schedule-grid",
@@ -785,12 +809,28 @@
     return refreshed;
   }
 
-  function allIntents() {
+  function allIntents(audienceFilter) {
+    const audience = audienceFilter
+      || global.FLOQRHelpRepository?.getActiveAudience?.()
+      || "patron";
     const seen = new Set();
     const merged = [];
-    // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
-    [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
+    const repo = typeof global.FLOQRHelpRepository?.toSearchIntents === "function"
+      ? global.FLOQRHelpRepository.toSearchIntents(audience)
+      : collectPopoutIntents();
+    // Help repository first (audience-filtered), then curated product/help intents.
+    [...repo, ...INTENTS].forEach(intent => {
       const key = intent.id || intent.label;
+      const intentAudience = intent.audience || (intent.kind === "product" ? "all" : "patron");
+      if (intent.kind === "help" || intent.kind === "product") {
+        const allows = typeof global.FLOQRHelpRepository?.audienceAllows === "function"
+          ? global.FLOQRHelpRepository.audienceAllows({audience: intentAudience}, audience)
+          : true;
+        if (!allows && intent.kind === "help") return;
+        if (intent.kind === "product") {
+          /* products stay visible to every signed-in audience */
+        }
+      }
       if (seen.has(key)) {
         const existing = merged.find(row => (row.id || row.label) === key);
         if (existing) {
@@ -801,20 +841,20 @@
         return;
       }
       seen.add(key);
-      merged.push({...intent, patterns: [...(intent.patterns || [])]});
+      merged.push({...intent, patterns: [...(intent.patterns || [])], audience: intentAudience});
     });
     return merged;
   }
 
   function looksLikeHelpQuery(q) {
-    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings|user\s*guide|multi[\s-]?delete|publish\s*schedule/.test(q);
+    return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings|user\s*guide|multi[\s-]?delete|publish\s*schedule|64\s*[x×]\s*48|heist|display\s*screens?/.test(q);
   }
 
-  function matchIntents(raw) {
+  function scoreIntents(raw, intentList) {
     const q = normalizePhrase(raw);
     if (!q) return [];
     const helpBias = looksLikeHelpQuery(q) ? 1.5 : 1;
-    const scored = allIntents().map(intent => {
+    const scored = intentList.map(intent => {
       let score = 0;
       (intent.patterns || []).forEach(re => { if (re.test(q)) score += intent.kind === "help" ? helpBias : 1; });
       const labelKey = normalizePhrase(intent.label).replace(/^trade by /, "");
@@ -831,6 +871,46 @@
       return 0;
     });
     return scored.map(row => row.intent);
+  }
+
+  function matchIntents(raw) {
+    const audience = global.FLOQRHelpRepository?.getActiveAudience?.() || "patron";
+    const allowed = allIntents(audience);
+    const matches = scoreIntents(raw, allowed);
+    if (matches.length) {
+      global.FLOQRHelpRepository?.markMatchDenied?.(false);
+      return matches;
+    }
+    // If another audience would have matched, return blank (do not leak admin/ops help).
+    const unrestricted = scoreIntents(raw, allIntentsUnfiltered());
+    const denied = unrestricted.some(intent => intent.kind === "help");
+    global.FLOQRHelpRepository?.markMatchDenied?.(denied);
+    return [];
+  }
+
+  function allIntentsUnfiltered() {
+    const seen = new Set();
+    const merged = [];
+    const repo = typeof global.FLOQRHelpRepository?.entries === "function"
+      ? global.FLOQRHelpRepository.entries().map(entry => ({
+          id: entry.id,
+          kind: "help",
+          label: entry.title,
+          blurb: entry.body,
+          steps: entry.steps || [],
+          links: entry.links || [],
+          searchPhrases: entry.searchPhrases || [],
+          patterns: [],
+          audience: entry.audience
+        }))
+      : [];
+    [...repo, ...INTENTS].forEach(intent => {
+      const key = intent.id || intent.label;
+      if (seen.has(key)) return;
+      seen.add(key);
+      merged.push(intent);
+    });
+    return merged;
   }
 
   function esc(value) {
@@ -871,6 +951,11 @@
       return;
     }
     if (!intents.length) {
+      // Audience-denied admin/ops help → blank (do not tip that the topic exists).
+      if (global.FLOQRHelpRepository?.wasLastMatchDenied?.()) {
+        container.innerHTML = "";
+        return;
+      }
       container.innerHTML = `<div class="card intent-result-empty"><strong>No clear match yet</strong><p class="sub small">Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a help-popout phrase like “Onboarding” / “link to onboarding.”</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">Onboarding / role access</a><a href="./?v=${APP_V}&start=search">Open classic Search</a></div></div>`;
       return;
     }
@@ -914,11 +999,29 @@
     const results = document.getElementById("intentSearchResults");
     if (!input) return;
 
+    const refreshAudience = async () => {
+      try {
+        if (typeof global.FLOQRHelpRepository?.resolveAudienceFromAuth === "function") {
+          await global.FLOQRHelpRepository.resolveAudienceFromAuth(
+            opts.auth || (typeof firebase !== "undefined" ? firebase.auth() : null)
+          );
+        }
+      } catch (_) {
+        global.FLOQRHelpRepository?.setActiveAudience?.("patron");
+      }
+    };
+
     const run = () => {
       const matches = matchIntents(input.value);
       renderResults(results, matches, input.value);
       return matches;
     };
+
+    refreshAudience().then(() => { if (input.value) run(); });
+    try {
+      const auth = opts.auth || (typeof firebase !== "undefined" ? firebase.auth() : null);
+      auth?.onAuthStateChanged?.(() => { refreshAudience().then(() => { if (input.value) run(); }); });
+    } catch (_) {}
 
     input.addEventListener("input", run);
     input.addEventListener("keydown", event => {
@@ -928,7 +1031,6 @@
         if (matches.length === 1 || (matches.length && !event.shiftKey)) goPrimary(matches);
       }
     });
-
     results?.addEventListener("click", event => {
       const card = event.target.closest("[data-intent]");
       if (!card) return;
@@ -942,6 +1044,7 @@
         opts.onMingl();
       }
     });
+    return {run, refreshAudience};
   }
 
   global.FLOQRIntentSearch = {

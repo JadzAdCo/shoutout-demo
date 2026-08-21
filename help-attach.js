@@ -157,24 +157,36 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     host.appendChild(details);
 
     try {
-      global.FLOQRHelpRepository?.registerFromHelpNode?.(details, {
+      const audienceRaw = opts.audience
+        || host.getAttribute?.("data-floqr-help-audience")
+        || "";
+      const audience = Array.isArray(audienceRaw)
+        ? audienceRaw
+        : String(audienceRaw || "")
+          .split(",")
+          .map(s => s.trim())
+          .filter(Boolean);
+      const regOpts = {
         id: opts.id || "",
         title,
         body: opts.body || details.querySelector(".help-popout-body")?.textContent || "",
         searchPhrases: opts.searchPhrases || [title],
         links: opts.links || [],
         source: opts.source || "help-attach",
-        page: location.pathname || ""
-      });
-      if (opts.id || opts.searchPhrases || opts.links) {
+        page: location.pathname || "",
+        audience: audience.length ? audience : undefined
+      };
+      global.FLOQRHelpRepository?.registerFromHelpNode?.(details, regOpts);
+      if (opts.id || opts.searchPhrases || opts.links || audience.length) {
         global.FLOQRHelpRepository?.register?.({
           id: opts.id || `help-attach-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 80),
-          title,
-          body: opts.body || details.querySelector(".help-popout-body")?.textContent || "",
-          searchPhrases: opts.searchPhrases || [title],
-          links: opts.links || [],
-          source: opts.source || "help-attach",
-          page: location.pathname || ""
+          title: regOpts.title,
+          body: regOpts.body,
+          searchPhrases: regOpts.searchPhrases,
+          links: regOpts.links,
+          source: regOpts.source,
+          page: regOpts.page,
+          audience: regOpts.audience
         });
       }
     } catch (_error) {
@@ -280,6 +292,10 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
         id: node.getAttribute("data-floqr-help-id") || "",
         searchPhrases: String(node.getAttribute("data-floqr-help-search") || "")
           .split("|")
+          .map(s => s.trim())
+          .filter(Boolean),
+        audience: String(node.getAttribute("data-floqr-help-audience") || "")
+          .split(",")
           .map(s => s.trim())
           .filter(Boolean)
       });

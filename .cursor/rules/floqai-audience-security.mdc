@@ -1,0 +1,56 @@
+---
+description: FloqAi help audiences — IsPatron / IsServiceMember / IsVenueAdmin / IsMasterAdmin gate verbiage
+alwaysApply: true
+---
+
+# FloqAi help content & security (always)
+
+FloqAi answers come from **`floqai-help-repository.js`** (durable seed + runtime `?` registration) and curated intents in **`intent-search.js`**. Help is **not** world-readable ops docs — each entry is tagged with an **audience** and FloqAi only returns rows allowed for the signed-in user’s datapoints.
+
+Resume / extend: keep this rule in sync when adding FloqAi copy.
+
+## Four sections (audiences)
+
+| Audience key | Datapoint(s) that unlock | Typical content |
+|---|---|---|
+| `patron` | `users.IsPatron` truthy (`1` / `yes` / `true`), or signed-out guest default | ShoutOut, Mingl, RydR, BartR, role elect, privacy |
+| `serviceMember` | `users.IsServiceMember` or `IsserviceMember` truthy **and** `IsPatron` falsy | Work Calendar, shift approve, service roles |
+| `venueAdmin` | `users.IsVenueAdmin` truthy **or** active club-admin assignment (`isClubAdmin`) | Club Public Profile, display screens, Scheduler, club notifications |
+| `masterAdmin` | `users.IsMasterAdmin` truthy **or** `masterAdmin` claim / master email list | SOS2FA / Privilege Admin Access, Venue Links, entity purge, network diagnostics |
+
+Legacy aliases may still be read for migration (`serviceMember`, `clubAdmin`, `masterAdmin` boolean) but **writes and new help tags must use the `Is*` names**.
+
+## How verbiage is stored
+
+1. **Canonical store:** `register` / `registerMany` in `floqai-help-repository.js` — each entry has `id`, `title`, `body`, `steps`, `links`, `searchPhrases`, and **`audience`** (string or array).
+2. **UI `?` popouts:** same copy must be registered (or `data-floqr-help-*` + `FLOQRHelpAttach` / `helper-popouts.js` runtime register). Popouts may add `data-floqr-help-audience="masterAdmin"` (or comma list).
+3. **Sections:** `FLOQRHelpRepository.entriesBySection()` groups by audience. Do not invent a fifth public “everyone” help dump for ops topics.
+4. **Retrieval:** `toSearchIntents(audience)` → `intent-search.js` `matchIntents`. Products (`PRODUCT_INTENTS`) stay visible to signed-in users; **help** rows are audience-filtered.
+
+## Access resolution (client)
+
+`FLOQRHelpRepository.resolveAudienceFromAuth` / `resolveAudienceFromProfile` picks **one** active audience (highest privilege wins):
+
+1. `IsMasterAdmin` → `masterAdmin`
+2. else `IsVenueAdmin` (or active club admin) → `venueAdmin`
+3. else `IsServiceMember` / `IsserviceMember` with `IsPatron` not truthy → `serviceMember`
+4. else → `patron` (including signed-out)
+
+When a query would match help for a **higher** audience but not the active one, FloqAi returns a **blank** result (no tip that the topic exists).
+
+## Security guardrails (required thinking)
+
+- **Client filter is UX, not authorization.** Never put secrets, Twilio SIDs, Stripe keys, ingest secrets, or SOS2FA codes in help bodies. Anyone can read the Pages JS bundle.
+- **Do not leak** Master/Venue ops phrasing into `patron` or `serviceMember` entries (e.g. Heist `VenueSupports64x48` steps are `masterAdmin` + `venueAdmin` only).
+- **Server truth for gates:** Entity Management unlock, queue purge, and similar stay behind Functions + SOS2FA / claims. Help text describes the path; it does not grant it.
+- **Future hardening (recommended):** callable `getFloqAiHelpIntents` that returns only the caller’s audience from Admin SDK using the same `Is*` fields; keep the Pages repo as an editor seed, not the sole ACL.
+- **Audit:** new help that mentions Entity Management, VenueSupports*, purge, diagnostics, or SOS2FA must set `audience: "masterAdmin"` (and `venueAdmin` only when Club Admins truly perform the step).
+
+## Checklist (new or edited FloqAi / `?` help)
+
+- [ ] Entry registered in `floqai-help-repository.js` with explicit `audience`
+- [ ] `IsPatron` / `IsServiceMember` / `IsVenueAdmin` / `IsMasterAdmin` used for resolution (not ad-hoc role strings alone)
+- [ ] Patron query for admin-only topic → blank; Master/Venue query → steps
+- [ ] No secrets in verbiage
+- [ ] `floqai-help-repository.js` loaded before `intent-search.js`; cache-bust both
+- [ ] Mirror `?` UI copy into the repository (see also `floqai-help-repository.mdc`)

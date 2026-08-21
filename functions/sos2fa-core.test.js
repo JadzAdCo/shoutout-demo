@@ -10,8 +10,8 @@ const {
 } = require("./sos2fa-core");
 
 test("SOS2FA masks phone last 5 and email local-part", () => {
-  assert.equal(maskPhoneLast5("+12025530274"), "SMS *****30274");
-  assert.equal(maskEmail("bans.don@gmail.com"), "Email ba******@gmail.com");
+  assert.equal(maskPhoneLast5("+12025530274"), "SMS ****3-0274");
+  assert.equal(maskEmail("bans.don@gmail.com"), "email B***@gmail.com");
 });
 
 test("SOS2FA channels follow universal notifyEmail / notifySms flags", () => {
@@ -39,5 +39,5 @@ test("SOS2FA delivery notes match Venue Links status copy", () => {
     sms: true,
     mail: true
   });
-  assert.equal(notes, "Delivered / notes: SMS *****30274 · Email ba******@gmail.com");
+  assert.equal(notes, "Delivered / notes: email B***@gmail.com / SMS ****3-0274");
 });
