@@ -1,0 +1,22 @@
+---
+description: FloqAi help partition datapoints (patron / service / venue / master) — not served help copy
+globs: floqai-help-repository.js,intent-search.js,index.html
+alwaysApply: false
+---
+
+# Design notes — FloqAi help partitions
+
+Partitions (internal keys): `patronHelpverbiage`, `serviceMemberHelpverbiage`, `venueAdminHelpverbiage`, `masterAdminHelpverbiage`.
+
+| Partition | Access |
+|---|---|
+| patron | `IsPatron=1` **or** `IsMasterAdmin=1` |
+| serviceMember | `IsServiceMember=1` (after elect + venue approval) **or** `IsMasterAdmin=1` |
+| venueAdmin | `IsVenueAdmin=1` / club admin **or** `IsMasterAdmin=1` |
+| masterAdmin | `IsMasterAdmin=1` only |
+
+Contextual search returns blank when the signed-in entity lacks the matching flag. Client filtering is UX only — never put secrets in help bodies.
+
+## Help vs this file
+
+Served FloqAi audience help may say roles see matching help. Do **not** list partition key names or the flag matrix in `?` / FloqAi bodies.

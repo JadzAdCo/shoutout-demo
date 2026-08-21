@@ -258,7 +258,7 @@
       btn.addEventListener("click", () => activatePanel(btn.dataset.panel));
     });
 
-    // Deep-link: #entityManagement / #clubOnboarding / #securityLogs / etc.
+    // Design notes: .cursor/rules/design-notes-master-admin-entity-mgmt.mdc
     const hashPanel = hashPanelId();
     if (hashPanel && byId(hashPanel)) {
       rememberMasterDeepLink(hashPanel);

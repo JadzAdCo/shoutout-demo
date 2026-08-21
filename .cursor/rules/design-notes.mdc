@@ -1,0 +1,35 @@
+---
+description: Design notes stay in .cursor/rules — never in served help, HTML, or Pages copy
+alwaysApply: true
+---
+
+# Design notes vs help verbiage (always)
+
+**Served pages must not ship design notes.** Help `?` bodies, FloqAi repository bodies, visible status copy, and HTML comments on Pages must be **operator/patron facing** only.
+
+## Where design decisions live
+
+Put routing contracts, hash defaults, auth resume order, partition flag matrices, “never put `?v=` on Display”, packaging vs Firestore precedence, and agent FIX PROMPTs in:
+
+`.cursor/rules/design-notes-*.mdc`
+
+(or an existing domain always-apply rule such as `screen-datapoints.mdc` / `satellite-session-auth.mdc`).
+
+Code may use a **one-line reference** only:
+
+```js
+// Design notes: .cursor/rules/design-notes-master-admin-entity-mgmt.mdc
+```
+
+Never paste the design paragraph into `data-floqr-help-body`, `floqai-help-repository.js` `body:`, or UI tooltips.
+
+## Help verbiage (allowed)
+
+What the signed-in person needs to **do or understand** on that screen (how to request SOS2FA, what Email/SMS means, retention). No hash catalogs, no “if signed out then resume then SOS2FA” architecture essays unless that sentence is the user’s next action on *this* screen.
+
+## Checklist before commit
+
+- [ ] New product decision written under `design-notes-*.mdc` (or domain rule)
+- [ ] Help / FloqAi body has no design-note paragraph
+- [ ] `floqai-help-repository.js` mirrors the short help only
+- [ ] No HTML/JS comment blocks that restate the design essay — reference the rule file instead

@@ -1,0 +1,16 @@
+---
+description: Heist 64×48 enablement — field names and packaging vs Firestore (not served help)
+globs: floqai-help-repository.js,admin.html,shared-data.js,club-profile-app.js
+alwaysApply: false
+---
+
+# Design notes — Heist 64×48 display choice
+
+Operator-facing help stays short (tick 64×48 on Club Public Profile / Master Admin). Implementation detail lives here:
+
+- Firestore: `clubLocations/heist-washington-dc` → `VenueSupports64x48=1` (keep `VenueSupports64x32` if that board stays live).
+- Optional primary: `primaryDisplayScreenFormatId=led-64x48` only when that board is Xibo Display 1.
+- Xibo URL: `display.html?location=heist-washington-dc` only — never `?screen=` or `?v=`.
+- Packaged catalog may list `led-64x48`; **Firestore `VenueSupports*` flags win** when set.
+
+See also `screen-datapoints.mdc`.

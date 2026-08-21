@@ -1,0 +1,25 @@
+---
+description: Master Admin Entity Management hashes, default tab, auth then SOS2FA resume
+globs: master-admin.html,master-admin-app.js,sos2fa.js,floqai-help-repository.js
+alwaysApply: false
+---
+
+# Design notes — Master Admin Entity Management
+
+## Default tab and hash
+
+- Parent **Entity Management** opens **Manage Entities** (`data-default-panel="entityManagement"`).
+- URL hash must be `#entityManagement`, never `#clubAdminUrls` for that parent click.
+- Subtabs keep their own hashes: `#clubAdminUrls`, `#allQueues`, `#clubOnboarding`, `#templateManagement`, `#recommendationModeration`.
+
+## Shared-link resume (all Entity Management panels)
+
+1. Unauthenticated deep link → Master Admin sign-in (Google/Microsoft). Persist intended panel (`floqr_master_admin_deeplink`) so Microsoft redirect does not lose the hash.
+2. After primary auth → resume the hashed panel.
+3. Panel stays behind **SOS2FA** until Verify & unlock; then show gated content.
+
+Same order for every Entity Management subtab. Security / Reports / Diagnostics groups are separate (not SOS2FA Entity Management).
+
+## Help vs this file
+
+Privilege Admin Access `?` help is SOS2FA how-to only. Do **not** put this hash/resume essay in served help — keep it here.
