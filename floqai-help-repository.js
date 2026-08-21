@@ -128,10 +128,36 @@
       helpPartition,
       source: entry.source || existing.source || "help-repository",
       page: entry.page || existing.page || "",
-      kind: entry.kind || existing.kind || "help"
+      kind: entry.kind || existing.kind || "help",
+      locales: entry.locales != null ? entry.locales : existing.locales
     };
     byId.set(id, next);
     return next;
+  }
+
+  function resolveUiLanguage() {
+    try {
+      if (global.FLOQRI18n?.getLanguage) return global.FLOQRI18n.getLanguage() || "en";
+      if (global.FLOQRI18n?.current) return global.FLOQRI18n.current;
+      return localStorage.getItem("floqr.uiLanguage") || "en";
+    } catch (_) {
+      return "en";
+    }
+  }
+
+  function localizeEntry(entry) {
+    if (!entry) return entry;
+    const lang = resolveUiLanguage();
+    if (global.FLOQRI18nHelp?.localize) {
+      return global.FLOQRI18nHelp.localize(entry, lang);
+    }
+    const code = String(lang || "en").toLowerCase().split(/[-_]/)[0];
+    const row = entry.locales && entry.locales[code];
+    if (!row) return entry;
+    return Object.assign({}, entry, {
+      title: row.title || entry.title,
+      body: row.body || entry.body
+    });
   }
 
   function registerMany(entries) {
@@ -295,21 +321,30 @@
     } else {
       list = entries("accessible");
     }
-    return list.map(entry => ({
-      id: entry.id,
-      kind: "help",
-      source: entry.source,
-      label: entry.title,
-      blurb: entry.body || entry.title,
-      steps: entry.steps || [],
-      audiences: entry.audiences || ["patron"],
-      helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
-      links: (entry.links || []).length
-        ? entry.links
-        : [{label: entry.title, href: `./?v=${APP_V}&start=intent`}],
-      searchPhrases: entry.searchPhrases || [],
-      patterns: []
-    }));
+    return list.map(entry => {
+      const localized = localizeEntry(entry) || entry;
+      const searchPhrases = Array.from(new Set([
+        ...(entry.searchPhrases || []),
+        ...(localized.searchPhrases || []),
+        localized.title,
+        localized.body
+      ].map(normalize).filter(Boolean)));
+      return {
+        id: entry.id,
+        kind: "help",
+        source: entry.source,
+        label: localized.title || entry.title,
+        blurb: localized.body || entry.body || entry.title,
+        steps: entry.steps || [],
+        audiences: entry.audiences || ["patron"],
+        helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
+        links: (entry.links || []).length
+          ? entry.links
+          : [{label: localized.title || entry.title, href: `./?v=${APP_V}&start=intent`}],
+        searchPhrases,
+        patterns: []
+      };
+    });
   }
 
   /* Seed: FloqAi "?" popout + core onboarding / role help (must stay in sync with UI). */
@@ -915,6 +950,7 @@
     registerDomHelpPopouts,
     entries,
     toSearchIntents,
+    localizeEntry,
     setViewerAudience,
     getViewerAudience,
     getViewerAccessFlags,

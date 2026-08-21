@@ -188,7 +188,7 @@
           <button id="saveProfileBtn" class="primary" type="button">Save Profile</button>
         </div>
         <div id="becomeServiceMemberCard" class="card hidden">
-          <h2>Services &amp; Service Members</h2>
+          <h2 data-i18n="nav.serviceMembers">Services &amp; Service Members</h2>
           <p class="sub small">This tab stays hidden while <code>IsPatron</code> is yes/1. Elect to become a service member to set <code>IsServiceMember</code> and open the tab.</p>
           <button id="becomeServiceMemberBtn" class="primary" type="button">Elect to become a service member</button>
         </div>
@@ -217,7 +217,7 @@
 
       <section id="portalTemplateVariants" class="admin-panel-section">
         <div class="card">
-          <h2>My ShoutOut Templates</h2>
+          <h2 data-i18n="nav.myTemplates">My ShoutOut Templates</h2>
           <p class="sub small">Saved variants use locked official/admin template layouts. Only background values can be customized.</p>
           <div id="myTemplateVariants" class="template-grid"></div>
         </div>
@@ -252,7 +252,7 @@
           </div>
           <div id="shoutoutDiagnosticReport" class="report-block"></div>
         </div>
-        <div class="card"><h2>My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
+        <div class="card"><h2 data-i18n="nav.myShoutouts">My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
       </section>
       <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
 
@@ -333,7 +333,7 @@
       </section>
 
       <section id="portalGuestLists" class="admin-panel-section">
-        <div class="card"><h2>My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
+        <div class="card"><h2 data-i18n="nav.guestLists">My Guest Lists</h2><div id="myGuestLists" class="report-block"></div></div>
       </section>
 
       <section id="portalMessages" class="admin-panel-section">
@@ -487,7 +487,7 @@
 
       <section id="portalHelp" class="admin-panel-section">
         <div class="card">
-          <h2>Help</h2>
+          <h2 data-i18n="nav.help">Help</h2>
           <p class="sub small">Help content is grouped by FLOQR feature so working pages stay clean.</p>
           <div class="help-section-grid">
             <details class="mingl-action-details" open>
@@ -523,7 +523,7 @@
 
       <section id="portalPrivacy" class="admin-panel-section">
         <div class="card">
-          <h2>My Privacy</h2>
+          <h2 data-i18n="nav.myPrivacy">My Privacy</h2>
           <p class="sub small">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
           <div class="profile-grid">
             <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
@@ -562,7 +562,7 @@
       </section>
       <section id="portalMinglFriends" class="admin-panel-section">
         <div class="card">
-          <h2>Manage Mingl Friends</h2>
+          <h2 data-i18n="nav.minglFriends">Manage Mingl Friends</h2>
           <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Manage mutual Mingl friends. Mark close friends, exclude someone from viewing or contacting you, require only disappearing messages, or UnMingl to block their access to your public profile, public services, Mingl Chat, and Mingl Gist.</div></details>
           <input id="minglFriendSearchInput" class="search" placeholder="Search Mingl friends by name, username, or email"/>
           <div id="minglFriendManagementReport" class="report-block"></div>
@@ -674,13 +674,14 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqai-help-repository.js?v=s3.0.16"></script>
-<script src="./help-attach.js?v=s3.0.6"></script>
+<script src="./floqr-i18n.js?v=s3.0.27"></script>
+<script src="./floqai-help-repository.js?v=s3.0.27"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.27"></script>
+<script src="./help-attach.js?v=s3.0.27"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.11"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./patron-portal-app.js?v=s3.0.11"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>

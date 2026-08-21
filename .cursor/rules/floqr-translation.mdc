@@ -1,0 +1,41 @@
+---
+description: FLOQR UI + help translation — full chrome packs, patron/venue-admin help locales, protected brands
+alwaysApply: true
+---
+
+# Translation / i18n (always)
+
+## Stack
+
+- Module: `floqr-i18n.js` → `window.FLOQRI18n`
+- Markup: `data-i18n="key"`, `data-i18n-placeholder`, `title[data-i18n]` / `data-i18n-title`
+- Help locales: `floqr-i18n-help.js` (patron + venueAdmin bodies) applied via `FLOQRHelpRepository.localize` / HelpAttach
+- Policy page: `translation-policy.html` — **ShoutOut** stays **ShoutOut** in every language
+
+## Who must be fully translated
+
+When App language is a supported non-English code (`ru`, `nl`, `fr`, …):
+
+| Audience datapoint | Surfaces |
+|---|---|
+| `IsPatron=1` | Search, My Profile / Settings, satellite patron pages, patron FloqAi / `?` help |
+| `IsServiceMember=1` | Work Calendar, role-request, service help |
+| `IsVenueAdmin=1` (legacy aliases `IsClubAdmin` / `isClubAdmin` map into this for FloqAi) | Club Admin (`admin.html`) chrome + panel titles + venueAdmin help |
+
+Master Admin may stay thinner until requested; still translate keyed master tabs when chrome packs exist.
+
+## Required chrome coverage
+
+`CHROME.ru`, `CHROME.nl`, and other selected languages must have **parity with `CHROME.en`** (same keys). A thin pack is a product bug — missing keys silently fall back to English (Dutch/Russian “only partly translated”).
+
+## Help verbiage
+
+Patron and venue-admin help titles/bodies must localize. Do not leave design notes in help (`design-notes.mdc`). Keep protected brands.
+
+## Checklist before commit
+
+- [ ] New UI string has `data-i18n` or `FLOQRI18n.t(...)` and an `en` key
+- [ ] Same key filled for `ru` + `nl` (+ `fr` when chrome is touched)
+- [ ] Patron / venueAdmin help entry has locale rows for `ru`/`nl` when English help changed
+- [ ] Cache-bust `floqr-i18n.js` / `floqr-i18n-help.js` `?v=`
+- [ ] Hard-refresh test: App language → Russian and Dutch on Search + My Profile + Club Admin
