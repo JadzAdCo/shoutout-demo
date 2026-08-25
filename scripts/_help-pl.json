@@ -1,0 +1,134 @@
+{
+  "floqai-ask-floqr": {
+    "title": "Zapytaj FloqR z FloqAi",
+    "body": "Zapytaj FloqR z FloqAi — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, SupRstR (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
+  },
+  "help-soccer-jersey": {
+    "title": "Koszulka piłkarska ShoutOut",
+    "body": "Wyszukaj Soccer, Jersey lub kraj/klub (Tanzania, Chelsea). Każda karta z zestawem zdjęć to podświetlenie LED, które zobaczysz na ShoutOut — Soccer · Jersey · Country or Club. Rozmiary 96×48, 64×48, 64×32. Nazwa i 2-znakowa ikona nałożone na zestaw; numery pozostają wyśrodkowane."
+  },
+  "help-suprstar": {
+    "title": "Zrób mi supRstar / supergwiazdę",
+    "body": "Wybierz miejsce → prywatny podgląd kamery → zapłać 20 $ (Stripe wysuwane) → Club Admin zatwierdza w kolejce supRstar → Go live na tablicy SupRStar. Jak ShoutOut, ale wideo na żywo. Linki podglądu używają tajnych tokenów, więc nie można ich odgadnąć z URL-u klubu."
+  },
+  "help-become-club-admin": {
+    "title": "Zostań Club Admin",
+    "body": "Poproś o dostęp do Club Admin, a następnie uzyskaj zatwierdzenie miejsca."
+  },
+  "help-become-dj": {
+    "title": "Zostań DJ",
+    "body": "Wybierz DJ jako swoją rolę usługową i połącz się z klubami."
+  },
+  "help-become-promoter": {
+    "title": "Zostań Promoter",
+    "body": "Poproś o dostęp Promoter do list gości i kampanii."
+  },
+  "help-role-profiles": {
+    "title": "Przegląd profili ról",
+    "body": "Zobacz, jak działają role Club Admin, DJ, Promoter i gościnne."
+  },
+  "help-staff-scheduling": {
+    "title": "Kalendarz i Harmonogram",
+    "body": "Kalendarz Club Admin pokazuje Wersje robocze (fioletowe), Oczekujące (bursztynowe), Potwierdzone (zielone) i Otwarte/niewypełnione karty — każda z pisanym statusie, nie tylko kolorem. Harmonogram to siatka osób × dni dla wersji roboczej/publikacji. Website ingest / publicVenueCalendar pokazuje tylko potwierdzone zadania. Zielona etykieta Opłacone w tym miesiącu jest wyświetlana dla Club Admin, gdy staffSchedulingPaid=1."
+  },
+  "help-club-notification-subscriptions": {
+    "title": "Subskrypcje powiadomień Klubowe dla SMS i WhatsApp",
+    "body": "Club Admin → Powiadomienia: Send test alert używa obecnie zaznaczonych pól. W aplikacji (i Push) zapisuje wiadomość systemową w FloqR Inbox. E-mail używa adresów administratora klubu. SMS i WhatsApp nadal wymagają płatnej subskrypcji oraz telefonu ostrzegawczego E.164. Zielona tabletka = Firebase subskrypcja 1 (przedpłacony pakiet $10); czerwona = 0. Jeśli Send test alert zwraca Authentication Error - invalid username, sekret Firebase TWILIO_ACCOUNT_SID musi być SID konta zaczynającym się od AC (34 znaki) z console.twilio.com — nie Token uwierzytelniający i nie Klucz API (SK)."
+  },
+  "help-club-sms-notification": {
+    "title": "SMS subskrypcja powiadomień",
+    "body": "Tabletka SMS jest zielona, gdy Firebase smsSubscribed wynosi 1 (przedpłacony pakiet $10, 466 kredytów, nie miesięczny ani roczny). Czerwona/migająca oznacza 0 — otwórz ? i stuknij Subscribe $10. Pozostałe kredyty i data ostatniej płatności są w tej pomocy. Odznacz SMS i Zapisz, aby wstrzymać alerty bez utraty opłaconego pakietu."
+  },
+  "help-club-whatsapp-notification": {
+    "title": "WhatsApp subskrypcja powiadomień",
+    "body": "Pigułka WhatsApp jest zielona, gdy Firebase whatsappSubscribed wynosi 1 (przedpłacony pakiet $10, 233 kredyty, nie miesięczny ani roczny). Czerwona/migająca oznacza 0 — otwórz ? i stuknij Subscribe $10. Pozostałe kredyty i ostatnia data płatności znajdują się w tej pomocy. Odznacz WhatsApp i Zapisz, aby wstrzymać alerty bez utraty opłaconego pakietu."
+  },
+  "help-schedule-message-templates": {
+    "title": "Szablony wiadomości w harmonogramie",
+    "body": "Club Admin → Powiadomienia → Message templates. Są to Wiadomości systemowe (Inbox / Email / SMS / WhatsApp), nie ShoutOut. Edytuj tytuł i treść dla New shift needs confirmation, Aktualizacja harmonogramu, Potwierdzono zmianę i Odrzucono zmianę. Pola zastępcze: {club} {role} {when} {link} {worker}. Skrzynka odbiorcza pracownika używa Review & confirm shift — nigdy Open Related ShoutOut."
+  },
+  "help-schedule-confirm": {
+    "title": "Potwierdź przypisane zmiany",
+    "body": "Inbox / Email / linki SMS otwierają Work Calendar. Sprawdź każde oczekujące przypisanie, zaznacz je (lub Select all), a następnie Approve selected. Otwarcie linku nie oznacza potwierdzenia. Tylko przypisany członek służby może zatwierdzić — Club Admin nie może potwierdzić w jego imieniu."
+  },
+  "help-template-catalog-report": {
+    "title": "Raport katalogu szablonów",
+    "body": "Wymienia każdy typ szablonu ShoutOut i jakie rozmiary LED obsługuje (Is96x48, Is64x48, Is64x32). Miejsce oferuje szablon tylko wtedy, gdy przynajmniej jeden z tych wskaźników wynosi 1, a odpowiadający mu wskaźnik VenueSupports* jest również równy 1. Szablony urodzinowe / z podziałem mediów są 1 na 96×48, 64×48 i 64×32. 96×48 to 3-liniowy obok siebie; 64×48 i 64×32 pokazują w pętli zdjęcie, a następnie 3-liniowy shoutout z kartą FLOQR + handle."
+  },
+  "help-club-display-screens": {
+    "title": "FLOQR ekrany wyświetlaczy",
+    "body": "Firebase clubLocations przechowuje VenueSupports96x48, VenueSupports64x48 i VenueSupports64x32 jako 0 lub 1. Szablony przechowują Is96x48, Is64x48 i Is64x32 w ten sam sposób. Miejsce wyświetla szablon tylko wtedy, gdy przynajmniej jedna para wynosi 1. Adresy URL Xibo pozostają display.html?location=id i display2.html?location=id — rozmiar ekranu nie jest w URL. Urodziny są oferowane we wszystkich trzech rozmiarach (3-liniowy obok siebie na 96×48; pętla zdjęcie/shoutout na 64×48 i 64×32). Główny to display.html. Drugorzędny to display2.html."
+  },
+  "help-donpapi-led-wall": {
+    "title": "DonPapi ShoutOut ściana LED",
+    "body": "VIP ShoutOut są przenoszeni przez kelnerów na przenośnej ścianie LED DonPapi — trzymanej w powietrzu przed gośćmi z wiadomością powitalną na ekranie centralnym (nazwa klubu na górze, świecąca biała falista ramka). Diody stołowe (64×32) i ściany portretowe (960×1900) pozostają dla innych formatów."
+  },
+  "help-staff-week-calendar": {
+    "title": "Harmonogram",
+    "body": "Club Admin Harmonogram to siatka osób × dni tygodnia. Save shift zamyka edytor z Schedule card successfully saved. Twórz szkice, Publish schedule aby pracownicy potwierdzili oczekujące na potwierdzenie, Select shifts do wielokrotnego usuwania oraz Website ingest do publikowania harmonogramu zmian na stronie klubu. Domyślne okno zmian = otwarcie klubu − 2 godziny do zamknięcia + 1 godzina."
+  },
+  "help-staff-schedule-user-guide": {
+    "title": "Przewodnik użytkownika do harmonogramu personelu",
+    "body": "Otwórz ? obok Harmonogramu na Club Admin Harmonogramowanie. Twórz szkice zmian, Publish schedule aby pracownicy potwierdzili oczekujące→potwierdzone, następnie Select shifts aby usunąć kilka naraz. Przykład: wszystkie środowe szkice oraz potwierdzona zmianę z czwartku."
+  },
+  "help-create-publish-schedule": {
+    "title": "Tworzenie i publikowanie harmonogramu pracy personelu",
+    "body": "Dodaj robocze zmiany na siatce osoby × dni, przejrzyj chipy, potem Publish schedule. Pracownicy muszą potwierdzić, zanim zmiana zostanie potwierdzona. FloqAi: create a schedule, publish schedule, how to schedule staff."
+  },
+  "help-multi-delete-shifts": {
+    "title": "Usuń wiele zaplanowanych lub roboczych zmian",
+    "body": "Select shifts, połącz nagłówki dni i chipy, potem Delete selected. Przykład: wszystkie robocze zmiany w środę plus jedna potwierdzona zmiana w czwartek."
+  },
+  "help-staff-worksheet": {
+    "title": "Arkusz pracy - Tygodniowy kalendarz personelu",
+    "body": "Wybrani członkowie służby otwierają Work Calendar w Ustawieniach. Inbox / Email / SMS linki potwierdzające trafiają tutaj. Przejrzyj oczekujące zadania, zaznacz każdą zmianę (lub Select all), potem Approve selected — otwarcie wiadomości nie oznacza potwierdzenia. Siatka tygodnia pokazuje opublikowane zmiany współpracowników. Robocze pozostają w Club Admin."
+  },
+  "help-service-members": {
+    "title": "Services & Service Members",
+    "body": "Ustawienia → Services & Service Members jest ukryte, gdy users.IsPatron wynosi 1/tak. Wybierz z Mojego Profilu, aby ustawić IsServiceMember (IsserviceMember) na 1/tak i IsPatron na 0/nie. Następnie poproś o Club Admin, DJ, Promoter, hotelarstwo lub inne role. Club Admin również widzi Przegląd i wybór."
+  },
+  "help-venue-website-ingest": {
+    "title": "Import strony klubu (API, RSS, iframe)",
+    "body": "Club Admin → Harmonogram → Website ingest. Wygeneruj sekret (pokazany raz; przechowywany jest tylko hash). Pobierz opublikowane zmiany pracowników na oficjalną stronę klubu za pomocą JSON (?format=json&dataset=schedule|hours|profile|all), RSS lub fragmentu iframe. Szkice, e-mail pracownika i telefon nigdy nie są uwzględniane. Zmień sekret, jeśli wycieknie."
+  },
+  "help-venue-hours-calendar": {
+    "title": "Godziny otwarcia lokalu",
+    "body": "Na profilu publicznym klubu ustaw domyślne godziny otwarcia/zamknięcia w tygodniu, a następnie dodaj nadpisania okresowe dla specjalnych tygodni, nie tracąc wartości domyślnych. Publiczna strona klubu pokazuje siatkę tygodnia od niedzieli do soboty z zakresem dat (np. Nied 9 – Sob 15, sierpnia 2026) i kolorowanie kalendarza. Nadchodzące święta publiczne uwzględniają godziny otwarcia/zamknięcia i wskazują, kiedy różnią się od zwykłego dnia roboczego. Harmonogram pracowników korzysta z czasu otwarcia − 2h do zamknięcia + 1h. Lista gości może sugerować nocne otwarcia."
+  },
+  "help-club-admin-affiliation": {
+    "title": "Club Admin przypisanie lokalu",
+    "body": "Club Adminotwierza tylko Centrum Dowodzenia Miejsca dla klubu, do którego są przypisani. Otwarcie admin.html bez miejsca nie domyślnie ustawia już Zebbies. Konta demonstracyjne temp_clubadmin_N@floqr-demo.com mapują na temp-democlub-N. Nieprzypisani administratorzy proszą o przypisanie od Master Admin."
+  },
+  "help-general-notifications": {
+    "title": "Powiadomienia ogólne",
+    "body": "SOS2FA i inne systemowe wiadomości FloqR podążają za tymi flagami ustawionymi w rekordzie użytkownika patrona. Miejsca lub konkretnych niezależnych członków usługowych muszą subskrybować płatne usługi Twilio SMS/WhatsApp"
+  },
+  "help-app-language": {
+    "title": "Język aplikacji",
+    "body": "Przy pierwszym użyciu, FloqR odczytuje język przeglądarki (na przykład nl-NL → holenderski / Nederlands) i zmienia język Chrome i menu na ten język, jeśli jest obsługiwany — Kategorie wyszukiwania, zakładki Mój profil, zakładki Club Admin i zakładki Master Admin. Języki nieobsługiwane pozostają w języku angielskim. Następnie Mój profil → Język aplikacji i zapisany język profilu mają pierwszeństwo. Zapisanie języka aplikacji powoduje ponowne tłumaczenie każdej wczytywanej strony FLOQRI18n, nie tylko tej karty."
+  },
+  "help-my-profile": {
+    "title": "My Profile & Settings",
+    "body": "Otwórz My Profile & Settings, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
+  },
+  "help-onboarding": {
+    "title": "Wprowadzenie",
+    "body": "Onboarding patrona / członka obsługi — żądanie dostępu do Club Admin, DJ, Promoter lub usług hotelarskich. Master Admin może również wdrażać obiekty."
+  },
+  "help-mingl-search": {
+    "title": "O wyszukiwaniu Mingl",
+    "body": "Wyszukuj publiczne profile według wspólnych zainteresowań, stylu życia, muzyki, podróży, jedzenia, wydarzeń, samochodów, miasta, nazwy użytkownika lub osoby, którą chcesz poznać."
+  },
+  "help-default-template": {
+    "title": "Domyślny szablon",
+    "body": "Darmowy tradycyjny czarno-biały klasyk. Użyj FloqAi poniżej do szablonów Sport, Koszulka, VIP, Humor, Samochody, Wideo, Zdjęcia i Ballers."
+  },
+  "help-floqai-template-search": {
+    "title": "Wyszukiwanie szablonów FloqAi",
+    "body": "Stuknij w poruszający się znak FloqAi (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
+  },
+  "help-mingl-requests": {
+    "title": "O żądaniach Mingl",
+    "body": "Wysłane i odebrane prośby o przyjaźń lub Mingl pojawiają się tutaj. Prośby pozostają na głównej stronie Mingl; zaakceptowane rozmowy otwierają się w Mingl Czat."
+  }
+}

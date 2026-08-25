@@ -1,0 +1,134 @@
+{
+  "floqai-ask-floqr": {
+    "title": "Vraag FloqR met FloqAi",
+    "body": "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
+  },
+  "help-soccer-jersey": {
+    "title": "Voetbalshirt ShoutOut",
+    "body": "Zoek Soccer, Jersey of een land/club (Tanzania, Chelsea). Elke foto-kitkaart is de LED-rug die je op ShoutOut ziet — Soccer · Jersey · Country of Club. Formaten 96×48, 64×48, 64×32. Naam en 2-tekenmarkering liggen over de kit; nummers blijven gecentreerd."
+  },
+  "help-suprstar": {
+    "title": "Maak me een supRstar / superstar",
+    "body": "Kies een venue → privé camerapreview → betaal $20 (Stripe-pop-out) → Club Admin keurt goed in de supRstar Queue → Go live op het SupRStar-bord. Als een ShoutOut, maar met live video. Previewlinks gebruiken geheime tokens en zijn niet te raden via een club-URL."
+  },
+  "help-become-club-admin": {
+    "title": "Word Club Admin",
+    "body": "Vraag Club Admin-toegang aan en krijg goedkeuring van de venue."
+  },
+  "help-become-dj": {
+    "title": "Word DJ",
+    "body": "Kies DJ als service-rol en koppel je aan clubs."
+  },
+  "help-become-promoter": {
+    "title": "Word Promoter",
+    "body": "Vraag Promoter-toegang aan voor gastenlijsten en campagnes."
+  },
+  "help-role-profiles": {
+    "title": "Overzicht rolprofielen",
+    "body": "Bekijk hoe Club Admin, DJ, Promoter en hospitality-rollen werken."
+  },
+  "help-staff-scheduling": {
+    "title": "Agenda & Planner",
+    "body": "Club Admin Calendar toont Draft (paars), Pending (amber), Confirmed (groen) en Open/onbezette kaarten — elk met een tekststatus, niet alleen kleur. Scheduler is het raster mensen × dagen voor concept/publicatie. Website ingest / publicVenueCalendar geeft alleen Confirmed toewijzingen. Een groene Paid this month-pill verschijnt voor Club Admins wanneer staffSchedulingPaid=1."
+  },
+  "help-club-notification-subscriptions": {
+    "title": "Club SMS- en WhatsApp-notificatieabonnementen",
+    "body": "Club Admin → Notifications: Send test alert gebruikt de momenteel aangevinkte kanalen. In-app (en Push) schrijft een System Message in FloqR Inbox. Email gebruikt clubadmin-adressen. SMS en WhatsApp vereisen een betaald abonnement plus een E.164-alerttelefoon. Groene pill = Firebase-abonnement 1 (vooruitbetaald $10-pakket); rood = 0. Als Send test alert Authentication Error - invalid username teruggeeft, moet Firebase-secret TWILIO_ACCOUNT_SID de Account SID zijn die met AC begint (34 tekens) van console.twilio.com — niet de Auth Token en niet een API Key (SK)."
+  },
+  "help-club-sms-notification": {
+    "title": "SMS-notificatieabonnement",
+    "body": "De SMS-pill is groen wanneer Firebase smsSubscribed 1 is (vooruitbetaald $10-pakket, 466 credits, niet maandelijks of jaarlijks). Rood/knipperend betekent 0 — open ? en tik Subscribe $10. Resterende credits en laatste betaaldatum staan in deze hulp. Vink SMS uit en Save om alerts te pauzeren zonder het betaalde pakket te verliezen."
+  },
+  "help-club-whatsapp-notification": {
+    "title": "WhatsApp-notificatieabonnement",
+    "body": "De WhatsApp-pill is groen wanneer Firebase whatsappSubscribed 1 is (vooruitbetaald $10-pakket, 233 credits, niet maandelijks of jaarlijks). Rood/knipperend betekent 0 — open ? en tik Subscribe $10. Resterende credits en laatste betaaldatum staan in deze hulp. Vink WhatsApp uit en Save om alerts te pauzeren zonder het betaalde pakket te verliezen."
+  },
+  "help-schedule-message-templates": {
+    "title": "Berichtensjablonen voor roosters",
+    "body": "Club Admin → Notifications → Message templates. Dit zijn System Messages (Inbox / Email / SMS / WhatsApp), geen ShoutOuts. Bewerk titel en tekst voor New shift needs confirmation, Schedule update, Shift confirmed en Shift declined. Placeholders: {club} {role} {when} {link} {worker}. Worker-inbox gebruikt Review & confirm shift — nooit Open Related ShoutOut."
+  },
+  "help-schedule-confirm": {
+    "title": "Toegewezen diensten bevestigen",
+    "body": "Inbox- / Email- / SMS-links openen Work Calendar. Bekijk elke pending toewijzing, vink aan (of Select all), en dan Approve selected. De link openen bevestigt niet. Alleen het toegewezen service member kan goedkeuren — Club Admin kan dat niet namens hen doen."
+  },
+  "help-template-catalog-report": {
+    "title": "Rapport sjablooncatalogus",
+    "body": "Lijst van elk ShoutOut-sjabloontype en welke LED-formaten het ondersteunt (Is96x48, Is64x48, Is64x32). Een venue biedt een sjabloon alleen aan als minstens één van die vlaggen 1 is en de bijpassende VenueSupports*-vlag 1 is. Birthday- / split-media-sjablonen zijn 1 op 96×48, 64×48 en 64×32. 96×48 is 3 regels naast elkaar; 64×48 en 64×32 wisselen foto en 3-regelige shoutout met een FLOQR + handle-kaart."
+  },
+  "help-club-display-screens": {
+    "title": "FLOQR-displayschermen",
+    "body": "Firebase clubLocations bewaart VenueSupports96x48, VenueSupports64x48 en VenueSupports64x32 als 0 of 1. templates bewaart Is96x48, Is64x48 en Is64x32 op dezelfde manier. Een venue toont een sjabloon alleen als minstens één paar 1 is. Xibo-URL’s blijven display.html?location=id en display2.html?location=id — schermgrootte zit niet in de URL. Birthday is beschikbaar op alle drie formaten (3 regels naast elkaar op 96×48; foto/shoutout-lus op 64×48 en 64×32). Primary is display.html. Secondary is display2.html."
+  },
+  "help-donpapi-led-wall": {
+    "title": "DonPapi ShoutOut LED-wand",
+    "body": "VIP ShoutOuts worden door busboys gedragen op de handheld DonPapi LED-wand — in de lucht gehouden voor gasten met het shoutout-bericht op het midden-scherm (clubnaam bovenaan, gloeiende witte festonrand). Tafel-LED’s (64×32) en portretwanden (960×1900) blijven voor andere formaten."
+  },
+  "help-staff-week-calendar": {
+    "title": "Planner",
+    "body": "Club Admin Scheduler is een weekraster mensen × dagen. Save shift sluit de editor met Schedule card successfully saved. Maak concepten, Publish schedule zodat medewerkers pending bevestigen tot confirmed, Select shifts om meerdere te verwijderen, en Website ingest om gepubliceerde diensten op de clubsites te zetten. Standaard dienstvenster = club open − 2 uur tot sluiting + 1 uur."
+  },
+  "help-staff-schedule-user-guide": {
+    "title": "Gebruikersgids personeelsplanning",
+    "body": "Open de ? naast Scheduler op Club Admin Scheduling. Maak conceptdiensten, Publish schedule zodat medewerkers pending→confirmed bevestigen, daarna Select shifts om er meerdere tegelijk te verwijderen. Voorbeeld: alle woensdagconcepten plus een donderdag confirmed-chip."
+  },
+  "help-create-publish-schedule": {
+    "title": "Personeelsrooster maken en publiceren",
+    "body": "Voeg conceptdiensten toe op het raster mensen × dagen, controleer chips, en Publish schedule. Medewerkers moeten bevestigen voordat een dienst confirmed wordt. FloqAi: create a schedule, publish schedule, how to schedule staff."
+  },
+  "help-multi-delete-shifts": {
+    "title": "Meerdere geplande of conceptdiensten verwijderen",
+    "body": "Select shifts, combineer dagkoppen en chips, daarna Delete selected. Voorbeeld: alle woensdagconcepten plus één donderdag confirmed dienst."
+  },
+  "help-staff-worksheet": {
+    "title": "Work Sheet — wekelijkse personeelskalender",
+    "body": "Gekozen service members openen Work Calendar in Settings. Inbox- / Email- / SMS-bevestigingslinks landen hier. Bekijk pending toewijzingen, vink elke dienst aan (of Select all), daarna Approve selected — het bericht openen bevestigt niet. Het weekraster toont gepubliceerde diensten van collega’s. Concepten blijven in Club Admin."
+  },
+  "help-service-members": {
+    "title": "Services & Service Members",
+    "body": "Settings → Services & Service Members is verborgen wanneer users.IsPatron 1/yes is. Kies via My Profile om IsServiceMember (IsserviceMember) op 1/yes en IsPatron op 0/no te zetten. Vraag daarna Club Admin, DJ, Promoter, hospitality of andere rollen aan. Club Admins zien ook Review & elect."
+  },
+  "help-venue-website-ingest": {
+    "title": "Clubwebsite-ingest (API, RSS, iframe)",
+    "body": "Club Admin → Scheduling → Website ingest. Genereer een secret (eenmalig zichtbaar; alleen een hash wordt bewaard). Haal gepubliceerde diensten naar de officiële clubsites met JSON (?format=json&dataset=schedule|hours|profile|all), RSS of een iframe-snippet. Concepten, e-mail en telefoon van medewerkers zitten er nooit in. Roteer het secret bij lek."
+  },
+  "help-venue-hours-calendar": {
+    "title": "Openingstijden van de venue",
+    "body": "Op Club Public Profile stel je de standaard wekelijkse open/gesloten uren in, en voeg period overrides toe voor speciale weken zonder de standaard te verliezen. De openbare clubpagina toont een zo–za weekraster met datumbereik (bijv. Sun 9 – Sat 15, Aug 2026) en kalenderkleuren. Aankomende feestdagen tonen open/sluituren en markeren afwijkingen van de gebruikelijke weekdag. Staff Scheduling gebruikt open − 2u tot sluit + 1u. Guest List kan open avonden voorstellen."
+  },
+  "help-club-admin-affiliation": {
+    "title": "Club Admin-venue toewijzing",
+    "body": "Club Admins openen het Venue Command Center alleen voor een club waaraan ze zijn toegewezen. admin.html zonder venue opent niet langer standaard Zebbies. Demo-accounts temp_clubadmin_N@floqr-demo.com horen bij temp-democlub-N. Niet-toegewezen admins vragen toewijzing aan bij Master Admin."
+  },
+  "help-general-notifications": {
+    "title": "Algemene meldingen",
+    "body": "SOS2FA en andere FloqR-systeemberichten volgen deze vlaggen in het gebruikersrecord van een patron. Venues of onafhankelijke service members moeten zich abonneren op betaalde SMS/WhatsApp Twilio-diensten."
+  },
+  "help-app-language": {
+    "title": "App-taal",
+    "body": "Bij eerste gebruik leest FloqR de browsertaal (bijvoorbeeld nl-NL → Dutch / Nederlands) en schakelt chrome en menu’s over wanneer die taal wordt ondersteund — Search-categorieën, My Profile-tabbladen, Club Admin-tabbladen en Master Admin-tabbladen. Niet-ondersteunde talen blijven Engels. Daarna winnen My Profile → App language en de opgeslagen profieltaal. App language opslaan vertaalt elke pagina die FLOQRI18n laadt, niet alleen deze kaart."
+  },
+  "help-my-profile": {
+    "title": "My Profile & Settings",
+    "body": "Open My Profile & Settings voor rollen, verkoperstools en accountopties."
+  },
+  "help-onboarding": {
+    "title": "Onboarding",
+    "body": "Patron- / service-member-onboarding — vraag Club Admin-, DJ-, Promoter- of hospitality-toegang aan. Master Admins kunnen ook venues onboarden."
+  },
+  "help-mingl-search": {
+    "title": "Over Mingl-zoeken",
+    "body": "Zoek openbare profielen op gedeelde interesses, lifestyle, muziek, reizen, eten, events, auto’s, stad, username of wie je wilt ontmoeten."
+  },
+  "help-default-template": {
+    "title": "Standaardsjabloon",
+    "body": "Gratis Traditional Black and White Classic. Gebruik FloqAi hieronder voor Sports-, Jersey-, VIP-, Humor-, Cars-, Video-, Pictures- en Ballers-sjablonen."
+  },
+  "help-floqai-template-search": {
+    "title": "FloqAi-sjabloonzoeken",
+    "body": "Tik op het bewegende FloqAi-merkteken (of wacht op de speech bubbles) en vraag om Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures of Ballers."
+  },
+  "help-mingl-requests": {
+    "title": "Over Mingl Requests",
+    "body": "Verzonden en ontvangen Friend- of Mingl Requests verschijnen hier. Requests blijven op de hoofd-Mingl-pagina; geaccepteerde gesprekken openen in Mingl Chat."
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "floqai-ask-floqr": {
+    "title": "Ask FloqR with FloqAi",
+    "body": "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
+  },
+  "help-soccer-jersey": {
+    "title": "Soccer jersey ShoutOut",
+    "body": "Search Soccer, Jersey, or a country/club (Tanzania, Chelsea). Each photo kit card is the LED back you will see on ShoutOut — Soccer · Jersey · Country or Club. Sizes 96×48, 64×48, 64×32. Name and 2-character mark overlay the kit; numbers stay center-justified."
+  },
+  "help-suprstar": {
+    "title": "Make me a supRstar / superstar",
+    "body": "Pick a venue → private camera preview → pay $20 (Stripe pop-out) → Club Admin approves in the supRstar Queue → Go live on the SupRStar board. Like a ShoutOut, but live video. Preview links use secret tokens so they cannot be guessed from a club URL."
+  },
+  "help-become-club-admin": {
+    "title": "Become a Club Admin",
+    "body": "Request Club Admin access, then get venue approval."
+  },
+  "help-become-dj": {
+    "title": "Become a DJ",
+    "body": "Elect DJ as your service role and associate with clubs."
+  },
+  "help-become-promoter": {
+    "title": "Become a Promoter",
+    "body": "Request Promoter access for guest lists and campaigns."
+  },
+  "help-role-profiles": {
+    "title": "Role profiles overview",
+    "body": "See how Club Admin, DJ, Promoter, and hospitality roles work."
+  },
+  "help-staff-scheduling": {
+    "title": "Calendar & Scheduler",
+    "body": "Club Admin Calendar shows Draft (purple), Pending (amber), Confirmed (green), and Open/unfilled cards — each with a written status, not color alone. Scheduler is the people × days draft/publish grid. Website ingest / publicVenueCalendar returns Confirmed assignments only. A green Paid this month pill is shown to Club Admins when staffSchedulingPaid=1."
+  },
+  "help-club-notification-subscriptions": {
+    "title": "Club SMS and WhatsApp notification subscriptions",
+    "body": "Club Admin → Notifications: Send test alert uses the boxes currently checked. In-app (and Push) writes a System Message in FloqR Inbox. Email uses club admin addresses. SMS and WhatsApp still need a paid subscription plus an E.164 alert phone. Green pill = Firebase subscription 1 (prepaid $10 pack); red = 0. If Send test alert returns Authentication Error - invalid username, Firebase secret TWILIO_ACCOUNT_SID must be the Account SID starting with AC (34 characters) from console.twilio.com — not the Auth Token and not an API Key (SK)."
+  },
+  "help-club-sms-notification": {
+    "title": "SMS notification subscription",
+    "body": "The SMS pill is green when Firebase smsSubscribed is 1 (prepaid $10 pack, 466 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck SMS and Save to pause alerts without losing the paid pack."
+  },
+  "help-club-whatsapp-notification": {
+    "title": "WhatsApp notification subscription",
+    "body": "The WhatsApp pill is green when Firebase whatsappSubscribed is 1 (prepaid $10 pack, 233 credits, not monthly or yearly). Red/flashing means 0 — open ? and tap Subscribe $10. Credits remaining and last paid date are in this help. Uncheck WhatsApp and Save to pause alerts without losing the paid pack."
+  },
+  "help-schedule-message-templates": {
+    "title": "Schedule message templates",
+    "body": "Club Admin → Notifications → Message templates. These are System Messages (Inbox / Email / SMS / WhatsApp), not ShoutOuts. Edit title and body for New shift needs confirmation, Schedule update, Shift confirmed, and Shift declined. Placeholders: {club} {role} {when} {link} {worker}. Worker inbox uses Review & confirm shift — never Open Related ShoutOut."
+  },
+  "help-schedule-confirm": {
+    "title": "Confirm assigned shifts",
+    "body": "Inbox / Email / SMS links open Work Calendar. Look at each pending assignment, tick it (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve — Club Admin cannot confirm on their behalf."
+  },
+  "help-template-catalog-report": {
+    "title": "Template catalog report",
+    "body": "Lists every ShoutOut template type and which LED sizes it supports (Is96x48, Is64x48, Is64x32). A venue only offers a template when at least one of those flags is 1 and the matching VenueSupports* flag is 1. Birthday / split-media templates are 1 on 96×48, 64×48, and 64×32. 96×48 is 3-line side-by-side; 64×48 and 64×32 loop the photo then the 3-line shoutout with a FLOQR + handle card."
+  },
+  "help-club-display-screens": {
+    "title": "FLOQR display screens",
+    "body": "Firebase clubLocations stores VenueSupports96x48, VenueSupports64x48, and VenueSupports64x32 as 0 or 1. templates stores Is96x48, Is64x48, and Is64x32 the same way. A venue only lists a template when at least one pair is 1. Xibo URLs stay display.html?location=id and display2.html?location=id — screen size is not in the URL. Birthday is offered on all three sizes (3-line side-by-side on 96×48; photo/shoutout loop on 64×48 and 64×32). Primary is display.html. Secondary is display2.html."
+  },
+  "help-donpapi-led-wall": {
+    "title": "DonPapi ShoutOut LED wall",
+    "body": "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other formats."
+  },
+  "help-staff-week-calendar": {
+    "title": "Scheduler",
+    "body": "Club Admin Scheduler is a people × days week grid. Save shift closes the editor with Schedule card successfully saved. Create drafts, Publish schedule so workers confirm pending until confirmed, Select shifts to multi-delete, and Website ingest to put published shifts on the club site. Default shift window = club open − 2 hours through close + 1 hour."
+  },
+  "help-staff-schedule-user-guide": {
+    "title": "Staff Scheduling User Guide",
+    "body": "Open the ? beside Scheduler on Club Admin Scheduling. Create draft shifts, Publish schedule so workers confirm pending→confirmed, then Select shifts to delete several at once. Example: all Wednesday drafts plus a Thursday confirmed chip."
+  },
+  "help-create-publish-schedule": {
+    "title": "Create and publish a staff schedule",
+    "body": "Add draft shifts on the people × days grid, review chips, then Publish schedule. Workers must confirm before a shift becomes confirmed. FloqAi: create a schedule, publish schedule, how to schedule staff."
+  },
+  "help-multi-delete-shifts": {
+    "title": "Delete multiple scheduled or draft shifts",
+    "body": "Select shifts, mix day headers and chips, then Delete selected. Example: all Wednesday drafts plus one Thursday confirmed shift."
+  },
+  "help-staff-worksheet": {
+    "title": "Work Sheet - Weekly Staff Calendar",
+    "body": "Elected service members open Work Calendar in Settings. Inbox / Email / SMS confirmation links land here. Review pending assignments, tick each shift (or Select all), then Approve selected — opening the message does not confirm. The week grid shows published colleague shifts. Drafts stay in Club Admin."
+  },
+  "help-service-members": {
+    "title": "Services & Service Members",
+    "body": "Settings → Services & Service Members is hidden when users.IsPatron is 1/yes. Elect from My Profile to set IsServiceMember (IsserviceMember) to 1/yes and IsPatron to 0/no. Then request Club Admin, DJ, Promoter, hospitality, or other roles. Club Admins also see Review & elect."
+  },
+  "help-venue-website-ingest": {
+    "title": "Club website ingest (API, RSS, iframe)",
+    "body": "Club Admin → Scheduling → Website ingest. Generate a secret (shown once; only a hash is stored). Pull published staff shifts onto the official club website with JSON (?format=json&dataset=schedule|hours|profile|all), RSS, or an iframe snippet. Drafts, worker email, and phone are never included. Rotate the secret if it leaks."
+  },
+  "help-venue-hours-calendar": {
+    "title": "Venue opening hours",
+    "body": "On Club Public Profile, set the default weekly open/closed hours, then add period overrides for special weeks without losing the default. The public club page shows a Sun–Sat week grid with the date range (e.g. Sun 9 – Sat 15, Aug 2026) and calendar coloring. Upcoming public holidays list open/close hours and call out when they differ from the usual weekday. Staff Scheduling uses open − 2h through close + 1h. Guest List can suggest open nights."
+  },
+  "help-club-admin-affiliation": {
+    "title": "Club Admin venue assignment",
+    "body": "Club Admins only open the Venue Command Center for a club they are assigned to. Opening admin.html without a venue no longer defaults to Zebbies. Demo accounts temp_clubadmin_N@floqr-demo.com map to temp-democlub-N. Unassigned admins request assignment from Master Admin."
+  },
+  "help-general-notifications": {
+    "title": "General Notifications",
+    "body": "SOS2FA and other FloqR system messages follow these flags as set in a patrons your user record. Venues or specific independent service members need to subscribe to paid SMS/WhatsApp Twilio services"
+  },
+  "help-app-language": {
+    "title": "App language",
+    "body": "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card."
+  },
+  "help-my-profile": {
+    "title": "My Profile & Settings",
+    "body": "Open My Profile & Settings for roles, seller tools, and account options."
+  },
+  "help-onboarding": {
+    "title": "Onboarding",
+    "body": "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues."
+  },
+  "help-mingl-search": {
+    "title": "About Mingl search",
+    "body": "Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet."
+  },
+  "help-default-template": {
+    "title": "Default Template",
+    "body": "Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
+  },
+  "help-floqai-template-search": {
+    "title": "FloqAi template search",
+    "body": "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers."
+  },
+  "help-mingl-requests": {
+    "title": "About Mingl Requests",
+    "body": "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat."
+  }
+}
