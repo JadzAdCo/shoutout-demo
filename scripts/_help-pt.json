@@ -1,0 +1,134 @@
+{
+  "floqai-ask-floqr": {
+    "title": "Pergunte FloqR com FloqAi",
+    "body": "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
+  },
+  "help-soccer-jersey": {
+    "title": "Camisa de futebol ShoutOut",
+    "body": "Pesquise Futebol, Jersey ou um país/clube (Tanzânia, Chelsea). Cada cartão de kit fotográfico é o LED traseiro que você verá em ShoutOut — Futebol · Camisa · País ou Clube. Tamanhos 96×48, 64×48, 64×32. O nome e a marca de 2 caracteres sobrepõem o kit; os números permanecem justificados ao centro."
+  },
+  "help-suprstar": {
+    "title": "Faça de mim um supRstar / superstar",
+    "body": "Escolha um local → visualização da câmera privada → pague $20 (Stripe pop-out) → Club Admin aprova na fila supRstar → Go live no quadro SupRStar. Como um ShoutOut, mas vídeo ao vivo. Os links de visualização usam tokens secretos para que não possam ser adivinhados a partir do URL do clube."
+  },
+  "help-become-club-admin": {
+    "title": "Torne-se um Club Admin",
+    "body": "Solicite acesso Club Admin e obtenha a aprovação do local."
+  },
+  "help-become-dj": {
+    "title": "Torne-se um DJ",
+    "body": "Eleja DJ como sua função de serviço e associe-se aos clubes."
+  },
+  "help-become-promoter": {
+    "title": "Torne-se um Promoter",
+    "body": "Solicite acesso Promoter para listas de convidados e campanhas."
+  },
+  "help-role-profiles": {
+    "title": "Visão geral dos perfis de função",
+    "body": "Veja como funcionam as funções Club Admin, DJ, Promoter e hospitalidade."
+  },
+  "help-staff-scheduling": {
+    "title": "Calendário e agendador",
+    "body": "Club Admin O calendário mostra os cartões Rascunho (roxo), Pendente (âmbar), Confirmado (verde) e Aberto/não preenchido — cada um com um status escrito, e não apenas uma cor. O Agendador é a grade de rascunho/publicação de pessoas × dias. Website ingest / publicVenueCalendar retorna apenas atribuições confirmadas. Uma pílula verde paga este mês é mostrada como Club Admins quando staffSchedulingPaid=1."
+  },
+  "help-club-notification-subscriptions": {
+    "title": "Assinaturas de notificação do Club SMS e WhatsApp",
+    "body": "Club Admin → Notificações: Send test alert usa as caixas atualmente marcadas. No aplicativo (e Push) escreve uma mensagem do sistema em FloqR Inbox. O e-mail usa endereços de administrador do clube. SMS e WhatsApp ainda precisam de uma assinatura paga, além de um telefone de alerta E.164. Pílula verde = Firebase assinatura 1 (pacote pré-pago de US$ 10); vermelho = 0. Se Send test alert retornar Authentication Error - invalid username, Firebase segredo TWILIO_ACCOUNT_SID deve ser o SID da conta começando com AC (34 caracteres) de console.twilio.com — não o token de autenticação e não uma chave de API (SK)."
+  },
+  "help-club-sms-notification": {
+    "title": "SMS assinatura de notificação",
+    "body": "A pílula SMS é verde quando Firebase smsSubscribed é 1 (pacote pré-pago de US$ 10, 466 créditos, não mensal ou anual). Vermelho/piscando significa 0 — aberto? e toque em Subscribe $10. Os créditos restantes e a data do último pagamento estão nesta ajuda. Desmarque SMS e Salvar para pausar alertas sem perder o pacote pago."
+  },
+  "help-club-whatsapp-notification": {
+    "title": "WhatsApp assinatura de notificação",
+    "body": "A pílula WhatsApp é verde quando Firebase whatsappSubscribed é 1 (pacote pré-pago de US$ 10, 233 créditos, não mensal ou anual). Vermelho/piscando significa 0 — aberto? e toque em Subscribe $10. Os créditos restantes e a data do último pagamento estão nesta ajuda. Desmarque WhatsApp e Salvar para pausar alertas sem perder o pacote pago."
+  },
+  "help-schedule-message-templates": {
+    "title": "Agendar modelos de mensagens",
+    "body": "Club Admin → Notificações → Message templates. Estas são mensagens do sistema (Inbox / Email / SMS / WhatsApp), não ShoutOuts. Edite o título e o corpo de New shift needs confirmation, Atualização programada, Turno confirmado e Turno recusado. Espaços reservados: {club} {role} {when} {link} {worker}. A caixa de entrada do trabalhador usa Review & confirm shift — nunca Open Related ShoutOut."
+  },
+  "help-schedule-confirm": {
+    "title": "Confirmar turnos atribuídos",
+    "body": "Inbox / Email / SMS links abrem Work Calendar. Veja cada tarefa pendente, marque-a (ou Select all) e depois Approve selected. Abrir o link não confirma. Somente o membro do serviço designado pode aprovar — Club Admin não pode confirmar em seu nome."
+  },
+  "help-template-catalog-report": {
+    "title": "Relatório de catálogo de modelos",
+    "body": "Lista cada tipo de modelo ShoutOut e quais tamanhos de LED ele suporta (Is96x48, Is64x48, Is64x32). Um local só oferece um modelo quando pelo menos um desses sinalizadores é 1 e o sinalizador VenueSupports* correspondente é 1. Os modelos de aniversário/mídia dividida são 1 em 96×48, 64×48 e 64×32. 96×48 são 3 linhas lado a lado; 64×48 e 64×32 fazem um loop na foto e depois na mensagem de 3 linhas com um cartão FLOQR + alça."
+  },
+  "help-club-display-screens": {
+    "title": "FLOQR telas de exibição",
+    "body": "Firebase clubLocations armazena VenueSupports96x48, VenueSupports64x48 e VenueSupports64x32 como 0 ou 1. templates armazena Is96x48, Is64x48 e Is64x32 da mesma maneira. Um local só lista um modelo quando pelo menos um par é 1. As URLs do Xibo permanecem display.html?location=id e display2.html?location=id — o tamanho da tela não está na URL. O aniversário é oferecido em todos os três tamanhos (3 linhas lado a lado em 96×48; loop de foto/mensagem em 64×48 e 64×32). O principal é display.html. O secundário é display2.html."
+  },
+  "help-donpapi-led-wall": {
+    "title": "DonPapi ShoutOut Parede LED",
+    "body": "Os VIP ShoutOuts são carregados por ajudantes de mesa na parede de LED portátil DonPapi – mantida no ar na frente dos clientes com a mensagem de aviso na tela central (nome do clube na parte superior, borda recortada branca brilhante). Os LEDs de mesa (64x32) e as paredes retrato (960x1900) permanecem para os demais formatos."
+  },
+  "help-staff-week-calendar": {
+    "title": "Agendador",
+    "body": "Club Admin O Agendador é uma grade de pessoas × dias por semana. Save shift fecha o editor com Schedule card successfully saved. Crie rascunhos, Publish schedule para que os trabalhadores confirmem pendências até serem confirmados, Select shifts para exclusão múltipla e Website ingest para colocar turnos publicados no site do clube. Janela de turno padrão = clube aberto − 2 horas até o fechamento + 1 hora."
+  },
+  "help-staff-schedule-user-guide": {
+    "title": "Guia do usuário de agendamento de equipe",
+    "body": "Abra o? ao lado de Agendador em Club Admin Agendamento. Crie turnos de rascunho, Publish schedule para que os trabalhadores confirmem pendentes→confirmados, depois Select shifts para excluir vários de uma vez. Exemplo: todos os drafts de quarta-feira mais uma ficha confirmada de quinta-feira."
+  },
+  "help-create-publish-schedule": {
+    "title": "Crie e publique uma agenda de equipe",
+    "body": "Adicione turnos de rascunho na grade pessoas × dias, revise fichas e depois Publish schedule. Os trabalhadores devem confirmar antes que um turno seja confirmado. FloqAi: create a schedule, publish schedule, how to schedule staff."
+  },
+  "help-multi-delete-shifts": {
+    "title": "Excluir vários turnos agendados ou rascunhos",
+    "body": "Select shifts, misture cabeçalhos e fichas do dia e depois Delete selected. Exemplo: todos os rascunhos de quarta-feira mais um turno confirmado de quinta-feira."
+  },
+  "help-staff-worksheet": {
+    "title": "Planilha de Trabalho - Calendário Semanal da Equipe",
+    "body": "Os militares eleitos abrem Work Calendar em Configurações. Inbox / Email / SMS links de confirmação chegam aqui. Revise as tarefas pendentes, marque cada turno (ou Select all) e depois Approve selected — abrir a mensagem não confirma. A grade semanal mostra os turnos publicados dos colegas. Os rascunhos ficam em Club Admin."
+  },
+  "help-service-members": {
+    "title": "Services & Service Members",
+    "body": "Configurações → Services & Service Members fica oculto quando users.IsPatron é 1/sim. Escolha em Meu perfil para definir IsServiceMember (IsserviceMember) como 1/sim e IsPatron como 0/não. Em seguida, solicite Club Admin, DJ, Promoter, hospitalidade ou outras funções. Club Admins veja também Revisar e eleger."
+  },
+  "help-venue-website-ingest": {
+    "title": "Ingestão do site do clube (API, RSS, iframe)",
+    "body": "Club Admin → Agendamento → Website ingest. Gere um segredo (mostrado uma vez; apenas um hash é armazenado). Extraia os turnos de funcionários publicados no site oficial do clube com JSON (?format=json&dataset=schedule|hours|profile|all), RSS ou um snippet de iframe. Rascunhos, e-mail do funcionário e telefone nunca são incluídos. Gire o segredo se ele vazar."
+  },
+  "help-venue-hours-calendar": {
+    "title": "Horário de funcionamento do local",
+    "body": "No Perfil Público do Clube, defina o horário de abertura/fechamento semanal padrão e, em seguida, adicione substituições de período para semanas especiais sem perder o padrão. A página pública do clube mostra uma grade semanal de domingo a sábado com o intervalo de datas (por exemplo, domingo, 9 a sábado, 15 de agosto de 2026) e cores do calendário. Os próximos feriados listam os horários de abertura/fechamento e avisam quando forem diferentes do dia normal da semana. O agendamento da equipe utiliza aberto − 2h até fechamento + 1h. A Guest List pode sugerir noites abertas."
+  },
+  "help-club-admin-affiliation": {
+    "title": "Club Admin atribuição de local",
+    "body": "Club Adminsó abrem o Venue Command Center para um clube ao qual estão atribuídos. Abrir admin.html sem um local não é mais o padrão Zebbies. As contas de demonstração temp_clubadmin_N@floqr-demo.com são mapeadas para temp-democlub-N. Administradores não atribuídos solicitam atribuição de Master Admin."
+  },
+  "help-general-notifications": {
+    "title": "Notificações Gerais",
+    "body": "O SOS2FA e outras mensagens do sistema FloqR seguem essas sinalizações conforme definido no registro do usuário do usuário. Locais ou membros de serviços independentes específicos precisam assinar serviços pagos SMS/WhatsApp da Twilio"
+  },
+  "help-app-language": {
+    "title": "Idioma do aplicativo",
+    "body": "Na primeira utilização, FloqR lê o idioma do navegador (por exemplo, nl-NL → Holandês / Nederlands) e alterna o cromo e os menus para esse idioma quando é suportado – categorias de pesquisa, guias Meu perfil, guias Club Admin e guias Master Admin. Os idiomas não suportados permanecem em inglês. Depois disso, Meu Perfil → Idioma do aplicativo e o idioma do perfil salvo vencem. Salvar o idioma do aplicativo traduz novamente todas as páginas que carregam FLOQRI18n, não apenas este cartão."
+  },
+  "help-my-profile": {
+    "title": "My Profile & Settings",
+    "body": "Abra My Profile & Settings para funções, ferramentas de vendedor e opções de conta."
+  },
+  "help-onboarding": {
+    "title": "Integração",
+    "body": "Integração de usuários/membros de serviço — solicite acesso Club Admin, DJ, Promoter ou acesso de hospitalidade. Os Master Admins também podem integrar locais."
+  },
+  "help-mingl-search": {
+    "title": "Sobre a pesquisa Mingl",
+    "body": "Pesquise perfis públicos por interesses comuns, estilo de vida, música, viagens, comida, eventos, carros, cidade, nome de usuário ou quem você deseja conhecer."
+  },
+  "help-default-template": {
+    "title": "Modelo padrão",
+    "body": "Clássico tradicional preto e branco grátis. Use FloqAi abaixo para modelos de Esportes, Jersey, VIP, Humor, Carros, Vídeo, Fotos e Ballers."
+  },
+  "help-floqai-template-search": {
+    "title": "FloqAi pesquisa de modelos",
+    "body": "Toque na marca móvel FloqAi (ou espere pelos balões de fala) e peça Esportes, Jersey, NBA, NFL, Carros, Humor, VIP, Vídeo, Fotos ou Ballers."
+  },
+  "help-mingl-requests": {
+    "title": "Sobre Mingl solicitações",
+    "body": "Solicitações de amizade ou Mingl enviadas e recebidas aparecem aqui. As solicitações ficam na página Mingl principal; conversas aceitas abertas em Mingl Chat."
+  }
+}

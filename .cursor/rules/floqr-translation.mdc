@@ -1,41 +1,46 @@
 ---
-description: FLOQR UI + help translation — full chrome packs, patron/venue-admin help locales, protected brands
+description: FLOQR UI + help translation — every supported language must have full chrome + patron/venueAdmin help before commit/publish
 alwaysApply: true
 ---
 
 # Translation / i18n (always)
 
+English-only help for a French (or any supported) speaker is a **product bug**. Do not ship it.
+
 ## Stack
 
-- Module: `floqr-i18n.js` → `window.FLOQRI18n`
-- Markup: `data-i18n="key"`, `data-i18n-placeholder`, `title[data-i18n]` / `data-i18n-title`
-- Help locales: `floqr-i18n-help.js` (patron + venueAdmin bodies) applied via `FLOQRHelpRepository.localize` / HelpAttach
-- Policy page: `translation-policy.html` — **ShoutOut** stays **ShoutOut** in every language
+- Chrome: `floqr-i18n.js` → `window.FLOQRI18n` (`data-i18n`, `FLOQRI18n.t`)
+- Help: `floqr-i18n-help.js` → `window.FLOQRI18nHelp` (patron / serviceMember / venueAdmin titles+bodies)
+- Policy: `translation-policy.html` — **ShoutOut** stays **ShoutOut** in every language
+- Gate: `node scripts/i18n-coverage-report.js` and `functions/i18n-coverage.test.js`
 
-## Who must be fully translated
+## Supported languages (all required)
 
-When App language is a supported non-English code (`ru`, `nl`, `fr`, …):
+`en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar`
 
-| Audience datapoint | Surfaces |
-|---|---|
-| `IsPatron=1` | Search, My Profile / Settings, satellite patron pages, patron FloqAi / `?` help |
-| `IsServiceMember=1` | Work Calendar, role-request, service help |
-| `IsVenueAdmin=1` (legacy aliases `IsClubAdmin` / `isClubAdmin` map into this for FloqAi) | Club Admin (`admin.html`) chrome + panel titles + venueAdmin help |
+## Who must be fully localized
 
-Master Admin may stay thinner until requested; still translate keyed master tabs when chrome packs exist.
+| Audience | Datapoint | Must translate |
+|---|---|---|
+| Patron | `IsPatron=1` | Search + My Profile chrome, satellite titles, patron `?` / FloqAi help |
+| Service member | `IsServiceMember=1` | Work Calendar / role help |
+| Venue admin | `IsVenueAdmin=1` (legacy `IsClubAdmin` / `isClubAdmin` alias into this) | Club Admin chrome + venueAdmin help |
 
-## Required chrome coverage
+Master Admin–only help may stay English until requested; keyed master **tabs** still follow chrome parity.
 
-`CHROME.ru`, `CHROME.nl`, and other selected languages must have **parity with `CHROME.en`** (same keys). A thin pack is a product bug — missing keys silently fall back to English (Dutch/Russian “only partly translated”).
+## Commit / publish gate (mandatory)
 
-## Help verbiage
+Before **every** commit that touches UI or help, and before **every** Pages publish:
 
-Patron and venue-admin help titles/bodies must localize. Do not leave design notes in help (`design-notes.mdc`). Keep protected brands.
+1. **Chrome:** every supported lang has `CHROME.*` key-count **===** `CHROME.en` (no silent English fallback).
+2. **Help:** every patron / venueAdmin / serviceMember help id in `floqai-help-repository.js` has title+body in `floqr-i18n-help.js` for **every** non-English supported lang (`de fr es it pt ru el pl nl ar`).
+3. New English UI string → `data-i18n` / `t(key)` + fill **all** chrome packs in the same change.
+4. New/changed English help → update **all** help locale packs in the same change.
+5. Cache-bust `floqr-i18n.js` and `floqr-i18n-help.js` `?v=`.
+6. Run `node scripts/i18n-coverage-report.js` — must exit 0.
 
-## Checklist before commit
+Incomplete packs → **do not publish**.
 
-- [ ] New UI string has `data-i18n` or `FLOQRI18n.t(...)` and an `en` key
-- [ ] Same key filled for `ru` + `nl` (+ `fr` when chrome is touched)
-- [ ] Patron / venueAdmin help entry has locale rows for `ru`/`nl` when English help changed
-- [ ] Cache-bust `floqr-i18n.js` / `floqr-i18n-help.js` `?v=`
-- [ ] Hard-refresh test: App language → Russian and Dutch on Search + My Profile + Club Admin
+## Protected brands (never translate)
+
+ShoutOut, Mingl, BartR, RydR, FloqAi, FloqR, supRstar, SupRstR, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.
