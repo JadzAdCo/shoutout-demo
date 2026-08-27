@@ -41,6 +41,12 @@ Before **every** commit that touches UI or help, and before **every** Pages publ
 
 Incomplete packs → **do not publish**.
 
+## Panel bodies (not just tabs)
+
+Patron/admin **panel body** copy (Inbox rules, compose labels, JS-rendered policy lists via `FLOQRI18n.t`) is in scope for chrome packs—not only nav tabs. When localizing a surface, key the visible panel HTML and any `innerHTML`/`textContent` strings in the page app in the same change. Incomplete panel localization with translated tabs is a product bug.
+
+Language is **not** path-based (`/de/`, `/fr/`). It is `profile.uiLanguage` + `localStorage` selection on the same URLs.
+
 ## Protected brands (never translate)
 
 ShoutOut, Mingl, BartR, RydR, FloqAi, FloqR, supRstar, SupRstR, DonPapi, Google, Microsoft, Facebook, Stripe, WhatsApp, SMS, OTP.

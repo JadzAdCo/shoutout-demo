@@ -1325,11 +1325,11 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
     defaultMain:'NYX',
     defaultSub:'99',
-    lineCount:2,
+    lineCount:1,
     maxCharactersPerLine:8,
-    maxMainCharacters:14,
+    maxMainCharacters:8,
     maxSubCharacters:2,
-    description:'$30 Soccer Jersey. Search a country or club (Tanzania, Chelsea…) to see that kit as it will look on the LED. Sizes: 96×48, 64×48, 64×32.',
+    description:'$30 Soccer Jersey. Search a country or club (Tanzania, Chelsea…) to see that kit as it will look on the LED. Name max 8 characters on one line. Sizes: 96×48, 64×48, 64×32.',
     tags:["soccer","football","jersey","Sports","Jersey","Soccer","Country","Club","name","number","$30","shared","2026/27","team"]
   }
 });
@@ -1417,12 +1417,12 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   soccerJersey: {
     label:"Sports jersey country/club + name + mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:7,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8},
-      "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:8,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:7,maxMainCharacters:14,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8}
+      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8},
+      "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
+      "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8}
     }
   }
 };

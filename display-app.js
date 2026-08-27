@@ -277,17 +277,10 @@
   }
 
   function jerseyNameRows(mainText, caps = {}) {
-    const maxTotal = Math.max(1, Math.min(14, Number(caps.maxMainCharacters || caps.main || 14)));
-    const perLine = Math.max(1, Math.min(maxTotal, Number(caps.maxCharactersPerLine || caps.perLine || 8)));
+    // Soccer kit names stay on one line (max 8). Longer legacy values are truncated; display scales type to fit.
+    const maxTotal = Math.max(1, Math.min(8, Number(caps.maxMainCharacters || caps.main || 8)));
     const name = glyphSlice(cleanBoardText(mainText), 0, maxTotal);
-    if (!name) return [""];
-    if (glyphLen(name) <= perLine) return [name];
-    const rows = displayTextRows(name, {lineCount: 2, maxCharactersPerLine: perLine, maxMainCharacters: maxTotal});
-    if (rows.length >= 2) return rows.slice(0, 2);
-    // Hard wrap mid-word when a single token exceeds one line.
-    const chars = glyphs(name);
-    const mid = Math.ceil(chars.length / 2);
-    return [chars.slice(0, mid).join(""), chars.slice(mid).join("")].filter(Boolean);
+    return name ? [name] : [""];
   }
 
   function ensureJerseyTeamEl(center) {
@@ -1280,12 +1273,15 @@
       mediaSlot.innerHTML = "";
       const nameRows = jerseyNameRows(mainText, {
         ...textCaps,
-        maxMainCharacters: Math.min(14, Number(textCaps.maxMainCharacters || textCaps.main || 14)),
+        maxMainCharacters: Math.min(8, Number(textCaps.maxMainCharacters || textCaps.main || 8)),
         maxCharactersPerLine: Math.min(8, Number(textCaps.maxCharactersPerLine || textCaps.perLine || 8)),
-        lineCount: 2
+        lineCount: 1
       });
-      const wrapped = nameRows.filter(Boolean).length > 1;
-      const wrapScale = wrapped ? 0.85 : 1;
+      const nameGlyphs = glyphLen(nameRows.filter(Boolean).join("") || "");
+      // Scale long names down on one line so the number never moves.
+      const fitScale = nameGlyphs > 6 ? (nameGlyphs >= 8 ? 0.82 : 0.9) : 1;
+      const wrapped = false;
+      const wrapScale = 1;
       // Soccer: upright condensed kit type for CSS name + number only. Country/club is in the PNG.
       let baseName = Number(textCaps.mainTextSizePercent || 16.2);
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
@@ -1304,9 +1300,10 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(7, baseName * wrapScale));
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber * wrapScale));
-      const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam * wrapScale));
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(7, baseName * wrapScale * fitScale));
+      // Number size/position stay fixed — never shrink because the name is long.
+      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber));
+      const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
@@ -1328,11 +1325,17 @@
       byId("displaySub").classList.add("soccer-jersey-number");
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
-      // Optical midline: digit 1 is thin — slight left pad so 13 sits on jersey center without a wide gap.
-      if (usePhotoBack && sport === "soccer" && /^1\d$/.test(String(subText || "").trim())) {
-        byId("displaySub").style.setProperty("padding-left", "0.06em", "important");
-        byId("displaySub").style.setProperty("padding-right", "0", "important");
-        byId("displaySub").style.setProperty("letter-spacing", "-.05em", "important");
+      // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
+      if (usePhotoBack && sport === "soccer") {
+        const mark = String(subText || "").trim();
+        byId("displaySub").style.setProperty("letter-spacing", ".05em", "important");
+        if (/^1\d$/.test(mark)) {
+          byId("displaySub").style.setProperty("padding-left", "0.08em", "important");
+          byId("displaySub").style.setProperty("padding-right", "0", "important");
+        } else {
+          byId("displaySub").style.removeProperty("padding-left");
+          byId("displaySub").style.removeProperty("padding-right");
+        }
       } else {
         byId("displaySub").style.removeProperty("padding-left");
         byId("displaySub").style.removeProperty("padding-right");

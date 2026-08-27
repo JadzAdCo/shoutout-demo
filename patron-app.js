@@ -231,9 +231,12 @@
       if (select && select.options.length <= 1) populateSoccerTeamSelect(select.value || "");
     }
     const caps = templateDisplayCaps();
-    const nameLimit = Math.max(1, Math.min(14, Number(caps.main || caps.maxMainCharacters || 14)));
+    const nameLimit = Math.max(1, Math.min(8, Number(caps.main || caps.maxMainCharacters || 8)));
     const numberLimit = Math.min(2, Math.max(1, Number(caps.sub || caps.maxSubCharacters || 2)));
-    if (byId("soccerManualName")) byId("soccerManualName").maxLength = nameLimit;
+    if (byId("soccerManualName")) {
+      byId("soccerManualName").maxLength = nameLimit;
+      byId("soccerManualName").placeholder = `Name on jersey (max ${nameLimit})`;
+    }
     // HTML maxlength counts UTF-16 units and blocks emoji — rely on grapheme glyphCap instead.
     if (byId("soccerJerseyNumber")) byId("soccerJerseyNumber").removeAttribute("maxlength");
     const name = glyphCap(String(soccerNameFromSource() || "").toUpperCase(), nameLimit);
