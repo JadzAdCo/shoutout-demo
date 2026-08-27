@@ -228,7 +228,7 @@
     "Morocco", "Spain", "Cameroon", "Nigeria",
     "Egypt", "Ghana", "Senegal", "Ivory Coast", "South Africa", "Tunisia", "Kenya",
     "Mali", "Zambia", "Angola", "DR Congo", "Ethiopia", "Tanzania", "Mozambique", "Rwanda",
-    "Russia", "Ukraine"
+    "Russia", "Ukraine", "Germany"
   ]);
 
   function nationalPhotoUrl(teamName) {

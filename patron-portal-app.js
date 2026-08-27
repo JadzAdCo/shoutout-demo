@@ -2901,21 +2901,25 @@
   function renderPolicies(profile) {
     const roles = getApprovedRoles(profile).map(x => ROLE_LABELS[x] || x);
     const canDirect = canSendDirectInbox(profile);
+    const tt = (key, vars) => window.FLOQRI18n?.t?.(key, vars) || key;
+    const roleText = esc(roles.join(", ") || "Patron");
     byId("messagePolicySummary").innerHTML = `<ul>
-      <li>System notifications are internal FloqR Inbox messages and use <strong>System Message</strong> as the sender.</li>
-      <li>FloqR Inbox messages store sender, timestamp, subject, body, read state, and opened/read timestamps.</li>
-      <li>Patrons can send internal support messages to Club Admins or club-designated Customer Service Representatives.</li>
-      <li>Patron-to-patron direct FloqR Inbox messages remain blocked unless the sender is an approved Master Admin, Club Admin, Promoter, DJ, Waiter, Waitress, or Bottle Girl.</li>
-      <li>Your current approved role set: <strong>${esc(roles.join(", "))}</strong>.</li>
+      <li>${tt("inbox.policySystem")}</li>
+      <li>${tt("inbox.policyClubOps")}</li>
+      <li>${tt("inbox.policyPatronBlocked")}</li>
+      <li>${tt("inbox.policyStaffRoles")}</li>
+      <li>${tt("inbox.policyRoles", {roles: roleText})}</li>
     </ul>`;
-    byId("chatPolicySummary").innerHTML = `<ul>
-      <li>Mingl Chat is separate from Inbox.</li>
-      <li>Master Admin is excluded from member Mingl Chat.</li>
-      <li>Patron-to-patron Mingl Chat requires both patrons to Mingl back.</li>
-      <li>Role members cannot initiate Mingl Chat with patrons unless the thread is tied to a patron-originated action such as a payment, guest list request, ShoutOut purchase, reservation, or support question.</li>
-      <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
-    </ul>`;
-    byId("composePolicyNote").textContent = canDirect ? "Internal messaging is enabled for your approved role. Use patron-originated context before contacting a patron." : "Patrons can message Club Admins and designated Customer Service Representatives here. Patron-to-patron conversations use Mingl Chat after both patrons Mingl back.";
+    if (byId("chatPolicySummary")) {
+      byId("chatPolicySummary").innerHTML = `<ul>
+        <li>Mingl Chat is separate from Inbox.</li>
+        <li>Master Admin is excluded from member Mingl Chat.</li>
+        <li>Patron-to-patron Mingl Chat requires both patrons to Mingl back.</li>
+        <li>Role members cannot initiate Mingl Chat with patrons unless the thread is tied to a patron-originated action such as a payment, guest list request, ShoutOut purchase, reservation, or support question.</li>
+        <li>Role-specific Mingl permissions must be enforced by Firestore rules or a server function before production launch.</li>
+      </ul>`;
+    }
+    byId("composePolicyNote").textContent = canDirect ? tt("inbox.composeNoteStaff") : tt("inbox.composeNotePatron");
     byId("sendMessageBtn").disabled = false;
     byId("composeRecipientSearch").disabled = false;
     byId("composeSubject").disabled = false;
@@ -3522,6 +3526,8 @@
     bind("saveUiAppLanguageBtn", saveUiAppLanguage);
     window.addEventListener("floqr:ui-language", () => {
       renderLanguageSettingsReport(currentLanguageSettings);
+      if (currentProfile) renderPolicies(currentProfile);
+      window.FLOQRI18n?.applyDom?.();
     });
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);

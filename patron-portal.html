@@ -338,24 +338,24 @@
 
       <section id="portalMessages" class="admin-panel-section">
         <div class="card">
-          <h2>FloqR Inbox Rules</h2>
+          <h2 data-i18n="inbox.rulesTitle">FloqR Inbox Rules</h2>
           <div id="messagePolicySummary" class="policy-list"></div>
         </div>
         <div class="card" id="portalCompose">
-          <h2>Send FloqR Inbox Message</h2>
+          <h2 data-i18n="inbox.composeTitle">Send FloqR Inbox Message</h2>
           <p id="composePolicyNote" class="sub small"></p>
           <div class="profile-grid">
-            <label>Recipient Search<input id="composeRecipientSearch" placeholder="Search club admin, CSR, display name, or username"/></label>
-            <label>Subject<input id="composeSubject" placeholder="Subject"/></label>
+            <label><span data-i18n="inbox.recipientSearch">Recipient Search</span><input id="composeRecipientSearch" data-i18n-placeholder="inbox.recipientPlaceholder" placeholder="Search club admin, CSR, display name, or username"/></label>
+            <label><span data-i18n="inbox.subject">Subject</span><input id="composeSubject" data-i18n-placeholder="inbox.subjectPlaceholder" placeholder="Subject"/></label>
           </div>
           <input id="composeRecipientUid" type="hidden"/>
           <input id="composeRecipientEmail" type="hidden"/>
           <input id="composeRecipientLabel" type="hidden"/>
           <div id="recipientSearchResults" class="recipient-search-results"></div>
-          <label>Message<input id="composeBody" placeholder="Write your message..."/></label>
-          <button id="sendMessageBtn" class="primary" type="button">Send Message</button>
+          <label><span data-i18n="inbox.message">Message</span><input id="composeBody" data-i18n-placeholder="inbox.messagePlaceholder" placeholder="Write your message..."/></label>
+          <button id="sendMessageBtn" class="primary" type="button" data-i18n="inbox.send">Send Message</button>
         </div>
-        <div class="card"><h2>FloqR Inbox <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
+        <div class="card"><h2><span data-i18n="inbox.listTitle">FloqR Inbox</span> <span id="messageCountLabel">(0/0)</span></h2><div id="myMessages" class="report-block"></div></div>
       </section>
 
       <section id="portalChats" class="admin-panel-section hidden" aria-hidden="true">
@@ -674,16 +674,16 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.28"></script>
+<script src="./floqr-i18n.js?v=s3.0.29"></script>
 <script src="./floqai-help-repository.js?v=s3.0.27"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.28"></script>
-<script src="./help-attach.js?v=s3.0.28"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.29"></script>
+<script src="./help-attach.js?v=s3.0.29"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
 <script src="./payment-service.js?v=29.09.8"></script>
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
-<script src="./patron-portal-app.js?v=s3.0.11"></script>
+<script src="./patron-portal-app.js?v=s3.0.29"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
