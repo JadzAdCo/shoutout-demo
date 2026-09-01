@@ -7,7 +7,7 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const HELP_JS = path.join(ROOT, "floqr-i18n-help.js");
-const VERSION = "s3.0.31";
+const VERSION = "s3.0.32";
 const LANGS = ["ru", "nl", "fr", "de", "es", "it", "pt", "el", "pl", "ar"];
 const CANONICAL = Object.keys(
   JSON.parse(fs.readFileSync(path.join(__dirname, "_help-en.json"), "utf8"))

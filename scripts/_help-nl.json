@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Iedereen start als FLOQR-patron. Tik in My Profile & Settings op Elect to become a service member om dit tabblad te openen. Kies uw servicerol (Waitress, DJ, Promoter enz.), zoek en selecteer een of meer clubs en dien in. De Club Admin van elke club keurt uw koppeling goed. Club Admins gebruiken Review & elect ook voor inkomende aanvragen."
+    "body": "Iedereen start als FLOQR-patron. Tik Elect to become a service member, kies servicerol en clubs, en dien onderaan in.\n\nProfielsjabloon-gids — patron-sociale profielen blijven onder Openbare media.\n\nClub Admin-goedkeuring — Club Admin → Employee/Workers → Pending Worker Requests, of Beoordelen en kiezen op dit tabblad."
   },
   "help-venue-website-ingest": {
     "title": "Clubwebsite-ingest (API, RSS, iframe)",

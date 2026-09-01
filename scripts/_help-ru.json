@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Все начинают как patron FLOQR. В My Profile & Settings нажмите Elect to become a service member, чтобы открыть эту вкладку. Выберите сервисную роль (Waitress, DJ, Promoter и др.), найдите и выберите один или несколько клубов и отправьте запрос. Club Admin каждого клуба утверждает связь. Club Admins также используют Review & elect для входящих запросов."
+    "body": "Все начинают как patron FLOQR. В My Profile & Settings нажмите Elect to become a service member, выберите роль и клубы, отправьте внизу страницы.\n\nГид по шаблонам профиля — социальные профили patron остаются в Публичных медиа.\n\nУтверждение Club Admin — Club Admin → Employee/Workers → Pending Worker Requests или Проверить и выбрать на этой вкладке."
   },
   "help-venue-website-ingest": {
     "title": "Ингест сайта клуба (API, RSS, iframe)",

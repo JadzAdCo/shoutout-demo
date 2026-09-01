@@ -69,13 +69,20 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     max-width:calc(100vw - 24px) !important;
     z-index:100002;
   }
-  html.floqr-mobile-browser .help-popout,
   html.floqr-mobile-browser .floqr-help-popout,
   html.floqr-mobile-browser .help-popout summary{
     width:auto !important;
     min-width:22px !important;
     max-width:22px !important;
     flex:0 0 auto !important;
+  }
+  .help-popout .help-popout-body,
+  .floqr-help-popout .floqr-help-panel,
+  .help-popout > div:not(summary){
+    max-height:min(70vh, 520px);
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    line-height:1.45;
   }
 }
 `;

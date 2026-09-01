@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Wszyscy zaczynają jako patron FLOQR. W My Profile & Settings naciśnij Elect to become a service member, aby otworzyć tę kartę. Wybierz rolę serwisową (Waitress, DJ, Promoter itd.), wyszukaj i zaznacz jeden lub więcej klubów i wyślij. Club Admin każdego klubu zatwierdza powiązanie. Club Admins używają też Review & elect dla przychodzących wniosków."
+    "body": "Wszyscy zaczynają jako patron FLOQR. W My Profile & Settings naciśnij Elect to become a service member, wybierz rolę i kluby, wyślij na dole strony.\n\nPrzewodnik po szablonach profilu — profile społeczne patron pozostają w Mediach publicznych.\n\nZatwierdzenie Club Admin — Club Admin → Employee/Workers → Pending Worker Requests lub Przegląd i wybór na tej karcie."
   },
   "help-venue-website-ingest": {
     "title": "Import strony klubu (API, RSS, iframe)",

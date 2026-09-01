@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.31 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.32 (stable)
 
+- s3.0.32: Service members panel UX (profile guide in ? help, single submit, bottom confirmation); NFL photo-back jerseys (49ers + ScammerVille); Club Admin approval copy.
 - s3.0.31: Services & Service Members help is patron-facing (no IsPatron flags); panel chrome + help localized in all 11 languages.
 - s3.0.30: Service role request uses specialty dropdown + searchable multi-club picker; club admin indexed association queries.
 - s3.0.28: full chrome+help locales for all 11 supported languages.

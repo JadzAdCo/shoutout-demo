@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="portal.title">My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.19"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.32"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
 </head>
 <body>
@@ -584,20 +584,16 @@
           <h2
             data-floqr-help-id="help-service-members"
             data-floqr-help-title="Services &amp; Service Members"
-            data-floqr-help-search="service members|elect service member|request access|worker association|become a waitress|bottle girl|affiliate club"
-            data-floqr-help-body="Everyone starts as a FLOQR patron. On My Profile &amp; Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit. Each club's Club Admin approves your association. Club Admins also use Review &amp; elect here to approve incoming requests."
+            data-floqr-help-search="service members|elect service member|request access|worker association|become a waitress|bottle girl|affiliate club|profile template guide|approve waitress"
+            data-floqr-help-body="Everyone starts as a FLOQR patron. Tap Elect to become a service member, then choose your service role, select clubs, and submit at the bottom. Open ? for the profile template guide and Club Admin approval steps."
             data-i18n="nav.serviceMembers"
           >Services &amp; Service Members</h2>
-          <h3>Profile Template Guide</h3>
-          <p class="sub small" data-i18n="portal.serviceMembers.templateGuide">Use these role templates when you are a service member. Patron social profiles stay on Public Media.</p>
-          <div id="roleTemplateGuide" class="role-template-grid"></div>
-          <div class="admin-subtabs" id="serviceMembersSubtabs">
+          <div class="admin-subtabs hidden" id="serviceMembersSubtabs">
             <button class="admin-subtab active" type="button" data-sm-pane="serviceMembersRequestPane" data-i18n="portal.serviceMembers.requestPane">Request access</button>
             <button class="admin-subtab hidden" id="serviceMembersAdminSubtab" type="button" data-sm-pane="serviceMembersAdminPane" data-i18n="portal.serviceMembers.reviewPane">Review &amp; elect</button>
           </div>
           <div id="serviceMembersRequestPane" class="admin-subpanel">
             <p class="sub small" data-i18n="portal.serviceMembers.requestIntro">Request a service role and association with one or more clubs. Each Club Admin approves your request.</p>
-            <p id="smRoleStatus" class="status"></p>
             <div class="profile-grid">
               <label data-i18n="portal.serviceMembers.serviceRole">Service role
                 <select id="smServiceSpecialty"></select>
@@ -607,11 +603,11 @@
             <div id="smVenuePickerMount" class="floqr-venue-picker-mount"></div>
             <label data-i18n="portal.serviceMembers.notesLabel">Notes<textarea id="smRoleNotes" data-i18n-placeholder="portal.serviceMembers.notesPlaceholder" placeholder="Optional notes for the club (schedule, residency, promoter company, etc.)"></textarea></label>
             <button id="smSubmitRoleRequestBtn" class="primary" type="button" data-i18n="portal.serviceMembers.submitBtn">Submit Club Association Request</button>
+            <p id="smRoleStatus" class="status portal-service-members-status" aria-live="polite"></p>
           </div>
           <div id="serviceMembersAdminPane" class="admin-subpanel hidden">
             <p class="sub small" data-i18n="portal.serviceMembers.adminIntro">Club Admins review association requests and can search for a patron to elect for the selected club.</p>
-            <p id="smAdminStatus" class="status"></p>
-            <label>Club
+            <label data-i18n="portal.serviceMembers.clubLabel">Club
               <select id="smAdminClubSelect"></select>
             </label>
             <h3 data-i18n="portal.serviceMembers.pendingHeading">Pending association requests</h3>
@@ -635,6 +631,7 @@
             </div>
             <button id="smElectBtn" type="button" data-i18n="portal.serviceMembers.electBtn">Elect Selected Patron Role</button>
             <div id="smElectMatches" class="report-block"></div>
+            <p id="smAdminStatus" class="status portal-service-members-status" aria-live="polite"></p>
           </div>
         </div>
       </section>
@@ -647,7 +644,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-nav.js?v=s3.0.31"></script>
+<script src="./floqr-nav.js?v=s3.0.32"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
@@ -660,10 +657,10 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.31"></script>
-<script src="./floqai-help-repository.js?v=s3.0.31"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.31"></script>
-<script src="./help-attach.js?v=s3.0.31"></script>
+<script src="./floqr-i18n.js?v=s3.0.32"></script>
+<script src="./floqai-help-repository.js?v=s3.0.32"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.32"></script>
+<script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
@@ -671,7 +668,7 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./patron-portal-app.js?v=s3.0.30"></script>
+<script src="./patron-portal-app.js?v=s3.0.32"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
