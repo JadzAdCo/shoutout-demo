@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Όλοι ξεκινούν ως patron FLOQR. Στο My Profile & Settings, πατήστε Elect to become a service member για να ανοίξετε αυτή την καρτέλα. Επιλέξτε ρόλο υπηρεσίας (Waitress, DJ, Promoter κ.ά.), αναζητήστε και επιλέξτε έναν ή περισσότερους clubs και υποβάλετε. Ο Club Admin κάθε club εγκρίνει τη σύνδεσή σας. Οι Club Admins χρησιμοποιούν επίσης Review & elect για εισερχόμενα αιτήματα."
+    "body": "Όλοι ξεκινούν ως patron FLOQR. Στο My Profile & Settings πατήστε Elect to become a service member, επιλέξτε ρόλο και clubs, υποβάλετε στο κάτω μέρος.\n\nΟδηγός προτύπων προφίλ — τα κοινωνικά προφίλ patron παραμένουν στα Δημόσια μέσα.\n\nΈγκριση Club Admin — Club Admin → Employee/Workers → Pending Worker Requests, ή Αναθεώρηση και επιλογή σε αυτή την καρτέλα."
   },
   "help-venue-website-ingest": {
     "title": "Απορρόφηση ιστότοπου συλλόγου (API, RSS, iframe)",

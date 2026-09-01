@@ -687,11 +687,12 @@
     {
       id: "help-service-members",
       title: "Services & Service Members",
-      body: "Everyone starts as a FLOQR patron. On My Profile & Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit. Each club's Club Admin approves your association. Club Admins also use Review & elect here to approve incoming requests.",
+      body: "Everyone starts as a FLOQR patron. On My Profile & Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit at the bottom of this page.\n\nProfile template guide — patron social profiles stay on Public Media. Service roles use dedicated profile templates on My Profile:\n• Patron — music, travel, hobbies, nightlife style, looking to meet; 8 photos and 2 short videos.\n• Promoter — active cities, events, guest lists, VIP tables, venue relationships, promo media.\n• DJ — genres, residencies, booking availability, mix links, crowd style, performance media.\n• Waitress / Waitress / Bottle Girl — venue experience, service style, languages, nights, bottle service, professional media.\n• Bus Boys or Security — floor support, door, security stations, venue experience, professional media.\n• Venue Manager — venues managed, ops specialties, staff coordination, professional media.\n\nClub Admin approval — each club's Club Admin approves your association after you submit. Club Admins: open Club Admin → Employee/Workers → Pending Worker Requests (Approve or Reject), or on this tab open Review & elect.",
       searchPhrases: [
         "service members", "services and service members", "request club admin", "request access", "elect service member",
         "worker association", "request dj access", "request promoter", "bus boys or security",
-        "venue manager", "approve worker request", "become a waitress", "bottle girl", "affiliate club"
+        "venue manager", "approve worker request", "become a waitress", "bottle girl", "affiliate club",
+        "profile template guide", "approve waitress", "pending worker requests"
       ],
       links: [
         {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},

@@ -1561,14 +1561,19 @@
   }
 
   function renderRoleGuide() {
-    const guide = byId("roleTemplateGuide");
-    if (!guide) return;
-    guide.innerHTML = Object.entries(PROFILE_TEMPLATES).map(([key, item]) => `<div class="role-template-card">
-      <p class="eyebrow">${esc(ROLE_LABELS[key])}</p>
-      <h3>${esc(item.title)}</h3>
-      <p>${esc(item.headline)}</p>
-      <ul>${item.sections.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    </div>`).join("");
+    /* Profile template guide lives in help-service-members ? popout (FLOQRHelpAttach + i18n). */
+  }
+
+  function smStatusText(key, vars = {}, fallback = "") {
+    const text = window.FLOQRI18n?.t?.(`portal.serviceMembers.${key}`, vars);
+    return text && text !== `portal.serviceMembers.${key}` ? text : fallback;
+  }
+
+  function showSmStatus(elId, key, vars = {}, fallback = "") {
+    const el = byId(elId);
+    if (!el) return;
+    el.textContent = smStatusText(key, vars, fallback);
+    if (el.textContent) el.scrollIntoView?.({behavior: "smooth", block: "nearest"});
   }
 
   function normalizeMessage(x) {
@@ -3021,7 +3026,7 @@
   async function submitServiceMemberRequest() {
     const user = auth.currentUser;
     if (!user) {
-      setText("smRoleStatus", "Please sign in first.");
+      showSmStatus("smRoleStatus", "statusSignIn", {}, "Please sign in first.");
       return;
     }
     const serviceSubtype = (byId("smServiceSpecialty")?.value || "").trim();
@@ -3030,11 +3035,11 @@
     const roleType = serviceAccess.roleTypeForSpecialty?.(serviceSubtype) || "hospitality";
     const publicName = serviceAccess.displayWorkerName?.(user, currentProfile) || user.displayName || user.email || "FLOQR member";
     if (!serviceSubtype) {
-      setText("smRoleStatus", "Choose your service role.");
+      showSmStatus("smRoleStatus", "statusChooseRole", {}, "Choose your service role.");
       return;
     }
     if (!relatedLocations.length) {
-      setText("smRoleStatus", "Select at least one club for the association request.");
+      showSmStatus("smRoleStatus", "statusChooseClub", {}, "Select at least one club for the association request.");
       return;
     }
     const request = {
@@ -3085,7 +3090,8 @@
     await batch.commit();
     if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
     if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
-    setText("smRoleStatus", `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
+    showSmStatus("smRoleStatus", "statusSubmitted", {count: relatedLocations.length},
+      `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
   }
 
   async function loadServiceMemberAdmin(clubLocationId) {
@@ -3152,7 +3158,9 @@
       reviewedByUid: auth.currentUser?.uid || "",
       reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
-    setText("smAdminStatus", `Worker association ${status}.`);
+    setText("smAdminStatus", smStatusText("statusAdminDone", {status},
+      `Worker association ${status}.`));
+    byId("smAdminStatus")?.scrollIntoView?.({behavior: "smooth", block: "nearest"});
     await loadServiceMemberAdmin(clubLocationId);
   }
 
@@ -3264,6 +3272,7 @@
       reason: "service-members-admin"
     }], datapoints);
     byId("becomeServiceMemberCard")?.classList.toggle("hidden", !!datapoints.servicesTabVisible);
+    byId("serviceMembersSubtabs")?.classList.toggle("hidden", !datapoints.isClubAdmin);
     const pageParams = new URL(location.href).searchParams;
     const wantServices = ["service-members", "servicemembers", "role-request"].includes(String(pageParams.get("tab") || "").toLowerCase());
     if (wantServices) {

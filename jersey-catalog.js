@@ -68,7 +68,9 @@
       sport,
       league,
       description: isPhoto
-        ? `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`
+        ? (sport === "nfl"
+          ? `$30 ${teamName} NFL jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). NFL · Jersey · ${kindTag}.`
+          : `$30 ${teamName} soccer jersey ShoutOut — LED back matches this kit (96×48, 64×48, 64×32). Soccer · Jersey · ${kindTag}.`)
         : `Shared $30 ${name} jersey-back ShoutOut on a hanger (${league}, 2026/27). ${silhouetteNote}`,
       tags
     };
@@ -309,7 +311,11 @@
     });
   }
 
-  function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags) {
+  const NFL_PHOTO = {
+    "San Francisco 49ers": "./images/nfl/nfl-49ers-back-with-club.png"
+  };
+
+  function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags, bgUrl) {
     const id = `${prefix}${slug(teamName)}`;
     if (nbaNflTemplates[id]) return;
     nbaNflTemplates[id] = jerseyTemplate({
@@ -320,6 +326,7 @@
       sport,
       primary,
       secondary,
+      bgUrl: bgUrl || "",
       extraTags
     });
     nbaNflIds.push(id);
@@ -349,7 +356,8 @@
   }
 
   NBA.forEach(([name, p, s]) => addNbaNfl("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
-  NFL.forEach(([name, p, s]) => addNbaNfl("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"]));
+  NFL.forEach(([name, p, s]) => addNbaNfl("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"], NFL_PHOTO[name] || ""));
+  addNbaNfl("nfl", "nfl", "NFL", "ScammerVille", "#AA0000", "#B3995D", ["football", "American football", "NFL", "ScammerVille", "parody"], "./images/nfl/nfl-scammerville-back-with-club.png");
 
   function resolveSoccerTeam(teamId) {
     const id = String(teamId || "").trim();
@@ -386,7 +394,10 @@
   global.FLOQR_SOCCER_TEAMS = soccerTeams;
   global.FLOQR_JERSEY_CATALOG = {...soccerTeams, ...nbaNflTemplates};
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
-  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat(["soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille"]);
+  global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat([
+    "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille",
+    "nflSanFrancisco49ers", "nflScammerVille"
+  ]);
   global.FLOQRSoccerPhotoTeams = function soccerPhotoTeams() {
     const seen = new Set();
     return (global.FLOQR_JERSEY_PHOTO_IDS || []).map(id => soccerTeams[id]).filter(team => {

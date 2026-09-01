@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Alle beginnen als FLOQR-Patron. Tippen Sie in My Profile & Settings auf Elect to become a service member, um diesen Tab zu öffnen. Wählen Sie Ihre Service-Rolle (Waitress, DJ, Promoter usw.), suchen und wählen Sie einen oder mehrere Clubs und senden Sie die Anfrage. Der Club Admin jedes Clubs genehmigt Ihre Verknüpfung. Club Admins nutzen Review & elect auch für eingehende Anfragen."
+    "body": "Alle beginnen als FLOQR-Patron. In My Profile & Settings tippen Sie Elect to become a service member. Wählen Sie Ihre Service-Rolle, Clubs, und senden Sie unten auf der Seite.\n\nProfilvorlagen-Leitfaden — Patron-Sozialprofile bleiben unter Öffentliche Medien. Service-Rollen nutzen eigene Vorlagen auf Mein Profil.\n\nClub-Admin-Genehmigung — Club Admin → Employee/Workers → Pending Worker Requests, oder Prüfen und wählen auf diesem Tab."
   },
   "help-venue-website-ingest": {
     "title": "Aufnahme der Club-Website (API, RSS, Iframe)",

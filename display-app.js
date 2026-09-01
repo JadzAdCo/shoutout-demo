@@ -1291,6 +1291,10 @@
         baseName = Math.min(baseName * 0.56, 9.4);
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
+      } else if (sport === "nfl" && usePhotoBack) {
+        baseName = Math.min(baseName * 0.5, 10.5);
+        baseNumber = Math.min(baseNumber * 0.78, 58);
+        baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
         baseNumber = Math.max(baseNumber, 70);
@@ -1307,7 +1311,7 @@
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
       if (teamEl) {
-        const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack);
+        const hideCrest = sport === "nfl" || !teamLabel || (sport === "soccer" && usePhotoBack) || (sport === "nfl" && usePhotoBack);
         teamEl.className = "soccer-jersey-team" + (hideCrest ? " hidden" : "");
         teamEl.setAttribute("aria-hidden", hideCrest ? "true" : "false");
         if (hideCrest) teamEl.textContent = "";
@@ -1326,7 +1330,7 @@
       byId("displaySub").style.setProperty("font-size", `${numberSize}vh`, "important");
       byId("displaySub").style.setProperty("text-align", "center", "important");
       // Optical midline on photo kits: slight positive tracking so 13 does not smash; thin "1" gets a left pad.
-      if (usePhotoBack && sport === "soccer") {
+      if (usePhotoBack && (sport === "soccer" || sport === "nfl")) {
         const mark = String(subText || "").trim();
         byId("displaySub").style.setProperty("letter-spacing", ".05em", "important");
         if (/^1\d$/.test(mark)) {

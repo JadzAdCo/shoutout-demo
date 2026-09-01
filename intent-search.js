@@ -636,6 +636,17 @@
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
     {
+      id: "help-nfl-jersey",
+      kind: "help",
+      label: "NFL jersey ShoutOut",
+      blurb: "Search NFL, 49ers, or ScammerVille. Photo LED backs use the bulky NFL yoke cut with a side helmet — no hanger. Enter patron name (up to 8 characters) and a 2-character mark.",
+      links: [
+        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
+        {label: "Jersey preview gallery", href: vUrl("./jersey-preview-all.html", {from: "floqai"})}
+      ],
+      patterns: [/nfl\s*jersey/, /49ers/, /49\s*ers/, /scammerville/, /football\s*jersey/, /san\s*francisco\s*49/]
+    },
+    {
       id: "help-soccer-jersey",
       kind: "help",
       label: "Soccer jersey ShoutOut",

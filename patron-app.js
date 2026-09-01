@@ -140,6 +140,23 @@
   }
   function soccerJerseyPayloadFields() {
     if (!isSoccerJerseyTemplate()) return {};
+    const templateId = String(selectedTemplate || "");
+    if (/^(nba|nfl)/i.test(templateId) && !isConsolidatedSoccerTemplate(templateId)) {
+      const t = getTemplate(templateId);
+      return {
+        template: templateId,
+        templateName: t.name || templateId,
+        jerseyTeamId: "",
+        jerseyTeamLabel: t.jerseyTeamLabel || String(t.teamName || t.name || "").replace(/^(NBA|NFL)\s+/i, "").toUpperCase(),
+        jerseyPrimary: t.jerseyPrimary || "",
+        jerseySecondary: t.jerseySecondary || "",
+        jerseyAccent: t.jerseyAccent || t.jerseySecondary || "",
+        jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
+        backgroundUrl: t.defaultBackgroundUrl || "",
+        sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
+        league: t.league || ""
+      };
+    }
     const team = resolveSelectedSoccerTeam();
     const teamId = byId("soccerTeamId")?.value || team?.id || "";
     if (!team && isConsolidatedSoccerTemplate() && String(selectedTemplate) === "soccerJersey") {
@@ -225,8 +242,11 @@
     document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer);
     const source = byId("soccerNameSource")?.value || "displayName";
     byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
+    const consolidated = isConsolidatedSoccerTemplate();
+    byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
+    byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
     if (!soccer) return;
-    if (isConsolidatedSoccerTemplate()) {
+    if (consolidated) {
       const select = byId("soccerTeamId");
       if (select && select.options.length <= 1) populateSoccerTeamSelect(select.value || "");
     }
@@ -1159,9 +1179,21 @@
     status.textContent = seconds ? `Code sent. Expires in ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}.` : "This code expired. Request a new one.";
     if (!seconds && emailOtpTimer) { clearInterval(emailOtpTimer); emailOtpTimer = null; }
   }
+  function brokenDemoEmailHint(email = "") {
+    const normalized = String(email || "").trim().toLowerCase();
+    if (!normalized.endsWith("@floqr-demo.com")) return "";
+    if (/^temp_[a-z0-9]+_\d+@floqr-demo\.com$/.test(normalized)) return "";
+    if (/^temp_[a-z0-9]+_n@floqr-demo\.com$/.test(normalized)) {
+      return "Demo accounts use a club number 1–10, not the letter N. Example: temp_waitress_1@floqr-demo.com";
+    }
+    return "Enter a valid demo email such as temp_waitress_1@floqr-demo.com (number 1–10).";
+  }
+
   async function requestEmailOtp() {
     const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
     if (!email) { setText("emailOtpStatus", "Enter your email address first."); byId("emailOtpAddress")?.focus?.(); return; }
+    const demoHint = brokenDemoEmailHint(email);
+    if (demoHint) { setText("emailOtpStatus", demoHint); byId("emailOtpAddress")?.focus?.(); return; }
     if (!functions) { setText("emailOtpStatus", "Firebase Functions is unavailable on this page."); return; }
     try {
       setText("emailOtpStatus", "Sending your secure sign-in code...");
@@ -2734,15 +2766,16 @@
   }
   function jerseyMiniPreview(template) {
     const bg = String(template.defaultBackgroundUrl || "").trim();
-    if (bg && (template.sport === "soccer" || template.layout === "soccer-jersey")) {
+    if (bg && (template.sport === "soccer" || template.sport === "nfl" || template.layout === "soccer-jersey")) {
       return `<div class="template-mini-preview jersey-shoutout-preview" style="background-image:url('${esc(bg)}')"><span class="jersey-preview-name">${esc(template.defaultMain || "NYX")}</span><span class="jersey-preview-num">${esc(template.defaultSub || "99")}</span></div>`;
     }
     return `<div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>`;
   }
   function jerseyPublicTags(template) {
     const team = template.teamName || String(template.name || "").replace(/\s+Jersey$/i, "");
-    const kind = template.league === "National teams" ? "Country" : (template.sport === "soccer" ? "Club" : "");
-    return Array.from(new Set(["Soccer", "Jersey", kind, team].filter(Boolean))).slice(0, 4);
+    const sportTag = template.sport === "nfl" ? "NFL" : "Soccer";
+    const kind = template.league === "National teams" ? "Country" : (template.sport === "soccer" ? "Club" : template.league || "");
+    return Array.from(new Set([sportTag, "Jersey", kind, team].filter(Boolean))).slice(0, 4);
   }
   function allowedSoccerTeamIds() {
     const ids = getLocation()?.soccerJerseyTeamIds;
@@ -2768,11 +2801,14 @@
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
     const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32", "p125-96x48": "96×48", "p125-64x48": "64×48", "p125-64x32": "64×32" };
     const sizeChips = supportedFormats.map(id => sizeLabels[id] || id).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
-    const tags = (template.sport === "soccer" && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
+    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
+    const jerseyTagLine = template.sport === "nfl" && template.defaultBackgroundUrl
+      ? `NFL · Jersey · ${template.league || "NFL"}`
+      : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video")));
     return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}" data-soccer-team-id="${esc(template.sport === "soccer" && template.id !== "soccerJersey" ? template.id : "")}">
       ${jerseyMiniPreview(template)}
       <div class="name">${esc(template.name)}</div>
-      <div class="tag">${esc(template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video")))}</div>
+      <div class="tag">${esc(jerseyTagLine)}</div>
       <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">Use</button>

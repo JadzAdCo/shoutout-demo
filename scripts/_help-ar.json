@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "يبدأ الجميع كـ patron FLOQR. في My Profile & Settings، اضغط Elect to become a service member لفتح هذا التبويب. اختر دور الخدمة (Waitress، DJ، Promoter، وغيرها)، ابحث واختر ناديًا واحدًا أو أكثر ثم أرسل. Club Admin لكل نادي يوافق على ارتباطك. يستخدم Club Admins أيضًا Review & elect للطلبات الواردة."
+    "body": "يبدأ الجميع كـ patron FLOQR. في My Profile & Settings اضغط Elect to become a service member واختر الدور والأندية وأرسل في أسفل الصفحة.\n\nدليل قوالب الملف — تبقى الملفات الاجتماعية للـ patron في الوسائط العامة.\n\nموافقة Club Admin — Club Admin → Employee/Workers → Pending Worker Requests، أو مراجعة واختيار على هذا التبويب."
   },
   "help-venue-website-ingest": {
     "title": "استيراد موقع النادي (API، RSS، iframe)",
