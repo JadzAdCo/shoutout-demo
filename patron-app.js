@@ -140,10 +140,14 @@
   }
   function soccerJerseyPayloadFields() {
     if (!isSoccerJerseyTemplate()) return {};
+    const nameSource = byId("soccerNameSource")?.value || "displayName";
+    const attribution = soccerJerseyAttributionFromSource();
+    const jerseyAttribution = {attribution, soccerNameSource: nameSource};
     const templateId = String(selectedTemplate || "");
     if (/^(nba|nfl)/i.test(templateId) && !isConsolidatedSoccerTemplate(templateId)) {
       const t = getTemplate(templateId);
       return {
+        ...jerseyAttribution,
         template: templateId,
         templateName: t.name || templateId,
         jerseyTeamId: "",
@@ -164,6 +168,7 @@
     }
     const resolved = team || {};
     return {
+      ...jerseyAttribution,
       template: "soccerJersey",
       templateName: "Soccer Jersey",
       jerseyTeamId: teamId || resolved.id || "",
@@ -234,6 +239,10 @@
     if (source === "instagram") return floqrId().normalizeInstagramHandle?.(profile.instagramHandle || byId("profileInstagram")?.value || username) || cleanHandle(username);
     if (source === "floqrHandle") return floqrId().normalizeFloqrHandle?.(profile.floqrHandle || profile.username || username) || floqrId().normalizeFloqrHandle?.(username);
     return String(profile.displayName || currentUser?.displayName || username).trim();
+  }
+  function soccerJerseyAttributionFromSource() {
+    if (!isSoccerJerseyTemplate()) return "";
+    return graphemes(soccerNameFromSource()).slice(0, 30).join("");
   }
   function syncSoccerJerseyFields() {
     const soccer = isSoccerJerseyTemplate();
@@ -2989,6 +2998,8 @@
       if (payload.jerseySecondary) url.searchParams.set("jerseySecondary", payload.jerseySecondary);
       if (payload.jerseyAccent) url.searchParams.set("jerseyAccent", payload.jerseyAccent);
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
+      if (payload.attribution) url.searchParams.set("attribution", payload.attribution);
+      if (payload.soccerNameSource) url.searchParams.set("soccerNameSource", payload.soccerNameSource);
       url.searchParams.set("preview", "1");
       if (Array.isArray(payload.teamMembers) && payload.teamMembers.length) url.searchParams.set("teamMembers", JSON.stringify(payload.teamMembers));
       if (payload.stadiumMessage) url.searchParams.set("stadiumMessage", payload.stadiumMessage);
