@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Settings → Services & Service Members is verborgen wanneer users.IsPatron 1/yes is. Kies via My Profile om IsServiceMember (IsserviceMember) op 1/yes en IsPatron op 0/no te zetten. Vraag daarna Club Admin, DJ, Promoter, hospitality of andere rollen aan. Club Admins zien ook Review & elect."
+    "body": "Iedereen start als FLOQR-patron. Tik in My Profile & Settings op Elect to become a service member om dit tabblad te openen. Kies uw servicerol (Waitress, DJ, Promoter enz.), zoek en selecteer een of meer clubs en dien in. De Club Admin van elke club keurt uw koppeling goed. Club Admins gebruiken Review & elect ook voor inkomende aanvragen."
   },
   "help-venue-website-ingest": {
     "title": "Clubwebsite-ingest (API, RSS, iframe)",

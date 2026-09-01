@@ -687,11 +687,11 @@
     {
       id: "help-service-members",
       title: "Services & Service Members",
-      body: "Settings → Services & Service Members is hidden when users.IsPatron is 1/yes. Elect from My Profile to set IsServiceMember (IsserviceMember) to 1/yes and IsPatron to 0/no. Then request Club Admin, DJ, Promoter, hospitality, or other roles. Club Admins also see Review & elect.",
+      body: "Everyone starts as a FLOQR patron. On My Profile & Settings, tap Elect to become a service member to unlock this tab. Choose your service role (Waitress, DJ, Promoter, and more), search and select one or more clubs, then submit. Each club's Club Admin approves your association. Club Admins also use Review & elect here to approve incoming requests.",
       searchPhrases: [
         "service members", "services and service members", "request club admin", "request access", "elect service member",
         "worker association", "request dj access", "request promoter", "bus boys or security",
-        "venue manager", "approve worker request", "IsPatron", "IsServiceMember"
+        "venue manager", "approve worker request", "become a waitress", "bottle girl", "affiliate club"
       ],
       links: [
         {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},

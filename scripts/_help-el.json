@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Ρυθμίσεις → Το Services & Service Members είναι κρυφό όταν το users.IsPatron είναι 1/ναι. Επιλέξτε από το προφίλ μου για να ορίσετε το IsServiceMember (IsserviceMember) σε 1/ναι και IsPatron σε 0/όχι. Στη συνέχεια ζητήστε Club Admin, DJ, Promoter, φιλοξενία ή άλλους ρόλους. Club Admin Δείτε επίσης Αναθεώρηση και επιλογή."
+    "body": "Όλοι ξεκινούν ως patron FLOQR. Στο My Profile & Settings, πατήστε Elect to become a service member για να ανοίξετε αυτή την καρτέλα. Επιλέξτε ρόλο υπηρεσίας (Waitress, DJ, Promoter κ.ά.), αναζητήστε και επιλέξτε έναν ή περισσότερους clubs και υποβάλετε. Ο Club Admin κάθε club εγκρίνει τη σύνδεσή σας. Οι Club Admins χρησιμοποιούν επίσης Review & elect για εισερχόμενα αιτήματα."
   },
   "help-venue-website-ingest": {
     "title": "Απορρόφηση ιστότοπου συλλόγου (API, RSS, iframe)",
