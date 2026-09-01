@@ -1,5 +1,5 @@
 ---
-description: NFL photo jersey LED backs — yoke plate, side helmet, photo wins over CSS hanger
+description: NFL photo jersey LED backs — yoke plate, side helmet, per-screen sizing
 alwaysApply: true
 ---
 
@@ -7,26 +7,39 @@ alwaysApply: true
 
 **One silhouette.** Bulky NFL yoke cut with shoulder nameplate, short sleeves with stripe bands, side helmet in frame. Solid `#000` (LED energy). No hanger on photo backs.
 
+**Per-screen PNG + CSS.** NFL kits must read on **96×48**, **64×48**, and **64×32** Xibo boards. Photo assets and `display.css` both account for format — do not use one `background-size` for all LEDs.
+
 **Wordmark:** baked into the PNG only (club name on the yoke plate, never the patron name or number). Upright block caps heat-transfer on the yoke — not italic, not arched like soccer. Letter color = kit secondary. CSS must **not** reprint the team name on photo kits (`.soccer-jersey-team` hidden when `usePhotoBack`).
 
-**Collar:** PNG must show the full collar/neckline band above the yoke. Do not crop the top of the jersey in the asset. QA: collar visible on `led-64x32` before Pages.
+**Collar (PNG):** Leave **≥12% empty black** above the collar ribbing in the asset so the neckline is never flush with the image top. Full gold collar band must be obvious in the file before Pages.
 
-**Helmet:** gold (or kit secondary) helmet on the **right** side, partially overlapping the jersey hem. Helmet bottom must sit **well above** the image bottom edge (~8%+ margin) so `display.css` scaling does not clip the facemask.
+**Helmet (PNG):** gold (or kit secondary) helmet on the **right**, overlapping the jersey hem. Helmet facemask bottom **≥22% above** the image bottom edge — not tucked into the corner.
 
-**Patron name overlay:** CSS only (`#displayMain.soccer-jersey-name`). Upright Impact / condensed caps. Sit **halfway** between the PNG yoke wordmark bottom and the number box top. Photo-back CSS: name `top` ~18% (96×48 / 64×48 ~17%, 64×32 ~16%); `height` ~9%; `font-size` cap ~11.5vh (one notch above soccer photo kits).
+**Patron name overlay:** CSS only (`#displayMain.soccer-jersey-name`). Upright Impact / condensed caps. Halfway between yoke wordmark bottom and number box top. Name `top` ~18% (96×48 / 64×48 ~17%, 64×32 ~16%); `height` ~9%; cap ~11.5vh.
 
-**Number overlay:** CSS only (`#displaySub.soccer-jersey-number`). Huge upright condensed mark, horizontally center-justified. `top` ~40% (96×48 ~39%, 64×32 ~38%); `height` ~28%; `align-content: center` (not end — prevents 50vh glyphs from climbing into the name). Cap ~48vh. Same horizontal inset as the name.
+**Number overlay:** CSS only (`#displaySub.soccer-jersey-number`). `top` ~40% (96×48 ~39%, 64×32 ~38%); `height` ~28%; `align-content: center`; cap ~48vh.
 
-**Background layer:** `background-size: 82% auto`; `background-position: center 36%` — shows collar at top and keeps helmet in frame.
+**Background layer (`display.css`) — height-fit, per format:**
+
+| Format | `background-size` | `background-position` |
+|---|---|---|
+| default | `auto 86%` | `center 50%` |
+| 96×48 | `auto 90%` | `center 50%` |
+| 64×48 | `auto 88%` | `center 50%` |
+| 64×32 | `auto 82%` | `center 50%` |
+
+Height-fit keeps collar + helmet inside wide short boards. QA ScammerVille on **64×32** before shipping other NFL kits.
 
 ## FIX PROMPT — CSS hanger vs named photo
 
-Same as soccer: a named PNG **always** wins. Catalog `defaultBackgroundUrl` = `images/nfl/nfl-{slug}-back-with-club.png`, `jerseyCssBack: false`. Ship PNGs on **`origin/main`**.
+Named PNG **always** wins. Catalog `defaultBackgroundUrl` = `images/nfl/nfl-{slug}-back-with-club.png`, `jerseyCssBack: false`. Ship PNGs on **`origin/main`**.
 
 ## GenerateImage prompt (PNG wordmark + helmet only)
 
 ```
-Keep this EXACT NFL jersey BACK silhouette: same camera angle, same bulky yoke cut, solid #000000 backdrop, NO hanger, NO person. Recolor body/collar/sleeve stripes for this team. FULL collar ribbing visible at the top — do not crop the neckline. Three sleeve stripe bands in secondary color. Print ONLY the club wordmark "{CLUB}" in heat-transfer block caps on the shoulder yoke plate (upright, not arched). Never print a player name or number. Empty mid-back for CSS patron name + number overlay. {SECONDARY_COLOR} football helmet with team marks on the RIGHT side — position helmet HIGH so the entire helmet including facemask sits at least 8% above the bottom edge (not cut off). Studio product shot, fabric texture.
+NFL jersey BACK product photo, solid #000000, NO hanger, NO person. Leave at least 12% empty black ABOVE the collar so the full gold collar ribbing / neckline is clearly visible (not at the image edge). Bulky yoke cut, three sleeve stripe bands in {SECONDARY_COLOR}. Recolor body for this team. Print ONLY "{CLUB}" in heat-transfer block caps on the yoke plate (upright). Never print patron name or number. Empty mid-back for CSS overlays. {SECONDARY_COLOR} football helmet with team marks on the RIGHT — place helmet HIGH: facemask bottom at least 22% above the image bottom (fully visible). Jersey slightly smaller in frame so collar and helmet both fit. Studio fabric texture.
 ```
+
+**Ship order:** ScammerVille first → patron confirms LED → then regenerate 49ers (and future kits) with the same margin rules.
 
 Resume: `@jersey$` / `$jersey@` / `@nfl$`.

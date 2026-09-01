@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.33 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.34 (stable)
 
+- s3.0.34: ScammerVille NFL collar/helmet + per-screen photo sizing; jersey ShoutOuts save name-source as `attribution` for FROM on the FLOQR card.
 - s3.0.33: NFL photo-back layout (name midway yoke/number, larger patron name, visible collar, helmet raised); regenerated 49ers + ScammerVille PNGs; `nfl-jersey-photo-backs.mdc` prompt rule.
 - s3.0.32: Service members panel UX (profile guide in ? help, single submit, bottom confirmation); NFL photo-back jerseys (49ers + ScammerVille); Club Admin approval copy.
 - s3.0.31: Services & Service Members help is patron-facing (no IsPatron flags); panel chrome + help localized in all 11 languages.

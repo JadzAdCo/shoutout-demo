@@ -753,6 +753,8 @@
       jerseySecondary: params.get("jerseySecondary") || "",
       jerseyAccent: params.get("jerseyAccent") || "",
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
+      attribution: params.get("attribution") || "",
+      soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
       stadiumMessage: params.get("stadiumMessage") || "",
       animationDurationSeconds: 20,
