@@ -7,24 +7,24 @@ alwaysApply: true
 
 **One silhouette.** Bulky NFL yoke cut with shoulder nameplate, short sleeves with stripe bands, side helmet in frame. Solid `#000` (LED energy). No hanger on photo backs.
 
-**Scale lock:** PNG jersey must fill the frame like the ScammerVille / 49ers reference — **never shrink the jersey** to add collar margin or lift the helmet. CSS uses **width-based** `background-size: 88% auto` (not `auto XX%` height-fit). Overlay positions are tuned per format; the photo scale stays fixed.
+**Scale lock:** PNG jersey must fill the frame like the ScammerVille / 49ers reference — **never shrink the jersey** to add collar margin or lift the helmet. CSS uses **width-based** `background-size: 88% auto` (not `auto XX%` height-fit).
+
+**Uniform stack shift:** `--nfl-photo-stack-y` (default `10%`) moves jersey PNG + club wordmark + patron overlays together via `calc()` on `background-position` and overlay `top`. Font caps unchanged (~11.5vh name, ~48vh number).
+
+**Helmet:** Regenerate PNG with **identical jersey scale**; only move the side helmet **up** so it does not touch the right jersey sleeve.
 
 **Wordmark:** baked into the PNG only (club on yoke plate). Upright block caps. CSS hides `.soccer-jersey-team` on photo kits.
 
-**Collar:** visible gold collar band in the PNG. If the LED crops the top, nudge `background-position` (e.g. `center 38%`) — **do not** shrink `background-size`.
+**Patron name (CSS):** base `top` ~18% + `var(--nfl-photo-stack-y)` (64×32 base ~16% + shift); `height` ~9%; cap ~11.5vh.
 
-**Helmet:** kit-secondary helmet on the **right**, overlapping the hem. Regenerate from the current PNG with **identical jersey scale**; only move the helmet upward so the facemask is fully visible.
+**Number (CSS):** base `top` ~40% + shift (64×32 ~38% + shift); `height` ~28%; cap ~48vh.
 
-**Patron name (CSS):** `#displayMain.soccer-jersey-name` — midway yoke ↔ number. `top` ~18% (64×32 ~16%); `height` ~9%; cap ~11.5vh.
+**Background:** `background-size: 88% auto`; `background-position: center calc(38% + var(--nfl-photo-stack-y))`.
 
-**Number (CSS):** `#displaySub.soccer-jersey-number` — `top` ~40% (64×32 ~38%); `height` ~28%; `align-content: center`; cap ~48vh.
-
-**Background (`display.css`):** `background-size: 88% auto`; `background-position: center 38%`.
-
-## GenerateImage prompt (helmet / collar only — same scale)
+## GenerateImage prompt (helmet only)
 
 ```
-CRITICAL: Keep the reference image EXACTLY — same jersey scale, position, size, camera, silhouette. Do NOT shrink the jersey. Do NOT add margins that make the jersey smaller. ONLY: (1) crisp visible gold collar at neckline if needed; (2) move the side helmet UP so facemask is fully visible. Solid #000000. Print ONLY "{CLUB}" on yoke. No patron name/number. No hanger.
+CRITICAL: Keep the reference image EXACTLY — same jersey scale, position, size, camera, silhouette. Do NOT shrink or move the jersey body. ONLY move the side helmet UP on the right so there is clear black gap between helmet and right jersey sleeve — helmet must NOT touch the sleeve. Facemask fully visible. Solid #000000. Print ONLY "{CLUB}" on yoke. No patron name/number. No hanger.
 ```
 
 Resume: `@jersey$` / `$jersey@` / `@nfl$`.

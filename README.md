@@ -1,6 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.36 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.39 (stable)
 
-- s3.0.36: NFL ScammerVille silhouette scale restored (`88% auto`); helmet raised without shrinking jersey; rule file corrected.
+- s3.0.39: NFL uniform stack shift (`--nfl-photo-stack-y: 10%`); ScammerVille helmet gap PNG; overlays move with jersey.
 - s3.0.35: Classic B&W pre-shoutout idle uses dark board + white text (lower LED current); 64×48 main text cap 48 chars; emoji on non-B&W templates; `classic-bw-pre-shoutout.mdc` rule.
 - s3.0.34: ScammerVille NFL collar/helmet + per-screen photo sizing; jersey ShoutOuts save name-source as `attribution` for FROM on the FLOQR card.
 - s3.0.33: NFL photo-back layout (name midway yoke/number, larger patron name, visible collar, helmet raised); regenerated 49ers + ScammerVille PNGs; `nfl-jersey-photo-backs.mdc` prompt rule.
