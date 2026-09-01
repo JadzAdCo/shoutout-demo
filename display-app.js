@@ -1292,8 +1292,8 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        baseName = Math.min(baseName * 0.5, 10.5);
-        baseNumber = Math.min(baseNumber * 0.78, 58);
+        baseName = Math.min(baseName * 0.55, 11.5);
+        baseNumber = Math.min(baseNumber * 0.72, 48);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);

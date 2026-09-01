@@ -985,8 +985,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 /* NFL photo kits (yoke back + side helmet in PNG): no hanger */
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  background-size:88% auto!important;
-  background-position:center 42%!important;
+  background-size:82% auto!important;
+  background-position:center 36%!important;
   background-repeat:no-repeat!important;
   background-color:#000!important;
 }
@@ -997,8 +997,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:22%!important;
-  height:8%!important;
+  top:18%!important;
+  height:9%!important;
   left:22%!important;
   right:22%!important;
   margin:0 auto!important;
@@ -1013,8 +1013,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   color:var(--jersey-secondary,#fff)!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:36%!important;
-  height:32%!important;
+  top:40%!important;
+  height:28%!important;
   left:22%!important;
   right:22%!important;
   margin:0 auto!important;
@@ -1022,8 +1022,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   text-align:center!important;
   justify-items:center!important;
   justify-content:center!important;
-  align-content:end!important;
-  place-items:end center!important;
+  align-content:center!important;
+  place-items:center!important;
   font-family:Impact,"Arial Black","Helvetica Neue Condensed","Arial Narrow",sans-serif!important;
   font-style:normal!important;
   font-weight:900!important;
@@ -1036,38 +1036,38 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:21%!important;
+  top:17%!important;
   left:24%!important;
   right:24%!important;
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:35%!important;
+  top:39%!important;
   left:24%!important;
   right:24%!important;
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:21%!important;
+  top:17%!important;
   left:22%!important;
   right:22%!important;
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:35%!important;
+  top:39%!important;
   left:22%!important;
   right:22%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:20%!important;
+  top:16%!important;
   left:20%!important;
   right:20%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:34%!important;
-  height:34%!important;
+  top:38%!important;
+  height:30%!important;
   left:20%!important;
   right:20%!important;
 }
