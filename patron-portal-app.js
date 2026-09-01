@@ -2943,26 +2943,31 @@
     return "patron";
   }
 
+  let smVenuePicker = null;
+  const serviceAccess = window.FLOQRServiceAccess || {};
+
   function clubLocationLabel(id) {
     const loc = (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || {};
-    return [loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" - ") || id;
+    if (window.FLOQRVenuePicker?.venueLabel) return window.FLOQRVenuePicker.venueLabel({id, ...loc});
+    return [loc.locationName || loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" · ") || id;
   }
 
-  function populateServiceMemberLocations() {
-    const select = byId("smRelatedLocations");
-    if (!select) return;
-    const locations = window.SHOUTOUT_CLUB_LOCATIONS || {};
-    select.innerHTML = Object.entries(locations).map(([id, loc]) => {
-      const label = [loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" - ");
-      return `<option value="${esc(id)}">${esc(label)}</option>`;
-    }).join("");
+  function initSmVenuePicker() {
+    const mount = byId("smVenuePickerMount");
+    if (!mount || !window.FLOQRVenuePicker || smVenuePicker) return;
+    smVenuePicker = window.FLOQRVenuePicker.mount({
+      container: mount,
+      db,
+      staticCatalog: window.SHOUTOUT_CLUB_LOCATIONS || {}
+    });
   }
 
   function smWorkerRoleLabel(request = {}) {
+    if (request.serviceSubtype) return request.serviceSubtype;
     const type = String(request.roleType || "").toLowerCase();
     if (SERVICE_ROLE_LABELS[type]) return SERVICE_ROLE_LABELS[type];
     if (type === "busboy" || type === "security") return "Bus Boys or Security";
-    return request.serviceSubtype || request.roleLabel || "Waiter / Waitress / Bottle Girl";
+    return request.roleLabel || "Waiter / Waitress / Bottle Girl";
   }
 
   function smDesignationId(clubLocationId, uid) {
@@ -3019,16 +3024,13 @@
       setText("smRoleStatus", "Please sign in first.");
       return;
     }
-    const roleType = (byId("smRequestType")?.value || "").trim();
-    const publicName = (byId("smPublicName")?.value || "").trim();
-    const serviceSubtype = (byId("smServiceSubtype")?.value || "").trim();
-    const instagram = (byId("smInstagram")?.value || "").trim();
-    const phone = (byId("smPhone")?.value || "").trim();
-    const website = (byId("smWebsite")?.value || "").trim();
+    const serviceSubtype = (byId("smServiceSpecialty")?.value || "").trim();
     const notes = (byId("smRoleNotes")?.value || "").trim();
-    const relatedLocations = Array.from(byId("smRelatedLocations")?.selectedOptions || []).map(option => option.value).filter(Boolean);
-    if (!roleType || !publicName) {
-      setText("smRoleStatus", "Role and public name are required.");
+    const relatedLocations = smVenuePicker?.getSelectedIds?.() || [];
+    const roleType = serviceAccess.roleTypeForSpecialty?.(serviceSubtype) || "hospitality";
+    const publicName = serviceAccess.displayWorkerName?.(user, currentProfile) || user.displayName || user.email || "FLOQR member";
+    if (!serviceSubtype) {
+      setText("smRoleStatus", "Choose your service role.");
       return;
     }
     if (!relatedLocations.length) {
@@ -3041,9 +3043,6 @@
       roleType,
       publicName,
       serviceSubtype,
-      instagram,
-      phone,
-      website,
       notes,
       relatedLocations,
       status: "pending",
@@ -3056,7 +3055,7 @@
       batch.set(associationRef, {
         ...request,
         clubLocationId,
-        roleLabel: SERVICE_ROLE_LABELS[roleType] || roleType,
+        roleLabel: serviceSubtype,
         workerUid: user.uid,
         status: "pending",
         requestedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -3067,20 +3066,20 @@
         clubLocationId,
         workerAssociationRequestId: associationRef.id,
         workerUid: user.uid,
-        workerName: publicName || user.displayName || user.email || "FLOQR patron",
-        roleLabel: SERVICE_ROLE_LABELS[roleType] || roleType,
+        workerName: publicName,
+        roleLabel: serviceSubtype,
         serviceSubtype,
         status: "unread",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     });
     batch.set(db.collection("users").doc(user.uid), serviceMembershipPatch({
-      requestedRoles: firebase.firestore.FieldValue.arrayUnion(SERVICE_ROLE_LABELS[roleType] || roleType),
+      requestedRoles: firebase.firestore.FieldValue.arrayUnion(serviceSubtype),
       requestedClubLocationIds: relatedLocations,
-      publicProfileType: publicProfileTypeForRole(roleType),
+      publicProfileType: serviceAccess.publicProfileTypeForSpecialty?.(serviceSubtype) || publicProfileTypeForRole(roleType),
       serviceSubtype,
-      memberType: SERVICE_ROLE_LABELS[roleType] || roleType,
-      memberLevel: SERVICE_ROLE_LABELS[roleType] || roleType,
+      memberType: serviceSubtype,
+      memberLevel: serviceSubtype,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }), {merge: true});
     await batch.commit();
@@ -3096,12 +3095,12 @@
       wrap.innerHTML = "<p class='sub'>No Club Admin club is linked to this account yet.</p>";
       return;
     }
-    const requests = await getCollectionSafe("workerAssociationRequests", x => x.clubLocationId === clubLocationId, 400);
+    const requests = await queryCollectionSafe("workerAssociationRequests", "clubLocationId", clubLocationId, 200);
     const pending = requests.filter(request => String(request.status || "pending").toLowerCase() === "pending");
     wrap.innerHTML = pending.length ? pending.map(request => `<div class="queue-item">
       <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
-      <p>${esc(request.roleLabel || smWorkerRoleLabel(request))}${request.serviceSubtype ? ` - ${esc(request.serviceSubtype)}` : ""}</p>
-      <small>${esc(request.email || request.instagram || "")}</small>
+      <p>${esc(smWorkerRoleLabel(request))}</p>
+      <small>${esc(request.email || "")}</small>
       <div class="queue-actions"><button type="button" data-sm-request="${esc(request.id)}" data-sm-status="approved">Approve</button><button type="button" data-sm-request="${esc(request.id)}" data-sm-status="rejected">Reject</button></div>
     </div>`).join("") : "<p class='sub'>No pending worker requests for this club yet.</p>";
     wrap.querySelectorAll("[data-sm-request]").forEach(button => {
@@ -3268,6 +3267,9 @@
     const pageParams = new URL(location.href).searchParams;
     const wantServices = ["service-members", "servicemembers", "role-request"].includes(String(pageParams.get("tab") || "").toLowerCase());
     if (wantServices) {
+      const type = pageParams.get("type") || pageParams.get("role") || "";
+      const specialty = serviceAccess.specialtyFromQueryType?.(type) || "";
+      if (specialty && byId("smServiceSpecialty")) byId("smServiceSpecialty").value = specialty;
       if (datapoints.servicesTabVisible) showPortalPanel("portalServiceMembers", "portalServiceMembers");
       else showPortalPanel("portalProfile", "portalProfile");
     }
@@ -3298,7 +3300,7 @@
     if (frame && (datapoints.workCalendarEligible || confirmDeepLink)) frame.src = href;
     const card = byId("staffCalendarCard");
     card?.classList.toggle("hidden", !datapoints.workCalendarEligible);
-    populateServiceMemberLocations();
+    initSmVenuePicker();
     const adminIds = datapoints.clubAdminLocationIds?.length
       ? datapoints.clubAdminLocationIds
       : smAdminClubIds(currentProfile || user, designations, uid);
@@ -3533,6 +3535,8 @@
     bind("exportDataBtn", downloadData);
     bind("deleteDataBtn", requestDelete);
     bind("smSubmitRoleRequestBtn", submitServiceMemberRequest);
+    serviceAccess.fillSpecialtySelect?.(byId("smServiceSpecialty"));
+    initSmVenuePicker();
     bind("becomeServiceMemberBtn", electBecomeServiceMember);
     bind("smElectBtn", () => electServiceMember());
     byId("smElectSearch")?.addEventListener("input", renderServiceMemberElectMatches);

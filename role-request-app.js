@@ -1,10 +1,11 @@
-/* role-request-app.js v29.07 - service membership and club association requests */
+/* role-request-app.js — service membership and club association requests */
 (function () {
   "use strict";
 
   const byId = id => document.getElementById(id);
   const setText = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
   const valueOf = id => (byId(id)?.value || "").trim();
+  const access = window.FLOQRServiceAccess || {};
 
   if (!window.firebaseConfig) {
     setText("roleStatus", "firebase-config.js missing window.firebaseConfig.");
@@ -15,28 +16,16 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", busboyOrSecurity:"Bus Boys or Security", venueManager:"Venue Manager", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
+  let venuePicker = null;
 
-  function publicProfileTypeForRole(roleType) {
-    if (roleType === "hospitality" || roleType === "bartender") return "hospitality";
-    if (roleType === "busboyOrSecurity" || roleType === "venueManager" || roleType === "dj" || roleType === "promoter") return roleType;
-    return "patron";
-  }
-
-  function getSelectedLocations() {
-    const select = byId("relatedLocations");
-    if (!select) return [];
-    return Array.from(select.selectedOptions || []).map(option => option.value).filter(Boolean);
-  }
-
-  function populateLocations() {
-    const select = byId("relatedLocations");
-    const locations = window.SHOUTOUT_CLUB_LOCATIONS || {};
-    if (!select) return;
-    select.innerHTML = Object.entries(locations).map(([id, loc]) => {
-      const label = [loc.name, loc.city, loc.region || loc.state, loc.country].filter(Boolean).join(" - ");
-      return `<option value="${id}">${label}</option>`;
-    }).join("");
+  function mountVenuePicker() {
+    const mount = byId("roleVenuePickerMount");
+    if (!mount || !window.FLOQRVenuePicker) return;
+    venuePicker = window.FLOQRVenuePicker.mount({
+      container: mount,
+      db,
+      staticCatalog: window.SHOUTOUT_CLUB_LOCATIONS || {}
+    });
   }
 
   async function submitRoleRequest() {
@@ -46,16 +35,14 @@
       return;
     }
 
-    const roleType = valueOf("requestType");
-    const publicName = valueOf("publicName");
-    const serviceSubtype = valueOf("serviceSubtype");
-    const instagram = valueOf("instagram");
-    const phone = valueOf("phone");
-    const website = valueOf("website");
+    const serviceSubtype = valueOf("serviceSpecialty");
     const notes = valueOf("roleNotes");
-    const relatedLocations = getSelectedLocations();
-    if (!roleType || !publicName) {
-      setText("roleStatus", "Role and public name are required.");
+    const relatedLocations = venuePicker?.getSelectedIds?.() || [];
+    const roleType = access.roleTypeForSpecialty?.(serviceSubtype) || "hospitality";
+    const publicName = access.displayWorkerName?.(user, {}) || user.displayName || user.email || "FLOQR member";
+
+    if (!serviceSubtype) {
+      setText("roleStatus", "Choose your service role.");
       return;
     }
     if (!relatedLocations.length) {
@@ -69,9 +56,6 @@
       roleType,
       publicName,
       serviceSubtype,
-      instagram,
-      phone,
-      website,
       notes,
       relatedLocations,
       status: "pending",
@@ -80,62 +64,57 @@
 
     await db.collection("roleRequests").add(request);
 
-    const roleLabels = {clubAdmin:"Club Admin", dj:"DJ", promoter:"Promoter", hospitality:"Waiter / Waitress / Bottle Girl", busboyOrSecurity:"Bus Boys or Security", venueManager:"Venue Manager", bartender:"Bartender / Barman", mediaCreator:"Videographer / Camera Operator"};
     const batch = db.batch();
     relatedLocations.forEach(clubLocationId => {
       const associationRef = db.collection("workerAssociationRequests").doc();
       batch.set(associationRef, {
         ...request,
         clubLocationId,
-        roleLabel:roleLabels[roleType] || roleType,
-        workerUid:user.uid,
-        status:"pending",
-        requestedAt:firebase.firestore.FieldValue.serverTimestamp()
+        roleLabel: serviceSubtype,
+        workerUid: user.uid,
+        status: "pending",
+        requestedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       const notificationRef = db.collection("clubAdminNotifications").doc();
       batch.set(notificationRef, {
-        type:"workerAssociationRequest",
+        type: "workerAssociationRequest",
         clubLocationId,
-        workerAssociationRequestId:associationRef.id,
-        workerUid:user.uid,
-        workerName:publicName || user.displayName || user.email || "FLOQR patron",
-        roleLabel:roleLabels[roleType] || roleType,
+        workerAssociationRequestId: associationRef.id,
+        workerUid: user.uid,
+        workerName: publicName,
+        roleLabel: serviceSubtype,
         serviceSubtype,
-        status:"unread",
-        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        status: "unread",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     });
     batch.set(db.collection("users").doc(user.uid), {
-      serviceMember:roleType !== "clubAdmin",
-      requestedRoles:firebase.firestore.FieldValue.arrayUnion(roleLabels[roleType] || roleType),
-      requestedClubLocationIds:relatedLocations,
-      publicProfileType: publicProfileTypeForRole(roleType),
+      serviceMember: roleType !== "clubAdmin",
+      requestedRoles: firebase.firestore.FieldValue.arrayUnion(serviceSubtype),
+      requestedClubLocationIds: relatedLocations,
+      publicProfileType: access.publicProfileTypeForSpecialty?.(serviceSubtype) || "patron",
       serviceSubtype,
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge:true});
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
     await batch.commit();
 
-    if (roleType === "dj") {
-      await db.collection("djProfiles").doc(user.uid).set(request, { merge: true });
-    }
-    if (roleType === "promoter") {
-      await db.collection("promoterProfiles").doc(user.uid).set(request, { merge: true });
-    }
+    if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
+    if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
 
     setText("roleStatus", `Association request submitted to ${relatedLocations.length} club(s) for approval.`);
   }
 
   function applyTypeFromQuery() {
     const type = new URLSearchParams(location.search).get("type") || new URLSearchParams(location.search).get("role") || "";
-    const select = byId("requestType");
-    if (!select || !type) return;
-    const allowed = new Set(["clubAdmin", "dj", "promoter", "hospitality", "bartender", "mediaCreator", "busboyOrSecurity", "venueManager"]);
-    if (allowed.has(type)) select.value = type;
+    const specialty = access.specialtyFromQueryType?.(type) || "";
+    const select = byId("serviceSpecialty");
+    if (select && specialty) select.value = specialty;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    populateLocations();
+    access.fillSpecialtySelect?.(byId("serviceSpecialty"));
     applyTypeFromQuery();
+    mountVenuePicker();
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",
@@ -150,7 +129,7 @@
   });
 
   auth.onAuthStateChanged(user => {
-    setText("roleStatus", user ? "Choose the access type you want to request." : "Please sign in.");
+    setText("roleStatus", user ? "Choose the service role and clubs you want to associate with." : "Please sign in.");
     byId("roleLogin")?.classList.toggle("hidden", !!user);
     byId("roleForm")?.classList.toggle("hidden", !user);
   });

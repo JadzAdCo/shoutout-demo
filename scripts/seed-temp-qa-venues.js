@@ -13,6 +13,10 @@ function clubPayload(n) {
     ...row,
     displayScreenFormatIds: ["led-96x48", "led-64x32"],
     primaryDisplayScreenFormatId: "led-96x48",
+    secondaryDisplayScreenFormatId: "led-96x48",
+    VenueSupports96x48: 1,
+    VenueSupports64x48: 0,
+    VenueSupports64x32: 1,
     publicProfileSections: {
       about: true, contact: true, upcomingEvents: true, pastEvents: true,
       featuredDjs: true, featuredStaff: true, promotionGroups: true, gallery: true
@@ -90,16 +94,26 @@ function clubPayload(n) {
       for (const doc of usersSnap.docs) {
         const data = doc.data() || {};
         const email = String(data.email || "").toLowerCase();
-        const match = email.match(/^temp_(clubadmin|dj|waitress|waiter|bottle|promoter)_(\d+)@floqr-demo\.com$/);
+        const match = email.match(/^temp_(clubadmin|dj|waitress|waiter|busboy|bottle|promoter|bartender)_(\d+)@floqr-demo\.com$/);
         if (!match) continue;
         const role = match[1];
         const n = Number(match[2]);
         const patch = showcase.userProfilePatch(role, n, doc.id);
-        await doc.ref.set({
+        const mergePatch = {
           ...patch,
           email: data.email || patch.email,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        }, {merge: true});
+        };
+        if (showcase.roleSkipsAutoClubAffiliation(role)) {
+          mergePatch.affiliatedClubId = admin.firestore.FieldValue.delete();
+          mergePatch.affiliatedClubName = admin.firestore.FieldValue.delete();
+          mergePatch.affiliatedClubLocationId = admin.firestore.FieldValue.delete();
+          mergePatch.affiliatedClubLocationIds = admin.firestore.FieldValue.delete();
+          mergePatch.approvedRoles = admin.firestore.FieldValue.delete();
+          mergePatch.requestedClubLocationIds = admin.firestore.FieldValue.delete();
+          mergePatch.requestedRoles = admin.firestore.FieldValue.delete();
+        }
+        await doc.ref.set(mergePatch, {merge: true});
         usersUpdated += 1;
       }
       lastDoc = usersSnap.docs[usersSnap.docs.length - 1];
