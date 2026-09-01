@@ -559,7 +559,7 @@
       id: "help-service-member",
       kind: "help",
       label: "Become a service member",
-      blurb: "All users start as patrons. Elect from My Profile so IsServiceMember is 1 and IsPatron is 0, then open Settings → Services & Service Members to request a role and club association.",
+      blurb: "Everyone starts as a FLOQR patron. Elect from My Profile to unlock Services & Service Members, then pick your service role, select clubs, and submit for Club Admin approval.",
       steps: [
         "Open My Profile & Settings → My Profile and elect to become a service member if the tab is hidden.",
         "Open Services & Service Members and pick the role that matches how you work nightlife.",

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.30 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.31 (stable)
 
+- s3.0.31: Services & Service Members help is patron-facing (no IsPatron flags); panel chrome + help localized in all 11 languages.
 - s3.0.30: Service role request uses specialty dropdown + searchable multi-club picker; club admin indexed association queries.
 - s3.0.28: full chrome+help locales for all 11 supported languages.
 - s3.0.27: Full UI chrome packs for ru/nl/de/es (parity with en); patron/venueAdmin/serviceMember help locales (ru/nl); translation rule.

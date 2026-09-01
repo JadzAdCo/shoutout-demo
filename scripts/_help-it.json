@@ -85,7 +85,7 @@
   },
   "help-service-members": {
     "title": "Services & Service Members",
-    "body": "Impostazioni → Services & Service Members è nascosto quando users.IsPatron è 1/sì. Seleziona da Il mio profilo per impostare IsServiceMember (IsserviceMember) su 1/sì e IsPatron su 0/no. Quindi richiedi Club Admin, DJ, Promoter, ospitalità o altri ruoli. Vedi anche Rivedi ed eleggi."
+    "body": "Tutti iniziano come patron FLOQR. In My Profile & Settings, tocca Elect to become a service member per aprire questa scheda. Scegli il ruolo di servizio (Waitress, DJ, Promoter, ecc.), cerca e seleziona uno o più club e invia. Il Club Admin di ogni club approva la tua associazione. I Club Admins usano anche Review & elect per le richieste in arrivo."
   },
   "help-venue-website-ingest": {
     "title": "Acquisizione del sito web del club (API, RSS, iframe)",
