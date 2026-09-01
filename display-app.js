@@ -236,6 +236,14 @@
       .trim();
   }
 
+  function cleanDisplayText(value) {
+    // Patron-facing templates (not traditional B&W): preserve emoji; strip control chars only.
+    return String(value || "")
+      .normalize("NFC")
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+      .trim();
+  }
+
   function jerseyTeamLabel(template = {}, data = {}) {
     const team = window.FLOQRResolveSoccerTeam?.(data.jerseyTeamId || "") || null;
     const explicit = cleanBoardText(
@@ -338,16 +346,18 @@
     if (line && rows.length < maxRows) rows.push(line);
   }
 
-  function displayTextRows(mainText, caps = {}) {
+  function displayTextRows(mainText, caps = {}, options = {}) {
+    const uppercase = options.uppercase !== false;
     const maxRows = Math.max(1, Number(caps.lineCount || 1));
     const maxChars = Math.max(1, Number(caps.maxCharactersPerLine || caps.perLine || caps.maxMainCharacters || 60));
     const rows = [];
 
-    const prepared = glyphSlice(String(mainText || "")
+    let prepared = String(mainText || "")
       .normalize("NFC")
-      .toUpperCase()
       .replace(/\r\n?/g, "\n")
-      .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " "), 0, maxChars * maxRows + maxRows - 1);
+      .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ");
+    if (uppercase) prepared = prepared.toUpperCase();
+    prepared = glyphSlice(prepared, 0, maxChars * maxRows + maxRows - 1);
     prepared.split(/\n+/).forEach(sourceLine => {
       if (rows.length >= maxRows) return;
       const words = sourceLine.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -1104,7 +1114,9 @@
     if (isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId)) {
       t = resolveJerseyStyle(t, data);
     }
-    const isClassicBoard = templateId === "blackwhite" || t.id === "blackwhite" || t.className === "classic-bw" || t.identityRail === true;
+    const isClassicBlackWhite = templateId === "blackwhite" || t.id === "blackwhite";
+    const isClassicBoard = isClassicBlackWhite || t.className === "classic-bw" || t.identityRail === true;
+    const isIdleCta = !!(data.idleCta || String(data.status || "").toLowerCase() === "default");
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
@@ -1143,6 +1155,7 @@
       .filter(cls => cls && cls !== "neon")
       .forEach(cls => canvas.classList.add(cls));
     if (isClassicBoard && !isTextOverlay) canvas.classList.add("classic-board-template");
+    canvas.classList.toggle("classic-bw-idle", isClassicBoard && isIdleCta);
     if (isTextOverlay) canvas.classList.add("text-overlay-template");
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
@@ -1181,7 +1194,9 @@
       : rawMain;
     const mainText = isSoccerJersey
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
-      : mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
+      : isClassicBoard
+      ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
+      : glyphSlice(cleanDisplayText(mainSource), 0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
     // Soccer jersey mark: any characters including emoji (grapheme-capped at 2).
     const subText = isSoccerJersey
       ? glyphSlice(cleanJerseyMark(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
@@ -1418,7 +1433,7 @@
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");
-      const rows = displayTextRows(mainText, textCaps);
+      const rows = displayTextRows(mainText, textCaps, {uppercase: false});
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
       const identity = usesSplitMedia ? splitMediaIdentityPresentation(data, subText) : null;

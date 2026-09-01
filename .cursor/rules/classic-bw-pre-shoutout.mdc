@@ -1,0 +1,54 @@
+---
+description: Traditional Black and White ShoutOut — pre-shoutout idle power mode vs live board
+alwaysApply: true
+---
+
+# Traditional Black and White (`blackwhite`) template
+
+**Template id:** `blackwhite` · **class:** `classic-bw` · **profile:** `classicBoard`
+
+Default Zebbies / club idle board uses this template in **pre-shoutout mode** (`status: default`, `idleCta: true`) — e.g. “Use ShoutOut @ Clubname”.
+
+## Pre-shoutout idle (lower LED current)
+
+When `display-app.js` renders `blackwhite` with `idleCta` / `status: default`, the canvas gets **`classic-bw-idle`**.
+
+| Region | Live patron ShoutOut | Pre-shoutout idle |
+|---|---|---|
+| Center message panel (`:after` white board) | Light `#fbfdff` gradient | **Black** `#050505`–`#101114` gradient |
+| Main board text | Dark `#111318` on light panel | **White** `#f8f8f8` on dark panel |
+| Outer sign chrome | Red/black frame (unchanged) | Same |
+| FLOQR identity rail | Red/black pill (unchanged) | Same |
+
+**Do not** apply `classic-bw-idle` to approved/live patron ShoutOuts — only idle/default CTA.
+
+### CSS contract (`display.css`)
+
+- `.classic-bw.classic-bw-idle .display-center:after` → dark panel background
+- `.classic-bw.classic-bw-idle #displayMain.classic-bw-board` → white text, dark row tint
+- `.classic-bw.classic-bw-idle .classic-board-lines b` → white lettering, dark shadow
+
+### JS contract (`display-app.js`)
+
+```js
+canvas.classList.toggle("classic-bw-idle", isClassicBoard && isIdleCta);
+```
+
+## Live ShoutOut (patron-composed)
+
+- Three-line physical board; uppercase letters only (`cleanBoardText` / `normalizeClassicBoardText`).
+- **No emoji** on `blackwhite` — composer uses uppercase + classic normalization; display uses `displayTextRows` with `uppercase: true`.
+- 64×48 cap: **48 characters including spaces** (`maxMainCharacters: 48`, `maxCharactersPerLine: 16` × 3 lines).
+
+## Other templates (not `blackwhite`)
+
+- Emoji supported in composer (`glyphCap` / `graphemes`) and on display (`cleanDisplayText`, `displayTextRows` with `uppercase: false`).
+- 64×48 `full` + `classicBoard` profiles: `maxMainCharacters: 48` where updated in `shared-data.js`.
+
+## FIX PROMPT — change idle power colors only
+
+```
+Traditional Black and White pre-shoutout idle only: keep red/black outer sign frame. Change the INNER three-line message panel from white to solid black (#050505–#101114). Change main board lettering from dark to white (#f8f8f8). Do not alter live approved ShoutOut white board. Add classic-bw-idle CSS; toggle from display-app when idleCta or status default.
+```
+
+Resume: `@classic-bw$` / `$blackwhite$`.

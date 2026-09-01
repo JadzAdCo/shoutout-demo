@@ -3275,6 +3275,19 @@
       .trim();
   }
 
+  function isClassicBlackWhiteTemplate(template = getTemplate()) {
+    return String(template?.id || selectedTemplate || "") === "blackwhite";
+  }
+
+  function normalizeClassicBoardText(value = "") {
+    return String(value || "")
+      .normalize("NFC")
+      .toUpperCase()
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function fitTemplateText(value = "", type = "main") {
     const caps = templateDisplayCaps();
     const limit = Number(type === "sub" ? caps.sub : caps.main);
@@ -3287,11 +3300,35 @@
     if (isSoccerJerseyTemplate() && type === "main") {
       return glyphCap(cleaned.toUpperCase(), limit);
     }
-    if (type !== "main" || caps.lineCount <= 1) return cleaned.slice(0, limit);
+    if (isClassicBlackWhiteTemplate() && type === "main") {
+      const normalized = normalizeClassicBoardText(cleaned);
+      if (caps.lineCount <= 1) return graphemes(normalized).slice(0, limit).join("");
+      const availableLines = caps.lineCount;
+      const visibleLimit = Math.min(limit, caps.perLine * availableLines);
+      const sourceLimit = visibleLimit + Math.max(0, availableLines - 1);
+      const words = normalized.slice(0, sourceLimit).split(/\s+/).filter(Boolean);
+      const rows = [];
+      let line = "";
+      words.forEach(word => {
+        const chunks = [];
+        for (let i = 0; i < word.length; i += caps.perLine) chunks.push(word.slice(i, i + caps.perLine));
+        chunks.forEach(chunk => {
+          const next = line ? `${line} ${chunk}` : chunk;
+          if (next.length <= caps.perLine) line = next;
+          else {
+            if (line && rows.length < caps.lineCount) rows.push(line);
+            line = chunk;
+          }
+        });
+      });
+      if (line && rows.length < caps.lineCount) rows.push(line);
+      return rows.slice(0, caps.lineCount).join("\n");
+    }
+    if (type !== "main" || caps.lineCount <= 1) return glyphCap(cleaned, limit);
     const availableLines = caps.lineCount;
     const visibleLimit = Math.min(limit, caps.perLine * availableLines);
     const sourceLimit = visibleLimit + Math.max(0, availableLines - 1);
-    const words = cleaned.slice(0, sourceLimit).split(/\s+/).filter(Boolean);
+    const words = glyphCap(cleaned, sourceLimit).split(/\s+/).filter(Boolean);
     const rows = [];
     let line = "";
     words.forEach(word => {
@@ -3317,7 +3354,8 @@
     if (caps.supported === false) return String(value || "");
     const maxRaw = Number(caps.main || 0) + Math.max(0, Number(caps.lineCount || 1) - 1);
     if (maxRaw <= 0) return String(value || "");
-    return String(value || "").slice(0, maxRaw);
+    if (isClassicBlackWhiteTemplate()) return String(value || "").slice(0, maxRaw);
+    return graphemes(value).slice(0, maxRaw).join("");
   }
 
   function applyFittedMainText(input) {
