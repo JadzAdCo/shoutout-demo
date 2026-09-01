@@ -22,6 +22,11 @@ const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
 const venueDatapoints = require("./venue-datapoint-extract");
 const {sendSystemMail} = require("./mail-log");
+const {
+  looksLikeBrokenDemoEmail,
+  brokenDemoEmailMessage,
+  demoEmailOtpDelivery
+} = require("./floqr-demo-accounts");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -579,23 +584,26 @@ function createOtpCode() {
 async function sendEmailOtp(email, code) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
   if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
-  const body = `Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`;
+  const delivery = demoEmailOtpDelivery(email);
+  const body = `${delivery.bodyPrefix}Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`;
   try {
     await sendSystemMail({
       apiKey: key,
       kind: "email-otp",
       source: "requestEmailOtp",
       trigger: "callable",
-      to: email,
+      to: delivery.deliveredTo,
       from: EMAIL_OTP_FROM,
-      subject: "Your FLOQR sign-in code",
+      subject: delivery.subject,
       textBody: body,
-      htmlBody: `<p>${body.replace(/</g, "&lt;")}</p>`,
-      redactBody: true
+      htmlBody: `<p>${body.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</p>`,
+      redactBody: true,
+      extra: delivery.redirected ? {demoIntendedEmail: delivery.intendedEmail} : undefined
     });
   } catch (err) {
     throw new HttpsError("internal", `Email provider returned ${err?.status || "error"}${err?.message ? `: ${String(err.message).slice(0, 180)}` : ""}.`);
   }
+  return delivery;
 }
 
 async function assertMasterAdmin(request) {
@@ -1025,6 +1033,9 @@ exports.runFloqrDiscoveryCrawl = onCall({
 
 exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {
   const email = normalizeEmail(request.data?.email);
+  if (looksLikeBrokenDemoEmail(email)) {
+    throw new HttpsError("invalid-argument", brokenDemoEmailMessage(email));
+  }
   const challengeId = crypto.createHash("sha256").update(email).digest("hex");
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
   const previous = await ref.get();
@@ -1037,8 +1048,15 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
     expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
   });
-  await sendEmailOtp(email, code);
-  return {challengeId, expiresInSeconds:360, delivery:"email"};
+  const delivery = await sendEmailOtp(email, code);
+  return {
+    challengeId,
+    expiresInSeconds:360,
+    delivery:"email",
+    intendedEmail: delivery.intendedEmail,
+    deliveredTo: delivery.deliveredTo,
+    redirected: delivery.redirected
+  };
 });
 
 exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {

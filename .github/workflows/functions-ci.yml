@@ -98,6 +98,7 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+          FUNCTIONS_DISCOVERY_TIMEOUT: "120"
         run: |
           firebase deploy \
             --only functions,firestore,storage \
