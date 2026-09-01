@@ -999,27 +999,12 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   letter-spacing:.05em!important;
   transform:none;
 }
-/* NFL photo kits (yoke back + side helmet in PNG): no hanger — scale by HEIGHT per screen so collar + helmet stay in frame */
+/* NFL photo kits (yoke back + side helmet in PNG): no hanger — fixed width scale (do not height-shrink jersey) */
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  background-size:auto 86%!important;
-  background-position:center 50%!important;
+  background-size:88% auto!important;
+  background-position:center 38%!important;
   background-repeat:no-repeat!important;
   background-color:#000!important;
-}
-.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background,
-.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  background-size:auto 90%!important;
-  background-position:center 50%!important;
-}
-.display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background,
-.display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  background-size:auto 88%!important;
-  background-position:center 50%!important;
-}
-.display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background,
-.display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  background-size:auto 82%!important;
-  background-position:center 50%!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .jersey-hanger-mount{
   display:none!important;
