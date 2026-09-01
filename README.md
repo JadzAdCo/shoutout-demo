@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.32 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.0.33 (stable)
 
+- s3.0.33: NFL photo-back layout (name midway yoke/number, larger patron name, visible collar, helmet raised); regenerated 49ers + ScammerVille PNGs; `nfl-jersey-photo-backs.mdc` prompt rule.
 - s3.0.32: Service members panel UX (profile guide in ? help, single submit, bottom confirmation); NFL photo-back jerseys (49ers + ScammerVille); Club Admin approval copy.
 - s3.0.31: Services & Service Members help is patron-facing (no IsPatron flags); panel chrome + help localized in all 11 languages.
 - s3.0.30: Service role request uses specialty dropdown + searchable multi-club picker; club admin indexed association queries.
