@@ -1813,8 +1813,8 @@
     const pending = workerAssociationRequests.filter(request => String(request.status || "pending").toLowerCase() === "pending");
     byId("pendingWorkerRequests").innerHTML = pending.length ? pending.map(request => `<div class="queue-item">
       <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
-      <p>${esc(request.roleLabel || request.roleType || "Requested worker role")}${request.serviceSubtype ? ` - ${esc(request.serviceSubtype)}` : ""}</p>
-      <small>${esc(request.email || request.instagram || "")}</small>
+      <p>${esc(request.serviceSubtype || workerRoleLabel(request))}</p>
+      <small>${esc(request.email || "")}</small>
       <div class="queue-actions"><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="approved">Approve</button><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="rejected">Reject</button></div>
     </div>`).join("") : "<p class='sub'>No pending worker requests for this club location yet.</p>";
     byId("pendingWorkerRequests").querySelectorAll("[data-worker-request]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerRequest, button.dataset.workerStatus)));
@@ -1838,11 +1838,11 @@
     const [users, designations, requests] = await Promise.all([
       getCollectionSafe("users"),
       getCollectionSafe("clubEmployeeDesignations"),
-      getCollectionSafe("workerAssociationRequests")
+      queryCollectionWhere("workerAssociationRequests", "clubLocationId", locationId, 200)
     ]);
     adminUsers = users;
     adminDesignations = designations.filter(x => x.clubLocationId === locationId);
-    workerAssociationRequests = requests.filter(x => x.clubLocationId === locationId);
+    workerAssociationRequests = requests;
     const teamOptions = byId("guestSupportingTeamOptions");
     if (teamOptions) teamOptions.innerHTML = adminDesignations.filter(item => String(item.status || "approved") === "approved").map(item => {
       const name = item.workerName || item.workerUsername || item.workerEmail || "Approved team member";
@@ -1853,6 +1853,7 @@
   }
 
   function workerRoleLabel(request = {}) {
+    if (request.serviceSubtype) return request.serviceSubtype;
     const type = String(request.roleType || "").toLowerCase();
     if (type === "clubadmin") return "Club Admin";
     if (type === "dj") return "DJ";
@@ -2227,6 +2228,17 @@
     const item = snap.exists ? snap.data() : {};
     await db.collection("shoutouts").doc(id).delete();
     loadReports();
+  }
+
+  async function queryCollectionWhere(name, field, value, limit = 150) {
+    if (!value) return [];
+    try {
+      const snap = await db.collection(name).where(field, "==", value).limit(limit).get();
+      return snap.docs.map(d => ({id: d.id, ...d.data()}));
+    } catch (e) {
+      console.warn(`Could not query ${name}:`, e.message);
+      return [];
+    }
   }
 
   async function getCollectionSafe(name, limit=500) {

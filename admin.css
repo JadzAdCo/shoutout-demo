@@ -838,3 +838,17 @@ body.floqr-embed-mode #floqrGlobalBack,
 body.floqr-embed-mode .global-back-btn{display:none!important}
 html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
 html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75}
+
+.floqr-venue-picker-mount{margin:8px 0 14px}
+.floqr-venue-picker{display:grid;gap:10px}
+.floqr-venue-picker-search{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:inherit}
+.floqr-venue-picker-selected{display:flex;flex-wrap:wrap;gap:8px;min-height:36px}
+.floqr-venue-chip{display:grid;gap:2px;text-align:left;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(94,234,255,.08);color:inherit;cursor:pointer;max-width:min(100%,320px)}
+.floqr-venue-chip span{font-size:13px;font-weight:800;line-height:1.25}
+.floqr-venue-chip small{font-size:11px;color:var(--muted)}
+.floqr-venue-picker-results{display:grid;gap:6px;max-height:280px;overflow:auto;padding:8px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18)}
+.floqr-venue-result{display:grid;gap:2px;text-align:left;padding:10px 12px;border:0;border-radius:12px;background:rgba(255,255,255,.04);color:inherit;cursor:pointer}
+.floqr-venue-result strong{font-size:13px}
+.floqr-venue-result small{font-size:11px;color:var(--muted)}
+.floqr-venue-result.is-picked{opacity:.55;cursor:default}
+.floqr-venue-result:not(.is-picked):hover{background:rgba(38,216,255,.12)}
