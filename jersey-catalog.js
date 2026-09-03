@@ -311,8 +311,18 @@
     });
   }
 
+  // Eagles-elite silhouette photo backs (solid #000). 2025 top-5 + requested clubs + ScammerVille.
   const NFL_PHOTO = {
-    "San Francisco 49ers": "./images/nfl/nfl-49ers-back-with-club.png"
+    "San Francisco 49ers": "./images/nfl/nfl-49ers-back-with-club.png",
+    "Seattle Seahawks": "./images/nfl/nfl-seahawks-back-with-club.png",
+    "Denver Broncos": "./images/nfl/nfl-broncos-back-with-club.png",
+    "Los Angeles Rams": "./images/nfl/nfl-rams-back-with-club.png",
+    "New England Patriots": "./images/nfl/nfl-patriots-back-with-club.png",
+    "Buffalo Bills": "./images/nfl/nfl-bills-back-with-club.png",
+    "Dallas Cowboys": "./images/nfl/nfl-cowboys-back-with-club.png",
+    "New York Giants": "./images/nfl/nfl-giants-back-with-club.png",
+    "Baltimore Ravens": "./images/nfl/nfl-ravens-back-with-club.png",
+    "Washington Commanders": "./images/nfl/nfl-commanders-back-with-club.png"
   };
 
   function addNbaNfl(prefix, sport, league, teamName, primary, secondary, extraTags, bgUrl) {
@@ -357,7 +367,16 @@
 
   NBA.forEach(([name, p, s]) => addNbaNfl("nba", "nba", "NBA", name, p, s, ["basketball", "NBA"]));
   NFL.forEach(([name, p, s]) => addNbaNfl("nfl", "nfl", "NFL", name, p, s, ["football", "American football", "NFL"], NFL_PHOTO[name] || ""));
-  addNbaNfl("nfl", "nfl", "NFL", "ScammerVille", "#AA0000", "#B3995D", ["football", "American football", "NFL", "ScammerVille", "parody"], "./images/nfl/nfl-scammerville-back-with-club.png");
+  addNbaNfl("nfl", "nfl", "NFL", "ScammerVille", "#004C54", "#B3995D", ["football", "American football", "NFL", "ScammerVille", "parody", "2025"], "./images/nfl/nfl-scammerville-back-with-club.png");
+  // Promote photo NFL kits with dual-panel shoutout layout flags.
+  Object.keys(nbaNflTemplates).forEach(id => {
+    const row = nbaNflTemplates[id];
+    if (!row || row.sport !== "nfl" || !row.defaultBackgroundUrl) return;
+    row.nflDualLayout = true;
+    row.nflShoutOut = true;
+    row.layout = "nfl-jersey";
+    row.description = `$30 ${row.teamName} NFL jersey ShoutOut — Eagles-elite silhouette LED back; 96×48 jersey+text, 64×48/64×32 rotating jersey↔text. Emotes OK.`;
+  });
 
   function resolveSoccerTeam(teamId) {
     const id = String(teamId || "").trim();
@@ -396,7 +415,9 @@
   global.FLOQR_JERSEY_TEMPLATE_IDS = nbaNflIds.slice();
   global.FLOQR_JERSEY_PHOTO_IDS = PHOTO_NATIONALS.filter(row => row.bgUrl).map(row => row.id).concat([
     "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco", "soccerASMonaco", "soccerLille",
-    "nflSanFrancisco49ers", "nflScammerVille"
+    "nflSanFrancisco49ers", "nflScammerVille",
+    "nflSeattleSeahawks", "nflDenverBroncos", "nflLosAngelesRams", "nflNewEnglandPatriots", "nflBuffaloBills",
+    "nflDallasCowboys", "nflNewYorkGiants", "nflBaltimoreRavens", "nflWashingtonCommanders"
   ]);
   global.FLOQRSoccerPhotoTeams = function soccerPhotoTeams() {
     const seen = new Set();

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NFL 64x48 jersey phase</title>
+  <link rel="stylesheet" href="./display.css?v=s3.0.40"/>
+  <style>
+    html,body{margin:0;width:640px;height:480px;overflow:hidden;background:#000}
+    .display-canvas{width:640px!important;height:480px!important;animation:none!important}
+    .display-text-overlay,.display-compose-slot,.display-center{width:100%!important;height:100%!important}
+    #displayMain.soccer-jersey-name{font-size:40px!important}
+    #displaySub.soccer-jersey-number{font-size:150px!important}
+    .nfl-shout-lines b{font-size:34px!important}
+  </style>
+</head>
+<body class="display">
+  <main class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-rotate split-media-loop split-media-phase-media"
+    style="--jersey-primary:#004C54;--jersey-secondary:#B3995D;" data-screen-format-id="led-64x48">
+    <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+    <div class="display-text-overlay">
+      <div class="display-compose-slot">
+        <div class="display-center">
+          <h1 id="displayMain" class="soccer-jersey-name" style="color:#B3995D!important;">NYX</h1>
+          <h2 id="displaySub" class="soccer-jersey-number" style="color:#B3995D!important;">88</h2>
+          <div class="nfl-shout-panel"><div class="nfl-shout-lines"><b>LET'S GO</b><b>SCAMMERVILLE</b><b>🔥 NIGHT</b><b>OUT 🎉</b></div></div>
+          <div class="display-identity-rail soccer-jersey-rail has-attribution"><span class="classic-identity-shell"><small>FROM</small><strong>@NYX.VIP</strong></span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

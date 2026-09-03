@@ -122,7 +122,11 @@
     const t = getTemplate(id);
     if (id === "soccerJersey" || t.id === "soccerJersey" || t.requiresTeamSelect === true) return true;
     if (t.consolidatedTemplateId === "soccerJersey" || t.aliasOf === "soccerJersey") return true;
-    return t.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || t.jerseyNumberField === true;
+    return t.layout === "soccer-jersey" || t.layout === "nfl-jersey" || /^(soccer|nba|nfl)/i.test(id) || t.jerseyNumberField === true;
+  }
+  function isNflDualJerseyTemplate(templateId = selectedTemplate) {
+    const t = getTemplate(templateId || selectedTemplate);
+    return !!(t && (t.layout === "nfl-jersey" || t.nflDualLayout || (t.sport === "nfl" && t.defaultBackgroundUrl)));
   }
   function isConsolidatedSoccerTemplate(templateId = selectedTemplate) {
     const id = String(templateId || selectedTemplate || "");
@@ -141,8 +145,13 @@
   function soccerJerseyPayloadFields() {
     if (!isSoccerJerseyTemplate()) return {};
     const nameSource = byId("soccerNameSource")?.value || "displayName";
-    const attribution = soccerJerseyAttributionFromSource();
-    const jerseyAttribution = {attribution, soccerNameSource: nameSource};
+    const nflDual = isNflDualJerseyTemplate();
+    const jerseyPatronName = graphemes(String(soccerNameFromSource() || "").toUpperCase()).slice(0, 8).join("");
+    // FloqR card attribution is opt-in and independent of jersey name (Instagram may ride the card only).
+    const attribution = nflDual
+      ? (byId("includeAttribution")?.checked ? currentAttributionValue() : "")
+      : soccerJerseyAttributionFromSource();
+    const jerseyAttribution = {attribution, soccerNameSource: nameSource, jerseyPatronName};
     const templateId = String(selectedTemplate || "");
     if (/^(nba|nfl)/i.test(templateId) && !isConsolidatedSoccerTemplate(templateId)) {
       const t = getTemplate(templateId);
@@ -158,7 +167,8 @@
         jerseyCssBack: t.defaultBackgroundUrl ? false : (t.jerseyCssBack !== false),
         backgroundUrl: t.defaultBackgroundUrl || "",
         sport: t.sport || (templateId.startsWith("nfl") ? "nfl" : "nba"),
-        league: t.league || ""
+        league: t.league || "",
+        nflDualLayout: !!t.nflDualLayout || t.layout === "nfl-jersey"
       };
     }
     const team = resolveSelectedSoccerTeam();
@@ -246,22 +256,28 @@
   }
   function syncSoccerJerseyFields() {
     const soccer = isSoccerJerseyTemplate();
+    const nflDual = isNflDualJerseyTemplate();
     byId("soccerJerseyFields")?.classList.toggle("hidden", !soccer);
-    byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer);
-    document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer);
+    // NFL dual: keep ShoutOut main message + FloqR-card attribution controls visible.
+    byId("mainText")?.closest("label")?.classList.toggle("hidden", soccer && !nflDual);
+    document.querySelector(".attribution-controls")?.classList.toggle("hidden", soccer && !nflDual);
     const source = byId("soccerNameSource")?.value || "displayName";
     byId("soccerManualNameWrap")?.classList.toggle("hidden", !soccer || source !== "manual");
     const consolidated = isConsolidatedSoccerTemplate();
     byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
     byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
+    const floqrAttrHint = document.querySelector(".attribution-controls .sub.small");
+    if (floqrAttrHint && nflDual) {
+      floqrAttrHint.textContent = "Optional FloqR card only — choose Instagram (or another handle) here. Jersey name above stays separate.";
+    }
     if (!soccer) return;
     if (consolidated) {
       const select = byId("soccerTeamId");
       if (select && select.options.length <= 1) populateSoccerTeamSelect(select.value || "");
     }
     const caps = templateDisplayCaps();
-    const nameLimit = Math.max(1, Math.min(8, Number(caps.main || caps.maxMainCharacters || 8)));
-    const numberLimit = Math.min(2, Math.max(1, Number(caps.sub || caps.maxSubCharacters || 2)));
+    const nameLimit = Math.max(1, Math.min(8, Number(caps.jerseyNameMax || 8)));
+    const numberLimit = Math.min(2, Math.max(1, Number(caps.jerseyNumberMax || caps.sub || caps.maxSubCharacters || 2)));
     if (byId("soccerManualName")) {
       byId("soccerManualName").maxLength = nameLimit;
       byId("soccerManualName").placeholder = `Name on jersey (max ${nameLimit})`;
@@ -272,6 +288,20 @@
     // Any characters allowed for jersey mark (emoji/special); hard-capped at 2 graphemes.
     const mark = glyphCap(byId("soccerJerseyNumber")?.value || "", numberLimit);
     if (byId("soccerJerseyNumber") && byId("soccerJerseyNumber").value !== mark) byId("soccerJerseyNumber").value = mark;
+    if (nflDual) {
+      // ShoutOut copy stays in #mainText; jersey name is payload.jerseyPatronName only.
+      if (byId("subText")) byId("subText").value = mark;
+      const main = byId("mainText");
+      if (main) {
+        const shoutLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 64));
+        main.maxLength = shoutLimit * 2; // emoji-safe headroom; glyphCap enforces grapheme cap
+        main.value = glyphCap(main.value || "", shoutLimit);
+        main.placeholder = caps.lineCount >= 4
+          ? `ShoutOut text (max ${shoutLimit} · ${caps.lineCount} lines · emoji OK)`
+          : `ShoutOut text (max ${shoutLimit} · 3 lines · emoji OK)`;
+      }
+      return;
+    }
     if (byId("mainText")) byId("mainText").value = name;
     if (byId("subText")) byId("subText").value = mark;
   }
@@ -893,7 +923,10 @@
   function syncAttribution() {
     const enabled = !!byId("includeAttribution")?.checked;
     byId("attributionChoiceWrap")?.classList.toggle("hidden", !enabled);
-    if (byId("subText")) byId("subText").value = fitTemplateText(currentAttributionValue(), "sub");
+    // Jersey dual NFL keeps subText as the jersey mark — attribution is payload-only.
+    if (!isNflDualJerseyTemplate() && byId("subText")) {
+      byId("subText").value = fitTemplateText(currentAttributionValue(), "sub");
+    }
     if (typeof updateTemplateCharacterCapHint === "function") updateTemplateCharacterCapHint();
     updatePreview();
   }

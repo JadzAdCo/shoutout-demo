@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NFL Eagles-silhouette dual layout preview</title>
+  <link rel="stylesheet" href="./display.css?v=s3.0.40"/>
+  <style>
+    body { margin: 0; background: #111; color: #eee; font-family: Segoe UI, sans-serif; padding: 16px; }
+    h1 { font-size: 18px; margin: 0 0 8px; }
+    p { color: #bbb; font-size: 13px; max-width: 960px; }
+    .row { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+    .col { display: flex; flex-direction: column; gap: 6px; }
+    .label { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #9ad; }
+    .board {
+      position: relative; background: #000; overflow: hidden;
+    }
+    .led-96x48 { width: 720px; height: 360px; }
+    .led-64x48 { width: 480px; height: 360px; }
+    .led-64x32 { width: 640px; height: 320px; }
+    .board.display-canvas { width: 100% !important; height: 100% !important; animation: none !important; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .gallery figure { margin: 0; background: #1a1a1a; padding: 6px; }
+    .gallery img { width: 100%; height: 160px; object-fit: contain; background: #000; display: block; }
+    .gallery figcaption { font-size: 11px; text-align: center; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>NFL dual layout — ScammerVille (Eagles silhouette)</h1>
+  <p>96×48: jersey left + 4-line shoutout right. 64×48 / 64×32: rotating jersey ↔ text. FloqR card FROM @handle. Glow matches jersey primary.</p>
+
+  <div class="row">
+    <div class="col">
+      <span class="label">96 × 48 cm (side-by-side)</span>
+      <div class="board led-96x48">
+        <main class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-side"
+          style="--jersey-primary:#004C54;--jersey-secondary:#B3995D;" data-screen-format-id="led-96x48" data-is-96x48="1">
+          <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+          <div class="display-text-overlay" style="width:100%;height:100%;">
+            <div class="display-compose-slot" style="width:100%;height:100%;">
+              <div class="display-center">
+                <h1 id="m96" class="soccer-jersey-name" style="font-size:11.5vh!important;color:#B3995D!important;">NYX</h1>
+                <h2 id="n96" class="soccer-jersey-number" style="font-size:48vh!important;color:#B3995D!important;">88</h2>
+                <div class="nfl-shout-panel"><div class="nfl-shout-lines"><b>LET'S GO</b><b>SCAMMERVILLE</b><b>🔥 NIGHT</b><b>OUT 🎉</b></div></div>
+                <div class="display-identity-rail soccer-jersey-rail has-attribution"><span class="classic-identity-shell"><small>FROM</small><strong>@NYX.VIP</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <span class="label">64 × 48 cm (rotate — jersey phase)</span>
+      <div class="board led-64x48">
+        <main class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-rotate split-media-loop split-media-phase-media"
+          style="--jersey-primary:#004C54;--jersey-secondary:#B3995D;" data-screen-format-id="led-64x48">
+          <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+          <div class="display-text-overlay" style="width:100%;height:100%;">
+            <div class="display-compose-slot" style="width:100%;height:100%;">
+              <div class="display-center">
+                <h1 class="soccer-jersey-name" style="font-size:11.5vh!important;color:#B3995D!important;">NYX</h1>
+                <h2 class="soccer-jersey-number" style="font-size:48vh!important;color:#B3995D!important;">88</h2>
+                <div class="nfl-shout-panel"><div class="nfl-shout-lines"><b>LET'S GO</b><b>SCAMMERVILLE</b><b>🔥 NIGHT</b><b>OUT 🎉</b></div></div>
+                <div class="display-identity-rail soccer-jersey-rail has-attribution"><span class="classic-identity-shell"><small>FROM</small><strong>@NYX.VIP</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <div class="col">
+      <span class="label">64 × 48 cm (rotate — text phase)</span>
+      <div class="board led-64x48">
+        <main class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-rotate split-media-loop split-media-phase-copy"
+          style="--jersey-primary:#004C54;--jersey-secondary:#B3995D;" data-screen-format-id="led-64x48">
+          <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+          <div class="display-text-overlay" style="width:100%;height:100%;">
+            <div class="display-compose-slot" style="width:100%;height:100%;">
+              <div class="display-center">
+                <h1 class="soccer-jersey-name" style="font-size:11.5vh!important;color:#B3995D!important;">NYX</h1>
+                <h2 class="soccer-jersey-number" style="font-size:48vh!important;color:#B3995D!important;">88</h2>
+                <div class="nfl-shout-panel"><div class="nfl-shout-lines"><b>LET'S GO</b><b>SCAMMERVILLE</b><b>🔥 NIGHT</b><b>OUT 🎉</b></div></div>
+                <div class="display-identity-rail soccer-jersey-rail has-attribution"><span class="classic-identity-shell"><small>FROM</small><strong>@NYX.VIP</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <span class="label">64 × 32 cm (3 lines · 48 chars)</span>
+      <div class="board led-64x32">
+        <main class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-rotate split-media-loop split-media-phase-copy"
+          style="--jersey-primary:#004C54;--jersey-secondary:#B3995D;" data-screen-format-id="led-64x32" data-is-64x32="1">
+          <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+          <div class="display-text-overlay" style="width:100%;height:100%;">
+            <div class="display-compose-slot" style="width:100%;height:100%;">
+              <div class="display-center">
+                <h1 class="soccer-jersey-name" style="font-size:11.5vh!important;color:#B3995D!important;">NYX</h1>
+                <h2 class="soccer-jersey-number" style="font-size:48vh!important;color:#B3995D!important;">88</h2>
+                <div class="nfl-shout-panel"><div class="nfl-shout-lines"><b>LET'S GO NIGHT</b><b>🔥 VIP TABLE</b><b>OUT 🎉🎉</b></div></div>
+                <div class="display-identity-rail soccer-jersey-rail has-attribution"><span class="classic-identity-shell"><small>FROM</small><strong>@NYX.VIP</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <h1>Photo kit gallery</h1>
+  <div class="gallery">
+    <figure><img src="images/nfl/nfl-scammerville-back-with-club.png" alt="ScammerVille"><figcaption>ScammerVille</figcaption></figure>
+    <figure><img src="images/nfl/nfl-seahawks-back-with-club.png" alt="Seahawks"><figcaption>Seahawks</figcaption></figure>
+    <figure><img src="images/nfl/nfl-broncos-back-with-club.png" alt="Broncos"><figcaption>Broncos</figcaption></figure>
+    <figure><img src="images/nfl/nfl-rams-back-with-club.png" alt="Rams"><figcaption>Rams</figcaption></figure>
+    <figure><img src="images/nfl/nfl-patriots-back-with-club.png" alt="Patriots"><figcaption>Patriots</figcaption></figure>
+    <figure><img src="images/nfl/nfl-bills-back-with-club.png" alt="Bills"><figcaption>Bills</figcaption></figure>
+    <figure><img src="images/nfl/nfl-cowboys-back-with-club.png" alt="Cowboys"><figcaption>Cowboys</figcaption></figure>
+    <figure><img src="images/nfl/nfl-giants-back-with-club.png" alt="Giants"><figcaption>Giants</figcaption></figure>
+    <figure><img src="images/nfl/nfl-ravens-back-with-club.png" alt="Ravens"><figcaption>Ravens</figcaption></figure>
+    <figure><img src="images/nfl/nfl-commanders-back-with-club.png" alt="Commanders"><figcaption>Commanders</figcaption></figure>
+    <figure><img src="images/nfl/nfl-49ers-back-with-club.png" alt="49ers"><figcaption>49ers</figcaption></figure>
+  </div>
+</body>
+</html>
