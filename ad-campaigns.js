@@ -275,7 +275,10 @@
   function campaignSlotScore(campaign, slot = "default") {
     const slots = campaign.slots || ["default"];
     if (slots.includes(slot)) return 30;
-    if (slot === "default" && slots.includes("default")) return 10;
+    // Allow "default" campaigns to be eligible for other slots too.
+    // This prevents the rotation from collapsing to a single advertiser when
+    // your non-default slots don't have matching campaigns seeded yet.
+    if (slots.includes("default")) return slot === "default" ? 10 : 8;
     return -999;
   }
 
