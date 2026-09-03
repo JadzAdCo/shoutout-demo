@@ -2059,8 +2059,16 @@
 
   function adminShoutoutTextCaps(item = {}) {
     const template = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {id:item.template || item.templateId || "blackwhite", className:item.templateClassName || ""};
+    const itemSport = String(item.sport || template.sport || "").toLowerCase();
+    const isNflDual = item.nflDualLayout === true
+      || template.nflDualLayout === true
+      || template.layout === "nfl-jersey"
+      || (itemSport === "nfl" && !!(item.backgroundUrl || template.defaultBackgroundUrl));
+    const textTemplate = isNflDual
+      ? {...template, layout:"nfl-jersey", nflDualLayout:true, sport:"nfl"}
+      : template;
     const formatId = item.screenFormatId || loc.primaryDisplayScreenFormatId || "led-96x48";
-    return window.FLOQRTextLayout?.resolve?.(template, formatId) || {
+    return window.FLOQRTextLayout?.resolve?.(textTemplate, formatId) || {
       supported:true,
       formatId,
       main:Number(item.maxMainCharacters || 45),
@@ -2094,6 +2102,10 @@
   async function approve(id, item) {
     const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const textCaps = adminShoutoutTextCaps(item);
+    const itemSport = String(item.sport || "").toLowerCase();
+    const isNflDual = item.nflDualLayout === true
+      || itemSport === "nfl"
+      || String(item.template || "").toLowerCase().startsWith("nfl");
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
@@ -2104,6 +2116,12 @@
       templateName: item.templateName || "",
       mainText: fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
       subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub"),
+      attribution: String(item.attribution || "").trim(),
+      includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
+      attributionChoice: item.attributionChoice || "",
+      jerseyPatronName: item.jerseyPatronName || item.jerseyName || "",
+      nflDualLayout: isNflDual,
+      sport: isNflDual ? "nfl" : (item.sport || ""),
       textLayoutVersion:window.FLOQRTextLayout?.version || "",
       textProfileId:textCaps.profileId || item.textProfileId || "full",
       maxMainCharacters:textCaps.main,
