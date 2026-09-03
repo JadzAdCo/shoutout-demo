@@ -997,6 +997,18 @@
     return `--fit-size:clamp(${minPx}px,${vw}vw,${maxPx}px)`;
   }
 
+  /** NFL dual shout panel: maximize line size to fill half (96×48) or nearly full board (64×). */
+  function nflShoutFitStyle(row = "", {sideBySide = false, compact = false} = {}) {
+    const rowLen = Math.max(glyphLen(row), 1);
+    // Full-board rotate needs larger type; half-panel side layout is slightly tighter.
+    const base = sideBySide ? 0.92 : 1.28;
+    const scale = base * (compact ? 0.95 : 1);
+    const maxPx = Math.round((rowLen <= 6 ? 160 : rowLen <= 10 ? 132 : rowLen <= 13 ? 112 : rowLen <= 16 ? 96 : 78) * scale);
+    const vw = ((rowLen <= 6 ? 10.5 : rowLen <= 10 ? 8.6 : rowLen <= 13 ? 7.2 : rowLen <= 16 ? 6.4 : 5.4) * scale).toFixed(2);
+    const minPx = compact ? 28 : (sideBySide ? 26 : 36);
+    return `font-size:clamp(${minPx}px,${vw}vw,${maxPx}px)`;
+  }
+
   function enforceTrimmedVideoPlayback(video, data = {}) {
     if (!video || data.selectedMediaVersion !== "trimmed") return;
     const start = Number(data.trimStart || 0);
@@ -1460,14 +1472,20 @@
         }
         if (shoutPanel) {
           // NFL dual: shoutout copy should never inherit the soccer 14-char cap.
+          const lineCount = Number(textCaps.lineCount || (is96 ? 4 : 3));
           const nflShoutMainText = glyphSlice(cleanDisplayText(mainSource), 0, mainLimit);
           const shoutRows = displayTextRows(nflShoutMainText || "", {
-            lineCount: Number(textCaps.lineCount || (is96 ? 4 : 3)),
+            lineCount,
             maxCharactersPerLine: Number(textCaps.perLine || textCaps.maxCharactersPerLine || 16),
             maxMainCharacters: Number(textCaps.main || textCaps.maxMainCharacters || (is96 ? 64 : 48))
           }, {uppercase: false});
+          const compact = /64x32/i.test(formatId) || canvas.getAttribute("data-is-64x32") === "1";
+          canvas.style.setProperty("--nfl-shout-line-count", String(Math.max(1, lineCount)));
           shoutPanel.className = "nfl-shout-panel";
-          shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => `<b>${esc(row || " ")}</b>`).join("")}</div>`;
+          shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => {
+            const style = nflShoutFitStyle(row || " ", {sideBySide: is96, compact});
+            return `<b style="${style}">${esc(row || " ")}</b>`;
+          }).join("")}</div>`;
         }
         if (!is96) {
           stopSplitMediaLoop();
