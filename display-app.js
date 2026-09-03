@@ -1247,11 +1247,14 @@
     const mainSource = (data.idleCta || data.status === "default") && !isSoccerJersey && !isTextOverlay
       ? (rawMain || locationDefaultMain)
       : rawMain;
+    // s3.0.44: also trust template-id pattern so stale Firestore records (missing nflDualLayout field)
+    // never fall through to the soccer 14-char cap branch.
     const isNflDual = isSoccerJersey && (
       t.layout === "nfl-jersey"
       || t.nflDualLayout === true
       || data.nflDualLayout === true
       || (String(data.sport || t.sport || "").toLowerCase() === "nfl" && !!(data.backgroundUrl || t.defaultBackgroundUrl))
+      || /^nfl[A-Za-z0-9]+$/i.test(String(data.template || templateId || ""))
     );
     const mainText = isNflDual
       ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit)

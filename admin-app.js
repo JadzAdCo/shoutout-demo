@@ -2114,7 +2114,10 @@
       brandName: item.brandName || loc.brandName,
       template: item.template || "neon",
       templateName: item.templateName || "",
-      mainText: fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
+      // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
+      mainText: isNflDual
+        ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
+        : fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
       subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub"),
       attribution: String(item.attribution || "").trim(),
       includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
