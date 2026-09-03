@@ -33,7 +33,7 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "s3.0.41: NFL dual LED fix — solid black frame 2, FloqR card, nflJersey checkout caps"
+    & $git commit -m "s3.0.41: NFL dual LED fix - solid black frame 2, FloqR card, nflJersey checkout caps"
     & $git -c credential.helper= -c credential.helper=manager push origin main
     if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }
     & $git log -1 --oneline
