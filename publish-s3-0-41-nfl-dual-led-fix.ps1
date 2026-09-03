@@ -11,7 +11,9 @@ $files = @(
   "display-app.js",
   "index.html",
   "patron-app.js",
-  "README.md"
+  "README.md",
+  "functions/commerce-functions.js",
+  "functions/commerce-invariants.test.js"
 )
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 & $git clone --depth 1 "https://github.com/JadzAdCo/shoutout-demo.git" $stage
