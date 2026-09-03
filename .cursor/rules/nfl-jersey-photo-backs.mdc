@@ -19,8 +19,8 @@ alwaysApply: true
 
 **Dual shoutout layout (`nfl-jersey` / `nflDualLayout`):**
 - **96×48:** jersey left-justified; white text shoutout on the right (4 lines × 16 = 64 graphemes, emoji OK); FloqR card bottom; kit-color edge glow.
-- **64×48 / 64×32:** rotate jersey phase ↔ text phase; FloqR card on both. **64×32:** 3 lines × 16 = 48 graphemes.
-- FloqR card Instagram/handle is **opt-in** and **independent** of jersey name (`includeAttribution` + `attributionChoice` vs `soccerNameSource` / `jerseyPatronName`).
+- **64×48 / 64×32:** rotate jersey phase ↔ text phase (frame 2 = **solid black** + white shoutout; jersey fully hidden). FloqR card on both. **64×32:** 3 lines × 16 = 48 graphemes.
+- FloqR card Instagram/handle is **opt-in** and **independent** of jersey name (`includeAttribution` + `attributionChoice` vs `soccerNameSource` / `jerseyPatronName`). Checkout must use `nflJersey` text caps (not soccer 8–12).
 
 ## GenerateImage prompt (team wordmark only)
 

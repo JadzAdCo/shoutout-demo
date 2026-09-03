@@ -148,10 +148,18 @@
     const nflDual = isNflDualJerseyTemplate();
     const jerseyPatronName = graphemes(String(soccerNameFromSource() || "").toUpperCase()).slice(0, 8).join("");
     // FloqR card attribution is opt-in and independent of jersey name (Instagram may ride the card only).
+    const includeAttribution = !!byId("includeAttribution")?.checked;
+    const attributionChoice = byId("attributionChoice")?.value || "displayName";
     const attribution = nflDual
-      ? (byId("includeAttribution")?.checked ? currentAttributionValue() : "")
+      ? (includeAttribution ? currentAttributionValue() : "")
       : soccerJerseyAttributionFromSource();
-    const jerseyAttribution = {attribution, soccerNameSource: nameSource, jerseyPatronName};
+    const jerseyAttribution = {
+      attribution,
+      includeAttribution: nflDual ? includeAttribution : !!attribution,
+      attributionChoice: nflDual ? attributionChoice : (nameSource === "instagram" ? "instagram" : nameSource === "floqrHandle" ? "floqrHandle" : "displayName"),
+      soccerNameSource: nameSource,
+      jerseyPatronName
+    };
     const templateId = String(selectedTemplate || "");
     if (/^(nba|nfl)/i.test(templateId) && !isConsolidatedSoccerTemplate(templateId)) {
       const t = getTemplate(templateId);
@@ -267,8 +275,12 @@
     byId("soccerTeamId")?.closest("label")?.classList.toggle("hidden", !consolidated);
     byId("soccerTeamHint")?.classList.toggle("hidden", !consolidated);
     const floqrAttrHint = document.querySelector(".attribution-controls .sub.small");
-    if (floqrAttrHint && nflDual) {
-      floqrAttrHint.textContent = "Optional FloqR card only — choose Instagram (or another handle) here. Jersey name above stays separate.";
+    const floqrAttrLabel = document.querySelector(".attribution-controls .consent-line span");
+    if (nflDual) {
+      if (floqrAttrLabel) floqrAttrLabel.textContent = "Show FROM @handle on the FloqR card (Instagram / display name — not the jersey name)";
+      if (floqrAttrHint) floqrAttrHint.textContent = "Optional FloqR card only. Jersey name above stays separate. Pick Instagram here when you want FROM @instagram on the card.";
+    } else if (floqrAttrLabel) {
+      floqrAttrLabel.textContent = "Show my name or social handle in the animated identity rail";
     }
     if (!soccer) return;
     if (consolidated) {
@@ -3032,6 +3044,10 @@
       if (payload.jerseyAccent) url.searchParams.set("jerseyAccent", payload.jerseyAccent);
       if (payload.jerseyCssBack != null) url.searchParams.set("jerseyCssBack", payload.jerseyCssBack ? "1" : "0");
       if (payload.attribution) url.searchParams.set("attribution", payload.attribution);
+      if (payload.includeAttribution) url.searchParams.set("includeAttribution", "1");
+      if (payload.jerseyPatronName) url.searchParams.set("jerseyPatronName", payload.jerseyPatronName);
+      if (payload.nflDualLayout) url.searchParams.set("nflDualLayout", "1");
+      if (payload.sport) url.searchParams.set("sport", payload.sport);
       if (payload.soccerNameSource) url.searchParams.set("soccerNameSource", payload.soccerNameSource);
       url.searchParams.set("preview", "1");
       if (Array.isArray(payload.teamMembers) && payload.teamMembers.length) url.searchParams.set("teamMembers", JSON.stringify(payload.teamMembers));
@@ -3331,6 +3347,8 @@
       return glyphCap(cleaned, Math.min(2, limit));
     }
     if (isSoccerJerseyTemplate() && type === "main") {
+      // NFL dual: mainText is shoutout copy (emoji OK, do not force uppercase). Soccer/NBA: jersey name.
+      if (isNflDualJerseyTemplate()) return glyphCap(cleaned, limit);
       return glyphCap(cleaned.toUpperCase(), limit);
     }
     if (isClassicBlackWhiteTemplate() && type === "main") {
@@ -3805,9 +3823,24 @@
         byId("soccerTeamId")?.focus?.();
         return;
       }
+      if (isNflDualJerseyTemplate()) {
+        const shoutCopy = String(byId("mainText")?.value || "").trim();
+        if (!shoutCopy) {
+          status.textContent = "Enter your ShoutOut text for frame 2 / the side panel (jersey name is separate above).";
+          byId("mainText")?.focus?.();
+          return;
+        }
+        if (byId("includeAttribution")?.checked && !currentAttributionValue()) {
+          status.textContent = "FloqR card is checked, but the chosen handle is empty. Add Instagram in My Profile or pick Display name.";
+          byId("attributionChoice")?.focus?.();
+          return;
+        }
+      }
       const canonicalTemplateId = jerseyFields.template || selectedTemplate;
       const canonicalTemplate = getTemplate(canonicalTemplateId);
-      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(byId("mainText").value.trim()||"SHOUTOUT!","main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
+      const nflDualSubmit = isNflDualJerseyTemplate();
+      const mainRaw = byId("mainText").value.trim();
+      const payload={ location:locationId(), club:locationId(), clubLocationId:locationId(), brandName:l.brandName, locationName:l.locationName, clubName:l.locationName, country:l.country, region:l.region, city:l.city, streetAddress:l.streetAddress || l.addressLine1 || "", postalCode:l.postalCode || "", fullAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationAddress:l.fullAddress || window.FLOQRAddress?.fullAddress?.(l) || "", locationLabel:l.locationLabel, template:canonicalTemplateId, templateName:jerseyFields.templateName || canonicalTemplate.name || t.name, templateClassName:canonicalTemplate.className || t.className || "neon", templateSupportsMedia:!!(footballIntro || t.supportsMedia || t.supportsImage || t.supportsVideo), screenFormatId:caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId, screenFormatLabel:(window.FLOQR_DISPLAY_FORMATS?.[caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId]?.label) || (caps.formatId || byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || ""), textLayoutVersion:window.FLOQRTextLayout?.version || "", textProfileId:caps.profileId || t.textProfileId || "full", maxMainCharacters:caps.main, maxSubCharacters:isSoccerJerseyTemplate() ? 2 : caps.sub, lineCount:caps.lineCount, maxCharactersPerLine:caps.perLine, minimumFontPixels:caps.minimumFontPixels || 0, mainTextSizePercent:caps.mainTextSizePercent, subTextSizePercent:caps.subTextSizePercent, ...variantPayload, ...jerseyFields, mainText:fitTemplateText(nflDualSubmit ? mainRaw : (mainRaw||"SHOUTOUT!"),"main"), subText:fitTemplateText(byId("subText").value.trim()||"","sub"), ...mediaPayload, status:"pending", editable:true, submittedByUid:currentUser.uid, submittedBy:safeUser(), submittedAt:firebase.firestore.FieldValue.serverTimestamp(), referenceNumber };
       const priceCents = Math.max(0, Math.round(Number(canonicalTemplate.priceCents || t.priceCents || mediaPayload.priceCents || 0)));
       if (priceCents > 0) {
         const checkoutPayload = {...payload, priceCents, submittedAt:null, mediaUploadedAt:null};
