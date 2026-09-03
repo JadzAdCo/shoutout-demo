@@ -1,6 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.41 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.42 (stable)
 
-- s3.0.41: NFL dual LED fix — checkout uses nflJersey caps (not soccer 8–12); frame 2 solid black; FloqR card FROM @handle wiring + reusable paintFloqrCard.
+- s3.0.42: NFL dual LED fix — checkout uses nflJersey caps (not soccer 8–12); frame 2 solid black; NFL dual shout panel uses nflMainText slice (not soccer 14-char cap); FloqR card FROM @handle wiring + reusable paintFloqrCard.
 - s3.0.40: NFL Eagles-silhouette photo kits + dual shoutout layout (96x48 side / 64x rotate); FloqR card Instagram opt-in separate from jersey name.
 - s3.0.35: Classic B&W pre-shoutout idle uses dark board + white text (lower LED current); 64â”œÃ¹48 main text cap 48 chars; emoji on non-B&W templates; `classic-bw-pre-shoutout.mdc` rule.
 - s3.0.34: ScammerVille NFL collar/helmet + per-screen photo sizing; jersey ShoutOuts save name-source as `attribution` for FROM on the FLOQR card.

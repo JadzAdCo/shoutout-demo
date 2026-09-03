@@ -1456,7 +1456,9 @@
           center.appendChild(shoutPanel);
         }
         if (shoutPanel) {
-          const shoutRows = displayTextRows(mainText || "", {
+          // NFL dual: shoutout copy should never inherit the soccer 14-char cap.
+          const nflShoutMainText = glyphSlice(cleanDisplayText(mainSource), 0, mainLimit);
+          const shoutRows = displayTextRows(nflShoutMainText || "", {
             lineCount: Number(textCaps.lineCount || (is96 ? 4 : 3)),
             maxCharactersPerLine: Number(textCaps.perLine || textCaps.maxCharactersPerLine || 16),
             maxMainCharacters: Number(textCaps.main || textCaps.maxMainCharacters || (is96 ? 64 : 48))
