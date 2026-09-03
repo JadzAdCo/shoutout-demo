@@ -1424,6 +1424,17 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
       "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8}
     }
+  },
+  nflJersey: {
+    label:"NFL jersey dual layout — shoutout copy + jersey name/mark",
+    formats:{
+      "p125-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
+      "p125-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
+      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:28,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
+      "led-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
+      "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:30,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
+      "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:26,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2}
+    }
   }
 };
 
@@ -1666,6 +1677,7 @@ window.FLOQRTextLayout = {
   version:"29.09.30",
   profileId(template = {}) {
     const id = String(template.id || "");
+    if (template.layout === "nfl-jersey" || (template.sport === "nfl" && template.nflDualLayout) || /^nfl/i.test(id) && template.nflDualLayout) return "nflJersey";
     if (template.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || template.jerseyNumberField) return "soccerJersey";
     if (template.textOverlay === true) return "textOverlayFrame";
     if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
@@ -1695,6 +1707,8 @@ window.FLOQRTextLayout = {
       sub:Number(rule.maxSubCharacters || 0),
       total:Number(rule.maxMainCharacters || 0),
       perLine:Number(rule.maxCharactersPerLine || 0),
+      jerseyNameMax:Number(rule.jerseyNameMax || 8),
+      jerseyNumberMax:Number(rule.jerseyNumberMax || 2),
       textScale:1.3
     };
   },

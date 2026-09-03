@@ -1001,7 +1001,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 /* NFL photo kits: uniform stack shift — jersey PNG + patron overlays move together (--nfl-photo-stack-y) */
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back{
-  --nfl-photo-stack-y:10%;
+  --nfl-photo-stack-y:4%;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
   background-size:88% auto!important;
@@ -1053,6 +1053,104 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   -webkit-text-stroke:1px rgba(0,0,0,.35);
   transform:none;
 }
+/* NFL dual shoutout: kit-color bezel glow, 96×48 side-by-side, 64× rotate jersey↔text */
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout{
+  --nfl-photo-stack-y:8%;
+  background:#000!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:20;
+  pointer-events:none;
+  box-shadow:inset 0 0 0 3px var(--jersey-primary,#AA0000),inset 0 0 36px 8px var(--jersey-primary,#AA0000);
+  opacity:.72;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .nfl-shout-panel{
+  position:absolute;
+  z-index:6;
+  color:#fff;
+  text-align:center;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .nfl-shout-lines{
+  display:grid;
+  gap:.15em;
+  width:100%;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .nfl-shout-lines b{
+  font-family:"Segoe UI",Inter,Arial,sans-serif;
+  font-weight:800;
+  font-size:clamp(14px,4.2vh,42px);
+  line-height:1.05;
+  letter-spacing:.02em;
+  color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,.65);
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-side .display-background{
+  left:0!important;
+  right:auto!important;
+  width:48%!important;
+  background-size:92% auto!important;
+  background-position:center calc(40% + var(--nfl-photo-stack-y))!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displaySub.soccer-jersey-number{
+  left:2%!important;
+  right:58%!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-side .nfl-shout-panel{
+  left:52%;
+  right:3%;
+  top:10%;
+  bottom:18%;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .display-identity-rail.soccer-jersey-rail{
+  z-index:25!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .classic-identity-shell{
+  animation:none!important;
+  opacity:1!important;
+  transform:none!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout:after{
+  z-index:15;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate .nfl-shout-panel{
+  left:8%;
+  right:8%;
+  top:12%;
+  bottom:18%;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media #displaySub.soccer-jersey-number{
+  opacity:1!important;
+  visibility:visible!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media .nfl-shout-panel{
+  opacity:0;
+  visibility:hidden;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .display-background{
+  opacity:.18!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy #displayMain.soccer-jersey-name,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy #displaySub.soccer-jersey-number{
+  opacity:0!important;
+  visibility:hidden!important;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .nfl-shout-panel{
+  opacity:1;
+  visibility:visible;
+}
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .display-identity-rail.soccer-jersey-rail{
+  z-index:25!important;
+}
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
   top:calc(17% + var(--nfl-photo-stack-y))!important;
@@ -1064,6 +1162,13 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   top:calc(39% + var(--nfl-photo-stack-y))!important;
   left:24%!important;
   right:24%!important;
+}
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
+.display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displaySub.soccer-jersey-number,
+.display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displaySub.soccer-jersey-number{
+  left:2%!important;
+  right:58%!important;
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{

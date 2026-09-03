@@ -376,7 +376,9 @@
   }
 
   function classicIdentityPresentation(subText) {
-    const supplied = glyphSlice(cleanBoardText(subText), 0, 20);
+    const raw = String(subText || "").trim();
+    const withAt = raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw;
+    const supplied = glyphSlice(cleanBoardText(withAt), 0, 22);
     const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR ShoutOut"), 0, 20) || "FLOQR ShoutOut";
     return {
       supplied:!!supplied,
@@ -393,6 +395,7 @@
   function isSoccerJerseyTemplate(template = {}, templateId = "") {
     const id = String(templateId || template.id || "");
     return template.layout === "soccer-jersey"
+      || template.layout === "nfl-jersey"
       || id === "soccerJersey"
       || template.requiresTeamSelect === true
       || template.consolidatedTemplateId === "soccerJersey"
@@ -1192,7 +1195,10 @@
     const mainSource = (data.idleCta || data.status === "default") && !isSoccerJersey && !isTextOverlay
       ? (rawMain || locationDefaultMain)
       : rawMain;
-    const mainText = isSoccerJersey
+    const isNflDual = isSoccerJersey && (t.layout === "nfl-jersey" || t.nflDualLayout === true);
+    const mainText = isNflDual
+      ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit)
+      : isSoccerJersey
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
       : isClassicBoard
       ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
@@ -1201,6 +1207,9 @@
     const subText = isSoccerJersey
       ? glyphSlice(cleanJerseyMark(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
       : String(data.subText || data.attribution || data.displayName || t.defaultSub || "").slice(0, subLimit);
+    const jerseyPatronName = isNflDual
+      ? glyphSlice(cleanBoardText(data.jerseyPatronName || data.jerseyName || ""), 0, 8)
+      : "";
     byId("displayBrand").textContent = "";
     const center = document.querySelector(".display-center");
     const mediaSlot = byId("mediaSlot");
@@ -1288,10 +1297,14 @@
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
-      const nameRows = jerseyNameRows(mainText, {
+      const nflDualActive = sport === "nfl" && usePhotoBack && (t.nflDualLayout || t.layout === "nfl-jersey" || isNflDual);
+      const jerseyNameText = nflDualActive
+        ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || ""), 0, 8) || "NYX")
+        : mainText;
+      const nameRows = jerseyNameRows(jerseyNameText, {
         ...textCaps,
-        maxMainCharacters: Math.min(8, Number(textCaps.maxMainCharacters || textCaps.main || 8)),
-        maxCharactersPerLine: Math.min(8, Number(textCaps.maxCharactersPerLine || textCaps.perLine || 8)),
+        maxMainCharacters: Math.min(8, Number(textCaps.jerseyNameMax || 8)),
+        maxCharactersPerLine: Math.min(8, Number(textCaps.jerseyNameMax || 8)),
         lineCount: 1
       });
       const nameGlyphs = glyphLen(nameRows.filter(Boolean).join("") || "");
@@ -1303,14 +1316,14 @@
       let baseName = Number(textCaps.mainTextSizePercent || 16.2);
       let baseNumber = Number(textCaps.subTextSizePercent || 64);
       let baseTeam = Number(textCaps.teamTextSizePercent || 7.2);
-      canvas.classList.remove("jersey-css-country");
+      canvas.classList.remove("jersey-css-country", "nfl-dual-layout", "nfl-dual-side", "nfl-dual-rotate", "split-media-loop", "split-media-phase-media", "split-media-phase-copy");
       if (sport === "soccer" && usePhotoBack) {
         baseName = Math.min(baseName * 0.56, 9.4);
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        baseName = Math.min(baseName * 0.55, 11.5);
-        baseNumber = Math.min(baseNumber * 0.72, 48);
+        baseName = Math.min(11.5, 11.5);
+        baseNumber = Math.min(48, 48);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1364,6 +1377,43 @@
       }
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
+
+      // NFL dual: shoutout copy panel + FloqR card; 96×48 side-by-side, 64× rotate jersey↔text.
+      let shoutPanel = byId("displayNflShoutPanel");
+      if (nflDualActive) {
+        canvas.classList.add("nfl-dual-layout");
+        const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
+        const is96 = /96x48/i.test(formatId) || canvas.getAttribute("data-is-96x48") === "1";
+        canvas.classList.toggle("nfl-dual-side", is96);
+        canvas.classList.toggle("nfl-dual-rotate", !is96);
+        if (!shoutPanel && center) {
+          shoutPanel = document.createElement("div");
+          shoutPanel.id = "displayNflShoutPanel";
+          shoutPanel.className = "nfl-shout-panel";
+          shoutPanel.setAttribute("aria-hidden", "false");
+          center.appendChild(shoutPanel);
+        }
+        if (shoutPanel) {
+          const shoutRows = displayTextRows(mainText || "", {
+            lineCount: Number(textCaps.lineCount || (is96 ? 4 : 3)),
+            maxCharactersPerLine: Number(textCaps.perLine || textCaps.maxCharactersPerLine || 16),
+            maxMainCharacters: Number(textCaps.main || textCaps.maxMainCharacters || (is96 ? 64 : 48))
+          }, {uppercase: false});
+          shoutPanel.className = "nfl-shout-panel";
+          shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => `<b>${esc(row || " ")}</b>`).join("")}</div>`;
+        }
+        if (!is96) {
+          stopSplitMediaLoop();
+          canvas.classList.add("split-media-loop", "split-media-phase-media");
+          startSplitMediaLoop(canvas);
+        } else {
+          stopSplitMediaLoop();
+        }
+      } else if (shoutPanel) {
+        shoutPanel.remove();
+        stopSplitMediaLoop();
+      }
+
       // Animated text holder at bottom (same burst rail as classic).
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
@@ -1373,7 +1423,7 @@
           ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
           : `Use ShoutOut @ ${clubName}`;
         const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || identity.value;
-        const showIdle = !subText && !mainText;
+        const showIdle = !subText && !jerseyNameText && !mainText;
         rail.className = "display-identity-rail classic-bw-identity soccer-jersey-rail" + (showIdle || !identity.supplied ? " uses-brand-fallback" : " has-attribution");
         rail.setAttribute("aria-label", showIdle ? idleCta : `${identity.kicker} ${identity.value}`);
         const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";

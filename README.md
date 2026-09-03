@@ -1,7 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.0.39 (stable)
+﻿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.40 (stable)
 
-- s3.0.39: NFL uniform stack shift (`--nfl-photo-stack-y: 10%`); ScammerVille helmet gap PNG; overlays move with jersey.
-- s3.0.35: Classic B&W pre-shoutout idle uses dark board + white text (lower LED current); 64×48 main text cap 48 chars; emoji on non-B&W templates; `classic-bw-pre-shoutout.mdc` rule.
+- s3.0.40: NFL Eagles-silhouette photo kits + dual shoutout layout (96x48 side / 64x rotate); FloqR card Instagram opt-in separate from jersey name.
+- s3.0.35: Classic B&W pre-shoutout idle uses dark board + white text (lower LED current); 64├ù48 main text cap 48 chars; emoji on non-B&W templates; `classic-bw-pre-shoutout.mdc` rule.
 - s3.0.34: ScammerVille NFL collar/helmet + per-screen photo sizing; jersey ShoutOuts save name-source as `attribution` for FROM on the FLOQR card.
 - s3.0.33: NFL photo-back layout (name midway yoke/number, larger patron name, visible collar, helmet raised); regenerated 49ers + ScammerVille PNGs; `nfl-jersey-photo-backs.mdc` prompt rule.
 - s3.0.32: Service members panel UX (profile guide in ? help, single submit, bottom confirmation); NFL photo-back jerseys (49ers + ScammerVille); Club Admin approval copy.
@@ -16,23 +16,23 @@
 
 Live test URL: `https://jadzadco.github.io/shoutout-demo/?v=s3.0.16&start=search`
 
-s3.0.16: General Notifications copy lives in the `?` help and FloqAi, not as a paragraph on My Privacy. s3.0.15: ShÃ´ko Barcelona Cameroon jersey primary screen is 96Ã—48 (64Ã—48 secondary; 64Ã—32 still offered). s3.0.14: Cameroon jersey test at ShÃ´ko Barcelona plus 64Ã—32 and 64Ã—48 composer previews for ShÃ´ko, Zebbies, and LIMA Twist. s3.0.13: My Privacy General Notifications copy now covers patron user-record flags and paid Twilio SMS/WhatsApp for venues and independent service members. s3.0.12: Cameroon soccer jersey test also at Zebbies Garden DC and LIMA Twist (same Cameroon-only picker as Heist). s3.0.11: SOS2FA idle copy removed; Request Code `?` points at My Privacy Email/SMS. Profile Template Guide moved under Services & Service Members (gated by IsPatron / IsServiceMember). Member Type rename. s3.0.10: Cameroon jersey country name is baked into the PNG; patron name/number stay CSS. Heist DC soccer picker is Cameroon-only for live LED test. Composer/URL preview paints without Display Security. s3.0.9: Tanzania LED overlay (wordmark at collar, name/number up +7%, numbers center-justified) on every soccer photo kit. Composer cards show the real kit PNG tagged Soccer Â· Jersey Â· Country/Club, with 96Ã—48 / 64Ã—48 / 64Ã—32. s3.0.8: Soccer photo jerseys use one Cameroon/Morocco silhouette, team colors only, solid black LED backdrop. A named PNG always beats the CSS hanger (ignore jerseyCssBack=1). Proposed Tanzania, Ethiopia, Zambia, Ivory Coast, and South Africa kits are the live named files. s3.0.7: Master Admin Diagnostics â†’ Mail Logging records every system-generated SendGrid email (success, failure, headers, body, TLS 1.3, delivery). s3.0.6: Search profile menu stays inside the dropdown (no leak over Clubs). Help `?` sits beside its label on phones. Remaining Search chrome follows App language (Back to welcome, Beach Clubs, Clubs, Lounges). s3.0.5: App language covers Language Settings report values, satellite page chrome, and the profile status menu. From Club Admin / Master Admin, patron links open in a new tab and show an in-app hold notice so the admin portal stays on this session. s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
+s3.0.16: General Notifications copy lives in the `?` help and FloqAi, not as a paragraph on My Privacy. s3.0.15: Sh├â┬┤ko Barcelona Cameroon jersey primary screen is 96├âΓÇö48 (64├âΓÇö48 secondary; 64├âΓÇö32 still offered). s3.0.14: Cameroon jersey test at Sh├â┬┤ko Barcelona plus 64├âΓÇö32 and 64├âΓÇö48 composer previews for Sh├â┬┤ko, Zebbies, and LIMA Twist. s3.0.13: My Privacy General Notifications copy now covers patron user-record flags and paid Twilio SMS/WhatsApp for venues and independent service members. s3.0.12: Cameroon soccer jersey test also at Zebbies Garden DC and LIMA Twist (same Cameroon-only picker as Heist). s3.0.11: SOS2FA idle copy removed; Request Code `?` points at My Privacy Email/SMS. Profile Template Guide moved under Services & Service Members (gated by IsPatron / IsServiceMember). Member Type rename. s3.0.10: Cameroon jersey country name is baked into the PNG; patron name/number stay CSS. Heist DC soccer picker is Cameroon-only for live LED test. Composer/URL preview paints without Display Security. s3.0.9: Tanzania LED overlay (wordmark at collar, name/number up +7%, numbers center-justified) on every soccer photo kit. Composer cards show the real kit PNG tagged Soccer ├é┬╖ Jersey ├é┬╖ Country/Club, with 96├âΓÇö48 / 64├âΓÇö48 / 64├âΓÇö32. s3.0.8: Soccer photo jerseys use one Cameroon/Morocco silhouette, team colors only, solid black LED backdrop. A named PNG always beats the CSS hanger (ignore jerseyCssBack=1). Proposed Tanzania, Ethiopia, Zambia, Ivory Coast, and South Africa kits are the live named files. s3.0.7: Master Admin Diagnostics ├óΓÇáΓÇÖ Mail Logging records every system-generated SendGrid email (success, failure, headers, body, TLS 1.3, delivery). s3.0.6: Search profile menu stays inside the dropdown (no leak over Clubs). Help `?` sits beside its label on phones. Remaining Search chrome follows App language (Back to welcome, Beach Clubs, Clubs, Lounges). s3.0.5: App language covers Language Settings report values, satellite page chrome, and the profile status menu. From Club Admin / Master Admin, patron links open in a new tab and show an in-app hold notice so the admin portal stays on this session. s3.0.4: SOS2FA request uses FloqR Email/SMS notification channels (not hardcoded SMS). s3.0.3: Every satellite page inherits the FLOQR session via `floqr-session-shell.js`.
 
 ## UI media input convention (required)
 
 When adding or updating upload controls for logos, icons, profile photos, campaign art, or other patron/admin media:
 
 - **Always provide a local file upload** (`<input type="file">`) as the primary control.
-- Use `url-media-field.js` (`FLOQRUrlMediaField.bind`) to upload to Firebase Storage and store the resulting URL internally â€” do **not** expose a visible â€œpaste URLâ€ field for logos/icons unless a legacy migration path is explicitly required.
-- **Display URLs** for venue LED / Xibo boards (`display.html?location=â€¦` and `display2.html?location=â€¦`) must stay **stable** (no `?v=` cache-bust query). Configure once in Xibo; do not change the URL when app versions update. Cache-bust JS/CSS only inside the HTML (`script`/`link` `?v=`). Use `FLOQRNav.stableDisplayUrl` / `stableSecondaryDisplayUrl`.
-- **After every webapp modification**, first verify GitHub Actions / Functions CI logs are green for the published commit, then email mobile preview links so testers can open live URLs on iPhone: Master Admin â†’ **Diagnostics** â†’ **Email mobile preview links**, or deploy/call Cloud Function `emailFloqrPreviewLinks`. See `STANDARD-AFTER-DEPLOYMENT.md` steps 7â€“8.
-- **Product spelling:** always **ShoutOut** (capital O) in user-facing copy â€” not â€œShoutoutâ€, â€œSHOUTOUTâ€, or â€œShout Outâ€.
+- Use `url-media-field.js` (`FLOQRUrlMediaField.bind`) to upload to Firebase Storage and store the resulting URL internally ├óΓé¼ΓÇ¥ do **not** expose a visible ├óΓé¼┼ôpaste URL├óΓé¼┬¥ field for logos/icons unless a legacy migration path is explicitly required.
+- **Display URLs** for venue LED / Xibo boards (`display.html?location=├óΓé¼┬ª` and `display2.html?location=├óΓé¼┬ª`) must stay **stable** (no `?v=` cache-bust query). Configure once in Xibo; do not change the URL when app versions update. Cache-bust JS/CSS only inside the HTML (`script`/`link` `?v=`). Use `FLOQRNav.stableDisplayUrl` / `stableSecondaryDisplayUrl`.
+- **After every webapp modification**, first verify GitHub Actions / Functions CI logs are green for the published commit, then email mobile preview links so testers can open live URLs on iPhone: Master Admin ├óΓÇáΓÇÖ **Diagnostics** ├óΓÇáΓÇÖ **Email mobile preview links**, or deploy/call Cloud Function `emailFloqrPreviewLinks`. See `STANDARD-AFTER-DEPLOYMENT.md` steps 7├óΓé¼ΓÇ£8.
+- **Product spelling:** always **ShoutOut** (capital O) in user-facing copy ├óΓé¼ΓÇ¥ not ├óΓé¼┼ôShoutout├óΓé¼┬¥, ├óΓé¼┼ôSHOUTOUT├óΓé¼┬¥, or ├óΓé¼┼ôShout Out├óΓé¼┬¥.
 - Admin portal pages may still use `?v=` for cache-busting JS/CSS; venue board URLs should not.
 
 ## v29.09.8 highlights (publish when approved)
 
-- **BartR** shared ecommerce frontend (barter + swag). Larger Search icon tile â†’ `commerce.html`. US sellers manage products in My Profile â†’ BartR Store. FloqR MoR; vendor ships.
-- Contextual Back (`floqr-nav.js`): satellites â†’ Profile and Settings; portals â†’ Search (`?start=search`).
+- **BartR** shared ecommerce frontend (barter + swag). Larger Search icon tile ├óΓÇáΓÇÖ `commerce.html`. US sellers manage products in My Profile ├óΓÇáΓÇÖ BartR Store. FloqR MoR; vendor ships.
+- Contextual Back (`floqr-nav.js`): satellites ├óΓÇáΓÇÖ Profile and Settings; portals ├óΓÇáΓÇÖ Search (`?start=search`).
 - Diagnostics package `v29.09.8` + live step-by-step tests in `STANDARD-AFTER-DEPLOYMENT.md`.
 - Help / command popouts dismiss on outside click and Escape; profile status wired on BartR and other interactive pages.
 
@@ -44,8 +44,8 @@ https://jadzadco.github.io/shoutout-demo/?v=29.09.8&start=search
 
 v29.09.8 focused manual tests:
 
-1. Search BartR tile size + icon â†’ BartR â†’ Back to Search.
-2. Portal â†’ Mingl/Services/BartR (`from=portal`) â†’ Back to Profile and Settings.
+1. Search BartR tile size + icon ├óΓÇáΓÇÖ BartR ├óΓÇáΓÇÖ Back to Search.
+2. Portal ├óΓÇáΓÇÖ Mingl/Services/BartR (`from=portal`) ├óΓÇáΓÇÖ Back to Profile and Settings.
 3. US BartR seller: enable store, Save (popout), publish product (popout), find on marketplace.
 4. Fix Grammar personal corrections (`watz -> what's`) on Mingl Chat.
 5. `?` help dismiss; profile pill on interactive pages; Master Admin Diagnostics for `v29.09.8`.
@@ -213,7 +213,7 @@ v29.02 focused manual tests:
 - Gemini correction prompts now allow a patron to use the suggestion, keep the original, add the changed word to My Word List, or save the correction pair for repeated future typos.
 - Adds `Height` as a user profile datapoint on first-time profile setup, Patron Portal profile editing, public profile preview, privacy datapoint selection, and Mingl contextual matching/search.
 - Adds Master Admin > Club Admin URLs with direct `admin.html?location=...` and `display.html?location=...` links for each club/location.
-- Fixes idle ShoutOut display fallback text so a non-Zebbies location with stale/default live content shows its own venue default, such as `USE SHOUT OUT @ SHÃ”KO` or `USE SHOUT OUT @ JOSEPHINE`.
+- Fixes idle ShoutOut display fallback text so a non-Zebbies location with stale/default live content shows its own venue default, such as `USE SHOUT OUT @ SH├âΓÇ¥KO` or `USE SHOUT OUT @ JOSEPHINE`.
 - Mingl chat background changes now remain local to the requesting patron until the other patron approves the shared background request.
 - Patron Portal Help now contains feature help sections for Mingl, ShoutOut, Bata, and Fix Grammar; Mingl Rules are no longer shown as the main Mingl Chat content.
 - Historical readme/rollback artifacts are compressed into the included rollback-history ZIP so GitHub uploads stay manageable.
@@ -373,7 +373,7 @@ v29.02 focused manual tests:
 - Adds Master Admin > Duplicate Records to scan likely duplicate `clubLocations`, choose the correct primary record, and merge duplicate records into safe aliases.
 - Duplicate merge keeps the primary club active and marks duplicates as `status: "merged"`, `active: false`, `canonicalLocationId`, and `mergedInto` instead of deleting records.
 - Creates `clubLocationAliases/{duplicateId}` so old links, admin/display URLs, search records, events, ShoutOuts, and guest list references can resolve to the primary club.
-- Adds a known static ShÃ´ko Barcelona alias so `ShÃ´ko Barcelona Beach Club` resolves to `ShÃ´ko Barcelona` and the duplicate no longer appears as a separate active static listing.
+- Adds a known static Sh├â┬┤ko Barcelona alias so `Sh├â┬┤ko Barcelona Beach Club` resolves to `Sh├â┬┤ko Barcelona` and the duplicate no longer appears as a separate active static listing.
 - Updates patron, club admin, and display routing to resolve club aliases before rendering public search, ShoutOut selection, admin queues, and LED/display live content.
 - Updates Firestore rules to `v28.70-duplicate-alias-rules` for the new alias collection. Publish `firestore.rules` after installing this package, then rerun Master Admin > Diagnostics > Run Rules Smoke Test.
 - Adds `Run Merge Diagnostic` on Master Admin > Duplicate Records so Master Admin can verify whether a merge actually completed.
@@ -556,7 +556,7 @@ Automatic internet crawling runs in backend code using Firebase scheduled functi
 
 ## Master Admin Duplicate Records
 
-Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `ShÃ´ko Barcelona Beach Club` and `ShÃ´ko Barcelona`.
+Open Master Admin > Duplicate Records when two public club profiles represent the same institution, such as `Sh├â┬┤ko Barcelona Beach Club` and `Sh├â┬┤ko Barcelona`.
 
 - Click `Refresh Duplicate Scan` to find likely duplicate `clubLocations` by normalized club name, city, country, brand, website, and address.
 - The scan summary shows whether the list came from live Firestore or failed back to static alias evidence. If it says `Live Firestore: clubLocations`, the records are not hardcoded.
@@ -1818,7 +1818,7 @@ Guest List - Zebbies DC:
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-Guest List - ShÃ´ko Barcelona:
+Guest List - Sh├â┬┤ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -1950,13 +1950,13 @@ match /friendRequests/{id} {
 
 ## Test URLs
 
-Guest List â€” Zebbies Garden DC:
+Guest List ├óΓé¼ΓÇ¥ Zebbies Garden DC:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-Guest List â€” ShÃ´ko Barcelona:
+Guest List ├óΓé¼ΓÇ¥ Sh├â┬┤ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -1968,7 +1968,7 @@ Promoter Admin:
 https://jadzadco.github.io/shoutout-demo/promoter-admin.html?v=28.8
 ```
 
-Club Admin â€” Zebbies Garden DC:
+Club Admin ├óΓé¼ΓÇ¥ Zebbies Garden DC:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/admin.html?location=zebbies-garden-washington-dc&v=28.8
@@ -2056,7 +2056,7 @@ admin.html?location=zebbies-garden-washington-dc&v=28.8
 3. Open `Guest Lists / Promoters` tab.
 4. Confirm guest list totals appear for Zebbies only.
 5. Confirm promoter performance appears.
-6. Confirm ShÃ´ko or Christie records do not appear on Zebbies admin.
+6. Confirm Sh├â┬┤ko or Christie records do not appear on Zebbies admin.
 
 ## E. Promoter Admin Test
 
@@ -2173,7 +2173,7 @@ Zebbies Garden DC:
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden-washington-dc&v=28.8
 ```
 
-ShÃ´ko Barcelona:
+Sh├â┬┤ko Barcelona:
 
 ```text
 https://jadzadco.github.io/shoutout-demo/guest-list.html?location=shoko-barcelona-spain&v=28.8
@@ -2333,7 +2333,7 @@ https://jadzadco.github.io/shoutout-demo/guest-list.html?location=zebbies-garden
 2. Upload all files to GitHub repo root.
 3. Replace existing files.
 4. Commit: `Upload v28.4 inbox chat and service isolation`
-5. Wait 1â€“3 minutes.
+5. Wait 1├óΓé¼ΓÇ£3 minutes.
 6. Test in Incognito or hard refresh.
 
 ## Test URLs
@@ -2447,7 +2447,7 @@ match /shoutoutRecommendations/{id} {
 2. Upload all files to GitHub repo root.
 3. Replace existing files.
 4. Commit: `Upload v28.5 media video templates`.
-5. Wait 1â€“3 minutes.
+5. Wait 1├óΓé¼ΓÇ£3 minutes.
 6. Test in Incognito.
 
 ## Test URLs
@@ -2500,7 +2500,7 @@ https://jadzadco.github.io/shoutout-demo/?v=28.8
 ```
 
 
-# v28.8 Hard Fix â€” ShoutOut Button on Club Options
+# v28.8 Hard Fix ├óΓé¼ΓÇ¥ ShoutOut Button on Club Options
 
 Fixes missing `Throw a ShoutOut` button on the Club Options screen.
 
@@ -2521,7 +2521,7 @@ v28.8 hardcoded club option ShoutOut insertion
 
 ---
 
-# v28.9 Codex Release â€” Clean Club Options + Contextual Search
+# v28.9 Codex Release ├óΓé¼ΓÇ¥ Clean Club Options + Contextual Search
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-9-codex-contextual-search-full-package.zip`
@@ -2724,7 +2724,7 @@ Location-aware ranking
 
 ---
 
-# v28.10 Codex Release â€” Search Display Cleanup
+# v28.10 Codex Release ├óΓé¼ΓÇ¥ Search Display Cleanup
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-10-contextual-search-ui-cleanup-full-package.zip`
@@ -2886,7 +2886,7 @@ No database rollback is needed unless live test submissions were created manuall
 
 ---
 
-# v28.11 Codex Release â€” Template Preview Cleanup
+# v28.11 Codex Release ├óΓé¼ΓÇ¥ Template Preview Cleanup
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-11-template-preview-cleanup-full-package.zip`
@@ -3043,7 +3043,7 @@ No database rollback is needed unless live test submissions were created manuall
 
 ---
 
-# v28.12 Codex Release â€” Avatar Dropdown Link Color Fix
+# v28.12 Codex Release ├óΓé¼ΓÇ¥ Avatar Dropdown Link Color Fix
 
 Generated: 2026-06-23  
 Package: `jadz-shoutout-v28-12-avatar-dropdown-link-color-full-package.zip`
@@ -3559,9 +3559,9 @@ shoutoutwepp,vers-28.24-f-full-package.zip
 
 ## What Changed
 
-- Removed the duplicated generic `â† Back` button.
-- Standardized workflow back buttons as page-specific `â† Back to ...` controls.
-- Added clearer workflow labels such as `Screen 3B â€” Club / Search` and `Screen 4 â€” Club / Select ShoutOut Template`.
+- Removed the duplicated generic `├óΓÇá┬É Back` button.
+- Standardized workflow back buttons as page-specific `├óΓÇá┬É Back to ...` controls.
+- Added clearer workflow labels such as `Screen 3B ├óΓé¼ΓÇ¥ Club / Search` and `Screen 4 ├óΓé¼ΓÇ¥ Club / Select ShoutOut Template`.
 - Removed the bottom Messages / Chats / Notifications bar.
 - Merged notifications into Messages counts and the Messages tab.
 - Consolidated the previous v28.16 media upload/display pipeline fix and the Classic Black & White board size refinement into one `28.24-f` fix release.
