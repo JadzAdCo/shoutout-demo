@@ -124,7 +124,9 @@ test("Soccer jersey mark accepts any 2 characters", () => {
   assert.match(displayApp, /graphemes/);
   assert.match(backend, /SOCCER_JERSEY_TEMPLATE_IDS/);
   assert.match(backend, /isSportsJerseyTemplateId/);
+  assert.match(backend, /isNflDualJerseyTemplateId/);
   assert.match(backend, /soccerJersey/);
+  assert.match(backend, /nflJersey/);
   assert.match(backend, /Array\.from\(String\(rawShoutout\.subText/);
 });
 

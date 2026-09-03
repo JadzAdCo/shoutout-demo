@@ -74,7 +74,17 @@
       const snap = await db.collection("templates").get();
       snap.forEach(doc => {
         const packaged = window.SHOUTOUT_TEMPLATES?.[doc.id] || {};
-        const merged = {...packaged, id: doc.id, ...doc.data()};
+        const firestoreData = doc.data() || {};
+        const merged = {...packaged, id: doc.id, ...firestoreData};
+        // Stale Firestore rows must not strip packaged NFL dual-layout flags.
+        if (packaged.nflDualLayout || packaged.layout === "nfl-jersey") {
+          merged.nflDualLayout = true;
+          merged.layout = packaged.layout || "nfl-jersey";
+          if (packaged.sport) merged.sport = packaged.sport;
+          if (packaged.defaultBackgroundUrl && !merged.defaultBackgroundUrl) {
+            merged.defaultBackgroundUrl = packaged.defaultBackgroundUrl;
+          }
+        }
         templates[doc.id] = window.FLOQRScreenDatapoints?.applyTemplate?.(merged) || merged;
       });
     } catch (e) {}
@@ -385,6 +395,44 @@
       kicker:supplied ? "FROM" : "PRESENTED BY",
       value:supplied || brandFallback
     };
+  }
+
+  /** Reusable FloqR card (identity rail) — classic / soccer / NFL / split-media. */
+  function paintFloqrCard(rail, {
+    attribution = "",
+    idle = false,
+    idleKicker = "USE",
+    idleValue = "",
+    idleAria = "",
+    extraClass = ""
+  } = {}) {
+    if (!rail) return null;
+    const identity = classicIdentityPresentation(attribution);
+    const showIdle = !!idle;
+    const kicker = showIdle ? idleKicker : identity.kicker;
+    const value = showIdle
+      ? (idleValue || identity.value)
+      : identity.value;
+    const classes = [
+      "display-identity-rail",
+      "classic-bw-identity",
+      extraClass,
+      showIdle || !identity.supplied ? "uses-brand-fallback" : "has-attribution"
+    ].filter(Boolean).join(" ");
+    rail.className = classes;
+    rail.setAttribute("aria-label", showIdle ? (idleAria || `${kicker} ${value}`) : `${identity.kicker} ${identity.value}`);
+    rail.setAttribute("aria-hidden", "false");
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(kicker)}</small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+    return identity;
+  }
+
+  function floqrCardAttributionFromData(data = {}) {
+    const direct = String(data.attribution || "").trim();
+    if (direct) return direct;
+    if (data.includeAttribution === true) {
+      return String(data.displayName || data.submittedByDisplayName || "").trim();
+    }
+    return "";
   }
 
   function isTextOverlayTemplate(template = {}, templateId = "") {
@@ -767,6 +815,10 @@
       jerseyAccent: params.get("jerseyAccent") || "",
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       attribution: params.get("attribution") || "",
+      includeAttribution: params.get("includeAttribution") === "1",
+      jerseyPatronName: params.get("jerseyPatronName") || "",
+      nflDualLayout: params.get("nflDualLayout") === "1",
+      sport: params.get("sport") || "",
       soccerNameSource: params.get("soccerNameSource") || "",
       teamMembers: qsJson("teamMembers", []),
       stadiumMessage: params.get("stadiumMessage") || "",
@@ -1195,7 +1247,12 @@
     const mainSource = (data.idleCta || data.status === "default") && !isSoccerJersey && !isTextOverlay
       ? (rawMain || locationDefaultMain)
       : rawMain;
-    const isNflDual = isSoccerJersey && (t.layout === "nfl-jersey" || t.nflDualLayout === true);
+    const isNflDual = isSoccerJersey && (
+      t.layout === "nfl-jersey"
+      || t.nflDualLayout === true
+      || data.nflDualLayout === true
+      || (String(data.sport || t.sport || "").toLowerCase() === "nfl" && !!(data.backgroundUrl || t.defaultBackgroundUrl))
+    );
     const mainText = isNflDual
       ? glyphSlice(cleanDisplayText(mainSource), 0, mainLimit)
       : isSoccerJersey
@@ -1297,7 +1354,12 @@
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
-      const nflDualActive = sport === "nfl" && usePhotoBack && (t.nflDualLayout || t.layout === "nfl-jersey" || isNflDual);
+      const nflDualActive = sport === "nfl" && usePhotoBack && (
+        t.nflDualLayout
+        || t.layout === "nfl-jersey"
+        || data.nflDualLayout === true
+        || isNflDual
+      );
       const jerseyNameText = nflDualActive
         ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || ""), 0, 8) || "NYX")
         : mainText;
@@ -1414,23 +1476,28 @@
         stopSplitMediaLoop();
       }
 
-      // Animated text holder at bottom (same burst rail as classic).
+      // Animated FloqR card (reusable module — same FROM / PRESENTED BY shell as classic).
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
         const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
-        const identity = classicIdentityPresentation(data.attribution || "");
+        const cardAttribution = floqrCardAttributionFromData(data);
         const idleCta = DISPLAY_BOARD === "secondary"
           ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
           : `Use ShoutOut @ ${clubName}`;
-        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || identity.value;
-        const showIdle = !subText && !jerseyNameText && !mainText;
-        rail.className = "display-identity-rail classic-bw-identity soccer-jersey-rail" + (showIdle || !identity.supplied ? " uses-brand-fallback" : " has-attribution");
-        rail.setAttribute("aria-label", showIdle ? idleCta : `${identity.kicker} ${identity.value}`);
+        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || "FLOQR ShoutOut";
+        const showIdle = !subText && !jerseyNameText && !mainText && !cardAttribution;
         const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
         const idleStrong = showIdle
           ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
-          : identity.value;
-        rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(showIdle ? idleKicker : identity.kicker)}</small><strong>${esc(showIdle ? idleStrong : identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+          : "";
+        paintFloqrCard(rail, {
+          attribution: cardAttribution,
+          idle: showIdle,
+          idleKicker,
+          idleValue: idleStrong,
+          idleAria: idleCta,
+          extraClass: "soccer-jersey-rail"
+        });
       } else if (rail) {
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";

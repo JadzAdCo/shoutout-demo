@@ -49,6 +49,10 @@ function isSportsJerseyTemplateId(templateId = "") {
   if (id === "soccerJersey" || SOCCER_JERSEY_TEMPLATE_IDS.has(id)) return true;
   return /^(soccer|nba|nfl)[A-Za-z0-9]+$/.test(id);
 }
+/** Photo NFL dual layout (jersey + shoutout copy). Not soccer/NBA name-only kits. */
+function isNflDualJerseyTemplateId(templateId = "") {
+  return /^nfl[A-Za-z0-9]+$/i.test(String(templateId || ""));
+}
 const LIVE_SHOUTOUT_DURATION_MS = 10 * 60 * 1000;
 const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "engagementMedia", "fianceMedia"]);
 const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
@@ -76,6 +80,11 @@ const SHOUTOUT_TEXT_LIMITS = {
   soccerJersey:{
     "p125-96x48":[1,12,12,2],"p125-64x48":[1,12,12,2],"p125-64x32":[1,10,10,2],
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
+  },
+  // Must match shared-data nflJersey — shoutout copy is NOT the jersey name.
+  nflJersey:{
+    "p125-96x48":[4,16,64,2],"p125-64x48":[4,16,64,2],"p125-64x32":[3,16,48,2],
+    "led-96x48":[4,16,64,2],"led-64x48":[4,16,64,2],"led-64x32":[3,16,48,2]
   }
 };
 const SHOUTOUT_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
@@ -163,15 +172,17 @@ function secretValueSafe(secret, envName = "") {
 function checkoutTextCaps(templateId = "", formatId = "") {
   const profileId = templateId === FOOTBALL_TEAM_INTRO_TEMPLATE_ID
     ? "footballIntro"
-    : isSportsJerseyTemplateId(templateId)
-      ? "soccerJersey"
-      : templateId === "car"
-        ? "car"
-        : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
-          ? "splitMedia"
-          : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
-            ? "classicBoard"
-            : "full";
+    : isNflDualJerseyTemplateId(templateId)
+      ? "nflJersey"
+      : isSportsJerseyTemplateId(templateId)
+        ? "soccerJersey"
+        : templateId === "car"
+          ? "car"
+          : SPLIT_MEDIA_TEMPLATE_IDS.has(templateId)
+            ? "splitMedia"
+            : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
+              ? "classicBoard"
+              : "full";
   const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[formatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
   return {
@@ -259,6 +270,8 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
   const templateId = text(rawShoutout.template || rawShoutout.templateId, 80);
   const screenFormatId = text(rawShoutout.screenFormatId, 40);
   const caps = checkoutTextCaps(templateId, screenFormatId);
+  const nflDual = isNflDualJerseyTemplateId(templateId);
+  const rawMain = String(rawShoutout.mainText || "").trim();
   const shoutout = {
     ...rawShoutout,
     template:templateId,
@@ -269,13 +282,21 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
     maxSubCharacters:caps.sub,
     lineCount:caps.lineCount,
     maxCharactersPerLine:caps.perLine,
-    mainTextSizePercent:20.8,
-    subTextSizePercent:7.8,
-    mainText:fitCheckoutDisplayText(rawShoutout.mainText || "SHOUTOUT!", caps, "main"),
-    // Soccer jersey mark: any characters, hard-capped at 2 glyphs (not digits-only).
+    mainTextSizePercent:nflDual ? 9 : 20.8,
+    subTextSizePercent:nflDual ? 48 : 7.8,
+    // NFL dual: mainText is the rotating/side shoutout copy (not jersey name). Keep caps from nflJersey.
+    mainText:fitCheckoutDisplayText(rawMain || "SHOUTOUT!", caps, "main"),
+    // Soccer/NFL jersey mark: any characters, hard-capped at 2 glyphs (not digits-only).
     subText:isSportsJerseyTemplateId(templateId)
       ? Array.from(String(rawShoutout.subText || "")).slice(0, 2).join("")
       : fitCheckoutDisplayText(rawShoutout.subText || "", caps, "sub"),
+    // FloqR card (reusable identity rail) — independent of jerseyPatronName.
+    attribution:text(rawShoutout.attribution, 40),
+    includeAttribution:rawShoutout.includeAttribution === true || !!String(rawShoutout.attribution || "").trim(),
+    attributionChoice:text(rawShoutout.attributionChoice, 40),
+    jerseyPatronName:text(rawShoutout.jerseyPatronName || rawShoutout.jerseyName, 16),
+    nflDualLayout:nflDual || rawShoutout.nflDualLayout === true,
+    sport:text(rawShoutout.sport, 20) || (nflDual ? "nfl" : ""),
     submittedByUid:authContext.uid || "",
     submittedBy:text(authContext.token?.email || rawShoutout.submittedBy, 200).toLowerCase()
   };

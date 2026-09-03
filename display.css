@@ -1064,8 +1064,11 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   inset:0;
   z-index:20;
   pointer-events:none;
-  box-shadow:inset 0 0 0 3px var(--jersey-primary,#AA0000),inset 0 0 36px 8px var(--jersey-primary,#AA0000);
-  opacity:.72;
+  box-shadow:
+    inset 0 0 0 4px var(--jersey-primary,#004C54),
+    inset 0 0 32px 12px var(--jersey-primary,#004C54),
+    inset 0 0 64px 20px var(--jersey-accent,#B3995D);
+  opacity:.85;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .nfl-shout-panel{
   position:absolute;
@@ -1136,8 +1139,12 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   opacity:0;
   visibility:hidden;
 }
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy{
+  background:#000!important;
+}
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .display-background{
-  opacity:.18!important;
+  opacity:0!important;
+  visibility:hidden!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy #displayMain.soccer-jersey-name,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy #displaySub.soccer-jersey-number{
@@ -1147,6 +1154,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .nfl-shout-panel{
   opacity:1;
   visibility:visible;
+  z-index:8;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .display-identity-rail.soccer-jersey-rail{
   z-index:25!important;
