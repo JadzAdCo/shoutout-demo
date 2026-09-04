@@ -360,6 +360,7 @@
     const uppercase = options.uppercase !== false;
     const maxRows = Math.max(1, Number(caps.lineCount || 1));
     const maxChars = Math.max(1, Number(caps.maxCharactersPerLine || caps.perLine || caps.maxMainCharacters || 60));
+    const maxTotal = Math.max(1, Number(caps.maxMainCharacters || caps.main || maxChars * maxRows));
     const rows = [];
 
     let prepared = String(mainText || "")
@@ -367,7 +368,8 @@
       .replace(/\r\n?/g, "\n")
       .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ");
     if (uppercase) prepared = prepared.toUpperCase();
-    prepared = glyphSlice(prepared, 0, maxChars * maxRows + maxRows - 1);
+    // Keep the full shoutout budget (emoji-aware), then wrap onto lines.
+    prepared = glyphSlice(prepared, 0, Math.max(maxTotal, maxChars * maxRows));
     prepared.split(/\n+/).forEach(sourceLine => {
       if (rows.length >= maxRows) return;
       const words = sourceLine.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -652,15 +654,21 @@
     if (!canvas) return;
     canvas.classList.add("split-media-loop", "split-media-phase-media");
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const refitNfl = () => {
+      if (!canvas.classList.contains("nfl-dual-rotate")) return;
+      fitNflShoutPanel(byId("displayNflShoutPanel"));
+    };
     if (reduced) {
       canvas.classList.add("split-media-phase-copy");
       canvas.classList.remove("split-media-phase-media");
+      requestAnimationFrame(refitNfl);
       return;
     }
     splitMediaLoopTimer = window.setInterval(() => {
       const onMedia = canvas.classList.contains("split-media-phase-media");
       canvas.classList.toggle("split-media-phase-media", !onMedia);
       canvas.classList.toggle("split-media-phase-copy", onMedia);
+      if (onMedia) requestAnimationFrame(refitNfl);
     }, SPLIT_MEDIA_LOOP_MS);
   }
 
@@ -1001,12 +1009,43 @@
   function nflShoutFitStyle(row = "", {sideBySide = false, compact = false} = {}) {
     const rowLen = Math.max(glyphLen(row), 1);
     // Full-board rotate needs larger type; half-panel side layout is slightly tighter.
-    const base = sideBySide ? 0.92 : 1.28;
+    const base = sideBySide ? 1.05 : 1.55;
     const scale = base * (compact ? 0.95 : 1);
-    const maxPx = Math.round((rowLen <= 6 ? 160 : rowLen <= 10 ? 132 : rowLen <= 13 ? 112 : rowLen <= 16 ? 96 : 78) * scale);
-    const vw = ((rowLen <= 6 ? 10.5 : rowLen <= 10 ? 8.6 : rowLen <= 13 ? 7.2 : rowLen <= 16 ? 6.4 : 5.4) * scale).toFixed(2);
-    const minPx = compact ? 28 : (sideBySide ? 26 : 36);
+    const maxPx = Math.round((rowLen <= 6 ? 180 : rowLen <= 10 ? 150 : rowLen <= 13 ? 128 : rowLen <= 16 ? 110 : 88) * scale);
+    const vw = ((rowLen <= 6 ? 12 : rowLen <= 10 ? 9.6 : rowLen <= 13 ? 8.2 : rowLen <= 16 ? 7.4 : 6.2) * scale).toFixed(2);
+    const minPx = compact ? 32 : (sideBySide ? 28 : 40);
     return `font-size:clamp(${minPx}px,${vw}vw,${maxPx}px)`;
+  }
+
+  /** Measure panel and grow a uniform font until the longest line / height fills the board. */
+  function fitNflShoutPanel(panel) {
+    if (!panel) return;
+    const lines = Array.from(panel.querySelectorAll(".nfl-shout-lines > b"));
+    if (!lines.length) return;
+    const width = panel.clientWidth;
+    const height = panel.clientHeight;
+    if (width < 24 || height < 24) return;
+    const box = panel.querySelector(".nfl-shout-lines");
+    const apply = px => {
+      lines.forEach(el => {
+        el.style.fontSize = `${px}px`;
+        el.style.lineHeight = "0.92";
+      });
+    };
+    let lo = 16;
+    let hi = Math.max(24, Math.floor(height / Math.max(1, lines.length) * 1.2));
+    for (let i = 0; i < 16; i += 1) {
+      const mid = Math.floor((lo + hi + 1) / 2);
+      apply(mid);
+      let overflow = false;
+      lines.forEach(el => {
+        if (el.scrollWidth > width + 2) overflow = true;
+      });
+      if (box && box.scrollHeight > height + 2) overflow = true;
+      if (overflow) hi = mid - 1;
+      else lo = mid;
+    }
+    apply(Math.max(16, lo));
   }
 
   function enforceTrimmedVideoPlayback(video, data = {}) {
@@ -1399,8 +1438,9 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        baseName = Math.min(11.5, 11.5);
-        baseNumber = Math.min(48, 48);
+        // Name + number −10% vs prior 10.35 / 43.2 (with jersey silhouette −10%).
+        baseName = Math.min(9.3, 9.3);
+        baseNumber = Math.min(38.9, 38.9);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1472,20 +1512,44 @@
         }
         if (shoutPanel) {
           // NFL dual: shoutout copy should never inherit the soccer 14-char cap.
-          const lineCount = Number(textCaps.lineCount || (is96 ? 4 : 3));
-          const nflShoutMainText = glyphSlice(cleanDisplayText(mainSource), 0, mainLimit);
+          // Prefer live payload caps, then profile, then hard board maxima (64 / 48).
+          const compact = /64x32/i.test(formatId) || canvas.getAttribute("data-is-64x32") === "1";
+          const lineCount = Number(
+            data.lineCount
+            || textCaps.lineCount
+            || (is96 || !compact ? 4 : 3)
+          );
+          const perLine = Number(
+            data.maxCharactersPerLine
+            || textCaps.perLine
+            || textCaps.maxCharactersPerLine
+            || 16
+          );
+          const nflMainCap = Math.max(
+            Number(data.maxMainCharacters || 0),
+            Number(textCaps.main || textCaps.maxMainCharacters || 0),
+            mainLimit,
+            is96 || !compact ? 64 : 48
+          );
+          const nflShoutMainText = glyphSlice(cleanDisplayText(mainSource), 0, nflMainCap);
           const shoutRows = displayTextRows(nflShoutMainText || "", {
             lineCount,
-            maxCharactersPerLine: Number(textCaps.perLine || textCaps.maxCharactersPerLine || 16),
-            maxMainCharacters: Number(textCaps.main || textCaps.maxMainCharacters || (is96 ? 64 : 48))
+            maxCharactersPerLine: perLine,
+            maxMainCharacters: nflMainCap
           }, {uppercase: false});
-          const compact = /64x32/i.test(formatId) || canvas.getAttribute("data-is-64x32") === "1";
           canvas.style.setProperty("--nfl-shout-line-count", String(Math.max(1, lineCount)));
           shoutPanel.className = "nfl-shout-panel";
           shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => {
             const style = nflShoutFitStyle(row || " ", {sideBySide: is96, compact});
             return `<b style="${style}">${esc(row || " ")}</b>`;
           }).join("")}</div>`;
+          // Grow uniform type until the entered copy fills the panel.
+          const runFit = () => fitNflShoutPanel(shoutPanel);
+          runFit();
+          requestAnimationFrame(() => {
+            runFit();
+            requestAnimationFrame(runFit);
+          });
         }
         if (!is96) {
           stopSplitMediaLoop();
