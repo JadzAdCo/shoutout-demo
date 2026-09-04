@@ -3681,16 +3681,29 @@
     box.classList.remove("hidden");
     box.innerHTML = "Loading past ShoutOuts...";
     try {
-      const snap = await db.collection("shoutouts").where("submittedBy", "==", safeUser()).limit(10).get();
-      const rows = [];
-      snap.forEach(doc => rows.push({id:doc.id, ...doc.data()}));
+      const email = String(currentUser.email || "").trim().toLowerCase();
+      const phone = String(currentUser.phoneNumber || "").trim();
+      const queries = [
+        db.collection("shoutouts").where("submittedByUid", "==", currentUser.uid).limit(20).get()
+      ];
+      if (email) queries.push(db.collection("shoutouts").where("submittedBy", "==", email).limit(20).get());
+      if (phone) queries.push(db.collection("shoutouts").where("submittedBy", "==", phone).limit(20).get());
+      const snaps = await Promise.all(queries.map(p => p.catch(() => null)));
+      const byIdMap = new Map();
+      snaps.forEach(snap => {
+        if (!snap) return;
+        snap.forEach(doc => byIdMap.set(doc.id, {id:doc.id, ...doc.data()}));
+      });
+      const rows = Array.from(byIdMap.values())
+        .sort((a, b) => Number(b.submittedAt?.seconds || 0) - Number(a.submittedAt?.seconds || 0))
+        .slice(0, 10);
       if (!rows.length) { box.innerHTML = "<p>No previous ShoutOuts found yet.</p>"; return; }
-      box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||"")}</button>`).join("");
+      box.innerHTML = rows.map((s,i)=>`<button type="button" class="reuse-shoutout" data-i="${i}">${esc(s.mainText||"ShoutOut")} — ${esc(s.subText||s.attribution||"")}</button>`).join("");
       box.querySelectorAll(".reuse-shoutout").forEach(btn => btn.addEventListener("click", () => {
         const s = rows[Number(btn.dataset.i)];
         const mainInput = byId("mainText");
         if (mainInput) mainInput.value = fitTemplateText(s.mainText || "", "main");
-        if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText;
+        if (byId("includeAttribution")) byId("includeAttribution").checked = !!s.subText || !!s.attribution || s.includeAttribution === true;
         syncAttribution();
         if (s.mediaUrl) byId("mediaUrl").value = s.mediaUrl;
         if (s.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = s.mediaUrl;

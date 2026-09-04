@@ -320,6 +320,19 @@
     } catch (e) { return []; }
   }
 
+  async function getDocsByIdsSafe(name, ids = [], limit=150) {
+    const unique = Array.from(new Set((ids || []).map(id => String(id || "").trim()).filter(Boolean))).slice(0, limit);
+    if (!unique.length) return [];
+    const rows = await Promise.all(unique.map(async id => {
+      try {
+        const snap = await db.collection(name).doc(id).get();
+        if (!snap.exists) return null;
+        return {id:snap.id, _collection:name, ...snap.data()};
+      } catch (e) { return null; }
+    }));
+    return rows.filter(Boolean);
+  }
+
   function uniqueRows(rows = []) {
     const map = new Map();
     rows.flat().forEach(row => {
@@ -329,9 +342,48 @@
     return Array.from(map.values());
   }
 
+  function scopedQueryValue(user, source = "uid") {
+    if (source === "email") return String(user?.email || "").trim().toLowerCase();
+    if (source === "phone") return String(user?.phoneNumber || "").trim();
+    return String(user?.uid || "").trim();
+  }
+
   async function getUserScopedRows(name, user, fields, limit=150) {
-    const queries = fields.map(([field, source]) => queryCollectionSafe(name, field, source === "email" ? user.email : user.uid, limit));
+    const queries = fields.map(([field, source]) => queryCollectionSafe(name, field, scopedQueryValue(user, source), limit));
     return uniqueRows(await Promise.all(queries));
+  }
+
+  function sortBySubmittedAtDesc(rows = []) {
+    return rows.slice().sort((a, b) => {
+      const aMs = Number(a?.submittedAt?.toMillis?.() || a?.submittedAt?.seconds * 1000 || a?.paidAt?.toMillis?.() || a?.createdAt?.toMillis?.() || a?.createdAt?.seconds * 1000 || 0);
+      const bMs = Number(b?.submittedAt?.toMillis?.() || b?.submittedAt?.seconds * 1000 || b?.paidAt?.toMillis?.() || b?.createdAt?.toMillis?.() || b?.createdAt?.seconds * 1000 || 0);
+      return bMs - aMs;
+    });
+  }
+
+  async function loadPatronShoutoutHistory(user, serviceOrders = []) {
+    const email = scopedQueryValue(user, "email");
+    const phone = scopedQueryValue(user, "phone");
+    const scoped = await getUserScopedRows("shoutouts", user, [
+      ["submittedByUid", "uid"],
+      ["submittedBy", "email"],
+      ["submittedBy", "phone"]
+    ]);
+    // Paid Stripe shoutouts are written as shoutouts/stripe_<orderId>. Also recover via serviceOrders.
+    const orderIds = (serviceOrders || [])
+      .filter(order => String(order.orderType || "") === "shoutout")
+      .flatMap(order => [order.fulfilledRecordId, order.id ? `stripe_${order.id}` : ""])
+      .filter(Boolean);
+    const fromOrders = await getDocsByIdsSafe("shoutouts", orderIds, 200);
+    // Client-side ownership filter for any recovered docs (email case / legacy rows).
+    const owned = uniqueRows([scoped, fromOrders]).filter(row => {
+      const byUid = row.submittedByUid && row.submittedByUid === user.uid;
+      const byEmail = email && String(row.submittedBy || "").trim().toLowerCase() === email;
+      const byPhone = phone && String(row.submittedBy || "").trim() === phone;
+      const byOrder = orderIds.includes(row.id);
+      return byUid || byEmail || byPhone || byOrder;
+    });
+    return sortBySubmittedAtDesc(owned);
   }
 
   function simpleRows(rows) {
@@ -2672,7 +2724,9 @@
     if (!user || !activeShoutoutEditId) return;
     const item = currentShoutouts.find(x => x.id === activeShoutoutEditId);
     if (!item) { setText("shoutoutEditStatus", "Could not find that pending ShoutOut."); return; }
-    const ownsItem = item.submittedByUid === user.uid || item.submittedBy === user.email;
+    const ownsItem = item.submittedByUid === user.uid
+      || String(item.submittedBy || "").trim().toLowerCase() === String(user.email || "").trim().toLowerCase()
+      || (!!user.phoneNumber && String(item.submittedBy || "").trim() === String(user.phoneNumber || "").trim());
     const pending = String(item.status || "pending").toLowerCase() === "pending" && item.editable !== false;
     if (!ownsItem || !pending) { setText("shoutoutEditStatus", "This ShoutOut can no longer be modified."); return; }
     const caps = portalShoutoutTextCaps(item);
@@ -3357,8 +3411,7 @@
 
     setText("portalStatus", "Loading your FloqR Inbox…");
     await refreshBlocks(user);
-    const [shoutouts, guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
-      getUserScopedRows("shoutouts", user, [["submittedByUid","uid"],["submittedBy","email"]]),
+    const [guestLists, directMessages, inboxNotifications, queriedChats, queriedConnections, serviceOrders] = await Promise.all([
       getUserScopedRows("guestListRequests", user, [["submittedByUid","uid"],["guestEmail","email"]]),
       getUserScopedRows("messages", user, [["recipientUid","uid"],["senderUid","uid"],["recipientEmail","email"],["senderEmail","email"]]),
       getUserScopedRows("inboxNotifications", user, [["recipientUid","uid"],["recipientEmail","email"]]),
@@ -3366,6 +3419,7 @@
       getParticipantCollectionSafe("minglConnections", user.uid),
       queryCollectionSafe("serviceOrders", "ownerUid", user.uid, 300)
     ]);
+    const shoutouts = await loadPatronShoutoutHistory(user, serviceOrders);
     currentMinglConnections = await getPortalMinglConnections(user, [], queriedConnections);
     currentPortalUsers = [];
     const chats = (await getPortalMinglRooms(user, [], queriedChats)).filter(room => {
