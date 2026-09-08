@@ -427,11 +427,29 @@
     return identity;
   }
 
+  function withAtHandle(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    const compact = raw.replace(/\s+/g, "");
+    if (compact.startsWith("@")) return `@${compact.replace(/^@+/, "")}`;
+    if (/^[a-z0-9._]{2,30}$/i.test(compact)) return `@${compact}`;
+    return raw;
+  }
+
   function floqrCardAttributionFromData(data = {}) {
+    const choice = String(data.attributionChoice || "").trim();
+    const handle = String(
+      data.floqrHandle
+      || data.instagramHandle
+      || data.submittedByHandle
+      || ""
+    ).trim();
     const direct = String(data.attribution || "").trim();
-    if (direct) return direct;
-    if (data.includeAttribution === true) {
-      return String(data.displayName || data.submittedByDisplayName || "").trim();
+    const wantsHandle = choice === "floqrHandle" || choice === "instagram" || choice === "username";
+    if (wantsHandle) return withAtHandle(direct || handle);
+    if (direct) return withAtHandle(direct);
+    if (data.includeAttribution === true || data.includeAttribution === "1") {
+      return withAtHandle(handle || data.displayName || data.submittedByDisplayName || "");
     }
     return "";
   }
@@ -805,6 +823,7 @@
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       attribution: params.get("attribution") || "",
       includeAttribution: params.get("includeAttribution") === "1",
+      attributionChoice: params.get("attributionChoice") || "",
       jerseyPatronName: params.get("jerseyPatronName") || "",
       nflDualLayout: params.get("nflDualLayout") === "1",
       sport: params.get("sport") || "",
