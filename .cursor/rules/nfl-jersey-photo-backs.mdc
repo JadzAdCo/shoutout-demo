@@ -7,19 +7,19 @@ alwaysApply: true
 
 **One silhouette.** Philadelphia Eagles elite cut (V-neck, short sleeves with cuff bands, upper-back nameplate, mesh fabric). Solid `#000` (LED energy). No hanger on photo backs.
 
-**Scale lock:** PNG jersey must fill the frame — **never shrink** for collar/helmet. CSS uses **width-based** `background-size: 88% auto`. Uniform shift: `--nfl-photo-stack-y` (default `4%`) moves jersey PNG + patron overlays together via `calc()` on `background-position` and overlay `top`. Font caps unchanged (~11.5vh name, ~48vh number).
+**Scale lock:** PNG jersey fills the frame at **63.9%** width (`background-size: 63.9% auto`) — −10% from the prior 71% lock. CSS uses **width-based** sizing. Uniform shift: `--nfl-photo-stack-y` (default `4%`) moves jersey PNG + patron overlays together via `calc()` on `background-position` and overlay `top`. Font caps: name ~**8.37vh**, number ~**35.01vh** (−10% from prior 9.3 / 38.9). 96×48 dual pane uses `67.5%` of the left half.
 
 **Helmet:** Optional side mascot/helmet in PNG only after jersey stack is locked; must not touch the right sleeve.
 
 **Wordmark:** baked into the PNG only (club on nameplate). Upright athletic block caps. CSS hides `.soccer-jersey-team` on photo kits.
 
-**Patron name (CSS):** base `top` ~18% + `var(--nfl-photo-stack-y)`; cap ~11.5vh.
+**Patron name (CSS):** base `top` ~20% + `var(--nfl-photo-stack-y)`; cap ~8.37vh.
 
-**Number (CSS):** base `top` ~40% + shift; cap ~48vh.
+**Number (CSS):** base `top` ~39.5% + shift; cap ~35.01vh.
 
 **Dual shoutout layout (`nfl-jersey` / `nflDualLayout`):**
-- **96×48:** jersey left-justified; white text shoutout on the right (4 lines × 16 = 64 graphemes, emoji OK); FloqR card bottom; kit-color edge glow.
-- **64×48 / 64×32:** rotate jersey phase ↔ text phase (frame 2 = **solid black** + white shoutout; jersey fully hidden). FloqR card on both. **64×32:** 3 lines × 16 = 48 graphemes.
+- **96×48:** jersey left-justified; white text shoutout on the right (4 lines × 16 = 64 graphemes, emoji OK); FloqR card bottom; kit-color edge glow. Shout panel fills the **right half**.
+- **64×48 / 64×32:** rotate jersey phase ↔ text phase (frame 2 = **solid black** + white shoutout; jersey fully hidden). FloqR card on both. **64×48:** 4 lines × 16 = 64; **64×32:** 3 lines × 16 = 48. Text phase fills **almost the entire board** (glow edges + FloqR card reserved); `fitNflShoutPanel` measure-fits a uniform font to the full entered copy.
 - FloqR card Instagram/handle is **opt-in** and **independent** of jersey name (`includeAttribution` + `attributionChoice` vs `soccerNameSource` / `jerseyPatronName`). Checkout must use `nflJersey` text caps (not soccer 8–12).
 
 ## GenerateImage prompt (team wordmark only)
