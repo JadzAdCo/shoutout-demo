@@ -57,6 +57,7 @@
   let heistPhaseLoopTimer = null;
   let splitMediaLoopTimer = null;
   const SPLIT_MEDIA_LOOP_MS = 4000;
+  const NFL_DUAL_ROTATE_MS = 10000;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -649,7 +650,7 @@
     rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
   }
 
-  function startSplitMediaLoop(canvas) {
+  function startSplitMediaLoop(canvas, intervalMs = SPLIT_MEDIA_LOOP_MS) {
     stopSplitMediaLoop();
     if (!canvas) return;
     canvas.classList.add("split-media-loop", "split-media-phase-media");
@@ -669,7 +670,7 @@
       canvas.classList.toggle("split-media-phase-media", !onMedia);
       canvas.classList.toggle("split-media-phase-copy", onMedia);
       if (onMedia) requestAnimationFrame(refitNfl);
-    }, SPLIT_MEDIA_LOOP_MS);
+    }, intervalMs);
   }
 
   function heistBrandLogoUrl() {
@@ -1554,7 +1555,7 @@
         if (!is96) {
           stopSplitMediaLoop();
           canvas.classList.add("split-media-loop", "split-media-phase-media");
-          startSplitMediaLoop(canvas);
+          startSplitMediaLoop(canvas, NFL_DUAL_ROTATE_MS);
         } else {
           stopSplitMediaLoop();
         }
