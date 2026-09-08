@@ -21,7 +21,7 @@ Also persist the sync fields: venue `displayScreenFormatIds`, `primaryDisplayScr
 1. Show a template at a venue only when at least one size pair is both `1` (`templateFitsVenue`).
 2. Composer screen list = `overlappingFormatIds(template, venue)`. Store the chosen size on the ShoutOut as `screenFormatId`.
 3. `display.html` = primary LED; `display2.html` = secondary. Playback format = that board’s assigned size ∩ venue flags ∩ template `Is*` ∩ the composed ShoutOut’s family. Layout CSS uses `data-is-96x48|64x48|64x32`.
-4. Birthday / split-media: **96×48** = 3-line side-by-side; **64×48** and **64×32** = 3-line GIF loop (photo then shoutout) with a FLOQR + handle card on every frame. `Is64x32=1`. `?screen=` is composer **preview only**.
+4. Birthday / split-media: **96×48** = 3-line side-by-side; **64×48** and **64×32** = 3-line GIF loop (photo then shoutout) with a FLOQR + handle card on every frame. `Is64x32=1`. `?screen=` is composer **preview only**. Frame hold is `FLOQRFrameLoop` (`floqr-frame-loop.js`, 6s). Templates call that module; they do not start their own interval.
 5. Template kinds (`templateKind` from `FLOQRTextLayout.profileId`): `full`, `classicBoard`, `splitMedia`, `car`, `footballIntro`, `textOverlayFrame`, `soccerJersey`. Reports → Template Catalog lists types and `Is*` flags.
 
 Forbidden: inventing a Display Settings tab just to relocate URLs; driving Xibo layout from the query string; filtering templates by catalog arrays when Firestore flags exist.
