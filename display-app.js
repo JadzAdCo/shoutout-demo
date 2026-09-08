@@ -47,11 +47,13 @@
   let loc = getStaticLocation(locationId);
   let templates = Object.assign({}, window.SHOUTOUT_TEMPLATES || {});
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
+  const DEFAULT_FLOQR_CARD_BRAND = "FloqMedia";
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
   const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
+  let expiredLiveKey = "";
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
@@ -393,7 +395,7 @@
       ? (raw ? `@${raw.replace(/^@+/, "")}` : "")
       : (raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw);
     const supplied = glyphSlice(cleanBoardText(withAt), 0, 22);
-    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR ShoutOut"), 0, 20) || "FLOQR ShoutOut";
+    const brandFallback = glyphSlice(cleanBoardText(options.brand || DEFAULT_FLOQR_CARD_BRAND), 0, 22) || DEFAULT_FLOQR_CARD_BRAND;
     return {
       supplied:!!supplied,
       kicker:supplied ? "FROM" : "PRESENTED BY",
@@ -405,29 +407,29 @@
   function paintFloqrCard(rail, {
     attribution = "",
     asHandle = false,
-    idle = false,
-    idleKicker = "USE",
-    idleValue = "",
-    idleAria = "",
+    defaultScreen = false,
     extraClass = ""
   } = {}) {
     if (!rail) return null;
-    const identity = classicIdentityPresentation(attribution, {asHandle});
-    const showIdle = !!idle;
-    const kicker = showIdle ? idleKicker : identity.kicker;
-    const value = showIdle
-      ? (idleValue || identity.value)
-      : identity.value;
-    const classes = [
-      "display-identity-rail",
-      "classic-bw-identity",
-      extraClass,
-      showIdle || !identity.supplied ? "uses-brand-fallback" : "has-attribution"
-    ].filter(Boolean).join(" ");
-    rail.className = classes;
-    rail.setAttribute("aria-label", showIdle ? (idleAria || `${kicker} ${value}`) : `${identity.kicker} ${identity.value}`);
+    if (defaultScreen) {
+      const identity = classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND});
+      rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "uses-brand-fallback"].filter(Boolean).join(" ");
+      rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+      rail.setAttribute("aria-hidden", "false");
+      rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      return identity;
+    }
+    if (!String(attribution || "").trim()) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+      rail.setAttribute("aria-hidden", "true");
+      return null;
+    }
+    const identity = classicIdentityPresentation(attribution, {asHandle: true});
+    rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "has-attribution"].filter(Boolean).join(" ");
+    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
     rail.setAttribute("aria-hidden", "false");
-    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(kicker)}</small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     return identity;
   }
 
@@ -885,14 +887,10 @@
         suprstarIdle: true
       };
     }
-    const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
-      .map(String)
-      .find(id => id.startsWith("heist")) || "";
-    const idleTemplate = previewTemplate || heistIdleTemplate || "blackwhite";
-    const idleIsJersey = isSoccerJerseyTemplate(templates[idleTemplate] || {}, idleTemplate);
+    const idleTemplate = "blackwhite";
     return {
       locationName: loc.locationName,
-      mainText: idleIsJersey ? "" : clubDefaultMainText(loc),
+      mainText: clubDefaultMainText(loc),
       subText: "",
       template: idleTemplate,
       status: "default",
@@ -960,24 +958,97 @@
     markDisplayReady();
   }
 
+  function livePlaybackKey(data = {}) {
+    const approved = data.approvedAt?.toMillis?.() || data.approvedAt || data.updatedAt?.toMillis?.() || "";
+    return [approved, data.template || "", data.mainText || "", data.attribution || "", data.subText || ""].join("|");
+  }
+
+  function purgeDisplaySurface() {
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    stopSplitMediaLoop();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    byId("displayNflShoutPanel")?.remove();
+    const canvas = byId("displayCanvas");
+    if (canvas) {
+      canvas.className = "display-canvas";
+      canvas.style.backgroundImage = "";
+      canvas.style.background = "";
+      canvas.style.backgroundSize = "";
+      canvas.style.backgroundPosition = "";
+    }
+    resetBackgroundLayer(byId("displayBackground"));
+    const frame = byId("displayFrameOverlay");
+    if (frame) {
+      frame.className = "display-frame-overlay hidden";
+      frame.innerHTML = "";
+      frame.style.backgroundImage = "";
+    }
+    const mediaSlot = byId("mediaSlot");
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot hidden";
+      mediaSlot.innerHTML = "";
+    }
+    ["displayBrand", "displayMain", "displaySub"].forEach(id => {
+      const el = byId(id);
+      if (!el) return;
+      el.className = id === "displayBrand" ? "brand" : "";
+      el.innerHTML = "";
+      el.textContent = "";
+      el.removeAttribute("style");
+      el.removeAttribute("aria-label");
+    });
+    const rail = byId("displayIdentityRail");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+      rail.removeAttribute("style");
+      rail.setAttribute("aria-hidden", "true");
+    }
+    const team = byId("displayJerseyTeam");
+    if (team) {
+      team.className = "soccer-jersey-team hidden";
+      team.textContent = "";
+      team.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function resetDisplayToDefault() {
+    purgeDisplaySurface();
+    render(defaultClubDisplayPayload());
+  }
+
   function renderTimedLiveContent(data = {}) {
     if (liveContentExpiryTimer) {
       window.clearTimeout(liveContentExpiryTimer);
       liveContentExpiryTimer = null;
     }
+    const status = String(data.status || "").toLowerCase();
+    const key = livePlaybackKey(data);
     const approvedMillis = data.approvedAt?.toMillis?.() || 0;
+    const explicitExpires = data.expiresAt?.toMillis?.() || data.liveUntil?.toMillis?.() || data.playedUntil?.toMillis?.() || 0;
     const durationSeconds = Math.max(1, Number(data.displayDurationSeconds || DEFAULT_LIVE_SHOUTOUT_SECONDS));
-    const expiresMillis = approvedMillis ? approvedMillis + durationSeconds * 1000 : 0;
-    if (String(data.status || "").toLowerCase() === "approved" && expiresMillis) {
+    const expiresMillis = explicitExpires || (approvedMillis ? approvedMillis + durationSeconds * 1000 : 0);
+    const liveShoutout = status === "approved" || status === "live";
+    if (liveShoutout && expiredLiveKey && key === expiredLiveKey) {
+      resetDisplayToDefault();
+      return;
+    }
+    if (liveShoutout && expiresMillis) {
       const remaining = expiresMillis - Date.now();
       if (remaining <= 0) {
-        render(defaultClubDisplayPayload());
+        expiredLiveKey = key;
+        resetDisplayToDefault();
         return;
       }
       liveContentExpiryTimer = window.setTimeout(() => {
         liveContentExpiryTimer = null;
-        render(defaultClubDisplayPayload());
+        expiredLiveKey = key;
+        resetDisplayToDefault();
       }, Math.min(remaining, 2147483647));
+    } else if (!liveShoutout) {
+      expiredLiveKey = "";
     }
     render(data);
   }
@@ -1192,6 +1263,7 @@
 
   function render(data) {
     stopSplitMediaLoop();
+    byId("displayNflShoutPanel")?.remove();
     if (isSuprstarIdlePayload(data)) {
       renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
@@ -1551,27 +1623,17 @@
       // Animated FloqR card (reusable module — same FROM / PRESENTED BY shell as classic).
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
-        const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
         const cardAttribution = floqrCardAttributionFromData(data);
         const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
-        const idleCta = DISPLAY_BOARD === "secondary"
-          ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
-          : `Use ShoutOut @ ${clubName}`;
-        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || "FLOQR ShoutOut";
-        const showIdle = !subText && !jerseyNameText && !mainText && !cardValue;
-        const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
-        const idleStrong = showIdle
-          ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
-          : "";
-        paintFloqrCard(rail, {
-          attribution: cardValue,
-          asHandle: !!(cardAttribution && cardAttribution.asHandle),
-          idle: showIdle,
-          idleKicker,
-          idleValue: idleStrong,
-          idleAria: idleCta,
-          extraClass: "soccer-jersey-rail"
-        });
+        if (isIdleCta) {
+          paintFloqrCard(rail, {defaultScreen: true, extraClass: "soccer-jersey-rail"});
+        } else {
+          paintFloqrCard(rail, {
+            attribution: cardValue,
+            asHandle: true,
+            extraClass: "soccer-jersey-rail"
+          });
+        }
       } else if (rail) {
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
@@ -1611,12 +1673,22 @@
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
       const rows = classicBoardRows(mainText, textCaps);
-      const identity = classicIdentityPresentation(subText);
+      const cardAttribution = floqrCardAttributionFromData(data);
+      const cardValue = isIdleCta ? "" : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
+      const identity = isIdleCta
+        ? classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND})
+        : classicIdentityPresentation(cardValue, {asHandle: true});
       byId("displayMain").classList.add("classic-bw-board");
       byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
-      byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-      byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      if (!isIdleCta && !cardValue) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").removeAttribute("aria-label");
+        byId("displaySub").innerHTML = "";
+      } else {
+        byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
+        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+        byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      }
     } else {
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
