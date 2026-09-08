@@ -55,9 +55,7 @@
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
-  let splitMediaLoopTimer = null;
-  const SPLIT_MEDIA_LOOP_MS = 4000;
-  const NFL_DUAL_ROTATE_MS = 10000;
+  const frameLoop = () => window.FLOQRFrameLoop;
 
   function canonicalStaticLocationId(id = "") {
     const key = String(id || "zebbies-garden-washington-dc").toLowerCase();
@@ -622,11 +620,11 @@
   }
 
   function stopSplitMediaLoop() {
-    if (splitMediaLoopTimer) {
-      window.clearInterval(splitMediaLoopTimer);
-      splitMediaLoopTimer = null;
-    }
-    byId("displayCanvas")?.classList.remove("split-media-loop", "split-media-phase-media", "split-media-phase-copy");
+    frameLoop()?.stop(byId("displayCanvas"));
+  }
+
+  function startFrameLoop(canvas, onAdvance) {
+    frameLoop()?.start(canvas, {onAdvance});
   }
 
   function splitMediaIdentityPresentation(data = {}, subText = "") {
@@ -650,27 +648,9 @@
     rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
   }
 
-  function startSplitMediaLoop(canvas, intervalMs = SPLIT_MEDIA_LOOP_MS) {
-    stopSplitMediaLoop();
-    if (!canvas) return;
-    canvas.classList.add("split-media-loop", "split-media-phase-media");
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    const refitNfl = () => {
-      if (!canvas.classList.contains("nfl-dual-rotate")) return;
-      fitNflShoutPanel(byId("displayNflShoutPanel"));
-    };
-    if (reduced) {
-      canvas.classList.add("split-media-phase-copy");
-      canvas.classList.remove("split-media-phase-media");
-      requestAnimationFrame(refitNfl);
-      return;
-    }
-    splitMediaLoopTimer = window.setInterval(() => {
-      const onMedia = canvas.classList.contains("split-media-phase-media");
-      canvas.classList.toggle("split-media-phase-media", !onMedia);
-      canvas.classList.toggle("split-media-phase-copy", onMedia);
-      if (onMedia) requestAnimationFrame(refitNfl);
-    }, intervalMs);
+  function refitNflShoutOnCopy(phase, canvas) {
+    if (phase !== "copy" || !canvas?.classList.contains("nfl-dual-rotate")) return;
+    fitNflShoutPanel(byId("displayNflShoutPanel"));
   }
 
   function heistBrandLogoUrl() {
@@ -1553,9 +1533,7 @@
           });
         }
         if (!is96) {
-          stopSplitMediaLoop();
-          canvas.classList.add("split-media-loop", "split-media-phase-media");
-          startSplitMediaLoop(canvas, NFL_DUAL_ROTATE_MS);
+          startFrameLoop(canvas, refitNflShoutOnCopy);
         } else {
           stopSplitMediaLoop();
         }
@@ -1647,7 +1625,7 @@
         byId("displaySub").textContent = identity.extraCopy || "";
         renderSplitMediaIdentityRail(identity);
         const family = window.FLOQRScreenDatapoints?.familyOf?.(screenFormatId) || "";
-        if (family === "64x48" || family === "64x32") startSplitMediaLoop(canvas);
+        if (family === "64x48" || family === "64x32") startFrameLoop(canvas);
       } else {
         byId("displaySub").textContent = subText;
       }
