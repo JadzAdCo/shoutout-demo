@@ -1017,10 +1017,11 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:none!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(20% + var(--nfl-photo-stack-y))!important;
-  height:8.1%!important;
-  left:25%!important;
-  right:25%!important;
+  /* Below the baked nameplate, on the empty back. */
+  top:calc(32% + var(--nfl-photo-stack-y))!important;
+  height:7%!important;
+  left:28%!important;
+  right:28%!important;
   margin:0 auto!important;
   padding:0!important;
   text-align:center!important;
@@ -1033,10 +1034,11 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   color:var(--jersey-secondary,#fff)!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(39.5% + var(--nfl-photo-stack-y))!important;
-  height:25.2%!important;
-  left:25%!important;
-  right:25%!important;
+  /* Center of the empty back, clear of the nameplate and hem. */
+  top:calc(44% + var(--nfl-photo-stack-y))!important;
+  height:30%!important;
+  left:28%!important;
+  right:28%!important;
   margin:0 auto!important;
   padding:0!important;
   text-align:center!important;
@@ -1203,15 +1205,15 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(19% + var(--nfl-photo-stack-y))!important;
-  left:27%!important;
-  right:27%!important;
+  top:calc(31% + var(--nfl-photo-stack-y))!important;
+  left:30%!important;
+  right:30%!important;
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(39% + var(--nfl-photo-stack-y))!important;
-  left:27%!important;
-  right:27%!important;
+  top:calc(43% + var(--nfl-photo-stack-y))!important;
+  left:30%!important;
+  right:30%!important;
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
@@ -1222,28 +1224,28 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(19% + var(--nfl-photo-stack-y))!important;
-  left:25%!important;
-  right:25%!important;
+  top:calc(30% + var(--nfl-photo-stack-y))!important;
+  left:28%!important;
+  right:28%!important;
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(39% + var(--nfl-photo-stack-y))!important;
-  left:25%!important;
-  right:25%!important;
+  top:calc(42% + var(--nfl-photo-stack-y))!important;
+  left:28%!important;
+  right:28%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(18% + var(--nfl-photo-stack-y))!important;
-  left:23%!important;
-  right:23%!important;
+  top:calc(26% + var(--nfl-photo-stack-y))!important;
+  left:26%!important;
+  right:26%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(39% + var(--nfl-photo-stack-y))!important;
-  height:27%!important;
-  left:23%!important;
-  right:23%!important;
+  top:calc(38% + var(--nfl-photo-stack-y))!important;
+  height:26%!important;
+  left:26%!important;
+  right:26%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template .soccer-jersey-team,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template .soccer-jersey-team{
