@@ -252,7 +252,18 @@
           </div>
           <div id="shoutoutDiagnosticReport" class="report-block"></div>
         </div>
-        <div class="card"><h2 data-i18n="nav.myShoutouts">My ShoutOuts</h2><div id="myShoutouts" class="report-block"></div></div>
+        <div class="card">
+          <h2 data-i18n="nav.myShoutouts">My ShoutOuts</h2>
+          <h3 data-i18n="portal.openShoutouts">Open ShoutOuts</h3>
+          <div id="myShoutouts" class="report-block"></div>
+          <h3
+            data-i18n="portal.completedShoutouts"
+            data-floqr-help-title="Completed ShoutOuts"
+            data-floqr-help-body="Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later."
+            data-floqr-help-search="completed shoutouts|archive shoutout|shoutout history|save as template">Completed ShoutOuts</h3>
+          <p class="sub small" data-i18n="portal.completedShoutoutsNote">Paid and finished ShoutOuts stay here for your records. Archive keeps the record and removes it from the open list.</p>
+          <div id="completedShoutouts" class="report-block"></div>
+        </div>
       </section>
       <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
 
@@ -657,9 +668,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.32"></script>
-<script src="./floqai-help-repository.js?v=s3.0.32"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.32"></script>
+<script src="./floqr-i18n.js?v=s3.0.52"></script>
+<script src="./floqai-help-repository.js?v=s3.0.52"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.52"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -668,7 +679,7 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./patron-portal-app.js?v=s3.0.48"></script>
+<script src="./patron-portal-app.js?v=s3.0.52"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

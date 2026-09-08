@@ -386,6 +386,171 @@
     return sortBySubmittedAtDesc(owned);
   }
 
+  const SHOUTOUT_FINISHED_STATUSES = new Set(["ended", "expired", "completed", "played", "displayed"]);
+
+  function shoutoutStatus(row) {
+    return String(row?.status || "pending").toLowerCase();
+  }
+
+  function shoutoutPaid(row) {
+    const pay = String(row?.paymentStatus || "").toLowerCase();
+    if (pay === "paid" || pay === "refunded" || pay === "partially-refunded") return true;
+    return Number(row?.amountCents || 0) > 0 && !!row?.stripePaymentIntentId;
+  }
+
+  function shoutoutExpiresMs(row) {
+    const value = row?.expiresAt || row?.playedUntil || row?.liveUntil;
+    return Number(value?.toMillis?.() || (value?.seconds ? value.seconds * 1000 : 0) || 0);
+  }
+
+  function shoutoutDisplayFinished(row) {
+    const status = shoutoutStatus(row);
+    if (SHOUTOUT_FINISHED_STATUSES.has(status)) return true;
+    const expires = shoutoutExpiresMs(row);
+    return expires > 0 && expires < Date.now() && status !== "pending" && status !== "pending_approval";
+  }
+
+  function isCompletedShoutout(row) {
+    return shoutoutPaid(row) || shoutoutDisplayFinished(row) || shoutoutStatus(row) === "refunded";
+  }
+
+  function isOpenShoutout(row) {
+    if (row?.complianceArchived) return false;
+    if (shoutoutDisplayFinished(row)) return false;
+    const status = shoutoutStatus(row);
+    return status === "pending" || status === "pending_approval" || status === "approved" || status === "live" || status === "preview" || !status;
+  }
+
+  function shoutoutAuditSnapshot(row) {
+    return {
+      shoutoutId: row.id || "",
+      referenceNumber: row.referenceNumber || "",
+      mainText: row.mainText || "",
+      subText: row.subText || "",
+      template: row.template || row.templateId || "",
+      templateName: row.templateName || "",
+      locationName: row.locationName || row.clubName || "",
+      clubLocationId: row.clubLocationId || row.location || "",
+      status: row.status || "",
+      paymentStatus: row.paymentStatus || "",
+      amountCents: Number(row.amountCents || 0),
+      serviceOrderId: row.serviceOrderId || "",
+      screenFormatId: row.screenFormatId || ""
+    };
+  }
+
+  function bindShoutoutListActions(root) {
+    root?.querySelectorAll(".modify-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => startShoutoutEdit(currentShoutouts[Number(btn.dataset.shoutoutIndex)]));
+    });
+    root?.querySelectorAll(".diagnose-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showShoutoutDiagnostic(btn.dataset.shoutoutRef || "");
+        runShoutoutDiagnostic();
+      });
+    });
+    root?.querySelectorAll(".archive-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => archiveCompletedShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not archive this ShoutOut.");
+      }));
+    });
+    root?.querySelectorAll(".save-shoutout-template-btn").forEach(btn => {
+      btn.addEventListener("click", () => saveCompletedShoutoutTemplate(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not save this ShoutOut template.");
+      }));
+    });
+  }
+
+  function renderShoutoutQueueItem(x, index, mode) {
+    const status = shoutoutStatus(x);
+    const canModify = mode === "open" && x.editable !== false && status === "pending";
+    const archived = !!x.complianceArchived;
+    const paid = shoutoutPaid(x) ? tt("portal.paid", {}, "Paid") : tt("portal.unpaid", {}, "Unpaid");
+    return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
+      <strong>${esc(x.mainText || "ShoutOut")}</strong>
+      <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}</p>
+      <small>${esc(fmtDate(x.submittedAt || x.paidAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
+      <p class="queue-actions">
+        ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
+        ${mode === "completed" ? `<button class="buttonlike save-shoutout-template-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveAsTemplate", {}, "Save as my template"))}</button>` : ""}
+        ${mode === "completed" && !archived ? `<button class="buttonlike archive-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.archiveShoutout", {}, "Archive"))}</button>` : ""}
+        <button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">${esc(tt("portal.diagnose", {}, "Diagnose"))}</button>
+      </p>
+    </div>`;
+  }
+
+  // Design notes: .cursor/rules/design-notes-completed-shoutouts.mdc
+  async function archiveCompletedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row?.id) return;
+    const archiveId = `${user.uid}__${row.id}`.replace(/[^\w.-]/g, "_").slice(0, 700);
+    const archiveRef = db.collection("patronShoutoutArchives").doc(archiveId);
+    const existing = await archiveRef.get();
+    if (!existing.exists) {
+      await archiveRef.set({
+        ownerUid: user.uid,
+        shoutoutId: row.id,
+        retained: true,
+        reason: "patron-compliance-archive",
+        snapshot: shoutoutAuditSnapshot(row),
+        archivedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    await db.collection("shoutouts").doc(row.id).set({
+      complianceArchived: true,
+      archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      archivedByUid: user.uid,
+      archiveReason: "patron-compliance-archive"
+    }, {merge: true});
+    setText("portalStatus", tt("portal.archivedKept", {}, "Archived. The record stays in Completed ShoutOuts."));
+    await loadPortal(user);
+  }
+
+  async function saveCompletedShoutoutTemplate(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row) return;
+    const variants = window.FLOQRStudio
+      ? await window.FLOQRStudio.loadPatronTemplateVariants({db, uid: user.uid})
+      : {mine: []};
+    const existing = (variants.mine || []).find(item => item.sourceShoutoutId === row.id);
+    const baseTemplateId = row.template || row.templateId || "blackwhite";
+    const templates = window.SHOUTOUT_TEMPLATES || {};
+    const base = templates[baseTemplateId] || {};
+    const payload = {
+      ownerUid: user.uid,
+      ownerDisplayName: user.displayName || user.email || "FLOQR Member",
+      ownerRole: "patron",
+      variantScope: "patron",
+      sourceShoutoutId: row.id,
+      sourceReferenceNumber: row.referenceNumber || "",
+      baseTemplateId,
+      baseTemplateName: row.templateName || base.name || baseTemplateId,
+      variantName: String(row.mainText || "My ShoutOut").slice(0, 80),
+      defaultMain: String(row.mainText || "").slice(0, 120),
+      defaultSub: String(row.subText || "").slice(0, 40),
+      backgroundType: row.backgroundUrl ? "image" : (row.backgroundGradient ? "gradient" : "color"),
+      backgroundUrl: row.backgroundUrl || "",
+      backgroundColor: row.backgroundColor || "",
+      backgroundGradient: row.backgroundGradient || "",
+      visibility: "private",
+      isPublicProfileItem: false,
+      status: "active",
+      lockedBaseTemplate: true,
+      allowedCustomization: ["background", "wording"],
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (existing?.id) {
+      await db.collection("patronTemplateVariants").doc(existing.id).set(payload, {merge: true});
+    } else {
+      payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("patronTemplateVariants").add(payload);
+    }
+    setText("portalStatus", tt("portal.templateSaved", {}, "Saved to My ShoutOut Templates."));
+    await renderTemplateVariantSettings(user, currentProfile || {});
+  }
+
   function simpleRows(rows) {
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
@@ -3460,27 +3625,22 @@
     if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or BartR orders yet.</p>";
 
     currentShoutouts = shoutouts;
-    byId("myShoutouts").innerHTML = shoutouts.length ? shoutouts.map((x, index) => {
-      const canModify = x.editable !== false && String(x.status || "pending").toLowerCase() === "pending";
-      return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
-        <strong>${esc(x.mainText || "ShoutOut")}</strong>
-        <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")}</p>
-        <small>${esc(fmtDate(x.submittedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
-        <p class="queue-actions">
-          ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">Modify ShoutOut</button>` : ""}
-          <button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">Diagnose</button>
-        </p>
-      </div>`;
-    }).join("") : "<p class='sub'>No ShoutOuts yet.</p>";
-    document.querySelectorAll(".modify-shoutout-btn").forEach(btn => {
-      btn.addEventListener("click", () => startShoutoutEdit(currentShoutouts[Number(btn.dataset.shoutoutIndex)]));
-    });
-    document.querySelectorAll(".diagnose-shoutout-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        showShoutoutDiagnostic(btn.dataset.shoutoutRef || "");
-        runShoutoutDiagnostic();
-      });
-    });
+    const openShoutouts = shoutouts.filter(isOpenShoutout);
+    const completedShoutouts = shoutouts.filter(isCompletedShoutout);
+    const openHost = byId("myShoutouts");
+    const completedHost = byId("completedShoutouts");
+    if (openHost) {
+      openHost.innerHTML = openShoutouts.length
+        ? openShoutouts.map(x => renderShoutoutQueueItem(x, shoutouts.indexOf(x), "open")).join("")
+        : `<p class="sub">${esc(tt("portal.noOpenShoutouts", {}, "No open ShoutOuts."))}</p>`;
+      bindShoutoutListActions(openHost);
+    }
+    if (completedHost) {
+      completedHost.innerHTML = completedShoutouts.length
+        ? completedShoutouts.map(x => renderShoutoutQueueItem(x, shoutouts.indexOf(x), "completed")).join("")
+        : `<p class="sub">${esc(tt("portal.noCompletedShoutouts", {}, "No completed ShoutOuts yet."))}</p>`;
+      bindShoutoutListActions(completedHost);
+    }
     const params = new URL(window.location.href).searchParams;
     const requestedId = params.get("id");
     const requestedRef = params.get("ref");
