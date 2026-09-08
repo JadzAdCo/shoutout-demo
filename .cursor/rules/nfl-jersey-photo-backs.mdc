@@ -13,9 +13,9 @@ alwaysApply: true
 
 **Wordmark:** baked into the PNG only (club on nameplate). Upright athletic block caps. CSS hides `.soccer-jersey-team` on photo kits.
 
-**Patron name (CSS):** base `top` ~20% + `var(--nfl-photo-stack-y)`; cap ~8.37vh.
+**Patron name (CSS):** below the baked nameplate, base `top` ~32% + `var(--nfl-photo-stack-y)`; cap ~7.2vh.
 
-**Number (CSS):** base `top` ~39.5% + shift; cap ~35.01vh.
+**Number (CSS):** center of the empty back, base `top` ~44% + shift; cap ~32vh.
 
 **Dual shoutout layout (`nfl-jersey` / `nflDualLayout`):**
 - **96×48:** jersey left-justified; white text shoutout on the right (4 lines × 16 = 64 graphemes, emoji OK); FloqR card bottom; kit-color edge glow. Shout panel fills the **right half**.

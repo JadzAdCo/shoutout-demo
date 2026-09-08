@@ -1419,9 +1419,9 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        // Name + number −10% vs prior 9.3 / 38.9 (with jersey silhouette −10% from 71%).
-        baseName = Math.min(8.37, 8.37);
-        baseNumber = Math.min(35.01, 35.01);
+        // Name sits under the baked plate; number fills the empty back.
+        baseName = Math.min(7.2, 8.37);
+        baseNumber = Math.min(32, 35.01);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
