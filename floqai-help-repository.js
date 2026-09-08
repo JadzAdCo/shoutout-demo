@@ -491,6 +491,20 @@
       page: "admin.html#notifyTemplatesPane"
     },
     {
+      id: "help-completed-shoutouts",
+      title: "Completed ShoutOuts",
+      body: "Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later.",
+      searchPhrases: [
+        "completed shoutouts", "completed shoutout", "archive shoutout", "shoutout history",
+        "paid shoutout history", "save as template", "shoutout audit"
+      ],
+      links: [
+        {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalShoutouts"
+    },
+    {
       id: "help-schedule-confirm",
       title: "Confirm assigned shifts",
       body: "Inbox / Email / SMS links open Work Calendar. Look at each pending assignment, tick it (or Select all), then Approve selected. Opening the link does not confirm. Only the assigned service member can approve — Club Admin cannot confirm on their behalf.",

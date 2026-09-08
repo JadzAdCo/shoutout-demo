@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-completed-shoutouts": {
+        title: "Завершённые ShoutOuts",
+        body: "Завершённые ShoutOuts хранят запись оплаченных и законченных ShoutOuts. Архив сохраняет запись и убирает её из открытого списка. Сохранить как шаблон копирует текст в шаблон ShoutOut, который можно обновить позже."
+      },
       "floqai-ask-floqr": {
         title: "Спросите FloqR через FloqAi",
         body: "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
@@ -140,6 +144,10 @@
       }
     },
     nl: {
+      "help-completed-shoutouts": {
+        title: "Voltooide ShoutOuts",
+        body: "Voltooide ShoutOuts bewaart een record van betaalde en afgeronde ShoutOuts. Archiveren bewaart het record en haalt het uit de open lijst. Opslaan als sjabloon kopieert de tekst naar een ShoutOut-sjabloon dat je later kunt bijwerken."
+      },
       "floqai-ask-floqr": {
         title: "Vraag FloqR met FloqAi",
         body: "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
@@ -274,6 +282,10 @@
       }
     },
     fr: {
+      "help-completed-shoutouts": {
+        title: "ShoutOuts terminés",
+        body: "ShoutOuts terminés conserve un enregistrement des ShoutOuts payés et terminés. Archiver conserve l’enregistrement et le retire de la liste ouverte. Enregistrer comme modèle copie le texte vers un modèle ShoutOut que vous pouvez mettre à jour plus tard."
+      },
       "floqai-ask-floqr": {
         title: "Demandez FloqR avec FloqAi",
         body: "Demandez FloqR avec FloqAi — appuyez sur la marque animée ou attendez l'invite, puis décrivez ce que vous voulez en mots simples. Produits : Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Objectifs : dites « je veux pouvoir… » (par ex. devenir Club Admin) ou « make me a superstar » pour les étapes et les liens."
@@ -408,6 +420,10 @@
       }
     },
     de: {
+      "help-completed-shoutouts": {
+        title: "Abgeschlossene ShoutOuts",
+        body: "Abgeschlossene ShoutOuts speichert bezahlte und abgeschlossene ShoutOuts. Archivieren behält den Nachweis und entfernt ihn aus der offenen Liste. Als Vorlage speichern kopiert den Text in eine ShoutOut-Vorlage, die Sie später aktualisieren können."
+      },
       "floqai-ask-floqr": {
         title: "Fragen Sie FloqR mit FloqAi",
         body: "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, SupRstR (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
@@ -542,6 +558,10 @@
       }
     },
     es: {
+      "help-completed-shoutouts": {
+        title: "ShoutOuts completados",
+        body: "ShoutOuts completados guarda un registro de los ShoutOuts pagados y terminados. Archivar conserva el registro y lo quita de la lista abierta. Guardar como plantilla copia el texto a una plantilla de ShoutOut que puede actualizar después."
+      },
       "floqai-ask-floqr": {
         title: "Pregunta FloqR con FloqAi",
         body: "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, SupRstR (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
@@ -676,6 +696,10 @@
       }
     },
     it: {
+      "help-completed-shoutouts": {
+        title: "ShoutOuts completati",
+        body: "ShoutOuts completati conserva un record degli ShoutOut pagati e completati. Archivia conserva il record e lo toglie dall’elenco aperto. Salva come modello copia il testo su un modello ShoutOut che puoi aggiornare dopo."
+      },
       "floqai-ask-floqr": {
         title: "Chiedi FloqR con FloqAi",
         body: "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
@@ -810,6 +834,10 @@
       }
     },
     pt: {
+      "help-completed-shoutouts": {
+        title: "ShoutOuts concluídos",
+        body: "ShoutOuts concluídos guarda um registro dos ShoutOuts pagos e concluídos. Arquivar mantém o registro e o remove da lista aberta. Salvar como modelo copia o texto para um modelo de ShoutOut que você pode atualizar depois."
+      },
       "floqai-ask-floqr": {
         title: "Pergunte FloqR com FloqAi",
         body: "Pergunte FloqR com FloqAi — toque na marca animada ou aguarde o prompt e digite o que deseja em palavras simples. Produtos: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubes. Metas: diga “Eu quero poder…” (por exemplo, tornar-se um Club Admin) ou “make me a superstar” para etapas e links."
@@ -944,6 +972,10 @@
       }
     },
     el: {
+      "help-completed-shoutouts": {
+        title: "Ολοκληρωμένα ShoutOuts",
+        body: "Τα ολοκληρωμένα ShoutOuts κρατούν εγγραφή των πληρωμένων και τελειωμένων ShoutOuts. Η αρχειοθέτηση κρατά την εγγραφή και την αφαιρεί από την ανοιχτή λίστα. Η αποθήκευση ως πρότυπο αντιγράφει το κείμενο σε πρότυπο ShoutOut που μπορείτε να ενημερώσετε αργότερα."
+      },
       "floqai-ask-floqr": {
         title: "Ρωτήστε το FloqR με το FloqAi",
         body: "Ρωτήστε το FloqR με το FloqAi — πατήστε την κινούμενη ένδειξη ή περιμένετε να σας ζητηθεί και μετά πληκτρολογήστε αυτό που θέλετε με απλά λόγια. Προϊόντα: Mingl, RydR, BartR, ShoutOut, SupRstR (σούπερ σταρ), κλαμπ. Στόχοι: πείτε «Θέλω να μπορώ να…» (π.χ. να γίνω Club Admin) ή «make me a superstar» για βήματα και συνδέσμους."
@@ -1078,6 +1110,10 @@
       }
     },
     pl: {
+      "help-completed-shoutouts": {
+        title: "Zakończone ShoutOuts",
+        body: "Zakończone ShoutOuts przechowuje zapis opłaconych i zakończonych ShoutOuts. Archiwizacja zachowuje zapis i usuwa go z listy otwartych. Zapisz jako szablon kopiuje tekst do szablonu ShoutOut, który możesz później zaktualizować."
+      },
       "floqai-ask-floqr": {
         title: "Zapytaj FloqR z FloqAi",
         body: "Zapytaj FloqR z FloqAi — stuknij animowaną ikonę lub poczekaj na komunikat, a następnie wpisz, czego chcesz w zwykłych słowach. Produkty: Mingl, RydR, BartR, ShoutOut, SupRstR (supergwiazda), kluby. Cele: powiedz „Chcę być w stanie…” (np. zostać Club Admin) lub „make me a superstar” po kroki i linki."
@@ -1212,6 +1248,10 @@
       }
     },
     ar: {
+      "help-completed-shoutouts": {
+        title: "ShoutOuts المكتملة",
+        body: "تحتفظ ShoutOuts المكتملة بسجل ShoutOuts المدفوعة والمنتهية. الأرشفة تحتفظ بالسجل وتزيله من القائمة المفتوحة. حفظ كقالب ينسخ النص إلى قالب ShoutOut يمكنك تحديثه لاحقًا."
+      },
       "floqai-ask-floqr": {
         title: "اسأل FloqR مع FloqAi",
         body: "اسأل FloqR مع FloqAi — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، SupRstR (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."

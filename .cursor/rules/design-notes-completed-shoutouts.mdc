@@ -1,0 +1,11 @@
+# Completed ShoutOuts audit trail
+
+Patron-facing history is not itself a GRC control name. It supports the record those controls expect.
+
+- **SOC 2** CC7.2 / CC6.1: log user activity and changes. Completed paid ShoutOuts are the patron-visible copy of that trail.
+- **ISO/IEC 27001:2022** A.8.15 logging, A.5.28 evidence, A.5.33 protection of records: archive must not delete the source row.
+- **PCI DSS** Req. 10: log payment-related actions. Store order id, amount, status, and time. Never store card numbers.
+- **GDPR** Art. 5(2) accountability and Art. 15 access: the patron can see their own paid history. Archive is retention, not erasure.
+- **NIST 800-53** AU-2 / AU-3 / AU-11: who, what, when, outcome, retained.
+
+Collection `patronShoutoutArchives` is create-once, owner-read, no update or delete. The shoutout document stays; `complianceArchived` only removes it from Open ShoutOuts.

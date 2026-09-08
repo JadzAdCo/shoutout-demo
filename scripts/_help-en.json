@@ -1,4 +1,8 @@
 {
+  "help-completed-shoutouts": {
+    "title": "Completed ShoutOuts",
+    "body": "Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later."
+  },
   "floqai-ask-floqr": {
     "title": "Ask FloqR with FloqAi",
     "body": "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links."
