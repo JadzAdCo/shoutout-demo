@@ -386,9 +386,12 @@
     });
   }
 
-  function classicIdentityPresentation(subText) {
+  function classicIdentityPresentation(subText, options = {}) {
     const raw = String(subText || "").trim();
-    const withAt = raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw;
+    const forceHandle = options.asHandle === true;
+    const withAt = forceHandle
+      ? (raw ? `@${raw.replace(/^@+/, "")}` : "")
+      : (raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw);
     const supplied = glyphSlice(cleanBoardText(withAt), 0, 22);
     const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR ShoutOut"), 0, 20) || "FLOQR ShoutOut";
     return {
@@ -401,6 +404,7 @@
   /** Reusable FloqR card (identity rail) — classic / soccer / NFL / split-media. */
   function paintFloqrCard(rail, {
     attribution = "",
+    asHandle = false,
     idle = false,
     idleKicker = "USE",
     idleValue = "",
@@ -408,7 +412,7 @@
     extraClass = ""
   } = {}) {
     if (!rail) return null;
-    const identity = classicIdentityPresentation(attribution);
+    const identity = classicIdentityPresentation(attribution, {asHandle});
     const showIdle = !!idle;
     const kicker = showIdle ? idleKicker : identity.kicker;
     const value = showIdle
@@ -427,31 +431,14 @@
     return identity;
   }
 
-  function withAtHandle(value) {
-    const raw = String(value || "").trim();
-    if (!raw) return "";
-    const compact = raw.replace(/\s+/g, "");
-    if (compact.startsWith("@")) return `@${compact.replace(/^@+/, "")}`;
-    if (/^[a-z0-9._]{2,30}$/i.test(compact)) return `@${compact}`;
-    return raw;
-  }
-
   function floqrCardAttributionFromData(data = {}) {
-    const choice = String(data.attributionChoice || "").trim();
-    const handle = String(
-      data.floqrHandle
-      || data.instagramHandle
-      || data.submittedByHandle
-      || ""
-    ).trim();
+    // Opt-in only. Jersey name stays on the fabric. The stored attribution string is the choice.
     const direct = String(data.attribution || "").trim();
-    const wantsHandle = choice === "floqrHandle" || choice === "instagram" || choice === "username";
-    if (wantsHandle) return withAtHandle(direct || handle);
-    if (direct) return withAtHandle(direct);
-    if (data.includeAttribution === true || data.includeAttribution === "1") {
-      return withAtHandle(handle || data.displayName || data.submittedByDisplayName || "");
-    }
-    return "";
+    const optedIn = data.includeAttribution === true || data.includeAttribution === "1" || !!direct;
+    if (!optedIn) return {value:"", asHandle:false};
+    const choice = String(data.attributionChoice || "displayName").trim();
+    const asHandle = choice === "floqrHandle" || choice === "instagram" || choice === "username";
+    return {value:direct, asHandle};
   }
 
   function isTextOverlayTemplate(template = {}, templateId = "") {
@@ -1566,17 +1553,19 @@
       if (rail && t.identityRail !== false) {
         const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
         const cardAttribution = floqrCardAttributionFromData(data);
+        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
         const idleCta = DISPLAY_BOARD === "secondary"
           ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
           : `Use ShoutOut @ ${clubName}`;
         const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || "FLOQR ShoutOut";
-        const showIdle = !subText && !jerseyNameText && !mainText && !cardAttribution;
+        const showIdle = !subText && !jerseyNameText && !mainText && !cardValue;
         const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
         const idleStrong = showIdle
           ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
           : "";
         paintFloqrCard(rail, {
-          attribution: cardAttribution,
+          attribution: cardValue,
+          asHandle: !!(cardAttribution && cardAttribution.asHandle),
           idle: showIdle,
           idleKicker,
           idleValue: idleStrong,
