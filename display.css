@@ -1004,8 +1004,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   --nfl-photo-stack-y:0%;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-background{
-  /* Contain + top: neckline stays visible; width and height scale together. */
-  background-size:contain!important;
+  /* Crop 15% off the hem, then enlarge 10%. Neckline stays pinned to the top. */
+  background-size:auto 129.4%!important;
   background-position:center top!important;
   background-repeat:no-repeat!important;
   background-color:#000!important;
@@ -1018,7 +1018,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
   /* Just under the baked nameplate; collar stays clear above. */
-  top:calc(24% + var(--nfl-photo-stack-y))!important;
+  top:calc(31% + var(--nfl-photo-stack-y))!important;
   height:6.5%!important;
   left:34%!important;
   right:34%!important;
@@ -1035,7 +1035,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
   /* Empty back, below the name, clear of the hem and FloqR rail. */
-  top:calc(34% + var(--nfl-photo-stack-y))!important;
+  top:calc(44% + var(--nfl-photo-stack-y))!important;
   height:28%!important;
   left:34%!important;
   right:34%!important;
@@ -1115,7 +1115,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   left:0!important;
   right:auto!important;
   width:48%!important;
-  background-size:contain!important;
+  background-size:auto 129.4%!important;
   background-position:center top!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back.nfl-dual-side #displayMain.soccer-jersey-name,
@@ -1222,14 +1222,14 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-is-96x48="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(23% + var(--nfl-photo-stack-y))!important;
+  top:calc(30% + var(--nfl-photo-stack-y))!important;
   left:34%!important;
   right:34%!important;
 }
 .display-canvas[data-screen-format-id="led-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-96x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-is-96x48="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(33% + var(--nfl-photo-stack-y))!important;
+  top:calc(43% + var(--nfl-photo-stack-y))!important;
   left:34%!important;
   right:34%!important;
 }
@@ -1245,28 +1245,28 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(22% + var(--nfl-photo-stack-y))!important;
+  top:calc(28% + var(--nfl-photo-stack-y))!important;
   left:32%!important;
   right:32%!important;
 }
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x48"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-is-64x48="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(32% + var(--nfl-photo-stack-y))!important;
+  top:calc(41% + var(--nfl-photo-stack-y))!important;
   left:32%!important;
   right:32%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name,
 .display-canvas[data-is-64x32="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displayMain.soccer-jersey-name{
-  top:calc(20% + var(--nfl-photo-stack-y))!important;
+  top:calc(26% + var(--nfl-photo-stack-y))!important;
   left:33%!important;
   right:33%!important;
 }
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number,
 .display-canvas[data-is-64x32="1"].soccer-jersey-template.jersey-sport-nfl.jersey-photo-back #displaySub.soccer-jersey-number{
-  top:calc(30% + var(--nfl-photo-stack-y))!important;
+  top:calc(39% + var(--nfl-photo-stack-y))!important;
   height:24%!important;
   left:33%!important;
   right:33%!important;
