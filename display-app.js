@@ -1438,9 +1438,9 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        // Name + number −10% vs prior 10.35 / 43.2 (with jersey silhouette −10%).
-        baseName = Math.min(9.3, 9.3);
-        baseNumber = Math.min(38.9, 38.9);
+        // Name + number −10% vs prior 9.3 / 38.9 (with jersey silhouette −10% from 71%).
+        baseName = Math.min(8.37, 8.37);
+        baseNumber = Math.min(35.01, 35.01);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
