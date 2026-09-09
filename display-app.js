@@ -1107,9 +1107,10 @@
   }
 
   function enforceTrimmedVideoPlayback(video, data = {}) {
-    if (!video || data.selectedMediaVersion !== "trimmed") return;
+    const forceSeven = data.template === "christine" || data.maxVideoSeconds === 7;
+    if (!video || (data.selectedMediaVersion !== "trimmed" && !forceSeven)) return;
     const start = Number(data.trimStart || 0);
-    const end = Number(data.trimEnd || data.trimmedDuration || 7);
+    const end = Math.min(7, Number(data.trimEnd || data.trimmedDuration || 7) || 7);
     if (!end || end <= start) return;
     const loopTrim = () => {
       if (video.currentTime < start || video.currentTime >= end) {
@@ -1285,12 +1286,16 @@
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
-    const screenFormatId = String(
+    const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true;
+    let screenFormatId = String(
       resolvePlaybackScreenFormat(data, t)
       || boardAssignedFormatId()
       || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0]
       || "led-96x48"
     );
+    if (isChristine && !/64x48/i.test(screenFormatId)) {
+      screenFormatId = (t.screenFormatIds || []).find(id => /64x48/i.test(id)) || "led-64x48";
+    }
     const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
       supported:true,
       lineCount:Number(data.lineCount || t.lineCount || 1),
@@ -1325,9 +1330,9 @@
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
     const screenFlags = window.FLOQRScreenDatapoints?.canvasFlags?.(screenFormatId) || {};
-    canvas.dataset.is96x48 = screenFlags.is96x48 || "0";
-    canvas.dataset.is64x48 = screenFlags.is64x48 || "0";
-    canvas.dataset.is64x32 = screenFlags.is64x32 || "0";
+    canvas.dataset.is96x48 = isChristine ? "0" : (screenFlags.is96x48 || "0");
+    canvas.dataset.is64x48 = isChristine ? "1" : (screenFlags.is64x48 || "0");
+    canvas.dataset.is64x32 = isChristine ? "0" : (screenFlags.is64x32 || "0");
     canvas.dataset.textProfile = textCaps.profileId || "custom";
     const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
@@ -1423,8 +1428,13 @@
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) mediaElement.style.objectFit = data.mediaFit === "cover" ? "cover" : "contain";
-        if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
+        if (mediaElement) mediaElement.style.objectFit = isChristine ? "contain" : (data.mediaFit === "cover" ? "cover" : "contain");
+        if (isVideo) {
+          const playback = isChristine
+            ? {...data, template: "christine", selectedMediaVersion: "trimmed", trimStart: 0, trimEnd: 7, trimmedDuration: 7}
+            : data;
+          enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), playback);
+        }
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
@@ -1699,8 +1709,19 @@
       const rows = displayTextRows(mainText, textCaps, {uppercase: false});
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
-      const identity = usesSplitMedia ? splitMediaIdentityPresentation(data, subText) : null;
-      if (usesSplitMedia && identity) {
+      const identity = usesSplitMedia && !isChristine ? splitMediaIdentityPresentation(data, subText) : null;
+      if (isChristine) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").textContent = "";
+        const cardAttribution = floqrCardAttributionFromData(data);
+        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
+        paintFloqrCard(byId("displayIdentityRail"), {
+          attribution: cardValue,
+          asHandle: true,
+          extraClass: "split-media-identity christine-floqr-card"
+        });
+        startFrameLoop(canvas);
+      } else if (usesSplitMedia && identity) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = identity.extraCopy || "";
         renderSplitMediaIdentityRail(identity);

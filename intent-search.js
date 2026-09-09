@@ -41,7 +41,7 @@
       blurb: "Send a live message to a FloqR display.",
       href: `./?v=${APP_V}&start=search`,
       action: "shoutout",
-      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/]
+      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
     },
     {
       id: "suprstr",

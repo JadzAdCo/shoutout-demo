@@ -3791,7 +3791,7 @@
       } : currentTemplateSupportsMedia() ? {
         mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
-        mediaFit:byId("shoutoutMediaFit")?.value || "contain",
+        mediaFit: (selectedTemplate === "christine" || getTemplate()?.id === "christine") ? "contain" : (byId("shoutoutMediaFit")?.value || "contain"),
         mediaFileName: uploadedMedia.mediaFileName || "",
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
         originalMediaStoragePath: uploadedMedia.originalMediaStoragePath || "",
@@ -3973,7 +3973,8 @@
     const fitEl = byId("shoutoutMediaFit");
     if (fitEl && allowsMedia) {
       const preferredFit = String(t.defaultMediaFit || "").toLowerCase() === "cover" ? "cover" : (fitEl.value || "contain");
-      if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
+      if ((t.id || selectedTemplate) === "christine") fitEl.value = "contain";
+      else if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
       else if (!fitEl.value) fitEl.value = preferredFit;
     }
     if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);
@@ -3983,7 +3984,7 @@
     const venue = window.FLOQRScreenDatapoints?.applyVenue?.(location) || location;
     const templateRow = window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template;
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(templateRow, venue) || venue.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
-    const preferred = isFootballTeamIntro(template.id) ? (template.preferredP125FormatIds || []) : [];
+    const preferred = (isFootballTeamIntro(template.id) || template.id === "christine") ? (template.preferredP125FormatIds || []) : [];
     const available = Array.from(new Set([...preferred, ...venueFormats])).filter(id => venueFormats.includes(id));
     const supported = available.filter(id => window.FLOQRTextLayout?.resolve?.(templateRow, id)?.supported !== false);
     screenSelect.innerHTML = available.map(id => {
@@ -3994,6 +3995,9 @@
       return `<option value="${esc(id)}"${disabled ? " disabled" : ""}>${esc(format.label)} - ${esc(format.pixelWidth)} x ${esc(format.pixelHeight)} px${esc(suffix)}</option>`;
     }).join("");
     selectedScreenFormatId = supported.includes(selectedScreenFormatId) ? selectedScreenFormatId : supported.includes(location.primaryDisplayScreenFormatId) ? location.primaryDisplayScreenFormatId : supported[0] || available[0];
+    if (template.id === "christine") {
+      selectedScreenFormatId = supported.find(id => /64x48/i.test(id)) || supported[0] || selectedScreenFormatId;
+    }
     screenSelect.value = selectedScreenFormatId;
     screenSelect.disabled = !supported.length;
   }

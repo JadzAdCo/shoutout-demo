@@ -78,7 +78,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     genres:["Hip Hop","Afro Beats","EDM","International"], artists:["DJ Nova"],
     activityStatus:"Active demo location",
     activityDates:["Monday Hip Hop","Wednesday EDM","Friday Afro Beats","Saturday International"],
-    templates:["birthday","vip","bottle","neon","zebbiesFootballTeamIntro","soccerJersey"],
+    templates:["birthday","vip","bottle","neon","zebbiesFootballTeamIntro","soccerJersey","christine"],
     soccerJerseyTeamIds:["soccerCameroon","soccerRussia","soccerUkraine"],
     displayScreenFormatIds:["p125-96x48","p125-64x48","p125-64x32","led-96x48","led-64x48","led-64x32"],
     VenueSupports96x48:1, VenueSupports64x48:1, VenueSupports64x32:1,
@@ -1126,6 +1126,41 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     description:'Football Intro: a Zebbies-only, 20-second American football stadium sequence with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
     tags:["football intro","zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
+  christine: {
+    id:"christine",
+    name:"Christine",
+    scope:"Club",
+    venueIds:["zebbies-garden-washington-dc"],
+    className:"celebration-media christine-template",
+    category:"Zebbies",
+    mediaMode:"Picture or 7-second trimmed video",
+    supportsMedia:true,
+    supportsImage:true,
+    supportsVideo:true,
+    maxVideoSeconds:7,
+    defaultMediaFit:"contain",
+    layout:"split-media",
+    loopMediaWithText:true,
+    floqrCardHandleLoop:true,
+    identityRail:false,
+    backgroundEditable:false,
+    priceCents:3000,
+    priceLabel:"$30",
+    Is96x48:0,
+    Is64x48:1,
+    Is64x32:0,
+    screenFormatIds:["led-64x48","p125-64x48"],
+    preferredP125FormatIds:["p125-64x48","led-64x48"],
+    primaryDisplayScreenFormatId:"led-64x48",
+    defaultMain:"",
+    defaultSub:"",
+    lineCount:3,
+    maxCharactersPerLine:16,
+    maxMainCharacters:48,
+    maxSubCharacters:22,
+    description:"Zebbies Garden DC, 64×48 only. Loop a picture or a 7-second trimmed video with the shoutout text. The FloqR card shows FROM @handle on both frames.",
+    tags:["christine","zebbies","zebbies garden","64x48","video","photo","trimmed video","7 seconds","loop","handle","floqr card"]
+  },
   luxury: { id:'luxury', name:'Luxury Gold', scope:'Shared', className:'gold', category:'VIP', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["luxury","gold","vip","premium","bottle service"] },
   corporate: { id:'corporate', name:'Corporate Event', scope:'Shared', className:'classic-bw', category:'Business', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["corporate","business","company","brand","event"] },
   heistVaultNight: {
@@ -1368,6 +1403,17 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:18,minimumFontPixels:46},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; identity rail stays PRESENTED BY FLOQR ShoutOut when blank."}
+    }
+  },
+  christine: {
+    label:"Christine media then message",
+    formats:{
+      "p125-96x48": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
+      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:46},
+      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
+      "led-96x48": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
+      "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:40},
+      "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."}
     }
   },
   splitMedia: {
@@ -1681,6 +1727,7 @@ window.FLOQRTextLayout = {
     if (template.layout === "soccer-jersey" || /^(soccer|nba|nfl)/i.test(id) || template.jerseyNumberField) return "soccerJersey";
     if (template.textOverlay === true) return "textOverlayFrame";
     if (id === "blackwhite" || template.className === "classic-bw" || template.identityRail === true) return "classicBoard";
+    if (id === "christine" || template.loopMediaWithText === true) return "christine";
     if (id === "zebbiesFootballTeamIntro" || template.layout === "football-team-intro") return "footballIntro";
     if (id === "car" || template.className === "car") return "car";
     if (template.layout === "split-media") return "splitMedia";
