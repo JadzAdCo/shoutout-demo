@@ -3791,7 +3791,7 @@
       } : currentTemplateSupportsMedia() ? {
         mediaUrl: uploadedMedia.mediaUrl || existingMediaUrl,
         mediaType: uploadedMedia.mediaType || existingMediaType || "",
-        mediaFit:byId("shoutoutMediaFit")?.value || "contain",
+        mediaFit: (selectedTemplate === "christine" || getTemplate()?.id === "christine") ? "contain" : (byId("shoutoutMediaFit")?.value || "contain"),
         mediaFileName: uploadedMedia.mediaFileName || "",
         mediaStoragePath: uploadedMedia.mediaStoragePath || "",
         originalMediaStoragePath: uploadedMedia.originalMediaStoragePath || "",
@@ -3973,7 +3973,8 @@
     const fitEl = byId("shoutoutMediaFit");
     if (fitEl && allowsMedia) {
       const preferredFit = String(t.defaultMediaFit || "").toLowerCase() === "cover" ? "cover" : (fitEl.value || "contain");
-      if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
+      if ((t.id || selectedTemplate) === "christine") fitEl.value = "contain";
+      else if ((t.id || selectedTemplate) === "birthdayMedia") fitEl.value = "cover";
       else if (!fitEl.value) fitEl.value = preferredFit;
     }
     if (window.jadzEnsureSingleMediaUploader) setTimeout(() => window.jadzEnsureSingleMediaUploader(), 0);

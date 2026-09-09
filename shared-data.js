@@ -1138,6 +1138,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     supportsImage:true,
     supportsVideo:true,
     maxVideoSeconds:7,
+    defaultMediaFit:"contain",
     layout:"split-media",
     loopMediaWithText:true,
     floqrCardHandleLoop:true,

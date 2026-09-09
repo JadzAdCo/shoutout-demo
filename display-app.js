@@ -1428,7 +1428,7 @@
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) mediaElement.style.objectFit = (isChristine || data.mediaFit === "cover") ? "cover" : "contain";
+        if (mediaElement) mediaElement.style.objectFit = isChristine ? "contain" : (data.mediaFit === "cover" ? "cover" : "contain");
         if (isVideo) {
           const playback = isChristine
             ? {...data, template: "christine", selectedMediaVersion: "trimmed", trimStart: 0, trimEnd: 7, trimmedDuration: 7}
