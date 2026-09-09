@@ -47,11 +47,13 @@
   let loc = getStaticLocation(locationId);
   let templates = Object.assign({}, window.SHOUTOUT_TEMPLATES || {});
   const DEFAULT_LIVE_SHOUTOUT_SECONDS = 10 * 60;
+  const DEFAULT_FLOQR_CARD_BRAND = "FloqMedia";
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
   const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
+  let expiredLiveKey = "";
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
@@ -386,11 +388,14 @@
     });
   }
 
-  function classicIdentityPresentation(subText) {
+  function classicIdentityPresentation(subText, options = {}) {
     const raw = String(subText || "").trim();
-    const withAt = raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw;
+    const forceHandle = options.asHandle === true;
+    const withAt = forceHandle
+      ? (raw ? `@${raw.replace(/^@+/, "")}` : "")
+      : (raw && !raw.startsWith("@") && /^[a-z0-9._]{2,30}$/i.test(raw) ? `@${raw}` : raw);
     const supplied = glyphSlice(cleanBoardText(withAt), 0, 22);
-    const brandFallback = glyphSlice(cleanBoardText(loc.displayFooterBrand || "FLOQR ShoutOut"), 0, 20) || "FLOQR ShoutOut";
+    const brandFallback = glyphSlice(cleanBoardText(options.brand || DEFAULT_FLOQR_CARD_BRAND), 0, 22) || DEFAULT_FLOQR_CARD_BRAND;
     return {
       supplied:!!supplied,
       kicker:supplied ? "FROM" : "PRESENTED BY",
@@ -401,39 +406,41 @@
   /** Reusable FloqR card (identity rail) — classic / soccer / NFL / split-media. */
   function paintFloqrCard(rail, {
     attribution = "",
-    idle = false,
-    idleKicker = "USE",
-    idleValue = "",
-    idleAria = "",
+    asHandle = false,
+    defaultScreen = false,
     extraClass = ""
   } = {}) {
     if (!rail) return null;
-    const identity = classicIdentityPresentation(attribution);
-    const showIdle = !!idle;
-    const kicker = showIdle ? idleKicker : identity.kicker;
-    const value = showIdle
-      ? (idleValue || identity.value)
-      : identity.value;
-    const classes = [
-      "display-identity-rail",
-      "classic-bw-identity",
-      extraClass,
-      showIdle || !identity.supplied ? "uses-brand-fallback" : "has-attribution"
-    ].filter(Boolean).join(" ");
-    rail.className = classes;
-    rail.setAttribute("aria-label", showIdle ? (idleAria || `${kicker} ${value}`) : `${identity.kicker} ${identity.value}`);
+    if (defaultScreen) {
+      const identity = classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND});
+      rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "uses-brand-fallback"].filter(Boolean).join(" ");
+      rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+      rail.setAttribute("aria-hidden", "false");
+      rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      return identity;
+    }
+    if (!String(attribution || "").trim()) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+      rail.setAttribute("aria-hidden", "true");
+      return null;
+    }
+    const identity = classicIdentityPresentation(attribution, {asHandle: true});
+    rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "has-attribution"].filter(Boolean).join(" ");
+    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
     rail.setAttribute("aria-hidden", "false");
-    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(kicker)}</small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
     return identity;
   }
 
   function floqrCardAttributionFromData(data = {}) {
+    // Opt-in only. Jersey name stays on the fabric. The stored attribution string is the choice.
     const direct = String(data.attribution || "").trim();
-    if (direct) return direct;
-    if (data.includeAttribution === true) {
-      return String(data.displayName || data.submittedByDisplayName || "").trim();
-    }
-    return "";
+    const optedIn = data.includeAttribution === true || data.includeAttribution === "1" || !!direct;
+    if (!optedIn) return {value:"", asHandle:false};
+    const choice = String(data.attributionChoice || "displayName").trim();
+    const asHandle = choice === "floqrHandle" || choice === "instagram" || choice === "username";
+    return {value:direct, asHandle};
   }
 
   function isTextOverlayTemplate(template = {}, templateId = "") {
@@ -805,6 +812,7 @@
       jerseyCssBack: params.get("jerseyCssBack") === "1" ? true : (params.get("jerseyCssBack") === "0" ? false : undefined),
       attribution: params.get("attribution") || "",
       includeAttribution: params.get("includeAttribution") === "1",
+      attributionChoice: params.get("attributionChoice") || "",
       jerseyPatronName: params.get("jerseyPatronName") || "",
       nflDualLayout: params.get("nflDualLayout") === "1",
       sport: params.get("sport") || "",
@@ -879,14 +887,10 @@
         suprstarIdle: true
       };
     }
-    const heistIdleTemplate = (Array.isArray(loc.templates) ? loc.templates : [])
-      .map(String)
-      .find(id => id.startsWith("heist")) || "";
-    const idleTemplate = previewTemplate || heistIdleTemplate || "blackwhite";
-    const idleIsJersey = isSoccerJerseyTemplate(templates[idleTemplate] || {}, idleTemplate);
+    const idleTemplate = "blackwhite";
     return {
       locationName: loc.locationName,
-      mainText: idleIsJersey ? "" : clubDefaultMainText(loc),
+      mainText: clubDefaultMainText(loc),
       subText: "",
       template: idleTemplate,
       status: "default",
@@ -954,24 +958,97 @@
     markDisplayReady();
   }
 
+  function livePlaybackKey(data = {}) {
+    const approved = data.approvedAt?.toMillis?.() || data.approvedAt || data.updatedAt?.toMillis?.() || "";
+    return [approved, data.template || "", data.mainText || "", data.attribution || "", data.subText || ""].join("|");
+  }
+
+  function purgeDisplaySurface() {
+    stopHeistIdentityCycle();
+    stopHeistPhaseTimers();
+    stopSplitMediaLoop();
+    hideHeistBrandSlide();
+    hideJerseyMount();
+    byId("displayNflShoutPanel")?.remove();
+    const canvas = byId("displayCanvas");
+    if (canvas) {
+      canvas.className = "display-canvas";
+      canvas.style.backgroundImage = "";
+      canvas.style.background = "";
+      canvas.style.backgroundSize = "";
+      canvas.style.backgroundPosition = "";
+    }
+    resetBackgroundLayer(byId("displayBackground"));
+    const frame = byId("displayFrameOverlay");
+    if (frame) {
+      frame.className = "display-frame-overlay hidden";
+      frame.innerHTML = "";
+      frame.style.backgroundImage = "";
+    }
+    const mediaSlot = byId("mediaSlot");
+    if (mediaSlot) {
+      mediaSlot.className = "media-slot hidden";
+      mediaSlot.innerHTML = "";
+    }
+    ["displayBrand", "displayMain", "displaySub"].forEach(id => {
+      const el = byId(id);
+      if (!el) return;
+      el.className = id === "displayBrand" ? "brand" : "";
+      el.innerHTML = "";
+      el.textContent = "";
+      el.removeAttribute("style");
+      el.removeAttribute("aria-label");
+    });
+    const rail = byId("displayIdentityRail");
+    if (rail) {
+      rail.className = "display-identity-rail hidden";
+      rail.innerHTML = "";
+      rail.removeAttribute("style");
+      rail.setAttribute("aria-hidden", "true");
+    }
+    const team = byId("displayJerseyTeam");
+    if (team) {
+      team.className = "soccer-jersey-team hidden";
+      team.textContent = "";
+      team.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function resetDisplayToDefault() {
+    purgeDisplaySurface();
+    render(defaultClubDisplayPayload());
+  }
+
   function renderTimedLiveContent(data = {}) {
     if (liveContentExpiryTimer) {
       window.clearTimeout(liveContentExpiryTimer);
       liveContentExpiryTimer = null;
     }
+    const status = String(data.status || "").toLowerCase();
+    const key = livePlaybackKey(data);
     const approvedMillis = data.approvedAt?.toMillis?.() || 0;
+    const explicitExpires = data.expiresAt?.toMillis?.() || data.liveUntil?.toMillis?.() || data.playedUntil?.toMillis?.() || 0;
     const durationSeconds = Math.max(1, Number(data.displayDurationSeconds || DEFAULT_LIVE_SHOUTOUT_SECONDS));
-    const expiresMillis = approvedMillis ? approvedMillis + durationSeconds * 1000 : 0;
-    if (String(data.status || "").toLowerCase() === "approved" && expiresMillis) {
+    const expiresMillis = explicitExpires || (approvedMillis ? approvedMillis + durationSeconds * 1000 : 0);
+    const liveShoutout = status === "approved" || status === "live";
+    if (liveShoutout && expiredLiveKey && key === expiredLiveKey) {
+      resetDisplayToDefault();
+      return;
+    }
+    if (liveShoutout && expiresMillis) {
       const remaining = expiresMillis - Date.now();
       if (remaining <= 0) {
-        render(defaultClubDisplayPayload());
+        expiredLiveKey = key;
+        resetDisplayToDefault();
         return;
       }
       liveContentExpiryTimer = window.setTimeout(() => {
         liveContentExpiryTimer = null;
-        render(defaultClubDisplayPayload());
+        expiredLiveKey = key;
+        resetDisplayToDefault();
       }, Math.min(remaining, 2147483647));
+    } else if (!liveShoutout) {
+      expiredLiveKey = "";
     }
     render(data);
   }
@@ -1030,9 +1107,10 @@
   }
 
   function enforceTrimmedVideoPlayback(video, data = {}) {
-    if (!video || data.selectedMediaVersion !== "trimmed") return;
+    const forceSeven = data.template === "christine" || data.maxVideoSeconds === 7;
+    if (!video || (data.selectedMediaVersion !== "trimmed" && !forceSeven)) return;
     const start = Number(data.trimStart || 0);
-    const end = Number(data.trimEnd || data.trimmedDuration || 7);
+    const end = Math.min(7, Number(data.trimEnd || data.trimmedDuration || 7) || 7);
     if (!end || end <= start) return;
     const loopTrim = () => {
       if (video.currentTime < start || video.currentTime >= end) {
@@ -1186,6 +1264,7 @@
 
   function render(data) {
     stopSplitMediaLoop();
+    byId("displayNflShoutPanel")?.remove();
     if (isSuprstarIdlePayload(data)) {
       renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
@@ -1207,12 +1286,16 @@
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
-    const screenFormatId = String(
+    const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true;
+    let screenFormatId = String(
       resolvePlaybackScreenFormat(data, t)
       || boardAssignedFormatId()
       || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0]
       || "led-96x48"
     );
+    if (isChristine && !/64x48/i.test(screenFormatId)) {
+      screenFormatId = (t.screenFormatIds || []).find(id => /64x48/i.test(id)) || "led-64x48";
+    }
     const textCaps = window.FLOQRTextLayout?.resolve?.(t, screenFormatId) || {
       supported:true,
       lineCount:Number(data.lineCount || t.lineCount || 1),
@@ -1247,9 +1330,9 @@
     canvas.dataset.templateId = templateId;
     canvas.dataset.screenFormatId = screenFormatId;
     const screenFlags = window.FLOQRScreenDatapoints?.canvasFlags?.(screenFormatId) || {};
-    canvas.dataset.is96x48 = screenFlags.is96x48 || "0";
-    canvas.dataset.is64x48 = screenFlags.is64x48 || "0";
-    canvas.dataset.is64x32 = screenFlags.is64x32 || "0";
+    canvas.dataset.is96x48 = isChristine ? "0" : (screenFlags.is96x48 || "0");
+    canvas.dataset.is64x48 = isChristine ? "1" : (screenFlags.is64x48 || "0");
+    canvas.dataset.is64x32 = isChristine ? "0" : (screenFlags.is64x32 || "0");
     canvas.dataset.textProfile = textCaps.profileId || "custom";
     const backgroundUrl = data.backgroundUrl || t.defaultBackgroundUrl || "";
     const backgroundColor = data.backgroundColor || "";
@@ -1345,8 +1428,13 @@
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) mediaElement.style.objectFit = data.mediaFit === "cover" ? "cover" : "contain";
-        if (isVideo) enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), data);
+        if (mediaElement) mediaElement.style.objectFit = (isChristine || data.mediaFit === "cover") ? "cover" : "contain";
+        if (isVideo) {
+          const playback = isChristine
+            ? {...data, template: "christine", selectedMediaVersion: "trimmed", trimStart: 0, trimEnd: 7, trimmedDuration: 7}
+            : data;
+          enforceTrimmedVideoPlayback(mediaSlot.querySelector("video"), playback);
+        }
       } else {
         mediaSlot.innerHTML = '<div class="media-placeholder">IMAGE / VIDEO</div>';
       }
@@ -1420,8 +1508,8 @@
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
         // Name sits under the baked plate; number fills the empty back.
-        baseName = Math.min(7.2, 8.37);
-        baseNumber = Math.min(32, 35.01);
+        baseName = Math.min(7, 8.37);
+        baseNumber = Math.min(28.6, 35.01);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1545,25 +1633,17 @@
       // Animated FloqR card (reusable module — same FROM / PRESENTED BY shell as classic).
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
-        const clubName = String(data.locationName || loc.locationName || "Club").trim() || "Club";
         const cardAttribution = floqrCardAttributionFromData(data);
-        const idleCta = DISPLAY_BOARD === "secondary"
-          ? `Awaiting live Feed. Be a SupRstar @ ${clubName}`
-          : `Use ShoutOut @ ${clubName}`;
-        const idleValue = glyphSlice(cleanBoardText(idleCta), 0, 28) || "FLOQR ShoutOut";
-        const showIdle = !subText && !jerseyNameText && !mainText && !cardAttribution;
-        const idleKicker = DISPLAY_BOARD === "secondary" ? "LIVE" : "USE";
-        const idleStrong = showIdle
-          ? (DISPLAY_BOARD === "secondary" ? idleValue.replace(/^AWAITING\s*/i, "") : idleValue.replace(/^USE\s*/i, ""))
-          : "";
-        paintFloqrCard(rail, {
-          attribution: cardAttribution,
-          idle: showIdle,
-          idleKicker,
-          idleValue: idleStrong,
-          idleAria: idleCta,
-          extraClass: "soccer-jersey-rail"
-        });
+        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
+        if (isIdleCta) {
+          paintFloqrCard(rail, {defaultScreen: true, extraClass: "soccer-jersey-rail"});
+        } else {
+          paintFloqrCard(rail, {
+            attribution: cardValue,
+            asHandle: true,
+            extraClass: "soccer-jersey-rail"
+          });
+        }
       } else if (rail) {
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
@@ -1603,12 +1683,22 @@
       stopHeistPhaseTimers();
       hideHeistBrandSlide();
       const rows = classicBoardRows(mainText, textCaps);
-      const identity = classicIdentityPresentation(subText);
+      const cardAttribution = floqrCardAttributionFromData(data);
+      const cardValue = isIdleCta ? "" : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
+      const identity = isIdleCta
+        ? classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND})
+        : classicIdentityPresentation(cardValue, {asHandle: true});
       byId("displayMain").classList.add("classic-bw-board");
       byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
-      byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
-      byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-      byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      if (!isIdleCta && !cardValue) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").removeAttribute("aria-label");
+        byId("displaySub").innerHTML = "";
+      } else {
+        byId("displaySub").classList.add("classic-bw-identity", identity.supplied ? "has-attribution" : "uses-brand-fallback");
+        byId("displaySub").setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
+        byId("displaySub").innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+      }
     } else {
       stopHeistIdentityCycle();
       stopHeistPhaseTimers();
@@ -1619,8 +1709,19 @@
       const rows = displayTextRows(mainText, textCaps, {uppercase: false});
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
-      const identity = usesSplitMedia ? splitMediaIdentityPresentation(data, subText) : null;
-      if (usesSplitMedia && identity) {
+      const identity = usesSplitMedia && !isChristine ? splitMediaIdentityPresentation(data, subText) : null;
+      if (isChristine) {
+        byId("displaySub").classList.add("classic-bw-sub-hidden");
+        byId("displaySub").textContent = "";
+        const cardAttribution = floqrCardAttributionFromData(data);
+        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
+        paintFloqrCard(byId("displayIdentityRail"), {
+          attribution: cardValue,
+          asHandle: true,
+          extraClass: "split-media-identity christine-floqr-card"
+        });
+        startFrameLoop(canvas);
+      } else if (usesSplitMedia && identity) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = identity.extraCopy || "";
         renderSplitMediaIdentityRail(identity);
