@@ -7,15 +7,15 @@ alwaysApply: true
 
 **One silhouette.** Philadelphia Eagles elite cut (V-neck, short sleeves with cuff bands, upper-back nameplate, mesh fabric). Solid `#000` (LED energy). No hanger on photo backs.
 
-**Scale lock:** PNG jersey fills the frame at **63.9%** width (`background-size: 63.9% auto`) — −10% from the prior 71% lock. CSS uses **width-based** sizing. Uniform shift: `--nfl-photo-stack-y` (default `4%`) moves jersey PNG + patron overlays together via `calc()` on `background-position` and overlay `top`. Font caps: name ~**8.37vh**, number ~**35.01vh** (−10% from prior 9.3 / 38.9). 96×48 dual pane uses `67.5%` of the left half.
+**Scale lock:** full original silhouette, aspect locked, neckline pinned to the top. Hem crop **15%**, then the remaining kit is **+10%** (`background-size: auto 129.4%`, `background-position: center top`). Font caps: name ~**7vh**, number ~**28.6vh**.
 
 **Helmet:** Optional side mascot/helmet in PNG only after jersey stack is locked; must not touch the right sleeve.
 
 **Wordmark:** baked into the PNG only (club on nameplate). Upright athletic block caps. CSS hides `.soccer-jersey-team` on photo kits.
 
-**Patron name (CSS):** below the baked nameplate, base `top` ~32% + `var(--nfl-photo-stack-y)`; cap ~7.2vh.
+**Patron name (CSS):** just under the baked nameplate, clear of the collar and wordmark, base `top` ~38% + `var(--nfl-photo-stack-y)` (96× ~37%, 64×48 ~36%, 64×32 ~34%); cap ~6.4vh.
 
-**Number (CSS):** center of the empty back, base `top` ~44% + shift; cap ~32vh.
+**Number (CSS):** empty mid-back, base `top` ~48% + shift (96× ~47%, 64×48 ~46%, 64×32 ~44%); cap ~26–28.6vh and clearly larger than the name.
 
 **Dual shoutout layout (`nfl-jersey` / `nflDualLayout`):**
 - **96×48:** jersey left-justified; white text shoutout on the right (4 lines × 16 = 64 graphemes, emoji OK); FloqR card bottom; kit-color edge glow. Shout panel fills the **right half**.
