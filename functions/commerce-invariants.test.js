@@ -93,7 +93,8 @@ test("Traditional Black and White keeps a global fixed identity rail", () => {
   assert.match(displayCss, /classicIdentityShellBurst 20s/);
   assert.match(displayCss, /classicIdentityParticle 20s/);
   assert.match(indexHtml, /placeholder="Enter ShoutOut Here"/);
-  assert.match(displayApp, /heistIdleTemplate \|\| "blackwhite"/);
+  assert.match(displayApp, /idleTemplate = "blackwhite"/);
+  assert.match(displayApp, /defaultClubDisplayPayload/);
   // Idle classic board shows Use ShoutOut @ Clubname (club default verbiage).
   assert.match(displayApp, /clubDefaultMainText/);
   assert.match(displayApp, /Use ShoutOut @ \$\{clubName\}/);
