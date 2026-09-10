@@ -90,9 +90,18 @@
 
   function inboxLinkLabel(x = {}) {
     const href = String(x.link || "");
+    const type = String(x.type || x.messageType || "").toLowerCase();
     if (/admin\.html/.test(href) && /tab=scheduling/.test(href)) return "Open Calendar & Scheduler";
     if (isScheduleInboxMessage(x)) return "Review & confirm shift";
-    return "Open Related ShoutOut";
+    if (
+      type === "paidshoutoutreceipt"
+      || type === "shoutoutsubmitted"
+      || /tab=shoutouts/.test(href)
+      || (/shoutout/i.test(type) && href)
+    ) {
+      return "Open My ShoutOuts";
+    }
+    return href ? "Open link" : "Open Related ShoutOut";
   }
   const fmtDate = value => {
     if (!value) return "-";
@@ -283,7 +292,38 @@
         window.location.href = window.FLOQRNav?.portalLink("./mingl-chat.html", room ? { room } : {}) || `./mingl-chat.html?${params.toString()}`;
         return;
       }
-      const map = {messages:"portalMessages", inbox:"portalMessages", help:"portalHelp", profile:"portalProfile", public:"portalPublicProfile", media:"portalPublicProfile", settings:"portalProfile", language:"portalLanguageSettings", "language-settings":"portalLanguageSettings", "my-privacy":"portalPrivacy", "ai-notifications":"portalAiNotifications", templates:"portalTemplateVariants", privacy:"portalPrivacy", bartr:"portalBartrStore", commerce:"portalBartrStore", store:"portalBartrStore", "mingl-friends":"portalMinglFriends", friends:"portalMinglFriends", unmingl:"portalMinglFriends", "work-calendar":"portalWorkCalendar", workcalendar:"portalWorkCalendar", "staff-calendar":"portalWorkCalendar", "service-members":"portalServiceMembers", servicemembers:"portalServiceMembers", "role-request":"portalServiceMembers"};
+      const map = {
+        messages:"portalMessages",
+        inbox:"portalMessages",
+        help:"portalHelp",
+        profile:"portalProfile",
+        public:"portalPublicProfile",
+        media:"portalPublicProfile",
+        settings:"portalProfile",
+        language:"portalLanguageSettings",
+        "language-settings":"portalLanguageSettings",
+        "my-privacy":"portalPrivacy",
+        "ai-notifications":"portalAiNotifications",
+        templates:"portalTemplateVariants",
+        privacy:"portalPrivacy",
+        bartr:"portalBartrStore",
+        commerce:"portalBartrStore",
+        store:"portalBartrStore",
+        "mingl-friends":"portalMinglFriends",
+        friends:"portalMinglFriends",
+        unmingl:"portalMinglFriends",
+        "work-calendar":"portalWorkCalendar",
+        workcalendar:"portalWorkCalendar",
+        "staff-calendar":"portalWorkCalendar",
+        "service-members":"portalServiceMembers",
+        servicemembers:"portalServiceMembers",
+        "role-request":"portalServiceMembers",
+        // Receipts / FloqAi / modify links: ?tab=shoutouts → My ShoutOuts
+        shoutouts:"portalShoutouts",
+        myshoutouts:"portalShoutouts",
+        "my-shoutouts":"portalShoutouts",
+        shoutout:"portalShoutouts"
+      };
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
@@ -3510,6 +3550,10 @@
         reason: "schedule-confirm-link"
       });
       showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
+    }
+    const shoutTab = String(pageParams.get("tab") || "").toLowerCase();
+    if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout"].includes(shoutTab)) {
+      showPortalPanel("portalShoutouts", "portalShoutouts");
     }
     const frameQuery = new URLSearchParams({
       v: window.FLOQRNav?.appVersion || "s3.0.5",
