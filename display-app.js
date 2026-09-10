@@ -403,33 +403,92 @@
     };
   }
 
+  function stopFloqrCardCycle() {
+    if (window.__floqrCardCycleTimer) {
+      window.clearInterval(window.__floqrCardCycleTimer);
+      window.__floqrCardCycleTimer = null;
+    }
+  }
+
+  function paintFloqrCardFrame(rail, {kicker, value, extraClass = "", brandFallback = false} = {}) {
+    if (!rail) return;
+    rail.className = [
+      "display-identity-rail",
+      "classic-bw-identity",
+      extraClass,
+      brandFallback ? "uses-brand-fallback" : "has-attribution"
+    ].filter(Boolean).join(" ");
+    rail.setAttribute("aria-label", `${kicker} ${value}`);
+    rail.setAttribute("aria-hidden", "false");
+    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(kicker)}</small><strong>${esc(value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+  }
+
+  /** FloqR card: PRESENTED BY FloqMedia always; when @handle opted in, alternate with FROM @handle. */
+  function startFloqrCardCycle(rail, {
+    handle = "",
+    extraClass = "",
+    holdMs = 6000
+  } = {}) {
+    stopFloqrCardCycle();
+    if (!rail) return null;
+    const brand = classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND});
+    const cleanHandle = String(handle || "").trim().replace(/^@+/, "");
+    const paintBrand = () => paintFloqrCardFrame(rail, {
+      kicker: brand.kicker,
+      value: brand.value,
+      extraClass,
+      brandFallback: true
+    });
+    if (!cleanHandle) {
+      paintBrand();
+      return brand;
+    }
+    const fromIdentity = classicIdentityPresentation(cleanHandle, {asHandle: true});
+    let showHandle = false;
+    const paint = () => {
+      if (showHandle) {
+        paintFloqrCardFrame(rail, {
+          kicker: fromIdentity.kicker,
+          value: fromIdentity.value,
+          extraClass,
+          brandFallback: false
+        });
+      } else {
+        paintBrand();
+      }
+      showHandle = !showHandle;
+    };
+    paint();
+    window.__floqrCardCycleTimer = window.setInterval(paint, Math.max(3000, Number(holdMs) || 6000));
+    return fromIdentity;
+  }
+
   /** Reusable FloqR card (identity rail) — classic / soccer / NFL / split-media. */
   function paintFloqrCard(rail, {
     attribution = "",
     asHandle = false,
     defaultScreen = false,
-    extraClass = ""
+    extraClass = "",
+    cycleWithBrand = false
   } = {}) {
     if (!rail) return null;
-    if (defaultScreen) {
-      const identity = classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND});
-      rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "uses-brand-fallback"].filter(Boolean).join(" ");
-      rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-      rail.setAttribute("aria-hidden", "false");
-      rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
-      return identity;
+    stopFloqrCardCycle();
+    if (defaultScreen || cycleWithBrand) {
+      return startFloqrCardCycle(rail, {
+        handle: defaultScreen ? "" : attribution,
+        extraClass
+      });
     }
     if (!String(attribution || "").trim()) {
-      rail.className = "display-identity-rail hidden";
-      rail.innerHTML = "";
-      rail.setAttribute("aria-hidden", "true");
-      return null;
+      return startFloqrCardCycle(rail, {handle: "", extraClass});
     }
     const identity = classicIdentityPresentation(attribution, {asHandle: true});
-    rail.className = ["display-identity-rail", "classic-bw-identity", extraClass, "has-attribution"].filter(Boolean).join(" ");
-    rail.setAttribute("aria-label", `${identity.kicker} ${identity.value}`);
-    rail.setAttribute("aria-hidden", "false");
-    rail.innerHTML = `<span class="classic-identity-shell"><small>${esc(identity.kicker)}</small><strong>${esc(identity.value)}</strong></span><span class="classic-identity-particles" aria-hidden="true">${"<i></i>".repeat(12)}</span>`;
+    paintFloqrCardFrame(rail, {
+      kicker: identity.kicker,
+      value: identity.value,
+      extraClass,
+      brandFallback: !identity.supplied
+    });
     return identity;
   }
 
@@ -652,7 +711,27 @@
   }
 
   function startFrameLoop(canvas, onAdvance) {
-    frameLoop()?.start(canvas, {onAdvance});
+    if (!canvas) return;
+    if (!frameLoop()?.start) {
+      // Hard fallback so jersey/Christine never lose the 6s media↔copy rotation.
+      canvas.classList.add("split-media-loop", "split-media-phase-media");
+      canvas.classList.remove("split-media-phase-copy");
+      if (window.__floqrFrameLoopFallback) window.clearInterval(window.__floqrFrameLoopFallback);
+      window.__floqrFrameLoopFallback = window.setInterval(() => {
+        const nextCopy = !canvas.classList.contains("split-media-phase-copy");
+        canvas.classList.toggle("split-media-phase-media", !nextCopy);
+        canvas.classList.toggle("split-media-phase-copy", nextCopy);
+        if (typeof onAdvance === "function") {
+          window.requestAnimationFrame(() => onAdvance(nextCopy ? "copy" : "media", canvas));
+        }
+      }, 6000);
+      return;
+    }
+    if (window.__floqrFrameLoopFallback) {
+      window.clearInterval(window.__floqrFrameLoopFallback);
+      window.__floqrFrameLoopFallback = null;
+    }
+    frameLoop().start(canvas, {onAdvance});
   }
 
   function splitMediaIdentityPresentation(data = {}, subText = "") {
@@ -1596,14 +1675,14 @@
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
 
-      // NFL dual: shoutout copy panel + FloqR card; 96×48 side-by-side, 64× rotate jersey↔text.
+      // NFL dual: ALWAYS 6s jersey↔shoutout gif loop (all board sizes). FloqR card stays bottom.
       let shoutPanel = byId("displayNflShoutPanel");
       if (nflDualActive) {
-        canvas.classList.add("nfl-dual-layout");
+        canvas.classList.add("nfl-dual-layout", "nfl-dual-rotate", "split-media-loop");
         const formatId = String(data.screenFormatId || canvas.getAttribute("data-screen-format-id") || "");
         const is96 = /96x48/i.test(formatId) || canvas.getAttribute("data-is-96x48") === "1";
-        canvas.classList.toggle("nfl-dual-side", is96);
-        canvas.classList.toggle("nfl-dual-rotate", !is96);
+        // Gif loop on every board size — never leave shoutout stuck in a side-only layout.
+        canvas.classList.remove("nfl-dual-side");
         if (!shoutPanel && center) {
           shoutPanel = document.createElement("div");
           shoutPanel.id = "displayNflShoutPanel";
@@ -1633,7 +1712,7 @@
             is96 || !compact ? 64 : 48
           );
           const nflShoutMainText = glyphSlice(cleanDisplayText(mainSource), 0, nflMainCap);
-          const shoutRows = displayTextRows(nflShoutMainText || "", {
+          const shoutRows = displayTextRows(nflShoutMainText || " ", {
             lineCount,
             maxCharactersPerLine: perLine,
             maxMainCharacters: nflMainCap
@@ -1641,7 +1720,7 @@
           canvas.style.setProperty("--nfl-shout-line-count", String(Math.max(1, lineCount)));
           shoutPanel.className = "nfl-shout-panel";
           shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => {
-            const style = nflShoutFitStyle(row || " ", {sideBySide: is96, compact});
+            const style = nflShoutFitStyle(row || " ", {sideBySide: false, compact});
             return `<b style="${style}">${esc(row || " ")}</b>`;
           }).join("")}</div>`;
           // Grow uniform type until the entered copy fills the panel.
@@ -1652,31 +1731,28 @@
             requestAnimationFrame(runFit);
           });
         }
-        if (!is96) {
-          startFrameLoop(canvas, refitNflShoutOnCopy);
-        } else {
-          stopSplitMediaLoop();
-        }
+        startFrameLoop(canvas, refitNflShoutOnCopy);
       } else if (shoutPanel) {
         shoutPanel.remove();
         stopSplitMediaLoop();
       }
 
-      // Animated FloqR card (reusable module — same FROM / PRESENTED BY shell as classic).
+      // FloqR card (bottom): PRESENTED BY FloqMedia; with opted-in @handle, alternate FROM @handle.
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
         const cardAttribution = floqrCardAttributionFromData(data);
-        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
-        if (isIdleCta) {
-          paintFloqrCard(rail, {defaultScreen: true, extraClass: "soccer-jersey-rail"});
-        } else {
-          paintFloqrCard(rail, {
-            attribution: cardValue,
-            asHandle: true,
-            extraClass: "soccer-jersey-rail"
-          });
-        }
+        const cardValue = isIdleCta
+          ? ""
+          : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
+        paintFloqrCard(rail, {
+          attribution: cardValue,
+          asHandle: true,
+          defaultScreen: isIdleCta || !cardValue,
+          cycleWithBrand: !isIdleCta && !!cardValue,
+          extraClass: "soccer-jersey-rail floqr-card-bottom"
+        });
       } else if (rail) {
+        stopFloqrCardCycle();
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
       }
@@ -1687,6 +1763,7 @@
     canvas.classList.remove("jersey-sport-soccer", "jersey-sport-nba", "jersey-sport-nfl", "jersey-css-back", "jersey-photo-back", "jersey-css-country");
     const railClear = byId("displayIdentityRail");
     if (railClear) {
+      stopFloqrCardCycle();
       railClear.className = "display-identity-rail hidden";
       railClear.innerHTML = "";
     }
@@ -1745,11 +1822,17 @@
       if (isChristine) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = "";
-        const handle = christineFloqrHandle(data);
+        const cardAttribution = floqrCardAttributionFromData(data);
+        const handle = String(
+          (typeof cardAttribution === "string" ? cardAttribution : cardAttribution.value)
+          || ""
+        ).trim();
         paintFloqrCard(byId("displayIdentityRail"), {
           attribution: handle,
           asHandle: true,
-          extraClass: "split-media-identity christine-floqr-card"
+          defaultScreen: !handle,
+          cycleWithBrand: !!handle,
+          extraClass: "split-media-identity christine-floqr-card floqr-card-bottom"
         });
         // Force loop classes even if FLOQRFrameLoop is late; then start the 6s rotation.
         canvas.classList.add("split-media-loop");
@@ -1772,6 +1855,7 @@
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
     stopSplitMediaLoop();
+    stopFloqrCardCycle();
     hideHeistBrandSlide();
     hideJerseyMount();
     const canvas = byId("displayCanvas");
