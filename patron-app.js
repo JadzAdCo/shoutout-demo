@@ -306,7 +306,8 @@
       const main = byId("mainText");
       if (main) {
         const shoutLimit = Math.max(1, Number(caps.main || caps.maxMainCharacters || 64));
-        main.maxLength = shoutLimit * 2; // emoji-safe headroom; glyphCap enforces grapheme cap
+        // HTML maxlength is UTF-16 and blocks emoji — grapheme glyphCap is the real gate.
+        main.removeAttribute("maxlength");
         main.value = glyphCap(main.value || "", shoutLimit);
         main.placeholder = caps.lineCount >= 4
           ? `ShoutOut text (max ${shoutLimit} · ${caps.lineCount} lines · emoji OK)`
@@ -3381,20 +3382,22 @@
     const sourceLimit = visibleLimit + Math.max(0, availableLines - 1);
     const words = glyphCap(cleaned, sourceLimit).split(/\s+/).filter(Boolean);
     const rows = [];
-    let line = "";
+    let lineGlyphs = [];
     words.forEach(word => {
-      const chunks = [];
-      for (let i = 0; i < word.length; i += caps.perLine) chunks.push(word.slice(i, i + caps.perLine));
-      chunks.forEach(chunk => {
-        const next = line ? `${line} ${chunk}` : chunk;
-        if (next.length <= caps.perLine) line = next;
-        else {
-          if (line && rows.length < caps.lineCount) rows.push(line);
-          line = chunk;
+      const wordGlyphs = graphemes(word);
+      for (let i = 0; i < wordGlyphs.length; i += caps.perLine) {
+        const chunk = wordGlyphs.slice(i, i + caps.perLine);
+        const nextLen = lineGlyphs.length ? lineGlyphs.length + 1 + chunk.length : chunk.length;
+        if (nextLen <= caps.perLine) {
+          if (lineGlyphs.length) lineGlyphs.push(" ");
+          lineGlyphs.push(...chunk);
+        } else {
+          if (lineGlyphs.length && rows.length < caps.lineCount) rows.push(lineGlyphs.join(""));
+          lineGlyphs = chunk.slice();
         }
-      });
+      }
     });
-    if (line && rows.length < caps.lineCount) rows.push(line);
+    if (lineGlyphs.length && rows.length < caps.lineCount) rows.push(lineGlyphs.join(""));
     return rows.slice(0, caps.lineCount).join("\n");
   }
 
