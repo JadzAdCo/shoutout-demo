@@ -443,6 +443,27 @@
     return {value:direct, asHandle};
   }
 
+  function christineFloqrHandle(data = {}) {
+    const card = floqrCardAttributionFromData(data);
+    const direct = typeof card === "string" ? card : String(card.value || "").trim();
+    if (direct) return direct.replace(/^@+/, "");
+    const fallbacks = [
+      data.floqrHandle,
+      data.instagram,
+      data.username,
+      data.displayName,
+      data.attribution,
+      data.subText
+    ];
+    for (const raw of fallbacks) {
+      const value = String(raw || "").trim().replace(/^@+/, "");
+      if (value && !/^(CELEBRATE BIG|LOVE ALL NIGHT|FOREVER STARTS TONIGHT|SHE SAID YES)$/i.test(value)) {
+        return value.slice(0, 30);
+      }
+    }
+    return "FloqR";
+  }
+
   function isTextOverlayTemplate(template = {}, templateId = "") {
     if (template.layout === "soccer-jersey" || String(templateId || template.id || "").startsWith("soccer")) return false;
     return template.textOverlay === true || String(templateId || template.id || "").startsWith("heist");
@@ -1263,9 +1284,10 @@
   }
 
   function render(data) {
-    stopSplitMediaLoop();
+    // Frame loop stop is deferred until we know this paint is not a looping template.
     byId("displayNflShoutPanel")?.remove();
     if (isSuprstarIdlePayload(data)) {
+      stopSplitMediaLoop();
       renderSuprstarIdleScreen({...loc, locationName: data.locationName || loc.locationName});
       return;
     }
@@ -1286,7 +1308,14 @@
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
-    const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true;
+    const isChristine = templateId === "christine" || t.id === "christine" || t.floqrCardHandleLoop === true || t.loopMediaWithText === true;
+    // Preserve media↔copy phase across live re-renders for Christine / split-media / NFL rotate.
+    const keepFrameLoop = isChristine
+      || t.layout === "split-media"
+      || t.layout === "nfl-jersey"
+      || t.nflDualLayout === true
+      || (isSoccerJersey && String(data.sport || t.sport || "").toLowerCase() === "nfl");
+    if (!keepFrameLoop) stopSplitMediaLoop();
     let screenFormatId = String(
       resolvePlaybackScreenFormat(data, t)
       || boardAssignedFormatId()
@@ -1428,7 +1457,10 @@
         const isVideo = mediaType === "video" || (!mediaType && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(mediaUrl));
         mediaSlot.innerHTML = isVideo ? `<video src="${esc(mediaUrl)}" autoplay muted loop playsinline></video>` : `<img src="${esc(mediaUrl)}" alt="ShoutOut media">`;
         const mediaElement = mediaSlot.querySelector("img,video");
-        if (mediaElement) mediaElement.style.objectFit = isChristine ? "contain" : (data.mediaFit === "cover" ? "cover" : "contain");
+        if (mediaElement) {
+          mediaElement.style.objectFit = isChristine ? "contain" : (data.mediaFit === "cover" ? "cover" : "contain");
+          mediaElement.style.objectPosition = "center center";
+        }
         if (isVideo) {
           const playback = isChristine
             ? {...data, template: "christine", selectedMediaVersion: "trimmed", trimStart: 0, trimEnd: 7, trimmedDuration: 7}
@@ -1508,8 +1540,8 @@
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
         // Name sits under the baked plate; number fills the empty back.
-        baseName = Math.min(7, 8.37);
-        baseNumber = Math.min(28.6, 35.01);
+        baseName = Math.min(6.4, 7.5);
+        baseNumber = Math.min(30, 36);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1713,13 +1745,15 @@
       if (isChristine) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = "";
-        const cardAttribution = floqrCardAttributionFromData(data);
-        const cardValue = typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || "");
+        const handle = christineFloqrHandle(data);
         paintFloqrCard(byId("displayIdentityRail"), {
-          attribution: cardValue,
+          attribution: handle,
           asHandle: true,
           extraClass: "split-media-identity christine-floqr-card"
         });
+        // Force loop classes even if FLOQRFrameLoop is late; then start the 6s rotation.
+        canvas.classList.add("split-media-loop");
+        if (center) center.classList.add("split-media-layout");
         startFrameLoop(canvas);
       } else if (usesSplitMedia && identity) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
