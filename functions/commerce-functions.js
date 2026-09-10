@@ -155,6 +155,22 @@ function text(value = "", max = 500) {
   return String(value || "").trim().slice(0, max);
 }
 
+function checkoutGraphemes(value = "") {
+  const raw = String(value || "");
+  try {
+    if (typeof Intl !== "undefined" && Intl.Segmenter) {
+      return Array.from(new Intl.Segmenter(undefined, {granularity:"grapheme"}).segment(raw), part => part.segment);
+    }
+  } catch (_) {
+    /* fall through */
+  }
+  return Array.from(raw);
+}
+
+function checkoutGlyphSlice(value = "", start = 0, end = Infinity) {
+  return checkoutGraphemes(value).slice(start, end).join("");
+}
+
 function secretValueSafe(secret, envName = "") {
   try {
     const fromSecret = secret && typeof secret.value === "function" ? secret.value() : "";
@@ -202,21 +218,31 @@ function checkoutTextCaps(templateId = "", formatId = "") {
 
 function fitCheckoutDisplayText(value = "", caps = {}, type = "main") {
   const limit = Math.max(0, Number(type === "sub" ? caps.sub : caps.main));
+  const perLine = Math.max(1, Number(caps.perLine || limit || 1));
+  const lineCount = Math.max(1, Number(caps.lineCount || 1));
+  // Preserve emoji / grapheme clusters — never use UTF-16 .length / .slice for shout copy.
   const clean = String(value || "").replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim();
-  if (type === "sub" || Number(caps.lineCount || 1) <= 1) return clean.slice(0, limit);
+  if (type === "sub" || lineCount <= 1) return checkoutGlyphSlice(clean, 0, limit);
   const rows = [];
-  let row = "";
-  clean.slice(0, limit + caps.lineCount - 1).split(/\s+/).filter(Boolean).forEach(word => {
-    const chunks = [];
-    for (let i = 0; i < word.length; i += caps.perLine) chunks.push(word.slice(i, i + caps.perLine));
-    chunks.forEach(chunk => {
-      const next = row ? `${row} ${chunk}` : chunk;
-      if (next.length <= caps.perLine) row = next;
-      else if (rows.length < caps.lineCount) { rows.push(row); row = chunk; }
-    });
+  let row = [];
+  clean.split(/\s+/).filter(Boolean).forEach(word => {
+    const wordGlyphs = checkoutGraphemes(word);
+    for (let i = 0; i < wordGlyphs.length; i += perLine) {
+      const chunk = wordGlyphs.slice(i, i + perLine);
+      const nextLen = row.length ? row.length + 1 + chunk.length : chunk.length;
+      if (nextLen <= perLine) {
+        if (row.length) row.push(" ");
+        row.push(...chunk);
+      } else if (rows.length < lineCount) {
+        if (row.length) rows.push(row.join(""));
+        row = chunk.slice();
+      }
+    }
   });
-  if (row && rows.length < caps.lineCount) rows.push(row);
-  return rows.slice(0, caps.lineCount).join("\n");
+  if (row.length && rows.length < lineCount) rows.push(row.join(""));
+  const joined = rows.slice(0, lineCount).join("\n");
+  // Soft total cap by grapheme count across lines (spaces/newlines count).
+  return checkoutGlyphSlice(joined, 0, limit + Math.max(0, lineCount - 1));
 }
 
 function safeHttpsMediaUrl(value = "") {
@@ -1684,6 +1710,9 @@ async function finalizePaidOrder(orderId, session) {
       clubShareCents,
       floqrShareCents,
       clubSharePercent:Number(order.clubSharePercent || SHOUTOUT_CLUB_SHARE_PERCENT),
+      // Patron history wiring: always stamp owner identity (never rely on client-only fields).
+      submittedByUid:text(shoutout.submittedByUid || order.ownerUid, 120) || text(order.ownerUid, 120),
+      submittedBy:text(shoutout.submittedBy || order.ownerEmail || order.customerEmail, 200).toLowerCase(),
       submittedAt:paidAt,
       paidAt,
       paidAtIso,

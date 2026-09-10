@@ -140,7 +140,7 @@ async function writeFloqrInboxReceipt({recipientUid, recipientEmail = "", receip
     "Your paid ShoutOut is submitted for location approval.",
     "",
     ...receiptBodyLines(receipt),
-    link ? `\nView ShoutOuts: ${link}` : ""
+    link ? `\nView My ShoutOuts: ${link}` : ""
   ].join("\n").trim();
   const ref = await admin.firestore().collection("inboxNotifications").add({
     recipientUid,
@@ -239,7 +239,7 @@ async function deliverFinalPaidShoutoutReceipt({
 } = {}) {
   const ownerUid = text(order.ownerUid, 160);
   const ownerEmail = text(order.customerEmail || order.ownerEmail, 200);
-  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}&v=29.09.56`;
+  const link = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(receipt.referenceNumber || "")}&id=${encodeURIComponent(shoutoutId || "")}&v=s3.0.62`;
   const inboxId = await writeFloqrInboxReceipt({
     recipientUid: ownerUid,
     recipientEmail: ownerEmail,

@@ -195,6 +195,19 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   const portalApp = readReleaseFile("patron-portal-app.js");
   assert.match(portalApp, /lang\.aiGrammar/);
   assert.match(portalApp, /floqr:ui-language/);
+  assert.match(portalApp, /shoutouts\s*:\s*["']portalShoutouts["']/);
+  assert.match(portalApp, /Open My ShoutOuts/);
+});
+
+test("paid receipt deep links open My ShoutOuts in the patron portal", () => {
+  const receipt = readReleaseFile("functions/receipt-delivery.js");
+  assert.match(receipt, /patron-portal\.html\?tab=shoutouts/);
+  assert.match(receipt, /View My ShoutOuts/);
+  const paymentReturn = readReleaseFile("payment-return.html");
+  assert.match(paymentReturn, /patron-portal\.html\?tab=shoutouts/);
+  const portal = readReleaseFile("patron-portal.html");
+  assert.match(portal, /id="portalShoutouts"/);
+  assert.match(portal, /data-panel="portalShoutouts"/);
 });
 
 test("production pages load floqr-i18n and the profile status card is translated", () => {
