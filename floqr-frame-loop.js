@@ -12,6 +12,7 @@
 
   let timer = null;
   let activeCanvas = null;
+  let lastPhase = "media";
 
   function prefersReducedMotion() {
     try {
@@ -28,6 +29,7 @@
 
   function setPhase(canvas, phase) {
     const copy = phase === "copy";
+    lastPhase = copy ? "copy" : "media";
     canvas.classList.toggle(PHASE_MEDIA, !copy);
     canvas.classList.toggle(PHASE_COPY, copy);
   }
@@ -39,14 +41,21 @@
     }
     const target = canvas || activeCanvas;
     activeCanvas = null;
+    lastPhase = "media";
     target?.classList.remove(LOOP, PHASE_MEDIA, PHASE_COPY);
   }
 
   function start(canvas, options = {}) {
-    stop(canvas);
     if (!canvas) return;
     const onAdvance = typeof options.onAdvance === "function" ? options.onAdvance : null;
     const holdMs = Number(options.holdMs) > 0 ? Number(options.holdMs) : HOLD_MS;
+    // Re-render wipes canvas classes. Keep the running phase so the shoutout frame is not skipped.
+    if (timer && activeCanvas === canvas) {
+      canvas.classList.add(LOOP);
+      setPhase(canvas, lastPhase);
+      return;
+    }
+    stop(canvas);
     activeCanvas = canvas;
     canvas.classList.add(LOOP);
     if (prefersReducedMotion()) {
