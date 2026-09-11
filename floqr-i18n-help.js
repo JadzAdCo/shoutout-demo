@@ -2,13 +2,13 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.32";
+  const VERSION = "s3.0.64";
 
   const packs = {
     ru: {
       "help-completed-shoutouts": {
         title: "Завершённые ShoutOuts",
-        body: "Завершённые ShoutOuts хранят запись оплаченных и законченных ShoutOuts. Архив сохраняет запись и убирает её из открытого списка. Сохранить как шаблон копирует текст в шаблон ShoutOut, который можно обновить позже."
+        body: "Завершённые ShoutOuts — одобренные клубом (и законченные) ShoutOuts для ваших записей. Ожидающие остаются до одобрения; после одобрения переходят сюда. История хранит 60 дней и до 10 с медиа. Архив сохраняет запись и убирает из Ожидающих. Сохранить как шаблон копирует текст в My ShoutOuts → шаблоны. Оплаченные квитанции остаются в FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Спросите FloqR через FloqAi",
@@ -146,7 +146,7 @@
     nl: {
       "help-completed-shoutouts": {
         title: "Voltooide ShoutOuts",
-        body: "Voltooide ShoutOuts bewaart een record van betaalde en afgeronde ShoutOuts. Archiveren bewaart het record en haalt het uit de open lijst. Opslaan als sjabloon kopieert de tekst naar een ShoutOut-sjabloon dat je later kunt bijwerken."
+        body: "Voltooide ShoutOuts zijn door de club goedgekeurde (en afgeronde) ShoutOuts voor je administratie. Openstaande blijven tot goedkeuring; daarna komen ze hier. Geschiedenis bewaart 60 dagen plus tot 10 met media. Archiveren bewaart het record en haalt het uit Openstaand. Opslaan als sjabloon kopieert de tekst naar My ShoutOuts → sjablonen. Betaalde bonnen blijven in FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Vraag FloqR met FloqAi",
@@ -284,7 +284,7 @@
     fr: {
       "help-completed-shoutouts": {
         title: "ShoutOuts terminés",
-        body: "ShoutOuts terminés conserve un enregistrement des ShoutOuts payés et terminés. Archiver conserve l’enregistrement et le retire de la liste ouverte. Enregistrer comme modèle copie le texte vers un modèle ShoutOut que vous pouvez mettre à jour plus tard."
+        body: "ShoutOuts terminés = ShoutOuts approuvés par le club (et terminés) pour vos archives. Les en attente restent jusqu'à approbation, puis passent ici. L'historique garde 60 jours et jusqu'à 10 avec média. Archiver conserve l'enregistrement et le retire des en attente. Enregistrer comme modèle copie le texte sous Mes ShoutOuts → modèles. Les reçus payés restent dans FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Demandez FloqR avec FloqAi",
@@ -422,7 +422,7 @@
     de: {
       "help-completed-shoutouts": {
         title: "Abgeschlossene ShoutOuts",
-        body: "Abgeschlossene ShoutOuts speichert bezahlte und abgeschlossene ShoutOuts. Archivieren behält den Nachweis und entfernt ihn aus der offenen Liste. Als Vorlage speichern kopiert den Text in eine ShoutOut-Vorlage, die Sie später aktualisieren können."
+        body: "Abgeschlossene ShoutOuts sind vom Club freigegebene (und beendete) ShoutOuts für Ihre Unterlagen. Ausstehende bleiben bis zur Freigabe; danach erscheinen sie hier. Verlauf behält 60 Tage und bis zu 10 mit Medien. Archivieren behält den Nachweis und entfernt ihn aus Ausstehend. Als Vorlage speichern kopiert den Text unter Meine ShoutOuts → Vorlagen. Bezahlte Belege bleiben in FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Fragen Sie FloqR mit FloqAi",
@@ -560,7 +560,7 @@
     es: {
       "help-completed-shoutouts": {
         title: "ShoutOuts completados",
-        body: "ShoutOuts completados guarda un registro de los ShoutOuts pagados y terminados. Archivar conserva el registro y lo quita de la lista abierta. Guardar como plantilla copia el texto a una plantilla de ShoutOut que puede actualizar después."
+        body: "ShoutOuts completados son los aprobados por el club (y terminados) para tus registros. Los pendientes esperan la aprobación; después pasan aquí. El historial guarda 60 días y hasta 10 con media. Archivar conserva el registro y lo quita de Pendientes. Guardar como plantilla copia el texto en Mis ShoutOuts → plantillas. Los recibos pagados permanecen en FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Pregunta FloqR con FloqAi",
@@ -698,7 +698,7 @@
     it: {
       "help-completed-shoutouts": {
         title: "ShoutOuts completati",
-        body: "ShoutOuts completati conserva un record degli ShoutOut pagati e completati. Archivia conserva il record e lo toglie dall’elenco aperto. Salva come modello copia il testo su un modello ShoutOut che puoi aggiornare dopo."
+        body: "ShoutOut completati sono quelli approvati dal club (e finiti) per i tuoi archivi. Quelli in attesa restano fino all'approvazione, poi passano qui. La cronologia tiene 60 giorni e fino a 10 con media. Archivia conserva il record e lo toglie da In attesa. Salva come modello copia il testo in I miei ShoutOut → modelli. Le ricevute pagate restano in FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Chiedi FloqR con FloqAi",
@@ -836,7 +836,7 @@
     pt: {
       "help-completed-shoutouts": {
         title: "ShoutOuts concluídos",
-        body: "ShoutOuts concluídos guarda um registro dos ShoutOuts pagos e concluídos. Arquivar mantém o registro e o remove da lista aberta. Salvar como modelo copia o texto para um modelo de ShoutOut que você pode atualizar depois."
+        body: "ShoutOuts concluídos são os aprovados pelo clube (e finalizados) para os seus registos. Os pendentes ficam até à aprovação; depois passam para aqui. O histórico guarda 60 dias e até 10 com mídia. Arquivar mantém o registro e remove dos Pendentes. Salvar como modelo copia o texto em Meus ShoutOuts → modelos. Recibos pagos ficam no FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Pergunte FloqR com FloqAi",
@@ -974,7 +974,7 @@
     el: {
       "help-completed-shoutouts": {
         title: "Ολοκληρωμένα ShoutOuts",
-        body: "Τα ολοκληρωμένα ShoutOuts κρατούν εγγραφή των πληρωμένων και τελειωμένων ShoutOuts. Η αρχειοθέτηση κρατά την εγγραφή και την αφαιρεί από την ανοιχτή λίστα. Η αποθήκευση ως πρότυπο αντιγράφει το κείμενο σε πρότυπο ShoutOut που μπορείτε να ενημερώσετε αργότερα."
+        body: "Τα Ολοκληρωμένα ShoutOuts είναι τα εγκεκριμένα από το club (και τελειωμένα) για τα αρχεία σας. Τα Εκκρεμή μένουν μέχρι την έγκριση· μετά μετακινούνται εδώ. Το ιστορικό κρατά 60 ημέρες και έως 10 με media. Η αρχειοθέτηση κρατά την εγγραφή και την αφαιρεί από τα Εκκρεμή. Αποθήκευση ως πρότυπο αντιγράφει το κείμενο στα ShoutOuts μου → πρότυπα. Οι πληρωμένες αποδείξεις μένουν στο FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Ρωτήστε το FloqR με το FloqAi",
@@ -1112,7 +1112,7 @@
     pl: {
       "help-completed-shoutouts": {
         title: "Zakończone ShoutOuts",
-        body: "Zakończone ShoutOuts przechowuje zapis opłaconych i zakończonych ShoutOuts. Archiwizacja zachowuje zapis i usuwa go z listy otwartych. Zapisz jako szablon kopiuje tekst do szablonu ShoutOut, który możesz później zaktualizować."
+        body: "Zakończone ShoutOuts to zatwierdzone przez klub (i zakończone) ShoutOuts do Twoich zapisów. Oczekujące czekają na zatwierdzenie; potem trafiają tutaj. Historia trzyma 60 dni i do 10 z mediami. Archiwizacja zachowuje zapis i usuwa z Oczekujących. Zapisz jako szablon kopiuje tekst do Moje ShoutOuts → szablony. Opłacone paragony zostają w FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "Zapytaj FloqR z FloqAi",
@@ -1250,7 +1250,7 @@
     ar: {
       "help-completed-shoutouts": {
         title: "ShoutOuts المكتملة",
-        body: "تحتفظ ShoutOuts المكتملة بسجل ShoutOuts المدفوعة والمنتهية. الأرشفة تحتفظ بالسجل وتزيله من القائمة المفتوحة. حفظ كقالب ينسخ النص إلى قالب ShoutOut يمكنك تحديثه لاحقًا."
+        body: "ShoutOuts المكتملة هي المعتمدة من النادي (والمنتهية) لسجلاتك. تبقى المعلقة حتى الموافقة ثم تنتقل إلى هنا. يحفظ السجل 60 يوماً وحتى 10 مع وسائط. الأرشفة تحتفظ بالسجل وتزيله من المعلقة. حفظ كقالب ينسخ النص إلى ShoutOuts الخاص بي ← القوالب. تبقى الإيصالات المدفوعة في FloqR Inbox."
       },
       "floqai-ask-floqr": {
         title: "اسأل FloqR مع FloqAi",

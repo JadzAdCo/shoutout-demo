@@ -2,10 +2,26 @@
 
 Patron-facing history is not itself a GRC control name. It supports the record those controls expect.
 
-- **SOC 2** CC7.2 / CC6.1: log user activity and changes. Completed paid ShoutOuts are the patron-visible copy of that trail.
+- **SOC 2** CC7.2 / CC6.1: log user activity and changes. Completed club-approved ShoutOuts are the patron-visible copy of that trail.
 - **ISO/IEC 27001:2022** A.8.15 logging, A.5.28 evidence, A.5.33 protection of records: archive must not delete the source row.
 - **PCI DSS** Req. 10: log payment-related actions. Store order id, amount, status, and time. Never store card numbers.
-- **GDPR** Art. 5(2) accountability and Art. 15 access: the patron can see their own paid history. Archive is retention, not erasure.
+- **GDPR** Art. 5(2) accountability and Art. 15 access: the patron can see their own history. Archive is retention, not erasure.
 - **NIST 800-53** AU-2 / AU-3 / AU-11: who, what, when, outcome, retained.
 
-Collection `patronShoutoutArchives` is create-once, owner-read, no update or delete. The shoutout document stays; `complianceArchived` only removes it from Open ShoutOuts.
+## Portal wiring (My ShoutOuts)
+
+Main tab: **My ShoutOuts** only (Templates is a sub-tab, not a top-level portal tab).
+
+| Sub-tab | Contents |
+|---|---|
+| Pending ShoutOuts | Not yet club-approved (`pending`, `pending_approval`, preview/unpaid, rejected, etc.). Paid-but-unapproved stays here. |
+| Completed ShoutOuts | Club-approved / live / finished / archived / refunded. Leaves Pending on approve. |
+| My ShoutOut Templates | Patron template variants + community variants. |
+
+Retention for Completed: last **60 days**, plus up to **10** ShoutOuts that include media. Pending is always shown.
+
+Collection `patronShoutoutArchives` is create-once, owner-read, no update or delete. The shoutout document stays; `complianceArchived` only removes it from Pending.
+
+## Receipts
+
+Paid ShoutOut **receipts must stay in FloqR Inbox** (email/SMS/PDF as configured). Inbox CTA deep-links to `patron-portal.html?tab=shoutouts` (My ShoutOuts). Do not remove Inbox delivery in favor of the portal list alone.

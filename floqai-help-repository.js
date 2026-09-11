@@ -493,13 +493,15 @@
     {
       id: "help-completed-shoutouts",
       title: "Completed ShoutOuts",
-      body: "Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later.",
+      body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Pending ShoutOuts wait until the club approves; after approval they move here. History keeps the last 60 days, plus up to 10 ShoutOuts with media. Archive keeps the record and removes it from Pending. Save as my template copies the wording onto a ShoutOut template under My ShoutOuts. Paid receipts stay in FloqR Inbox — open My ShoutOuts from the receipt to manage the ShoutOut.",
       searchPhrases: [
         "completed shoutouts", "completed shoutout", "archive shoutout", "shoutout history",
-        "paid shoutout history", "save as template", "shoutout audit"
+        "paid shoutout history", "save as template", "shoutout audit", "pending shoutouts",
+        "my shoutout templates", "shoutout receipt"
       ],
       links: [
-        {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})}
+        {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})},
+        {label: "FloqR Inbox", href: vUrl("./patron-portal.html", {from: "floqai", tab: "inbox"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalShoutouts"
