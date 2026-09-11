@@ -275,13 +275,34 @@
     document.querySelectorAll(".admin-tab").forEach(btn => btn.classList.toggle("active", !!tabPanelId && btn.dataset.panel === tabPanelId));
     document.querySelectorAll(".admin-panel-section").forEach(section => section.classList.remove("active"));
     byId(panelId)?.classList.add("active");
+    if (panelId === "portalShoutouts") {
+      // Default pending unless a deep link already chose a sub-pane.
+      const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");
+      if (!activeSub) showShoutoutPane("shoutoutPendingPane");
+    }
+  }
+
+  function showShoutoutPane(paneId) {
+    const target = String(paneId || "shoutoutPendingPane");
+    ["shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutTemplatesPane"].forEach(id => {
+      byId(id)?.classList.toggle("hidden", id !== target);
+    });
+    document.querySelectorAll("#shoutoutSubtabs .admin-subtab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.soPane === target);
+    });
   }
 
   function setupTabs() {
     document.querySelectorAll(".admin-tab[data-panel]").forEach(btn => {
       btn.addEventListener("click", () => {
         showPortalPanel(btn.dataset.panel, btn.dataset.panel);
+        if (btn.dataset.panel === "portalShoutouts") showShoutoutPane("shoutoutPendingPane");
       });
+    });
+    document.getElementById("shoutoutSubtabs")?.addEventListener("click", event => {
+      const btn = event.target?.closest?.("[data-so-pane]");
+      if (!btn) return;
+      showShoutoutPane(btn.dataset.soPane);
     });
     const tab = new URL(window.location.href).searchParams.get("tab");
     if (tab) {
@@ -304,7 +325,9 @@
         "language-settings":"portalLanguageSettings",
         "my-privacy":"portalPrivacy",
         "ai-notifications":"portalAiNotifications",
-        templates:"portalTemplateVariants",
+        // Legacy top-level Templates tab → My ShoutOuts → Templates sub-tab
+        templates:"portalShoutouts",
+        "my-templates":"portalShoutouts",
         privacy:"portalPrivacy",
         bartr:"portalBartrStore",
         commerce:"portalBartrStore",
@@ -318,7 +341,7 @@
         "service-members":"portalServiceMembers",
         servicemembers:"portalServiceMembers",
         "role-request":"portalServiceMembers",
-        // Receipts / FloqAi / modify links: ?tab=shoutouts → My ShoutOuts
+        // Receipts / FloqAi / modify links: ?tab=shoutouts → My ShoutOuts (receipts stay in Inbox)
         shoutouts:"portalShoutouts",
         myshoutouts:"portalShoutouts",
         "my-shoutouts":"portalShoutouts",
@@ -327,6 +350,12 @@
       const btn = document.querySelector(`[data-panel='${map[tab] || ""}']`);
       if (btn) btn.click();
       else if (map[tab]) showPortalPanel(map[tab], tab === "mingl-chat" ? "portalChats" : "");
+      if (map[tab] === "portalShoutouts") {
+        const sub = String(new URL(window.location.href).searchParams.get("sub") || "").trim().toLowerCase();
+        if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
+        else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+        else showShoutoutPane("shoutoutPendingPane");
+      }
     }
   }
 
@@ -426,7 +455,17 @@
     return sortBySubmittedAtDesc(owned);
   }
 
-  const SHOUTOUT_FINISHED_STATUSES = new Set(["ended", "expired", "completed", "played", "displayed"]);
+  const SHOUTOUT_FINISHED_STATUSES = new Set(["ended", "expired", "completed", "played", "displayed", "done", "finished"]);
+  const SHOUTOUT_APPROVED_OR_DONE = new Set([
+    "approved", "live", "playing", "displayed", "completed", "done", "finished",
+    "ended", "expired", "played", "archived", "refunded", "cancelled", "canceled"
+  ]);
+  const SHOUTOUT_PENDING_STATUSES = new Set([
+    "draft", "preview", "unpaid", "pending", "pending_payment", "pending_approval",
+    "awaiting_payment", "payment_pending", "rejected", "needs_revision"
+  ]);
+  const SHOUTOUT_HISTORY_DAYS = 60;
+  const SHOUTOUT_MEDIA_HISTORY_CAP = 10;
 
   function shoutoutStatus(row) {
     return String(row?.status || "pending").toLowerCase();
@@ -447,18 +486,77 @@
     const status = shoutoutStatus(row);
     if (SHOUTOUT_FINISHED_STATUSES.has(status)) return true;
     const expires = shoutoutExpiresMs(row);
-    return expires > 0 && expires < Date.now() && status !== "pending" && status !== "pending_approval";
+    return expires > 0 && expires < Date.now() && !SHOUTOUT_PENDING_STATUSES.has(status);
   }
 
-  function isCompletedShoutout(row) {
-    return shoutoutPaid(row) || shoutoutDisplayFinished(row) || shoutoutStatus(row) === "refunded";
+  function shoutoutHasMedia(row) {
+    const s = row && typeof row === "object" ? row : {};
+    return !!(
+      String(s.mediaUrl || s.photoUrl || s.imageUrl || s.backgroundUrl || s.gifUrl || s.mediaStoragePath || "").trim()
+      || String(s.mediaType || "").trim()
+      || (Array.isArray(s.media) && s.media.length)
+    );
   }
 
-  function isOpenShoutout(row) {
+  function shoutoutActivityMs(row) {
+    const s = row && typeof row === "object" ? row : {};
+    const raw = s.updatedAt || s.completedAt || s.approvedAt || s.paidAt || s.submittedAt || s.createdAt || s.archivedAt || null;
+    if (!raw) return 0;
+    if (typeof raw.toMillis === "function") {
+      try { return Number(raw.toMillis()) || 0; } catch (_) { return 0; }
+    }
+    if (typeof raw.toDate === "function") {
+      try { return raw.toDate().getTime(); } catch (_) { return 0; }
+    }
+    if (raw.seconds) return Number(raw.seconds) * 1000;
+    const n = Number(raw);
+    if (Number.isFinite(n) && n > 0) return n < 1e12 ? n * 1000 : n;
+    const parsed = Date.parse(String(raw));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  /** Pending = not yet club-approved (paid receipts can still be pending). */
+  function isPendingShoutout(row) {
     if (row?.complianceArchived) return false;
     if (shoutoutDisplayFinished(row)) return false;
     const status = shoutoutStatus(row);
-    return status === "pending" || status === "pending_approval" || status === "approved" || status === "live" || status === "preview" || !status;
+    if (SHOUTOUT_APPROVED_OR_DONE.has(status)) return false;
+    return SHOUTOUT_PENDING_STATUSES.has(status) || !status;
+  }
+
+  /** Completed = club-approved / live / finished / archived / refunded. Leaves Pending after approve. */
+  function isCompletedShoutout(row) {
+    if (row?.complianceArchived) return true;
+    const status = shoutoutStatus(row);
+    if (SHOUTOUT_APPROVED_OR_DONE.has(status)) return true;
+    if (shoutoutDisplayFinished(row)) return true;
+    return false;
+  }
+
+  /** Keep pending always; completed = last 60 days, plus up to 10 with media. */
+  function applyShoutoutHistoryRetention(rows) {
+    const list = Array.isArray(rows) ? rows.slice() : [];
+    const cutoff = Date.now() - (SHOUTOUT_HISTORY_DAYS * 24 * 60 * 60 * 1000);
+    const pending = list.filter(row => isPendingShoutout(row));
+    const completed = list
+      .filter(row => isCompletedShoutout(row) && !isPendingShoutout(row))
+      .sort((a, b) => shoutoutActivityMs(b) - shoutoutActivityMs(a));
+    const withinWindow = completed.filter(row => shoutoutActivityMs(row) >= cutoff || !shoutoutActivityMs(row));
+    const mediaRanked = completed.filter(row => shoutoutHasMedia(row));
+    const mediaKept = mediaRanked.slice(0, SHOUTOUT_MEDIA_HISTORY_CAP);
+    const mediaIds = new Set(mediaKept.map(row => String(row?.id || "")));
+    const retainedCompleted = [];
+    const seen = new Set();
+    [...withinWindow, ...mediaKept].forEach(row => {
+      const id = String(row?.id || "");
+      if (!id || seen.has(id)) return;
+      const activity = shoutoutActivityMs(row);
+      // Keep undated rows that passed withinWindow; only drop aged media outside the media cap.
+      if (shoutoutHasMedia(row) && !mediaIds.has(id) && activity > 0 && activity < cutoff) return;
+      seen.add(id);
+      retainedCompleted.push(row);
+    });
+    return [...pending, ...retainedCompleted];
   }
 
   function shoutoutAuditSnapshot(row) {
@@ -503,7 +601,7 @@
 
   function renderShoutoutQueueItem(x, index, mode) {
     const status = shoutoutStatus(x);
-    const canModify = mode === "open" && x.editable !== false && status === "pending";
+    const canModify = mode === "open" && x.editable !== false && (status === "pending" || status === "pending_approval" || status === "preview");
     const archived = !!x.complianceArchived;
     const paid = shoutoutPaid(x) ? tt("portal.paid", {}, "Paid") : tt("portal.unpaid", {}, "Unpaid");
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
@@ -3552,8 +3650,12 @@
       showPortalPanel("portalWorkCalendar", "portalWorkCalendar");
     }
     const shoutTab = String(pageParams.get("tab") || "").toLowerCase();
-    if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout"].includes(shoutTab)) {
+    if (["shoutouts", "myshoutouts", "my-shoutouts", "shoutout", "templates", "my-templates"].includes(shoutTab)) {
       showPortalPanel("portalShoutouts", "portalShoutouts");
+      const sub = String(pageParams.get("sub") || "").trim().toLowerCase();
+      if (shoutTab === "templates" || shoutTab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
+      else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+      else showShoutoutPane("shoutoutPendingPane");
     }
     const frameQuery = new URLSearchParams({
       v: window.FLOQRNav?.appVersion || "s3.0.5",
@@ -3668,20 +3770,20 @@
     ]);
     if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or BartR orders yet.</p>";
 
-    currentShoutouts = shoutouts;
-    const openShoutouts = shoutouts.filter(isOpenShoutout);
-    const completedShoutouts = shoutouts.filter(isCompletedShoutout);
-    const openHost = byId("myShoutouts");
+    currentShoutouts = applyShoutoutHistoryRetention(shoutouts);
+    const pendingShoutouts = currentShoutouts.filter(isPendingShoutout);
+    const completedShoutouts = currentShoutouts.filter(row => isCompletedShoutout(row) && !isPendingShoutout(row));
+    const pendingHost = byId("myShoutouts");
     const completedHost = byId("completedShoutouts");
-    if (openHost) {
-      openHost.innerHTML = openShoutouts.length
-        ? openShoutouts.map(x => renderShoutoutQueueItem(x, shoutouts.indexOf(x), "open")).join("")
-        : `<p class="sub">${esc(tt("portal.noOpenShoutouts", {}, "No open ShoutOuts."))}</p>`;
-      bindShoutoutListActions(openHost);
+    if (pendingHost) {
+      pendingHost.innerHTML = pendingShoutouts.length
+        ? pendingShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "open")).join("")
+        : `<p class="sub">${esc(tt("portal.noPendingShoutouts", {}, "No pending ShoutOuts."))}</p>`;
+      bindShoutoutListActions(pendingHost);
     }
     if (completedHost) {
       completedHost.innerHTML = completedShoutouts.length
-        ? completedShoutouts.map(x => renderShoutoutQueueItem(x, shoutouts.indexOf(x), "completed")).join("")
+        ? completedShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "completed")).join("")
         : `<p class="sub">${esc(tt("portal.noCompletedShoutouts", {}, "No completed ShoutOuts yet."))}</p>`;
       bindShoutoutListActions(completedHost);
     }
@@ -3689,6 +3791,10 @@
     const requestedId = params.get("id");
     const requestedRef = params.get("ref");
     const requestedItem = currentShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
+    if (requestedItem) {
+      if (isCompletedShoutout(requestedItem) && !isPendingShoutout(requestedItem)) showShoutoutPane("shoutoutCompletedPane");
+      else showShoutoutPane("shoutoutPendingPane");
+    }
     if (requestedItem && !activeShoutoutEditId && requestedItem.editable !== false && String(requestedItem.status || "pending").toLowerCase() === "pending") {
       startShoutoutEdit(requestedItem);
     } else if ((requestedId || requestedRef) && !requestedItem) {

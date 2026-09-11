@@ -33,7 +33,6 @@
         <button class="admin-tab" data-panel="portalPrivacy" type="button" data-i18n="nav.myPrivacy">My Privacy</button>
         <button class="admin-tab" data-panel="portalLanguageSettings" type="button" data-i18n="nav.languageSettings">Language Settings</button>
         <button class="admin-tab" data-panel="portalAiNotifications" type="button" data-i18n="nav.aiNotifications">AI Notification Preferences</button>
-        <button class="admin-tab" data-panel="portalTemplateVariants" type="button" data-i18n="nav.myTemplates">My ShoutOut Templates</button>
         <button class="admin-tab" data-panel="portalPublicProfile" type="button" data-i18n="nav.publicMedia">Public Media and Data Sharing</button>
         <button class="admin-tab" data-panel="portalShoutouts" type="button" data-i18n="nav.myShoutouts">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button" data-i18n="nav.guestLists">My Guest Lists</button>
@@ -215,20 +214,16 @@
         <div id="aiNotificationPreferencesMount"></div>
       </section>
 
-      <section id="portalTemplateVariants" class="admin-panel-section">
-        <div class="card">
-          <h2 data-i18n="nav.myTemplates">My ShoutOut Templates</h2>
-          <p class="sub small">Saved variants use locked official/admin template layouts. Only background values can be customized.</p>
-          <div id="myTemplateVariants" class="template-grid"></div>
-        </div>
-        <div class="card">
-          <h2>Community Templates</h2>
-          <p class="sub small">Public variants are searchable and can appear on public profiles when shared.</p>
-          <div id="communityTemplateVariants" class="template-grid"></div>
-        </div>
-      </section>
-
       <section id="portalShoutouts" class="admin-panel-section">
+        <div class="card">
+          <h2 data-i18n="nav.myShoutouts">My ShoutOuts</h2>
+          <p class="sub small" data-i18n="portal.shoutoutsRetentionNote">Pending ShoutOuts wait for club approval. After approval they move to Completed. History keeps the last 60 days, plus up to 10 ShoutOuts that include media. Paid receipts stay in FloqR Inbox.</p>
+          <div class="admin-subtabs" id="shoutoutSubtabs" role="tablist" aria-label="My ShoutOuts sections">
+            <button class="admin-subtab active" type="button" data-so-pane="shoutoutPendingPane" data-i18n="portal.pendingShoutouts">Pending ShoutOuts</button>
+            <button class="admin-subtab" type="button" data-so-pane="shoutoutCompletedPane" data-i18n="portal.completedShoutouts">Completed ShoutOuts</button>
+            <button class="admin-subtab" type="button" data-so-pane="shoutoutTemplatesPane" data-i18n="nav.myTemplates">My ShoutOut Templates</button>
+          </div>
+        </div>
         <div id="shoutoutEditCard" class="card hidden">
           <h2>Modify ShoutOut</h2>
           <p id="shoutoutEditStatus" class="sub small"></p>
@@ -252,17 +247,36 @@
           </div>
           <div id="shoutoutDiagnosticReport" class="report-block"></div>
         </div>
-        <div class="card">
-          <h2 data-i18n="nav.myShoutouts">My ShoutOuts</h2>
-          <h3 data-i18n="portal.openShoutouts">Open ShoutOuts</h3>
-          <div id="myShoutouts" class="report-block"></div>
-          <h3
-            data-i18n="portal.completedShoutouts"
-            data-floqr-help-title="Completed ShoutOuts"
-            data-floqr-help-body="Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later."
-            data-floqr-help-search="completed shoutouts|archive shoutout|shoutout history|save as template">Completed ShoutOuts</h3>
-          <p class="sub small" data-i18n="portal.completedShoutoutsNote">Paid and finished ShoutOuts stay here for your records. Archive keeps the record and removes it from the open list.</p>
-          <div id="completedShoutouts" class="report-block"></div>
+        <div id="shoutoutPendingPane" class="shoutout-so-pane">
+          <div class="card">
+            <h3 data-i18n="portal.pendingShoutouts">Pending ShoutOuts</h3>
+            <p class="sub small" data-i18n="portal.pendingShoutoutsNote">ShoutOuts that are unpaid, waiting for payment confirmation, or waiting for club approval. After approval they move to Completed.</p>
+            <div id="myShoutouts" class="report-block"></div>
+          </div>
+        </div>
+        <div id="shoutoutCompletedPane" class="shoutout-so-pane hidden">
+          <div class="card">
+            <h3
+              data-i18n="portal.completedShoutouts"
+              data-floqr-help-id="help-completed-shoutouts"
+              data-floqr-help-title="Completed ShoutOuts"
+              data-floqr-help-body="Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive keeps the record and removes it from Pending. Save as my template copies the wording onto a ShoutOut template you can update later. Paid receipts remain in FloqR Inbox."
+              data-floqr-help-search="completed shoutouts|archive shoutout|shoutout history|save as template|pending shoutouts|my shoutout templates">Completed ShoutOuts</h3>
+            <p class="sub small" data-i18n="portal.completedShoutoutsNote">Club-approved and finished ShoutOuts stay here for your records (last 60 days, and up to 10 with media). Archive keeps the record. Paid receipts stay in FloqR Inbox.</p>
+            <div id="completedShoutouts" class="report-block"></div>
+          </div>
+        </div>
+        <div id="shoutoutTemplatesPane" class="shoutout-so-pane hidden">
+          <div class="card">
+            <h3 data-i18n="nav.myTemplates">My ShoutOut Templates</h3>
+            <p class="sub small" data-i18n="portal.myTemplatesNote">Saved variants use locked official/admin template layouts. Only background values can be customized.</p>
+            <div id="myTemplateVariants" class="template-grid"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="portal.communityTemplates">Community Templates</h3>
+            <p class="sub small" data-i18n="portal.communityTemplatesNote">Public variants are searchable and can appear on public profiles when shared.</p>
+            <div id="communityTemplateVariants" class="template-grid"></div>
+          </div>
         </div>
       </section>
       <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
@@ -668,9 +682,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.52"></script>
-<script src="./floqai-help-repository.js?v=s3.0.52"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.52"></script>
+<script src="./floqr-i18n.js?v=s3.0.64"></script>
+<script src="./floqai-help-repository.js?v=s3.0.64"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.64"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -679,7 +693,7 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./patron-portal-app.js?v=s3.0.63"></script>
+<script src="./patron-portal-app.js?v=s3.0.64"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
