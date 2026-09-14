@@ -421,9 +421,17 @@ async function applyInboundDecision(clubLocationId, action, shoutoutHint = "") {
     submittedBy: item.submittedBy || "unknown",
     approvedBy: "messaging-inbound",
     referenceNumber: item.referenceNumber || "",
+    shoutoutId: doc.id,
     approvedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge: true});
-  await doc.ref.delete();
+  // Keep shoutout for patron Completed history (do not delete).
+  await doc.ref.set({
+    status: "approved",
+    approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+    approvedBy: "messaging-inbound",
+    liveContentLocationId: clubLocationId,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
   await db.collection("shoutoutAudit").add({
     shoutoutId: doc.id,
     action: "approved",

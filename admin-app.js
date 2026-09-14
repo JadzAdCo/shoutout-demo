@@ -2059,8 +2059,16 @@
 
   function adminShoutoutTextCaps(item = {}) {
     const template = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {id:item.template || item.templateId || "blackwhite", className:item.templateClassName || ""};
+    const itemSport = String(item.sport || template.sport || "").toLowerCase();
+    const isNflDual = item.nflDualLayout === true
+      || template.nflDualLayout === true
+      || template.layout === "nfl-jersey"
+      || (itemSport === "nfl" && !!(item.backgroundUrl || template.defaultBackgroundUrl));
+    const textTemplate = isNflDual
+      ? {...template, layout:"nfl-jersey", nflDualLayout:true, sport:"nfl"}
+      : template;
     const formatId = item.screenFormatId || loc.primaryDisplayScreenFormatId || "led-96x48";
-    return window.FLOQRTextLayout?.resolve?.(template, formatId) || {
+    return window.FLOQRTextLayout?.resolve?.(textTemplate, formatId) || {
       supported:true,
       formatId,
       main:Number(item.maxMainCharacters || 45),
@@ -2094,6 +2102,10 @@
   async function approve(id, item) {
     const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const textCaps = adminShoutoutTextCaps(item);
+    const itemSport = String(item.sport || "").toLowerCase();
+    const isNflDual = item.nflDualLayout === true
+      || itemSport === "nfl"
+      || String(item.template || "").toLowerCase().startsWith("nfl");
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
@@ -2102,8 +2114,17 @@
       brandName: item.brandName || loc.brandName,
       template: item.template || "neon",
       templateName: item.templateName || "",
-      mainText: fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
+      // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
+      mainText: isNflDual
+        ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
+        : fitAdminShoutoutText(item.mainText || "SHOUTOUT!", textCaps, "main"),
       subText: fitAdminShoutoutText(item.subText || "", textCaps, "sub"),
+      attribution: String(item.attribution || "").trim(),
+      includeAttribution: item.includeAttribution === true || !!String(item.attribution || "").trim(),
+      attributionChoice: item.attributionChoice || "",
+      jerseyPatronName: item.jerseyPatronName || item.jerseyName || "",
+      nflDualLayout: isNflDual,
+      sport: isNflDual ? "nfl" : (item.sport || ""),
       textLayoutVersion:window.FLOQRTextLayout?.version || "",
       textProfileId:textCaps.profileId || item.textProfileId || "full",
       maxMainCharacters:textCaps.main,
@@ -2159,12 +2180,20 @@
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
       referenceNumber: item.referenceNumber || "",
+      shoutoutId: id,
       approvedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
 
     await createStatusNotification(item,"approved","ShoutOut Approved");
     await auditShoutout(id,item,"approved");
-    await db.collection("shoutouts").doc(id).delete();
+    // Keep the shoutout document so My ShoutOuts → Completed stays populated (do not delete).
+    await db.collection("shoutouts").doc(id).set({
+      status: "approved",
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      approvedBy: safeUser(auth.currentUser),
+      liveContentLocationId: locationId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
     loadReports();
   }
 
@@ -2207,7 +2236,30 @@
       resetAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    let priorLive = {};
+    try {
+      const priorSnap = await db.collection("liveContent").doc(locationId).get();
+      priorLive = priorSnap.exists ? (priorSnap.data() || {}) : {};
+    } catch (_e) {}
     await db.collection("liveContent").doc(locationId).set(payload, {merge:false});
+    try {
+      const priorId = String(priorLive.shoutoutId || "").trim();
+      const priorRef = String(priorLive.referenceNumber || "").trim();
+      if (priorId) {
+        await db.collection("shoutouts").doc(priorId).set({
+          status: "ended",
+          endedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge: true});
+      } else if (priorRef) {
+        const prior = await db.collection("shoutouts").where("referenceNumber", "==", priorRef).limit(5).get();
+        await Promise.all(prior.docs.map(doc => doc.ref.set({
+          status: "ended",
+          endedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge: true})));
+      }
+    } catch (_e) {}
     try {
       await db.collection("shoutoutAudit").add({
         action:"reset-display-to-club-default",
@@ -2226,7 +2278,15 @@
   async function reject(id) {
     const snap = await db.collection("shoutouts").doc(id).get();
     const item = snap.exists ? snap.data() : {};
-    await db.collection("shoutouts").doc(id).delete();
+    // Keep the document for patron Completed / history (do not delete).
+    await db.collection("shoutouts").doc(id).set({
+      status: "rejected",
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      rejectedBy: safeUser(auth.currentUser),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    try { await createStatusNotification(item, "rejected", "ShoutOut Rejected"); } catch (_e) {}
+    try { await auditShoutout(id, item, "rejected"); } catch (_e) {}
     loadReports();
   }
 

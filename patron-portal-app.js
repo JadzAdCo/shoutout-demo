@@ -439,8 +439,8 @@
       ["submittedBy", "phone"]
     ]);
     // Paid Stripe shoutouts are written as shoutouts/stripe_<orderId>. Also recover via serviceOrders.
-    const orderIds = (serviceOrders || [])
-      .filter(order => String(order.orderType || "") === "shoutout")
+    const shoutoutOrders = (serviceOrders || []).filter(order => String(order.orderType || "") === "shoutout");
+    const orderIds = shoutoutOrders
       .flatMap(order => [order.fulfilledRecordId, order.id ? `stripe_${order.id}` : ""])
       .filter(Boolean);
     const fromOrders = await getDocsByIdsSafe("shoutouts", orderIds, 200);
@@ -452,17 +452,76 @@
       const byOrder = orderIds.includes(row.id);
       return byUid || byEmail || byPhone || byOrder;
     });
-    return sortBySubmittedAtDesc(owned);
+    const ownedIds = new Set(owned.map(row => String(row.id || "")));
+
+    // Patron archives (compliance) — always eligible for Completed.
+    let fromArchives = [];
+    try {
+      const archiveSnap = await db.collection("patronShoutoutArchives").where("ownerUid", "==", user.uid).limit(100).get();
+      fromArchives = archiveSnap.docs.map(doc => {
+        const data = doc.data() || {};
+        const snap = data.snapshot && typeof data.snapshot === "object" ? data.snapshot : {};
+        return {
+          id: String(data.shoutoutId || snap.shoutoutId || doc.id),
+          ...snap,
+          status: snap.status || "archived",
+          complianceArchived: true,
+          archivedAt: data.archivedAt || snap.archivedAt || null,
+          _fromArchive: true
+        };
+      });
+    } catch (_e) {}
+
+    // Legacy gap: approve used to delete shoutouts/{id}. Rebuild Completed rows from paid serviceOrders
+    // whenever the shoutout document is gone.
+    const fromPaidGhosts = shoutoutOrders
+      .filter(order => {
+        const pay = String(order.paymentStatus || order.status || "").toLowerCase();
+        return pay === "paid" || pay === "refunded" || pay === "partially-refunded";
+      })
+      .map(order => {
+        const sid = String(order.fulfilledRecordId || (order.id ? `stripe_${order.id}` : "")).trim();
+        if (!sid || ownedIds.has(sid)) return null;
+        const payload = (order.payload && order.payload.shoutout) || {};
+        const receipt = order.receipt && typeof order.receipt === "object" ? order.receipt : {};
+        return {
+          id: sid,
+          ...payload,
+          mainText: payload.mainText || order.itemName || receipt.templateName || "ShoutOut",
+          subText: payload.subText || "",
+          locationName: payload.locationName || receipt.locationName || order.locationName || "",
+          clubLocationId: payload.clubLocationId || order.clubLocationId || "",
+          template: payload.template || payload.templateId || "",
+          templateName: payload.templateName || receipt.templateName || order.itemName || "",
+          referenceNumber: payload.referenceNumber || receipt.referenceNumber || "",
+          mediaUrl: payload.mediaUrl || "",
+          mediaType: payload.mediaType || "",
+          status: "completed",
+          paymentStatus: String(order.paymentStatus || "paid").toLowerCase() === "refunded" ? "refunded" : "paid",
+          amountCents: Number(order.amountCents || payload.amountCents || receipt.amountCents || 0),
+          serviceOrderId: order.id || "",
+          invoiceNumber: order.invoiceNumber || receipt.invoiceNumber || "",
+          submittedByUid: order.ownerUid || user.uid,
+          submittedBy: String(order.ownerEmail || order.customerEmail || email || "").toLowerCase(),
+          submittedAt: order.paidAt || order.createdAt || null,
+          paidAt: order.paidAt || null,
+          completedAt: order.paidAt || order.updatedAt || order.createdAt || null,
+          _recoveredFromOrder: true
+        };
+      })
+      .filter(Boolean);
+
+    return sortBySubmittedAtDesc(uniqueRows([owned, fromArchives, fromPaidGhosts]));
   }
 
   const SHOUTOUT_FINISHED_STATUSES = new Set(["ended", "expired", "completed", "played", "displayed", "done", "finished"]);
   const SHOUTOUT_APPROVED_OR_DONE = new Set([
     "approved", "live", "playing", "displayed", "completed", "done", "finished",
-    "ended", "expired", "played", "archived", "refunded", "cancelled", "canceled"
+    "ended", "expired", "played", "archived", "refunded", "cancelled", "canceled", "rejected"
   ]);
   const SHOUTOUT_PENDING_STATUSES = new Set([
     "draft", "preview", "unpaid", "pending", "pending_payment", "pending_approval",
-    "awaiting_payment", "payment_pending", "rejected", "needs_revision"
+    "awaiting_payment", "payment_pending", "needs_revision"
   ]);
   const SHOUTOUT_HISTORY_DAYS = 60;
   const SHOUTOUT_MEDIA_HISTORY_CAP = 10;
