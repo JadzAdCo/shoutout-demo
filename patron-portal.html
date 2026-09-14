@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="portal.title">My Profile and Settings</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.32"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.66"/>
 </head>
 <body>
 <main class="app admin-shell">
@@ -221,6 +221,7 @@
           <div class="admin-subtabs" id="shoutoutSubtabs" role="tablist" aria-label="My ShoutOuts sections">
             <button class="admin-subtab active" type="button" data-so-pane="shoutoutPendingPane" data-i18n="portal.pendingShoutouts">Pending ShoutOuts</button>
             <button class="admin-subtab" type="button" data-so-pane="shoutoutCompletedPane" data-i18n="portal.completedShoutouts">Completed ShoutOuts</button>
+            <button class="admin-subtab" type="button" data-so-pane="shoutoutArchivePane" data-i18n="portal.archivedShoutouts">Archive</button>
             <button class="admin-subtab" type="button" data-so-pane="shoutoutTemplatesPane" data-i18n="nav.myTemplates">My ShoutOut Templates</button>
           </div>
         </div>
@@ -260,10 +261,21 @@
               data-i18n="portal.completedShoutouts"
               data-floqr-help-id="help-completed-shoutouts"
               data-floqr-help-title="Completed ShoutOuts"
-              data-floqr-help-body="Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive keeps the record and removes it from Pending. Save as my template copies the wording onto a ShoutOut template you can update later. Paid receipts remain in FloqR Inbox."
-              data-floqr-help-search="completed shoutouts|archive shoutout|shoutout history|save as template|pending shoutouts|my shoutout templates">Completed ShoutOuts</h3>
-            <p class="sub small" data-i18n="portal.completedShoutoutsNote">Club-approved and finished ShoutOuts stay here for your records (last 60 days, and up to 10 with media). Archive keeps the record. Paid receipts stay in FloqR Inbox.</p>
+              data-floqr-help-body="Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media. Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts remain in FloqR Inbox."
+              data-floqr-help-search="completed shoutouts|archive shoutout|shoutout history|save as template|re-use shoutout|pending shoutouts|my shoutout templates">Completed ShoutOuts</h3>
+            <p class="sub small" data-i18n="portal.completedShoutoutsNote">Club-approved and finished ShoutOuts stay here for your records (last 60 days, and up to 10 with media). Archive moves them to the Archive tab. Paid receipts stay in FloqR Inbox.</p>
             <div id="completedShoutouts" class="report-block"></div>
+          </div>
+        </div>
+        <div id="shoutoutArchivePane" class="shoutout-so-pane hidden">
+          <div class="card">
+            <h3
+              data-i18n="portal.archivedShoutouts"
+              data-floqr-help-title="Archived ShoutOuts"
+              data-floqr-help-body="Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts."
+              data-floqr-help-search="archive shoutout|archived shoutouts|compressed shoutout media">Archive</h3>
+            <p class="sub small" data-i18n="portal.archivedShoutoutsNote">Compressed history of ShoutOuts you archived from Completed. Media is kept when the original ShoutOut included it.</p>
+            <div id="archivedShoutouts" class="report-block"></div>
           </div>
         </div>
         <div id="shoutoutTemplatesPane" class="shoutout-so-pane hidden">
@@ -672,7 +684,7 @@
 <script src="./floqr-nav.js?v=s3.0.32"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
-<script src="./shared-data.js?v=29.09.120"></script>
+<script src="./shared-data.js?v=s3.0.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
@@ -682,9 +694,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.64"></script>
-<script src="./floqai-help-repository.js?v=s3.0.64"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.64"></script>
+<script src="./floqr-i18n.js?v=s3.0.66"></script>
+<script src="./floqai-help-repository.js?v=s3.0.66"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.66"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -693,7 +705,7 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./patron-portal-app.js?v=s3.0.65"></script>
+<script src="./patron-portal-app.js?v=s3.0.66"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

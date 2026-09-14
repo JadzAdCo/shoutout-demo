@@ -493,18 +493,34 @@
     {
       id: "help-completed-shoutouts",
       title: "Completed ShoutOuts",
-      body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Pending ShoutOuts wait until the club approves; after approval they move here. History keeps the last 60 days, plus up to 10 ShoutOuts with media. Archive keeps the record and removes it from Pending. Save as my template copies the wording onto a ShoutOut template under My ShoutOuts. Paid receipts stay in FloqR Inbox — open My ShoutOuts from the receipt to manage the ShoutOut.",
+      body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox.",
       searchPhrases: [
-        "completed shoutouts", "completed shoutout", "archive shoutout", "shoutout history",
-        "paid shoutout history", "save as template", "shoutout audit", "pending shoutouts",
-        "my shoutout templates", "shoutout receipt"
+        "completed shoutouts", "completed shoutout", "archive shoutout", "archived shoutouts",
+        "re-use shoutout", "reuse shoutout", "shoutout history", "paid shoutout history",
+        "save as template", "modifiable template", "IsModifiable", "pending shoutouts",
+        "my shoutout templates", "shoutout receipt", "compressed shoutout"
       ],
       links: [
         {label: "My ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts"})},
+        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
         {label: "FloqR Inbox", href: vUrl("./patron-portal.html", {from: "floqai", tab: "inbox"})}
       ],
       source: "help-repository-seed",
       page: "patron-portal.html#portalShoutouts"
+    },
+    {
+      id: "help-archived-shoutouts",
+      title: "Archived ShoutOuts",
+      body: "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive.",
+      searchPhrases: [
+        "archive shoutout", "archived shoutouts", "compressed shoutout media", "shoutout archive tab"
+      ],
+      links: [
+        {label: "Archive", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "archive"})},
+        {label: "Completed ShoutOuts", href: vUrl("./patron-portal.html", {from: "floqai", tab: "shoutouts", sub: "completed"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#shoutoutArchivePane"
     },
     {
       id: "help-schedule-confirm",

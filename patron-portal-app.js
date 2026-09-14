@@ -218,6 +218,7 @@
   let currentMessages = [];
   let messageRecipients = [];
   let currentShoutouts = [];
+  let currentArchivedShoutouts = [];
   let activeShoutoutEditId = "";
   let activePortalMinglRoomId = "";
   let portalMinglUnsubscribe = null;
@@ -284,7 +285,7 @@
 
   function showShoutoutPane(paneId) {
     const target = String(paneId || "shoutoutPendingPane");
-    ["shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutTemplatesPane"].forEach(id => {
+    ["shoutoutPendingPane", "shoutoutCompletedPane", "shoutoutArchivePane", "shoutoutTemplatesPane"].forEach(id => {
       byId(id)?.classList.toggle("hidden", id !== target);
     });
     document.querySelectorAll("#shoutoutSubtabs .admin-subtab").forEach(btn => {
@@ -354,6 +355,7 @@
         const sub = String(new URL(window.location.href).searchParams.get("sub") || "").trim().toLowerCase();
         if (tab === "templates" || tab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
         else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+        else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
         else showShoutoutPane("shoutoutPendingPane");
       }
     }
@@ -583,9 +585,9 @@
     return SHOUTOUT_PENDING_STATUSES.has(status) || !status;
   }
 
-  /** Completed = club-approved / live / finished / archived / refunded. Leaves Pending after approve. */
+  /** Completed = club-approved / live / finished / refunded / rejected. Archived rows leave Completed for the Archive tab. */
   function isCompletedShoutout(row) {
-    if (row?.complianceArchived) return true;
+    if (row?.complianceArchived || row?._fromArchive) return false;
     const status = shoutoutStatus(row);
     if (SHOUTOUT_APPROVED_OR_DONE.has(status)) return true;
     if (shoutoutDisplayFinished(row)) return true;
@@ -618,6 +620,15 @@
     return [...pending, ...retainedCompleted];
   }
 
+  function shoutoutTemplateIsModifiable(row) {
+    const id = row?.template || row?.templateId || "";
+    if (window.FLOQRTemplateFlags?.isModifiable) return !!window.FLOQRTemplateFlags.isModifiable(id || row);
+    const t = (window.SHOUTOUT_TEMPLATES || {})[id] || {};
+    if (t.IsModifiable === 0 || t.IsModifiable === false) return false;
+    if (t.IsModifiable === 1 || t.IsModifiable === true) return true;
+    return t.backgroundEditable !== false;
+  }
+
   function shoutoutAuditSnapshot(row) {
     return {
       shoutoutId: row.id || "",
@@ -632,8 +643,42 @@
       paymentStatus: row.paymentStatus || "",
       amountCents: Number(row.amountCents || 0),
       serviceOrderId: row.serviceOrderId || "",
-      screenFormatId: row.screenFormatId || ""
+      screenFormatId: row.screenFormatId || "",
+      mediaUrl: row.mediaUrl || row.photoUrl || row.imageUrl || "",
+      mediaType: row.mediaType || "",
+      backgroundUrl: row.backgroundUrl || "",
+      IsModifiable: shoutoutTemplateIsModifiable(row) ? 1 : 0
     };
+  }
+
+  async function compressImageToJpegBlob(sourceUrl, maxEdge = 720, quality = 0.55) {
+    if (!sourceUrl || typeof sourceUrl !== "string") return null;
+    if (!/^https?:/i.test(sourceUrl) && !sourceUrl.startsWith("blob:") && !sourceUrl.startsWith("data:")) return null;
+    const img = await new Promise((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Could not load media for archive compression."));
+      el.src = sourceUrl;
+    });
+    const scale = Math.min(1, maxEdge / Math.max(img.naturalWidth || img.width || 1, img.naturalHeight || img.height || 1));
+    const width = Math.max(1, Math.round((img.naturalWidth || img.width || 1) * scale));
+    const height = Math.max(1, Math.round((img.naturalHeight || img.height || 1) * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, width, height);
+    return new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+  }
+
+  async function uploadArchiveMediaBlob(user, archiveId, blob) {
+    if (!user?.uid || !blob || !firebase.storage) return { url: "", path: "" };
+    const path = `shoutouts/${user.uid}/archives/${archiveId}.jpg`;
+    const ref = firebase.storage().ref().child(path);
+    await ref.put(blob, { contentType: "image/jpeg", customMetadata: { purpose: "patron-shoutout-archive" } });
+    const url = await ref.getDownloadURL();
+    return { url, path };
   }
 
   function bindShoutoutListActions(root) {
@@ -656,22 +701,35 @@
         setText("portalStatus", err.message || "Could not save this ShoutOut template.");
       }));
     });
+    root?.querySelectorAll(".reuse-shoutout-btn").forEach(btn => {
+      btn.addEventListener("click", () => reuseCompletedShoutout(btn.dataset.shoutoutId || "").catch(err => {
+        setText("portalStatus", err.message || "Could not re-use this ShoutOut.");
+      }));
+    });
   }
 
   function renderShoutoutQueueItem(x, index, mode) {
     const status = shoutoutStatus(x);
     const canModify = mode === "open" && x.editable !== false && (status === "pending" || status === "pending_approval" || status === "preview");
-    const archived = !!x.complianceArchived;
+    const archived = !!x.complianceArchived || mode === "archive";
     const paid = shoutoutPaid(x) ? tt("portal.paid", {}, "Paid") : tt("portal.unpaid", {}, "Unpaid");
+    const canSaveTemplate = (mode === "completed" || mode === "archive") && shoutoutTemplateIsModifiable(x);
+    const canReuse = mode === "completed" || mode === "archive";
+    const mediaThumb = String(x.mediaUrl || x.archivedMediaUrl || x.photoUrl || "").trim();
+    const mediaBadge = shoutoutHasMedia(x) || mediaThumb
+      ? ` - ${esc(tt("portal.hasMedia", {}, "Media"))}`
+      : "";
     return `<div class="queue-item ${new URL(window.location.href).searchParams.get("ref") === x.referenceNumber ? "highlight-item" : ""}">
+      ${mediaThumb && mode === "archive" ? `<div class="archive-media-thumb"><img src="${esc(mediaThumb)}" alt="" loading="lazy"/></div>` : ""}
       <strong>${esc(x.mainText || "ShoutOut")}</strong>
-      <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}</p>
-      <small>${esc(fmtDate(x.submittedAt || x.paidAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
+      <p>${esc(x.locationName || x.clubName || "")} - ${esc(x.status || "pending")} - ${esc(paid)}${archived ? ` - ${esc(tt("portal.archived", {}, "Archived"))}` : ""}${mediaBadge}</p>
+      <small>${esc(fmtDate(x.submittedAt || x.paidAt || x.archivedAt))}${x.referenceNumber ? ` - Ref: ${esc(x.referenceNumber)}` : ""}</small>
       <p class="queue-actions">
         ${canModify ? `<button class="buttonlike modify-shoutout-btn" type="button" data-shoutout-index="${index}">${esc(tt("portal.modifyShoutout", {}, "Modify ShoutOut"))}</button>` : ""}
-        ${mode === "completed" ? `<button class="buttonlike save-shoutout-template-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveAsTemplate", {}, "Save as my template"))}</button>` : ""}
+        ${canReuse ? `<button class="buttonlike reuse-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.reuseShoutout", {}, "Re-Use ShoutOut"))}</button>` : ""}
+        ${canSaveTemplate ? `<button class="buttonlike save-shoutout-template-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.saveAsTemplate", {}, "Save as my template"))}</button>` : ""}
         ${mode === "completed" && !archived ? `<button class="buttonlike archive-shoutout-btn" type="button" data-shoutout-id="${esc(x.id || "")}">${esc(tt("portal.archiveShoutout", {}, "Archive"))}</button>` : ""}
-        <button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">${esc(tt("portal.diagnose", {}, "Diagnose"))}</button>
+        ${mode === "open" ? `<button class="buttonlike diagnose-shoutout-btn" type="button" data-shoutout-ref="${esc(x.referenceNumber || x.id || "")}">${esc(tt("portal.diagnose", {}, "Diagnose"))}</button>` : ""}
       </p>
     </div>`;
   }
@@ -681,33 +739,114 @@
     const user = auth.currentUser;
     const row = currentShoutouts.find(item => item.id === shoutoutId);
     if (!user || !row?.id) return;
+    setText("portalStatus", tt("portal.archiving", {}, "Archiving ShoutOut…"));
     const archiveId = `${user.uid}__${row.id}`.replace(/[^\w.-]/g, "_").slice(0, 700);
     const archiveRef = db.collection("patronShoutoutArchives").doc(archiveId);
+    const snapshot = shoutoutAuditSnapshot(row);
+    let archivedMediaUrl = "";
+    let mediaStoragePath = "";
+    const sourceMedia = String(row.mediaUrl || row.photoUrl || row.imageUrl || row.backgroundUrl || "").trim();
+    const mediaType = String(row.mediaType || "").toLowerCase();
+    if (sourceMedia && !mediaType.startsWith("video")) {
+      try {
+        const blob = await compressImageToJpegBlob(sourceMedia);
+        if (blob) {
+          const uploaded = await uploadArchiveMediaBlob(user, archiveId, blob);
+          archivedMediaUrl = uploaded.url || "";
+          mediaStoragePath = uploaded.path || "";
+        }
+      } catch (err) {
+        console.warn("archive media compression skipped", err?.message || err);
+      }
+    } else if (sourceMedia && mediaType.startsWith("video")) {
+      // Keep original video URL reference; do not re-encode (expensive). Mark as linked.
+      archivedMediaUrl = sourceMedia;
+      snapshot.mediaArchiveMode = "original-video-link";
+    }
+    if (archivedMediaUrl) {
+      snapshot.mediaUrl = archivedMediaUrl;
+      snapshot.archivedMediaUrl = archivedMediaUrl;
+      snapshot.originalMediaUrl = sourceMedia;
+      snapshot.hasMedia = true;
+    } else {
+      snapshot.hasMedia = !!sourceMedia;
+      snapshot.originalMediaUrl = sourceMedia;
+    }
+    // create-once (firestore.rules: no update/delete). Re-archive only flags the shoutout.
     const existing = await archiveRef.get();
     if (!existing.exists) {
       await archiveRef.set({
         ownerUid: user.uid,
         shoutoutId: row.id,
         retained: true,
+        compressed: true,
         reason: "patron-compliance-archive",
-        snapshot: shoutoutAuditSnapshot(row),
+        snapshot,
+        mediaStoragePath,
+        archivedMediaUrl,
+        hasMedia: !!snapshot.hasMedia,
         archivedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
-    await db.collection("shoutouts").doc(row.id).set({
-      complianceArchived: true,
-      archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      archivedByUid: user.uid,
-      archiveReason: "patron-compliance-archive"
-    }, {merge: true});
-    setText("portalStatus", tt("portal.archivedKept", {}, "Archived. The record stays in Completed ShoutOuts."));
+    if (!row._recoveredFromOrder && !row._fromArchive) {
+      try {
+        await db.collection("shoutouts").doc(row.id).set({
+          complianceArchived: true,
+          archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          archivedByUid: user.uid,
+          archiveReason: "patron-compliance-archive",
+          archivedMediaUrl: archivedMediaUrl || "",
+          archiveId
+        }, {merge: true});
+      } catch (err) {
+        console.warn("shoutout archive flag skipped", err?.message || err);
+      }
+    }
+    setText("portalStatus", tt("portal.archivedMoved", {}, "Archived. Open the Archive tab to view the compressed copy."));
     await loadPortal(user);
+    showShoutoutPane("shoutoutArchivePane");
+  }
+
+  async function reuseCompletedShoutout(shoutoutId) {
+    const user = auth.currentUser;
+    const row = currentShoutouts.find(item => item.id === shoutoutId)
+      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
+    if (!user || !row) return;
+    const draft = {
+      mainText: row.mainText || "",
+      subText: row.subText || "",
+      template: row.template || row.templateId || "blackwhite",
+      templateName: row.templateName || "",
+      locationId: row.clubLocationId || row.location || "",
+      locationName: row.locationName || row.clubName || "",
+      mediaUrl: row.mediaUrl || row.archivedMediaUrl || row.originalMediaUrl || "",
+      mediaType: row.mediaType || "",
+      backgroundUrl: row.backgroundUrl || "",
+      attribution: row.attribution || "",
+      includeAttribution: !!row.includeAttribution || !!row.attribution,
+      sourceShoutoutId: row.id || "",
+      referenceNumber: row.referenceNumber || "",
+      createdAt: Date.now()
+    };
+    try {
+      sessionStorage.setItem("FLOQR_REUSE_SHOUTOUT", JSON.stringify(draft));
+    } catch (_e) {}
+    const v = window.FLOQRNav?.appVersion || "s3.0.66";
+    const params = new URLSearchParams({ v, start: "shoutout", from: "portal-reuse" });
+    if (draft.locationId) params.set("location", draft.locationId);
+    if (draft.template) params.set("template", draft.template);
+    window.location.href = `./?${params.toString()}`;
   }
 
   async function saveCompletedShoutoutTemplate(shoutoutId) {
     const user = auth.currentUser;
-    const row = currentShoutouts.find(item => item.id === shoutoutId);
+    const row = currentShoutouts.find(item => item.id === shoutoutId)
+      || currentArchivedShoutouts.find(item => item.id === shoutoutId);
     if (!user || !row) return;
+    if (!shoutoutTemplateIsModifiable(row)) {
+      setText("portalStatus", tt("portal.templateNotModifiable", {}, "This ShoutOut template background is not modifiable, so it cannot be saved as a personal template."));
+      return;
+    }
     const variants = window.FLOQRStudio
       ? await window.FLOQRStudio.loadPatronTemplateVariants({db, uid: user.uid})
       : {mine: []};
@@ -735,6 +874,7 @@
       isPublicProfileItem: false,
       status: "active",
       lockedBaseTemplate: true,
+      IsModifiable: 1,
       allowedCustomization: ["background", "wording"],
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -3714,6 +3854,7 @@
       const sub = String(pageParams.get("sub") || "").trim().toLowerCase();
       if (shoutTab === "templates" || shoutTab === "my-templates" || sub === "templates") showShoutoutPane("shoutoutTemplatesPane");
       else if (sub === "completed") showShoutoutPane("shoutoutCompletedPane");
+      else if (sub === "archive" || sub === "archived") showShoutoutPane("shoutoutArchivePane");
       else showShoutoutPane("shoutoutPendingPane");
     }
     const frameQuery = new URLSearchParams({
@@ -3832,8 +3973,41 @@
     currentShoutouts = applyShoutoutHistoryRetention(shoutouts);
     const pendingShoutouts = currentShoutouts.filter(isPendingShoutout);
     const completedShoutouts = currentShoutouts.filter(row => isCompletedShoutout(row) && !isPendingShoutout(row));
+    currentArchivedShoutouts = (shoutouts || [])
+      .filter(row => row?._fromArchive || row?.complianceArchived)
+      .map(row => ({
+        ...row,
+        mediaUrl: row.archivedMediaUrl || row.mediaUrl || row.snapshot?.mediaUrl || "",
+        mainText: row.mainText || row.snapshot?.mainText || "ShoutOut",
+        complianceArchived: true
+      }))
+      .sort((a, b) => shoutoutActivityMs(b) - shoutoutActivityMs(a));
+    // Prefer archive collection rows when present (richer compressed media).
+    try {
+      const archiveSnap = await db.collection("patronShoutoutArchives").where("ownerUid", "==", user.uid).limit(100).get();
+      if (!archiveSnap.empty) {
+        currentArchivedShoutouts = archiveSnap.docs.map(doc => {
+          const data = doc.data() || {};
+          const snap = data.snapshot && typeof data.snapshot === "object" ? data.snapshot : {};
+          return {
+            id: String(data.shoutoutId || snap.shoutoutId || doc.id),
+            ...snap,
+            mediaUrl: data.archivedMediaUrl || snap.archivedMediaUrl || snap.mediaUrl || "",
+            archivedMediaUrl: data.archivedMediaUrl || snap.archivedMediaUrl || "",
+            originalMediaUrl: snap.originalMediaUrl || "",
+            status: "archived",
+            complianceArchived: true,
+            archivedAt: data.archivedAt || null,
+            hasMedia: data.hasMedia === true || !!data.archivedMediaUrl,
+            _fromArchive: true,
+            _archiveDocId: doc.id
+          };
+        }).sort((a, b) => shoutoutActivityMs(b) - shoutoutActivityMs(a));
+      }
+    } catch (_e) {}
     const pendingHost = byId("myShoutouts");
     const completedHost = byId("completedShoutouts");
+    const archiveHost = byId("archivedShoutouts");
     if (pendingHost) {
       pendingHost.innerHTML = pendingShoutouts.length
         ? pendingShoutouts.map(x => renderShoutoutQueueItem(x, currentShoutouts.indexOf(x), "open")).join("")
@@ -3846,12 +4020,20 @@
         : `<p class="sub">${esc(tt("portal.noCompletedShoutouts", {}, "No completed ShoutOuts yet."))}</p>`;
       bindShoutoutListActions(completedHost);
     }
+    if (archiveHost) {
+      archiveHost.innerHTML = currentArchivedShoutouts.length
+        ? currentArchivedShoutouts.map(x => renderShoutoutQueueItem(x, 0, "archive")).join("")
+        : `<p class="sub">${esc(tt("portal.noArchivedShoutouts", {}, "No archived ShoutOuts yet."))}</p>`;
+      bindShoutoutListActions(archiveHost);
+    }
     const params = new URL(window.location.href).searchParams;
     const requestedId = params.get("id");
     const requestedRef = params.get("ref");
-    const requestedItem = currentShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
+    const requestedItem = currentShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef))
+      || currentArchivedShoutouts.find(x => (requestedId && x.id === requestedId) || (requestedRef && x.referenceNumber === requestedRef));
     if (requestedItem) {
-      if (isCompletedShoutout(requestedItem) && !isPendingShoutout(requestedItem)) showShoutoutPane("shoutoutCompletedPane");
+      if (requestedItem.complianceArchived || requestedItem._fromArchive) showShoutoutPane("shoutoutArchivePane");
+      else if (isCompletedShoutout(requestedItem) && !isPendingShoutout(requestedItem)) showShoutoutPane("shoutoutCompletedPane");
       else showShoutoutPane("shoutoutPendingPane");
     }
     if (requestedItem && !activeShoutoutEditId && requestedItem.editable !== false && String(requestedItem.status || "pending").toLowerCase() === "pending") {

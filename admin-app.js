@@ -2191,6 +2191,7 @@
       status: "approved",
       approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       approvedBy: safeUser(auth.currentUser),
+      approvedByUid: auth.currentUser?.uid || "",
       liveContentLocationId: locationId,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
@@ -2262,11 +2263,11 @@
     } catch (_e) {}
     try {
       await db.collection("shoutoutAudit").add({
+        shoutoutId: `display-reset:${locationId}`,
         action:"reset-display-to-club-default",
         clubLocationId:locationId,
         actorUid:user.uid || "",
         actorEmail:safeUser(user),
-        mainText:main,
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch(e) {}

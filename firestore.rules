@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.127-demo-accounts-manifest-read
+// FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.127-demo-accounts-manifest-read
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
@@ -842,7 +843,30 @@ service cloud.firestore {
  }
 
  match /shoutoutAudit/{id} {
- allow create, read, update, delete: if signedIn();
+ allow create: if signedIn()
+ && request.resource.data.shoutoutId is string
+ && request.resource.data.action is string
+ && request.resource.data.actorUid == request.auth.uid;
+ allow read: if isMasterAdmin()
+ || (
+ signedIn()
+ && (
+ resource.data.actorUid == request.auth.uid
+ || resource.data.ownerUid == request.auth.uid
+ || resource.data.submittedByUid == request.auth.uid
+ )
+ );
+ allow update, delete: if false;
+ }
+
+ match /shoutoutComplianceLogs/{shoutoutId} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
+ }
+
+ match /shoutoutComplianceMeta/{id} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
  }
 
  match /djProfiles/{id} {
