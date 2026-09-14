@@ -200,6 +200,18 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   assert.match(portalApp, /isPendingShoutout/);
   assert.match(portalApp, /applyShoutoutHistoryRetention/);
   assert.match(portalApp, /templates\s*:\s*["']portalShoutouts["']/);
+  assert.match(portalApp, /_recoveredFromOrder/);
+  assert.match(portalApp, /patronShoutoutArchives/);
+});
+
+test("club approve keeps shoutout docs for Completed history", () => {
+  const adminApp = readReleaseFile("admin-app.js");
+  assert.match(adminApp, /status:\s*["']approved["']/);
+  assert.match(adminApp, /Keep the shoutout document so My ShoutOuts/);
+  assert.doesNotMatch(adminApp, /await db\.collection\(["']shoutouts["']\)\.doc\(id\)\.delete\(\)/);
+  const messaging = readReleaseFile("functions/messaging-functions.js");
+  assert.match(messaging, /Keep shoutout for patron Completed history/);
+  assert.doesNotMatch(messaging, /await doc\.ref\.delete\(\)/);
 });
 
 test("paid receipt deep links open My ShoutOuts in the patron portal", () => {
