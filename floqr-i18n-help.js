@@ -2,13 +2,17 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.64";
+  const VERSION = "s3.0.66";
 
   const packs = {
     ru: {
       "help-completed-shoutouts": {
         title: "Завершённые ShoutOuts",
-        body: "Завершённые ShoutOuts — одобренные клубом (и законченные) ShoutOuts для ваших записей. Ожидающие остаются до одобрения; после одобрения переходят сюда. История хранит 60 дней и до 10 с медиа. Архив сохраняет запись и убирает из Ожидающих. Сохранить как шаблон копирует текст в My ShoutOuts → шаблоны. Оплаченные квитанции остаются в FloqR Inbox."
+        body: "Завершённые ShoutOuts — одобренные клубом (и законченные) ShoutOuts для ваших записей. Архив переносит ShoutOut из Завершённых в Archive со сжатым текстом и медиа (если оно было). Повторное использование открывает Search с тем же текстом. Сохранить как шаблон доступно только если фон шаблона изменяем (IsModifiable). Оплаченные квитанции остаются в FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "Архивные ShoutOuts",
+        body: "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
       },
       "floqai-ask-floqr": {
         title: "Спросите FloqR через FloqAi",
@@ -146,7 +150,11 @@
     nl: {
       "help-completed-shoutouts": {
         title: "Voltooide ShoutOuts",
-        body: "Voltooide ShoutOuts zijn door de club goedgekeurde (en afgeronde) ShoutOuts voor je administratie. Openstaande blijven tot goedkeuring; daarna komen ze hier. Geschiedenis bewaart 60 dagen plus tot 10 met media. Archiveren bewaart het record en haalt het uit Openstaand. Opslaan als sjabloon kopieert de tekst naar My ShoutOuts → sjablonen. Betaalde bonnen blijven in FloqR Inbox."
+        body: "Voltooide ShoutOuts zijn door de club goedgekeurde (en afgeronde) ShoutOuts voor je administratie. Archiveren verplaatst een ShoutOut van Voltooid naar Archive met gecomprimeerde tekst en media (als die er was). Hergebruik opent Search met dezelfde tekst. Opslaan als sjabloon verschijnt alleen als de sjabloonachtergrond wijzigbaar is (IsModifiable). Betaalde bonnen blijven in FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "Gearchiveerde ShoutOuts",
+        body: "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
       },
       "floqai-ask-floqr": {
         title: "Vraag FloqR met FloqAi",
@@ -284,7 +292,11 @@
     fr: {
       "help-completed-shoutouts": {
         title: "ShoutOuts terminés",
-        body: "ShoutOuts terminés = ShoutOuts approuvés par le club (et terminés) pour vos archives. Les en attente restent jusqu'à approbation, puis passent ici. L'historique garde 60 jours et jusqu'à 10 avec média. Archiver conserve l'enregistrement et le retire des en attente. Enregistrer comme modèle copie le texte sous Mes ShoutOuts → modèles. Les reçus payés restent dans FloqR Inbox."
+        body: "Les ShoutOuts terminés sont les ShoutOuts approuvés par le club (et terminés) pour vos archives. Archiver déplace un ShoutOut de Terminés vers Archive avec texte et média compressés (s'il y en avait). Réutiliser ouvre Search avec le même texte. Enregistrer comme modèle apparaît seulement si l'arrière-plan du modèle est modifiable (IsModifiable). Les reçus payés restent dans FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "ShoutOuts archivés",
+        body: "Archive stocke une copie compressée du texte et du média de votre ShoutOut terminé (s'il y avait un média) dans un stockage Firebase économique, et le retire de Terminés. Ouvrez Archive à tout moment. Réutiliser fonctionne aussi depuis Archive."
       },
       "floqai-ask-floqr": {
         title: "Demandez FloqR avec FloqAi",
@@ -422,7 +434,11 @@
     de: {
       "help-completed-shoutouts": {
         title: "Abgeschlossene ShoutOuts",
-        body: "Abgeschlossene ShoutOuts sind vom Club freigegebene (und beendete) ShoutOuts für Ihre Unterlagen. Ausstehende bleiben bis zur Freigabe; danach erscheinen sie hier. Verlauf behält 60 Tage und bis zu 10 mit Medien. Archivieren behält den Nachweis und entfernt ihn aus Ausstehend. Als Vorlage speichern kopiert den Text unter Meine ShoutOuts → Vorlagen. Bezahlte Belege bleiben in FloqR Inbox."
+        body: "Abgeschlossene ShoutOuts sind vom Club freigegebene (und beendete) ShoutOuts für Ihre Unterlagen. Archivieren verschiebt einen ShoutOut von Abgeschlossen nach Archive mit komprimiertem Text und Medien (falls vorhanden). Erneut verwenden öffnet Search mit demselben Text. Als Vorlage speichern erscheint nur, wenn der Vorlagenhintergrund änderbar ist (IsModifiable). Bezahlte Belege bleiben in FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "Archivierte ShoutOuts",
+        body: "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
       },
       "floqai-ask-floqr": {
         title: "Fragen Sie FloqR mit FloqAi",
@@ -560,7 +576,11 @@
     es: {
       "help-completed-shoutouts": {
         title: "ShoutOuts completados",
-        body: "ShoutOuts completados son los aprobados por el club (y terminados) para tus registros. Los pendientes esperan la aprobación; después pasan aquí. El historial guarda 60 días y hasta 10 con media. Archivar conserva el registro y lo quita de Pendientes. Guardar como plantilla copia el texto en Mis ShoutOuts → plantillas. Los recibos pagados permanecen en FloqR Inbox."
+        body: "Los ShoutOuts completados son ShoutOuts aprobados por el club (y terminados) para tus registros. Archivar mueve un ShoutOut de Completados a Archive con texto y media comprimidos (si los había). Reutilizar abre Search con el mismo texto. Guardar como plantilla solo aparece cuando el fondo de la plantilla es modificable (IsModifiable). Los recibos pagados permanecen en FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "ShoutOuts archivados",
+        body: "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
       },
       "floqai-ask-floqr": {
         title: "Pregunta FloqR con FloqAi",
@@ -698,7 +718,11 @@
     it: {
       "help-completed-shoutouts": {
         title: "ShoutOuts completati",
-        body: "ShoutOut completati sono quelli approvati dal club (e finiti) per i tuoi archivi. Quelli in attesa restano fino all'approvazione, poi passano qui. La cronologia tiene 60 giorni e fino a 10 con media. Archivia conserva il record e lo toglie da In attesa. Salva come modello copia il testo in I miei ShoutOut → modelli. Le ricevute pagate restano in FloqR Inbox."
+        body: "Gli ShoutOut completati sono ShoutOut approvati dal club (e terminati) per i tuoi record. Archivia sposta uno ShoutOut da Completati ad Archive con testo e media compressi (se presenti). Riusa apre Search con lo stesso testo. Salva come modello appare solo se lo sfondo del modello è modificabile (IsModifiable). Le ricevute pagate restano in FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "ShoutOut archiviati",
+        body: "Archive memorizza una copia compressa del testo e dei media dello ShoutOut completato (se presenti) in storage Firebase economico e lo rimuove da Completati. Apri Archive quando vuoi. Riusa funziona anche da Archive."
       },
       "floqai-ask-floqr": {
         title: "Chiedi FloqR con FloqAi",
@@ -836,7 +860,11 @@
     pt: {
       "help-completed-shoutouts": {
         title: "ShoutOuts concluídos",
-        body: "ShoutOuts concluídos são os aprovados pelo clube (e finalizados) para os seus registos. Os pendentes ficam até à aprovação; depois passam para aqui. O histórico guarda 60 dias e até 10 com mídia. Arquivar mantém o registro e remove dos Pendentes. Salvar como modelo copia o texto em Meus ShoutOuts → modelos. Recibos pagos ficam no FloqR Inbox."
+        body: "ShoutOuts concluídos são ShoutOuts aprovados pelo clube (e finalizados) para seus registros. Arquivar move um ShoutOut de Concluídos para Archive com texto e mídia comprimidos (se houver). Reutilizar abre Search com o mesmo texto. Salvar como modelo aparece só quando o fundo do modelo é modificável (IsModifiable). Recibos pagos ficam no FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "ShoutOuts arquivados",
+        body: "Archive guarda uma cópia comprimida do texto e da mídia do seu ShoutOut concluído (se o original tinha mídia) em armazenamento Firebase econômico e remove de Concluídos. Abra Archive a qualquer momento. Reutilizar também funciona a partir de Archive."
       },
       "floqai-ask-floqr": {
         title: "Pergunte FloqR com FloqAi",
@@ -974,7 +1002,11 @@
     el: {
       "help-completed-shoutouts": {
         title: "Ολοκληρωμένα ShoutOuts",
-        body: "Τα Ολοκληρωμένα ShoutOuts είναι τα εγκεκριμένα από το club (και τελειωμένα) για τα αρχεία σας. Τα Εκκρεμή μένουν μέχρι την έγκριση· μετά μετακινούνται εδώ. Το ιστορικό κρατά 60 ημέρες και έως 10 με media. Η αρχειοθέτηση κρατά την εγγραφή και την αφαιρεί από τα Εκκρεμή. Αποθήκευση ως πρότυπο αντιγράφει το κείμενο στα ShoutOuts μου → πρότυπα. Οι πληρωμένες αποδείξεις μένουν στο FloqR Inbox."
+        body: "Τα ολοκληρωμένα ShoutOuts είναι εγκεκριμένα από το club (και τελειωμένα) για τα αρχεία σας. Η αρχειοθέτηση μεταφέρει ένα ShoutOut από Ολοκληρωμένα στο Archive με συμπιεσμένο κείμενο και media (αν υπήρχε). Η επαναχρησιμοποίηση ανοίγει Search με το ίδιο κείμενο. Αποθήκευση ως πρότυπο εμφανίζεται μόνο όταν το φόντο είναι τροποποιήσιμο (IsModifiable). Οι πληρωμένες αποδείξεις μένουν στο FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "Αρχειοθετημένα ShoutOuts",
+        body: "Το Archive αποθηκεύει συμπιεσμένο αντίγραφο κειμένου και media του ολοκληρωμένου ShoutOut (αν υπήρχε media) σε οικονομικό Firebase storage και το αφαιρεί από Ολοκληρωμένα. Ανοίξτε Archive οποτεδήποτε. Η επαναχρησιμοποίηση δουλεύει και από Archive."
       },
       "floqai-ask-floqr": {
         title: "Ρωτήστε το FloqR με το FloqAi",
@@ -1112,7 +1144,11 @@
     pl: {
       "help-completed-shoutouts": {
         title: "Zakończone ShoutOuts",
-        body: "Zakończone ShoutOuts to zatwierdzone przez klub (i zakończone) ShoutOuts do Twoich zapisów. Oczekujące czekają na zatwierdzenie; potem trafiają tutaj. Historia trzyma 60 dni i do 10 z mediami. Archiwizacja zachowuje zapis i usuwa z Oczekujących. Zapisz jako szablon kopiuje tekst do Moje ShoutOuts → szablony. Opłacone paragony zostają w FloqR Inbox."
+        body: "Zakończone ShoutOuts to zatwierdzone przez klub (i zakończone) ShoutOuts do Twojej dokumentacji. Archiwizacja przenosi ShoutOut z Zakończonych do Archive ze skompresowanym tekstem i mediami (jeśli były). Ponów otwiera Search z tym samym tekstem. Zapisz jako szablon pojawia się tylko, gdy tło szablonu jest modyfikowalne (IsModifiable). Opłacone paragony zostają w FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "Zarchiwizowane ShoutOuts",
+        body: "Archive przechowuje skompresowaną kopię tekstu i mediów zakończonego ShoutOut (jeśli media były) w niedrogim Firebase Storage i usuwa je z Zakończonych. Otwórz Archive w dowolnym momencie. Ponów działa też z Archive."
       },
       "floqai-ask-floqr": {
         title: "Zapytaj FloqR z FloqAi",
@@ -1250,7 +1286,11 @@
     ar: {
       "help-completed-shoutouts": {
         title: "ShoutOuts المكتملة",
-        body: "ShoutOuts المكتملة هي المعتمدة من النادي (والمنتهية) لسجلاتك. تبقى المعلقة حتى الموافقة ثم تنتقل إلى هنا. يحفظ السجل 60 يوماً وحتى 10 مع وسائط. الأرشفة تحتفظ بالسجل وتزيله من المعلقة. حفظ كقالب ينسخ النص إلى ShoutOuts الخاص بي ← القوالب. تبقى الإيصالات المدفوعة في FloqR Inbox."
+        body: "ShoutOuts المكتملة هي المعتمدة من النادي (والمنتهية) لسجلاتك. تنقل الأرشفة ShoutOut من المكتملة إلى Archive مع نص ووسائط مضغوطة (إن وُجدت). إعادة الاستخدام تفتح Search بنفس النص. يظهر حفظ كقالب فقط عندما تكون خلفية القالب قابلة للتعديل (IsModifiable). تبقى الإيصالات المدفوعة في FloqR Inbox."
+      },
+      "help-archived-shoutouts": {
+        title: "ShoutOuts المؤرشفة",
+        body: "يخزّن Archive نسخة مضغوطة من نص ووسائط ShoutOut المكتمل (إن وُجدت وسائط) في تخزين Firebase منخفض التكلفة ويزيله من المكتملة. افتح Archive في أي وقت. تعمل إعادة الاستخدام أيضاً من Archive."
       },
       "floqai-ask-floqr": {
         title: "اسأل FloqR مع FloqAi",

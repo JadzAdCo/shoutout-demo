@@ -1765,9 +1765,22 @@ window.FLOQRTextLayout = {
 };
 
 Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
+  const normalizeModifiable = (row) => {
+    if (row.IsModifiable === 0 || row.IsModifiable === false) {
+      row.IsModifiable = 0;
+      row.backgroundEditable = false;
+    } else if (row.IsModifiable === 1 || row.IsModifiable === true) {
+      row.IsModifiable = 1;
+      row.backgroundEditable = row.backgroundEditable !== false;
+    } else {
+      row.backgroundEditable = row.backgroundEditable !== false;
+      row.IsModifiable = row.backgroundEditable ? 1 : 0;
+    }
+  };
   if (String(template.id || key) !== key) {
     template.catalogKey = key;
     template.aliasOf = template.aliasOf || template.id;
+    normalizeModifiable(template);
     return;
   }
   window.FLOQRScreenDatapoints.classify(template);
@@ -1781,10 +1794,22 @@ Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
   template.maxCharactersPerLine = primaryTextRule.perLine;
   template.tags = Array.from(new Set([...(template.tags || []), ...template.screenFormatIds.flatMap(id => window.FLOQR_DISPLAY_FORMATS[id]?.tags || [])]));
   template.status = template.status || "active";
-  template.backgroundEditable = template.backgroundEditable !== false;
+  // Background / variant reuse: IsModifiable is the public datapoint (0|1). Mirror backgroundEditable.
+  normalizeModifiable(template);
   template.mainTextSizePercent = primaryTextRule.mainTextSizePercent;
   template.subTextSizePercent = primaryTextRule.subTextSizePercent;
 });
+
+window.FLOQRTemplateFlags = {
+  isModifiable(templateOrId) {
+    const row = typeof templateOrId === "string"
+      ? (window.SHOUTOUT_TEMPLATES?.[templateOrId] || {})
+      : (templateOrId || {});
+    if (row.IsModifiable === 0 || row.IsModifiable === false) return false;
+    if (row.IsModifiable === 1 || row.IsModifiable === true) return true;
+    return row.backgroundEditable !== false;
+  }
+};
 
 window.FLOQRAddress = {
   isUnitedStates(record = {}) {

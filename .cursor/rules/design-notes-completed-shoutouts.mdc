@@ -14,15 +14,22 @@ Main tab: **My ShoutOuts** only (Templates is a sub-tab, not a top-level portal 
 
 | Sub-tab | Contents |
 |---|---|
-| Pending ShoutOuts | Not yet club-approved (`pending`, `pending_approval`, preview/unpaid, needs_revision). Paid-but-unapproved stays here. |
-| Completed ShoutOuts | Club-approved / live / ended / finished / archived / refunded / rejected. Leaves Pending on approve or reject. |
-| My ShoutOut Templates | Patron template variants + community variants. |
+| Pending ShoutOuts | Not yet club-approved (`pending`, `pending_approval`, preview/unpaid, needs_revision). Paid-but-unapproved stays here. Diagnose stays here only. |
+| Completed ShoutOuts | Club-approved / live / ended / finished / refunded / rejected. Leaves Pending on approve or reject. **Not** `complianceArchived`. Actions: Re-Use, Archive, Save as my template (only if `IsModifiable=1`). |
+| Archive | Compressed copies from Completed. Text + optional JPEG media under `shoutouts/{uid}/archives/`. Removed from Completed display. |
+| My ShoutOut Templates | Patron template variants + community variants. Only when base template `IsModifiable=1` (background modifiable). |
 
-Retention for Completed: last **60 days**, plus up to **10** ShoutOuts that include media. Pending is always shown.
+Retention for Completed: last **60 days**, plus up to **10** ShoutOuts that include media. Pending is always shown. Archived rows leave Completed immediately.
+
+**Master Admin compliance** (separate from patron Archive): see `.cursor/rules/design-notes-master-admin-shoutouts.mdc` — `shoutoutComplianceLogs`, 7-year metadata, 90-day media purge, ShoutOuts → Completed log + Retention.
 
 **Approve must keep the shoutout document.** Club Admin / SMS approve writes `liveContent` and sets `shoutouts/{id}.status = approved` — it must **not** delete the shoutout. Deleting was why Completed looked empty for patrons (including after paid approval). Legacy paid orders whose docs were deleted are reconstructed from `serviceOrders` into Completed.
 
-Collection `patronShoutoutArchives` is create-once, owner-read, no update or delete. The shoutout document stays; `complianceArchived` only removes it from Pending.
+Collection `patronShoutoutArchives` is create-once, owner-read, no update or delete. Archive writes a compressed snapshot + optional Storage JPEG, then sets `shoutouts/{id}.complianceArchived = true` so Completed hides it. The shoutout document stays (audit). Video archives keep the original URL link (no re-encode).
+
+**Re-Use ShoutOut** stores `sessionStorage FLOQR_REUSE_SHOUTOUT` and opens Search (`start=shoutout`) with location/template; `patron-app.js` applies wording/media when the editor opens.
+
+**IsModifiable** (0|1) is required on every template (normalized from / mirrored to `backgroundEditable`). Tags alone are not enough. Save as my template is gated on this flag.
 
 ## Receipts
 

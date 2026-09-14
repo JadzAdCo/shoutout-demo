@@ -58,6 +58,13 @@
             <button class="admin-subtab" data-panel="recommendationModeration" type="button" data-i18n="master.recommendations">Unapproved Recommendations</button>
           </div>
         </div>
+        <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
+          <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOuts</button>
+          <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
+            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Completed log</button>
+            <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
+          </div>
+        </div>
         <div class="admin-tab-group" data-tab-group="security">
           <button class="admin-tab admin-tab-parent" data-group="security" type="button" aria-expanded="false" data-i18n="master.security">Security</button>
           <div class="admin-subtabs hidden" id="securitySubtabs" role="group" aria-label="Security pages">
@@ -164,6 +171,42 @@
             </div>
           </div>
           <div id="clubAdminUrlList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="shoutoutCompletedLog" class="admin-panel-section">
+        <div class="card">
+          <h2
+            data-i18n="master.shoutoutCompletedLog"
+            data-floqr-help-title="Completed ShoutOut log"
+            data-floqr-help-body="Network compliance log of completed and paid ShoutOuts for Master Admin review. Search by venue name, ShoutOut content, and date. Audit metadata is kept for 7 years. Media is deleted 90 days after completion — FloqR does not forever-archive media for compliance."
+            data-floqr-help-search="shoutout compliance|completed shoutout log|master shoutouts|audit retention">Completed log</h2>
+          <p class="sub small">SOC 2 / ISO 27001 / NIST-aligned audit metadata. Firestore search (v1): filter by date range, then venue name and content.</p>
+          <div class="profile-grid">
+            <label>Event / venue name<input id="soComplianceVenue" placeholder="Zebbies, club id, city"/></label>
+            <label>ShoutOut content<input id="soComplianceContent" placeholder="HAPPY BIRTHDAY, main text…"/></label>
+            <label>From date<input id="soComplianceFrom" type="date"/></label>
+            <label>To date<input id="soComplianceTo" type="date"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="soComplianceSearchBtn" class="primary" type="button">Search</button>
+            <button id="soComplianceRefreshBtn" type="button">Refresh</button>
+          </div>
+          <p id="soComplianceStatus" class="status"></p>
+          <div id="soComplianceResults" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="shoutoutRetention" class="admin-panel-section">
+        <div class="card">
+          <h2 data-i18n="master.shoutoutRetention">Retention</h2>
+          <p class="sub small">Audit metadata: 7 years then anonymize. Media: delete 90 days after completion. No forever media archive for compliance.</p>
+          <div class="queue-actions">
+            <button id="soRetentionRefreshBtn" type="button">Refresh policy</button>
+            <button id="soComplianceBackfillBtn" type="button">Backfill recent ShoutOuts</button>
+          </div>
+          <p id="soRetentionStatus" class="status"></p>
+          <div id="soRetentionPolicy" class="report-block"></div>
         </div>
       </section>
 
@@ -1126,7 +1169,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.28"></script>
+<script src="./floqr-i18n.js?v=s3.0.66"></script>
 <script src="./firebase-config.js?v=29.09.22"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
@@ -1145,12 +1188,13 @@
 <script src="./floqr-i18n-help.js?v=s3.0.28"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./ad-campaigns.js?v=29.09.22"></script>
+<script src="./ad-campaigns.js?v=29.09.34"></script>
 <script src="./ai-diagnostics-service.js?v=s3.0.12"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.26"></script>
+<script src="./master-admin-app.js?v=s3.0.66"></script>
+<script src="./master-admin-shoutouts.js?v=s3.0.66"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>

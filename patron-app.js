@@ -1792,6 +1792,49 @@
       return;
     }
     showPage("shoutoutLandingPage");
+    const draft = readReuseShoutoutDraft();
+    if (draft?.locationId) {
+      try {
+        await selectLocationForShoutOut(draft.locationId);
+      } catch (err) {
+        console.warn("reuse location select failed", err?.message || err);
+      }
+    }
+  }
+
+  function readReuseShoutoutDraft() {
+    try {
+      const raw = sessionStorage.getItem("FLOQR_REUSE_SHOUTOUT");
+      if (!raw) return null;
+      const draft = JSON.parse(raw);
+      if (!draft || typeof draft !== "object") return null;
+      if (draft.createdAt && Date.now() - Number(draft.createdAt) > 2 * 60 * 60 * 1000) {
+        sessionStorage.removeItem("FLOQR_REUSE_SHOUTOUT");
+        return null;
+      }
+      return draft;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  function applyReuseShoutoutDraft(options = {}) {
+    const draft = readReuseShoutoutDraft();
+    if (!draft) return false;
+    if (options.clear !== false) {
+      try { sessionStorage.removeItem("FLOQR_REUSE_SHOUTOUT"); } catch (_e) {}
+    }
+    if (draft.template) selectedTemplate = draft.template;
+    const mainInput = byId("mainText");
+    if (mainInput && draft.mainText) mainInput.value = fitTemplateText(draft.mainText || "", "main");
+    if (byId("subText") && draft.subText != null) byId("subText").value = fitTemplateText(draft.subText || "", "sub");
+    if (byId("includeAttribution")) byId("includeAttribution").checked = !!draft.includeAttribution || !!draft.attribution || !!draft.subText;
+    if (typeof syncAttribution === "function") syncAttribution();
+    if (draft.mediaUrl && byId("mediaUrl")) byId("mediaUrl").value = draft.mediaUrl;
+    if (draft.mediaUrl && byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value = draft.mediaUrl;
+    if (draft.mediaType && byId("shoutoutMediaType")) byId("shoutoutMediaType").value = draft.mediaType;
+    if (typeof updatePreview === "function") updatePreview();
+    return true;
   }
 
   async function showMinglLanding() {
@@ -2764,7 +2807,8 @@
     const loc = await loadLocationById(selectedLocationId);
     setText("selectedClubTitle", loc.locationName);
     setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
-    selectedTemplate = "blackwhite";
+    const draft = readReuseShoutoutDraft();
+    selectedTemplate = draft?.template || "blackwhite";
     selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
     selectedTemplateVariant = null;
     await loadTemplateVariants();
@@ -2786,10 +2830,15 @@
     return getLocation()?.patronTemplateBackgroundEditingEnabled !== false;
   }
   function templateBackgroundCanBeCustomized(template = {}) {
+    if (window.FLOQRTemplateFlags?.isModifiable) {
+      return clubAllowsPatronBackgroundEditing() && window.FLOQRTemplateFlags.isModifiable(template);
+    }
+    if (template.IsModifiable === 0 || template.IsModifiable === false) return false;
     return clubAllowsPatronBackgroundEditing() && template.backgroundEditable !== false;
   }
   function patronVariantAllowedAtClub(variant = {}) {
-    return clubAllowsPatronBackgroundEditing() && getTemplate(variant.baseTemplateId || "blackwhite").backgroundEditable !== false;
+    const base = getTemplate(variant.baseTemplateId || "blackwhite");
+    return templateBackgroundCanBeCustomized(base);
   }
   async function openStudioForTemplate(template) {
     if (!clubAllowsPatronBackgroundEditing()) {
@@ -3055,16 +3104,6 @@
       if (payload.stadiumMessage) url.searchParams.set("stadiumMessage", payload.stadiumMessage);
     }
     return url.href;
-  }
-  function goToEditor() {
-    const l=getLocation(), t=getTemplate();
-    setText("editorClubTitle", l.locationName);
-    setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
-    updateMediaEditorForTemplate();
-    if (isConsolidatedSoccerTemplate()) populateSoccerTeamSelect(byId("soccerTeamId")?.value || "");
-    syncSoccerJerseyFields();
-    updatePreview();
-    showPage("editorPage");
   }
   function updatePreview() {
     const frame=byId("previewFrame");
@@ -3886,7 +3925,7 @@
       const shoutoutRef = await db.collection("shoutouts").add(payload);
       payload.shoutoutId = shoutoutRef.id;
       payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.09.8`;
-      await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, ownerUid:currentUser.uid, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
       try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);
@@ -4012,7 +4051,12 @@
     setText("editorClubTitle", l.locationName);
     setText("editorTemplateMeta", `${l.locationLabel} - Template: ${selectedTemplateVariant?.variantName || t.name}`);
     updateMediaEditorForTemplate();
+    if (typeof isConsolidatedSoccerTemplate === "function" && isConsolidatedSoccerTemplate()) {
+      populateSoccerTeamSelect(byId("soccerTeamId")?.value || "");
+    }
+    if (typeof syncSoccerJerseyFields === "function") syncSoccerJerseyFields();
     syncAttribution();
+    applyReuseShoutoutDraft({ clear: true });
     updatePreview();
     showPage("editorPage");
   }

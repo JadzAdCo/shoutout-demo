@@ -210,6 +210,9 @@
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
+      if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention") {
+        window.FLOQRMasterShoutouts?.onPanel?.(panelId);
+      }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
@@ -2006,6 +2009,7 @@
       if (window.FLOQRAIDiscovery) window.FLOQRAIDiscovery.mountMasterAdminPanel({db, auth});
       if (window.FLOQRDuplicateRecords) window.FLOQRDuplicateRecords.mount({db, auth});
       if (window.FLOQRDiagnostics) window.FLOQRDiagnostics.mount({db, auth, storage});
+      if (window.FLOQRMasterShoutouts) window.FLOQRMasterShoutouts.mount();
       if (window.FLOQRAppLogging) window.FLOQRLog?.write?.({
         level: "info",
         category: "admin",

@@ -40,8 +40,22 @@ test("every published template allows patron background changes", () => {
       || String(template.id || "").startsWith("soccer")
       || template.id === "christine") {
       assert.equal(template.backgroundEditable, false, `${template.id} art background must stay locked`);
+      assert.equal(template.IsModifiable, 0, `${template.id} must expose IsModifiable=0`);
       return;
     }
     assert.equal(template.backgroundEditable, true, `${template.id} background must be editable`);
+    assert.equal(template.IsModifiable, 1, `${template.id} must expose IsModifiable=1`);
+  });
+});
+
+test("every template exposes IsModifiable as 0 or 1 datapoint", () => {
+  assert.ok(templates.length >= 30);
+  templates.forEach(template => {
+    assert.ok(template.IsModifiable === 0 || template.IsModifiable === 1, `${template.id} missing IsModifiable 0|1`);
+    assert.equal(
+      !!context.window.FLOQRTemplateFlags.isModifiable(template.id),
+      template.IsModifiable === 1,
+      `${template.id} FLOQRTemplateFlags mismatch`
+    );
   });
 });

@@ -1,7 +1,11 @@
 {
   "help-completed-shoutouts": {
     "title": "Completed ShoutOuts",
-    "body": "Completed ShoutOuts keeps a record of paid and finished ShoutOuts. Archive keeps the record and removes it from the open list. Save as my template copies the wording onto a ShoutOut template you can update later."
+    "body": "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "Archived ShoutOuts",
+    "body": "Archive stores a compressed copy of your completed ShoutOut text and media (when the original included media) in low-cost Firebase storage, and removes it from Completed. Open Archive anytime to review past ShoutOuts. Re-Use still works from Archive."
   },
   "floqai-ask-floqr": {
     "title": "Ask FloqR with FloqAi",

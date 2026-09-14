@@ -1,0 +1,64 @@
+"use strict";
+
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const compliance = require("./shoutout-compliance-functions");
+
+test("compliance retention constants match approved policy", () => {
+  assert.equal(compliance.MEDIA_RETENTION_DAYS, 90);
+  assert.equal(compliance.AUDIT_RETENTION_YEARS, 7);
+});
+
+test("buildComplianceRecord indexes venue content and media purge window", () => {
+  const row = compliance.buildComplianceRecord("abc123", {
+    status: "approved",
+    mainText: "HAPPY BIRTHDAY NYX",
+    subText: "@nyx",
+    locationName: "Zebbies Miami",
+    clubLocationId: "zebbies-miami",
+    mediaUrl: "https://firebasestorage.googleapis.com/v0/b/x/o/shoutouts%2Fuid%2Ffile.jpg?alt=media",
+    mediaType: "image/jpeg",
+    submittedAt: {toMillis: () => Date.parse("2026-01-01T00:00:00Z")},
+    approvedAt: {toMillis: () => Date.parse("2026-01-02T00:00:00Z")},
+    amountCents: 2000,
+    paymentStatus: "paid",
+    referenceNumber: "SO-1"
+  });
+  assert.equal(row.shoutoutId, "abc123");
+  assert.equal(row.venueNameLower, "zebbies miami");
+  assert.match(row.searchBlob, /happy birthday nyx/);
+  assert.equal(row.hasMedia, true);
+  assert.equal(row.mediaPurgeStatus, "pending");
+  assert.ok(row.mediaRetentionUntilMs > row.eventAtMs);
+  assert.ok(row.retentionUntilMs > row.eventAtMs);
+  assert.equal(row.complianceVersion, "s3.0.66");
+});
+
+test("master admin html nests ShoutOuts completed log and retention", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "master-admin.html"), "utf8");
+  assert.match(html, /data-tab-group="shoutouts"/);
+  assert.match(html, /data-panel="shoutoutCompletedLog"/);
+  assert.match(html, /data-panel="shoutoutRetention"/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.66/);
+  assert.match(html, /id="soComplianceVenue"/);
+  assert.match(html, /id="soComplianceContent"/);
+});
+
+test("firestore rules harden shoutoutAudit and lock compliance logs", () => {
+  const rules = fs.readFileSync(path.join(__dirname, "..", "firestore.rules"), "utf8");
+  assert.match(rules, /match \/shoutoutComplianceLogs\/\{shoutoutId\}/);
+  assert.match(rules, /allow read: if isMasterAdmin\(\);\s*\n allow create, update, delete: if false;/);
+  assert.match(rules, /match \/shoutoutAudit\/\{id\}/);
+  assert.match(rules, /allow update, delete: if false;/);
+});
+
+test("patron portal completed actions prefer Re-Use over Diagnose", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "patron-portal-app.js"), "utf8");
+  assert.match(app, /reuse-shoutout-btn/);
+  assert.match(app, /mode === "open".*diagnose-shoutout-btn/s);
+  assert.match(app, /shoutoutTemplateIsModifiable/);
+  assert.match(app, /FLOQR_REUSE_SHOUTOUT/);
+});
