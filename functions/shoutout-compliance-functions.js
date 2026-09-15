@@ -153,7 +153,11 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     ? addDays(completedMs || eventAtMs, MEDIA_RETENTION_DAYS)
     : 0;
   const retentionUntilMs = addYears(eventAtMs || Date.now(), AUDIT_RETENTION_YEARS);
-  const searchBlob = `${venueName} ${mainText} ${subText} ${clubLocationId} ${text(data.referenceNumber, 80)} ${text(data.locationLabel, 160)}`.toLowerCase();
+  const actorEmail = text(data.actorEmail || data.submittedByEmail || data.submittedBy || data.ownerEmail || "", 200).toLowerCase();
+  const actorPhone = text(data.actorPhone || data.submittedByPhone || data.phone || data.phoneNumber || "", 40);
+  const actorIdentifier = text(data.actorIdentifier || actorEmail || actorPhone || "", 200).toLowerCase();
+  const clientIp = text(data.clientIp || data.submitterIp || data.actorIp || "", 80);
+  const searchBlob = `${venueName} ${mainText} ${subText} ${clubLocationId} ${text(data.referenceNumber, 80)} ${text(data.locationLabel, 160)} ${actorIdentifier} ${clientIp}`.toLowerCase();
 
   return {
     shoutoutId: text(shoutoutId, 120),
@@ -176,6 +180,11 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     submittedByUid: text(data.submittedByUid || data.ownerUid || "", 128),
     approvedByUid: text(data.approvedByUid || "", 128),
     rejectedByUid: text(data.rejectedByUid || "", 128),
+    actorEmail,
+    actorPhone,
+    actorIdentifier,
+    clientIp,
+    ipSource: text(data.ipSource || (clientIp ? "request" : ""), 40),
     submittedAt: data.submittedAt || null,
     paidAt: data.paidAt || null,
     approvedAt: data.approvedAt || null,
@@ -199,7 +208,7 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     contentHash: contentHash(mainText, subText, shoutoutId),
     anonymized: !!data.anonymized,
     source: text(data.source || "shoutouts", 40),
-    complianceVersion: "s3.0.67",
+    complianceVersion: "s3.0.68",
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
 }
@@ -231,6 +240,12 @@ async function upsertComplianceLog(shoutoutId, data = {}, options = {}) {
     merged.submittedByUid = "";
     merged.approvedByUid = merged.approvedByUid ? "[redacted]" : "";
     merged.rejectedByUid = merged.rejectedByUid ? "[redacted]" : "";
+    merged.actorEmail = "";
+    merged.actorPhone = "";
+    merged.actorIdentifier = "[redacted]";
+    merged.clientIp = "";
+    merged.ipSource = "";
+    merged.submittedBy = "";
     merged.searchBlob = `${merged.venueName || ""} ${merged.clubLocationId || ""} ${merged.referenceNumber || ""}`.toLowerCase();
     merged.mediaUrl = "";
     merged.hasMedia = false;
@@ -307,6 +322,99 @@ function enrichVenue(data = {}, venueMap = new Map()) {
   };
 }
 
+function normalizeIp(raw = "") {
+  let ip = String(raw || "").trim();
+  if (!ip) return "";
+  if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+  return ip.slice(0, 80);
+}
+
+function extractClientIp(request) {
+  const req = request?.rawRequest || {};
+  const headers = req.headers || {};
+  const xf = String(headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const real = String(headers["x-real-ip"] || "").trim();
+  const raw = xf || real || req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || "";
+  return normalizeIp(raw);
+}
+
+function profilePhone(profile = {}) {
+  return text(profile.phone || profile.smsPhone || profile.phoneNumber || profile.mobile || profile.telephone || "", 40);
+}
+
+function profileEmail(profile = {}) {
+  return text(profile.email || "", 200).toLowerCase();
+}
+
+function actorFieldsFromSources(data = {}, profile = {}) {
+  const email = text(
+    data.actorEmail || data.submittedByEmail || data.submittedBy || data.ownerEmail || data.customerEmail || profileEmail(profile),
+    200
+  ).toLowerCase();
+  const phone = text(data.actorPhone || data.submittedByPhone || data.phone || profilePhone(profile), 40);
+  const identifier = text(email || phone, 200).toLowerCase();
+  const clientIp = normalizeIp(data.clientIp || data.submitterIp || data.actorIp || "");
+  return {
+    actorEmail: email,
+    actorPhone: phone,
+    actorIdentifier: identifier,
+    clientIp,
+    ipSource: text(data.ipSource || (clientIp ? data.ipSource || "request" : ""), 40),
+    submittedBy: email || text(data.submittedBy, 200).toLowerCase()
+  };
+}
+
+async function loadUserIdentityMap(uids = []) {
+  const unique = Array.from(new Set(uids.map((u) => text(u, 128)).filter(Boolean))).slice(0, 400);
+  const map = new Map();
+  await Promise.all(unique.map(async (uid) => {
+    try {
+      const snap = await db.collection("users").doc(uid).get();
+      if (snap.exists) map.set(uid, snap.data() || {});
+    } catch (_e) {}
+  }));
+  return map;
+}
+
+async function enrichActorIdentity(data = {}, userMap = null) {
+  const uid = text(data.submittedByUid || data.ownerUid || data.actorUid || "", 128);
+  let profile = {};
+  if (uid) {
+    if (userMap?.has(uid)) profile = userMap.get(uid) || {};
+    else {
+      try {
+        const snap = await db.collection("users").doc(uid).get();
+        profile = snap.exists ? snap.data() || {} : {};
+      } catch (_e) {}
+    }
+  }
+  return {...data, ...actorFieldsFromSources(data, profile)};
+}
+
+async function resolveIpFromAppLogs(uid = "", shoutoutId = "", referenceNumber = "") {
+  const ownerUid = text(uid, 128);
+  if (!ownerUid) return {clientIp: "", ipSource: ""};
+  try {
+    const snap = await db.collection("appLogs")
+      .where("uid", "==", ownerUid)
+      .orderBy("createdAt", "desc")
+      .limit(40)
+      .get();
+    for (const doc of snap.docs) {
+      const row = doc.data() || {};
+      const details = row.details && typeof row.details === "object" ? row.details : {};
+      const ip = normalizeIp(row.clientIp || details.clientIp || "");
+      if (!ip) continue;
+      const blob = `${details.shoutoutId || ""} ${details.orderId || ""} ${details.referenceNumber || ""} ${row.correlationId || ""}`.toLowerCase();
+      const needle = text(shoutoutId || referenceNumber, 120).toLowerCase();
+      if (!needle || blob.includes(needle) || ["checkout", "shoutout"].includes(text(row.category, 40).toLowerCase())) {
+        return {clientIp: ip, ipSource: "appLogs"};
+      }
+    }
+  } catch (_e) {}
+  return {clientIp: "", ipSource: ""};
+}
+
 function parseInboxBodyFields(body = "") {
   const textBody = String(body || "");
   const pick = (label) => {
@@ -347,7 +455,13 @@ async function collectReconstructCandidates(limit = 300) {
   shoutSnap.docs.forEach((doc) => {
     const data = enrichVenue(doc.data() || {}, venueMap);
     if (!shouldIndexShoutout(data)) return;
-    mergeByShoutoutId(byId, doc.id, {...data, source: "shoutouts"});
+    mergeByShoutoutId(byId, doc.id, {
+      ...data,
+      actorEmail: text(data.submittedBy || data.actorEmail, 200).toLowerCase(),
+      clientIp: normalizeIp(data.clientIp || data.submitterIp || ""),
+      ipSource: text(data.ipSource || (data.clientIp ? "shoutouts" : ""), 40),
+      source: "shoutouts"
+    });
   });
 
   const auditSnap = await db.collection("shoutoutAudit").orderBy("createdAt", "desc").limit(Math.min(1500, limit * 4)).get().catch(async () => {
@@ -381,6 +495,9 @@ async function collectReconstructCandidates(limit = 300) {
       submittedByUid: text(submitted?.actorUid || latest.ownerUid || "", 128),
       approvedByUid: text(approved?.actorUid || "", 128),
       rejectedByUid: text(rejected?.actorUid || "", 128),
+      actorEmail: text(submitted?.actorEmail || latest.actorEmail || approved?.actorEmail || "", 200).toLowerCase(),
+      clientIp: normalizeIp(submitted?.clientIp || latest.clientIp || ""),
+      ipSource: text(submitted?.clientIp || latest.clientIp ? "shoutoutAudit" : "", 40),
       submittedAt: submitted?.createdAt || null,
       approvedAt: approved?.createdAt || null,
       rejectedAt: rejected?.createdAt || null,
@@ -417,12 +534,26 @@ async function collectReconstructCandidates(limit = 300) {
       clubLocationId: text(row.clubLocationId, 120),
       locationName: text(row.locationName || parsed.locationName, 160),
       templateName: text(row.templateName || parsed.templateName, 120),
+      actorEmail: text(row.recipientEmail || "", 200).toLowerCase(),
+      submittedByUid: text(row.recipientUid || "", 128),
       paidAt: row.paidAtIso ? new Date(row.paidAtIso) : row.createdAt || null,
       submittedAt: row.createdAt || null,
       source: "inboxNotifications"
     }, venueMap);
     mergeByShoutoutId(byId, shoutoutId, patch);
   });
+
+  const userMap = await loadUserIdentityMap(
+    Array.from(byId.values()).map((row) => row.submittedByUid || row.ownerUid || "")
+  );
+  for (const [shoutoutId, data] of byId.entries()) {
+    let enriched = await enrichActorIdentity(data, userMap);
+    if (!enriched.clientIp) {
+      const fromLogs = await resolveIpFromAppLogs(enriched.submittedByUid, shoutoutId, enriched.referenceNumber);
+      if (fromLogs.clientIp) enriched = {...enriched, ...fromLogs};
+    }
+    byId.set(shoutoutId, enriched);
+  }
 
   return {byId, venueMap, scanned: {
     shoutouts: shoutSnap.size,
@@ -438,7 +569,61 @@ const onShoutoutComplianceWrite = onDocumentWritten("shoutouts/{shoutoutId}", as
   const data = after.data() || {};
   if (!shouldIndexShoutout(data)) return;
   const venueMap = await loadVenueMap();
-  await upsertComplianceLog(shoutoutId, enrichVenue({...data, source: "shoutouts"}, venueMap));
+  let enriched = await enrichActorIdentity(enrichVenue({...data, source: "shoutouts"}, venueMap));
+  if (!enriched.clientIp) {
+    const fromLogs = await resolveIpFromAppLogs(enriched.submittedByUid, shoutoutId, enriched.referenceNumber);
+    if (fromLogs.clientIp) enriched = {...enriched, ...fromLogs};
+  }
+  await upsertComplianceLog(shoutoutId, enriched);
+});
+
+const stampShoutoutActorContext = onCall({region: "us-central1"}, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const shoutoutId = text(request.data?.shoutoutId, 120);
+  if (!shoutoutId) throw new HttpsError("invalid-argument", "shoutoutId is required.");
+  const snap = await db.collection("shoutouts").doc(shoutoutId).get();
+  if (!snap.exists) throw new HttpsError("not-found", "ShoutOut not found.");
+  const data = snap.data() || {};
+  const ownerUid = text(data.submittedByUid || data.ownerUid, 128);
+  const email = emailOf(request.auth);
+  const isOwner = ownerUid && ownerUid === request.auth.uid;
+  const isMaster = request.auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  if (!isOwner && !isMaster) throw new HttpsError("permission-denied", "Only the submitter or Master Admin can stamp actor context.");
+  const clientIp = extractClientIp(request);
+  const actor = await enrichActorIdentity({
+    ...data,
+    submittedByUid: ownerUid || request.auth.uid,
+    actorEmail: text(data.submittedBy || request.auth.token?.email || email, 200).toLowerCase(),
+    clientIp,
+    ipSource: clientIp ? "callable" : "",
+    source: "stampShoutoutActorContext"
+  });
+  const patch = {
+    clientIp: actor.clientIp,
+    ipSource: actor.ipSource,
+    actorEmail: actor.actorEmail,
+    actorPhone: actor.actorPhone,
+    actorIdentifier: actor.actorIdentifier,
+    submittedBy: actor.submittedBy || actor.actorEmail,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+  await db.collection("shoutouts").doc(shoutoutId).set(patch, {merge: true});
+  await upsertComplianceLog(shoutoutId, {...data, ...actor, ...patch});
+  try {
+    await db.collection("appLogs").add({
+      level: "info",
+      category: "shoutout",
+      action: "actor_context_stamped",
+      message: "ShoutOut actor IP/identity stamped for compliance",
+      details: {shoutoutId, referenceNumber: text(data.referenceNumber, 80), clientIp: actor.clientIp},
+      uid: request.auth.uid,
+      email: actor.actorEmail,
+      clientIp: actor.clientIp,
+      source: "functions",
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (_e) {}
+  return {ok: true, shoutoutId, clientIp: actor.clientIp, actorIdentifier: actor.actorIdentifier};
 });
 
 const purgeExpiredShoutoutMedia = onSchedule({
@@ -567,9 +752,11 @@ module.exports = {
   TERMINAL_STATUSES,
   shouldIndexShoutout,
   lifecyclePhase,
+  actorFieldsFromSources,
   buildComplianceRecord,
   upsertComplianceLog,
   onShoutoutComplianceWrite,
+  stampShoutoutActorContext,
   purgeExpiredShoutoutMedia,
   anonymizeExpiredComplianceLogs,
   backfillShoutoutComplianceLogs,

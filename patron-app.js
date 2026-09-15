@@ -3926,6 +3926,11 @@
       payload.shoutoutId = shoutoutRef.id;
       payload.modifyLink = `./patron-portal.html?tab=shoutouts&ref=${encodeURIComponent(payload.referenceNumber)}&id=${encodeURIComponent(shoutoutRef.id)}&v=29.09.8`;
       await db.collection("shoutoutAudit").add({shoutoutId:shoutoutRef.id, action:"submitted", referenceNumber:payload.referenceNumber, ownerUid:currentUser.uid, actorUid:currentUser.uid, actorEmail:safeUser(), createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      try {
+        await firebase.app().functions("us-central1").httpsCallable("stampShoutoutActorContext")({shoutoutId: shoutoutRef.id});
+      } catch (stampErr) {
+        console.warn("stampShoutoutActorContext skipped", stampErr?.message || stampErr);
+      }
       try { await db.collection("shoutoutRecommendations").add({source:"submission", sourceType:"patron-submission", status:"pending", rightsStatus:"review-required", rightsNote:"Patron-submitted wording; Master Admin review is required before reuse.", uid:currentUser.uid, template:payload.template, mainText:payload.mainText, subText:payload.subText, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } catch(e) {}
       if (window.createShoutOutSubmissionNotification) await window.createShoutOutSubmissionNotification(payload);
       showShoutoutConfirmation(payload, l, t);

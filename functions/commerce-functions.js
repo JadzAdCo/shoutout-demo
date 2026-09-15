@@ -122,6 +122,16 @@ function callableErrorFields(error) {
   };
 }
 
+function extractClientIp(request) {
+  const req = request?.rawRequest || {};
+  const headers = req.headers || {};
+  const xf = String(headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const real = String(headers["x-real-ip"] || "").trim();
+  let ip = String(xf || real || req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || "").trim();
+  if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+  return ip.slice(0, 80);
+}
+
 function stripeClient() {
   const key = STRIPE_SECRET_KEY.value();
   if (!key) throw new HttpsError("failed-precondition", "Stripe checkout is not configured. Set STRIPE_SECRET_KEY in Firebase Functions.");
@@ -1017,6 +1027,8 @@ exports.createFloqrCheckoutSession = onCall({
       orderType:type,
       ownerUid:request.auth.uid,
       ownerEmail:text(request.auth.token?.email, 200),
+      clientIp:extractClientIp(request),
+      ipSource:"checkout-callable",
       status:"checkout-created",
       paymentStatus:"unpaid",
       currency:"usd",
@@ -1029,6 +1041,18 @@ exports.createFloqrCheckoutSession = onCall({
       createdAt:now,
       updatedAt:now
     };
+    if (type === "shoutout" && payload?.shoutout) {
+      order.payload = {
+        ...payload,
+        shoutout:{
+          ...payload.shoutout,
+          clientIp:order.clientIp,
+          ipSource:"checkout-callable",
+          actorEmail:text(payload.shoutout.submittedBy || request.auth.token?.email, 200).toLowerCase(),
+          submittedByUid:text(payload.shoutout.submittedByUid || request.auth.uid, 120)
+        }
+      };
+    }
     if (type === "shoutout" && payload?.shoutout) {
       order.receipt = buildTempShoutoutReceipt({
         shoutout:payload.shoutout,
@@ -1713,6 +1737,9 @@ async function finalizePaidOrder(orderId, session) {
       // Patron history wiring: always stamp owner identity (never rely on client-only fields).
       submittedByUid:text(shoutout.submittedByUid || order.ownerUid, 120) || text(order.ownerUid, 120),
       submittedBy:text(shoutout.submittedBy || order.ownerEmail || order.customerEmail, 200).toLowerCase(),
+      actorEmail:text(shoutout.actorEmail || shoutout.submittedBy || order.ownerEmail || order.customerEmail, 200).toLowerCase(),
+      clientIp:text(shoutout.clientIp || order.clientIp, 80),
+      ipSource:text(shoutout.ipSource || order.ipSource || (order.clientIp ? "checkout-order" : ""), 40),
       submittedAt:paidAt,
       paidAt,
       paidAtIso,

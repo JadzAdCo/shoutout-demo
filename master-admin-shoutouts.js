@@ -185,6 +185,7 @@
       return `<div class="queue-item">
         <strong>${esc(row.mainText || row.referenceNumber || "ShoutOut")}</strong>
         <p>${esc(row.venueName || row.clubLocationId || "Venue")} — ${esc(row.lifecyclePhase || row.status || "")} — ${esc(row.status || "")} — ${esc(row.paymentStatus || "")} — $${((Number(row.amountCents || 0) || 0) / 100).toFixed(2)}</p>
+        <p class="sub small">Actor ${esc(row.actorIdentifier || row.actorEmail || row.actorPhone || row.submittedByUid || "—")}${row.clientIp ? ` · IP ${esc(row.clientIp)}` : " · IP —"}${row.ipSource ? ` (${esc(row.ipSource)})` : ""}</p>
         <small>Ref ${esc(row.referenceNumber || row.shoutoutId || row.id)} · Event ${esc(fmtDate(row.eventAt || row.eventAtMs))} · ${mediaNote}${row.legalHold ? " · LEGAL HOLD" : ""}${row.anonymized ? " · anonymized" : ""}${row.source ? ` · source ${esc(row.source)}` : ""}</small>
         ${row.subText ? `<p class="sub small">${esc(row.subText)}</p>` : ""}
         ${mediaLink}

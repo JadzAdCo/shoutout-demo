@@ -17,6 +17,7 @@ module.exports = {
   anonymizeExpiredComplianceLogs: require("./shoutout-compliance-functions").anonymizeExpiredComplianceLogs,
   backfillShoutoutComplianceLogs: require("./shoutout-compliance-functions").backfillShoutoutComplianceLogs,
   getShoutoutComplianceRetention: require("./shoutout-compliance-functions").getShoutoutComplianceRetention,
+  stampShoutoutActorContext: require("./shoutout-compliance-functions").stampShoutoutActorContext,
   setPatronFeatureGates: featureGateFns.setPatronFeatureGates,
   setEntityAppEnabled: featureGateFns.setEntityAppEnabled,
   setVenueFeatureGates: featureGateFns.setVenueFeatureGates,

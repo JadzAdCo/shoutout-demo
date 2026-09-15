@@ -46,6 +46,13 @@ Tab group **ShoutOuts**:
 - `shoutoutComplianceMeta/retention` — purge / backfill stamps
 - `shoutoutAudit/{id}` — create + limited read; no update/delete
 
-## Indexed lifecycle
+## Actor identity + IP
 
-submitted / pending / pending_approval / paid / approved / rejected / cancelled / completed / stale (plus payment paid).
+| Field | Source |
+|---|---|
+| `actorEmail` / `actorPhone` / `actorIdentifier` | shoutout `submittedBy`, `shoutoutAudit.actorEmail`, Inbox `recipientEmail`, `users/{uid}` email/phone |
+| `clientIp` / `ipSource` | checkout callable (`serviceOrders.clientIp` → paid shoutout), `stampShoutoutActorContext` for free submits, optional `appLogs.clientIp` when present |
+
+Display security logs (`displayAccessLogs`) are board/kiosk IPs — not used as the patron submitter IP.
+
+Historical rows may show email/phone after Rebuild even when IP is blank (IP was not stored before this pass).
