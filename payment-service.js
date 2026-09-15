@@ -71,14 +71,30 @@
     requireUser();
     const correlationId = window.FLOQRLog?.correlationId?.("chk") || `chk_${Date.now().toString(36)}`;
     status?.("Opening secure Stripe checkout…");
+    try { await window.FLOQRClientIp?.ensure?.(); } catch (_e) {}
+    const sessionIp = window.FLOQRClientIp?.patchPayload?.({}) || window.FLOQRClientIp?.current?.() || {};
+    let checkoutPayload = payload;
+    if (payload?.shoutout && typeof payload.shoutout === "object") {
+      checkoutPayload = {
+        ...payload,
+        shoutout: window.FLOQRClientIp?.patchPayload?.(payload.shoutout) || {
+          ...payload.shoutout,
+          clientIp: sessionIp.clientIp || payload.shoutout.clientIp || "",
+          ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : (payload.shoutout.ipSource || "")
+        }
+      };
+    } else if (sessionIp.clientIp) {
+      checkoutPayload = window.FLOQRClientIp?.patchPayload?.(payload) || {...payload, ...sessionIp};
+    }
     await logClient("info", "checkout_start", `Starting ${orderType || "order"} checkout`, {
       orderType,
-      clubLocationId: payload?.clubLocationId || payload?.shoutout?.clubLocationId || "",
-      template: payload?.shoutout?.template || ""
+      clubLocationId: checkoutPayload?.clubLocationId || checkoutPayload?.shoutout?.clubLocationId || "",
+      template: checkoutPayload?.shoutout?.template || "",
+      clientIp: sessionIp.clientIp || checkoutPayload?.shoutout?.clientIp || ""
     }, correlationId);
     try {
       const returnBase = new URL(".", window.location.href).href;
-      const response = await callable("createFloqrCheckoutSession")({orderType, payload, returnBase, correlationId});
+      const response = await callable("createFloqrCheckoutSession")({orderType, payload: checkoutPayload, returnBase, correlationId});
       const result = response?.data || {};
       if (!result.checkoutUrl) throw new Error("Stripe checkout did not return a secure payment link.");
       await logClient("info", "checkout_redirect", redirect ? "Redirecting to Stripe Checkout" : "Checkout session ready (deferred redirect)", {
