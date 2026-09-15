@@ -2102,18 +2102,22 @@
   async function approve(id, item) {
     const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
     const textCaps = adminShoutoutTextCaps(item);
-    const itemSport = String(item.sport || "").toLowerCase();
+    const packaged = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {};
+    const itemSport = String(item.sport || packaged.sport || "").toLowerCase();
     const isNflDual = item.nflDualLayout === true
+      || packaged.nflDualLayout === true
+      || packaged.layout === "nfl-jersey"
       || itemSport === "nfl"
       || String(item.template || "").toLowerCase().startsWith("nfl");
     if (textCaps.supported === false) throw new Error(textCaps.advice || "This template is not supported on the selected display size.");
+    const resolvedBackgroundUrl = item.backgroundUrl || packaged.defaultBackgroundUrl || "";
     await db.collection("liveContent").doc(locationId).set({
       location: locationId,
       clubLocationId: locationId,
       locationName: item.locationName || loc.locationName,
       brandName: item.brandName || loc.brandName,
       template: item.template || "neon",
-      templateName: item.templateName || "",
+      templateName: item.templateName || packaged.name || "",
       // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
       mainText: isNflDual
         ? String(item.mainText || "SHOUTOUT!").trim().slice(0, Number(textCaps.main || 64))
@@ -2124,7 +2128,12 @@
       attributionChoice: item.attributionChoice || "",
       jerseyPatronName: item.jerseyPatronName || item.jerseyName || "",
       nflDualLayout: isNflDual,
-      sport: isNflDual ? "nfl" : (item.sport || ""),
+      sport: isNflDual ? "nfl" : (item.sport || packaged.sport || ""),
+      layout: isNflDual ? "nfl-jersey" : (item.layout || packaged.layout || ""),
+      jerseyPrimary: item.jerseyPrimary || packaged.jerseyPrimary || "",
+      jerseySecondary: item.jerseySecondary || packaged.jerseySecondary || "",
+      jerseyAccent: item.jerseyAccent || packaged.jerseyAccent || packaged.jerseySecondary || "",
+      jerseyTeamLabel: item.jerseyTeamLabel || packaged.jerseyTeamLabel || "",
       textLayoutVersion:window.FLOQRTextLayout?.version || "",
       textProfileId:textCaps.profileId || item.textProfileId || "full",
       maxMainCharacters:textCaps.main,
@@ -2170,7 +2179,7 @@
       templateVariantName: item.templateVariantName || "",
       lockedBaseTemplateId: item.lockedBaseTemplateId || "",
       backgroundType: item.backgroundType || "",
-      backgroundUrl: item.backgroundUrl || "",
+      backgroundUrl: resolvedBackgroundUrl,
       backgroundColor: item.backgroundColor || "",
       backgroundGradient: item.backgroundGradient || "",
       backgroundStoragePath: item.backgroundStoragePath || "",
