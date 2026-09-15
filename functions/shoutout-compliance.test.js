@@ -10,6 +10,7 @@ const compliance = require("./shoutout-compliance-functions");
 test("compliance retention constants match approved policy", () => {
   assert.equal(compliance.MEDIA_RETENTION_DAYS, 90);
   assert.equal(compliance.AUDIT_RETENTION_YEARS, 7);
+  assert.equal(compliance.UI_DEFAULT_SEARCH_DAYS, 60);
 });
 
 test("buildComplianceRecord indexes venue content and media purge window", () => {
@@ -32,9 +33,19 @@ test("buildComplianceRecord indexes venue content and media purge window", () =>
   assert.match(row.searchBlob, /happy birthday nyx/);
   assert.equal(row.hasMedia, true);
   assert.equal(row.mediaPurgeStatus, "pending");
+  assert.equal(row.lifecyclePhase, "completed");
   assert.ok(row.mediaRetentionUntilMs > row.eventAtMs);
   assert.ok(row.retentionUntilMs > row.eventAtMs);
-  assert.equal(row.complianceVersion, "s3.0.66");
+  assert.equal(row.complianceVersion, "s3.0.67");
+});
+
+test("shouldIndexShoutout covers submitted and rejected lifecycle", () => {
+  assert.equal(compliance.shouldIndexShoutout({status: "pending", referenceNumber: "SO-1"}), true);
+  assert.equal(compliance.shouldIndexShoutout({status: "rejected"}), true);
+  assert.equal(compliance.shouldIndexShoutout({status: "approved"}), true);
+  assert.equal(compliance.shouldIndexShoutout({status: "stale"}), true);
+  assert.equal(compliance.lifecyclePhase("rejected"), "rejected");
+  assert.equal(compliance.lifecyclePhase("pending_approval", "paid"), "submitted_paid");
 });
 
 test("master admin html nests ShoutOuts completed log and retention", () => {
@@ -42,8 +53,11 @@ test("master admin html nests ShoutOuts completed log and retention", () => {
   assert.match(html, /data-tab-group="shoutouts"/);
   assert.match(html, /data-panel="shoutoutCompletedLog"/);
   assert.match(html, /data-panel="shoutoutRetention"/);
-  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.66/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.67/);
   assert.match(html, /id="soComplianceVenue"/);
+  assert.match(html, /id="soComplianceVenueList"/);
+  assert.match(html, /id="soComplianceStatusFilter"/);
+  assert.match(html, /id="soComplianceRebuildBtn"/);
   assert.match(html, /id="soComplianceContent"/);
 });
 
@@ -61,4 +75,12 @@ test("patron portal completed actions prefer Re-Use over Diagnose", () => {
   assert.match(app, /mode === "open".*diagnose-shoutout-btn/s);
   assert.match(app, /shoutoutTemplateIsModifiable/);
   assert.match(app, /FLOQR_REUSE_SHOUTOUT/);
+});
+
+test("master admin shoutouts loads venues from clubLocations", () => {
+  const js = fs.readFileSync(path.join(__dirname, "..", "master-admin-shoutouts.js"), "utf8");
+  assert.match(js, /clubLocations/);
+  assert.match(js, /soComplianceVenueList/);
+  assert.match(js, /backfillShoutoutComplianceLogs/);
+  assert.match(js, /startOfDayInput\(60\)/);
 });
