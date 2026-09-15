@@ -7,19 +7,21 @@ alwaysApply: true
 
 **One silhouette.** Philadelphia Eagles elite cut (V-neck, short sleeves with cuff bands, upper-back nameplate, mesh fabric). Solid `#000` (LED energy). No hanger on photo backs.
 
-**Scale lock:** neckline pinned to the top. Height = prior 103.5% × **0.9** (−10% length) → `background-size: auto 93.15%`; width **+15%** via cumulative `transform: scaleX(1.3225)` (1.15×1.15) on `.display-background`. Font caps: name ~**7.04vh** (+10% from 6.4), number ~**27vh** (−10% from 30).
+**Scale lock:** neckline pinned to the top. Height stays `background-size: auto 93.15%` (length unchanged). Width is cumulative `transform: scaleX(1.520875)` (1.15³) on `.display-background` — widen only, never change height. Font caps: name ~**7.04vh**, number ~**27vh**.
 
 **Helmet:** Optional side mascot/helmet in PNG only after jersey stack is locked; must not touch the right sleeve.
 
 **Wordmark:** baked into the PNG only (club on nameplate), **almost on the inner collar / shoulder** — minimal green gap under the collar. Upright athletic block caps. CSS hides `.soccer-jersey-team` on photo kits.
 
-**Patron name (CSS):** just under the baked nameplate, base `top` ~19% + `var(--nfl-photo-stack-y)` (96× ~18%, 64×48 ~19%, 64×32 ~17%); cap ~7.04vh.
+**Patron name (CSS):** BETWEEN baked nameplate and number — base `top` ~28% + `var(--nfl-photo-stack-y)` (96× ~27%, 64×48 ~28%, 64×32 ~26%); cap ~7.04vh. Never overlap the club nameplate.
 
-**Number (CSS):** empty mid-back under the name, base `top` ~30% + shift (96× ~29%, 64×48 ~30%, 64×32 ~28%); cap ~27vh.
+**Number (CSS):** mid-back under the patron name — base `top` ~38% (96× ~37%, 64×48 ~38%, 64×32 ~36%); cap ~27vh.
+
+**FloqR card:** Mount `#displayIdentityRail` on the canvas for NFL photo dual. Bottom placement (`bottom:1.2%`, `z-index:50`) must beat soccer `top:78%/86%` format rules. Use `nflFloqrCardPulse` (stays readable) — not classic burst alone (classic hides the pill ~2/3 of the cycle).
 
 **Dual shoutout layout (`nfl-jersey` / `nflDualLayout`):**
 - **Every NFL photo kit** (`sport===nfl` + photo back): always 6s `FLOQRFrameLoop` gif — frame 1 = rendered jersey, frame 2 = solid black + shoutout verbiage (emoji OK). FloqR card **bottom** on both phases. Do not require Firestore `nflDualLayout` to activate.
-- FloqR card: always **PRESENTED BY FloqMedia** (with classic burst animation). When `@handle` is opted in (`includeAttribution`), alternate every 6s with **FROM @handle**. When handle is absent, FloqMedia only — never hide the card.
+- FloqR card: always **PRESENTED BY FloqMedia**. When `@handle` is opted in (`includeAttribution`), alternate every 6s with **FROM @handle**. When handle is absent, FloqMedia only — never hide the card.
 - Caps: **64×48 / 96×48** 4×16=64; **64×32** 3×16=48. Checkout uses `nflJersey` (not soccer 8–12).
 - Club Admin approve must stamp `backgroundUrl` from packaged `defaultBackgroundUrl` when missing, plus `sport` / jersey colors / `nflDualLayout`.
 

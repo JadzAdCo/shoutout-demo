@@ -1735,20 +1735,26 @@
       }
 
       // FloqR card (bottom): always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
-      const rail = byId("displayIdentityRail");
+      // Mount rail on the canvas (not inside display-center) so format/bezel stacking cannot hide it.
+      let rail = byId("displayIdentityRail");
+      if (rail && canvas && rail.parentElement !== canvas) {
+        canvas.appendChild(rail);
+      }
       if (rail && t.identityRail !== false) {
         const cardAttribution = floqrCardAttributionFromData(data);
         const cardValue = isIdleCta
           ? ""
           : (typeof cardAttribution === "string" ? cardAttribution : (cardAttribution.value || ""));
+        // NFL photo dual always paints FloqR — never leave the rail empty/hidden.
         paintFloqrCard(rail, {
           attribution: cardValue,
           asHandle: true,
           defaultScreen: isIdleCta || (nflDualActive && !cardValue),
-          // NFL dual: always run the FloqR gif (brand alone, or brand ↔ FROM @handle).
           cycleWithBrand: !isIdleCta && (nflDualActive || !!cardValue),
           extraClass: "soccer-jersey-rail floqr-card-bottom"
         });
+        rail.setAttribute("aria-hidden", "false");
+        rail.classList.remove("hidden");
       } else if (rail) {
         stopFloqrCardCycle();
         rail.className = "display-identity-rail hidden";

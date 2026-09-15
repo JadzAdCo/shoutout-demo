@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NFL FloqR QA 64×32</title>
+  <link rel="stylesheet" href="./display.css?v=s3.0.72"/>
+  <style>
+    html,body{margin:0;background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif}
+    .stage{width:640px;height:320px;margin:16px;overflow:hidden;border:2px solid #444}
+    .display-canvas{width:640px!important;height:320px!important;animation:none!important}
+    .display-text-overlay,.display-compose-slot,.display-center{width:100%!important;height:100%!important}
+    #displayMain.soccer-jersey-name{font-size:22px!important;color:#fff!important}
+    #displaySub.soccer-jersey-number{font-size:96px!important;color:#fff!important}
+    #qaNote{margin:0 16px 16px;max-width:640px}
+  </style>
+</head>
+<body>
+  <p id="qaNote">QA: FloqR card must stay visible at bottom (PRESENTED BY FloqMedia). Patron name between SCAMMERVILLE and 22.</p>
+  <div class="stage">
+    <main id="displayCanvas" class="display-canvas soccer-jersey-template jersey-sport-nfl jersey-photo-back has-background-layer nfl-dual-layout nfl-dual-rotate split-media-loop split-media-phase-media"
+      style="--jersey-primary:#004C54;--jersey-secondary:#ffffff;--jersey-accent:#B3995D;"
+      data-screen-format-id="led-64x32" data-is-64x32="1">
+      <div class="display-background" style="background-image:url('./images/nfl/nfl-scammerville-back-with-club.png')"></div>
+      <div class="display-text-overlay">
+        <div class="display-compose-slot">
+          <div class="display-center">
+            <h1 id="displayMain" class="soccer-jersey-name"><span class="jersey-name-line">PAPA</span></h1>
+            <h2 id="displaySub" class="soccer-jersey-number">22</h2>
+            <div class="nfl-shout-panel" aria-hidden="true"><div class="nfl-shout-lines"><b>VIP TABLE</b></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="displayIdentityRail" class="display-identity-rail soccer-jersey-rail floqr-card-bottom uses-brand-fallback" aria-hidden="false" aria-label="PRESENTED BY FloqMedia">
+        <span class="classic-identity-shell"><small>PRESENTED BY</small><strong>FloqMedia</strong></span>
+        <span class="classic-identity-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
