@@ -1588,14 +1588,10 @@
       }
       mediaSlot.classList.add("hidden");
       mediaSlot.innerHTML = "";
-      const nflDualActive = sport === "nfl" && usePhotoBack && (
-        t.nflDualLayout
-        || t.layout === "nfl-jersey"
-        || data.nflDualLayout === true
-        || isNflDual
-      );
+      // NFL photo kits ALWAYS run the dual gif (jersey → shoutout). Do not depend on stale Firestore flags.
+      const nflDualActive = sport === "nfl" && usePhotoBack;
       const jerseyNameText = nflDualActive
-        ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || ""), 0, 8) || "NYX")
+        ? (jerseyPatronName || glyphSlice(cleanBoardText(data.jerseyPatronName || data.jerseyName || ""), 0, 8) || "NYX")
         : mainText;
       const nameRows = jerseyNameRows(jerseyNameText, {
         ...textCaps,
@@ -1618,9 +1614,9 @@
         baseNumber = Math.min(baseNumber * 0.68, 42);
         baseTeam = Math.min(baseTeam * 0.65, 5.5);
       } else if (sport === "nfl" && usePhotoBack) {
-        // Name sits under the baked plate; number fills the empty back.
-        baseName = Math.min(6.4, 7.5);
-        baseNumber = Math.min(30, 36);
+        // Real-kit stack: name under plate (+10%), number mid-back (−10%).
+        baseName = Math.min(7.04, 8.2);
+        baseNumber = Math.min(27, 32);
         baseTeam = 0;
       } else if (sport === "nba") {
         baseName = Math.min(baseName, 12.5);
@@ -1631,9 +1627,10 @@
         baseNumber = Math.max(baseNumber, 74);
         baseTeam = Math.min(baseTeam, 5);
       }
-      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(7, baseName * wrapScale * fitScale));
+      const nameFloor = (sport === "nfl" && usePhotoBack) ? 5 : 7;
+      const nameSize = Math.min(sport === "nba" || sport === "nfl" ? 16 : (usePhotoBack && sport === "soccer" ? 9.4 : 18), Math.max(nameFloor, baseName * wrapScale * fitScale));
       // Number size/position stay fixed — never shrink because the name is long.
-      const numberSize = Math.min(sport === "nfl" ? 78 : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber));
+      const numberSize = Math.min(sport === "nfl" ? (usePhotoBack ? 32 : 78) : (usePhotoBack && sport === "soccer" ? 42 : 72), Math.max(16, baseNumber));
       const teamSize = Math.min(usePhotoBack && sport === "soccer" ? 5.4 : 12, Math.max(3.8, baseTeam));
       const teamLabel = jerseyTeamLabel(t, data);
       const teamEl = ensureJerseyTeamEl(center);
@@ -1675,7 +1672,7 @@
       byId("displaySub").textContent = subText;
       byId("displaySub").setAttribute("aria-label", subText ? `Jersey mark ${subText}` : "Jersey mark");
 
-      // NFL dual: ALWAYS 6s jersey↔shoutout gif loop (all board sizes). FloqR card stays bottom.
+      // NFL dual: ALWAYS 6s jersey↔shoutout gif loop (all board sizes). FloqR card stays bottom on both frames.
       let shoutPanel = byId("displayNflShoutPanel");
       if (nflDualActive) {
         canvas.classList.add("nfl-dual-layout", "nfl-dual-rotate", "split-media-loop");
@@ -1737,7 +1734,7 @@
         stopSplitMediaLoop();
       }
 
-      // FloqR card (bottom): PRESENTED BY FloqMedia; with opted-in @handle, alternate FROM @handle.
+      // FloqR card (bottom): always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
       const rail = byId("displayIdentityRail");
       if (rail && t.identityRail !== false) {
         const cardAttribution = floqrCardAttributionFromData(data);
@@ -1747,8 +1744,9 @@
         paintFloqrCard(rail, {
           attribution: cardValue,
           asHandle: true,
-          defaultScreen: isIdleCta || !cardValue,
-          cycleWithBrand: !isIdleCta && !!cardValue,
+          defaultScreen: isIdleCta || (nflDualActive && !cardValue),
+          // NFL dual: always run the FloqR gif (brand alone, or brand ↔ FROM @handle).
+          cycleWithBrand: !isIdleCta && (nflDualActive || !!cardValue),
           extraClass: "soccer-jersey-rail floqr-card-bottom"
         });
       } else if (rail) {
