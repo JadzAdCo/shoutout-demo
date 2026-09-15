@@ -1,10 +1,11 @@
 /* FLOQR frame loop — one 6s media↔copy rotation for any display template. */
 (function (root, factory) {
-  if (typeof module === "object" && module.exports) module.exports = factory();
-  else root.FLOQRFrameLoop = factory();
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  if (typeof module === "object" && module.exports) module.exports = factory(root);
+  else root.FLOQRFrameLoop = factory(root);
+})(typeof globalThis !== "undefined" ? globalThis : this, function (root) {
   "use strict";
 
+  const g = root || (typeof globalThis !== "undefined" ? globalThis : {});
   const HOLD_MS = 6000;
   const LOOP = "split-media-loop";
   const PHASE_MEDIA = "split-media-phase-media";
@@ -16,7 +17,7 @@
 
   function prefersReducedMotion() {
     try {
-      return !!root.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      return !!g.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     } catch (_) {
       return false;
     }
@@ -36,9 +37,9 @@
 
   function stop(canvas) {
     if (timer) {
-      root.clearInterval(timer);
-      timer = null;
+      g.clearInterval(timer);
     }
+    timer = null;
     const target = canvas || activeCanvas;
     activeCanvas = null;
     lastPhase = "media";
@@ -50,24 +51,29 @@
     const onAdvance = typeof options.onAdvance === "function" ? options.onAdvance : null;
     const holdMs = Number(options.holdMs) > 0 ? Number(options.holdMs) : HOLD_MS;
     // Re-render wipes canvas classes. Keep the running phase so the shoutout frame is not skipped.
-    if (timer && activeCanvas === canvas) {
-      canvas.classList.add(LOOP);
-      setPhase(canvas, lastPhase);
-      return;
+    // Always rebind the interval so media↔copy never stalls after a class wipe / re-paint.
+    const resumePhase = (timer && activeCanvas === canvas)
+      ? (canvas.classList.contains(PHASE_COPY) || canvas.classList.contains(PHASE_MEDIA)
+        ? phaseOf(canvas)
+        : (lastPhase || "media"))
+      : "media";
+    if (timer) {
+      g.clearInterval(timer);
+      timer = null;
     }
-    stop(canvas);
     activeCanvas = canvas;
     canvas.classList.add(LOOP);
     if (prefersReducedMotion()) {
       setPhase(canvas, "copy");
-      if (onAdvance) root.requestAnimationFrame(() => onAdvance("copy", canvas));
+      if (onAdvance) g.requestAnimationFrame(() => onAdvance("copy", canvas));
       return;
     }
-    setPhase(canvas, "media");
-    timer = root.setInterval(() => {
-      const next = phaseOf(canvas) === "media" ? "copy" : "media";
-      setPhase(canvas, next);
-      if (onAdvance) root.requestAnimationFrame(() => onAdvance(next, canvas));
+    setPhase(canvas, resumePhase);
+    timer = g.setInterval(() => {
+      if (!activeCanvas) return;
+      const next = phaseOf(activeCanvas) === "media" ? "copy" : "media";
+      setPhase(activeCanvas, next);
+      if (onAdvance) g.requestAnimationFrame(() => onAdvance(next, activeCanvas));
     }, holdMs);
   }
 

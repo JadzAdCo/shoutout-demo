@@ -710,28 +710,40 @@
     frameLoop()?.stop(byId("displayCanvas"));
   }
 
+  function startFrameLoopFallback(canvas, onAdvance) {
+    // Hard fallback so jersey/Christine never lose the 6s media↔copy rotation.
+    const resumeCopy = canvas.classList.contains("split-media-phase-copy");
+    canvas.classList.add("split-media-loop");
+    canvas.classList.toggle("split-media-phase-media", !resumeCopy);
+    canvas.classList.toggle("split-media-phase-copy", resumeCopy);
+    if (window.__floqrFrameLoopFallback) window.clearInterval(window.__floqrFrameLoopFallback);
+    window.__floqrFrameLoopFallback = window.setInterval(() => {
+      const nextCopy = !canvas.classList.contains("split-media-phase-copy");
+      canvas.classList.toggle("split-media-phase-media", !nextCopy);
+      canvas.classList.toggle("split-media-phase-copy", nextCopy);
+      if (typeof onAdvance === "function") {
+        window.requestAnimationFrame(() => onAdvance(nextCopy ? "copy" : "media", canvas));
+      }
+    }, 6000);
+  }
+
   function startFrameLoop(canvas, onAdvance) {
     if (!canvas) return;
     if (!frameLoop()?.start) {
-      // Hard fallback so jersey/Christine never lose the 6s media↔copy rotation.
-      canvas.classList.add("split-media-loop", "split-media-phase-media");
-      canvas.classList.remove("split-media-phase-copy");
-      if (window.__floqrFrameLoopFallback) window.clearInterval(window.__floqrFrameLoopFallback);
-      window.__floqrFrameLoopFallback = window.setInterval(() => {
-        const nextCopy = !canvas.classList.contains("split-media-phase-copy");
-        canvas.classList.toggle("split-media-phase-media", !nextCopy);
-        canvas.classList.toggle("split-media-phase-copy", nextCopy);
-        if (typeof onAdvance === "function") {
-          window.requestAnimationFrame(() => onAdvance(nextCopy ? "copy" : "media", canvas));
-        }
-      }, 6000);
+      startFrameLoopFallback(canvas, onAdvance);
       return;
     }
     if (window.__floqrFrameLoopFallback) {
       window.clearInterval(window.__floqrFrameLoopFallback);
       window.__floqrFrameLoopFallback = null;
     }
-    frameLoop().start(canvas, {onAdvance});
+    try {
+      frameLoop().start(canvas, {onAdvance});
+    } catch (err) {
+      // FrameLoop must never abort jersey render (FloqR paint runs after this).
+      console.warn("FLOQRFrameLoop.start failed; using fallback", err);
+      startFrameLoopFallback(canvas, onAdvance);
+    }
   }
 
   function splitMediaIdentityPresentation(data = {}, subText = "") {
@@ -1716,6 +1728,7 @@
           }, {uppercase: false});
           canvas.style.setProperty("--nfl-shout-line-count", String(Math.max(1, lineCount)));
           shoutPanel.className = "nfl-shout-panel";
+          shoutPanel.setAttribute("aria-hidden", "false");
           shoutPanel.innerHTML = `<div class="nfl-shout-lines">${shoutRows.map(row => {
             const style = nflShoutFitStyle(row || " ", {sideBySide: false, compact});
             return `<b style="${style}">${esc(row || " ")}</b>`;
@@ -1728,13 +1741,13 @@
             requestAnimationFrame(runFit);
           });
         }
-        startFrameLoop(canvas, refitNflShoutOnCopy);
       } else if (shoutPanel) {
         shoutPanel.remove();
         stopSplitMediaLoop();
       }
 
-      // FloqR card (bottom): always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
+      // FloqR card (bottom): paint BEFORE FrameLoop so a loop throw cannot skip the rail.
+      // Always PRESENTED BY FloqMedia on NFL dual; opt-in @handle alternates every 6s.
       // Mount rail on the canvas (not inside display-center) so format/bezel stacking cannot hide it.
       let rail = byId("displayIdentityRail");
       if (rail && canvas && rail.parentElement !== canvas) {
@@ -1753,12 +1766,24 @@
           cycleWithBrand: !isIdleCta && (nflDualActive || !!cardValue),
           extraClass: "soccer-jersey-rail floqr-card-bottom"
         });
-        rail.setAttribute("aria-hidden", "false");
         rail.classList.remove("hidden");
+        rail.setAttribute("aria-hidden", "false");
+        // Keep FloqR above the text overlay on both dual frames.
+        rail.style.setProperty("z-index", "60", "important");
+        rail.style.setProperty("opacity", "1", "important");
+        rail.style.setProperty("visibility", "visible", "important");
       } else if (rail) {
         stopFloqrCardCycle();
         rail.className = "display-identity-rail hidden";
         rail.innerHTML = "";
+      }
+
+      // Start / rebind the 6s jersey↔verbiage loop after FloqR + panel exist.
+      if (nflDualActive) {
+        startFrameLoop(canvas, refitNflShoutOnCopy);
+        requestAnimationFrame(() => {
+          if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
+        });
       }
       markDisplayReady();
       return;

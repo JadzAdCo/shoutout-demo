@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Local ScammerVille dual QA — same display stack, preview=1 (no Firebase/Xibo gate). -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <title>ScammerVille local dual QA</title>
+  <link rel="stylesheet" href="./display.css?v=s3.0.74"/>
+  <style>
+    html,body.display{width:640px!important;height:480px!important;overflow:hidden!important}
+    #displayCanvas.display-canvas{width:640px!important;height:480px!important;animation:none!important}
+    #qaBanner{
+      position:fixed;left:8px;top:8px;z-index:9999;padding:6px 10px;border-radius:8px;
+      background:rgba(0,0,0,.72);color:#fff;font:12px/1.35 Segoe UI,Arial,sans-serif;pointer-events:none
+    }
+  </style>
+  <script>
+    // Stamp fictitious ScammerVille payload into the URL before display-app boots.
+    (function () {
+      const params = new URLSearchParams({
+        preview: "1",
+        template: "nflScammerVille",
+        sport: "nfl",
+        nflDualLayout: "1",
+        jerseyCssBack: "0",
+        screenFormatId: "led-64x48",
+        jerseyPatronName: "NYX",
+        sub: "88",
+        attribution: "@nyx.vip.club",
+        includeAttribution: "1",
+        attributionChoice: "instagram",
+        jerseyPrimary: "#004C54",
+        jerseySecondary: "#ffffff",
+        jerseyAccent: "#B3995D",
+        backgroundUrl: "./images/nfl/nfl-scammerville-back-with-club.png",
+        main: "👏 VIP table night\ntest windfall ghost\nlets go club\ncharacteristic"
+      });
+      if (!location.search.includes("preview=1")) {
+        history.replaceState(null, "", location.pathname + "?" + params.toString());
+      }
+    })();
+  </script>
+</head>
+<body class="display display-booting display-board-primary">
+  <div id="qaBanner">Local QA · Frame1 jersey+FloqR · Frame2 verbiage+FloqR · 6s loop</div>
+  <main id="displayCanvas" class="display-canvas" data-display-board="primary">
+    <div id="displayBackground" class="display-background" aria-hidden="true"></div>
+    <div class="display-text-overlay">
+      <div id="displayBrand" class="brand"></div>
+      <div class="display-compose-slot">
+        <div id="displayFrameOverlay" class="display-frame-overlay hidden" aria-hidden="true"></div>
+        <div class="display-center">
+          <div id="mediaSlot" class="media-slot hidden"></div>
+          <div id="displayJerseyMount" class="jersey-hanger-mount hidden" aria-hidden="true"></div>
+          <div id="displayJerseyTeam" class="soccer-jersey-team hidden" aria-hidden="true"></div>
+          <h1 id="displayMain"></h1>
+          <h2 id="displaySub"></h2>
+          <div id="displayIdentityRail" class="display-identity-rail hidden" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="ticker"></div>
+    </div>
+  </main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=29.09.22"></script>
+<script src="./shared-data.js?v=s3.0.60"></script>
+<script src="./national-teams-data.js?v=s3.0.20"></script>
+<script src="./jersey-catalog.js?v=s3.0.62"></script>
+<script src="./floqr-identity.js?v=29.09.22"></script>
+<script src="./floqr-frame-loop.js?v=s3.0.74"></script>
+<script src="./display-app.js?v=s3.0.74"></script>
+<script>
+  // Phase probe for local verification (console + banner).
+  (function () {
+    const banner = document.getElementById("qaBanner");
+    const tick = () => {
+      const canvas = document.getElementById("displayCanvas");
+      const rail = document.getElementById("displayIdentityRail");
+      const panel = document.getElementById("displayNflShoutPanel");
+      if (!canvas || !banner) return;
+      const phase = canvas.classList.contains("split-media-phase-copy") ? "copy/verbiage"
+        : canvas.classList.contains("split-media-phase-media") ? "media/jersey"
+        : "no-phase";
+      const railCs = rail ? getComputedStyle(rail) : null;
+      const panelCs = panel ? getComputedStyle(panel) : null;
+      banner.textContent = [
+        "phase=" + phase,
+        "floqr=" + (railCs ? (railCs.visibility + "/op" + railCs.opacity + "/z" + railCs.zIndex) : "missing"),
+        "verbiage=" + (panelCs ? (panelCs.visibility + "/op" + panelCs.opacity) : "missing"),
+        "text=" + (panel ? panel.textContent.trim().slice(0, 40) : "")
+      ].join(" · ");
+    };
+    setInterval(tick, 500);
+    window.addEventListener("load", () => setTimeout(tick, 300));
+  })();
+</script>
+</body>
+</html>

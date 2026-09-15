@@ -36,11 +36,29 @@ test("Club Admin approve stamps NFL photo background from packaged catalog", () 
   assert.match(js, /layout: isNflDual \? "nfl-jersey"/);
 });
 
-test("display pages cache-bust NFL FloqR + width pass", () => {
+test("display pages cache-bust NFL FloqR + FrameLoop fix", () => {
   const display = fs.readFileSync(path.join(root, "display.html"), "utf8");
   const display2 = fs.readFileSync(path.join(root, "display2.html"), "utf8");
-  assert.match(display, /display\.css\?v=s3\.0\.72/);
-  assert.match(display, /display-app\.js\?v=s3\.0\.72/);
-  assert.match(display2, /display\.css\?v=s3\.0\.72/);
-  assert.match(display2, /display-app\.js\?v=s3\.0\.72/);
+  assert.match(display, /display\.css\?v=s3\.0\.74/);
+  assert.match(display, /display-app\.js\?v=s3\.0\.74/);
+  assert.match(display, /floqr-frame-loop\.js\?v=s3\.0\.74/);
+  assert.match(display2, /display\.css\?v=s3\.0\.74/);
+  assert.match(display2, /display-app\.js\?v=s3\.0\.74/);
+  assert.match(display2, /floqr-frame-loop\.js\?v=s3\.0\.74/);
+});
+
+test("FLOQRFrameLoop rebinds interval so media↔copy cannot stall", () => {
+  const js = fs.readFileSync(path.join(root, "floqr-frame-loop.js"), "utf8");
+  assert.match(js, /Always rebind the interval/);
+  assert.match(js, /activeCanvas/);
+  assert.match(js, /resumePhase/);
+  // Factory must receive root — bare `root` inside factory() was ReferenceError and killed dual + FloqR.
+  assert.match(js, /factory\(root\)/);
+  assert.match(js, /function \(root\)/);
+});
+
+test("display-app FrameLoop start is try/caught so FloqR still paints", () => {
+  const js = fs.readFileSync(path.join(root, "display-app.js"), "utf8");
+  assert.match(js, /FLOQRFrameLoop\.start failed; using fallback/);
+  assert.match(js, /paint BEFORE FrameLoop/);
 });
