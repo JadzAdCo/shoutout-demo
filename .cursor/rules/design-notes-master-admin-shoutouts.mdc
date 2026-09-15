@@ -2,38 +2,50 @@
 
 Design notes only (not FloqAi help). Resume: `@master-shoutouts$`.
 
+## Why Completed log was empty (diagnosed)
+
+- Collection `shoutoutComplianceLogs` was **empty** — wiring existed, but:
+  1. Live trigger only indexed a narrow status set (missed many `pending` / historical rows).
+  2. Backfill was never run (or filtered too tightly), so historical data never populated.
+  3. Many approved ShoutOut docs were later cleared/`stale`, so reconstructing from `shoutouts` alone is incomplete.
+
+## Reconstructable sources (available)
+
+| Source | What it has |
+|---|---|
+| `clubLocations` | Venue names, city, ids for typeahead search |
+| `shoutouts` | Live / pending / stale rows with venue + copy |
+| `shoutoutAudit` | submitted / approved / rejected timeline + clubLocationId + reference |
+| `inboxNotifications` (`paidShoutoutReceipt`, `shoutoutStatus`) | Location name, reference, paid/approved/rejected signals |
+
+Backfill callable `backfillShoutoutComplianceLogs` merges these into `shoutoutComplianceLogs`.
+
 ## Standards mapping
 
 | Control set | FloqR implementation |
 |---|---|
 | SOC 2 CC6 / CC7 | `shoutoutComplianceLogs` + append-only `shoutoutAudit` on submit/pay/approve/reject/end/media_purged |
 | ISO 27001 A.8.15 / A.5.28 / A.5.33 | Master-Admin-only read; no client delete of compliance rows; evidence searchable |
-| NIST 800-53 AU-2 / AU-3 / AU-11 | Who / what / when / venue / outcome; 7-year metadata retention |
+| NIST 800-53 AU-2 / AU-3 / AU-11 | Who / what / when / venue / outcome; **7-year** metadata retention |
 | GDPR storage limitation + accountability | Media deleted after **90 days**; metadata anonymized after **7 years**; legal hold supported |
 
 **Not claimed:** forever compressed media archives as a SOC 2 / ISO requirement.
+
+**60 days:** UI default search window only. Do **not** delete compliance metadata at 60 days — that conflicts with AU-11 / SOC 2 audit retention.
 
 ## Master Admin UI
 
 Tab group **ShoutOuts**:
 
-- **Completed log** — search venue name, ShoutOut content, date range (Firestore query + client filter; no external search engine in v1)
-- **Retention** — shows 7y / 90d policy, last purge counts, backfill button
-
-Entity → **All ShoutOut Queues** stays live pending ops.
+- **Completed log** — venue typeahead from `clubLocations`, lifecycle filter (submitted / rejected / completed), content + date; **Rebuild compliance log**
+- **Retention** — 7y / 90d / 60d UI window policy + rebuild
 
 ## Collections
 
-- `shoutoutComplianceLogs/{shoutoutId}` — upserted from `shoutouts` writes (Functions trigger)
-- `shoutoutComplianceMeta/retention` — purge job stamps
+- `shoutoutComplianceLogs/{shoutoutId}` — upserted from `shoutouts` writes + reconstruct backfill
+- `shoutoutComplianceMeta/retention` — purge / backfill stamps
 - `shoutoutAudit/{id}` — create + limited read; no update/delete
 
-## Retention
+## Indexed lifecycle
 
-- Audit metadata: **7 years**, then anonymize text/uids
-- Media: **90 days** after completed/approved event, then Storage delete + `mediaPurgeStatus: purged`
-- Legal hold blocks purge/anonymize
-
-## Patron track (separate)
-
-Patron Completed: Re-Use, Archive (moves to patron Archive tab), Save as template only if `IsModifiable=1`. Not the Master Admin compliance store.
+submitted / pending / pending_approval / paid / approved / rejected / cancelled / completed / stale (plus payment paid).

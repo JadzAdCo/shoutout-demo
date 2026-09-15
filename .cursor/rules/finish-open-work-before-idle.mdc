@@ -1,0 +1,23 @@
+---
+description: Never idle with unfinished work — finish open tasks before ending a turn
+alwaysApply: true
+---
+
+# Finish open work before idle
+
+Before ending any turn (including after topic switches, tool interruptions, or “brief status” replies):
+
+1. **Scan open work** — todos, in-progress deploys, promised features, and earlier asks in this chat that still lack delivered output.
+2. **Do not park work** — “I’ll get back to that” / multitasking is not done. Either finish it in this turn or leave a concrete in-progress artifact (files saved + next step already running).
+3. **Topic switch ≠ cancel** — If the user starts a new ask, keep unfinished prior work on the active list and resume it as soon as the new ask is handled, in the **same turn** when possible.
+4. **Background jobs** — Await deploy/test/shell completion (or restart if interrupted) before claiming the task is done.
+5. **Idle checklist** — Only stop when every user-visible ask in the thread has either: (a) shipped output, (b) an explicit blocker only the user can clear, or (c) a running job you will continue without waiting for a reminder.
+
+## Bad
+
+- Diagnose empty Completed log → switch to App Check → idle without finishing the log rebuild.
+- Start `firebase deploy` → get interrupted → tell the user “later” instead of checking the terminal and finishing.
+
+## Good
+
+- Finish or explicitly block on user action; then answer the new ask; then resume any remaining open item before idling.

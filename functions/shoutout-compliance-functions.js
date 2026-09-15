@@ -4,6 +4,7 @@
  *
  * - shoutoutComplianceLogs: Master Admin searchable audit metadata (7 years)
  * - Media blobs deleted after 90 days (not forever-archived)
+ * - Reconstruct from shoutouts + shoutoutAudit + inboxNotifications when live docs were cleared
  * - shoutoutAudit remains append-only event stream
  */
 const crypto = require("crypto");
@@ -23,10 +24,35 @@ const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "ban
 
 const AUDIT_RETENTION_YEARS = 7;
 const MEDIA_RETENTION_DAYS = 90;
-const COMPLETED_STATUSES = new Set([
+/** Default Master Admin search window — not deletion. Compliance metadata stays 7 years. */
+const UI_DEFAULT_SEARCH_DAYS = 60;
+
+const TERMINAL_STATUSES = new Set([
   "approved", "live", "playing", "displayed", "completed", "done", "finished",
-  "ended", "expired", "played", "archived", "refunded", "rejected", "cancelled", "canceled"
+  "ended", "expired", "played", "archived", "refunded", "rejected", "cancelled", "canceled", "stale"
 ]);
+
+const INDEXABLE_STATUSES = new Set([
+  ...TERMINAL_STATUSES,
+  "pending", "pending_approval", "submitted", "paid", "queued", "processing"
+]);
+
+const AUDIT_ACTION_STATUS = {
+  submitted: "pending",
+  paid: "pending_approval",
+  pending_approval: "pending_approval",
+  approved: "approved",
+  rejected: "rejected",
+  cancelled: "cancelled",
+  canceled: "canceled",
+  completed: "completed",
+  ended: "ended",
+  expired: "expired",
+  archived: "archived",
+  refunded: "refunded",
+  media_purged: "approved",
+  "stale-shoutout-cleared": "stale"
+};
 
 function text(value, max = 240) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -86,25 +112,48 @@ function storagePathFromUrl(url) {
   }
 }
 
+function shouldIndexShoutout(data = {}) {
+  const status = text(data.status, 40).toLowerCase();
+  const payment = text(data.paymentStatus, 40).toLowerCase();
+  if (payment === "paid") return true;
+  if (INDEXABLE_STATUSES.has(status)) return true;
+  if (data.referenceNumber || data.submittedAt || data.approvedAt || data.rejectedAt) return true;
+  return false;
+}
+
+function lifecyclePhase(status = "", paymentStatus = "") {
+  const s = text(status, 40).toLowerCase();
+  const p = text(paymentStatus, 40).toLowerCase();
+  if (s === "rejected") return "rejected";
+  if (s === "stale") return "stale";
+  if (["cancelled", "canceled"].includes(s)) return "cancelled";
+  if (TERMINAL_STATUSES.has(s) && s !== "rejected") return "completed";
+  if (s === "pending_approval" || p === "paid") return "submitted_paid";
+  if (["pending", "submitted", "queued", "processing"].includes(s)) return "submitted";
+  return s || "unknown";
+}
+
 function buildComplianceRecord(shoutoutId, data = {}) {
   const status = text(data.status || "pending", 40).toLowerCase();
   const mainText = text(data.mainText || data.main || "", 200);
   const subText = text(data.subText || data.sub || "", 80);
-  const venueName = text(data.locationName || data.clubName || data.venueName || "", 160);
-  const clubLocationId = text(data.clubLocationId || data.location || "", 120);
+  const venueName = text(data.locationName || data.clubName || data.venueName || data.brandName || "", 160);
+  const clubLocationId = text(data.clubLocationId || data.location || data.club || "", 120);
   const mediaUrl = text(data.mediaUrl || data.photoUrl || data.imageUrl || "", 2000);
   const hasMedia = !!(mediaUrl || data.hasMedia);
   const submittedMs = toMillis(data.submittedAt) || toMillis(data.createdAt) || Date.now();
   const paidMs = toMillis(data.paidAt);
   const approvedMs = toMillis(data.approvedAt) || toMillis(data.completedAt);
-  const completedMs = toMillis(data.completedAt) || toMillis(data.endedAt) || approvedMs || paidMs || submittedMs;
-  const eventAtMs = Math.max(completedMs, approvedMs, paidMs, submittedMs);
-  const isTerminal = COMPLETED_STATUSES.has(status) || text(data.paymentStatus, 40).toLowerCase() === "paid";
+  const rejectedMs = toMillis(data.rejectedAt);
+  const completedMs = toMillis(data.completedAt) || toMillis(data.endedAt) || approvedMs || rejectedMs || paidMs || submittedMs;
+  const eventAtMs = Math.max(completedMs, approvedMs, rejectedMs, paidMs, submittedMs);
+  const paymentStatus = text(data.paymentStatus || "", 40).toLowerCase();
+  const isTerminal = TERMINAL_STATUSES.has(status) || paymentStatus === "paid";
   const mediaRetentionUntilMs = isTerminal && hasMedia
     ? addDays(completedMs || eventAtMs, MEDIA_RETENTION_DAYS)
     : 0;
   const retentionUntilMs = addYears(eventAtMs || Date.now(), AUDIT_RETENTION_YEARS);
-  const searchBlob = `${venueName} ${mainText} ${subText} ${clubLocationId} ${text(data.referenceNumber, 80)}`.toLowerCase();
+  const searchBlob = `${venueName} ${mainText} ${subText} ${clubLocationId} ${text(data.referenceNumber, 80)} ${text(data.locationLabel, 160)}`.toLowerCase();
 
   return {
     shoutoutId: text(shoutoutId, 120),
@@ -121,7 +170,8 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     template: text(data.template || data.templateId || "", 80),
     templateName: text(data.templateName || "", 120),
     status,
-    paymentStatus: text(data.paymentStatus || "", 40).toLowerCase(),
+    lifecyclePhase: lifecyclePhase(status, paymentStatus),
+    paymentStatus,
     amountCents: Number(data.amountCents || 0) || 0,
     submittedByUid: text(data.submittedByUid || data.ownerUid || "", 128),
     approvedByUid: text(data.approvedByUid || "", 128),
@@ -148,7 +198,8 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     legalHold: !!data.legalHold,
     contentHash: contentHash(mainText, subText, shoutoutId),
     anonymized: !!data.anonymized,
-    complianceVersion: "s3.0.66",
+    source: text(data.source || "shoutouts", 40),
+    complianceVersion: "s3.0.67",
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
 }
@@ -165,6 +216,8 @@ async function upsertComplianceLog(shoutoutId, data = {}, options = {}) {
   const merged = {
     ...prev,
     ...data,
+    locationName: data.locationName || data.venueName || prev.locationName || prev.venueName || "",
+    venueName: data.venueName || data.locationName || prev.venueName || prev.locationName || "",
     legalHold: options.legalHold != null ? !!options.legalHold : !!prev.legalHold,
     mediaPurgedAt: options.clearMedia ? admin.firestore.FieldValue.serverTimestamp() : (data.mediaPurgedAt || prev.mediaPurgedAt || null),
     mediaPurgeStatus: options.clearMedia ? "purged" : (data.mediaPurgeStatus || prev.mediaPurgeStatus || ""),
@@ -222,16 +275,170 @@ async function deleteMediaPath(path) {
   }
 }
 
+async function loadVenueMap() {
+  const snap = await db.collection("clubLocations").limit(800).get();
+  const map = new Map();
+  snap.docs.forEach((doc) => {
+    const row = doc.data() || {};
+    if (text(row.status, 40).toLowerCase() === "deleted" || row.deletedAt) return;
+    const name = text(row.locationName || row.clubName || row.brandName || doc.id, 160);
+    map.set(doc.id, {
+      clubLocationId: doc.id,
+      locationName: name,
+      brandName: text(row.brandName, 160),
+      city: text(row.city, 80),
+      locationLabel: text(row.locationLabel, 160)
+    });
+  });
+  return map;
+}
+
+function enrichVenue(data = {}, venueMap = new Map()) {
+  const clubLocationId = text(data.clubLocationId || data.location || data.club || "", 120);
+  const venue = clubLocationId ? venueMap.get(clubLocationId) : null;
+  if (!venue) return {...data, clubLocationId};
+  return {
+    ...data,
+    clubLocationId,
+    locationName: text(data.locationName || data.venueName || data.clubName || "", 160) || venue.locationName,
+    venueName: text(data.venueName || data.locationName || data.clubName || "", 160) || venue.locationName,
+    brandName: text(data.brandName, 160) || venue.brandName,
+    locationLabel: text(data.locationLabel, 160) || venue.locationLabel
+  };
+}
+
+function parseInboxBodyFields(body = "") {
+  const textBody = String(body || "");
+  const pick = (label) => {
+    const match = textBody.match(new RegExp(`${label}:\\s*(.+)`, "i"));
+    return match ? text(match[1], 200) : "";
+  };
+  return {
+    referenceNumber: pick("Reference"),
+    locationName: pick("Location"),
+    templateName: pick("Template"),
+    statusHint: pick("Status")
+  };
+}
+
+function mergeByShoutoutId(target, shoutoutId, patch = {}) {
+  const id = text(shoutoutId, 120);
+  if (!id) return;
+  const prev = target.get(id) || {};
+  target.set(id, {
+    ...prev,
+    ...Object.fromEntries(Object.entries(patch).filter(([, v]) => v != null && v !== "")),
+    clubLocationId: text(patch.clubLocationId || prev.clubLocationId, 120),
+    referenceNumber: text(patch.referenceNumber || prev.referenceNumber, 80),
+    locationName: text(patch.locationName || prev.locationName || prev.venueName, 160),
+    mainText: text(patch.mainText || prev.mainText, 200),
+    subText: text(patch.subText || prev.subText, 80),
+    status: text(patch.status || prev.status || "pending", 40).toLowerCase()
+  });
+}
+
+async function collectReconstructCandidates(limit = 300) {
+  const byId = new Map();
+  const venueMap = await loadVenueMap();
+
+  const shoutSnap = await db.collection("shoutouts").orderBy("submittedAt", "desc").limit(limit).get().catch(async () => {
+    return db.collection("shoutouts").limit(limit).get();
+  });
+  shoutSnap.docs.forEach((doc) => {
+    const data = enrichVenue(doc.data() || {}, venueMap);
+    if (!shouldIndexShoutout(data)) return;
+    mergeByShoutoutId(byId, doc.id, {...data, source: "shoutouts"});
+  });
+
+  const auditSnap = await db.collection("shoutoutAudit").orderBy("createdAt", "desc").limit(Math.min(1500, limit * 4)).get().catch(async () => {
+    return db.collection("shoutoutAudit").limit(Math.min(1500, limit * 4)).get();
+  });
+  const auditById = new Map();
+  auditSnap.docs.forEach((doc) => {
+    const row = doc.data() || {};
+    const shoutoutId = text(row.shoutoutId, 120);
+    if (!shoutoutId) return;
+    const list = auditById.get(shoutoutId) || [];
+    list.push(row);
+    auditById.set(shoutoutId, list);
+  });
+  for (const [shoutoutId, events] of auditById.entries()) {
+    events.sort((a, b) => toMillis(a.createdAt) - toMillis(b.createdAt));
+    const latest = events[events.length - 1] || {};
+    const submitted = events.find((e) => text(e.action, 40).toLowerCase() === "submitted");
+    const approved = [...events].reverse().find((e) => text(e.action, 40).toLowerCase() === "approved");
+    const rejected = [...events].reverse().find((e) => text(e.action, 40).toLowerCase() === "rejected");
+    const action = text(latest.action, 60).toLowerCase();
+    const mappedStatus = AUDIT_ACTION_STATUS[action] || text(latest.status, 40).toLowerCase() || "pending";
+    const clubLocationId = text(
+      rejected?.clubLocationId || approved?.clubLocationId || latest.clubLocationId || submitted?.clubLocationId,
+      120
+    );
+    const patch = enrichVenue({
+      status: mappedStatus,
+      referenceNumber: text(latest.referenceNumber || approved?.referenceNumber || rejected?.referenceNumber || submitted?.referenceNumber, 80),
+      clubLocationId,
+      submittedByUid: text(submitted?.actorUid || latest.ownerUid || "", 128),
+      approvedByUid: text(approved?.actorUid || "", 128),
+      rejectedByUid: text(rejected?.actorUid || "", 128),
+      submittedAt: submitted?.createdAt || null,
+      approvedAt: approved?.createdAt || null,
+      rejectedAt: rejected?.createdAt || null,
+      mainText: text(latest.mainText || "", 200),
+      source: "shoutoutAudit"
+    }, venueMap);
+    mergeByShoutoutId(byId, shoutoutId, patch);
+  }
+
+  const inboxSnap = await db.collection("inboxNotifications")
+    .where("type", "in", ["paidShoutoutReceipt", "shoutoutStatus"])
+    .limit(Math.min(400, limit * 2))
+    .get()
+    .catch(async () => {
+      const all = await db.collection("inboxNotifications").limit(400).get();
+      return {
+        docs: all.docs.filter((d) => ["paidShoutoutReceipt", "shoutoutStatus"].includes(text(d.data()?.type, 60)))
+      };
+    });
+  inboxSnap.docs.forEach((doc) => {
+    const row = doc.data() || {};
+    const parsed = parseInboxBodyFields(row.body);
+    const shoutoutId = text(row.shoutoutId || "", 120);
+    if (!shoutoutId) return;
+    const statusRaw = text(row.status || parsed.statusHint, 80).toLowerCase();
+    let status = "pending_approval";
+    if (statusRaw.includes("reject")) status = "rejected";
+    else if (statusRaw.includes("approv")) status = "approved";
+    else if (statusRaw.includes("pending")) status = "pending_approval";
+    const patch = enrichVenue({
+      status,
+      paymentStatus: text(row.type, 40) === "paidShoutoutReceipt" ? "paid" : "",
+      referenceNumber: text(row.referenceNumber || parsed.referenceNumber, 80),
+      clubLocationId: text(row.clubLocationId, 120),
+      locationName: text(row.locationName || parsed.locationName, 160),
+      templateName: text(row.templateName || parsed.templateName, 120),
+      paidAt: row.paidAtIso ? new Date(row.paidAtIso) : row.createdAt || null,
+      submittedAt: row.createdAt || null,
+      source: "inboxNotifications"
+    }, venueMap);
+    mergeByShoutoutId(byId, shoutoutId, patch);
+  });
+
+  return {byId, venueMap, scanned: {
+    shoutouts: shoutSnap.size,
+    audit: auditSnap.size,
+    inbox: inboxSnap.docs.length
+  }};
+}
+
 const onShoutoutComplianceWrite = onDocumentWritten("shoutouts/{shoutoutId}", async (event) => {
   const after = event.data?.after;
   if (!after?.exists) return;
   const shoutoutId = event.params.shoutoutId;
   const data = after.data() || {};
-  const status = text(data.status, 40).toLowerCase();
-  const payment = text(data.paymentStatus, 40).toLowerCase();
-  // Index paid / completed / approved / rejected (compliance evidence). Skip pure drafts.
-  if (!COMPLETED_STATUSES.has(status) && payment !== "paid" && status !== "pending_approval") return;
-  await upsertComplianceLog(shoutoutId, data);
+  if (!shouldIndexShoutout(data)) return;
+  const venueMap = await loadVenueMap();
+  await upsertComplianceLog(shoutoutId, enrichVenue({...data, source: "shoutouts"}, venueMap));
 });
 
 const purgeExpiredShoutoutMedia = onSchedule({
@@ -265,6 +472,7 @@ const purgeExpiredShoutoutMedia = onSchedule({
     lastMediaPurgeCount: purged,
     mediaRetentionDays: MEDIA_RETENTION_DAYS,
     auditRetentionYears: AUDIT_RETENTION_YEARS,
+    uiDefaultSearchDays: UI_DEFAULT_SEARCH_DAYS,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge: true});
   return {purged};
@@ -301,22 +509,35 @@ const anonymizeExpiredComplianceLogs = onSchedule({
   return {count};
 });
 
-const backfillShoutoutComplianceLogs = onCall({region: "us-central1"}, async (request) => {
+const backfillShoutoutComplianceLogs = onCall({
+  region: "us-central1",
+  timeoutSeconds: 300,
+  memory: "1GiB"
+}, async (request) => {
   assertMasterAdmin(request);
-  const limit = Math.min(500, Math.max(1, Number(request.data?.limit || 200)));
-  const snap = await db.collection("shoutouts").orderBy("submittedAt", "desc").limit(limit).get().catch(async () => {
-    return db.collection("shoutouts").limit(limit).get();
-  });
+  const limit = Math.min(500, Math.max(1, Number(request.data?.limit || 300)));
+  const {byId, scanned} = await collectReconstructCandidates(limit);
   let written = 0;
-  for (const doc of snap.docs) {
-    const data = doc.data() || {};
-    const status = text(data.status, 40).toLowerCase();
-    const payment = text(data.paymentStatus, 40).toLowerCase();
-    if (!COMPLETED_STATUSES.has(status) && payment !== "paid") continue;
-    await upsertComplianceLog(doc.id, data);
+  for (const [shoutoutId, data] of byId.entries()) {
+    if (!shouldIndexShoutout(data)) continue;
+    await upsertComplianceLog(shoutoutId, data);
     written += 1;
   }
-  return {ok: true, scanned: snap.size, written, mediaRetentionDays: MEDIA_RETENTION_DAYS, auditRetentionYears: AUDIT_RETENTION_YEARS};
+  await db.collection("shoutoutComplianceMeta").doc("retention").set({
+    lastBackfillAt: admin.firestore.FieldValue.serverTimestamp(),
+    lastBackfillWritten: written,
+    lastBackfillScanned: scanned,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, {merge: true});
+  return {
+    ok: true,
+    scanned,
+    candidates: byId.size,
+    written,
+    mediaRetentionDays: MEDIA_RETENTION_DAYS,
+    auditRetentionYears: AUDIT_RETENTION_YEARS,
+    uiDefaultSearchDays: UI_DEFAULT_SEARCH_DAYS
+  };
 });
 
 const getShoutoutComplianceRetention = onCall({region: "us-central1"}, async (request) => {
@@ -326,10 +547,13 @@ const getShoutoutComplianceRetention = onCall({region: "us-central1"}, async (re
     ok: true,
     mediaRetentionDays: MEDIA_RETENTION_DAYS,
     auditRetentionYears: AUDIT_RETENTION_YEARS,
+    uiDefaultSearchDays: UI_DEFAULT_SEARCH_DAYS,
     policy: {
       media: `ShoutOut media is deleted ${MEDIA_RETENTION_DAYS} days after completion/approval.`,
-      audit: `Audit metadata is retained ${AUDIT_RETENTION_YEARS} years, then anonymized.`,
-      foreverMedia: false
+      audit: `Audit metadata is retained ${AUDIT_RETENTION_YEARS} years, then anonymized (SOC 2 / NIST AU-11).`,
+      uiWindow: `Master Admin default search window is ${UI_DEFAULT_SEARCH_DAYS} days; expand the date range to search older retained metadata.`,
+      foreverMedia: false,
+      note: "Do not delete compliance metadata at 60 days — that would break audit retention requirements."
     },
     meta: meta.exists ? meta.data() : {}
   };
@@ -338,6 +562,11 @@ const getShoutoutComplianceRetention = onCall({region: "us-central1"}, async (re
 module.exports = {
   AUDIT_RETENTION_YEARS,
   MEDIA_RETENTION_DAYS,
+  UI_DEFAULT_SEARCH_DAYS,
+  INDEXABLE_STATUSES,
+  TERMINAL_STATUSES,
+  shouldIndexShoutout,
+  lifecyclePhase,
   buildComplianceRecord,
   upsertComplianceLog,
   onShoutoutComplianceWrite,

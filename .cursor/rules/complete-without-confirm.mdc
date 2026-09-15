@@ -33,5 +33,10 @@ Do not end a turn with “I’ll check whether it’s committed/published.” If
 - Re-ask for details they already gave.
 - Treat an interrupted tool run as “waiting for the user” — resume and finish.
 - Investigate status as a substitute for producing the output.
+- Drop earlier unfinished work because a newer message arrived — see `finish-open-work-before-idle.mdc`.
 
 Commit / push / Pages publish when they already asked for that in this thread (including an earlier message in the same conversation), including words like **release**, **ship**, **publish**, **go live**, or **major version**.
+
+## Before idle (mandatory)
+
+Re-read this chat’s open asks and todos. If anything still lacks shipped output, continue that work in the same turn. Do not require the user to remind you.
