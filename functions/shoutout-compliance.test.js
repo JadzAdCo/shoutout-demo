@@ -26,7 +26,10 @@ test("buildComplianceRecord indexes venue content and media purge window", () =>
     approvedAt: {toMillis: () => Date.parse("2026-01-02T00:00:00Z")},
     amountCents: 2000,
     paymentStatus: "paid",
-    referenceNumber: "SO-1"
+    referenceNumber: "SO-1",
+    submittedBy: "patron@example.com",
+    clientIp: "69.243.87.16",
+    ipSource: "callable"
   });
   assert.equal(row.shoutoutId, "abc123");
   assert.equal(row.venueNameLower, "zebbies miami");
@@ -36,7 +39,22 @@ test("buildComplianceRecord indexes venue content and media purge window", () =>
   assert.equal(row.lifecyclePhase, "completed");
   assert.ok(row.mediaRetentionUntilMs > row.eventAtMs);
   assert.ok(row.retentionUntilMs > row.eventAtMs);
-  assert.equal(row.complianceVersion, "s3.0.67");
+  assert.equal(row.complianceVersion, "s3.0.68");
+  assert.equal(row.actorEmail, "patron@example.com");
+  assert.equal(row.actorIdentifier, "patron@example.com");
+  assert.equal(row.clientIp, "69.243.87.16");
+});
+
+test("actorFieldsFromSources prefers email then phone", () => {
+  const emailFirst = compliance.actorFieldsFromSources({
+    submittedBy: "a@b.com",
+    phone: "2025551212"
+  });
+  assert.equal(emailFirst.actorIdentifier, "a@b.com");
+  const phoneOnly = compliance.actorFieldsFromSources({
+    phone: "2025551212"
+  }, {});
+  assert.equal(phoneOnly.actorIdentifier, "2025551212");
 });
 
 test("shouldIndexShoutout covers submitted and rejected lifecycle", () => {
@@ -53,7 +71,7 @@ test("master admin html nests ShoutOuts completed log and retention", () => {
   assert.match(html, /data-tab-group="shoutouts"/);
   assert.match(html, /data-panel="shoutoutCompletedLog"/);
   assert.match(html, /data-panel="shoutoutRetention"/);
-  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.67/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.68/);
   assert.match(html, /id="soComplianceVenue"/);
   assert.match(html, /id="soComplianceVenueList"/);
   assert.match(html, /id="soComplianceStatusFilter"/);
