@@ -1,5 +1,5 @@
 /**
- * Master Admin → ShoutOuts (Completed log + Retention).
+ * Master Admin → ShoutOuts (Compliance Logs + Retention).
  * Design notes: .cursor/rules/design-notes-master-admin-shoutouts.mdc
  * Firestore search v1: date-range query + client filter for venue/content/status.
  * Venues come from clubLocations datapoints (contextual typeahead).
@@ -8,6 +8,7 @@
   "use strict";
 
   let venueCache = [];
+  let lastComplianceRows = [];
 
   function byId(id) { return document.getElementById(id); }
   function esc(value) {
@@ -40,6 +41,12 @@
   }
   function endOfDayInput() {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  function csvEscape(value) {
+    const text = String(value == null ? "" : value);
+    if (/[",\n\r]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+    return text;
   }
 
   function db() {
@@ -110,6 +117,7 @@
     const toStr = String(byId("soComplianceTo")?.value || "").trim();
     const host = byId("soComplianceResults");
     if (!host) return;
+    lastComplianceRows = [];
     setText("soComplianceStatus", "Searching compliance log…");
     const fromMs = fromStr ? Date.parse(`${fromStr}T00:00:00`) : Date.now() - 60 * 24 * 60 * 60 * 1000;
     const toMs = toStr ? Date.parse(`${toStr}T23:59:59`) : Date.now();
@@ -132,6 +140,7 @@
             return ms >= fromMs && ms <= toMs;
           });
       } catch (err2) {
+        lastComplianceRows = [];
         setText("soComplianceStatus", err2.message || "Could not read shoutoutComplianceLogs.");
         host.innerHTML = `<p class="sub">${esc(err2.message || "Read failed")}</p>`;
         return;
@@ -165,6 +174,7 @@
         return phase === statusFilter || status === statusFilter;
       });
     }
+    lastComplianceRows = rows.slice();
     setText(
       "soComplianceStatus",
       `${rows.length} record(s). Default window 60 days (searchable). Media max 90 days; audit metadata 7 years.`
@@ -191,6 +201,77 @@
         ${mediaLink}
       </div>`;
     }).join("");
+  }
+
+  function exportComplianceLogsCsv() {
+    const rows = Array.isArray(lastComplianceRows) ? lastComplianceRows : [];
+    if (!rows.length) {
+      setText("soComplianceStatus", "No compliance records to export. Search first, then Export to CSV.");
+      return;
+    }
+    const header = [
+      "eventAt",
+      "referenceNumber",
+      "shoutoutId",
+      "venueName",
+      "clubLocationId",
+      "lifecyclePhase",
+      "status",
+      "paymentStatus",
+      "amountCents",
+      "mainText",
+      "subText",
+      "actorIdentifier",
+      "actorEmail",
+      "actorPhone",
+      "submittedByUid",
+      "clientIp",
+      "ipSource",
+      "mediaUrl",
+      "mediaPurgeStatus",
+      "mediaRetentionUntil",
+      "legalHold",
+      "anonymized",
+      "source"
+    ];
+    const lines = [header.join(",")];
+    rows.forEach((row) => {
+      lines.push([
+        fmtDate(row.eventAt || row.eventAtMs),
+        row.referenceNumber || "",
+        row.shoutoutId || row.id || "",
+        row.venueName || "",
+        row.clubLocationId || "",
+        row.lifecyclePhase || "",
+        row.status || "",
+        row.paymentStatus || "",
+        row.amountCents ?? "",
+        row.mainText || "",
+        row.subText || "",
+        row.actorIdentifier || "",
+        row.actorEmail || "",
+        row.actorPhone || "",
+        row.submittedByUid || "",
+        row.clientIp || "",
+        row.ipSource || "",
+        row.mediaUrl || "",
+        row.mediaPurgeStatus || "",
+        fmtDate(row.mediaRetentionUntil),
+        row.legalHold ? "yes" : "",
+        row.anonymized ? "yes" : "",
+        row.source || ""
+      ].map(csvEscape).join(","));
+    });
+    const blob = new Blob([lines.join("\n")], {type: "text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `floqr-compliance-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setText("soComplianceStatus", `Exported ${rows.length} compliance log row(s) to CSV.`);
   }
 
   async function loadRetentionPolicy() {
@@ -248,6 +329,7 @@
     if (!byId("soComplianceTo")?.value) byId("soComplianceTo").value = endOfDayInput();
     byId("soComplianceSearchBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
     byId("soComplianceRefreshBtn")?.addEventListener("click", () => searchComplianceLogs().catch(console.warn));
+    byId("soComplianceExportCsvBtn")?.addEventListener("click", () => exportComplianceLogsCsv());
     byId("soRetentionRefreshBtn")?.addEventListener("click", () => loadRetentionPolicy().catch(console.warn));
     byId("soComplianceBackfillBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
     byId("soComplianceRebuildBtn")?.addEventListener("click", () => runBackfill().catch(console.warn));
@@ -261,5 +343,5 @@
     if (panelId === "shoutoutRetention") loadRetentionPolicy().catch(console.warn);
   }
 
-  global.FLOQRMasterShoutouts = {mount, onPanel, searchComplianceLogs, loadRetentionPolicy, loadVenues};
+  global.FLOQRMasterShoutouts = {mount, onPanel, searchComplianceLogs, exportComplianceLogsCsv, loadRetentionPolicy, loadVenues};
 })(window);

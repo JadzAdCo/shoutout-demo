@@ -37,7 +37,7 @@ Backfill callable `backfillShoutoutComplianceLogs` merges these into `shoutoutCo
 
 Tab group **ShoutOuts**:
 
-- **Completed log** — venue typeahead from `clubLocations`, lifecycle filter (submitted / rejected / completed), content + date; **Rebuild compliance log**
+- **Compliance Logs** — venue typeahead from `clubLocations`, lifecycle filter (submitted / rejected / completed), content + date; **Rebuild compliance log**; **Export to CSV** (current search results)
 - **Retention** — 7y / 90d / 60d UI window policy + rebuild
 
 ## Collections

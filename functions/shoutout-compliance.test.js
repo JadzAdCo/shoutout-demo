@@ -91,17 +91,19 @@ test("shouldIndexShoutout covers submitted and rejected lifecycle", () => {
   assert.equal(compliance.lifecyclePhase("pending_approval", "paid"), "submitted_paid");
 });
 
-test("master admin html nests ShoutOuts completed log and retention", () => {
+test("master admin html nests ShoutOuts compliance logs and retention", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "master-admin.html"), "utf8");
   assert.match(html, /data-tab-group="shoutouts"/);
   assert.match(html, /data-panel="shoutoutCompletedLog"/);
   assert.match(html, /data-panel="shoutoutRetention"/);
-  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.68/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.75/);
+  assert.match(html, /Compliance Logs/);
   assert.match(html, /id="soComplianceVenue"/);
   assert.match(html, /id="soComplianceVenueList"/);
   assert.match(html, /id="soComplianceStatusFilter"/);
   assert.match(html, /id="soComplianceRebuildBtn"/);
   assert.match(html, /id="soComplianceContent"/);
+  assert.match(html, /id="soComplianceExportCsvBtn"/);
 });
 
 test("firestore rules harden shoutoutAudit and lock compliance logs", () => {
@@ -120,10 +122,12 @@ test("patron portal completed actions prefer Re-Use over Diagnose", () => {
   assert.match(app, /FLOQR_REUSE_SHOUTOUT/);
 });
 
-test("master admin shoutouts loads venues from clubLocations", () => {
+test("master admin shoutouts loads venues from clubLocations and exports CSV", () => {
   const js = fs.readFileSync(path.join(__dirname, "..", "master-admin-shoutouts.js"), "utf8");
   assert.match(js, /clubLocations/);
   assert.match(js, /soComplianceVenueList/);
   assert.match(js, /backfillShoutoutComplianceLogs/);
   assert.match(js, /startOfDayInput\(60\)/);
+  assert.match(js, /exportComplianceLogsCsv/);
+  assert.match(js, /floqr-compliance-logs-/);
 });

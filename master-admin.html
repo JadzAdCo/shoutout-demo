@@ -61,7 +61,7 @@
         <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
           <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOuts</button>
           <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
-            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Completed log</button>
+            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Compliance Logs</button>
             <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
           </div>
         </div>
@@ -178,9 +178,9 @@
         <div class="card">
           <h2
             data-i18n="master.shoutoutCompletedLog"
-            data-floqr-help-title="Completed ShoutOut log"
-            data-floqr-help-body="Network compliance log of submitted, rejected, paid, and completed ShoutOuts for Master Admin review. Pick a venue from clubLocations or type to filter. Audit metadata is kept for 7 years. Media is deleted 90 days after completion. The default search window is 60 days — expand dates to search older retained records. FloqR does not forever-archive media for compliance."
-            data-floqr-help-search="shoutout compliance|completed shoutout log|master shoutouts|audit retention|venue search">Completed log</h2>
+            data-floqr-help-title="Compliance Logs"
+            data-floqr-help-body="Network compliance logs of submitted, rejected, paid, and completed ShoutOuts for Master Admin review. Pick a venue from clubLocations or type to filter. Audit metadata is kept for 7 years. Media is deleted 90 days after completion. The default search window is 60 days — expand dates to search older retained records. Export to CSV downloads the current search results. FloqR does not forever-archive media for compliance."
+            data-floqr-help-search="shoutout compliance|compliance logs|completed shoutout log|master shoutouts|audit retention|venue search|export csv">Compliance Logs</h2>
           <p class="sub small">SOC 2 / ISO 27001 / NIST-aligned audit metadata. Venue list comes from Firebase <code>clubLocations</code>. Rebuild reconstructs empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages.</p>
           <div class="profile-grid">
             <label>Event / venue name
@@ -207,6 +207,9 @@
           </div>
           <p id="soComplianceStatus" class="status"></p>
           <div id="soComplianceResults" class="report-block"></div>
+          <div class="queue-actions" style="margin-top:1rem">
+            <button id="soComplianceExportCsvBtn" class="primary" type="button" data-i18n="master.shoutoutComplianceExportCsv">Export to CSV</button>
+          </div>
         </div>
       </section>
 
@@ -1183,7 +1186,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.66"></script>
+<script src="./floqr-i18n.js?v=s3.0.75"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
@@ -1209,7 +1212,7 @@
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=s3.0.66"></script>
-<script src="./master-admin-shoutouts.js?v=s3.0.68"></script>
+<script src="./master-admin-shoutouts.js?v=s3.0.75"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
