@@ -889,6 +889,8 @@
     setText("signedInAs", user ? "" : "Please Sign-In or Sign-Up:");
     byId("signedInActions")?.classList.toggle("hidden", !user);
     byId("loginActions")?.classList.toggle("hidden", !!user);
+    byId("dropdownSignInBtn")?.classList.toggle("hidden", !!user);
+    byId("dropdownSignOutBtn")?.classList.toggle("hidden", !user);
     updateUserMenu(user);
   }
 
@@ -1130,9 +1132,27 @@
       await auth.signInWithPopup(provider);
     } catch(e) {
       const code = e?.code || "";
-      if (code === "auth/popup-blocked" || code === "auth/cancelled-popup-request") {
-        setStatus(`${label} popup was blocked. Redirecting instead...`);
-        await auth.signInWithRedirect(provider);
+      // Popup closed / blocked is common on mobile + strict browsers; fall back to redirect.
+      if (
+        code === "auth/popup-blocked"
+        || code === "auth/cancelled-popup-request"
+        || code === "auth/popup-closed-by-user"
+      ) {
+        setStatus(`${label} popup closed or blocked. Redirecting to secure sign-in…`);
+        try {
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (redirectErr) {
+          setStatus(`${redirectErr.code || "error"}: ${redirectErr.message || redirectErr}`);
+          return;
+        }
+      }
+      if (code === "auth/unauthorized-domain") {
+        setStatus("This site is not authorized for Google sign-in. Add jadzadco.github.io under Firebase Authentication → Settings → Authorized domains.");
+        return;
+      }
+      if (code === "auth/operation-not-allowed") {
+        setStatus("Google sign-in is not enabled in Firebase Authentication.");
         return;
       }
       setStatus(`${e.code || "error"}: ${e.message}`);
@@ -4180,6 +4200,11 @@
     }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
     auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
     bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
+    bind("dropdownSignInBtn", () => {
+      byId("userDropdown")?.classList.add("hidden");
+      showPage("landingPage");
+      setStatus("Please Sign-In or Sign-Up:");
+    });
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
     bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
