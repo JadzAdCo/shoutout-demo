@@ -39,10 +39,35 @@ test("buildComplianceRecord indexes venue content and media purge window", () =>
   assert.equal(row.lifecyclePhase, "completed");
   assert.ok(row.mediaRetentionUntilMs > row.eventAtMs);
   assert.ok(row.retentionUntilMs > row.eventAtMs);
-  assert.equal(row.complianceVersion, "s3.0.68");
+  assert.equal(row.complianceVersion, "s3.0.69");
   assert.equal(row.actorEmail, "patron@example.com");
   assert.equal(row.actorIdentifier, "patron@example.com");
   assert.equal(row.clientIp, "69.243.87.16");
+});
+
+test("getFloqrClientIp and stampShoutoutActorContext are exported callables", () => {
+  assert.equal(typeof compliance.getFloqrClientIp, "function");
+  assert.equal(typeof compliance.stampShoutoutActorContext, "function");
+  const src = fs.readFileSync(path.join(__dirname, "shoutout-compliance-functions.js"), "utf8");
+  assert.match(src, /const getFloqrClientIp = onCall/);
+  assert.match(src, /action: "client_ip_probe"/);
+  const index = fs.readFileSync(path.join(__dirname, "index.js"), "utf8");
+  assert.match(index, /getFloqrClientIp:/);
+});
+
+test("patron Search loads floqr-client-ip and attaches session IP on submit", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  assert.match(html, /floqr-client-ip\.js\?v=s3\.0\.69/);
+  assert.match(html, /patron-app\.js\?v=s3\.0\.69/);
+  const clientIp = fs.readFileSync(path.join(__dirname, "..", "floqr-client-ip.js"), "utf8");
+  assert.match(clientIp, /getFloqrClientIp/);
+  assert.match(clientIp, /FLOQRClientIp/);
+  const patron = fs.readFileSync(path.join(__dirname, "..", "patron-app.js"), "utf8");
+  assert.match(patron, /FLOQRClientIp\?\.ensure/);
+  assert.match(patron, /clientIp: sessionIp\.clientIp/);
+  const pay = fs.readFileSync(path.join(__dirname, "..", "payment-service.js"), "utf8");
+  assert.match(pay, /FLOQRClientIp\?\.ensure/);
+  assert.match(pay, /patchPayload/);
 });
 
 test("actorFieldsFromSources prefers email then phone", () => {

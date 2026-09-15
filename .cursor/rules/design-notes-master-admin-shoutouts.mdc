@@ -51,8 +51,14 @@ Tab group **ShoutOuts**:
 | Field | Source |
 |---|---|
 | `actorEmail` / `actorPhone` / `actorIdentifier` | shoutout `submittedBy`, `shoutoutAudit.actorEmail`, Inbox `recipientEmail`, `users/{uid}` email/phone |
-| `clientIp` / `ipSource` | checkout callable (`serviceOrders.clientIp` → paid shoutout), `stampShoutoutActorContext` for free submits, optional `appLogs.clientIp` when present |
+| `clientIp` / `ipSource` | **Session probe** `getFloqrClientIp` (signed-in, cached in `sessionStorage` via `floqr-client-ip.js`) attached at editor/submit; **server overwrite** on free submit via `stampShoutoutActorContext`; **paid** via `createFloqrCheckoutSession` → `serviceOrders.clientIp` (prefer order IP over client-supplied) |
+
+Capture points (patron Search / ShoutOut flow):
+
+1. After login (`afterLogin`) — warm cache
+2. Enter editor (`goToEditor`) — refresh if TTL expired
+3. Submit / checkout — embed `clientIp`/`ipSource` on shoutout payload; stamp/checkout still authoritative
 
 Display security logs (`displayAccessLogs`) are board/kiosk IPs — not used as the patron submitter IP.
 
-Historical rows may show email/phone after Rebuild even when IP is blank (IP was not stored before this pass).
+Historical rows may show email/phone after Rebuild even when IP is blank (IP was not stored before session probe).

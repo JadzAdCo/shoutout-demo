@@ -37,23 +37,64 @@
         details,
         correlationId,
         source: "payment-service",
-        appVersion: "29.09.4"
+        appVersion: "29.09.69"
       });
     } catch (_) {}
+  }
+
+  /**
+   * Open a popup synchronously during a user click (before any await).
+   * Do NOT pass noopener — modern browsers return null even when the window opens,
+   * which makes callers think the popup was blocked.
+   */
+  function openUserGesturePopup(name = "floqr_checkout", features = "width=540,height=780") {
+    const popup = window.open("about:blank", name, features);
+    if (popup) {
+      try {
+        popup.document.title = "FLOQR Checkout";
+        popup.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">Opening secure checkout…</p>";
+        popup.opener = null;
+      } catch (_) {}
+    }
+    return popup || null;
+  }
+
+  async function logPopupEvent(action, message, details = {}, correlationId) {
+    await logClient(action === "popup_blocked" ? "warn" : "info", action, message, {
+      href: typeof location !== "undefined" ? location.href : "",
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+      ...details
+    }, correlationId);
   }
 
   async function startCheckout({orderType, payload = {}, status, redirect = true} = {}) {
     requireUser();
     const correlationId = window.FLOQRLog?.correlationId?.("chk") || `chk_${Date.now().toString(36)}`;
     status?.("Opening secure Stripe checkout…");
+    try { await window.FLOQRClientIp?.ensure?.(); } catch (_e) {}
+    const sessionIp = window.FLOQRClientIp?.patchPayload?.({}) || window.FLOQRClientIp?.current?.() || {};
+    let checkoutPayload = payload;
+    if (payload?.shoutout && typeof payload.shoutout === "object") {
+      checkoutPayload = {
+        ...payload,
+        shoutout: window.FLOQRClientIp?.patchPayload?.(payload.shoutout) || {
+          ...payload.shoutout,
+          clientIp: sessionIp.clientIp || payload.shoutout.clientIp || "",
+          ipSource: sessionIp.clientIp ? (sessionIp.ipSource || "session-cache") : (payload.shoutout.ipSource || "")
+        }
+      };
+    } else if (sessionIp.clientIp) {
+      checkoutPayload = window.FLOQRClientIp?.patchPayload?.(payload) || {...payload, ...sessionIp};
+    }
     await logClient("info", "checkout_start", `Starting ${orderType || "order"} checkout`, {
       orderType,
-      clubLocationId: payload?.clubLocationId || payload?.shoutout?.clubLocationId || "",
-      template: payload?.shoutout?.template || ""
+      clubLocationId: checkoutPayload?.clubLocationId || checkoutPayload?.shoutout?.clubLocationId || "",
+      template: checkoutPayload?.shoutout?.template || "",
+      clientIp: sessionIp.clientIp || checkoutPayload?.shoutout?.clientIp || ""
     }, correlationId);
     try {
       const returnBase = new URL(".", window.location.href).href;
-      const response = await callable("createFloqrCheckoutSession")({orderType, payload, returnBase, correlationId});
+      const response = await callable("createFloqrCheckoutSession")({orderType, payload: checkoutPayload, returnBase, correlationId});
       const result = response?.data || {};
       if (!result.checkoutUrl) throw new Error("Stripe checkout did not return a secure payment link.");
       await logClient("info", "checkout_redirect", redirect ? "Redirecting to Stripe Checkout" : "Checkout session ready (deferred redirect)", {
@@ -170,15 +211,30 @@
     }
   }
 
+  async function confirmCheckoutSession({orderId, sessionId, status} = {}) {
+    requireUser();
+    if (!orderId) throw new Error("Order id is required.");
+    status?.("Confirming payment with Stripe…");
+    try {
+      const response = await callable("confirmFloqrCheckoutSession")({orderId, sessionId: sessionId || ""});
+      return response?.data || {};
+    } catch (error) {
+      throw unwrapCallableError(error);
+    }
+  }
+
   window.FLOQRPayments = {
     getConnectStatus,
     getClubCheckoutReadiness,
     startCheckout,
+    confirmCheckoutSession,
     startConnectOnboarding,
     cancelCheckoutOrder,
     clearUnpaidCheckouts,
     purgeTestPayments,
     publishFollowerCampaign,
-    requestTeslaPickup
+    requestTeslaPickup,
+    openUserGesturePopup,
+    logPopupEvent
   };
 })();

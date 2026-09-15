@@ -208,7 +208,7 @@ function buildComplianceRecord(shoutoutId, data = {}) {
     contentHash: contentHash(mainText, subText, shoutoutId),
     anonymized: !!data.anonymized,
     source: text(data.source || "shoutouts", 40),
-    complianceVersion: "s3.0.68",
+    complianceVersion: "s3.0.69",
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
 }
@@ -626,6 +626,30 @@ const stampShoutoutActorContext = onCall({region: "us-central1"}, async (request
   return {ok: true, shoutoutId, clientIp: actor.clientIp, actorIdentifier: actor.actorIdentifier};
 });
 
+/** Signed-in session probe: return the caller's public IP for ShoutOut compliance attachment. */
+const getFloqrClientIp = onCall({region: "us-central1"}, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const clientIp = extractClientIp(request);
+  try {
+    await db.collection("appLogs").add({
+      level: "info",
+      category: "shoutout",
+      action: "client_ip_probe",
+      message: "Captured public IP for ShoutOut session",
+      details: {clientIp},
+      uid: request.auth.uid,
+      email: emailOf(request.auth),
+      clientIp,
+      source: "functions",
+      logCategory: "diagnostic",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAtMs: Date.now(),
+      expireAtMs: Date.now() + (30 * 24 * 60 * 60 * 1000)
+    });
+  } catch (_e) {}
+  return {ok: true, clientIp, ipSource: clientIp ? "session-callable" : ""};
+});
+
 const purgeExpiredShoutoutMedia = onSchedule({
   schedule: "every 24 hours",
   timeZone: "America/New_York"
@@ -757,6 +781,7 @@ module.exports = {
   upsertComplianceLog,
   onShoutoutComplianceWrite,
   stampShoutoutActorContext,
+  getFloqrClientIp,
   purgeExpiredShoutoutMedia,
   anonymizeExpiredComplianceLogs,
   backfillShoutoutComplianceLogs,
