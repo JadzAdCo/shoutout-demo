@@ -256,17 +256,25 @@
     if (!currentCampaignId) await saveCampaign();
     if (!currentCampaignId) throw new Error("Save a draft before sending.");
     const testPhone = String(byId("marketingTestPhone")?.value || "").trim();
-    if (!testPhone) throw new Error("Enter a test recipient phone (E.164) to send.");
+    if (!testPhone) throw new Error("Enter a test recipient phone (E.164, e.g. +12025550123) to send.");
     const channel = byId("marketingChannel")?.value || "sms";
-    if (status) status.textContent = "Sending campaign (debits message credits)…";
+    if (status) status.textContent = "Sending test (Twilio; debits only on real delivery)…";
     const result = await callable("sendClubMarketingCampaign")({
       clubLocationId: locationId,
       campaignId: currentCampaignId,
+      allowRetest: true,
+      broadcast: false,
       recipients: [{phone: testPhone, channel: channel === "whatsapp" ? "whatsapp" : "sms"}]
     });
     const data = result?.data || {};
     if (status) {
-      status.textContent = `Sent ${data.sent || 0}/${data.attempted || 0}. Remaining SMS ${data.remaining?.smsBalance ?? "—"}, WhatsApp ${data.remaining?.whatsappBalance ?? "—"}.`;
+      if (data.dryRun) {
+        status.textContent = data.message
+          || "Twilio dry-run: no SMS delivered (secrets/From missing). Credits not debited. Check Master Admin → Twilio Logging.";
+      } else {
+        status.textContent = data.message
+          || `Sent ${data.sent || 0}/${data.attempted || 0}. Remaining SMS ${data.remaining?.smsBalance ?? "—"}, WhatsApp ${data.remaining?.whatsappBalance ?? "—"}.`;
+      }
     }
     await loadCredits();
     await loadCampaignList();
@@ -371,6 +379,7 @@
       if (!user) return;
       loadCredits().catch(() => {});
       loadCampaignList().catch(() => {});
+      window.FLOQRTwilioLogging?.mountClub?.({clubLocationId: locationId});
     });
   }
 

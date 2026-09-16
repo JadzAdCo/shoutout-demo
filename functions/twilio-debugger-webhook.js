@@ -12,6 +12,8 @@ const crypto = require("crypto");
 const admin = require("firebase-admin");
 const {onRequest} = require("firebase-functions/v2/https");
 
+const {writeTwilioLog} = require("./twilio-log");
+
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
@@ -233,6 +235,33 @@ exports.twilioDebuggerWebhook = onRequest({
     await db.collection("twilioDebuggerEvents").add(doc);
   } catch (error) {
     console.error("twilioDebuggerEvents write failed", error?.message || error);
+  }
+
+  try {
+    await writeTwilioLog({
+      channel: "other",
+      feature: "debugger",
+      purpose: "debugger-webhook",
+      source: "twilioDebuggerWebhook",
+      trigger: "webhook",
+      to: summary.toLast4 ? `***${summary.toLast4}` : "",
+      from: summary.fromLast4 ? `***${summary.fromLast4}` : "",
+      body: "",
+      status: text(level, 40).toLowerCase() || "error",
+      sendOk: false,
+      dryRun: false,
+      providerSid: summary.resourceSid || eventSid,
+      error: text(`${summary.errorCode || ""} ${summary.errorMessage || level}`, 500),
+      errorCode: summary.errorCode,
+      accountSidLast4: accountSid ? accountSid.slice(-4) : "",
+      extra: {
+        eventSid,
+        moreInfo: summary.moreInfo,
+        securityRelevant
+      }
+    });
+  } catch (error) {
+    console.error("twilio feature/compliance log write failed", error?.message || error);
   }
 
   try {
