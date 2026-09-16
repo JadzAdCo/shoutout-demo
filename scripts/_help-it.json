@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "Campagne pubblicitarie",
+    "body": "Scegli un account Business in My Profile per aprire Ad Campaigns. Inline (45 $ / 7 giorni — durante l’uso di FloqR) o Mingl Gist (25 $ / 7 giorni — scorrendo Mingl). Carica PNG/JPEG/GIF o incolla HTML. Pubblico: tutti o datapoint del profilo. L’invio va a Master Admin per approvazione e pianificazione."
+  },
+  "help-completed-shoutouts": {
+    "title": "ShoutOuts completati",
+    "body": "Gli ShoutOut completati sono ShoutOut approvati dal club (e terminati) per i tuoi record. Archivia sposta uno ShoutOut da Completati ad Archive con testo e media compressi (se presenti). Riusa apre Search con lo stesso testo. Salva come modello appare solo se lo sfondo del modello è modificabile (IsModifiable). Le ricevute pagate restano in FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "ShoutOut archiviati",
+    "body": "Archive memorizza una copia compressa del testo e dei media dello ShoutOut completato (se presenti) in storage Firebase economico e lo rimuove da Completati. Apri Archive quando vuoi. Riusa funziona anche da Archive."
+  },
   "floqai-ask-floqr": {
     "title": "Chiedi FloqR con FloqAi",
     "body": "Chiedi FloqR con FloqAi: tocca il segno animato o attendi il messaggio, quindi digita ciò che desideri in parole semplici. Prodotti: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), mazze. Obiettivi: dì \"Voglio poter...\" (ad esempio diventare un Club Admin) o \"make me a superstar\" per passaggi e collegamenti."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "Circa Mingl richieste",
     "body": "Le richieste di amico o Mingl inviate e ricevute vengono visualizzate qui. Le richieste rimangono nella pagina principale Mingl; le conversazioni accettate si aprono in Mingl Chat."
+  },
+  "help-club-messaging-logs": {
+    "title": "Registri di consegna SMS e WhatsApp",
+    "body": "Mostra SMS e WhatsApp Twilio inviati per questa sede (test marketing, avvisi club). Le stesse righe sono in Master Admin → Twilio. Dry-run = mancano secrets o From — nulla consegnato e nessun credito addebitato. Telefoni mascherati."
   }
 }

@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "Рекламные кампании",
+    "body": "Выберите Business account в My Profile, чтобы открыть Ad Campaigns. Inline ($45 / 7 дней — во время использования FloqR) или Mingl Gist ($25 / 7 дней — при прокрутке Mingl). Загрузите PNG/JPEG/GIF или вставьте HTML. Аудитория: все или datapoints профиля. Отправка уходит Master Admin на одобрение и расписание."
+  },
+  "help-completed-shoutouts": {
+    "title": "Завершённые ShoutOuts",
+    "body": "Завершённые ShoutOuts — одобренные клубом (и законченные) ShoutOuts для ваших записей. Архив переносит ShoutOut из Завершённых в Archive со сжатым текстом и медиа (если оно было). Повторное использование открывает Search с тем же текстом. Сохранить как шаблон доступно только если фон шаблона изменяем (IsModifiable). Оплаченные квитанции остаются в FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "Архивные ShoutOuts",
+    "body": "Архив хранит сжатую копию текста и медиа завершённого ShoutOut (если медиа было) в недорогом Firebase Storage и убирает его из Завершённых. Откройте Archive в любое время. Повторное использование работает и из Archive."
+  },
   "floqai-ask-floqr": {
     "title": "Спросите FloqR через FloqAi",
     "body": "Спросите FloqR через FloqAi — нажмите анимированный знак или дождитесь подсказки, затем опишите, что нужно, простыми словами. Продукты: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), клубы. Цели: скажите «я хочу уметь…» (например, стать Club Admin) или «make me a superstar» — получите шаги и ссылки."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "О запросах Mingl",
     "body": "Отправленные и полученные Friend или Mingl Requests появляются здесь. Запросы остаются на главной странице Mingl; принятые разговоры открываются в Mingl Chat."
+  },
+  "help-club-messaging-logs": {
+    "title": "Журналы доставки SMS и WhatsApp",
+    "body": "Показывает SMS и WhatsApp Twilio для этой площадки (тест маркетинга, клубные оповещения). Те же строки в Master Admin → Twilio. Dry-run = нет secrets или From — ничего не доставлено, кредиты не списаны. Телефоны скрыты."
   }
 }

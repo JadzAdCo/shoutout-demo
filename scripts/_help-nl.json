@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "Advertentiecampagnes",
+    "body": "Kies een Business account in My Profile om Ad Campaigns te openen. Inline ($45 / 7 dagen — tijdens FloqR-gebruik) of Mingl Gist ($25 / 7 dagen — tijdens Mingl-scrollen). Upload PNG/JPEG/GIF of plak HTML. Richt je op alle patrons of op profiel-datapoints. Indienen gaat naar Master Admin voor goedkeuring en planning."
+  },
+  "help-completed-shoutouts": {
+    "title": "Voltooide ShoutOuts",
+    "body": "Voltooide ShoutOuts zijn door de club goedgekeurde (en afgeronde) ShoutOuts voor je administratie. Archiveren verplaatst een ShoutOut van Voltooid naar Archive met gecomprimeerde tekst en media (als die er was). Hergebruik opent Search met dezelfde tekst. Opslaan als sjabloon verschijnt alleen als de sjabloonachtergrond wijzigbaar is (IsModifiable). Betaalde bonnen blijven in FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "Gearchiveerde ShoutOuts",
+    "body": "Archive bewaart een gecomprimeerde kopie van je voltooide ShoutOut-tekst en media (als het origineel media had) in goedkope Firebase-opslag, en haalt het uit Voltooid. Open Archive wanneer je wilt. Hergebruik werkt ook vanuit Archive."
+  },
   "floqai-ask-floqr": {
     "title": "Vraag FloqR met FloqAi",
     "body": "Vraag FloqR met FloqAi — tik op het bewegende merkteken of wacht op de prompt, en typ in gewone woorden wat je wilt. Producten: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Doelen: zeg “ik wil kunnen…” (bijv. Club Admin worden) of “make me a superstar” voor stappen en links."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "Over Mingl Requests",
     "body": "Verzonden en ontvangen Friend- of Mingl Requests verschijnen hier. Requests blijven op de hoofd-Mingl-pagina; geaccepteerde gesprekken openen in Mingl Chat."
+  },
+  "help-club-messaging-logs": {
+    "title": "SMS- en WhatsApp-bezorglogboeken",
+    "body": "Toont Twilio SMS en WhatsApp voor deze locatie (marketingtest, clubalerts). Dezelfde rijen staan onder Master Admin → Twilio. Dry-run = secrets of From ontbreken — niets bezorgd en geen credits afgeschreven. Telefoons gemaskeerd."
   }
 }

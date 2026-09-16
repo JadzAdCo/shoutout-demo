@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "Campañas publicitarias",
+    "body": "Elige una cuenta Business en My Profile para abrir Ad Campaigns. Inline (45 $ / 7 días — al usar FloqR) o Mingl Gist (25 $ / 7 días — al desplazarte en Mingl). Sube PNG/JPEG/GIF o pega HTML. Dirige a todos o a datapoints del perfil. El envío va a Master Admin para aprobación y programación."
+  },
+  "help-completed-shoutouts": {
+    "title": "ShoutOuts completados",
+    "body": "Los ShoutOuts completados son ShoutOuts aprobados por el club (y terminados) para tus registros. Archivar mueve un ShoutOut de Completados a Archive con texto y media comprimidos (si los había). Reutilizar abre Search con el mismo texto. Guardar como plantilla solo aparece cuando el fondo de la plantilla es modificable (IsModifiable). Los recibos pagados permanecen en FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "ShoutOuts archivados",
+    "body": "Archive guarda una copia comprimida del texto y media de tu ShoutOut completado (si el original tenía media) en almacenamiento Firebase económico, y lo quita de Completados. Abre Archive cuando quieras. Reutilizar también funciona desde Archive."
+  },
   "floqai-ask-floqr": {
     "title": "Pregunta FloqR con FloqAi",
     "body": "Pregunta FloqR con FloqAi: toca la marca animada o espera el mensaje y luego escribe lo que quieras en palabras sencillas. Productos: Mingl, RydR, BartR, ShoutOut, SupRstR (superestrella), palos. Metas: diga “Quiero poder…” (por ejemplo, convertirme en Club Admin) o “make me a superstar” para conocer los pasos y enlaces."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "Acerca de Mingl Solicitudes",
     "body": "Las solicitudes de amigo o Mingl enviadas y recibidas aparecen aquí. Las solicitudes permanecen en la página principal Mingl; Las conversaciones aceptadas se abren en Mingl Chat."
+  },
+  "help-club-messaging-logs": {
+    "title": "Registros de entrega SMS y WhatsApp",
+    "body": "Muestra SMS y WhatsApp de Twilio enviados para este local (prueba de marketing, alertas del club). Las mismas filas están en Master Admin → Twilio. Dry-run = faltan secrets o From — no se entregó nada y no se debitaron créditos. Teléfonos enmascarados."
   }
 }

@@ -58,7 +58,7 @@ test("marketing send allows retest and does not treat dry-run as delivered", () 
   assert.match(src, /Campaign already sent\. Save a new draft/);
 });
 
-test("Master Admin exposes Twilio tab with log-type subtabs and compliance under Compliance Logs", () => {
+test("Master Admin exposes Twilio tab with log-type subtabs including compliance and SendGrid mail", () => {
   const html = read("master-admin.html");
   const ui = read("master-twilio-logging.js");
   assert.match(html, /data-tab-group="twilio"/);
@@ -66,8 +66,10 @@ test("Master Admin exposes Twilio tab with log-type subtabs and compliance under
   assert.match(html, /data-panel="twilioWhatsAppLogs"/);
   assert.match(html, /data-panel="twilioFeatureLogs"/);
   assert.match(html, /data-panel="twilioComplianceLogs"/);
+  assert.match(html, /data-panel="twilio_sendgridMailLogs"/);
   assert.match(html, /master-twilio-logging\.js\?v=/);
   assert.doesNotMatch(html, /data-panel="twilioLogging"/);
+  assert.doesNotMatch(html, /data-panel="mailLogging"/);
   assert.match(ui, /twilioSmsLogs/);
   assert.match(ui, /mountClub/);
   assert.match(ui, /twilioComplianceLogs/);

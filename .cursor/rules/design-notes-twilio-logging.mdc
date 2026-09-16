@@ -31,8 +31,9 @@ Retention: diagnostic body **30 days**; security metadata **90 days**; complianc
 
 ## Master Admin UI
 
-- Top-level **Twilio** tab group with subtabs: `twilioSmsLogs`, `twilioWhatsAppLogs`, `twilioFeatureLogs`
-- **ShoutOuts → Twilio Compliance** for `twilioComplianceLogs` (GRC only — not operational traffic)
+- Top-level **Twilio** tab group with subtabs: `twilioSmsLogs`, `twilioWhatsAppLogs`, `twilioFeatureLogs`, `twilioComplianceLogs`, `twilio_sendgridMailLogs`
+- SendGrid system mail (formerly Diagnostics → Mail Logging) lives under **Twilio → twilio_sendgridMailLogs** (`systemMailLogs`)
+- `twilioComplianceLogs` is GRC only — not operational traffic
 
 ## Club Admin UI
 

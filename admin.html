@@ -437,43 +437,49 @@
         </div>
 
         <div class="card" id="clubMessagingLogsCard">
-          <p class="eyebrow">Messaging logs</p>
-          <h2>SMS & WhatsApp delivery logs</h2>
-          <p class="sub small">Messages sent for this venue (marketing tests, club alerts). Same rows appear under Master Admin → Twilio. Phones are masked.</p>
+          <p class="eyebrow" data-i18n="admin.messagingLogs">Messaging logs</p>
+          <h2
+            data-i18n="admin.messagingLogsTitle"
+            data-floqr-help-id="help-club-messaging-logs"
+            data-floqr-help-title="SMS & WhatsApp delivery logs"
+            data-floqr-help-search="messaging logs|twilioSmsLogs|twilioWhatsAppLogs|club sms log|marketing sms log|send test debit"
+            data-floqr-help-body="Shows Twilio SMS and WhatsApp messages sent for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked."
+          >SMS & WhatsApp delivery logs</h2>
+          <p class="sub small" data-i18n="admin.messagingLogsBody">Messages sent for this venue (marketing tests, club alerts). Same rows appear under Master Admin → Twilio. Phones are masked.</p>
           <div class="admin-grid">
             <div>
-              <h3>twilioSmsLogs</h3>
+              <h3 data-i18n="admin.twilioSmsLogs">twilioSmsLogs</h3>
               <div class="profile-grid">
-                <label>Status
+                <label><span data-i18n="admin.logStatus">Status</span>
                   <select id="clubTwilioSmsLogsStatusFilter">
-                    <option value="">All</option>
+                    <option value="" data-i18n="admin.logStatusAll">All</option>
                     <option value="sent">sent</option>
                     <option value="failed">failed</option>
                     <option value="dry-run">dry-run</option>
                   </select>
                 </label>
-                <label>Search<input id="clubTwilioSmsLogsSearch" placeholder="purpose, SID, error"/></label>
+                <label><span data-i18n="admin.logSearch">Search</span><input id="clubTwilioSmsLogsSearch" data-i18n-placeholder="admin.logSearchPlaceholder" placeholder="purpose, SID, error"/></label>
               </div>
-              <div class="queue-actions"><button id="clubTwilioSmsLogsRefreshBtn" type="button">Refresh SMS</button></div>
+              <div class="queue-actions"><button id="clubTwilioSmsLogsRefreshBtn" type="button" data-i18n="admin.refreshSms">Refresh SMS</button></div>
               <p id="clubTwilioSmsLogsStatus" class="status"></p>
               <div id="clubTwilioSmsLogs" class="hidden" aria-hidden="true"></div>
               <div id="clubTwilioSmsLogsList" class="report-block"></div>
               <div id="clubTwilioSmsLogsDetail" class="report-block" style="margin-top:8px"></div>
             </div>
             <div>
-              <h3>twilioWhatsAppLogs</h3>
+              <h3 data-i18n="admin.twilioWhatsAppLogs">twilioWhatsAppLogs</h3>
               <div class="profile-grid">
-                <label>Status
+                <label><span data-i18n="admin.logStatus">Status</span>
                   <select id="clubTwilioWhatsAppLogsStatusFilter">
-                    <option value="">All</option>
+                    <option value="" data-i18n="admin.logStatusAll">All</option>
                     <option value="sent">sent</option>
                     <option value="failed">failed</option>
                     <option value="dry-run">dry-run</option>
                   </select>
                 </label>
-                <label>Search<input id="clubTwilioWhatsAppLogsSearch" placeholder="purpose, SID, error"/></label>
+                <label><span data-i18n="admin.logSearch">Search</span><input id="clubTwilioWhatsAppLogsSearch" data-i18n-placeholder="admin.logSearchPlaceholder" placeholder="purpose, SID, error"/></label>
               </div>
-              <div class="queue-actions"><button id="clubTwilioWhatsAppLogsRefreshBtn" type="button">Refresh WhatsApp</button></div>
+              <div class="queue-actions"><button id="clubTwilioWhatsAppLogsRefreshBtn" type="button" data-i18n="admin.refreshWhatsapp">Refresh WhatsApp</button></div>
               <p id="clubTwilioWhatsAppLogsStatus" class="status"></p>
               <div id="clubTwilioWhatsAppLogs" class="hidden" aria-hidden="true"></div>
               <div id="clubTwilioWhatsAppLogsList" class="report-block"></div>
@@ -908,9 +914,9 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.28"></script>
-<script src="./floqai-help-repository.js?v=s3.0.27"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.28"></script>
+<script src="./floqr-i18n.js?v=s3.0.78"></script>
+<script src="./floqai-help-repository.js?v=s3.0.78"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.78"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -926,8 +932,8 @@
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
-<script src="./admin-marketing.js?v=s3.0.77"></script>
-<script src="./master-twilio-logging.js?v=s3.0.77"></script>
+<script src="./admin-marketing.js?v=s3.0.78"></script>
+<script src="./master-twilio-logging.js?v=s3.0.78"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./admin-scheduling.js?v=s3.0.0"></script>
