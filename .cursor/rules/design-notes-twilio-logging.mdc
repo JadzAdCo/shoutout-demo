@@ -1,0 +1,45 @@
+# Twilio logging & marketing SMS delivery (follow-up)
+
+Design notes only (not FloqAi help). Resume: `@twilio-log$` / `@ad-pay$`.
+
+## Why Club Admin “Send test” showed sent but no SMS
+
+1. `sendClubMarketingCampaign` marked the campaign `status: "sent"` even when Twilio returned **dry-run** (`ok: true` with missing secrets/From).
+2. Credits were debited **before** Twilio accepted the message.
+3. A second click threw **Campaign already sent.** — matching the screenshot status.
+4. Spot ad · RydR interstitial templates often had empty `smsBody`, so copy relied on placeholders (`{{club}}`) without fill.
+
+## Fix contract
+
+- Test send (`broadcast: false`, default from Club Admin) may **retest**; status becomes `tested` / stays `draft` on dry-run/fail.
+- Debit SMS/WhatsApp credits **only** for real Twilio accepts (`ok && !dryRun`).
+- Fill `{{club}}` / `{{event}}` from `clubLocations` + campaign headline at send time.
+- Compose SMS from eyebrow/headline/body/cta when `smsBody` is empty; append STOP language.
+
+## Logging collections (GRC)
+
+Same standard as Mail Logging: **ISO/IEC 27001:2022 A.8.15** (+ SOC 2 CC6/CC7, NIST 800-53 AU).
+
+| Collection | Feature |
+|---|---|
+| `twilioSmsLogs` | Outbound SMS |
+| `twilioWhatsAppLogs` | Outbound WhatsApp |
+| `twilioFeatureLogs` | Debugger webhook, verify, voice, other |
+| `twilioComplianceLogs` | Security-relevant GRC rows (dry-run, auth fail, blocked/filtered, etc.) |
+
+Retention: diagnostic body **30 days**; security metadata **90 days**; compliance metadata up to **7 years**. Phones masked + hashed; never log Auth Token / full Account SID.
+
+## Master Admin UI
+
+- Top-level **Twilio** tab group with subtabs: `twilioSmsLogs`, `twilioWhatsAppLogs`, `twilioFeatureLogs`
+- **ShoutOuts → Twilio Compliance** for `twilioComplianceLogs` (GRC only — not operational traffic)
+
+## Club Admin UI
+
+Advertising → Messaging logs shows SMS + WhatsApp filtered by `clubLocationId`. Same rows appear on Master Admin Twilio tabs.
+
+## Forbidden
+
+- Do not treat dry-run as delivered success for marketing tests
+- Do not put Auth Token or full Account SID in Firestore logs
+- Do not put these design notes in FloqAi help bodies

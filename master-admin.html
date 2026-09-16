@@ -62,7 +62,16 @@
           <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOuts</button>
           <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
             <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Compliance Logs</button>
+            <button class="admin-subtab" data-panel="twilioComplianceLogs" type="button">Twilio Compliance</button>
             <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
+          </div>
+        </div>
+        <div class="admin-tab-group" data-tab-group="twilio" data-default-panel="twilioSmsLogs">
+          <button class="admin-tab admin-tab-parent" data-group="twilio" type="button" aria-expanded="false">Twilio</button>
+          <div class="admin-subtabs hidden" id="twilioSubtabs" role="group" aria-label="Twilio log types">
+            <button class="admin-subtab" data-panel="twilioSmsLogs" type="button">twilioSmsLogs</button>
+            <button class="admin-subtab" data-panel="twilioWhatsAppLogs" type="button">twilioWhatsAppLogs</button>
+            <button class="admin-subtab" data-panel="twilioFeatureLogs" type="button">twilioFeatureLogs</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="security">
@@ -210,6 +219,41 @@
           <div class="queue-actions" style="margin-top:1rem">
             <button id="soComplianceExportCsvBtn" class="primary" type="button" data-i18n="master.shoutoutComplianceExportCsv">Export to CSV</button>
           </div>
+        </div>
+      </section>
+
+      <section id="twilioComplianceLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioComplianceLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioComplianceLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Compliance Logs · Twilio</p>
+          <h2
+            data-floqr-help-id="help-twilio-compliance-logs"
+            data-floqr-help-title="Twilio Compliance Logs"
+            data-floqr-help-search="twilio compliance|grc sms|twilioComplianceLogs|dry-run compliance"
+            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Compliance Logs. Operational SMS and WhatsApp traffic lives under the Twilio tab."
+          >Twilio Compliance</h2>
+          <p class="sub small">Collection <code>twilioComplianceLogs</code>. Masked destinations; Auth Token never stored.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioComplianceLogsStatusFilter">
+                <option value="">All statuses</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioComplianceLogsSearch" placeholder="club, purpose, error, SID"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="twilioComplianceLogsRefreshBtn" type="button">Refresh</button>
+          </div>
+          <p id="twilioComplianceLogsStatus" class="status"></p>
+          <div id="twilioComplianceLogsList" class="report-block"></div>
+          <div id="twilioComplianceLogsDetail" class="report-block" style="margin-top:12px"></div>
         </div>
       </section>
 
@@ -620,6 +664,95 @@
         <div class="admin-grid"><div class="card"><h2>Campaign Analytics</h2><div id="serviceCampaignAnalytics" class="report-block"></div></div><div class="card"><h2>Pickup Analytics</h2><div id="pickupAnalyticsReport" class="report-block"></div></div></div>
       </section>
 
+      <section id="twilioSmsLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioSmsLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioSmsLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Twilio · twilioSmsLogs</p>
+          <h2
+            data-floqr-help-id="help-twilio-logging"
+            data-floqr-help-title="Twilio SMS Logs"
+            data-floqr-help-search="twilioSmsLogs|sms log|marketing sms|twilio dry-run"
+            data-floqr-help-body="Outbound Twilio SMS for the whole network (club alerts, marketing tests, schedule notify). Dry-run means secrets or From were missing — nothing delivered. Club-originated campaigns also appear under that club’s Advertising → Messaging logs. GRC security rows are under ShoutOuts → Twilio Compliance."
+          >twilioSmsLogs</h2>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioSmsLogsStatusFilter">
+                <option value="">All</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+                <option value="invalid-to">invalid-to</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioSmsLogsSearch" placeholder="club, to, purpose, SID, error"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioSmsLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioSmsLogsStatus" class="status"></p>
+          <div id="twilioSmsLogsList" class="report-block"></div>
+          <div id="twilioSmsLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="twilioWhatsAppLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioWhatsAppLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioWhatsAppLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Twilio · twilioWhatsAppLogs</p>
+          <h2>twilioWhatsAppLogs</h2>
+          <p class="sub small">Outbound WhatsApp via Twilio. Club campaigns show here and under that venue’s Club Admin logs.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioWhatsAppLogsStatusFilter">
+                <option value="">All</option>
+                <option value="sent">sent</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+                <option value="invalid-sid">invalid-sid</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioWhatsAppLogsSearch" placeholder="club, to, purpose, SID, error"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioWhatsAppLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioWhatsAppLogsStatus" class="status"></p>
+          <div id="twilioWhatsAppLogsList" class="report-block"></div>
+          <div id="twilioWhatsAppLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="twilioFeatureLogs" class="admin-panel-section">
+        <div class="metric-grid">
+          <div class="metric-card"><span>Visible rows</span><strong id="twilioFeatureLogsCount">0</strong></div>
+          <div class="metric-card"><span>Failed / dry-run</span><strong id="twilioFeatureLogsFailCount">0</strong></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">Twilio · twilioFeatureLogs</p>
+          <h2>twilioFeatureLogs</h2>
+          <p class="sub small">Debugger webhook and other non-SMS/WhatsApp Twilio features.</p>
+          <div class="profile-grid">
+            <label>Status
+              <select id="twilioFeatureLogsStatusFilter">
+                <option value="">All</option>
+                <option value="error">error</option>
+                <option value="warning">warning</option>
+                <option value="failed">failed</option>
+                <option value="dry-run">dry-run</option>
+              </select>
+            </label>
+            <label>Search<input id="twilioFeatureLogsSearch" placeholder="error, SID, purpose"/></label>
+          </div>
+          <div class="queue-actions"><button id="twilioFeatureLogsRefreshBtn" type="button">Refresh</button></div>
+          <p id="twilioFeatureLogsStatus" class="status"></p>
+          <div id="twilioFeatureLogsList" class="report-block"></div>
+          <div id="twilioFeatureLogsDetail" class="report-block" style="margin-top:12px"></div>
+        </div>
+      </section>
+
       <section id="appLogging" class="admin-panel-section">
         <div class="metric-grid">
           <div class="metric-card"><span>Visible Logs</span><strong id="appLogCount">0</strong></div>
@@ -722,7 +855,13 @@
       <section id="adCampaignManagement" class="admin-panel-section">
         <div class="card">
           <h2>Ad Campaign Management</h2>
-          <p class="sub small">Manage campaign copy, targeted patron datapoints, campaign tags, preview status, and estimated audience matches. Saved target-tag edits are local preview overrides until Firestore campaign persistence is approved.</p>
+          <p class="sub small">Approve business-account campaigns, schedule flights, and manage live pool targeting. Inline = feature-path ads ($45 / 7 days). Mingl Gist = scroll-feed ads ($25 / 7 days). Packaged demos still listed below for tag overrides.</p>
+          <div class="queue-actions">
+            <button id="refreshAdCampaignPendingBtn" class="primary" type="button">Refresh pending queue</button>
+          </div>
+          <h3>Pending approval</h3>
+          <div id="adCampaignPendingQueue" class="report-block"></div>
+          <h3>Live / packaged pool</h3>
           <div id="adCampaignManagementSummary" class="report-block"></div>
           <div id="adCampaignManagementList" class="report-block"></div>
         </div>
@@ -1206,18 +1345,20 @@
 <script src="./floqr-i18n-help.js?v=s3.0.28"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./ad-campaigns.js?v=29.09.34"></script>
+<script src="./floqr-ad-pricing.js?v=s3.0.76"></script>
+<script src="./ad-campaigns.js?v=s3.0.76"></script>
 <script src="./ai-diagnostics-service.js?v=s3.0.12"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.66"></script>
+<script src="./master-admin-app.js?v=s3.0.76"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.75"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
 <script src="./master-mail-logging.js?v=s3.0.7"></script>
+<script src="./master-twilio-logging.js?v=s3.0.77"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>

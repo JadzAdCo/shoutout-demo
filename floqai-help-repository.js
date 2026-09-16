@@ -491,6 +491,22 @@
       page: "admin.html#notifyTemplatesPane"
     },
     {
+      id: "help-ad-campaigns",
+      title: "Ad Campaigns",
+      body: "Elect a Business account in My Profile to open Ad Campaigns. Choose Inline ($45 / 7 days — shows while using FloqR features) or Mingl Gist ($25 / 7 days — shows while scrolling Mingl stories). Upload a PNG/JPEG/GIF flyer or paste HTML. Target all patrons or match profile datapoints. Submit sends the campaign to Master Admin for approval and scheduling.",
+      searchPhrases: [
+        "ad campaigns", "advertise", "business account", "inline ad", "mingl gist ad",
+        "flyer ad", "html ad", "sponsored", "post an ad", "advertisement"
+      ],
+      links: [
+        {label: "My Profile", href: vUrl("./patron-portal.html", {from: "floqai", tab: "profile"})},
+        {label: "Ad Campaigns", href: vUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalAdCampaigns",
+      audiences: ["patron"]
+    },
+    {
       id: "help-completed-shoutouts",
       title: "Completed ShoutOuts",
       body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox.",
@@ -917,6 +933,33 @@
       ],
       source: "help-repository-seed",
       page: "master-admin.html#mailLogging"
+    },
+    {
+      id: "help-twilio-logging",
+      title: "Twilio SMS Logs",
+      body: "Master Admin → Twilio → twilioSmsLogs shows outbound SMS for the network. Club Admin → Advertising shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under ShoutOuts → Twilio Compliance.",
+      searchPhrases: [
+        "twilio logging", "sms log", "whatsapp log", "twilio dry-run", "twilioSmsLogs",
+        "marketing sms", "why no sms", "send test debit", "twilio debugger"
+      ],
+      links: [
+        {label: "Twilio SMS Logs", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#twilioSmsLogs"
+    },
+    {
+      id: "help-twilio-compliance-logs",
+      title: "Twilio Compliance Logs",
+      body: "ShoutOuts → Twilio Compliance lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered). Same GRC standard as ShoutOut Compliance Logs. Day-to-day SMS and WhatsApp traffic stays under the Twilio tab.",
+      searchPhrases: [
+        "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
+      ],
+      links: [
+        {label: "Twilio Compliance", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#twilioComplianceLogs"
     },
     {
       id: "help-venue-onboarding",

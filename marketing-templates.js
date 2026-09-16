@@ -222,8 +222,8 @@
       headline: "{{event}}",
       body: "You're invited to {{club}}. RSVP before doors.",
       cta: "RSVP",
-      smsBody: "",
-      whatsappBody: ""
+      smsBody: "{{club}}: you're invited. RSVP before doors. Reply STOP to opt out.",
+      whatsappBody: "{{club}}: {{event}} — RSVP before doors."
     },
     {
       id: "spot-rydr-hail",
@@ -235,8 +235,8 @@
       headline: "Going out to {{club}}?",
       body: "{{event}} — hail with RydR, then throw a ShoutOut.",
       cta: "Continue hail",
-      smsBody: "",
-      whatsappBody: ""
+      smsBody: "{{club}}: going out? Hail with RydR, then throw a ShoutOut. Reply STOP to opt out.",
+      whatsappBody: "{{club}}: {{event}} — hail with RydR, then throw a ShoutOut."
     }
   ];
 

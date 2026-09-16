@@ -597,6 +597,33 @@ service cloud.firestore {
  allow create, update, delete: if false;
  }
 
+ // Twilio SMS / WhatsApp / feature / GRC compliance logs. Functions write.
+ // Master Admin: all rows. Club managers: SMS/WhatsApp for their clubLocationId only.
+ match /twilioSmsLogs/{id} {
+ allow read: if isMasterAdmin()
+ || (
+ resource.data.clubLocationId is string
+ && isClubManager(resource.data.clubLocationId)
+ );
+ allow create, update, delete: if false;
+ }
+ match /twilioWhatsAppLogs/{id} {
+ allow read: if isMasterAdmin()
+ || (
+ resource.data.clubLocationId is string
+ && isClubManager(resource.data.clubLocationId)
+ );
+ allow create, update, delete: if false;
+ }
+ match /twilioFeatureLogs/{id} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
+ }
+ match /twilioComplianceLogs/{id} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
+ }
+
  // SOS2FA challenges, sessions, and authenticator secrets (Admin SDK / Functions only).
  match /sos2faChallenges/{uid} {
  allow read, write: if false;
@@ -1065,7 +1092,13 @@ service cloud.firestore {
 
  match /spotAdCampaigns/{id} {
  allow read: if true;
- allow create, update: if signedIn();
+ // Business patrons create pending campaigns; owners may update their own docs; Master Admin approves/schedules.
+ allow create: if signedIn()
+ && request.resource.data.publishedByUid == request.auth.uid;
+ allow update: if signedIn() && (
+ isMasterAdmin()
+ || resource.data.publishedByUid == request.auth.uid
+ );
  allow delete: if signedIn() && (isMasterAdmin() || resource.data.publishedByUid == request.auth.uid);
  }
 

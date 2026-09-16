@@ -206,11 +206,14 @@
 
       if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
       if (panelId === "mailLogging" && window.FLOQRMailLogging) window.FLOQRMailLogging.mount();
+      if (/^twilio(Sms|WhatsApp|Feature|Compliance)Logs$/.test(panelId) || panelId === "twilioLogging") {
+        window.FLOQRTwilioLogging?.mount?.(panelId);
+      }
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
-      if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention") {
+      if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention" || panelId === "twilioComplianceLogs") {
         window.FLOQRMasterShoutouts?.onPanel?.(panelId);
       }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
@@ -1599,14 +1602,35 @@
     const patrons = users.filter(isPatronProfile);
     const campaigns = window.FLOQRAdCampaigns.campaigns();
     const analytics = window.FLOQRAdCampaigns.campaignAnalytics(patrons);
+    const pending = window.FLOQRAdCampaigns.pendingCampaigns?.() || [];
     summary.innerHTML = simpleRows([
-      ["Campaigns in pool", campaigns.length.toLocaleString()],
+      ["Pending approval", pending.length.toLocaleString()],
+      ["Campaigns in live pool", campaigns.length.toLocaleString()],
       ["Preview campaigns", campaigns.filter(item => item.status === "preview").length.toLocaleString()],
       ["Needs verification", campaigns.filter(item => item.status === "needs-verification").length.toLocaleString()],
       ["Patron profiles scanned", patrons.length.toLocaleString()],
-      ["Top campaign match", analytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"]
+      ["Top campaign match", analytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"],
+      ["Inline package", window.FLOQRAdPricing?.packageFor?.("inline")?.packageLabel || "$45 / 7 days"],
+      ["Mingl Gist package", window.FLOQRAdPricing?.packageFor?.("minglGist")?.packageLabel || "$25 / 7 days"]
     ]);
     window.FLOQRAdCampaigns.renderAdminCampaignManager("adCampaignManagementList", patrons);
+    const refreshPending = async () => {
+      await window.FLOQRAdCampaigns.loadPendingSpotAds?.(db);
+      await window.FLOQRAdCampaigns.loadFirestoreSpotAds?.(db);
+      window.FLOQRAdCampaigns.renderPendingApprovalQueue?.("adCampaignPendingQueue", db);
+      const nextPending = window.FLOQRAdCampaigns.pendingCampaigns?.() || [];
+      summary.innerHTML = simpleRows([
+        ["Pending approval", nextPending.length.toLocaleString()],
+        ["Campaigns in live pool", window.FLOQRAdCampaigns.campaigns().length.toLocaleString()],
+        ["Preview campaigns", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "preview").length.toLocaleString()],
+        ["Needs verification", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "needs-verification").length.toLocaleString()],
+        ["Patron profiles scanned", patrons.length.toLocaleString()],
+        ["Inline package", window.FLOQRAdPricing?.packageFor?.("inline")?.packageLabel || "$45 / 7 days"],
+        ["Mingl Gist package", window.FLOQRAdPricing?.packageFor?.("minglGist")?.packageLabel || "$25 / 7 days"]
+      ]);
+    };
+    byId("refreshAdCampaignPendingBtn")?.addEventListener("click", () => refreshPending().catch(console.warn), {once: false});
+    refreshPending().catch(console.warn);
   }
 
   async function loadNetworkPaymentLedger() {

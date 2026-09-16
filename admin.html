@@ -436,6 +436,52 @@
           <div id="marketingCampaignReport" class="report-block"></div>
         </div>
 
+        <div class="card" id="clubMessagingLogsCard">
+          <p class="eyebrow">Messaging logs</p>
+          <h2>SMS & WhatsApp delivery logs</h2>
+          <p class="sub small">Messages sent for this venue (marketing tests, club alerts). Same rows appear under Master Admin → Twilio. Phones are masked.</p>
+          <div class="admin-grid">
+            <div>
+              <h3>twilioSmsLogs</h3>
+              <div class="profile-grid">
+                <label>Status
+                  <select id="clubTwilioSmsLogsStatusFilter">
+                    <option value="">All</option>
+                    <option value="sent">sent</option>
+                    <option value="failed">failed</option>
+                    <option value="dry-run">dry-run</option>
+                  </select>
+                </label>
+                <label>Search<input id="clubTwilioSmsLogsSearch" placeholder="purpose, SID, error"/></label>
+              </div>
+              <div class="queue-actions"><button id="clubTwilioSmsLogsRefreshBtn" type="button">Refresh SMS</button></div>
+              <p id="clubTwilioSmsLogsStatus" class="status"></p>
+              <div id="clubTwilioSmsLogs" class="hidden" aria-hidden="true"></div>
+              <div id="clubTwilioSmsLogsList" class="report-block"></div>
+              <div id="clubTwilioSmsLogsDetail" class="report-block" style="margin-top:8px"></div>
+            </div>
+            <div>
+              <h3>twilioWhatsAppLogs</h3>
+              <div class="profile-grid">
+                <label>Status
+                  <select id="clubTwilioWhatsAppLogsStatusFilter">
+                    <option value="">All</option>
+                    <option value="sent">sent</option>
+                    <option value="failed">failed</option>
+                    <option value="dry-run">dry-run</option>
+                  </select>
+                </label>
+                <label>Search<input id="clubTwilioWhatsAppLogsSearch" placeholder="purpose, SID, error"/></label>
+              </div>
+              <div class="queue-actions"><button id="clubTwilioWhatsAppLogsRefreshBtn" type="button">Refresh WhatsApp</button></div>
+              <p id="clubTwilioWhatsAppLogsStatus" class="status"></p>
+              <div id="clubTwilioWhatsAppLogs" class="hidden" aria-hidden="true"></div>
+              <div id="clubTwilioWhatsAppLogsList" class="report-block"></div>
+              <div id="clubTwilioWhatsAppLogsDetail" class="report-block" style="margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="card" id="spotAdCampaignCard">
           <p class="eyebrow">In-app media</p>
           <h2>Start a spot advertisement campaign</h2>
@@ -880,7 +926,8 @@
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
-<script src="./admin-marketing.js?v=29.09.18"></script>
+<script src="./admin-marketing.js?v=s3.0.77"></script>
+<script src="./master-twilio-logging.js?v=s3.0.77"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./admin-scheduling.js?v=s3.0.0"></script>

@@ -1,0 +1,41 @@
+# Ad campaigns — payment modes (follow-up)
+
+Design notes only (not FloqAi help). Parent: `design-notes-ad-campaigns-business.mdc`. Resume: `@ad-campaigns$` / `@ad-pay$`.
+
+There should be **three different Ad payment modes**. Do not invent a fourth until product asks.
+
+## 1. Invoice mode
+
+- Reserved for patrons who subscribed as a **business** and have a **contract with FloqMedia**.
+- Contractual / invoice-like payment — **not** self-serve card checkout.
+- Master Admin (or FloqMedia ops) **must approve** the contractual / invoice arrangement before the campaign can run as paid/waived under invoice terms.
+- Typical fields: `paymentMode: "invoice"`, contract id / PO reference, `paymentStatus: unpaid|invoiced|paid|waived`, admin approval gate separate from creative approval when needed.
+
+## 2. Subscription mode
+
+- Patron pays a **monthly fee**; their advertisement runs for a window of **7 to 31 days** per cycle (offer distinct subscription options inside that range).
+- Options **must be DOOH-similar** (digital out-of-home package thinking: duration × placement attention, not random SaaS tiers). If a proposed tier is not DOOH-comparable, **do not include it**.
+- Examples of DOOH-shaped options only: e.g. 7-day / 14-day / 21-day / 31-day run lengths tied to Inline vs Mingl Gist (or future DOOH-grade slots), priced from the same DOOH justification as `FLOQRAdPricing`.
+- Typical fields: `paymentMode: "subscription"`, `subscriptionPlanId`, `billingPeriod: "month"`, `runDays: 7|14|21|31` (or other approved DOOH-like lengths only).
+
+## 3. Pay-as-you-go mode
+
+- One-shot / prepaid purchase with **DOOH pricing** (same family as current Inline $45/7d and Mingl Gist $25/7d packages — extend via `floqr-ad-pricing.js`, do not invent non-DOOH rates).
+- No FloqMedia contract required beyond business-account eligibility.
+- Typical fields: `paymentMode: "payg"`, Stripe (or equivalent) checkout, `paymentStatus: unpaid|paid`.
+
+## Mode selection rules
+
+| Mode | Who | Gate |
+|---|---|---|
+| `invoice` | Business patron + FloqMedia contract | Master Admin approve contractual / invoice payment |
+| `subscription` | Business patron | Monthly bill + DOOH-like run-length options only |
+| `payg` | Business patron | Self-serve DOOH package price |
+
+Creative / schedule approval (pending_approval → active) remains required for all modes; payment mode only answers **how** the advertiser pays.
+
+## Forbidden
+
+- Do not ship subscription tiers that are not DOOH-similar
+- Do not allow invoice mode without Master Admin contractual / invoice approval
+- Do not put these design notes in FloqAi help bodies

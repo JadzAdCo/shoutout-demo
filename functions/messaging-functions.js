@@ -24,6 +24,7 @@ const {
   explainTwilioDeliveryError
 } = require("./messaging-core");
 const {sendSystemMail} = require("./mail-log");
+const {sendTwilioMessagesApi, writeTwilioLog} = require("./twilio-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -176,6 +177,12 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
   const creds = twilioCredentials();
   const phone = normalizeE164(to);
   if (!phone) {
+    await writeTwilioLog({
+      channel, feature: channel, purpose, source: "messaging-functions",
+      clubLocationId, shoutoutId, shiftId, to, body,
+      status: "invalid-to", sendOk: false, dryRun: true,
+      error: "Destination phone is not valid E.164."
+    });
     await logDelivery({clubLocationId, channel, to, body, status: "invalid-to", dryRun: true, purpose, shoutoutId, shiftId});
     return {ok: false, dryRun: true, status: "invalid-to"};
   }
@@ -187,64 +194,53 @@ async function sendTwilioMessage({channel, to, body, clubLocationId, shoutoutId 
     : normalizeE164(fromRaw);
   const destination = useWhatsApp ? twilioWhatsAppAddress(phone) : phone;
 
-  if (!twilioReady(creds) || !from || !destination) {
+  const result = await sendTwilioMessagesApi({
+    accountSid: creds.accountSid,
+    authToken: creds.authToken,
+    to: destination,
+    from,
+    body,
+    channel: useWhatsApp ? "whatsapp" : "sms",
+    purpose,
+    source: "messaging-functions",
+    clubLocationId,
+    shoutoutId,
+    shiftId,
+    describeInvalidSid: describeTwilioAccountSid,
+    explainError: explainTwilioDeliveryError
+  });
+
+  // Legacy dry-run treated ops alerts as ok:true; keep that for club alert fan-out,
+  // but mark dryRun so callers can surface "not delivered".
+  if (result.dryRun && result.status === "dry-run") {
     console.info("messaging dry-run (Twilio secrets missing)", {clubLocationId, channel, purpose});
     await logDelivery({
       clubLocationId, channel, to: destination || phone, body, status: "dry-run", dryRun: true, purpose, shoutoutId, shiftId
     });
-    return {ok: true, dryRun: true, status: "dry-run"};
+    return {ok: true, dryRun: true, status: "dry-run", error: result.error};
   }
 
-  const sidInfo = describeTwilioAccountSid(creds.accountSid);
-  if (!sidInfo.looksLikeAccountSid) {
-    const error = explainTwilioDeliveryError("Authentication Error - invalid username", sidInfo);
-    await logDelivery({
-      clubLocationId, channel, to: destination, body, status: "failed", dryRun: false, purpose, shoutoutId, error
-    });
-    return {ok: false, dryRun: false, status: "invalid-sid", error};
-  }
-
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(creds.accountSid)}/Messages.json`;
-  const params = new URLSearchParams({To: destination, From: from, Body: String(body || "").slice(0, 1500)});
-  const auth = Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString("base64");
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        authorization: `Basic ${auth}`,
-        "content-type": "application/x-www-form-urlencoded"
-      },
-      body: params.toString()
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const rawError = text(payload.message || payload.error_message || `HTTP ${response.status}`, 500);
-      const error = explainTwilioDeliveryError(rawError, sidInfo);
-      await logDelivery({
-        clubLocationId, channel, to: destination, body, status: "failed", dryRun: false, purpose, shoutoutId, error
-      });
-      return {ok: false, dryRun: false, status: "failed", error};
-    }
-    await logDelivery({
-      clubLocationId,
-      channel,
-      to: destination,
-      body,
-      status: "sent",
-      dryRun: false,
-      purpose,
-      shoutoutId,
-      shiftId,
-      providerSid: text(payload.sid, 80)
-    });
-    return {ok: true, dryRun: false, status: "sent", sid: text(payload.sid, 80)};
-  } catch (error) {
-    const message = text(error?.message || error, 500);
-    await logDelivery({
-      clubLocationId, channel, to: destination, body, status: "failed", dryRun: false, purpose, shoutoutId, error: message
-    });
-    return {ok: false, dryRun: false, status: "failed", error: message};
-  }
+  await logDelivery({
+    clubLocationId,
+    channel,
+    to: destination,
+    body,
+    status: text(result.status, 40),
+    dryRun: false,
+    purpose,
+    shoutoutId,
+    shiftId,
+    providerSid: text(result.sid, 80),
+    error: text(result.error, 500)
+  });
+  return {
+    ok: !!result.ok,
+    dryRun: false,
+    status: result.status,
+    sid: result.sid,
+    error: result.error,
+    logId: result.logId
+  };
 }
 
 async function deliverToClubTargets(clubLocationId, settings, body, meta = {}) {
