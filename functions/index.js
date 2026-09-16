@@ -18,6 +18,7 @@ module.exports = {
   backfillShoutoutComplianceLogs: require("./shoutout-compliance-functions").backfillShoutoutComplianceLogs,
   getShoutoutComplianceRetention: require("./shoutout-compliance-functions").getShoutoutComplianceRetention,
   stampShoutoutActorContext: require("./shoutout-compliance-functions").stampShoutoutActorContext,
+  getFloqrClientIp: require("./shoutout-compliance-functions").getFloqrClientIp,
   setPatronFeatureGates: featureGateFns.setPatronFeatureGates,
   setEntityAppEnabled: featureGateFns.setEntityAppEnabled,
   setVenueFeatureGates: featureGateFns.setVenueFeatureGates,
