@@ -922,22 +922,22 @@
     },
     {
       id: "help-mail-logging",
-      title: "Mail Logging",
-      body: "Every FLOQR system-generated email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days. This is not Application Logging and not Security Logs.",
+      title: "twilio_sendgridMailLogs",
+      body: "Master Admin → Twilio → twilio_sendgridMailLogs logs every FLOQR system-generated SendGrid email: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
       searchPhrases: [
-        "mail logging", "email log", "sendgrid", "system mail", "preview links email",
-        "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
+        "twilio_sendgridMailLogs", "mail logging", "email log", "sendgrid", "system mail",
+        "preview links email", "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
       ],
       links: [
-        {label: "Mail Logging", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "twilio_sendgridMailLogs", href: vUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
-      page: "master-admin.html#mailLogging"
+      page: "master-admin.html#twilio_sendgridMailLogs"
     },
     {
       id: "help-twilio-logging",
       title: "Twilio SMS Logs",
-      body: "Master Admin → Twilio → twilioSmsLogs shows outbound SMS for the network. Club Admin → Advertising shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under ShoutOuts → Twilio Compliance.",
+      body: "Master Admin → Twilio → twilioSmsLogs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → twilioComplianceLogs. SendGrid email is under Twilio → twilio_sendgridMailLogs.",
       searchPhrases: [
         "twilio logging", "sms log", "whatsapp log", "twilio dry-run", "twilioSmsLogs",
         "marketing sms", "why no sms", "send test debit", "twilio debugger"
@@ -951,15 +951,29 @@
     {
       id: "help-twilio-compliance-logs",
       title: "Twilio Compliance Logs",
-      body: "ShoutOuts → Twilio Compliance lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered). Same GRC standard as ShoutOut Compliance Logs. Day-to-day SMS and WhatsApp traffic stays under the Twilio tab.",
+      body: "Master Admin → Twilio → twilioComplianceLogs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same standard as ShoutOut Compliance Logs. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
       searchPhrases: [
         "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
       ],
       links: [
-        {label: "Twilio Compliance", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "twilioComplianceLogs", href: vUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilioComplianceLogs"
+    },
+    {
+      id: "help-club-messaging-logs",
+      title: "SMS & WhatsApp delivery logs",
+      body: "Club Admin → Advertising → Messaging logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked.",
+      searchPhrases: [
+        "messaging logs", "club sms log", "club whatsapp log", "twilioSmsLogs", "twilioWhatsAppLogs",
+        "marketing sms log", "send test debit", "why no sms"
+      ],
+      links: [
+        {label: "Club Advertising", href: vUrl("./admin.html", {from: "floqai"})}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#advertising"
     },
     {
       id: "help-venue-onboarding",

@@ -1,4 +1,8 @@
 {
+  "help-ad-campaigns": {
+    "title": "Ad Campaigns",
+    "body": "Elect a Business account in My Profile to open Ad Campaigns. Choose Inline ($45 / 7 days — shows while using FloqR features) or Mingl Gist ($25 / 7 days — shows while scrolling Mingl stories). Upload a PNG/JPEG/GIF flyer or paste HTML. Target all patrons or match profile datapoints. Submit sends the campaign to Master Admin for approval and scheduling."
+  },
   "help-completed-shoutouts": {
     "title": "Completed ShoutOuts",
     "body": "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox."
@@ -138,5 +142,9 @@
   "help-mingl-requests": {
     "title": "About Mingl Requests",
     "body": "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat."
+  },
+  "help-club-messaging-logs": {
+    "title": "SMS & WhatsApp delivery logs",
+    "body": "Shows Twilio SMS and WhatsApp messages sent for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked."
   }
 }

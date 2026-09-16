@@ -205,7 +205,9 @@
       }
 
       if (panelId === "appLogging" && window.FLOQRAppLogging) window.FLOQRAppLogging.mount();
-      if (panelId === "mailLogging" && window.FLOQRMailLogging) window.FLOQRMailLogging.mount();
+      if ((panelId === "mailLogging" || panelId === "twilio_sendgridMailLogs") && window.FLOQRMailLogging) {
+        window.FLOQRMailLogging.mount();
+      }
       if (/^twilio(Sms|WhatsApp|Feature|Compliance)Logs$/.test(panelId) || panelId === "twilioLogging") {
         window.FLOQRTwilioLogging?.mount?.(panelId);
       }
@@ -213,7 +215,7 @@
       if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
-      if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention" || panelId === "twilioComplianceLogs") {
+      if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention") {
         window.FLOQRMasterShoutouts?.onPanel?.(panelId);
       }
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();

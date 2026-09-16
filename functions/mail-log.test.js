@@ -27,15 +27,16 @@ test("OTP-style bodies redact six-digit codes in stored logs", () => {
   ]);
 });
 
-test("Master Admin Diagnostics exposes Mail Logging search and content", () => {
+test("Master Admin Twilio exposes twilio_sendgridMailLogs search and content", () => {
   const html = read("master-admin.html");
   const ui = read("master-mail-logging.js");
-  assert.match(html, /data-panel="mailLogging"/);
-  assert.match(html, /id="mailLogging"/);
+  assert.match(html, /data-panel="twilio_sendgridMailLogs"/);
+  assert.match(html, /id="twilio_sendgridMailLogs"/);
   assert.match(html, /id="mailLogSearch"/);
   assert.match(html, /id="mailLogStatusFilter"/);
   assert.match(html, /master-mail-logging\.js\?v=/);
   assert.match(html, /data-floqr-help-id="help-mail-logging"/);
+  assert.doesNotMatch(html, /data-panel="mailLogging"/);
   assert.match(ui, /COLLECTION = "systemMailLogs"/);
   assert.match(ui, /\.collection\(COLLECTION\)/);
   assert.match(ui, /tlsMinRequested/);

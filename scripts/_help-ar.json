@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "حملات إعلانية",
+    "body": "اختر حساب Business في My Profile لفتح Ad Campaigns. Inline (45$ / 7 أيام — أثناء استخدام FloqR) أو Mingl Gist (25$ / 7 أيام — أثناء التمرير في Mingl). ارفع PNG/JPEG/GIF أو الصق HTML. الجمهور: الجميع أو نقاط بيانات الملف. الإرسال يذهب إلى Master Admin للموافقة والجدولة."
+  },
+  "help-completed-shoutouts": {
+    "title": "ShoutOuts المكتملة",
+    "body": "ShoutOuts المكتملة هي المعتمدة من النادي (والمنتهية) لسجلاتك. تنقل الأرشفة ShoutOut من المكتملة إلى Archive مع نص ووسائط مضغوطة (إن وُجدت). إعادة الاستخدام تفتح Search بنفس النص. يظهر حفظ كقالب فقط عندما تكون خلفية القالب قابلة للتعديل (IsModifiable). تبقى الإيصالات المدفوعة في FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "ShoutOuts المؤرشفة",
+    "body": "يخزّن Archive نسخة مضغوطة من نص ووسائط ShoutOut المكتمل (إن وُجدت وسائط) في تخزين Firebase منخفض التكلفة ويزيله من المكتملة. افتح Archive في أي وقت. تعمل إعادة الاستخدام أيضاً من Archive."
+  },
   "floqai-ask-floqr": {
     "title": "اسأل FloqR مع FloqAi",
     "body": "اسأل FloqR مع FloqAi — اضغط على العلامة المتحركة أو انتظر المطالبة، ثم اكتب ما تريد بكلمات عادية. المنتجات: Mingl، RydR، BartR، ShoutOut، SupRstR (نجمة مشهورة)، الأندية. الأهداف: قُل “أريد أن أتمكن من…” (مثلاً أن أصبح Club Admin) أو “make me a superstar” للخطوات والروابط."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "حول طلبات Mingl",
     "body": "تظهر هنا الطلبات المرسلة والمستلمة من الأصدقاء أو Mingl. تبقى الطلبات في الصفحة الرئيسية لـ Mingl؛ المحادثات المقبولة تفتح في دردشة Mingl."
+  },
+  "help-club-messaging-logs": {
+    "title": "سجلات تسليم SMS وWhatsApp",
+    "body": "يعرض رسائل Twilio SMS وWhatsApp لهذا المكان (اختبار التسويق، تنبيهات النادي). تظهر الصفوف نفسها في Master Admin → Twilio. Dry-run يعني غياب secrets أو From — لم يُسلَّم شيء ولم تُخصم أرصدة. أرقام الهاتف مخفية."
   }
 }

@@ -62,16 +62,17 @@
           <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOuts</button>
           <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
             <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Compliance Logs</button>
-            <button class="admin-subtab" data-panel="twilioComplianceLogs" type="button">Twilio Compliance</button>
             <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="twilio" data-default-panel="twilioSmsLogs">
-          <button class="admin-tab admin-tab-parent" data-group="twilio" type="button" aria-expanded="false">Twilio</button>
+          <button class="admin-tab admin-tab-parent" data-group="twilio" type="button" aria-expanded="false" data-i18n="master.twilio">Twilio</button>
           <div class="admin-subtabs hidden" id="twilioSubtabs" role="group" aria-label="Twilio log types">
-            <button class="admin-subtab" data-panel="twilioSmsLogs" type="button">twilioSmsLogs</button>
-            <button class="admin-subtab" data-panel="twilioWhatsAppLogs" type="button">twilioWhatsAppLogs</button>
-            <button class="admin-subtab" data-panel="twilioFeatureLogs" type="button">twilioFeatureLogs</button>
+            <button class="admin-subtab" data-panel="twilioSmsLogs" type="button" data-i18n="master.twilioSmsLogs">twilioSmsLogs</button>
+            <button class="admin-subtab" data-panel="twilioWhatsAppLogs" type="button" data-i18n="master.twilioWhatsAppLogs">twilioWhatsAppLogs</button>
+            <button class="admin-subtab" data-panel="twilioFeatureLogs" type="button" data-i18n="master.twilioFeatureLogs">twilioFeatureLogs</button>
+            <button class="admin-subtab" data-panel="twilioComplianceLogs" type="button" data-i18n="master.twilioComplianceLogs">twilioComplianceLogs</button>
+            <button class="admin-subtab" data-panel="twilio_sendgridMailLogs" type="button" data-i18n="master.twilioSendgridMailLogs">twilio_sendgridMailLogs</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="security">
@@ -102,7 +103,6 @@
             <button class="admin-subtab" data-panel="diagnostics" type="button">Run Diagnostics</button>
             <button class="admin-subtab" data-panel="diagnosticsManualTests" type="button">Manual Feature Tests</button>
             <button class="admin-subtab" id="diagnosticsDisplayErrorsTab" data-panel="diagnosticsDisplayErrors" type="button">Display / Xibo Load Errors</button>
-            <button class="admin-subtab" data-panel="mailLogging" type="button">Mail Logging</button>
             <button class="admin-subtab" data-panel="appLogging" type="button">Application Logging</button>
             <button class="admin-subtab" data-panel="diagnosticArchives" type="button">Diagnostic Archives</button>
             <button class="admin-subtab" data-panel="patronDiagnostics" type="button">Patron Datapoints</button>
@@ -233,8 +233,8 @@
             data-floqr-help-id="help-twilio-compliance-logs"
             data-floqr-help-title="Twilio Compliance Logs"
             data-floqr-help-search="twilio compliance|grc sms|twilioComplianceLogs|dry-run compliance"
-            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Compliance Logs. Operational SMS and WhatsApp traffic lives under the Twilio tab."
-          >Twilio Compliance</h2>
+            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Compliance Logs. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs."
+          >twilioComplianceLogs</h2>
           <p class="sub small">Collection <code>twilioComplianceLogs</code>. Masked destinations; Auth Token never stored.</p>
           <div class="profile-grid">
             <label>Status
@@ -675,7 +675,7 @@
             data-floqr-help-id="help-twilio-logging"
             data-floqr-help-title="Twilio SMS Logs"
             data-floqr-help-search="twilioSmsLogs|sms log|marketing sms|twilio dry-run"
-            data-floqr-help-body="Outbound Twilio SMS for the whole network (club alerts, marketing tests, schedule notify). Dry-run means secrets or From were missing — nothing delivered. Club-originated campaigns also appear under that club’s Advertising → Messaging logs. GRC security rows are under ShoutOuts → Twilio Compliance."
+            data-floqr-help-body="Outbound Twilio SMS for the whole network (club alerts, marketing tests, schedule notify). Dry-run means secrets or From were missing — nothing delivered. Club-originated campaigns also appear under that club’s Advertising → Messaging logs. GRC security rows are under Twilio → twilioComplianceLogs. SendGrid email is under Twilio → twilio_sendgridMailLogs."
           >twilioSmsLogs</h2>
           <div class="profile-grid">
             <label>Status
@@ -1226,19 +1226,19 @@
         </div>
       </section>
 
-      <section id="mailLogging" class="admin-panel-section">
+      <section id="twilio_sendgridMailLogs" class="admin-panel-section">
         <div class="metric-grid">
           <div class="metric-card"><span>Visible mails</span><strong id="mailLogCount">0</strong></div>
           <div class="metric-card"><span>Failed in view</span><strong id="mailLogFailCount">0</strong></div>
         </div>
         <div class="card">
-          <p class="eyebrow">Diagnostics · Mail Logging</p>
+          <p class="eyebrow">Twilio · twilio_sendgridMailLogs</p>
           <h2
             data-floqr-help-id="help-mail-logging"
-            data-floqr-help-title="Mail Logging"
-            data-floqr-help-search="mail logging|email log|sendgrid|system mail|preview links email|tls 1.3|mail delivery"
-            data-floqr-help-body="Every FLOQR system-generated email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days. This is not Application Logging and not Security Logs."
-          >Mail Logging</h2>
+            data-floqr-help-title="twilio_sendgridMailLogs"
+            data-floqr-help-search="twilio_sendgridMailLogs|mail logging|email log|sendgrid|system mail|preview links email|tls 1.3|mail delivery"
+            data-floqr-help-body="Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days. This lives under Master Admin → Twilio (not Diagnostics)."
+          >twilio_sendgridMailLogs</h2>
           <p class="sub small">
             System-generated SendGrid mail only (preview links, OTP, SOS2FA, receipts, schedule invites, club ops).
             API send requests <strong>TLS 1.3</strong>. Recipient delivery uses SendGrid Enforced TLS when the account allows it.
@@ -1325,7 +1325,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.75"></script>
+<script src="./floqr-i18n.js?v=s3.0.78"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
@@ -1341,8 +1341,8 @@
 <script src="./floqr-venue-datapoints.js?v=29.09.119"></script>
 <script src="./ai-discovery-service.js?v=29.09.104"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.26"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.28"></script>
+<script src="./floqai-help-repository.js?v=s3.0.78"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.78"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-ad-pricing.js?v=s3.0.76"></script>
@@ -1351,14 +1351,14 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.76"></script>
+<script src="./master-admin-app.js?v=s3.0.78"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.75"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
 <script src="./master-logging-extension.js?v=29.09.22"></script>
-<script src="./master-mail-logging.js?v=s3.0.7"></script>
-<script src="./master-twilio-logging.js?v=s3.0.77"></script>
+<script src="./master-mail-logging.js?v=s3.0.78"></script>
+<script src="./master-twilio-logging.js?v=s3.0.78"></script>
 <script src="./notification-center.js?v=29.09.22"></script>
 <script src="./profile-access-guard.js?v=29.09.9"></script>
 <script>

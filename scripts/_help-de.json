@@ -1,4 +1,16 @@
 {
+  "help-ad-campaigns": {
+    "title": "Werbekampagnen",
+    "body": "Wählen Sie in My Profile ein Business-Konto, um Ad Campaigns zu öffnen. Inline (45 $ / 7 Tage — während FloqR-Nutzung) oder Mingl Gist (25 $ / 7 Tage — beim Mingl-Scrollen). PNG/JPEG/GIF hochladen oder HTML einfügen. Zielgruppe: alle oder Profildatenpunkte. Einreichung geht an Master Admin zur Freigabe und Planung."
+  },
+  "help-completed-shoutouts": {
+    "title": "Abgeschlossene ShoutOuts",
+    "body": "Abgeschlossene ShoutOuts sind vom Club freigegebene (und beendete) ShoutOuts für Ihre Unterlagen. Archivieren verschiebt einen ShoutOut von Abgeschlossen nach Archive mit komprimiertem Text und Medien (falls vorhanden). Erneut verwenden öffnet Search mit demselben Text. Als Vorlage speichern erscheint nur, wenn der Vorlagenhintergrund änderbar ist (IsModifiable). Bezahlte Belege bleiben in FloqR Inbox."
+  },
+  "help-archived-shoutouts": {
+    "title": "Archivierte ShoutOuts",
+    "body": "Archive speichert eine komprimierte Kopie Ihres abgeschlossenen ShoutOut-Texts und der Medien (falls vorhanden) in kostengünstigem Firebase-Speicher und entfernt sie aus Abgeschlossen. Öffnen Sie Archive jederzeit. Erneut verwenden funktioniert auch aus Archive."
+  },
   "floqai-ask-floqr": {
     "title": "Fragen Sie FloqR mit FloqAi",
     "body": "Fragen Sie FloqR mit FloqAi – tippen Sie auf die animierte Markierung oder warten Sie auf die Aufforderung und geben Sie dann in einfachen Worten ein, was Sie möchten. Produkte: Mingl, RydR, BartR, ShoutOut, SupRstR (Superstar), Keulen. Ziele: Sagen Sie „Ich möchte in der Lage sein…“ (z. B. ein Club Admin werden) oder „make me a superstar“ für Schritte und Links."
@@ -130,5 +142,9 @@
   "help-mingl-requests": {
     "title": "Ungefähr Mingl Anfragen",
     "body": "Gesendete und empfangene Freundschafts- oder Mingl-Anfragen werden hier angezeigt. Anfragen bleiben auf der Mingl-Hauptseite; Akzeptierte Konversationen werden im Mingl Chat geöffnet."
+  },
+  "help-club-messaging-logs": {
+    "title": "SMS- und WhatsApp-Zustellprotokolle",
+    "body": "Zeigt Twilio-SMS und WhatsApp für diesen Standort (Marketing-Sendetest, Club-Alerts). Dieselben Zeilen unter Master Admin → Twilio. Dry-run = Secrets oder From fehlen — nichts zugestellt, keine Credits abgebucht. Telefone maskiert."
   }
 }

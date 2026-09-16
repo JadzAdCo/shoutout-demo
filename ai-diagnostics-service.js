@@ -896,7 +896,7 @@
       title:"Mail Logging for system-generated SendGrid mail + TLS 1.3",
       checks:[
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.7\""]},
-        {label:"Mail Logging tab", file:"master-admin.html", includes:["data-panel=\"mailLogging\"", "id=\"mailLogging\"", "id=\"mailLogSearch\""]},
+        {label:"Mail Logging tab", file:"master-admin.html", includes:["data-panel=\"twilio_sendgridMailLogs\"", "id=\"twilio_sendgridMailLogs\"", "id=\"mailLogSearch\""]},
         {label:"Mail log module", file:"master-mail-logging.js", includes:["FLOQRMailLogging", "systemMailLogs", "tlsMinRequested"]},
         {label:"Send path TLS 1.3", file:"functions/mail-log.js", includes:["TLSv1.3", "minVersion: TLS_MIN", "systemMailLogs"]},
         {label:"Event webhook export", file:"functions/index.js", includes:["sendgridMailEvents"]},
@@ -1122,10 +1122,10 @@
     },
     {
       id:"s3-0-7-mail-logging",
-      area:"Master Admin / Diagnostics",
-      feature:"Mail Logging records every system-generated email",
-      changed:"Diagnostics → Mail Logging lists SendGrid system mail with status, headers, body, TLS 1.3, and delivery events. Preview emails no longer use a v29.09.117 default or FLOQR vs3 subject.",
-      howToTest:"Hard-refresh master-admin.html?v=s3.0.7#mailLogging. Confirm the preview email for s3.0.7 appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row: headers, body, and TLS 1.3 are visible.",
+      area:"Master Admin / Twilio",
+      feature:"twilio_sendgridMailLogs records every system-generated email",
+      changed:"Master Admin → Twilio → twilio_sendgridMailLogs lists SendGrid system mail with status, headers, body, TLS 1.3, and delivery events (moved from Diagnostics → Mail Logging).",
+      howToTest:"Hard-refresh master-admin.html?v=s3.0.78#twilio_sendgridMailLogs. Confirm a recent preview email appears with status accepted (then delivered if the SendGrid event webhook is pointed at sendgridMailEvents). Open the row: headers, body, and TLS 1.3 are visible.",
       expected:"A row exists for bans.don@gmail.com, kind preview-links, send ok, TLS min TLSv1.3. Subject is FLOQR s3.0.7 — mobile preview links, not FLOQR vs3.0.7."
     },
     {

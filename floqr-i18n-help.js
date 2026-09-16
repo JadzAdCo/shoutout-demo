@@ -2,10 +2,14 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.66";
+  const VERSION = "s3.0.78";
 
   const packs = {
     ru: {
+      "help-ad-campaigns": {
+        title: "Рекламные кампании",
+        body: "Выберите Business account в My Profile, чтобы открыть Ad Campaigns. Inline ($45 / 7 дней — во время использования FloqR) или Mingl Gist ($25 / 7 дней — при прокрутке Mingl). Загрузите PNG/JPEG/GIF или вставьте HTML. Аудитория: все или datapoints профиля. Отправка уходит Master Admin на одобрение и расписание."
+      },
       "help-completed-shoutouts": {
         title: "Завершённые ShoutOuts",
         body: "Завершённые ShoutOuts — одобренные клубом (и законченные) ShoutOuts для ваших записей. Архив переносит ShoutOut из Завершённых в Archive со сжатым текстом и медиа (если оно было). Повторное использование открывает Search с тем же текстом. Сохранить как шаблон доступно только если фон шаблона изменяем (IsModifiable). Оплаченные квитанции остаются в FloqR Inbox."
@@ -145,9 +149,17 @@
       "help-mingl-requests": {
         title: "О запросах Mingl",
         body: "Отправленные и полученные Friend или Mingl Requests появляются здесь. Запросы остаются на главной странице Mingl; принятые разговоры открываются в Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Журналы доставки SMS и WhatsApp",
+        body: "Показывает SMS и WhatsApp Twilio для этой площадки (тест маркетинга, клубные оповещения). Те же строки в Master Admin → Twilio. Dry-run = нет secrets или From — ничего не доставлено, кредиты не списаны. Телефоны скрыты."
       }
     },
     nl: {
+      "help-ad-campaigns": {
+        title: "Advertentiecampagnes",
+        body: "Kies een Business account in My Profile om Ad Campaigns te openen. Inline ($45 / 7 dagen — tijdens FloqR-gebruik) of Mingl Gist ($25 / 7 dagen — tijdens Mingl-scrollen). Upload PNG/JPEG/GIF of plak HTML. Richt je op alle patrons of op profiel-datapoints. Indienen gaat naar Master Admin voor goedkeuring en planning."
+      },
       "help-completed-shoutouts": {
         title: "Voltooide ShoutOuts",
         body: "Voltooide ShoutOuts zijn door de club goedgekeurde (en afgeronde) ShoutOuts voor je administratie. Archiveren verplaatst een ShoutOut van Voltooid naar Archive met gecomprimeerde tekst en media (als die er was). Hergebruik opent Search met dezelfde tekst. Opslaan als sjabloon verschijnt alleen als de sjabloonachtergrond wijzigbaar is (IsModifiable). Betaalde bonnen blijven in FloqR Inbox."
@@ -287,9 +299,17 @@
       "help-mingl-requests": {
         title: "Over Mingl Requests",
         body: "Verzonden en ontvangen Friend- of Mingl Requests verschijnen hier. Requests blijven op de hoofd-Mingl-pagina; geaccepteerde gesprekken openen in Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "SMS- en WhatsApp-bezorglogboeken",
+        body: "Toont Twilio SMS en WhatsApp voor deze locatie (marketingtest, clubalerts). Dezelfde rijen staan onder Master Admin → Twilio. Dry-run = secrets of From ontbreken — niets bezorgd en geen credits afgeschreven. Telefoons gemaskeerd."
       }
     },
     fr: {
+      "help-ad-campaigns": {
+        title: "Campagnes publicitaires",
+        body: "Choisissez un compte Business dans My Profile pour ouvrir Ad Campaigns. Inline (45 $ / 7 jours — pendant l’usage de FloqR) ou Mingl Gist (25 $ / 7 jours — en scrollant Mingl). Téléversez PNG/JPEG/GIF ou collez du HTML. Ciblez tous les patrons ou des datapoints. L’envoi part vers Master Admin pour approbation et planning."
+      },
       "help-completed-shoutouts": {
         title: "ShoutOuts terminés",
         body: "Les ShoutOuts terminés sont les ShoutOuts approuvés par le club (et terminés) pour vos archives. Archiver déplace un ShoutOut de Terminés vers Archive avec texte et média compressés (s'il y en avait). Réutiliser ouvre Search avec le même texte. Enregistrer comme modèle apparaît seulement si l'arrière-plan du modèle est modifiable (IsModifiable). Les reçus payés restent dans FloqR Inbox."
@@ -429,9 +449,17 @@
       "help-mingl-requests": {
         title: "Environ Mingl demandes",
         body: "Les demandes d'ami ou Mingl envoyées et reçues apparaissent ici. Les demandes restent sur la page Mingl principale ; conversations acceptées ouvertes dans Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Journaux de livraison SMS et WhatsApp",
+        body: "Affiche les SMS et WhatsApp Twilio envoyés pour ce lieu (test marketing, alertes club). Les mêmes lignes sont sous Master Admin → Twilio. Dry-run = secrets ou From manquants — rien n’a été livré et aucun crédit débité. Téléphones masqués."
       }
     },
     de: {
+      "help-ad-campaigns": {
+        title: "Werbekampagnen",
+        body: "Wählen Sie in My Profile ein Business-Konto, um Ad Campaigns zu öffnen. Inline (45 $ / 7 Tage — während FloqR-Nutzung) oder Mingl Gist (25 $ / 7 Tage — beim Mingl-Scrollen). PNG/JPEG/GIF hochladen oder HTML einfügen. Zielgruppe: alle oder Profildatenpunkte. Einreichung geht an Master Admin zur Freigabe und Planung."
+      },
       "help-completed-shoutouts": {
         title: "Abgeschlossene ShoutOuts",
         body: "Abgeschlossene ShoutOuts sind vom Club freigegebene (und beendete) ShoutOuts für Ihre Unterlagen. Archivieren verschiebt einen ShoutOut von Abgeschlossen nach Archive mit komprimiertem Text und Medien (falls vorhanden). Erneut verwenden öffnet Search mit demselben Text. Als Vorlage speichern erscheint nur, wenn der Vorlagenhintergrund änderbar ist (IsModifiable). Bezahlte Belege bleiben in FloqR Inbox."
@@ -571,9 +599,17 @@
       "help-mingl-requests": {
         title: "Ungefähr Mingl Anfragen",
         body: "Gesendete und empfangene Freundschafts- oder Mingl-Anfragen werden hier angezeigt. Anfragen bleiben auf der Mingl-Hauptseite; Akzeptierte Konversationen werden im Mingl Chat geöffnet."
+      },
+      "help-club-messaging-logs": {
+        title: "SMS- und WhatsApp-Zustellprotokolle",
+        body: "Zeigt Twilio-SMS und WhatsApp für diesen Standort (Marketing-Sendetest, Club-Alerts). Dieselben Zeilen unter Master Admin → Twilio. Dry-run = Secrets oder From fehlen — nichts zugestellt, keine Credits abgebucht. Telefone maskiert."
       }
     },
     es: {
+      "help-ad-campaigns": {
+        title: "Campañas publicitarias",
+        body: "Elige una cuenta Business en My Profile para abrir Ad Campaigns. Inline (45 $ / 7 días — al usar FloqR) o Mingl Gist (25 $ / 7 días — al desplazarte en Mingl). Sube PNG/JPEG/GIF o pega HTML. Dirige a todos o a datapoints del perfil. El envío va a Master Admin para aprobación y programación."
+      },
       "help-completed-shoutouts": {
         title: "ShoutOuts completados",
         body: "Los ShoutOuts completados son ShoutOuts aprobados por el club (y terminados) para tus registros. Archivar mueve un ShoutOut de Completados a Archive con texto y media comprimidos (si los había). Reutilizar abre Search con el mismo texto. Guardar como plantilla solo aparece cuando el fondo de la plantilla es modificable (IsModifiable). Los recibos pagados permanecen en FloqR Inbox."
@@ -713,9 +749,17 @@
       "help-mingl-requests": {
         title: "Acerca de Mingl Solicitudes",
         body: "Las solicitudes de amigo o Mingl enviadas y recibidas aparecen aquí. Las solicitudes permanecen en la página principal Mingl; Las conversaciones aceptadas se abren en Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Registros de entrega SMS y WhatsApp",
+        body: "Muestra SMS y WhatsApp de Twilio enviados para este local (prueba de marketing, alertas del club). Las mismas filas están en Master Admin → Twilio. Dry-run = faltan secrets o From — no se entregó nada y no se debitaron créditos. Teléfonos enmascarados."
       }
     },
     it: {
+      "help-ad-campaigns": {
+        title: "Campagne pubblicitarie",
+        body: "Scegli un account Business in My Profile per aprire Ad Campaigns. Inline (45 $ / 7 giorni — durante l’uso di FloqR) o Mingl Gist (25 $ / 7 giorni — scorrendo Mingl). Carica PNG/JPEG/GIF o incolla HTML. Pubblico: tutti o datapoint del profilo. L’invio va a Master Admin per approvazione e pianificazione."
+      },
       "help-completed-shoutouts": {
         title: "ShoutOuts completati",
         body: "Gli ShoutOut completati sono ShoutOut approvati dal club (e terminati) per i tuoi record. Archivia sposta uno ShoutOut da Completati ad Archive con testo e media compressi (se presenti). Riusa apre Search con lo stesso testo. Salva come modello appare solo se lo sfondo del modello è modificabile (IsModifiable). Le ricevute pagate restano in FloqR Inbox."
@@ -855,9 +899,17 @@
       "help-mingl-requests": {
         title: "Circa Mingl richieste",
         body: "Le richieste di amico o Mingl inviate e ricevute vengono visualizzate qui. Le richieste rimangono nella pagina principale Mingl; le conversazioni accettate si aprono in Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Registri di consegna SMS e WhatsApp",
+        body: "Mostra SMS e WhatsApp Twilio inviati per questa sede (test marketing, avvisi club). Le stesse righe sono in Master Admin → Twilio. Dry-run = mancano secrets o From — nulla consegnato e nessun credito addebitato. Telefoni mascherati."
       }
     },
     pt: {
+      "help-ad-campaigns": {
+        title: "Campanhas publicitárias",
+        body: "Escolha uma conta Business em My Profile para abrir Ad Campaigns. Inline (45 $ / 7 dias — ao usar o FloqR) ou Mingl Gist (25 $ / 7 dias — ao percorrer o Mingl). Carregue PNG/JPEG/GIF ou cole HTML. Público: todos ou datapoints do perfil. O envio vai para Master Admin para aprovação e agendamento."
+      },
       "help-completed-shoutouts": {
         title: "ShoutOuts concluídos",
         body: "ShoutOuts concluídos são ShoutOuts aprovados pelo clube (e finalizados) para seus registros. Arquivar move um ShoutOut de Concluídos para Archive com texto e mídia comprimidos (se houver). Reutilizar abre Search com o mesmo texto. Salvar como modelo aparece só quando o fundo do modelo é modificável (IsModifiable). Recibos pagos ficam no FloqR Inbox."
@@ -997,9 +1049,17 @@
       "help-mingl-requests": {
         title: "Sobre Mingl solicitações",
         body: "Solicitações de amizade ou Mingl enviadas e recebidas aparecem aqui. As solicitações ficam na página Mingl principal; conversas aceitas abertas em Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Registos de entrega SMS e WhatsApp",
+        body: "Mostra SMS e WhatsApp Twilio enviados para este local (teste de marketing, alertas do clube). As mesmas linhas estão em Master Admin → Twilio. Dry-run = faltam secrets ou From — nada entregue e créditos não debitados. Telefones mascarados."
       }
     },
     el: {
+      "help-ad-campaigns": {
+        title: "Διαφημιστικές καμπάνιες",
+        body: "Επιλέξτε Business account στο My Profile για Ad Campaigns. Inline (45 $ / 7 ημέρες — κατά τη χρήση FloqR) ή Mingl Gist (25 $ / 7 ημέρες — στο scroll του Mingl). Ανεβάστε PNG/JPEG/GIF ή επικολλήστε HTML. Κοινό: όλοι ή datapoints προφίλ. Υποβολή στον Master Admin για έγκριση και προγραμματισμό."
+      },
       "help-completed-shoutouts": {
         title: "Ολοκληρωμένα ShoutOuts",
         body: "Τα ολοκληρωμένα ShoutOuts είναι εγκεκριμένα από το club (και τελειωμένα) για τα αρχεία σας. Η αρχειοθέτηση μεταφέρει ένα ShoutOut από Ολοκληρωμένα στο Archive με συμπιεσμένο κείμενο και media (αν υπήρχε). Η επαναχρησιμοποίηση ανοίγει Search με το ίδιο κείμενο. Αποθήκευση ως πρότυπο εμφανίζεται μόνο όταν το φόντο είναι τροποποιήσιμο (IsModifiable). Οι πληρωμένες αποδείξεις μένουν στο FloqR Inbox."
@@ -1139,9 +1199,17 @@
       "help-mingl-requests": {
         title: "Περίπου Mingl Αιτήματα",
         body: "Απεσταλμένα και ληφθέντα Αιτήματα φίλου ή Mingl εμφανίζονται εδώ. Τα αιτήματα παραμένουν στην κύρια σελίδα Mingl. οι αποδεκτές συνομιλίες ανοίγουν στο Mingl Chat."
+      },
+      "help-club-messaging-logs": {
+        title: "Αρχεία παράδοσης SMS και WhatsApp",
+        body: "Εμφανίζει SMS και WhatsApp Twilio για αυτόν τον χώρο (δοκιμή marketing, ειδοποιήσεις club). Οι ίδιες γραμμές στο Master Admin → Twilio. Dry-run = λείπουν secrets ή From — τίποτα δεν παραδόθηκε και δεν χρεώθηκαν credits. Τηλέφωνα καλυμμένα."
       }
     },
     pl: {
+      "help-ad-campaigns": {
+        title: "Kampanie reklamowe",
+        body: "Wybierz konto Business w My Profile, aby otworzyć Ad Campaigns. Inline (45 $ / 7 dni — podczas używania FloqR) lub Mingl Gist (25 $ / 7 dni — podczas przewijania Mingl). Prześlij PNG/JPEG/GIF lub wklej HTML. Grupy: wszyscy lub datapointy profilu. Wysłanie trafia do Master Admin do zatwierdzenia i harmonogramu."
+      },
       "help-completed-shoutouts": {
         title: "Zakończone ShoutOuts",
         body: "Zakończone ShoutOuts to zatwierdzone przez klub (i zakończone) ShoutOuts do Twojej dokumentacji. Archiwizacja przenosi ShoutOut z Zakończonych do Archive ze skompresowanym tekstem i mediami (jeśli były). Ponów otwiera Search z tym samym tekstem. Zapisz jako szablon pojawia się tylko, gdy tło szablonu jest modyfikowalne (IsModifiable). Opłacone paragony zostają w FloqR Inbox."
@@ -1281,9 +1349,17 @@
       "help-mingl-requests": {
         title: "O żądaniach Mingl",
         body: "Wysłane i odebrane prośby o przyjaźń lub Mingl pojawiają się tutaj. Prośby pozostają na głównej stronie Mingl; zaakceptowane rozmowy otwierają się w Mingl Czat."
+      },
+      "help-club-messaging-logs": {
+        title: "Dzienniki dostawy SMS i WhatsApp",
+        body: "Pokazuje SMS i WhatsApp Twilio dla tej lokalizacji (test marketingowy, alerty klubu). Te same wiersze są w Master Admin → Twilio. Dry-run = brak secrets lub From — nic nie dostarczono i nie pobrano kredytów. Telefony zamaskowane."
       }
     },
     ar: {
+      "help-ad-campaigns": {
+        title: "حملات إعلانية",
+        body: "اختر حساب Business في My Profile لفتح Ad Campaigns. Inline (45$ / 7 أيام — أثناء استخدام FloqR) أو Mingl Gist (25$ / 7 أيام — أثناء التمرير في Mingl). ارفع PNG/JPEG/GIF أو الصق HTML. الجمهور: الجميع أو نقاط بيانات الملف. الإرسال يذهب إلى Master Admin للموافقة والجدولة."
+      },
       "help-completed-shoutouts": {
         title: "ShoutOuts المكتملة",
         body: "ShoutOuts المكتملة هي المعتمدة من النادي (والمنتهية) لسجلاتك. تنقل الأرشفة ShoutOut من المكتملة إلى Archive مع نص ووسائط مضغوطة (إن وُجدت). إعادة الاستخدام تفتح Search بنفس النص. يظهر حفظ كقالب فقط عندما تكون خلفية القالب قابلة للتعديل (IsModifiable). تبقى الإيصالات المدفوعة في FloqR Inbox."
@@ -1423,6 +1499,10 @@
       "help-mingl-requests": {
         title: "حول طلبات Mingl",
         body: "تظهر هنا الطلبات المرسلة والمستلمة من الأصدقاء أو Mingl. تبقى الطلبات في الصفحة الرئيسية لـ Mingl؛ المحادثات المقبولة تفتح في دردشة Mingl."
+      },
+      "help-club-messaging-logs": {
+        title: "سجلات تسليم SMS وWhatsApp",
+        body: "يعرض رسائل Twilio SMS وWhatsApp لهذا المكان (اختبار التسويق، تنبيهات النادي). تظهر الصفوف نفسها في Master Admin → Twilio. Dry-run يعني غياب secrets أو From — لم يُسلَّم شيء ولم تُخصم أرصدة. أرقام الهاتف مخفية."
       }
     }
   };
