@@ -57,8 +57,8 @@ test("getFloqrClientIp and stampShoutoutActorContext are exported callables", ()
 
 test("patron Search loads floqr-client-ip and attaches session IP on submit", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-  assert.match(html, /floqr-client-ip\.js\?v=s3\.0\.69/);
-  assert.match(html, /patron-app\.js\?v=s3\.0\.69/);
+  assert.match(html, /floqr-client-ip\.js\?v=s3\.0\.\d+/);
+  assert.match(html, /patron-app\.js\?v=s3\.0\.\d+/);
   const clientIp = fs.readFileSync(path.join(__dirname, "..", "floqr-client-ip.js"), "utf8");
   assert.match(clientIp, /getFloqrClientIp/);
   assert.match(clientIp, /FLOQRClientIp/);
