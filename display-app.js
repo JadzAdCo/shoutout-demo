@@ -357,20 +357,61 @@
     if (line && rows.length < maxRows) rows.push(line);
   }
 
+  /**
+   * Pack every word into maxRows without dropping overflow.
+   * Relaxes the soft per-line char budget so fitDisplayMessageLines can shrink type.
+   * Design notes: .cursor/rules/design-notes-display-screens.mdc
+   */
+  function packAllWordsIntoRows(words, maxRows, softMaxChars) {
+    const rows = Math.max(1, maxRows);
+    const list = (words || []).filter(Boolean);
+    if (!list.length) return [""];
+    let budget = Math.max(1, softMaxChars || 16);
+    for (let attempt = 0; attempt < 48; attempt += 1) {
+      const out = [];
+      pushWrapped(out, list, rows, budget);
+      const packed = out.join(" ").replace(/\s+/g, " ").trim();
+      const source = list.join(" ").replace(/\s+/g, " ").trim();
+      if (packed === source || glyphLen(packed) >= glyphLen(source)) {
+        while (out.length < rows) out.push("");
+        return out.slice(0, rows);
+      }
+      budget += 2;
+    }
+    // Last resort: force equal-ish slices so nothing is lost.
+    const all = list.join(" ");
+    const chars = glyphs(all);
+    const per = Math.ceil(chars.length / rows) || 1;
+    const forced = [];
+    for (let i = 0; i < rows; i += 1) {
+      forced.push(chars.slice(i * per, (i + 1) * per).join("").trim());
+    }
+    return forced.map((row, i) => row || (i === 0 ? all : ""));
+  }
+
   function displayTextRows(mainText, caps = {}, options = {}) {
     const uppercase = options.uppercase !== false;
+    const preserveAll = options.preserveAll === true;
     const maxRows = Math.max(1, Number(caps.lineCount || 1));
     const maxChars = Math.max(1, Number(caps.maxCharactersPerLine || caps.perLine || caps.maxMainCharacters || 60));
     const maxTotal = Math.max(1, Number(caps.maxMainCharacters || caps.main || maxChars * maxRows));
-    const rows = [];
+    const hardCeiling = preserveAll
+      ? Math.max(maxTotal * 3, maxChars * maxRows * 3, 120)
+      : Math.max(maxTotal, maxChars * maxRows);
 
     let prepared = String(mainText || "")
       .normalize("NFC")
       .replace(/\r\n?/g, "\n")
       .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ");
     if (uppercase) prepared = prepared.toUpperCase();
-    // Keep the full shoutout budget (emoji-aware), then wrap onto lines.
-    prepared = glyphSlice(prepared, 0, Math.max(maxTotal, maxChars * maxRows));
+    prepared = glyphSlice(prepared, 0, hardCeiling);
+
+    if (preserveAll) {
+      const words = prepared.replace(/\n+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+      return packAllWordsIntoRows(words, maxRows, maxChars);
+    }
+
+    const rows = [];
     prepared.split(/\n+/).forEach(sourceLine => {
       if (rows.length >= maxRows) return;
       const words = sourceLine.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -386,6 +427,40 @@
       maxCharactersPerLine:Number(caps.maxCharactersPerLine || caps.perLine || 15),
       maxMainCharacters:Number(caps.maxMainCharacters || caps.main || 45)
     });
+  }
+
+  /** Uniform font shrink so every nowrap message line fits the board width (no word drop). */
+  function fitDisplayMessageLines(host, options = {}) {
+    if (!host) return 0;
+    const lines = Array.from(host.querySelectorAll(":scope > span, :scope > b"));
+    if (!lines.length) return 0;
+    const width = host.clientWidth || host.parentElement?.clientWidth || 0;
+    const height = host.clientHeight || host.parentElement?.clientHeight || 0;
+    if (width < 24) return 0;
+    const minPx = Math.max(10, Number(options.minPx || 14));
+    const startPx = Number(options.startPx || 0);
+    const computed = Number.parseFloat(window.getComputedStyle(lines[0]).fontSize) || 24;
+    let lo = minPx;
+    let hi = Math.max(minPx, Math.floor(startPx || computed || Math.min(height / Math.max(1, lines.length), width / 4)));
+    const apply = px => {
+      lines.forEach(el => {
+        el.style.fontSize = `${px}px`;
+        el.style.lineHeight = "0.92";
+      });
+    };
+    for (let i = 0; i < 18; i += 1) {
+      const mid = Math.floor((lo + hi + 1) / 2);
+      apply(mid);
+      let overflow = false;
+      lines.forEach(el => {
+        if (el.scrollWidth > width + 2) overflow = true;
+      });
+      if (height > 24 && host.scrollHeight > height + 4) overflow = true;
+      if (overflow) hi = mid - 1;
+      else lo = mid;
+    }
+    apply(Math.max(minPx, lo));
+    return Math.max(minPx, lo);
   }
 
   function classicIdentityPresentation(subText, options = {}) {
@@ -1497,7 +1572,8 @@
       ? glyphSlice(cleanBoardText(mainSource), 0, Math.min(14, mainLimit))
       : isClassicBoard
       ? mainSource.slice(0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1))
-      : glyphSlice(cleanDisplayText(mainSource), 0, mainLimit + Math.max(0, Number(textCaps.lineCount || 1) - 1));
+      // Soft composer caps guide writing; display packs all words then shrinks type (no drop).
+      : glyphSlice(cleanDisplayText(mainSource), 0, Math.max(mainLimit * 3, 120));
     // Soccer jersey mark: any characters including emoji (grapheme-capped at 2).
     const subText = isSoccerJersey
       ? glyphSlice(cleanJerseyMark(data.subText || data.jerseyNumber || t.defaultSub || ""), 0, Math.min(2, subLimit || 2))
@@ -1844,9 +1920,22 @@
       byId("displayMain").classList.remove("classic-bw-board");
       byId("displaySub").classList.remove("classic-bw-sub-hidden");
       byId("displaySub").removeAttribute("aria-label");
-      const rows = displayTextRows(mainText, textCaps, {uppercase: false});
+      const rows = displayTextRows(mainText, textCaps, {uppercase: false, preserveAll: true});
       byId("displayMain").classList.add("display-message-lines", `display-message-lines-${rows.length}`);
+      byId("displayMain").style.setProperty("--display-message-lines", String(Math.max(1, rows.length)));
+      // Start from profile size; fitDisplayMessageLines shrinks uniformly so no word is clipped.
+      const startVh = usesSplitMedia || isChristine ? mainSize * 0.78 : mainSize;
+      byId("displayMain").style.fontSize = `${startVh}vh`;
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
+      const runMessageFit = () => fitDisplayMessageLines(byId("displayMain"), {
+        minPx: Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35)),
+        startPx: 0
+      });
+      runMessageFit();
+      requestAnimationFrame(() => {
+        runMessageFit();
+        requestAnimationFrame(runMessageFit);
+      });
       const identity = usesSplitMedia && !isChristine ? splitMediaIdentityPresentation(data, subText) : null;
       if (isChristine) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
@@ -1866,7 +1955,13 @@
         // Force loop classes even if FLOQRFrameLoop is late; then start the 6s rotation.
         canvas.classList.add("split-media-loop");
         if (center) center.classList.add("split-media-layout");
-        startFrameLoop(canvas);
+        startFrameLoop(canvas, () => {
+          if (canvas.classList.contains("split-media-phase-copy")) {
+            fitDisplayMessageLines(byId("displayMain"), {
+              minPx: Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35))
+            });
+          }
+        });
       } else if (usesSplitMedia && identity) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").textContent = identity.extraCopy || "";

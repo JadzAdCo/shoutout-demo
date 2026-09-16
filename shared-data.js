@@ -1150,7 +1150,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     Is64x48:1,
     Is64x32:0,
     screenFormatIds:["led-64x48","p125-64x48"],
-    preferredP125FormatIds:["p125-64x48","led-64x48"],
+    preferredP125FormatIds:["led-64x48","p125-64x48"],
     primaryDisplayScreenFormatId:"led-64x48",
     defaultMain:"",
     defaultSub:"",
@@ -1372,14 +1372,15 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
 window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversaryMedia','engagementMedia','fianceMedia','car','summer','champagne','beach','graduation','wedding','sports','luxury','corporate','soccerJersey'];
 
 window.FLOQR_DISPLAY_FORMATS = {
-  "p125-96x48": {id:"p125-96x48", label:"P1.25 - 96 x 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.25, pixelWidth:768, pixelHeight:384, aspectRatio:"2 / 1", tags:["P1.25","96x48cm","768x384","2:1","7 meter visibility"]},
-  "p125-64x48": {id:"p125-64x48", label:"P1.25 - 64 x 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.25, pixelWidth:512, pixelHeight:384, aspectRatio:"4 / 3", tags:["P1.25","64x48cm","512x384","4:3","7 meter visibility"]},
-  "p125-64x32": {id:"p125-64x32", label:"P1.25 - 64 x 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.25, pixelWidth:512, pixelHeight:256, aspectRatio:"2 / 1", tags:["P1.25","64x32cm","512x256","2:1","7 meter visibility"]},
-  "led-96x48": {id:"led-96x48", label:"96 x 48 cm", widthCm:96, heightCm:48, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["96x48cm","624x312","2:1"]},
-  "led-64x48": {id:"led-64x48", label:"64 x 48 cm", widthCm:64, heightCm:48, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["64x48cm","416x312","4:3"]},
-  "led-64x32": {id:"led-64x32", label:"64 x 32 cm", widthCm:64, heightCm:32, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["64x32cm","416x208","2:1"]}
+  "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},
+  "led-64x48": {id:"led-64x48", label:"P1.56 — 64 × 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["P1.56","64x48cm","416x312","4:3"]},
+  "led-64x32": {id:"led-64x32", label:"P1.56 — 64 × 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["P1.56","64x32cm","416x208","2:1"]},
+  // Legacy aliases (same three physical sizes). Prefer led-* in new writes.
+  "p125-96x48": {id:"p125-96x48", aliasOf:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","legacy-alias"]},
+  "p125-64x48": {id:"p125-64x48", aliasOf:"led-64x48", label:"P1.56 — 64 × 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["P1.56","64x48cm","legacy-alias"]},
+  "p125-64x32": {id:"p125-64x32", aliasOf:"led-64x32", label:"P1.56 — 64 × 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["P1.56","64x32cm","legacy-alias"]}
 };
-window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = Object.keys(window.FLOQR_DISPLAY_FORMATS);
+window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = ["led-96x48", "led-64x48", "led-64x32"];
 
 /* v29.08.4: display-aware text contracts. Limits are readability ceilings, not targets. */
 window.FLOQR_TEMPLATE_TEXT_PROFILES = {

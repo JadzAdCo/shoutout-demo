@@ -12,7 +12,7 @@
   const safeUser = user => (user?.email || user?.phoneNumber || "unknown").toLowerCase();
   const money = value => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(value || 0);
   const CURRENT_VERSION = window.FLOQRNav?.currentVersion?.() || window.FLOQRNav?.appVersion || "s3.0.3";
-  const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32","p125-96x48","p125-64x48","p125-64x32"];
+  const DISPLAY_FORMAT_IDS = ["led-96x48","led-64x48","led-64x32"];
   let clubDisplaySetupLocationId = "";
 
   if (!window.firebaseConfig) {
@@ -234,6 +234,7 @@
       try {
         if (location.hash !== `#${panelId}`) history.replaceState(null, "", `#${panelId}`);
       } catch (_) {}
+      try { window.FLOQRNav?.applyGlobalBack?.("floqrGlobalBack"); } catch (_) {}
     };
 
     const resumeDeepLinkPanel = (preferred = "") => {

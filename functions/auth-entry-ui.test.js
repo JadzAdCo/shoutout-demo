@@ -150,6 +150,46 @@ test("SOS2FA request UI is channel-neutral and puts status below the request but
   assert.doesNotMatch(js, /Email and SMS notification settings/);
 });
 
+test("Master Admin global back stays on NIC, not patron Search", () => {
+  const vm = require("node:vm");
+  const html = readReleaseFile("master-admin.html");
+  const backIdx = html.indexOf('id="floqrGlobalBack"');
+  assert.ok(backIdx > 0, "master-admin.html must define floqrGlobalBack");
+  const backTag = html.slice(backIdx, backIdx + 280);
+  assert.doesNotMatch(backTag, /data-from\s*=\s*["']search["']/i, "NIC back must not use data-from=search");
+
+  const navSource = readReleaseFile("floqr-nav.js");
+  const sandbox = {
+    window: {},
+    document: { getElementById() { return null; } },
+    location: {
+      href: "https://example.test/master-admin.html?from=search#entityManagement",
+      hash: "#entityManagement",
+      pathname: "/master-admin.html"
+    },
+    URL,
+    URLSearchParams,
+    addEventListener() {}
+  };
+  sandbox.global = sandbox;
+  sandbox.window = sandbox;
+  vm.runInNewContext(navSource, sandbox);
+
+  const target = sandbox.FLOQRNav.resolveBack("search");
+  assert.match(target.href, /master-admin\.html/);
+  assert.match(target.href, /#networkDashboard/);
+  assert.doesNotMatch(target.href, /start=search/);
+  assert.doesNotMatch(target.href, /\?\s*$/);
+  assert.match(target.label, /Network Intelligence Center/);
+
+  const searchFallback = sandbox.FLOQRNav.resolveBack("search");
+  assert.notEqual(
+    searchFallback.href,
+    sandbox.FLOQRNav.searchHome(),
+    "master-admin resolveBack must not fall through to searchHome"
+  );
+});
+
 test("Master Admin Entity Management defaults to Manage Entities and resumes deep links after auth", () => {
   const html = readReleaseFile("master-admin.html");
   assert.match(html, /data-tab-group="entityManagement"[^>]*data-default-panel="entityManagement"/);
