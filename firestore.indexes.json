@@ -9,13 +9,6 @@
       ]
     },
     {
-      "collectionGroup": "systemMailLogs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAtMs", "order": "DESCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "twilioSmsLogs",
       "queryScope": "COLLECTION",
       "fields": [
