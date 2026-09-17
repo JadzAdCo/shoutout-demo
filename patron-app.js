@@ -2926,7 +2926,7 @@
     const canCustomize = templateBackgroundCanBeCustomized(template);
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(template, getLocation() || {}) || getLocation()?.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || [];
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
-    const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32", "p125-96x48": "96×48", "p125-64x48": "64×48", "p125-64x32": "64×32" };
+    const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32" };
     const sizeChips = supportedFormats.map(id => sizeLabels[id] || id).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
     const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
     const jerseyTagLine = template.sport === "nfl" && template.defaultBackgroundUrl
@@ -3367,7 +3367,7 @@
 
   function templateDisplayCaps(template = getTemplate()) {
     const t = template || {};
-    const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || getLocation()?.primaryDisplayScreenFormatId || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48";
+    const formatId = byId("shoutoutScreenFormat")?.value || selectedScreenFormatId || getLocation()?.primaryDisplayScreenFormatId || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "led-96x48";
     const resolved = window.FLOQRTextLayout?.resolve?.(t, formatId);
     if (resolved) return resolved;
     const cap = t.displayCaps || t.characterCaps || {};
@@ -4058,7 +4058,9 @@
     const venue = window.FLOQRScreenDatapoints?.applyVenue?.(location) || location;
     const templateRow = window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template;
     const venueFormats = window.FLOQRScreenDatapoints?.overlappingFormatIds?.(templateRow, venue) || venue.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
-    const preferred = (isFootballTeamIntro(template.id) || template.id === "christine") ? (template.preferredP125FormatIds || []) : [];
+    const preferred = (isFootballTeamIntro(template.id) || template.id === "christine")
+      ? (template.preferredFormatIds || template.preferredP125FormatIds || []).map(id => window.FLOQRScreenDatapoints?.canonicalFormatId?.(id) || String(id).replace(/^p125-/, "led-"))
+      : [];
     const available = Array.from(new Set([...preferred, ...venueFormats])).filter(id => venueFormats.includes(id));
     const supported = available.filter(id => window.FLOQRTextLayout?.resolve?.(templateRow, id)?.supported !== false);
     screenSelect.innerHTML = available.map(id => {

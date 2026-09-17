@@ -80,9 +80,9 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     activityDates:["Monday Hip Hop","Wednesday EDM","Friday Afro Beats","Saturday International"],
     templates:["birthday","vip","bottle","neon","zebbiesFootballTeamIntro","soccerJersey","christine"],
     soccerJerseyTeamIds:["soccerCameroon","soccerRussia","soccerUkraine"],
-    displayScreenFormatIds:["p125-96x48","p125-64x48","p125-64x32","led-96x48","led-64x48","led-64x32"],
+    displayScreenFormatIds:["led-96x48","led-64x48","led-64x32"],
     VenueSupports96x48:1, VenueSupports64x48:1, VenueSupports64x32:1,
-    primaryDisplayScreenFormatId:"p125-96x48",
+    primaryDisplayScreenFormatId:"led-96x48",
     active:true
   },
   "heist-washington-dc": {
@@ -1117,8 +1117,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['p125-96x48','p125-64x48','p125-64x32','led-96x48','led-64x48','led-64x32'],
-    preferredP125FormatIds:['p125-96x48','p125-64x48','p125-64x32'],
+    screenFormatIds:['led-96x48','led-64x48','led-64x32'],
+    preferredFormatIds:['led-96x48','led-64x48','led-64x32'],
     defaultMain:'ZEBBIES ALL-STARS',
     defaultSub:'GAME NIGHT LINEUP',
     maxMainCharacters:36,
@@ -1149,8 +1149,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     Is96x48:0,
     Is64x48:1,
     Is64x32:0,
-    screenFormatIds:["led-64x48","p125-64x48"],
-    preferredP125FormatIds:["led-64x48","p125-64x48"],
+    screenFormatIds:["led-64x48"],
+    preferredFormatIds:["led-64x48"],
     primaryDisplayScreenFormatId:"led-64x48",
     defaultMain:"",
     defaultSub:"",
@@ -1187,7 +1187,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'',
     defaultSub:'',
     lineCount:3,
@@ -1221,7 +1221,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'',
     defaultSub:'',
     lineCount:3,
@@ -1255,7 +1255,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'',
     defaultSub:'',
     lineCount:3,
@@ -1289,7 +1289,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'',
     defaultSub:'',
     lineCount:3,
@@ -1324,7 +1324,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'',
     defaultSub:'',
     lineCount:3,
@@ -1357,7 +1357,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     priceCents:3000,
     priceLabel:'$30',
     Is96x48:1, Is64x48:1, Is64x32:1,
-    screenFormatIds:['led-64x32','led-64x48','led-96x48','p125-64x32','p125-64x48','p125-96x48'],
+    screenFormatIds:['led-64x32','led-64x48','led-96x48'],
     defaultMain:'NYX',
     defaultSub:'99',
     lineCount:1,
@@ -1374,11 +1374,7 @@ window.SHOUTOUT_STANDARD_TEMPLATE_IDS = ['blackwhite','birthdayMedia','anniversa
 window.FLOQR_DISPLAY_FORMATS = {
   "led-96x48": {id:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","624x312","2:1"]},
   "led-64x48": {id:"led-64x48", label:"P1.56 — 64 × 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["P1.56","64x48cm","416x312","4:3"]},
-  "led-64x32": {id:"led-64x32", label:"P1.56 — 64 × 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["P1.56","64x32cm","416x208","2:1"]},
-  // Legacy aliases (same three physical sizes). Prefer led-* in new writes.
-  "p125-96x48": {id:"p125-96x48", aliasOf:"led-96x48", label:"P1.56 — 96 × 48 cm", widthCm:96, heightCm:48, pixelPitchMm:1.56, pixelWidth:624, pixelHeight:312, aspectRatio:"2 / 1", tags:["P1.56","96x48cm","legacy-alias"]},
-  "p125-64x48": {id:"p125-64x48", aliasOf:"led-64x48", label:"P1.56 — 64 × 48 cm", widthCm:64, heightCm:48, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:312, aspectRatio:"4 / 3", tags:["P1.56","64x48cm","legacy-alias"]},
-  "p125-64x32": {id:"p125-64x32", aliasOf:"led-64x32", label:"P1.56 — 64 × 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["P1.56","64x32cm","legacy-alias"]}
+  "led-64x32": {id:"led-64x32", label:"P1.56 — 64 × 32 cm", widthCm:64, heightCm:32, pixelPitchMm:1.56, pixelWidth:416, pixelHeight:208, aspectRatio:"2 / 1", tags:["P1.56","64x32cm","416x208","2:1"]}
 };
 window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS = ["led-96x48", "led-64x48", "led-64x32"];
 
@@ -1387,9 +1383,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   full: {
     label:"Full-screen message",
     formats:{
-      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:72},
-      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:72},
-      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:24,minimumFontPixels:48},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:28,minimumFontPixels:58},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:58},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters so text does not clip."}
@@ -1398,9 +1391,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   classicBoard: {
     label:"Three-line classic board",
     formats:{
-      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:62},
-      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:18,minimumFontPixels:56},
-      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:44},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:15,maxMainCharacters:45,maxSubCharacters:20,minimumFontPixels:52},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:18,minimumFontPixels:46},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED safe area: keep lines ≤10 characters; identity rail stays PRESENTED BY FLOQR ShoutOut when blank."}
@@ -1409,9 +1399,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   christine: {
     label:"Christine media then message",
     formats:{
-      "p125-96x48": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
-      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:46},
-      "p125-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
       "led-96x48": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:22,minimumFontPixels:40},
       "led-64x32": {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"Christine is a 64×48 template."}
@@ -1420,9 +1407,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   splitMedia: {
     label:"Media and message split",
     formats:{
-      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:54},
-      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:18,minimumFontPixels:46},
-      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:36},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:20,minimumFontPixels:44},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:18,minimumFontPixels:40},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:10,maxMainCharacters:30,maxSubCharacters:16,minimumFontPixels:32}
@@ -1431,9 +1415,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   car: {
     label:"Illustrated car message",
     formats:{
-      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:22,minimumFontPixels:72},
-      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:18,minimumFontPixels:72},
-      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:18,minimumFontPixels:48},
       "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:22,minimumFontPixels:58},
       "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:18,minimumFontPixels:58},
       "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:12,maxMainCharacters:24,maxSubCharacters:16,minimumFontPixels:38}
@@ -1442,9 +1423,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   footballIntro: {
     label:"Football Intro four-player sequence",
     formats:{
-      "p125-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:72,skipFinaleLineup:false},
-      "p125-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:68,skipFinaleLineup:false},
-      "p125-64x32": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:14,stadiumLineCount:2,stadiumCharactersPerLine:12,maxStadiumCharacters:24,maxPlayerNameCharacters:8,minimumFontPixels:40,skipFinaleLineup:true,advice:"Reduced Football Intro layout: no finale lineup; stadium message stays visible longer."},
       "led-96x48": {supported:true,lineCount:2,maxCharactersPerLine:14,maxMainCharacters:28,maxSubCharacters:20,stadiumLineCount:3,stadiumCharactersPerLine:18,maxStadiumCharacters:54,maxPlayerNameCharacters:14,minimumFontPixels:58,skipFinaleLineup:false},
       "led-64x48": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:16,stadiumLineCount:3,stadiumCharactersPerLine:12,maxStadiumCharacters:36,maxPlayerNameCharacters:10,minimumFontPixels:54,skipFinaleLineup:false},
       "led-64x32": {supported:true,lineCount:2,maxCharactersPerLine:10,maxMainCharacters:20,maxSubCharacters:14,stadiumLineCount:2,stadiumCharactersPerLine:12,maxStadiumCharacters:24,maxPlayerNameCharacters:8,minimumFontPixels:38,skipFinaleLineup:true,advice:"Reduced Football Intro layout: no finale lineup; stadium message stays visible longer."}
@@ -1453,9 +1431,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   textOverlayFrame: {
     label:"Framed transparent text overlay",
     formats:{
-      "p125-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:20,minimumFontPixels:52},
-      "p125-64x48": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:48},
-      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:44},
       "led-96x48": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:20,minimumFontPixels:44},
       "led-64x48": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:18,minimumFontPixels:40},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:14,maxMainCharacters:42,maxSubCharacters:14,minimumFontPixels:28,advice:"64×32 LED framed overlay: up to 3 lines, 14 characters per line (42 total)."}
@@ -1464,9 +1439,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   soccerJersey: {
     label:"Sports jersey country/club + name + mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:48,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "p125-64x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:44,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
-      "p125-64x32": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8},
       "led-96x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:40,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
       "led-64x48": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:38,mainTextSizePercent:16.2,subTextSizePercent:64,teamTextSizePercent:7.2},
       "led-64x32": {supported:true,lineCount:1,maxCharactersPerLine:8,maxMainCharacters:8,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:15.3,subTextSizePercent:56,teamTextSizePercent:6.8}
@@ -1475,9 +1447,6 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
   nflJersey: {
     label:"NFL jersey dual layout — shoutout copy + jersey name/mark",
     formats:{
-      "p125-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:36,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
-      "p125-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
-      "p125-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:28,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-96x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:32,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x48": {supported:true,lineCount:4,maxCharactersPerLine:16,maxMainCharacters:64,maxSubCharacters:2,minimumFontPixels:30,mainTextSizePercent:8.5,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2},
       "led-64x32": {supported:true,lineCount:3,maxCharactersPerLine:16,maxMainCharacters:48,maxSubCharacters:2,minimumFontPixels:26,mainTextSizePercent:9,subTextSizePercent:48,jerseyNameMax:8,jerseyNumberMax:2}
@@ -1486,12 +1455,34 @@ window.FLOQR_TEMPLATE_TEXT_PROFILES = {
 };
 
 window.FLOQRScreenDatapoints = {
-  version: "29.09.119",
+  version: "29.09.120",
+  legacyP125Ids: {
+    "p125-96x48": "led-96x48",
+    "p125-64x48": "led-64x48",
+    "p125-64x32": "led-64x32"
+  },
   sizes: [
-    {family: "96x48", led: "led-96x48", p125: "p125-96x48", isKey: "Is96x48", venueKey: "VenueSupports96x48"},
-    {family: "64x48", led: "led-64x48", p125: "p125-64x48", isKey: "Is64x48", venueKey: "VenueSupports64x48"},
-    {family: "64x32", led: "led-64x32", p125: "p125-64x32", isKey: "Is64x32", venueKey: "VenueSupports64x32"}
+    {family: "96x48", led: "led-96x48", isKey: "Is96x48", venueKey: "VenueSupports96x48"},
+    {family: "64x48", led: "led-64x48", isKey: "Is64x48", venueKey: "VenueSupports64x48"},
+    {family: "64x32", led: "led-64x32", isKey: "Is64x32", venueKey: "VenueSupports64x32"}
   ],
+  canonicalFormatId(formatId = "") {
+    const raw = String(formatId || "").trim().toLowerCase();
+    if (!raw) return "";
+    if (this.legacyP125Ids[raw]) return this.legacyP125Ids[raw];
+    if (raw.startsWith("p125-")) return raw.replace(/^p125-/, "led-");
+    const row = this.sizes.find(size => raw === size.led || raw.endsWith(size.family));
+    if (row) return row.led;
+    if ((window.FLOQR_DISPLAY_FORMATS || {})[raw]) return raw;
+    return "";
+  },
+  matchesFamily(formatId = "", size = {}) {
+    const raw = String(formatId || "").trim().toLowerCase();
+    if (!raw || !size?.family) return false;
+    if (raw === size.led || raw.endsWith(size.family)) return true;
+    const legacy = this.legacyP125Ids[raw] || (raw.startsWith("p125-") ? raw.replace(/^p125-/, "led-") : "");
+    return legacy === size.led;
+  },
   hasExplicit(record = {}, keyName = "venueKey") {
     return this.sizes.some(size => {
       const value = record[size[keyName]];
@@ -1502,7 +1493,7 @@ window.FLOQRScreenDatapoints = {
     const listed = (Array.isArray(ids) ? ids : []).map(String);
     const next = {};
     this.sizes.forEach(size => {
-      next[size[keyName]] = listed.some(id => id === size.led || id === size.p125 || String(id).endsWith(size.family)) ? 1 : 0;
+      next[size[keyName]] = listed.some(id => this.matchesFamily(id, size)) ? 1 : 0;
     });
     return next;
   },
@@ -1513,21 +1504,21 @@ window.FLOQRScreenDatapoints = {
   },
   familyOf(formatId = "") {
     const raw = String(formatId || "").toLowerCase();
-    const row = this.sizes.find(size => raw === size.led || raw === size.p125 || raw.endsWith(size.family));
+    const row = this.sizes.find(size => this.matchesFamily(raw, size));
     return row ? row.family : "";
   },
   sizeByFamily(family = "") {
     return this.sizes.find(size => size.family === family) || null;
   },
   templateFormatIds(template = {}) {
-    return this.sizes.flatMap(size => this.as01(template[size.isKey]) === 1 ? [size.led, size.p125] : []);
+    return this.sizes.flatMap(size => this.as01(template[size.isKey]) === 1 ? [size.led] : []);
   },
   venueLedIds(venue = {}) {
-    return this.sizes.flatMap(size => this.as01(venue[size.venueKey]) === 1 ? [size.led, size.p125] : []);
+    return this.sizes.flatMap(size => this.as01(venue[size.venueKey]) === 1 ? [size.led] : []);
   },
   overlappingFormatIds(template = {}, venue = {}) {
     return this.sizes.flatMap(size => (
-      this.as01(template[size.isKey]) === 1 && this.as01(venue[size.venueKey]) === 1 ? [size.led, size.p125] : []
+      this.as01(template[size.isKey]) === 1 && this.as01(venue[size.venueKey]) === 1 ? [size.led] : []
     ));
   },
   templateFitsVenue(template = {}, venue = {}) {
@@ -1541,9 +1532,8 @@ window.FLOQRScreenDatapoints = {
         template[size.isKey] = this.as01(template[size.isKey], 0);
         return;
       }
-      const familyIds = [size.led, size.p125];
-      const listedHit = !listed.length || listed.some(id => familyIds.includes(id));
-      const layoutOk = familyIds.some(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
+      const listedHit = !listed.length || listed.some(id => this.matchesFamily(id, size));
+      const layoutOk = window.FLOQRTextLayout?.resolve?.(template, size.led)?.supported !== false;
       template[size.isKey] = listedHit && layoutOk ? 1 : 0;
     });
     template.screenFormatIds = this.templateFormatIds(template);
@@ -1557,13 +1547,14 @@ window.FLOQRScreenDatapoints = {
         venue[size.venueKey] = this.as01(venue[size.venueKey], 0);
         return;
       }
-      const familyIds = [size.led, size.p125, size.family];
-      venue[size.venueKey] = listed.some(id => familyIds.includes(String(id))) ? 1 : 0;
+      venue[size.venueKey] = listed.some(id => this.matchesFamily(id, size)) ? 1 : 0;
     });
     if (!explicit && !listed.length) {
       this.sizes.forEach(size => { venue[size.venueKey] = 1; });
     }
     venue.displayScreenFormatIds = this.sizes.filter(size => venue[size.venueKey] === 1).map(size => size.led);
+    venue.primaryDisplayScreenFormatId = this.canonicalFormatId(venue.primaryDisplayScreenFormatId);
+    venue.secondaryDisplayScreenFormatId = this.canonicalFormatId(venue.secondaryDisplayScreenFormatId);
     if (venue.primaryDisplayScreenFormatId && !venue.displayScreenFormatIds.includes(venue.primaryDisplayScreenFormatId)) {
       venue.primaryDisplayScreenFormatId = venue.displayScreenFormatIds[0] || "led-96x48";
     }
@@ -1601,11 +1592,11 @@ window.FLOQRScreenDatapoints = {
   resolvePlaybackFormat({venue = {}, template = {}, shoutout = {}, board = "primary"} = {}) {
     this.applyVenue(venue);
     this.applyTemplate(template);
-    const assigned = board === "secondary"
+    const assigned = this.canonicalFormatId(board === "secondary"
       ? (venue.secondaryDisplayScreenFormatId || venue.primaryDisplayScreenFormatId)
-      : (venue.primaryDisplayScreenFormatId || venue.displayScreenFormatIds?.[0]);
+      : (venue.primaryDisplayScreenFormatId || venue.displayScreenFormatIds?.[0]));
     const overlap = this.overlappingFormatIds(template, venue);
-    const item = String(shoutout.screenFormatId || "");
+    const item = this.canonicalFormatId(shoutout.screenFormatId || "");
     const itemFamily = this.familyOf(item);
     const boardFamily = this.familyOf(assigned);
     const pickFamily = family => overlap.find(id => id === item && this.familyOf(id) === family)
@@ -1736,7 +1727,8 @@ window.FLOQRTextLayout = {
   },
   resolve(templateOrId = {}, formatId = "") {
     const template = typeof templateOrId === "string" ? (window.SHOUTOUT_TEMPLATES?.[templateOrId] || {id:templateOrId}) : (templateOrId || {});
-    const resolvedFormatId = String(formatId || template.screenFormatIds?.[0] || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "p125-96x48");
+    const rawFormatId = String(formatId || template.screenFormatIds?.[0] || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS?.[0] || "led-96x48");
+    const resolvedFormatId = window.FLOQRScreenDatapoints?.canonicalFormatId?.(rawFormatId) || rawFormatId.replace(/^p125-/, "led-");
     const profileId = this.profileId(template);
     const profile = window.FLOQR_TEMPLATE_TEXT_PROFILES[profileId] || window.FLOQR_TEMPLATE_TEXT_PROFILES.full;
     const rule = profile.formats[resolvedFormatId] || {supported:false,lineCount:0,maxCharactersPerLine:0,maxMainCharacters:0,maxSubCharacters:0,minimumFontPixels:0,advice:"This template has no reviewed text layout for the selected display."};

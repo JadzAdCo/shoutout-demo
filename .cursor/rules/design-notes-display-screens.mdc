@@ -22,7 +22,7 @@ All venue LEDs are **P1.56** pitch. Physical sizes:
 | **64 × 48 cm** | 4:3 | `led-64x48` | `VenueSupports64x48` / `Is64x48` |
 | **64 × 32 cm** | 2:1 | `led-64x32` | `VenueSupports64x32` / `Is64x32` |
 
-Legacy aliases `p125-*` map to the same three families for old venue docs. Do **not** offer six pitch choices in Club Admin / Master Admin / composer — only these three sizes.
+Old Firestore `p125-*` ids **canonicalize to `led-*` at read time** (`FLOQRScreenDatapoints.canonicalFormatId` / `normalizeScreenFormatId`). Never emit `p125-*` in catalogs or UI — only these three sizes.
 
 ## URLs (never put size in the query)
 
@@ -36,7 +36,7 @@ Size comes from Firebase (`clubLocations` + template `Is*` + shoutout `screenFor
 
 - **Composer caps** (`FLOQR_TEMPLATE_TEXT_PROFILES` × format): soft guidance (lines × chars) so patrons write readable copy.
 - **Christine (64×48 only):** soft cap **3 lines × 16 = 48 graphemes** (~words depend on length; not a fixed word count).
-- **Display:** do **not** drop words when a line is full. Pack into the template line count, then **shrink a uniform font** (`fitDisplayMessageLines`) until every line fits horizontally. No CSS word-wrap on message lines (`white-space: nowrap`).
+- **Display:** do **not** drop words when a line is full. Pack into the template line count, then **dynamic max fit** (`fitDisplayMessageLines`): binary search from a generous ceiling for the **largest** uniform font where every line fits. No CSS word-wrap on message lines (`white-space: nowrap`).
 - Hard absolute grapheme ceiling exists only as a safety valve for abuse; fit handles normal overflow.
 
 ## Wiring map

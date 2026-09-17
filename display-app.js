@@ -92,11 +92,14 @@
   }
 
   function normalizeScreenFormatId(raw = "") {
+    const canonical = window.FLOQRScreenDatapoints?.canonicalFormatId?.(raw);
+    if (canonical) return canonical;
     const value = String(raw || "").trim().toLowerCase();
     if (!value) return "";
-    if (value === "64x32" || value === "64×32" || value === "led-64x32" || value === "p125-64x32") return value.startsWith("p125") ? "p125-64x32" : "led-64x32";
-    if (value === "64x48" || value === "led-64x48") return "led-64x48";
-    if (value === "96x48" || value === "led-96x48") return "led-96x48";
+    if (value === "64x32" || value === "64×32") return "led-64x32";
+    if (value === "64x48" || value === "64×48") return "led-64x48";
+    if (value === "96x48" || value === "96×48") return "led-96x48";
+    if (value.startsWith("p125-")) return value.replace(/^p125-/, "led-");
     if ((window.FLOQR_DISPLAY_FORMATS || {})[value]) return value;
     return "";
   }
@@ -429,7 +432,7 @@
     });
   }
 
-  /** Uniform font shrink so every nowrap message line fits the board width (no word drop). */
+  /** Dynamic max fit: binary search for the largest uniform px where every nowrap line fits (no word drop). */
   function fitDisplayMessageLines(host, options = {}) {
     if (!host) return 0;
     const lines = Array.from(host.querySelectorAll(":scope > span, :scope > b"));
@@ -438,17 +441,28 @@
     const height = host.clientHeight || host.parentElement?.clientHeight || 0;
     if (width < 24) return 0;
     const minPx = Math.max(10, Number(options.minPx || 14));
-    const startPx = Number(options.startPx || 0);
-    const computed = Number.parseFloat(window.getComputedStyle(lines[0]).fontSize) || 24;
+    const lineCount = Math.max(1, lines.length);
+    const heightBudget = height > 24 ? height * 0.92 : width;
+    const generousCeiling = Math.max(
+      minPx,
+      Math.floor(heightBudget / (lineCount * 1.06)),
+      Math.floor(width / 2.4),
+      96
+    );
+    const requestedStart = Number(options.startPx);
     let lo = minPx;
-    let hi = Math.max(minPx, Math.floor(startPx || computed || Math.min(height / Math.max(1, lines.length), width / 4)));
+    let hi = generousCeiling;
+    if (Number.isFinite(requestedStart) && requestedStart > 0) {
+      hi = Math.max(hi, Math.floor(requestedStart));
+    }
     const apply = px => {
       lines.forEach(el => {
         el.style.fontSize = `${px}px`;
         el.style.lineHeight = "0.92";
       });
     };
-    for (let i = 0; i < 18; i += 1) {
+    apply(hi);
+    for (let i = 0; i < 20; i += 1) {
       const mid = Math.floor((lo + hi + 1) / 2);
       apply(mid);
       let overflow = false;
@@ -1928,8 +1942,7 @@
       byId("displayMain").style.fontSize = `${startVh}vh`;
       byId("displayMain").innerHTML = rows.map(row => `<span>${esc(row)}</span>`).join("");
       const runMessageFit = () => fitDisplayMessageLines(byId("displayMain"), {
-        minPx: Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35)),
-        startPx: 0
+        minPx: Math.max(12, Math.round(Number(textCaps.minimumFontPixels || 40) * 0.35))
       });
       runMessageFit();
       requestAnimationFrame(() => {

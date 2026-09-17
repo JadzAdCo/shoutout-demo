@@ -5,7 +5,7 @@
 (function (global) {
   "use strict";
 
-  const SCREEN = ["led-64x32", "led-64x48", "led-96x48", "p125-64x32", "p125-64x48", "p125-96x48"];
+  const SCREEN = ["led-64x32", "led-64x48", "led-96x48"];
   const PRICE = 3000;
   const SOCCER_TEMPLATE_ID = "soccerJersey";
 
