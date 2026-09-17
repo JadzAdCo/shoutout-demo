@@ -58,35 +58,34 @@ const SPLIT_MEDIA_TEMPLATE_IDS = new Set(["birthdayMedia", "anniversaryMedia", "
 const CLASSIC_BOARD_TEMPLATE_IDS = new Set(["blackwhite", "graduation", "corporate", "heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const SHOUTOUT_TEXT_LIMITS = {
   full:{
-    "p125-96x48":[3,16,48,28],"p125-64x48":[3,10,30,22],"p125-64x32":[3,14,42,24],
     "led-96x48":[3,16,48,28],"led-64x48":[3,10,30,22],"led-64x32":[3,10,30,16]
   },
   classicBoard:{
-    "p125-96x48":[3,15,45,20],"p125-64x48":[3,12,36,18],"p125-64x32":[3,14,42,18],
     "led-96x48":[3,15,45,20],"led-64x48":[3,12,36,18],"led-64x32":[3,10,30,14]
   },
   splitMedia:{
-    "p125-96x48":[3,10,30,20],"p125-64x48":[3,10,30,18],"p125-64x32":[3,10,30,16],
     "led-96x48":[3,10,30,20],"led-64x48":[3,10,30,18],"led-64x32":[3,10,30,16]
   },
   car:{
-    "p125-96x48":[2,14,28,22],"p125-64x48":[2,10,20,18],"p125-64x32":[2,12,24,18],
     "led-96x48":[2,14,28,22],"led-64x48":[2,10,20,18],"led-64x32":[2,12,24,16]
   },
   footballIntro:{
-    "p125-96x48":[2,14,28,20,3,18,54,14,false],"p125-64x48":[2,10,20,16,3,12,36,10,false],"p125-64x32":[2,10,20,14,2,12,24,8,true],
     "led-96x48":[2,14,28,20,3,18,54,14,false],"led-64x48":[2,10,20,16,3,12,36,10,false],"led-64x32":[2,10,20,14,2,12,24,8,true]
   },
   soccerJersey:{
-    "p125-96x48":[1,12,12,2],"p125-64x48":[1,12,12,2],"p125-64x32":[1,10,10,2],
     "led-96x48":[1,12,12,2],"led-64x48":[1,12,12,2],"led-64x32":[1,10,10,2]
   },
   // Must match shared-data nflJersey — shoutout copy is NOT the jersey name.
   nflJersey:{
-    "p125-96x48":[4,16,64,2],"p125-64x48":[4,16,64,2],"p125-64x32":[3,16,48,2],
     "led-96x48":[4,16,64,2],"led-64x48":[4,16,64,2],"led-64x32":[3,16,48,2]
   }
 };
+function canonicalCheckoutFormatId(formatId = "") {
+  const raw = String(formatId || "").trim().toLowerCase();
+  if (!raw) return "";
+  if (raw.startsWith("p125-")) return raw.replace(/^p125-/, "led-");
+  return raw;
+}
 const SHOUTOUT_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
 const SHOUTOUT_CLUB_SHARE_PERCENT = 20;
 const UNPAID_CLEARABLE_STATUSES = new Set(["checkout-created", "checkout-failed", "checkout-expired", "payment-failed"]);
@@ -209,11 +208,12 @@ function checkoutTextCaps(templateId = "", formatId = "") {
             : CLASSIC_BOARD_TEMPLATE_IDS.has(templateId)
               ? "classicBoard"
               : "full";
-  const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[formatId];
+  const canonicalFormatId = canonicalCheckoutFormatId(formatId);
+  const values = SHOUTOUT_TEXT_LIMITS[profileId]?.[canonicalFormatId];
   if (!values) throw new HttpsError("failed-precondition", "The selected template is not supported on this display size.");
   return {
     profileId,
-    formatId,
+    formatId: canonicalFormatId,
     lineCount:values[0],
     perLine:values[1],
     main:values[2],
@@ -1738,8 +1738,8 @@ async function finalizePaidOrder(orderId, session) {
       submittedByUid:text(shoutout.submittedByUid || order.ownerUid, 120) || text(order.ownerUid, 120),
       submittedBy:text(shoutout.submittedBy || order.ownerEmail || order.customerEmail, 200).toLowerCase(),
       actorEmail:text(shoutout.actorEmail || shoutout.submittedBy || order.ownerEmail || order.customerEmail, 200).toLowerCase(),
-      clientIp:text(shoutout.clientIp || order.clientIp, 80),
-      ipSource:text(shoutout.ipSource || order.ipSource || (order.clientIp ? "checkout-order" : ""), 40),
+      clientIp:text(order.clientIp || shoutout.clientIp, 80),
+      ipSource:text(order.clientIp ? (order.ipSource || "checkout-callable") : (shoutout.ipSource || ""), 40),
       submittedAt:paidAt,
       paidAt,
       paidAtIso,

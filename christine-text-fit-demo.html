@@ -1,143 +1,154 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Christine text-fit demo (local)</title>
-  <style>
-    body { font-family: "Segoe UI", sans-serif; margin: 24px; background: #111; color: #f4f4f4; }
-    h1 { font-size: 1.25rem; }
-    .row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
-    .board {
-      width: 416px; height: 312px; /* led-64x48 aspect */
-      background: #000; border: 2px solid #333; position: relative;
-      display: grid; place-items: center; overflow: hidden;
-    }
-    .lines {
-      display: grid; gap: 0.04em; width: 92%; justify-items: center; align-content: center;
-      --display-message-lines: 3; grid-template-rows: repeat(var(--display-message-lines), auto);
-    }
-    .lines span { display: block; max-width: 100%; white-space: nowrap; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
-    .card { position: absolute; left: 8%; right: 8%; bottom: 8px; background: #b00000; color: #fff;
-      text-align: center; padding: 4px 8px; font-size: 12px; border-radius: 4px; }
-    label { display: block; margin: 8px 0 4px; }
-    textarea { width: min(420px, 100%); min-height: 90px; }
-    .meta { color: #aaa; font-size: .9rem; max-width: 52rem; }
-    code { color: #9cf; }
-  </style>
-</head>
-<body>
-  <h1>Local demo — Christine-style fit (no word drop)</h1>
-  <p class="meta">
-    Soft composer cap for Christine on <strong>P1.56 64×48</strong> is <code>3 × 16 = 48</code> graphemes
-    (word count varies). Old path truncated overflow lines. New path packs every word into 3 lines, then shrinks a uniform font.
-  </p>
-  <div class="row">
-    <div>
-      <label for="copy">ShoutOut copy</label>
-      <textarea id="copy">we're just testing small words big numbers long enough that the old board used to drop the ending</textarea>
-      <p class="meta" id="stats"></p>
-    </div>
-    <div>
-      <p>Before (truncate / drop)</p>
-      <div class="board" id="beforeBoard"><div class="lines" id="beforeLines"></div><div class="card">@THE_DON_4LD</div></div>
-    </div>
-    <div>
-      <p>After (pack all + shrink font)</p>
-      <div class="board" id="afterBoard"><div class="lines" id="afterLines"></div><div class="card">@THE_DON_4LD</div></div>
-    </div>
-  </div>
-  <script>
-    const MAX_ROWS = 3;
-    const SOFT_CHARS = 16;
-    const SOFT_TOTAL = 48;
-
-    function glyphs(s) {
-      return Array.from(String(s || "").normalize("NFC"));
-    }
-    function glyphLen(s) { return glyphs(s).length; }
-    function glyphSlice(s, start, end) { return glyphs(s).slice(start, end).join(""); }
-
-    function pushWrapped(rows, words, maxRows, maxChars) {
-      let line = "";
-      words.forEach(word => {
-        if (!word) return;
-        if (glyphLen(word) > maxChars) {
-          if (line && rows.length < maxRows) rows.push(line);
-          line = "";
-          const chars = glyphs(word);
-          for (let i = 0; i < chars.length && rows.length < maxRows; i += maxChars) {
-            rows.push(chars.slice(i, i + maxChars).join(""));
-          }
-          return;
-        }
-        const next = line ? `${line} ${word}` : word;
-        if (glyphLen(next) <= maxChars) line = next;
-        else {
-          if (rows.length < maxRows) rows.push(line);
-          line = word;
-        }
-      });
-      if (line && rows.length < maxRows) rows.push(line);
-    }
-
-    function oldRows(text) {
-      const prepared = glyphSlice(text.replace(/\s+/g, " ").trim(), 0, SOFT_TOTAL + 2);
-      const rows = [];
-      pushWrapped(rows, prepared.split(" ").filter(Boolean), MAX_ROWS, SOFT_CHARS);
-      while (rows.length < MAX_ROWS) rows.push("");
-      return rows.slice(0, MAX_ROWS);
-    }
-
-    function packAll(text) {
-      const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-      let budget = SOFT_CHARS;
-      for (let a = 0; a < 48; a++) {
-        const out = [];
-        pushWrapped(out, words, MAX_ROWS, budget);
-        if (out.join(" ") === words.join(" ")) {
-          while (out.length < MAX_ROWS) out.push("");
-          return out.slice(0, MAX_ROWS);
-        }
-        budget += 2;
-      }
-      return oldRows(text);
-    }
-
-    function fit(host) {
-      const lines = [...host.querySelectorAll("span")];
-      const width = host.clientWidth;
-      let lo = 12, hi = 72;
-      const apply = px => lines.forEach(el => { el.style.fontSize = px + "px"; el.style.lineHeight = "0.92"; });
-      for (let i = 0; i < 18; i++) {
-        const mid = Math.floor((lo + hi + 1) / 2);
-        apply(mid);
-        const overflow = lines.some(el => el.scrollWidth > width + 2);
-        if (overflow) hi = mid - 1; else lo = mid;
-      }
-      apply(Math.max(12, lo));
-      return lo;
-    }
-
-    function paint() {
-      const text = document.getElementById("copy").value;
-      const before = oldRows(text);
-      const after = packAll(text);
-      const bEl = document.getElementById("beforeLines");
-      const aEl = document.getElementById("afterLines");
-      bEl.innerHTML = before.map(r => `<span>${r || " "}</span>`).join("");
-      aEl.innerHTML = after.map(r => `<span>${r || " "}</span>`).join("");
-      bEl.style.fontSize = "28px";
-      [...bEl.querySelectorAll("span")].forEach(el => { el.style.fontSize = "28px"; });
-      const px = fit(aEl);
-      const dropped = before.join(" ").trim() !== text.replace(/\s+/g, " ").trim();
-      document.getElementById("stats").textContent =
-        `Graphemes: ${glyphLen(text.replace(/\s+/g, " ").trim())} · soft cap 48 · ` +
-        `before ${dropped ? "DROPPED words" : "fit in soft cap"} · after font ${px}px · all words kept`;
-    }
-
-    document.getElementById("copy").addEventListener("input", paint);
-    paint();
-  </script>
-</body>
-</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Christine text-fit demo (local)</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; margin: 24px; background: #111; color: #f4f4f4; }
+    h1 { font-size: 1.25rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+    .board {
+      width: 416px; height: 312px; /* led-64x48 aspect */
+      background: #000; border: 2px solid #333; position: relative;
+      display: grid; place-items: center; overflow: hidden;
+    }
+    .lines {
+      display: grid; gap: 0.04em; width: 92%; justify-items: center; align-content: center;
+      --display-message-lines: 3; grid-template-rows: repeat(var(--display-message-lines), auto);
+    }
+    .lines span { display: block; max-width: 100%; white-space: nowrap; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+    .card { position: absolute; left: 8%; right: 8%; bottom: 8px; background: #b00000; color: #fff;
+      text-align: center; padding: 4px 8px; font-size: 12px; border-radius: 4px; }
+    label { display: block; margin: 8px 0 4px; }
+    textarea { width: min(420px, 100%); min-height: 90px; }
+    .meta { color: #aaa; font-size: .9rem; max-width: 52rem; }
+    code { color: #9cf; }
+  </style>
+</head>
+<body>
+  <h1>Local demo — Christine-style fit (no word drop)</h1>
+  <p class="meta">
+    Soft composer cap for Christine on <strong>P1.56 64×48</strong> is <code>3 × 16 = 48</code> graphemes
+    (word count varies). Old path truncated overflow lines. New path packs every word into 3 lines, then uses
+    <strong>DYNAMIC max fit</strong>: recomputes the largest fitting font on every input change — short text = larger type, long text = smaller.
+  </p>
+  <div class="row">
+    <div>
+      <label for="copy">ShoutOut copy</label>
+      <textarea id="copy">we're just testing small words big numbers long enough that the old board used to drop the ending</textarea>
+      <p class="meta" id="stats"></p>
+    </div>
+    <div>
+      <p>Before (truncate / drop)</p>
+      <div class="board" id="beforeBoard"><div class="lines" id="beforeLines"></div><div class="card">@THE_DON_4LD</div></div>
+    </div>
+    <div>
+      <p>After (pack all + dynamic max fit)</p>
+      <div class="board" id="afterBoard"><div class="lines" id="afterLines"></div><div class="card">@THE_DON_4LD</div></div>
+    </div>
+  </div>
+  <script>
+    const MAX_ROWS = 3;
+    const SOFT_CHARS = 16;
+    const SOFT_TOTAL = 48;
+
+    function glyphs(s) {
+      return Array.from(String(s || "").normalize("NFC"));
+    }
+    function glyphLen(s) { return glyphs(s).length; }
+    function glyphSlice(s, start, end) { return glyphs(s).slice(start, end).join(""); }
+
+    function pushWrapped(rows, words, maxRows, maxChars) {
+      let line = "";
+      words.forEach(word => {
+        if (!word) return;
+        if (glyphLen(word) > maxChars) {
+          if (line && rows.length < maxRows) rows.push(line);
+          line = "";
+          const chars = glyphs(word);
+          for (let i = 0; i < chars.length && rows.length < maxRows; i += maxChars) {
+            rows.push(chars.slice(i, i + maxChars).join(""));
+          }
+          return;
+        }
+        const next = line ? `${line} ${word}` : word;
+        if (glyphLen(next) <= maxChars) line = next;
+        else {
+          if (rows.length < maxRows) rows.push(line);
+          line = word;
+        }
+      });
+      if (line && rows.length < maxRows) rows.push(line);
+    }
+
+    function oldRows(text) {
+      const prepared = glyphSlice(text.replace(/\s+/g, " ").trim(), 0, SOFT_TOTAL + 2);
+      const rows = [];
+      pushWrapped(rows, prepared.split(" ").filter(Boolean), MAX_ROWS, SOFT_CHARS);
+      while (rows.length < MAX_ROWS) rows.push("");
+      return rows.slice(0, MAX_ROWS);
+    }
+
+    function packAll(text) {
+      const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+      let budget = SOFT_CHARS;
+      for (let a = 0; a < 48; a++) {
+        const out = [];
+        pushWrapped(out, words, MAX_ROWS, budget);
+        if (out.join(" ") === words.join(" ")) {
+          while (out.length < MAX_ROWS) out.push("");
+          return out.slice(0, MAX_ROWS);
+        }
+        budget += 2;
+      }
+      return oldRows(text);
+    }
+
+    /** Dynamic max fit — largest px that fits every line (starts from a generous ceiling). */
+    function fit(host) {
+      const lines = [...host.querySelectorAll("span")];
+      const width = host.clientWidth;
+      const height = host.clientHeight || 312;
+      const lineCount = Math.max(1, lines.length);
+      let lo = 12;
+      let hi = Math.max(
+        72,
+        Math.floor((height * 0.92) / (lineCount * 1.06)),
+        Math.floor(width / 2.4)
+      );
+      const apply = px => lines.forEach(el => { el.style.fontSize = px + "px"; el.style.lineHeight = "0.92"; });
+      apply(hi);
+      for (let i = 0; i < 20; i++) {
+        const mid = Math.floor((lo + hi + 1) / 2);
+        apply(mid);
+        const overflow = lines.some(el => el.scrollWidth > width + 2);
+        if (overflow) hi = mid - 1; else lo = mid;
+      }
+      apply(Math.max(12, lo));
+      return lo;
+    }
+
+    function paint() {
+      const text = document.getElementById("copy").value;
+      const before = oldRows(text);
+      const after = packAll(text);
+      const bEl = document.getElementById("beforeLines");
+      const aEl = document.getElementById("afterLines");
+      bEl.innerHTML = before.map(r => `<span>${r || " "}</span>`).join("");
+      aEl.innerHTML = after.map(r => `<span>${r || " "}</span>`).join("");
+      bEl.style.fontSize = "28px";
+      [...bEl.querySelectorAll("span")].forEach(el => { el.style.fontSize = "28px"; });
+      [...aEl.querySelectorAll("span")].forEach(el => { el.style.fontSize = "120px"; el.style.lineHeight = "0.92"; });
+      const px = fit(aEl);
+      const dropped = before.join(" ").trim() !== text.replace(/\s+/g, " ").trim();
+      document.getElementById("stats").textContent =
+        `Graphemes: ${glyphLen(text.replace(/\s+/g, " ").trim())} · soft cap 48 · ` +
+        `before ${dropped ? "DROPPED words" : "fit in soft cap"} · after dynamic max-fit ${px}px · all words kept`;
+    }
+
+    document.getElementById("copy").addEventListener("input", paint);
+    paint();
+  </script>
+</body>
+</html>

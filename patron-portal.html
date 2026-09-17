@@ -38,6 +38,7 @@
         <button class="admin-tab" data-panel="portalGuestLists" type="button" data-i18n="nav.guestLists">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalPaidServices" type="button" data-i18n="nav.paidServices">Paid Services & Orders</button>
         <button class="admin-tab" data-panel="portalBartrStore" type="button" data-i18n="nav.bartrStore">BartR Store</button>
+        <button class="admin-tab hidden" id="portalAdCampaignsTab" data-panel="portalAdCampaigns" type="button" data-i18n="nav.adCampaigns">Ad Campaigns</button>
         <button class="admin-tab" data-panel="portalMessages" type="button" data-i18n="nav.inbox">FloqR Inbox</button>
         <button class="admin-tab" data-panel="portalMinglFriends" type="button" data-i18n="nav.minglFriends">Manage Mingl Friends</button>
         <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
@@ -137,6 +138,16 @@
             <label>Birthday Day <input id="editBirthDay" type="number" min="1" max="31" placeholder="Day only"/></label>
             <label>Instagram Handle <input id="editInstagram"/></label>
             <label>X Handle <input id="editX"/></label>
+            <label>Account type
+              <select id="editAccountType"
+                data-floqr-help-title="Business or personal account"
+                data-floqr-help-body="Personal is the default FloqR patron account. Elect Business to open Ad Campaigns and post Inline or Mingl Gist ads for Master Admin approval. You remain a patron either way."
+                data-floqr-help-search="business account|personal account|ad campaigns|advertise">
+                <option value="personal">Personal account</option>
+                <option value="business">Business account</option>
+              </select>
+            </label>
+            <label id="editBusinessNameWrap" class="hidden">Business name <input id="editBusinessName" placeholder="Your brand or company name"/></label>
             <label>Public Profile Type
               <select id="editProfileType">
                 <option value="patron">Patron</option>
@@ -190,6 +201,64 @@
           <h2 data-i18n="nav.serviceMembers">Services &amp; Service Members</h2>
           <p class="sub small" data-i18n="portal.becomeServiceMember.intro">This tab is for nightlife staff and other service roles. While you are registered as a patron only, it stays hidden. Tap the button below to elect as a service member and open this tab.</p>
           <button id="becomeServiceMemberBtn" class="primary" type="button" data-i18n="portal.becomeServiceMember.btn">Elect to become a service member</button>
+        </div>
+      </section>
+
+      <section id="portalAdCampaigns" class="admin-panel-section">
+        <div class="card" id="adCampBusinessGate">
+          <h2 data-i18n="nav.adCampaigns">Ad Campaigns</h2>
+          <p class="sub small">Elect a <strong>Business account</strong> under My Profile to post Inline or Mingl Gist advertisements. Campaigns go to Master Admin for approval and scheduling.</p>
+        </div>
+        <div class="card hidden" id="adCampComposer">
+          <h2
+            data-floqr-help-title="Ad Campaigns"
+            data-floqr-help-body="Business accounts can post Inline ads (during feature use) or Mingl Gist ads (while scrolling Mingl stories). Upload a PNG/JPEG/GIF flyer or paste HTML. Choose All patrons or target profile datapoints. Submit sends the campaign to Master Admin Ad Campaign Management for approval and scheduling."
+            data-floqr-help-search="ad campaigns|inline ad|mingl gist ad|business advertise|flyer html ad"
+          >Ad Campaigns</h2>
+          <p class="sub small">Inline package <strong>$45 / 7 days</strong> (feature-path, DOOH-like attention). Mingl Gist package <strong>$25 / 7 days</strong> (scroll feed). Payment can be marked unpaid until checkout is wired; Master Admin may waive.</p>
+          <div class="profile-grid">
+            <label>Placement
+              <select id="adCampPlacement">
+                <option value="inline">Inline advertisement</option>
+                <option value="minglGist">Mingl Gist advertisement</option>
+              </select>
+            </label>
+            <label>Creative type
+              <select id="adCampCreativeType">
+                <option value="image">Flyer (PNG / JPEG / GIF)</option>
+                <option value="html">HTML ad (paste code)</option>
+              </select>
+            </label>
+            <label>Campaign title <input id="adCampTitle" maxlength="80" placeholder="Weekend brunch at…"/></label>
+            <label>Call to action <input id="adCampCta" maxlength="40" placeholder="Learn more"/></label>
+            <label class="profile-grid-wide">Body copy <textarea id="adCampBody" rows="3" maxlength="400" placeholder="Short sponsored message"></textarea></label>
+            <label class="profile-grid-wide">Destination link <input id="adCampLink" type="url" placeholder="https://…"/></label>
+            <label>Audience
+              <select id="adCampTargetMode">
+                <option value="all">All patrons</option>
+                <option value="targeted">Targeted datapoints</option>
+              </select>
+            </label>
+          </div>
+          <p id="adCampPriceHint" class="sub small"></p>
+          <div id="adCampImageBlock">
+            <label>Flyer file <input id="adCampFlyer" type="file" accept="image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif"/></label>
+          </div>
+          <div id="adCampHtmlBlock" class="hidden">
+            <label class="profile-grid-wide">HTML (include image links) <textarea id="adCampHtml" rows="8" placeholder="&lt;div&gt;…&lt;img src=&quot;https://…&quot;&gt;…&lt;/div&gt;"></textarea></label>
+          </div>
+          <div id="adCampTargetBlock" class="hidden">
+            <p class="sub small">Enter comma-separated values that should match patron profile datapoints.</p>
+            <div id="adCampTargetFields" class="profile-grid"></div>
+            <label class="profile-grid-wide">Extra tags <input id="adCampTargetTags" placeholder="Optional extra tags"/></label>
+          </div>
+          <div class="queue-actions">
+            <button id="adCampSubmitBtn" class="primary" type="button">Submit for approval</button>
+            <button id="adCampRefreshMineBtn" type="button">Refresh my campaigns</button>
+          </div>
+          <p id="adCampStatus" class="status"></p>
+          <h3>My campaigns</h3>
+          <div id="adCampMineList" class="report-block"></div>
         </div>
       </section>
 
@@ -686,7 +755,7 @@
 <script src="./floqr-nav.js?v=s3.0.32"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
-<script src="./shared-data.js?v=s3.0.66"></script>
+<script src="./shared-data.js?v=s3.0.80"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./ai-service.js?v=29.09.8"></script>
 <script src="./ai-index-service.js?v=29.09.8"></script>
@@ -696,9 +765,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.66"></script>
-<script src="./floqai-help-repository.js?v=s3.0.66"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.66"></script>
+<script src="./floqr-i18n.js?v=s3.0.76"></script>
+<script src="./floqai-help-repository.js?v=s3.0.76"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.76"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -707,7 +776,10 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./patron-portal-app.js?v=s3.0.66"></script>
+<script src="./floqr-ad-pricing.js?v=s3.0.76"></script>
+<script src="./ad-campaigns.js?v=s3.0.76"></script>
+<script src="./patron-ad-campaigns.js?v=s3.0.76"></script>
+<script src="./patron-portal-app.js?v=s3.0.76"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

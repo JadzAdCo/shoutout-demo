@@ -7,7 +7,7 @@ alwaysApply: true
 
 Xibo widgets stay **`display.html?location=<id>`** and **`display2.html?location=<id>`**. Do **not** add `?screen=`, `?screenFormatId=`, or `?v=`. Do **not** move or rewrite those Display URLs in Club Admin — Show Display URL stays on Club Public Profile.
 
-Physical size is **not** in the URL. The same URL shape is pasted onto many different LEDs. Size comes from Firebase. Product boards are **P1.56** only — three sizes (`led-96x48`, `led-64x48`, `led-64x32`). Legacy `p125-*` ids alias the same families. See `.cursor/rules/design-notes-display-screens.mdc`.
+Physical size is **not** in the URL. The same URL shape is pasted onto many different LEDs. Size comes from Firebase. Product boards are **P1.56** only — three sizes (`led-96x48`, `led-64x48`, `led-64x32`). Legacy stored `p125-*` ids canonicalize to `led-*` at read time only. See `.cursor/rules/design-notes-display-screens.mdc`.
 
 | Collection | Fields (`0` or `1`) | Writer |
 |---|---|---|

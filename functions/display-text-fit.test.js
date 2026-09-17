@@ -11,6 +11,7 @@ test("display packs all words and exposes fitDisplayMessageLines", () => {
   const src = read("display-app.js");
   assert.match(src, /function packAllWordsIntoRows/);
   assert.match(src, /function fitDisplayMessageLines/);
+  assert.match(src, /Dynamic max fit/);
   assert.match(src, /preserveAll:\s*true/);
   assert.match(src, /fitDisplayMessageLines\(byId\("displayMain"/);
 });

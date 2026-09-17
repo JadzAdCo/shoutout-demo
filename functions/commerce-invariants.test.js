@@ -60,8 +60,8 @@ test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 d
   assert.match(sharedData, /name:'Football Intro'/);
   assert.match(sharedData, /teamMemberSlots:4/);
   assert.match(sharedData, /durationSeconds:20/);
-  assert.match(sharedData, /"p125-96x48"[\s\S]*pixelWidth:768, pixelHeight:384/);
-  assert.match(sharedData, /"p125-64x32"[\s\S]*supported:true[\s\S]*skipFinaleLineup:true/);
+  assert.match(sharedData, /"led-96x48"[\s\S]*pixelWidth:624, pixelHeight:312/);
+  assert.match(sharedData, /footballIntro:[\s\S]*"led-64x32"[\s\S]*skipFinaleLineup:true/);
   assert.match(patronApp, /uploadFootballTeamMembers/);
   assert.match(patronApp, /footballTeamMessage/);
   assert.match(patronApp, /football-portrait-motion/);
@@ -158,7 +158,7 @@ test("all published templates have display-aware text contracts", () => {
   const templates = Object.values(sandbox.SHOUTOUT_TEMPLATES || {});
   const formats = Object.keys(sandbox.FLOQR_DISPLAY_FORMATS || {});
   assert.ok(templates.length >= 30, `expected >= 30 templates, got ${templates.length}`);
-  assert.equal(formats.length, 6);
+  assert.equal(formats.length, 3);
   templates.forEach(template => {
     const rules = formats.map(formatId => sandbox.FLOQRTextLayout.resolve(template, formatId));
     assert.ok(rules.some(rule => rule.supported), `${template.id} must support at least one display`);
@@ -182,7 +182,9 @@ test("all published templates have display-aware text contracts", () => {
   assert.equal(sandbox.FLOQRTextLayout.resolve("birthdayMedia", "led-64x48").lineCount, 3);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").supported, true);
   assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").skipFinaleLineup, true);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("zebbiesFootballTeamIntro", "p125-64x32").formatId, "led-64x32");
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").main, 45);
+  assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "p125-96x48").formatId, "led-96x48");
   assert.equal(sandbox.FLOQRTextLayout.resolve("blackwhite", "led-64x32").main, 30);
   assert.match(patronApp, /recommendations use the same limits/);
   assert.match(patronPortalApp, /portalShoutoutTextCaps/);
