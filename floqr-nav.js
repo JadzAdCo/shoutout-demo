@@ -88,8 +88,11 @@
       }
       return buildUrl(href, { v: APP_V, ...extra });
     },
-    masterHome() {
-      return `./master-admin.html?v=${APP_V}`;
+    masterHome(extra = {}) {
+      const { hash, ...params } = extra || {};
+      const href = buildUrl("./master-admin.html", { v: APP_V, ...params });
+      const panel = String(hash || "").replace(/^#/, "").trim();
+      return panel ? `${href}#${panel}` : href;
     },
     suprstrHome(extra = {}) {
       return buildUrl("./suprstr-search.html", { v: APP_V, from: "master", ...extra });
@@ -102,6 +105,10 @@
     adminLink(path, extra = {}) {
       const locationId = qs("location") || qs("club") || extra.location || "";
       return buildUrl(path, { v: APP_V, from: "admin", location: locationId, ...extra });
+    },
+    /** Satellite opened from Master Admin NIC — stamp from=master so Back returns to NIC. */
+    masterLink(path, extra = {}) {
+      return buildUrl(path, { v: APP_V, from: "master", ...extra });
     },
     /** Stable venue board URL — no cache-bust ?v= (for LED devices and external embeds). */
     stableDisplayUrl(locationId = "", extra = {}) {
@@ -123,6 +130,19 @@
     resolveBack(fromOverride = "") {
       const from = String(fromOverride || qs("from") || "").toLowerCase();
       const file = pageName();
+      let hash = "";
+      try { hash = String(global.location?.hash || "").replace(/^#/, "").trim(); } catch (_) {}
+
+      // Master Admin NIC: never dump operators onto the patron Search landing.
+      // Profile & Settings is an explicit profile-menu exit (new tab), not Back.
+      if (file === "master-admin.html") {
+        const onHome = !hash || hash === "networkDashboard";
+        return {
+          href: this.masterHome({ hash: "networkDashboard" }),
+          label: navT("nav.backToNic", "← Network Intelligence Center"),
+          stay: onHome
+        };
+      }
 
       // Club Admin landing: never dump managers onto the patron Search site.
       if (file === "admin.html") {
@@ -139,7 +159,6 @@
         return { href: this.adminHome({ from: "" }), label: navT("nav.backToAdmin", "← Back to Venue Command Center") };
       }
       if (from === "master") {
-        if (file === "admin.html") return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
         return { href: this.masterHome(), label: navT("nav.backToMaster", "← Back to Master Admin") };
       }
       if (from === "mingl") {
@@ -163,8 +182,9 @@
       const target = this.resolveBack(from);
       anchor.href = target.href;
       anchor.textContent = target.label;
-      // On admin landing with no Master return path, hide a no-op "home" back.
-      if (target.stay && pageName() === "admin.html" && !queryFrom) {
+      // On Club Admin / Master Admin NIC home, hide a no-op "home" back.
+      const hub = pageName();
+      if (target.stay && (hub === "admin.html" || hub === "master-admin.html") && !queryFrom) {
         anchor.classList.add("hidden");
         anchor.setAttribute("aria-hidden", "true");
       } else {

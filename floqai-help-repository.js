@@ -923,7 +923,7 @@
     {
       id: "help-mail-logging",
       title: "twilio_sendgridMailLogs",
-      body: "Master Admin → Twilio → twilio_sendgridMailLogs logs every FLOQR system-generated SendGrid email: queued, accepted, failed, and later delivery (delivered, bounce, drop). Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
+      body: "Master Admin → Twilio → twilio_sendgridMailLogs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
       searchPhrases: [
         "twilio_sendgridMailLogs", "mail logging", "email log", "sendgrid", "system mail",
         "preview links email", "tls 1.3", "mail delivery", "who sent that email", "system generated mail"

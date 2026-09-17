@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.0.78";
+  const VERSION = "s3.0.79";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -447,6 +447,7 @@
       "nav.backToSearchArrow": "← Back to Search",
       "nav.backToPortal": "← Back to My Profile and Settings",
       "nav.backToMaster": "← Back to Master Admin",
+      "nav.backToNic": "← Network Intelligence Center",
       "nav.backToAdmin": "← Back to Venue Command Center",
       "nav.backToVenueCommand": "← Venue Command Center",
       "nav.backToMingl": "← Back to Mingl",
@@ -730,6 +731,7 @@
       "nav.backToSearchArrow": "← Retour à la recherche",
       "nav.backToPortal": "← Retour à Mon profil et paramètres",
       "nav.backToMaster": "← Retour à Master Admin",
+      "nav.backToNic": "← Centre d'intelligence réseau",
       "nav.backToAdmin": "← Retour au centre de commande",
       "nav.backToVenueCommand": "← Centre de commande du lieu",
       "nav.backToMingl": "← Retour à Mingl",
@@ -1013,6 +1015,7 @@
       "nav.backToSearchArrow": "← Zurück zur Suche",
       "nav.backToPortal": "← Zurück zu Mein Profil und Einstellungen",
       "nav.backToMaster": "← Zurück zu Master Admin",
+      "nav.backToNic": "← Netzwerk-Intelligence-Center",
       "nav.backToAdmin": "← Zurück zum Venue Command Center",
       "nav.backToVenueCommand": "← Venue Command Center",
       "nav.backToMingl": "← Zurück zu Mingl",
@@ -1296,6 +1299,7 @@
       "nav.backToSearchArrow": "← Volver a la búsqueda",
       "nav.backToPortal": "← Volver a Mi perfil y ajustes",
       "nav.backToMaster": "← Volver a Master Admin",
+      "nav.backToNic": "← Centro de Inteligencia de Red",
       "nav.backToAdmin": "← Volver al Venue Command Center",
       "nav.backToVenueCommand": "← Venue Command Center",
       "nav.backToMingl": "← Volver a Mingl",
@@ -1579,6 +1583,7 @@
       "nav.backToSearchArrow": "← Terug naar zoeken",
       "nav.backToPortal": "← Terug naar Mijn profiel en instellingen",
       "nav.backToMaster": "← Terug naar Master Admin",
+      "nav.backToNic": "← Network Intelligence Center",
       "nav.backToAdmin": "← Terug naar Venue Command Center",
       "nav.backToVenueCommand": "← Venue Command Center",
       "nav.backToMingl": "← Terug naar Mingl",
@@ -1862,6 +1867,7 @@
       "nav.backToSearchArrow": "← Назад к поиску",
       "nav.backToPortal": "← Назад к «Мой профиль и настройки»",
       "nav.backToMaster": "← Назад к Master Admin",
+      "nav.backToNic": "← Центр сетевой аналитики",
       "nav.backToAdmin": "← Назад в центр управления площадкой",
       "nav.backToVenueCommand": "← Центр управления площадкой",
       "nav.backToMingl": "← Назад к Mingl",
@@ -2145,6 +2151,7 @@
       "nav.backToSearchArrow": "← Torna alla ricerca",
       "nav.backToPortal": "← Torna a Il mio profilo e le impostazioni",
       "nav.backToMaster": "← Torna a Master Admin",
+      "nav.backToNic": "← Centro intelligence di rete",
       "nav.backToAdmin": "← Torna a Venue Command Center",
       "nav.backToVenueCommand": "← Venue Command Center",
       "nav.backToMingl": "← Torna a Mingl",
@@ -2428,6 +2435,7 @@
       "nav.backToSearchArrow": "← Voltar à pesquisa",
       "nav.backToPortal": "← Voltar para Meu perfil e configurações",
       "nav.backToMaster": "← Voltar para Master Admin",
+      "nav.backToNic": "← Centro de Inteligência de Rede",
       "nav.backToAdmin": "← Voltar ao Centro de Comando do Local",
       "nav.backToVenueCommand": "← Centro de Comando do Local",
       "nav.backToMingl": "← Voltar para Mingl",
@@ -2711,6 +2719,7 @@
       "nav.backToSearchArrow": "← Επιστροφή στην αναζήτηση",
       "nav.backToPortal": "← Επιστροφή στο προφίλ και τις ρυθμίσεις μου",
       "nav.backToMaster": "← Επιστροφή στο Master Admin",
+      "nav.backToNic": "← Network Intelligence Center",
       "nav.backToAdmin": "← Επιστροφή στο Κέντρο Διοίκησης Χώρου",
       "nav.backToVenueCommand": "← Κέντρο Διοίκησης Χώρου",
       "nav.backToMingl": "← Επιστροφή στο Mingl",
@@ -2994,6 +3003,7 @@
       "nav.backToSearchArrow": "← Powrót do wyszukiwania",
       "nav.backToPortal": "← Wróć do profilu i ustawień",
       "nav.backToMaster": "← Powrót do Master Admin",
+      "nav.backToNic": "← Network Intelligence Center",
       "nav.backToAdmin": "← Powrót do centrum dowodzenia obiektem",
       "nav.backToVenueCommand": "← Centrum dowodzenia obiektem",
       "nav.backToMingl": "← Powrót do Mingl",
@@ -3277,6 +3287,7 @@
       "nav.backToSearchArrow": "← العودة إلى البحث",
       "nav.backToPortal": "← العودة إلى ملفي الشخصي والإعدادات",
       "nav.backToMaster": "← عودة إلى Master Admin",
+      "nav.backToNic": "← Network Intelligence Center",
       "nav.backToAdmin": "← العودة إلى مركز قيادة المنشأة",
       "nav.backToVenueCommand": "← مركز قيادة المنشأة",
       "nav.backToMingl": "← عودة إلى Mingl",

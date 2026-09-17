@@ -1,0 +1,58 @@
+---
+description: FLOQR LED display sizes, URLs, and text-fit wiring
+globs: display.html,display2.html,display-app.js,display.css,shared-data.js,admin.html,master-admin.html,patron-app.js,screen-datapoints.mdc
+alwaysApply: false
+---
+
+# Design notes — FLOQR displays
+
+Resume: `@display$` / `$screen$`.
+
+## What an `.mdc` file is
+
+Cursor **rules** live under `.cursor/rules/*.mdc`. They are Markdown with a small YAML frontmatter block (`description`, `globs`, `alwaysApply`). Agents load them as durable product/engineering contracts so help UI and FloqAi stay patron-facing while routing and size rules stay here.
+
+## Physical boards (only three)
+
+All venue LEDs are **P1.56** pitch. Physical sizes:
+
+| Size | Aspect | Canonical format id | Firestore flags |
+|---|---|---|---|
+| **96 × 48 cm** | 2:1 | `led-96x48` | `VenueSupports96x48` / `Is96x48` |
+| **64 × 48 cm** | 4:3 | `led-64x48` | `VenueSupports64x48` / `Is64x48` |
+| **64 × 32 cm** | 2:1 | `led-64x32` | `VenueSupports64x32` / `Is64x32` |
+
+Legacy aliases `p125-*` map to the same three families for old venue docs. Do **not** offer six pitch choices in Club Admin / Master Admin / composer — only these three sizes.
+
+## URLs (never put size in the query)
+
+- Primary: `display.html?location=<id>`
+- Secondary: `display2.html?location=<id>`
+- Never `?v=`, `?screen=`, or `?screenFormatId=` on Xibo widgets
+
+Size comes from Firebase (`clubLocations` + template `Is*` + shoutout `screenFormatId`). Helper: `window.FLOQRScreenDatapoints` in `shared-data.js`. See `screen-datapoints.mdc`.
+
+## Text caps vs fit
+
+- **Composer caps** (`FLOQR_TEMPLATE_TEXT_PROFILES` × format): soft guidance (lines × chars) so patrons write readable copy.
+- **Christine (64×48 only):** soft cap **3 lines × 16 = 48 graphemes** (~words depend on length; not a fixed word count).
+- **Display:** do **not** drop words when a line is full. Pack into the template line count, then **shrink a uniform font** (`fitDisplayMessageLines`) until every line fits horizontally. No CSS word-wrap on message lines (`white-space: nowrap`).
+- Hard absolute grapheme ceiling exists only as a safety valve for abuse; fit handles normal overflow.
+
+## Wiring map
+
+| Layer | Role |
+|---|---|
+| `shared-data.js` | `FLOQR_DISPLAY_FORMATS`, text profiles, `FLOQRTextLayout`, `FLOQRScreenDatapoints` |
+| `patron-app.js` | Composer screen list = venue ∩ template formats |
+| `admin.html` / Club Public Profile | VenueSupports* checkboxes (three sizes) |
+| `master-admin.html` | Template Is* + venue onboarding (three sizes) |
+| `display-app.js` | Playback format resolve, row pack, `fitDisplayMessageLines` |
+| `display.css` | Layout / nowrap message lines |
+
+## Forbidden
+
+- Inventing extra screen sizes in the UI
+- Driving Xibo layout from `?screen=`
+- Truncating visible shoutout words when font can still shrink
+- Putting design-note paragraphs into FloqAi / `?` help bodies

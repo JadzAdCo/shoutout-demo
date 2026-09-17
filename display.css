@@ -230,6 +230,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-message-lines span{display:block;max-width:100%;white-space:nowrap}
 .display-message-lines-2{--display-message-lines:2}
 .display-message-lines-3{--display-message-lines:3}
+.display-message-lines-4{--display-message-lines:4}
 .split-media-layout .display-message-lines{line-height:.88}
 .unsupported-text-layout{display:grid!important;place-content:center!important;gap:3vh!important}
 .unsupported-text-layout #displayMain{font-size:clamp(34px,7vw,96px)!important}
@@ -1274,7 +1275,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:grid!important;
   opacity:1!important;
   visibility:visible!important;
-  z-index:8;
+  z-index:25!important;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .display-identity-rail.soccer-jersey-rail,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media .display-identity-rail.soccer-jersey-rail{
@@ -1362,10 +1363,9 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 
 /* NFL FloqR card rebuild — must follow all soccer/64×32 rail tops so bottom placement wins. */
 @keyframes nflFloqrCardPulse{
-  0%,72%{opacity:1;transform:scale(1);filter:blur(0) brightness(1)}
-  78%{opacity:1;transform:scale(1.045);filter:blur(0) brightness(1.28)}
-  86%{opacity:.55;transform:scale(1.1);filter:blur(1.5px) brightness(1.1)}
-  100%{opacity:1;transform:scale(1);filter:blur(0) brightness(1)}
+  0%,100%{opacity:1;transform:scale(1);filter:brightness(1)}
+  45%{opacity:1;transform:scale(1.04);filter:brightness(1.25)}
+  70%{opacity:1;transform:scale(1.02);filter:brightness(1.1)}
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl .display-identity-rail.soccer-jersey-rail,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .display-identity-rail.soccer-jersey-rail,
@@ -1373,6 +1373,8 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-identity-rail.soccer-jersey-rail,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-identity-rail.floqr-card-bottom,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.jersey-photo-back .display-identity-rail.soccer-jersey-rail.floqr-card-bottom,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media .display-identity-rail.soccer-jersey-rail,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .display-identity-rail.soccer-jersey-rail,
 .display-canvas[data-screen-format-id="led-64x32"].soccer-jersey-template.jersey-sport-nfl .display-identity-rail.soccer-jersey-rail,
 .display-canvas[data-screen-format-id="p125-64x32"].soccer-jersey-template.jersey-sport-nfl .display-identity-rail.soccer-jersey-rail,
 .display-canvas[data-screen-format-id="led-64x48"].soccer-jersey-template.jersey-sport-nfl .display-identity-rail.soccer-jersey-rail,
@@ -1387,7 +1389,7 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   display:grid!important;
   visibility:visible!important;
   opacity:1!important;
-  z-index:50!important;
+  z-index:60!important;
   position:absolute!important;
   top:auto!important;
   bottom:1.2%!important;
@@ -1403,14 +1405,17 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl .display-identity-rail .classic-identity-shell,
 .display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-layout .classic-identity-shell,
-.display-canvas.soccer-jersey-template.jersey-sport-nfl .display-identity-rail.floqr-card-bottom .classic-identity-shell{
-  /* Persistent FloqR pulse — stays readable (classic burst hid the pill ~2/3 of the cycle). */
-  animation:nflFloqrCardPulse 12s cubic-bezier(.2,.8,.2,1) infinite!important;
+.display-canvas.soccer-jersey-template.jersey-sport-nfl .display-identity-rail.floqr-card-bottom .classic-identity-shell,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-media .classic-identity-shell,
+.display-canvas.soccer-jersey-template.jersey-sport-nfl.nfl-dual-rotate.split-media-phase-copy .classic-identity-shell{
+  /* Persistent FloqR pulse — never fades out (classic burst hid the pill ~2/3 of the cycle). */
+  animation:nflFloqrCardPulse 8s cubic-bezier(.2,.8,.2,1) infinite!important;
   opacity:1!important;
   visibility:visible!important;
   width:100%!important;
   height:100%!important;
   min-height:0!important;
+  filter:none;
 }
 .display-canvas.soccer-jersey-template.jersey-sport-nfl .classic-identity-shell small{
   font-size:clamp(8px,1.6vh,16px)!important;

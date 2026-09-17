@@ -1,0 +1,22 @@
+---
+description: Master Admin NIC back navigation vs profile exit
+globs: master-admin.html,floqr-nav.js,master-admin-app.js,floqr-i18n.js
+alwaysApply: false
+---
+
+# Design notes — Master Admin navigation
+
+## NIC Back (global back)
+
+- On `master-admin.html`, **Back** always resolves to the **Network Intelligence Center** home (`master-admin.html` + `#networkDashboard`), including when `?from=search` or `data-from=search` would otherwise send a satellite to patron Search.
+- Do **not** put `data-from="search"` on `#floqrGlobalBack` in Master Admin.
+- Label: `nav.backToNic` in `floqr-i18n.js` STRINGS (not a patron Search string).
+
+## Profile menu exit
+
+- Leaving Master Admin for **My Profile and Settings** is an explicit **profile menu** action (typically new tab), not the global Back control.
+- Back is for staying inside the Master Admin / NIC area, not for crossing into the patron portal.
+
+## Help vs this file
+
+Patron-facing help should describe what Back does on Master Admin in one sentence. Do not paste this routing matrix into FloqAi bodies.
