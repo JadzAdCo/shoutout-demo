@@ -190,5 +190,14 @@
   "master.promoters": "Promoter",
   "master.reconciliation": "Netzwerk-Abstimmung",
   "master.services": "Services und Commerce",
-  "master.diagnostics": "Diagnose"
+  "master.diagnostics": "Diagnose",
+  "admin.marketing": "Marketing",
+  "admin.adPerformance": "Anzeigenleistung",
+  "admin.marketingCampaigns": "Marketingkampagnen",
+  "admin.marketingCampaignsTitle": "Marketingkampagne starten",
+  "admin.messagingCredit": "Messaging-Guthaben",
+  "admin.messagingCreditTitle": "SMS- & WhatsApp-Guthaben",
+  "admin.smsWhatsappLogs": "SMS- & WhatsApp-Protokolle",
+  "admin.inAppMarketing": "In-App-Marketing",
+  "admin.inAppMarketingTitle": "Spot-Werbekampagne starten"
 }

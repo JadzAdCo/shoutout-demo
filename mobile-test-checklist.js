@@ -22,13 +22,13 @@
       id: "adv-media-upload",
       title: "Advertising — device media upload",
       detail: "Advertising panel → template input: upload a local photo/video from the phone (not only a URL). Confirm preview sticks.",
-      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelAdvertising`
+      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
     },
     {
       id: "adv-stripe-10",
       title: "Advertising — $10 Buy → Stripe",
       detail: "Same Advertising panel. Tap Buy SMS or WhatsApp $10 service/bundle and confirm Stripe Checkout opens.",
-      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelAdvertising`
+      href: `${BASE}/admin.html?location=${CASAMARA}&v=${V_ADMIN}#panelMarketingAdPerformance`
     },
     {
       id: "portal-tabs-wrap",

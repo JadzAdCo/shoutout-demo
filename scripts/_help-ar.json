@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "سجلات تسليم SMS وWhatsApp",
-    "body": "يعرض رسائل Twilio SMS وWhatsApp لهذا المكان (اختبار التسويق، تنبيهات النادي). تظهر الصفوف نفسها في Master Admin → Twilio. Dry-run يعني غياب secrets أو From — لم يُسلَّم شيء ولم تُخصم أرصدة. أرقام الهاتف مخفية."
+    "body": "Club Admin → Marketing → سجلات SMS وWhatsApp تعرض Twilio SMS وWhatsApp لهذا المكان (اختبار تسويق، تنبيهات النادي). نفس الصفوف في Master Admin → Twilio. dry-run: نقص secrets أو From — لم يُسلَّم شيء ولم يُخصم رصيد. أرقام مخفية."
+  },
+  "help-club-messaging-credit": {
+    "title": "رصيد SMS وWhatsApp",
+    "body": "كل حزمة بـ 10$ تموّل 7.00$ من سعة Twilio؛ تحتفظ FloqR بـ 3.00$ هامش المنصة. حزمة SMS → 466 رسالة (≈ 0.015$ SMS أمريكي). حزمة WhatsApp → 233 رسالة (≈ 0.030$ Twilio + Meta marketing). عند الرصيد 0 اشترِ حزمة أخرى قبل الإرسال. فتح SMS ops (10$) يمنح حزمة SMS. خدمة WhatsApp (10$) تمنح حزمة WhatsApp. الحساب: 10$ → 466 SMS أو 233 WhatsApp (7.00$ Twilio / 3.00$ FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "حملات التسويق",
+    "body": "اختر قالبًا للقطاع، حمّل الخلفية والصور الإضافية، عدّل النص، ثم احفظ أو أرسل. الإرسال يخصم رصيد SMS أو WhatsApp من رصيد المراسلة."
+  },
+  "help-club-in-app-marketing": {
+    "title": "التسويق داخل التطبيق",
+    "body": "انشر إعلان spot بينيًا في مجمع إعلانات FLOQR (Mingl وRydR والأندية ومواقع ShoutOut). قوالب من فعاليات المكان القادمة. لا يلزم رصيد SMS."
   }
 }

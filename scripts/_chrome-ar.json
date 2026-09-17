@@ -190,5 +190,14 @@
   "master.promoters": "المروجين",
   "master.reconciliation": "تسوية الشبكة",
   "master.services": "الخدمات - التجارة",
-  "master.diagnostics": "المسوغات"
+  "master.diagnostics": "المسوغات",
+  "admin.marketing": "التسويق",
+  "admin.adPerformance": "أداء الإعلانات",
+  "admin.marketingCampaigns": "حملات التسويق",
+  "admin.marketingCampaignsTitle": "بدء حملة تسويق",
+  "admin.messagingCredit": "رصيد المراسلة",
+  "admin.messagingCreditTitle": "رصيد SMS وWhatsApp",
+  "admin.smsWhatsappLogs": "سجلات SMS وWhatsApp",
+  "admin.inAppMarketing": "التسويق داخل التطبيق",
+  "admin.inAppMarketingTitle": "بدء حملة إعلان spot"
 }

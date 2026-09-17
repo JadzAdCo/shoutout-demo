@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "SMS & WhatsApp delivery logs",
-    "body": "Shows Twilio SMS and WhatsApp messages sent for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked."
+    "body": "Club Admin → Marketing → SMS & WhatsApp Logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked."
+  },
+  "help-club-messaging-credit": {
+    "title": "SMS & WhatsApp Credit",
+    "body": "Each $10 pack funds $7.00 of Twilio delivery capacity; FloqR keeps $3.00 as platform profit on the pack. SMS pack → 466 messages (≈ $0.015 all-in US SMS). WhatsApp pack → 233 messages (≈ $0.030 Twilio + Meta marketing). When balance reaches 0, buy another $10 messaging bundle before sending more campaign messages. Ops SMS unlock ($10) also grants one SMS pack. WhatsApp service ($10) grants one WhatsApp pack. Pack math: $10 → 466 SMS or 233 WhatsApp ($7.00 Twilio / $3.00 FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "Marketing campaigns",
+    "body": "Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS or WhatsApp credits from Messaging Credit."
+  },
+  "help-club-in-app-marketing": {
+    "title": "In-app marketing",
+    "body": "Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required."
   }
 }

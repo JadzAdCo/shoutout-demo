@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "SMS- en WhatsApp-bezorglogboeken",
-    "body": "Toont Twilio SMS en WhatsApp voor deze locatie (marketingtest, clubalerts). Dezelfde rijen staan onder Master Admin → Twilio. Dry-run = secrets of From ontbreken — niets bezorgd en geen credits afgeschreven. Telefoons gemaskeerd."
+    "body": "Club Admin → Marketing → SMS- en WhatsApp-logboeken toont Twilio SMS en WhatsApp voor deze locatie (marketingtest, clubalerts). Dezelfde rijen onder Master Admin → Twilio. Dry-run: secrets of From ontbraken — niets geleverd, geen tegoed afgeschreven. Telefoons gemaskeerd."
+  },
+  "help-club-messaging-credit": {
+    "title": "SMS- en WhatsApp-tegoed",
+    "body": "Elk pakket van $10 dekt $7,00 Twilio-capaciteit; FloqR houdt $3,00 platformmarge. SMS-pakket → 466 berichten (≈ $0,015 US-SMS). WhatsApp-pakket → 233 berichten (≈ $0,030 Twilio + Meta marketing). Bij saldo 0 eerst een nieuw pakket kopen. Ops SMS-unlock ($10) bevat een SMS-pakket. WhatsApp-service ($10) bevat een WhatsApp-pakket. Rekening: $10 → 466 SMS of 233 WhatsApp ($7,00 Twilio / $3,00 FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "Marketingcampagnes",
+    "body": "Kies een branchesjabloon, laad achtergrond en extra afbeeldingen, bewerk tekst, sla op of verstuur. Verzenden debiteert SMS- of WhatsApp-tegoed via Messagingtegoed."
+  },
+  "help-club-in-app-marketing": {
+    "title": "In-app marketing",
+    "body": "Publiceer een interstitiale spot-ad in de FLOQR-advertentiepool (Mingl, RydR, clubs, shoutout-slots). Sjablonen op basis van komende events. Geen SMS-tegoed nodig."
   }
 }

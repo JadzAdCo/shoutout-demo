@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "Αρχεία παράδοσης SMS και WhatsApp",
-    "body": "Εμφανίζει SMS και WhatsApp Twilio για αυτόν τον χώρο (δοκιμή marketing, ειδοποιήσεις club). Οι ίδιες γραμμές στο Master Admin → Twilio. Dry-run = λείπουν secrets ή From — τίποτα δεν παραδόθηκε και δεν χρεώθηκαν credits. Τηλέφωνα καλυμμένα."
+    "body": "Club Admin → Marketing → Αρχεία SMS & WhatsApp εμφανίζει Twilio SMS και WhatsApp για τον χώρο (δοκιμή marketing, ειδοποιήσεις club). Ίδιες γραμμές στο Master Admin → Twilio. Dry-run: έλειπαν secrets ή From — καμία παράδοση/χρέωση. Τηλέφωνα masked."
+  },
+  "help-club-messaging-credit": {
+    "title": "Πίστωση SMS & WhatsApp",
+    "body": "Κάθε πακέτο $10 χρηματοδοτεί $7,00 χωρητικότητας Twilio· η FloqR κρατά $3,00 πλατφόρμας. Πακέτο SMS → 466 μηνύματα (≈ $0,015 SMS ΗΠΑ). Πακέτο WhatsApp → 233 μηνύματα (≈ $0,030 Twilio + Meta marketing). Σε μηδενικό υπόλοιπο αγοράστε νέο πακέτο πριν την αποστολή. Ops SMS unlock ($10) περιλαμβάνει πακέτο SMS. Υπηρεσία WhatsApp ($10) περιλαμβάνει πακέτο WhatsApp. Υπολογισμός: $10 → 466 SMS ή 233 WhatsApp ($7,00 Twilio / $3,00 FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "Καμπάνιες marketing",
+    "body": "Επιλέξτε πρότυπο κλάδου, φορτώστε φόντο και επιπλέον εικόνες, επεξεργαστείτε κείμενο, αποθηκεύστε ή στείλτε. Η αποστολή χρεώνει πίστωση SMS ή WhatsApp από Πίστωση μηνυμάτων."
+  },
+  "help-club-in-app-marketing": {
+    "title": "Marketing in-app",
+    "body": "Δημοσιεύστε spot interstitial στο pool διαφημίσεων FLOQR (Mingl, RydR, clubs, θέσεις ShoutOut). Πρότυπα από επερχόμενα events. Δεν απαιτούνται πίστωση SMS."
   }
 }

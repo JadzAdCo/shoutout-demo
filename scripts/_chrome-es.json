@@ -190,5 +190,14 @@
   "master.promoters": "Promoters",
   "master.reconciliation": "Conciliación de red",
   "master.services": "Servicios y comercio",
-  "master.diagnostics": "Diagnósticos"
+  "master.diagnostics": "Diagnósticos",
+  "admin.marketing": "Marketing",
+  "admin.adPerformance": "Rendimiento de anuncios",
+  "admin.marketingCampaigns": "Campañas de marketing",
+  "admin.marketingCampaignsTitle": "Iniciar una campaña de marketing",
+  "admin.messagingCredit": "Crédito de mensajería",
+  "admin.messagingCreditTitle": "Crédito SMS y WhatsApp",
+  "admin.smsWhatsappLogs": "Registros SMS y WhatsApp",
+  "admin.inAppMarketing": "Marketing in-app",
+  "admin.inAppMarketingTitle": "Iniciar campaña publicitaria spot"
 }
