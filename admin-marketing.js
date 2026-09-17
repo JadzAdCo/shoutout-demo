@@ -71,7 +71,7 @@
     bindBuyButtons();
   }
 
-  if (!window.firebase || !byId("panelAdvertising")) return;
+  if (!window.firebase || !byId("messagingCreditsCard")) return;
 
   let auth;
   let db;
@@ -94,23 +94,11 @@
     return byId("marketingCampaignStatus");
   }
 
-  function useConditionText() {
-    return window.FLOQRMessagingCredits?.useCondition
-      || "Each $10 pack funds $7.00 of Twilio delivery; FloqR keeps $3.00. SMS ≈ 466 msgs; WhatsApp ≈ 233 msgs.";
-  }
-
   function renderCredits() {
     const sms = byId("creditSmsBalance");
     const wa = byId("creditWhatsappBalance");
-    const pack = byId("creditPackSummary");
     if (sms) sms.textContent = String(credits.smsBalance || 0);
     if (wa) wa.textContent = String(credits.whatsappBalance || 0);
-    if (pack) {
-      const c = window.FLOQRMessagingCredits || {};
-      pack.textContent = `Pack: $10 → ${c.SMS_MESSAGES_PER_PACK || 466} SMS or ${c.WHATSAPP_MESSAGES_PER_PACK || 233} WhatsApp ($${((c.TWILIO_BUDGET_CENTS || 700) / 100).toFixed(2)} Twilio / $${((c.FLOQR_PROFIT_CENTS || 300) / 100).toFixed(2)} FloqR).`;
-    }
-    const cond = byId("messagingUseCondition");
-    if (cond) cond.textContent = useConditionText();
   }
 
   async function loadCredits() {

@@ -190,5 +190,14 @@
   "master.promoters": "Promoters",
   "master.reconciliation": "Network Reconciliation",
   "master.services": "Services & Commerce",
-  "master.diagnostics": "Diagnostics"
+  "master.diagnostics": "Diagnostics",
+  "admin.marketing": "Marketing",
+  "admin.adPerformance": "Ad Performance",
+  "admin.marketingCampaigns": "Marketing Campaigns",
+  "admin.marketingCampaignsTitle": "Start a marketing campaign",
+  "admin.messagingCredit": "Messaging Credit",
+  "admin.messagingCreditTitle": "SMS & WhatsApp Credit",
+  "admin.smsWhatsappLogs": "SMS & WhatsApp Logs",
+  "admin.inAppMarketing": "In-App Marketing",
+  "admin.inAppMarketingTitle": "Start a spot advertisement campaign"
 }

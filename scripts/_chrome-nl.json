@@ -190,5 +190,14 @@
   "master.promoters": "Promoters",
   "master.reconciliation": "Netwerkafstemming",
   "master.services": "Services en commerce",
-  "master.diagnostics": "Diagnostiek"
+  "master.diagnostics": "Diagnostiek",
+  "admin.marketing": "Marketing",
+  "admin.adPerformance": "Advertentieprestaties",
+  "admin.marketingCampaigns": "Marketingcampagnes",
+  "admin.marketingCampaignsTitle": "Start een marketingcampagne",
+  "admin.messagingCredit": "Messagingtegoed",
+  "admin.messagingCreditTitle": "SMS- en WhatsApp-tegoed",
+  "admin.smsWhatsappLogs": "SMS- en WhatsApp-logboeken",
+  "admin.inAppMarketing": "In-app marketing",
+  "admin.inAppMarketingTitle": "Start een spot-advertentiecampagne"
 }

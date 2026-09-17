@@ -964,16 +964,55 @@
     {
       id: "help-club-messaging-logs",
       title: "SMS & WhatsApp delivery logs",
-      body: "Club Admin → Advertising → Messaging logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked.",
+      body: "Club Admin → Marketing → SMS & WhatsApp Logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked.",
       searchPhrases: [
         "messaging logs", "club sms log", "club whatsapp log", "twilioSmsLogs", "twilioWhatsAppLogs",
         "marketing sms log", "send test debit", "why no sms"
       ],
       links: [
-        {label: "Club Advertising", href: vUrl("./admin.html", {from: "floqai"})}
+        {label: "Club Marketing", href: vUrl("./admin.html", {tab: "marketing", from: "floqai"})}
       ],
       source: "help-repository-seed",
-      page: "admin.html#advertising"
+      page: "admin.html#panelMessagingLogs"
+    },
+    {
+      id: "help-club-messaging-credit",
+      title: "SMS & WhatsApp Credit",
+      body: "Each $10 pack funds $7.00 of Twilio delivery capacity; FloqR keeps $3.00 as platform profit on the pack. SMS pack → 466 messages (≈ $0.015 all-in US SMS). WhatsApp pack → 233 messages (≈ $0.030 Twilio + Meta marketing). When balance reaches 0, buy another $10 messaging bundle before sending more campaign messages. Ops SMS unlock ($10) also grants one SMS pack. WhatsApp service ($10) grants one WhatsApp pack. Pack math: $10 → 466 SMS or 233 WhatsApp ($7.00 Twilio / $3.00 FloqR).",
+      searchPhrases: [
+        "messaging credit", "sms pack", "whatsapp pack", "buy sms bundle", "twilio credits", "466 sms"
+      ],
+      links: [
+        {label: "Messaging Credit", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMessagingCredit"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelMessagingCredit"
+    },
+    {
+      id: "help-club-marketing-campaigns",
+      title: "Marketing campaigns",
+      body: "Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS or WhatsApp credits from Messaging Credit.",
+      searchPhrases: [
+        "marketing campaign", "sms blast", "whatsapp campaign", "industry template", "send test marketing"
+      ],
+      links: [
+        {label: "Marketing Campaigns", href: vUrl("./admin.html", {from: "floqai"}) + "#panelMarketingCampaigns"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelMarketingCampaigns"
+    },
+    {
+      id: "help-club-in-app-marketing",
+      title: "In-app marketing",
+      body: "Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required.",
+      searchPhrases: [
+        "spot ad", "in-app marketing", "advertisement pool", "mingl ad", "rydr ad", "interstitial"
+      ],
+      links: [
+        {label: "In-App Marketing", href: vUrl("./admin.html", {from: "floqai"}) + "#panelInAppMarketing"}
+      ],
+      source: "help-repository-seed",
+      page: "admin.html#panelInAppMarketing"
     },
     {
       id: "help-venue-onboarding",

@@ -74,7 +74,16 @@
         <button class="admin-tab" data-panel="panelQueue" type="button" data-i18n="admin.queue">ShoutOut Queue</button>
         <button class="admin-tab" data-panel="panelSuprstar" type="button" data-i18n="admin.suprstarQueue">supRstar Queue</button>
         <button class="admin-tab" data-panel="panelAnalytics" type="button" data-i18n="admin.analytics">Analytics</button>
-        <button class="admin-tab" data-panel="panelAdvertising" type="button" data-i18n="admin.advertising">Advertising</button>
+        <div class="admin-tab-group" data-tab-group="marketing" data-default-panel="panelMarketingAdPerformance">
+          <button class="admin-tab admin-tab-parent" data-group="marketing" type="button" aria-expanded="false" data-i18n="admin.marketing">Marketing</button>
+          <div class="admin-subtabs hidden" id="marketingSubtabs" role="group" aria-label="Marketing pages">
+            <button class="admin-subtab" data-panel="panelMarketingAdPerformance" type="button" data-i18n="admin.adPerformance">Ad Performance</button>
+            <button class="admin-subtab" data-panel="panelMarketingCampaigns" type="button" data-i18n="admin.marketingCampaigns">Marketing Campaigns</button>
+            <button class="admin-subtab" data-panel="panelMessagingCredit" type="button" data-i18n="admin.messagingCredit">Messaging Credit</button>
+            <button class="admin-subtab" data-panel="panelMessagingLogs" type="button" data-i18n="admin.smsWhatsappLogs">SMS &amp; WhatsApp Logs</button>
+            <button class="admin-subtab" data-panel="panelInAppMarketing" type="button" data-i18n="admin.inAppMarketing">In-App Marketing</button>
+          </div>
+        </div>
         <button class="admin-tab" data-panel="panelGuestLists" type="button" data-i18n="admin.guestLists">Guest Lists / Promoters</button>
         <button class="admin-tab" data-panel="panelEmployees" type="button" data-i18n="admin.employees">Employee/Workers</button>
         <button class="admin-tab" data-panel="panelScheduling" type="button" data-i18n="admin.scheduling">Calendar &amp; Scheduler</button>
@@ -352,10 +361,10 @@
         </div>
       </section>
 
-      <section id="panelAdvertising" class="admin-panel-section">
+      <section id="panelMarketingAdPerformance" class="admin-panel-section">
         <div class="admin-grid">
           <div class="card">
-            <h2>Ad Performance</h2>
+            <h2 data-i18n="admin.adPerformance">Ad Performance</h2>
             <div id="adReport" class="report-block"></div>
           </div>
           <div class="card">
@@ -363,30 +372,17 @@
             <div id="sponsorReport" class="report-block"></div>
           </div>
         </div>
+      </section>
 
-        <div class="card" id="messagingCreditsCard">
-          <p class="eyebrow">Service patrons</p>
-          <h2>SMS &amp; WhatsApp messaging packs</h2>
-          <p id="messagingUseCondition" class="sub small"></p>
-          <div class="metric-grid">
-            <div class="metric-card"><span>SMS credits</span><strong id="creditSmsBalance">0</strong></div>
-            <div class="metric-card"><span>WhatsApp credits</span><strong id="creditWhatsappBalance">0</strong></div>
-          </div>
-          <p id="creditPackSummary" class="sub small"></p>
-          <div class="queue-actions" style="margin-top:10px;flex-wrap:wrap;gap:8px">
-            <button id="buySmsServiceBtn" class="primary" type="button">Buy SMS service $10 (466 msgs)</button>
-            <button id="buyWhatsappServiceBtn" class="primary" type="button">Buy WhatsApp service $10 (233 msgs)</button>
-            <button id="buySmsBundleBtn" type="button">Buy SMS bundle $10</button>
-            <button id="buyWhatsappBundleBtn" type="button">Buy WhatsApp bundle $10</button>
-            <button id="refreshMessagingCreditsBtn" type="button">Refresh balances</button>
-          </div>
-          <p id="messagingCreditsStatus" class="status"></p>
-        </div>
-
+      <section id="panelMarketingCampaigns" class="admin-panel-section">
         <div class="card" id="marketingCampaignCard">
-          <p class="eyebrow">Marketing</p>
-          <h2>Start a marketing campaign</h2>
-          <p class="sub small">Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS/WhatsApp credits.</p>
+          <h2
+            data-i18n="admin.marketingCampaignsTitle"
+            data-floqr-help-id="help-club-marketing-campaigns"
+            data-floqr-help-title="Marketing campaigns"
+            data-floqr-help-search="marketing campaign|sms blast|whatsapp campaign|send test|industry template"
+            data-floqr-help-body="Pick an industry template, load background and extra images, edit copy, then save or send. Sending debits SMS or WhatsApp credits from Messaging Credit."
+          >Start a marketing campaign</h2>
           <div class="profile-grid">
             <label>Industry
               <select id="marketingIndustry"></select>
@@ -435,17 +431,43 @@
           <h3 style="margin-top:16px">Recent campaigns</h3>
           <div id="marketingCampaignReport" class="report-block"></div>
         </div>
+      </section>
 
+      <section id="panelMessagingCredit" class="admin-panel-section">
+        <div class="card" id="messagingCreditsCard">
+          <h2
+            data-i18n="admin.messagingCreditTitle"
+            data-floqr-help-id="help-club-messaging-credit"
+            data-floqr-help-title="SMS & WhatsApp Credit"
+            data-floqr-help-search="messaging credit|sms pack|whatsapp pack|twilio credits|buy sms bundle"
+            data-floqr-help-body="Each $10 pack funds $7.00 of Twilio delivery capacity; FloqR keeps $3.00 as platform profit on the pack. SMS pack → 466 messages (≈ $0.015 all-in US SMS). WhatsApp pack → 233 messages (≈ $0.030 Twilio + Meta marketing). When balance reaches 0, buy another $10 messaging bundle before sending more campaign messages. Ops SMS unlock ($10) also grants one SMS pack. WhatsApp service ($10) grants one WhatsApp pack. Pack math: $10 → 466 SMS or 233 WhatsApp ($7.00 Twilio / $3.00 FloqR)."
+          >SMS &amp; WhatsApp Credit</h2>
+          <p id="messagingUseCondition" class="sub small hidden" aria-hidden="true"></p>
+          <div class="metric-grid">
+            <div class="metric-card"><span>SMS credits</span><strong id="creditSmsBalance">0</strong></div>
+            <div class="metric-card"><span>WhatsApp credits</span><strong id="creditWhatsappBalance">0</strong></div>
+          </div>
+          <p id="creditPackSummary" class="sub small hidden" aria-hidden="true"></p>
+          <div class="queue-actions" style="margin-top:10px;flex-wrap:wrap;gap:8px">
+            <button id="buySmsServiceBtn" class="primary" type="button">Buy SMS service $10 (466 msgs)</button>
+            <button id="buyWhatsappServiceBtn" class="primary" type="button">Buy WhatsApp service $10 (233 msgs)</button>
+            <button id="buySmsBundleBtn" type="button">Buy SMS bundle $10</button>
+            <button id="buyWhatsappBundleBtn" type="button">Buy WhatsApp bundle $10</button>
+            <button id="refreshMessagingCreditsBtn" type="button">Refresh balances</button>
+          </div>
+          <p id="messagingCreditsStatus" class="status"></p>
+        </div>
+      </section>
+
+      <section id="panelMessagingLogs" class="admin-panel-section">
         <div class="card" id="clubMessagingLogsCard">
-          <p class="eyebrow" data-i18n="admin.messagingLogs">Messaging logs</p>
           <h2
             data-i18n="admin.messagingLogsTitle"
             data-floqr-help-id="help-club-messaging-logs"
             data-floqr-help-title="SMS & WhatsApp delivery logs"
             data-floqr-help-search="messaging logs|twilioSmsLogs|twilioWhatsAppLogs|club sms log|marketing sms log|send test debit"
             data-floqr-help-body="Shows Twilio SMS and WhatsApp messages sent for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones are masked."
-          >SMS & WhatsApp delivery logs</h2>
-          <p class="sub small" data-i18n="admin.messagingLogsBody">Messages sent for this venue (marketing tests, club alerts). Same rows appear under Master Admin → Twilio. Phones are masked.</p>
+          >SMS &amp; WhatsApp delivery logs</h2>
           <div class="admin-grid">
             <div>
               <h3 data-i18n="admin.twilioSmsLogs">twilioSmsLogs</h3>
@@ -487,11 +509,17 @@
             </div>
           </div>
         </div>
+      </section>
 
+      <section id="panelInAppMarketing" class="admin-panel-section">
         <div class="card" id="spotAdCampaignCard">
-          <p class="eyebrow">In-app media</p>
-          <h2>Start a spot advertisement campaign</h2>
-          <p class="sub small">Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required.</p>
+          <h2
+            data-i18n="admin.inAppMarketingTitle"
+            data-floqr-help-id="help-club-in-app-marketing"
+            data-floqr-help-title="In-app marketing"
+            data-floqr-help-search="spot ad|in-app marketing|advertisement pool|mingl ad|rydr ad|interstitial"
+            data-floqr-help-body="Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required."
+          >Start a spot advertisement campaign</h2>
           <div class="profile-grid">
             <label>Spot template
               <select id="spotTemplateSelect"></select>
@@ -914,9 +942,9 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.78"></script>
-<script src="./floqai-help-repository.js?v=s3.0.78"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.78"></script>
+<script src="./floqr-i18n.js?v=s3.0.81"></script>
+<script src="./floqai-help-repository.js?v=s3.0.81"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.81"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -928,11 +956,11 @@
 <script src="./ad-campaigns.js?v=29.09.34"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=s3.0.70"></script>
+<script src="./admin-app.js?v=s3.0.81"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
 <script src="./admin-rep-extension.js?v=29.09.11"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
-<script src="./admin-marketing.js?v=s3.0.78"></script>
+<script src="./admin-marketing.js?v=s3.0.81"></script>
 <script src="./master-twilio-logging.js?v=s3.0.78"></script>
 <script src="./admin-spot-ads.js?v=29.09.17"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>

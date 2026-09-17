@@ -38,11 +38,11 @@ test("help packs cover the canonical 33 ids for every localized language", () =>
   assert.equal(help.gaps.length, 0, JSON.stringify(help.gaps));
 });
 
-test("floqr-i18n and help VERSION are s3.0.28", () => {
+test("floqr-i18n and help VERSION are s3.0.81", () => {
   const fs = require("fs");
   const root = path.join(__dirname, "..");
   const i18n = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   const help = fs.readFileSync(path.join(root, "floqr-i18n-help.js"), "utf8");
-  assert.match(i18n, /const VERSION\s*=\s*"s3\.0\.28"/);
-  assert.match(help, /const VERSION\s*=\s*"s3\.0\.28"/);
+  assert.match(i18n, /const VERSION\s*=\s*"s3\.0\.81"/);
+  assert.match(help, /const VERSION\s*=\s*"s3\.0\.81"/);
 });

@@ -190,5 +190,14 @@
   "master.promoters": "Εταίροι",
   "master.reconciliation": "Συμφιλίωση δικτύου",
   "master.services": "Υπηρεσίες & Εμπόριο",
-  "master.diagnostics": "διαγνωστικά"
+  "master.diagnostics": "διαγνωστικά",
+  "admin.marketing": "Marketing",
+  "admin.adPerformance": "Απόδοση διαφημίσεων",
+  "admin.marketingCampaigns": "Καμπάνιες marketing",
+  "admin.marketingCampaignsTitle": "Έναρξη καμπάνιας marketing",
+  "admin.messagingCredit": "Πίστωση μηνυμάτων",
+  "admin.messagingCreditTitle": "Πίστωση SMS & WhatsApp",
+  "admin.smsWhatsappLogs": "Αρχεία SMS & WhatsApp",
+  "admin.inAppMarketing": "Marketing in-app",
+  "admin.inAppMarketingTitle": "Έναρξη spot διαφημιστικής καμπάνιας"
 }

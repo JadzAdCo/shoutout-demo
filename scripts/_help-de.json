@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "SMS- und WhatsApp-Zustellprotokolle",
-    "body": "Zeigt Twilio-SMS und WhatsApp für diesen Standort (Marketing-Sendetest, Club-Alerts). Dieselben Zeilen unter Master Admin → Twilio. Dry-run = Secrets oder From fehlen — nichts zugestellt, keine Credits abgebucht. Telefone maskiert."
+    "body": "Club Admin → Marketing → SMS- & WhatsApp-Protokolle zeigt Twilio SMS und WhatsApp für diesen Standort (Marketing-Test, Club-Alerts). Dieselben Zeilen unter Master Admin → Twilio. Dry-run: Secrets oder From fehlten — nichts zugestellt, kein Guthaben belastet. Telefonnummern maskiert."
+  },
+  "help-club-messaging-credit": {
+    "title": "SMS- & WhatsApp-Guthaben",
+    "body": "Jedes 10-$-Paket finanziert 7,00 $ Twilio-Kapazität; FloqR behält 3,00 $ Plattformmarge. SMS-Paket → 466 Nachrichten (≈ 0,015 $ US-SMS). WhatsApp-Paket → 233 Nachrichten (≈ 0,030 $ Twilio + Meta Marketing). Bei 0 Guthaben neues 10-$-Paket kaufen. Ops-SMS-Freischaltung (10 $) inkl. SMS-Paket. WhatsApp-Service (10 $) inkl. WhatsApp-Paket. Rechnung: 10 $ → 466 SMS oder 233 WhatsApp (7,00 $ Twilio / 3,00 $ FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "Marketingkampagnen",
+    "body": "Branchenvorlage wählen, Hintergrund- und Zusatzbilder laden, Text anpassen, speichern oder senden. Senden belastet SMS- oder WhatsApp-Guthaben unter Messaging-Guthaben."
+  },
+  "help-club-in-app-marketing": {
+    "title": "In-App-Marketing",
+    "body": "Veröffentlichen Sie eine Spot-Interstitial-Anzeige im FLOQR-Werbe-Pool (Mingl, RydR, Clubs, ShoutOut-Slots). Vorlagen aus kommenden Events des Standorts. Kein SMS-Guthaben nötig."
   }
 }

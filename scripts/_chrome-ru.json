@@ -190,5 +190,14 @@
   "master.promoters": "Промоутеры",
   "master.reconciliation": "Сетевая сверка",
   "master.services": "Сервисы и коммерция",
-  "master.diagnostics": "Диагностика"
+  "master.diagnostics": "Диагностика",
+  "admin.marketing": "Маркетинг",
+  "admin.adPerformance": "Эффективность рекламы",
+  "admin.marketingCampaigns": "Маркетинговые кампании",
+  "admin.marketingCampaignsTitle": "Запустить маркетинговую кампанию",
+  "admin.messagingCredit": "Кредит сообщений",
+  "admin.messagingCreditTitle": "Кредит SMS и WhatsApp",
+  "admin.smsWhatsappLogs": "Журналы SMS и WhatsApp",
+  "admin.inAppMarketing": "In-app маркетинг",
+  "admin.inAppMarketingTitle": "Запустить spot-рекламную кампанию"
 }

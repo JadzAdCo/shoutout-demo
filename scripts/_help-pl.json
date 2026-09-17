@@ -145,6 +145,18 @@
   },
   "help-club-messaging-logs": {
     "title": "Dzienniki dostawy SMS i WhatsApp",
-    "body": "Pokazuje SMS i WhatsApp Twilio dla tej lokalizacji (test marketingowy, alerty klubu). Te same wiersze są w Master Admin → Twilio. Dry-run = brak secrets lub From — nic nie dostarczono i nie pobrano kredytów. Telefony zamaskowane."
+    "body": "Club Admin → Marketing → Dzienniki SMS i WhatsApp pokazuje Twilio SMS i WhatsApp dla lokalu (test marketing, alerty klubu). Te same wiersze w Master Admin → Twilio. Dry-run: brak secrets lub From — brak dostawy i obciążenia. Telefony zamaskowane."
+  },
+  "help-club-messaging-credit": {
+    "title": "Kredyt SMS i WhatsApp",
+    "body": "Każdy pakiet $10 finansuje $7,00 pojemności Twilio; FloqR zatrzymuje $3,00 marży platformy. Pakiet SMS → 466 wiadomości (≈ $0,015 SMS US). Pakiet WhatsApp → 233 wiadomości (≈ $0,030 Twilio + Meta marketing). Przy saldzie 0 kup kolejny pakiet przed wysyłką. Ops SMS unlock ($10) obejmuje pakiet SMS. Usługa WhatsApp ($10) obejmuje pakiet WhatsApp. Rachunek: $10 → 466 SMS lub 233 WhatsApp ($7,00 Twilio / $3,00 FloqR)."
+  },
+  "help-club-marketing-campaigns": {
+    "title": "Kampanie marketingowe",
+    "body": "Wybierz szablon branżowy, dodaj tło i dodatkowe obrazy, edytuj treść, zapisz lub wyślij. Wysyłka obciąża kredyt SMS lub WhatsApp w Kredyt wiadomości."
+  },
+  "help-club-in-app-marketing": {
+    "title": "Marketing in-app",
+    "body": "Opublikuj spot interstitial w puli reklam FLOQR (Mingl, RydR, kluby, sloty ShoutOut). Szablony z nadchodzących wydarzeń lokalu. Bez kredytu SMS."
   }
 }
