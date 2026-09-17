@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.0.81";
+  const VERSION = "s3.0.82";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -2127,7 +2127,7 @@
       "master.reconciliation": "Συμφιλίωση δικτύου",
       "master.services": "Υπηρεσίες & Εμπόριο",
       "master.diagnostics": "διαγνωστικά",
-      "admin.marketing": "Marketing",
+      "admin.marketing": "Μάρκετινγκ",
       "admin.adPerformance": "Απόδοση διαφημίσεων",
       "admin.marketingCampaigns": "Καμπάνιες marketing",
       "admin.marketingCampaignsTitle": "Έναρξη καμπάνιας marketing",
