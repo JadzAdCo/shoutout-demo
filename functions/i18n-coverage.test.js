@@ -1,5 +1,5 @@
 /**
- * i18n coverage: chrome parity vs en + help packs vs canonical 33 ids.
+ * i18n coverage: chrome parity vs en + help packs vs canonical help ids.
  */
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 192);
+  assert.equal(chrome.enKeys, 201);
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);
@@ -23,9 +23,9 @@ test("chrome packs match en key count for every supported language", () => {
   assert.equal(chrome.gaps.length, 0, JSON.stringify(chrome.gaps));
 });
 
-test("help packs cover the canonical 33 ids for every localized language", () => {
+test("help packs cover the canonical help ids for every localized language", () => {
   const { help } = analyze();
-  assert.equal(help.canonical, 33);
+  assert.equal(help.canonical, 40);
   for (const code of HELP_LANGS) {
     assert.ok(help.packsPresent.includes(code), `missing help pack ${code}`);
   }
