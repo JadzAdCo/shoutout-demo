@@ -1982,14 +1982,23 @@
       .filter(item => !query || usedFloqrSearch || item.intentScore > 0 || contextualSearchMatch(query, publicProfileHaystack(item.profile)))
       .sort((a,b) => (b.intentScore + b.sharedScore) - (a.intentScore + a.sharedScore))
       .slice(0, 40);
-    grid.innerHTML = matches.length ? "" : '<div class="empty">No public Mingl profiles matched that search yet. Try interests like fast cars, Latin events, Afro House, travel, food, city, or hobbies.</div>';
+    grid.innerHTML = matches.length ? "" : `<div class="empty">${esc(tt("page.minglLanding.emptySearch", null, "No public Mingl profiles matched that search yet. Try interests like fast cars, Latin events, Afro House, travel, food, city, or hobbies."))}</div>`;
     matches.forEach(({profile, sharedScore, intentScore}, index) => {
       const uid = profile.uid || profile.id;
       const status = connectionStatusFor(uid);
       const photoUrl = profileMinglPhoto(profile);
       const card = document.createElement("div");
       card.className = "mingl-person-card";
-      const buttonText = status.state === "mutual" ? "Open Mingl Chat" : status.state === "sent" ? "Mingl Request Sent" : status.state === "received" ? "Mingl Back" : "Let's Mingl";
+      const buttonText = status.state === "mutual"
+        ? tt("page.minglLanding.openChat", null, "Open Mingl Chat")
+        : status.state === "sent"
+          ? tt("page.minglLanding.requestSent", null, "Mingl Request Sent")
+          : status.state === "received"
+            ? tt("page.minglLanding.minglBack", null, "Mingl Back")
+            : tt("page.minglLanding.letsMingl", null, "Let's Mingl");
+      const matchMeta = tt("page.minglLanding.sharedMatches", {n: sharedScore}, `${sharedScore} shared profile matches`)
+        + (query ? ` - ${tt("page.minglLanding.searchSignals", {n: intentScore}, `${intentScore} search signals`)}` : "");
+      const memberFallback = tt("page.minglLanding.member", null, "Mingl Member");
       const sharedLabels = sharedDataPointLabels(cachedUserProfile || {}, profile).slice(0, 5);
       const isMutual = status.state === "mutual";
       const matchReasonOnly = !isMutual;
@@ -1999,9 +2008,9 @@
       card.innerHTML = `
         <div class="mingl-person-photo">${photoUrl ? `<img src="${esc(photoUrl)}" alt="${esc(profile.displayName || "Mingl profile")}">` : `<span>${esc((profile.displayName || profile.username || "M").slice(0,1).toUpperCase())}</span>`}</div>
         <div>
-          <h3>${esc(profile.displayName || profile.username || "Mingl Member")}</h3>
+          <h3>${esc(profile.displayName || profile.username || memberFallback)}</h3>
           ${profileContactLine(profile) ? `<div class="mingl-contact-row">${profileContactLine(profile)}</div>` : ""}
-          <small>${sharedScore} shared profile matches${query ? ` - ${intentScore} search signals` : ""}</small>
+          <small>${esc(matchMeta)}</small>
           ${matchReasonOnly
             ? (sharedLabels.length ? `<div class="mingl-shared-row mingl-match-reason-only"><span>${esc(matchReasonText)}</span></div>` : "")
             : (sharedLabels.length ? `<div class="mingl-shared-row">${sharedLabels.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : "")}
@@ -2208,10 +2217,18 @@
     const statusBtn = byId("minglRequestStatusBtn");
     if (statusBtn) statusBtn.textContent = `(${sentRows.length}/${receivedRows.length})`;
     renderMinglRequestStatusPopout(sentRows, receivedRows);
-    wrap.innerHTML = rows.length ? "" : "<p class='sub'>No pending Mingl requests.</p>";
+    wrap.innerHTML = rows.length ? "" : `<p class='sub'>${esc(tt("page.minglLanding.noRequests", null, "No pending Mingl requests."))}</p>`;
     const sections = [
-      {title:"Sent Mingl/Friend Request", rows:sentRows, empty:"No sent requests waiting for a Mingl back."},
-      {title:"Received Mingl/Friend Request", rows:receivedRows, empty:"No received requests waiting on you."}
+      {
+        title: tt("page.minglLanding.sectionSent", null, "Sent Mingl/Friend Request"),
+        rows: sentRows,
+        empty: tt("page.minglLanding.emptySent", null, "No sent requests waiting for a Mingl back.")
+      },
+      {
+        title: tt("page.minglLanding.sectionReceived", null, "Received Mingl/Friend Request"),
+        rows: receivedRows,
+        empty: tt("page.minglLanding.emptyReceived", null, "No received requests waiting on you.")
+      }
     ];
     sections.forEach(section => {
       if (!section.rows.length) return;
@@ -2230,25 +2247,27 @@
       const state = connectionStatusFor(otherUid).state;
       const item = document.createElement("div");
       item.className = "queue-item mingl-request-item";
+      const memberFallback = tt("page.minglLanding.member", null, "Mingl Member");
       const label = state === "received"
-        ? "Received request"
+        ? tt("page.minglLanding.receivedLabel", null, "Received request")
         : state === "sent"
-          ? "Sent request"
-          : "Pending request";
+          ? tt("page.minglLanding.sentLabel", null, "Sent request")
+          : tt("page.minglLanding.pendingLabel", null, "Pending request");
       const detail = state === "received"
-        ? "This patron wants to Mingl with you. Tap Mingl Back to approve."
+        ? tt("page.minglLanding.receivedDetail", null, "This patron wants to Mingl with you. Tap Mingl Back to approve.")
         : state === "sent"
-          ? "Waiting for this patron to Mingl back."
-          : "Friend or Mingl Request is pending.";
+          ? tt("page.minglLanding.sentDetail", null, "Waiting for this patron to Mingl back.")
+          : tt("page.minglLanding.pendingDetail", null, "Friend or Mingl Request is pending.");
       const action = state === "received"
-        ? `<button class="primary" data-mingl-action="accept" type="button">Accept Mingl</button><button data-mingl-action="deny" type="button">Deny</button>`
-        : state === "mutual" ? `<button class="primary" data-mingl-action="open" type="button">Open Mingl Chat</button>` : "";
+        ? `<button class="primary" data-mingl-action="accept" type="button">${esc(tt("page.minglLanding.accept", null, "Accept Mingl"))}</button><button data-mingl-action="deny" type="button">${esc(tt("page.minglLanding.deny", null, "Deny"))}</button>`
+        : state === "mutual" ? `<button class="primary" data-mingl-action="open" type="button">${esc(tt("page.minglLanding.openChat", null, "Open Mingl Chat"))}</button>` : "";
       const shared = (connection.sharedDatapoints || []).slice(0,4).filter(Boolean);
+      const sharedPrefix = tt("page.minglLanding.sharedPrefix", null, "Shared:");
       item.innerHTML = `<div class="mingl-request-copy">
-        <strong>${esc(profile.displayName || profile.username || "Mingl Member")}</strong>
+        <strong>${esc(profile.displayName || profile.username || memberFallback)}</strong>
         <span>${esc(label)}</span>
         <small>${esc(detail)}</small>
-        ${shared.length ? `<small class="mingl-request-shared">Shared: ${esc(shared.join(", "))}</small>` : ""}
+        ${shared.length ? `<small class="mingl-request-shared">${esc(sharedPrefix)} ${esc(shared.join(", "))}</small>` : ""}
       </div>
       ${action ? `<div class="mingl-request-actions">${action}</div>` : ""}`;
       item.querySelector("[data-mingl-action='accept']")?.addEventListener("click", () => handleMinglAction({...profile, uid:otherUid}));
@@ -2263,11 +2282,14 @@
     const itemName = connection => {
       const otherUid = (connection.participants || []).find(uid => uid !== currentUser.uid) || connection.requestedTo || connection.requestedBy || "";
       const profile = minglCandidates.find(x => (x.uid || x.id) === otherUid) || connection.userSummaries?.[otherUid] || {};
-      return profile.displayName || profile.username || "Mingl Member";
+      return profile.displayName || profile.username || tt("page.minglLanding.member", null, "Mingl Member");
     };
+    const noneLabel = esc(tt("page.minglLanding.none", null, "None"));
+    const sentWaiting = esc(tt("page.minglLanding.statusSentWaiting", null, "waiting for Mingl back."));
+    const receivedWaiting = esc(tt("page.minglLanding.statusReceivedWaiting", null, "waiting for you."));
     popout.innerHTML = `<div class="mingl-request-status-grid">
-      <section><strong>Sent Mingl/Friend Request</strong><p>${sentRows.length} waiting for Mingl back.</p>${sentRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || "<span>None</span>"}</section>
-      <section><strong>Received Mingl/Friend Request</strong><p>${receivedRows.length} waiting for you.</p>${receivedRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || "<span>None</span>"}</section>
+      <section><strong>${esc(tt("page.minglLanding.sectionSent", null, "Sent Mingl/Friend Request"))}</strong><p>${sentRows.length} ${sentWaiting}</p>${sentRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || `<span>${noneLabel}</span>`}</section>
+      <section><strong>${esc(tt("page.minglLanding.sectionReceived", null, "Received Mingl/Friend Request"))}</strong><p>${receivedRows.length} ${receivedWaiting}</p>${receivedRows.slice(0,5).map(row => `<span>${esc(itemName(row))}</span>`).join("") || `<span>${noneLabel}</span>`}</section>
     </div>`;
   }
 
@@ -4342,6 +4364,10 @@
     window.FLOQRNav?.applyStartPage(showPage);
     window.addEventListener("floqr:ui-language", () => {
       if (currentUser) ensureProfileMenuEnhancements(currentUser);
+      const minglPage = byId("minglLandingPage");
+      if (currentUser && minglPage?.classList.contains("active")) {
+        void loadMingl();
+      }
     });
   });
 

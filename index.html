@@ -311,43 +311,43 @@
   <section id="shoutoutLandingPage" class="page product-page shoutout-product-page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromShoutoutLandingBtn" type="button">&larr; Back to main categories</button>
+        <button id="backToCategoriesFromShoutoutLandingBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img src="./shoutout-logo.png?v=29.09.33" alt="ShoutOut" class="product-logo shoutout-hero-logo" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')}"/>
           <div class="hero-logo-fallback product-fallback hidden">ShoutOut</div>
         </div>
-        <h1>Throw a ShoutOut</h1>
-        <p class="sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display.</p>
+        <h1 data-i18n="page.shoutoutLanding.title">Throw a ShoutOut</h1>
+        <p class="sub" data-i18n="page.shoutoutLanding.sub">Choose a venue, select a template, and send a live ShoutOut to a FLOQR-powered display.</p>
       </div>
     </header>
     <div class="product-action-row">
-      <button id="startShoutoutFlowBtn" class="category-card hot" type="button">Start ShoutOut</button>
-      <button id="backToCategoriesFromShoutoutLandingBtn2" class="category-card" type="button">Back to Search</button>
+      <button id="startShoutoutFlowBtn" class="category-card hot" type="button" data-i18n="page.shoutoutLanding.start">Start ShoutOut</button>
+      <button id="backToCategoriesFromShoutoutLandingBtn2" class="category-card" type="button" data-i18n="nav.backToSearch">Back to Search</button>
     </div>
   </section>
 
   <section id="minglLandingPage" class="page product-page mingl-product-page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromMinglBtn" type="button">&larr; Back to main categories</button>
+        <button id="backToCategoriesFromMinglBtn" type="button" data-i18n="nav.backToMainCategories">&larr; Back to main categories</button>
         <div class="product-brand-stack">
           <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
           <img id="minglLandingLogo" src="./images/mingl-chrome-logo.png" alt="Mingl" class="product-logo mingl-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
           <div class="hero-logo-fallback product-fallback hidden">Mingl</div>
         </div>
-        <div class="mingl-quick-actions" aria-label="Mingl shortcuts">
+        <div class="mingl-quick-actions" data-i18n-attr="aria-label" data-i18n="page.minglLanding.shortcutsAria" aria-label="Mingl shortcuts">
           <button id="minglQuickChatBtn" class="icon-action-button" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 17 0Z"/><path d="M8 10h8M8 14h5"/></svg>
-            <span>Chat</span>
+            <span data-i18n="page.minglLanding.chat">Chat</span>
           </button>
           <button id="minglQuickSearchBtn" class="icon-action-button" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/><path d="M11 8v6M8 11h6"/></svg>
-            <span>Search for People</span>
+            <span data-i18n="page.minglLanding.searchPeople">Search for People</span>
           </button>
           <a id="minglQuickGistBtn" class="icon-action-button" href="./mingl-gist.html?v=29.09.33&from=mingl">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>
-            <span>Mingl Gist</span>
+            <span data-i18n="page.minglLanding.gist">Mingl Gist</span>
           </a>
         </div>
       </div>
@@ -359,9 +359,9 @@
           <h2 data-floqr-help-id="help-mingl-search"
               data-floqr-help-title="About Mingl search"
               data-floqr-help-search="mingl search|search people|mingl social playground|find people"
-              data-floqr-help-body="Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.">Mingl Social Playground</h2>
+              data-floqr-help-body="Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet." data-i18n="page.minglLanding.socialTitle">Mingl Social Playground</h2>
         </div>
-        <input id="minglSearch" class="search" placeholder="Try: girls interested in fast cars and Latina events"/>
+        <input id="minglSearch" class="search" data-i18n-placeholder="page.minglLanding.searchPlaceholder" placeholder="Try: girls interested in fast cars and Latina events"/>
         <div id="minglPeopleGrid" class="mingl-people-grid"></div>
       </div>
       <div class="card mingl-requests-card">
@@ -370,7 +370,7 @@
             <h2 data-floqr-help-id="help-mingl-requests"
                 data-floqr-help-title="About Mingl Requests"
                 data-floqr-help-search="mingl requests|friend request|mingl chat"
-                data-floqr-help-body="Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.">Mingl Requests</h2>
+                data-floqr-help-body="Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat." data-i18n="page.minglLanding.requestsTitle">Mingl Requests</h2>
           </div>
           <button id="minglRequestStatusBtn" class="mingl-request-status-btn" type="button" aria-label="Mingl request status">(0/0)</button>
         </div>
@@ -383,19 +383,19 @@
   <section id="clubActionsPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToCategoriesFromActionsBtn" type="button">&larr; Back to categories</button>
-        <h1>What would you like to do?</h1>
-        <p class="sub">Choose a club action, then select the exact location.</p>
+        <button id="backToCategoriesFromActionsBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
+        <h1 data-i18n="page.clubActions.title">What would you like to do?</h1>
+        <p class="sub" data-i18n="page.clubActions.sub">Choose a club action, then select the exact location.</p>
       </div>
-      <button id="logoutBtnClubActions" type="button">Sign out</button>
+      <button id="logoutBtnClubActions" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
     <div class="category-grid">
-      <button id="clubShoutoutBtn" class="category-card hot" type="button">Throw a ShoutOut</button>
-      <button id="reserveTableBtn" class="category-card" type="button">Reserve a Table</button>
-      <button id="joinGuestListBtn" class="category-card" type="button">Join Guest List</button>
-      <button id="payVipEntryBtn" class="category-card hot" type="button">Pay VIP Entry</button>
-      <button id="payEventEntryBtn" class="category-card" type="button">Pay Event Entry</button>
-      <button id="payStdEntryBtn" class="category-card" type="button">Pay Std. Entry</button>
+      <button id="clubShoutoutBtn" class="category-card hot" type="button" data-i18n="cat.shoutout">Throw a ShoutOut</button>
+      <button id="reserveTableBtn" class="category-card" type="button" data-i18n="page.clubActions.reserveTable">Reserve a Table</button>
+      <button id="joinGuestListBtn" class="category-card" type="button" data-i18n="page.clubActions.joinGuestList">Join Guest List</button>
+      <button id="payVipEntryBtn" class="category-card hot" type="button" data-i18n="page.clubActions.payVip">Pay VIP Entry</button>
+      <button id="payEventEntryBtn" class="category-card" type="button" data-i18n="page.clubActions.payEvent">Pay Event Entry</button>
+      <button id="payStdEntryBtn" class="category-card" type="button" data-i18n="page.clubActions.payStd">Pay Std. Entry</button>
     </div>
   </section>
 
@@ -403,7 +403,7 @@
   <section id="adSplashPage" class="page">
     <div class="splash-wrap">
       <div class="splash-card">
-        <button id="backFromAdBtn" type="button">&larr; Back to categories</button>
+        <button id="backFromAdBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
         <div class="splash-logo-row">
           <div id="splashClubLogoWrap" class="splash-logo-wrap">
             <img id="splashClubLogo" alt="Club logo" class="splash-logo hidden"/>
@@ -414,14 +414,14 @@
             <div id="splashFloqrLogoFallback" class="hero-logo-fallback splash-fallback-logo hidden">FLOQR</div>
           </div>
         </div>
-        <h1 id="adTitle">Get Ready</h1>
-        <p id="adBody" class="sub">Your shoutout is almost live.</p>
+        <h1 id="adTitle" data-i18n="ad.splash.getReady">Get Ready</h1>
+        <p id="adBody" class="sub" data-i18n="ad.splash.body">Your shoutout is almost live.</p>
         <div class="splash-statement-stack">
           <p id="splashStatementPrimary" class="splash-statement">Powered by Papi</p>
           <p id="splashStatementSecondary" class="splash-statement">and Social OS</p>
         </div>
-        <p class="splash-countdown">Continuing in <span id="adCountdown">10</span> seconds...</p>
-        <button id="skipAdBtn" class="ghost" type="button">Skip</button>
+        <p class="splash-countdown"><span data-i18n="ad.splash.continuingPrefix">Continuing in </span><span id="adCountdown">10</span><span data-i18n="ad.splash.continuingSuffix"> seconds...</span></p>
+        <button id="skipAdBtn" class="ghost" type="button" data-i18n="ad.splash.skip">Skip</button>
       </div>
     </div>
   </section>
@@ -430,15 +430,15 @@
     <input type="hidden" id="listingType" value="clubs"/>
     <header class="topbar">
       <div>
-        <button id="backToCategoriesBtn" type="button">&larr; Back to categories</button>
+        <button id="backToCategoriesBtn" type="button" data-i18n="nav.backToCategories">&larr; Back to categories</button>
         <h1 id="listingTitle" data-i18n="listing.searchClubs">Search Clubs</h1>
-        <p id="listingIntro" class="sub">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
+        <p id="listingIntro" class="sub" data-i18n="listing.intro">Search naturally by city, country, venue, genre, artist, event day, or activity date.</p>
       </div>
-      <button id="logoutBtn3" type="button">Sign out</button>
+      <button id="logoutBtn3" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
     <div class="card">
-      <input id="locationSearch" class="search" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
-      <p id="locationRankingStatus" class="sub small">Search results rank by nearby/profile location, preferred cities, music genres, venue type, and interests.</p>
+      <input id="locationSearch" class="search" data-i18n-placeholder="listing.searchPlaceholder" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
+      <p id="locationRankingStatus" class="sub small" data-i18n="listing.rankingStatus">Search results rank by nearby/profile location, preferred cities, music genres, venue type, and interests.</p>
     </div>
     <div id="locationGrid" class="club-grid"></div>
   </section>
@@ -446,35 +446,35 @@
   <section id="templateSelectPage" class="page">
     <header class="topbar">
       <div>
-        <button id="backToListingBtn" type="button">&larr; Back to club search</button>
+        <button id="backToListingBtn" type="button" data-i18n="nav.backToClubSearch">&larr; Back to club search</button>
         <h1 id="selectedClubTitle">Location</h1>
         <p id="selectedClubMeta" class="sub"></p>
       </div>
-      <button id="logoutBtn4" type="button">Sign out</button>
+      <button id="logoutBtn4" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
     <div class="template-layout">
       <div class="card template-pick-card">
         <div id="templateSearchPanel" class="template-floqai-search-panel hidden">
           <label class="intent-search-label" for="templateSearch">
-            <span class="intent-help">Tell FloqAi which template you want</span>
-            <input id="templateSearch" class="search" type="search" autocomplete="off" placeholder="Sports, Jersey, VIP, Humor, Cars, Video, Pictures, Ballers…"/>
+            <span class="intent-help" data-i18n="template.floqaiHelp">Tell FloqAi which template you want</span>
+            <input id="templateSearch" class="search" type="search" autocomplete="off" data-i18n-placeholder="template.searchPlaceholder" placeholder="Sports, Jersey, VIP, Humor, Cars, Video, Pictures, Ballers…"/>
           </label>
         </div>
         <div id="templateGrid" class="template-grid"></div>
       </div>
-      <div class="card template-selected-panel"><h2>Selected template</h2><div id="selectedTemplateSummary" class="selected-summary">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button">Continue to Editor</button></div>
+      <div class="card template-selected-panel"><h2 data-i18n="template.selected">Selected template</h2><div id="selectedTemplateSummary" class="selected-summary" data-i18n="template.chooseContinue">Choose a template to continue.</div><button id="goToEditorBtn" class="primary" type="button" data-i18n="template.continueEditor">Continue to Editor</button></div>
     </div>
   </section>
 
   <section id="editorPage" class="page">
     <header class="topbar">
-      <div><button id="backToTemplatesBtn" type="button">&larr; Back to template selection</button><h1 id="editorClubTitle">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
-      <button id="logoutBtn5" type="button">Sign out</button>
+      <div><button id="backToTemplatesBtn" type="button" data-i18n="nav.backToTemplates">&larr; Back to template selection</button><h1 id="editorClubTitle" data-i18n="editor.createMessage">Create your message</h1><p id="editorTemplateMeta" class="sub"></p></div>
+      <button id="logoutBtn5" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
     <div class="composer">
       <div class="card">
-        <h2>Message</h2>
-        <label>Main message<textarea id="mainText" rows="3" maxlength="160" placeholder="Enter ShoutOut Here (emoji OK)"></textarea></label>
+        <h2 data-i18n="editor.messageHeading">Message</h2>
+        <label>Main message<textarea id="mainText" rows="3" maxlength="160" data-i18n-placeholder="editor.mainPlaceholder" placeholder="Enter ShoutOut Here (emoji OK)"></textarea></label>
         <div id="soccerJerseyFields" class="soccer-jersey-fields hidden">
           <label>Team / club
             <select id="soccerTeamId" aria-describedby="soccerTeamHint">
@@ -713,7 +713,7 @@
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
-<script src="./floqr-i18n.js?v=s3.0.28"></script>
+<script src="./floqr-i18n.js?v=s3.0.83"></script>
 <script src="./floqai-help-repository.js?v=s3.0.27"></script>
 <script src="./floqr-i18n-help.js?v=s3.0.28"></script>
 <script src="./intent-search.js?v=s3.0.59"></script>
@@ -743,7 +743,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.80"></script>
+<script src="./patron-app.js?v=s3.0.83"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>
