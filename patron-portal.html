@@ -10,7 +10,7 @@
 </head>
 <body>
 <main class="app admin-shell">
-  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search">&larr; Back to Search</a>
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?v=29.09.8&start=search" data-i18n="nav.backToSearchArrow">&larr; Back to Search</a>
   <section class="page active">
     <header class="topbar">
       <div>
@@ -57,7 +57,7 @@
           <div class="metric-card"><span>Member Since</span><strong id="metricMemberSince">&mdash;</strong></div>
         </div>
         <div class="card">
-          <h2>Profile Summary</h2>
+          <h2 data-i18n="portal.profileSummary">Profile Summary</h2>
           <div id="profileSummary" class="report-block"></div>
         </div>
         <div id="staffCalendarCard" class="card hidden">
@@ -66,15 +66,16 @@
             data-floqr-help-title="Work Calendar"
             data-floqr-help-search="work calendar|staff calendar|work sheet|weekly staff calendar"
             data-floqr-help-body="Work Calendar is a Settings tab for elected service members at a club with staffSchedulingPaid=1. Open it to see published colleague shifts. Drafts stay in Club Admin."
+          data-i18n="nav.workCalendar"
           >Work Calendar</h2>
-          <p class="sub small" data-keep-visible="true">Use the Work Calendar tab for the weekly published roster.</p>
+          <p class="sub small" data-keep-visible="true" data-i18n="portal.workCalendarOverviewHint">Use the Work Calendar tab for the weekly published roster.</p>
         </div>
       </section>
 
       <section id="portalProfile" class="admin-panel-section">
         <div class="card">
-          <h2>Edit Profile</h2>
-          <p class="sub small">Use legal first and last name for guest lists where ID checks are required.</p>
+          <h2 data-i18n="portal.editProfile">Edit Profile</h2>
+          <p class="sub small" data-i18n="portal.editProfileLegalHint">Use legal first and last name for guest lists where ID checks are required.</p>
           <div class="profile-grid">
             <label>First Name <input id="editFirstName"/></label>
             <label>Last Name <input id="editLastName"/></label>
@@ -264,18 +265,22 @@
 
       <section id="portalPublicProfile" class="admin-panel-section">
         <div class="card">
-          <h2>Public Media and Data Sharing</h2>
-          <p class="sub small">Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.</p>
+          <h2
+            data-i18n="nav.publicMedia"
+            data-floqr-help-id="help-public-media-sharing"
+            data-floqr-help-title="Public Media and Data Sharing"
+            data-floqr-help-search="public media|profile media|upload photos|profile pictures|data sharing"
+            data-floqr-help-body="Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.">Public Media and Data Sharing</h2>
           <div id="profileTemplatePreview" class="profile-template-preview"></div>
         </div>
         <div class="card">
-          <h2>Profile Media</h2>
-          <p class="sub small">Use the single upload control to select multiple files. Move items up or down to control their public-profile order; the first item becomes the hero media.</p>
-          <label>Choose profile media
+          <h2 data-i18n="portal.publicMedia.profileMediaTitle">Profile Media</h2>
+          <p class="sub small" data-i18n="portal.publicMedia.profileMediaHint" data-keep-visible="true">Use the single upload control to select multiple files. Move items up or down to control their public-profile order; the first item becomes the hero media.</p>
+          <label data-i18n="portal.publicMedia.chooseMedia">Choose profile media
             <input id="profileMediaBatchInput" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple/>
           </label>
           <div id="profileMediaSlots" class="profile-media-grid"></div>
-          <button id="saveMediaSlotsBtn" class="primary" type="button">Save Media and Order</button>
+          <button id="saveMediaSlotsBtn" class="primary" type="button" data-i18n="portal.publicMedia.saveBtn">Save Media and Order</button>
         </div>
       </section>
 
@@ -360,7 +365,7 @@
           </div>
         </div>
       </section>
-      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2>Paid Services & Orders</h2><p class="sub small">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
+      <section id="portalPaidServices" class="admin-panel-section"><div class="card"><h2 data-i18n="nav.paidServices">Paid Services & Orders</h2><p class="sub small" data-i18n="portal.paidServices.sub">Track payment, invoice, fulfillment, and shipping status for ShoutOuts, targeted campaigns, SMS services, and BartR orders. FloqR collects payment; vendors ship.</p><div id="paidServicesReport" class="report-block"></div></div></section>
 
       <section id="portalBartrStore" class="admin-panel-section">
         <div class="card">
@@ -465,10 +470,10 @@
       </section>
 
       <section id="portalChats" class="admin-panel-section hidden" aria-hidden="true">
-        <div class="card"><h2>Mingl Chat <span id="chatCountLabel">(0/0)</span></h2><p class="sub small">Open a mutual Mingl chat in its own page.</p><div id="myChats" class="report-block"></div></div>
+        <div class="card"><h2><span data-i18n="portal.minglChat.title">Mingl Chat</span> <span id="chatCountLabel">(0/0)</span></h2><p class="sub small" data-i18n="portal.minglChat.sub">Open a mutual Mingl chat in its own page.</p><div id="myChats" class="report-block"></div></div>
         <div class="card mingl-dashboard-card">
-          <h2>Mingl Requests</h2>
-          <p class="sub small">Sent and received Friend or Mingl Requests appear here after the chat list.</p>
+          <h2 data-i18n="portal.minglRequests.title">Mingl Requests</h2>
+          <p class="sub small" data-i18n="portal.minglRequests.sub">Sent and received Friend or Mingl Requests appear here after the chat list.</p>
           <div class="mingl-control-grid">
             <details id="minglRequestsDetails" class="mingl-action-details">
               <summary id="minglRequestsSummaryButton">Mingl Requests</summary>
@@ -630,7 +635,7 @@
       <section id="portalPrivacy" class="admin-panel-section">
         <div class="card">
           <h2 data-i18n="nav.myPrivacy">My Privacy</h2>
-          <p class="sub small">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
+          <p class="sub small" data-i18n="portal.privacyIntro">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
           <div class="profile-grid">
             <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
             <label class="consent-checkbox"><input id="privacyAnalytics" type="checkbox"/><span>Analytics consent</span></label>
@@ -680,8 +685,8 @@
       </section>
       <section id="portalWorkCalendar" class="admin-panel-section">
         <div class="card">
-          <h2 id="portalWorkCalendarHeading">Work Calendar</h2>
-          <p class="sub small" data-keep-visible="true">Pending assignments need your tick + Approve selected. The Inbox link only opens this page. The week grid shows published colleague shifts; drafts stay in Club Admin.</p>
+          <h2 id="portalWorkCalendarHeading" data-i18n="nav.workCalendar">Work Calendar</h2>
+          <p class="sub small" data-keep-visible="true" data-i18n="portal.workCalendar.sub">Pending assignments need your tick + Approve selected. The Inbox link only opens this page. The week grid shows published colleague shifts; drafts stay in Club Admin.</p>
           <iframe id="portalWorkCalendarFrame" class="work-calendar-frame" title="Work Calendar" src="./staff-worksheet.html?v=s3.0.5&embed=1&from=portal"></iframe>
         </div>
       </section>
@@ -765,9 +770,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.76"></script>
-<script src="./floqai-help-repository.js?v=s3.0.76"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.76"></script>
+<script src="./floqr-i18n.js?v=s3.0.85"></script>
+<script src="./floqai-help-repository.js?v=s3.0.85"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.85"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>

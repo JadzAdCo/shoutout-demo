@@ -158,5 +158,9 @@
   "help-club-in-app-marketing": {
     "title": "In-app marketing",
     "body": "Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required."
+  },
+  "help-public-media-sharing": {
+    "title": "Public Media and Data Sharing",
+    "body": "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos."
   }
 }

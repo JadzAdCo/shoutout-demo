@@ -158,5 +158,9 @@
   "help-club-in-app-marketing": {
     "title": "Marketing in-app",
     "body": "Opublikuj spot interstitial w puli reklam FLOQR (Mingl, RydR, kluby, sloty ShoutOut). Szablony z nadchodzących wydarzeń lokalu. Bez kredytu SMS."
+  },
+  "help-public-media-sharing": {
+    "title": "Udostępnianie mediów publicznych i danych",
+    "body": "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
   }
 }

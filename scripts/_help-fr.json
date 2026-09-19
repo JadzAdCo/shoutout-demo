@@ -120,7 +120,7 @@
     "body": "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
   },
   "help-my-profile": {
-    "title": "My Profile & Settings",
+    "title": "Mon profil et paramètres",
     "body": "Ouvrez My Profile & Settings pour les rôles, les outils de vendeur et les options de compte."
   },
   "help-onboarding": {
@@ -158,5 +158,9 @@
   "help-club-in-app-marketing": {
     "title": "Marketing in-app",
     "body": "Publiez une annonce spot interstitielle dans le pool FLOQR (Mingl, RydR, clubs, emplacements ShoutOut). Modèles basés sur les événements du lieu. Aucun crédit SMS requis."
+  },
+  "help-public-media-sharing": {
+    "title": "Médias publics et partage",
+    "body": "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
   }
 }

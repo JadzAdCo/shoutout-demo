@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.0.81";
+  const VERSION = "s3.0.85";
 
   const packs = {
     ru: {
@@ -165,6 +165,10 @@
       "help-club-in-app-marketing": {
         title: "In-app маркетинг",
         body: "Опубликуйте spot interstitial в пуле рекламы FLOQR (Mingl, RydR, клубы, слоты ShoutOut). Шаблоны по предстоящим событиям площадки. Кредиты SMS не нужны."
+      },
+      "help-public-media-sharing": {
+        title: "Публичные медиа и обмен данными",
+        body: "Выберите несколько изображений или коротких видео сразу, затем задайте их порядок в публичном профиле. Профили поддерживают до 8 изображений и 2 коротких видео."
       }
     },
     nl: {
@@ -327,6 +331,10 @@
       "help-club-in-app-marketing": {
         title: "In-app marketing",
         body: "Publiceer een interstitiale spot-ad in de FLOQR-advertentiepool (Mingl, RydR, clubs, shoutout-slots). Sjablonen op basis van komende events. Geen SMS-tegoed nodig."
+      },
+      "help-public-media-sharing": {
+        title: "Openbare media en gegevensdeling",
+        body: "Kies meerdere afbeeldingen of korte video's tegelijk en rangschik daarna hun volgorde op het openbare profiel. Profielen ondersteunen tot 8 afbeeldingen en 2 korte video's."
       }
     },
     fr: {
@@ -451,7 +459,7 @@
         body: "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
       },
       "help-my-profile": {
-        title: "My Profile & Settings",
+        title: "Mon profil et paramètres",
         body: "Ouvrez My Profile & Settings pour les rôles, les outils de vendeur et les options de compte."
       },
       "help-onboarding": {
@@ -489,6 +497,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Publiez une annonce spot interstitielle dans le pool FLOQR (Mingl, RydR, clubs, emplacements ShoutOut). Modèles basés sur les événements du lieu. Aucun crédit SMS requis."
+      },
+      "help-public-media-sharing": {
+        title: "Médias publics et partage",
+        body: "Choisissez plusieurs images ou courtes vidéos à la fois, puis organisez leur ordre sur le profil public. Les profils acceptent jusqu'à 8 images et 2 courtes vidéos."
       }
     },
     de: {
@@ -651,6 +663,10 @@
       "help-club-in-app-marketing": {
         title: "In-App-Marketing",
         body: "Veröffentlichen Sie eine Spot-Interstitial-Anzeige im FLOQR-Werbe-Pool (Mingl, RydR, Clubs, ShoutOut-Slots). Vorlagen aus kommenden Events des Standorts. Kein SMS-Guthaben nötig."
+      },
+      "help-public-media-sharing": {
+        title: "Öffentliche Medien und Datenfreigabe",
+        body: "Wähle mehrere Bilder oder kurze Videos auf einmal aus und lege dann ihre Reihenfolge im öffentlichen Profil fest. Profile unterstützen bis zu 8 Bilder und 2 kurze Videos."
       }
     },
     es: {
@@ -813,6 +829,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Publique un anuncio spot intersticial en el pool FLOQR (Mingl, RydR, clubs, slots ShoutOut). Plantillas según eventos del local. No requiere créditos SMS."
+      },
+      "help-public-media-sharing": {
+        title: "Medios públicos y uso compartido de datos",
+        body: "Elige varias imágenes o videos cortos a la vez y luego ordena su posición en el perfil público. Los perfiles admiten hasta 8 imágenes y 2 videos cortos."
       }
     },
     it: {
@@ -975,6 +995,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Pubblica uno spot interstitial nel pool pubblicitario FLOQR (Mingl, RydR, club, slot ShoutOut). Modelli dagli eventi in programma. Nessun credito SMS richiesto."
+      },
+      "help-public-media-sharing": {
+        title: "Public Media and Data Sharing",
+        body: "Scegli più immagini o brevi video insieme, poi definisci l'ordine nel profilo pubblico. I profili supportano fino a 8 immagini e 2 brevi video."
       }
     },
     pt: {
@@ -1137,6 +1161,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Publique um spot interstitial no pool FLOQR (Mingl, RydR, clubes, slots ShoutOut). Modelos com base nos eventos do local. Sem créditos SMS."
+      },
+      "help-public-media-sharing": {
+        title: "Mídia pública e compartilhamento de dados",
+        body: "Escolha várias imagens ou vídeos curtos de uma vez e organize a ordem no perfil público. Os perfis suportam até 8 imagens e 2 vídeos curtos."
       }
     },
     el: {
@@ -1299,6 +1327,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Δημοσιεύστε spot interstitial στο pool διαφημίσεων FLOQR (Mingl, RydR, clubs, θέσεις ShoutOut). Πρότυπα από επερχόμενα events. Δεν απαιτούνται πίστωση SMS."
+      },
+      "help-public-media-sharing": {
+        title: "Δημόσια Μέσα και Κοινοποίηση Δεδομένων",
+        body: "Επιλέξτε πολλές εικόνες ή σύντομα βίντεο μαζί και στη συνέχεια ρυθμίστε τη σειρά τους στο δημόσιο προφίλ. Τα προφίλ υποστηρίζουν έως 8 εικόνες και 2 σύντομα βίντεο."
       }
     },
     pl: {
@@ -1461,6 +1493,10 @@
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
         body: "Opublikuj spot interstitial w puli reklam FLOQR (Mingl, RydR, kluby, sloty ShoutOut). Szablony z nadchodzących wydarzeń lokalu. Bez kredytu SMS."
+      },
+      "help-public-media-sharing": {
+        title: "Udostępnianie mediów publicznych i danych",
+        body: "Wybierz kilka obrazów lub krótkich filmów naraz, a następnie ułóż ich kolejność w profilu publicznym. Profile obsługują do 8 obrazów i 2 krótkich filmów."
       }
     },
     ar: {
@@ -1623,6 +1659,10 @@
       "help-club-in-app-marketing": {
         title: "التسويق داخل التطبيق",
         body: "انشر إعلان spot بينيًا في مجمع إعلانات FLOQR (Mingl وRydR والأندية ومواقع ShoutOut). قوالب من فعاليات المكان القادمة. لا يلزم رصيد SMS."
+      },
+      "help-public-media-sharing": {
+        title: "وسائل الإعلام العامة ومشاركة البيانات",
+        body: "اختر عدة صور أو مقاطع فيديو قصيرة دفعة واحدة، ثم رتّب ترتيبها في الملف العام. تدعم الملفات حتى 8 صور ومقطعي فيديو قصيرين."
       }
     }
   };
