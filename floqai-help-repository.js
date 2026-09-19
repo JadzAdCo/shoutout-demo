@@ -871,6 +871,20 @@
       page: "master-admin.html#entityManagement"
     },
     {
+      id: "help-public-media-sharing",
+      title: "Public Media and Data Sharing",
+      body: "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.",
+      searchPhrases: [
+        "public media", "profile media", "upload photos", "profile pictures", "data sharing",
+        "public profile media", "8 photos", "profile videos"
+      ],
+      links: [
+        {label: "Public Media and Data Sharing", href: vUrl("./patron-portal.html", {from: "floqai", tab: "public-profile"}), search: "public media"}
+      ],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPublicProfile"
+    },
+    {
       id: "help-app-language",
       title: "App language",
       body: "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card.",

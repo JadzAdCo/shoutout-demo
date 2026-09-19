@@ -1390,24 +1390,24 @@
 
     byId("listingType").value = type;
     byId("listingTitle").textContent =
-      type === "events" ? "Search Events" :
-      type === "shoutout" ? "Choose Location for ShoutOut" :
+      type === "events" ? tt("listing.searchEvents", {}, "Search Events") :
+      type === "shoutout" ? tt("listing.chooseLocationShoutout", {}, "Choose Location for ShoutOut") :
       type.startsWith("club-action:") ? type.replace("club-action:","").replaceAll("-"," ").replace(/\b\w/g, c => c.toUpperCase()) :
-      "Search";
+      tt("listing.searchClubs", {}, "Search Clubs");
     byId("listingIntro").textContent =
-      type === "shoutout" ? "Pick the exact location where your ShoutOut should appear." :
-      type.startsWith("club-action:") ? "Select the exact venue/location for this action. Payment and booking integration will be connected later." :
-      "Search naturally by city, country, venue, genre, artist, event day, or activity time.";
+      type === "shoutout" ? tt("listing.introShoutout", {}, "Pick the exact location where your ShoutOut should appear.") :
+      type.startsWith("club-action:") ? tt("listing.introClubAction", {}, "Select the exact venue/location for this action. Payment and booking integration will be connected later.") :
+      tt("listing.intro", {}, "Search naturally by city, country, venue, genre, artist, event day, or activity date.");
     showListing();
   }
 
   function populateFilters() {
     const country = byId("countryFilter"), region = byId("regionFilter"), city = byId("cityFilter"), genre = byId("genreFilter");
     if (!country) return;
-    country.innerHTML = '<option value="">All countries</option>';
-    region.innerHTML = '<option value="">All states / regions</option>';
-    city.innerHTML = '<option value="">All cities</option>';
-    genre.innerHTML = '<option value="">All genres</option>';
+    country.innerHTML = `<option value="">${esc(tt("listing.filter.allCountries", {}, "All countries"))}</option>`;
+    region.innerHTML = `<option value="">${esc(tt("listing.filter.allRegions", {}, "All states / regions"))}</option>`;
+    city.innerHTML = `<option value="">${esc(tt("listing.filter.allCities", {}, "All cities"))}</option>`;
+    genre.innerHTML = `<option value="">${esc(tt("listing.filter.allGenres", {}, "All genres"))}</option>`;
     const source = byId("listingType").value === "events" ? Object.values(events) : Object.values(locations);
     unique(source.map(x => x.country)).forEach(x => country.append(new Option(x,x)));
     unique(source.map(x => x.region)).forEach(x => region.append(new Option(x,x)));
@@ -2794,7 +2794,14 @@
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
-    setText("locationRankingStatus", `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`);
+    setText(
+      "locationRankingStatus",
+      tt(
+        "listing.rankingActive",
+        { source: context.source || context.locationSource || "profile/browser" },
+        `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`
+      )
+    );
     const matches = ranked
       .map(record => [record.id, record.data || events[record.id]])
       .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)));
@@ -2824,7 +2831,14 @@
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
-    setText("locationRankingStatus", `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`);
+    setText(
+      "locationRankingStatus",
+      tt(
+        "listing.rankingActive",
+        { source: context.source || context.locationSource || "profile/browser" },
+        `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`
+      )
+    );
     const matches = ranked.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
       if (!l) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
@@ -2841,7 +2855,15 @@
     matches.forEach(([id,l]) => {
       const card = document.createElement("div");
       card.className = "club-option";
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.8">View Club</a><button class="primary" type="button">${type === "shoutout" ? "Throw ShoutOut Here" : type.startsWith("club-action:") ? "Continue" : "Select"}</button></div>`;
+      const viewClubLabel = esc(tt("listing.viewClub", {}, "View Club"));
+      const actionLabel = esc(
+        type === "shoutout"
+          ? tt("listing.throwShoutoutHere", {}, "Throw ShoutOut Here")
+          : type.startsWith("club-action:")
+            ? tt("listing.continue", {}, "Continue")
+            : tt("listing.select", {}, "Select")
+      );
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.8">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });
