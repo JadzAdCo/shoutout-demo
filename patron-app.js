@@ -2975,15 +2975,15 @@
     const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
     const jerseyTagLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
-      : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? "Image/video placeholder" : "No image/video")));
+      : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? tt("template.mediaPlaceholder", {}, "Image/video placeholder") : tt("template.noMedia", {}, "No image/video"))));
     return `<div class="template ${esc(template.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-template-id="${esc(template.id)}" data-soccer-team-id="${esc(template.sport === "soccer" && template.id !== "soccerJersey" ? template.id : "")}">
       ${jerseyMiniPreview(template)}
       <div class="name">${esc(template.name)}</div>
       <div class="tag">${esc(jerseyTagLine)}</div>
       <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
-        <button type="button" data-template-open="${esc(template.id)}">Use</button>
-        ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">Customize Background</button>` : `<span class="template-background-lock">${template.backgroundEditable === false ? "Background locked" : "Club customization off"}</span>`}
+        <button type="button" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
+        ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">${esc(tt("template.customizeBackground", {}, "Customize Background"))}</button>` : `<span class="template-background-lock">${esc(template.backgroundEditable === false ? tt("template.backgroundLocked", {}, "Background locked") : tt("template.clubCustomizationOff", {}, "Club customization off"))}</span>`}
       </div>
     </div>`;
   }
@@ -2993,10 +2993,10 @@
     const style = window.FLOQRStudio?.variantBackgroundStyle ? window.FLOQRStudio.variantBackgroundStyle(variant) : "";
     return `<div class="template ${esc(base.className || "neon")} ${selected ? "selected" : ""}" role="button" tabindex="0" data-variant-id="${esc(variant.id || variant.variantId || "")}" data-base-template-id="${esc(variant.baseTemplateId || base.id)}">
       <div class="template-mini-preview" style="${esc(style)}"><strong>${esc(base.defaultMain || "SHOUTOUT")}</strong><span>${esc(variant.variantName || base.category || "")}</span></div>
-      <div class="name">${esc(variant.variantName || "Saved Background")}</div>
-      <div class="tag">${esc(variant.baseTemplateName || base.name)}${scope === "mine" ? " - Mine" : scope === "club" ? " - Club approved" : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
+      <div class="name">${esc(variant.variantName || tt("template.variantSavedBackground", {}, "Saved Background"))}</div>
+      <div class="tag">${esc(variant.baseTemplateName || base.name)}${scope === "mine" ? tt("template.variantScopeMine", {}, " - Mine") : scope === "club" ? tt("template.variantScopeClub", {}, " - Club approved") : ` - ${esc(variant.ownerDisplayName || "Community")}`}</div>
       <div class="tag-row">${(variant.tags || []).slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
-      <button type="button" data-variant-open="${esc(variant.id || variant.variantId || "")}">Use Template</button>
+      <button type="button" data-variant-open="${esc(variant.id || variant.variantId || "")}">${esc(tt("template.useTemplate", {}, "Use Template"))}</button>
     </div>`;
   }
   async function renderTemplates() {
@@ -3039,24 +3039,18 @@
       grid.innerHTML = `
         <section class="template-section template-section-default">
           <div class="section-heading-row template-heading-row">
-            <h3 data-floqr-help-id="help-default-template"
-                data-floqr-help-title="Default Template"
-                data-floqr-help-search="default template|black and white|classic shoutout"
-                data-floqr-help-body="Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.">Default Template</h3>
+            <h3 data-floqr-help-id="help-default-template">${esc(tt("template.defaultSection", {}, "Default Template"))}</h3>
           </div>
-          <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : '<div class="empty">No default template is available.</div>'}</div>
+          <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : `<div class="empty">${esc(tt("template.noDefaultAvailable", {}, "No default template is available."))}</div>`}</div>
         </section>
         <section class="template-section template-section-floqai" id="templateFloqAiHost">
           <div class="section-heading-row template-heading-row">
-            <h3 data-floqr-help-id="help-floqai-template-search"
-                data-floqr-help-title="FloqAi template search"
-                data-floqr-help-search="floqai template|sports jersey|nba nfl cars humor"
-                data-floqr-help-body="Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.">FloqAi template search</h3>
+            <h3 data-floqr-help-id="help-floqai-template-search">${esc(tt("template.floqaiSection", {}, "FloqAi template search"))}</h3>
           </div>
           <div id="templateFloqAiMount" class="template-floqai-mount"></div>
         </section>
-        ${club.length ? `<section class="template-section"><h3>Club-Approved Backgrounds</h3><p class="sub small" data-keep-visible="true">Customized by this club's admins.</p><div class="template-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization. Original and club-approved templates remain available.</p>'}`;
+        ${club.length ? `<section class="template-section"><h3>${esc(tt("template.clubApproved", {}, "Club-Approved Backgrounds"))}</h3><p class="sub small" data-keep-visible="true">${esc(tt("template.clubApprovedHint", {}, "Customized by this club's admins."))}</p><div class="template-grid">${club.map(variant => variantCard(variant, "club")).join("")}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicy", {}, "This club has disabled patron background customization. Original and club-approved templates remain available."))}</p>`}`;
       window.FLOQRFloqAi?.ensureTemplateMode?.();
     } else {
       const [officialRecords, clubRecords, mineRecords, communityRecords] = window.floqrSearch ? await Promise.all([
@@ -3072,11 +3066,11 @@
       const mineHtml = mineRecords.map(record => variantCard(record.data, "mine")).join("");
       const communityHtml = communityRecords.map(record => variantCard(record.data, "community")).join("");
       grid.innerHTML = `
-        <section class="template-section"><h3>Matching Official FLOQR Templates</h3><div class="template-grid">${officialHtml || '<div class="empty">No official templates matched.</div>'}</div></section>
-        ${clubHtml ? `<section class="template-section"><h3>Matching Club-Approved Backgrounds</h3><div class="template-grid">${clubHtml}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() && mineHtml ? `<section class="template-section"><h3>My Matching Backgrounds</h3><div class="template-grid">${mineHtml}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() && communityHtml ? `<section class="template-section"><h3>Matching Community Backgrounds</h3><div class="template-grid">${communityHtml}</div></section>` : ""}
-        ${clubAllowsPatronBackgroundEditing() ? "" : '<p class="template-background-policy-note">This club has disabled patron background customization.</p>'}`;
+        <section class="template-section"><h3>${esc(tt("template.matchingOfficial", {}, "Matching Official FLOQR Templates"))}</h3><div class="template-grid">${officialHtml || `<div class="empty">${esc(tt("template.noOfficialMatch", {}, "No official templates matched."))}</div>`}</div></section>
+        ${clubHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingClubApproved", {}, "Matching Club-Approved Backgrounds"))}</h3><div class="template-grid">${clubHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() && mineHtml ? `<section class="template-section"><h3>${esc(tt("template.myMatchingBackgrounds", {}, "My Matching Backgrounds"))}</h3><div class="template-grid">${mineHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() && communityHtml ? `<section class="template-section"><h3>${esc(tt("template.matchingCommunity", {}, "Matching Community Backgrounds"))}</h3><div class="template-grid">${communityHtml}</div></section>` : ""}
+        ${clubAllowsPatronBackgroundEditing() ? "" : `<p class="template-background-policy-note">${esc(tt("template.clubCustomizationPolicyNote", {}, "This club has disabled patron background customization."))}</p>`}`;
     }
     window.FLOQRHelpAttach?.mountAll?.(grid);
     grid.querySelectorAll("[data-template-open]").forEach(btn => btn.addEventListener("click", event => {

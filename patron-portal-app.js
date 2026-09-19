@@ -333,6 +333,10 @@
         bartr:"portalBartrStore",
         commerce:"portalBartrStore",
         store:"portalBartrStore",
+        "ad-campaigns":"portalAdCampaigns",
+        adcampaigns:"portalAdCampaigns",
+        advertise:"portalAdCampaigns",
+        ads:"portalAdCampaigns",
         "mingl-friends":"portalMinglFriends",
         friends:"portalMinglFriends",
         unmingl:"portalMinglFriends",
@@ -1292,6 +1296,14 @@
     if (byId("editBirthDay")) byId("editBirthDay").value = profile.birthDay || "";
     byId("editInstagram").value = profile.instagramHandle || "";
     byId("editX").value = profile.xHandle || "";
+    const accountType = String(profile.accountType || "").toLowerCase() === "business"
+      || profile.IsBusinessAccount === 1
+      || profile.IsBusinessAccount === true
+      ? "business"
+      : "personal";
+    if (byId("editAccountType")) byId("editAccountType").value = accountType;
+    if (byId("editBusinessName")) byId("editBusinessName").value = profile.businessName || "";
+    byId("editBusinessNameWrap")?.classList.toggle("hidden", accountType !== "business");
     byId("editProfileType").value = profile.publicProfileType || "patron";
     byId("editProfileVisibility").value = profile.publicProfileVisibility || "followers";
     byId("editPublicProfileLanguageMode").value = profile.publicProfileLanguageMode || "preferred";
@@ -1578,6 +1590,11 @@
       birthDay: byId("editBirthDay")?.value || "",
       instagramHandle: window.FLOQRIdentity?.normalizeInstagramHandle?.(byId("editInstagram").value) || "",
       xHandle: byId("editX").value.trim(),
+      accountType: byId("editAccountType")?.value === "business" ? "business" : "personal",
+      IsBusinessAccount: byId("editAccountType")?.value === "business" ? 1 : 0,
+      businessName: byId("editAccountType")?.value === "business"
+        ? (byId("editBusinessName")?.value.trim() || byId("editDisplayName")?.value.trim() || "")
+        : "",
       publicProfileType: byId("editProfileType").value,
       publicProfileVisibility: byId("editProfileVisibility").value,
       publicProfileLanguageMode: byId("editPublicProfileLanguageMode").value,
@@ -1599,6 +1616,10 @@
     updates.fullName = `${updates.firstName} ${updates.lastName}`.trim();
     if (byId("editCommerceEnabled")?.checked && !isUsMarketplaceEligible(updates)) {
       setText("portalStatus", "BartR seller store is limited to U.S.-based patrons and service members.");
+      return;
+    }
+    if (updates.accountType === "business" && !updates.businessName) {
+      setText("portalStatus", "Add a business name when electing a business account.");
       return;
     }
     await db.collection("users").doc(user.uid).set(updates, {merge:true});
@@ -3953,21 +3974,29 @@
     setText("chatCountLabel", `(${unreadChats}/${chats.length})`);
 
     byId("profileSummary").innerHTML = simpleRows([
-      ["Name", profile.fullName || profile.displayName || user.displayName || "-"],
-      ["Email", user.email || "-"],
-      ["City", profile.city || "-"],
-      ["Country", profile.country || "-"],
-      ["Gender", profile.gender || "-"],
-      ["Height", heightDisplay(profile) || "-"],
-      ["Food Choices", joinCSV(profile.foodChoices) || "-"],
-      ["Favorite Beverages", joinCSV(profile.favoriteBeverages) || "-"],
-      ["Preferred Language", profile.preferredLanguage || "-"],
-      ["Public Profile Language", publicProfileLanguageLabel(profile)],
-      ["English Translation", profile.publicProfileTranslationStatus || "not prepared"],
-      ["Member Type", memberTypeLabel(profile)],
-      ["Public Profile", ROLE_LABELS[profile.publicProfileType || "patron"]],
-      ["Visibility", profile.publicProfileVisibility || "followers"]
+      [tt("portal.field.name", {}, "Name"), profile.fullName || profile.displayName || user.displayName || "-"],
+      [tt("portal.field.email", {}, "Email"), user.email || "-"],
+      [tt("portal.field.city", {}, "City"), profile.city || "-"],
+      [tt("portal.field.country", {}, "Country"), profile.country || "-"],
+      [tt("portal.field.gender", {}, "Gender"), profile.gender || "-"],
+      [tt("portal.field.height", {}, "Height"), heightDisplay(profile) || "-"],
+      [tt("portal.field.foodChoices", {}, "Food Choices"), joinCSV(profile.foodChoices) || "-"],
+      [tt("portal.field.favoriteBeverages", {}, "Favorite Beverages"), joinCSV(profile.favoriteBeverages) || "-"],
+      [tt("portal.field.preferredLanguage", {}, "Preferred Language"), profile.preferredLanguage || "-"],
+      [tt("portal.field.publicProfileLanguage", {}, "Public Profile Language"), publicProfileLanguageLabel(profile)],
+      [tt("portal.field.englishTranslation", {}, "English Translation"), profile.publicProfileTranslationStatus || "not prepared"],
+      [tt("portal.field.memberType", {}, "Member Type"), memberTypeLabel(profile)],
+      [tt("portal.field.accountType", {}, "Account type"), String(profile.accountType || "").toLowerCase() === "business" || profile.IsBusinessAccount === 1 ? `Business${profile.businessName ? ` · ${profile.businessName}` : ""}` : "Personal"],
+      [tt("portal.field.publicProfile", {}, "Public Profile"), ROLE_LABELS[profile.publicProfileType || "patron"]],
+      [tt("portal.field.visibility", {}, "Visibility"), profile.publicProfileVisibility || "followers"]
     ]);
+    const businessOk = window.FLOQRPatronAdCampaigns?.showPanel?.(currentProfile);
+    if (businessOk && !window.__floqrPatronAdsBound) {
+      window.FLOQRPatronAdCampaigns.bind(currentProfile, user);
+      window.__floqrPatronAdsBound = true;
+    } else if (businessOk) {
+      window.FLOQRPatronAdCampaigns.refreshMine?.(user);
+    }
     if (byId("paidServicesReport")) byId("paidServicesReport").innerHTML = serviceOrders.length ? serviceOrders.sort((a,b) => Number(b.createdAt?.seconds || 0) - Number(a.createdAt?.seconds || 0)).map(order => `<div class="queue-item"><div class="message-envelope-head"><strong>${esc(order.itemName || order.orderType || "FLOQR service")}</strong><span>${esc(order.paymentStatus || order.status || "pending")}</span></div><p>${esc(order.invoiceNumber || order.id)}</p><small>Total: $${(Number(order.amountCents || 0)/100).toFixed(2)} - Fulfillment: ${esc(order.fulfillmentStatus || order.shippingStatus || "pending")}${order.trackingNumber ? ` - Tracking: ${esc(order.trackingNumber)}` : ""}</small></div>`).join("") : "<p class='sub'>No paid services or BartR orders yet.</p>";
 
     currentShoutouts = applyShoutoutHistoryRetention(shoutouts);
@@ -4130,6 +4159,10 @@
     setupTabs();
     bind("portalGoogleLoginBtn", loginGoogle);
     bind("saveProfileBtn", saveProfile);
+    byId("editAccountType")?.addEventListener("change", () => {
+      const business = byId("editAccountType")?.value === "business";
+      byId("editBusinessNameWrap")?.classList.toggle("hidden", !business);
+    });
     window.FLOQRIdentity?.bindInstagramInput?.(byId("editInstagram"));
     window.FLOQRIdentity?.bindFloqrHandleInput?.(byId("editFloqrHandle"));
     window.FLOQRIdentity?.attachHelpPopout?.(byId("editFloqrHandleHelp"), window.FLOQRIdentity?.FLOQR_HANDLE_HELP);
