@@ -26,6 +26,17 @@
   const SHOW_MS = 3000;
   const HIDE_MS = 3000;
 
+  function tt(key, vars, fallback) {
+    try {
+      const fn = global.FLOQRI18n?.t;
+      if (typeof fn === "function") {
+        const out = fn(key, vars || {});
+        if (out && out !== key) return out;
+      }
+    } catch (_) {}
+    return fallback != null ? fallback : key;
+  }
+
   let activeMode = "intent";
   let templateIntroStep = 0;
 
@@ -382,7 +393,7 @@
     else boundController.setMode?.("templates");
     const mount = document.getElementById("templateFloqAiMount");
     if (mount) {
-      mount.innerHTML = '<p class="floqai-template-hint" data-keep-visible="true">FloqAi floats on this screen — tap the glowing mark to search templates, or wait for its tips.</p>';
+      mount.innerHTML = `<p class="floqai-template-hint" data-keep-visible="true">${String(tt("template.floqaiHint", {}, "FloqAi floats on this screen — tap the glowing mark to search templates, or wait for its tips.")).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}</p>`;
     }
     const agent = document.getElementById("floqAiAgent");
     agent?.classList.add("is-idle");
