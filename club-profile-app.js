@@ -130,8 +130,16 @@
     byId("clubProfileName").textContent = name;
     byId("clubProfileType").textContent = club.venueType || club.type || "FLOQR Venue";
     byId("clubProfileTagline").textContent = club.tagline || club.publicTagline || "";
-    byId("clubProfileLocation").textContent = window.FLOQRAddress?.publicLocation(club) || club.locationLabel || [club.city, club.country].filter(Boolean).join(", ");
-    byId("clubProfileGenres").innerHTML = (club.genres || []).slice(0,8).map(value => `<span>${esc(value)}</span>`).join("");
+    const Place = window.FLOQRPlaceI18n;
+    byId("clubProfileLocation").textContent =
+      Place?.placeLine?.(club) ||
+      window.FLOQRAddress?.publicLocation(club) ||
+      club.locationLabel ||
+      [club.city, club.country].filter(Boolean).join(", ");
+    byId("clubProfileGenres").innerHTML = (club.genres || []).slice(0, 8).map(value => {
+      const label = Place?.genre?.(value) || value;
+      return `<span>${esc(label)}</span>`;
+    }).join("");
     document.title = `${name} | FLOQR`;
   }
 

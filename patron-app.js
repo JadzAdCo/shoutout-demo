@@ -1409,10 +1409,11 @@
     city.innerHTML = `<option value="">${esc(tt("listing.filter.allCities", {}, "All cities"))}</option>`;
     genre.innerHTML = `<option value="">${esc(tt("listing.filter.allGenres", {}, "All genres"))}</option>`;
     const source = byId("listingType").value === "events" ? Object.values(events) : Object.values(locations);
-    unique(source.map(x => x.country)).forEach(x => country.append(new Option(x,x)));
-    unique(source.map(x => x.region)).forEach(x => region.append(new Option(x,x)));
-    unique(source.map(x => x.city)).forEach(x => city.append(new Option(x,x)));
-    unique(source.flatMap(x => x.genres || [])).forEach(x => genre.append(new Option(x,x)));
+    const Place = window.FLOQRPlaceI18n;
+    unique(source.map(x => x.country)).forEach(x => country.append(new Option(Place?.optionLabel?.("country", x) || x, x)));
+    unique(source.map(x => x.region)).forEach(x => region.append(new Option(Place?.optionLabel?.("region", x) || x, x)));
+    unique(source.map(x => x.city)).forEach(x => city.append(new Option(Place?.optionLabel?.("city", x) || x, x)));
+    unique(source.flatMap(x => x.genres || [])).forEach(x => genre.append(new Option(Place?.optionLabel?.("genre", x) || x, x)));
   }
   function bindFilters() {
     ["locationSearch","countryFilter","regionFilter","cityFilter","genreFilter"].forEach(id => {
@@ -2810,8 +2811,11 @@
       const loc = getLocation(e.locationId);
       const card = document.createElement("div");
       card.className = "club-option";
-      const publicLocation = window.FLOQRAddress?.publicLocation?.(e) || [e.city, e.region || e.stateRegion || e.country].filter(Boolean).join(", ");
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} • ${esc(publicLocation)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc((e.genres||[]).join(" • "))}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button">Buy Ticket / ShoutOut</button>`;
+      const Place = window.FLOQRPlaceI18n;
+      const publicLocationRaw = window.FLOQRAddress?.publicLocation?.(e) || [e.city, e.region || e.stateRegion || e.country].filter(Boolean).join(", ");
+      const publicLocation = Place?.placeLine?.({ city: e.city, region: e.region || e.stateRegion, country: e.country, locationLabel: publicLocationRaw }) || publicLocationRaw;
+      const genreLine = (Place?.genres?.(e.genres) || e.genres || []).join(" • ");
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(e.eventName)}</h3><p>${esc(loc.locationName || e.locationId)} • ${esc(publicLocation)}</p></div><strong>${esc(e.eventDay || "")}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row"><span>${esc(e.eventDate || "")}</span><span>${esc(e.eventTime || "")}</span>${(e.artists||[]).slice(0,2).map(a=>`<span>${esc(a)}</span>`).join("")}</div></div><button class="primary" type="button">Buy Ticket / ShoutOut</button>`;
       card.querySelector("button").addEventListener("click", () => {
         const msg = "Ticket checkout will be connected in the next payment integration. For now, you can throw a ShoutOut at this event location.";
         alert(msg);
@@ -2863,7 +2867,12 @@
             ? tt("listing.continue", {}, "Continue")
             : tt("listing.select", {}, "Select")
       );
-      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(l.locationLabel)}</p></div><strong>${esc(l.country)}</strong></div><p class="dj">${esc((l.genres||[]).join(" • "))}</p><div class="badge-row">${(l.activityDates||[]).slice(0,4).map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.8">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
+      const Place = window.FLOQRPlaceI18n;
+      const placeLine = Place?.placeLine?.(l) || l.locationLabel || [l.city, l.region].filter(Boolean).join(", ");
+      const countryLabel = Place?.country?.(l.country) || l.country;
+      const genreLine = (Place?.genres?.(l.genres) || l.genres || []).join(" • ");
+      const badges = (l.activityDates || []).slice(0, 4).map((x) => Place?.offering?.(x) || x);
+      card.innerHTML = `<div><div class="club-option-head"><div><h3>${esc(l.locationName)}</h3><p>${esc(placeLine)}</p></div><strong>${esc(countryLabel)}</strong></div><p class="dj">${esc(genreLine)}</p><div class="badge-row">${badges.map(x => `<span>${esc(x)}</span>`).join("")}</div></div><div class="queue-actions"><a class="buttonlike" href="./club-profile.html?location=${encodeURIComponent(id)}&v=29.09.8">${viewClubLabel}</a><button class="primary" type="button">${actionLabel}</button></div>`;
       card.querySelector("button").addEventListener("click", () => selectLocationForShoutOut(id));
       grid.appendChild(card);
     });
@@ -2873,7 +2882,10 @@
     selectedLocationId = await resolveLocationAlias(id);
     const loc = await loadLocationById(selectedLocationId);
     setText("selectedClubTitle", loc.locationName);
-    setText("selectedClubMeta", `${loc.locationLabel} • ${(loc.genres||[]).join(" / ")}`);
+    const Place = window.FLOQRPlaceI18n;
+    const metaPlace = Place?.placeLine?.(loc) || loc.locationLabel || "";
+    const metaGenres = (Place?.genres?.(loc.genres) || loc.genres || []).join(" / ");
+    setText("selectedClubMeta", `${metaPlace} • ${metaGenres}`);
     const draft = readReuseShoutoutDraft();
     selectedTemplate = draft?.template || "blackwhite";
     selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
@@ -4383,6 +4395,11 @@
       const minglPage = byId("minglLandingPage");
       if (currentUser && minglPage?.classList.contains("active")) {
         void loadMingl();
+      }
+      const listingPage = byId("listingPage");
+      if (listingPage?.classList.contains("active")) {
+        populateFilters();
+        renderGrid();
       }
     });
   });
