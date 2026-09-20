@@ -130,8 +130,16 @@
     byId("clubProfileName").textContent = name;
     byId("clubProfileType").textContent = club.venueType || club.type || "FLOQR Venue";
     byId("clubProfileTagline").textContent = club.tagline || club.publicTagline || "";
-    byId("clubProfileLocation").textContent = window.FLOQRAddress?.publicLocation(club) || club.locationLabel || [club.city, club.country].filter(Boolean).join(", ");
-    byId("clubProfileGenres").innerHTML = (club.genres || []).slice(0,8).map(value => `<span>${esc(value)}</span>`).join("");
+    const Place = window.FLOQRPlaceI18n;
+    byId("clubProfileLocation").textContent =
+      Place?.placeLine?.(club) ||
+      window.FLOQRAddress?.publicLocation(club) ||
+      club.locationLabel ||
+      [club.city, club.country].filter(Boolean).join(", ");
+    byId("clubProfileGenres").innerHTML = (club.genres || []).slice(0, 8).map(value => {
+      const label = Place?.genre?.(value) || value;
+      return `<span>${esc(label)}</span>`;
+    }).join("");
     document.title = `${name} | FLOQR`;
   }
 
@@ -263,7 +271,7 @@
       }))
       .filter(item => item.slotType === "gallery")
       .sort((a,b) => Number(a.galleryOrder ?? 0) - Number(b.galleryOrder ?? 0))
-      .slice(0,10);
+      .slice(0,16);
     byId("clubProfileGallery").innerHTML = gallery.length ? gallery.map(item => `<figure>${mediaMarkup(item.mediaUrl, item.mediaType, item.title || "Club gallery media", item)}${item.title ? `<figcaption>${esc(item.title)}</figcaption>` : ""}</figure>`).join("") : '<p class="sub">No public gallery media has been published.</p>';
     enforceClubVideoTrims(byId("clubProfileGallery"));
     toggleSection("clubGallerySection", sectionEnabled("gallery") && gallery.length);
