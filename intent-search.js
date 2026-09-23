@@ -11,6 +11,14 @@
 
   const PRODUCT_INTENTS = [
     {
+      id: "ad-campaigns",
+      kind: "product",
+      label: "Advertise on FloqR",
+      blurb: "Business accounts post Inline or Mingl Gist ads for Master Admin approval.",
+      href: vUrl("./patron-portal.html", {from: "search", tab: "ad-campaigns"}),
+      patterns: [/advertise/, /advertis/, /\bads?\b/, /ad\s*campaign/, /sponsor/, /inline\s*ad/, /mingl\s*gist\s*ad/, /business\s*account/, /post\s*(an?\s*)?ad/]
+    },
+    {
       id: "mingl",
       kind: "product",
       label: "Mingl",
@@ -231,24 +239,51 @@
     {
       id: "help-app-language",
       kind: "help",
-      label: "App language / Dutch / browser language",
-      blurb: "First visit uses the browser language when FloqR supports it (including Dutch / Nederlands). Otherwise English. Change it anytime under My Profile → App language.",
+      label: "App language / FloqR webapp language",
+      blurb: "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it under My Profile → Language Settings. Not based on IP or country.",
       steps: [
-        "On first use, FloqR reads navigator.language (nl-NL becomes Dutch).",
+        "On first use, FloqR may adopt the browser language when it is supported.",
         "If that language is not in the app list, chrome stays English.",
-        "Open My Profile & Settings → App language to switch later (saved on this device and on your profile)."
+        "Open My Profile & Settings → Language Settings → FloqR webapp language to switch later (saved on this device and on your profile).",
+        "FLOQR does not pick language from IP address or country."
       ],
       links: [
-        {label: "App language (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai"})}
+        {label: "Language Settings (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "language"})},
+        {label: "Translation Overrides (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
       ],
       searchPhrases: [
-        "app language", "dutch", "nederlands", "browser language", "first use language",
-        "change language", "switch language", "ui language", "detect language"
+        "app language", "webapp language", "dutch", "nederlands", "browser language", "first use language",
+        "change language", "switch language", "ui language", "detect language", "language settings",
+        "ip language", "country language"
       ],
       patterns: [
-        /app\s*language/, /dutch/, /nederlands/, /browser\s*language/,
-        /change\s*(the\s*)?(app\s*)?language/, /switch\s*(to\s*)?(dutch|nederlands|english)/,
-        /detect\s*(my\s*)?language/, /first\s*use\s*language/
+        /app\s*language/, /webapp\s*language/, /dutch/, /nederlands/, /browser\s*language/,
+        /change\s*(the\s*)?(app\s*)?language/, /switch\s*(to\s*)?(dutch|nederlands|english|german|arabic)/,
+        /detect\s*(my\s*)?language/, /first\s*use\s*language/, /language\s*settings/,
+        /ip\s*(address\s*)?language/, /country\s*language/
+      ]
+    },
+    {
+      id: "help-translation-overrides",
+      kind: "help",
+      label: "Edit German / Arabic translations (Translation Overrides)",
+      blurb: "Master Admin → Translation Overrides. Fix AI-sounding German or Arabic UI wording; Save language so patrons see it on the next load.",
+      steps: [
+        "Open Master Admin → Translation Overrides.",
+        "Choose German or Arabic.",
+        "Search a UI string key, edit the override text, then Save language.",
+        "Patrons see the new wording after they reload. Overrides win over packaged translations."
+      ],
+      links: [
+        {label: "Translation Overrides", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides"}
+      ],
+      searchPhrases: [
+        "translation overrides", "edit translation", "fix german translation", "fix arabic translation",
+        "ai sounding translation", "native speaker", "how to edit language", "override german", "override arabic"
+      ],
+      patterns: [
+        /translation\s*overrides?/, /edit\s*(the\s*)?translation/, /fix\s*(german|arabic)\s*translation/,
+        /ai[- ]?sounding/, /native\s*speaker/, /how\s+to\s+edit\s+language/, /override\s*(german|arabic|language)/
       ]
     },
     {
