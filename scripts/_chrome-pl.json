@@ -384,5 +384,8 @@
   "template.useTemplate": "Użyj szablonu",
   "template.variantSavedBackground": "Zapisane tło",
   "template.variantScopeClub": " - Zatwierdzone przez klub",
-  "template.variantScopeMine": " - Moje"
+  "template.variantScopeMine": " - Moje",
+  "master.translationOverrides": "Nadpisania tłumaczeń",
+  "master.translationOverridesTitle": "Nadpisania tłumaczeń",
+  "master.translationOverridesHint": "Native speakerzy poprawiają tu sztucznie brzmiące teksty. Nadpisania działają w runtime do czasu promocji do packów."
 }

@@ -94,6 +94,7 @@
           </div>
         </div>
         <button class="admin-tab" data-panel="adCampaignManagement" type="button" data-i18n="master.adCampaigns">Ad Campaign Management</button>
+        <button class="admin-tab" data-panel="translationOverrides" type="button" data-i18n="master.translationOverrides">Translation Overrides</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button" data-i18n="master.promoters">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button" data-i18n="master.reconciliation">Network Reconciliation</button>
         <button class="admin-tab" data-panel="servicesCommerce" type="button" data-i18n="master.services">Services & Commerce</button>
@@ -925,6 +926,54 @@
         </div>
       </section>
 
+      <section id="translationOverrides" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Localization</p>
+          <h2
+            data-i18n="master.translationOverridesTitle"
+            data-floqr-help-id="help-translation-overrides"
+            data-floqr-help-title="Translation Overrides"
+            data-floqr-help-search="translation overrides|native speaker|german|arabic|de|ar|i18n"
+            data-floqr-help-body="Native speakers fix AI-sounding UI copy for German and Arabic. Saved overrides load on Search and patron pages at runtime and win over packaged chrome strings until you promote the text into scripts/_chrome-*.json and rebuild floqr-i18n.js. FLOQR does not auto-detect language from IP — patrons choose UI language in profile or the first-use prompt."
+          >Translation Overrides</h2>
+          <p class="sub small" data-i18n="master.translationOverridesHint">Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs.</p>
+          <div class="profile-grid" style="align-items:end">
+            <label>Language
+              <div class="queue-actions" role="group" aria-label="Override language">
+                <button type="button" class="primary" id="translationOverridesLangDe" data-lang="de">German (de)</button>
+                <button type="button" id="translationOverridesLangAr" data-lang="ar">Arabic (ar)</button>
+              </div>
+            </label>
+            <label>Search keys<input id="translationOverridesSearch" type="search" placeholder="master.networkDashboard, app.search…" autocomplete="off"/></label>
+            <label>Filter
+              <select id="translationOverridesFilter">
+                <option value="all">All keys</option>
+                <option value="overridden">Overridden only</option>
+                <option value="missing">Missing override</option>
+              </select>
+            </label>
+          </div>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="translationOverridesReloadBtn">Reload</button>
+            <button type="button" class="primary" id="translationOverridesSaveBtn">Save language</button>
+          </div>
+          <p id="translationOverridesStatus" class="status" aria-live="polite"></p>
+          <div id="translationOverridesTableWrap" class="report-block" style="max-height:min(70vh,720px);overflow:auto;margin-top:12px">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align:left;width:22%">Key</th>
+                  <th scope="col" style="text-align:left;width:34%">English</th>
+                  <th scope="col" style="text-align:left">Override</th>
+                  <th scope="col" style="width:120px"></th>
+                </tr>
+              </thead>
+              <tbody id="translationOverridesRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section id="aiCrawling" class="admin-panel-section">
         <div class="card">
           <h2>AI Crawling</h2>
@@ -1308,7 +1357,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.79"></script>
+<script src="./floqr-i18n.js?v=s3.0.88"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.79"></script>
@@ -1334,7 +1383,8 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.79"></script>
+<script src="./master-admin-app.js?v=s3.0.88"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.75"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>

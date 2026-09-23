@@ -384,5 +384,8 @@
   "template.useTemplate": "Usa modello",
   "template.variantSavedBackground": "Sfondo salvato",
   "template.variantScopeClub": " - Approvato dal club",
-  "template.variantScopeMine": " - Mio"
+  "template.variantScopeMine": " - Mio",
+  "master.translationOverrides": "Override traduzione",
+  "master.translationOverridesTitle": "Override traduzione",
+  "master.translationOverridesHint": "I madrelingua possono correggere qui testi dall'aspetto artificiale. Gli override valgono a runtime finché non finiscono nei pack."
 }

@@ -384,5 +384,8 @@
   "template.useTemplate": "Sjabloon gebruiken",
   "template.variantSavedBackground": "Opgeslagen achtergrond",
   "template.variantScopeClub": " - Club-goedgekeurd",
-  "template.variantScopeMine": " - Mijn"
+  "template.variantScopeMine": " - Mijn",
+  "master.translationOverrides": "Vertaling overrides",
+  "master.translationOverridesTitle": "Vertaling overrides",
+  "master.translationOverridesHint": "Moedertaalsprekers kunnen hier AI-achtige teksten corrigeren. Overrides gelden tijdens runtime tot ze in taalpakketten staan."
 }

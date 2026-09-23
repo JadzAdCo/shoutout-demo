@@ -761,7 +761,7 @@ service cloud.firestore {
  }
  match /translationOverrides/{id} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create, update, delete: if isMasterAdmin();
  }
 
  match /inboxNotifications/{id} {

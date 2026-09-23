@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.0.86";
+  const VERSION = "s3.0.88";
 
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
@@ -696,7 +696,10 @@
       "template.useTemplate": "Use Template",
       "template.variantSavedBackground": "Saved Background",
       "template.variantScopeClub": " - Club approved",
-      "template.variantScopeMine": " - Mine"
+      "template.variantScopeMine": " - Mine",
+      "master.translationOverrides": "Translation Overrides",
+      "master.translationOverridesTitle": "Translation Overrides",
+      "master.translationOverridesHint": "Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs."
     },
     fr: {
       "ad.splash.body": "Votre ShoutOut est presque en direct.",
@@ -1084,7 +1087,10 @@
       "template.useTemplate": "Utiliser le modèle",
       "template.variantSavedBackground": "Arrière-plan enregistré",
       "template.variantScopeClub": " - Approuvé par le club",
-      "template.variantScopeMine": " - Moi"
+      "template.variantScopeMine": " - Moi",
+      "master.translationOverrides": "Remplacements de traduction",
+      "master.translationOverridesTitle": "Remplacements de traduction",
+      "master.translationOverridesHint": "Les locuteurs natifs peuvent corriger ici les textes trop « IA ». Les remplacements s'appliquent à l'exécution jusqu'à promotion dans les packs."
     },
     de: {
       "ad.splash.body": "Dein ShoutOut ist fast live.",
@@ -1472,7 +1478,10 @@
       "template.useTemplate": "Vorlage verwenden",
       "template.variantSavedBackground": "Gespeicherter Hintergrund",
       "template.variantScopeClub": " - Club-genehmigt",
-      "template.variantScopeMine": " - Meine"
+      "template.variantScopeMine": " - Meine",
+      "master.translationOverrides": "Übersetzungs-Anpassungen",
+      "master.translationOverridesTitle": "Übersetzungs-Anpassungen",
+      "master.translationOverridesHint": "Muttersprachler können hier künstlich klingende Texte korrigieren. Anpassungen gelten zur Laufzeit, bis sie in Sprachpakete übernommen werden."
     },
     es: {
       "ad.splash.body": "Tu ShoutOut casi está en vivo.",
@@ -1860,7 +1869,10 @@
       "template.useTemplate": "Usar plantilla",
       "template.variantSavedBackground": "Fondo guardado",
       "template.variantScopeClub": " - Aprobado por el club",
-      "template.variantScopeMine": " - Mío"
+      "template.variantScopeMine": " - Mío",
+      "master.translationOverrides": "Anulaciones de traducción",
+      "master.translationOverridesTitle": "Anulaciones de traducción",
+      "master.translationOverridesHint": "Los hablantes nativos pueden corregir aquí textos con sonido artificial. Las anulaciones se aplican en tiempo de ejecución hasta promoverlas a los paquetes."
     },
     nl: {
       "ad.splash.body": "Je ShoutOut is bijna live.",
@@ -2248,7 +2260,10 @@
       "template.useTemplate": "Sjabloon gebruiken",
       "template.variantSavedBackground": "Opgeslagen achtergrond",
       "template.variantScopeClub": " - Club-goedgekeurd",
-      "template.variantScopeMine": " - Mijn"
+      "template.variantScopeMine": " - Mijn",
+      "master.translationOverrides": "Vertaling overrides",
+      "master.translationOverridesTitle": "Vertaling overrides",
+      "master.translationOverridesHint": "Moedertaalsprekers kunnen hier AI-achtige teksten corrigeren. Overrides gelden tijdens runtime tot ze in taalpakketten staan."
     },
     ru: {
       "ad.splash.body": "Ваш ShoutOut почти в эфире.",
@@ -2636,7 +2651,10 @@
       "template.useTemplate": "Использовать шаблон",
       "template.variantSavedBackground": "Сохранённый фон",
       "template.variantScopeClub": " — Одобрено клубом",
-      "template.variantScopeMine": " — Мои"
+      "template.variantScopeMine": " — Мои",
+      "master.translationOverrides": "Переопределения перевода",
+      "master.translationOverridesTitle": "Переопределения перевода",
+      "master.translationOverridesHint": "Носители языка могут исправить «нейросетевой» текст. Переопределения действуют до переноса в языковые пакеты."
     },
     it: {
       "ad.splash.body": "Il tuo ShoutOut è quasi live.",
@@ -3024,7 +3042,10 @@
       "template.useTemplate": "Usa modello",
       "template.variantSavedBackground": "Sfondo salvato",
       "template.variantScopeClub": " - Approvato dal club",
-      "template.variantScopeMine": " - Mio"
+      "template.variantScopeMine": " - Mio",
+      "master.translationOverrides": "Override traduzione",
+      "master.translationOverridesTitle": "Override traduzione",
+      "master.translationOverridesHint": "I madrelingua possono correggere qui testi dall'aspetto artificiale. Gli override valgono a runtime finché non finiscono nei pack."
     },
     pt: {
       "ad.splash.body": "O seu ShoutOut está quase ao vivo.",
@@ -3412,7 +3433,10 @@
       "template.useTemplate": "Usar modelo",
       "template.variantSavedBackground": "Fundo guardado",
       "template.variantScopeClub": " - Aprovado pelo clube",
-      "template.variantScopeMine": " - Meu"
+      "template.variantScopeMine": " - Meu",
+      "master.translationOverrides": "Substituições de tradução",
+      "master.translationOverridesTitle": "Substituições de tradução",
+      "master.translationOverridesHint": "Falantes nativos podem corrigir textos artificiais aqui. Substituições valem em runtime até irem para os packs."
     },
     el: {
       "ad.splash.body": "Το ShoutOut σας είναι σχεδόν live.",
@@ -3800,7 +3824,10 @@
       "template.useTemplate": "Χρήση προτύπου",
       "template.variantSavedBackground": "Αποθηκευμένο φόντο",
       "template.variantScopeClub": " - Εγκεκριμένο από club",
-      "template.variantScopeMine": " - Δικό μου"
+      "template.variantScopeMine": " - Δικό μου",
+      "master.translationOverrides": "Παράκαμψεις μετάφρασης",
+      "master.translationOverridesTitle": "Παράκαμψεις μετάφρασης",
+      "master.translationOverridesHint": "Οι μητρόφωνοι διορθώνουν εδώ τεχνητό κείμενο. Οι παράκαμψεις ισχύουν μέχρι προώθηση στα packs."
     },
     pl: {
       "ad.splash.body": "Twój ShoutOut jest prawie na żywo.",
@@ -4188,7 +4215,10 @@
       "template.useTemplate": "Użyj szablonu",
       "template.variantSavedBackground": "Zapisane tło",
       "template.variantScopeClub": " - Zatwierdzone przez klub",
-      "template.variantScopeMine": " - Moje"
+      "template.variantScopeMine": " - Moje",
+      "master.translationOverrides": "Nadpisania tłumaczeń",
+      "master.translationOverridesTitle": "Nadpisania tłumaczeń",
+      "master.translationOverridesHint": "Native speakerzy poprawiają tu sztucznie brzmiące teksty. Nadpisania działają w runtime do czasu promocji do packów."
     },
     ar: {
       "ad.splash.body": "ShoutOut الخاص بك على وشك البث المباشر.",
@@ -4576,7 +4606,10 @@
       "template.useTemplate": "استخدام القالب",
       "template.variantSavedBackground": "خلفية محفوظة",
       "template.variantScopeClub": " - معتمد من النادي",
-      "template.variantScopeMine": " - لي"
+      "template.variantScopeMine": " - لي",
+      "master.translationOverrides": "تعديلات الترجمة",
+      "master.translationOverridesTitle": "تعديلات الترجمة",
+      "master.translationOverridesHint": "يمكن للناطقين الأصليين تصحيح النصوص التي تبدو آلية هنا. التعديلات سارية وقت التشغيل حتى تُدمج في حزم اللغة."
     }
   };
 
@@ -4619,6 +4652,17 @@
 
   function markPromptDone() {
     try { localStorage.setItem(PROMPT_KEY, "1"); } catch (_) {}
+  }
+
+  function listKeys() {
+    const en = STRINGS.en || {};
+    return Object.keys(en).sort();
+  }
+
+  function getPack(lang) {
+    const code = normalizeCode(lang) || "en";
+    const base = STRINGS[code] || STRINGS.en || {};
+    return {...base};
   }
 
   function t(key, vars = {}) {
@@ -4835,7 +4879,9 @@
     maybePromptReturningPatron,
     languageOptionsHtml,
     loadOverrides,
-    markPromptDone
+    markPromptDone,
+    listKeys,
+    getPack
   };
 
   if (document.readyState === "loading") {

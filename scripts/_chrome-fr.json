@@ -384,5 +384,8 @@
   "template.useTemplate": "Utiliser le modèle",
   "template.variantSavedBackground": "Arrière-plan enregistré",
   "template.variantScopeClub": " - Approuvé par le club",
-  "template.variantScopeMine": " - Moi"
+  "template.variantScopeMine": " - Moi",
+  "master.translationOverrides": "Remplacements de traduction",
+  "master.translationOverridesTitle": "Remplacements de traduction",
+  "master.translationOverridesHint": "Les locuteurs natifs peuvent corriger ici les textes trop « IA ». Les remplacements s'appliquent à l'exécution jusqu'à promotion dans les packs."
 }

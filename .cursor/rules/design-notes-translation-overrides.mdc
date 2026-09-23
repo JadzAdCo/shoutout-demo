@@ -1,0 +1,28 @@
+# Translation overrides (Master Admin)
+
+**Resume:** `@translation-overrides$`
+
+## Runtime vs packs
+
+- Packaged UI strings live in `scripts/_chrome-*.json` → rebuilt into `floqr-i18n.js` `CHROME`.
+- `FLOQRI18n.loadOverrides()` reads Firestore `translationOverrides/{lang}` (`strings` map). `t()` prefers overrides over CHROME for the active UI language.
+- Master Admin **Translation Overrides** panel edits `de` and `ar` first. Promote stable copy into `_chrome-*.json` + `node scripts/build-i18n-chrome.js`, then remove redundant Firestore keys.
+
+## Firestore
+
+| Doc id | Fields |
+|---|---|
+| `de`, `ar` (more later) | `lang`, `strings: { [chromeKey]: "text" }`, `updatedAt`, `updatedByUid` |
+
+Rules: public read (patron Search loads overrides); **write** `isMasterAdmin()` only.
+
+## Product
+
+- No IP-based language detection — profile / first-use prompt / manual selector only.
+- Empty override textarea + **Save language** removes that key from `strings`.
+
+## FIX PROMPT
+
+```
+Master Admin Translation Overrides: de/ar tabs, key search, filter all/overridden/missing, English readonly + override textarea, Reload/Save/Clear row. Firestore translationOverrides; loadOverrides on save. Rules: read true, write isMasterAdmin. listKeys/getPack on FLOQRI18n.
+```

@@ -8,7 +8,7 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const I18N = path.join(ROOT, "floqr-i18n.js");
-const VERSION = "s3.0.86";
+const VERSION = "s3.0.88";
 const LOCALES = ["en", "fr", "de", "es", "nl", "ru", "it", "pt", "el", "pl", "ar"];
 
 function loadPack(code) {
