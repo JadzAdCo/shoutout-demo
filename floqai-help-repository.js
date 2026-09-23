@@ -886,17 +886,19 @@
     },
     {
       id: "help-app-language",
-      title: "App language",
-      body: "On first use, FloqR reads the browser language (for example nl-NL → Dutch / Nederlands) and switches chrome and menus to that language when it is supported — Search categories, My Profile tabs, Club Admin tabs, and Master Admin tabs. Unsupported languages stay in English. After that, My Profile → App language and the saved profile language win. Saving App language re-translates every page that loads FLOQRI18n, not only this card.",
+      title: "App language / FloqR webapp language",
+      body: "First visit can follow the browser language when FloqR supports it. Otherwise English. Change it anytime under My Profile → Language Settings → FloqR webapp language (saved on this device and on your profile). FLOQR does not choose language from IP address or country. To fix AI-sounding German or Arabic wording for everyone, Master Admin uses Translation Overrides.",
       searchPhrases: [
-        "app language", "dutch", "nederlands", "browser language", "first use language",
-        "change language", "ui language", "floqr language", "switch to dutch", "detect language"
+        "app language", "webapp language", "dutch", "nederlands", "browser language", "first use language",
+        "change language", "switch language", "ui language", "detect language", "language settings",
+        "how language works", "ip language", "country language", "floqr language"
       ],
       links: [
-        {label: "App language (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai"}), search: "app language", blurb: "Choose FloqR chrome language, including Dutch"}
+        {label: "Language Settings (My Profile)", href: vUrl("./patron-portal.html", {from: "floqai", tab: "language"}), search: "language settings", blurb: "Choose FloqR chrome language"},
+        {label: "Translation Overrides (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides", search: "translation overrides", blurb: "Fix German and Arabic UI wording"}
       ],
       source: "help-repository-seed",
-      page: "patron-portal.html#uiAppLanguage"
+      page: "patron-portal.html#portalLanguageSettings"
     },
     {
       id: "help-my-profile",
@@ -933,6 +935,26 @@
       ],
       source: "help-repository-seed",
       page: "master-admin.html#clubAdminUrls"
+    },
+    {
+      id: "help-translation-overrides",
+      title: "Translation Overrides",
+      body: "Master Admin → Translation Overrides. Choose German or Arabic, search a UI string key, edit the wording, then Save language. Patrons see the fix on the next page load — overrides win over the packaged translation. German and Arabic ship first. FLOQR does not pick language from IP; patrons set FloqR webapp language under My Profile → Language Settings (or the first-use browser language prompt).",
+      searchPhrases: [
+        "translation overrides", "edit translation", "fix german translation", "fix arabic translation",
+        "ai sounding translation", "native speaker edit", "override language", "german arabic chrome",
+        "how to edit language", "i18n override", "Übersetzungs-Anpassungen", "تعديلات الترجمة"
+      ],
+      links: [
+        {
+          label: "Translation Overrides",
+          href: vUrl("./master-admin.html", {from: "floqai"}) + "#translationOverrides",
+          search: "translation overrides|edit translation|german|arabic|native speaker",
+          blurb: "Edit German and Arabic UI wording that sounds artificial."
+        }
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#translationOverrides"
     },
     {
       id: "help-mail-logging",
