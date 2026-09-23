@@ -384,5 +384,8 @@
   "template.useTemplate": "استخدام القالب",
   "template.variantSavedBackground": "خلفية محفوظة",
   "template.variantScopeClub": " - معتمد من النادي",
-  "template.variantScopeMine": " - لي"
+  "template.variantScopeMine": " - لي",
+  "master.translationOverrides": "تعديلات الترجمة",
+  "master.translationOverridesTitle": "تعديلات الترجمة",
+  "master.translationOverridesHint": "يمكن للناطقين الأصليين تصحيح النصوص التي تبدو آلية هنا. التعديلات سارية وقت التشغيل حتى تُدمج في حزم اللغة."
 }

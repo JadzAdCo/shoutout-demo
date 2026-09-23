@@ -94,7 +94,8 @@
     clubOnboarding: "Entity Onboarding",
     templateManagement: "Template Management",
     recommendationModeration: "Unapproved Recommendations",
-    networkDashboard: "Network Dashboard"
+    networkDashboard: "Network Dashboard",
+    translationOverrides: "Translation Overrides"
   };
 
   function hashPanelId() {
@@ -221,6 +222,9 @@
       if (panelId === "diagnosticsDisplayErrors") window.FLOQRDiagnosticsPanels?.focusDisplayLoadErrors?.();
       if (panelId === "diagnostics" || panelId === "diagnosticsManualTests" || panelId === "diagnosticArchives") {
         window.FLOQRDiagnosticsPanels?.ensureMounted?.();
+      }
+      if (panelId === "translationOverrides") {
+        window.FLOQRMasterTranslationOverrides?.mount?.();
       }
       if (window.FLOQRSOS2FA?.isEntityMgmtPanel?.(panelId)) {
         window.FLOQRSOS2FA.mount({

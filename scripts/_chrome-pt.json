@@ -384,5 +384,8 @@
   "template.useTemplate": "Usar modelo",
   "template.variantSavedBackground": "Fundo guardado",
   "template.variantScopeClub": " - Aprovado pelo clube",
-  "template.variantScopeMine": " - Meu"
+  "template.variantScopeMine": " - Meu",
+  "master.translationOverrides": "Substituições de tradução",
+  "master.translationOverridesTitle": "Substituições de tradução",
+  "master.translationOverridesHint": "Falantes nativos podem corrigir textos artificiais aqui. Substituições valem em runtime até irem para os packs."
 }

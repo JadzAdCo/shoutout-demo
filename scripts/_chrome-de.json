@@ -384,5 +384,8 @@
   "template.useTemplate": "Vorlage verwenden",
   "template.variantSavedBackground": "Gespeicherter Hintergrund",
   "template.variantScopeClub": " - Club-genehmigt",
-  "template.variantScopeMine": " - Meine"
+  "template.variantScopeMine": " - Meine",
+  "master.translationOverrides": "Übersetzungs-Anpassungen",
+  "master.translationOverridesTitle": "Übersetzungs-Anpassungen",
+  "master.translationOverridesHint": "Muttersprachler können hier künstlich klingende Texte korrigieren. Anpassungen gelten zur Laufzeit, bis sie in Sprachpakete übernommen werden."
 }

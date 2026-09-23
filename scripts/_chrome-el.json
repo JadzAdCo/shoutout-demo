@@ -384,5 +384,8 @@
   "template.useTemplate": "Χρήση προτύπου",
   "template.variantSavedBackground": "Αποθηκευμένο φόντο",
   "template.variantScopeClub": " - Εγκεκριμένο από club",
-  "template.variantScopeMine": " - Δικό μου"
+  "template.variantScopeMine": " - Δικό μου",
+  "master.translationOverrides": "Παράκαμψεις μετάφρασης",
+  "master.translationOverridesTitle": "Παράκαμψεις μετάφρασης",
+  "master.translationOverridesHint": "Οι μητρόφωνοι διορθώνουν εδώ τεχνητό κείμενο. Οι παράκαμψεις ισχύουν μέχρι προώθηση στα packs."
 }

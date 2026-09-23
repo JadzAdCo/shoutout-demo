@@ -384,5 +384,8 @@
   "template.useTemplate": "Usar plantilla",
   "template.variantSavedBackground": "Fondo guardado",
   "template.variantScopeClub": " - Aprobado por el club",
-  "template.variantScopeMine": " - Mío"
+  "template.variantScopeMine": " - Mío",
+  "master.translationOverrides": "Anulaciones de traducción",
+  "master.translationOverridesTitle": "Anulaciones de traducción",
+  "master.translationOverridesHint": "Los hablantes nativos pueden corregir aquí textos con sonido artificial. Las anulaciones se aplican en tiempo de ejecución hasta promoverlas a los paquetes."
 }

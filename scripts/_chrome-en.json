@@ -384,5 +384,8 @@
   "template.useTemplate": "Use Template",
   "template.variantSavedBackground": "Saved Background",
   "template.variantScopeClub": " - Club approved",
-  "template.variantScopeMine": " - Mine"
+  "template.variantScopeMine": " - Mine",
+  "master.translationOverrides": "Translation Overrides",
+  "master.translationOverridesTitle": "Translation Overrides",
+  "master.translationOverridesHint": "Native speakers can fix AI-sounding copy here. Overrides apply at runtime until promoted into locale packs."
 }

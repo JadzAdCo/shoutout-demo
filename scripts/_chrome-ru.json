@@ -384,5 +384,8 @@
   "template.useTemplate": "Использовать шаблон",
   "template.variantSavedBackground": "Сохранённый фон",
   "template.variantScopeClub": " — Одобрено клубом",
-  "template.variantScopeMine": " — Мои"
+  "template.variantScopeMine": " — Мои",
+  "master.translationOverrides": "Переопределения перевода",
+  "master.translationOverridesTitle": "Переопределения перевода",
+  "master.translationOverridesHint": "Носители языка могут исправить «нейросетевой» текст. Переопределения действуют до переноса в языковые пакеты."
 }
