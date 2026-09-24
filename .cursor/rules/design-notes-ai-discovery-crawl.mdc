@@ -64,10 +64,36 @@ Discovery collections: **Master Admin** write. Signed-in Club Admins may **read*
 
 `onboard-dc-venues.html` batch-seeds known DC clubs — document separately; do not confuse with discovery approve.
 
+## Social media extraction
+
+Venues almost always expose Instagram / Facebook / TikTok / X in the **footer** or on a contact/social secondary page. Crawl must:
+
+1. Parse **all** `href` social URLs from the page HTML (not only the first text match).
+2. After Google Places returns `websiteUri`, **fetch that website** and enrich socials.
+3. If still empty, follow up to **2 same-origin secondary pages** (contact / follow / social / réseaux).
+4. Stamp `socialPagesFetched` on the queue record for audit.
+
+## Timestamps
+
+Every queue row gets `collectedAt` (server) + `collectedAtIso` (ISO string). Review cards show **Collected …** in local time.
+
+## Onboarded venues (updates-only)
+
+When a crawl match already exists in `clubLocations` (same website or same name+city+country):
+
+- `crawlScope: "updates-only"` / `discoveryMode: "onboarded-update-scan"`
+- Keep live **static** fields (address, phone, email, website, socials unless crawl fills a missing social)
+- Prefer crawl for **dynamic** fields (DJs/artists, promoters, genres/events)
+- Card badge: “Updates only · already onboarded”
+
+## Country tabs
+
+Review Discovery Queue shows dynamic **country tabs** (All + each country present in the filtered queue).
+
 ## FIX PROMPT
 
 ```
-AI crawl human UX: form-first review cards; Advanced-only source snapshot / understood fields; weight number inputs; Needs research action; Source Detail wizard; fail loud on Places miss (no placeholder queue rows); Master-Admin firestore rules for discovery collections; keep Ticketmaster later. Design notes: design-notes-ai-discovery-crawl.mdc
+AI crawl: href-based footer socials + website follow-up + secondary contact pages; collectedAt on queue cards; updates-only for onboarded clubLocations; country tabs on Review Discovery Queue. Design notes: design-notes-ai-discovery-crawl.mdc
 ```
 
-Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.
+Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-venue-datapoints.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.

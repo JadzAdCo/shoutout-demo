@@ -782,7 +782,7 @@
     {
       id: "help-venue-crawl-datapoints",
       title: "AI crawl venue datapoints",
-      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Fill missing fields on the card — you do not need to edit technical data dumps. Approve when ready, or choose Needs research. Ticketmaster confirmation comes later.",
+      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Crawls also check venue website footers and contact pages for social handles. Each card shows when it was collected. Already-onboarded venues are scanned for lineup/event updates only. Use the country tabs to filter the queue. Approve when ready, or choose Needs research.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
         "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
