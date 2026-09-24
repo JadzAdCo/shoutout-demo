@@ -967,23 +967,30 @@ service cloud.firestore {
  }
 
  match /aiDiscoverySources/{id} {
- allow read, write: if signedIn();
+ allow read: if isMasterAdmin();
+ allow write: if isMasterAdmin();
  }
 
  match /aiDiscoveryQueue/{id} {
- allow read, write: if signedIn();
+ allow read: if isMasterAdmin()
+ || (signedIn()
+ && resource.data.discoveryMode == "profile-import-draft");
+ allow create, update, delete: if isMasterAdmin();
  }
 
  match /aiDiscoveryRatingCriteria/{id} {
- allow read, write: if signedIn();
+ allow read: if isMasterAdmin();
+ allow write: if isMasterAdmin();
  }
 
  match /aiCrawlRuns/{id} {
- allow read, write: if signedIn();
+ allow read: if isMasterAdmin();
+ allow write: if isMasterAdmin();
  }
 
  match /aiCrawlerSchedules/{id} {
- allow read, write: if signedIn();
+ allow read: if isMasterAdmin();
+ allow write: if isMasterAdmin();
  }
 
  match /aiDiagnosticsReports/{id} {

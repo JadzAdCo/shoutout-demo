@@ -782,13 +782,14 @@
     {
       id: "help-venue-crawl-datapoints",
       title: "AI crawl venue datapoints",
-      body: "AI Crawling ingests public pages and Google Places, then parses venue public-profile datapoints: name, brand, tagline, description, address, phone, email, website, menu/reservations URLs, Instagram/Facebook/X/TikTok, genres, DJs/artists, promoters, amenities, age policy, dress code, hoursStructured + timeZone, featured people, logo/images, and display formats. Approval writes these into clubLocations for the Club Public Profile.",
+      body: "On Master Admin → AI Crawling, FLOQR searches public pages and Google Places, then shows review cards with Name, Genre, DJs, Promoters, address, phone, email, Instagram, hours, and more. Fill missing fields on the card — you do not need to edit technical data dumps. Approve when ready, or choose Needs research. Ticketmaster confirmation comes later.",
       searchPhrases: [
         "ai crawl", "discovery crawl", "venue datapoints", "impactful datapoints",
-        "crawl ingest", "parse venue", "hoursStructured crawl"
+        "crawl ingest", "parse venue", "hoursStructured crawl", "needs research",
+        "club admin imports"
       ],
       links: [
-        {label: "Master Admin Diagnostics / Discovery", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Master Admin AI Crawling", href: vUrl("./master-admin.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "master-admin.html"

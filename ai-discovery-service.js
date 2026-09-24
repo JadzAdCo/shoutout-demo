@@ -1,4 +1,5 @@
 /* FLOQR AI Discovery review tools. Public-source queue, datapoint validation, approval, and soft-delete tools. */
+/* Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc */
 (function () {
   "use strict";
 
@@ -236,7 +237,7 @@
 
   function auditDetailsHtml(item = {}) {
     const raw = item.rawCrawlInput || item.initialCrawlData || {
-      note:"No raw crawl/input audit was saved on this older record.",
+      note:"No source snapshot was saved on this older record.",
       sourceUrl:item.sourceUrl || "",
       searchQuery:item.searchQuery || "",
       discoveryMode:item.discoveryMode || ""
@@ -244,14 +245,25 @@
     const parsed = item.parsedData || parsedDataFallback(item);
     return `<div class="profile-grid">
       <details class="admin-detail wide-field">
-        <summary>Raw crawled/input data</summary>
+        <summary>Advanced: source snapshot</summary>
         <pre class="diagnostic-json">${esc(JSON.stringify(raw, null, 2))}</pre>
       </details>
       <details class="admin-detail wide-field">
-        <summary>Parsed data used by FLOQR</summary>
+        <summary>Advanced: what FLOQR understood</summary>
         <pre class="diagnostic-json">${esc(JSON.stringify(parsed, null, 2))}</pre>
       </details>
     </div>`;
+  }
+
+  function readinessBanner(item = {}, missing = []) {
+    const status = String(item.status || "pendingReview");
+    if (status === "needsResearch") {
+      return `<p class="sub small"><strong>Needs research.</strong> Someone still needs to look up: ${esc((item.missingDatapoints || missing).join(", ") || "contact or lineup details")}.</p>`;
+    }
+    if (missing.length) {
+      return `<p class="sub small"><strong>Still need:</strong> ${esc(missing.join(", "))} — fill the fields below, or choose Needs research.</p>`;
+    }
+    return `<p class="sub small"><strong>Ready to publish</strong> after a final source check.</p>`;
   }
 
   function queueCard(item, index) {
@@ -266,9 +278,8 @@
         <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
       </div>
       <p>${esc(item.proposedDescription || item.aiSummary || "No description yet.")}</p>
-      ${missing.length ? `<p class="sub small"><strong>Missing required datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Required datapoints complete.</strong> Ready for final source review and approval.</p>`}
+      ${readinessBanner(item, missing)}
       ${sourceConfirmationsHtml(item)}
-      ${auditDetailsHtml(item)}
       ${datapointChecklist(item)}
       ${item.venueDatapointsCaptured ? `<p class="sub small"><strong>Venue public-profile datapoints captured:</strong> ${esc(item.venueDatapointsCaptured.capturedCount || 0)} / ${(window.FLOQRVenueDatapoints?.VENUE_PUBLIC_PROFILE_DATAPOINTS || []).length || 40}</p>` : ""}
       ${window.FLOQRVenueDatapoints?.checklistHtml ? window.FLOQRVenueDatapoints.checklistHtml() : ""}
@@ -309,13 +320,15 @@
         ${queueField(item, "sourceUrl", "Source URL", true)}
         ${queueField(item, "ticketUrl", "Ticket URL", true)}
       </div>
+      ${auditDetailsHtml(item)}
       ${item.aiRatingReasons?.length ? `<div class="tag-row">${item.aiRatingReasons.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
       <div class="queue-actions">
-        <button type="button" data-discovery-action="approve">Approve</button>
+        <button type="button" class="primary" data-discovery-action="approve">Approve</button>
+        <button type="button" data-discovery-action="needs-research">Needs research</button>
         <button type="button" data-discovery-action="reject">Reject</button>
         <button type="button" data-discovery-action="duplicate">Mark Duplicate</button>
         <button type="button" data-discovery-action="delete">Delete</button>
-        ${item.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(item.sourceUrl)}">Source</a>` : ""}
+        ${item.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(item.sourceUrl)}">Open source</a>` : ""}
       </div>
     </div>`;
   }
@@ -364,8 +377,8 @@
         crawlResultStatus: "missing-required-datapoints",
         updatedAt:nowField()
       }, {merge:true});
-      setStatus(`Cannot approve yet. Missing required datapoints: ${missing.join(", ")}.`);
-      alert(`Cannot approve yet. Missing required datapoints: ${missing.join(", ")}.`);
+      setStatus(`Cannot approve yet. Still need: ${missing.join(", ")}. Use Needs research if you will come back later.`);
+      alert(`Cannot approve yet.\n\nStill need: ${missing.join(", ")}\n\nFill those fields on the card, or choose Needs research.`);
       await loadDiscoveryQueue();
       return;
     }
@@ -445,6 +458,26 @@
     await loadDiscoveryQueue();
   }
 
+  async function markNeedsResearch(card, item) {
+    const edited = readEditedQueueItem(card, item);
+    const missing = missingDatapoints(edited);
+    await db.collection("aiDiscoveryQueue").doc(item.id).set({
+      ...edited,
+      status: "needsResearch",
+      missingDatapoints: missing,
+      crawlResultStatus: "needs-research",
+      followUpRequestedAt: nowField(),
+      followUpRequestedByUid: auth.currentUser?.uid || "",
+      reviewedByUid: auth.currentUser?.uid || "",
+      reviewedAt: nowField(),
+      updatedAt: nowField()
+    }, {merge:true});
+    setStatus(missing.length
+      ? `Marked for research. Still need: ${missing.join(", ")}.`
+      : "Marked for research.");
+    await loadDiscoveryQueue();
+  }
+
   async function setQueueStatus(item, status, extra = {}) {
     await db.collection("aiDiscoveryQueue").doc(item.id).set({
       status,
@@ -462,7 +495,12 @@
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
     const rows = await getCollectionSafe("aiDiscoveryQueue", 500);
     queueRows = rows.filter(item => {
-      if (status !== "all" && String(item.status || "pendingReview") !== status) return false;
+      const rowStatus = String(item.status || "pendingReview");
+      if (status === "pendingReview") {
+        if (rowStatus !== "pendingReview" && rowStatus !== "needsResearch") return false;
+      } else if (status !== "all" && rowStatus !== status) {
+        return false;
+      }
       if (city && !String(item.city || "").toLowerCase().includes(city)) return false;
       return true;
     });
@@ -475,9 +513,10 @@
       button.addEventListener("click", async () => {
         const action = button.dataset.discoveryAction;
         if (action === "approve") return approveQueueItem(card, item);
+        if (action === "needs-research") return markNeedsResearch(card, item);
         if (action === "reject") return setQueueStatus(item, "rejected");
         if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
-        if (action === "delete" && confirm("This will delete the discovery queue record from active review.")) return setQueueStatus(item, "deleted");
+        if (action === "delete" && confirm("Remove this discovery card from active review?")) return setQueueStatus(item, "deleted");
       });
     });
   }
@@ -539,21 +578,38 @@
     await loadListingDeleteTool();
   }
 
+  function syncCriteriaWeightsToForm(weights = {}) {
+    const merged = {...DEFAULT_CRITERIA.weights, ...(weights || {})};
+    document.querySelectorAll("[data-weight-key]").forEach(input => {
+      const key = input.dataset.weightKey;
+      if (key && merged[key] != null) input.value = String(merged[key]);
+    });
+    const jsonEl = byId("aiDiscoveryCriteriaJson");
+    if (jsonEl) jsonEl.value = JSON.stringify(merged, null, 2);
+  }
+
+  function readCriteriaWeightsFromForm() {
+    const weights = {...DEFAULT_CRITERIA.weights};
+    document.querySelectorAll("[data-weight-key]").forEach(input => {
+      const key = input.dataset.weightKey;
+      if (!key) return;
+      const num = Number(input.value);
+      weights[key] = Number.isFinite(num) ? num : weights[key];
+    });
+    const jsonEl = byId("aiDiscoveryCriteriaJson");
+    if (jsonEl) jsonEl.value = JSON.stringify(weights, null, 2);
+    return weights;
+  }
+
   async function loadCriteria() {
     const snap = await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").get();
     const criteria = snap.exists ? snap.data() : DEFAULT_CRITERIA;
-    byId("aiDiscoveryCriteriaJson").value = JSON.stringify(criteria.weights || DEFAULT_CRITERIA.weights, null, 2);
+    syncCriteriaWeightsToForm(criteria.weights || DEFAULT_CRITERIA.weights);
     byId("aiDiscoveryCriteriaNotes").value = criteria.notes || "";
   }
 
   async function saveCriteria() {
-    let weights = DEFAULT_CRITERIA.weights;
-    try {
-      weights = JSON.parse(byId("aiDiscoveryCriteriaJson").value || "{}");
-    } catch(e) {
-      setStatus("Rating criteria weights must be valid JSON.");
-      return;
-    }
+    const weights = readCriteriaWeightsFromForm();
     await db.collection("aiDiscoveryRatingCriteria").doc("defaultNightlifeRating").set({
       active:true,
       criteriaName:"Default Nightlife Rating",
@@ -575,15 +631,23 @@
     if (!db || !auth || !byId("aiCrawling")) return;
     await ensureDiscoveryDefaults();
     byId("aiDiscoverySummary").innerHTML = simpleRows([
-      ["Discovery mode", "Refined city/genre/venue-or-event search with Google Places + public pages"],
-      ["Publish behavior", "Records remain in review until impactful datapoints are complete and Master Admin approves"],
-      ["Impactful datapoints", "Name, genre, DJ(s)/artist(s), promoter(s), phone, email, Instagram, physical address"],
-      ["Source confirmation", "Google Places today; Ticketmaster (later); public page when extracted"]
+      ["How it works", "Search → review cards → Approve or Needs research → live listing"],
+      ["Publish rule", "Approve only when Name, Genre, DJs, Promoters, Address, City, Country, Phone, Email, and Instagram are filled"],
+      ["Technical dumps", "Hidden under Advanced — operators use the form fields"],
+      ["Source confirmation", "Google Places today; Ticketmaster later; paste a detail page when needed"]
     ]);
     byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
     byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);
     byId("aiDiscoveryCityFilter")?.addEventListener("input", loadDiscoveryQueue);
     byId("saveAiDiscoveryCriteriaBtn")?.addEventListener("click", saveCriteria);
+    byId("aiDiscoveryCriteriaJson")?.addEventListener("change", () => {
+      try {
+        syncCriteriaWeightsToForm(JSON.parse(byId("aiDiscoveryCriteriaJson").value || "{}"));
+      } catch (_e) { /* keep form values if advanced dump is invalid */ }
+    });
+    document.querySelectorAll("[data-weight-key]").forEach(input => {
+      input.addEventListener("input", readCriteriaWeightsFromForm);
+    });
     byId("listingDeleteSearch")?.addEventListener("input", loadListingDeleteTool);
     byId("listingIncludeDeleted")?.addEventListener("change", loadListingDeleteTool);
     await loadCriteria();
