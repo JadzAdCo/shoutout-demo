@@ -22,10 +22,15 @@ const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
 const venueDatapoints = require("./venue-datapoint-extract");
 const {sendSystemMail} = require("./mail-log");
+const {
+  looksLikeBrokenDemoEmail,
+  brokenDemoEmailMessage,
+  demoEmailOtpDelivery
+} = require("./floqr-demo-accounts");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 const GEMINI_IMAGE_EDIT_MODEL = process.env.FLOQR_GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
-const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-2.5-flash";
+const GEMINI_TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const MAX_GEMINI_IMAGE_BYTES = 8 * 1024 * 1024;
 
 const MONTHS = {
@@ -449,14 +454,17 @@ async function crawlPublicEventSources(criteria = {}) {
     if (isSearchResultsUrl(sourceUrl)) continue;
     try {
       const html = await fetchPublicSource(sourceUrl);
-      discovered.push({
+      let record = {
         ...extractDiscoveryRecordFromHtml(sourceUrl, html, ""),
         sourceName:source.sourceName || sourceNameForUrl(sourceUrl),
         sourceConfigId:source.id,
         allowedCategories:source.allowedCategories || DEFAULT_ALLOWED_CATEGORIES,
         markets:source.markets || DEFAULT_DISCOVERY_MARKETS,
         crawlCriteria:criteria
-      });
+      };
+      record = await enrichRecordFromPublicWebsite(record);
+      record = await applyOnboardedUpdatePolicy(record);
+      discovered.push(record);
     } catch (error) {
       console.warn(`Skipping source ${sourceUrl}:`, error.message);
     }
@@ -481,6 +489,140 @@ function languageCode(value = "") {
   return map[normalized(value)] || "en";
 }
 
+function hasUsefulSocialHandles(record = {}) {
+  const socials = record.socialMediaHandles || {};
+  return !!(socials.instagram || socials.facebook || socials.tiktok || socials.x || record.instagramHandle);
+}
+
+async function enrichRecordFromPublicWebsite(record = {}) {
+  const site = String(record.officialWebsite || record.website || record.sourceUrl || "").trim();
+  if (!/^https?:\/\//i.test(site) || /google\.(com|maps)|maps\.app\.goo\.gl/i.test(site)) return record;
+  let next = {...record};
+  const pagesFetched = [];
+  try {
+    const html = await fetchPublicSource(site);
+    pagesFetched.push(site);
+    next = venueDatapoints.enrichVenueRecord(next, {html, text: stripTags(html)});
+    next.sourceConfirmations = {
+      ...(next.sourceConfirmations || {}),
+      publicPage: true,
+      googlePlaces: !!(next.sourceConfirmations?.googlePlaces || record.sourceName === "Google Places API")
+    };
+    if (!hasUsefulSocialHandles(next)) {
+      const secondaries = (venueDatapoints.listSocialSecondaryUrls?.(html, site) || []).slice(0, 2);
+      for (const url of secondaries) {
+        try {
+          const html2 = await fetchPublicSource(url);
+          pagesFetched.push(url);
+          next = venueDatapoints.enrichVenueRecord(next, {html: html2, text: stripTags(html2)});
+          if (hasUsefulSocialHandles(next)) break;
+        } catch (error) {
+          console.warn(`Secondary social page skipped (${url}):`, error.message);
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`Website enrich skipped (${site}):`, error.message);
+    return record;
+  }
+  next.socialPagesFetched = pagesFetched;
+  next.extractionMethod = `${record.extractionMethod || "public-page"}+website-social-pass`;
+  if (hasUsefulSocialHandles(next)) {
+    next.aiRatingReasons = uniqueList([...(next.aiRatingReasons || []), "Social handles from venue website / footer"]);
+  }
+  return next;
+}
+
+function uniqueListLocal(values = []) {
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(item => {
+    const key = String(item || "").trim().toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+async function findMatchingLiveListing(record = {}) {
+  const website = String(record.officialWebsite || record.website || "").trim().toLowerCase().replace(/\/$/, "");
+  const name = normalized(record.proposedTitle || record.proposedLocationName || "");
+  const city = normalized(record.city || "");
+  const country = normalized(record.country || "");
+  try {
+    const snap = await db.collection("clubLocations").limit(400).get();
+    for (const doc of snap.docs) {
+      const row = {id: doc.id, collection: "clubLocations", ...doc.data()};
+      if (String(row.status || "active") === "deleted") continue;
+      const liveWeb = String(row.officialWebsite || row.website || "").trim().toLowerCase().replace(/\/$/, "");
+      if (website && liveWeb && (website === liveWeb || website.includes(liveWeb) || liveWeb.includes(website))) {
+        return row;
+      }
+      const liveName = normalized(row.locationName || row.brandName || "");
+      const liveCity = normalized(row.city || "");
+      const liveCountry = normalized(row.country || "");
+      if (name && liveName && name === liveName && (!city || !liveCity || city === liveCity) && (!country || !liveCountry || country === liveCountry)) {
+        return row;
+      }
+    }
+  } catch (error) {
+    console.warn("Onboarded listing lookup failed:", error.message);
+  }
+  return null;
+}
+
+async function applyOnboardedUpdatePolicy(record = {}) {
+  const existing = await findMatchingLiveListing(record);
+  const collectedAtIso = new Date().toISOString();
+  if (!existing) {
+    return {
+      ...record,
+      crawlScope: "full-new-listing",
+      collectedAtIso,
+      collectedAtLabel: collectedAtIso
+    };
+  }
+  const liveSocials = existing.socialMediaHandles || existing.socialHandles || {};
+  const incomingSocials = record.socialMediaHandles || {};
+  const mergedSocials = {
+    instagram: liveSocials.instagram || incomingSocials.instagram || existing.instagramHandle || "",
+    facebook: liveSocials.facebook || incomingSocials.facebook || "",
+    x: liveSocials.x || liveSocials.twitter || incomingSocials.x || "",
+    tiktok: liveSocials.tiktok || incomingSocials.tiktok || "",
+    floqrHandle: liveSocials.floqrHandle || incomingSocials.floqrHandle || ""
+  };
+  return {
+    ...record,
+    crawlScope: "updates-only",
+    discoveryMode: "onboarded-update-scan",
+    onboardedListingId: existing.id,
+    onboardedCollection: existing.collection || "clubLocations",
+    staticFieldsPreserved: true,
+    collectedAtIso,
+    collectedAtLabel: collectedAtIso,
+    proposedAddress: existing.fullAddress || existing.address || existing.streetAddress || record.proposedAddress || "",
+    streetAddress: existing.streetAddress || existing.addressLine1 || record.streetAddress || "",
+    city: existing.city || record.city || "",
+    stateRegion: existing.stateRegion || existing.region || record.stateRegion || "",
+    country: existing.country || record.country || "",
+    postalCode: existing.postalCode || record.postalCode || "",
+    telephone: existing.telephone || existing.phone || record.telephone || "",
+    phone: existing.telephone || existing.phone || record.phone || "",
+    email: existing.email || record.email || "",
+    officialWebsite: existing.officialWebsite || existing.website || record.officialWebsite || "",
+    website: existing.officialWebsite || existing.website || record.website || "",
+    socialMediaHandles: mergedSocials,
+    instagramHandle: mergedSocials.instagram || "",
+    // Dynamic fields stay from crawl
+    artistsOrDjs: record.artistsOrDjs || [],
+    promoters: record.promoters || [],
+    genres: uniqueListLocal([...(existing.genres || []), ...(record.genres || [])]),
+    aiSummary: `Already onboarded as ${existing.locationName || existing.brandName || existing.id}. This pass looks for lineup / event updates — contact, address, and socials stay from the live listing unless crawl found a missing social handle.`,
+    aiRatingReasons: uniqueListLocal([...(record.aiRatingReasons || []), "Onboarded venue — updates-only crawl"])
+  };
+}
+
 async function searchGooglePlaces(job, apiKey) {
   const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method:"POST",
@@ -493,10 +635,12 @@ async function searchGooglePlaces(job, apiKey) {
   });
   if (!response.ok) throw new Error(`Google Places search returned HTTP ${response.status}`);
   const payload = await response.json();
-  return (payload.places || []).map(place => {
+  const places = (payload.places || []).slice(0, 10);
+  const out = [];
+  for (const place of places) {
     const hoursStructured = venueDatapoints.hoursStructuredFromPlaces(place.regularOpeningHours || {});
     const editorial = place.editorialSummary?.text || "";
-    const baseRecord = {
+    let baseRecord = {
       proposedType:/concert|event/i.test(job.eventType || "") ? "event" : "club",
       proposedTitle:place.displayName?.text || "Discovered nightlife venue",
       proposedDescription:editorial || `Discovered through a localized ${job.language || "native-language"} Google Places query for ${job.genre || "nightlife"} in ${job.city || job.country || "the target market"}.`,
@@ -536,11 +680,14 @@ async function searchGooglePlaces(job, apiKey) {
       extractionMethod:"google-places-text-search"
     };
     Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
+    baseRecord = await enrichRecordFromPublicWebsite(baseRecord);
+    baseRecord = await applyOnboardedUpdatePolicy(baseRecord);
     baseRecord.missingDatapoints = missingDatapoints(baseRecord);
     baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     baseRecord.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
-    return baseRecord;
-  });
+    out.push(baseRecord);
+  }
+  return out;
 }
 
 async function discoverPlacesForCriteria(criteria = {}) {
@@ -579,23 +726,26 @@ function createOtpCode() {
 async function sendEmailOtp(email, code) {
   const key = SENDGRID_API_KEY.value() || process.env.SENDGRID_API_KEY || "";
   if (!key) throw new HttpsError("failed-precondition", "Email delivery is not configured. Set the SENDGRID_API_KEY secret.");
-  const body = `Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`;
+  const delivery = demoEmailOtpDelivery(email);
+  const body = `${delivery.bodyPrefix}Your FLOQR sign-in code is ${code}. It expires in 6 minutes. If you did not request this code, ignore this email.`;
   try {
     await sendSystemMail({
       apiKey: key,
       kind: "email-otp",
       source: "requestEmailOtp",
       trigger: "callable",
-      to: email,
+      to: delivery.deliveredTo,
       from: EMAIL_OTP_FROM,
-      subject: "Your FLOQR sign-in code",
+      subject: delivery.subject,
       textBody: body,
-      htmlBody: `<p>${body.replace(/</g, "&lt;")}</p>`,
-      redactBody: true
+      htmlBody: `<p>${body.replace(/</g, "&lt;").replace(/\n/g, "<br/>")}</p>`,
+      redactBody: true,
+      extra: delivery.redirected ? {demoIntendedEmail: delivery.intendedEmail} : undefined
     });
   } catch (err) {
     throw new HttpsError("internal", `Email provider returned ${err?.status || "error"}${err?.message ? `: ${String(err.message).slice(0, 180)}` : ""}.`);
   }
+  return delivery;
 }
 
 async function assertMasterAdmin(request) {
@@ -672,9 +822,13 @@ async function classifyDiscoveryRecord(record) {
 
 async function writeDiscoveryQueueItem(record) {
   const ref = db.collection("aiDiscoveryQueue").doc();
+  const collectedAtIso = record.collectedAtIso || new Date().toISOString();
   await ref.set({
     ...record,
     status:"pendingReview",
+    collectedAtIso,
+    collectedAtLabel: record.collectedAtLabel || collectedAtIso,
+    collectedAt:admin.firestore.FieldValue.serverTimestamp(),
     createdAt:admin.firestore.FieldValue.serverTimestamp(),
     updatedAt:admin.firestore.FieldValue.serverTimestamp()
   });
@@ -992,7 +1146,7 @@ exports.scheduledAiDiscoveryCrawl = onSchedule({schedule:"every 15 minutes", tim
 exports.runFloqrDiscoveryCrawl = onCall({
   region:"us-central1",
   secrets:[GOOGLE_PLACES_API_KEY],
-  timeoutSeconds:120,
+  timeoutSeconds:240,
   memory:"512MiB"
 }, async request => {
   await assertMasterAdmin(request);
@@ -1006,7 +1160,7 @@ exports.runFloqrDiscoveryCrawl = onCall({
       ...record,
       crawlRunId: runId,
       criteriaSnapshot: criteria,
-      discoveryMode: "master-admin-refined-discovery-crawl"
+      discoveryMode: record.discoveryMode || "master-admin-refined-discovery-crawl"
     });
     await writeDiscoveryQueueItem(classified);
     created += 1;
@@ -1025,6 +1179,9 @@ exports.runFloqrDiscoveryCrawl = onCall({
 
 exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {
   const email = normalizeEmail(request.data?.email);
+  if (looksLikeBrokenDemoEmail(email)) {
+    throw new HttpsError("invalid-argument", brokenDemoEmailMessage(email));
+  }
   const challengeId = crypto.createHash("sha256").update(email).digest("hex");
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
   const previous = await ref.get();
@@ -1037,8 +1194,15 @@ exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KE
     requestedAt:admin.firestore.FieldValue.serverTimestamp(),
     expiresAt:admin.firestore.Timestamp.fromMillis(Date.now() + 6 * 60 * 1000)
   });
-  await sendEmailOtp(email, code);
-  return {challengeId, expiresInSeconds:360, delivery:"email"};
+  const delivery = await sendEmailOtp(email, code);
+  return {
+    challengeId,
+    expiresInSeconds:360,
+    delivery:"email",
+    intendedEmail: delivery.intendedEmail,
+    deliveredTo: delivery.deliveredTo,
+    redirected: delivery.redirected
+  };
 });
 
 exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER]}, async request => {
@@ -1144,7 +1308,16 @@ exports.aiExtractPublicSourceUrl = functions.https.onCall(async (data, context) 
     };
   }
   const html = await fetchPublicSource(sourceUrl);
-  const record = extractDiscoveryRecordFromHtml(sourceUrl, html, sourceText);
+  let record = extractDiscoveryRecordFromHtml(sourceUrl, html, sourceText);
+  record = await enrichRecordFromPublicWebsite({
+    ...record,
+    officialWebsite: record.officialWebsite || sourceUrl,
+    website: record.website || sourceUrl,
+    sourceUrl
+  });
+  record = await applyOnboardedUpdatePolicy(record);
+  record.missingDatapoints = missingDatapoints(record);
+  record.crawlResultStatus = record.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
   return {
     status:"extracted",
     sourceUrl,

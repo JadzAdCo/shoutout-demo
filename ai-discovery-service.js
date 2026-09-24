@@ -31,10 +31,64 @@
   let db = null;
   let auth = null;
   let queueRows = [];
+  let allQueueRows = [];
   let listingRows = [];
+  let countryFilter = "all";
 
   function nowField() {
     return firebase.firestore.FieldValue.serverTimestamp();
+  }
+
+  function formatCollectedAt(item = {}) {
+    const raw = item.collectedAtIso || item.collectedAtLabel || item.collectedAt || item.createdAt;
+    if (!raw) return "";
+    try {
+      const date = raw.toDate ? raw.toDate() : (raw.seconds ? new Date(raw.seconds * 1000) : new Date(raw));
+      if (Number.isNaN(date.getTime())) return String(raw);
+      return date.toLocaleString(undefined, {dateStyle: "medium", timeStyle: "short"});
+    } catch (_e) {
+      return String(raw);
+    }
+  }
+
+  function crawlScopeBadge(item = {}) {
+    if (item.crawlScope === "updates-only" || item.discoveryMode === "onboarded-update-scan") {
+      return `<span class="status-pill">Updates only · already onboarded</span>`;
+    }
+    if (item.crawlScope === "full-new-listing") {
+      return `<span class="status-pill">New listing crawl</span>`;
+    }
+    return "";
+  }
+
+  function countryKey(item = {}) {
+    return String(item.country || "").trim() || "Unspecified";
+  }
+
+  function renderCountryTabs(rows = []) {
+    const wrap = byId("aiDiscoveryCountryTabs");
+    if (!wrap) return;
+    const counts = new Map();
+    rows.forEach(row => {
+      const key = countryKey(row);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    const countries = Array.from(counts.keys()).sort((a, b) => a.localeCompare(b));
+    const tabs = [
+      {id: "all", label: `All countries (${rows.length})`},
+      ...countries.map(name => ({id: name, label: `${name} (${counts.get(name)})`}))
+    ];
+    if (!tabs.some(tab => tab.id === countryFilter)) countryFilter = "all";
+    wrap.innerHTML = tabs.map(tab =>
+      `<button type="button" class="admin-subtab${tab.id === countryFilter ? " active" : ""}" data-discovery-country="${esc(tab.id)}">${esc(tab.label)}</button>`
+    ).join("");
+    wrap.querySelectorAll("[data-discovery-country]").forEach(button => {
+      button.addEventListener("click", () => {
+        countryFilter = button.dataset.discoveryCountry || "all";
+        renderQueueCards();
+        renderCountryTabs(allQueueRows);
+      });
+    });
   }
 
   function simpleRows(rows) {
@@ -269,13 +323,18 @@
   function queueCard(item, index) {
     item = {...parsedDataFallback(item), ...item};
     const missing = missingDatapoints(item);
+    const collected = formatCollectedAt(item);
     return `<div class="queue-item ai-discovery-item" data-queue-index="${index}">
       <div class="club-option-head">
         <div>
           <strong>${esc(item.proposedTitle || item.proposedLocationName || "Untitled discovery")}</strong>
           <p>${esc(recordKind(item))} - ${esc(window.FLOQRAddress?.publicLocation(item) || [item.city, item.country].filter(Boolean).join(", "))}</p>
+          <p class="discovery-meta">${collected ? `Collected ${esc(collected)}` : "Collected time unavailable"}${item.socialPagesFetched?.length ? ` · Social pages checked: ${esc(item.socialPagesFetched.length)}` : ""}</p>
         </div>
-        <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
+        <div>
+          <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
+          ${crawlScopeBadge(item)}
+        </div>
       </div>
       <p>${esc(item.proposedDescription || item.aiSummary || "No description yet.")}</p>
       ${readinessBanner(item, missing)}
@@ -331,6 +390,25 @@
         ${item.sourceUrl ? `<a class="buttonlike" target="_blank" href="${esc(item.sourceUrl)}">Open source</a>` : ""}
       </div>
     </div>`;
+  }
+
+  function renderQueueCards() {
+    const wrap = byId("aiDiscoveryQueueList");
+    if (!wrap) return;
+    queueRows = allQueueRows.filter(item => countryFilter === "all" || countryKey(item) === countryFilter);
+    wrap.innerHTML = queueRows.length ? queueRows.map(queueCard).join("") : "<p class='sub'>No discovery records matched.</p>";
+    wrap.querySelectorAll("[data-discovery-action]").forEach(button => {
+      const card = button.closest(".ai-discovery-item");
+      const item = queueRows[Number(card.dataset.queueIndex)];
+      button.addEventListener("click", async () => {
+        const action = button.dataset.discoveryAction;
+        if (action === "approve") return approveQueueItem(card, item);
+        if (action === "needs-research") return markNeedsResearch(card, item);
+        if (action === "reject") return setQueueStatus(item, "rejected");
+        if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
+        if (action === "delete" && confirm("Remove this discovery card from active review?")) return setQueueStatus(item, "deleted");
+      });
+    });
   }
 
   function readEditedQueueItem(card, original) {
@@ -494,7 +572,7 @@
     const status = byId("aiDiscoveryStatusFilter")?.value || "pendingReview";
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
     const rows = await getCollectionSafe("aiDiscoveryQueue", 500);
-    queueRows = rows.filter(item => {
+    allQueueRows = rows.filter(item => {
       const rowStatus = String(item.status || "pendingReview");
       if (status === "pendingReview") {
         if (rowStatus !== "pendingReview" && rowStatus !== "needsResearch") return false;
@@ -504,21 +582,8 @@
       if (city && !String(item.city || "").toLowerCase().includes(city)) return false;
       return true;
     });
-    const wrap = byId("aiDiscoveryQueueList");
-    if (!wrap) return;
-    wrap.innerHTML = queueRows.length ? queueRows.map(queueCard).join("") : "<p class='sub'>No discovery records matched.</p>";
-    wrap.querySelectorAll("[data-discovery-action]").forEach(button => {
-      const card = button.closest(".ai-discovery-item");
-      const item = queueRows[Number(card.dataset.queueIndex)];
-      button.addEventListener("click", async () => {
-        const action = button.dataset.discoveryAction;
-        if (action === "approve") return approveQueueItem(card, item);
-        if (action === "needs-research") return markNeedsResearch(card, item);
-        if (action === "reject") return setQueueStatus(item, "rejected");
-        if (action === "duplicate") return setQueueStatus(item, "pendingReview", {duplicateMarked:true, aiRatingReasons:[...(item.aiRatingReasons || []), "Marked duplicate by Super Admin"]});
-        if (action === "delete" && confirm("Remove this discovery card from active review?")) return setQueueStatus(item, "deleted");
-      });
-    });
+    renderCountryTabs(allQueueRows);
+    renderQueueCards();
   }
 
   function listingSearchText(item = {}) {

@@ -57,6 +57,45 @@ test("discovery review UX is form-first with Needs research", () => {
   assert.match(html, /design-notes-ai-discovery-crawl\.mdc/);
 });
 
+test("social handle extraction reads footer hrefs", () => {
+  const source = read("functions/venue-datapoint-extract.js");
+  assert.match(source, /listSocialSecondaryUrls/);
+  assert.match(source, /href\s*=\s*\["']/);
+  const {extractSocialHandles, listSocialSecondaryUrls} = require("./venue-datapoint-extract");
+  const html = `
+    <footer>
+      <a href="https://www.facebook.com/MonteCarloSBM">f</a>
+      <a href="https://www.instagram.com/montecarlosbm">ig</a>
+      <a href="https://x.com/MonteCarloSBM">x</a>
+      <a href="https://www.tiktok.com/@montecarlosbm">tt</a>
+      <a href="/fr/contact">Contact</a>
+    </footer>`;
+  const socials = extractSocialHandles(html);
+  assert.equal(socials.instagram, "@montecarlosbm");
+  assert.equal(socials.facebook, "MonteCarloSBM");
+  assert.equal(socials.x, "@MonteCarloSBM");
+  assert.equal(socials.tiktok, "@montecarlosbm");
+  const secondaries = listSocialSecondaryUrls(html, "https://www.montecarlosbm.com/fr/restaurant-monaco/buddha-bar-monte-carlo");
+  assert.ok(secondaries.some(url => /contact/i.test(url)));
+});
+
+test("discovery crawl enriches website socials and stamps collectedAt", () => {
+  const source = read("functions/ai-discovery-functions.js");
+  assert.match(source, /enrichRecordFromPublicWebsite/);
+  assert.match(source, /applyOnboardedUpdatePolicy/);
+  assert.match(source, /collectedAtIso/);
+  assert.match(source, /updates-only/);
+});
+
+test("master admin discovery queue has country tabs and collected label", () => {
+  const html = read("master-admin.html");
+  const discovery = read("ai-discovery-service.js");
+  assert.match(html, /aiDiscoveryCountryTabs/);
+  assert.match(discovery, /Collected /);
+  assert.match(discovery, /renderCountryTabs/);
+  assert.match(discovery, /Updates only/);
+});
+
 test("discovery Firestore rules require Master Admin writes", () => {
   const rules = read("firestore.rules");
   assert.match(rules, /match \/aiDiscoveryQueue\/\{id\}/);

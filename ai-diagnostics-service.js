@@ -4423,10 +4423,14 @@
       renderSourceExtractionReport(record);
       return;
     }
+    const collectedAtIso = new Date().toISOString();
     await state.db.collection("aiDiscoveryQueue").add({
       ...record,
+      collectedAtIso,
+      collectedAtLabel: collectedAtIso,
       createdByUid: state.auth?.currentUser?.uid || "",
       createdByEmail: state.auth?.currentUser?.email || "",
+      collectedAt: fieldValue(),
       createdAt: fieldValue(),
       updatedAt: fieldValue()
     });

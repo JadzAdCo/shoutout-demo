@@ -46,7 +46,11 @@
     {key: "logoUrl", label: "Club logo URL", group: "media", required: false},
     {key: "extractedImages", label: "Extracted images", group: "media", required: false},
     {key: "displayScreenFormatIds", label: "Display screen formats", group: "display", required: false},
-    {key: "primaryDisplayScreenFormatId", label: "Primary display format", group: "display", required: false}
+    {key: "primaryDisplayScreenFormatId", label: "Primary display format", group: "display", required: false},
+    {key: "secondaryDisplayScreenFormatId", label: "Secondary display format", group: "display", required: false},
+    {key: "VenueSupports96x48", label: "VenueSupports96x48 (0|1)", group: "display", required: false},
+    {key: "VenueSupports64x48", label: "VenueSupports64x48 (0|1)", group: "display", required: false},
+    {key: "VenueSupports64x32", label: "VenueSupports64x32 (0|1)", group: "display", required: false}
   ];
 
   function clip(value = "", max = 500) {
@@ -64,6 +68,32 @@
       out.push(raw);
     });
     return out.slice(0, max);
+  }
+
+  function as01(value, fallback = 0) {
+    if (value === 1 || value === "1" || value === true) return 1;
+    if (value === 0 || value === "0" || value === false) return 0;
+    return fallback;
+  }
+
+  function venueScreenFlags(record = {}) {
+    const explicit = ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"]
+      .some(key => record[key] === 0 || record[key] === 1 || record[key] === "0" || record[key] === "1");
+    if (explicit) {
+      return {
+        VenueSupports96x48: as01(record.VenueSupports96x48, 0),
+        VenueSupports64x48: as01(record.VenueSupports64x48, 0),
+        VenueSupports64x32: as01(record.VenueSupports64x32, 0)
+      };
+    }
+    const ids = Array.isArray(record.displayScreenFormatIds) ? record.displayScreenFormatIds.map(String) : [];
+    const hit = family => ids.some(id => id.includes(family)) ? 1 : 0;
+    if (!ids.length) return {VenueSupports96x48: 1, VenueSupports64x48: 1, VenueSupports64x32: 1};
+    return {
+      VenueSupports96x48: hit("96x48"),
+      VenueSupports64x48: hit("64x48"),
+      VenueSupports64x32: hit("64x32")
+    };
   }
 
   function extractEmail(value = "") {
@@ -84,21 +114,93 @@
 
   function extractSocialHandles(rawIn = "") {
     const raw = String(rawIn || "");
-    const pick = (re) => {
-      const m = raw.match(re);
-      return m ? clip(m[1] || m[0], 80).replace(/\/$/, "") : "";
+    const decode = (value = "") => String(value || "")
+      .replace(/&amp;/gi, "&")
+      .replace(/&#x2f;/gi, "/")
+      .replace(/&#47;/gi, "/")
+      .replace(/%2f/gi, "/");
+    const collect = (re) => {
+      const out = [];
+      const flags = re.flags.includes("g") ? re.flags : `${re.flags}g`;
+      const global = new RegExp(re.source, flags);
+      let match;
+      while ((match = global.exec(raw)) !== null) {
+        out.push(clip(decode(match[1] || match[0]), 120).replace(/\/$/, ""));
+        if (out.length >= 24) break;
+      }
+      return out;
     };
-    const ig = pick(/instagram\.com\/([A-Za-z0-9._]+)/i);
-    const fb = pick(/facebook\.com\/([A-Za-z0-9.]+)/i);
-    const tt = pick(/tiktok\.com\/@?([A-Za-z0-9._]+)/i);
-    const x = pick(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i);
+    const hrefs = collect(/href\s*=\s*["']([^"']+)["']/i);
+    const blob = `${raw}\n${hrefs.join("\n")}`;
+    const pick = (candidates, rejectRe) => {
+      for (const candidate of candidates) {
+        const value = clip(candidate, 80).replace(/^@/, "");
+        if (!value || (rejectRe && rejectRe.test(value))) continue;
+        return value;
+      }
+      return "";
+    };
+    const ig = pick([
+      ...collect(/instagram\.com\/([A-Za-z0-9._]+)/i),
+      ...hrefs.map(h => (h.match(/instagram\.com\/([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
+    ], /^(?:reel|p|stories|explore|share|accounts|about|legal|directory)$/i);
+    const fb = pick([
+      ...collect(/facebook\.com\/([A-Za-z0-9.]+)/i),
+      ...hrefs.map(h => (h.match(/facebook\.com\/([A-Za-z0-9.]+)/i) || [])[1]).filter(Boolean)
+    ], /^(?:sharer|share|dialog|plugins|pages|watch|events|groups|login|help|privacy|policies)$/i);
+    const tt = pick([
+      ...collect(/tiktok\.com\/@?([A-Za-z0-9._]+)/i),
+      ...hrefs.map(h => (h.match(/tiktok\.com\/@?([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
+    ], /^(?:explore|tag|music|share|login|signup|foryou|following)$/i);
+    const x = pick([
+      ...collect(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i),
+      ...hrefs.map(h => (h.match(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i) || [])[1]).filter(Boolean)
+    ], /^(?:intent|share|home|i|search|explore|settings|login|signup|privacy|tos)$/i);
     return {
-      instagram: ig && !/reel|p\/|stories|explore/i.test(ig) ? `@${ig.replace(/^@/, "")}` : "",
+      instagram: ig ? `@${ig.replace(/^@/, "")}` : "",
       facebook: fb || "",
       tiktok: tt ? `@${tt.replace(/^@/, "")}` : "",
-      x: x && !/intent|share|home/i.test(x) ? `@${x.replace(/^@/, "")}` : "",
+      x: x ? `@${x.replace(/^@/, "")}` : "",
       floqrHandle: ""
     };
+  }
+
+  function listSocialSecondaryUrls(html = "", baseUrl = "") {
+    let origin = "";
+    try { origin = new URL(baseUrl).origin; } catch (_e) { origin = ""; }
+    const hrefs = [];
+    const re = /href\s*=\s*["']([^"']+)["']/gi;
+    let match;
+    while ((match = re.exec(String(html || ""))) !== null) {
+      hrefs.push(match[1]);
+      if (hrefs.length >= 200) break;
+    }
+    const scored = [];
+    hrefs.forEach(href => {
+      const raw = String(href || "").trim();
+      if (!raw || raw.startsWith("#") || raw.startsWith("mailto:") || raw.startsWith("tel:") || raw.startsWith("javascript:")) return;
+      let absolute = raw;
+      try {
+        absolute = new URL(raw, baseUrl || undefined).toString();
+      } catch (_e) {
+        return;
+      }
+      if (origin && !absolute.startsWith(origin)) return;
+      if (/instagram\.com|facebook\.com|tiktok\.com|(?:twitter|x)\.com/i.test(absolute)) return;
+      const path = absolute.toLowerCase();
+      let score = 0;
+      if (/contact|contato|kontakt|contacto|nous-contacter/i.test(path)) score += 5;
+      if (/follow|social|reseaux|redes|community|newsletter/i.test(path)) score += 4;
+      if (/about|presse|press|footer/i.test(path)) score += 2;
+      if (score > 0) scored.push({url: absolute, score});
+    });
+    scored.sort((a, b) => b.score - a.score);
+    const seen = new Set();
+    return scored.map(item => item.url).filter(url => {
+      if (seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    }).slice(0, 3);
   }
 
   function extractAmenities(source = "") {
@@ -205,6 +307,8 @@
     next.publicServices = uniqueList(record.publicServices || ["ShoutOut", "Guest List"]);
     next.displayScreenFormatIds = record.displayScreenFormatIds?.length ? record.displayScreenFormatIds : ["led-96x48", "led-64x32"];
     next.primaryDisplayScreenFormatId = record.primaryDisplayScreenFormatId || "led-96x48";
+    next.secondaryDisplayScreenFormatId = record.secondaryDisplayScreenFormatId || next.primaryDisplayScreenFormatId;
+    Object.assign(next, venueScreenFlags({...record, displayScreenFormatIds: next.displayScreenFormatIds}));
     return next;
   }
 
@@ -262,6 +366,8 @@
       extractedImages: Array.isArray(edited.extractedImages) ? edited.extractedImages.slice(0, 12) : [],
       displayScreenFormatIds: edited.displayScreenFormatIds?.length ? edited.displayScreenFormatIds : ["led-96x48", "led-64x32"],
       primaryDisplayScreenFormatId: edited.primaryDisplayScreenFormatId || "led-96x48",
+      secondaryDisplayScreenFormatId: edited.secondaryDisplayScreenFormatId || edited.primaryDisplayScreenFormatId || "led-96x48",
+      ...venueScreenFlags(edited),
       publicProfilePublished: true
     };
   }
@@ -281,9 +387,11 @@
     VENUE_PUBLIC_PROFILE_DATAPOINTS,
     enrichVenueRecord,
     clubLocationPayloadFromDiscovery,
+    venueScreenFlags,
     extractEmail,
     extractPhone,
     extractSocialHandles,
+    listSocialSecondaryUrls,
     extractHoursStructured,
     hoursBlurbFromStructured,
     guessTimeZone,
