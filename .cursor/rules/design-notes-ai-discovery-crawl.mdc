@@ -1,0 +1,73 @@
+---
+description: AI discovery crawl — schedule, review UX (no JSON for operators), retention, approval
+alwaysApply: true
+---
+
+# AI discovery crawl (always)
+
+Resume: `@crawl$` / `$discovery$`.
+
+Master Admin → **AI Crawling**. Internet search (Google Places + public pages today) → parse → human review → approve → live `clubLocations` / `events`. Ticketmaster Discovery API confirmation is **later**.
+
+## Operator UX contract (non-technical)
+
+- Approval is driven by **named form fields** and a Pass/Missing checklist — never by editing JSON.
+- Raw/parsed payloads are **Advanced** only. Labels: “Source snapshot” / “What FLOQR understood” — not “JSON”.
+- Rating criteria use **number inputs** (weights). Machine dump stays under Advanced.
+- Profile import: **Prepare Club Admin imports** → review cards → Save drafts / send link. Advanced “generated data” disclosure is optional.
+- Source Detail Extraction is a **wizard**: one event/venue detail URL (not a search-results list) → extract → save.
+- Queue actions: **Approve** | **Needs research** | Reject | Duplicate | Delete.
+
+## Schedule (defaults)
+
+| Control | Default |
+|---|---|
+| Runs / day | 4 |
+| Slots | `00:00`, `06:00`, `12:00`, `18:00` |
+| Time zone | `America/New_York` |
+| Focus | Spain + Germany · Hip Hop · concert / nightclub / club / lounge |
+| Language | Native market + English |
+
+Backend: `scheduledAiDiscoveryCrawl` every **15 minutes UTC**; runs when local time is within 15 minutes of a saved slot; claims `aiCrawlRuns/{scheduleId}_{slot}`. Saved in `aiCrawlerSchedules/default`.
+
+Manual **Run Discovery Crawl** calls `runFloqrDiscoveryCrawl`. On failure: **fail loudly** — do **not** seed placeholder search-plan review cards.
+
+## Collections
+
+| Collection | Role |
+|---|---|
+| `aiCrawlerSchedules` | Enabled schedule + criteria + structured plan |
+| `aiCrawlRuns` | Manual / scheduled run lifecycle |
+| `aiDiscoveryQueue` | Review-only candidates (+ `profile-import-draft`) |
+| `aiDiscoverySources` | Enabled public source URLs |
+| `aiDiscoveryRatingCriteria` | Star/confidence weights |
+| `clubLocations` / `events` | Live after Approve |
+| `aiIndex` | Upsert on approve |
+
+## Previous data / retention
+
+- New crawls **append** queue docs; they do not overwrite pending rows.
+- Approve → queue `approved` + separate live listing.
+- Reject / Delete → status only.
+- **Stale Record Cleanup**: soft-clear ~**4 days** (`stale-cache-cleared`). Approved listings, profiles, ShoutOuts, guest lists, audit history **untouched**.
+- Profile import: `missingOnly` / never overwrite existing public-profile fields.
+
+## Approval datapoints (impactful)
+
+Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy). Incomplete → cannot Approve; use **Needs research** (`status: needsResearch`).
+
+## Security
+
+Discovery collections: **Master Admin** write. Signed-in Club Admins may **read** `aiDiscoveryQueue` docs with `discoveryMode == "profile-import-draft"` (import link). Cloud Functions use Admin SDK.
+
+## Parallel path (not this queue)
+
+`onboard-dc-venues.html` batch-seeds known DC clubs — document separately; do not confuse with discovery approve.
+
+## FIX PROMPT
+
+```
+AI crawl human UX: form-first review cards; Advanced-only source snapshot / understood fields; weight number inputs; Needs research action; Source Detail wizard; fail loud on Places miss (no placeholder queue rows); Master-Admin firestore rules for discovery collections; keep Ticketmaster later. Design notes: design-notes-ai-discovery-crawl.mdc
+```
+
+Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.

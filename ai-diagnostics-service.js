@@ -1,4 +1,5 @@
 /* FLOQR AI diagnostics, crawler engine, TXT/JSON export, rules guidance, and manual feature tests v29.09.9 */
+/* Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc */
 (function () {
   "use strict";
 
@@ -14,6 +15,7 @@
     lastSchedule: null,
     lastCrawlPlan: null,
     lastExtractedSourceRecord: null,
+    lastProfileImportRecords: [],
     lastStaleRecords: [],
     lastFeatures: [],
     lastPackageDiagnostics: [],
@@ -362,7 +364,7 @@
       version: "v28.61-crawler-profile-import",
       title: "AI Crawler Profile Import",
       checks: [
-        {label:"Crawler profile import card", file:"master-admin.html", includes:["AI Crawler Profile Import", "clubProfileImportJson", "saveClubProfileImportDraftsBtn"]},
+        {label:"Crawler profile import card", file:"master-admin.html", includes:["Club Admin profile handoff", "clubProfileImportJson", "saveClubProfileImportDraftsBtn"]},
         {label:"Club profile backfill action", file:"ai-diagnostics-service.js", includes:["backfillClubProfileFields", "Backfill Missing Club Profile Fields"]},
         {label:"Crawler JSON generator", file:"ai-diagnostics-service.js", includes:["generateCrawlerProfileJson", "profile-import-draft", "clubAdminImportUrl"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.61-crawler-profile-import"]},
@@ -407,7 +409,9 @@
       version: "v28.65-source-detail-extraction",
       title: "Source Detail Extraction",
       checks: [
-        {label:"Source extraction UI", file:"master-admin.html", includes:["sourceExtractUrl", "Extract Source Details", "Save Extracted Review Record"]},
+        {label:"Source extraction UI", file:"master-admin.html", includes:["sourceExtractUrl", "Extract details", "Save for review", "crawl-extract-steps"]},
+        {label:"Human-friendly rating weights", file:"master-admin.html", includes:["aiDiscoveryCriteriaWeights", "data-weight-key", "Advanced: weight data"]},
+        {label:"Club Admin profile handoff", file:"master-admin.html", includes:["Prepare Club Admin imports", "Club Admin profile handoff"]},
         {label:"Frontend source parser", file:"ai-diagnostics-service.js", includes:["extractSourceDetailsFromText", "saveExtractedDiscoveryRecord", "sourceExtractionReport"]},
         {label:"Backend source extractor", file:"functions/ai-discovery-functions.js", includes:["aiExtractPublicSourceUrl", "extractDiscoveryRecordFromHtml", "application\\/ld\\+json"]},
         {label:"Firebase Functions compat script", file:"master-admin.html", includes:["firebase-functions-compat.js"]},
@@ -431,7 +435,8 @@
       title: "Raw + Parsed Crawl Output",
       checks: [
         {label:"Extraction report raw and parsed output", file:"ai-diagnostics-service.js", includes:["rawCrawlInput", "parsedData", "renderAuditJsonBlock"]},
-        {label:"Queue card raw and parsed output", file:"ai-discovery-service.js", includes:["auditDetailsHtml", "Raw crawled/input data", "Parsed data used by FLOQR"]},
+        {label:"Queue card raw and parsed output", file:"ai-discovery-service.js", includes:["auditDetailsHtml", "Advanced: source snapshot", "Advanced: what FLOQR understood", "Needs research"]},
+        {label:"Manual crawl fail-loud", file:"ai-diagnostics-service.js", includes:["No placeholder review cards were created", "runFloqrDiscoveryCrawl"]},
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION", "v28.67-crawl-raw-parsed-output"]},
         {label:"README raw parsed explanation", file:"README.md", includes:["raw crawled/input data", "parsed data"]}
       ]
@@ -4324,7 +4329,7 @@
       ["Source", record.sourceName || record.sourceUrl || "-"],
       ["Missing datapoints", (record.missingDatapoints || []).join(", ") || "None"]
     ];
-    wrap.innerHTML = `${simpleRows(rows)}${renderAuditJsonBlock("Initial crawled/input data", record.rawCrawlInput || {})}${renderAuditJsonBlock("Parsed data output", record.parsedData || parsedDiscoveryData(record))}<div class="queue-item">
+    wrap.innerHTML = `${simpleRows(rows)}${renderAuditJsonBlock("Advanced: source snapshot", record.rawCrawlInput || {})}${renderAuditJsonBlock("Advanced: what FLOQR understood", record.parsedData || parsedDiscoveryData(record))}<div class="queue-item">
       <div class="message-envelope-head">
         <strong>${esc(record.proposedTitle || "Extracted source")}</strong>
         ${statusBadge(record.notApprovable ? "Failed" : (record.missingDatapoints || []).length ? "Soft Fail" : "Pass")}
@@ -4338,10 +4343,25 @@
 
   function renderAuditJsonBlock(title, value = {}) {
     const text = JSON.stringify(value || {}, null, 2);
-    return `<details class="admin-detail" open>
+    return `<details class="admin-detail">
       <summary>${esc(title)}</summary>
       <pre class="diagnostic-json">${esc(text)}</pre>
     </details>`;
+  }
+
+  function updateSourceExtractUrlHint() {
+    const hint = byId("sourceExtractUrlHint");
+    const sourceUrl = byId("sourceExtractUrl")?.value.trim() || "";
+    if (!hint) return;
+    if (!sourceUrl) {
+      hint.textContent = "";
+      return;
+    }
+    if (isSearchResultsUrl(sourceUrl)) {
+      hint.textContent = "This looks like a search list, not one event or venue page. Open a single result, then paste that page address here.";
+      return;
+    }
+    hint.textContent = "Looks like a detail page URL — you can Extract details next.";
   }
 
   async function tryBackendSourceExtraction(sourceUrl, sourceText) {
@@ -4620,24 +4640,36 @@
         if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
         return;
       } catch (error) {
-        console.warn("runFloqrDiscoveryCrawl unavailable, falling back to local candidates:", error?.message || error);
+        console.warn("runFloqrDiscoveryCrawl unavailable:", error?.message || error);
+        await runRef.set({
+          status: "failed",
+          createdRecordCount: 0,
+          fallbackMode: "none",
+          error: String(error?.message || error).slice(0, 1000),
+          completedAt: fieldValue(),
+          updatedAt: fieldValue()
+        }, {merge: true});
+        setText(
+          "diagnosticsStatus",
+          `Discovery crawl failed: ${error?.message || error}. Check that Functions are deployed and GOOGLE_PLACES_API_KEY is configured. No placeholder review cards were created.`
+        );
+        await refreshDiagnostics();
+        return;
       }
     }
-    const candidates = buildManualCrawlCandidates(criteria, runRef.id);
-    for (const item of candidates) {
-      await state.db.collection("aiDiscoveryQueue").add(item);
-    }
-    createdCount = candidates.length;
     await runRef.set({
-      status: "completed",
-      createdRecordCount: createdCount,
-      fallbackMode: "local-manual-candidates",
+      status: "failed",
+      createdRecordCount: 0,
+      fallbackMode: "none",
+      error: "Firebase Functions client unavailable",
       completedAt: fieldValue(),
       updatedAt: fieldValue()
     }, {merge: true});
-    setText("diagnosticsStatus", `Local fallback: ${createdCount} structured review record(s) added. Deploy runFloqrDiscoveryCrawl with GOOGLE_PLACES_API_KEY for live Places discovery crawls.`);
+    setText(
+      "diagnosticsStatus",
+      "Discovery crawl failed: Firebase Functions client unavailable. No placeholder review cards were created."
+    );
     await refreshDiagnostics();
-    if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
   }
 
   function staleAgeThresholdDays() {
@@ -4877,11 +4909,11 @@
         <p class="sub small">${esc([isShoutOut ? "ShoutOut queue" : "AI Discovery", row.proposedType || "", row.locationName || row.clubName || row.city, row.stateRegion, row.country].filter(Boolean).join(" - "))}</p>
         <div class="tag-row">${reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div>
         <details class="admin-detail">
-          <summary>${isShoutOut ? "Original queue record snapshot" : "Raw crawled/input data"}</summary>
+          <summary>${isShoutOut ? "Original queue record snapshot" : "Advanced: source snapshot"}</summary>
           <pre class="diagnostic-json">${esc(JSON.stringify(raw, null, 2))}</pre>
         </details>
         <details class="admin-detail">
-          <summary>${isShoutOut ? "ShoutOut queue fields" : "Parsed data used by FLOQR"}</summary>
+          <summary>${isShoutOut ? "ShoutOut queue fields" : "Advanced: what FLOQR understood"}</summary>
           <pre class="diagnostic-json">${esc(JSON.stringify(parsed, null, 2))}</pre>
         </details>
         <div class="queue-actions">
@@ -5319,17 +5351,23 @@
 
   function generateCrawlerProfileJson() {
     const records = buildProfileImportRecords(state.lastData || {});
+    state.lastProfileImportRecords = records;
     const envelope = profileImportEnvelope(records);
     const text = JSON.stringify(envelope, null, 2);
     if (byId("clubProfileImportJson")) byId("clubProfileImportJson").value = text;
-    renderClubProfileImportDrafts(records, "Generated crawler JSON from current discovery, club, and event records. Review or edit before saving import drafts.");
-    setText("diagnosticsStatus", `Generated crawler profile JSON with ${records.length} record(s).`);
+    renderClubProfileImportDrafts(records, "Prepared Club Admin import cards from current discovery, club, and event records. Review the cards, then Save import drafts.");
+    setText("diagnosticsStatus", `Prepared ${records.length} Club Admin import card(s).`);
     return envelope;
   }
 
   function parseProfileImportJson() {
     const raw = byId("clubProfileImportJson")?.value.trim() || "";
-    if (!raw) return profileImportEnvelope([]);
+    if (!raw) {
+      if (Array.isArray(state.lastProfileImportRecords) && state.lastProfileImportRecords.length) {
+        return profileImportEnvelope(state.lastProfileImportRecords);
+      }
+      return profileImportEnvelope(buildProfileImportRecords(state.lastData || {}));
+    }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) return profileImportEnvelope(parsed);
     return {
@@ -5400,12 +5438,12 @@
     try {
       envelope = parseProfileImportJson();
     } catch (error) {
-      setText("diagnosticsStatus", `Crawler JSON could not be parsed: ${error?.message || error}`);
+      setText("diagnosticsStatus", `Import data could not be read: ${error?.message || error}`);
       return;
     }
     const drafts = envelope.records.map(cleanProfileImportDraft).filter(draft => draft.targetId);
     if (!drafts.length) {
-      setText("diagnosticsStatus", "No crawler profile import records were found in the JSON.");
+      setText("diagnosticsStatus", "No Club Admin import records ready. Click Prepare Club Admin imports first.");
       return;
     }
     const saved = [];
@@ -6029,6 +6067,8 @@
     byId("clearCachedCrawlsBtn")?.addEventListener("click", clearCachedCrawlRecords);
     byId("extractSourceDetailsBtn")?.addEventListener("click", extractSourceDetails);
     byId("saveExtractedDiscoveryBtn")?.addEventListener("click", saveExtractedDiscoveryRecord);
+    byId("sourceExtractUrl")?.addEventListener("input", updateSourceExtractUrlHint);
+    byId("sourceExtractUrl")?.addEventListener("change", updateSourceExtractUrlHint);
     byId("generateClubProfileJsonBtn")?.addEventListener("click", generateCrawlerProfileJson);
     byId("saveClubProfileImportDraftsBtn")?.addEventListener("click", saveClubProfileImportDrafts);
     byId("backfillClubProfileFieldsBtn")?.addEventListener("click", backfillClubProfileFields);

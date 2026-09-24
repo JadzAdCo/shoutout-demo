@@ -495,6 +495,8 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 .admin-detail>summary::-webkit-details-marker,.json-disclosure>summary::-webkit-details-marker{display:none}
 .admin-detail>summary::before,.json-disclosure>summary::before{content:"+";display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--line);border-radius:50%;font-size:20px;line-height:1}
 .admin-detail[open]>summary::before,.json-disclosure[open]>summary::before{content:"-"}
+.crawl-extract-steps{margin:10px 0 14px;padding-left:1.25rem;line-height:1.55}
+.crawl-extract-steps li{margin:4px 0}
 .admin-detail>div,.json-disclosure>div,.json-disclosure>textarea{margin:0 14px 14px}
 .json-disclosure textarea{width:calc(100% - 28px);min-height:260px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}
 .template-view-card{width:min(980px,94vw);max-height:94vh;overflow:auto;text-align:left}

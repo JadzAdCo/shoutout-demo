@@ -35,9 +35,31 @@ test("master-admin refined discovery search UI copy", () => {
   assert.match(html, /rooftop lounge/);
 });
 
-test("runManualCrawl tries runFloqrDiscoveryCrawl callable with fallback", () => {
+test("runManualCrawl tries runFloqrDiscoveryCrawl callable and fails loud without placeholders", () => {
   const diagnostics = read("ai-diagnostics-service.js");
   assert.match(diagnostics, /runFloqrDiscoveryCrawl/);
-  assert.match(diagnostics, /buildManualCrawlCandidates/);
+  assert.match(diagnostics, /No placeholder review cards were created/);
   assert.match(diagnostics, /Ticketmaster \(later\)/);
+  assert.match(diagnostics, /buildManualCrawlCandidates/);
+  assert.doesNotMatch(diagnostics, /Local fallback:.*structured review record/);
+});
+
+test("discovery review UX is form-first with Needs research", () => {
+  const discovery = read("ai-discovery-service.js");
+  const html = read("master-admin.html");
+  assert.match(discovery, /Needs research/);
+  assert.match(discovery, /Advanced: source snapshot/);
+  assert.match(discovery, /Advanced: what FLOQR understood/);
+  assert.match(discovery, /markNeedsResearch/);
+  assert.match(html, /aiDiscoveryCriteriaWeights/);
+  assert.match(html, /Prepare Club Admin imports/);
+  assert.match(html, /crawl-extract-steps/);
+  assert.match(html, /design-notes-ai-discovery-crawl\.mdc/);
+});
+
+test("discovery Firestore rules require Master Admin writes", () => {
+  const rules = read("firestore.rules");
+  assert.match(rules, /match \/aiDiscoveryQueue\/\{id\}/);
+  assert.match(rules, /discoveryMode == "profile-import-draft"/);
+  assert.match(rules, /allow create, update, delete: if isMasterAdmin\(\)/);
 });
