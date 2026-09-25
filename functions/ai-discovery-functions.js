@@ -362,6 +362,42 @@ function missingDatapoints(record = {}) {
   return missing;
 }
 
+function contactFieldSnapshot(record = {}) {
+  const socials = record.socialMediaHandles || {};
+  return {
+    phone: !!(record.telephone || record.phone),
+    email: !!String(record.email || "").trim(),
+    instagram: !!(socials.instagram || record.instagramHandle),
+    facebook: !!String(socials.facebook || "").trim()
+  };
+}
+
+function isContactComplete(snapshot = {}) {
+  return !!(snapshot.phone && snapshot.email && snapshot.instagram);
+}
+
+function summarizeContactLift(rows = []) {
+  const n = rows.length || 0;
+  const beforeComplete = rows.filter(r => isContactComplete(r.before)).length;
+  const afterComplete = rows.filter(r => isContactComplete(r.after)).length;
+  const gained = {
+    phone: rows.filter(r => !r.before.phone && r.after.phone).length,
+    email: rows.filter(r => !r.before.email && r.after.email).length,
+    instagram: rows.filter(r => !r.before.instagram && r.after.instagram).length,
+    facebook: rows.filter(r => !r.before.facebook && r.after.facebook).length
+  };
+  return {
+    sampled: n,
+    beforeComplete,
+    afterComplete,
+    contactCompleteBeforePct: n ? Math.round((beforeComplete / n) * 1000) / 10 : 0,
+    contactCompleteAfterPct: n ? Math.round((afterComplete / n) * 1000) / 10 : 0,
+    liftPctPoints: n ? Math.round(((afterComplete - beforeComplete) / n) * 1000) / 10 : 0,
+    gained,
+    note: "Contact-complete = Phone + Email + Instagram"
+  };
+}
+
 async function fetchPublicSource(sourceUrl) {
   const url = safeUrl(sourceUrl);
   const controller = new AbortController();
@@ -721,11 +757,16 @@ async function searchGooglePlaces(job, apiKey) {
       extractionMethod:"google-places-text-search"
     };
     Object.assign(baseRecord, venueDatapoints.enrichVenueRecord(baseRecord, {html: "", text: `${editorial} ${place.formattedAddress || ""}`}));
+    const contactBefore = contactFieldSnapshot(baseRecord);
     baseRecord = await enrichRecordFromPublicWebsite(baseRecord);
     baseRecord = await applyOnboardedUpdatePolicy(baseRecord);
     baseRecord.missingDatapoints = missingDatapoints(baseRecord);
     baseRecord.crawlResultStatus = baseRecord.missingDatapoints.length ? "missing-required-datapoints" : "ready-for-approval";
     baseRecord.venuePublicProfileDatapoints = venueDatapoints.VENUE_PUBLIC_PROFILE_DATAPOINTS.map(x => x.key);
+    baseRecord.contactLift = {
+      before: contactBefore,
+      after: contactFieldSnapshot(baseRecord)
+    };
     out.push(baseRecord);
   }
   return out;
@@ -1196,26 +1237,140 @@ exports.runFloqrDiscoveryCrawl = onCall({
   const runId = String(request.data?.runId || "");
   const records = await discoverPlacesForCriteria({...criteria, structuredPlan});
   let created = 0;
+  const liftRows = [];
   for (const record of records) {
+    if (record.contactLift) liftRows.push(record.contactLift);
     const classified = await classifyDiscoveryRecord({
       ...record,
       crawlRunId: runId,
       criteriaSnapshot: criteria,
       discoveryMode: record.discoveryMode || "master-admin-refined-discovery-crawl"
     });
+    // Strip ephemeral lift object before write (kept only in response stats).
+    delete classified.contactLift;
     await writeDiscoveryQueueItem(classified);
     created += 1;
   }
+  const contactStats = summarizeContactLift(liftRows);
   return {
     created,
     placesConfigured: !!optionalPlacesKey(),
     ticketmaster: "later",
+    contactStats,
     message: created
-      ? `Discovery crawl wrote ${created} Google Places candidate(s). Complete DJ/artist, promoter, email, and Instagram before approval.`
+      ? `Discovery crawl wrote ${created} Google Places candidate(s). Contact-complete ${contactStats.contactCompleteBeforePct}% → ${contactStats.contactCompleteAfterPct}% after website enrich.`
       : (optionalPlacesKey()
         ? "No Places matches for this refined search. Broaden city/genre/type or add a public page extraction."
         : "GOOGLE_PLACES_API_KEY is not configured. Set the Firebase secret to run live discovery crawls.")
   };
+});
+
+/**
+ * Instant crawl: use saved schedule (or request criteria), short job cap, run now.
+ * Does not wait for the 15-minute schedule slot window.
+ */
+exports.runInstantDiscoveryCrawl = onCall({
+  region: "us-central1",
+  secrets: [GOOGLE_PLACES_API_KEY],
+  timeoutSeconds: 300,
+  memory: "512MiB"
+}, async request => {
+  await assertMasterAdmin(request);
+  const jobLimit = Math.max(1, Math.min(12, Number(request.data?.jobLimit || 8)));
+  const scheduleSnap = await db.collection("aiCrawlerSchedules").doc("default").get();
+  const schedule = scheduleSnap.exists ? (scheduleSnap.data() || {}) : {};
+  const criteria = {
+    ...(schedule.criteria || {}),
+    ...(request.data?.criteria || {})
+  };
+  let structuredPlan = request.data?.structuredPlan || criteria.structuredPlan || schedule.criteria?.structuredPlan || {};
+  const jobs = Array.isArray(structuredPlan.jobs) ? structuredPlan.jobs.slice(0, jobLimit) : [];
+  structuredPlan = {...structuredPlan, jobs, jobCount: jobs.length};
+  criteria.structuredPlan = structuredPlan;
+
+  const runRef = db.collection("aiCrawlRuns").doc();
+  await runRef.set({
+    trigger: "instant",
+    mode: "instant-discovery-crawl",
+    status: "running",
+    criteria,
+    structuredPlan,
+    jobLimit,
+    requestedByUid: request.auth?.uid || "",
+    requestedByEmail: String(request.auth?.token?.email || ""),
+    startedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  try {
+    const records = await discoverPlacesForCriteria(criteria);
+    let created = 0;
+    const liftRows = [];
+    const examples = [];
+    for (const record of records) {
+      if (record.contactLift) {
+        liftRows.push(record.contactLift);
+        if (examples.length < 8) {
+          examples.push({
+            title: record.proposedTitle || record.proposedLocationName || "",
+            site: record.officialWebsite || record.website || "",
+            before: record.contactLift.before,
+            after: record.contactLift.after
+          });
+        }
+      }
+      const classified = await classifyDiscoveryRecord({
+        ...record,
+        crawlRunId: runRef.id,
+        criteriaSnapshot: criteria,
+        discoveryMode: "instant-discovery-crawl",
+        extractionMethod: `${record.extractionMethod || "google-places-text-search"}+instant`
+      });
+      delete classified.contactLift;
+      await writeDiscoveryQueueItem(classified);
+      created += 1;
+    }
+    const contactStats = summarizeContactLift(liftRows);
+    const message = created
+      ? `Instant crawl wrote ${created} candidate(s) from ${jobs.length} job(s). Contact-complete ${contactStats.contactCompleteBeforePct}% → ${contactStats.contactCompleteAfterPct}% (+${contactStats.liftPctPoints} pp).`
+      : (optionalPlacesKey()
+        ? `Instant crawl found no Places matches for ${jobs.length} job(s). Broaden the saved schedule.`
+        : "GOOGLE_PLACES_API_KEY is not configured.");
+    await runRef.set({
+      status: "completed",
+      createdRecordCount: created,
+      resultCount: created,
+      jobLimit,
+      jobsAttempted: jobs.length,
+      contactStats,
+      placesConfigured: !!optionalPlacesKey(),
+      completedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      note: message
+    }, {merge: true});
+    return {
+      created,
+      runId: runRef.id,
+      jobsAttempted: jobs.length,
+      jobLimit,
+      placesConfigured: !!optionalPlacesKey(),
+      contactStats,
+      examples,
+      baselines: {
+        previousEngineContactCompletePct: 0,
+        enrichV1ContactCompletePct: 37.8,
+        note: "Baselines from incomplete-queue contact enrich benchmark (n=45) before aggregator/WhatsApp pass."
+      },
+      message
+    };
+  } catch (error) {
+    await runRef.set({
+      status: "failed",
+      error: String(error?.message || error).slice(0, 1000),
+      completedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+    throw new HttpsError("internal", `Instant crawl failed: ${error?.message || error}`);
+  }
 });
 
 exports.requestEmailOtp = onCall({region:"us-central1", secrets:[SENDGRID_API_KEY, EMAIL_OTP_PEPPER]}, async request => {

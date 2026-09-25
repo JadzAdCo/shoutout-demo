@@ -1,5 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.95 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.96 (stable)
 
+- s3.0.96: Instant Crawl Now on Master Admin — short job-cap run of the saved schedule with contact-lift stats vs prior baselines.
 - s3.0.95: Discovery contact completeness — aggregator brand-domain preferencer, WhatsApp phone harvest, ordered crawl UI reads.
 
 - s3.0.42: NFL dual LED fix  checkout uses nflJersey caps (not soccer 812); frame 2 solid black; NFL dual shout panel uses nflMainText slice (not soccer 14-char cap); FloqR card FROM @handle wiring + reusable paintFloqrCard.

@@ -7,6 +7,19 @@ const path = require("node:path");
 
 const read = relativePath => fs.readFileSync(path.resolve(__dirname, "..", relativePath), "utf8");
 
+test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
+  const source = read("functions/ai-discovery-functions.js");
+  assert.match(source, /exports\.runInstantDiscoveryCrawl\s*=\s*onCall/);
+  assert.match(source, /summarizeContactLift/);
+  assert.match(source, /instant-discovery-crawl/);
+  const html = read("master-admin.html");
+  assert.match(html, /runInstantCrawlBtn/);
+  assert.match(html, /Instant Crawl Now/);
+  const diagnostics = read("ai-diagnostics-service.js");
+  assert.match(diagnostics, /runInstantCrawl/);
+  assert.match(diagnostics, /runInstantDiscoveryCrawl/);
+});
+
 test("runFloqrDiscoveryCrawl export exists in ai-discovery-functions", () => {
   const source = read("functions/ai-discovery-functions.js");
   assert.match(source, /exports\.runFloqrDiscoveryCrawl\s*=\s*onCall/);

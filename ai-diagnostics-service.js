@@ -4626,6 +4626,50 @@
     }));
   }
 
+  async function runInstantCrawl() {
+    if (!state.db) return;
+    if (!window.firebase?.app) {
+      setText("diagnosticsStatus", "Instant crawl failed: Firebase Functions client unavailable.");
+      return;
+    }
+    const schedule = await readScheduleSafe();
+    const criteria = schedule?.criteria || readCriteriaFromControls();
+    const plan = criteria?.structuredPlan || buildCrawlSearchPlan(criteria || readCriteriaFromControls());
+    const jobLimit = 8;
+    setText("diagnosticsStatus", `Instant crawl starting (${Math.min(jobLimit, plan.jobCount || plan.jobs?.length || 0)} job cap)...`);
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("runInstantDiscoveryCrawl");
+      const result = await callable({
+        criteria,
+        structuredPlan: plan,
+        jobLimit
+      });
+      const data = result?.data || {};
+      const stats = data.contactStats || {};
+      const statusMessage = data.message
+        || `Instant crawl wrote ${data.created || 0} record(s). Contact-complete ${stats.contactCompleteBeforePct ?? "—"}% → ${stats.contactCompleteAfterPct ?? "—"}%.`;
+      setText("diagnosticsStatus", statusMessage);
+      const report = byId("crawlSearchPlanReport");
+      if (report && data.contactStats) {
+        const baselines = data.baselines || {};
+        report.innerHTML = `${report.innerHTML || ""}
+          <div class="queue-item" style="margin-top:12px">
+            <strong>Instant crawl contact lift</strong>
+            <p>Created: ${esc(data.created || 0)} · Jobs: ${esc(data.jobsAttempted || 0)}/${esc(data.jobLimit || jobLimit)}</p>
+            <p>This run contact-complete: ${esc(stats.contactCompleteBeforePct)}% → ${esc(stats.contactCompleteAfterPct)}% (+${esc(stats.liftPctPoints)} pp)</p>
+            <p>Gained IG ${esc(stats.gained?.instagram || 0)} · Email ${esc(stats.gained?.email || 0)} · FB ${esc(stats.gained?.facebook || 0)} · Phone ${esc(stats.gained?.phone || 0)}</p>
+            <small>Baselines: previous engine ${esc(baselines.previousEngineContactCompletePct ?? 0)}% · enrich v1 ${esc(baselines.enrichV1ContactCompletePct ?? 37.8)}%</small>
+          </div>`;
+      }
+      await refreshDiagnostics();
+      if (window.FLOQRAIDiscovery?.loadDiscoveryQueue) await window.FLOQRAIDiscovery.loadDiscoveryQueue();
+    } catch (error) {
+      console.warn("runInstantDiscoveryCrawl failed:", error?.message || error);
+      setText("diagnosticsStatus", `Instant crawl failed: ${error?.message || error}`);
+      await refreshDiagnostics();
+    }
+  }
+
   async function runManualCrawl() {
     if (!state.db) return;
     const user = state.auth?.currentUser;
@@ -6101,6 +6145,7 @@
     byId("saveCrawlScheduleBtn")?.addEventListener("click", () => saveCrawlSchedule());
     byId("previewCrawlPlanBtn")?.addEventListener("click", previewCrawlPlan);
     byId("runManualCrawlBtn")?.addEventListener("click", runManualCrawl);
+    byId("runInstantCrawlBtn")?.addEventListener("click", runInstantCrawl);
     byId("searchStaleRecordsBtn")?.addEventListener("click", () => searchStaleRecords());
     byId("removeSelectedStaleRecordsBtn")?.addEventListener("click", removeSelectedStaleRecords);
     byId("removeAllFoundStaleRecordsBtn")?.addEventListener("click", removeAllFoundStaleRecords);
