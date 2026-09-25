@@ -22,15 +22,19 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 
 | Control | Default |
 |---|---|
-| Runs / day | 4 |
-| Slots | `00:00`, `06:00`, `12:00`, `18:00` |
-| Time zone | `America/New_York` |
+| Runs / day | 6 (live `aiCrawlerSchedules/default`) |
+| Slots | `00:00`, `04:00`, `08:00`, `12:00`, `16:00`, `20:00` |
+| Time zone | `UTC` on live schedule doc (design default was `America/New_York`) |
 | Focus | Spain + Germany · Hip Hop · concert / nightclub / club / lounge |
 | Language | Native market + English |
 
 Backend: `scheduledAiDiscoveryCrawl` every **15 minutes UTC**; runs when local time is within 15 minutes of a saved slot; claims `aiCrawlRuns/{scheduleId}_{slot}`. Saved in `aiCrawlerSchedules/default`.
 
+**UI load pitfall:** Master Admin must read `aiCrawlRuns` with `orderBy(startedAt, desc)` and `aiDiscoveryQueue` with `orderBy(createdAt, desc)`. An unordered `.limit(N)` returns document-id order, so run ids like `default_2026-07-*` fill the page and the newest successful slot (still writing in Sept+) never appears — operators report a false “last crawl July 28.”
+
 Manual **Run Discovery Crawl** calls `runFloqrDiscoveryCrawl`. On failure: **fail loudly** — do **not** seed placeholder search-plan review cards.
+
+**Social / contact enrichment:** Prefer `href` / JSON-LD `sameAs` / `mailto:` / `tel:` / `wa.me` over visible text. Rank Instagram/Facebook handles against the venue name + website host so photographer credit links lose to `@gateclubparis`. Penalize aggregator chrome (`privateaser`, marketplace emails). When Places `websiteUri` is an aggregator (Privateaser, OpenTable, TheFork, TripAdvisor, Yelp, RA/Dice/Shotgun/Eventbrite, Linktree, Paris Society), always follow linked official brand domains and re-rank Facebook/email even if Instagram was already filled. When Instagram or email/phone is still missing, follow up to **4** same-origin secondary pages (contact, privatisation, about, réseaux) — never CSS/JS/wp-content assets. **Do not scrape Facebook.com** (login walls); collect Facebook URLs only when the venue website links them.
 
 ## Collections
 
@@ -70,8 +74,10 @@ Venues almost always expose Instagram / Facebook / TikTok / X in the **footer** 
 
 1. Parse **all** `href` social URLs from the page HTML (not only the first text match).
 2. After Google Places returns `websiteUri`, **fetch that website** and enrich socials.
-3. If still empty, follow up to **2 same-origin secondary pages** (contact / follow / social / réseaux).
-4. Stamp `socialPagesFetched` on the queue record for audit.
+3. If `websiteUri` is an **aggregator**, always follow linked **official brand domains** (venue-name host hit), re-rank Facebook/email, and promote `officialWebsite` to the brand domain when found.
+4. If still empty, follow up to **4** same-origin secondary pages (contact / follow / social / réseaux) — never CSS/JS/wp-content assets. Skip same-origin contact guesses on aggregator hosts.
+5. Parse `wa.me` / WhatsApp into telephone when phone is missing.
+6. Stamp `socialPagesFetched` on the queue record for audit.
 
 ## Timestamps
 
@@ -93,7 +99,7 @@ Review Discovery Queue shows dynamic **country tabs** (All + each country presen
 ## FIX PROMPT
 
 ```
-AI crawl: href-based footer socials + website follow-up + secondary contact pages; collectedAt on queue cards; updates-only for onboarded clubLocations; country tabs on Review Discovery Queue. Design notes: design-notes-ai-discovery-crawl.mdc
+AI crawl: aggregator brand-domain preferencer + WhatsApp phone + href socials + secondary contact pages; collectedAt; updates-only; country tabs. Design notes: design-notes-ai-discovery-crawl.mdc
 ```
 
 Key files: `master-admin.html`, `ai-discovery-service.js`, `ai-diagnostics-service.js`, `floqr-venue-datapoints.js`, `functions/venue-datapoint-extract.js`, `functions/ai-discovery-functions.js`, `firestore.rules`.

@@ -96,66 +96,160 @@
     };
   }
 
-  function extractEmail(value = "") {
-    const match = String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-    if (!match) return "";
-    const email = match[0];
-    if (/example\.com|sentry\.|wixpress|schema\.org/i.test(email)) return "";
-    return email;
+  function extractEmail(value = "", context = {}) {
+    const raw = String(value || "");
+    const mailto = [...raw.matchAll(/mailto:([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi)].map(m => m[1]);
+    const plain = [...raw.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)].map(m => m[0]);
+    let hostHint = "";
+    try {
+      hostHint = new URL(context.website || context.officialWebsite || "").hostname.replace(/^www\./i, "").toLowerCase();
+    } catch (_e) { hostHint = ""; }
+    const candidates = [...mailto, ...plain].filter(email =>
+      !/example\.com|sentry\.|wixpress|schema\.org|wordpress|w3\.org|googleapis|gstatic/i.test(email)
+    );
+    if (hostHint) {
+      const root = hostHint.split(".").slice(-2).join(".");
+      const domainMatch = candidates.find(email => {
+        const lower = String(email).toLowerCase();
+        return lower.endsWith(`@${hostHint}`) || lower.endsWith(`@${root}`);
+      });
+      if (domainMatch) return domainMatch;
+    }
+    return candidates[0] || "";
   }
 
   function extractPhone(value = "") {
-    const matches = String(value || "").match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
-    return (matches.find(item => {
-      const digits = item.replace(/\D/g, "");
-      return digits.length >= 8 && digits.length <= 15 && !/^\d{6}$/.test(digits);
+    const raw = String(value || "");
+    const whatsappHits = [
+      ...[...raw.matchAll(/(?:wa\.me|api\.whatsapp\.com\/send\?phone=)\/?(\d{8,15})/gi)].map(m => m[1])
+    ];
+    const whatsapp = whatsappHits[0] ? `+${String(whatsappHits[0]).replace(/\D/g, "")}` : "";
+    const telHrefs = [...raw.matchAll(/href\s*=\s*["']tel:([^"']+)["']/gi)].map(m => decodeURIComponent(m[1] || "").trim());
+    const labeled = [...raw.matchAll(/(?:tel|phone|telephone|call|appeler)\s*[:#]?\s*([+\d][\d\s()./-]{7,22}\d)/gi)].map(m => m[1]);
+    const loose = raw.match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
+    const candidates = [whatsapp, ...telHrefs, ...labeled, ...loose].filter(Boolean);
+    return (candidates.find(item => {
+      const text = String(item || "").trim();
+      if (!text) return false;
+      const at = raw.indexOf(text);
+      if (/ver=\d|wp-content|fonts\.google|timestamp|unix/i.test(raw.slice(Math.max(0, at - 24), at + text.length + 12))) return false;
+      const digits = text.replace(/\D/g, "");
+      if (digits.length < 8 || digits.length > 15) return false;
+      if (/^20\d{8,}$/.test(digits) && !/[+\s().-]/.test(text) && !telHrefs.includes(text) && text !== whatsapp) return false;
+      return true;
     }) || "").trim();
   }
 
-  function extractSocialHandles(rawIn = "") {
-    const raw = String(rawIn || "");
-    const decode = (value = "") => String(value || "")
+  function isAggregatorWebsite(url = "") {
+    try {
+      const host = new URL(String(url || "").startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./i, "").toLowerCase();
+      return /(?:^|\.)(?:privateaser|opentable|thefork|lafourchette|tripadvisor|yelp|timeout|residentadvisor|ra\.co|shotgun\.live|dice\.fm|eventbrite|facebook|instagram|linktr\.ee|beacons\.ai|paris-society)\b/i.test(host);
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  function decodeHtmlUrl(value = "") {
+    return String(value || "")
       .replace(/&amp;/gi, "&")
       .replace(/&#x2f;/gi, "/")
       .replace(/&#47;/gi, "/")
       .replace(/%2f/gi, "/");
-    const collect = (re) => {
-      const out = [];
-      const flags = re.flags.includes("g") ? re.flags : `${re.flags}g`;
-      const global = new RegExp(re.source, flags);
-      let match;
-      while ((match = global.exec(raw)) !== null) {
-        out.push(clip(decode(match[1] || match[0]), 120).replace(/\/$/, ""));
-        if (out.length >= 24) break;
-      }
-      return out;
-    };
-    const hrefs = collect(/href\s*=\s*["']([^"']+)["']/i);
-    const blob = `${raw}\n${hrefs.join("\n")}`;
-    const pick = (candidates, rejectRe) => {
-      for (const candidate of candidates) {
+  }
+
+  function venueHandleHints(context = {}) {
+    const tokens = [];
+    const push = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).forEach(t => {
+      if (t.length >= 3) tokens.push(t);
+    });
+    push(context.venueName);
+    push(context.proposedTitle);
+    push(context.locationName);
+    try {
+      const host = new URL(context.website || context.officialWebsite || "").hostname.replace(/^www\./i, "");
+      push(host.replace(/\.[a-z]{2,}$/i, "").replace(/\./g, " "));
+      const slug = host.split(".")[0];
+      if (slug) tokens.push(slug);
+    } catch (_e) { /* ignore */ }
+    return [...new Set(tokens)];
+  }
+
+  function scoreSocialHandle(handle = "", platform = "", hints = []) {
+    const value = String(handle || "").replace(/^@/, "").toLowerCase();
+    if (!value) return -100;
+    let score = 1;
+    hints.forEach(hint => {
+      if (!hint) return;
+      if (value === hint) score += 12;
+      else if (value.includes(hint) || hint.includes(value)) score += 8;
+    });
+    if (/photo|photo(s|grapher)?|studio|agency|design|media|press|prinz|llorca|tuturfu/i.test(value)) score -= 6;
+    if (/privateaser|opentable|thefork|tripadvisor|yelp|timeout|shotgun|dicefm|eventbrite|linktree|beacons/i.test(value)) score -= 14;
+    if (platform === "facebook" && /profile\.php|people\//i.test(value)) score -= 4;
+    return score;
+  }
+
+  function collectRegex(raw, re, limit = 40) {
+    const out = [];
+    const flags = re.flags.includes("g") ? re.flags : `${re.flags}g`;
+    const global = new RegExp(re.source, flags);
+    let match;
+    while ((match = global.exec(String(raw || ""))) !== null) {
+      out.push(decodeHtmlUrl(match[1] || match[0]).replace(/\/$/, ""));
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+
+  function extractJsonLdSameAs(html = "") {
+    const out = [];
+    const blocks = collectRegex(html, /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i, 8);
+    blocks.forEach(block => {
+      try {
+        const parsed = JSON.parse(block);
+        const nodes = Array.isArray(parsed) ? parsed : [parsed, ...(Array.isArray(parsed["@graph"]) ? parsed["@graph"] : [])];
+        nodes.forEach(node => {
+          const sameAs = node?.sameAs;
+          (Array.isArray(sameAs) ? sameAs : sameAs ? [sameAs] : []).forEach(url => out.push(String(url || "")));
+        });
+      } catch (_e) { /* ignore */ }
+    });
+    return out;
+  }
+
+  function extractSocialHandles(rawIn = "", context = {}) {
+    const raw = String(rawIn || "");
+    const hrefs = collectRegex(raw, /href\s*=\s*["']([^"']+)["']/i, 120);
+    const dataUrls = collectRegex(raw, /data-(?:url|href|link|social(?:-url)?)\s*=\s*["']([^"']+)["']/i, 40);
+    const sameAs = extractJsonLdSameAs(raw);
+    const blob = `${raw}\n${hrefs.join("\n")}\n${dataUrls.join("\n")}\n${sameAs.join("\n")}`;
+    const hints = venueHandleHints(context);
+    const pick = (candidates, rejectRe, platform) => {
+      const ranked = [];
+      candidates.forEach(candidate => {
         const value = clip(candidate, 80).replace(/^@/, "");
-        if (!value || (rejectRe && rejectRe.test(value))) continue;
-        return value;
-      }
-      return "";
+        if (!value || (rejectRe && rejectRe.test(value))) return;
+        ranked.push({value, score: scoreSocialHandle(value, platform, hints)});
+      });
+      ranked.sort((a, b) => b.score - a.score);
+      return ranked[0]?.score > 0 ? ranked[0].value : (ranked[0]?.value || "");
     };
     const ig = pick([
-      ...collect(/instagram\.com\/([A-Za-z0-9._]+)/i),
+      ...collectRegex(blob, /instagram\.com\/([A-Za-z0-9._]+)/i),
       ...hrefs.map(h => (h.match(/instagram\.com\/([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
-    ], /^(?:reel|p|stories|explore|share|accounts|about|legal|directory)$/i);
+    ], /^(?:reel|p|stories|explore|share|accounts|about|legal|directory|tv|tags)$/i, "instagram");
     const fb = pick([
-      ...collect(/facebook\.com\/([A-Za-z0-9.]+)/i),
-      ...hrefs.map(h => (h.match(/facebook\.com\/([A-Za-z0-9.]+)/i) || [])[1]).filter(Boolean)
-    ], /^(?:sharer|share|dialog|plugins|pages|watch|events|groups|login|help|privacy|policies)$/i);
+      ...collectRegex(blob, /facebook\.com\/(?:pages\/[^/]+\/)?([A-Za-z0-9.]+)/i),
+      ...hrefs.map(h => (h.match(/facebook\.com\/(?:pages\/[^/]+\/)?([A-Za-z0-9.]+)/i) || [])[1]).filter(Boolean)
+    ], /^(?:sharer|share|dialog|plugins|pages|watch|events|groups|login|help|privacy|policies|tr|r\.php)$/i, "facebook");
     const tt = pick([
-      ...collect(/tiktok\.com\/@?([A-Za-z0-9._]+)/i),
+      ...collectRegex(blob, /tiktok\.com\/@?([A-Za-z0-9._]+)/i),
       ...hrefs.map(h => (h.match(/tiktok\.com\/@?([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
-    ], /^(?:explore|tag|music|share|login|signup|foryou|following)$/i);
+    ], /^(?:explore|tag|music|share|login|signup|foryou|following)$/i, "tiktok");
     const x = pick([
-      ...collect(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i),
+      ...collectRegex(blob, /(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i),
       ...hrefs.map(h => (h.match(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i) || [])[1]).filter(Boolean)
-    ], /^(?:intent|share|home|i|search|explore|settings|login|signup|privacy|tos)$/i);
+    ], /^(?:intent|share|home|i|search|explore|settings|login|signup|privacy|tos)$/i, "x");
     return {
       instagram: ig ? `@${ig.replace(/^@/, "")}` : "",
       facebook: fb || "",
@@ -165,16 +259,12 @@
     };
   }
 
-  function listSocialSecondaryUrls(html = "", baseUrl = "") {
+  function listSocialSecondaryUrls(html = "", baseUrl = "", context = {}) {
     let origin = "";
     try { origin = new URL(baseUrl).origin; } catch (_e) { origin = ""; }
-    const hrefs = [];
-    const re = /href\s*=\s*["']([^"']+)["']/gi;
-    let match;
-    while ((match = re.exec(String(html || ""))) !== null) {
-      hrefs.push(match[1]);
-      if (hrefs.length >= 200) break;
-    }
+    const baseIsAggregator = isAggregatorWebsite(baseUrl);
+    const hints = venueHandleHints(context);
+    const hrefs = collectRegex(html, /href\s*=\s*["']([^"']+)["']/i, 250);
     const scored = [];
     hrefs.forEach(href => {
       const raw = String(href || "").trim();
@@ -185,22 +275,57 @@
       } catch (_e) {
         return;
       }
-      if (origin && !absolute.startsWith(origin)) return;
-      if (/instagram\.com|facebook\.com|tiktok\.com|(?:twitter|x)\.com/i.test(absolute)) return;
+      const sameOrigin = origin && absolute.startsWith(origin);
+      if (/instagram\.com|facebook\.com|tiktok\.com|(?:twitter|x)\.com|behance\.net|linkedin\.com|wa\.me|whatsapp\.com/i.test(absolute)) return;
       const path = absolute.toLowerCase();
+      if (/\.(?:css|js|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|pdf|xml)(?:$|\?)/i.test(path)) return;
+      if (/\/wp-(?:content|includes|json|admin)\//i.test(path)) return;
+      if (/feed\/?$|\/#|\/cart|\/checkout|\/login|\/account/i.test(path)) return;
+      if (isAggregatorWebsite(absolute) && !sameOrigin) return;
       let score = 0;
-      if (/contact|contato|kontakt|contacto|nous-contacter/i.test(path)) score += 5;
-      if (/follow|social|reseaux|redes|community|newsletter/i.test(path)) score += 4;
-      if (/about|presse|press|footer/i.test(path)) score += 2;
-      if (score > 0) scored.push({url: absolute, score});
+      if (/contact|contato|kontakt|contacto|nous-contacter|contact-us|get-in-touch/i.test(path)) score += 6;
+      if (/privatisation|reservation|book(?:ing)?|infos?|access|plan|venir/i.test(path)) score += 5;
+      if (/follow|social|reseaux|r[eé]seaux|redes|community|newsletter|actualit/i.test(path)) score += 4;
+      if (/about|a-propos|qui-sommes|presse|press|team|equipe|footer|mentions/i.test(path)) score += 3;
+      if (!sameOrigin) {
+        const hostHit = hints.some(hint => hint.length >= 4 && path.includes(hint));
+        if (!hostHit) return;
+        score += baseIsAggregator ? 20 : 7;
+      } else if (baseIsAggregator && /reservation|book(?:ing)?|team-building|privatisation/i.test(path)) {
+        score -= 4;
+      }
+      if (score > 0) scored.push({url: absolute.split("#")[0], score});
     });
-    scored.sort((a, b) => b.score - a.score);
+    scored.sort((a, b) => b.score - a.score || a.url.length - b.url.length);
     const seen = new Set();
-    return scored.map(item => item.url).filter(url => {
-      if (seen.has(url)) return false;
-      seen.add(url);
+    const fromPage = scored.map(item => item.url).filter(url => {
+      const key = url.replace(/\/$/, "").toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
-    }).slice(0, 3);
+    });
+    const guesses = [
+      "/contact", "/contact-us", "/contactus", "/nous-contacter",
+      "/about", "/about-us", "/a-propos", "/infos", "/info",
+      "/privatisation", "/reservations", "/reservation"
+    ];
+    if (origin && !baseIsAggregator) {
+      guesses.forEach(path => {
+        const url = `${origin}${path}`;
+        const key = url.replace(/\/$/, "").toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        fromPage.push(url);
+      });
+    }
+    return fromPage.slice(0, 8);
+  }
+
+  function listOfficialBrandUrls(html = "", baseUrl = "", context = {}) {
+    if (!isAggregatorWebsite(baseUrl)) return [];
+    return listSocialSecondaryUrls(html, baseUrl, context)
+      .filter(url => !isAggregatorWebsite(url))
+      .slice(0, 3);
   }
 
   function extractAmenities(source = "") {
@@ -284,16 +409,38 @@
   function enrichVenueRecord(record = {}, {html = "", text: visibleText = ""} = {}) {
     const blob = `${html}\n${visibleText}\n${record.proposedDescription || ""}`;
     const next = {...record};
-    const socials = extractSocialHandles(blob);
+    const socialContext = {
+      venueName: record.proposedTitle || record.proposedLocationName || record.locationName || record.brandName || "",
+      proposedTitle: record.proposedTitle || "",
+      locationName: record.locationName || "",
+      website: record.officialWebsite || record.website || record.sourceUrl || "",
+      officialWebsite: record.officialWebsite || ""
+    };
+    const socials = extractSocialHandles(blob, socialContext);
+    const hints = venueHandleHints(socialContext);
+    const pickBetterHandle = (existing, incoming, platform) => {
+      const a = String(existing || "").replace(/^@/, "");
+      const b = String(incoming || "").replace(/^@/, "");
+      if (!a) return incoming || "";
+      if (!b) return existing || "";
+      return scoreSocialHandle(b, platform, hints) > scoreSocialHandle(a, platform, hints) ? incoming : existing;
+    };
     next.socialMediaHandles = {
-      instagram: record.socialMediaHandles?.instagram || socials.instagram,
-      facebook: record.socialMediaHandles?.facebook || socials.facebook,
-      x: record.socialMediaHandles?.x || socials.x,
-      tiktok: record.socialMediaHandles?.tiktok || socials.tiktok,
+      instagram: pickBetterHandle(record.socialMediaHandles?.instagram, socials.instagram, "instagram"),
+      facebook: pickBetterHandle(record.socialMediaHandles?.facebook, socials.facebook, "facebook"),
+      x: pickBetterHandle(record.socialMediaHandles?.x, socials.x, "x"),
+      tiktok: pickBetterHandle(record.socialMediaHandles?.tiktok, socials.tiktok, "tiktok"),
       floqrHandle: record.socialMediaHandles?.floqrHandle || ""
     };
-    next.email = record.email || extractEmail(blob);
-    next.telephone = record.telephone || record.phone || extractPhone(blob);
+    const incomingEmail = extractEmail(blob, socialContext);
+    if (!record.email) next.email = incomingEmail;
+    else if (incomingEmail && /privateaser|opentable|thefork|example\.com/i.test(String(record.email))) next.email = incomingEmail;
+    else next.email = record.email;
+    const nextPhone = extractPhone(blob);
+    next.telephone = record.telephone || record.phone || nextPhone;
+    if (nextPhone && /^\+/.test(nextPhone) && !/^\+/.test(String(record.telephone || record.phone || ""))) {
+      next.telephone = nextPhone;
+    }
     next.phone = next.telephone;
     next.amenities = uniqueList([...(record.amenities || []), ...extractAmenities(blob)]);
     next.agePolicy = record.agePolicy || extractAgePolicy(blob);
@@ -388,6 +535,8 @@
     enrichVenueRecord,
     clubLocationPayloadFromDiscovery,
     venueScreenFlags,
+    isAggregatorWebsite,
+    listOfficialBrandUrls,
     extractEmail,
     extractPhone,
     extractSocialHandles,

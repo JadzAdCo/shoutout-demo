@@ -61,7 +61,8 @@ test("social handle extraction reads footer hrefs", () => {
   const source = read("functions/venue-datapoint-extract.js");
   assert.match(source, /listSocialSecondaryUrls/);
   assert.match(source, /href\s*=\s*\["']/);
-  const {extractSocialHandles, listSocialSecondaryUrls} = require("./venue-datapoint-extract");
+  assert.match(source, /venueHandleHints|scoreSocialHandle/);
+  const {extractSocialHandles, listSocialSecondaryUrls, enrichVenueRecord} = require("./venue-datapoint-extract");
   const html = `
     <footer>
       <a href="https://www.facebook.com/MonteCarloSBM">f</a>
@@ -79,9 +80,116 @@ test("social handle extraction reads footer hrefs", () => {
   assert.ok(secondaries.some(url => /contact/i.test(url)));
 });
 
+test("Gate Club Paris prefers venue Instagram over photographer credits", () => {
+  const {extractSocialHandles, listSocialSecondaryUrls, enrichVenueRecord, extractPhone, extractEmail, socialHandlesFromWebsiteUrl} = require("./venue-datapoint-extract");
+  const html = `
+    <link rel="stylesheet" href="https://www.gateclubparis.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=5.8.6"/>
+    <a href="tel:0171253215">01 71 25 32 15</a>
+    <a href="mailto:privatisation@gateclubparis.com">Contact</a>
+    <a href="https://www.instagram.com/gateclubparis/"><i class="fab fa-instagram"></i> Actualités</a>
+    <a href="/contact-us/">Contact Us</a>
+    <a href="/about-us/">About</a>
+    <a href="/#privatisation">Privatisation</a>
+    <p>Photos : <a href="https://www.instagram.com/justin_prinz/">Justin Prinz</a>
+       / <a href="https://www.instagram.com/mickaelllorca/">Mickael Llorca</a></p>
+    <script type="application/ld+json">{"@type":"NightClub","sameAs":["https://www.instagram.com/gateclubparis/"]}</script>
+  `;
+  const socials = extractSocialHandles(html, {
+    venueName: "Gate Club Paris",
+    website: "https://www.gateclubparis.com/"
+  });
+  assert.equal(socials.instagram, "@gateclubparis");
+  assert.notEqual(socials.instagram, "@justin_prinz");
+  const secondaries = listSocialSecondaryUrls(html, "https://www.gateclubparis.com/", {venueName: "Gate Club Paris"});
+  assert.ok(secondaries.every(url => !/\.css/i.test(url)), "secondary urls must exclude CSS assets");
+  assert.ok(secondaries.some(url => /contact-us/i.test(url)));
+  assert.ok(secondaries.some(url => /about-us/i.test(url)));
+  assert.match(extractPhone(html), /0171253215|01\s*71/);
+  assert.equal(extractEmail(html, {website: "https://www.gateclubparis.com/"}), "privatisation@gateclubparis.com");
+  const enriched = enrichVenueRecord({
+    proposedTitle: "Gate Club Paris",
+    officialWebsite: "https://www.gateclubparis.com/"
+  }, {html, text: "Gate Club Paris"});
+  assert.equal(enriched.socialMediaHandles.instagram, "@gateclubparis");
+  assert.equal(enriched.email, "privatisation@gateclubparis.com");
+  assert.equal(socialHandlesFromWebsiteUrl("https://www.instagram.com/thisissanctum/").instagram, "@thisissanctum");
+  assert.equal(socialHandlesFromWebsiteUrl("https://m.facebook.com/ledistrictparis/").facebook, "ledistrictparis");
+});
+
+test("Buddha-Bar Monte-Carlo brand page supplies venue email", () => {
+  const {enrichVenueRecord, extractPhone} = require("./venue-datapoint-extract");
+  const sbm = `
+    <a href="https://www.instagram.com/montecarlosbm">ig</a>
+    <a href="https://www.facebook.com/MonteCarloSBM">fb</a>
+    <p>+377 98 06 19 19</p>
+    <a href="https://www.buddhabar.com/en/restaurants/buddha-bar-monte-carlo/">Brand</a>
+  `;
+  const brand = `
+    <a href="mailto:buddhabarmontecarlo@sbm.mc">mail</a>
+    <p>Tel : +377 98 06 19 19</p>
+  `;
+  let rec = enrichVenueRecord({
+    proposedTitle: "Buddha-Bar Monte-Carlo",
+    officialWebsite: "https://www.montecarlosbm.com/fr/restaurant-monaco/buddha-bar-monte-carlo"
+  }, {html: sbm, text: "Buddha-Bar Monte-Carlo"});
+  rec = enrichVenueRecord(rec, {html: brand, text: "Buddha-Bar Monte-Carlo"});
+  assert.equal(rec.email, "buddhabarmontecarlo@sbm.mc");
+  assert.match(extractPhone(sbm + brand), /\+377/);
+  assert.ok(rec.socialMediaHandles.instagram || rec.socialMediaHandles.facebook);
+});
+
+test("aggregator listing prefers official brand domain contacts", () => {
+  const {
+    isAggregatorWebsite,
+    listSocialSecondaryUrls,
+    listOfficialBrandUrls,
+    enrichVenueRecord,
+    extractWhatsAppPhone,
+    extractPhone
+  } = require("./venue-datapoint-extract");
+  assert.equal(isAggregatorWebsite("https://www.privateaser.com/lieu/674-charlotte-club"), true);
+  assert.equal(isAggregatorWebsite("https://charlotte-club.fr/"), false);
+  const privateaserHtml = `
+    <a href="https://www.instagram.com/charlotteclubparis/">ig</a>
+    <a href="https://www.facebook.com/privateaser">fb platform</a>
+    <a href="mailto:contact@privateaser.com">mail</a>
+    <a href="https://www.privateaser.com/reservation-bar/top-bars-team-building-paris">booking</a>
+    <a href="https://charlotte-club.fr/">Official site</a>
+  `;
+  const secondaries = listSocialSecondaryUrls(privateaserHtml, "https://www.privateaser.com/lieu/674-charlotte-club", {
+    venueName: "Charlotte Bar/Club Paris"
+  });
+  assert.ok(secondaries[0] && /charlotte-club\.fr/i.test(secondaries[0]), `brand domain should rank first, got ${secondaries[0]}`);
+  assert.deepEqual(listOfficialBrandUrls(privateaserHtml, "https://www.privateaser.com/lieu/674-charlotte-club", {
+    venueName: "Charlotte Bar/Club Paris"
+  }).slice(0, 1), ["https://charlotte-club.fr/"]);
+
+  let rec = enrichVenueRecord({
+    proposedTitle: "Charlotte Bar/Club Paris",
+    officialWebsite: "https://www.privateaser.com/lieu/674-charlotte-club"
+  }, {html: privateaserHtml});
+  assert.equal(rec.socialMediaHandles.instagram, "@charlotteclubparis");
+  assert.equal(rec.socialMediaHandles.facebook, "privateaser");
+  const brandHtml = `
+    <a href="https://instagram.com/charlotteclubparis?igshid=YmMyMTA2M2Y=" aria-label="Instagram"></a>
+    <a href="https://www.facebook.com/CharlotteBarBastille" aria-label="Facebook"></a>
+    <p>E-mail: contactcharlotte.bar@gmail.com</p>
+    <p>Tél: 09 74 64 01 36</p>
+  `;
+  rec = enrichVenueRecord(rec, {html: brandHtml, text: "Charlotte Club"});
+  assert.equal(rec.socialMediaHandles.facebook, "CharlotteBarBastille");
+  assert.equal(rec.email, "contactcharlotte.bar@gmail.com");
+
+  const nua = `<a href="http://wa.me/33648100403">WhatsApp</a><a href="mailto:nuaparisevent@gmail.com">mail</a>`;
+  assert.equal(extractWhatsAppPhone(nua), "+33648100403");
+  assert.equal(extractPhone(nua), "+33648100403");
+});
+
 test("discovery crawl enriches website socials and stamps collectedAt", () => {
   const source = read("functions/ai-discovery-functions.js");
   assert.match(source, /enrichRecordFromPublicWebsite/);
+  assert.match(source, /needsSecondaryContactCrawl/);
+  assert.match(source, /listOfficialBrandUrls|looksLikeAggregatorContact/);
   assert.match(source, /applyOnboardedUpdatePolicy/);
   assert.match(source, /collectedAtIso/);
   assert.match(source, /updates-only/);

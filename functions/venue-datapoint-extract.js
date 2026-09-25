@@ -98,67 +98,230 @@ function venueScreenFlags(record = {}) {
   };
 }
 
-function extractEmail(value = "") {
-  const match = String(value || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-  if (!match) return "";
-  const email = match[0];
-  if (/example\.com|sentry\.|wixpress|schema\.org/i.test(email)) return "";
-  return email;
+/** Listing / marketplace hosts that should not be treated as the venue's own site. */
+const AGGREGATOR_HOST_RE = /(?:^|\.)(?:privateaser|opentable|thefork|lafourchette|tripadvisor|yelp|timeout|residentadvisor|ra\.co|shotgun\.live|dice\.fm|eventbrite|facebook|instagram|linktr\.ee|beacons\.ai|paris-society)\b/i;
+
+function hostnameOf(url = "") {
+  try {
+    return new URL(String(url || "").trim().startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./i, "").toLowerCase();
+  } catch (_e) {
+    return "";
+  }
+}
+
+function isAggregatorWebsite(url = "") {
+  const host = hostnameOf(url);
+  return !!(host && AGGREGATOR_HOST_RE.test(host));
+}
+
+function isAggregatorEmail(email = "") {
+  const domain = String(email || "").split("@")[1] || "";
+  return !!(domain && AGGREGATOR_HOST_RE.test(domain));
+}
+
+function extractWhatsAppPhone(value = "") {
+  const raw = String(value || "");
+  const hits = [
+    ...[...raw.matchAll(/(?:wa\.me|api\.whatsapp\.com\/send\?phone=)\/?(\d{8,15})/gi)].map(m => m[1]),
+    ...[...raw.matchAll(/["']https?:\/\/(?:wa\.me|api\.whatsapp\.com\/send\?phone=)\/?(\d{8,15})/gi)].map(m => m[1])
+  ];
+  const digits = String(hits[0] || "").replace(/\D/g, "");
+  if (digits.length < 8 || digits.length > 15) return "";
+  return `+${digits}`;
+}
+
+function scoreEmailCandidate(email = "", context = {}) {
+  const value = String(email || "").toLowerCase();
+  if (!value || !value.includes("@")) return -100;
+  let score = 1;
+  if (isAggregatorEmail(value) || /example\.com|sentry\.|wixpress|schema\.org|wordpress|w3\.org|googleapis|gstatic/i.test(value)) score -= 12;
+  const hints = venueHandleHints(context);
+  const local = value.split("@")[0] || "";
+  const domain = value.split("@")[1] || "";
+  hints.forEach(hint => {
+    if (!hint || hint.length < 4) return;
+    if (local.includes(hint) || domain.includes(hint)) score += 8;
+  });
+  let hostHint = "";
+  try {
+    hostHint = hostnameOf(context.website || context.officialWebsite || "");
+  } catch (_e) { hostHint = ""; }
+  if (hostHint && !isAggregatorWebsite(hostHint) && (value.endsWith(`@${hostHint}`) || value.includes(`@${hostHint.split(".").slice(-2).join(".")}`))) {
+    score += 10;
+  }
+  return score;
+}
+
+function extractEmail(value = "", context = {}) {
+  const raw = String(value || "");
+  const mailto = [...raw.matchAll(/mailto:([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi)].map(m => m[1]);
+  const plain = [...raw.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)].map(m => m[0]);
+  const candidates = [...mailto, ...plain].filter(email =>
+    !/example\.com|sentry\.|wixpress|schema\.org|wordpress|w3\.org|googleapis|gstatic/i.test(email)
+  );
+  const ranked = candidates
+    .map(email => ({email, score: scoreEmailCandidate(email, context)}))
+    .sort((a, b) => b.score - a.score);
+  return ranked[0]?.score > -10 ? ranked[0].email : (ranked[0]?.email || "");
 }
 
 function extractPhone(value = "") {
-  const matches = String(value || "").match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
-  return (matches.find(item => {
-    const digits = item.replace(/\D/g, "");
-    return digits.length >= 8 && digits.length <= 15 && !/^\d{6}$/.test(digits);
+  const raw = String(value || "");
+  const whatsapp = extractWhatsAppPhone(raw);
+  const telHrefs = [...raw.matchAll(/href\s*=\s*["']tel:([^"']+)["']/gi)].map(m => decodeURIComponent(m[1] || "").trim());
+  const labeled = [...raw.matchAll(/(?:tel|phone|telephone|call|appeler|t[eé]l(?:[eé]phone)?)\s*[:#]?\s*([+\d][\d\s()./-]{7,22}\d)/gi)].map(m => m[1]);
+  const intl = raw.match(/\+\d{1,3}[\s.-]?(?:\(?\d{1,4}\)?[\s.-]?){2,5}\d{2,4}/g) || [];
+  const loose = raw.match(/(?:\+\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,4}\d{2,4}/g) || [];
+  const candidates = [whatsapp, ...telHrefs, ...labeled, ...intl, ...loose].filter(Boolean);
+  return (candidates.find(item => {
+    const text = String(item || "").trim();
+    if (!text) return false;
+    const at = raw.indexOf(text);
+    if (at >= 0 && /ver=\d|wp-content|fonts\.google|timestamp|unix|datetime|data-time/i.test(raw.slice(Math.max(0, at - 24), at + text.length + 12))) return false;
+    const digits = text.replace(/\D/g, "");
+    if (digits.length < 8 || digits.length > 15) return false;
+    // Reject epoch/ms-like blobs and bare long digit runs without a + or separators.
+    if (/^1[0-9]{11,}$/.test(digits)) return false;
+    if (digits.length >= 12 && !/^\+/.test(text) && !/[()\s.-]/.test(text) && !telHrefs.includes(text) && text !== whatsapp) return false;
+    if (/^20\d{8,}$/.test(digits) && !/[+\s().-]/.test(text) && !telHrefs.includes(text) && text !== whatsapp) return false;
+    return true;
   }) || "").trim();
 }
 
-function extractSocialHandles(textOrHtml = "") {
-  const raw = String(textOrHtml || "");
-  const decode = (value = "") => String(value || "")
+function socialHandlesFromWebsiteUrl(website = "") {
+  const raw = String(website || "").trim();
+  if (!raw) return {instagram: "", facebook: "", tiktok: "", x: ""};
+  try {
+    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    const host = url.hostname.replace(/^www\./i, "").toLowerCase();
+    const path = url.pathname.replace(/\/+$/, "");
+    if (/instagram\.com$/i.test(host)) {
+      const handle = (path.match(/^\/([A-Za-z0-9._]+)/) || [])[1] || "";
+      if (handle && !/^(reel|p|stories|explore|share|accounts)$/i.test(handle)) {
+        return {instagram: `@${handle}`, facebook: "", tiktok: "", x: ""};
+      }
+    }
+    if (/facebook\.com$/i.test(host) || /^m\.facebook\.com$/i.test(host) || /fb\.com$/i.test(host)) {
+      const handle = (path.match(/^\/(?:pages\/[^/]+\/)?([A-Za-z0-9.]+)/) || [])[1] || "";
+      if (handle && !/^(sharer|share|dialog|plugins|watch|events|groups|login|profile\.php|docs|developers|business|ads|\d+)$/i.test(handle)) {
+        return {instagram: "", facebook: handle, tiktok: "", x: ""};
+      }
+    }
+    if (/tiktok\.com$/i.test(host)) {
+      const handle = (path.match(/^\/@?([A-Za-z0-9._]+)/) || [])[1] || "";
+      if (handle) return {instagram: "", facebook: "", tiktok: `@${handle}`, x: ""};
+    }
+    if (/^(?:twitter|x)\.com$/i.test(host)) {
+      const handle = (path.match(/^\/([A-Za-z0-9_]+)/) || [])[1] || "";
+      if (handle && !/^(intent|share|home|i|search)$/i.test(handle)) {
+        return {instagram: "", facebook: "", tiktok: "", x: `@${handle}`};
+      }
+    }
+  } catch (_e) { /* ignore */ }
+  return {instagram: "", facebook: "", tiktok: "", x: ""};
+}
+
+function decodeHtmlUrl(value = "") {
+  return String(value || "")
     .replace(/&amp;/gi, "&")
     .replace(/&#x2f;/gi, "/")
     .replace(/&#47;/gi, "/")
     .replace(/%2f/gi, "/");
-  const collect = (re) => {
-    const out = [];
-    const flags = re.flags.includes("g") ? re.flags : `${re.flags}g`;
-    const global = new RegExp(re.source, flags);
-    let match;
-    while ((match = global.exec(raw)) !== null) {
-      out.push(clip(decode(match[1] || match[0]), 120).replace(/\/$/, ""));
-      if (out.length >= 24) break;
-    }
-    return out;
-  };
-  const hrefs = collect(/href\s*=\s*["']([^"']+)["']/i);
-  const titled = collect(/(?:aria-label|title)\s*=\s*["']([^"']*(?:instagram|facebook|tiktok|twitter|\bx\b)[^"']*)["']/i);
-  const blob = `${raw}\n${hrefs.join("\n")}\n${titled.join("\n")}`;
-  const pick = (candidates, rejectRe) => {
-    for (const candidate of candidates) {
+}
+
+function venueHandleHints(context = {}) {
+  const tokens = [];
+  const push = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).forEach(t => {
+    if (t.length >= 3) tokens.push(t);
+  });
+  push(context.venueName);
+  push(context.proposedTitle);
+  push(context.locationName);
+  try {
+    const host = new URL(context.website || context.officialWebsite || "").hostname.replace(/^www\./i, "");
+    push(host.replace(/\.[a-z]{2,}$/i, "").replace(/\./g, " "));
+    const slug = host.split(".")[0];
+    if (slug) tokens.push(slug);
+  } catch (_e) { /* ignore */ }
+  return [...new Set(tokens)];
+}
+
+function scoreSocialHandle(handle = "", platform = "", hints = []) {
+  const value = String(handle || "").replace(/^@/, "").toLowerCase();
+  if (!value) return -100;
+  let score = 1;
+  hints.forEach(hint => {
+    if (!hint) return;
+    if (value === hint) score += 12;
+    else if (value.includes(hint) || hint.includes(value)) score += 8;
+  });
+  if (/photo|photo(s|grapher)?|studio|agency|design|media|press|prinz|llorca|tuturfu/i.test(value)) score -= 6;
+  if (/privateaser|opentable|thefork|tripadvisor|yelp|timeout|shotgun|dicefm|eventbrite|linktree|beacons/i.test(value)) score -= 14;
+  if (platform === "facebook" && /profile\.php|people\//i.test(value)) score -= 4;
+  return score;
+}
+
+function collectRegex(raw, re, limit = 40) {
+  const out = [];
+  const flags = re.flags.includes("g") ? re.flags : `${re.flags}g`;
+  const global = new RegExp(re.source, flags);
+  let match;
+  while ((match = global.exec(String(raw || ""))) !== null) {
+    out.push(decodeHtmlUrl(match[1] || match[0]).replace(/\/$/, ""));
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+function extractJsonLdSameAs(html = "") {
+  const out = [];
+  const blocks = collectRegex(html, /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i, 8);
+  blocks.forEach(block => {
+    try {
+      const parsed = JSON.parse(block);
+      const nodes = Array.isArray(parsed) ? parsed : [parsed, ...(Array.isArray(parsed["@graph"]) ? parsed["@graph"] : [])];
+      nodes.forEach(node => {
+        const sameAs = node?.sameAs;
+        (Array.isArray(sameAs) ? sameAs : sameAs ? [sameAs] : []).forEach(url => out.push(String(url || "")));
+      });
+    } catch (_e) { /* ignore malformed JSON-LD */ }
+  });
+  return out;
+}
+
+function extractSocialHandles(textOrHtml = "", context = {}) {
+  const raw = String(textOrHtml || "");
+  const hrefs = collectRegex(raw, /href\s*=\s*["']([^"']+)["']/i, 120);
+  const dataUrls = collectRegex(raw, /data-(?:url|href|link|social(?:-url)?)\s*=\s*["']([^"']+)["']/i, 40);
+  const sameAs = extractJsonLdSameAs(raw);
+  const blob = `${raw}\n${hrefs.join("\n")}\n${dataUrls.join("\n")}\n${sameAs.join("\n")}`;
+  const hints = venueHandleHints(context);
+  const pick = (candidates, rejectRe, platform) => {
+    const ranked = [];
+    candidates.forEach(candidate => {
       const value = clip(candidate, 80).replace(/^@/, "");
-      if (!value || (rejectRe && rejectRe.test(value))) continue;
-      return value;
-    }
-    return "";
+      if (!value || (rejectRe && rejectRe.test(value))) return;
+      ranked.push({value, score: scoreSocialHandle(value, platform, hints)});
+    });
+    ranked.sort((a, b) => b.score - a.score);
+    return ranked[0]?.score > 0 ? ranked[0].value : (ranked[0]?.value || "");
   };
   const ig = pick([
-    ...collect(/instagram\.com\/([A-Za-z0-9._]+)/i),
+    ...collectRegex(blob, /instagram\.com\/([A-Za-z0-9._]+)/i),
     ...hrefs.map(h => (h.match(/instagram\.com\/([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
-  ], /^(?:reel|p|stories|explore|share|accounts|about|legal|directory)$/i);
+  ], /^(?:reel|p|stories|explore|share|accounts|about|legal|directory|tv|tags)$/i, "instagram");
   const fb = pick([
-    ...collect(/facebook\.com\/([A-Za-z0-9.]+)/i),
-    ...hrefs.map(h => (h.match(/facebook\.com\/([A-Za-z0-9.]+)/i) || [])[1]).filter(Boolean)
-  ], /^(?:sharer|share|dialog|plugins|pages|watch|events|groups|login|help|privacy|policies)$/i);
+    ...collectRegex(blob, /facebook\.com\/(?:pages\/[^/]+\/)?([A-Za-z0-9.]+)/i),
+    ...hrefs.map(h => (h.match(/facebook\.com\/(?:pages\/[^/]+\/)?([A-Za-z0-9.]+)/i) || [])[1]).filter(Boolean)
+  ], /^(?:sharer|share|dialog|plugins|pages|watch|events|groups|login|help|privacy|policies|tr|r\.php|docs|developers|business|ads|gaming|marketplace|\d+)$/i, "facebook");
   const tt = pick([
-    ...collect(/tiktok\.com\/@?([A-Za-z0-9._]+)/i),
+    ...collectRegex(blob, /tiktok\.com\/@?([A-Za-z0-9._]+)/i),
     ...hrefs.map(h => (h.match(/tiktok\.com\/@?([A-Za-z0-9._]+)/i) || [])[1]).filter(Boolean)
-  ], /^(?:explore|tag|music|share|login|signup|foryou|following)$/i);
+  ], /^(?:explore|tag|music|share|login|signup|foryou|following)$/i, "tiktok");
   const x = pick([
-    ...collect(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i),
+    ...collectRegex(blob, /(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i),
     ...hrefs.map(h => (h.match(/(?:twitter|x)\.com\/([A-Za-z0-9_]+)/i) || [])[1]).filter(Boolean)
-  ], /^(?:intent|share|home|i|search|explore|settings|login|signup|privacy|tos)$/i);
+  ], /^(?:intent|share|home|i|search|explore|settings|login|signup|privacy|tos)$/i, "x");
   return {
     instagram: ig ? `@${ig.replace(/^@/, "")}` : "",
     facebook: fb || "",
@@ -168,16 +331,12 @@ function extractSocialHandles(textOrHtml = "") {
   };
 }
 
-function listSocialSecondaryUrls(html = "", baseUrl = "") {
+function listSocialSecondaryUrls(html = "", baseUrl = "", context = {}) {
   let origin = "";
   try { origin = new URL(baseUrl).origin; } catch (_e) { origin = ""; }
-  const hrefs = [];
-  const re = /href\s*=\s*["']([^"']+)["']/gi;
-  let match;
-  while ((match = re.exec(String(html || ""))) !== null) {
-    hrefs.push(match[1]);
-    if (hrefs.length >= 200) break;
-  }
+  const baseIsAggregator = isAggregatorWebsite(baseUrl);
+  const hints = venueHandleHints(context);
+  const hrefs = collectRegex(html, /href\s*=\s*["']([^"']+)["']/i, 250);
   const scored = [];
   hrefs.forEach(href => {
     const raw = String(href || "").trim();
@@ -188,22 +347,59 @@ function listSocialSecondaryUrls(html = "", baseUrl = "") {
     } catch (_e) {
       return;
     }
-    if (origin && !absolute.startsWith(origin)) return;
-    if (/instagram\.com|facebook\.com|tiktok\.com|(?:twitter|x)\.com/i.test(absolute)) return;
+    const sameOrigin = origin && absolute.startsWith(origin);
+    if (/instagram\.com|facebook\.com|tiktok\.com|(?:twitter|x)\.com|behance\.net|linkedin\.com|wa\.me|whatsapp\.com/i.test(absolute)) return;
     const path = absolute.toLowerCase();
+    if (/\.(?:css|js|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|pdf|xml)(?:$|\?)/i.test(path)) return;
+    if (/\/wp-(?:content|includes|json|admin)\//i.test(path)) return;
+    if (/feed\/?$|\/#|\/cart|\/checkout|\/login|\/account/i.test(path)) return;
+    if (isAggregatorWebsite(absolute) && !sameOrigin) return;
     let score = 0;
-    if (/contact|contato|kontakt|contacto|nous-contacter/i.test(path)) score += 5;
-    if (/follow|social|reseaux|redes|community|newsletter/i.test(path)) score += 4;
-    if (/about|presse|press|footer/i.test(path)) score += 2;
-    if (score > 0) scored.push({url: absolute, score});
+    if (/contact|contato|kontakt|contacto|nous-contacter|contact-us|get-in-touch/i.test(path)) score += 6;
+    if (/privatisation|reservation|book(?:ing)?|infos?|access|plan|venir/i.test(path)) score += 5;
+    if (/follow|social|reseaux|r[eé]seaux|redes|community|newsletter|actualit/i.test(path)) score += 4;
+    if (/about|a-propos|qui-sommes|presse|press|team|equipe|footer|mentions/i.test(path)) score += 3;
+    if (!sameOrigin) {
+      // Off-site brand pages (e.g. charlotte-club.fr from Privateaser, buddhabar.com from SBM).
+      const hostHit = hints.some(hint => hint.length >= 4 && path.includes(hint));
+      if (!hostHit) return;
+      score += baseIsAggregator ? 20 : 7;
+    } else if (baseIsAggregator && /reservation|book(?:ing)?|team-building|privatisation/i.test(path)) {
+      // Keep aggregator booking pages below official brand domains.
+      score -= 4;
+    }
+    if (score > 0) scored.push({url: absolute.split("#")[0], score, sameOrigin: !!sameOrigin});
   });
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a, b) => b.score - a.score || a.url.length - b.url.length);
   const seen = new Set();
-  return scored.map(item => item.url).filter(url => {
-    if (seen.has(url)) return false;
-    seen.add(url);
+  const fromPage = scored.map(item => item.url).filter(url => {
+    const key = url.replace(/\/$/, "").toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
-  }).slice(0, 3);
+  });
+  const guesses = [
+    "/contact", "/contact-us", "/contactus", "/nous-contacter",
+    "/about", "/about-us", "/a-propos", "/infos", "/info",
+    "/privatisation", "/reservations", "/reservation"
+  ];
+  if (origin && !baseIsAggregator) {
+    guesses.forEach(path => {
+      const url = `${origin}${path}`;
+      const key = url.replace(/\/$/, "").toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      fromPage.push(url);
+    });
+  }
+  return fromPage.slice(0, 8);
+}
+
+function listOfficialBrandUrls(html = "", baseUrl = "", context = {}) {
+  if (!isAggregatorWebsite(baseUrl)) return [];
+  return listSocialSecondaryUrls(html, baseUrl, context)
+    .filter(url => !isAggregatorWebsite(url))
+    .slice(0, 3);
 }
 
 function extractUrlByLabel(htmlOrText = "", labels = []) {
@@ -391,16 +587,54 @@ function extractPromotersHint(text = "") {
 function enrichVenueRecord(record = {}, {html = "", text: visibleText = ""} = {}) {
   const blob = `${html}\n${visibleText}\n${record.proposedDescription || ""}\n${record.aiSummary || ""}`;
   const next = {...record};
-  const socials = extractSocialHandles(blob);
+  const fromWebsite = socialHandlesFromWebsiteUrl(record.officialWebsite || record.website || record.sourceUrl || "");
+  const socialContext = {
+    venueName: record.proposedTitle || record.proposedLocationName || record.locationName || record.brandName || "",
+    proposedTitle: record.proposedTitle || "",
+    locationName: record.locationName || "",
+    website: record.officialWebsite || record.website || record.sourceUrl || "",
+    officialWebsite: record.officialWebsite || ""
+  };
+  const socials = extractSocialHandles(blob, socialContext);
+  const pickBetterHandle = (existing, incoming, platform) => {
+    const a = String(existing || "").replace(/^@/, "");
+    const b = String(incoming || "").replace(/^@/, "");
+    if (!a) return incoming || "";
+    if (!b) return existing || "";
+    const scoreA = scoreSocialHandle(a, platform, venueHandleHints(socialContext));
+    const scoreB = scoreSocialHandle(b, platform, venueHandleHints(socialContext));
+    return scoreB > scoreA ? incoming : existing;
+  };
   next.socialMediaHandles = {
-    instagram: record.socialMediaHandles?.instagram || socials.instagram,
-    facebook: record.socialMediaHandles?.facebook || socials.facebook,
-    x: record.socialMediaHandles?.x || socials.x,
-    tiktok: record.socialMediaHandles?.tiktok || socials.tiktok,
+    instagram: pickBetterHandle(record.socialMediaHandles?.instagram || fromWebsite.instagram, socials.instagram || fromWebsite.instagram, "instagram"),
+    facebook: pickBetterHandle(record.socialMediaHandles?.facebook || fromWebsite.facebook, socials.facebook || fromWebsite.facebook, "facebook"),
+    x: pickBetterHandle(record.socialMediaHandles?.x || fromWebsite.x, socials.x || fromWebsite.x, "x"),
+    tiktok: pickBetterHandle(record.socialMediaHandles?.tiktok || fromWebsite.tiktok, socials.tiktok || fromWebsite.tiktok, "tiktok"),
     floqrHandle: record.socialMediaHandles?.floqrHandle || ""
   };
-  next.email = record.email || extractEmail(blob);
-  next.telephone = record.telephone || record.phone || extractPhone(blob);
+  const emailContext = {
+    ...socialContext,
+    website: record.officialWebsite || record.website || "",
+    officialWebsite: record.officialWebsite || ""
+  };
+  const incomingEmail = extractEmail(blob, emailContext);
+  const existingEmail = String(record.email || "");
+  if (!existingEmail) {
+    next.email = incomingEmail;
+  } else if (incomingEmail && scoreEmailCandidate(incomingEmail, emailContext) > scoreEmailCandidate(existingEmail, emailContext)) {
+    next.email = incomingEmail;
+  } else {
+    next.email = existingEmail;
+  }
+  const nextPhone = extractPhone(blob);
+  // Prefer international (+country) numbers over domestic fragments once we have either.
+  if (!record.telephone && !record.phone) {
+    next.telephone = nextPhone;
+  } else if (nextPhone && /^\+/.test(nextPhone) && !/^\+/.test(String(record.telephone || record.phone || ""))) {
+    next.telephone = nextPhone;
+  } else {
+    next.telephone = record.telephone || record.phone || nextPhone;
+  }
   next.phone = next.telephone;
   next.amenities = uniqueList([...(record.amenities || []), ...extractAmenities(blob)]);
   next.agePolicy = record.agePolicy || extractAgePolicy(blob);
@@ -517,10 +751,16 @@ module.exports = {
   DAY_KEYS,
   DAY_LABELS,
   VENUE_PUBLIC_PROFILE_DATAPOINTS,
+  AGGREGATOR_HOST_RE,
+  isAggregatorWebsite,
+  isAggregatorEmail,
   extractEmail,
   extractPhone,
+  extractWhatsAppPhone,
   extractSocialHandles,
   listSocialSecondaryUrls,
+  listOfficialBrandUrls,
+  socialHandlesFromWebsiteUrl,
   extractAmenities,
   extractAgePolicy,
   extractDressCode,

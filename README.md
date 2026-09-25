@@ -1,4 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.80 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.95 (stable)
+
+- s3.0.95: Discovery contact completeness — aggregator brand-domain preferencer, WhatsApp phone harvest, ordered crawl UI reads.
 
 - s3.0.42: NFL dual LED fix  checkout uses nflJersey caps (not soccer 812); frame 2 solid black; NFL dual shout panel uses nflMainText slice (not soccer 14-char cap); FloqR card FROM @handle wiring + reusable paintFloqrCard.
 - s3.0.40: NFL Eagles-silhouette photo kits + dual shoutout layout (96x48 side / 64x rotate); FloqR card Instagram opt-in separate from jersey name.
