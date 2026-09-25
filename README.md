@@ -1,5 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.98 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.99 (stable)
 
+- s3.0.99: Master Admin header cleanup — remove FLOQR Master Admin / Network View eyebrows; nest portal scope + verified status in ? help.
 - s3.0.98: Master Admin — remove Ops Status (FloqAi help); Completed Log / Retention labels; SOC 2 copy in ? help.
 - s3.0.97: Mass onboard for ready discovery cards + readiness report; lineup/residents page follow for DJ/promoter hints.
 - s3.0.96: Instant Crawl Now on Master Admin — short job-cap run of the saved schedule with contact-lift stats vs prior baselines.
