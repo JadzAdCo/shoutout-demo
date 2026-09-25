@@ -494,11 +494,31 @@ function hasUsefulSocialHandles(record = {}) {
   return !!(socials.instagram || socials.facebook || socials.tiktok || socials.x || record.instagramHandle);
 }
 
+function looksLikeAggregatorContact(record = {}) {
+  const site = String(record.officialWebsite || record.website || record.sourceUrl || "");
+  if (venueDatapoints.isAggregatorWebsite?.(site)) return true;
+  const socials = record.socialMediaHandles || {};
+  if (venueDatapoints.isAggregatorEmail?.(record.email)) return true;
+  const fb = String(socials.facebook || "").replace(/^@/, "").toLowerCase();
+  if (/privateaser|opentable|thefork|tripadvisor|yelp|timeout|shotgun|dicefm|eventbrite/i.test(fb)) return true;
+  return false;
+}
+
+function needsSecondaryContactCrawl(record = {}) {
+  const socials = record.socialMediaHandles || {};
+  if (looksLikeAggregatorContact(record)) return true;
+  return !(socials.instagram && (record.email || record.telephone || record.phone));
+}
+
 async function enrichRecordFromPublicWebsite(record = {}) {
   const site = String(record.officialWebsite || record.website || record.sourceUrl || "").trim();
   if (!/^https?:\/\//i.test(site) || /google\.(com|maps)|maps\.app\.goo\.gl/i.test(site)) return record;
   let next = {...record};
   const pagesFetched = [];
+  const venueContext = {
+    venueName: next.proposedTitle || next.proposedLocationName || "",
+    website: site
+  };
   try {
     const html = await fetchPublicSource(site);
     pagesFetched.push(site);
@@ -508,17 +528,35 @@ async function enrichRecordFromPublicWebsite(record = {}) {
       publicPage: true,
       googlePlaces: !!(next.sourceConfirmations?.googlePlaces || record.sourceName === "Google Places API")
     };
-    if (!hasUsefulSocialHandles(next)) {
-      const secondaries = (venueDatapoints.listSocialSecondaryUrls?.(html, site) || []).slice(0, 2);
-      for (const url of secondaries) {
-        try {
-          const html2 = await fetchPublicSource(url);
-          pagesFetched.push(url);
-          next = venueDatapoints.enrichVenueRecord(next, {html: html2, text: stripTags(html2)});
-          if (hasUsefulSocialHandles(next)) break;
-        } catch (error) {
-          console.warn(`Secondary social page skipped (${url}):`, error.message);
+
+    const brandUrls = venueDatapoints.listOfficialBrandUrls?.(html, site, venueContext) || [];
+    const secondaries = (venueDatapoints.listSocialSecondaryUrls?.(html, site, venueContext) || []).slice(0, 6);
+    // Always chase official brand domains when Places/website is an aggregator.
+    // Otherwise follow contact/about pages when socials or contact are incomplete.
+    const followList = [...brandUrls];
+    if (needsSecondaryContactCrawl(next) || !hasUsefulSocialHandles(next) || brandUrls.length) {
+      secondaries.forEach(url => {
+        if (!followList.includes(url)) followList.push(url);
+      });
+    }
+
+    for (const url of followList.slice(0, 6)) {
+      if (pagesFetched.includes(url)) continue;
+      try {
+        const html2 = await fetchPublicSource(url);
+        pagesFetched.push(url);
+        next = venueDatapoints.enrichVenueRecord(next, {html: html2, text: stripTags(html2)});
+        if (!venueDatapoints.isAggregatorWebsite?.(url) && /^https?:\/\//i.test(url)) {
+          // Promote the official brand site when we found one from an aggregator listing.
+          if (venueDatapoints.isAggregatorWebsite?.(site)) {
+            next.officialWebsite = url.split("#")[0];
+            next.website = next.officialWebsite;
+          }
         }
+        const contactOk = hasUsefulSocialHandles(next) && (next.email || next.telephone || next.phone);
+        if (contactOk && !looksLikeAggregatorContact(next) && !needsSecondaryContactCrawl(next)) break;
+      } catch (error) {
+        console.warn(`Secondary social page skipped (${url}):`, error.message);
       }
     }
   } catch (error) {
@@ -528,7 +566,10 @@ async function enrichRecordFromPublicWebsite(record = {}) {
   next.socialPagesFetched = pagesFetched;
   next.extractionMethod = `${record.extractionMethod || "public-page"}+website-social-pass`;
   if (hasUsefulSocialHandles(next)) {
-    next.aiRatingReasons = uniqueList([...(next.aiRatingReasons || []), "Social handles from venue website / footer"]);
+    next.aiRatingReasons = uniqueListLocal([...(next.aiRatingReasons || []), "Social handles from venue website / footer"]);
+  }
+  if (venueDatapoints.isAggregatorWebsite?.(site) && !venueDatapoints.isAggregatorWebsite?.(next.officialWebsite || "")) {
+    next.aiRatingReasons = uniqueListLocal([...(next.aiRatingReasons || []), "Official brand domain preferred over aggregator listing"]);
   }
   return next;
 }

@@ -186,11 +186,24 @@
     return `<div class="tag-row">${rows.map(([, label, ok]) => `<span>${ok ? "Pass" : "Missing"}: ${esc(label)}</span>`).join("")}</div>`;
   }
 
-  async function getCollectionSafe(name, limit = 500) {
+  async function getCollectionSafe(name, limit = 500, orderByField = "") {
     try {
-      const snap = await db.collection(name).limit(limit).get();
+      let query = db.collection(name);
+      if (orderByField) query = query.orderBy(orderByField, "desc");
+      const snap = await query.limit(limit).get();
       return snap.docs.map(d => ({id:d.id, ...d.data()}));
     } catch(e) {
+      // Unordered limit returns document-id order and hides recent crawl writes.
+      if (orderByField) {
+        console.warn(`Ordered read failed for ${name} (${orderByField}); falling back unordered:`, e.message);
+        try {
+          const snap = await db.collection(name).limit(limit).get();
+          return snap.docs.map(d => ({id:d.id, ...d.data()}));
+        } catch (fallbackError) {
+          console.warn(`Could not read ${name}:`, fallbackError.message);
+          return [];
+        }
+      }
       console.warn(`Could not read ${name}:`, e.message);
       return [];
     }
@@ -571,7 +584,7 @@
   async function loadDiscoveryQueue() {
     const status = byId("aiDiscoveryStatusFilter")?.value || "pendingReview";
     const city = String(byId("aiDiscoveryCityFilter")?.value || "").toLowerCase();
-    const rows = await getCollectionSafe("aiDiscoveryQueue", 500);
+    const rows = await getCollectionSafe("aiDiscoveryQueue", 500, "createdAt");
     allQueueRows = rows.filter(item => {
       const rowStatus = String(item.status || "pendingReview");
       if (status === "pendingReview") {

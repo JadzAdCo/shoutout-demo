@@ -1709,6 +1709,15 @@
     return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString();
   }
 
+  function tsMillis(value) {
+    if (!value) return 0;
+    if (typeof value.toMillis === "function") return value.toMillis();
+    if (value.seconds) return Number(value.seconds) * 1000;
+    const date = value.toDate ? value.toDate() : new Date(value);
+    const ms = date.getTime();
+    return Number.isNaN(ms) ? 0 : ms;
+  }
+
   function splitList(value) {
     if (Array.isArray(value)) return value.map(String).map(x => x.trim()).filter(Boolean);
     return String(value || "").split(/[\n,;|]+/).map(x => x.trim()).filter(Boolean);
@@ -4122,11 +4131,26 @@
   async function readCollectionSafe(name, limit = 750) {
     const protectedResult = await readProtectedCollectionSafe(name, limit);
     if (protectedResult) return protectedResult;
+    const orderedField = name === "aiCrawlRuns"
+      ? "startedAt"
+      : (name === "aiDiscoveryQueue" ? "createdAt" : "");
     try {
-      const snap = await state.db.collection(name).limit(limit).get();
+      let query = state.db.collection(name);
+      if (orderedField) query = query.orderBy(orderedField, "desc");
+      const snap = await query.limit(limit).get();
       return {rows: snap.docs.map(doc => ({id: doc.id, _collection: name, ...doc.data()})), error: ""};
     } catch (error) {
-      return {rows: [], error: error?.message || String(error)};
+      if (!orderedField) return {rows: [], error: error?.message || String(error)};
+      try {
+        const snap = await state.db.collection(name).limit(limit).get();
+        return {
+          rows: snap.docs.map(doc => ({id: doc.id, _collection: name, ...doc.data()})),
+          error: "",
+          note: `Ordered ${orderedField} read failed (${error?.message || error}); showing unordered sample.`
+        };
+      } catch (fallbackError) {
+        return {rows: [], error: fallbackError?.message || String(fallbackError)};
+      }
     }
   }
 
@@ -4932,7 +4956,12 @@
   }
 
   async function loadStaleDiscoveryRows(locationIds) {
-    const snap = await state.db.collection("aiDiscoveryQueue").limit(750).get();
+    let snap;
+    try {
+      snap = await state.db.collection("aiDiscoveryQueue").orderBy("createdAt", "desc").limit(750).get();
+    } catch (_error) {
+      snap = await state.db.collection("aiDiscoveryQueue").limit(750).get();
+    }
     return snap.docs.map(doc => {
       const row = {id:doc.id, _collection:"aiDiscoveryQueue", ...doc.data()};
       row._staleReasons = discoveryStaleReasons(row, locationIds);
@@ -5715,21 +5744,28 @@
   }
 
   function renderCrawlActivity(data, schedule) {
-    const runs = (data.aiCrawlRuns?.rows || []).slice().sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0));
+    const runs = (data.aiCrawlRuns?.rows || []).slice().sort((a, b) => tsMillis(b.startedAt || b.completedAt) - tsMillis(a.startedAt || a.completedAt));
     const wrap = byId("crawlActivityReport");
     if (!wrap) return;
+    const latestCompleted = runs.find(run => String(run.status || "").toLowerCase() === "completed") || null;
     const scheduleRows = [
       ["Automatic crawl setting", schedule?.frequency || "Not saved"],
-      ["Schedule enabled", schedule?.enabled ? "Yes" : "No"],
+      ["Schedule enabled", schedule?.enabled === false ? "No" : "Yes"],
       ["Planned run times", joinList(schedule?.scheduleHours) || "00:00, 04:00, 08:00, 12:00, 16:00, 20:00"],
+      ["Last successful crawl", latestCompleted ? `${fmtDate(latestCompleted.completedAt || latestCompleted.startedAt)} (${latestCompleted.localSlot || latestCompleted.id || "run"})` : "No completed run loaded"],
+      ["Last successful record count", latestCompleted ? String(latestCompleted.resultCount ?? latestCompleted.createdRecordCount ?? 0) : "—"],
       ["Manual crawl workflow", "Plain-English input creates structured review records with required datapoint checks"],
-      ["Automatic execution path", "Saved schedule is ready for Firebase scheduled execution"]
+      ["Automatic execution path", "Firebase scheduledAiDiscoveryCrawl every 15 minutes; runs when a saved slot is due"]
     ];
-    const runHtml = runs.length ? runs.slice(0, 12).map(run => `<div class="queue-item">
-      <strong>${esc(run.status || "crawl run")} - ${esc(run.mode || run.trigger || "manual")}</strong>
-      <p>Started: ${esc(fmtDate(run.startedAt))} | Completed: ${esc(fmtDate(run.completedAt))} | Records: ${esc(run.createdRecordCount || 0)}</p>
-      <small>${esc(run.requestedByEmail || run.note || "")}</small>
-    </div>`).join("") : "<p class='sub'>No crawl runs have been logged yet.</p>";
+    const runHtml = runs.length ? runs.slice(0, 12).map(run => {
+      const records = run.resultCount ?? run.createdRecordCount ?? 0;
+      const mode = run.mode || run.trigger || (run.scheduleId || String(run.id || "").startsWith("default_") ? "scheduled" : "manual");
+      return `<div class="queue-item">
+      <strong>${esc(run.status || "crawl run")} - ${esc(mode)}</strong>
+      <p>Started: ${esc(fmtDate(run.startedAt))} | Completed: ${esc(fmtDate(run.completedAt))} | Records: ${esc(records)}</p>
+      <small>${esc(run.localSlot || run.requestedByEmail || run.note || run.id || "")}</small>
+    </div>`;
+    }).join("") : "<p class='sub'>No crawl runs have been logged yet.</p>";
     wrap.innerHTML = `${simpleRows(scheduleRows)}${runHtml}`;
   }
 

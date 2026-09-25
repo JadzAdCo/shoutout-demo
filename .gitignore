@@ -11,8 +11,8 @@ configstore/
 .publish-*/
 so-main-publish/
 
-# Local scrape / scratch dumps
-functions/scripts/_scrape-out.json
+# Local scrape / scratch dumps (underscore-prefixed probe outputs)
+functions/scripts/_*.json
 rollback-readme-history.zip
 
 # Firebase
