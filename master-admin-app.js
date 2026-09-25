@@ -359,7 +359,7 @@
       ? "Firebase MFA enrollment detected."
       : "MFA should be enforced by the identity provider for production Master Admin accounts.";
 
-    return { ok:true, reason:`Master admin verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}` };
+    return { ok:true, reason:`Master admin verified. Providers: ${providers.join(", ")}. ${domainMessage} ${mfaMessage}`, shortStatus: "Signed in as Master Admin." };
   }
 
   function simpleRows(rows) {
@@ -2022,7 +2022,7 @@
 
       byId("masterLogin").classList.add("hidden");
       byId("masterPanel").classList.remove("hidden");
-      setText("masterStatus", check.reason);
+      setText("masterStatus", check.shortStatus || "Signed in as Master Admin.");
       setText("masterPanelSecurityStatus", check.reason);
       const resumed = window.FLOQRMasterTabs?.resumeDeepLinkPanel?.() || "";
       if (resumed && ENTITY_MGMT_PANEL_IDS.includes(resumed) && !window.FLOQRSOS2FA?.isUnlocked?.("entityManagement")) {

@@ -888,6 +888,22 @@
       page: "master-admin.html"
     },
     {
+      id: "help-master-network-intelligence",
+      title: "Network Intelligence Center",
+      body: "Master Admins can view all venues, all ShoutOut queues, all reports, advertiser data, reconciliation summaries, and network-level analytics. After Google or Microsoft sign-in against the Master Admin allow-list, verification confirms Master admin verified along with providers, domain-enforcement notes, and MFA guidance. This portal is FLOQR internal use only.",
+      searchPhrases: [
+        "network intelligence", "network intelligence center", "master admins can view", "master admin verified",
+        "all venues", "network view", "floqr master admin", "master admin portal", "all locations"
+      ],
+      links: [
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})},
+        {label: "Network Dashboard", href: vUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
       id: "help-master-completed-log",
       title: "Completed Log",
       body: "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata: 7 years. Media: deleted 90 days after completion. Default search window: 60 days. Export CSV downloads the current results. FloqR does not forever-archive media for compliance.",
