@@ -7,6 +7,20 @@ const path = require("node:path");
 
 const read = relativePath => fs.readFileSync(path.resolve(__dirname, "..", relativePath), "utf8");
 
+test("mass onboard UI selects ready discovery cards only", () => {
+  const html = read("master-admin.html");
+  assert.match(html, /aiDiscoveryMassOnboardBtn/);
+  assert.match(html, /Onboard selected \(ready only\)/);
+  assert.match(html, /aiDiscoveryReadinessFilter/);
+  assert.match(html, /aiDiscoveryOnboardReport/);
+  const source = read("ai-discovery-service.js");
+  assert.match(source, /massOnboardSelected/);
+  assert.match(source, /publishDiscoveryRecord/);
+  assert.match(source, /data-onboard-select/);
+  assert.match(source, /Missing datapoints/);
+  assert.match(source, /renderOnboardReport/);
+});
+
 test("runInstantDiscoveryCrawl export and contact lift helpers exist", () => {
   const source = read("functions/ai-discovery-functions.js");
   assert.match(source, /exports\.runInstantDiscoveryCrawl\s*=\s*onCall/);

@@ -202,9 +202,51 @@ async function loadJobs() {
   const beforeComplete = liftRows.filter(r => isComplete(r.before)).length;
   const afterComplete = liftRows.filter(r => isComplete(r.after)).length;
   const pct = v => (n ? Math.round((v / n) * 1000) / 10 : 0);
+
+  function missingOnboard(record = {}) {
+    const missing = [];
+    if (!record.proposedTitle && !record.proposedLocationName) missing.push("Name");
+    if (!(record.genres || []).length) missing.push("Genre");
+    const artists = record.artistsOrDjs || record.artists || record.djs;
+    if (!(Array.isArray(artists) ? artists.length : String(artists || "").trim())) missing.push("DJ(s)/Artist(s)");
+    const promoters = record.promoters || record.promotionGroup;
+    if (!(Array.isArray(promoters) ? promoters.length : String(promoters || "").trim())) missing.push("Promoter(s)");
+    if (!(record.proposedAddress || record.address)) missing.push("Address");
+    if (!record.city) missing.push("City");
+    if (!record.country) missing.push("Country");
+    if (!(record.telephone || record.phone)) missing.push("Phone");
+    if (!record.email) missing.push("Email");
+    if (!(record.socialMediaHandles?.instagram || record.instagramHandle)) missing.push("Instagram");
+    return missing;
+  }
+
+  const completedAt = new Date().toISOString();
+  const rows = created.map((record, i) => {
+    const missing = missingOnboard(record);
+    return {
+      name: record.proposedTitle || record.proposedLocationName || "",
+      type: record.proposedType || "club",
+      country: record.country || "",
+      city: record.city || "",
+      genre: Array.isArray(record.genres) ? record.genres.join(", ") : String(record.genres || ""),
+      phone: !!(record.telephone || record.phone),
+      email: !!String(record.email || "").trim(),
+      instagram: !!(record.socialMediaHandles?.instagram || record.instagramHandle),
+      address: !!(record.proposedAddress || record.address),
+      website: record.officialWebsite || record.website || "",
+      onboardReady: missing.length === 0,
+      missingDatapoints: missing,
+      contactLift: liftRows[i] || null
+    };
+  });
+  const readyCount = rows.filter(r => r.onboardReady).length;
+  const missingFreq = {};
+  rows.forEach(r => r.missingDatapoints.forEach(m => { missingFreq[m] = (missingFreq[m] || 0) + 1; }));
   const report = {
+    crawlCompletedAt: completedAt,
     sampled: n,
     jobsAttempted: jobs.length,
+    jobSource: loaded.source,
     contactCompleteBeforePct: pct(beforeComplete),
     contactCompleteAfterPct: pct(afterComplete),
     liftPctPoints: pct(afterComplete - beforeComplete),
@@ -214,17 +256,20 @@ async function loadJobs() {
       instagram: liftRows.filter(r => !r.before.instagram && r.after.instagram).length,
       facebook: liftRows.filter(r => !r.before.facebook && r.after.facebook).length
     },
+    onboardReadyCount: readyCount,
+    onboardReadyPct: pct(readyCount),
+    missingDatapointFrequency: missingFreq,
     baselines: {
       previousEngineContactCompletePct: 0,
       enrichV1ContactCompletePct: 37.8
     },
-    examples: liftRows.slice(0, 10).map(r => ({
-      title: r.title,
-      site: r.site,
-      before: r.before,
-      after: r.after
-    })),
-    note: "Contact-complete = Phone + Email + Instagram"
+    rows: rows.sort((a, b) =>
+      String(a.country).localeCompare(b.country) ||
+      String(a.city).localeCompare(b.city) ||
+      String(a.genre).localeCompare(b.genre) ||
+      String(a.name).localeCompare(b.name)
+    ),
+    note: "Contact-complete = Phone + Email + Instagram. Onboard-ready = Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram."
   };
 
   if (doWrite) {
@@ -267,6 +312,15 @@ async function loadJobs() {
   }
 
   console.log(JSON.stringify(report, null, 2));
+  try {
+    const fs = require("fs");
+    const outPath = path.join(__dirname, "..", "..", "reports", "instant-crawl-onboard-report.json");
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, JSON.stringify(report, null, 2), "utf8");
+    console.error(`Wrote ${outPath}`);
+  } catch (err) {
+    console.warn("Could not write report file:", err.message || err);
+  }
 })().catch(err => {
   console.error(err);
   process.exit(1);

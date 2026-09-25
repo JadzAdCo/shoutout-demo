@@ -287,6 +287,7 @@
       if (/privatisation|reservation|book(?:ing)?|infos?|access|plan|venir/i.test(path)) score += 5;
       if (/follow|social|reseaux|r[eé]seaux|redes|community|newsletter|actualit/i.test(path)) score += 4;
       if (/about|a-propos|qui-sommes|presse|press|team|equipe|footer|mentions/i.test(path)) score += 3;
+      if (/\b(?:events?|agenda|program(?:me)?|line[- ]?up|residents?|djs?|artists?|calendar|showtimes?)\b/i.test(path)) score += 8;
       if (!sameOrigin) {
         const hostHit = hints.some(hint => hint.length >= 4 && path.includes(hint));
         if (!hostHit) return;
