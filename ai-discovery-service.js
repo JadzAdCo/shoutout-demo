@@ -336,13 +336,16 @@
   function queueCard(item, index) {
     item = {...parsedDataFallback(item), ...item};
     const missing = missingDatapoints(item);
+    const ready = missing.length === 0 && String(item.status || "pendingReview") !== "approved";
     const collected = formatCollectedAt(item);
-    return `<div class="queue-item ai-discovery-item" data-queue-index="${index}">
+    return `<div class="queue-item ai-discovery-item" data-queue-index="${index}" data-queue-id="${esc(item.id || "")}" data-onboard-ready="${ready ? "1" : "0"}">
       <div class="club-option-head">
         <div>
+          <label class="consent-line"><input type="checkbox" data-onboard-select ${ready ? "" : "disabled"} aria-label="Select for mass onboard"/> ${ready ? "Ready — select to onboard" : "Not ready to onboard"}</label>
           <strong>${esc(item.proposedTitle || item.proposedLocationName || "Untitled discovery")}</strong>
           <p>${esc(recordKind(item))} - ${esc(window.FLOQRAddress?.publicLocation(item) || [item.city, item.country].filter(Boolean).join(", "))}</p>
           <p class="discovery-meta">${collected ? `Collected ${esc(collected)}` : "Collected time unavailable"}${item.socialPagesFetched?.length ? ` · Social pages checked: ${esc(item.socialPagesFetched.length)}` : ""}</p>
+          ${missing.length ? `<p class="sub small"><strong>Missing datapoints:</strong> ${esc(missing.join(", "))}</p>` : `<p class="sub small"><strong>Onboard ready</strong> — all required datapoints present.</p>`}
         </div>
         <div>
           <span class="status-pill">${esc(item.aiStarRating || 3)} stars / ${esc(Math.round(Number(item.aiConfidenceScore || 0) * 100))}%</span>
@@ -395,7 +398,7 @@
       ${auditDetailsHtml(item)}
       ${item.aiRatingReasons?.length ? `<div class="tag-row">${item.aiRatingReasons.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
       <div class="queue-actions">
-        <button type="button" class="primary" data-discovery-action="approve">Approve</button>
+        <button type="button" class="primary" data-discovery-action="approve"${missing.length ? " disabled" : ""}>Approve</button>
         <button type="button" data-discovery-action="needs-research">Needs research</button>
         <button type="button" data-discovery-action="reject">Reject</button>
         <button type="button" data-discovery-action="duplicate">Mark Duplicate</button>
@@ -405,10 +408,76 @@
     </div>`;
   }
 
+  function renderOnboardReport(rows = []) {
+    const wrap = byId("aiDiscoveryOnboardReport");
+    if (!wrap) return;
+    const pending = rows.filter(item => {
+      const st = String(item.status || "pendingReview");
+      return st === "pendingReview" || st === "needsResearch";
+    });
+    if (!pending.length) {
+      wrap.innerHTML = "<p class='sub'>No pending discovery records in this filter.</p>";
+      return;
+    }
+    const scored = pending.map(item => {
+      const merged = {...parsedDataFallback(item), ...item};
+      const missing = missingDatapoints(merged);
+      return {
+        item: merged,
+        missing,
+        ready: missing.length === 0,
+        country: merged.country || "—",
+        city: merged.city || "—",
+        genre: Array.isArray(merged.genres) ? merged.genres.join(", ") : String(merged.genres || "—"),
+        name: merged.proposedTitle || merged.proposedLocationName || "Untitled",
+        type: recordKind(merged),
+        collected: formatCollectedAt(merged) || "—"
+      };
+    }).sort((a, b) =>
+      a.country.localeCompare(b.country) ||
+      a.city.localeCompare(b.city) ||
+      a.genre.localeCompare(b.genre) ||
+      a.name.localeCompare(b.name)
+    );
+    const readyN = scored.filter(r => r.ready).length;
+    const missingFreq = {};
+    scored.forEach(r => r.missing.forEach(m => { missingFreq[m] = (missingFreq[m] || 0) + 1; }));
+    const freqRows = Object.entries(missingFreq).sort((a, b) => b[1] - a[1])
+      .map(([label, count]) => `<tr><td>${esc(label)}</td><td>${esc(count)}</td></tr>`).join("");
+    wrap.innerHTML = `
+      <p class="sub small"><strong>Onboard readiness:</strong> ${esc(readyN)} ready · ${esc(scored.length - readyN)} missing datapoints · ${esc(scored.length)} pending shown</p>
+      ${freqRows ? `<details class="admin-detail"><summary>Missing datapoint frequency</summary><table class="report-table"><thead><tr><th>Datapoint</th><th>Count</th></tr></thead><tbody>${freqRows}</tbody></table></details>` : ""}
+      <div style="overflow:auto;max-height:320px">
+        <table class="report-table">
+          <thead><tr><th>Country</th><th>City</th><th>Genre</th><th>Name</th><th>Type</th><th>Collected</th><th>Ready</th><th>Missing</th></tr></thead>
+          <tbody>
+            ${scored.map(r => `<tr>
+              <td>${esc(r.country)}</td>
+              <td>${esc(r.city)}</td>
+              <td>${esc(r.genre)}</td>
+              <td>${esc(r.name)}</td>
+              <td>${esc(r.type)}</td>
+              <td>${esc(r.collected)}</td>
+              <td>${r.ready ? "Yes" : "No"}</td>
+              <td>${esc(r.missing.join(", ") || "—")}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
   function renderQueueCards() {
     const wrap = byId("aiDiscoveryQueueList");
     if (!wrap) return;
-    queueRows = allQueueRows.filter(item => countryFilter === "all" || countryKey(item) === countryFilter);
+    const readiness = byId("aiDiscoveryReadinessFilter")?.value || "all";
+    queueRows = allQueueRows.filter(item => {
+      if (countryFilter !== "all" && countryKey(item) !== countryFilter) return false;
+      if (readiness === "all") return true;
+      const missing = missingDatapoints({...parsedDataFallback(item), ...item});
+      if (readiness === "ready") return missing.length === 0;
+      return missing.length > 0;
+    });
+    renderOnboardReport(allQueueRows);
     wrap.innerHTML = queueRows.length ? queueRows.map(queueCard).join("") : "<p class='sub'>No discovery records matched.</p>";
     wrap.querySelectorAll("[data-discovery-action]").forEach(button => {
       const card = button.closest(".ai-discovery-item");
@@ -458,20 +527,10 @@
     return next;
   }
 
-  async function approveQueueItem(card, item) {
-    const edited = readEditedQueueItem(card, item);
+  async function publishDiscoveryRecord(edited, itemId) {
     const missing = missingDatapoints(edited);
     if (missing.length) {
-      await db.collection("aiDiscoveryQueue").doc(item.id).set({
-        ...edited,
-        missingDatapoints: missing,
-        crawlResultStatus: "missing-required-datapoints",
-        updatedAt:nowField()
-      }, {merge:true});
-      setStatus(`Cannot approve yet. Still need: ${missing.join(", ")}. Use Needs research if you will come back later.`);
-      alert(`Cannot approve yet.\n\nStill need: ${missing.join(", ")}\n\nFill those fields on the card, or choose Needs research.`);
-      await loadDiscoveryQueue();
-      return;
+      return { ok: false, missing };
     }
     const proposedType = String(edited.proposedType || "").toLowerCase();
     const isVenue = /club|venue|lounge|beach|bar|rooftop/.test(proposedType);
@@ -491,7 +550,7 @@
       subscriptionRequiredForPublicProfileEdits:true,
       requiredProfileDatapointsComplete:true,
       publicSearchKeywords:[enriched.proposedTitle, enriched.proposedLocationName, enriched.city, enriched.country, ...(enriched.categories || []), ...(enriched.genres || []), ...(enriched.amenities || [])].filter(Boolean),
-      approvedFromDiscoveryQueueId:item.id,
+      approvedFromDiscoveryQueueId:itemId,
       sourceUrl:enriched.sourceUrl || "",
       updatedAt:nowField()
     } : {
@@ -526,11 +585,11 @@
       active:true,
       status:"active",
       visibility:"public",
-      approvedFromDiscoveryQueueId:item.id,
+      approvedFromDiscoveryQueueId:itemId,
       updatedAt:nowField()
     };
     await db.collection(isVenue ? "clubLocations" : "events").doc(id).set(payload, {merge:true});
-    await db.collection("aiDiscoveryQueue").doc(item.id).set({
+    await db.collection("aiDiscoveryQueue").doc(itemId).set({
       ...edited,
       status:"approved",
       missingDatapoints:[],
@@ -545,7 +604,73 @@
       const indexRecord = isVenue ? window.FLOQRAIIndex.clubLocationIndexRecord(id, payload) : window.FLOQRAIIndex.eventIndexRecord(id, payload);
       await window.FLOQRAIIndex.upsertAiIndex(db, `${indexRecord.sourceType}_${id}`, indexRecord);
     }
+    return { ok: true, approvedRecordId: id, collection: isVenue ? "clubLocations" : "events" };
+  }
+
+  async function approveQueueItem(card, item) {
+    const edited = readEditedQueueItem(card, item);
+    const result = await publishDiscoveryRecord(edited, item.id);
+    if (!result.ok) {
+      await db.collection("aiDiscoveryQueue").doc(item.id).set({
+        ...edited,
+        missingDatapoints: result.missing,
+        crawlResultStatus: "missing-required-datapoints",
+        updatedAt:nowField()
+      }, {merge:true});
+      setStatus(`Cannot approve yet. Still need: ${result.missing.join(", ")}. Use Needs research if you will come back later.`);
+      alert(`Cannot approve yet.\n\nStill need: ${result.missing.join(", ")}\n\nFill those fields on the card, or choose Needs research.`);
+      await loadDiscoveryQueue();
+      return;
+    }
     setStatus("Approved discovery record.");
+    await loadDiscoveryQueue();
+  }
+
+  function selectedOnboardCards() {
+    const wrap = byId("aiDiscoveryQueueList");
+    if (!wrap) return [];
+    return [...wrap.querySelectorAll(".ai-discovery-item")].filter(card => {
+      const box = card.querySelector("[data-onboard-select]");
+      return box && box.checked && !box.disabled;
+    });
+  }
+
+  function selectAllReadyForOnboard() {
+    const wrap = byId("aiDiscoveryQueueList");
+    if (!wrap) return;
+    wrap.querySelectorAll("[data-onboard-select]:not(:disabled)").forEach(box => { box.checked = true; });
+    setStatus(`Selected ${wrap.querySelectorAll("[data-onboard-select]:checked").length} ready discovery card(s).`);
+  }
+
+  function clearOnboardSelection() {
+    const wrap = byId("aiDiscoveryQueueList");
+    if (!wrap) return;
+    wrap.querySelectorAll("[data-onboard-select]").forEach(box => { box.checked = false; });
+    setStatus("Cleared mass-onboard selection.");
+  }
+
+  async function massOnboardSelected() {
+    const cards = selectedOnboardCards();
+    if (!cards.length) {
+      setStatus("Select one or more ready discovery cards first.");
+      alert("Select one or more ready discovery cards first.");
+      return;
+    }
+    if (!confirm(`Onboard ${cards.length} ready club/event record(s) to live listings?`)) return;
+    let ok = 0;
+    const blocked = [];
+    for (const card of cards) {
+      const item = queueRows[Number(card.dataset.queueIndex)];
+      if (!item?.id) continue;
+      const edited = readEditedQueueItem(card, item);
+      const result = await publishDiscoveryRecord(edited, item.id);
+      if (result.ok) ok += 1;
+      else blocked.push(`${edited.proposedTitle || item.id}: ${result.missing.join(", ")}`);
+    }
+    setStatus(ok
+      ? `Mass onboard complete: ${ok} published${blocked.length ? `; ${blocked.length} skipped (still missing datapoints)` : ""}.`
+      : `Mass onboard skipped. Still missing datapoints on selected cards.`);
+    if (blocked.length) alert(`Skipped ${blocked.length} card(s):\n\n${blocked.slice(0, 12).join("\n")}${blocked.length > 12 ? "\n…" : ""}`);
     await loadDiscoveryQueue();
   }
 
@@ -716,7 +841,11 @@
     ]);
     byId("aiDiscoveryRefreshBtn")?.addEventListener("click", loadDiscoveryQueue);
     byId("aiDiscoveryStatusFilter")?.addEventListener("change", loadDiscoveryQueue);
+    byId("aiDiscoveryReadinessFilter")?.addEventListener("change", renderQueueCards);
     byId("aiDiscoveryCityFilter")?.addEventListener("input", loadDiscoveryQueue);
+    byId("aiDiscoverySelectReadyBtn")?.addEventListener("click", selectAllReadyForOnboard);
+    byId("aiDiscoveryClearSelectionBtn")?.addEventListener("click", clearOnboardSelection);
+    byId("aiDiscoveryMassOnboardBtn")?.addEventListener("click", massOnboardSelected);
     byId("saveAiDiscoveryCriteriaBtn")?.addEventListener("click", saveCriteria);
     byId("aiDiscoveryCriteriaJson")?.addEventListener("change", () => {
       try {

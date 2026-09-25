@@ -17,6 +17,7 @@ Master Admin → **AI Crawling**. Internet search (Google Places + public pages 
 - Profile import: **Prepare Club Admin imports** → review cards → Save drafts / send link. Advanced “generated data” disclosure is optional.
 - Source Detail Extraction is a **wizard**: one event/venue detail URL (not a search-results list) → extract → save.
 - Queue actions: **Approve** | **Needs research** | Reject | Duplicate | Delete.
+- **Mass onboard:** select ready cards (all required datapoints present) → **Onboard selected**. Not-ready cards stay listed with **Missing datapoints** called out; they cannot be selected for mass publish.
 
 ## Schedule (defaults)
 
@@ -95,6 +96,19 @@ When a crawl match already exists in `clubLocations` (same website or same name+
 ## Country tabs
 
 Review Discovery Queue shows dynamic **country tabs** (All + each country present in the filtered queue).
+
+## Onboard readiness blockers (engine gaps)
+
+Approve / mass onboard require: Name, Genre, DJ(s)/Artist(s), Promoter(s), Address, City, Country, Phone, Email, Instagram (+ Date/Time for comedy).
+
+Places + website enrich usually fills Name / Address / City / Country / Genre (from search job) / Phone / Email / Instagram. **DJ(s)/Artist(s)** and **Promoter(s)** almost never appear on Google Places or club homepage chrome — they live on event calendars, RA/Dice/Shotgun listings, or “Residents / Line-up” pages.
+
+**Next crawl improvements (priority):**
+
+1. Follow `/events`, `/agenda`, `/program`, `/lineup`, `/residents` same-origin pages and parse DJ / “presented by” / promoter phrases (strengthen `extractArtistsHint` / `extractPromotersHint`).
+2. When Places website is RA / Dice / Shotgun / Eventbrite, scrape that listing’s artist + promoter fields (not just brand-domain handoff).
+3. Optional Ticketmaster Discovery later for ticketed concerts (artist + promoter).
+4. Do **not** invent “TBA” roster values to force readiness — leave Needs research.
 
 ## FIX PROMPT
 

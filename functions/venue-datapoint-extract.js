@@ -359,6 +359,8 @@ function listSocialSecondaryUrls(html = "", baseUrl = "", context = {}) {
     if (/privatisation|reservation|book(?:ing)?|infos?|access|plan|venir/i.test(path)) score += 5;
     if (/follow|social|reseaux|r[eé]seaux|redes|community|newsletter|actualit/i.test(path)) score += 4;
     if (/about|a-propos|qui-sommes|presse|press|team|equipe|footer|mentions/i.test(path)) score += 3;
+    // Lineup / residents pages often hold DJ + promoter data missing from Places.
+    if (/\b(?:events?|agenda|program(?:me)?|line[- ]?up|residents?|djs?|artists?|calendar|showtimes?)\b/i.test(path)) score += 8;
     if (!sameOrigin) {
       // Off-site brand pages (e.g. charlotte-club.fr from Privateaser, buddhabar.com from SBM).
       const hostHit = hints.some(hint => hint.length >= 4 && path.includes(hint));
@@ -571,13 +573,33 @@ function guessTimeZone(country = "") {
 }
 
 function extractArtistsHint(text = "") {
-  const m = String(text || "").match(/(?:dj|resident|featuring|with)\s+([A-Z][A-Za-z0-9 .'-]{2,40})/gi) || [];
-  return uniqueList(m.map(item => item.replace(/^(?:dj|resident|featuring|with)\s+/i, "")), 8);
+  const patterns = [
+    /(?:dj|resident(?:s)?|featuring|with|line[- ]?up|guest(?:s)?)\s*[:\-]?\s*([A-Z][A-Za-z0-9 .'-]{2,40})/gi,
+    /(?:artists?|performers?)\s*[:\-]\s*([A-Z][A-Za-z0-9 .',&\-]{2,60})/gi
+  ];
+  const found = [];
+  patterns.forEach(re => {
+    const m = String(text || "").match(re) || [];
+    m.forEach(item => {
+      found.push(item.replace(/^(?:dj|resident(?:s)?|featuring|with|line[- ]?up|guest(?:s)?|artists?|performers?)\s*[:\-]?\s*/i, ""));
+    });
+  });
+  return uniqueList(found, 8);
 }
 
 function extractPromotersHint(text = "") {
-  const m = String(text || "").match(/(?:presented by|promoted by|promotion(?:s)? by)\s+([A-Z][A-Za-z0-9 .'-]{2,50})/gi) || [];
-  return uniqueList(m.map(item => item.replace(/^(?:presented by|promoted by|promotion(?:s)? by)\s+/i, "")), 6);
+  const patterns = [
+    /(?:presented by|promoted by|promotion(?:s)? by|promoter(?:s)?)\s*[:\-]?\s*([A-Z][A-Za-z0-9 .'-]{2,50})/gi,
+    /(?:in association with|powered by)\s+([A-Z][A-Za-z0-9 .'-]{2,50})/gi
+  ];
+  const found = [];
+  patterns.forEach(re => {
+    const m = String(text || "").match(re) || [];
+    m.forEach(item => {
+      found.push(item.replace(/^(?:presented by|promoted by|promotion(?:s)? by|promoter(?:s)?|in association with|powered by)\s*[:\-]?\s*/i, ""));
+    });
+  });
+  return uniqueList(found, 6);
 }
 
 /**
