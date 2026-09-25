@@ -91,13 +91,18 @@ test("shouldIndexShoutout covers submitted and rejected lifecycle", () => {
   assert.equal(compliance.lifecyclePhase("pending_approval", "paid"), "submitted_paid");
 });
 
-test("master admin html nests ShoutOuts compliance logs and retention", () => {
+test("master admin html nests ShoutOuts completed log and retention", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "master-admin.html"), "utf8");
   assert.match(html, /data-tab-group="shoutouts"/);
   assert.match(html, /data-panel="shoutoutCompletedLog"/);
   assert.match(html, /data-panel="shoutoutRetention"/);
-  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.75/);
-  assert.match(html, /Compliance Logs/);
+  assert.match(html, /Completed Log/);
+  assert.doesNotMatch(html, /masterAccountStatusCard|Ops status/);
+  assert.match(html, /help-master-completed-log/);
+  assert.match(html, /help-master-shoutout-retention/);
+  assert.match(html, /SOC 2 \/ ISO 27001 \/ NIST-aligned audit metadata/);
+  assert.doesNotMatch(html, /<p class="sub small">SOC 2 \/ ISO 27001/);
+  assert.match(html, /master-admin-shoutouts\.js\?v=s3\.0\.98/);
   assert.match(html, /id="soComplianceVenue"/);
   assert.match(html, /id="soComplianceVenueList"/);
   assert.match(html, /id="soComplianceStatusFilter"/);

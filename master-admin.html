@@ -38,13 +38,6 @@
     </div>
 
     <div id="masterPanel" class="hidden">
-      <div id="masterAccountStatusCard" class="card account-status-card master-ops-status-card">
-        <div>
-          <p class="eyebrow">Ops status</p>
-          <p id="masterPanelSecurityStatus" class="sub small">Security status pending...</p>
-          <p id="masterActionFeedback" class="sub small">No admin action clicked yet.</p>
-        </div>
-      </div>
       <nav class="admin-tabs">
         <button class="admin-tab active" data-panel="networkDashboard" type="button" data-i18n="master.networkDashboard">Network Dashboard</button>
         <div class="admin-tab-group" data-tab-group="entityManagement" data-default-panel="entityManagement">
@@ -61,7 +54,7 @@
         <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
           <button class="admin-tab admin-tab-parent" data-group="shoutouts" type="button" aria-expanded="false" data-i18n="master.shoutouts">ShoutOut Mgmt</button>
           <div class="admin-subtabs hidden" data-subtabs-for="shoutouts">
-            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Compliance Logs</button>
+            <button class="admin-subtab" data-panel="shoutoutCompletedLog" type="button" data-i18n="master.shoutoutCompletedLog">Completed Log</button>
             <button class="admin-subtab" data-panel="shoutoutRetention" type="button" data-i18n="master.shoutoutRetention">Retention</button>
           </div>
         </div>
@@ -188,10 +181,10 @@
         <div class="card">
           <h2
             data-i18n="master.shoutoutCompletedLog"
-            data-floqr-help-title="Compliance Logs"
-            data-floqr-help-body="Network compliance logs of submitted, rejected, paid, and completed ShoutOuts for Master Admin review. Pick a venue from clubLocations or type to filter. Audit metadata is kept for 7 years. Media is deleted 90 days after completion. The default search window is 60 days — expand dates to search older retained records. Export to CSV downloads the current search results. FloqR does not forever-archive media for compliance."
-            data-floqr-help-search="shoutout compliance|compliance logs|completed shoutout log|master shoutouts|audit retention|venue search|export csv">Compliance Logs</h2>
-          <p class="sub small">SOC 2 / ISO 27001 / NIST-aligned audit metadata. Venue list comes from Firebase <code>clubLocations</code>. Rebuild reconstructs empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages.</p>
+            data-floqr-help-id="help-master-completed-log"
+            data-floqr-help-title="Completed Log"
+            data-floqr-help-body="Network log of submitted, rejected, paid, and completed ShoutOuts for Master Admin review. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Venue list comes from clubLocations — pick a venue or type to filter. Rebuild reconstructs empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata is kept for 7 years. Media is deleted 90 days after completion. The default search window is 60 days — expand dates to search older retained records. Export to CSV downloads the current search results. FloqR does not forever-archive media for compliance."
+            data-floqr-help-search="completed log|completed shoutout log|shoutout compliance|compliance logs|master shoutouts|audit retention|soc 2|iso 27001|nist|venue search|export csv|rebuild compliance">Completed Log</h2>
           <div class="profile-grid">
             <label>Event / venue name
               <input id="soComplianceVenue" list="soComplianceVenueList" placeholder="Type Zebbies, Heist, city, or club id" autocomplete="off"/>
@@ -234,7 +227,7 @@
             data-floqr-help-id="help-twilio-compliance-logs"
             data-floqr-help-title="Twilio Compliance Logs"
             data-floqr-help-search="twilio compliance|grc sms|twilioComplianceLogs|dry-run compliance"
-            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Compliance Logs. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs."
+            data-floqr-help-body="Security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered delivery) for GRC review. Same ISO 27001 A.8.15 / SOC 2 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs."
           >twilioComplianceLogs</h2>
           <p class="sub small">Collection <code>twilioComplianceLogs</code>. Masked destinations; Auth Token never stored.</p>
           <div class="profile-grid">
@@ -260,8 +253,12 @@
 
       <section id="shoutoutRetention" class="admin-panel-section">
         <div class="card">
-          <h2 data-i18n="master.shoutoutRetention">Retention</h2>
-          <p class="sub small">Audit metadata: 7 years then anonymize (do not delete at 60 days). Media: delete 90 days after completion. Default UI search window: 60 days. No forever media archive for compliance.</p>
+          <h2
+            data-i18n="master.shoutoutRetention"
+            data-floqr-help-id="help-master-shoutout-retention"
+            data-floqr-help-title="Retention"
+            data-floqr-help-body="ShoutOut retention for Master Admin. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Default Completed Log search window: 60 days (expand dates for older retained rows). FloqR does not forever-archive media for compliance. Use Rebuild from ShoutOuts + Audit + Inbox when the Completed Log is empty."
+            data-floqr-help-search="retention|shoutout retention|audit retention|7 years|90 days|media purge|anonymize|completed log retention">Retention</h2>
           <div class="queue-actions">
             <button id="soRetentionRefreshBtn" type="button">Refresh policy</button>
             <button id="soComplianceBackfillBtn" type="button">Rebuild from ShoutOuts + Audit + Inbox</button>
@@ -1399,7 +1396,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.92"></script>
+<script src="./floqr-i18n.js?v=s3.0.98"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.79"></script>
@@ -1415,7 +1412,7 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.93"></script>
+<script src="./floqai-help-repository.js?v=s3.0.98"></script>
 <script src="./floqr-i18n-help.js?v=s3.0.78"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
@@ -1426,9 +1423,9 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.88"></script>
+<script src="./master-admin-app.js?v=s3.0.98"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
-<script src="./master-admin-shoutouts.js?v=s3.0.75"></script>
+<script src="./master-admin-shoutouts.js?v=s3.0.98"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>
 <script src="./master-services-extension.js?v=29.09.22"></script>
