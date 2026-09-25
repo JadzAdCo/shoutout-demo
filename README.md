@@ -1,5 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.97 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.98 (stable)
 
+- s3.0.98: Master Admin — remove Ops Status (FloqAi help); Completed Log / Retention labels; SOC 2 copy in ? help.
 - s3.0.97: Mass onboard for ready discovery cards + readiness report; lineup/residents page follow for DJ/promoter hints.
 - s3.0.96: Instant Crawl Now on Master Admin — short job-cap run of the saved schedule with contact-lift stats vs prior baselines.
 - s3.0.95: Discovery contact completeness — aggregator brand-domain preferencer, WhatsApp phone harvest, ordered crawl UI reads.

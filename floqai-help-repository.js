@@ -872,6 +872,54 @@
       page: "master-admin.html#entityManagement"
     },
     {
+      id: "help-master-ops-status",
+      title: "Master Admin security and action status",
+      body: "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status banner at the top of Master Admin was removed — ask FloqAi about SOS2FA, Privilege Admin Access, or a specific Master Admin tab instead.",
+      searchPhrases: [
+        "ops status", "master ops", "ops status banner", "security status pending", "no admin action clicked yet",
+        "master admin status", "master security status", "admin action feedback", "master admin unlock status"
+      ],
+      links: [
+        {label: "Privilege Admin Access", href: vUrl("./master-admin.html", {from: "floqai"}), search: "privilege admin access"},
+        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
+    },
+    {
+      id: "help-master-completed-log",
+      title: "Completed Log",
+      body: "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutAudit, and Inbox/System Messages. Audit metadata: 7 years. Media: deleted 90 days after completion. Default search window: 60 days. Export CSV downloads the current results. FloqR does not forever-archive media for compliance.",
+      searchPhrases: [
+        "completed log", "completed shoutout log", "shoutout compliance", "compliance logs", "master shoutouts",
+        "audit retention", "soc 2", "iso 27001", "nist", "rebuild compliance", "export csv shoutout"
+      ],
+      links: [
+        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"},
+        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#shoutoutCompletedLog"
+    },
+    {
+      id: "help-master-shoutout-retention",
+      title: "Retention",
+      body: "Master Admin → ShoutOut Mgmt → Retention. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Completed Log default search window is 60 days (expand dates for older retained rows). No forever media archive for compliance. Use Rebuild from ShoutOuts + Audit + Inbox when the Completed Log is empty.",
+      searchPhrases: [
+        "retention", "shoutout retention", "audit retention", "7 years", "90 days", "media purge",
+        "anonymize", "completed log retention", "master shoutout retention"
+      ],
+      links: [
+        {label: "Retention", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutRetention", search: "retention"},
+        {label: "Completed Log", href: vUrl("./master-admin.html", {from: "floqai"}) + "#shoutoutCompletedLog", search: "completed log"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#shoutoutRetention"
+    },
+    {
       id: "help-public-media-sharing",
       title: "Public Media and Data Sharing",
       body: "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos.",
@@ -988,7 +1036,7 @@
     {
       id: "help-twilio-compliance-logs",
       title: "Twilio Compliance Logs",
-      body: "Master Admin → Twilio → twilioComplianceLogs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same standard as ShoutOut Compliance Logs. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
+      body: "Master Admin → Twilio → twilioComplianceLogs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
       searchPhrases: [
         "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
       ],

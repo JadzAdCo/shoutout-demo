@@ -1,5 +1,5 @@
 /**
- * Master Admin → ShoutOuts (Compliance Logs + Retention).
+ * Master Admin → ShoutOuts (Completed Log + Retention).
  * Design notes: .cursor/rules/design-notes-master-admin-shoutouts.mdc
  * Firestore search v1: date-range query + client filter for venue/content/status.
  * Venues come from clubLocations datapoints (contextual typeahead).
