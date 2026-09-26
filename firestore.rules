@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
-// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.127-demo-accounts-manifest-read
+// FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.5-floqr-platform-payments
@@ -722,7 +722,14 @@ service cloud.firestore {
  }
 
  match /privacyConsents/{id} {
- allow create, read, update, delete: if signedIn();
+ allow create: if signedIn()
+ && request.resource.data.uid is string
+ && request.resource.data.uid == request.auth.uid;
+ allow read: if isMasterAdmin()
+ || (signedIn()
+ && resource.data.uid is string
+ && resource.data.uid == request.auth.uid);
+ allow update, delete: if isMasterAdmin();
  }
 
  match /friendRequests/{id} {

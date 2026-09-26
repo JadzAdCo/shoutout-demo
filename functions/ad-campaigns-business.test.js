@@ -33,8 +33,10 @@ test("patron portal wires business account election and Ad Campaigns module", ()
   const module = fs.readFileSync(path.join(root, "patron-ad-campaigns.js"), "utf8");
   assert.match(html, /id="editAccountType"/);
   assert.match(html, /id="portalAdCampaignsTab"/);
-  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.0\.76/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.76/);
+  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.0\.103/);
+  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.103/);
+  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.0\.103/);
+  assert.match(html, /id="privacyDoNotSell"/);
   assert.match(app, /IsBusinessAccount/);
   assert.match(app, /accountType/);
   assert.match(app, /FLOQRPatronAdCampaigns/);
@@ -49,8 +51,9 @@ test("master admin has pending ad approval queue", () => {
   const app = fs.readFileSync(path.join(root, "master-admin-app.js"), "utf8");
   const ads = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
   assert.match(html, /id="adCampaignPendingQueue"/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.102/);
-  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.102/);
+  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.103/);
+  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.103/);
+  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.0\.103/);
   assert.match(app, /renderPendingApprovalQueue/);
   assert.match(ads, /approveCampaign/);
   assert.match(ads, /loadPendingSpotAds/);
@@ -62,15 +65,18 @@ test("master admin has pending ad approval queue", () => {
   assert.match(ads, /Demo \(not live\)/);
   assert.match(ads, /ShoutOut path/);
   assert.match(ads, /campaignBadgeHtml/);
+  assert.match(ads, /allowsPersonalizedAds/);
   assert.doesNotMatch(ads, /Campaign datapoints JSON/);
   assert.doesNotMatch(ads, /Required target groups JSON/);
 });
 
 function loadAdCampaigns() {
+  const prefs = fs.readFileSync(path.join(root, "floqr-privacy-prefs.js"), "utf8");
   const code = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
   const sandbox = {
     window: {},
     globalThis: {},
+    navigator: {},
     localStorage: {
       _data: {},
       getItem(key) { return this._data[key] || null; },
@@ -88,6 +94,7 @@ function loadAdCampaigns() {
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
+  vm.runInNewContext(prefs, sandbox);
   vm.runInNewContext(code, sandbox);
   return sandbox.FLOQRAdCampaigns;
 }

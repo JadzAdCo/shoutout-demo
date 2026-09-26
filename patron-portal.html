@@ -636,10 +636,18 @@
         <div class="card">
           <h2 data-i18n="nav.myPrivacy">My Privacy</h2>
           <p class="sub small" data-i18n="portal.privacyIntro">Choose which profile datapoints can be public/shared and used by Mingl matching, discovery, recommendations, or other privacy-respecting FLOQR features.</p>
+          <p class="sub small"><a id="privacyPolicyLink" href="./privacy.html?v=s3.0.103">Privacy Policy</a> · <a id="privacyDoNotSellLink" href="./privacy.html?v=s3.0.103#do-not-sell">Do Not Sell or Share</a></p>
           <div class="profile-grid">
             <label class="consent-checkbox"><input id="privacyMarketing" type="checkbox"/><span>Marketing consent</span></label>
             <label class="consent-checkbox"><input id="privacyAnalytics" type="checkbox"/><span>Analytics consent</span></label>
             <label class="consent-checkbox"><input id="privacySharing" type="checkbox"/><span>Third-party data sharing consent</span></label>
+            <label
+              class="consent-checkbox"
+              data-floqr-help-id="help-do-not-sell"
+              data-floqr-help-title="Do Not Sell or Share"
+              data-floqr-help-search="do not sell|do not share|ccpa|cpra|gpc|global privacy control|personalized ads"
+              data-floqr-help-body="Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically."
+            ><input id="privacyDoNotSell" type="checkbox"/><span>Do Not Sell or Share (CCPA / CPRA)</span></label>
             <label class="consent-checkbox"><input id="privacyBirthdayNotifyOthers" type="checkbox"/><span>Allow FLOQR system birthday notifications to people I choose</span></label>
             <label>Receive Birthday Notifications
               <select id="privacyBirthdayNotificationScope">
@@ -649,6 +657,7 @@
               </select>
             </label>
           </div>
+          <p id="privacyGpcNotice" class="sub small hidden">Your browser sent Global Privacy Control (GPC). Do Not Sell or Share is on.</p>
           <div class="card-subsection">
             <h3
               data-floqr-help-id="help-general-notifications"
@@ -771,8 +780,8 @@
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
 <script src="./floqr-i18n.js?v=s3.0.86"></script>
-<script src="./floqai-help-repository.js?v=s3.0.86"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.86"></script>
+<script src="./floqai-help-repository.js?v=s3.0.103"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.103"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -781,10 +790,13 @@
 <script src="./dj-commerce-policy.js?v=29.09.12"></script>
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.0.30"></script>
-<script src="./floqr-ad-pricing.js?v=s3.0.76"></script>
-<script src="./ad-campaigns.js?v=s3.0.76"></script>
-<script src="./patron-ad-campaigns.js?v=s3.0.76"></script>
-<script src="./patron-portal-app.js?v=s3.0.86"></script>
+<script src="./floqr-canonical.js?v=s3.0.103"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
+<script src="./floqr-consent-mode.js?v=s3.0.103"></script>
+<script src="./floqr-ad-pricing.js?v=s3.0.103"></script>
+<script src="./ad-campaigns.js?v=s3.0.103"></script>
+<script src="./patron-ad-campaigns.js?v=s3.0.103"></script>
+<script src="./patron-portal-app.js?v=s3.0.103"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

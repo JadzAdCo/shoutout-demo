@@ -1323,6 +1323,15 @@
     byId("privacyMarketing").checked = !!profile.marketingConsent;
     byId("privacyAnalytics").checked = !!profile.analyticsConsent;
     byId("privacySharing").checked = !!profile.dataSharingConsent;
+    if (byId("privacyDoNotSell")) byId("privacyDoNotSell").checked = !!profile.doNotSellOrShare;
+    const gpcNotice = byId("privacyGpcNotice");
+    if (gpcNotice) {
+      const gpcOn = !!window.FLOQRPrivacyPrefs?.detectGpc?.();
+      gpcNotice.classList.toggle("hidden", !gpcOn);
+    }
+    try {
+      window.FLOQRConsentMode?.updateFromPrefs?.(profile);
+    } catch (_) { /* ignore */ }
     if (byId("privacyBirthdayNotifyOthers")) byId("privacyBirthdayNotifyOthers").checked = !!profile.birthdayNotifyOthers;
     if (byId("privacyBirthdayNotificationScope")) byId("privacyBirthdayNotificationScope").value = profile.birthdayNotificationScope || "none";
     if (byId("privacyNotifyEmail")) byId("privacyNotifyEmail").checked = notifyFlagOn(profile.notifyEmail ?? profile.emailNotifications, true);
@@ -1661,6 +1670,7 @@
       marketingConsent: byId("privacyMarketing").checked,
       analyticsConsent: byId("privacyAnalytics").checked,
       dataSharingConsent: byId("privacySharing").checked,
+      doNotSellOrShare: !!byId("privacyDoNotSell")?.checked,
       birthdayNotifyOthers: !!byId("privacyBirthdayNotifyOthers")?.checked,
       birthdayNotificationScope: byId("privacyBirthdayNotificationScope")?.value || "none",
       notifyEmail: !!byId("privacyNotifyEmail")?.checked,
@@ -1669,36 +1679,103 @@
       smsNotifications: !!byId("privacyNotifySms")?.checked,
       publicMinglDatapoints: selectedPrivacyDatapoints(),
       publicMinglDatapointsUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      privacyUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      privacyPolicyVersionAccepted: window.FLOQRPrivacyPrefs?.POLICY_VERSION || "s3.0.103"
     };
-    await db.collection("users").doc(user.uid).set(prefs, {merge:true});
-    await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...prefs, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+    const gpcPatch = window.FLOQRPrivacyPrefs?.patchFromGpc?.(prefs);
+    const merged = gpcPatch ? {...prefs, ...gpcPatch} : prefs;
+    if (gpcPatch?.doNotSellOrShare && byId("privacyDoNotSell")) {
+      byId("privacyDoNotSell").checked = true;
+    }
+    await db.collection("users").doc(user.uid).set(merged, {merge:true});
+    await db.collection("privacyConsents").add({uid:user.uid, email:user.email || "", ...merged, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+    try {
+      window.FLOQRConsentMode?.updateFromPrefs?.(merged);
+    } catch (_) { /* ignore */ }
     setText("portalStatus", "Privacy preferences saved.");
     await loadPortal(user);
     });
   }
 
-  function downloadData() {
-    const blob = new Blob([JSON.stringify(currentProfile, null, 2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "floqr-patron-data.json"; a.click();
-    URL.revokeObjectURL(url);
+  async function downloadData() {
+    const user = auth.currentUser;
+    if (!user) return;
+    return actionFeedback({
+      starting:"Preparing your data export...",
+      wait:"We are building your download from FLOQR servers. Please wait a few seconds.",
+      success:"Export ready",
+      redirecting:"Export ready, redirecting back to My Privacy.",
+      returnTo:"My Privacy"
+    }, async () => {
+      let payload = {profile: currentProfile, exportedAt: new Date().toISOString(), source: "local-fallback"};
+      try {
+        const callable = firebase.app().functions("us-central1").httpsCallable("exportPatronData");
+        const result = await callable({});
+        if (result?.data) payload = result.data;
+      } catch (err) {
+        console.warn("exportPatronData", err?.message || err);
+        payload.notice = `Server export unavailable (${err?.message || "error"}); local profile snapshot only.`;
+      }
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "floqr-patron-data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      setText("portalStatus", "Data export downloaded.");
+    });
   }
 
   async function requestDelete() {
     const user = auth.currentUser;
-    if (!user || !confirm("Request deletion of your patron data?")) return;
+    if (!user) return;
+    if (!confirm("This anonymizes your profile and deletes your sign-in. Type OK only if you mean it.\n\nContinue?")) return;
+    const typed = prompt('Type DELETE to confirm permanent account erasure.');
+    if (String(typed || "").trim().toUpperCase() !== "DELETE") {
+      setText("portalStatus", "Delete canceled — type DELETE to confirm.");
+      return;
+    }
     return actionFeedback({
-      starting:"Submitting delete request...",
-      wait:"We are submitting your data delete request. Please wait a few seconds.",
-      success:"Delete request submitted",
-      redirecting:"Delete request submitted, redirecting back to My Privacy.",
+      starting:"Erasing your account...",
+      wait:"We are fulfilling your data delete request. Please wait a few seconds.",
+      success:"Account erased",
+      redirecting:"Account erased, signing you out.",
       returnTo:"My Privacy"
     }, async () => {
-    await db.collection("privacyConsents").add({type:"deleteRequest", uid:user.uid, email:user.email || "", requestedAt: firebase.firestore.FieldValue.serverTimestamp(), status:"pending"});
-    setText("portalStatus", "Data delete request submitted.");
+      try {
+        const callable = firebase.app().functions("us-central1").httpsCallable("requestPatronDelete");
+        await callable({confirm: "delete"});
+      } catch (err) {
+        // Fallback ticket if callable not yet deployed.
+        await db.collection("privacyConsents").add({
+          type: "deleteRequest",
+          uid: user.uid,
+          email: user.email || "",
+          requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          status: "pending",
+          clientError: String(err?.message || err).slice(0, 200)
+        });
+        setText("portalStatus", "Delete ticket submitted for Master Admin fulfillment.");
+        return;
+      }
+      setText("portalStatus", "Account data anonymized. Signing out…");
+      try { await auth.signOut(); } catch (_) { /* ignore */ }
     });
+  }
+
+  async function applyGpcOnLoad(user, profile = {}) {
+    const prefsApi = window.FLOQRPrivacyPrefs;
+    if (!user || !prefsApi?.detectGpc?.()) return profile;
+    const patch = prefsApi.patchFromGpc(profile);
+    if (!patch) return profile;
+    try {
+      await db.collection("users").doc(user.uid).set(patch, {merge: true});
+      return {...profile, ...patch};
+    } catch (err) {
+      console.warn("GPC patch", err?.message || err);
+      return profile;
+    }
   }
 
   function mediaSlotDefaults(profile) {
@@ -3910,9 +3987,7 @@
   async function loadPortal(user) {
     const ref = db.collection("users").doc(user.uid);
     const snap = await ref.get();
-    const profile = snap.exists ? snap.data() : {};
-    currentProfile = {uid:user.uid, email:user.email || "", ...profile};
-
+    let profile = snap.exists ? snap.data() : {};
     if (!snap.exists) {
       await ref.set({
         displayName:user.displayName || "",
@@ -3926,12 +4001,20 @@
         createdAt:firebase.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
     }
+    profile = await applyGpcOnLoad(user, profile);
+    currentProfile = {uid:user.uid, email:user.email || "", ...profile};
 
     try {
       await window.FLOQRI18n?.init?.(currentProfile);
       window.FLOQRI18n?.applyDom?.();
     } catch (_) {}
     fillProfileForm(profile, user);
+    try {
+      const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || "./privacy.html?v=s3.0.103";
+      const dnsHref = `${policyHref}#do-not-sell`;
+      if (byId("privacyPolicyLink")) byId("privacyPolicyLink").href = policyHref;
+      if (byId("privacyDoNotSellLink")) byId("privacyDoNotSellLink").href = dnsHref;
+    } catch (_) { /* ignore */ }
     renderMediaSlots(profile);
     renderProfilePreview(profile, user);
     await renderTemplateVariantSettings(user, profile);
@@ -4104,6 +4187,7 @@
       ["Marketing Consent", profile.marketingConsent ? "Yes" : "No"],
       ["Analytics Consent", profile.analyticsConsent ? "Yes" : "No"],
       ["Data Sharing Consent", profile.dataSharingConsent ? "Yes" : "No"],
+      ["Do Not Sell or Share", profile.doNotSellOrShare ? "Yes" : "No"],
       ["Public Mingl Datapoints", publicMinglDatapoints(profile).map(key => PUBLIC_MINGL_DATAPOINTS.find(point => point.key === key)?.label || key).join(", ") || "None"]
     ]);
   }

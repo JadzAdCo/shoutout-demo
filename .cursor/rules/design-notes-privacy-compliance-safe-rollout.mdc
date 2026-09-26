@@ -1,0 +1,111 @@
+# Privacy compliance — safe rollout (web → hybrid native → multi-country)
+
+Design notes only. Resume: `@privacy-compliance$`.
+
+**Production host (cutover):** see `.cursor/rules/cutoffrequirement.mdc` — canonical origin is `https://www.floqr.com` (may be prepared before DNS flip).
+
+Not legal advice. Goal: raise GDPR / CCPA / Consent Mode posture **without breaking** signed-in product flows (Mingl, Search, ShoutOut, scheduling, ads rotation, SOS2FA).
+
+## Constraint: what “without breaking” means
+
+| Safe (additive) | Risky if done naively |
+|---|---|
+| Privacy Policy page + links | Tightening `users` read to owner-only (Mingl/Search/admin may list peers today) |
+| Expand export fields via callable | Defaulting all notify/marketing OFF overnight for existing users |
+| Honor GPC into a new flag (ads later) | Deleting Auth users without Storage/Firestore cascade |
+| Consent Mode defaults **only if** `gtag` exists | Blocking App Check / phone reCAPTCHA (auth breaks) |
+| Gate **new** marketing sends on consent | Rewriting profile schema mid-flight |
+
+**Rule:** prefer new collections / callables / flags with **grandfather defaults** that preserve current behavior until an explicit migration cutover.
+
+## Architecture for hybrid native (Capacitor / similar)
+
+Do **not** build cookie-only compliance. Shared privacy core:
+
+| Layer | Module (proposed) | Web | Hybrid native |
+|---|---|---|---|
+| Preferences | `floqr-privacy-prefs.js` | localStorage + `users` fields | Same Firestore fields; Capacitor Preferences as cache |
+| Policy / DNS | `privacy.html` + in-app WebView or native screen | `?v=` pages | Bundled HTML or remote URL; App Store / Play links |
+| Signals | `floqr-privacy-signals.js` | GPC header / `navigator.globalPrivacyControl` | iOS ATT (`AppTrackingTransparency`); Android Play Data Safety; no cookie banner as sole control |
+| Analytics gate | `floqr-consent-mode.js` | Consent Mode v2 before gtag | Firebase Analytics / ATT before IDFA; same preference keys |
+| DSAR | Cloud Functions | HTTPS / callable | Same callables from native |
+
+**Shared preference keys (already partially exist):**  
+`marketingConsent`, `analyticsConsent`, `dataSharingConsent`, `publicMinglDatapoints`, plus proposed: `doNotSellOrShare`, `gpcAppliedAt`, `privacyPolicyVersionAccepted`, `privacyRegion` (`eu`|`us-ca`|`us`|`br`|…).
+
+## Multi-country (eventual)
+
+| Region | Minimum product behavior |
+|---|---|
+| EU/EEA/UK | Art. 13 notice, lawful basis labels, real erasure, CMP before non-essential cookies/SDK |
+| California (CPRA) | Notice at collection, Do Not Sell/Share, GPC |
+| Brazil (LGPD) | Similar notice + rights; Portuguese pack already in i18n |
+| Other | Same privacy core; locale packs for policy + My Privacy (floqr-i18n) |
+
+Region detection: profile `country` / `uiLanguage` + IP country **only as hint** — never silent consent. Prefer user-confirmed region on first privacy gate.
+
+## Phased work I can do in-repo (safe order)
+
+### Phase A — Additive notice (no behavior change)
+1. `privacy.html` (controller placeholder, purposes, processors list from code: Firebase, Twilio, SendGrid, Stripe, Google reCAPTCHA/Places, retention pointers).
+2. Links from My Privacy, Search footer/chrome, onboarding — `FLOQRNav.appVersion` cache-bust.
+3. FloqAi help + design note (this file). Master Admin–only English OK; patron chrome/links i18n when shipping policy body.
+
+### Phase B — Consent enforcement with grandfathering
+1. Marketing SMS/email: require `marketingConsent === true` **OR** legacy `marketingConsent` unset **and** campaign flagged `allowLegacyUnset` until cutover date.
+2. Ad personalization: if `doNotSellOrShare` or `dataSharingConsent === false` or GPC → treat as `targetMode: "all"` house creatives only / no profile tag scoring (keep ads showing, stop using PII tags).
+3. Analytics: do **not** enable GA4 until Consent Mode stub + CMP; keep measurementId unused.
+
+### Phase C — DSAR that works
+1. Callable `exportPatronData` — profile + shoutouts + spotAds + consents + orders (Admin SDK).
+2. Callable `fulfillPatronDelete` — master/admin or scheduled job from `deleteRequest`; soft-delete → hard purge; never leave `pending` forever.
+3. Keep UI buttons; swap internals only.
+
+### Phase D — Rules lockdown (migration required)
+1. Inventory every client that reads other users’ docs (Mingl, admin lists, master diagnostics).
+2. Introduce `publicProfiles/{uid}` (safe fields only) written by Cloud Function on profile save.
+3. Change `users` read to `isSelf || isMasterAdmin || isClubAdminFor…`; clients switch to `publicProfiles`.
+4. `privacyConsents`: create by self; read self or master; no peer update/delete.
+
+### Phase E — CMP + Consent Mode v2 (web) / ATT (native)
+1. Web: lightweight first-party CMP or vendor; defaults denied; update on choice.
+2. `floqr-consent-mode.js`: if `window.gtag` exists, set denied defaults + `wait_for_update`.
+3. Native: ATT prompt only if tracking; map to same `analyticsConsent` / `doNotSellOrShare`.
+4. reCAPTCHA: classify as **strictly necessary security** in policy; do not block auth behind marketing CMP.
+
+### Phase F — Hybrid packaging
+1. Same privacy modules in shared JS; Capacitor shell loads them.
+2. App Store privacy nutrition labels / Play Data safety aligned with actual SDKs.
+3. No Xibo/`display.html` cookie banners (kiosk; public board — separate notice if needed).
+
+## Timing vs demo / cutover
+
+| When | What |
+|---|---|
+| **Now (demo on Pages)** | Ship Phases A–C: policy page, DNS/GPC, marketing grandfather gate, ad personalization soften, real DSAR export/delete, tighten `privacyConsents`. Fixes fake delete + open consents without breaking Mingl/Search. |
+| **Before floqr.com cutover** | Counsel-ready controller contact on `privacy.html`; optional `privacyPolicyVersionAccepted` re-ack; App Check / OAuth host allowlists for www. |
+| **At cutover** | Flip DNS; policy live at `https://www.floqr.com/privacy.html`; preview-email bases → www. |
+| **After publicProfiles (Phase D)** | Lock `users` reads. Do **not** tighten peer `users` reads in the safe slice. |
+
+## Shipped in s3.0.103 (Phases A–C)
+
+| Piece | Status |
+|---|---|
+| `privacy.html` + `FLOQRCanonical` | Live on Pages package; canonical host www.floqr.com |
+| My Privacy DNS + GPC + policy links | `patron-portal` + `floqr-privacy-prefs.js` |
+| Consent Mode stub | `floqr-consent-mode.js` (no-op until gtag exists) |
+| Ad personalization gate | `ad-campaigns.js` `allowsPersonalizedAds` |
+| Marketing broadcast filter | `marketing-campaign-functions.js` skips opted-out / DNS |
+| DSAR | `exportPatronData`, `requestPatronDelete`, `fulfillPatronDelete` |
+| `privacyConsents` rules | create self; read self/master; update/delete master only |
+
+## Explicit non-goals for “safe” passes
+- Do not disable App Check / phone OTP reCAPTCHA.
+- Do not put `?v=` on Display URLs.
+- Do not invent “TBA” consent or fake Privacy Policy legal entity — use placeholders marked TODO for counsel.
+- Do not break SOS2FA transactional sends (document as security necessity; separate from marketing).
+
+## First implementation slice (when asked to build)
+A → B(ad targeting DNS only) → C(export callable) → D(publicProfiles) → E → F.
+
+Resume: `@privacy-compliance$`.

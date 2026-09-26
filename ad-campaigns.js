@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "s3.0.102";
+  const VERSION = "s3.0.103";
   const OVERRIDE_KEY = "floqrAdCampaignOverrides:v28.99";
 
   /** Profile fields operators can require for a match group (same keys as profileTags). */
@@ -559,8 +559,14 @@
     const requiredGroups = campaignRequiredGroupMatches(campaign, profile);
     if (requiredGroups.some(group => !group.matches.length)) return -999;
     const targetMode = String(campaign.targetMode || "all");
-    const matches = campaignTargetMatches(campaign, profile);
+    const prefs = typeof window !== "undefined" ? window.FLOQRPrivacyPrefs : null;
+    const personalizedOk = !prefs || prefs.allowsPersonalizedAds(profile);
+    const matches = personalizedOk ? campaignTargetMatches(campaign, profile) : [];
     const hasTags = splitTags(campaign.targetTags).length > 0;
+    // Do Not Sell / GPC / sharing opt-out: still eligible for all-mode / house, not tag-targeted lift.
+    if (!personalizedOk && targetMode === "targeted" && hasTags && !campaign.isHouseFallback) {
+      return -999;
+    }
     if (targetMode === "targeted" && hasTags && !matches.length && !campaign.isHouseFallback) return -999;
     // targetMode "all" or empty tags: eligible for any patron (still slot/age gated).
     let score = slotScore + (matches.length * 20) + requiredGroups.reduce((sum, group) => sum + group.matches.length * 25, 0);
