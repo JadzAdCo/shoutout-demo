@@ -1,0 +1,84 @@
+# Ad campaigns — business accounts, placements, pricing
+
+Design notes only (not FloqAi help). Resume: `@ad-campaigns$`.
+
+## Placement types (product categories)
+
+| Type | Code | Where shown | Attention |
+|---|---|---|---|
+| **Inline** | `placementType: "inline"` | Feature flow interstitials (Search category/Mingl entry splash, RydR step, club CTA splash, Mingl people-grid cards) | High — interrupts a job |
+| **Mingl Gist** | `placementType: "minglGist"` | Mingl Gist story ring / scroll feed only | Medium — native in scroll |
+
+Slots map:
+
+- Inline → `["default","clubs","events","lounges","lounge-club","shoutout","rydr","mingl"]` (not exclusive to mingl-gist)
+- Mingl Gist → `["mingl-gist","mingl"]`
+
+## Account election
+
+| Field | Values |
+|---|---|
+| `accountType` | `personal` (default) \| `business` |
+| `IsBusinessAccount` | `0` \| `1` (mirror for gates) |
+| `businessName` | string, required when business |
+
+Personal accounts cannot open Ad Campaigns. Business accounts keep `IsPatron` (still patrons).
+
+## Creative
+
+| `creativeType` | Input |
+|---|---|
+| `image` / flyer | PNG, JPEG, or GIF upload → Storage `spotAds/{uid}/{campaignId}` |
+| `html` | Patron pastes HTML (image URLs allowed). Render in sandboxed iframe only — never `innerHTML` into the host page |
+
+## Workflow
+
+1. Business patron composes in My Profile → **Ad Campaigns**
+2. Submit → `spotAdCampaigns/{id}` `status: pending_approval`, `paymentStatus: unpaid|paid|waived`
+3. Master Admin → Ad Campaign Management → approve / reject + set `startsAt` / `endsAt`
+4. Approve → `status: active` (only while schedule window is open; picker also checks dates)
+5. Active campaigns enter `FLOQRAdCampaigns` pool via `loadFirestoreSpotAds`
+
+## Pricing (DOOH-informed)
+
+US DOOH / programmatic digital out-of-home CPM commonly ~$5–25; high-attention interstitial / takeover inventory sits toward the top. In-app feed native CPM often ~$5–12.
+
+| Placement | Package | Justification |
+|---|---|---|
+| Inline | **$45 / 7 days** | Interruptive, feature-path attention comparable to mid DOOH interstitial (~$12–18 CPM × ~250–400 expected impressions) |
+| Mingl Gist | **$25 / 7 days** | Scroll-native, higher volume / lower interrupt (~$6–10 CPM × similar volume) |
+
+Targeted audience vs **all patrons**: same package price in v1 (targeting is included). Geo/interest premium may be added later.
+
+Constants: `window.FLOQRAdPricing` in `floqr-ad-pricing.js`.
+
+Payment modes (invoice / subscription / pay-as-you-go): see `design-notes-ad-campaigns-payment-modes.mdc`.
+
+## Targeting
+
+- `targetMode: "all"` — eligible for any signed-in patron (age gates still apply)
+- `targetMode: "targeted"` — `targetTags` from patron datapoints (city, music, nightlife, food, beverages, hobbies, travel, lookingToMeet, gender, ageRange)
+
+### Master Admin editors (human forms → stored structure)
+
+Operators must **not** edit raw JSON. Ad Campaign Mgmt uses plain inputs:
+
+| UI | Stored field | Guard rails |
+|---|---|---|
+| Match tags (comma-separated) | `targetTags: string[]` | trim; max 80 tags × 80 chars |
+| Tag categories (Category + tags rows) | `campaignDatapoints: [{category, tags}]` | category + ≥1 tag per kept row; optional clarity only |
+| Required match groups (label + multi-select profile fields + tags) | `requiredTargetGroups: [{label, fields, tags}]` | each group needs ≥1 field and ≥1 tag; hard AND across groups |
+
+Save serializes forms via `normalizeDatapoints` / `normalizeRequiredGroups` into `localStorage` overrides (`floqrAdCampaignOverrides:v28.99`) for packaged demos — it does **not** rewrite Firestore `spotAdCampaigns` docs. Scoring still uses `targetTags` + required groups — categories are operator-facing organization.
+
+**Preview creative** toggles a sandboxed flyer/HTML preview on pending and live cards (`mountCreativePreview`). HTML ads stay in `sandbox=""` iframes — never host `innerHTML`.
+
+## Why patrons only saw Zebbies
+
+Packaged DC spots often have **empty** `targetTags`, so they always pass scoring, while brand demos with tags fail when the patron profile has no overlap. Rotation then collapses onto the DC pack (Zebbies frequently). Fix: honor `targetMode: "all"`, diversify rotation by advertiser, and include non-DC `active` creatives with empty tags / all-mode.
+
+## Forbidden
+
+- Do not put design notes in FloqAi help bodies
+- Do not execute unsandboxed HTML ads in the host DOM
+- Do not let personal accounts create campaigns

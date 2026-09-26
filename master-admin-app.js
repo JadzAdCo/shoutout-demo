@@ -1613,7 +1613,7 @@
     summary.innerHTML = simpleRows([
       ["Pending approval", pending.length.toLocaleString()],
       ["Campaigns in live pool", campaigns.length.toLocaleString()],
-      ["Preview campaigns", campaigns.filter(item => item.status === "preview").length.toLocaleString()],
+      ["Draft / preview status", campaigns.filter(item => item.status === "preview").length.toLocaleString()],
       ["Needs verification", campaigns.filter(item => item.status === "needs-verification").length.toLocaleString()],
       ["Patron profiles scanned", patrons.length.toLocaleString()],
       ["Top campaign match", analytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"],
@@ -1626,12 +1626,14 @@
       await window.FLOQRAdCampaigns.loadFirestoreSpotAds?.(db);
       window.FLOQRAdCampaigns.renderPendingApprovalQueue?.("adCampaignPendingQueue", db);
       const nextPending = window.FLOQRAdCampaigns.pendingCampaigns?.() || [];
+      const nextAnalytics = window.FLOQRAdCampaigns.campaignAnalytics(patrons);
       summary.innerHTML = simpleRows([
         ["Pending approval", nextPending.length.toLocaleString()],
         ["Campaigns in live pool", window.FLOQRAdCampaigns.campaigns().length.toLocaleString()],
-        ["Preview campaigns", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "preview").length.toLocaleString()],
+        ["Draft / preview status", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "preview").length.toLocaleString()],
         ["Needs verification", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "needs-verification").length.toLocaleString()],
         ["Patron profiles scanned", patrons.length.toLocaleString()],
+        ["Top campaign match", nextAnalytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"],
         ["Inline package", window.FLOQRAdPricing?.packageFor?.("inline")?.packageLabel || "$45 / 7 days"],
         ["Mingl Gist package", window.FLOQRAdPricing?.packageFor?.("minglGist")?.packageLabel || "$25 / 7 days"]
       ]);

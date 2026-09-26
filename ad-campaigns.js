@@ -1,9 +1,33 @@
-/* FLOQR ad campaign targeting v28.99 */
+/* FLOQR ad campaign targeting.
+ * Design notes: .cursor/rules/design-notes-ad-campaigns-business.mdc
+ */
 (function () {
   "use strict";
 
-  const VERSION = "28.99";
+  const VERSION = "s3.0.101";
   const OVERRIDE_KEY = "floqrAdCampaignOverrides:v28.99";
+
+  /** Profile fields operators can require for a match group (same keys as profileTags). */
+  const PROFILE_FIELD_OPTIONS = [
+    {id: "city", label: "City"},
+    {id: "state", label: "State"},
+    {id: "region", label: "Region"},
+    {id: "province", label: "Province"},
+    {id: "country", label: "Country"},
+    {id: "ageRange", label: "Age range"},
+    {id: "gender", label: "Gender"},
+    {id: "favoriteGenres", label: "Favorite genres"},
+    {id: "musicInterests", label: "Music interests"},
+    {id: "nightlifeInterests", label: "Nightlife style"},
+    {id: "foodChoices", label: "Food choices"},
+    {id: "favoriteFoods", label: "Favorite foods"},
+    {id: "beverageChoices", label: "Beverage choices"},
+    {id: "favoriteBeverages", label: "Favorite beverages"},
+    {id: "hobbies", label: "Hobbies"},
+    {id: "generalHobbies", label: "General hobbies"},
+    {id: "travelInterests", label: "Travel"},
+    {id: "lookingToMeet", label: "Looking to meet"}
+  ];
 
   const baseCampaigns = [
     {
@@ -169,17 +193,193 @@
     try {
       const parsed = JSON.parse(value || "[]");
       if (!Array.isArray(parsed)) return [];
-      return parsed.map(group => ({
-        label: String(group.label || "Required target group"),
-        fields: splitTags(group.fields || []),
-        tags: splitTags(group.tags || [])
-      })).filter(group => group.fields.length && group.tags.length);
+      return normalizeRequiredGroups(parsed);
     } catch {
       return null;
     }
   }
 
+  function normalizeDatapoints(rows) {
+    if (!Array.isArray(rows)) return [];
+    return rows.map((row) => ({
+      category: String(row?.category || "").trim().slice(0, 80),
+      tags: splitTags(row?.tags || []).map((t) => String(t).slice(0, 80)).slice(0, 40)
+    })).filter((row) => row.category && row.tags.length);
+  }
+
+  function normalizeRequiredGroups(rows) {
+    if (!Array.isArray(rows)) return [];
+    return rows.map((group) => ({
+      label: String(group?.label || "Required target group").trim().slice(0, 80) || "Required target group",
+      fields: splitTags(group?.fields || []).map((f) => String(f).slice(0, 60)).slice(0, 20),
+      tags: splitTags(group?.tags || []).map((t) => String(t).slice(0, 80)).slice(0, 40)
+    })).filter((group) => group.fields.length && group.tags.length);
+  }
+
+  function fieldOptionsHtml(selectedFields) {
+    const selected = new Set(splitTags(selectedFields).map(normalize));
+    return PROFILE_FIELD_OPTIONS.map((field) =>
+      `<option value="${esc(field.id)}"${selected.has(normalize(field.id)) ? " selected" : ""}>${esc(field.label)}</option>`
+    ).join("");
+  }
+
+  function datapointEditorHtml(datapoints) {
+    const rows = normalizeDatapoints(datapoints);
+    const list = rows.length ? rows : [{category: "", tags: []}];
+    return `<div class="ad-target-editor" data-dp-editor>
+      <p class="sub small">Group related tags under a category (Location, Music, Venue style…). These help operators read the campaign; matching still uses the tags below.</p>
+      <div data-dp-rows>${list.map((row) => `
+        <div class="profile-grid ad-target-row" data-dp-row>
+          <label>Category
+            <input type="text" data-dp-category maxlength="80" placeholder="e.g. Location" value="${esc(row.category || "")}"/>
+          </label>
+          <label>Tags (comma-separated)
+            <input type="text" data-dp-tags maxlength="600" placeholder="Washington DC, DC, DMV" value="${esc(splitTags(row.tags).join(", "))}"/>
+          </label>
+          <button type="button" data-remove-dp-row>Remove</button>
+        </div>`).join("")}</div>
+      <button type="button" data-add-dp-row>+ Add category</button>
+    </div>`;
+  }
+
+  function requiredGroupsEditorHtml(groups) {
+    const rows = normalizeRequiredGroups(groups);
+    const list = rows.length ? rows : [];
+    return `<div class="ad-target-editor" data-rg-editor>
+      <p class="sub small">Optional hard filters: patron must match at least one tag in <em>each</em> group below (checked only on the selected profile fields). Leave empty for soft tag scoring only.</p>
+      <div data-rg-rows>${list.map((row) => `
+        <div class="ad-target-row" data-rg-row>
+          <label>Group label
+            <input type="text" data-rg-label maxlength="80" placeholder="e.g. DC music fans" value="${esc(row.label || "")}"/>
+          </label>
+          <label>Profile fields to check
+            <select multiple size="5" data-rg-fields>${fieldOptionsHtml(row.fields)}</select>
+          </label>
+          <label>Must match any of these tags (comma-separated)
+            <input type="text" data-rg-tags maxlength="600" placeholder="DC, Latin, Reggaeton" value="${esc(splitTags(row.tags).join(", "))}"/>
+          </label>
+          <button type="button" data-remove-rg-row>Remove group</button>
+        </div>`).join("")}</div>
+      <button type="button" data-add-rg-row>+ Add required group</button>
+    </div>`;
+  }
+
+  function collectDatapointsFromCard(card) {
+    if (!card) return [];
+    return normalizeDatapoints(Array.from(card.querySelectorAll("[data-dp-row]")).map((row) => ({
+      category: row.querySelector("[data-dp-category]")?.value || "",
+      tags: row.querySelector("[data-dp-tags]")?.value || ""
+    })));
+  }
+
+  function collectRequiredGroupsFromCard(card) {
+    if (!card) return [];
+    return normalizeRequiredGroups(Array.from(card.querySelectorAll("[data-rg-row]")).map((row) => {
+      const select = row.querySelector("[data-rg-fields]");
+      const fields = select
+        ? Array.from(select.selectedOptions).map((opt) => opt.value)
+        : [];
+      return {
+        label: row.querySelector("[data-rg-label]")?.value || "",
+        fields,
+        tags: row.querySelector("[data-rg-tags]")?.value || ""
+      };
+    }));
+  }
+
+  function emptyDatapointRowHtml() {
+    return `<div class="profile-grid ad-target-row" data-dp-row>
+      <label>Category
+        <input type="text" data-dp-category maxlength="80" placeholder="e.g. Location" value=""/>
+      </label>
+      <label>Tags (comma-separated)
+        <input type="text" data-dp-tags maxlength="600" placeholder="Washington DC, DC, DMV" value=""/>
+      </label>
+      <button type="button" data-remove-dp-row>Remove</button>
+    </div>`;
+  }
+
+  function emptyRequiredGroupRowHtml() {
+    return `<div class="ad-target-row" data-rg-row>
+      <label>Group label
+        <input type="text" data-rg-label maxlength="80" placeholder="e.g. DC music fans" value=""/>
+      </label>
+      <label>Profile fields to check
+        <select multiple size="5" data-rg-fields>${fieldOptionsHtml([])}</select>
+      </label>
+      <label>Must match any of these tags (comma-separated)
+        <input type="text" data-rg-tags maxlength="600" placeholder="DC, Latin, Reggaeton" value=""/>
+      </label>
+      <button type="button" data-remove-rg-row>Remove group</button>
+    </div>`;
+  }
+
+  function mountCreativePreview(host, campaign) {
+    if (!host || !campaign) return;
+    host.innerHTML = "";
+    host.classList.add("ad-creative-preview");
+    if (campaign.creativeType === "html" && campaign.htmlBody) {
+      const frame = document.createElement("iframe");
+      frame.className = "ad-html-preview";
+      frame.setAttribute("sandbox", "");
+      frame.setAttribute("title", `${campaign.title || "Ad"} HTML preview`);
+      frame.style.cssText = "width:100%;max-width:360px;height:200px;border:0;border-radius:12px;background:#111";
+      frame.srcdoc = String(campaign.htmlBody);
+      host.appendChild(frame);
+      return;
+    }
+    if (campaign.image) {
+      const img = document.createElement("img");
+      img.src = String(campaign.image);
+      img.alt = `${campaign.title || "Ad"} creative preview`;
+      img.style.cssText = "max-width:100%;max-width:360px;max-height:280px;border-radius:12px;background:#050819;display:block";
+      host.appendChild(img);
+      return;
+    }
+    host.innerHTML = `<p class="sub small">No flyer or HTML creative on this campaign yet.</p>`;
+  }
+
+  function bindTargetEditorActions(card) {
+    if (!card || card.dataset.targetEditorBound === "1") return;
+    card.dataset.targetEditorBound = "1";
+    card.addEventListener("click", (event) => {
+      const addDp = event.target.closest("[data-add-dp-row]");
+      if (addDp && card.contains(addDp)) {
+        card.querySelector("[data-dp-rows]")?.insertAdjacentHTML("beforeend", emptyDatapointRowHtml());
+        return;
+      }
+      const removeDp = event.target.closest("[data-remove-dp-row]");
+      if (removeDp && card.contains(removeDp)) {
+        const rows = card.querySelectorAll("[data-dp-row]");
+        if (rows.length <= 1) {
+          removeDp.closest("[data-dp-row]")?.querySelectorAll("input").forEach((input) => { input.value = ""; });
+          return;
+        }
+        removeDp.closest("[data-dp-row]")?.remove();
+        return;
+      }
+      const addRg = event.target.closest("[data-add-rg-row]");
+      if (addRg && card.contains(addRg)) {
+        card.querySelector("[data-rg-rows]")?.insertAdjacentHTML("beforeend", emptyRequiredGroupRowHtml());
+        return;
+      }
+      const removeRg = event.target.closest("[data-remove-rg-row]");
+      if (removeRg && card.contains(removeRg)) {
+        removeRg.closest("[data-rg-row]")?.remove();
+      }
+    });
+  }
+
   let firestoreSpotAds = [];
+  let firestorePendingAds = [];
+
+  function isScheduleLive(campaign, nowMs = Date.now()) {
+    const starts = Number(campaign.startsAtMs || campaign.proposedStartsAtMs || 0);
+    const ends = Number(campaign.endsAtMs || campaign.proposedEndsAtMs || 0);
+    if (starts && nowMs < starts) return false;
+    if (ends && nowMs > ends) return false;
+    return true;
+  }
 
   function campaigns() {
     const overrides = readOverrides();
@@ -193,32 +393,73 @@
     return Array.from(byId.values());
   }
 
+  function mapSpotDoc(doc) {
+    const row = doc.data() || {};
+    const placementType = String(row.placementType || "").trim() || (
+      Array.isArray(row.slots) && row.slots.includes("mingl-gist") && !row.slots.includes("default")
+        ? "minglGist"
+        : "inline"
+    );
+    const pricing = (typeof window !== "undefined" && window.FLOQRAdPricing?.packageFor?.(placementType)) || null;
+    return {
+      id: doc.id,
+      title: row.title || row.headline || "Spot ad",
+      badge: row.badge || row.eyebrow || "Sponsored",
+      advertiser: row.advertiser || row.businessName || row.clubName || "Advertiser",
+      status: row.status || "active",
+      sourceUrl: row.sourceUrl || row.linkUrl || "",
+      image: row.image || row.imageUrl || row.backgroundImageUrl || "",
+      htmlBody: row.htmlBody || "",
+      creativeType: row.creativeType || (row.htmlBody ? "html" : "image"),
+      body: row.body || "",
+      callToAction: row.cta || row.callToAction || "Learn more",
+      slots: Array.isArray(row.slots) && row.slots.length
+        ? row.slots
+        : (pricing?.slots || ["clubs", "events", "mingl", "mingl-gist", "rydr", "default"]),
+      placementType,
+      targetMode: row.targetMode || (Array.isArray(row.targetTags) && row.targetTags.length ? "targeted" : "all"),
+      targetTags: row.targetTags || [],
+      clubLocationId: row.clubLocationId || "",
+      eventTags: row.eventTags || [],
+      priceCents: row.priceCents ?? pricing?.priceCents ?? null,
+      paymentStatus: row.paymentStatus || "",
+      publishedByUid: row.publishedByUid || "",
+      publisherEmail: row.publisherEmail || "",
+      businessName: row.businessName || "",
+      startsAtMs: Number(row.startsAtMs || 0) || null,
+      endsAtMs: Number(row.endsAtMs || 0) || null,
+      proposedStartsAtMs: Number(row.proposedStartsAtMs || 0) || null,
+      proposedEndsAtMs: Number(row.proposedEndsAtMs || 0) || null,
+      createdAtMs: Number(row.createdAtMs || 0) || null,
+      source: row.source || "firestore"
+    };
+  }
+
   async function loadFirestoreSpotAds(db) {
     if (!db?.collection) return campaigns();
     try {
       const snap = await db.collection("spotAdCampaigns").where("status", "==", "active").limit(80).get();
-      firestoreSpotAds = snap.docs.map(doc => {
-        const row = doc.data() || {};
-        return {
-          id: doc.id,
-          title: row.title || row.headline || "Club spot ad",
-          badge: row.badge || row.eyebrow || "Sponsored",
-          advertiser: row.advertiser || row.clubName || "Club",
-          status: row.status || "active",
-          sourceUrl: row.sourceUrl || row.linkUrl || "",
-          image: row.image || row.imageUrl || row.backgroundImageUrl || "",
-          body: row.body || "",
-          callToAction: row.cta || row.callToAction || "Learn more",
-          slots: Array.isArray(row.slots) && row.slots.length ? row.slots : ["clubs", "events", "mingl", "mingl-gist", "rydr", "default"],
-          targetTags: row.targetTags || [],
-          clubLocationId: row.clubLocationId || "",
-          eventTags: row.eventTags || []
-        };
-      });
+      firestoreSpotAds = snap.docs.map(mapSpotDoc).filter((row) => isScheduleLive(row));
     } catch (error) {
       firestoreSpotAds = [];
     }
     return campaigns();
+  }
+
+  async function loadPendingSpotAds(db) {
+    if (!db?.collection) return [];
+    try {
+      const snap = await db.collection("spotAdCampaigns").where("status", "==", "pending_approval").limit(80).get();
+      firestorePendingAds = snap.docs.map(mapSpotDoc)
+        .sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+    } catch (error) {
+      firestorePendingAds = [];
+    }
+    return firestorePendingAds;
+  }
+
+  function pendingCampaigns() {
+    return firestorePendingAds.slice();
   }
 
   function normalize(value) {
@@ -275,7 +516,10 @@
   function campaignSlotScore(campaign, slot = "default") {
     const slots = campaign.slots || ["default"];
     if (slots.includes(slot)) return 30;
-    if (slot === "default" && slots.includes("default")) return 10;
+    // Allow "default" campaigns to be eligible for other slots too.
+    // This prevents the rotation from collapsing to a single advertiser when
+    // your non-default slots don't have matching campaigns seeded yet.
+    if (slots.includes("default")) return slot === "default" ? 10 : 8;
     return -999;
   }
 
@@ -297,19 +541,33 @@
   }
 
   function scoreCampaign(campaign, profile = {}, slot = "default") {
+    if (String(campaign.status || "active") === "pending_approval") return -999;
+    if (String(campaign.status || "") === "rejected") return -999;
+    if (!isScheduleLive(campaign)) return -999;
     if (campaign.minimumAge) {
       const age = profileAgeNumber(profile);
       if (!age || age < campaign.minimumAge) return -999;
+    }
+    const placement = String(campaign.placementType || "");
+    if (placement === "minglGist" && slot !== "mingl-gist" && slot !== "mingl") return -999;
+    if (placement === "inline" && (slot === "mingl-gist")) {
+      // Inline packages are not Mingl Gist scroll inventory.
+      return -999;
     }
     const slotScore = campaignSlotScore(campaign, slot);
     if (slotScore < 0) return -999;
     const requiredGroups = campaignRequiredGroupMatches(campaign, profile);
     if (requiredGroups.some(group => !group.matches.length)) return -999;
+    const targetMode = String(campaign.targetMode || "all");
     const matches = campaignTargetMatches(campaign, profile);
-    if (!campaign.isHouseFallback && splitTags(campaign.targetTags).length && !matches.length) return -999;
+    const hasTags = splitTags(campaign.targetTags).length > 0;
+    if (targetMode === "targeted" && hasTags && !matches.length && !campaign.isHouseFallback) return -999;
+    // targetMode "all" or empty tags: eligible for any patron (still slot/age gated).
     let score = slotScore + (matches.length * 20) + requiredGroups.reduce((sum, group) => sum + group.matches.length * 25, 0);
     if (campaign.status === "active") score += 5;
     if (campaign.status === "needs-verification") score -= 15;
+    if (campaign.source === "patron_business") score += 3;
+    // Soft diversify: lightly prefer campaigns that are not the last shown advertiser.
     return score;
   }
 
@@ -327,7 +585,11 @@
       body: selected.body,
       badge: selected.badge,
       image: selected.image,
+      htmlBody: selected.htmlBody || "",
+      creativeType: selected.creativeType || "image",
       campaignId: selected.id,
+      advertiser: selected.advertiser || "",
+      placementType: selected.placementType || "",
       callToAction: selected.callToAction || "Learn more",
       sourceUrl: selected.sourceUrl || ""
     };
@@ -338,10 +600,16 @@
     if (!candidates.length) return null;
     if (candidates.length === 1) return candidates[0];
     const key = `floqrAdCampaignRotation:${slot}`;
+    const prevKey = `floqrAdCampaignRotationAdvertiser:${slot}`;
     const previous = localStorage.getItem(key) || "";
-    const previousIndex = candidates.findIndex(item => item.id === previous);
-    const next = candidates[(previousIndex + 1) % candidates.length] || candidates[0];
+    const previousAdvertiser = normalize(localStorage.getItem(prevKey) || "");
+    // Prefer a different advertiser than last shown so Zebbies cannot monopolize.
+    const diversify = candidates.filter(item => normalize(item.advertiser || item.id) !== previousAdvertiser);
+    const rotatePool = diversify.length ? diversify : candidates;
+    const previousIndex = rotatePool.findIndex(item => item.id === previous);
+    const next = rotatePool[(previousIndex + 1) % rotatePool.length] || rotatePool[0];
     localStorage.setItem(key, next.id);
+    localStorage.setItem(prevKey, next.advertiser || next.id);
     return next;
   }
 
@@ -366,67 +634,235 @@
     return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   }
 
+  async function approveCampaign(db, campaignId, {startsAtMs, endsAtMs, waivePayment = false} = {}) {
+    if (!db?.collection || !campaignId) throw new Error("Missing campaign.");
+    const ref = db.collection("spotAdCampaigns").doc(campaignId);
+    const snap = await ref.get();
+    if (!snap.exists) throw new Error("Campaign not found.");
+    const row = snap.data() || {};
+    const now = Date.now();
+    const flightDays = Number(row.flightDays || 7);
+    const starts = Number(startsAtMs || row.proposedStartsAtMs || now);
+    const ends = Number(endsAtMs || row.proposedEndsAtMs || (starts + flightDays * 24 * 60 * 60 * 1000));
+    const patch = {
+      status: "active",
+      startsAtMs: starts,
+      endsAtMs: ends,
+      approvedAtMs: now,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (waivePayment) patch.paymentStatus = "waived";
+    await ref.set(patch, {merge: true});
+    return patch;
+  }
+
+  async function rejectCampaign(db, campaignId, reason = "") {
+    if (!db?.collection || !campaignId) throw new Error("Missing campaign.");
+    await db.collection("spotAdCampaigns").doc(campaignId).set({
+      status: "rejected",
+      rejectedAtMs: Date.now(),
+      rejectionReason: String(reason || "").slice(0, 400),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  }
+
+  function renderPendingApprovalQueue(targetId, db) {
+    const wrap = document.getElementById(targetId);
+    if (!wrap) return;
+    const rows = pendingCampaigns();
+    if (!rows.length) {
+      wrap.innerHTML = `<p class="sub">No pending business campaigns. Business accounts submit from My Profile → Ad Campaigns.</p>`;
+      return;
+    }
+    wrap.innerHTML = rows.map((campaign) => {
+      const price = (typeof window !== "undefined" && window.FLOQRAdPricing?.priceLabel?.(campaign.priceCents)) || "";
+      const startVal = campaign.proposedStartsAtMs ? new Date(campaign.proposedStartsAtMs).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+      const endVal = campaign.proposedEndsAtMs ? new Date(campaign.proposedEndsAtMs).toISOString().slice(0, 10) : "";
+      return `<div class="queue-item ad-campaign-pending-card" data-campaign-id="${esc(campaign.id)}">
+        <div class="message-envelope-head">
+          <strong>${esc(campaign.title)}</strong>
+          <span>pending · ${esc(campaign.placementType || "")} · ${esc(campaign.creativeType || "image")}</span>
+        </div>
+        <p>${esc(campaign.body || "")}</p>
+        <p class="sub small">${esc(campaign.advertiser || "")} · ${esc(campaign.publisherEmail || "")} · ${esc(price)} · pay ${esc(campaign.paymentStatus || "unpaid")} · audience ${esc(campaign.targetMode || "all")}</p>
+        ${campaign.targetTags?.length ? `<p class="sub small">Tags: ${esc(splitTags(campaign.targetTags).join(", "))}</p>` : ""}
+        <div class="ad-creative-preview" data-ad-preview-host="${esc(campaign.id)}" hidden></div>
+        <div class="profile-grid">
+          <label>Starts <input type="date" data-ad-start="${esc(campaign.id)}" value="${esc(startVal)}"/></label>
+          <label>Ends <input type="date" data-ad-end="${esc(campaign.id)}" value="${esc(endVal)}"/></label>
+        </div>
+        <div class="queue-actions">
+          <button type="button" data-preview-ad="${esc(campaign.id)}">Preview creative</button>
+          <button type="button" class="primary" data-approve-ad="${esc(campaign.id)}">Approve &amp; schedule</button>
+          <button type="button" data-approve-waive-ad="${esc(campaign.id)}">Approve (waive payment)</button>
+          <button type="button" data-reject-ad="${esc(campaign.id)}">Reject</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
+    wrap.querySelectorAll("[data-preview-ad]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = button.dataset.previewAd;
+        const host = wrap.querySelector(`[data-ad-preview-host="${CSS.escape(id)}"]`);
+        const campaign = byId[id];
+        if (!host || !campaign) return;
+        const opening = host.hasAttribute("hidden");
+        if (opening) {
+          mountCreativePreview(host, campaign);
+          host.removeAttribute("hidden");
+          button.textContent = "Hide preview";
+        } else {
+          host.setAttribute("hidden", "");
+          host.innerHTML = "";
+          button.textContent = "Preview creative";
+        }
+      });
+    });
+
+    const refresh = async () => {
+      await loadPendingSpotAds(db);
+      await loadFirestoreSpotAds(db);
+      renderPendingApprovalQueue(targetId, db);
+    };
+
+    wrap.querySelectorAll("[data-approve-ad], [data-approve-waive-ad]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.dataset.approveAd || button.dataset.approveWaiveAd;
+        const startStr = wrap.querySelector(`[data-ad-start="${CSS.escape(id)}"]`)?.value || "";
+        const endStr = wrap.querySelector(`[data-ad-end="${CSS.escape(id)}"]`)?.value || "";
+        const startsAtMs = startStr ? Date.parse(`${startStr}T00:00:00`) : Date.now();
+        const endsAtMs = endStr ? Date.parse(`${endStr}T23:59:59`) : startsAtMs + 7 * 24 * 60 * 60 * 1000;
+        try {
+          await approveCampaign(db, id, {
+            startsAtMs,
+            endsAtMs,
+            waivePayment: !!button.dataset.approveWaiveAd
+          });
+          await refresh();
+        } catch (err) {
+          alert(err?.message || "Approve failed.");
+        }
+      });
+    });
+    wrap.querySelectorAll("[data-reject-ad]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.dataset.rejectAd;
+        const reason = prompt("Rejection reason (optional)") || "";
+        try {
+          await rejectCampaign(db, id, reason);
+          await refresh();
+        } catch (err) {
+          alert(err?.message || "Reject failed.");
+        }
+      });
+    });
+  }
+
   function renderAdminCampaignManager(targetId, profileRows = []) {
     const wrap = document.getElementById(targetId);
     if (!wrap) return;
     const analytics = campaignAnalytics(profileRows);
-    wrap.innerHTML = campaigns().map(campaign => {
-      const stat = analytics.find(item => item.id === campaign.id) || {};
+    const list = campaigns();
+    if (!list.length) {
+      wrap.innerHTML = `<p class="sub">No campaigns in the live pool yet.</p>`;
+      return;
+    }
+    wrap.innerHTML = list.map((campaign) => {
+      const stat = analytics.find((item) => item.id === campaign.id) || {};
       const setup = campaign.setupInfo ? `<div class="tag-row">
         <span>Name: ${esc(campaign.setupInfo.name)}</span>
         <span>Address: ${esc(campaign.setupInfo.address)}</span>
         <span>Phone: ${esc(campaign.setupInfo.phone)}</span>
         <span>Instagram: ${esc(campaign.setupInfo.instagramHandle)}</span>
       </div>` : "";
-      return `<div class="queue-item ad-campaign-admin-card">
+      return `<div class="queue-item ad-campaign-admin-card" data-campaign-id="${esc(campaign.id)}">
         <div class="message-envelope-head">
           <strong>${esc(campaign.title)}</strong>
-          <span>${esc(campaign.status || "active")}</span>
+          <span>${esc(campaign.status || "active")} · ${esc(campaign.placementType || campaign.slots?.[0] || "")}</span>
         </div>
         <p>${esc(campaign.body)}</p>
-        <p><strong>Potential audience:</strong> ${Number(stat.matchedPatrons || 0).toLocaleString()} patron match(es)</p>
-        <p><strong>Delivery rule:</strong> Must match this page slot and at least one target tag/datapoint${campaign.minimumAge ? `, and patron must be ${esc(campaign.minimumAge)}+` : ""}.</p>
-        ${campaign.requiredTargetGroups?.length ? `<p><strong>Required targeting:</strong> ${campaign.requiredTargetGroups.map(group => esc(group.label)).join(" + ")}</p>` : ""}
-        ${campaign.campaignDatapoints?.length ? `<p><strong>Campaign datapoints:</strong> ${campaign.campaignDatapoints.map(group => `${esc(group.category)}: ${esc(splitTags(group.tags).join(", "))}`).join(" | ")}</p>` : ""}
-        ${campaign.demoLabel ? `<p><strong>${esc(campaign.demoLabel)}</strong></p>` : ""}
-        <p><strong>AI targeting:</strong> ${esc(campaign.aiTargetingPrompt || "Use tag overlap against patron datapoints.")}</p>
-        ${campaign.canva?.editUrl ? `<p><strong>Canva Source:</strong> <a class="message-inline-link" href="${esc(campaign.canva.editUrl)}" target="_blank" rel="noopener">${esc(campaign.canva.designId || "Open design")}</a></p>` : ""}
+        <p class="sub small"><strong>Potential audience:</strong> ${Number(stat.matchedPatrons || 0).toLocaleString()} patron match(es)${campaign.minimumAge ? ` · ${esc(campaign.minimumAge)}+ only` : ""}${campaign.targetMode === "all" ? " · all patrons (slot/age still apply)" : ""}</p>
+        ${campaign.demoLabel ? `<p class="sub small">${esc(campaign.demoLabel)}</p>` : ""}
+        ${campaign.aiTargetingPrompt ? `<p class="sub small">${esc(campaign.aiTargetingPrompt)}</p>` : ""}
+        ${campaign.canva?.editUrl ? `<p class="sub small">Canva: <a class="message-inline-link" href="${esc(campaign.canva.editUrl)}" target="_blank" rel="noopener">${esc(campaign.canva.designId || "Open design")}</a></p>` : ""}
         ${setup}
-        <label>Target tags / datapoints
-          <textarea rows="2" data-ad-tags="${esc(campaign.id)}">${esc(splitTags(campaign.targetTags).join(", "))}</textarea>
-        </label>
-        <label>Campaign datapoints JSON
-          <textarea rows="5" data-ad-campaign-datapoints="${esc(campaign.id)}">${esc(JSON.stringify(campaign.campaignDatapoints || [], null, 2))}</textarea>
-        </label>
-        <label>Required target groups JSON
-          <textarea rows="5" data-ad-required-groups="${esc(campaign.id)}">${esc(JSON.stringify(campaign.requiredTargetGroups || [], null, 2))}</textarea>
-        </label>
+        <div class="ad-creative-preview" data-ad-preview-host="${esc(campaign.id)}" hidden></div>
+        <fieldset class="ad-target-fieldset">
+          <legend>Who should see this ad</legend>
+          <label>Match tags (comma-separated)
+            <input type="text" data-ad-tags="${esc(campaign.id)}" maxlength="1200" placeholder="tequila, lounge, VIP, celebration" value="${esc(splitTags(campaign.targetTags).join(", "))}"/>
+          </label>
+          <p class="sub small">Patrons match when any of these overlap their profile (city, music, nightlife, food, etc.).</p>
+          <h4 class="sub">Tag categories (optional, for clarity)</h4>
+          ${datapointEditorHtml(campaign.campaignDatapoints)}
+          <h4 class="sub">Required match groups (optional hard filters)</h4>
+          ${requiredGroupsEditorHtml(campaign.requiredTargetGroups)}
+        </fieldset>
         <div class="queue-actions">
-          <button type="button" data-save-ad-tags="${esc(campaign.id)}">Save Target Settings</button>
-          ${campaign.sourceUrl ? `<a class="button-link" href="${esc(campaign.sourceUrl)}" target="_blank" rel="noopener">Source</a>` : ""}
+          <button type="button" data-preview-ad="${esc(campaign.id)}">Preview creative</button>
+          <button type="button" class="primary" data-save-ad-tags="${esc(campaign.id)}">Save targeting</button>
+          ${campaign.sourceUrl ? `<a class="button-link" href="${esc(campaign.sourceUrl)}" target="_blank" rel="noopener">Advertiser site</a>` : ""}
         </div>
+        <p class="sub small">Save stores targeting as a local override in this browser (for packaged demos and quick tests). It does not rewrite the Firestore campaign document.</p>
       </div>`;
     }).join("");
-    wrap.querySelectorAll("[data-save-ad-tags]").forEach(button => {
+
+    const byId = Object.fromEntries(list.map((row) => [row.id, row]));
+    wrap.querySelectorAll(".ad-campaign-admin-card").forEach((card) => bindTargetEditorActions(card));
+
+    wrap.querySelectorAll("[data-preview-ad]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = button.dataset.previewAd;
+        const host = wrap.querySelector(`[data-ad-preview-host="${CSS.escape(id)}"]`);
+        const campaign = byId[id];
+        if (!host || !campaign) return;
+        const opening = host.hasAttribute("hidden");
+        if (opening) {
+          mountCreativePreview(host, campaign);
+          host.removeAttribute("hidden");
+          button.textContent = "Hide preview";
+        } else {
+          host.setAttribute("hidden", "");
+          host.innerHTML = "";
+          button.textContent = "Preview creative";
+        }
+      });
+    });
+
+    wrap.querySelectorAll("[data-save-ad-tags]").forEach((button) => {
       button.addEventListener("click", () => {
         const id = button.dataset.saveAdTags;
+        const card = button.closest(".ad-campaign-admin-card");
         const input = wrap.querySelector(`[data-ad-tags="${CSS.escape(id)}"]`);
-        const groupsInput = wrap.querySelector(`[data-ad-required-groups="${CSS.escape(id)}"]`);
-        const datapointsInput = wrap.querySelector(`[data-ad-campaign-datapoints="${CSS.escape(id)}"]`);
-        const requiredGroups = parseRequiredGroups(groupsInput?.value || "[]");
-        if (requiredGroups === null) {
-          alert("Required target groups must be valid JSON.");
+        const targetTags = splitTags(input?.value).map((t) => String(t).slice(0, 80)).slice(0, 80);
+        if (!targetTags.length && !card?.querySelector("[data-rg-row]")) {
+          // Allow empty tags (house / all-mode demos) — do not block save.
+        }
+        const campaignDatapoints = collectDatapointsFromCard(card);
+        const requiredTargetGroups = collectRequiredGroupsFromCard(card);
+        const incompleteDp = Array.from(card?.querySelectorAll("[data-dp-row]") || []).some((row) => {
+          const cat = String(row.querySelector("[data-dp-category]")?.value || "").trim();
+          const tags = splitTags(row.querySelector("[data-dp-tags]")?.value);
+          return (cat && !tags.length) || (!cat && tags.length);
+        });
+        if (incompleteDp) {
+          alert("Each tag category needs both a category name and at least one tag (or clear the row).");
           return;
         }
-        let campaignDatapoints = [];
-        try {
-          const parsed = JSON.parse(datapointsInput?.value || "[]");
-          campaignDatapoints = Array.isArray(parsed) ? parsed : [];
-        } catch {
-          alert("Campaign datapoints must be valid JSON.");
+        const incompleteRg = Array.from(card?.querySelectorAll("[data-rg-row]") || []).some((row) => {
+          const select = row.querySelector("[data-rg-fields]");
+          const fields = select ? Array.from(select.selectedOptions) : [];
+          const tags = splitTags(row.querySelector("[data-rg-tags]")?.value);
+          const label = String(row.querySelector("[data-rg-label]")?.value || "").trim();
+          const any = label || fields.length || tags.length;
+          return any && (!fields.length || !tags.length);
+        });
+        if (incompleteRg) {
+          alert("Each required group needs profile fields and match tags (or remove the group).");
           return;
         }
-        saveOverride(id, {targetTags:splitTags(input?.value), campaignDatapoints, requiredTargetGroups:requiredGroups});
+        saveOverride(id, {targetTags, campaignDatapoints, requiredTargetGroups});
         renderAdminCampaignManager(targetId, profileRows);
       });
     });
@@ -435,13 +871,25 @@
   window.FLOQRAdCampaigns = {
     VERSION,
     campaigns,
+    pendingCampaigns,
     baseCampaigns,
     profileTags,
     scoreCampaign,
     pickCampaign,
     campaignAnalytics,
     renderAdminCampaignManager,
+    renderPendingApprovalQueue,
+    approveCampaign,
+    rejectCampaign,
     saveOverride,
-    loadFirestoreSpotAds
+    loadFirestoreSpotAds,
+    loadPendingSpotAds,
+    isScheduleLive,
+    PROFILE_FIELD_OPTIONS,
+    normalizeDatapoints,
+    normalizeRequiredGroups,
+    collectDatapointsFromCard,
+    collectRequiredGroupsFromCard,
+    mountCreativePreview
   };
 })();
