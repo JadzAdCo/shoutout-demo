@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.103 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.104 (stable)
 
+- s3.0.104: Publish floqr-ad-pricing.js + patron-ad-campaigns.js to main so Functions CI (ad-campaigns-business tests) passes.
 - s3.0.103: Privacy Policy + Do Not Sell/GPC + DSAR export/delete callables; ad personalization gate; privacyConsents owner rules.
 
 - s3.0.102: Ad Campaign Mgmt card badge — Status / Shows on human labels + help (no raw preview · shoutout).
