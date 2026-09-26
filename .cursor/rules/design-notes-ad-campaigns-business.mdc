@@ -73,6 +73,17 @@ Save serializes forms via `normalizeDatapoints` / `normalizeRequiredGroups` into
 
 **Preview creative** toggles a sandboxed flyer/HTML preview on pending and live cards (`mountCreativePreview`). HTML ads stay in `sandbox=""` iframes — never host `innerHTML`.
 
+### Card badge (Status · Shows on)
+
+Top-right of each campaign card uses human labels — never raw `preview · shoutout`:
+
+| Part | Example | Meaning |
+|---|---|---|
+| **Status** | Demo (not live) / Live / Awaiting approval | Lifecycle. `preview` status → **Demo (not live)** packaged test creative, not a paid approved flight |
+| **Shows on** | ShoutOut path / Inline package / Mingl Gist package | `placementType` when set; else first `slots[]` entry mapped to a feature path |
+
+Helpers: `campaignStatusLabel`, `campaignPathLabel`, `campaignBadgeHtml`. Hover/`title` + FloqAi `help-ad-campaign-status-badge` explain the badge. **Preview creative** is a separate button.
+
 ## Why patrons only saw Zebbies
 
 Packaged DC spots often have **empty** `targetTags`, so they always pass scoring, while brand demos with tags fail when the patron profile has no overlap. Rotation then collapses onto the DC pack (Zebbies frequently). Fix: honor `targetMode: "all"`, diversify rotation by advertiser, and include non-DC `active` creatives with empty tags / all-mode.

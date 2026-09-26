@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
   <link rel="stylesheet" href="./styles.css?v=29.09.98"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.101"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.102"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
@@ -842,8 +842,8 @@
           <h2
             data-i18n="master.adCampaigns"
             data-floqr-help-title="Ad Campaign Mgmt"
-            data-floqr-help-body="Approve business-account ads, set start and end dates, then tune who sees each live creative. Use plain text for match tags and optional categories — FLOQR stores the structured rules. Preview creative shows the flyer or sandboxed HTML. Inline is $45 / 7 days on feature paths; Mingl Gist is $25 / 7 days in the story scroll."
-            data-floqr-help-search="ad campaign mgmt|preview creative|match tags|required match groups|inline ad|mingl gist ad|approve schedule"
+            data-floqr-help-body="Approve business-account ads, set start and end dates, then tune who sees each live creative. Use plain text for match tags and optional categories — FLOQR stores the structured rules. Preview creative shows the flyer or sandboxed HTML. Each card’s top-right badge is Status (Live / Demo not live / Awaiting approval) and Shows on (Inline package, Mingl Gist package, or a feature path such as ShoutOut). Demo (not live) means a packaged test creative, not an approved paid flight. Inline is $45 / 7 days on feature paths; Mingl Gist is $25 / 7 days in the story scroll."
+            data-floqr-help-search="ad campaign mgmt|preview creative|match tags|required match groups|inline ad|mingl gist ad|approve schedule|demo not live|shows on shoutout|campaign status badge"
           >Ad Campaign Mgmt</h2>
           <p class="sub small">Approve pending business ads, schedule flights, and edit live-pool targeting with plain text fields. Preview shows the flyer or HTML creative before you save.</p>
           <div class="queue-actions">
@@ -851,7 +851,11 @@
           </div>
           <h3>Pending approval</h3>
           <div id="adCampaignPendingQueue" class="report-block"></div>
-          <h3>Live / packaged pool</h3>
+          <h3
+            data-floqr-help-title="Live / packaged pool badge"
+            data-floqr-help-body="Top-right on each card: Status and Shows on. Status Demo (not live) = packaged demo for targeting tests, not a paid approved flight. Live = can serve patrons in the flight window. Shows on names the package (Inline / Mingl Gist) or the first feature path (for example ShoutOut path) where the creative may appear. Hover the badge for the full sentence. Preview creative is a separate button that opens the flyer or HTML."
+            data-floqr-help-search="demo not live|shows on|shoutout path|campaign status|live packaged pool|preview creative vs status"
+          >Live / packaged pool</h3>
           <div id="adCampaignManagementSummary" class="report-block"></div>
           <div id="adCampaignManagementList" class="report-block"></div>
         </div>
@@ -1417,13 +1421,13 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.101"></script>
+<script src="./floqai-help-repository.js?v=s3.0.102"></script>
 <script src="./floqr-i18n-help.js?v=s3.0.78"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./floqr-ad-pricing.js?v=s3.0.101"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.0.101"></script>
-<script src="./ad-campaigns.js?v=s3.0.101"></script>
+<script src="./floqr-ad-pricing.js?v=s3.0.102"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.0.102"></script>
+<script src="./ad-campaigns.js?v=s3.0.102"></script>
 <script src="./ai-diagnostics-service.js?v=s3.0.101"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>

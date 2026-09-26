@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "s3.0.101";
+  const VERSION = "s3.0.102";
   const OVERRIDE_KEY = "floqrAdCampaignOverrides:v28.99";
 
   /** Profile fields operators can require for a match group (same keys as profileTags). */
@@ -666,6 +666,74 @@
     }, {merge: true});
   }
 
+  function campaignStatusLabel(status) {
+    const key = String(status || "active").trim().toLowerCase();
+    const map = {
+      preview: "Demo (not live)",
+      active: "Live",
+      pending_approval: "Awaiting approval",
+      rejected: "Rejected",
+      "needs-verification": "Needs verification"
+    };
+    return map[key] || String(status || "Live");
+  }
+
+  function campaignPathLabel(campaign = {}) {
+    const placement = String(campaign.placementType || "").trim();
+    if (placement === "inline") return "Inline package";
+    if (placement === "minglGist") return "Mingl Gist package";
+    if (placement) return placement;
+    const slot = String((campaign.slots && campaign.slots[0]) || "").trim();
+    const slotMap = {
+      shoutout: "ShoutOut path",
+      default: "Feature splash",
+      clubs: "Clubs path",
+      events: "Events path",
+      lounges: "Lounges path",
+      "lounge-club": "Lounge-club path",
+      mingl: "Mingl path",
+      "mingl-gist": "Mingl Gist path",
+      rydr: "RydR path",
+      "beach-clubs": "Beach Clubs path"
+    };
+    return slotMap[slot] || (slot ? `${slot} path` : "Path not set");
+  }
+
+  function campaignBadgeTitle(campaign = {}) {
+    const status = String(campaign.status || "active").trim().toLowerCase();
+    const statusHelp = {
+      preview: "Packaged demo creative used for targeting tests — not an approved live business flight.",
+      active: "Eligible to serve patrons while the flight window is open.",
+      pending_approval: "Submitted by a business account; waiting for Master Admin approve + schedule.",
+      rejected: "Rejected — will not serve.",
+      "needs-verification": "Hold until advertiser details are verified."
+    }[status] || "Campaign status.";
+    const placement = String(campaign.placementType || "").trim();
+    let pathHelp = "";
+    if (placement === "inline") {
+      pathHelp = "Inline package ($45 / 7 days) — feature-path splash ads (Search, clubs, ShoutOut entry, RydR, Mingl).";
+    } else if (placement === "minglGist") {
+      pathHelp = "Mingl Gist package ($25 / 7 days) — story-scroll / ring feed only.";
+    } else {
+      const slot = String((campaign.slots && campaign.slots[0]) || "").trim();
+      pathHelp = slot
+        ? `Primary inventory slot “${slot}” — where this packaged demo is allowed to appear first (other slots may also be listed).`
+        : "No placement package or inventory slot recorded.";
+    }
+    return `${statusHelp} ${pathHelp}`;
+  }
+
+  function campaignBadgeHtml(campaign = {}) {
+    const statusLabel = campaignStatusLabel(campaign.status);
+    const pathLabel = campaignPathLabel(campaign);
+    const title = campaignBadgeTitle(campaign);
+    return `<span class="ad-campaign-badge" title="${esc(title)}">
+      <span class="ad-campaign-badge-part"><span class="ad-campaign-badge-key">Status</span> ${esc(statusLabel)}</span>
+      <span class="ad-campaign-badge-sep" aria-hidden="true">·</span>
+      <span class="ad-campaign-badge-part"><span class="ad-campaign-badge-key">Shows on</span> ${esc(pathLabel)}</span>
+    </span>`;
+  }
+
   function renderPendingApprovalQueue(targetId, db) {
     const wrap = document.getElementById(targetId);
     if (!wrap) return;
@@ -678,13 +746,19 @@
       const price = (typeof window !== "undefined" && window.FLOQRAdPricing?.priceLabel?.(campaign.priceCents)) || "";
       const startVal = campaign.proposedStartsAtMs ? new Date(campaign.proposedStartsAtMs).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
       const endVal = campaign.proposedEndsAtMs ? new Date(campaign.proposedEndsAtMs).toISOString().slice(0, 10) : "";
+      const creativeLabel = String(campaign.creativeType || "image") === "html" ? "HTML creative" : "Flyer image";
       return `<div class="queue-item ad-campaign-pending-card" data-campaign-id="${esc(campaign.id)}">
         <div class="message-envelope-head">
           <strong>${esc(campaign.title)}</strong>
-          <span>pending · ${esc(campaign.placementType || "")} · ${esc(campaign.creativeType || "image")}</span>
+          ${campaignBadgeHtml({
+            ...campaign,
+            status: "pending_approval",
+            placementType: campaign.placementType
+          })}
         </div>
+        <p class="sub small">${esc(creativeLabel)} · ${esc(campaign.paymentStatus || "unpaid")} payment · audience ${esc(campaign.targetMode === "targeted" ? "targeted tags" : "all patrons")}</p>
         <p>${esc(campaign.body || "")}</p>
-        <p class="sub small">${esc(campaign.advertiser || "")} · ${esc(campaign.publisherEmail || "")} · ${esc(price)} · pay ${esc(campaign.paymentStatus || "unpaid")} · audience ${esc(campaign.targetMode || "all")}</p>
+        <p class="sub small">${esc(campaign.advertiser || "")} · ${esc(campaign.publisherEmail || "")} · ${esc(price)}</p>
         ${campaign.targetTags?.length ? `<p class="sub small">Tags: ${esc(splitTags(campaign.targetTags).join(", "))}</p>` : ""}
         <div class="ad-creative-preview" data-ad-preview-host="${esc(campaign.id)}" hidden></div>
         <div class="profile-grid">
@@ -779,8 +853,9 @@
       return `<div class="queue-item ad-campaign-admin-card" data-campaign-id="${esc(campaign.id)}">
         <div class="message-envelope-head">
           <strong>${esc(campaign.title)}</strong>
-          <span>${esc(campaign.status || "active")} · ${esc(campaign.placementType || campaign.slots?.[0] || "")}</span>
+          ${campaignBadgeHtml(campaign)}
         </div>
+        <p class="sub small ad-campaign-badge-legend">${esc(campaignBadgeTitle(campaign))}</p>
         <p>${esc(campaign.body)}</p>
         <p class="sub small"><strong>Potential audience:</strong> ${Number(stat.matchedPatrons || 0).toLocaleString()} patron match(es)${campaign.minimumAge ? ` · ${esc(campaign.minimumAge)}+ only` : ""}${campaign.targetMode === "all" ? " · all patrons (slot/age still apply)" : ""}</p>
         ${campaign.demoLabel ? `<p class="sub small">${esc(campaign.demoLabel)}</p>` : ""}
@@ -890,6 +965,10 @@
     normalizeRequiredGroups,
     collectDatapointsFromCard,
     collectRequiredGroupsFromCard,
-    mountCreativePreview
+    mountCreativePreview,
+    campaignStatusLabel,
+    campaignPathLabel,
+    campaignBadgeTitle,
+    campaignBadgeHtml
   };
 })();

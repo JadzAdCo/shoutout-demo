@@ -862,6 +862,10 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 /* Ad Campaign Mgmt — human targeting editors + creative preview */
 .ad-creative-preview{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.28)}
 .ad-creative-preview[hidden]{display:none!important}
+.ad-campaign-badge{display:inline-flex;flex-wrap:wrap;gap:6px 8px;align-items:center;justify-content:flex-end;max-width:min(100%,420px);font-size:12px;line-height:1.35;color:var(--muted)}
+.ad-campaign-badge-key{font-weight:800;color:inherit;opacity:.85;margin-right:4px}
+.ad-campaign-badge-sep{opacity:.45}
+.ad-campaign-badge-legend{margin:6px 0 10px;max-width:52rem}
 .ad-target-fieldset{margin:14px 0 0;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.16)}
 .ad-target-fieldset legend{padding:0 8px;font-weight:800}
 .ad-target-editor{display:grid;gap:10px;margin:8px 0 12px}
