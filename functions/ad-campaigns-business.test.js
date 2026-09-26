@@ -49,8 +49,8 @@ test("master admin has pending ad approval queue", () => {
   const app = fs.readFileSync(path.join(root, "master-admin-app.js"), "utf8");
   const ads = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
   assert.match(html, /id="adCampaignPendingQueue"/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.101/);
-  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.101/);
+  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.102/);
+  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.102/);
   assert.match(app, /renderPendingApprovalQueue/);
   assert.match(ads, /approveCampaign/);
   assert.match(ads, /loadPendingSpotAds/);
@@ -59,6 +59,9 @@ test("master admin has pending ad approval queue", () => {
   assert.match(ads, /data-preview-ad/);
   assert.match(ads, /normalizeDatapoints/);
   assert.match(ads, /normalizeRequiredGroups/);
+  assert.match(ads, /Demo \(not live\)/);
+  assert.match(ads, /ShoutOut path/);
+  assert.match(ads, /campaignBadgeHtml/);
   assert.doesNotMatch(ads, /Campaign datapoints JSON/);
   assert.doesNotMatch(ads, /Required target groups JSON/);
 });
@@ -109,6 +112,10 @@ test("ad campaign form serializers build datapoints and required groups from pla
   assert.deepEqual(groups[0].fields, ["city", "musicInterests"]);
   assert.deepEqual(groups[0].tags, ["DC", "Latin"]);
   assert.ok(api.PROFILE_FIELD_OPTIONS.some((f) => f.id === "musicInterests"));
+  assert.equal(api.campaignStatusLabel("preview"), "Demo (not live)");
+  assert.equal(api.campaignPathLabel({slots: ["shoutout", "clubs"]}), "ShoutOut path");
+  assert.equal(api.campaignPathLabel({placementType: "inline"}), "Inline package");
+  assert.match(api.campaignBadgeTitle({status: "preview", slots: ["shoutout"]}), /packaged demo/i);
 });
 
 test("firestore and storage rules allow spotAds uploads and owned campaign writes", () => {

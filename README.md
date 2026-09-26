@@ -1,5 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.101 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.102 (stable)
 
+- s3.0.102: Ad Campaign Mgmt card badge — Status / Shows on human labels + help (no raw preview · shoutout).
 - s3.0.101: Ad Campaign Mgmt — Preview creative works; human form targeting (no raw JSON editors).
 - s3.0.100: Master Admin Twilio/SendGrid tab labels (SMS Logs, etc.) + Ad Campaign Mgmt rename.
 - s3.0.99: Master Admin header cleanup — remove FLOQR Master Admin / Network View eyebrows; nest portal scope + verified status in ? help.

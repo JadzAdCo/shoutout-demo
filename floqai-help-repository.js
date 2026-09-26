@@ -509,11 +509,26 @@
     {
       id: "help-ad-campaign-mgmt",
       title: "Ad Campaign Mgmt",
-      body: "Master Admin → Ad Campaign Mgmt. Approve pending business ads and set flight dates. On live / packaged campaigns, edit who should see the ad with plain match tags and optional category rows — no JSON. Preview creative shows the flyer or sandboxed HTML. Required match groups are optional hard filters (patron must hit each group). Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
+      body: "Master Admin → Ad Campaign Mgmt. Approve pending business ads and set flight dates. On live / packaged campaigns, edit who should see the ad with plain match tags and optional category rows — no JSON. Preview creative shows the flyer or sandboxed HTML. The top-right badge is Status (Live, Demo not live, Awaiting approval) and Shows on (Inline package, Mingl Gist package, or a feature path such as ShoutOut). Demo (not live) is a packaged test creative, not an approved paid flight. Required match groups are optional hard filters. Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
       searchPhrases: [
         "ad campaign mgmt", "approve ad", "preview creative", "match tags",
         "required match groups", "live pool targeting", "schedule ad flight",
-        "inline package", "mingl gist package"
+        "inline package", "mingl gist package", "demo not live", "shows on",
+        "shoutout path", "campaign status badge", "preview shoutout"
+      ],
+      links: [
+        {label: "Ad Campaign Mgmt", href: vUrl("./master-admin.html", {from: "floqai", tab: "adCampaignManagement"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#adCampaignManagement"
+    },
+    {
+      id: "help-ad-campaign-status-badge",
+      title: "Ad campaign Status and Shows on",
+      body: "On each Ad Campaign Mgmt card, Status tells whether the creative is Live, Demo (not live), Awaiting approval, Needs verification, or Rejected. Shows on names the paid package (Inline or Mingl Gist) or the first feature path for packaged demos (for example ShoutOut path). Demo (not live) means a packaged test ad for targeting — it is not the same as the Preview creative button, which opens the flyer or HTML.",
+      searchPhrases: [
+        "preview shoutout", "preview · shoutout", "demo not live", "shows on shoutout",
+        "campaign badge", "status live", "shoutout path", "what does preview mean on ad"
       ],
       links: [
         {label: "Ad Campaign Mgmt", href: vUrl("./master-admin.html", {from: "floqai", tab: "adCampaignManagement"})}
