@@ -507,6 +507,21 @@
       audiences: ["patron"]
     },
     {
+      id: "help-ad-campaign-mgmt",
+      title: "Ad Campaign Mgmt",
+      body: "Master Admin → Ad Campaign Mgmt. Approve pending business ads and set flight dates. On live / packaged campaigns, edit who should see the ad with plain match tags and optional category rows — no JSON. Preview creative shows the flyer or sandboxed HTML. Required match groups are optional hard filters (patron must hit each group). Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
+      searchPhrases: [
+        "ad campaign mgmt", "approve ad", "preview creative", "match tags",
+        "required match groups", "live pool targeting", "schedule ad flight",
+        "inline package", "mingl gist package"
+      ],
+      links: [
+        {label: "Ad Campaign Mgmt", href: vUrl("./master-admin.html", {from: "floqai", tab: "adCampaignManagement"})}
+      ],
+      source: "help-repository-seed",
+      page: "master-admin.html#adCampaignManagement"
+    },
+    {
       id: "help-completed-shoutouts",
       title: "Completed ShoutOuts",
       body: "Completed ShoutOuts are club-approved (and finished) ShoutOuts kept for your records. Archive moves a ShoutOut out of Completed into Archive with compressed text and media (when the original included media). Re-Use opens Search to throw the same wording again. Save as my template appears only when the template background is modifiable (IsModifiable). Paid receipts stay in FloqR Inbox.",

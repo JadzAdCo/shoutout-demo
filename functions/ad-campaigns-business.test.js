@@ -49,12 +49,66 @@ test("master admin has pending ad approval queue", () => {
   const app = fs.readFileSync(path.join(root, "master-admin-app.js"), "utf8");
   const ads = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
   assert.match(html, /id="adCampaignPendingQueue"/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.76/);
+  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.101/);
+  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.101/);
   assert.match(app, /renderPendingApprovalQueue/);
   assert.match(ads, /approveCampaign/);
   assert.match(ads, /loadPendingSpotAds/);
   assert.match(ads, /targetMode === "targeted"/);
   assert.match(ads, /floqrAdCampaignRotationAdvertiser/);
+  assert.match(ads, /data-preview-ad/);
+  assert.match(ads, /normalizeDatapoints/);
+  assert.match(ads, /normalizeRequiredGroups/);
+  assert.doesNotMatch(ads, /Campaign datapoints JSON/);
+  assert.doesNotMatch(ads, /Required target groups JSON/);
+});
+
+function loadAdCampaigns() {
+  const code = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
+  const sandbox = {
+    window: {},
+    globalThis: {},
+    localStorage: {
+      _data: {},
+      getItem(key) { return this._data[key] || null; },
+      setItem(key, value) { this._data[key] = String(value); }
+    },
+    document: { getElementById() { return null; } },
+    firebase: undefined,
+    Date,
+    Array,
+    String,
+    Number,
+    Object,
+    Set,
+    CSS: { escape: (s) => String(s).replace(/"/g, '\\"') }
+  };
+  sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
+  vm.runInNewContext(code, sandbox);
+  return sandbox.FLOQRAdCampaigns;
+}
+
+test("ad campaign form serializers build datapoints and required groups from plain fields", () => {
+  const api = loadAdCampaigns();
+  const datapoints = JSON.parse(JSON.stringify(api.normalizeDatapoints([
+    {category: " Location ", tags: "Washington DC, DC"},
+    {category: "", tags: "ignored"},
+    {category: "Music", tags: []}
+  ])));
+  assert.deepEqual(datapoints, [
+    {category: "Location", tags: ["Washington DC", "DC"]}
+  ]);
+  const groups = JSON.parse(JSON.stringify(api.normalizeRequiredGroups([
+    {label: "DC music", fields: ["city", "musicInterests"], tags: "DC, Latin"},
+    {label: "Incomplete", fields: ["city"], tags: ""},
+    {label: "Also incomplete", fields: [], tags: "x"}
+  ])));
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].label, "DC music");
+  assert.deepEqual(groups[0].fields, ["city", "musicInterests"]);
+  assert.deepEqual(groups[0].tags, ["DC", "Latin"]);
+  assert.ok(api.PROFILE_FIELD_OPTIONS.some((f) => f.id === "musicInterests"));
 });
 
 test("firestore and storage rules allow spotAds uploads and owned campaign writes", () => {
