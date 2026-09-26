@@ -1,5 +1,6 @@
-ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.99 (stable)
+ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.100 (stable)
 
+- s3.0.100: Master Admin Twilio/SendGrid tab labels (SMS Logs, etc.) + Ad Campaign Mgmt rename.
 - s3.0.99: Master Admin header cleanup — remove FLOQR Master Admin / Network View eyebrows; nest portal scope + verified status in ? help.
 - s3.0.98: Master Admin — remove Ops Status (FloqAi help); Completed Log / Retention labels; SOC 2 copy in ? help.
 - s3.0.97: Mass onboard for ready discovery cards + readiness report; lineup/residents page follow for DJ/promoter hints.

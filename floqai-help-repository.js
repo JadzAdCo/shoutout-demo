@@ -1023,41 +1023,41 @@
     },
     {
       id: "help-mail-logging",
-      title: "twilio_sendgridMailLogs",
-      body: "Master Admin → Twilio → twilio_sendgridMailLogs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
+      title: "SendGrid Mail Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → SendGrid Mail Logs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by status, kind, address, subject, or message id. Open a row for headers, body, TLS 1.3 on the SendGrid API hop, and provider delivery events. OTP digits are redacted. Retention is 90 days.",
       searchPhrases: [
-        "twilio_sendgridMailLogs", "mail logging", "email log", "sendgrid", "system mail",
+        "sendgrid mail logs", "twilio_sendgridMailLogs", "mail logging", "email log", "sendgrid", "system mail",
         "preview links email", "tls 1.3", "mail delivery", "who sent that email", "system generated mail"
       ],
       links: [
-        {label: "twilio_sendgridMailLogs", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "SendGrid Mail Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilio_sendgridMailLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilio_sendgridMailLogs"
     },
     {
       id: "help-twilio-logging",
-      title: "Twilio SMS Logs",
-      body: "Master Admin → Twilio → twilioSmsLogs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → twilioComplianceLogs. SendGrid email is under Twilio → twilio_sendgridMailLogs.",
+      title: "SMS Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → SMS Logs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → Compliance Logs. SendGrid email is under Twilio → SendGrid Mail Logs.",
       searchPhrases: [
-        "twilio logging", "sms log", "whatsapp log", "twilio dry-run", "twilioSmsLogs",
+        "sms logs", "twilio logging", "sms log", "whatsapp log", "twilio dry-run", "twilioSmsLogs",
         "marketing sms", "why no sms", "send test debit", "twilio debugger"
       ],
       links: [
-        {label: "Twilio SMS Logs", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "SMS Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioSmsLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilioSmsLogs"
     },
     {
       id: "help-twilio-compliance-logs",
-      title: "Twilio Compliance Logs",
-      body: "Master Admin → Twilio → twilioComplianceLogs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
+      title: "Compliance Logs",
+      body: "Master Admin → Twilio / SendGrid Mgmt → Compliance Logs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in the other Twilio subtabs.",
       searchPhrases: [
-        "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
+        "compliance logs", "twilio compliance", "twilioComplianceLogs", "grc sms", "dry-run compliance"
       ],
       links: [
-        {label: "twilioComplianceLogs", href: vUrl("./master-admin.html", {from: "floqai"})}
+        {label: "Compliance Logs", href: vUrl("./master-admin.html", {from: "floqai"}) + "#twilioComplianceLogs"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#twilioComplianceLogs"
