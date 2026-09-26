@@ -162,5 +162,9 @@
   "help-public-media-sharing": {
     "title": "Public Media and Data Sharing",
     "body": "Choose several images or short videos at once, then arrange their public-profile order. Profiles support up to 8 images and 2 short videos."
+  },
+  "help-do-not-sell": {
+    "title": "Do Not Sell or Share",
+    "body": "Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically. Open the Privacy Policy for CCPA / CPRA details."
   }
 }

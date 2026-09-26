@@ -636,6 +636,30 @@
       ]
     },
     {
+      id: "help-do-not-sell",
+      kind: "help",
+      label: "Do Not Sell or Share",
+      blurb: "Opt out of personalized profile-tag ads. GPC browsers are opted out automatically. Download or delete your data from My Privacy.",
+      steps: [
+        "Open My Profile & Settings → My Privacy.",
+        "Turn on Do Not Sell or Share (CCPA / CPRA), then Save Privacy Preferences.",
+        "Use Download My Data JSON or Request Data Delete when you need a DSAR.",
+        "Read the Privacy Policy for processors and rights."
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+      ],
+      searchPhrases: [
+        "do not sell", "do not share", "ccpa", "cpra", "gpc", "global privacy control",
+        "privacy policy", "download my data", "delete my account", "personalized ads"
+      ],
+      patterns: [
+        /do\s+not\s+sell/, /do\s+not\s+share/, /ccpa/, /cpra/, /global\s+privacy\s+control|\bgpc\b/,
+        /privacy\s+policy/, /download\s+my\s+data/, /delete\s+(my\s+)?(data|account)/
+      ]
+    },
+    {
       id: "help-guest-list",
       kind: "help",
       label: "Get on a guest list",

@@ -122,6 +122,10 @@
         title: "Общие уведомления",
         body: "SOS2FA и другие системные сообщения FloqR следуют этим флагам в записи пользователя патрона. Площадкам или независимым service members нужна подписка на платные SMS/WhatsApp сервисы Twilio."
       },
+      "help-do-not-sell": {
+        title: "Не продавать и не передавать",
+        body: "Включите, чтобы отказаться от персонализации по тегам профиля. Реклама для всех / house может остаться. Global Privacy Control (GPC) включает этот флаг автоматически. Политика конфиденциальности — детали CCPA / CPRA."
+      },
       "help-app-language": {
         title: "Язык приложения",
         body: "При первом запуске FloqR читает язык браузера (например nl-NL → Dutch / Nederlands) и переключает интерфейс и меню, если язык поддерживается — категории Search, вкладки My Profile, Club Admin и Master Admin. Неподдерживаемые языки остаются на английском. После этого побеждают My Profile → App language и сохранённый язык профиля. Сохранение App language переводит каждую страницу с FLOQRI18n, не только эту карточку."
@@ -287,6 +291,10 @@
       "help-general-notifications": {
         title: "Algemene meldingen",
         body: "SOS2FA en andere FloqR-systeemberichten volgen deze vlaggen in het gebruikersrecord van een patron. Venues of onafhankelijke service members moeten zich abonneren op betaalde SMS/WhatsApp Twilio-diensten."
+      },
+      "help-do-not-sell": {
+        title: "Niet verkopen of delen",
+        body: "Zet dit aan om personalisatie op basis van profieltags uit te schakelen. House- en alle-publiek-creatives kunnen blijven. Global Privacy Control (GPC) zet dit automatisch aan. Zie het Privacybeleid voor CCPA / CPRA."
       },
       "help-app-language": {
         title: "App-taal",
@@ -454,6 +462,10 @@
         title: "Notifications générales",
         body: "SOS2FA et d'autres messages du système FloqR suivent ces indicateurs tels que définis dans l'enregistrement de votre utilisateur. Les sites ou les membres de services indépendants spécifiques doivent s'abonner aux services Twilio payants SMS/WhatsApp"
       },
+      "help-do-not-sell": {
+        title: "Ne pas vendre ni partager",
+        body: "Activez pour refuser la personnalisation par tags de profil. Les creatives house / tous publics peuvent rester. Global Privacy Control (GPC) active ceci automatiquement. Voir la Politique de confidentialite pour CCPA / CPRA."
+      },
       "help-app-language": {
         title: "Langue de l'application",
         body: "Lors de la première utilisation, FloqR lit la langue du navigateur (par exemple nl-NL → Néerlandais / Nederlands) et bascule le chrome et les menus vers cette langue lorsqu'elle est prise en charge : catégories de recherche, onglets Mon profil, onglets Club Admin et onglets Master Admin. Les langues non prises en charge restent en anglais. Après cela, Mon profil → Langue de l'application et la langue du profil enregistré gagnent. La langue de l'application de sauvegarde retraduit chaque page qui charge FLOQRI18n, pas seulement cette carte."
@@ -619,6 +631,10 @@
       "help-general-notifications": {
         title: "Allgemeine Benachrichtigungen",
         body: "SOS2FA und andere FloqR-Systemmeldungen folgen diesen Flags, die in einem Benutzerdatensatz Ihres Benutzers festgelegt sind. Veranstaltungsorte oder bestimmte unabhängige Servicemitglieder müssen kostenpflichtige Twilio-Dienste für SMS/WhatsApp abonnieren"
+      },
+      "help-do-not-sell": {
+        title: "Nicht verkaufen oder teilen",
+        body: "Aktivieren Sie dies, um personalisierte Anzeigen anhand von Profil-Tags abzulehnen. House- und All-Audience-Creatives konnen weiterhin erscheinen. Global Privacy Control (GPC) setzt dies automatisch. Details in der Datenschutzrichtlinie (CCPA / CPRA)."
       },
       "help-app-language": {
         title: "App-Sprache",
@@ -786,6 +802,10 @@
         title: "Notificaciones generales",
         body: "SOS2FA y otros mensajes del sistema FloqR siguen estas banderas según lo establecido en su registro de usuario. Los lugares o miembros del servicio independientes específicos deben suscribirse a servicios pagos de SMS/WhatsApp Twilio."
       },
+      "help-do-not-sell": {
+        title: "No vender ni compartir",
+        body: "Activalo para optar por no personalizacion con etiquetas de perfil. Creatividades house / para todos pueden seguir. Global Privacy Control (GPC) lo activa automaticamente. Consulta la Politica de privacidad (CCPA / CPRA)."
+      },
       "help-app-language": {
         title: "Idioma de la aplicación",
         body: "En el primer uso, FloqR lee el idioma del navegador (por ejemplo, nl-NL → Holandés/Nederlands) y cambia Chrome y los menús a ese idioma cuando sea compatible: categorías de búsqueda, pestañas Mi perfil, pestañas Club Admin y pestañas Master Admin. Los idiomas no admitidos permanecen en inglés. Después de eso, ganan Mi perfil → Idioma de la aplicación y el idioma del perfil guardado. Al guardar el idioma de la aplicación, se vuelve a traducir cada página que se carga FLOQRI18n, no solo esta tarjeta."
@@ -951,6 +971,10 @@
       "help-general-notifications": {
         title: "Notifiche generali",
         body: "SOS2FA e altri messaggi di sistema FloqR seguono questi flag come impostati nel record utente di un utente. Le sedi o i membri specifici del servizio indipendente devono abbonarsi ai servizi Twilio a pagamento SMS/WhatsApp"
+      },
+      "help-do-not-sell": {
+        title: "Non vendere ne condividere",
+        body: "Attivalo per escludere la personalizzazione con tag del profilo. Le creative house / per tutti possono restare. Global Privacy Control (GPC) lo attiva automaticamente. Vedi l Informativa sulla privacy (CCPA / CPRA)."
       },
       "help-app-language": {
         title: "Lingua dell'app",
@@ -1118,6 +1142,10 @@
         title: "Notificações Gerais",
         body: "O SOS2FA e outras mensagens do sistema FloqR seguem essas sinalizações conforme definido no registro do usuário do usuário. Locais ou membros de serviços independentes específicos precisam assinar serviços pagos SMS/WhatsApp da Twilio"
       },
+      "help-do-not-sell": {
+        title: "Nao vender nem partilhar",
+        body: "Ative para optar por nao personalizacao com tags de perfil. Creatives house / para todos podem permanecer. Global Privacy Control (GPC) ativa isto automaticamente. Veja a Politica de Privacidade (CCPA / CPRA)."
+      },
       "help-app-language": {
         title: "Idioma do aplicativo",
         body: "Na primeira utilização, FloqR lê o idioma do navegador (por exemplo, nl-NL → Holandês / Nederlands) e alterna o cromo e os menus para esse idioma quando é suportado – categorias de pesquisa, guias Meu perfil, guias Club Admin e guias Master Admin. Os idiomas não suportados permanecem em inglês. Depois disso, Meu Perfil → Idioma do aplicativo e o idioma do perfil salvo vencem. Salvar o idioma do aplicativo traduz novamente todas as páginas que carregam FLOQRI18n, não apenas este cartão."
@@ -1283,6 +1311,10 @@
       "help-general-notifications": {
         title: "Γενικές Ειδοποιήσεις",
         body: "Το SOS2FA και άλλα μηνύματα συστήματος FloqR ακολουθούν αυτές τις σημαίες, όπως έχουν οριστεί στο αρχείο χρηστών σας. Χώροι εκδηλώσεων ή συγκεκριμένα ανεξάρτητα μέλη υπηρεσίας πρέπει να εγγραφούν στις επί πληρωμή υπηρεσίες SMS/WhatsApp Twilio"
+      },
+      "help-do-not-sell": {
+        title: "Μην πουλατε η κοινοποιειτε",
+        body: "Ενεργοποιηστε το για να εξαιρεθειτε απο προσωποποιημενες διαφημισεις με tags προφιλ. House / ολοι μπορουν να εμφανιζονται. Το Global Privacy Control (GPC) το θετει αυτοματα. Δειτε την Πολιτικη Απορρητου (CCPA / CPRA)."
       },
       "help-app-language": {
         title: "Γλώσσα εφαρμογής",
@@ -1450,6 +1482,10 @@
         title: "Powiadomienia ogólne",
         body: "SOS2FA i inne systemowe wiadomości FloqR podążają za tymi flagami ustawionymi w rekordzie użytkownika patrona. Miejsca lub konkretnych niezależnych członków usługowych muszą subskrybować płatne usługi Twilio SMS/WhatsApp"
       },
+      "help-do-not-sell": {
+        title: "Nie sprzedawaj ani nie udostepniaj",
+        body: "Wlacz, aby zrezygnowac z personalizacji po tagach profilu. Creatives house / dla wszystkich moga zostac. Global Privacy Control (GPC) ustawia to automatycznie. Zobacz Polityke prywatnosci (CCPA / CPRA)."
+      },
       "help-app-language": {
         title: "Język aplikacji",
         body: "Przy pierwszym użyciu, FloqR odczytuje język przeglądarki (na przykład nl-NL → holenderski / Nederlands) i zmienia język Chrome i menu na ten język, jeśli jest obsługiwany — Kategorie wyszukiwania, zakładki Mój profil, zakładki Club Admin i zakładki Master Admin. Języki nieobsługiwane pozostają w języku angielskim. Następnie Mój profil → Język aplikacji i zapisany język profilu mają pierwszeństwo. Zapisanie języka aplikacji powoduje ponowne tłumaczenie każdej wczytywanej strony FLOQRI18n, nie tylko tej karty."
@@ -1615,6 +1651,10 @@
       "help-general-notifications": {
         title: "الإشعارات العامة",
         body: "رسائل نظام SOS2FA وغيرها من FloqR تتبع هذه العلامات كما هو محدد في سجل المستخدم الخاص بك. الأماكن أو أعضاء الخدمة المستقلين المحددين بحاجة للاشتراك في خدمات Twilio المدفوعة SMS/WhatsApp"
+      },
+      "help-do-not-sell": {
+        title: "عدم البيع أو المشاركة",
+        body: "فعّل هذا لإيقاف التخصيص عبر وسوم الملف. إعلانات عامة/منزلية قد تظهر. Global Privacy Control (GPC) يفعّل هذا تلقائياً. راجع سياسة الخصوصية (CCPA / CPRA)."
       },
       "help-app-language": {
         title: "لغة التطبيق",

@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 389);
+  assert.equal(chrome.enKeys, 398);
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);
@@ -25,7 +25,7 @@ test("chrome packs match en key count for every supported language", () => {
 
 test("help packs cover the canonical help ids for every localized language", () => {
   const { help } = analyze();
-  assert.equal(help.canonical, 41);
+  assert.equal(help.canonical, 42);
   for (const code of HELP_LANGS) {
     assert.ok(help.packsPresent.includes(code), `missing help pack ${code}`);
   }

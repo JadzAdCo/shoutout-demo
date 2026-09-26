@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FLOQR Privacy Policy</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.103"/>
+  <style>
+    .privacy-shell{max-width:720px;margin:0 auto;padding:28px 18px 64px}
+    .privacy-shell h1{margin:12px 0 8px}
+    .privacy-shell h2{margin:28px 0 8px;font-size:1.15rem}
+    .privacy-shell ul{padding-left:1.2rem}
+    .privacy-shell li{margin:6px 0}
+  </style>
+</head>
+<body>
+  <main class="privacy-shell card">
+    <p class="eyebrow">FLOQR · FloqR</p>
+    <h1>Privacy Policy</h1>
+    <p class="sub small">Version s3.0.103 · Effective for the demo at GitHub Pages and for production at <strong>https://www.floqr.com</strong> after cutover. This page is product notice, not legal advice. Controller entity name and contact will be finalized at cutover.</p>
+    <p><a id="privacyBackLink" href="./patron-portal.html?tab=privacy">← Back to My Privacy</a></p>
+
+    <h2>Who we are</h2>
+    <p>FLOQR (also styled FloqR) operates nightlife discovery, ShoutOut LED messaging, Mingl, scheduling, and related venue tools. Production brand host: <code>https://www.floqr.com</code>. Until cutover, this demo may run on GitHub Pages.</p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li>Account data: email, phone, display name, auth providers</li>
+      <li>Profile datapoints you choose to share (city, music, nightlife interests, media)</li>
+      <li>Transactional data: ShoutOuts, schedules, payments (Stripe), Inbox</li>
+      <li>Security signals: App Check / reCAPTCHA, optional client IP for display security and compliance logs</li>
+      <li>Device / browser signals needed to run the web app (and later hybrid native apps)</li>
+    </ul>
+
+    <h2>Why we process data</h2>
+    <ul>
+      <li>Provide the service you request (ShoutOut, Mingl, Work Calendar, Club Admin)</li>
+      <li>Security and abuse prevention (OTP, SOS2FA, App Check)</li>
+      <li>Optional marketing and analytics only when you consent in My Privacy</li>
+      <li>Legal retention for ShoutOut compliance logs (media ~90 days; metadata longer — see in-product retention help)</li>
+    </ul>
+
+    <h2>Processors we use</h2>
+    <ul>
+      <li>Google Firebase (Auth, Firestore, Storage, App Check / reCAPTCHA Enterprise)</li>
+      <li>Twilio (SMS / WhatsApp)</li>
+      <li>SendGrid (system email)</li>
+      <li>Stripe (payments)</li>
+      <li>Google Places / Gemini where venue discovery or AI features are enabled</li>
+    </ul>
+
+    <h2 id="do-not-sell">Do Not Sell or Share (CCPA / CPRA)</h2>
+    <p>We do not sell personal information for money. We may use profile tags for in-app ad relevance. You can opt out of sale/share-style personalization:</p>
+    <ul>
+      <li>My Profile → <strong>My Privacy</strong> → turn off third-party sharing and/or enable <strong>Do Not Sell or Share</strong></li>
+      <li>If your browser sends <strong>Global Privacy Control (GPC)</strong>, we treat that as an opt-out signal and set Do Not Sell or Share</li>
+    </ul>
+    <p>Opt-out stops personalized profile-tag ad scoring. House / non-targeted creatives may still appear.</p>
+
+    <h2>Your rights</h2>
+    <ul>
+      <li><strong>Access / portability:</strong> My Privacy → Download My Data (server export when signed in)</li>
+      <li><strong>Delete:</strong> My Privacy → Request Data Delete (fulfilled by FLOQR; not ticket-only after this release)</li>
+      <li><strong>Correct:</strong> edit My Profile and My Privacy</li>
+      <li>EU/UK and other regions: contact the controller listed at cutover for additional rights requests</li>
+    </ul>
+
+    <h2>Cookies and Consent Mode</h2>
+    <p>Strictly necessary security (reCAPTCHA / App Check) may run so you can sign in. Marketing and analytics cookies/SDKs are not enabled until Consent Mode v2 defaults and a consent UI are live. A dormant Google Analytics measurement ID in config must not be activated without those controls.</p>
+
+    <h2>Hybrid apps and other countries</h2>
+    <p>The same preference fields and DSAR callables apply when FLOQR ships as a hybrid native app. Regional notices (GDPR, CCPA, LGPD, etc.) will use the same privacy core with localized copy.</p>
+
+    <h2>Contact</h2>
+    <p>Until cutover completes, demo privacy requests: use My Privacy in the app or email the Master Admin contact on file for this Firebase project. Production contact will be published on <code>https://www.floqr.com/privacy.html</code>.</p>
+  </main>
+  <script src="./floqr-nav.js?v=s3.0.103"></script>
+  <script src="./floqr-canonical.js?v=s3.0.103"></script>
+  <script>
+    (function () {
+      const back = document.getElementById("privacyBackLink");
+      const v = window.FLOQRNav?.appVersion || "s3.0.103";
+      if (back) back.href = `./patron-portal.html?v=${encodeURIComponent(v)}&tab=privacy`;
+    })();
+  </script>
+</body>
+</html>

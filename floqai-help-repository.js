@@ -886,6 +886,22 @@
       page: "patron-portal.html#portalPrivacy"
     },
     {
+      id: "help-do-not-sell",
+      title: "Do Not Sell or Share",
+      body: "Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically. Open the Privacy Policy for CCPA / CPRA details.",
+      searchPhrases: [
+        "do not sell", "do not share", "ccpa", "cpra", "gpc", "global privacy control",
+        "personalized ads", "privacy policy", "download my data", "delete my data", "dsar"
+      ],
+      links: [
+        {label: "My Privacy", href: vUrl("./patron-portal.html", {from: "floqai", tab: "privacy"})},
+        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#portalPrivacy"
+    },
+    {
       id: "help-sos2fa-entity-mgmt",
       title: "Privilege Admin Access",
       body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",

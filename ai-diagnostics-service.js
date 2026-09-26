@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.102";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.103";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1089,10 +1089,31 @@
         {label:"Test alert skip reasons", file:"functions/messaging-core.js", includes:["describeOutboundSkip", "channelAlertOn"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"29.09.111\""]}
       ]
+    },
+    {
+      version: "s3.0.103-privacy-compliance",
+      title: "Privacy Policy + DNS/GPC + DSAR callables",
+      checks: [
+        {label:"Privacy policy page", file:"privacy.html", includes:["www.floqr.com", "id=\"do-not-sell\"", "Download My Data"]},
+        {label:"Canonical + prefs + consent mode", file:"patron-portal.html", includes:["floqr-canonical.js?v=s3.0.103", "floqr-privacy-prefs.js?v=s3.0.103", "floqr-consent-mode.js?v=s3.0.103"]},
+        {label:"Do Not Sell control", file:"patron-portal.html", includes:["id=\"privacyDoNotSell\"", "help-do-not-sell"]},
+        {label:"DSAR callables", file:"functions/privacy-dsar-functions.js", includes:["exportPatronData", "requestPatronDelete", "fulfillPatronDelete"]},
+        {label:"privacyConsents owner rules", file:"firestore.rules", includes:["s3.0.103-privacy-consents-owner", "resource.data.uid == request.auth.uid"]},
+        {label:"Ad personalization gate", file:"ad-campaigns.js", includes:["allowsPersonalizedAds", "VERSION = \"s3.0.103\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.103\""]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-103-privacy-dns-dsar",
+      area:"My Privacy / compliance",
+      feature:"Privacy Policy, Do Not Sell / GPC, server export and delete",
+      changed:"Added privacy.html (www.floqr.com canonical). My Privacy has Do Not Sell or Share, GPC auto-apply, Download My Data via exportPatronData, and Request Data Delete via requestPatronDelete. Targeted ads skip profile tags when DNS/GPC/sharing is off. privacyConsents is owner-create only.",
+      howToTest:"Hard-refresh patron-portal.html?v=s3.0.103&tab=privacy. Open Privacy Policy link. Toggle Do Not Sell, Save. Download My Data JSON (server export). Confirm Search ads still rotate house creatives when DNS is on. Master Admin Rules Smoke Test after rules deploy.",
+      expected:"Policy loads. DNS persists. Export JSON includes profile bundles. Targeted tag scoring stops while house ads can still show. Delete requires typing DELETE and anonymizes the account."
+    },
     {
       id:"s3-0-14-cameroon-64x48-previews",
       area:"Display / soccer jerseys",

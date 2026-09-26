@@ -303,18 +303,41 @@ exports.sendClubMarketingCampaign = onCall({
 
   const channel = text(campaign.channel, 20) || "sms";
   const recipients = Array.isArray(request.data?.recipients) ? request.data.recipients : [];
-  const normalized = recipients
-    .map(row => ({
-      phone: normalizeE164(row?.phone || row),
-      channel: text(row?.channel, 20) || (channel === "both" ? "sms" : channel)
-    }))
-    .filter(row => row.phone)
-    .slice(0, broadcast ? 500 : 5);
+  const normalized = [];
+  for (const raw of recipients.slice(0, broadcast ? 500 : 5)) {
+    const phone = normalizeE164(raw?.phone || raw);
+    if (!phone) continue;
+    const rowChannel = text(raw?.channel, 20) || (channel === "both" ? "sms" : channel);
+    if (broadcast) {
+      // Honor marketingConsent / Do Not Sell when a matching user profile exists.
+      let allowed = true;
+      try {
+        const byPhone = await db.collection("users").where("phoneNumber", "==", phone).limit(1).get();
+        const alt = byPhone.empty
+          ? await db.collection("users").where("phone", "==", phone).limit(1).get()
+          : byPhone;
+        if (!alt.empty) {
+          const profile = alt.docs[0].data() || {};
+          if (profile.marketingConsent === false || profile.marketingConsent === 0
+            || String(profile.marketingConsent || "").toLowerCase() === "no"
+            || profile.doNotSellOrShare === true) {
+            allowed = false;
+          }
+        }
+      } catch (err) {
+        console.warn("marketing consent lookup", err?.message || err);
+      }
+      if (!allowed) continue;
+    }
+    normalized.push({phone, channel: rowChannel});
+  }
 
   if (!normalized.length) {
     throw new HttpsError(
       "invalid-argument",
-      "Provide recipients [{phone, channel?}]. Enter a test phone in E.164 (example +12025550123)."
+      broadcast
+        ? "No eligible recipients after marketing consent / Do Not Sell filters. Provide opted-in phones."
+        : "Provide recipients [{phone, channel?}]. Enter a test phone in E.164 (example +12025550123)."
     );
   }
 
