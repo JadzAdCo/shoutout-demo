@@ -11,7 +11,7 @@
 
         title: "Бета-тестирование",
 
-        body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт, и нажмите «Принять». После этого бета-функции появятся в поиске с меткой «Бета». Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
+        body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт, и нажмите «Принять». После этого в поиске с меткой «Бета» появятся только функции, которые FLOQR выбрал для вас. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
 
       },
       "help-location-search": {
@@ -20,7 +20,7 @@
       },
       "help-welcome": {
         title: "Добро пожаловать в FLOQR",
-        body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй. Войдите через Google, Microsoft, Facebook или с помощью одноразового пароля (OTP). OTP — это короткий код, который FLOQR отправляет на вашу почту, в WhatsApp (по всему миру) или по SMS (только номера США). Введите код в течение нескольких минут, чтобы войти, — пароль запоминать не нужно. Каждый код действует только один раз. Никому не сообщайте свой код."
+        body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй. Войдите через Google, Microsoft, Facebook или с помощью одноразового пароля (OTP). OTP — это короткий код, который FLOQR отправляет на вашу почту, в WhatsApp (по всему миру) или по SMS (только номера США и Канады). Введите код в течение нескольких минут, чтобы войти, — пароль запоминать не нужно. Каждый код действует только один раз. Никому не сообщайте свой код."
       },
       "help-ad-campaigns": {
         title: "Рекламные кампании",
@@ -197,7 +197,7 @@
 
         title: "Bètatesten",
 
-        body: "FLOQR nodigt soms bezoekers uit om nieuwe functies vroeg te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account en kies Accepteren. Bètafuncties verschijnen dan bij Zoeken met het label Bèta. Ze kunnen tijdens het testen veranderen of worden uitgezet. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
+        body: "FLOQR nodigt soms bezoekers uit om nieuwe functies vroeg te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account en kies Accepteren. Alleen de functies die FLOQR voor jou heeft gekozen verschijnen dan bij Zoeken met het label Bèta. Ze kunnen tijdens het testen veranderen of worden uitgezet. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
 
       },
       "help-location-search": {
@@ -206,7 +206,7 @@
       },
       "help-welcome": {
         title: "Welkom bij FLOQR",
-        body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie. Log in met Google, Microsoft, Facebook of een eenmalig wachtwoord (OTP). Een OTP is een korte code die FLOQR naar je e-mail, via WhatsApp (wereldwijd) of per SMS (alleen Amerikaanse nummers) stuurt. Typ de code binnen een paar minuten om in te loggen — geen wachtwoord om te onthouden. Elke code werkt maar één keer. Deel je code nooit met iemand."
+        body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie. Log in met Google, Microsoft, Facebook of een eenmalig wachtwoord (OTP). Een OTP is een korte code die FLOQR naar je e-mail, via WhatsApp (wereldwijd) of per SMS (alleen nummers uit de VS en Canada) stuurt. Typ de code binnen een paar minuten om in te loggen — geen wachtwoord om te onthouden. Elke code werkt maar één keer. Deel je code nooit met iemand."
       },
       "help-ad-campaigns": {
         title: "Advertentiecampagnes",
@@ -383,7 +383,7 @@
 
         title: "Tests bêta",
 
-        body: "FLOQR invite parfois des clients à essayer de nouvelles fonctionnalités en avant-première. L'invitation arrive dans votre boîte de réception ; ouvrez-la en étant connecté au même compte et choisissez Accepter. Les fonctionnalités bêta apparaissent alors dans la recherche avec l'étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
+        body: "FLOQR invite parfois des clients à essayer de nouvelles fonctionnalités en avant-première. L'invitation arrive dans votre boîte de réception ; ouvrez-la en étant connecté au même compte et choisissez Accepter. Seules les fonctionnalités que FLOQR a choisies pour vous apparaissent alors dans la recherche avec l'étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
 
       },
       "help-location-search": {
@@ -392,7 +392,7 @@
       },
       "help-welcome": {
         title: "Bienvenue sur FLOQR",
-        body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille. Connectez-vous avec Google, Microsoft, Facebook ou un mot de passe à usage unique (OTP). Un OTP est un code court que FLOQR envoie à votre e-mail, sur WhatsApp (monde entier) ou par SMS (numéros américains uniquement). Saisissez le code en quelques minutes pour vous connecter — aucun mot de passe à retenir. Chaque code ne fonctionne qu'une fois. Ne partagez jamais votre code."
+        body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille. Connectez-vous avec Google, Microsoft, Facebook ou un mot de passe à usage unique (OTP). Un OTP est un code court que FLOQR envoie à votre e-mail, sur WhatsApp (monde entier) ou par SMS (numéros américains et canadiens uniquement). Saisissez le code en quelques minutes pour vous connecter — aucun mot de passe à retenir. Chaque code ne fonctionne qu'une fois. Ne partagez jamais votre code."
       },
       "help-ad-campaigns": {
         title: "Campagnes publicitaires",
@@ -569,7 +569,7 @@
 
         title: "Beta-Tests",
 
-        body: "FLOQR lädt Gäste manchmal ein, neue Funktionen vorab auszuprobieren. Die Einladung kommt in Ihren Posteingang; öffnen Sie sie, während Sie mit demselben Konto angemeldet sind, und wählen Sie Annehmen. Beta-Funktionen erscheinen dann in der Suche mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das Konto, an das sie gesendet wurden."
+        body: "FLOQR lädt Gäste manchmal ein, neue Funktionen vorab auszuprobieren. Die Einladung kommt in Ihren Posteingang; öffnen Sie sie, während Sie mit demselben Konto angemeldet sind, und wählen Sie Annehmen. Nur die Funktionen, die FLOQR für Sie ausgewählt hat, erscheinen dann in der Suche mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das Konto, an das sie gesendet wurden."
 
       },
       "help-location-search": {
@@ -578,7 +578,7 @@
       },
       "help-welcome": {
         title: "Willkommen bei FLOQR",
-        body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie. Melde dich mit Google, Microsoft, Facebook oder einem Einmalpasswort (OTP) an. Ein OTP ist ein kurzer Code, den FLOQR an deine E-Mail, per WhatsApp (weltweit) oder per SMS (nur US-Nummern) sendet. Gib den Code innerhalb weniger Minuten ein, um dich anzumelden — kein Passwort nötig. Jeder Code funktioniert nur einmal. Teile deinen Code niemals mit anderen."
+        body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie. Melde dich mit Google, Microsoft, Facebook oder einem Einmalpasswort (OTP) an. Ein OTP ist ein kurzer Code, den FLOQR an deine E-Mail, per WhatsApp (weltweit) oder per SMS (nur Nummern aus den USA und Kanada) sendet. Gib den Code innerhalb weniger Minuten ein, um dich anzumelden — kein Passwort nötig. Jeder Code funktioniert nur einmal. Teile deinen Code niemals mit anderen."
       },
       "help-ad-campaigns": {
         title: "Werbekampagnen",
@@ -755,7 +755,7 @@
 
         title: "Pruebas beta",
 
-        body: "FLOQR a veces invita a clientes a probar funciones nuevas antes que nadie. La invitación llega a tu bandeja de entrada; ábrela con la sesión iniciada en la misma cuenta y elige Aceptar. Las funciones beta aparecerán en la búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta a la que se enviaron."
+        body: "FLOQR a veces invita a clientes a probar funciones nuevas antes que nadie. La invitación llega a tu bandeja de entrada; ábrela con la sesión iniciada en la misma cuenta y elige Aceptar. Solo las funciones que FLOQR eligió para ti aparecerán en la búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta a la que se enviaron."
 
       },
       "help-location-search": {
@@ -764,7 +764,7 @@
       },
       "help-welcome": {
         title: "Bienvenido a FLOQR",
-        body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia. Inicia sesión con Google, Microsoft, Facebook o una contraseña de un solo uso (OTP). Un OTP es un código corto que FLOQR envía a tu correo, por WhatsApp (todo el mundo) o por SMS (solo números de EE. UU.). Escribe el código en pocos minutos para iniciar sesión, sin contraseña que recordar. Cada código funciona una sola vez. Nunca compartas tu código."
+        body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia. Inicia sesión con Google, Microsoft, Facebook o una contraseña de un solo uso (OTP). Un OTP es un código corto que FLOQR envía a tu correo, por WhatsApp (todo el mundo) o por SMS (solo números de EE. UU. y Canadá). Escribe el código en pocos minutos para iniciar sesión, sin contraseña que recordar. Cada código funciona una sola vez. Nunca compartas tu código."
       },
       "help-ad-campaigns": {
         title: "Campañas publicitarias",
@@ -941,7 +941,7 @@
 
         title: "Test beta",
 
-        body: "FLOQR a volte invita i clienti a provare in anteprima nuove funzioni. L'invito arriva nella tua Posta in arrivo; aprilo mentre sei connesso allo stesso account e scegli Accetta. Le funzioni beta compariranno nella ricerca con l'etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l'account a cui sono stati inviati."
+        body: "FLOQR a volte invita i clienti a provare in anteprima nuove funzioni. L'invito arriva nella tua Posta in arrivo; aprilo mentre sei connesso allo stesso account e scegli Accetta. Solo le funzioni che FLOQR ha scelto per te compariranno nella ricerca con l'etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l'account a cui sono stati inviati."
 
       },
       "help-location-search": {
@@ -950,7 +950,7 @@
       },
       "help-welcome": {
         title: "Benvenuto su FLOQR",
-        body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari. Accedi con Google, Microsoft, Facebook o una password monouso (OTP). Un OTP è un codice breve che FLOQR invia alla tua email, su WhatsApp (in tutto il mondo) o via SMS (solo numeri USA). Inserisci il codice entro pochi minuti per accedere, senza password da ricordare. Ogni codice funziona una sola volta. Non condividere mai il tuo codice."
+        body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari. Accedi con Google, Microsoft, Facebook o una password monouso (OTP). Un OTP è un codice breve che FLOQR invia alla tua email, su WhatsApp (in tutto il mondo) o via SMS (solo numeri di USA e Canada). Inserisci il codice entro pochi minuti per accedere, senza password da ricordare. Ogni codice funziona una sola volta. Non condividere mai il tuo codice."
       },
       "help-ad-campaigns": {
         title: "Campagne pubblicitarie",
@@ -1127,7 +1127,7 @@
 
         title: "Testes beta",
 
-        body: "A FLOQR convida por vezes clientes a experimentar novas funcionalidades mais cedo. O convite chega à sua Caixa de entrada; abra-o com sessão iniciada na mesma conta e escolha Aceitar. As funcionalidades beta passam a aparecer na pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta a que foram enviados."
+        body: "A FLOQR convida por vezes clientes a experimentar novas funcionalidades mais cedo. O convite chega à sua Caixa de entrada; abra-o com sessão iniciada na mesma conta e escolha Aceitar. Só as funcionalidades que a FLOQR escolheu para si passam a aparecer na pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta a que foram enviados."
 
       },
       "help-location-search": {
@@ -1136,7 +1136,7 @@
       },
       "help-welcome": {
         title: "Bem-vindo ao FLOQR",
-        body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família. Entre com Google, Microsoft, Facebook ou uma senha de uso único (OTP). Um OTP é um código curto que o FLOQR envia para o seu e-mail, pelo WhatsApp (mundial) ou por SMS (apenas números dos EUA). Digite o código em poucos minutos para entrar — sem senha para lembrar. Cada código funciona só uma vez. Nunca compartilhe o seu código."
+        body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família. Entre com Google, Microsoft, Facebook ou uma senha de uso único (OTP). Um OTP é um código curto que o FLOQR envia para o seu e-mail, pelo WhatsApp (mundial) ou por SMS (apenas números dos EUA e do Canadá). Digite o código em poucos minutos para entrar — sem senha para lembrar. Cada código funciona só uma vez. Nunca compartilhe o seu código."
       },
       "help-ad-campaigns": {
         title: "Campanhas publicitárias",
@@ -1313,7 +1313,7 @@
 
         title: "Δοκιμές beta",
 
-        body: "Το FLOQR προσκαλεί κάποιες φορές πελάτες να δοκιμάσουν νωρίτερα νέες λειτουργίες. Η πρόσκληση έρχεται στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό και επιλέξτε Αποδοχή. Οι λειτουργίες beta εμφανίζονται τότε στην αναζήτηση με την ετικέτα Beta. Μπορεί να αλλάξουν ή να απενεργοποιηθούν κατά τις δοκιμές. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό στον οποίο στάλθηκαν."
+        body: "Το FLOQR προσκαλεί κάποιες φορές πελάτες να δοκιμάσουν νωρίτερα νέες λειτουργίες. Η πρόσκληση έρχεται στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό και επιλέξτε Αποδοχή. Μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς εμφανίζονται τότε στην αναζήτηση με την ετικέτα Beta. Μπορεί να αλλάξουν ή να απενεργοποιηθούν κατά τις δοκιμές. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό στον οποίο στάλθηκαν."
 
       },
       "help-location-search": {
@@ -1322,7 +1322,7 @@
       },
       "help-welcome": {
         title: "Καλώς ήρθατε στο FLOQR",
-        body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια. Συνδεθείτε με Google, Microsoft, Facebook ή με κωδικό μίας χρήσης (OTP). Το OTP είναι ένας σύντομος κωδικός που στέλνει το FLOQR στο email σας, στο WhatsApp (παγκοσμίως) ή με SMS (μόνο αριθμοί ΗΠΑ). Πληκτρολογήστε τον κωδικό μέσα σε λίγα λεπτά για να συνδεθείτε — χωρίς κωδικό πρόσβασης να θυμάστε. Κάθε κωδικός λειτουργεί μόνο μία φορά. Μην κοινοποιείτε ποτέ τον κωδικό σας."
+        body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια. Συνδεθείτε με Google, Microsoft, Facebook ή με κωδικό μίας χρήσης (OTP). Το OTP είναι ένας σύντομος κωδικός που στέλνει το FLOQR στο email σας, στο WhatsApp (παγκοσμίως) ή με SMS (μόνο αριθμοί ΗΠΑ και Καναδά). Πληκτρολογήστε τον κωδικό μέσα σε λίγα λεπτά για να συνδεθείτε — χωρίς κωδικό πρόσβασης να θυμάστε. Κάθε κωδικός λειτουργεί μόνο μία φορά. Μην κοινοποιείτε ποτέ τον κωδικό σας."
       },
       "help-ad-campaigns": {
         title: "Διαφημιστικές καμπάνιες",
@@ -1499,7 +1499,7 @@
 
         title: "Testy beta",
 
-        body: "FLOQR czasem zaprasza gości do wcześniejszego wypróbowania nowych funkcji. Zaproszenie trafia do skrzynki odbiorczej; otwórz je, będąc zalogowanym na to samo konto, i wybierz Akceptuj. Funkcje beta pojawią się w wyszukiwaniu z etykietą Beta. Mogą się zmieniać lub zostać wyłączone w trakcie testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta, na które je wysłano."
+        body: "FLOQR czasem zaprasza gości do wcześniejszego wypróbowania nowych funkcji. Zaproszenie trafia do skrzynki odbiorczej; otwórz je, będąc zalogowanym na to samo konto, i wybierz Akceptuj. W wyszukiwaniu z etykietą Beta pojawią się tylko funkcje, które FLOQR dla Ciebie wybrał. Mogą się zmieniać lub zostać wyłączone w trakcie testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta, na które je wysłano."
 
       },
       "help-location-search": {
@@ -1508,7 +1508,7 @@
       },
       "help-welcome": {
         title: "Witamy w FLOQR",
-        body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną. Zaloguj się przez Google, Microsoft, Facebook lub hasłem jednorazowym (OTP). OTP to krótki kod, który FLOQR wysyła na Twój e-mail, przez WhatsApp (cały świat) lub SMS-em (tylko numery z USA). Wpisz kod w ciągu kilku minut, aby się zalogować — bez hasła do zapamiętania. Każdy kod działa tylko raz. Nigdy nikomu nie udostępniaj swojego kodu."
+        body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną. Zaloguj się przez Google, Microsoft, Facebook lub hasłem jednorazowym (OTP). OTP to krótki kod, który FLOQR wysyła na Twój e-mail, przez WhatsApp (cały świat) lub SMS-em (tylko numery z USA i Kanady). Wpisz kod w ciągu kilku minut, aby się zalogować — bez hasła do zapamiętania. Każdy kod działa tylko raz. Nigdy nikomu nie udostępniaj swojego kodu."
       },
       "help-ad-campaigns": {
         title: "Kampanie reklamowe",
@@ -1685,7 +1685,7 @@
 
         title: "الاختبار التجريبي",
 
-        body: "تدعو FLOQR أحيانًا الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى صندوق الوارد؛ افتحها وأنت مسجّل الدخول بالحساب نفسه واختر قبول. ستظهر الميزات التجريبية بعد ذلك في البحث مع شارة تجريبي. قد تتغير أو تُوقَف أثناء الاختبار. تنتهي صلاحية الدعوات بعد 7 أيام ولا تعمل إلا للحساب الذي أُرسلت إليه."
+        body: "تدعو FLOQR أحيانًا الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى صندوق الوارد؛ افتحها وأنت مسجّل الدخول بالحساب نفسه واختر قبول. ستظهر بعد ذلك في البحث مع شارة تجريبي الميزات التي اختارتها FLOQR لك فقط. قد تتغير أو تُوقَف أثناء الاختبار. تنتهي صلاحية الدعوات بعد 7 أيام ولا تعمل إلا للحساب الذي أُرسلت إليه."
 
       },
       "help-location-search": {
@@ -1694,7 +1694,7 @@
       },
       "help-welcome": {
         title: "مرحباً بك في FLOQR",
-        body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة. سجّل الدخول عبر Google أو Microsoft أو Facebook أو بكلمة مرور لمرة واحدة (OTP). رمز OTP هو رمز قصير يرسله FLOQR إلى بريدك الإلكتروني أو عبر WhatsApp (عالمياً) أو عبر SMS (للأرقام الأمريكية فقط). اكتب الرمز خلال دقائق قليلة لتسجيل الدخول، دون الحاجة إلى تذكّر كلمة مرور. كل رمز يعمل مرة واحدة فقط. لا تشارك رمزك مع أي شخص."
+        body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة. سجّل الدخول عبر Google أو Microsoft أو Facebook أو بكلمة مرور لمرة واحدة (OTP). رمز OTP هو رمز قصير يرسله FLOQR إلى بريدك الإلكتروني أو عبر WhatsApp (عالمياً) أو عبر SMS (لأرقام الولايات المتحدة وكندا فقط). اكتب الرمز خلال دقائق قليلة لتسجيل الدخول، دون الحاجة إلى تذكّر كلمة مرور. كل رمز يعمل مرة واحدة فقط. لا تشارك رمزك مع أي شخص."
       },
       "help-ad-campaigns": {
         title: "حملات إعلانية",

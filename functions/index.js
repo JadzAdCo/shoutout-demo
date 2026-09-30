@@ -34,6 +34,8 @@ module.exports = {
   declineBetaInvite: featureServiceFns.declineBetaInvite,
   revokeBetaTester: featureServiceFns.revokeBetaTester,
   revokeBetaInvite: featureServiceFns.revokeBetaInvite,
+  setBetaTesterFeatures: featureServiceFns.setBetaTesterFeatures,
+  logFeatureAccessAttempt: featureServiceFns.logFeatureAccessAttempt,
   logFeatureCodePromotion: featureServiceFns.logFeatureCodePromotion,
   verifyFeatureServiceAuditChain: featureServiceFns.verifyFeatureServiceAuditChain,
   checkDisplayAccess: displaySecurityFns.checkDisplayAccess,

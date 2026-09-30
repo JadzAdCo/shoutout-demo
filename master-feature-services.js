@@ -82,6 +82,24 @@
     return `<label class="toggle-inline"><input type="checkbox" data-feature-key="${esc(key)}" data-feature-field="${field}"${checked}/> <span>${value === 1 ? "1" : "0"}</span></label>`;
   }
 
+  const STATE_TEXT = {
+    off: "Off for everyone",
+    test: "Testing — granted beta testers see it on Search; Master Admins use the link here",
+    live: "Live — every patron sees it on Search"
+  };
+
+  function stateOf(row) {
+    return root.FLOQRFeatureServices?.stateOf?.(row) || "off";
+  }
+
+  function featureLabel(key) {
+    return catalog().find(base => base.key === key)?.label || key;
+  }
+
+  function betaKeys() {
+    return root.FLOQRFeatureServices?.BETA_ELIGIBLE_KEYS || [];
+  }
+
   function renderFeatures() {
     const tbody = byId("featureServicesRows");
     if (!tbody) return;
@@ -90,16 +108,39 @@
       const last = row.revision
         ? `r${esc(row.revision)} · ${esc(row.updatedByEmail || "system")} · ${esc(formatWhen(row.updatedAtMs))}<br/><small>${esc(row.lastChangeReason || "")}</small>`
         : "<small>Packaged default (not saved yet)</small>";
-      const state = row.IsFeatureEnabled === 1 ? "Live for everyone" : row.IsTestFeature === 1 ? "Admins + beta testers" : "Hidden";
+      const state = stateOf(row);
+      const link = state === "off"
+        ? "<small>Off — set IsFeatureEnabled to 1 to open it.</small>"
+        : `<a href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a>`;
       return `<tr>
-        <td><strong>${esc(base.label)}</strong><br/><small>${esc(state)}</small></td>
+        <td><strong>${esc(base.label)}</strong><br/><small>${esc(STATE_TEXT[state])}</small></td>
         <td style="text-align:center">${flagToggle(base.key, "IsFeatureEnabled", row.IsFeatureEnabled)}</td>
         <td style="text-align:center">${flagToggle(base.key, "IsTestFeature", row.IsTestFeature)}</td>
-        <td><a href="${esc(testLink(base))}" target="_blank" rel="noopener">Open ${esc(base.label)}</a></td>
+        <td>${link}</td>
         <td>${last}</td>
         <td><button type="button" data-feature-save="${esc(base.key)}">Save</button></td>
       </tr>`;
     }).join("");
+    renderInviteFeatures();
+  }
+
+  function featureCheckboxes(attrs, granted = {}) {
+    return betaKeys().map(key => {
+      const checked = Number(granted[key]) === 1 ? " checked" : "";
+      const hint = STATE_TEXT[stateOf(features[key])] ? ` <small>(${esc(stateOf(features[key]))})</small>` : "";
+      return `<label class="toggle-inline"><input type="checkbox" ${attrs} data-feature-key="${esc(key)}"${checked}/> ${esc(featureLabel(key))}${hint}</label>`;
+    }).join(" ");
+  }
+
+  function renderInviteFeatures() {
+    const box = byId("betaInviteFeatures");
+    if (!box) return;
+    const previous = Object.fromEntries([...box.querySelectorAll("input[data-invite-feature]")].map(input => [input.dataset.featureKey, input.checked ? 1 : 0]));
+    box.innerHTML = `<legend>Features this tester may use</legend>${featureCheckboxes("data-invite-feature=\"1\"", previous)}`;
+  }
+
+  function checkedKeys(selector) {
+    return [...document.querySelectorAll(selector)].filter(input => input.checked).map(input => input.dataset.featureKey);
   }
 
   async function saveFeature(key) {
@@ -185,12 +226,18 @@
   }
 
   async function invite(uid) {
+    const featureKeys = checkedKeys("#betaInviteFeatures input[data-invite-feature]");
+    if (!featureKeys.length) {
+      setStatus("betaInviteStatus", "Tick at least one feature this tester may use, then click Invite again.");
+      return;
+    }
     setStatus("betaInviteStatus", "Sending invitation…");
     try {
-      const result = await call("createBetaInvite", {targetUid: uid, note: String(byId("betaInviteNote")?.value || "").trim()});
+      const result = await call("createBetaInvite", {targetUid: uid, featureKeys, note: String(byId("betaInviteNote")?.value || "").trim()});
       const url = new URL(result.invitePath, location.href).href;
       const copied = await copyText(url);
-      setStatus("betaInviteStatus", `Invitation sent to ${result.targetEmailMasked || "the patron"}'s Inbox. ${copied ? "Link copied to clipboard." : `Link: ${url}`} Expires ${formatWhen(result.expiresAtMs)} UTC.`);
+      const granted = featureKeys.map(featureLabel).join(", ");
+      setStatus("betaInviteStatus", `Invitation for ${granted} sent to ${result.targetEmailMasked || "the patron"}'s Inbox. ${copied ? "Link copied to clipboard." : `Link: ${url}`} Expires ${formatWhen(result.expiresAtMs)} UTC.`);
       await loadBeta();
       await loadAudit();
     } catch (error) {
@@ -209,8 +256,11 @@
       if (testersEl) {
         testersEl.innerHTML = testers.empty ? "<p class=\"sub small\">No active beta testers.</p>" : testers.docs.map(doc => {
           const row = doc.data();
+          const uid = esc(doc.id);
           return `<div class="queue-item"><strong>${esc(row.emailMasked || doc.id)}</strong> <small>since ${esc(formatWhen(row.acceptedAtMs))} · invited by ${esc(row.invitedByEmail || "—")}</small>
-            <button type="button" class="ghost" data-beta-revoke="${esc(doc.id)}">Revoke</button></div>`;
+            <div>${featureCheckboxes(`data-tester-feature="${uid}"`, row.features || {})}</div>
+            <button type="button" data-beta-features-save="${uid}">Save feature access</button>
+            <button type="button" class="ghost" data-beta-revoke="${uid}">Revoke</button></div>`;
         }).join("");
       }
       if (invitesEl) {
@@ -247,6 +297,24 @@
     }
   }
 
+  async function saveTesterFeatures(uid) {
+    const featureKeys = checkedKeys(`#betaTesterList input[data-tester-feature="${CSS.escape(uid)}"]`);
+    if (!featureKeys.length) {
+      setStatus("betaInviteStatus", "A beta tester needs at least one feature. To remove all access, use Revoke.");
+      return;
+    }
+    const reason = askReason(`Reason for giving this tester ${featureKeys.map(featureLabel).join(", ")} (saved in the audit trail):`);
+    if (!reason) return;
+    try {
+      await call("setBetaTesterFeatures", {targetUid: uid, featureKeys, reason});
+      setStatus("betaInviteStatus", "Beta feature access saved.");
+      await loadBeta();
+      await loadAudit();
+    } catch (error) {
+      setStatus("betaInviteStatus", errorText(error));
+    }
+  }
+
   async function revokeInvite(inviteId) {
     try {
       await call("revokeBetaInvite", {inviteId});
@@ -264,7 +332,7 @@
       setStatus("featurePromotionStatus", "Enter a promotion reason of at least 8 characters.");
       return;
     }
-    const testKeys = Object.values(features).filter(row => row.IsTestFeature === 1).map(row => row.key);
+    const testKeys = Object.values(features).filter(row => stateOf(row) === "test").map(row => row.key);
     setStatus("featurePromotionStatus", "Recording promotion…");
     try {
       const result = await call("logFeatureCodePromotion", {reason, featureKeys: testKeys});
@@ -320,6 +388,7 @@
     if (!target) return;
     if (target.dataset.featureSave) saveFeature(target.dataset.featureSave);
     else if (target.dataset.betaInvite) invite(target.dataset.betaInvite);
+    else if (target.dataset.betaFeaturesSave) saveTesterFeatures(target.dataset.betaFeaturesSave);
     else if (target.dataset.betaRevoke) revokeTester(target.dataset.betaRevoke);
     else if (target.dataset.inviteRevoke) revokeInvite(target.dataset.inviteRevoke);
   }

@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.0.108"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.110"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -42,7 +42,7 @@
           data-floqr-help-id="help-welcome"
           data-floqr-help-title="Welcome to FLOQR"
           data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout|what is otp|one time password|how does otp work|whatsapp otp|sms otp|sign in code"
-          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, to WhatsApp (worldwide), or by SMS (US numbers only). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
+          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
         >Welcome</h2>
         <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
 
@@ -65,7 +65,7 @@
           <button id="microsoftLoginBtn" class="signin microsoft" type="button" data-i18n="app.microsoft"><span class="icon ms-icon"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
           <button id="facebookLoginBtn" class="signin facebook" type="button" data-i18n="app.facebook"><span class="icon fb-icon">f</span>Continue with Facebook</button>
 
-          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false">Continue with your own Email</button>
+          <button id="showEmailOtpBtn" class="signin email" type="button" data-i18n="app.emailContinue" aria-controls="emailOtpPanel" aria-expanded="false" aria-pressed="false"><span class="icon mail-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3" fill="#fff"/><path d="M5.5 9.5 16 17.5l10.5-8" fill="none" stroke="#3a63ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Continue with your own Email</button>
           <div id="emailOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
             <label>Email address
               <input id="emailOtpAddress" type="email" autocomplete="email" placeholder="you@example.com"/>
@@ -76,6 +76,28 @@
             </label>
             <button id="verifyEmailOtpBtn" class="primary full" type="button">Verify and Continue</button>
             <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 6 minutes after delivery.</p>
+          </div>
+
+          <button id="showSmsOtpBtn" class="signin sms" type="button" data-i18n="app.smsOtp" aria-controls="smsOtpPanel"><span class="icon sms-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 6h20a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H13l-6 5v-5H6a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z" fill="#fff"/><circle cx="10.5" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="16" cy="14.5" r="1.9" fill="#3a63ff"/><circle cx="21.5" cy="14.5" r="1.9" fill="#3a63ff"/></svg></span>Continue with SMS OTP (US &amp; Canada Only)</button>
+          <div id="smsOtpPanel" class="sms-otp-panel hidden">
+          <p class="sub small" data-i18n="otp.smsUsOnly">SMS codes go to US and Canadian numbers (+1) only. Everywhere else, use WhatsApp OTP.</p>
+          <div class="phone-row sms-number-row">
+            <label data-i18n="otp.countryCode">Country code
+              <select id="phoneCountryCode" autocomplete="tel-country-code">
+                <option value="+1">United States / Canada (+1)</option>
+              </select>
+            </label>
+            <label data-i18n="otp.phoneNumber">Phone number
+              <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
+            </label>
+            <input id="phoneNumber" type="hidden"/>
+            <button id="sendOtpBtn" class="signin sms phone" type="button" data-i18n="otp.sendSms">Send OTP</button>
+          </div>
+          <div id="recaptcha-container"></div>
+          <div id="phoneCodeBlock" class="hidden">
+            <label class="compact-label" data-i18n="otp.code">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
+            <button id="verifyOtpBtn" class="signin sms phone verify" type="button" data-i18n="otp.verifySms">Verify OTP</button>
+          </div>
           </div>
 
           <button id="showWhatsAppOtpBtn" class="signin whatsapp" type="button" data-i18n="app.whatsappOtp" aria-controls="whatsappOtpPanel" aria-expanded="false"><span class="icon wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3z"/><path fill="#25d366" d="M16 5.3a10.7 10.7 0 0 0-9.1 16.3l.3.4-1.1 4 4.1-1.1.4.2A10.7 10.7 0 1 0 16 5.3z"/><path fill="#fff" d="M12.2 9.6c-.3-.6-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4.1 6.4 5.6 3.2 1.2 3.8 1 4.5.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5l-2.4-1.2c-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7z"/></svg></span>Continue with WhatsApp OTP (Worldwide)</button>
@@ -140,28 +162,6 @@
             </label>
             <button id="verifyWhatsAppOtpBtn" class="primary full" type="button" data-i18n="otp.verify">Verify and Continue</button>
             <p id="whatsappOtpStatus" class="status" aria-live="polite"></p>
-          </div>
-
-          <button id="showSmsOtpBtn" class="signin sms" type="button" data-i18n="app.smsOtp">Continue with SMS OTP (US Only)</button>
-          <div id="smsOtpPanel" class="sms-otp-panel hidden">
-          <p class="sub small" data-i18n="otp.smsUsOnly">SMS codes go to US numbers (+1) only. Outside the US, use WhatsApp OTP.</p>
-          <div class="phone-row sms-number-row">
-            <label data-i18n="otp.countryCode">Country code
-              <select id="phoneCountryCode" autocomplete="tel-country-code">
-                <option value="+1">United States (+1)</option>
-              </select>
-            </label>
-            <label data-i18n="otp.phoneNumber">Phone number
-              <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
-            </label>
-            <input id="phoneNumber" type="hidden"/>
-            <button id="sendOtpBtn" class="signin sms phone" type="button" data-i18n="otp.sendSms">Send OTP</button>
-          </div>
-          <div id="recaptcha-container"></div>
-          <div id="phoneCodeBlock" class="hidden">
-            <label class="compact-label" data-i18n="otp.code">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
-            <button id="verifyOtpBtn" class="signin sms phone verify" type="button" data-i18n="otp.verifySms">Verify OTP</button>
-          </div>
           </div>
         </div>
         <p id="authStatus" class="status"></p>
@@ -752,11 +752,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.0.108"></script>
-<script src="./floqr-i18n.js?v=s3.0.108"></script>
+<script src="./floqr-nav.js?v=s3.0.110"></script>
+<script src="./floqr-i18n.js?v=s3.0.110"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.0.108"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.108"></script>
+<script src="./floqai-help-repository.js?v=s3.0.110"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.110"></script>
 <script src="./floqr-venue-query.js?v=s3.0.106"></script>
 <script src="./intent-search.js?v=s3.0.105"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
@@ -766,7 +766,7 @@
 <script src="./national-teams-data.js?v=s3.0.20"></script>
 <script src="./jersey-catalog.js?v=s3.0.62"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>
-<script src="./floqr-feature-services.js?v=s3.0.109"></script>
+<script src="./floqr-feature-services.js?v=s3.0.110"></script>
 <script src="./url-media-field.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.33"></script>
 <script src="./ai-index-service.js?v=29.09.33"></script>
@@ -790,7 +790,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.108"></script>
+<script src="./patron-app.js?v=s3.0.110"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

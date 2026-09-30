@@ -93,22 +93,42 @@ function asHttps(error) {
   return new HttpsError("internal", "Features & Services request failed. Try again.");
 }
 
-async function isPrivilegedAuth(auth) {
-  if (!auth) return false;
-  const email = text(auth.token?.email, 200).toLowerCase();
-  if (auth.token?.masterAdmin === true || auth.token?.superAdmin === true || PRIVILEGED_EMAILS.includes(email)) return true;
-  const snap = await db.collection("users").doc(auth.uid).get();
-  const data = snap.exists ? snap.data() || {} : {};
+function isPrivilegedProfile(email, data = {}) {
+  if (PRIVILEGED_EMAILS.includes(text(email, 200).toLowerCase())) return true;
   return data.masterAdmin === true || data.superAdmin === true || (Array.isArray(data.roles) && data.roles.includes("masterAdmin"));
 }
 
+async function isPrivilegedAuth(auth) {
+  if (!auth) return false;
+  if (auth.token?.masterAdmin === true || auth.token?.superAdmin === true) return true;
+  if (isPrivilegedProfile(auth.token?.email)) return true;
+  const snap = await db.collection("users").doc(auth.uid).get();
+  return isPrivilegedProfile("", snap.exists ? snap.data() || {} : {});
+}
+
+/** Master Admins are never beta testers, even if a betaTesters doc exists for them. */
 async function viewerFor(auth) {
-  if (!auth) return {isMasterAdmin: false, isBetaTester: false};
+  if (!auth) return {isMasterAdmin: false, isBetaTester: false, betaFeatures: {}};
   const [privileged, betaSnap] = await Promise.all([
     isPrivilegedAuth(auth),
     db.collection(C.betaTesters).doc(auth.uid).get()
   ]);
-  return {isMasterAdmin: privileged, isBetaTester: core.isActiveBetaTester(betaSnap.exists ? betaSnap.data() : null)};
+  const row = betaSnap.exists ? betaSnap.data() : null;
+  const isBetaTester = !privileged && core.isActiveBetaTester(row);
+  return {isMasterAdmin: privileged, isBetaTester, betaFeatures: isBetaTester ? core.betaGrantsFrom(row) : {}};
+}
+
+function viewerRole(viewer) {
+  if (viewer.isMasterAdmin) return "masterAdmin";
+  return viewer.isBetaTester ? "betaTester" : "patron";
+}
+
+function grantedKeys(map) {
+  return Object.keys(map || {}).filter(key => core.flag(map[key]) === 1);
+}
+
+function featureLabels(map) {
+  return grantedKeys(map).map(key => core.catalogEntry(key)?.label || key).join(", ") || "new features";
 }
 
 async function loadFeature(featureKey) {
@@ -126,9 +146,9 @@ async function assertFeatureAccess(auth, featureKey, request = null) {
     ...(request ? requestContext(request) : {}),
     eventType: "feature.access_denied",
     outcome: "denied",
-    actor: {uid: auth?.uid || "", email: auth?.token?.email || "", role: viewer.isBetaTester ? "betaTester" : "patron"},
+    actor: {uid: auth?.uid || "", email: auth?.token?.email || "", role: viewerRole(viewer)},
     target: {type: "feature", id: featureKey},
-    detail: {IsFeatureEnabled: feature.IsFeatureEnabled, IsTestFeature: feature.IsTestFeature}
+    detail: {IsFeatureEnabled: feature.IsFeatureEnabled, IsTestFeature: feature.IsTestFeature, state: core.featureState(feature), surface: "server"}
   }));
   throw new HttpsError("failed-precondition", UNAVAILABLE_MESSAGE);
 }
@@ -215,15 +235,27 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
   const targetUid = text(request.data?.targetUid, 128);
   const note = text(request.data?.note, 300);
   if (!targetUid) throw new HttpsError("invalid-argument", "Choose a patron to invite.");
+  let features;
+  try { features = core.validateBetaFeatures(request.data?.featureKeys); } catch (error) { throw asHttps(error); }
   const [userSnap, betaSnap] = await Promise.all([
     db.collection("users").doc(targetUid).get(),
     db.collection(C.betaTesters).doc(targetUid).get()
   ]);
   if (!userSnap.exists) throw new HttpsError("not-found", "Patron not found.");
-  if (core.isActiveBetaTester(betaSnap.exists ? betaSnap.data() : null)) {
-    throw new HttpsError("already-exists", "This patron is already a beta tester.");
-  }
   const user = userSnap.data() || {};
+  if (isPrivilegedProfile(user.email, user)) {
+    await writeUnchainedAudit(auditRecord(request, {
+      eventType: "beta.invite_denied",
+      outcome: "denied",
+      target: {type: "patron", id: targetUid},
+      detail: {reason: "target-is-master-admin"},
+      sessionId
+    }));
+    throw new HttpsError("failed-precondition", "Master Admins cannot be beta testers. They open test features from Features & Services.");
+  }
+  if (core.isActiveBetaTester(betaSnap.exists ? betaSnap.data() : null)) {
+    throw new HttpsError("already-exists", "This patron is already a beta tester. Change their feature access in the beta tester list instead.");
+  }
   const targetEmail = text(user.email, 200).toLowerCase();
   const targetName = text(user.displayName || user.fullName || user.floqrHandle || "", 120);
   const token = core.newInviteToken();
@@ -241,6 +273,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
       targetEmailMasked: core.maskEmail(targetEmail),
       targetName,
       note,
+      features,
       status: "pending",
       createdAt: FieldValue.serverTimestamp(),
       createdAtMs: nowMs,
@@ -251,7 +284,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
     appendChainedAudit(tx, head, auditRecord(request, {
       eventType: "beta.invite_created",
       target: {type: "patron", id: targetUid},
-      after: {status: "pending", expiresAtMs},
+      after: {status: "pending", expiresAtMs, features},
       reason: note || "Beta tester invitation",
       detail: {inviteIdPrefix: inviteId.slice(0, 12), targetEmailMasked: core.maskEmail(targetEmail)},
       sessionId,
@@ -263,13 +296,13 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
     recipientUid: targetUid,
     type: "betaInvite",
     title: "You're invited to test new FLOQR features",
-    body: "FLOQR invited you to become a beta tester and try new features before everyone else. Open the invitation to accept or decline. It expires in 7 days.",
+    body: `FLOQR invited you to become a beta tester and try ${featureLabels(features)} before everyone else. Open the invitation to accept or decline. It expires in 7 days.`,
     link: invitePath,
     read: false,
     createdAt: FieldValue.serverTimestamp()
   });
 
-  return {ok: true, invitePath, expiresAtMs, targetEmailMasked: core.maskEmail(targetEmail)};
+  return {ok: true, invitePath, expiresAtMs, features, targetEmailMasked: core.maskEmail(targetEmail)};
 });
 
 async function respondToInvite(request, accept) {
@@ -280,8 +313,9 @@ async function respondToInvite(request, accept) {
   const inviteId = core.inviteIdFor(token);
   const uid = request.auth.uid;
   const nowMs = Date.now();
-  let denial = "";
-  await db.runTransaction(async tx => {
+  let denial = accept && await isPrivilegedAuth(request.auth) ? "master-admin" : "";
+  let granted = {};
+  if (!denial) await db.runTransaction(async tx => {
     const inviteRef = db.collection(C.betaInvites).doc(inviteId);
     const betaRef = db.collection(C.betaTesters).doc(uid);
     const inviteSnap = await tx.get(inviteRef);
@@ -292,6 +326,7 @@ async function respondToInvite(request, accept) {
       denial = verdict.reason;
       return;
     }
+    granted = core.validateBetaFeatures(invite.features || {}, {requireOne: false});
     tx.update(inviteRef, {
       status: accept ? "accepted" : "declined",
       respondedAt: FieldValue.serverTimestamp(),
@@ -302,6 +337,8 @@ async function respondToInvite(request, accept) {
       tx.set(betaRef, {
         uid,
         IsBetaTester: 1,
+        role: "betaTester",
+        features: granted,
         status: "active",
         emailMasked: core.maskEmail(request.auth.token?.email),
         inviteId,
@@ -317,7 +354,7 @@ async function respondToInvite(request, accept) {
       eventType: accept ? "beta.accepted" : "beta.declined",
       target: {type: "patron", id: uid},
       before: {status: "pending"},
-      after: {status: accept ? "accepted" : "declined", IsBetaTester: accept ? 1 : 0},
+      after: {status: accept ? "accepted" : "declined", IsBetaTester: accept ? 1 : 0, features: accept ? granted : {}},
       detail: {inviteIdPrefix: inviteId.slice(0, 12), invitedByEmail: invite.createdByEmail || ""},
       nowMs
     }));
@@ -330,9 +367,12 @@ async function respondToInvite(request, accept) {
       target: {type: "patron", id: uid},
       detail: {reason: denial, inviteIdPrefix: inviteId.slice(0, 12)}
     }));
+    if (denial === "master-admin") {
+      throw new HttpsError("failed-precondition", "Master Admins cannot be beta testers. Open test features from Features & Services.");
+    }
     throw invalid;
   }
-  return {ok: true, status: accept ? "accepted" : "declined"};
+  return {ok: true, status: accept ? "accepted" : "declined", features: accept ? grantedKeys(granted) : []};
 }
 
 exports.acceptBetaInvite = onCall(CALL_OPTS, request => respondToInvite(request, true));
@@ -399,6 +439,79 @@ exports.revokeBetaInvite = onCall(CALL_OPTS, async request => {
     }));
   });
   return {ok: true};
+});
+
+exports.setBetaTesterFeatures = onCall(CALL_OPTS, async request => {
+  const {email, sessionId} = await assertAdmin(request, "beta.features_change");
+  const targetUid = text(request.data?.targetUid, 128);
+  if (!targetUid) throw new HttpsError("invalid-argument", "Choose a beta tester.");
+  let reason;
+  let features;
+  try {
+    reason = core.validateReason(request.data?.reason);
+    features = core.validateBetaFeatures(request.data?.featureKeys);
+  } catch (error) {
+    throw asHttps(error);
+  }
+  const nowMs = Date.now();
+  const before = await db.runTransaction(async tx => {
+    const ref = db.collection(C.betaTesters).doc(targetUid);
+    const snap = await tx.get(ref);
+    const head = await tx.get(headRef());
+    const row = snap.exists ? snap.data() : null;
+    if (!core.isActiveBetaTester(row)) throw new HttpsError("failed-precondition", "This patron is not an active beta tester.");
+    const previous = core.validateBetaFeatures(row.features || {}, {requireOne: false});
+    if (core.canonicalJson(previous) === core.canonicalJson(features)) {
+      throw new HttpsError("failed-precondition", "Nothing changed — the tester already has that access.");
+    }
+    tx.set(ref, {features, role: "betaTester", featuresUpdatedAtMs: nowMs, featuresUpdatedByEmail: email}, {merge: true});
+    appendChainedAudit(tx, head, auditRecord(request, {
+      eventType: "beta.features_changed",
+      target: {type: "patron", id: targetUid},
+      before: {features: previous},
+      after: {features},
+      reason,
+      sessionId,
+      nowMs
+    }));
+    return previous;
+  });
+  return {ok: true, before: grantedKeys(before), features: grantedKeys(features)};
+});
+
+const ACCESS_LOG_WINDOW_MS = 10 * 60 * 1000;
+const ACCESS_LOG_MAX = 20;
+
+/** Page-guard denials (signed-in viewers). The server re-evaluates access; the client verdict is never trusted. */
+exports.logFeatureAccessAttempt = onCall(CALL_OPTS, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+  const featureKey = text(request.data?.featureKey, 60);
+  if (!core.catalogEntry(featureKey)) throw new HttpsError("invalid-argument", "Unknown feature.");
+  const page = text(request.data?.page, 80).replace(/[^A-Za-z0-9._-]/g, "");
+  const nowMs = Date.now();
+  const throttleRef = db.collection("featureServiceAccessThrottle").doc(request.auth.uid);
+  const allowed = await db.runTransaction(async tx => {
+    const snap = await tx.get(throttleRef);
+    const row = snap.exists ? snap.data() || {} : {};
+    const fresh = nowMs - Number(row.windowStartMs || 0) > ACCESS_LOG_WINDOW_MS;
+    const count = fresh ? 0 : Number(row.count || 0);
+    if (count >= ACCESS_LOG_MAX) return false;
+    tx.set(throttleRef, {windowStartMs: fresh ? nowMs : Number(row.windowStartMs), count: count + 1, updatedAtMs: nowMs});
+    return true;
+  });
+  if (!allowed) return {ok: true, logged: false};
+  const [feature, viewer] = await Promise.all([loadFeature(featureKey), viewerFor(request.auth)]);
+  const permitted = core.canAccessFeature(feature, viewer);
+  if (permitted) return {ok: true, logged: false, allowed: true};
+  await writeUnchainedAudit(auditRecord(request, {
+    role: viewerRole(viewer),
+    eventType: "feature.page_denied",
+    outcome: "denied",
+    target: {type: "feature", id: featureKey},
+    detail: {page, state: core.featureState(feature), IsFeatureEnabled: feature.IsFeatureEnabled, IsTestFeature: feature.IsTestFeature, surface: "page-guard"},
+    nowMs
+  }));
+  return {ok: true, logged: true, allowed: false};
 });
 
 exports.logFeatureCodePromotion = onCall(CALL_OPTS, async request => {

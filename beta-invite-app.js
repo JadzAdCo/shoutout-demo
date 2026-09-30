@@ -38,11 +38,14 @@
     setStatus(t("beta.working", "Working…"));
     try {
       const fn = firebase.app().functions("us-central1").httpsCallable(accept ? "acceptBetaInvite" : "declineBetaInvite");
-      await fn({token});
+      const result = (await fn({token}))?.data || {};
       showActions(false);
       hideTokenFromAddressBar();
+      const labels = (Array.isArray(result.features) ? result.features : [])
+        .map(key => (window.FLOQRFeatureServices?.CATALOG || []).find(row => row.key === key)?.label || key);
       setStatus(accept
-        ? t("beta.accepted", "You're a FLOQR beta tester. Beta features now appear on Search with a Beta label.")
+        ? [t("beta.accepted", "You're a FLOQR beta tester. Beta features now appear on Search with a Beta label."),
+          labels.length ? `${t("beta.granted", "Features you can test:")} ${labels.join(", ")}` : ""].filter(Boolean).join(" ")
         : t("beta.declined", "Invitation declined. Nothing changed on your account."));
       if (accept) {
         const back = byId("floqrGlobalBack");
@@ -51,8 +54,11 @@
           back.textContent = t("feature.backToSearch", "Back to Search");
         }
       }
-    } catch (_) {
-      setStatus(t("beta.invalid", "This invitation link is invalid, expired, or was sent to a different account."));
+    } catch (error) {
+      console.warn("Beta invite response failed", error?.code || "", error?.message || error);
+      setStatus(/Master Admins/.test(String(error?.message || ""))
+        ? t("beta.masterAdmin", "Master Admins open test features from Features & Services, not as beta testers.")
+        : t("beta.invalid", "This invitation link is invalid, expired, or was sent to a different account."));
       showActions(false);
     } finally {
       busy = false;

@@ -77,7 +77,7 @@ test("WhatsApp OTP callables log every auth event with a forced compliance row",
   assert.match(log, /ContentSid: template/);
 });
 
-test("Welcome sign-in: WhatsApp worldwide, SMS US only, no OTP divider, privacy links last in white", () => {
+test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divider, privacy links last in white", () => {
   const html = read("index.html");
   const card = html.slice(html.indexOf('id="landingPage"'), html.indexOf('id="signupProfilePage"'));
   assert.doesNotMatch(card, /Or use One Time Password/);
@@ -85,9 +85,19 @@ test("Welcome sign-in: WhatsApp worldwide, SMS US only, no OTP divider, privacy 
   assert.match(card, /id="showWhatsAppOtpBtn"[^>]*data-i18n="app\.whatsappOtp"/);
   assert.match(card, /Continue with WhatsApp OTP \(Worldwide\)/);
   assert.match(card, /id="showSmsOtpBtn"[^>]*data-i18n="app\.smsOtp"/);
-  assert.match(card, /Continue with SMS OTP \(US Only\)/);
+  assert.match(card, /Continue with SMS OTP \(US &amp; Canada Only\)/);
   const smsSelect = card.slice(card.indexOf('id="phoneCountryCode"'), card.indexOf("</select>", card.indexOf('id="phoneCountryCode"')));
-  assert.equal((smsSelect.match(/<option/g) || []).length, 1, "SMS OTP is US (+1) only");
+  assert.equal((smsSelect.match(/<option/g) || []).length, 1, "SMS OTP is +1 (US & Canada) only");
+  assert.match(smsSelect, /United States \/ Canada \(\+1\)/);
+  const order = ["googleLoginBtn", "microsoftLoginBtn", "facebookLoginBtn", "showEmailOtpBtn", "showSmsOtpBtn", "showWhatsAppOtpBtn"]
+    .map(id => card.indexOf(`id="${id}"`));
+  assert.deepEqual([...order].sort((a, b) => a - b), order, "Google, Microsoft, Facebook, Email, SMS, then WhatsApp last");
+  assert.match(card, /id="showEmailOtpBtn"[^>]*><span class="icon mail-icon">/);
+  assert.match(card, /id="showSmsOtpBtn"[^>]*><span class="icon sms-icon">/);
+  assert.match(card, /id="showWhatsAppOtpBtn"[^>]*><span class="icon wa-icon">/);
+  const css = read("styles.css");
+  assert.match(css, /#loginActions \.signin\{background:linear-gradient\(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\);color:#fff/);
+  assert.match(css, /#loginActions \.icon\{width:28px;height:28px/);
   assert.match(card, /id="whatsappCountryCode"/);
   const legal = card.indexOf('class="login-legal"');
   assert.ok(legal > card.indexOf('id="authStatus"'), "privacy links sit below every sign-in button");

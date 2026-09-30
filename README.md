@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.109 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.110 (stable)
+
+- s3.0.110: Features & Services access matrix — `IsFeatureEnabled=0` is off for everyone (Master Admins included); `IsFeatureEnabled=1` + `IsTestFeature=1` shows the Search button only to beta testers granted that feature (`betaTesters.features`), Master Admins open it from Features & Services; Master Admins cannot be beta testers. New callables `setBetaTesterFeatures` and `logFeatureAccessAttempt` (throttled, unchained denials). Signed-out visits to any satellite page redirect to the general FLOQR sign-in (`?profileRequired=sign-in&returnTo=`), not a Google-only card. Welcome buttons share the FloqAi blue-to-purple gradient with white text and same-size email / SMS / WhatsApp icons; SMS OTP is US & Canada; WhatsApp is last.
 
 - s3.0.109: Test-feature page guard starts Firebase itself when the page has no app script (RydR stayed blank) and denies cleanly on errors.
 

@@ -62,16 +62,58 @@ function normalizeFeature(key, raw = null) {
   };
 }
 
-/** Single access rule shared by Search tiles, satellite guards, and server callables. */
+const BETA_ELIGIBLE_KEYS = Object.freeze(FEATURE_KEYS.filter(key => key !== "shoutOut"));
+
+/** off = nobody (kill switch) · test = Master Admin (Features & Services) + granted beta testers · live = everyone. */
+function featureState(feature) {
+  if (!feature || flag(feature.IsFeatureEnabled) !== 1) return "off";
+  return flag(feature.IsTestFeature) === 1 ? "test" : "live";
+}
+
+/** Beta testers are never Master Admins; access is per feature, not a blanket role. */
+function hasBetaGrant(viewer = {}, featureKey = "") {
+  if (viewer.isMasterAdmin === true || viewer.isBetaTester !== true) return false;
+  const grants = viewer.betaFeatures && typeof viewer.betaFeatures === "object" ? viewer.betaFeatures : {};
+  return flag(grants[featureKey]) === 1;
+}
+
+/** Page + server access. Search tile visibility is searchTileVisible (Master Admins use Features & Services). */
 function canAccessFeature(feature, viewer = {}) {
-  if (!feature) return false;
-  if (viewer.isMasterAdmin === true) return true;
-  if (flag(feature.IsFeatureEnabled) === 1) return true;
-  return flag(feature.IsTestFeature) === 1 && viewer.isBetaTester === true;
+  const state = featureState(feature);
+  if (state === "off") return false;
+  if (state === "live") return true;
+  return viewer.isMasterAdmin === true || hasBetaGrant(viewer, feature.key);
+}
+
+function searchTileVisible(feature, viewer = {}) {
+  const state = featureState(feature);
+  if (state === "off") return false;
+  if (state === "live") return true;
+  return hasBetaGrant(viewer, feature.key);
 }
 
 function isActiveBetaTester(row) {
   return !!row && flag(row.IsBetaTester) === 1 && row.status === "active";
+}
+
+function betaGrantsFrom(row) {
+  if (!isActiveBetaTester(row)) return {};
+  const raw = row.features && typeof row.features === "object" ? row.features : {};
+  return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(raw[key]) === 1).map(key => [key, 1]));
+}
+
+/** Accepts ["mingl"] or {mingl: 1}; returns a full 0|1 map over beta-eligible keys. */
+function validateBetaFeatures(input, {requireOne = true} = {}) {
+  const picked = Array.isArray(input)
+    ? input.map(key => text(key, 60))
+    : Object.entries(input && typeof input === "object" ? input : {}).filter(([, value]) => flag(value) === 1).map(([key]) => text(key, 60));
+  const unknown = picked.filter(key => !BETA_ELIGIBLE_KEYS.includes(key));
+  if (unknown.length) throw validationError("invalid-argument", `Not a beta feature: ${unknown.join(", ")}.`);
+  const map = Object.fromEntries(BETA_ELIGIBLE_KEYS.map(key => [key, picked.includes(key) ? 1 : 0]));
+  if (requireOne && !Object.values(map).some(value => value === 1)) {
+    throw validationError("invalid-argument", "Choose at least one feature this beta tester may use.");
+  }
+  return map;
 }
 
 function validationError(code, message) {
@@ -218,8 +260,14 @@ module.exports = {
   flag,
   catalogEntry,
   normalizeFeature,
+  BETA_ELIGIBLE_KEYS,
+  featureState,
+  hasBetaGrant,
   canAccessFeature,
+  searchTileVisible,
   isActiveBetaTester,
+  betaGrantsFrom,
+  validateBetaFeatures,
   validateReason,
   validateFlagChange,
   flagEventType,
