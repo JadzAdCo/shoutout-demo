@@ -4,7 +4,7 @@
 
 const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {defineSecret, defineString} = require("firebase-functions/params");
+const {defineSecret} = require("firebase-functions/params");
 const {sanitizeTwilioSecret, normalizeE164, twilioWhatsAppAddress, describeTwilioAccountSid, explainTwilioDeliveryError} = require("./messaging-core");
 const {sendTwilioMessagesApi, fetchTwilioMessage, writeTwilioLog, maskPhone} = require("./twilio-log");
 const core = require("./whatsapp-otp-core");
@@ -17,7 +17,6 @@ const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
 const TWILIO_WHATSAPP_FROM = defineSecret("TWILIO_WHATSAPP_FROM");
 const OTP_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
-const WHATSAPP_OTP_CONTENT_SID = defineString("TWILIO_WHATSAPP_OTP_CONTENT_SID", {default: ""});
 
 const SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, TWILIO_WHATSAPP_FROM, OTP_PEPPER];
 const CHALLENGES = "whatsappOtpChallenges";
@@ -46,8 +45,9 @@ function pepper() {
   return value;
 }
 
+// Optional until Meta approves the Authentication template; set in functions/.env.
 function contentSid() {
-  try { return String(WHATSAPP_OTP_CONTENT_SID.value() || "").trim(); } catch (_) { return ""; }
+  return String(process.env.TWILIO_WHATSAPP_OTP_CONTENT_SID || "").trim();
 }
 
 function clientIp(request) {

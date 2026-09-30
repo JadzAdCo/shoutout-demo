@@ -34,7 +34,7 @@ Business-initiated WhatsApp outside a 24 h customer session **requires an approv
 
 1. Twilio Console → Messaging → Senders → WhatsApp: register FLOQR's WhatsApp Business sender (not the sandbox).
 2. Content Template Builder → type **WhatsApp Authentication**, variable `{{1}}` = code → submit for Meta approval.
-3. Put the `HX…` Content SID in `functions/.env` as `TWILIO_WHATSAPP_OTP_CONTENT_SID=HX…` (param, not a secret) and redeploy the two callables.
+3. Put the `HX…` Content SID in `functions/.env` as `TWILIO_WHATSAPP_OTP_CONTENT_SID=HX…` (plain env read via `process.env`, not a secret and not `defineString` — an empty `defineString` default blocks non-interactive deploys) and redeploy the two callables.
 
 Without the Content SID the callable sends a free-form body — works only in the Twilio sandbox (recipient sent the join word) or inside a 24 h session. Twilio error `63016` = template required; `63015` = sandbox join missing; `63007` = sender not WhatsApp-enabled. `explainWhatsAppError` maps these to patron copy.
 
