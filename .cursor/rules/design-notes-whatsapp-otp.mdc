@@ -12,6 +12,7 @@ Resume: `@whatsapp-otp$` / `$wa-otp$`.
 Order (s3.0.110): Google → Microsoft → Facebook → Email → **Continue with SMS OTP (US & Canada Only)** → **Continue with WhatsApp OTP (Worldwide)** (always last) → `#authStatus` → `.login-legal` (Privacy Policy · Do Not Sell or Share, white, last line of the card).
 
 - **One look for every button:** `#loginActions .signin` = FloqAi gradient `linear-gradient(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%)`, white text, lime `#dfff5a` focus/hover border. Do not reintroduce per-provider button colors (no white Google, no green WhatsApp button body).
+- **Alignment (s3.0.111):** the six provider buttons (`#loginActions > .signin`) are left-aligned — icon at the left edge, label right after it. Panel buttons (Send / Verify) stay centered.
 - **Icons:** every button has a 28×28 `.icon` — Google/Microsoft on a white tile, Facebook blue tile, `mail-icon` (white envelope), `sms-icon` (white chat bubble), `wa-icon` (green WhatsApp). New providers must use the same 28 px box.
 - No "Or use One Time Password (OTP) via SMS" divider.
 - SMS panel country select = `+1 United States / Canada` only (Firebase phone auth + reCAPTCHA). Server side: Firebase Auth **SMS region policy = ALLOW [US, CA]** (set s3.0.110 via `auth_set_sms_region_policy`), so other +1 NANP islands and non-+1 numbers are refused by Firebase, not just hidden in the UI.

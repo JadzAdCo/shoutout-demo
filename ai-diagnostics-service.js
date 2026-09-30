@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.110";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.111";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1175,6 +1175,15 @@
         {label:"Unified button gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,#1f8fff"]},
         {label:"Master Admin beta features", file:"master-admin.html", includes:["betaInviteFeatures", "master-feature-services.js?v=s3.0.110"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.110\""]}
+      ]
+    },
+    {
+      version: "s3.0.111-login-left-align",
+      title: "Welcome sign-in buttons: icon and label left-aligned",
+      checks: [
+        {label:"Left-aligned sign-in buttons", file:"styles.css", includes:["#loginActions > .signin{justify-content:flex-start;text-align:left"]},
+        {label:"Style cache bust", file:"index.html", includes:["styles.css?v=s3.0.111"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.111\""]}
       ]
     }
   ];
