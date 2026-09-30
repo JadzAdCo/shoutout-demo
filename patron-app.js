@@ -66,6 +66,10 @@
   let emailOtpExpiresAt = 0;
   let emailOtpTimer = null;
   let emailOtpSentAutoCloseTimer = null;
+  let whatsappOtpChallengeId = "";
+  let whatsappOtpPhone = "";
+  let whatsappOtpExpiresAt = 0;
+  let whatsappOtpTimer = null;
 
   function isMergedLocation(loc = {}) {
     const status = String(loc.status || "").toLowerCase();
@@ -1470,19 +1474,78 @@
   async function logout() { await auth.signOut(); window.location.href = "./"; }
   window.jadzPatronLogout = logout;
 
-  function populatePhoneCountrySelect() {
-    if (window.FLOQRPhoneCountries && typeof window.FLOQRPhoneCountries.populateSelect === "function") {
-      window.FLOQRPhoneCountries.populateSelect(byId("phoneCountryCode"));
+  function otpText(key, fallback, vars) {
+    const value = window.FLOQRI18n?.t ? window.FLOQRI18n.t(key, vars) : "";
+    const text = value && value !== key ? value : fallback;
+    return Object.entries(vars || {}).reduce((out, [name, v]) => out.replace(`{${name}}`, v), text);
+  }
+  function showWhatsAppOtpPanel() {
+    const panel = byId("whatsappOtpPanel");
+    const button = byId("showWhatsAppOtpBtn");
+    if (!panel || !button) return;
+    const willOpen = panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !willOpen);
+    panel.setAttribute("aria-hidden", String(!willOpen));
+    button.setAttribute("aria-expanded", String(willOpen));
+    if (willOpen) byId("whatsappNationalNumber")?.focus();
+  }
+  function buildWhatsAppPhone() {
+    const countryCode = byId("whatsappCountryCode")?.value || "";
+    const local = String(byId("whatsappNationalNumber")?.value || "").replace(/[^\d]/g, "").replace(/^0+/, "");
+    return local ? `${countryCode}${local}` : "";
+  }
+  function updateWhatsAppOtpCountdown() {
+    if (!whatsappOtpExpiresAt) return;
+    const seconds = Math.max(0, Math.ceil((whatsappOtpExpiresAt - Date.now()) / 1000));
+    const time = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+    setText("whatsappOtpStatus", seconds
+      ? otpText("otp.sent", "Code sent to WhatsApp. Expires in {time}.", {time})
+      : otpText("otp.expired", "This code expired. Request a new one."));
+    if (!seconds) { clearInterval(whatsappOtpTimer); whatsappOtpTimer = null; whatsappOtpChallengeId = ""; }
+  }
+  async function requestWhatsAppOtp() {
+    const phone = buildWhatsAppPhone();
+    if (!phone) { setText("whatsappOtpStatus", otpText("otp.enterPhone", "Enter your phone number first.")); byId("whatsappNationalNumber")?.focus(); return; }
+    if (!functions) { setText("whatsappOtpStatus", "Firebase Functions is unavailable on this page."); return; }
+    try {
+      setText("whatsappOtpStatus", otpText("otp.sending", "Sending your code…"));
+      const response = await functions.httpsCallable("requestWhatsAppOtp")({phone});
+      const data = response.data || {};
+      whatsappOtpChallengeId = data.challengeId || "";
+      whatsappOtpPhone = phone;
+      whatsappOtpExpiresAt = Date.now() + Number(data.expiresInSeconds || 300) * 1000;
+      clearInterval(whatsappOtpTimer);
+      whatsappOtpTimer = setInterval(updateWhatsAppOtpCountdown, 1000);
+      updateWhatsAppOtpCountdown();
+      byId("whatsappOtpCode")?.focus();
+    } catch (error) {
+      setText("whatsappOtpStatus", error?.message || "WhatsApp could not send the code.");
+    }
+  }
+  async function verifyWhatsAppOtp() {
+    const code = String(byId("whatsappOtpCode")?.value || "").replace(/\D/g, "");
+    if (!functions || !whatsappOtpChallengeId) { setText("whatsappOtpStatus", otpText("otp.expired", "This code expired. Request a new one.")); return; }
+    if (code.length !== 6) { setText("whatsappOtpStatus", otpText("otp.enterCode", "Enter the 6-digit code.")); return; }
+    try {
+      setText("whatsappOtpStatus", otpText("otp.verifying", "Verifying code…"));
+      const response = await functions.httpsCallable("verifyWhatsAppOtp")({phone: whatsappOtpPhone, code, challengeId: whatsappOtpChallengeId});
+      await auth.signInWithCustomToken(response.data.customToken);
+      clearInterval(whatsappOtpTimer);
+      whatsappOtpTimer = null;
+      whatsappOtpChallengeId = "";
+      setText("whatsappOtpStatus", otpText("otp.verified", "Verified. You are signed in."));
+    } catch (error) {
+      const message = error?.message || "The code could not be verified.";
+      setText("whatsappOtpStatus", message);
+      if (/cannot be used|expired|Too many/i.test(message)) { whatsappOtpChallengeId = ""; whatsappOtpExpiresAt = 0; }
     }
   }
   function showSmsOtpPanel() {
     byId("smsOtpPanel")?.classList.remove("hidden");
-    populatePhoneCountrySelect();
     setupPhoneAuth();
     setStatus("Enter your phone number, then send the SMS OTP.");
   }
   function setupPhoneAuth() {
-    populatePhoneCountrySelect();
     if (!byId("recaptcha-container") || window.recaptchaVerifier) return;
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {size:"normal"});
   }
@@ -4386,7 +4449,6 @@
 
 
   document.addEventListener("DOMContentLoaded", function(){
-    populatePhoneCountrySelect();
     window.FLOQRAdCampaigns?.loadFirestoreSpotAds?.(db).catch(() => {});
     detectRenderContext();
     window.FLOQRI18n?.init?.({}).then(() => window.FLOQRI18n?.applyDom?.()).catch(() => {});
@@ -4410,7 +4472,7 @@
       resetUserLocationContext();
       if (byId("listingPage")?.classList.contains("active")) renderGrid();
     });
-    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
+    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showWhatsAppOtpBtn", showWhatsAppOtpPanel); bind("requestWhatsAppOtpBtn", requestWhatsAppOtp); bind("verifyWhatsAppOtpBtn", verifyWhatsAppOtp); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
     bind("dropdownSignInBtn", () => {
       byId("userDropdown")?.classList.add("hidden");
       showPage("landingPage");

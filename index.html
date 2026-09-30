@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.0.105"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.107"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -41,10 +41,9 @@
           data-i18n="app.welcome"
           data-floqr-help-id="help-welcome"
           data-floqr-help-title="Welcome to FLOQR"
-          data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout"
-          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family."
+          data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout|what is otp|one time password|how does otp work|whatsapp otp|sms otp|sign in code"
+          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, to WhatsApp (worldwide), or by SMS (US numbers only). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
         >Welcome</h2>
-        <p class="sub small"><a href="./privacy.html?v=s3.0.103">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.103#do-not-sell">Do Not Sell or Share</a></p>
         <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
 
         <div id="signedInActions" class="hidden">
@@ -79,68 +78,94 @@
             <p id="emailOtpStatus" class="status" aria-live="polite">Codes expire 6 minutes after delivery.</p>
           </div>
 
-          <div class="divider"><span>Or use One Time Password (OTP) via SMS</span></div>
-          <button id="showSmsOtpBtn" class="signin sms" type="button">Continue with SMS OTP</button>
+          <button id="showWhatsAppOtpBtn" class="signin whatsapp" type="button" data-i18n="app.whatsappOtp" aria-controls="whatsappOtpPanel" aria-expanded="false"><span class="icon wa-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3z"/><path fill="#25d366" d="M16 5.3a10.7 10.7 0 0 0-9.1 16.3l.3.4-1.1 4 4.1-1.1.4.2A10.7 10.7 0 1 0 16 5.3z"/><path fill="#fff" d="M12.2 9.6c-.3-.6-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4.1 6.4 5.6 3.2 1.2 3.8 1 4.5.9.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5l-2.4-1.2c-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.5-.6-2.9-1.8-1.1-1-1.8-2.1-2-2.5-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7z"/></svg></span>Continue with WhatsApp OTP (Worldwide)</button>
+          <div id="whatsappOtpPanel" class="sms-otp-panel hidden" aria-hidden="true">
+            <p class="sub small" data-i18n="otp.whatsappNote">FLOQR sends one sign-in code to this WhatsApp number. It expires in 5 minutes.</p>
+            <div class="phone-row sms-number-row">
+              <label data-i18n="otp.countryCode">Country code
+                <select id="whatsappCountryCode" autocomplete="tel-country-code">
+                  <option value="+1">United States / Canada (+1)</option>
+                  <option value="+44">United Kingdom (+44)</option>
+                  <option value="+234">Nigeria (+234)</option>
+                  <option value="+34">Spain (+34)</option>
+                  <option value="+33">France (+33)</option>
+                  <option value="+49">Germany (+49)</option>
+                  <option value="+39">Italy (+39)</option>
+                  <option value="+971">United Arab Emirates (+971)</option>
+                  <option value="+52">Mexico (+52)</option>
+                  <option value="+55">Brazil (+55)</option>
+                  <option value="+91">India (+91)</option>
+                  <option value="+81">Japan (+81)</option>
+                  <option value="+61">Australia (+61)</option>
+                  <option value="+27">South Africa (+27)</option>
+                  <option value="+233">Ghana (+233)</option>
+                  <option value="+254">Kenya (+254)</option>
+                  <option value="+86">China (+86)</option>
+                  <option value="+82">South Korea (+82)</option>
+                  <option value="+65">Singapore (+65)</option>
+                  <option value="+60">Malaysia (+60)</option>
+                  <option value="+63">Philippines (+63)</option>
+                  <option value="+62">Indonesia (+62)</option>
+                  <option value="+66">Thailand (+66)</option>
+                  <option value="+31">Netherlands (+31)</option>
+                  <option value="+32">Belgium (+32)</option>
+                  <option value="+41">Switzerland (+41)</option>
+                  <option value="+46">Sweden (+46)</option>
+                  <option value="+47">Norway (+47)</option>
+                  <option value="+45">Denmark (+45)</option>
+                  <option value="+353">Ireland (+353)</option>
+                  <option value="+351">Portugal (+351)</option>
+                  <option value="+30">Greece (+30)</option>
+                  <option value="+48">Poland (+48)</option>
+                  <option value="+7">Russia (+7)</option>
+                  <option value="+377">Monaco (+377)</option>
+                  <option value="+90">Turkey (+90)</option>
+                  <option value="+972">Israel (+972)</option>
+                  <option value="+20">Egypt (+20)</option>
+                  <option value="+212">Morocco (+212)</option>
+                  <option value="+966">Saudi Arabia (+966)</option>
+                  <option value="+54">Argentina (+54)</option>
+                  <option value="+56">Chile (+56)</option>
+                  <option value="+57">Colombia (+57)</option>
+                  <option value="+51">Peru (+51)</option>
+                </select>
+              </label>
+              <label data-i18n="otp.phoneNumber">Phone number
+                <input id="whatsappNationalNumber" inputmode="tel" autocomplete="tel-national" placeholder="612345678"/>
+              </label>
+              <button id="requestWhatsAppOtpBtn" class="signin whatsapp phone" type="button" data-i18n="otp.sendWhatsapp">Send WhatsApp code</button>
+            </div>
+            <label data-i18n="otp.code">Verification code
+              <input id="whatsappOtpCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"/>
+            </label>
+            <button id="verifyWhatsAppOtpBtn" class="primary full" type="button" data-i18n="otp.verify">Verify and Continue</button>
+            <p id="whatsappOtpStatus" class="status" aria-live="polite"></p>
+          </div>
+
+          <button id="showSmsOtpBtn" class="signin sms" type="button" data-i18n="app.smsOtp">Continue with SMS OTP (US Only)</button>
           <div id="smsOtpPanel" class="sms-otp-panel hidden">
+          <p class="sub small" data-i18n="otp.smsUsOnly">SMS codes go to US numbers (+1) only. Outside the US, use WhatsApp OTP.</p>
           <div class="phone-row sms-number-row">
-            <label>Country code
+            <label data-i18n="otp.countryCode">Country code
               <select id="phoneCountryCode" autocomplete="tel-country-code">
-                <option value="+1">United States / Canada (+1)</option>
-                <option value="+44">United Kingdom (+44)</option>
-                <option value="+234">Nigeria (+234)</option>
-                <option value="+34">Spain (+34)</option>
-                <option value="+33">France (+33)</option>
-                <option value="+49">Germany (+49)</option>
-                <option value="+39">Italy (+39)</option>
-                <option value="+971">United Arab Emirates (+971)</option>
-                <option value="+52">Mexico (+52)</option>
-                <option value="+55">Brazil (+55)</option>
-                <option value="+91">India (+91)</option>
-                <option value="+81">Japan (+81)</option>
-                <option value="+61">Australia (+61)</option>
-                <option value="+27">South Africa (+27)</option>
-                <option value="+233">Ghana (+233)</option>
-                <option value="+254">Kenya (+254)</option>
-                <option value="+86">China (+86)</option>
-                <option value="+82">South Korea (+82)</option>
-                <option value="+65">Singapore (+65)</option>
-                <option value="+60">Malaysia (+60)</option>
-                <option value="+63">Philippines (+63)</option>
-                <option value="+62">Indonesia (+62)</option>
-                <option value="+66">Thailand (+66)</option>
-                <option value="+31">Netherlands (+31)</option>
-                <option value="+32">Belgium (+32)</option>
-                <option value="+41">Switzerland (+41)</option>
-                <option value="+46">Sweden (+46)</option>
-                <option value="+47">Norway (+47)</option>
-                <option value="+45">Denmark (+45)</option>
-                <option value="+353">Ireland (+353)</option>
-                <option value="+351">Portugal (+351)</option>
-                <option value="+30">Greece (+30)</option>
-                <option value="+90">Turkey (+90)</option>
-                <option value="+972">Israel (+972)</option>
-                <option value="+20">Egypt (+20)</option>
-                <option value="+212">Morocco (+212)</option>
-                <option value="+54">Argentina (+54)</option>
-                <option value="+56">Chile (+56)</option>
-                <option value="+57">Colombia (+57)</option>
-                <option value="+51">Peru (+51)</option>
+                <option value="+1">United States (+1)</option>
               </select>
             </label>
-            <label>Phone number
+            <label data-i18n="otp.phoneNumber">Phone number
               <input id="phoneNationalNumber" placeholder="2025550123" autocomplete="tel-national"/>
             </label>
             <input id="phoneNumber" type="hidden"/>
-            <button id="sendOtpBtn" class="signin sms phone" type="button">Send OTP</button>
+            <button id="sendOtpBtn" class="signin sms phone" type="button" data-i18n="otp.sendSms">Send OTP</button>
           </div>
           <div id="recaptcha-container"></div>
           <div id="phoneCodeBlock" class="hidden">
-            <label class="compact-label">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
-            <button id="verifyOtpBtn" class="signin sms phone verify" type="button">Verify OTP</button>
+            <label class="compact-label" data-i18n="otp.code">Verification code<input id="phoneCode" placeholder="123456" autocomplete="one-time-code"/></label>
+            <button id="verifyOtpBtn" class="signin sms phone verify" type="button" data-i18n="otp.verifySms">Verify OTP</button>
           </div>
           </div>
         </div>
         <p id="authStatus" class="status"></p>
+        <p class="login-legal"><a href="./privacy.html?v=s3.0.107" data-i18n="app.privacyPolicy">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.107#do-not-sell" data-i18n="app.doNotSell">Do Not Sell or Share</a></p>
       </div>
     </div>
   </section>
@@ -729,10 +754,10 @@
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
-<script src="./floqr-i18n.js?v=s3.0.106"></script>
+<script src="./floqr-i18n.js?v=s3.0.107"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.0.106"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.106"></script>
+<script src="./floqai-help-repository.js?v=s3.0.107"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.107"></script>
 <script src="./floqr-venue-query.js?v=s3.0.106"></script>
 <script src="./intent-search.js?v=s3.0.105"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
@@ -765,7 +790,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.106"></script>
+<script src="./patron-app.js?v=s3.0.107"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

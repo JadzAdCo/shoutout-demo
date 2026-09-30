@@ -1,0 +1,57 @@
+---
+description: WhatsApp OTP sign-in (Twilio), SMS OTP US-only, Welcome card order, OTP compliance logging, Twilio/Meta template requirements
+alwaysApply: false
+---
+
+# WhatsApp OTP sign-in (s3.0.107)
+
+Resume: `@whatsapp-otp$` / `$wa-otp$`.
+
+## Welcome card contract (`index.html#landingPage`)
+
+Order: Google → Microsoft → Facebook → Email → **Continue with WhatsApp OTP (Worldwide)** → **Continue with SMS OTP (US Only)** → `#authStatus` → `.login-legal` (Privacy Policy · Do Not Sell or Share, white, last line of the card).
+
+- No "Or use One Time Password (OTP) via SMS" divider.
+- SMS panel country select = `+1 United States` only (Firebase phone auth + reCAPTCHA; unchanged backend).
+- WhatsApp panel owns the full country list.
+- OTP explanation lives in the Welcome `?` (`help-welcome`) — EN in `index.html` + `floqai-help-repository.js` + `scripts/_help-en.json`, 10 locales in `floqr-i18n-help.js`.
+- Chrome keys: `app.whatsappOtp`, `app.smsOtp`, `app.privacyPolicy`, `app.doNotSell`, `otp.*` (all 11 packs).
+
+## Backend (`functions/whatsapp-otp-functions.js`, pure helpers `whatsapp-otp-core.js`)
+
+| Callable | Does |
+|---|---|
+| `requestWhatsAppOtp({phone})` | E.164 check → per-IP limit (`otpRateLimits`, 12/h) → per-phone challenge (`whatsappOtpChallenges/{sha256}`, 60 s cooldown, 5/h) → HMAC code hash (pepper `CLUB_AUTH_CODE_PEPPER`) → Twilio Messages API to `whatsapp:+…` → poll message status ~5 s → fail loudly on `failed/undelivered` (challenge voided) |
+| `verifyWhatsAppOtp({phone, code, challengeId})` | Transaction: not used/voided, not expired (5 min), attempts < 5, constant-time hash compare → delete hash → `getUserByPhoneNumber` or `createUser({phoneNumber})` → custom token `{whatsappOtp: true}` |
+
+Same phone = same Firebase uid as SMS phone auth.
+
+Sender: `TWILIO_WHATSAPP_FROM` secret (fallback `TWILIO_FROM_NUMBER`). Credentials: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`.
+
+### Meta / Twilio requirement (production)
+
+Business-initiated WhatsApp outside a 24 h customer session **requires an approved template**. OTP must use the **Authentication** category (copy-code button).
+
+1. Twilio Console → Messaging → Senders → WhatsApp: register FLOQR's WhatsApp Business sender (not the sandbox).
+2. Content Template Builder → type **WhatsApp Authentication**, variable `{{1}}` = code → submit for Meta approval.
+3. Put the `HX…` Content SID in `functions/.env` as `TWILIO_WHATSAPP_OTP_CONTENT_SID=HX…` (param, not a secret) and redeploy the two callables.
+
+Without the Content SID the callable sends a free-form body — works only in the Twilio sandbox (recipient sent the join word) or inside a 24 h session. Twilio error `63016` = template required; `63015` = sandbox join missing; `63007` = sender not WhatsApp-enabled. `explainWhatsAppError` maps these to patron copy.
+
+## Compliance logging
+
+All via `functions/twilio-log.js` with `forceSecurity: true` (every row also lands in `twilioComplianceLogs`, 7-year retention):
+
+| purpose | collection | when |
+|---|---|---|
+| `auth-otp` | `twilioWhatsAppLogs` | Twilio accept / reject (body = code redacted, or `[WhatsApp template HX…]`) |
+| `auth-otp-status` | `twilioWhatsAppLogs` | Polled delivery status + Twilio error code |
+| `auth-otp-verify` | `twilioFeatureLogs` | `verified` / `rejected` / `expired` / `locked` (+ `actorUid` on success) |
+
+Every row carries `extra.consent = {type: "user-initiated", surface, notice: "otp.whatsappNote"}`. Phones are masked + hashed; codes never stored in clear (`redactSecrets` masks 6-digit runs). Master Admin → Twilio tabs show them.
+
+## FIX PROMPT
+
+```
+WhatsApp OTP: Welcome order Google/Microsoft/Facebook/Email/WhatsApp (Worldwide)/SMS (US Only), privacy links white at the bottom, no OTP divider. requestWhatsAppOtp/verifyWhatsAppOtp via Twilio Messages API; forceSecurity compliance rows for auth-otp, auth-otp-status, auth-otp-verify. Production needs TWILIO_WHATSAPP_OTP_CONTENT_SID (approved Authentication template). Design notes: design-notes-whatsapp-otp.mdc
+```

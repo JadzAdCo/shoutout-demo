@@ -12,7 +12,7 @@
       },
       "help-welcome": {
         title: "Добро пожаловать в FLOQR",
-        body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй."
+        body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй. Войдите через Google, Microsoft, Facebook или с помощью одноразового пароля (OTP). OTP — это короткий код, который FLOQR отправляет на вашу почту, в WhatsApp (по всему миру) или по SMS (только номера США). Введите код в течение нескольких минут, чтобы войти, — пароль запоминать не нужно. Каждый код действует только один раз. Никому не сообщайте свой код."
       },
       "help-ad-campaigns": {
         title: "Рекламные кампании",
@@ -190,7 +190,7 @@
       },
       "help-welcome": {
         title: "Welkom bij FLOQR",
-        body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie."
+        body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie. Log in met Google, Microsoft, Facebook of een eenmalig wachtwoord (OTP). Een OTP is een korte code die FLOQR naar je e-mail, via WhatsApp (wereldwijd) of per SMS (alleen Amerikaanse nummers) stuurt. Typ de code binnen een paar minuten om in te loggen — geen wachtwoord om te onthouden. Elke code werkt maar één keer. Deel je code nooit met iemand."
       },
       "help-ad-campaigns": {
         title: "Advertentiecampagnes",
@@ -368,7 +368,7 @@
       },
       "help-welcome": {
         title: "Bienvenue sur FLOQR",
-        body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille."
+        body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille. Connectez-vous avec Google, Microsoft, Facebook ou un mot de passe à usage unique (OTP). Un OTP est un code court que FLOQR envoie à votre e-mail, sur WhatsApp (monde entier) ou par SMS (numéros américains uniquement). Saisissez le code en quelques minutes pour vous connecter — aucun mot de passe à retenir. Chaque code ne fonctionne qu'une fois. Ne partagez jamais votre code."
       },
       "help-ad-campaigns": {
         title: "Campagnes publicitaires",
@@ -546,7 +546,7 @@
       },
       "help-welcome": {
         title: "Willkommen bei FLOQR",
-        body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie."
+        body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie. Melde dich mit Google, Microsoft, Facebook oder einem Einmalpasswort (OTP) an. Ein OTP ist ein kurzer Code, den FLOQR an deine E-Mail, per WhatsApp (weltweit) oder per SMS (nur US-Nummern) sendet. Gib den Code innerhalb weniger Minuten ein, um dich anzumelden — kein Passwort nötig. Jeder Code funktioniert nur einmal. Teile deinen Code niemals mit anderen."
       },
       "help-ad-campaigns": {
         title: "Werbekampagnen",
@@ -724,7 +724,7 @@
       },
       "help-welcome": {
         title: "Bienvenido a FLOQR",
-        body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia."
+        body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia. Inicia sesión con Google, Microsoft, Facebook o una contraseña de un solo uso (OTP). Un OTP es un código corto que FLOQR envía a tu correo, por WhatsApp (todo el mundo) o por SMS (solo números de EE. UU.). Escribe el código en pocos minutos para iniciar sesión, sin contraseña que recordar. Cada código funciona una sola vez. Nunca compartas tu código."
       },
       "help-ad-campaigns": {
         title: "Campañas publicitarias",
@@ -902,7 +902,7 @@
       },
       "help-welcome": {
         title: "Benvenuto su FLOQR",
-        body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari."
+        body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari. Accedi con Google, Microsoft, Facebook o una password monouso (OTP). Un OTP è un codice breve che FLOQR invia alla tua email, su WhatsApp (in tutto il mondo) o via SMS (solo numeri USA). Inserisci il codice entro pochi minuti per accedere, senza password da ricordare. Ogni codice funziona una sola volta. Non condividere mai il tuo codice."
       },
       "help-ad-campaigns": {
         title: "Campagne pubblicitarie",
@@ -1080,7 +1080,7 @@
       },
       "help-welcome": {
         title: "Bem-vindo ao FLOQR",
-        body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família."
+        body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família. Entre com Google, Microsoft, Facebook ou uma senha de uso único (OTP). Um OTP é um código curto que o FLOQR envia para o seu e-mail, pelo WhatsApp (mundial) ou por SMS (apenas números dos EUA). Digite o código em poucos minutos para entrar — sem senha para lembrar. Cada código funciona só uma vez. Nunca compartilhe o seu código."
       },
       "help-ad-campaigns": {
         title: "Campanhas publicitárias",
@@ -1258,7 +1258,7 @@
       },
       "help-welcome": {
         title: "Καλώς ήρθατε στο FLOQR",
-        body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια."
+        body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια. Συνδεθείτε με Google, Microsoft, Facebook ή με κωδικό μίας χρήσης (OTP). Το OTP είναι ένας σύντομος κωδικός που στέλνει το FLOQR στο email σας, στο WhatsApp (παγκοσμίως) ή με SMS (μόνο αριθμοί ΗΠΑ). Πληκτρολογήστε τον κωδικό μέσα σε λίγα λεπτά για να συνδεθείτε — χωρίς κωδικό πρόσβασης να θυμάστε. Κάθε κωδικός λειτουργεί μόνο μία φορά. Μην κοινοποιείτε ποτέ τον κωδικό σας."
       },
       "help-ad-campaigns": {
         title: "Διαφημιστικές καμπάνιες",
@@ -1436,7 +1436,7 @@
       },
       "help-welcome": {
         title: "Witamy w FLOQR",
-        body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną."
+        body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną. Zaloguj się przez Google, Microsoft, Facebook lub hasłem jednorazowym (OTP). OTP to krótki kod, który FLOQR wysyła na Twój e-mail, przez WhatsApp (cały świat) lub SMS-em (tylko numery z USA). Wpisz kod w ciągu kilku minut, aby się zalogować — bez hasła do zapamiętania. Każdy kod działa tylko raz. Nigdy nikomu nie udostępniaj swojego kodu."
       },
       "help-ad-campaigns": {
         title: "Kampanie reklamowe",
@@ -1614,7 +1614,7 @@
       },
       "help-welcome": {
         title: "مرحباً بك في FLOQR",
-        body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة."
+        body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة. سجّل الدخول عبر Google أو Microsoft أو Facebook أو بكلمة مرور لمرة واحدة (OTP). رمز OTP هو رمز قصير يرسله FLOQR إلى بريدك الإلكتروني أو عبر WhatsApp (عالمياً) أو عبر SMS (للأرقام الأمريكية فقط). اكتب الرمز خلال دقائق قليلة لتسجيل الدخول، دون الحاجة إلى تذكّر كلمة مرور. كل رمز يعمل مرة واحدة فقط. لا تشارك رمزك مع أي شخص."
       },
       "help-ad-campaigns": {
         title: "حملات إعلانية",

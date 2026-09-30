@@ -147,7 +147,8 @@ async function writeTwilioLog({
   tlsProtocol = "",
   requestHeaders = {},
   responseHeaders = {},
-  extra = {}
+  extra = {},
+  forceSecurity = false
 } = {}) {
   const feat = featureOf(channel, feature);
   const collection = collectionFor(feat);
@@ -158,7 +159,8 @@ async function writeTwilioLog({
   const toHash = hashPhone(to);
   const fromHash = hashPhone(from);
   const safeBody = redactSecrets(stripPci(body));
-  const securityRelevant = isSecurityRelevant({status, error, errorCode, dryRun});
+  // Authentication events (OTP send / verify) always get a GRC row, even on success.
+  const securityRelevant = forceSecurity === true || isSecurityRelevant({status, error, errorCode, dryRun});
 
   const row = {
     logClass: securityRelevant ? "security" : "operational",
@@ -281,13 +283,20 @@ async function sendTwilioMessagesApi({
   actorUid = "",
   actorEmail = "",
   describeInvalidSid = null,
-  explainError = null
+  explainError = null,
+  contentSid = "",
+  contentVariables = "",
+  forceSecurity = false,
+  extra = {}
 } = {}) {
   const sid = text(accountSid, 80);
   const token = text(authToken, 200);
   const destination = text(to, 40);
   const fromAddr = text(from, 40);
   const accountSidLast4 = sid ? sid.slice(-4) : "";
+  const template = text(contentSid, 40);
+  const logBody = template ? `[WhatsApp template ${template}]` : body;
+  const logMeta = {forceSecurity, extra: {...extra, ...(template ? {contentSid: template} : {})}};
 
   if (!sid || !token || !destination || !fromAddr) {
     const log = await writeTwilioLog({
@@ -303,12 +312,13 @@ async function sendTwilioMessagesApi({
       actorEmail,
       to: destination,
       from: fromAddr,
-      body,
+      body: logBody,
       status: "dry-run",
       sendOk: false,
       dryRun: true,
       accountSidLast4,
-      error: "Twilio credentials or From/To missing — dry-run (no message sent)."
+      error: "Twilio credentials or From/To missing — dry-run (no message sent).",
+      ...logMeta
     });
     return {ok: false, dryRun: true, status: "dry-run", error: "Twilio credentials or From/To missing.", ...log};
   }
@@ -330,23 +340,22 @@ async function sendTwilioMessagesApi({
       actorEmail,
       to: destination,
       from: fromAddr,
-      body,
+      body: logBody,
       status: "invalid-sid",
       sendOk: false,
       dryRun: false,
       accountSidLast4,
       error,
-      errorCode: "20003"
+      errorCode: "20003",
+      ...logMeta
     });
     return {ok: false, dryRun: false, status: "invalid-sid", error, ...log};
   }
 
   const path = `/2010-04-01/Accounts/${encodeURIComponent(sid)}/Messages.json`;
-  const params = new URLSearchParams({
-    To: destination,
-    From: fromAddr,
-    Body: String(body || "").slice(0, 1500)
-  });
+  const params = new URLSearchParams(template
+    ? {To: destination, From: fromAddr, ContentSid: template, ContentVariables: String(contentVariables || "{}")}
+    : {To: destination, From: fromAddr, Body: String(body || "").slice(0, 1500)});
   const auth = Buffer.from(`${sid}:${token}`).toString("base64");
 
   try {
@@ -373,7 +382,7 @@ async function sendTwilioMessagesApi({
         actorEmail,
         to: destination,
         from: fromAddr,
-        body,
+        body: logBody,
         status: "failed",
         sendOk: false,
         dryRun: false,
@@ -383,9 +392,11 @@ async function sendTwilioMessagesApi({
         errorCode: text(String(payload.code || payload.error_code || ""), 40),
         tlsProtocol,
         requestHeaders: {host: TWILIO_HOST, path, "content-type": "application/x-www-form-urlencoded", "tls-min": TLS_MIN},
-        responseHeaders: {status: String(response.status)}
+        responseHeaders: {status: String(response.status)},
+        ...logMeta
       });
-      return {ok: false, dryRun: false, status: "failed", error, httpStatus: response.status, ...log};
+      const errorCode = text(String(payload.code || payload.error_code || ""), 40);
+      return {ok: false, dryRun: false, status: "failed", error, errorCode, httpStatus: response.status, ...log};
     }
 
     const providerSid = text(payload.sid, 80);
@@ -402,7 +413,7 @@ async function sendTwilioMessagesApi({
       actorEmail,
       to: destination,
       from: fromAddr,
-      body,
+      body: logBody,
       status: "sent",
       sendOk: true,
       dryRun: false,
@@ -411,7 +422,8 @@ async function sendTwilioMessagesApi({
       accountSidLast4,
       tlsProtocol,
       requestHeaders: {host: TWILIO_HOST, path, "content-type": "application/x-www-form-urlencoded", "tls-min": TLS_MIN},
-      responseHeaders: {status: String(response.status)}
+      responseHeaders: {status: String(response.status)},
+      ...logMeta
     });
     return {ok: true, dryRun: false, status: "sent", sid: providerSid, ...log};
   } catch (err) {
@@ -429,32 +441,58 @@ async function sendTwilioMessagesApi({
       actorEmail,
       to: destination,
       from: fromAddr,
-      body,
+      body: logBody,
       status: "failed",
       sendOk: false,
       dryRun: false,
       accountSidLast4,
-      error: message
+      error: message,
+      ...logMeta
     });
     return {ok: false, dryRun: false, status: "failed", error: message, ...log};
   }
 }
 
-function twilioHttpsForm({path, authHeader, body, timeoutMs = 20000}) {
+/** GET a Message resource to read delivery status (queued → sent → delivered | failed/undelivered). */
+async function fetchTwilioMessage({accountSid, authToken, messageSid}) {
+  const sid = text(accountSid, 80);
+  const token = text(authToken, 200);
+  const msgSid = text(messageSid, 80);
+  if (!sid || !token || !/^(SM|MM)[0-9a-f]{32}$/i.test(msgSid)) return {ok: false, status: "", errorCode: "", error: "missing message sid"};
+  const path = `/2010-04-01/Accounts/${encodeURIComponent(sid)}/Messages/${encodeURIComponent(msgSid)}.json`;
+  try {
+    const {response, payload} = await twilioHttpsForm({
+      path,
+      method: "GET",
+      authHeader: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+      body: "",
+      timeoutMs: 8000
+    });
+    return {
+      ok: response.ok,
+      status: text(payload.status, 40).toLowerCase(),
+      errorCode: payload.error_code == null ? "" : text(String(payload.error_code), 40),
+      error: text(payload.error_message || (response.ok ? "" : payload.message), 300)
+    };
+  } catch (err) {
+    return {ok: false, status: "", errorCode: "", error: text(err?.message || err, 300)};
+  }
+}
+
+function twilioHttpsForm({path, authHeader, body, method = "POST", timeoutMs = 20000}) {
   return new Promise((resolve, reject) => {
     const data = Buffer.from(body || "", "utf8");
+    const headers = method === "GET"
+      ? {authorization: authHeader}
+      : {authorization: authHeader, "content-type": "application/x-www-form-urlencoded", "content-length": data.length};
     const req = https.request({
       hostname: TWILIO_HOST,
       path,
-      method: "POST",
+      method,
       minVersion: TLS_MIN,
       servername: TWILIO_HOST,
       timeout: timeoutMs,
-      headers: {
-        authorization: authHeader,
-        "content-type": "application/x-www-form-urlencoded",
-        "content-length": data.length
-      }
+      headers
     }, (res) => {
       const chunks = [];
       res.on("data", (c) => chunks.push(c));
@@ -473,7 +511,7 @@ function twilioHttpsForm({path, authHeader, body, timeoutMs = 20000}) {
     req.on("timeout", () => {
       req.destroy(new Error("Twilio request timed out"));
     });
-    req.write(data);
+    if (method !== "GET") req.write(data);
     req.end();
   });
 }
@@ -489,6 +527,7 @@ module.exports = {
   isSecurityRelevant,
   writeTwilioLog,
   sendTwilioMessagesApi,
+  fetchTwilioMessage,
   featureOf,
   collectionFor
 };
