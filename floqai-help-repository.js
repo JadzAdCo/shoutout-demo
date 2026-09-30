@@ -904,7 +904,7 @@
     {
       id: "help-welcome",
       title: "Welcome to FLOQR",
-      body: "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, to WhatsApp (worldwide), or by SMS (US numbers only). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",
+      body: "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone.",
       searchPhrases: [
         "welcome", "what is floqr", "what can i do on floqr", "about floqr",
         "book nightlife", "send a live shoutout", "mingl with friends",
@@ -939,7 +939,7 @@
     {
       id: "help-beta-tester",
       title: "Beta testing",
-      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Beta features then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
+      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
       searchPhrases: [
         "beta", "beta tester", "beta testing", "become a beta tester", "test new features", "early access",
         "beta invite", "beta invitation", "try new features", "beta label", "why can't i see mingl", "feature not available"
@@ -955,7 +955,7 @@
     {
       id: "help-features-services",
       title: "Features & Services",
-      body: "Turn each Search link button on or off. Live (IsFeatureEnabled = 1) shows the button to every patron. Test (IsTestFeature = 1) shows it only to Master Admins and active beta testers, marked Beta. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Use Beta testers to invite patrons; they accept from their Inbox link. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",
+      body: "Each feature has two switches. IsFeatureEnabled = 0 turns the feature off for everyone, including beta testers and the Open link on this page. With IsFeatureEnabled = 1 and IsTestFeature = 0, every patron sees the Search link button. With IsFeatureEnabled = 1 and IsTestFeature = 1, the feature is in testing: only beta testers you granted that feature see it on Search, marked Beta, and Master Admins open it from the Open link on this page instead of Search. Master Admins cannot be beta testers. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",
       searchPhrases: [
         "features and services", "feature flags", "enable feature", "disable feature", "test feature", "beta testers",
         "invite beta tester", "IsFeatureEnabled", "IsTestFeature", "promote test to live", "feature audit trail"

@@ -6,7 +6,7 @@
   const SIGNED_OUT_EMBED =
     "You're signed in on FLOQR My Profile — restoring that session here. If this stays blank, refresh My Profile (not Google on this panel).";
   const SIGNED_OUT_STANDALONE =
-    "Sign in with the same FLOQR account you use on Search / My Profile (email, phone, or Google). This page shares that session.";
+    "Opening the FLOQR sign-in page. After you sign in, you come straight back here.";
 
   function params() {
     try {
@@ -58,6 +58,30 @@
     return `${next.pathname}${next.search}`;
   }
 
+  function isLoginOrPublicPage() {
+    const file = String(location.pathname || "").split("/").pop() || "index.html";
+    if (/^(?:index|display2?|display-error|privacy|translation-policy|auth-debug)\.html$/i.test(file)) return true;
+    return document.body?.hasAttribute("data-floqr-public") === true;
+  }
+
+  /** General FLOQR sign-in (Search Welcome card: every provider + OTP). Returns here after sign-in. */
+  function loginHref() {
+    const file = String(location.pathname || "").split("/").pop() || "index.html";
+    const q = new URLSearchParams();
+    const v = root.FLOQRNav?.appVersion || params().get("v") || "";
+    if (v) q.set("v", v);
+    q.set("profileRequired", "sign-in");
+    q.set("returnTo", `${file}${location.search}${location.hash}`);
+    return `./?${q.toString()}`;
+  }
+
+  /** Standalone only: an iframe must never navigate itself to the sign-in page. */
+  function redirectToLogin() {
+    if (isEmbedded() || isLoginOrPublicPage()) return false;
+    location.replace(loginHref());
+    return true;
+  }
+
   function popupBlocked(statusEl) {
     if (!isEmbedded()) return false;
     setStatus(statusEl, "Sign in on My Profile & Settings first. Google popups are not used inside this panel.");
@@ -96,8 +120,9 @@
       }
       setStatus(statusEl, SIGNED_OUT_EMBED);
     } else {
+      // Standalone pages hand off to the general sign-in (every provider + OTP), never a page-local Google button.
       setHidden(chrome, false);
-      setHidden(loginButtons, false);
+      setHidden(loginButtons, true);
       setStatus(statusEl, SIGNED_OUT_STANDALONE);
     }
   }
@@ -139,14 +164,14 @@
     if (!auth) return {embedded: isEmbedded(), ready: Promise.resolve(null)};
     applyEmbedChrome();
     setStatus(options.statusEl, options.restoringMessage || "Restoring your FLOQR session…");
-    paintAuthChrome({
-      chrome: options.chrome,
-      loginButtons: options.loginButtons,
-      statusEl: options.statusEl,
-      user: auth.currentUser
-    });
+    if (auth.currentUser) {
+      paintAuthChrome({chrome: options.chrome, loginButtons: options.loginButtons, statusEl: options.statusEl, user: auth.currentUser});
+    } else {
+      setHidden(options.loginButtons, true);
+    }
 
-    const ready = waitForUser(auth).then(user => {
+    const ready = waitForUser(auth, {timeoutMs: 15000}).then(user => {
+      if (!user && redirectToLogin()) return null;
       paintAuthChrome({
         chrome: options.chrome,
         loginButtons: options.loginButtons,
@@ -170,12 +195,43 @@
     return {embedded: isEmbedded(), ready, isEmbedded, waitForUser: () => waitForUser(auth)};
   }
 
+  const APP_WAIT_MS = 4000;
+
+  function waitForFirebaseApp() {
+    return new Promise(resolve => {
+      const started = Date.now();
+      (function poll() {
+        const fb = root.firebase;
+        if (fb?.apps?.length && typeof fb.auth === "function") return resolve(fb.auth());
+        if (Date.now() - started > APP_WAIT_MS) return resolve(null);
+        setTimeout(poll, 100);
+      })();
+    });
+  }
+
+  /** Every satellite that loads this file requires a FLOQR session, even if the page never calls bind(). */
+  async function requireSignIn() {
+    if (isEmbedded() || isLoginOrPublicPage()) return;
+    const auth = await waitForFirebaseApp();
+    if (!auth) return;
+    const user = await waitForUser(auth, {timeoutMs: 15000});
+    if (!user) redirectToLogin();
+  }
+
+  if (typeof document !== "undefined" && typeof location !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", requireSignIn);
+    else setTimeout(requireSignIn, 0);
+  }
+
   root.FLOQRSessionShell = {
     isEmbedded,
     waitForUser,
     bind,
     applyEmbedChrome,
     portalSignInHref,
-    popupBlocked
+    popupBlocked,
+    loginHref,
+    redirectToLogin,
+    requireSignIn
   };
 })(typeof window !== "undefined" ? window : globalThis);

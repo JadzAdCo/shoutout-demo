@@ -448,6 +448,10 @@ service cloud.firestore {
  allow write: if false;
  }
 
+ match /featureServiceAccessThrottle/{uid} {
+ allow read, write: if false;
+ }
+
  match /clubLocationAliases/{aliasId} {
  allow read: if true;
  allow write: if signedIn();

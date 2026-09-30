@@ -169,7 +169,7 @@
   },
   "help-welcome": {
     "title": "Welcome to FLOQR",
-    "body": "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, to WhatsApp (worldwide), or by SMS (US numbers only). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
+    "body": "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family. Sign in with Google, Microsoft, Facebook, or a One Time Password (OTP). An OTP is a short code FLOQR sends to your email, by SMS (US and Canadian numbers only), or to WhatsApp (worldwide). Type the code within a few minutes to sign in — no password to remember. Each code works only once. Never share your code with anyone."
   },
   "help-location-search": {
     "title": "Location-aware search",
@@ -177,6 +177,6 @@
   },
   "help-beta-tester": {
     "title": "Beta testing",
-    "body": "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Beta features then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to."
+    "body": "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to."
   }
 }

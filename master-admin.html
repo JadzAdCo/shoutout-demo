@@ -988,9 +988,9 @@
             data-floqr-help-id="help-features-services"
             data-floqr-help-title="Features & Services"
             data-floqr-help-search="features and services|feature flags|enable feature|disable feature|test feature|beta tester|beta testers|IsFeatureEnabled|IsTestFeature|promote test to live"
-            data-floqr-help-body="Turn each Search link button on or off. Live (IsFeatureEnabled = 1) shows the button to every patron. Test (IsTestFeature = 1) shows it only to Master Admins and active beta testers, marked Beta. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Use Beta testers to invite patrons; they accept from their Inbox link. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
+            data-floqr-help-body="Each feature has two switches. IsFeatureEnabled = 0 turns the feature off for everyone, including beta testers and the Open link on this page. With IsFeatureEnabled = 1 and IsTestFeature = 0, every patron sees the Search link button. With IsFeatureEnabled = 1 and IsTestFeature = 1, the feature is in testing: only beta testers you granted that feature see it on Search, marked Beta, and Master Admins open it from the Open link on this page instead of Search. Master Admins cannot be beta testers. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Invite beta testers for specific features; they accept from their Inbox link, and you can change their features or revoke them at any time. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
           >Features & Services</h2>
-          <p class="sub small">Only ShoutOut is live by default. Test features stay hidden from regular patrons.</p>
+          <p class="sub small">Only ShoutOut is live by default. A test feature shows on Search only for the beta testers you granted it to; Master Admins open it from the link in this table.</p>
           <p id="featureServicesStatus" class="status" aria-live="polite"></p>
           <label>Reason for change (required, 8+ characters)
             <input id="featureServicesReason" type="text" maxlength="500" placeholder="e.g. Beta round 2 for Mingl at Club Echo" autocomplete="off"/>
@@ -1000,9 +1000,9 @@
               <thead>
                 <tr>
                   <th scope="col" style="text-align:left">Feature</th>
-                  <th scope="col">Live<br/><small>IsFeatureEnabled</small></th>
+                  <th scope="col">Enabled<br/><small>IsFeatureEnabled</small></th>
                   <th scope="col">Test<br/><small>IsTestFeature</small></th>
-                  <th scope="col" style="text-align:left">Test link</th>
+                  <th scope="col" style="text-align:left">Master Admin link</th>
                   <th scope="col" style="text-align:left">Last change</th>
                   <th scope="col"></th>
                 </tr>
@@ -1018,11 +1018,14 @@
         <div class="card">
           <p class="eyebrow">Beta testers</p>
           <h2>Invite a beta tester</h2>
-          <p class="sub small">Search patrons by name, email, or phone. The invite goes to their Inbox; they must accept while signed in to the same account. Links expire in 7 days.</p>
+          <p class="sub small">Search patrons by name, email, or phone and pick the features they may test. The invite goes to their Inbox; they must accept while signed in to the same account. Links expire in 7 days. Master Admins cannot be beta testers.</p>
           <div class="profile-grid" style="align-items:end">
             <label>Find patron<input id="betaPatronSearch" type="search" placeholder="Name, email, phone" autocomplete="off"/></label>
             <label>Note (optional)<input id="betaInviteNote" type="text" maxlength="200" placeholder="Why they were picked" autocomplete="off"/></label>
           </div>
+          <fieldset id="betaInviteFeatures" class="report-block" style="margin-top:12px">
+            <legend>Features this tester may use</legend>
+          </fieldset>
           <div class="queue-actions" style="margin-top:12px">
             <button type="button" id="betaPatronSearchBtn">Search</button>
           </div>
@@ -1500,7 +1503,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.108"></script>
+<script src="./floqr-i18n.js?v=s3.0.110"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.79"></script>
@@ -1516,8 +1519,8 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.108"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.108"></script>
+<script src="./floqai-help-repository.js?v=s3.0.110"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.110"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-ad-pricing.js?v=s3.0.103"></script>
@@ -1530,8 +1533,8 @@
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./master-admin-app.js?v=s3.0.108"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
-<script src="./floqr-feature-services.js?v=s3.0.109"></script>
-<script src="./master-feature-services.js?v=s3.0.108"></script>
+<script src="./floqr-feature-services.js?v=s3.0.110"></script>
+<script src="./master-feature-services.js?v=s3.0.110"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.98"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>

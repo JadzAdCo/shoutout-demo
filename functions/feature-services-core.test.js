@@ -36,24 +36,79 @@ test("client catalog mirrors the server catalog (keys, routes, defaults)", () =>
   assert.deepEqual(JSON.parse(JSON.stringify(client.CATALOG.map(pick))), core.FEATURE_CATALOG.map(pick));
 });
 
-test("access rule: master admin always; live for all; test only for active beta testers", () => {
-  const live = core.normalizeFeature("shoutOut");
-  const beta = core.normalizeFeature("mingl");
-  const off = core.normalizeFeature("mingl", {IsFeatureEnabled: 0, IsTestFeature: 0});
-  const patron = {isMasterAdmin: false, isBetaTester: false};
-  const tester = {isMasterAdmin: false, isBetaTester: true};
-  const master = {isMasterAdmin: true, isBetaTester: false};
-  assert.equal(core.canAccessFeature(live, patron), true);
-  assert.equal(core.canAccessFeature(beta, patron), false);
-  assert.equal(core.canAccessFeature(beta, tester), true);
-  assert.equal(core.canAccessFeature(beta, master), true);
-  assert.equal(core.canAccessFeature(off, tester), false);
-  assert.equal(core.canAccessFeature(off, master), true);
-  assert.equal(core.canAccessFeature(null, master), false);
+const MATRIX = {
+  live: core.normalizeFeature("mingl", {IsFeatureEnabled: 1, IsTestFeature: 0}),
+  test: core.normalizeFeature("mingl", {IsFeatureEnabled: 1, IsTestFeature: 1}),
+  offTest: core.normalizeFeature("mingl", {IsFeatureEnabled: 0, IsTestFeature: 1}),
+  off: core.normalizeFeature("mingl", {IsFeatureEnabled: 0, IsTestFeature: 0})
+};
+const VIEWERS = {
+  patron: {isMasterAdmin: false, isBetaTester: false, betaFeatures: {}},
+  granted: {isMasterAdmin: false, isBetaTester: true, betaFeatures: {mingl: 1}},
+  otherGrant: {isMasterAdmin: false, isBetaTester: true, betaFeatures: {bartr: 1}},
+  master: {isMasterAdmin: true, isBetaTester: false, betaFeatures: {}},
+  masterClaimingBeta: {isMasterAdmin: true, isBetaTester: true, betaFeatures: {mingl: 1}}
+};
 
+test("feature state: IsFeatureEnabled=0 is off even when IsTestFeature=1", () => {
+  assert.equal(core.featureState(MATRIX.live), "live");
+  assert.equal(core.featureState(MATRIX.test), "test");
+  assert.equal(core.featureState(MATRIX.offTest), "off");
+  assert.equal(core.featureState(MATRIX.off), "off");
+  assert.equal(core.featureState(null), "off");
+});
+
+test("page/server access: off for everyone; test for Master Admins + granted beta testers; live for all", () => {
+  const expected = {
+    live: {patron: true, granted: true, otherGrant: true, master: true, masterClaimingBeta: true},
+    test: {patron: false, granted: true, otherGrant: false, master: true, masterClaimingBeta: true},
+    offTest: {patron: false, granted: false, otherGrant: false, master: false, masterClaimingBeta: false},
+    off: {patron: false, granted: false, otherGrant: false, master: false, masterClaimingBeta: false}
+  };
   const client = loadClientModule();
-  assert.equal(client.canAccess("mingl", patron, {mingl: beta}), false);
-  assert.equal(client.canAccess("mingl", tester, {mingl: beta}), true);
+  Object.entries(expected).forEach(([state, row]) => {
+    Object.entries(row).forEach(([who, allowed]) => {
+      assert.equal(core.canAccessFeature(MATRIX[state], VIEWERS[who]), allowed, `server ${state}/${who}`);
+      assert.equal(client.canAccess("mingl", VIEWERS[who], {mingl: MATRIX[state]}), allowed, `client ${state}/${who}`);
+    });
+  });
+});
+
+test("Search tile: Master Admins never see test tiles; only granted beta testers do", () => {
+  const expected = {
+    live: {patron: true, granted: true, otherGrant: true, master: true, masterClaimingBeta: true},
+    test: {patron: false, granted: true, otherGrant: false, master: false, masterClaimingBeta: false},
+    offTest: {patron: false, granted: false, otherGrant: false, master: false, masterClaimingBeta: false}
+  };
+  const client = loadClientModule();
+  Object.entries(expected).forEach(([state, row]) => {
+    Object.entries(row).forEach(([who, visible]) => {
+      assert.equal(core.searchTileVisible(MATRIX[state], VIEWERS[who]), visible, `server ${state}/${who}`);
+      assert.equal(client.searchVisible("mingl", VIEWERS[who], {mingl: MATRIX[state]}), visible, `client ${state}/${who}`);
+    });
+  });
+  assert.equal(client.stateOf(MATRIX.offTest), "off");
+});
+
+test("beta grants are per feature, only for active testers, never ShoutOut", () => {
+  assert.equal(core.BETA_ELIGIBLE_KEYS.includes("shoutOut"), false);
+  const row = {IsBetaTester: 1, status: "active", features: {mingl: 1, bartr: 0, shoutOut: 1, nope: 1}};
+  assert.deepEqual(core.betaGrantsFrom(row), {mingl: 1});
+  assert.deepEqual(core.betaGrantsFrom({...row, status: "revoked"}), {});
+  assert.deepEqual(core.betaGrantsFrom({IsBetaTester: 1, status: "active"}), {}, "legacy testers without a features map get nothing");
+  const client = loadClientModule();
+  assert.deepEqual(JSON.parse(JSON.stringify(client.betaGrantsFrom(row))), {mingl: 1});
+  assert.deepEqual([...client.BETA_ELIGIBLE_KEYS], [...core.BETA_ELIGIBLE_KEYS]);
+});
+
+test("beta feature choices are validated", () => {
+  const all = Object.fromEntries(core.BETA_ELIGIBLE_KEYS.map(key => [key, 0]));
+  assert.deepEqual(core.validateBetaFeatures(["mingl", "rydr"]), {...all, mingl: 1, rydr: 1});
+  assert.deepEqual(core.validateBetaFeatures({bartr: "1", floqAi: 0}), {...all, bartr: 1});
+  assert.throws(() => core.validateBetaFeatures(["shoutOut"]), /Not a beta feature/);
+  assert.throws(() => core.validateBetaFeatures(["nope"]), /Not a beta feature/);
+  assert.throws(() => core.validateBetaFeatures([]), /at least one feature/);
+  assert.deepEqual(core.validateBetaFeatures([], {requireOne: false}), all);
 });
 
 test("beta tester status requires IsBetaTester=1 and status active", () => {
@@ -148,8 +203,11 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "suprstrBtnCard", "intentSearchBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
-  assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.109/);
-  assert.match(read("patron-app.js"), /FLOQRFeatureServices\?\.applySearchUi/);
+  assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.110/);
+  const app = read("patron-app.js");
+  assert.match(app, /FLOQRFeatureServices\?\.applySearchUi/);
+  assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("floqAi"\)/, "start=intent must not bypass the floqAi gate");
+  assert.match(read("floqr-feature-services.js"), /searchVisible\(/);
 });
 
 test("test-feature satellite pages are guarded", () => {
@@ -163,8 +221,48 @@ test("test-feature satellite pages are guarded", () => {
   Object.entries(pages).forEach(([file, key]) => {
     const html = read(file);
     assert.match(html, new RegExp(`<body[^>]*data-floqr-feature="${key}"`), file);
-    assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.109/, file);
+    assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.110/, file);
+    assert.doesNotMatch(html, /data-floqr-feature-signed-out="allow"/, `${file} must send signed-out visitors to sign-in`);
   });
+  assert.match(guard, /if \(!root\.FLOQRSessionShell\?\.redirectToLogin\?\.\(\)\) showDenied\(doc\)/);
+  assert.match(guard, /httpsCallable\("logFeatureAccessAttempt"\)/);
+});
+
+function loadShell(href, {top = null, publicPage = false} = {}) {
+  const replaced = [];
+  const url = new URL(href);
+  const doc = {
+    readyState: "loading",
+    addEventListener() {},
+    querySelector: () => null,
+    body: {hasAttribute: name => publicPage && name === "data-floqr-public"}
+  };
+  const win = {document: doc, FLOQRNav: {appVersion: "s3.0.110"}};
+  win.self = win;
+  win.top = top || win;
+  const location = {href, pathname: url.pathname, search: url.search, hash: url.hash, replace: next => replaced.push(next)};
+  vm.runInNewContext(read("floqr-session-shell.js"), {window: win, document: doc, location, URL, URLSearchParams, setTimeout, clearTimeout, console});
+  return {shell: win.FLOQRSessionShell, replaced};
+}
+
+test("signed-out visitors on a forwarded page go to the general sign-in, then back", () => {
+  const {shell, replaced} = loadShell("https://example.test/shoutout-demo/commerce.html?v=s3.0.1&club=abc#store");
+  assert.equal(shell.redirectToLogin(), true);
+  const next = new URL(replaced[0], "https://example.test/shoutout-demo/commerce.html");
+  assert.equal(next.pathname, "/shoutout-demo/");
+  assert.equal(next.searchParams.get("profileRequired"), "sign-in");
+  assert.equal(next.searchParams.get("v"), "s3.0.110");
+  assert.equal(next.searchParams.get("returnTo"), "commerce.html?v=s3.0.1&club=abc#store");
+
+  const embedded = loadShell("https://example.test/staff-worksheet.html?embed=1");
+  assert.equal(embedded.shell.redirectToLogin(), false, "iframes never navigate to sign-in");
+  const framed = loadShell("https://example.test/staff-worksheet.html", {top: {}});
+  assert.equal(framed.shell.redirectToLogin(), false);
+  ["index.html", "display.html", "display2.html", "privacy.html"].forEach(file => {
+    assert.equal(loadShell(`https://example.test/${file}`).shell.redirectToLogin(), false, file);
+  });
+  assert.equal(loadShell("https://example.test/tool.html", {publicPage: true}).shell.redirectToLogin(), false);
+  assert.match(read("patron-app.js"), /app\.signInToContinue/);
 });
 
 test("server enforces feature access on checkout and robotaxi", () => {
@@ -174,16 +272,34 @@ test("server enforces feature access on checkout and robotaxi", () => {
   assert.match(commerce, /assertFeatureAccess\(request\.auth, "rydr", request\)/);
   const index = read("functions/index.js");
   ["setFeatureServiceFlags", "seedFeatureServices", "createBetaInvite", "acceptBetaInvite", "declineBetaInvite",
-    "revokeBetaTester", "revokeBetaInvite", "logFeatureCodePromotion", "verifyFeatureServiceAuditChain"].forEach(name => {
+    "revokeBetaTester", "revokeBetaInvite", "setBetaTesterFeatures", "logFeatureAccessAttempt",
+    "logFeatureCodePromotion", "verifyFeatureServiceAuditChain"].forEach(name => {
     assert.match(index, new RegExp(`\\b${name}: featureServiceFns\\.${name}\\b`), name);
   });
+});
+
+test("Master Admins cannot become beta testers; feature grants and denials are logged", () => {
+  const fns = read("functions/feature-services-functions.js");
+  assert.match(fns, /beta\.invite_denied/);
+  assert.match(fns, /Master Admins cannot be beta testers/);
+  assert.match(fns, /accept && await isPrivilegedAuth\(/);
+  assert.match(fns, /beta\.features_changed/);
+  assert.match(fns, /feature\.page_denied/);
+  assert.match(fns, /featureServiceAccessThrottle/);
+  assert.match(fns, /const isBetaTester = !privileged && core\.isActiveBetaTester\(row\)/);
+  const rules = read("firestore.rules");
+  assert.match(rules, /match \/featureServiceAccessThrottle\/\{uid\}\s*\{\s*allow read, write: if false;/);
 });
 
 test("Master Admin Features & Services tab is SOS2FA gated", () => {
   const html = read("master-admin.html");
   assert.match(html, /data-panel="featuresServices"/);
   assert.match(html, /<section id="featuresServices"/);
-  assert.match(html, /master-feature-services\.js\?v=s3\.0\.108/);
+  assert.match(html, /master-feature-services\.js\?v=s3\.0\.110/);
+  assert.match(html, /id="betaInviteFeatures"/);
+  const app = read("master-feature-services.js");
+  assert.match(app, /httpsCallable\("setBetaTesterFeatures"\)|call\("setBetaTesterFeatures"/);
+  assert.match(app, /featureKeys/);
   assert.match(read("sos2fa.js"), /"featuresServices"/);
   assert.match(read("master-admin-app.js"), /"featuresServices"/);
 });

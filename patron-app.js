@@ -1111,6 +1111,7 @@
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
     if (byId("minglLandingPage")?.classList.contains("active") && !featureServiceAllows("mingl")) showPage("categoryPage");
+    if (byId("intentSearchPage")?.classList.contains("active") && !featureServiceAllows("floqAi")) showPage("categoryPage");
     if (pendingDirectLocation) {
       openCategory("shoutout");
       setTimeout(() => selectLocationForShoutOut(pendingDirectLocation), 400);
@@ -4478,7 +4479,10 @@
       currentUser = user;
       updateLoginUI(user);
       rememberSignedInHint(user);
-      if (!user) return;
+      if (!user) {
+        if (safeReturnTo(pendingReturnTo)) setStatus(tt("app.signInToContinue", null, "Sign in to continue to the page you opened."));
+        return;
+      }
       if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
       await afterLogin();
     });

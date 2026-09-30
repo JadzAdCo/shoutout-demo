@@ -17,8 +17,10 @@
     {key: "floqAi", label: "FloqAi", patronGate: "floqAi", buttonIds: ["intentSearchBtnCard"], route: "./?start=intent", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1}
   ].map(row => Object.freeze(row)));
 
+  const BETA_ELIGIBLE_KEYS = Object.freeze(CATALOG.map(row => row.key).filter(key => key !== "shoutOut"));
+
   let features = defaults();
-  let viewer = {uid: "", isMasterAdmin: false, isBetaTester: false};
+  let viewer = {uid: "", isMasterAdmin: false, isBetaTester: false, betaFeatures: {}};
   let viewerUser = null;
   let viewerProfile = null;
 
@@ -70,23 +72,45 @@
     return RULES_MASTER_ADMIN_EMAILS.includes(String(user.email || "").toLowerCase());
   }
 
-  function canAccess(key, who = viewer, rows = features) {
-    const row = rows[key];
-    if (!row) return false;
-    if (who.isMasterAdmin) return true;
-    if (flag(row.IsFeatureEnabled) === 1) return true;
-    return flag(row.IsTestFeature) === 1 && who.isBetaTester === true;
+  // Same rule as functions/feature-services-core.js (featureState / canAccessFeature / searchTileVisible).
+  function stateOf(row) {
+    if (!row || flag(row.IsFeatureEnabled) !== 1) return "off";
+    return flag(row.IsTestFeature) === 1 ? "test" : "live";
   }
 
-  function isBetaOnly(key) {
-    const row = features[key];
-    return !!row && flag(row.IsFeatureEnabled) !== 1 && canAccess(key);
+  function hasBetaGrant(key, who = viewer) {
+    if (who.isMasterAdmin === true || who.isBetaTester !== true) return false;
+    return flag((who.betaFeatures || {})[key]) === 1;
+  }
+
+  function canAccess(key, who = viewer, rows = features) {
+    const state = stateOf(rows[key]);
+    if (state === "off") return false;
+    if (state === "live") return true;
+    return who.isMasterAdmin === true || hasBetaGrant(key, who);
+  }
+
+  function searchVisible(key, who = viewer, rows = features) {
+    const state = stateOf(rows[key]);
+    if (state === "off") return false;
+    if (state === "live") return true;
+    return hasBetaGrant(key, who);
+  }
+
+  function isBetaOnly(key, rows = features) {
+    return stateOf(rows[key]) === "test";
+  }
+
+  function betaGrantsFrom(row) {
+    if (!row || flag(row.IsBetaTester) !== 1 || row.status !== "active") return {};
+    const raw = row.features || {};
+    return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(raw[key]) === 1).map(key => [key, 1]));
   }
 
   async function load({db, user, profile} = {}) {
     const database = db || root.firebase?.firestore?.();
     const next = defaults();
-    let isBetaTester = false;
+    let betaRow = null;
     if (database && user?.uid) {
       const [featureSnap, betaSnap] = await Promise.all([
         database.collection(COLLECTION).get().catch(error => {
@@ -99,14 +123,19 @@
         const row = normalize(doc.id, doc.data());
         if (row) next[doc.id] = row;
       });
-      const beta = betaSnap?.exists ? betaSnap.data() || {} : {};
-      isBetaTester = flag(beta.IsBetaTester) === 1 && beta.status === "active";
+      betaRow = betaSnap?.exists ? betaSnap.data() || {} : null;
     }
     features = next;
     viewerUser = user || null;
     viewerProfile = profile || null;
-    viewer = {uid: user?.uid || "", isMasterAdmin: isMasterAdminUser(user, profile), isBetaTester};
-    return {features: getFeatures(), viewer: {...viewer}};
+    const isMasterAdmin = isMasterAdminUser(user, profile);
+    const betaFeatures = isMasterAdmin ? {} : betaGrantsFrom(betaRow);
+    viewer = {uid: user?.uid || "", isMasterAdmin, isBetaTester: Object.keys(betaFeatures).length > 0, betaFeatures};
+    return {features: getFeatures(), viewer: getViewer()};
+  }
+
+  function getViewer() {
+    return {...viewer, betaFeatures: {...viewer.betaFeatures}};
   }
 
   function patronGateAllows(base) {
@@ -118,7 +147,7 @@
   function applySearchUi(doc = document) {
     const betaLabel = t("cat.betaPill", "Beta");
     CATALOG.forEach(base => {
-      const allowed = canAccess(base.key) && patronGateAllows(base);
+      const allowed = searchVisible(base.key) && patronGateAllows(base);
       const beta = allowed && isBetaOnly(base.key);
       base.buttonIds.forEach(id => {
         const el = doc.getElementById(id);
@@ -190,8 +219,23 @@
     }
   }
 
-  /** <body data-floqr-feature="bartr" [data-floqr-feature-signed-out="allow"]> — fail closed. */
-  function guardPage({featureKey, allowSignedOut = false, doc = document} = {}) {
+  function pageName() {
+    return String(root.location?.pathname || "").split("/").pop() || "index.html";
+  }
+
+  function logDenied(key) {
+    try {
+      const fns = root.firebase?.app?.().functions?.("us-central1");
+      if (!fns) return;
+      fns.httpsCallable("logFeatureAccessAttempt")({featureKey: key, page: pageName()})
+        .catch(error => console.warn("Feature access log failed", error?.message || error));
+    } catch (error) {
+      console.warn("Feature access log unavailable", error?.message || error);
+    }
+  }
+
+  /** <body data-floqr-feature="bartr"> — fail closed. Signed-out visitors go to the general FLOQR sign-in. */
+  function guardPage({featureKey, doc = document} = {}) {
     const key = String(featureKey || "");
     if (!CATALOG.some(row => row.key === key)) return Promise.resolve(true);
     ensureGuardStyles(doc);
@@ -206,9 +250,8 @@
       auth.onAuthStateChanged(async user => {
         if (!user) {
           clearTimeout(timer);
-          if (allowSignedOut) showAllowed(doc);
-          else showDenied(doc);
-          resolve(allowSignedOut);
+          if (!root.FLOQRSessionShell?.redirectToLogin?.()) showDenied(doc);
+          resolve(false);
           return;
         }
         let ok = false;
@@ -219,8 +262,12 @@
           console.warn("Feature guard check failed", error?.message || error);
         }
         clearTimeout(timer);
-        if (ok) showAllowed(doc);
-        else showDenied(doc);
+        if (ok) {
+          showAllowed(doc);
+        } else {
+          showDenied(doc);
+          logDenied(key);
+        }
         resolve(ok);
       });
     });
@@ -233,7 +280,7 @@
   function autoGuard() {
     const key = document.body?.dataset?.floqrFeature;
     if (!key) return;
-    guardPage({featureKey: key, allowSignedOut: document.body.dataset.floqrFeatureSignedOut === "allow"});
+    guardPage({featureKey: key});
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", autoGuard);
@@ -241,15 +288,20 @@
 
   root.FLOQRFeatureServices = {
     CATALOG,
+    BETA_ELIGIBLE_KEYS,
     normalize,
+    stateOf,
     canAccess,
+    searchVisible,
+    hasBetaGrant,
     isBetaOnly,
+    betaGrantsFrom,
     load,
     applySearchUi,
     guardPage,
     waitForUser,
     getFeatures,
-    getViewer: () => ({...viewer}),
+    getViewer,
     unavailableMessage
   };
 })(window);

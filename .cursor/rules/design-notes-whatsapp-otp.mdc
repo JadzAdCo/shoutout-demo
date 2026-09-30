@@ -1,18 +1,20 @@
 ---
-description: WhatsApp OTP sign-in (Twilio), SMS OTP US-only, Welcome card order, OTP compliance logging, Twilio/Meta template requirements
+description: WhatsApp OTP sign-in (Twilio), SMS OTP US & Canada only, Welcome card order + unified FloqAi gradient buttons, OTP compliance logging, Twilio/Meta template requirements
 alwaysApply: false
 ---
 
-# WhatsApp OTP sign-in (s3.0.107)
+# WhatsApp OTP sign-in (s3.0.107, Welcome restyle s3.0.110)
 
 Resume: `@whatsapp-otp$` / `$wa-otp$`.
 
 ## Welcome card contract (`index.html#landingPage`)
 
-Order: Google → Microsoft → Facebook → Email → **Continue with WhatsApp OTP (Worldwide)** → **Continue with SMS OTP (US Only)** → `#authStatus` → `.login-legal` (Privacy Policy · Do Not Sell or Share, white, last line of the card).
+Order (s3.0.110): Google → Microsoft → Facebook → Email → **Continue with SMS OTP (US & Canada Only)** → **Continue with WhatsApp OTP (Worldwide)** (always last) → `#authStatus` → `.login-legal` (Privacy Policy · Do Not Sell or Share, white, last line of the card).
 
+- **One look for every button:** `#loginActions .signin` = FloqAi gradient `linear-gradient(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%)`, white text, lime `#dfff5a` focus/hover border. Do not reintroduce per-provider button colors (no white Google, no green WhatsApp button body).
+- **Icons:** every button has a 28×28 `.icon` — Google/Microsoft on a white tile, Facebook blue tile, `mail-icon` (white envelope), `sms-icon` (white chat bubble), `wa-icon` (green WhatsApp). New providers must use the same 28 px box.
 - No "Or use One Time Password (OTP) via SMS" divider.
-- SMS panel country select = `+1 United States` only (Firebase phone auth + reCAPTCHA; unchanged backend).
+- SMS panel country select = `+1 United States / Canada` only (Firebase phone auth + reCAPTCHA). Server side: Firebase Auth **SMS region policy = ALLOW [US, CA]** (set s3.0.110 via `auth_set_sms_region_policy`), so other +1 NANP islands and non-+1 numbers are refused by Firebase, not just hidden in the UI.
 - WhatsApp panel owns the full country list.
 - OTP explanation lives in the Welcome `?` (`help-welcome`) — EN in `index.html` + `floqai-help-repository.js` + `scripts/_help-en.json`, 10 locales in `floqr-i18n-help.js`.
 - Chrome keys: `app.whatsappOtp`, `app.smsOtp`, `app.privacyPolicy`, `app.doNotSell`, `otp.*` (all 11 packs).
@@ -53,5 +55,5 @@ Every row carries `extra.consent = {type: "user-initiated", surface, notice: "ot
 ## FIX PROMPT
 
 ```
-WhatsApp OTP: Welcome order Google/Microsoft/Facebook/Email/WhatsApp (Worldwide)/SMS (US Only), privacy links white at the bottom, no OTP divider. requestWhatsAppOtp/verifyWhatsAppOtp via Twilio Messages API; forceSecurity compliance rows for auth-otp, auth-otp-status, auth-otp-verify. Production needs TWILIO_WHATSAPP_OTP_CONTENT_SID (approved Authentication template). Design notes: design-notes-whatsapp-otp.mdc
+WhatsApp OTP: Welcome order Google/Microsoft/Facebook/Email/SMS (US & Canada Only)/WhatsApp (Worldwide, last); all buttons share the FloqAi blue→purple gradient with white text and 28 px icons; Firebase SMS region policy ALLOW US+CA; privacy links white at the bottom, no OTP divider. requestWhatsAppOtp/verifyWhatsAppOtp via Twilio Messages API; forceSecurity compliance rows for auth-otp, auth-otp-status, auth-otp-verify. Production needs TWILIO_WHATSAPP_OTP_CONTENT_SID (approved Authentication template). Design notes: design-notes-whatsapp-otp.mdc
 ```

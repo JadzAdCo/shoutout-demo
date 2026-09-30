@@ -67,7 +67,7 @@ FLOQRSessionShell.bind({
 });
 ```
 
-Standalone (not iframe): Google may remain as **one** option after the shell restores session and finds no user. Copy must say restore FLOQR session / open My Profile — not “Google only.”
+Standalone (not iframe), signed out (s3.0.110): the shell **redirects** to the general sign-in `./?v=…&profileRequired=sign-in&returnTo=<page>` (Search Welcome card, every provider) and Search returns the patron to the page after sign-in. No Google button on the satellite. `requireSignIn()` auto-runs on every page that loads the shell; public pages opt out with `<body data-floqr-public>`. Details: `design-notes-feature-services.mdc` → “Sign-in redirect on every page”.
 
 ## Embed / iframe
 
