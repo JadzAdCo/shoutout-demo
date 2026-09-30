@@ -937,6 +937,37 @@
       page: "index.html#listingPage"
     },
     {
+      id: "help-beta-tester",
+      title: "Beta testing",
+      body: "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Beta features then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to.",
+      searchPhrases: [
+        "beta", "beta tester", "beta testing", "become a beta tester", "test new features", "early access",
+        "beta invite", "beta invitation", "try new features", "beta label", "why can't i see mingl", "feature not available"
+      ],
+      links: [
+        {label: "My Profile Inbox", href: vUrl("./patron-portal.html", {tab: "inbox", from: "floqai"})},
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "beta-invite.html"
+    },
+    {
+      id: "help-features-services",
+      title: "Features & Services",
+      body: "Turn each Search link button on or off. Live (IsFeatureEnabled = 1) shows the button to every patron. Test (IsTestFeature = 1) shows it only to Master Admins and active beta testers, marked Beta. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Use Beta testers to invite patrons; they accept from their Inbox link. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live.",
+      searchPhrases: [
+        "features and services", "feature flags", "enable feature", "disable feature", "test feature", "beta testers",
+        "invite beta tester", "IsFeatureEnabled", "IsTestFeature", "promote test to live", "feature audit trail"
+      ],
+      links: [
+        {label: "Features & Services (Master Admin)", href: vUrl("./master-admin.html", {from: "floqai"}) + "#featuresServices"}
+      ],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#featuresServices"
+    },
+    {
       id: "help-sos2fa-entity-mgmt",
       title: "Privilege Admin Access",
       body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",

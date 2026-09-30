@@ -92,6 +92,7 @@
         <button class="admin-tab" data-panel="promoterNetwork" type="button" data-i18n="master.promoters">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button" data-i18n="master.reconciliation">Network Reconciliation</button>
         <button class="admin-tab" data-panel="servicesCommerce" type="button" data-i18n="master.services">Services & Commerce</button>
+        <button class="admin-tab" data-panel="featuresServices" type="button" data-i18n="master.featuresServices">Features & Services</button>
         <div class="admin-tab-group" data-tab-group="diagnostics">
           <button class="admin-tab admin-tab-parent" data-group="diagnostics" type="button" aria-expanded="false" data-i18n="master.diagnostics">Diagnostics</button>
           <div class="admin-subtabs hidden" id="diagnosticsSubtabs" role="group" aria-label="Diagnostics pages">
@@ -979,6 +980,100 @@
         </div>
       </section>
 
+      <section id="featuresServices" class="admin-panel-section">
+        <!-- Design notes: .cursor/rules/design-notes-feature-services.mdc -->
+        <div class="card">
+          <p class="eyebrow">Release control</p>
+          <h2
+            data-floqr-help-id="help-features-services"
+            data-floqr-help-title="Features & Services"
+            data-floqr-help-search="features and services|feature flags|enable feature|disable feature|test feature|beta tester|beta testers|IsFeatureEnabled|IsTestFeature|promote test to live"
+            data-floqr-help-body="Turn each Search link button on or off. Live (IsFeatureEnabled = 1) shows the button to every patron. Test (IsTestFeature = 1) shows it only to Master Admins and active beta testers, marked Beta. Every change needs a reason and an SOS2FA unlock, and is written to the tamper-evident audit trail below. Use Beta testers to invite patrons; they accept from their Inbox link. When a test feature is ready, record the promotion here, then run the GitHub promote workflow to move the test branch code to live."
+          >Features & Services</h2>
+          <p class="sub small">Only ShoutOut is live by default. Test features stay hidden from regular patrons.</p>
+          <p id="featureServicesStatus" class="status" aria-live="polite"></p>
+          <label>Reason for change (required, 8+ characters)
+            <input id="featureServicesReason" type="text" maxlength="500" placeholder="e.g. Beta round 2 for Mingl at Club Echo" autocomplete="off"/>
+          </label>
+          <div class="report-block" style="overflow:auto;margin-top:12px">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align:left">Feature</th>
+                  <th scope="col">Live<br/><small>IsFeatureEnabled</small></th>
+                  <th scope="col">Test<br/><small>IsTestFeature</small></th>
+                  <th scope="col" style="text-align:left">Test link</th>
+                  <th scope="col" style="text-align:left">Last change</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody id="featureServicesRows"></tbody>
+            </table>
+          </div>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="featureServicesReloadBtn">Reload</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Beta testers</p>
+          <h2>Invite a beta tester</h2>
+          <p class="sub small">Search patrons by name, email, or phone. The invite goes to their Inbox; they must accept while signed in to the same account. Links expire in 7 days.</p>
+          <div class="profile-grid" style="align-items:end">
+            <label>Find patron<input id="betaPatronSearch" type="search" placeholder="Name, email, phone" autocomplete="off"/></label>
+            <label>Note (optional)<input id="betaInviteNote" type="text" maxlength="200" placeholder="Why they were picked" autocomplete="off"/></label>
+          </div>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" id="betaPatronSearchBtn">Search</button>
+          </div>
+          <div id="betaPatronResults" class="report-block"></div>
+          <p id="betaInviteStatus" class="status" aria-live="polite"></p>
+          <h3>Active beta testers</h3>
+          <div id="betaTesterList" class="report-block"></div>
+          <h3>Pending invites</h3>
+          <div id="betaInviteList" class="report-block"></div>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Test → live</p>
+          <h2>Promote test code to live</h2>
+          <p class="sub small">Records who promoted what and why, then opens the GitHub workflow that merges the <code>test</code> branch into <code>main</code> after tests pass. Turn the feature Live above once the promotion is published.</p>
+          <label>Promotion reason (required, 8+ characters)
+            <input id="featurePromotionReason" type="text" maxlength="500" placeholder="e.g. Mingl beta signed off by QA" autocomplete="off"/>
+          </label>
+          <div class="queue-actions" style="margin-top:12px">
+            <button type="button" class="primary" id="featurePromotionBtn">Record promotion &amp; open workflow</button>
+          </div>
+          <p id="featurePromotionStatus" class="status" aria-live="polite"></p>
+        </div>
+
+        <div class="card">
+          <p class="eyebrow">Audit trail</p>
+          <h2>Feature & beta activity</h2>
+          <p class="sub small">Newest 50 events. Each record is hash-chained to the one before it; Verify integrity detects edits or gaps.</p>
+          <div class="queue-actions">
+            <button type="button" id="featureAuditReloadBtn">Reload</button>
+            <button type="button" id="featureAuditVerifyBtn">Verify integrity</button>
+          </div>
+          <p id="featureAuditStatus" class="status" aria-live="polite"></p>
+          <div class="report-block" style="max-height:min(60vh,600px);overflow:auto">
+            <table class="admin-table" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align:left">When (UTC)</th>
+                  <th scope="col" style="text-align:left">Event</th>
+                  <th scope="col" style="text-align:left">Who</th>
+                  <th scope="col" style="text-align:left">Target</th>
+                  <th scope="col" style="text-align:left">Outcome</th>
+                  <th scope="col" style="text-align:left">Reason</th>
+                </tr>
+              </thead>
+              <tbody id="featureAuditRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section id="aiCrawling" class="admin-panel-section">
         <!-- Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc -->
         <div class="card">
@@ -1405,7 +1500,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.100"></script>
+<script src="./floqr-i18n.js?v=s3.0.108"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.79"></script>
@@ -1413,7 +1508,7 @@
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=29.09.120"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./sos2fa.js?v=s3.0.25"></script>
+<script src="./sos2fa.js?v=s3.0.108"></script>
 <script src="./entity-management.js?v=s3.0.3"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
@@ -1421,20 +1516,22 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.102"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.78"></script>
+<script src="./floqai-help-repository.js?v=s3.0.108"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.108"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-ad-pricing.js?v=s3.0.103"></script>
 <script src="./dc-spot-ad-campaigns.js?v=s3.0.103"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
 <script src="./ad-campaigns.js?v=s3.0.103"></script>
-<script src="./ai-diagnostics-service.js?v=s3.0.103"></script>
+<script src="./ai-diagnostics-service.js?v=s3.0.108"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.101"></script>
+<script src="./master-admin-app.js?v=s3.0.108"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
+<script src="./floqr-feature-services.js?v=s3.0.108"></script>
+<script src="./master-feature-services.js?v=s3.0.108"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.98"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>

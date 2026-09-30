@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.0.107"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.108"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -287,12 +287,12 @@
 
     <div class="category-grid compact-category-grid">
       <div class="category-or" data-i18n="cat.or">Or</div>
-      <button id="shoutoutBtnCard" class="category-card hot" type="button" data-i18n="cat.shoutout">Throw a ShoutOut</button>
-      <button id="minglBtnCard" class="category-card mingl-card" type="button" data-i18n="cat.mingl">Mingl</button>
-      <a id="bartrBtnCard" class="category-card bartr-card" href="./commerce.html?v=29.09.33&from=search" data-i18n="cat.bartr">Trade by BartR</a>
-      <a id="rydrBtnCard" class="category-card rydr-card" href="./rydr.html?v=29.09.33&from=search" data-i18n="cat.rydr">RydR</a>
-      <a id="suprstrBtnCard" class="category-card suprstr-card" href="./suprstr-search.html?v=29.09.66&from=search" data-i18n="cat.suprstar">supRstar</a>
-      <a id="intentSearchBtnCard" class="category-card intent-card" href="./?v=29.09.44&start=intent" data-i18n="cat.floqai">FloqAi</a>
+      <button id="shoutoutBtnCard" class="category-card hot" type="button" data-feature-key="shoutOut" data-i18n="cat.shoutout">Throw a ShoutOut</button>
+      <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
+      <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?v=s3.0.108&from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
+      <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?v=s3.0.108&from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
+      <a id="suprstrBtnCard" class="category-card suprstr-card hidden" href="./suprstr-search.html?v=s3.0.108&from=search" data-feature-key="supRstar" data-i18n="cat.suprstar">supRstar</a>
+      <a id="intentSearchBtnCard" class="category-card intent-card hidden" href="./?v=s3.0.108&start=intent" data-feature-key="floqAi" data-i18n="cat.floqai">FloqAi</a>
     </div>
   </section>
 
@@ -454,8 +454,7 @@
           <p id="splashStatementPrimary" class="splash-statement">Powered by Papi</p>
           <p id="splashStatementSecondary" class="splash-statement">and Social OS</p>
         </div>
-        <p class="splash-countdown"><span data-i18n="ad.splash.continuingPrefix">Continuing in </span><span id="adCountdown">10</span><span data-i18n="ad.splash.continuingSuffix"> seconds...</span></p>
-        <button id="skipAdBtn" class="ghost" type="button" data-i18n="ad.splash.skip">Skip</button>
+        <p id="adLoadingSearch" class="splash-countdown" role="status" aria-live="polite" data-i18n="ad.splash.loadingSearch">…loading your search</p>
       </div>
     </div>
   </section>
@@ -753,11 +752,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.0.16"></script>
-<script src="./floqr-i18n.js?v=s3.0.107"></script>
+<script src="./floqr-nav.js?v=s3.0.108"></script>
+<script src="./floqr-i18n.js?v=s3.0.108"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.0.107"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.107"></script>
+<script src="./floqai-help-repository.js?v=s3.0.108"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.108"></script>
 <script src="./floqr-venue-query.js?v=s3.0.106"></script>
 <script src="./intent-search.js?v=s3.0.105"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
@@ -767,6 +766,7 @@
 <script src="./national-teams-data.js?v=s3.0.20"></script>
 <script src="./jersey-catalog.js?v=s3.0.62"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>
+<script src="./floqr-feature-services.js?v=s3.0.108"></script>
 <script src="./url-media-field.js?v=29.09.52"></script>
 <script src="./ai-service.js?v=29.09.33"></script>
 <script src="./ai-index-service.js?v=29.09.33"></script>
@@ -790,7 +790,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.107"></script>
+<script src="./patron-app.js?v=s3.0.108"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

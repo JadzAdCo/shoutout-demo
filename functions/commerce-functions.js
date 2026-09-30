@@ -960,6 +960,17 @@ async function releaseCommerceInventoryReservation(orderId, reason) {
   });
 }
 
+const CHECKOUT_FEATURE_KEYS = Object.freeze({
+  shoutout: "shoutOut",
+  commerceProduct: "bartr",
+  bartr: "bartr",
+  marketplace: "bartr",
+  rydrTrip: "rydr",
+  robotaxi: "rydr",
+  suprstarRequest: "supRstar",
+  suprstrSlot: "supRstar"
+});
+
 exports.createFloqrCheckoutSession = onCall({
   region:"us-central1",
   secrets:[STRIPE_SECRET_KEY],
@@ -981,6 +992,8 @@ exports.createFloqrCheckoutSession = onCall({
     if (type === "shoutout") await featureGateHelpers.assertPatronFeature(request.auth, "shoutOut");
     if (type === "commerceProduct" || type === "bartr" || type === "marketplace") await featureGateHelpers.assertPatronFeature(request.auth, "bartr");
     if (type === "rydrTrip" || type === "robotaxi") await featureGateHelpers.assertPatronFeature(request.auth, "rydr");
+    const serviceFeatureKey = CHECKOUT_FEATURE_KEYS[type];
+    if (serviceFeatureKey) await require("./feature-services-functions").__featureServiceHelpers.assertFeatureAccess(request.auth, serviceFeatureKey, request);
     const rawPayload = request.data?.payload && typeof request.data.payload === "object" ? request.data.payload : {};
     const payload = normalizeCheckoutPayload(type, rawPayload, request.auth);
     const clubGateId = text(payload.clubLocationId || payload.shoutout?.clubLocationId || payload.shoutout?.location, 120);
@@ -2357,6 +2370,7 @@ exports.publishFloqrFollowerCampaign = onCall({region:"us-central1", timeoutSeco
 exports.requestTeslaRobotaxiPickup = onCall({region:"us-central1", timeoutSeconds:15, memory:"256MiB"}, async request => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   await require("./feature-gate-functions").__featureGateHelpers.assertPatronFeature(request.auth, "rydr");
+  await require("./feature-services-functions").__featureServiceHelpers.assertFeatureAccess(request.auth, "rydr", request);
   const pickupAddress = text(request.data?.pickupAddress, 300);
   const destinationAddress = text(request.data?.destinationAddress, 300);
   if (!pickupAddress || !destinationAddress) throw new HttpsError("invalid-argument", "Pickup and destination addresses are required.");

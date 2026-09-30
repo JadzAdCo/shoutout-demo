@@ -93,6 +93,7 @@
     const type = String(x.type || x.messageType || "").toLowerCase();
     if (/admin\.html/.test(href) && /tab=scheduling/.test(href)) return "Open Calendar & Scheduler";
     if (isScheduleInboxMessage(x)) return "Review & confirm shift";
+    if (type === "betainvite" || /beta-invite\.html/.test(href)) return "Review beta invite";
     if (
       type === "paidshoutoutreceipt"
       || type === "shoutoutsubmitted"

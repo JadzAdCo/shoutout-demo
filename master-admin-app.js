@@ -85,9 +85,11 @@
     "allQueues",
     "clubOnboarding",
     "templateManagement",
-    "recommendationModeration"
+    "recommendationModeration",
+    "featuresServices"
   ];
   const PANEL_LABELS = {
+    featuresServices: "Features & Services",
     entityManagement: "Manage Entities",
     clubAdminUrls: "Venue Links",
     allQueues: "All ShoutOut Queues",
@@ -225,6 +227,9 @@
       }
       if (panelId === "translationOverrides") {
         window.FLOQRMasterTranslationOverrides?.mount?.();
+      }
+      if (panelId === "featuresServices") {
+        window.FLOQRMasterFeatureServices?.mount?.();
       }
       if (window.FLOQRSOS2FA?.isEntityMgmtPanel?.(panelId)) {
         window.FLOQRSOS2FA.mount({

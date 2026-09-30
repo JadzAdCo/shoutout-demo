@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
+// FLOQR FIRESTORE RULES VERSION: s3.0.108-feature-services-beta
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.21-heist-display-devices
@@ -78,6 +79,9 @@ service cloud.firestore {
  function hasBackendOnlyIdentityFields(data) {
  return data.keys().hasAny([
  "masterAdmin",
+ "superAdmin",
+ "IsBetaTester",
+ "betaTester",
  "roles",
  "approvedRoles",
  "approvedLocations",
@@ -92,6 +96,9 @@ service cloud.firestore {
  function preservesBackendOnlyIdentityFields() {
  return !request.resource.data.diff(resource.data).changedKeys().hasAny([
  "masterAdmin",
+ "superAdmin",
+ "IsBetaTester",
+ "betaTester",
  "roles",
  "approvedRoles",
  "approvedLocations",
@@ -413,6 +420,32 @@ service cloud.firestore {
  match /platformSettings/{docId} {
  allow read: if true;
  allow write: if isMasterAdmin();
+ }
+
+ // Features & Services — written only by Cloud Functions (SOS2FA + audit chain).
+ match /featureServices/{featureKey} {
+ allow read: if signedIn();
+ allow write: if false;
+ }
+
+ match /betaTesters/{uid} {
+ allow read: if isSelf(uid) || isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /betaInvites/{inviteId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /featureServiceAuditLogs/{eventId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /featureServiceAuditHead/{docId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
  }
 
  match /clubLocationAliases/{aliasId} {

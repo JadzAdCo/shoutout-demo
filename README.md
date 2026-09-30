@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.107 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.108 (stable)
+
+- s3.0.108: Master Admin → Features & Services — per-feature `IsFeatureEnabled` / `IsTestFeature` (Firestore `featureServices`), only ShoutOut live by default; test features visible to Master Admins + beta testers (Beta pill) and blocked on satellite pages for regular patrons; beta tester invites (Inbox link, account-bound, 7-day expiry) and revoke; test → live promotion log + GitHub `promote-test-to-main` workflow and `test` branch; hash-chained audit trail (ISO 27001 A.8.15 / NIST 800-53r5 AU) with integrity verify; `superAdmin` protected from self-write. In-app ad splash shows "…loading your search" for 5 seconds with no countdown or Skip.
 
 - s3.0.107: WhatsApp OTP sign-in (Worldwide) via Twilio (`requestWhatsAppOtp`, `verifyWhatsAppOtp`) with forced compliance rows for every send / delivery status / verify; SMS OTP limited to US (+1); OTP divider removed; Privacy Policy · Do Not Sell links moved below the sign-in buttons in white; Welcome `?` explains OTP in 11 languages.
 - s3.0.106: Location-aware search — nearest first then by name (GPS, then IP estimate, then profile city); "near me" in 11 languages; Google venue geocoding trigger + backfill (`onClubLocationGeocode`, `scheduledVenueGeocodeBackfill`); animated borderless FloqAi dialog; Search for heading and venue tiles removed.

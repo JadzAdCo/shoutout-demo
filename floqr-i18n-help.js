@@ -6,6 +6,14 @@
 
   const packs = {
     ru: {
+
+      "help-beta-tester": {
+
+        title: "Бета-тестирование",
+
+        body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт, и нажмите «Принять». После этого бета-функции появятся в поиске с меткой «Бета». Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
+
+      },
       "help-location-search": {
         title: "Поиск с учётом местоположения",
         body: "FLOQR сначала показывает ближайшие к вам события и клубы, затем — по названию. Если вы разрешите доступ, используется местоположение телефона или браузера (GPS); иначе город определяется примерно по вашему интернет-подключению (IP). Укажите место, например «Клубы в Монако», чтобы искать в другом городе — там результаты тоже начинаются с ближайших к вам. Доступ к местоположению можно отключить в настройках браузера или телефона."
@@ -184,6 +192,14 @@
       }
     },
     nl: {
+
+      "help-beta-tester": {
+
+        title: "Bètatesten",
+
+        body: "FLOQR nodigt soms bezoekers uit om nieuwe functies vroeg te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account en kies Accepteren. Bètafuncties verschijnen dan bij Zoeken met het label Bèta. Ze kunnen tijdens het testen veranderen of worden uitgezet. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
+
+      },
       "help-location-search": {
         title: "Zoeken op locatie",
         body: "FLOQR toont evenementen en clubs die het dichtst bij je zijn eerst, daarna op naam. Als je het toestaat, gebruikt FLOQR de locatie van je telefoon of browser (gps); anders wordt je stad geschat op basis van je internetverbinding (IP). Typ een plaats, zoals Clubs in Monaco, om ergens anders te zoeken — ook daar staan de dichtstbijzijnde eerst. Je kunt locatietoegang uitzetten in de instellingen van je browser of telefoon."
@@ -362,6 +378,14 @@
       }
     },
     fr: {
+
+      "help-beta-tester": {
+
+        title: "Tests bêta",
+
+        body: "FLOQR invite parfois des clients à essayer de nouvelles fonctionnalités en avant-première. L'invitation arrive dans votre boîte de réception ; ouvrez-la en étant connecté au même compte et choisissez Accepter. Les fonctionnalités bêta apparaissent alors dans la recherche avec l'étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
+
+      },
       "help-location-search": {
         title: "Recherche selon votre position",
         body: "FLOQR affiche d'abord les événements et clubs les plus proches de vous, puis par nom. Si vous l'autorisez, FLOQR utilise la position de votre téléphone ou navigateur (GPS) ; sinon, votre ville est estimée à partir de votre connexion internet (IP). Saisissez un lieu, par exemple Clubs à Monaco, pour chercher ailleurs — les résultats commencent toujours par les plus proches de vous. Vous pouvez désactiver l'accès à la position dans les réglages de votre navigateur ou téléphone."
@@ -540,6 +564,14 @@
       }
     },
     de: {
+
+      "help-beta-tester": {
+
+        title: "Beta-Tests",
+
+        body: "FLOQR lädt Gäste manchmal ein, neue Funktionen vorab auszuprobieren. Die Einladung kommt in Ihren Posteingang; öffnen Sie sie, während Sie mit demselben Konto angemeldet sind, und wählen Sie Annehmen. Beta-Funktionen erscheinen dann in der Suche mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das Konto, an das sie gesendet wurden."
+
+      },
       "help-location-search": {
         title: "Standortbezogene Suche",
         body: "FLOQR zeigt zuerst die Events und Clubs, die Ihnen am nächsten sind, danach nach Name. Wenn Sie es erlauben, nutzt FLOQR den Standort Ihres Telefons oder Browsers (GPS); sonst wird Ihre Stadt anhand Ihrer Internetverbindung (IP) geschätzt. Geben Sie einen Ort ein, z. B. Clubs in Monaco, um woanders zu suchen — auch dort stehen die nächstgelegenen zuerst. Den Standortzugriff können Sie in den Browser- oder Telefoneinstellungen deaktivieren."
@@ -718,6 +750,14 @@
       }
     },
     es: {
+
+      "help-beta-tester": {
+
+        title: "Pruebas beta",
+
+        body: "FLOQR a veces invita a clientes a probar funciones nuevas antes que nadie. La invitación llega a tu bandeja de entrada; ábrela con la sesión iniciada en la misma cuenta y elige Aceptar. Las funciones beta aparecerán en la búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta a la que se enviaron."
+
+      },
       "help-location-search": {
         title: "Búsqueda según tu ubicación",
         body: "FLOQR muestra primero los eventos y clubs más cercanos a ti y después por nombre. Si lo permites, usa la ubicación de tu teléfono o navegador (GPS); si no, estima tu ciudad a partir de tu conexión a internet (IP). Escribe un lugar, como Clubs en Mónaco, para buscar en otro sitio: allí los resultados también empiezan por los más cercanos a ti. Puedes desactivar el acceso a la ubicación en los ajustes del navegador o del teléfono."
@@ -896,6 +936,14 @@
       }
     },
     it: {
+
+      "help-beta-tester": {
+
+        title: "Test beta",
+
+        body: "FLOQR a volte invita i clienti a provare in anteprima nuove funzioni. L'invito arriva nella tua Posta in arrivo; aprilo mentre sei connesso allo stesso account e scegli Accetta. Le funzioni beta compariranno nella ricerca con l'etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l'account a cui sono stati inviati."
+
+      },
       "help-location-search": {
         title: "Ricerca in base alla posizione",
         body: "FLOQR mostra prima gli eventi e i club più vicini a te, poi per nome. Se lo consenti, usa la posizione del telefono o del browser (GPS); altrimenti stima la tua città dalla connessione internet (IP). Scrivi un luogo, ad esempio Club a Monaco, per cercare altrove: anche lì i risultati partono dai più vicini a te. Puoi disattivare l'accesso alla posizione nelle impostazioni del browser o del telefono."
@@ -1074,6 +1122,14 @@
       }
     },
     pt: {
+
+      "help-beta-tester": {
+
+        title: "Testes beta",
+
+        body: "A FLOQR convida por vezes clientes a experimentar novas funcionalidades mais cedo. O convite chega à sua Caixa de entrada; abra-o com sessão iniciada na mesma conta e escolha Aceitar. As funcionalidades beta passam a aparecer na pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta a que foram enviados."
+
+      },
       "help-location-search": {
         title: "Pesquisa por localização",
         body: "O FLOQR mostra primeiro os eventos e clubes mais próximos de si e depois por nome. Se permitir, usa a localização do telemóvel ou do navegador (GPS); caso contrário, estima a sua cidade a partir da ligação à internet (IP). Escreva um local, como Clubes no Mónaco, para pesquisar noutro sítio — aí os resultados também começam pelos mais próximos de si. Pode desativar o acesso à localização nas definições do navegador ou do telemóvel."
@@ -1252,6 +1308,14 @@
       }
     },
     el: {
+
+      "help-beta-tester": {
+
+        title: "Δοκιμές beta",
+
+        body: "Το FLOQR προσκαλεί κάποιες φορές πελάτες να δοκιμάσουν νωρίτερα νέες λειτουργίες. Η πρόσκληση έρχεται στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό και επιλέξτε Αποδοχή. Οι λειτουργίες beta εμφανίζονται τότε στην αναζήτηση με την ετικέτα Beta. Μπορεί να αλλάξουν ή να απενεργοποιηθούν κατά τις δοκιμές. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό στον οποίο στάλθηκαν."
+
+      },
       "help-location-search": {
         title: "Αναζήτηση με βάση την τοποθεσία",
         body: "Το FLOQR δείχνει πρώτα τις εκδηλώσεις και τα κλαμπ που είναι πιο κοντά σας και μετά κατά όνομα. Αν το επιτρέψετε, χρησιμοποιεί την τοποθεσία του τηλεφώνου ή του browser (GPS)· αλλιώς εκτιμά την πόλη σας από τη σύνδεσή σας στο διαδίκτυο (IP). Πληκτρολογήστε ένα μέρος, π.χ. Κλαμπ στο Μονακό, για να ψάξετε αλλού — και εκεί τα αποτελέσματα ξεκινούν από τα πιο κοντινά σας. Μπορείτε να απενεργοποιήσετε την πρόσβαση στην τοποθεσία από τις ρυθμίσεις του browser ή του τηλεφώνου."
@@ -1430,6 +1494,14 @@
       }
     },
     pl: {
+
+      "help-beta-tester": {
+
+        title: "Testy beta",
+
+        body: "FLOQR czasem zaprasza gości do wcześniejszego wypróbowania nowych funkcji. Zaproszenie trafia do skrzynki odbiorczej; otwórz je, będąc zalogowanym na to samo konto, i wybierz Akceptuj. Funkcje beta pojawią się w wyszukiwaniu z etykietą Beta. Mogą się zmieniać lub zostać wyłączone w trakcie testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta, na które je wysłano."
+
+      },
       "help-location-search": {
         title: "Wyszukiwanie według lokalizacji",
         body: "FLOQR najpierw pokazuje wydarzenia i kluby najbliżej Ciebie, a potem według nazwy. Jeśli na to pozwolisz, używa lokalizacji telefonu lub przeglądarki (GPS); w przeciwnym razie szacuje Twoje miasto na podstawie połączenia internetowego (IP). Wpisz miejsce, np. Kluby w Monako, aby szukać gdzie indziej — tam również wyniki zaczynają się od najbliższych Tobie. Dostęp do lokalizacji możesz wyłączyć w ustawieniach przeglądarki lub telefonu."
@@ -1608,6 +1680,14 @@
       }
     },
     ar: {
+
+      "help-beta-tester": {
+
+        title: "الاختبار التجريبي",
+
+        body: "تدعو FLOQR أحيانًا الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى صندوق الوارد؛ افتحها وأنت مسجّل الدخول بالحساب نفسه واختر قبول. ستظهر الميزات التجريبية بعد ذلك في البحث مع شارة تجريبي. قد تتغير أو تُوقَف أثناء الاختبار. تنتهي صلاحية الدعوات بعد 7 أيام ولا تعمل إلا للحساب الذي أُرسلت إليه."
+
+      },
       "help-location-search": {
         title: "البحث حسب الموقع",
         body: "يعرض FLOQR الفعاليات والنوادي الأقرب إليك أولاً، ثم حسب الاسم. إذا سمحت بذلك، يستخدم موقع هاتفك أو متصفحك (GPS)؛ وإلا فإنه يقدّر مدينتك من اتصالك بالإنترنت (IP). اكتب مكاناً، مثل نوادي في موناكو، للبحث في مكان آخر — وستبدأ النتائج هناك أيضاً بالأقرب إليك. يمكنك إيقاف الوصول إلى الموقع من إعدادات المتصفح أو الهاتف."

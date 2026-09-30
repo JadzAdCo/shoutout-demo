@@ -1,0 +1,101 @@
+# Test → live code promotion. Started from Master Admin → Features & Services (audited there first).
+# Design notes: .cursor/rules/design-notes-feature-services.mdc
+name: Promote test to main
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why this promotion is safe (same reason recorded in Master Admin)"
+        required: true
+        type: string
+      confirm:
+        description: "Type PROMOTE to merge test into main"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+  pages: write
+
+concurrency:
+  group: promote-test-to-main
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: Test branch quality gate
+    runs-on: ubuntu-latest
+    if: inputs.confirm == 'PROMOTE'
+    steps:
+      - name: Checkout test
+        uses: actions/checkout@v4
+        with:
+          ref: test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: i18n coverage gate
+        run: node scripts/i18n-coverage-report.js
+
+      - name: Functions tests
+        working-directory: functions
+        run: |
+          npm ci
+          npm test
+
+  promote:
+    name: Merge test into main
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (full history)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Merge test into main
+        env:
+          REASON: ${{ inputs.reason }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          git config user.name "floqr-promotion-bot"
+          git config user.email "floqr-promotion-bot@users.noreply.github.com"
+          git fetch origin test
+          if git merge-base --is-ancestor origin/test HEAD; then
+            echo "main already contains test — nothing to promote."
+            exit 0
+          fi
+          git merge --no-ff origin/test -m "chore: promote test to main" -m "Reason: ${REASON}" -m "Requested by: ${ACTOR} via workflow run ${GITHUB_RUN_ID}"
+          git push origin HEAD:main
+          git push origin HEAD:test
+
+      - name: Request GitHub Pages build
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds"
+
+      - name: Run Functions CI on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run functions-ci.yml --ref main -R "${GITHUB_REPOSITORY}"
+
+      - name: Summary
+        env:
+          REASON: ${{ inputs.reason }}
+        run: |
+          {
+            echo "### Promoted test → main"
+            echo "- Actor: ${GITHUB_ACTOR}"
+            echo "- Reason: ${REASON}"
+            echo "- main is now $(git rev-parse --short HEAD)"
+            echo "- Functions deploy is separate: run Functions CI with deploy=true when backend changed."
+          } >> "$GITHUB_STEP_SUMMARY"
