@@ -178,13 +178,25 @@
     doc.querySelector(".feature-guard-block")?.remove();
   }
 
+  function firebaseAuth() {
+    try {
+      const fb = root.firebase;
+      if (!fb) return null;
+      if (!fb.apps?.length && root.firebaseConfig) fb.initializeApp(root.firebaseConfig);
+      return fb.auth();
+    } catch (error) {
+      console.warn("Feature guard could not start Firebase Auth", error?.message || error);
+      return null;
+    }
+  }
+
   /** <body data-floqr-feature="bartr" [data-floqr-feature-signed-out="allow"]> — fail closed. */
   function guardPage({featureKey, allowSignedOut = false, doc = document} = {}) {
     const key = String(featureKey || "");
     if (!CATALOG.some(row => row.key === key)) return Promise.resolve(true);
     ensureGuardStyles(doc);
     doc.body.classList.add("feature-guard-pending");
-    const auth = root.firebase?.auth?.();
+    const auth = firebaseAuth();
     if (!auth) {
       showDenied(doc);
       return Promise.resolve(false);
@@ -199,9 +211,14 @@
           resolve(allowSignedOut);
           return;
         }
-        await load({user});
+        let ok = false;
+        try {
+          await load({user});
+          ok = canAccess(key);
+        } catch (error) {
+          console.warn("Feature guard check failed", error?.message || error);
+        }
         clearTimeout(timer);
-        const ok = canAccess(key);
         if (ok) showAllowed(doc);
         else showDenied(doc);
         resolve(ok);

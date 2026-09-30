@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.108";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.109";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1152,6 +1152,15 @@
         {label:"Beta invite landing", file:"beta-invite.html", includes:["beta-invite-app.js?v=s3.0.108", "data-floqr-auth-chrome"]},
         {label:"Ad splash 5s loading", file:"patron-app.js", includes:["const AD_SPLASH_MS = 5000;"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.108\""]}
+      ]
+    },
+    {
+      version: "s3.0.109-feature-guard-init",
+      title: "Test-feature page guard initializes Firebase and fails closed cleanly",
+      checks: [
+        {label:"Guard starts Firebase", file:"floqr-feature-services.js", includes:["function firebaseAuth()", "fb.initializeApp(root.firebaseConfig)"]},
+        {label:"Guard cache bust", file:"rydr.html", includes:["floqr-feature-services.js?v=s3.0.109", "data-floqr-feature=\"rydr\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.109\""]}
       ]
     }
   ];

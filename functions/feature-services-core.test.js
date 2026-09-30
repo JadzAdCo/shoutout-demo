@@ -148,7 +148,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "suprstrBtnCard", "intentSearchBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
-  assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.108/);
+  assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.109/);
   assert.match(read("patron-app.js"), /FLOQRFeatureServices\?\.applySearchUi/);
 });
 
@@ -158,10 +158,12 @@ test("test-feature satellite pages are guarded", () => {
     "suprstr-search.html": "supRstar", "suprstar-preview.html": "supRstar",
     "mingl-chat.html": "mingl", "mingl-gist.html": "mingl"
   };
+  const guard = read("floqr-feature-services.js");
+  assert.match(guard, /if \(!fb\.apps\?\.length && root\.firebaseConfig\) fb\.initializeApp\(root\.firebaseConfig\)/, "guard must start Firebase on pages without an app script");
   Object.entries(pages).forEach(([file, key]) => {
     const html = read(file);
     assert.match(html, new RegExp(`<body[^>]*data-floqr-feature="${key}"`), file);
-    assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.108/, file);
+    assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.109/, file);
   });
 });
 
