@@ -69,9 +69,14 @@
       id: "clubs",
       kind: "product",
       label: "Clubs & venues",
-      blurb: "Browse clubs, lounges, beach clubs, and events.",
+      blurb: "Search events, clubs, beach clubs, lounges, and lounge-clubs — try “Hip Hop Clubs in DC” or “EDM Events in New York”.",
       href: `./?v=${APP_V}&start=search`,
-      patterns: [/club/, /lounge/, /beach/, /event/, /nightlife/, /venue/, /party/, /tonight/]
+      searchPhrases: [
+        "hip hop clubs in dc", "edm events in new york", "beach clubs", "beachclub", "beach-club",
+        "lounge clubs", "lounge-club", "nightclubs", "night club", "lounges near me", "events tonight",
+        "find a club", "find events", "nightlife search"
+      ],
+      patterns: [/club/, /lounge/, /beach/, /event/, /nightlife/, /venue/, /party/, /tonight/, /concert/, /festival/]
     }
   ];
 
@@ -897,9 +902,43 @@
     return /help|how\s+do\s+i|i\s+want\s+to\s+be|become|request\s+access|service\s*member|role|admin|promot|dj|waitress|bartender|schedul|onboard|link\s+to|profile|settings|user\s*guide|multi[\s-]?delete|publish\s*schedule/.test(q);
   }
 
+  function venueSearchIntent(raw, q) {
+    const VQ = global.FLOQRVenueQuery;
+    if (!VQ || looksLikeHelpQuery(q)) return null;
+    const parsed = VQ.parse(raw, {entry: "category"});
+    if (!VQ.isVenueQuery(parsed)) return null;
+    const t = (key, vars, fallback) => {
+      try {
+        const out = global.FLOQRI18n?.t?.(key, vars || {});
+        if (out && out !== key) return out;
+      } catch (_) {}
+      return fallback;
+    };
+    const typeLabel = VQ.typeLabel(parsed.type, key => t(key, {}, key));
+    const details = [...parsed.genres];
+    if (parsed.place) details.push(t("cat.floqaiIn", {place: parsed.place.label}, `in ${parsed.place.label}`));
+    return {
+      id: "venue-search",
+      kind: "product",
+      label: t("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`),
+      blurb: details.length ? details.join(" · ") : String(raw).trim(),
+      href: vUrl("./", {start: "search", q: String(raw).trim()}),
+      patterns: []
+    };
+  }
+
   function matchIntents(raw) {
     const q = normalizePhrase(raw);
     if (!q) return [];
+    const venue = venueSearchIntent(raw, q);
+    if (venue) {
+      const rest = matchIntentsByScore(q).filter(intent => intent.id !== "clubs" && intent.kind !== "help");
+      return [venue, ...rest.slice(0, 2)];
+    }
+    return matchIntentsByScore(q);
+  }
+
+  function matchIntentsByScore(q) {
     const helpBias = looksLikeHelpQuery(q) ? 1.5 : 1;
     const scored = allIntents().map(intent => {
       let score = 0;

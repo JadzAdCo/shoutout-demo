@@ -889,6 +889,7 @@
     setText("signedInAs", user ? "" : "Please Sign-In or Sign-Up:");
     byId("signedInActions")?.classList.toggle("hidden", !user);
     byId("loginActions")?.classList.toggle("hidden", !!user);
+    byId("backToWelcomeBtn")?.classList.toggle("hidden", !!user);
     byId("dropdownSignInBtn")?.classList.toggle("hidden", !!user);
     byId("dropdownSignOutBtn")?.classList.toggle("hidden", !user);
     updateUserMenu(user);
@@ -1077,12 +1078,128 @@
       await window.FLOQRFeatureGates?.loadPatronGates?.(db);
       window.FLOQRFeatureGates?.applyPatronGateUi?.(currentUser, cachedUserProfile);
     } catch (e) {}
+    setStatus("");
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
     if (pendingDirectLocation) {
       openCategory("shoutout");
       setTimeout(() => selectLocationForShoutOut(pendingDirectLocation), 400);
+      return;
     }
+    runStartVenueQuery();
+  }
+
+  function rememberSignedInHint(user) {
+    try {
+      if (user) localStorage.setItem("floqr.signedInHint", "1");
+      else localStorage.removeItem("floqr.signedInHint");
+    } catch (_) {}
+    document.documentElement.classList.remove("floqr-auth-resolving");
+  }
+
+  const VENUE_LISTING_TYPES = ["events", "clubs", "lounges", "lounge-club", "beach-clubs"];
+  const CATEGORY_FLOQAI_DIALOG = ["cat.floqaiWelcome", "cat.floqaiAlso"];
+  const CATEGORY_FLOQAI_DIALOG_MS = 5000;
+
+  function venueTypeLabel(type) {
+    return window.FLOQRVenueQuery?.typeLabel?.(type, key => tt(key, {}, key)) || type;
+  }
+
+  function listingTitleFor(type) {
+    if (type === "events") return tt("listing.searchEvents", {}, "Search Events");
+    if (type === "clubs") return tt("listing.searchClubs", {}, "Search Clubs");
+    return `${tt("app.search", {}, "Search")} ${venueTypeLabel(type)}`;
+  }
+
+  function setListingType(type) {
+    byId("listingType").value = type;
+    byId("listingTitle").textContent = listingTitleFor(type);
+    byId("listingIntro").textContent = tt("listing.intro", {}, "Search naturally by city, country, venue, genre, artist, event day, or activity date.");
+  }
+
+  function parsedListingQuery(query, entry) {
+    const VQ = window.FLOQRVenueQuery;
+    return VQ && String(query || "").trim() ? VQ.parse(query, {entry}) : null;
+  }
+
+  function describeVenueQuery(parsed) {
+    const Place = window.FLOQRPlaceI18n;
+    const typeLabel = venueTypeLabel(parsed.type);
+    const parts = [tt("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`)];
+    parsed.genres.forEach(genre => parts.push(Place?.optionLabel?.("genre", genre) || genre));
+    if (parsed.place) {
+      const place = parsed.place.label;
+      parts.push(tt("cat.floqaiIn", {place}, `in ${place}`));
+    }
+    return parts.join(" · ");
+  }
+
+  function openVenueSearch(type, query) {
+    setListingType(type);
+    const input = byId("locationSearch");
+    if (input) input.value = query;
+    showListing();
+  }
+
+  function submitCategoryVenueQuery(query) {
+    const q = String(query || "").trim();
+    if (!q) return false;
+    const parsed = parsedListingQuery(q, "category");
+    const type = parsed?.type || "events";
+    showAdSplash(type, () => openVenueSearch(type, q));
+    return true;
+  }
+
+  function runStartVenueQuery() {
+    const url = new URL(window.location.href);
+    const q = url.searchParams.get("q");
+    if (!q || !byId("categoryPage")?.classList.contains("active")) return;
+    url.searchParams.delete("q");
+    try { history.replaceState(null, "", url.toString()); } catch (_) {}
+    const input = byId("categoryFloqAiInput");
+    if (input) input.value = q;
+    submitCategoryVenueQuery(q);
+  }
+
+  function bindCategoryFloqAi() {
+    const form = byId("categoryFloqAiForm");
+    const input = byId("categoryFloqAiInput");
+    const speech = byId("categoryFloqAiSpeech");
+    if (!form || !input || !speech || form.dataset.bound === "1") return;
+    form.dataset.bound = "1";
+    let step = 0;
+
+    const sayDialog = key => {
+      speech.setAttribute("data-i18n", key);
+      speech.classList.add("is-swapping");
+      setTimeout(() => {
+        speech.textContent = tt(key, {}, speech.textContent);
+        speech.classList.remove("is-swapping");
+      }, 220);
+    };
+
+    setInterval(() => {
+      if (input.value.trim() || document.hidden || !byId("categoryPage")?.classList.contains("active")) return;
+      step = (step + 1) % CATEGORY_FLOQAI_DIALOG.length;
+      sayDialog(CATEGORY_FLOQAI_DIALOG[step]);
+    }, CATEGORY_FLOQAI_DIALOG_MS);
+
+    input.addEventListener("input", () => {
+      const parsed = parsedListingQuery(input.value, "category");
+      if (!parsed) {
+        step = 0;
+        sayDialog(CATEGORY_FLOQAI_DIALOG[0]);
+        return;
+      }
+      speech.removeAttribute("data-i18n");
+      speech.classList.remove("is-swapping");
+      speech.textContent = describeVenueQuery(parsed);
+    });
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!submitCategoryVenueQuery(input.value)) input.focus();
+    });
   }
 
 
@@ -1398,6 +1515,8 @@
       type === "shoutout" ? tt("listing.introShoutout", {}, "Pick the exact location where your ShoutOut should appear.") :
       type.startsWith("club-action:") ? tt("listing.introClubAction", {}, "Select the exact venue/location for this action. Payment and booking integration will be connected later.") :
       tt("listing.intro", {}, "Search naturally by city, country, venue, genre, artist, event day, or activity date.");
+    const search = byId("locationSearch");
+    if (search) search.value = "";
     showListing();
   }
 
@@ -1436,7 +1555,13 @@
   function showListing() { showPage("listingPage"); populateFilters(); bindFilters(); renderGrid(); }
 
   function renderGrid() {
-    const type = byId("listingType").value || "clubs";
+    let type = byId("listingType").value || "clubs";
+    const parsed = parsedListingQuery(byId("locationSearch")?.value, type);
+    if (parsed && parsed.typeSource === "query" && parsed.type !== type && VENUE_LISTING_TYPES.includes(type)) {
+      type = parsed.type;
+      setListingType(type);
+      populateFilters();
+    }
     if (type === "events") return renderEventGrid();
     return renderLocationGrid();
   }
@@ -2790,8 +2915,10 @@
     const grid = byId("locationGrid");
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
+    const parsed = parsedListingQuery(s, "events");
+    const textQuery = parsed ? [parsed.residual, ...parsed.when].filter(Boolean).join(" ") : s;
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.eventsToRecords(events) : Object.entries(events).map(([id,e]) => ({id, data:e, title:e.eventName || id}));
-    const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
+    const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
@@ -2805,7 +2932,8 @@
     );
     const matches = ranked
       .map(record => [record.id, record.data || events[record.id]])
-      .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)));
+      .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)))
+      .filter(([id,e]) => !parsed || window.FLOQRVenueQuery.matchesFilters(parsed, e, getLocation(e.locationId)?.locationName || ""));
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching events found.</div>';
     matches.forEach(([id,e]) => {
       const loc = getLocation(e.locationId);
@@ -2830,8 +2958,10 @@
     const type = byId("listingType").value || "clubs";
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
+    const parsed = parsedListingQuery(s, type);
+    const textQuery = parsed ? parsed.residual : s;
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.locationsToRecords(locations) : Object.entries(locations).map(([id,l]) => ({id, data:l, title:l.locationName || id}));
-    const searched = window.floqrSearch ? await window.floqrSearch(s, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
+    const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
     const context = await userLocationContext();
     context.query = s;
     const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
@@ -2853,7 +2983,8 @@
         effectiveType === "beach-clubs" ? (l.type === "beach-club" || (l.categories||[]).includes("Beach Clubs")) :
         effectiveType === "clubs" || effectiveType === "shoutout" ? (l.type === "club" || l.type === "lounge-club" || l.type === "beach-club" || (l.categories||[]).includes("Clubs")) :
         true;
-      return l && typeOk && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre));
+      return l && typeOk && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre))
+        && (!parsed || window.FLOQRVenueQuery.matchesFilters(parsed, l));
     });
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching results found.</div>';
     matches.forEach(([id,l]) => {
@@ -4250,8 +4381,17 @@
     auth.getRedirectResult().then(result => {
       if (result?.user) setStatus(`Signed in with Microsoft as ${result.user.email || result.user.displayName || result.user.uid}`);
     }).catch(e => setStatus(microsoftAuthErrorMessage(e)));
-    auth.onAuthStateChanged(async user => { currentUser=user; updateLoginUI(user); if(user) await afterLogin(); });
-    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode); bind("continueBtn", afterLogin);
+    setTimeout(() => document.documentElement.classList.remove("floqr-auth-resolving"), 8000);
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      updateLoginUI(user);
+      rememberSignedInHint(user);
+      if (!user) return;
+      if (byId("landingPage")?.classList.contains("active")) showPage("categoryPage");
+      await afterLogin();
+    });
+    bindCategoryFloqAi();
+    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
     bind("dropdownSignInBtn", () => {
       byId("userDropdown")?.classList.add("hidden");
       showPage("landingPage");

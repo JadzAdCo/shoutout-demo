@@ -1,0 +1,51 @@
+---
+description: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs), Welcome help, signed-in routing
+alwaysApply: false
+---
+
+# FloqAi venue search (Search for page)
+
+Resume: `@venue-search$` / `$floqai-search$`.
+
+This is **search**, not help. Help copy (`?`, FloqAi repository bodies) never explains the parser.
+
+## Page contract (`index.html#categoryPage`)
+
+- FloqAi mark + speech bubble are **stationary above** the search input (`#categoryFloqAiSearch`). Category tiles stay below.
+- Dialog loop (5s, only while input is empty and the page is active): `cat.floqaiWelcome` ("Welcome, type below to search for Events") → `cat.floqaiAlso` ("You may also search for: Clubs or Lounges").
+- While typing, the bubble shows the live interpretation: `cat.floqaiSearching` ("Searching {type}") · genres · `cat.floqaiIn` ("in {place}"). `data-i18n` is removed from the bubble while it shows a live interpretation so `applyText` does not overwrite it.
+- Submit → `showAdSplash(type)` → `openVenueSearch(type, query)` → listing opens with that type and `#locationSearch` prefilled.
+
+## Parser (`floqr-venue-query.js` → `window.FLOQRVenueQuery`)
+
+- `normalize`: NFD, strip diacritics, `&` → "and", split on non-letters/digits. Word lookup compacts spans (max 4 tokens), so `Beachclub`, `Beach club`, `Beach-club`, `Beach clubs`, `beach_clubs` share one key. Singular fallback strips trailing `s`/`es`.
+- `VENUE_TYPES` word lists: `events`, `beach-clubs`, `lounge-club`, `lounges`, `clubs` (English variants + all supported languages). Add new spellings **only** to the `words` array for that type; tests cover variants.
+- Type precedence: **events wins** over venue words ("Hip Hop events at clubs" → events). Otherwise most specific: lounge-club > beach-clubs > lounges > clubs.
+- Entry context: `parse(q, {entry})`. On the Search for page the entry is `events` (default). On a listing page the listing's own type wins **unless** the query names another type (`typeSource === "query"`) — then the listing switches type.
+- `GENRES` / `PLACES` lists are stripped from the text; only `residual` goes to `floqrSearch`. Records are then strictly filtered with `matchesFilters(parsed, record, extraText)` (genre + place).
+- Free-text place: words after the last `PLACE_PREPOSITIONS` token, stopping at `WHEN_WORDS` / "this" / "next". Known places ("Miami Beach") win over the type word "beach".
+- `WHEN_WORDS` (tonight, weekend, weekdays) never remove venue results; they stay in the events text query only.
+
+## FloqAi global search (`intent-search.js`)
+
+`venueSearchIntent` runs before help scoring when `isVenueQuery` is true and the query is not help-like. It links to `./?start=search&q=<query>`; `runStartVenueQuery` reads `q`, removes it with `replaceState`, and submits it through the same path as the page search box.
+
+## Landing / auth routing
+
+- Landing paragraph lives in the Welcome `?` (`help-welcome`, `FLOQRHelpAttach` via `data-floqr-help-*`, localized in `floqr-i18n-help.js`, mirrored in `floqai-help-repository.js`). No duplicate `login-copy` paragraph.
+- Signed-in users **never** see a Continue / Sign out interstitial: `onAuthStateChanged` with a user on the landing page → `showPage("categoryPage")` → `afterLogin()`. `continueBtn` is removed.
+- `localStorage["floqr.signedInHint"] = "1"` after a signed-in resolve. Inline head script adds `html.floqr-auth-resolving` to hide landing auth chrome until auth resolves (8s failsafe). Sign-out clears the hint.
+- `backToWelcomeBtn` is hidden while signed in.
+
+## Checklist
+
+- [ ] New type/genre/place spelling added to the word list + a test in `functions/floqr-venue-query.test.js`
+- [ ] New dialog/label text keyed in `floqr-i18n.js` for all 11 languages
+- [ ] `floqr-venue-query.js` loads before `intent-search.js` and `patron-app.js`
+- [ ] Bubble stays above the input on phone (form stacks ≤520px)
+
+## FIX PROMPT
+
+```
+FloqAi venue search: Search for page has stationary FloqAi above the input (cat.floqaiWelcome → cat.floqaiAlso). Parser floqr-venue-query.js word lists for events / clubs / beach-clubs / lounges / lounge-club (+ spacing/hyphen/plural/localized variants), genres, places. Events win; else most specific type. Listing entry type wins unless query names a type. Strip type/genre/place; floqrSearch only on residual; strict matchesFilters. Signed-in skips interstitial. Design notes: design-notes-floqai-venue-search.mdc
+```

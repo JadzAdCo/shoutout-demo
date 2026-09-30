@@ -166,5 +166,9 @@
   "help-do-not-sell": {
     "title": "Do Not Sell or Share",
     "body": "Turn this on to opt out of sale/share-style personalization. FLOQR will not score ads with your profile tags. House and all-audience creatives may still show. If your browser sends Global Privacy Control (GPC), we set this automatically. Open the Privacy Policy for CCPA / CPRA details."
+  },
+  "help-welcome": {
+    "title": "Welcome to FLOQR",
+    "body": "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family."
   }
 }

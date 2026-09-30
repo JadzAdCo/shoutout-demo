@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-welcome": {
+        title: "Добро пожаловать в FLOQR",
+        body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй."
+      },
       "help-ad-campaigns": {
         title: "Рекламные кампании",
         body: "Выберите Business account в My Profile, чтобы открыть Ad Campaigns. Inline ($45 / 7 дней — во время использования FloqR) или Mingl Gist ($25 / 7 дней — при прокрутке Mingl). Загрузите PNG/JPEG/GIF или вставьте HTML. Аудитория: все или datapoints профиля. Отправка уходит Master Admin на одобрение и расписание."
@@ -176,6 +180,10 @@
       }
     },
     nl: {
+      "help-welcome": {
+        title: "Welkom bij FLOQR",
+        body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie."
+      },
       "help-ad-campaigns": {
         title: "Advertentiecampagnes",
         body: "Kies een Business account in My Profile om Ad Campaigns te openen. Inline ($45 / 7 dagen — tijdens FloqR-gebruik) of Mingl Gist ($25 / 7 dagen — tijdens Mingl-scrollen). Upload PNG/JPEG/GIF of plak HTML. Richt je op alle patrons of op profiel-datapoints. Indienen gaat naar Master Admin voor goedkeuring en planning."
@@ -346,6 +354,10 @@
       }
     },
     fr: {
+      "help-welcome": {
+        title: "Bienvenue sur FLOQR",
+        body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille."
+      },
       "help-ad-campaigns": {
         title: "Campagnes publicitaires",
         body: "Choisissez un compte Business dans My Profile pour ouvrir Ad Campaigns. Inline (45 $ / 7 jours — pendant l’usage de FloqR) ou Mingl Gist (25 $ / 7 jours — en scrollant Mingl). Téléversez PNG/JPEG/GIF ou collez du HTML. Ciblez tous les patrons ou des datapoints. L’envoi part vers Master Admin pour approbation et planning."
@@ -516,6 +528,10 @@
       }
     },
     de: {
+      "help-welcome": {
+        title: "Willkommen bei FLOQR",
+        body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie."
+      },
       "help-ad-campaigns": {
         title: "Werbekampagnen",
         body: "Wählen Sie in My Profile ein Business-Konto, um Ad Campaigns zu öffnen. Inline (45 $ / 7 Tage — während FloqR-Nutzung) oder Mingl Gist (25 $ / 7 Tage — beim Mingl-Scrollen). PNG/JPEG/GIF hochladen oder HTML einfügen. Zielgruppe: alle oder Profildatenpunkte. Einreichung geht an Master Admin zur Freigabe und Planung."
@@ -686,6 +702,10 @@
       }
     },
     es: {
+      "help-welcome": {
+        title: "Bienvenido a FLOQR",
+        body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia."
+      },
       "help-ad-campaigns": {
         title: "Campañas publicitarias",
         body: "Elige una cuenta Business en My Profile para abrir Ad Campaigns. Inline (45 $ / 7 días — al usar FloqR) o Mingl Gist (25 $ / 7 días — al desplazarte en Mingl). Sube PNG/JPEG/GIF o pega HTML. Dirige a todos o a datapoints del perfil. El envío va a Master Admin para aprobación y programación."
@@ -856,6 +876,10 @@
       }
     },
     it: {
+      "help-welcome": {
+        title: "Benvenuto su FLOQR",
+        body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari."
+      },
       "help-ad-campaigns": {
         title: "Campagne pubblicitarie",
         body: "Scegli un account Business in My Profile per aprire Ad Campaigns. Inline (45 $ / 7 giorni — durante l’uso di FloqR) o Mingl Gist (25 $ / 7 giorni — scorrendo Mingl). Carica PNG/JPEG/GIF o incolla HTML. Pubblico: tutti o datapoint del profilo. L’invio va a Master Admin per approvazione e pianificazione."
@@ -1026,6 +1050,10 @@
       }
     },
     pt: {
+      "help-welcome": {
+        title: "Bem-vindo ao FLOQR",
+        body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família."
+      },
       "help-ad-campaigns": {
         title: "Campanhas publicitárias",
         body: "Escolha uma conta Business em My Profile para abrir Ad Campaigns. Inline (45 $ / 7 dias — ao usar o FloqR) ou Mingl Gist (25 $ / 7 dias — ao percorrer o Mingl). Carregue PNG/JPEG/GIF ou cole HTML. Público: todos ou datapoints do perfil. O envio vai para Master Admin para aprovação e agendamento."
@@ -1196,6 +1224,10 @@
       }
     },
     el: {
+      "help-welcome": {
+        title: "Καλώς ήρθατε στο FLOQR",
+        body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια."
+      },
       "help-ad-campaigns": {
         title: "Διαφημιστικές καμπάνιες",
         body: "Επιλέξτε Business account στο My Profile για Ad Campaigns. Inline (45 $ / 7 ημέρες — κατά τη χρήση FloqR) ή Mingl Gist (25 $ / 7 ημέρες — στο scroll του Mingl). Ανεβάστε PNG/JPEG/GIF ή επικολλήστε HTML. Κοινό: όλοι ή datapoints προφίλ. Υποβολή στον Master Admin για έγκριση και προγραμματισμό."
@@ -1366,6 +1398,10 @@
       }
     },
     pl: {
+      "help-welcome": {
+        title: "Witamy w FLOQR",
+        body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną."
+      },
       "help-ad-campaigns": {
         title: "Kampanie reklamowe",
         body: "Wybierz konto Business w My Profile, aby otworzyć Ad Campaigns. Inline (45 $ / 7 dni — podczas używania FloqR) lub Mingl Gist (25 $ / 7 dni — podczas przewijania Mingl). Prześlij PNG/JPEG/GIF lub wklej HTML. Grupy: wszyscy lub datapointy profilu. Wysłanie trafia do Master Admin do zatwierdzenia i harmonogramu."
@@ -1536,6 +1572,10 @@
       }
     },
     ar: {
+      "help-welcome": {
+        title: "مرحباً بك في FLOQR",
+        body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة."
+      },
       "help-ad-campaigns": {
         title: "حملات إعلانية",
         body: "اختر حساب Business في My Profile لفتح Ad Campaigns. Inline (45$ / 7 أيام — أثناء استخدام FloqR) أو Mingl Gist (25$ / 7 أيام — أثناء التمرير في Mingl). ارفع PNG/JPEG/GIF أو الصق HTML. الجمهور: الجميع أو نقاط بيانات الملف. الإرسال يذهب إلى Master Admin للموافقة والجدولة."

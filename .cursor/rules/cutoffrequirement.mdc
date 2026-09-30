@@ -74,7 +74,7 @@ Until DNS/hosting flip, patrons keep using GitHub Pages; account-level prefs in 
 
 ## Related notes
 
-- Privacy safe rollout: `.cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc` (`@privacy-compliance$`)
+- Privacy safe rollout: `.cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc` (`@privacy-compliance$` / `$privacy-test$`) — includes **Manual test process (demo / Pages)**
 - **Demo timing:** ship DNS/GPC/DSAR/`privacyConsents` on Pages **before** cutover (s3.0.103+). Publish counsel-ready policy contact and force re-ack on `www.floqr.com` at cutover — not blocked on DNS flip.
 - Versioning / no `?v=` on Display: `.cursor/rules/floqr-versioning.mdc`, `.cursor/rules/screen-datapoints.mdc`
 
