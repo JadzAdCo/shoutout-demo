@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.104 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.105 (stable)
 
+- s3.0.105: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs + genre + city word lists); Welcome `?` help; signed-in users skip the Continue interstitial.
 - s3.0.104: Publish floqr-ad-pricing.js + patron-ad-campaigns.js to main so Functions CI (ad-campaigns-business tests) passes.
 - s3.0.103: Privacy Policy + Do Not Sell/GPC + DSAR export/delete callables; ad personalization gate; privacyConsents owner rules.
 

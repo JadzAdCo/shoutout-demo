@@ -5,9 +5,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.0.9"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.0.105"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=29.09.115"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=s3.0.105"/>
+  <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
 </head>
 <body>
 
@@ -36,13 +37,17 @@
       <div class="login-card">
         <img src="./images/floqr-color.png" alt="FLOQR" class="hero-logo floqr-hero-logo" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')"/>
         <div class="hero-logo-fallback hidden">FLOQR</div>
-        <h2 data-i18n="app.welcome">Welcome</h2>
-        <p class="login-copy" data-i18n="app.loginCopy">Search and book entertainment and nightlife events worldwide or send a live ShoutOut to one of our ShoutOut displays or Mingl with new people, friends, and family.</p>
+        <h2
+          data-i18n="app.welcome"
+          data-floqr-help-id="help-welcome"
+          data-floqr-help-title="Welcome to FLOQR"
+          data-floqr-help-search="welcome|what is floqr|what can i do on floqr|about floqr|book nightlife|send a live shoutout"
+          data-floqr-help-body="Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family."
+        >Welcome</h2>
         <p class="sub small"><a href="./privacy.html?v=s3.0.103">Privacy Policy</a> · <a href="./privacy.html?v=s3.0.103#do-not-sell">Do Not Sell or Share</a></p>
         <p id="signedInAs" class="status" data-i18n="app.signIn">Please Sign-In or Sign-Up:</p>
 
         <div id="signedInActions" class="hidden">
-          <button id="continueBtn" class="primary full" type="button" data-i18n="app.continue">Continue</button>
           <button id="logoutBtn1" class="ghost full" type="button" data-i18n="app.signOut">Sign out</button>
         </div>
 
@@ -246,6 +251,17 @@
       </div>
       <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
+
+    <div id="categoryFloqAiSearch" class="category-floqai-search">
+      <div class="category-floqai-intro">
+        <span class="category-floqai-mark" aria-hidden="true"><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
+        <p id="categoryFloqAiSpeech" class="category-floqai-speech" role="status" aria-live="polite" data-i18n="cat.floqaiWelcome">Welcome, type below to search for Events</p>
+      </div>
+      <form id="categoryFloqAiForm" class="category-floqai-form" role="search" autocomplete="off">
+        <input id="categoryFloqAiInput" type="search" enterkeyhint="search" data-i18n-placeholder="cat.floqaiPlaceholder" placeholder="Hip Hop Clubs in DC · EDM Events in New York" data-i18n="cat.floqaiLabel" data-i18n-attr="aria-label" aria-label="Search events and venues with FloqAi"/>
+        <button id="categoryFloqAiGo" class="primary" type="submit" data-i18n="cat.floqaiGo">Search</button>
+      </form>
+    </div>
 
     <div class="category-grid compact-category-grid">
       <button id="eventsBtnCard" class="category-card" type="button" data-i18n="cat.events">Events</button>
@@ -714,11 +730,12 @@
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
-<script src="./floqr-i18n.js?v=s3.0.86"></script>
+<script src="./floqr-i18n.js?v=s3.0.105"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.0.103"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.103"></script>
-<script src="./intent-search.js?v=s3.0.103"></script>
+<script src="./floqai-help-repository.js?v=s3.0.105"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.105"></script>
+<script src="./floqr-venue-query.js?v=s3.0.105"></script>
+<script src="./intent-search.js?v=s3.0.105"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
@@ -748,7 +765,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.87"></script>
+<script src="./patron-app.js?v=s3.0.105"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.103";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.105";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1099,19 +1099,38 @@
         {label:"Do Not Sell control", file:"patron-portal.html", includes:["id=\"privacyDoNotSell\"", "help-do-not-sell"]},
         {label:"DSAR callables", file:"functions/privacy-dsar-functions.js", includes:["exportPatronData", "requestPatronDelete", "fulfillPatronDelete"]},
         {label:"privacyConsents owner rules", file:"firestore.rules", includes:["s3.0.103-privacy-consents-owner", "resource.data.uid == request.auth.uid"]},
-        {label:"Ad personalization gate", file:"ad-campaigns.js", includes:["allowsPersonalizedAds", "VERSION = \"s3.0.103\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.103\""]}
+        {label:"Ad personalization gate", file:"ad-campaigns.js", includes:["allowsPersonalizedAds", "VERSION = \"s3.0.103\""]}
+      ]
+    },
+    {
+      version: "s3.0.105-floqai-venue-search",
+      title: "FloqAi venue search + Welcome help + no signed-in interstitial",
+      checks: [
+        {label:"Venue query parser", file:"floqr-venue-query.js", includes:["VERSION = \"s3.0.105\"", "beach-clubs", "lounge-club", "matchesFilters"]},
+        {label:"Stationary FloqAi above search", file:"index.html", includes:["id=\"categoryFloqAiSpeech\"", "data-i18n=\"cat.floqaiWelcome\"", "floqr-venue-query.js?v=s3.0.105"]},
+        {label:"Welcome help popout", file:"index.html", includes:["data-floqr-help-id=\"help-welcome\""]},
+        {label:"Signed-in skips interstitial", file:"patron-app.js", includes:["rememberSignedInHint", "runStartVenueQuery", "bindCategoryFloqAi"]},
+        {label:"FloqAi venue intent", file:"intent-search.js", includes:["venueSearchIntent", "start: \"search\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.105\""]}
       ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-0-105-floqai-venue-search",
+      area:"Search / FloqAi",
+      feature:"FloqAi venue search on Search for, Welcome help, no signed-in interstitial",
+      changed:"Welcome now has a ? help with the landing description. Signed-in patrons go straight to Search for. FloqAi sits above a search box on Search for and understands Events, Clubs, Beach Clubs, Lounges and Lounge-Clubs plus genre and city (e.g. Hip Hop Clubs in DC, EDM Events in New York).",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.105. Signed out: tap ? beside Welcome. Sign in: you land on Search for with no Continue card. Watch FloqAi alternate between the Welcome and You may also search for dialogs. Type Hip Hop Clubs in DC, then EDM Events in New York, then Beach-club Miami: the bubble shows what FloqAi understood; Search opens the matching listing prefilled. Switch language in My Profile and repeat.",
+      expected:"Help popout opens beside Welcome. No interstitial. Clubs / Events / Beach Clubs listings open with genre and city filters applied. Dialog text is translated."
+    },
+    {
       id:"s3-0-103-privacy-dns-dsar",
       area:"My Privacy / compliance",
       feature:"Privacy Policy, Do Not Sell / GPC, server export and delete",
       changed:"Added privacy.html (www.floqr.com canonical). My Privacy has Do Not Sell or Share, GPC auto-apply, Download My Data via exportPatronData, and Request Data Delete via requestPatronDelete. Targeted ads skip profile tags when DNS/GPC/sharing is off. privacyConsents is owner-create only.",
-      howToTest:"Hard-refresh patron-portal.html?v=s3.0.103&tab=privacy. Open Privacy Policy link. Toggle Do Not Sell, Save. Download My Data JSON (server export). Confirm Search ads still rotate house creatives when DNS is on. Master Admin Rules Smoke Test after rules deploy.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/privacy.html?v=s3.0.103 (Do Not Sell + www.floqr.com). Sign in → patron-portal.html?v=s3.0.103&tab=privacy: toggle Do Not Sell, Save, refresh; Download My Data JSON (server export with bundles); FloqAi “do not sell”. Optional GPC browser. Ads: DNS on → house/all still rotate, targeted tags stop. Delete only on disposable test account (type DELETE). Full steps: .cursor/rules/design-notes-privacy-compliance-safe-rollout.mdc Manual test process.",
       expected:"Policy loads. DNS persists. Export JSON includes profile bundles. Targeted tag scoring stops while house ads can still show. Delete requires typing DELETE and anonymizes the account."
     },
     {

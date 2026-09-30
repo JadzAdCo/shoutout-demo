@@ -902,6 +902,22 @@
       page: "patron-portal.html#portalPrivacy"
     },
     {
+      id: "help-welcome",
+      title: "Welcome to FLOQR",
+      body: "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family.",
+      searchPhrases: [
+        "welcome", "what is floqr", "what can i do on floqr", "about floqr",
+        "book nightlife", "send a live shoutout", "mingl with friends"
+      ],
+      links: [
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
+        {label: "Mingl", href: vUrl("./", {start: "mingl", from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#landingPage"
+    },
+    {
       id: "help-sos2fa-entity-mgmt",
       title: "Privilege Admin Access",
       body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
