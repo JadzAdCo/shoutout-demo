@@ -5,7 +5,22 @@ $root = [IO.Path]::GetFullPath($PSScriptRoot)
 $stage = Join-Path $root ".publish-s3-0-109-feature-guard"
 $git = "C:\Program Files\Git\cmd\git.exe"
 $files = @(
-  "README.md"   "ai-diagnostics-service.js"   "floqr-feature-services.js"   "floqr-nav.js"   "functions/package.json"   "functions/feature-services-core.test.js"   "index.html"   "master-admin.html"   "rydr.html"   "commerce.html"   "pickup.html"   "mingl-chat.html"   "mingl-gist.html"   "suprstr-search.html"   "suprstar-preview.html"
+  "README.md",
+  "ai-diagnostics-service.js",
+  "floqr-feature-services.js",
+  "floqr-nav.js",
+  "functions/package.json",
+  "functions/feature-services-core.test.js",
+  "index.html",
+  "master-admin.html",
+  "rydr.html",
+  "commerce.html",
+  "pickup.html",
+  "mingl-chat.html",
+  "mingl-gist.html",
+  "suprstr-search.html",
+  "suprstar-preview.html"
+)
 
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 & $git clone --depth 1 -b main "https://github.com/JadzAdCo/shoutout-demo.git" $stage
