@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.111";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.112";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1184,6 +1184,15 @@
         {label:"Left-aligned sign-in buttons", file:"styles.css", includes:["#loginActions > .signin{justify-content:flex-start;text-align:left"]},
         {label:"Style cache bust", file:"index.html", includes:["styles.css?v=s3.0.111"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.111\""]}
+      ]
+    },
+    {
+      version: "s3.0.112-heist-96x48-default",
+      title: "Heist Washington DC defaults to the 96×48 display",
+      checks: [
+        {label:"Heist packaged default", file:"shared-data.js", includes:["secondaryDisplayScreenFormatId:\"led-64x32\"", "VenueSupports96x48:1, VenueSupports64x48:0, VenueSupports64x32:1"]},
+        {label:"Display cache bust", file:"display.html", includes:["shared-data.js?v=s3.0.112"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.112\""]}
       ]
     }
   ];

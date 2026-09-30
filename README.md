@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.111 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.112 (stable)
+
+- s3.0.112: Heist Washington DC — 96×48 display enabled and set as the default (Display 1, `display.html?location=heist-washington-dc`); Display 2 stays 64×32; 64×48 stays off. Firestore `clubLocations/heist-washington-dc` and the packaged venue both updated.
 
 - s3.0.111: Welcome sign-in buttons show the icon and label left-aligned (panel Send / Verify buttons stay centered).
 
