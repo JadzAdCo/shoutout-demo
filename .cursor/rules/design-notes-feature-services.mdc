@@ -1,0 +1,98 @@
+---
+description: Features & Services — IsFeatureEnabled / IsTestFeature flags, beta testers, test branch + promotion, hash-chained audit (ISO 27001 / NIST 800-53r5)
+alwaysApply: true
+---
+
+# Features & Services (always)
+
+Resume: `@features$` / `$beta$`. Shipped in **s3.0.108**.
+
+Master Admin → **Features & Services** decides which Search link buttons exist for whom. Only **ShoutOut** is live by default. Everything else is a **test feature** until a Master Admin turns it Live.
+
+## Data model (Firestore)
+
+| Collection | Doc | Key fields | Read | Write |
+|---|---|---|---|---|
+| `featureServices` | `{featureKey}` | `IsFeatureEnabled` 0\|1, `IsTestFeature` 0\|1, `revision`, `updatedByEmail`, `updatedAtMs`, `lastChangeReason` | signed in | Functions only |
+| `betaTesters` | `{uid}` | `IsBetaTester` 0\|1, `status` active\|revoked, `inviteId`, `invitedByEmail`, `acceptedAtMs`, `revokedByEmail`, `revokeReason` | self + Master Admin | Functions only |
+| `betaInvites` | `sha256("floqr-beta-invite:"+token)` | `targetUid`, `status` pending\|accepted\|declined\|revoked, `expiresAtMs` (7 days), `createdByEmail` | Master Admin | Functions only |
+| `featureServiceAuditLogs` | auto | see Audit | Master Admin | Functions only |
+| `featureServiceAuditHead` | `current` | `hash`, `seq`, `eventId` | Master Admin | Functions only |
+
+Feature keys (catalog in `functions/feature-services-core.js`, mirrored in `floqr-feature-services.js`; a test asserts parity): `shoutOut` {1,0}, `mingl`, `bartr`, `rydr`, `supRstar`, `floqAi` {0,1}. Missing doc → packaged default (fail closed for non-ShoutOut). Master Admin auto-seeds missing docs on first unlock (`seedFeatureServices`).
+
+## Access rule (one rule, three enforcement points)
+
+```
+canAccess = isMasterAdmin || IsFeatureEnabled == 1 || (IsTestFeature == 1 && betaTesters/{uid} active)
+Search tile visible = canAccess && legacy patronFeatureGates.patronMayUse (platformSettings/patronFeatureGates)
+```
+
+1. **Search tiles** — `index.html` ships non-ShoutOut tiles with `hidden`; `patron-app.js` `continueToMainCategories` → `FLOQRFeatureServices.load` + `applySearchUi` (runs after `applyPatronGateUi`). Beta-only tiles get `.feature-beta` pill (`cat.betaPill`).
+2. **Satellite pages** — `<body data-floqr-feature="key" [data-floqr-feature-signed-out="allow"]>` + `floqr-feature-services.js`: hides body until checked; denied → “This feature isn't available on your account yet.” + Back to Search. 8 s timeout = deny. Guarded: `commerce.html` (bartr), `pickup.html` + `rydr.html` (rydr), `suprstr-search.html` + `suprstar-preview.html` (supRstar), `mingl-chat.html` + `mingl-gist.html` (mingl).
+3. **Server** — `assertFeatureAccess(auth, key)` in `createFloqrCheckoutSession` (`CHECKOUT_FEATURE_KEYS`) and `requestTeslaRobotaxiPickup`. Client guards are UX; the server check is the control.
+
+New feature checklist: add to both catalogs + `buttonIds`, add `data-feature-key` tile (hidden), guard its satellite page, add `assertFeatureAccess` to its paid/stateful callables, help + i18n.
+
+## Callables (`functions/feature-services-functions.js`, us-central1)
+
+All admin callables require an **SOS2FA** session (`assertSos2faSession`, scope `entityManagement`); failures log `*.denied` (unchained).
+
+`setFeatureServiceFlags` (reason ≥ 8 chars, transaction: doc + chained audit) · `seedFeatureServices` · `createBetaInvite` (Inbox row `type: betaInvite`, link `./beta-invite.html?t=…`) · `acceptBetaInvite` / `declineBetaInvite` (patron, token must match `targetUid`) · `revokeBetaTester` (reason; voids pending invites) · `revokeBetaInvite` · `logFeatureCodePromotion` (returns GitHub workflow URL) · `verifyFeatureServiceAuditChain`.
+
+## Beta testers
+
+- Master Admin searches patrons (client scan of `users`, 500) → **Invite** → Inbox message + link copied to clipboard (share by any channel).
+- Token: 32 random bytes (base64url); only its SHA-256 is stored. Link is useless on another account (`wrong-account`), after 7 days, or once used. `beta-invite.html` strips `t` from the address bar after responding and sets `no-referrer`.
+- Inbox button label: **Review beta invite** (`patron-portal-app.js` `inboxLinkLabel`).
+
+## Test branch and promotion
+
+GitHub Pages serves **one** branch (`main`). So runtime flags are the real gate (trunk-based dark launch): test code can live on `main` behind `IsTestFeature`.
+
+- `test` branch = staging code line created from `main`. `sync-main-into-test.yml` merges every push to `main` into `test` (fails loudly on conflict).
+- `functions-ci.yml` runs tests on pushes/PRs to `test`.
+- `promote-test-to-main.yml` (workflow_dispatch, inputs reason + `PROMOTE`): i18n gate + Functions tests on `test` → `merge --no-ff` into `main` → fast-forward `test` → request Pages build → dispatch Functions CI. Functions **deploy** stays a separate `deploy=true` dispatch.
+- Master Admin **Record promotion & open workflow** writes `code.promotion_requested` (chained) and opens the workflow page. No GitHub PAT is stored in Functions.
+- Order: promote code → verify live → flip `IsFeatureEnabled` = 1 (reason) → optionally `IsTestFeature` = 0.
+
+## Audit (ISO/IEC 27001:2022 + NIST SP 800-53 Rev. 5)
+
+Record fields (`buildAuditRecord`): `eventType`, `outcome` success|failure|denied, `actorUid`, `actorEmail`, `actorRole`, `targetType`, `targetId`, `before`, `after`, `reason`, `detail`, `sos2faSessionHash` (sha256/16), `sourceIpTruncated` (/24 or /48), `sourceIpHash`, `userAgent`, `source`, `createdAtMs`, `createdAtIso` (UTC), server `createdAt`, `controlSets`, `retentionYears` 7, `expireAtMs`.
+
+| Control | How |
+|---|---|
+| A.8.15 / AU-2, AU-12 | Every flag, seed, invite, accept/decline, revoke, promotion, verify, and denial is logged by the server |
+| AU-3 | what / when / where / source / outcome / identity + before/after |
+| AU-8 / A.8.17 | Server clock, ISO-8601 UTC + serverTimestamp |
+| AU-9 / A.8.15 | Rules: no client writes; Master Admin read only; SHA-256 hash chain (`prevHash`, `seq`, head doc in same transaction) |
+| AU-10 | Actor uid/email + SOS2FA session hash bound into the chained hash |
+| AU-11 | 7-year retention (`expireAtMs`) — do **not** enable a Firestore TTL shorter than this |
+| CM-3 / A.8.32 | Reason required, revision counter, before/after, promotion log |
+| AC-6(9) | Denied privileged attempts logged |
+| A.8.16 | **Verify integrity** button; chain verdict itself is logged |
+
+Denials are unchained on purpose (no contention on the head doc from abusive traffic).
+
+## Security findings (open — not fixed in s3.0.108)
+
+1. **`users` readable by any signed-in user** (PII: email, phone). Restrict to self + Master Admin + scoped venue staff; move patron search for admins to a callable.
+2. **`inboxNotifications` readable by any signed-in user.** Beta invite links stay safe only because invites are uid-bound. Restrict to `recipientUid == auth.uid`.
+3. **Admin email lists disagree**: client/rules include `bands.don@gmail.com`; Functions `sos2fa` / `PRIVILEGED_EMAILS` use `bans.don@gmail.com`. Pick one source (custom claims `masterAdmin: true`) and remove email lists.
+4. Fixed in s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` were self-writable on `users/{uid}` and trusted by the server — now in `hasBackendOnlyIdentityFields`.
+
+## Improvements (recommended next)
+
+- **Custom claims** for Master Admin and beta tester (`betaTester: true` on accept, revoke on revoke) → rules and callables stop reading user docs; force token refresh on change.
+- **Two-person rule** for turning a feature Live (second Master Admin approves) — CM-3(2)/AC-5.
+- **Percentage / venue-scoped rollout** (`rolloutPercent`, `venueIds`) and a **kill switch** field that also blocks server callables instantly.
+- **Firebase Hosting preview channel for `test`** (`firebase hosting:channel:deploy test`) so test code runs on its own URL — needs `hosting` in `firebase.json`, Auth authorized domain, App Check site key.
+- **Export audit to Cloud Logging / BigQuery sink** (WORM bucket with retention lock) for AU-4/AU-6 and SIEM alerts on `*.denied` spikes.
+- Beta invite by **email/SMS** through existing SendGrid/Twilio senders (today: Inbox + copied link).
+- Scheduled `verifyFeatureServiceAuditChain` daily with an alert on failure.
+
+## FIX PROMPT
+
+```
+Features & Services: flags in featureServices (IsFeatureEnabled / IsTestFeature), access = master || live || (test && active beta tester). Enforce on Search tiles (floqr-feature-services.js applySearchUi), satellite body data-floqr-feature guard, and server assertFeatureAccess. Admin writes via SOS2FA callables only, reason ≥ 8, chained audit in the same transaction. Test branch + promote-test-to-main workflow; Pages serves main only. Design notes: design-notes-feature-services.mdc
+```

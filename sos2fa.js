@@ -12,7 +12,8 @@
     "allQueues",
     "clubOnboarding",
     "templateManagement",
-    "recommendationModeration"
+    "recommendationModeration",
+    "featuresServices"
   ];
 
   let uiBound = false;
@@ -234,6 +235,7 @@
   function fireUnlock(scope) {
     const cb = unlockCallbacks.get(scope);
     if (typeof cb === "function") cb();
+    document.dispatchEvent(new CustomEvent("floqr:sos2fa-unlocked", {detail: {scope}}));
   }
 
   function bindUi(scope) {

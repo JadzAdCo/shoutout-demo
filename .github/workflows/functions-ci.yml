@@ -2,7 +2,7 @@ name: Functions CI and Deploy
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, test]
     paths:
       - "functions/**"
       - "firestore.rules"
@@ -12,7 +12,7 @@ on:
       - ".firebaserc"
       - ".github/workflows/functions-ci.yml"
   pull_request:
-    branches: [main, master]
+    branches: [main, master, test]
     paths:
       - "functions/**"
       - "firestore.rules"

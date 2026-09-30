@@ -680,8 +680,10 @@
     "default": { title: "Advertise Here", body: "Your brand can own this moment before patrons browse nightlife.", badge: "FLOQR Media Slot", image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20900%20520%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20x2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ff64d8%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23dfff5a%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Crect%20width%3D%22900%22%20height%3D%22520%22%20rx%3D%2244%22%20fill%3D%22%2309091c%22/%3E%0A%3Ccircle%20cx%3D%22170%22%20cy%3D%22110%22%20r%3D%22155%22%20fill%3D%22%23ff64d8%22%20opacity%3D%22.20%22/%3E%0A%3Ccircle%20cx%3D%22730%22%20cy%3D%22385%22%20r%3D%22185%22%20fill%3D%22%23dfff5a%22%20opacity%3D%22.20%22/%3E%0A%3Crect%20x%3D%22245%22%20y%3D%22135%22%20width%3D%22410%22%20height%3D%22240%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%2214%22/%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22245%22%20fill%3D%22%23fff%22%20font-size%3D%2256%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%20font-weight%3D%22900%22%3EADVERTISE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22310%22%20fill%3D%22%23dfff5a%22%20font-size%3D%2230%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%3EHERE%3C/text%3E%0A%3Ctext%20x%3D%22450%22%20y%3D%22450%22%20fill%3D%22%23c9cee5%22%20font-size%3D%2224%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%22%3ESponsored%20FLOQR%20Media%20Slot%3C/text%3E%0A%3C/svg%3E" }
   };
 
+  const AD_SPLASH_MS = 5000;
   let pendingCategoryAfterAd = null;
   let adTimer = null;
+  let adStatementTimers = [];
 
   function showAdSplash(type, nextFn) {
     pendingCategoryAfterAd = nextFn;
@@ -716,33 +718,29 @@
     const statementSecondary = byId("splashStatementSecondary");
     statementPrimary?.classList.remove("is-hidden");
     statementSecondary?.classList.remove("is-hidden");
-    let remaining = 10;
-    setText("adCountdown", String(remaining));
     showPage("adSplashPage");
-    clearInterval(adTimer);
-    adTimer = setInterval(() => {
-      remaining -= 1;
-      if (remaining <= 6) statementPrimary?.classList.add("is-hidden");
-      if (remaining <= 3) statementSecondary?.classList.add("is-hidden");
-      setText("adCountdown", String(Math.max(remaining, 0)));
-      if (remaining <= 0) {
-        clearInterval(adTimer);
-        const fn = pendingCategoryAfterAd;
-        pendingCategoryAfterAd = null;
-        if (typeof fn === "function") fn();
-      }
-    }, 1000);
+    clearAdSplashTimers();
+    adStatementTimers = [
+      setTimeout(() => statementPrimary?.classList.add("is-hidden"), AD_SPLASH_MS * 0.4),
+      setTimeout(() => statementSecondary?.classList.add("is-hidden"), AD_SPLASH_MS * 0.7)
+    ];
+    adTimer = setTimeout(() => {
+      clearAdSplashTimers();
+      const fn = pendingCategoryAfterAd;
+      pendingCategoryAfterAd = null;
+      if (typeof fn === "function") fn();
+    }, AD_SPLASH_MS);
   }
 
-  function skipAdSplash() {
-    clearInterval(adTimer);
-    const fn = pendingCategoryAfterAd;
-    pendingCategoryAfterAd = null;
-    if (typeof fn === "function") fn();
+  function clearAdSplashTimers() {
+    clearTimeout(adTimer);
+    adStatementTimers.forEach(clearTimeout);
+    adTimer = null;
+    adStatementTimers = [];
   }
 
   function cancelAdSplash() {
-    clearInterval(adTimer);
+    clearAdSplashTimers();
     pendingCategoryAfterAd = null;
     showPage("categoryPage");
   }
@@ -1100,12 +1098,19 @@
       return;
     }
     try {
-      await window.FLOQRFeatureGates?.loadPatronGates?.(db);
+      await Promise.all([
+        window.FLOQRFeatureGates?.loadPatronGates?.(db),
+        window.FLOQRFeatureServices?.load?.({db, user: currentUser, profile: cachedUserProfile})
+      ]);
       window.FLOQRFeatureGates?.applyPatronGateUi?.(currentUser, cachedUserProfile);
-    } catch (e) {}
+      window.FLOQRFeatureServices?.applySearchUi?.();
+    } catch (e) {
+      console.warn("Search feature visibility failed", e?.message || e);
+    }
     setStatus("");
     showPage("categoryPage");
     window.FLOQRNav?.applyStartPage(showPage);
+    if (byId("minglLandingPage")?.classList.contains("active") && !featureServiceAllows("mingl")) showPage("categoryPage");
     if (pendingDirectLocation) {
       openCategory("shoutout");
       setTimeout(() => selectLocationForShoutOut(pendingDirectLocation), 400);
@@ -2029,6 +2034,11 @@
     return `./mingl-chat.html?${params.toString()}`;
   }
 
+  function featureServiceAllows(featureKey) {
+    const fs = window.FLOQRFeatureServices;
+    return !fs || fs.canAccess(featureKey);
+  }
+
   async function showShoutoutLanding() {
     const g = window.FLOQRFeatureGates;
     if (g && !g.patronMayUse("shoutOut", currentUser, cachedUserProfile)) {
@@ -2090,6 +2100,11 @@
     const g = window.FLOQRFeatureGates;
     if (g && !g.patronMayUse("mingl", currentUser, cachedUserProfile)) {
       setStatus("Mingl is currently disabled for patrons.");
+      return;
+    }
+    if (!featureServiceAllows("mingl")) {
+      setStatus(window.FLOQRFeatureServices.unavailableMessage());
+      showPage("categoryPage");
       return;
     }
     const profile = await getUserProfile();
@@ -4532,7 +4547,6 @@
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);
-    bind("skipAdBtn", skipAdSplash);
     bind("saveProfileBtn", saveProfile);
     floqrId().bindInstagramInput?.(byId("profileInstagram"));
     floqrId().bindFloqrHandleInput?.(byId("profileUsername"));

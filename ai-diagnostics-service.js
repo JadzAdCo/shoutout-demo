@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.107";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.108";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -944,6 +944,8 @@
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.9\""]}
       ]
     },
+    {
+      version:"s3.0.8",
       title:"Soccer photo jerseys — one silhouette, black LED backdrop, proposed kits live",
       checks:[
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"s3.0.8\""]},
@@ -1137,10 +1139,32 @@
         {label:"Privacy discloses OTP logging", file:"privacy.html", includes:["One Time Password (OTP) sign-in"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.107\""]}
       ]
+    },
+    {
+      version: "s3.0.108-feature-services-beta",
+      title: "Features & Services flags, beta testers, audit chain + in-app ad loading splash",
+      checks: [
+        {label:"Search tiles gated", file:"index.html", includes:["data-feature-key=\"shoutOut\"", "floqr-feature-services.js?v=s3.0.108"]},
+        {label:"Client access rule", file:"floqr-feature-services.js", includes:["IsFeatureEnabled", "IsTestFeature", "guardPage", "applySearchUi"]},
+        {label:"Master Admin tab", file:"master-admin.html", includes:["data-panel=\"featuresServices\"", "master-feature-services.js?v=s3.0.108"]},
+        {label:"Callables + audit chain", file:"functions/feature-services-functions.js", includes:["exports.setFeatureServiceFlags", "exports.createBetaInvite", "exports.verifyFeatureServiceAuditChain", "appendChainedAudit"]},
+        {label:"Rules server-write-only", file:"firestore.rules", includes:["match /featureServices/", "match /featureServiceAuditLogs/", "\"superAdmin\""]},
+        {label:"Beta invite landing", file:"beta-invite.html", includes:["beta-invite-app.js?v=s3.0.108", "data-floqr-auth-chrome"]},
+        {label:"Ad splash 5s loading", file:"patron-app.js", includes:["const AD_SPLASH_MS = 5000;"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.108\""]}
+      ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-108-feature-services-beta",
+      area:"Master Admin / Search",
+      feature:"Features & Services (IsFeatureEnabled / IsTestFeature), beta testers, audit trail; in-app ad shows …loading your search for 5 seconds",
+      changed:"Search shows only the ShoutOut button by default. Master Admin → Features & Services turns each feature Live or Test with a reason, invites beta testers, records test → live promotions and shows a hash-chained audit trail. Test pages (BartR, RydR, Pickup, supRstar, Mingl chat/Gist) are blocked for regular patrons. The in-app ad no longer shows a countdown or Skip; it shows …loading your search for 5 seconds.",
+      howToTest:"As a regular patron, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.108 → only Throw a ShoutOut shows; opening ./commerce.html directly shows This feature isn't available on your account yet. As Master Admin, open Features & Services, unlock SOS2FA, see all six features and the Beta-labelled test tiles on Search. Invite a test patron; as that patron open the Inbox → Review beta invite → Accept → Search shows the Beta tiles. Toggle a feature Live with a reason and confirm the audit row, then Verify integrity. Tap Mingl to see the ad: …loading your search, no Skip, continues after 5 seconds.",
+      expected:"Patrons see only live features; beta testers and admins see test features marked Beta; every change is in the audit trail with who, when, reason and before/after; integrity check reports OK. Ad shows the loading message for 5 seconds with no Skip."
+    },
     {
       id:"s3-0-107-whatsapp-otp",
       area:"Sign-in / Welcome",

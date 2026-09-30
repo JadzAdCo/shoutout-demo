@@ -3,6 +3,7 @@ const displaySecurityFns = require("./display-security-functions");
 const sos2faFns = require("./sos2fa-functions");
 const twilioDebuggerFns = require("./twilio-debugger-webhook");
 const mailLogFns = require("./mail-log-functions");
+const featureServiceFns = require("./feature-services-functions");
 
 module.exports = {
   ...require("./ai-discovery-functions"),
@@ -26,6 +27,15 @@ module.exports = {
   setEntityAppEnabled: featureGateFns.setEntityAppEnabled,
   setVenueFeatureGates: featureGateFns.setVenueFeatureGates,
   offboardEntity: featureGateFns.offboardEntity,
+  setFeatureServiceFlags: featureServiceFns.setFeatureServiceFlags,
+  seedFeatureServices: featureServiceFns.seedFeatureServices,
+  createBetaInvite: featureServiceFns.createBetaInvite,
+  acceptBetaInvite: featureServiceFns.acceptBetaInvite,
+  declineBetaInvite: featureServiceFns.declineBetaInvite,
+  revokeBetaTester: featureServiceFns.revokeBetaTester,
+  revokeBetaInvite: featureServiceFns.revokeBetaInvite,
+  logFeatureCodePromotion: featureServiceFns.logFeatureCodePromotion,
+  verifyFeatureServiceAuditChain: featureServiceFns.verifyFeatureServiceAuditChain,
   checkDisplayAccess: displaySecurityFns.checkDisplayAccess,
   reportDisplayLoadError: displaySecurityFns.reportDisplayLoadError,
   setVenueDisplayIps: displaySecurityFns.setVenueDisplayIps,

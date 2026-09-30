@@ -1,0 +1,48 @@
+# Keep the test branch based on production: every push to main is merged into test.
+# Design notes: .cursor/rules/design-notes-feature-services.mdc
+name: Sync main into test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-main-into-test
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Merge main into test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (full history)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Merge
+        run: |
+          git config user.name "floqr-sync-bot"
+          git config user.email "floqr-sync-bot@users.noreply.github.com"
+          if ! git ls-remote --exit-code --heads origin test >/dev/null; then
+            git push origin HEAD:refs/heads/test
+            echo "Created test from main."
+            exit 0
+          fi
+          git fetch origin test
+          git checkout -B test origin/test
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "test already contains main."
+            exit 0
+          fi
+          if ! git merge --no-edit origin/main -m "chore: sync main into test"; then
+            git merge --abort || true
+            echo "::error::main could not be merged into test automatically. Resolve the conflict on the test branch by hand."
+            exit 1
+          fi
+          git push origin HEAD:test
