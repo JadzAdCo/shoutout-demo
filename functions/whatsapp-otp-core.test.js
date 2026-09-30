@@ -98,6 +98,7 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
   const css = read("styles.css");
   assert.match(css, /#loginActions \.signin\{background:linear-gradient\(90deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%\);color:#fff/);
   assert.match(css, /#loginActions \.icon\{width:28px;height:28px/);
+  assert.match(css, /#loginActions > \.signin\{justify-content:flex-start;text-align:left/, "sign-in icon + label are left-aligned");
   assert.match(card, /id="whatsappCountryCode"/);
   const legal = card.indexOf('class="login-legal"');
   assert.ok(legal > card.indexOf('id="authStatus"'), "privacy links sit below every sign-in button");
