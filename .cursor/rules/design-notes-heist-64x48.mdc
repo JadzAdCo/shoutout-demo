@@ -1,16 +1,35 @@
 ---
-description: Heist 64×48 enablement — field names and packaging vs Firestore (not served help)
+description: Heist display sizes — 96×48 default (s3.0.112), 64×48 enablement, field names and packaging vs Firestore (not served help)
 globs: floqai-help-repository.js,admin.html,shared-data.js,club-profile-app.js
 alwaysApply: false
 ---
 
-# Design notes — Heist 64×48 display choice
+# Design notes — Heist display sizes
 
-Operator-facing help stays short (tick 64×48 on Club Public Profile / Master Admin). Implementation detail lives here:
+Operator-facing help stays short (tick sizes on Club Public Profile / Master Admin). Implementation detail lives here.
 
-- Firestore: `clubLocations/heist-washington-dc` → `VenueSupports64x48=1` (keep `VenueSupports64x32` if that board stays live).
-- Optional primary: `primaryDisplayScreenFormatId=led-64x48` only when that board is Xibo Display 1.
+## Current state (s3.0.112, owner request)
+
+| Size | Enabled | Board |
+|---|---|---|
+| 96×48 (`led-96x48`, biggest) | **1** | **Default** — Display 1 `display.html?location=heist-washington-dc` |
+| 64×48 (`led-64x48`) | 0 | — |
+| 64×32 (`led-64x32`) | 1 | Display 2 `display2.html?location=heist-washington-dc` |
+
+Written in **both** places (they must agree):
+
+- Firestore `clubLocations/heist-washington-dc`: `VenueSupports96x48=1`, `VenueSupports64x48=0`, `VenueSupports64x32=1`, `displayScreenFormatIds=[led-96x48, led-64x32]`, `primaryDisplayScreenFormatId=led-96x48`, `secondaryDisplayScreenFormatId=led-64x32`, `displayType`/`screenFormatId`/`ledPanel` = 96×48.
+- Packaged `shared-data.js` `"heist-washington-dc"`: same values.
+
+Why both: `display-app.js` merge gives the **packaged** `primaryDisplayScreenFormatId` / `secondaryDisplayScreenFormatId` precedence over live, and packaged `VenueSupports*` survive when Firestore has no explicit flags. `FLOQRScreenDatapoints.applyVenue` then resets the primary to the first enabled size if the primary is not enabled — so a 96×48 default with `VenueSupports96x48=0` silently falls back to 64×32.
+
+No new display/device doc was created; only the existing venue's size fields changed. Test: `commerce-invariants.test.js` “Heist Washington DC defaults Display 1 to the 96x48 board”.
+
+## Enabling 64×48 later
+
+- Firestore → `VenueSupports64x48=1` and add `led-64x48` to `displayScreenFormatIds` (keep the others). Mirror in `shared-data.js`.
+- Primary only changes if that board becomes Xibo Display 1.
 - Xibo URL: `display.html?location=heist-washington-dc` only — never `?screen=` or `?v=`.
-- Packaged catalog may list `led-64x48`; **Firestore `VenueSupports*` flags win** when set.
+- **Firestore `VenueSupports*` flags win** when set.
 
 See also `screen-datapoints.mdc`.

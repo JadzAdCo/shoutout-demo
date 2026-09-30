@@ -240,6 +240,25 @@ test("screen datapoints are Firebase 0|1 flags and filter templates by venue ove
   assert.match(adminApp, /catalogReportHtml/);
 });
 
+test("Heist Washington DC defaults Display 1 to the 96x48 board; Display 2 stays 64x32", () => {
+  const sandbox = {};
+  sandbox.window = sandbox;
+  vm.runInNewContext(sharedData, sandbox, {filename:"shared-data.js"});
+  const dp = sandbox.FLOQRScreenDatapoints;
+  const heist = dp.applyVenue(JSON.parse(JSON.stringify(sandbox.SHOUTOUT_CLUB_LOCATIONS["heist-washington-dc"])));
+  assert.equal(heist.VenueSupports96x48, 1);
+  assert.equal(heist.VenueSupports64x48, 0);
+  assert.equal(heist.VenueSupports64x32, 1);
+  assert.equal(heist.primaryDisplayScreenFormatId, "led-96x48");
+  assert.equal(heist.secondaryDisplayScreenFormatId, "led-64x32");
+  assert.deepEqual([...heist.displayScreenFormatIds], ["led-96x48", "led-64x32"]);
+  assert.equal(heist.ledPanel.formatId, "led-96x48");
+  ["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "soccerJersey"].forEach(id => {
+    const template = dp.applyTemplate({...sandbox.SHOUTOUT_TEMPLATES[id]});
+    assert.equal(template.Is96x48, 1, `${id} must play on the Heist 96x48 board`);
+  });
+});
+
 test("birthday split-media loops on 64x48/64x32 and AssignmentCards spell status", () => {
   assert.match(displayApp, /startFrameLoop/);
   assert.match(fs.readFileSync(path.join(root, "floqr-frame-loop.js"), "utf8"), /HOLD_MS = 6000/);
