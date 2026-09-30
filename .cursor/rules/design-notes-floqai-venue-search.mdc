@@ -1,51 +1,82 @@
 ---
-description: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs), Welcome help, signed-in routing
+description: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs), location-aware nearest-first order (GPS → IP), Google venue geocoding, Welcome help, signed-in routing, native-app location plan
 alwaysApply: false
 ---
 
 # FloqAi venue search (Search for page)
 
-Resume: `@venue-search$` / `$floqai-search$`.
+Resume: `@venue-search$` / `$floqai-search$` / `@near-me$`.
 
 This is **search**, not help. Help copy (`?`, FloqAi repository bodies) never explains the parser.
 
 ## Page contract (`index.html#categoryPage`)
 
-- FloqAi mark + speech bubble are **stationary above** the search input (`#categoryFloqAiSearch`). Category tiles stay below.
+- **No** "Search for" heading and **no** Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs tiles (removed s3.0.106 — FloqAi search replaces them). Below the search: `Or` + product tiles (ShoutOut, Mingl, BartR, RydR, supRstar, FloqAi).
+- FloqAi mark + dialog are **stationary above** the search input (`#categoryFloqAiSearch`). Mark is animated (bob + glow + halo; faster `is-listening` while typing). Dialog is **borderless, unframed** text beside the mark with a type-on reveal (`is-speaking`, clip-path; RTL mirrored). `prefers-reduced-motion` disables all of it.
 - Dialog loop (5s, only while input is empty and the page is active): `cat.floqaiWelcome` ("Welcome, type below to search for Events") → `cat.floqaiAlso` ("You may also search for: Clubs or Lounges").
-- While typing, the bubble shows the live interpretation: `cat.floqaiSearching` ("Searching {type}") · genres · `cat.floqaiIn` ("in {place}"). `data-i18n` is removed from the bubble while it shows a live interpretation so `applyText` does not overwrite it.
+- While typing, the dialog shows the live interpretation: `cat.floqaiSearching` ("Searching {type}") · genres · `cat.floqaiIn` ("in {place}") or `cat.floqaiNearYou` ("near you"). `data-i18n` is removed while it shows a live interpretation so `applyText` does not overwrite it.
 - Submit → `showAdSplash(type)` → `openVenueSearch(type, query)` → listing opens with that type and `#locationSearch` prefilled.
 
 ## Parser (`floqr-venue-query.js` → `window.FLOQRVenueQuery`)
 
 - `normalize`: NFD, strip diacritics, `&` → "and", split on non-letters/digits. Word lookup compacts spans (max 4 tokens), so `Beachclub`, `Beach club`, `Beach-club`, `Beach clubs`, `beach_clubs` share one key. Singular fallback strips trailing `s`/`es`.
 - `VENUE_TYPES` word lists: `events`, `beach-clubs`, `lounge-club`, `lounges`, `clubs` (English variants + all supported languages). Add new spellings **only** to the `words` array for that type; tests cover variants.
-- Type precedence: **events wins** over venue words ("Hip Hop events at clubs" → events). Otherwise most specific: lounge-club > beach-clubs > lounges > clubs.
-- Entry context: `parse(q, {entry})`. On the Search for page the entry is `events` (default). On a listing page the listing's own type wins **unless** the query names another type (`typeSource === "query"`) — then the listing switches type.
-- `GENRES` / `PLACES` lists are stripped from the text; only `residual` goes to `floqrSearch`. Records are then strictly filtered with `matchesFilters(parsed, record, extraText)` (genre + place).
-- Free-text place: words after the last `PLACE_PREPOSITIONS` token, stopping at `WHEN_WORDS` / "this" / "next". Known places ("Miami Beach") win over the type word "beach".
-- `WHEN_WORDS` (tonight, weekend, weekdays) never remove venue results; they stay in the events text query only.
+- Type precedence: **events wins** over venue words. Otherwise most specific: lounge-club > beach-clubs > lounges > clubs.
+- Entry context: `parse(q, {entry})`. Search for page defaults to `events`. On a listing page the listing's own type wins **unless** the query names another type (`typeSource === "query"`).
+- `NEAR_ME` phrases (all 11 languages: near me, nearby, closest, cerca de mí, près de moi, in der Nähe, vicino a me, perto de mim, рядом, κοντά μου, w pobliżu, in de buurt, بالقرب مني …) set `nearMe: true` and are **not** a place. An explicit place wins (`nearMe` is false when `place` is set).
+- `GENRES` / `PLACES` are stripped; only `residual` goes to `floqrSearch`. Records are strictly filtered with `matchesFilters(parsed, record, extraText)`.
+- Free-text place: words after the last `PLACE_PREPOSITIONS` token, stopping at `WHEN_WORDS` / "this" / "next". Unknown cities ("Clubs in Accra") match record text, so **new cities need no word-list change**; `PLACES` only adds aliases (DC, NYC, Monte Carlo).
+
+## Location-aware order (default for every listing search)
+
+Rule (product): **GPS first, then IP**, then profile city. Results are **nearest to the user first, then name A→Z**. No user location → name A→Z.
+
+| Query | Filter | Order |
+|---|---|---|
+| No place ("EDM clubs", "EDM clubs near me") | type + genre | distance from user (GPS → IP → profile), then name |
+| With place ("Clubs in Monaco") | type + genre + place | distance from user (GPS → IP → profile), then name; same-city venues tie on whole km → name |
+
+- `floqr-geo-search.js` → `window.FLOQRGeoSearch` (UMD, node-tested): `resolveUserLocation`, `sortNearest`, `recordCoordinates`, `parseIpPayload`.
+- GPS: `navigator.geolocation` with a 3s wait. If the permission prompt answers later, `onLateGps` fires `floqr:location-updated`; `patron-app.js` resets the context and re-renders the listing.
+- IP: default provider `https://get.geojs.io/v1/ip/geo.json` (no key, CORS). Override with `window.FLOQR_IP_GEOLOCATION_PROVIDER = "https://…"`; `false` disables. Only city/region/country/lat/lng are cached (`sessionStorage["floqr.ipLocation.v1"]`, 6h) — **never the IP address**. Disclosed in `privacy.html`.
+- `ai-location-service.js` `getUserLocationContext` delegates to `FLOQRGeoSearch` (`locationSource: gps|ip|profile|unknown`, `locationCity`). Works signed out.
+- Listings: `sortListingNearest` in `patron-app.js` (events use event coords, else the venue's). Status line keys: `listing.sortNearest` / `listing.sortByName` / `listing.source*` / `listing.yourLocation`.
+- Distance is straight-line (haversine) on the device. Google Distance Matrix is **not** called per search (cost, key exposure).
+
+## Venue coordinates — Google, zero code per new city
+
+- `functions/venue-geocode-functions.js`: `onClubLocationGeocode` (Firestore `clubLocations/{id}` write) + `scheduledVenueGeocodeBackfill` (every 12h, ≤60 per run). Uses the existing `GOOGLE_PLACES_API_KEY` secret: Places API (New) Text Search `places.location`, fallback Geocoding API.
+- Writes top-level `latitude` / `longitude` + `geo {signature, source, formattedAddress, placeId, geocodedAt}`. `geo.signature` = normalized address/city query; unchanged signature → no re-geocode (loop-safe). Address change → re-geocode. `google-miss` recorded once per signature. `geoManual: true` or `geo.source: "manual"` → never overwritten.
+- Client `recordCoordinates` order: stored lat/lng (any of `latitude/longitude`, `lat/lng`, `geo`, `location`, `coordinates`) → built-in city table fallback (seed data only). New clubs in new cities sort correctly as soon as the trigger stamps coordinates.
+- Contract tests: `functions/venue-geocode-core.test.js`, `functions/floqr-geo-search.test.js`.
+
+## Native apps (later — not buildable in the web app today)
+
+- iOS Core Location / Android Fused Location Provider: request **When In Use** only; precise optional (approximate is enough for sorting). Reuse `sortNearest` semantics (distance then name) so web and native agree.
+- Cache last fix ~10 min; re-sort on significant change (>1 km) instead of polling.
+- Optional server search: store `geohash` alongside lat/lng in the geocode trigger and query by geohash ranges when venue counts outgrow client-side sorting (~5k+).
+- Optional radius filter for "near me" (e.g. 50 km, widen if empty) — only after venue coordinates are backfilled everywhere.
+- Deep links / universal links target `https://www.floqr.com` (see `cutoffrequirement.mdc`).
+- Privacy: native permission strings must match `privacy.html` (location used to list nearby events; not stored on profile).
 
 ## FloqAi global search (`intent-search.js`)
 
-`venueSearchIntent` runs before help scoring when `isVenueQuery` is true and the query is not help-like. It links to `./?start=search&q=<query>`; `runStartVenueQuery` reads `q`, removes it with `replaceState`, and submits it through the same path as the page search box.
+`venueSearchIntent` runs before help scoring when `isVenueQuery` is true and the query is not help-like. It links to `./?start=search&q=<query>`; `runStartVenueQuery` reads `q`, removes it with `replaceState`, and submits it through the page search path.
 
 ## Landing / auth routing
 
-- Landing paragraph lives in the Welcome `?` (`help-welcome`, `FLOQRHelpAttach` via `data-floqr-help-*`, localized in `floqr-i18n-help.js`, mirrored in `floqai-help-repository.js`). No duplicate `login-copy` paragraph.
-- Signed-in users **never** see a Continue / Sign out interstitial: `onAuthStateChanged` with a user on the landing page → `showPage("categoryPage")` → `afterLogin()`. `continueBtn` is removed.
-- `localStorage["floqr.signedInHint"] = "1"` after a signed-in resolve. Inline head script adds `html.floqr-auth-resolving` to hide landing auth chrome until auth resolves (8s failsafe). Sign-out clears the hint.
-- `backToWelcomeBtn` is hidden while signed in.
+- Landing paragraph lives in the Welcome `?` (`help-welcome`). Location help is `help-location-search` beside the static "Location-aware search" label on the listing page (the title / intro / status lines are rewritten by JS, so the `?` must not attach to them).
+- Signed-in users **never** see a Continue / Sign out interstitial. `localStorage["floqr.signedInHint"]` + `html.floqr-auth-resolving` hide landing auth chrome until auth resolves (8s failsafe). `backToWelcomeBtn` hidden while signed in.
 
 ## Checklist
 
-- [ ] New type/genre/place spelling added to the word list + a test in `functions/floqr-venue-query.test.js`
-- [ ] New dialog/label text keyed in `floqr-i18n.js` for all 11 languages
-- [ ] `floqr-venue-query.js` loads before `intent-search.js` and `patron-app.js`
-- [ ] Bubble stays above the input on phone (form stacks ≤520px)
+- [ ] New type/genre/near-me spelling added to the word list + a test in `functions/floqr-venue-query.test.js`
+- [ ] New dialog/label text keyed in `floqr-i18n.js` for all 11 languages; help in `floqr-i18n-help.js` + `floqai-help-repository.js`
+- [ ] Script order: `floqr-venue-query.js` → `intent-search.js`; `floqr-geo-search.js` → `ai-location-service.js` → `patron-app.js`
+- [ ] Backend geocode change → `npm test` + Functions deploy (`onClubLocationGeocode`, `scheduledVenueGeocodeBackfill`)
 
 ## FIX PROMPT
 
 ```
-FloqAi venue search: Search for page has stationary FloqAi above the input (cat.floqaiWelcome → cat.floqaiAlso). Parser floqr-venue-query.js word lists for events / clubs / beach-clubs / lounges / lounge-club (+ spacing/hyphen/plural/localized variants), genres, places. Events win; else most specific type. Listing entry type wins unless query names a type. Strip type/genre/place; floqrSearch only on residual; strict matchesFilters. Signed-in skips interstitial. Design notes: design-notes-floqai-venue-search.mdc
+FloqAi venue search + location order: category page has animated FloqAi mark with borderless type-on dialog above the input, no Search for heading, no venue tiles. Parser floqr-venue-query.js (types / genres / places / NEAR_ME in 11 languages). Listings sort nearest-first then name using FLOQRGeoSearch (GPS → IP geojs → profile), re-sort on late GPS. Venue lat/lng from Google via onClubLocationGeocode + scheduledVenueGeocodeBackfill (GOOGLE_PLACES_API_KEY), signature loop guard. Native Core Location / Fused plan in design-notes-floqai-venue-search.mdc.
 ```

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.105";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.106";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1106,17 +1106,37 @@
       version: "s3.0.105-floqai-venue-search",
       title: "FloqAi venue search + Welcome help + no signed-in interstitial",
       checks: [
-        {label:"Venue query parser", file:"floqr-venue-query.js", includes:["VERSION = \"s3.0.105\"", "beach-clubs", "lounge-club", "matchesFilters"]},
-        {label:"Stationary FloqAi above search", file:"index.html", includes:["id=\"categoryFloqAiSpeech\"", "data-i18n=\"cat.floqaiWelcome\"", "floqr-venue-query.js?v=s3.0.105"]},
+        {label:"Venue query parser", file:"floqr-venue-query.js", includes:["beach-clubs", "lounge-club", "matchesFilters"]},
+        {label:"Stationary FloqAi above search", file:"index.html", includes:["id=\"categoryFloqAiSpeech\"", "data-i18n=\"cat.floqaiWelcome\"", "floqr-venue-query.js?v="]},
         {label:"Welcome help popout", file:"index.html", includes:["data-floqr-help-id=\"help-welcome\""]},
         {label:"Signed-in skips interstitial", file:"patron-app.js", includes:["rememberSignedInHint", "runStartVenueQuery", "bindCategoryFloqAi"]},
-        {label:"FloqAi venue intent", file:"intent-search.js", includes:["venueSearchIntent", "start: \"search\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.105\""]}
+        {label:"FloqAi venue intent", file:"intent-search.js", includes:["venueSearchIntent", "start: \"search\""]}
+      ]
+    },
+    {
+      version: "s3.0.106-location-aware-search",
+      title: "Nearest-first search (GPS → IP) + Google venue geocoding + FloqAi dialog polish",
+      checks: [
+        {label:"Geo search module", file:"floqr-geo-search.js", includes:["resolveUserLocation", "sortNearest", "get.geojs.io", "floqr.ipLocation.v1"]},
+        {label:"Near me word list", file:"floqr-venue-query.js", includes:["NEAR_ME", "near me", "cerca de mi", "рядом"]},
+        {label:"Listing nearest-first sort", file:"patron-app.js", includes:["sortListingNearest", "floqr:location-updated", "cat.floqaiNearYou"]},
+        {label:"Geo module loaded before location AI", file:"index.html", includes:["floqr-geo-search.js?v=s3.0.106", "help-location-search", "category-floqai-mark-halo"]},
+        {label:"Google venue geocode trigger", file:"functions/venue-geocode-functions.js", includes:["onClubLocationGeocode", "scheduledVenueGeocodeBackfill", "GOOGLE_PLACES_API_KEY"]},
+        {label:"Privacy discloses location", file:"privacy.html", includes:["Approximate location for search", "GeoJS"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.106\""]}
       ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-106-location-aware-search",
+      area:"Search / FloqAi",
+      feature:"Nearest-first search (GPS, then IP), near me, Google venue coordinates",
+      changed:"Listings now show the closest events and clubs first, then by name. FLOQR uses phone/browser GPS when allowed, otherwise an IP city estimate. Near me works in all languages. Venues get Google coordinates automatically. Search for heading and venue tiles removed; FloqAi mark animates with a borderless dialog.",
+      howToTest:"Hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.106 and sign in. Watch the FloqAi mark animate and the dialog type on without a frame. Search EDM clubs near me: allow location → status says Nearest to <your city> first (GPS). Deny location in a private window → status says (IP estimate). Search Clubs in Monaco → only Monaco venues, closest to you first then by name. Tap ? beside Location-aware search. Switch language and repeat.",
+      expected:"No Search for heading or venue tiles. Nearest-first order with GPS or IP source shown. Explicit city filters results. Help and status text translated."
+    },
     {
       id:"s3-0-105-floqai-venue-search",
       area:"Search / FloqAi",

@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-location-search": {
+        title: "Поиск с учётом местоположения",
+        body: "FLOQR сначала показывает ближайшие к вам события и клубы, затем — по названию. Если вы разрешите доступ, используется местоположение телефона или браузера (GPS); иначе город определяется примерно по вашему интернет-подключению (IP). Укажите место, например «Клубы в Монако», чтобы искать в другом городе — там результаты тоже начинаются с ближайших к вам. Доступ к местоположению можно отключить в настройках браузера или телефона."
+      },
       "help-welcome": {
         title: "Добро пожаловать в FLOQR",
         body: "Ищите и бронируйте развлечения и ночные события по всему миру, отправляйте живой ShoutOut на один из наших экранов ShoutOut или Mingl с новыми людьми, друзьями и семьёй."
@@ -180,6 +184,10 @@
       }
     },
     nl: {
+      "help-location-search": {
+        title: "Zoeken op locatie",
+        body: "FLOQR toont evenementen en clubs die het dichtst bij je zijn eerst, daarna op naam. Als je het toestaat, gebruikt FLOQR de locatie van je telefoon of browser (gps); anders wordt je stad geschat op basis van je internetverbinding (IP). Typ een plaats, zoals Clubs in Monaco, om ergens anders te zoeken — ook daar staan de dichtstbijzijnde eerst. Je kunt locatietoegang uitzetten in de instellingen van je browser of telefoon."
+      },
       "help-welcome": {
         title: "Welkom bij FLOQR",
         body: "Zoek en boek entertainment- en nachtleven-evenementen wereldwijd, stuur een live ShoutOut naar een van onze ShoutOut-schermen, of Mingl met nieuwe mensen, vrienden en familie."
@@ -354,6 +362,10 @@
       }
     },
     fr: {
+      "help-location-search": {
+        title: "Recherche selon votre position",
+        body: "FLOQR affiche d'abord les événements et clubs les plus proches de vous, puis par nom. Si vous l'autorisez, FLOQR utilise la position de votre téléphone ou navigateur (GPS) ; sinon, votre ville est estimée à partir de votre connexion internet (IP). Saisissez un lieu, par exemple Clubs à Monaco, pour chercher ailleurs — les résultats commencent toujours par les plus proches de vous. Vous pouvez désactiver l'accès à la position dans les réglages de votre navigateur ou téléphone."
+      },
       "help-welcome": {
         title: "Bienvenue sur FLOQR",
         body: "Recherchez et réservez des sorties et événements nocturnes dans le monde entier, envoyez un ShoutOut en direct sur l'un de nos écrans ShoutOut, ou Mingl avec de nouvelles personnes, des amis et la famille."
@@ -528,6 +540,10 @@
       }
     },
     de: {
+      "help-location-search": {
+        title: "Standortbezogene Suche",
+        body: "FLOQR zeigt zuerst die Events und Clubs, die Ihnen am nächsten sind, danach nach Name. Wenn Sie es erlauben, nutzt FLOQR den Standort Ihres Telefons oder Browsers (GPS); sonst wird Ihre Stadt anhand Ihrer Internetverbindung (IP) geschätzt. Geben Sie einen Ort ein, z. B. Clubs in Monaco, um woanders zu suchen — auch dort stehen die nächstgelegenen zuerst. Den Standortzugriff können Sie in den Browser- oder Telefoneinstellungen deaktivieren."
+      },
       "help-welcome": {
         title: "Willkommen bei FLOQR",
         body: "Suche und buche Entertainment und Nightlife-Events weltweit, sende einen Live-ShoutOut an eines unserer ShoutOut-Displays oder Mingl mit neuen Leuten, Freunden und Familie."
@@ -702,6 +718,10 @@
       }
     },
     es: {
+      "help-location-search": {
+        title: "Búsqueda según tu ubicación",
+        body: "FLOQR muestra primero los eventos y clubs más cercanos a ti y después por nombre. Si lo permites, usa la ubicación de tu teléfono o navegador (GPS); si no, estima tu ciudad a partir de tu conexión a internet (IP). Escribe un lugar, como Clubs en Mónaco, para buscar en otro sitio: allí los resultados también empiezan por los más cercanos a ti. Puedes desactivar el acceso a la ubicación en los ajustes del navegador o del teléfono."
+      },
       "help-welcome": {
         title: "Bienvenido a FLOQR",
         body: "Busca y reserva eventos de entretenimiento y vida nocturna en todo el mundo, envía un ShoutOut en vivo a una de nuestras pantallas ShoutOut o Mingl con nuevas personas, amigos y familia."
@@ -876,6 +896,10 @@
       }
     },
     it: {
+      "help-location-search": {
+        title: "Ricerca in base alla posizione",
+        body: "FLOQR mostra prima gli eventi e i club più vicini a te, poi per nome. Se lo consenti, usa la posizione del telefono o del browser (GPS); altrimenti stima la tua città dalla connessione internet (IP). Scrivi un luogo, ad esempio Club a Monaco, per cercare altrove: anche lì i risultati partono dai più vicini a te. Puoi disattivare l'accesso alla posizione nelle impostazioni del browser o del telefono."
+      },
       "help-welcome": {
         title: "Benvenuto su FLOQR",
         body: "Cerca e prenota eventi di intrattenimento e vita notturna in tutto il mondo, invia un ShoutOut dal vivo su uno dei nostri display ShoutOut o Mingl con nuove persone, amici e familiari."
@@ -1050,6 +1074,10 @@
       }
     },
     pt: {
+      "help-location-search": {
+        title: "Pesquisa por localização",
+        body: "O FLOQR mostra primeiro os eventos e clubes mais próximos de si e depois por nome. Se permitir, usa a localização do telemóvel ou do navegador (GPS); caso contrário, estima a sua cidade a partir da ligação à internet (IP). Escreva um local, como Clubes no Mónaco, para pesquisar noutro sítio — aí os resultados também começam pelos mais próximos de si. Pode desativar o acesso à localização nas definições do navegador ou do telemóvel."
+      },
       "help-welcome": {
         title: "Bem-vindo ao FLOQR",
         body: "Pesquise e reserve eventos de entretenimento e vida noturna no mundo todo, envie um ShoutOut ao vivo para uma das nossas telas ShoutOut ou Mingl com novas pessoas, amigos e família."
@@ -1224,6 +1252,10 @@
       }
     },
     el: {
+      "help-location-search": {
+        title: "Αναζήτηση με βάση την τοποθεσία",
+        body: "Το FLOQR δείχνει πρώτα τις εκδηλώσεις και τα κλαμπ που είναι πιο κοντά σας και μετά κατά όνομα. Αν το επιτρέψετε, χρησιμοποιεί την τοποθεσία του τηλεφώνου ή του browser (GPS)· αλλιώς εκτιμά την πόλη σας από τη σύνδεσή σας στο διαδίκτυο (IP). Πληκτρολογήστε ένα μέρος, π.χ. Κλαμπ στο Μονακό, για να ψάξετε αλλού — και εκεί τα αποτελέσματα ξεκινούν από τα πιο κοντινά σας. Μπορείτε να απενεργοποιήσετε την πρόσβαση στην τοποθεσία από τις ρυθμίσεις του browser ή του τηλεφώνου."
+      },
       "help-welcome": {
         title: "Καλώς ήρθατε στο FLOQR",
         body: "Αναζητήστε και κλείστε εκδηλώσεις ψυχαγωγίας και νυχτερινής ζωής σε όλο τον κόσμο, στείλτε ένα live ShoutOut σε μία από τις οθόνες ShoutOut μας ή Mingl με νέα άτομα, φίλους και οικογένεια."
@@ -1398,6 +1430,10 @@
       }
     },
     pl: {
+      "help-location-search": {
+        title: "Wyszukiwanie według lokalizacji",
+        body: "FLOQR najpierw pokazuje wydarzenia i kluby najbliżej Ciebie, a potem według nazwy. Jeśli na to pozwolisz, używa lokalizacji telefonu lub przeglądarki (GPS); w przeciwnym razie szacuje Twoje miasto na podstawie połączenia internetowego (IP). Wpisz miejsce, np. Kluby w Monako, aby szukać gdzie indziej — tam również wyniki zaczynają się od najbliższych Tobie. Dostęp do lokalizacji możesz wyłączyć w ustawieniach przeglądarki lub telefonu."
+      },
       "help-welcome": {
         title: "Witamy w FLOQR",
         body: "Wyszukuj i rezerwuj wydarzenia rozrywkowe i nocne na całym świecie, wyślij ShoutOut na żywo na jeden z naszych ekranów ShoutOut lub Mingl z nowymi ludźmi, przyjaciółmi i rodziną."
@@ -1572,6 +1608,10 @@
       }
     },
     ar: {
+      "help-location-search": {
+        title: "البحث حسب الموقع",
+        body: "يعرض FLOQR الفعاليات والنوادي الأقرب إليك أولاً، ثم حسب الاسم. إذا سمحت بذلك، يستخدم موقع هاتفك أو متصفحك (GPS)؛ وإلا فإنه يقدّر مدينتك من اتصالك بالإنترنت (IP). اكتب مكاناً، مثل نوادي في موناكو، للبحث في مكان آخر — وستبدأ النتائج هناك أيضاً بالأقرب إليك. يمكنك إيقاف الوصول إلى الموقع من إعدادات المتصفح أو الهاتف."
+      },
       "help-welcome": {
         title: "مرحباً بك في FLOQR",
         body: "ابحث واحجز فعاليات الترفيه والحياة الليلية حول العالم، أو أرسل ShoutOut مباشراً إلى إحدى شاشات ShoutOut لدينا، أو Mingl مع أشخاص جدد وأصدقاء وعائلة."

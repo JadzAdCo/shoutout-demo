@@ -170,5 +170,9 @@
   "help-welcome": {
     "title": "Welcome to FLOQR",
     "body": "Search and book entertainment and nightlife events worldwide, send a live ShoutOut to one of our ShoutOut displays, or Mingl with new people, friends, and family."
+  },
+  "help-location-search": {
+    "title": "Location-aware search",
+    "body": "FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings."
   }
 }

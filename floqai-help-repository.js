@@ -918,6 +918,23 @@
       page: "index.html#landingPage"
     },
     {
+      id: "help-location-search",
+      title: "Location-aware search",
+      body: "FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings.",
+      searchPhrases: [
+        "location", "my location", "use my location", "gps", "ip location", "why these results",
+        "closest first", "nearest first", "sorted by distance", "how are results sorted", "location access",
+        "turn off location", "location permission"
+      ],
+      links: [
+        {label: "Search", href: vUrl("./", {start: "search", from: "floqai"})},
+        {label: "Privacy Policy", href: vUrl("./privacy.html", {from: "floqai"})}
+      ],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#listingPage"
+    },
+    {
       id: "help-sos2fa-entity-mgmt",
       title: "Privilege Admin Access",
       body: "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",

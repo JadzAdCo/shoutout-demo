@@ -7,7 +7,7 @@
   <title>ShoutOut App</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.105"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
-  <link rel="stylesheet" href="./floqai-search.css?v=s3.0.105"/>
+  <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
 </head>
 <body>
@@ -245,16 +245,13 @@
     <header class="topbar">
       <div>
         <button id="backToWelcomeBtn" type="button" data-i18n="nav.backToWelcome">&larr; Back to welcome</button>
-        <p class="sub category-sentence">
-          <strong data-i18n="nav.searchFor">Search for</strong>
-        </p>
       </div>
       <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
 
     <div id="categoryFloqAiSearch" class="category-floqai-search">
       <div class="category-floqai-intro">
-        <span class="category-floqai-mark" aria-hidden="true"><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
+        <span class="category-floqai-mark" aria-hidden="true"><span class="category-floqai-mark-halo"></span><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
         <p id="categoryFloqAiSpeech" class="category-floqai-speech" role="status" aria-live="polite" data-i18n="cat.floqaiWelcome">Welcome, type below to search for Events</p>
       </div>
       <form id="categoryFloqAiForm" class="category-floqai-form" role="search" autocomplete="off">
@@ -264,11 +261,6 @@
     </div>
 
     <div class="category-grid compact-category-grid">
-      <button id="eventsBtnCard" class="category-card" type="button" data-i18n="cat.events">Events</button>
-      <button id="clubsBtnCard" class="category-card" type="button" data-i18n="cat.clubs">Clubs</button>
-      <button id="beachClubsBtnCard" class="category-card" type="button" data-i18n="cat.beachClubs">Beach Clubs</button>
-      <button id="loungesBtnCard" class="category-card" type="button" data-i18n="cat.lounges">Lounges</button>
-      <button id="loungeClubBtnCard" class="category-card" type="button" data-i18n="cat.loungeClubs">Lounge-Clubs</button>
       <div class="category-or" data-i18n="cat.or">Or</div>
       <button id="shoutoutBtnCard" class="category-card hot" type="button" data-i18n="cat.shoutout">Throw a ShoutOut</button>
       <button id="minglBtnCard" class="category-card mingl-card" type="button" data-i18n="cat.mingl">Mingl</button>
@@ -455,7 +447,14 @@
     </header>
     <div class="card">
       <input id="locationSearch" class="search" data-i18n-placeholder="listing.searchPlaceholder" placeholder="Try hiphop clubs in Barcelona, Afro House in Miami, or Friday events in DC..."/>
-      <p id="locationRankingStatus" class="sub small" data-i18n="listing.rankingStatus">Search results rank by nearby/profile location, preferred cities, music genres, venue type, and interests.</p>
+      <p class="sub small listing-location-help"><span
+        data-i18n="listing.locationHelpLabel"
+        data-floqr-help-id="help-location-search"
+        data-floqr-help-title="Location-aware search"
+        data-floqr-help-search="location|my location|gps|ip location|closest first|nearest first|how are results sorted|turn off location"
+        data-floqr-help-body="FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings."
+      >Location-aware search</span></p>
+      <p id="locationRankingStatus" class="sub small" data-i18n="listing.rankingStatus">Results list the closest to you first (GPS, then IP estimate), then by name.</p>
     </div>
     <div id="locationGrid" class="club-grid"></div>
   </section>
@@ -730,11 +729,11 @@
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.0.16"></script>
-<script src="./floqr-i18n.js?v=s3.0.105"></script>
+<script src="./floqr-i18n.js?v=s3.0.106"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.0.105"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.105"></script>
-<script src="./floqr-venue-query.js?v=s3.0.105"></script>
+<script src="./floqai-help-repository.js?v=s3.0.106"></script>
+<script src="./floqr-i18n-help.js?v=s3.0.106"></script>
+<script src="./floqr-venue-query.js?v=s3.0.106"></script>
 <script src="./intent-search.js?v=s3.0.105"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
@@ -747,7 +746,8 @@
 <script src="./ai-service.js?v=29.09.33"></script>
 <script src="./ai-index-service.js?v=29.09.33"></script>
 <script src="./ai-search-service.js?v=29.09.33"></script>
-<script src="./ai-location-service.js?v=29.09.33"></script>
+<script src="./floqr-geo-search.js?v=s3.0.106"></script>
+<script src="./ai-location-service.js?v=s3.0.106"></script>
 <script src="./ai-notification-service.js?v=29.09.33"></script>
 <script src="./ai-template-studio.js?v=29.09.33"></script>
 <script src="./floqr-action-feedback.js?v=29.09.33"></script>
@@ -765,7 +765,7 @@
 <script src="./floqr-logger.js?v=29.09.33"></script>
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
-<script src="./patron-app.js?v=s3.0.105"></script>
+<script src="./patron-app.js?v=s3.0.106"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

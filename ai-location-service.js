@@ -1,4 +1,4 @@
-/* FLOQR location-aware ranking v28.80: browser/profile location, preferences, Gemini hook, local fallback. */
+/* FLOQR location-aware ranking: GPS → IP → profile location (FLOQRGeoSearch), preferences, Gemini hook, local fallback. */
 (function () {
   "use strict";
 
@@ -94,9 +94,15 @@
     };
     const hasProfileCoords = Number.isFinite(profileCoords.latitude) && Number.isFinite(profileCoords.longitude);
     const knownCityCoords = coordinateFor(city, stateRegion, country);
-    const browserCoords = await maybeBrowserCoordinates();
-    const coords = browserCoords || (hasProfileCoords ? profileCoords : knownCityCoords) || {};
-    const locationSource = browserCoords ? "browser" : hasProfileCoords || city || country ? "profile" : "unknown";
+    const resolved = window.FLOQRGeoSearch
+      ? await window.FLOQRGeoSearch.resolveUserLocation({
+          profile,
+          onLateGps: () => window.dispatchEvent(new CustomEvent("floqr:location-updated", {detail: {source: "gps"}}))
+        })
+      : null;
+    const browserCoords = resolved ? null : await maybeBrowserCoordinates();
+    const coords = resolved?.latitude != null ? resolved : browserCoords || (hasProfileCoords ? profileCoords : knownCityCoords) || {};
+    const locationSource = resolved ? resolved.source : browserCoords ? "gps" : hasProfileCoords || city || country ? "profile" : "unknown";
     const preferredGenres = valueList([
       profile.preferredGenres,
       profile.favoriteGenres,
@@ -135,7 +141,9 @@
       preferredCities,
       interests,
       locationSource,
-      ipGeolocationProviderConfigured:!!window.FLOQR_IP_GEOLOCATION_PROVIDER
+      locationCity:resolved?.city || city,
+      locationCountry:resolved?.country || country,
+      ipGeolocationProviderConfigured:window.FLOQR_IP_GEOLOCATION_PROVIDER !== false
     };
   }
 
