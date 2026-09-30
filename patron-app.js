@@ -557,17 +557,38 @@
     } catch (e) { return ""; }
   }
   async function userLocationContext() {
-    if (!window.FLOQRLocationAI || !currentUser) {
+    if (!window.FLOQRLocationAI) {
       return {uid:currentUser?.uid || "", locationSource:"unknown", preferredGenres:[], preferredVenueTypes:[], preferredCities:[], interests:[]};
     }
     if (!locationContextPromise) {
       locationContextPromise = window.FLOQRLocationAI.getUserLocationContext({
         ...(cachedUserProfile || {}),
         profile:cachedUserProfile || {},
-        uid:currentUser.uid
+        uid:currentUser?.uid || ""
       });
     }
     return locationContextPromise;
+  }
+  function locationSourceLabel(source) {
+    if (source === "gps") return tt("listing.sourceGps", {}, "GPS");
+    if (source === "ip") return tt("listing.sourceIp", {}, "IP estimate");
+    return tt("listing.sourceProfile", {}, "profile city");
+  }
+  /* Nearest to the user first (GPS → IP → profile city), then name A→Z; name order when location is unknown. */
+  function sortListingNearest(matches, context, coordsOf, nameOf) {
+    const Geo = window.FLOQRGeoSearch;
+    const origin = context && context.latitude != null && context.longitude != null ? context : null;
+    if (origin) {
+      const Place = window.FLOQRPlaceI18n;
+      const cityRaw = context.locationCity || "";
+      const place = (cityRaw && (Place?.city?.(cityRaw) || cityRaw)) || tt("listing.yourLocation", {}, "your location");
+      const source = locationSourceLabel(context.locationSource);
+      setText("locationRankingStatus", tt("listing.sortNearest", {place, source}, `Nearest to ${place} first (${source}), then by name.`));
+    } else {
+      setText("locationRankingStatus", tt("listing.sortByName", {}, "Sorted by name. Allow location to see the closest first."));
+    }
+    if (!Geo) return matches;
+    return Geo.sortNearest(matches, origin, {coordsOf, nameOf}).map(entry => entry.item);
   }
   function resetUserLocationContext() {
     locationContextPromise = null;
@@ -1130,6 +1151,8 @@
     if (parsed.place) {
       const place = parsed.place.label;
       parts.push(tt("cat.floqaiIn", {place}, `in ${place}`));
+    } else if (parsed.nearMe) {
+      parts.push(tt("cat.floqaiNearYou", {}, "near you"));
     }
     return parts.join(" · ");
   }
@@ -1169,14 +1192,22 @@
     form.dataset.bound = "1";
     let step = 0;
 
+    const shell = byId("categoryFloqAiSearch");
+    const speak = () => {
+      speech.classList.remove("is-speaking");
+      void speech.offsetWidth;
+      speech.classList.add("is-speaking");
+    };
     const sayDialog = key => {
       speech.setAttribute("data-i18n", key);
       speech.classList.add("is-swapping");
       setTimeout(() => {
         speech.textContent = tt(key, {}, speech.textContent);
         speech.classList.remove("is-swapping");
+        speak();
       }, 220);
     };
+    speak();
 
     setInterval(() => {
       if (input.value.trim() || document.hidden || !byId("categoryPage")?.classList.contains("active")) return;
@@ -1186,6 +1217,7 @@
 
     input.addEventListener("input", () => {
       const parsed = parsedListingQuery(input.value, "category");
+      shell?.classList.toggle("is-listening", !!input.value.trim());
       if (!parsed) {
         step = 0;
         sayDialog(CATEGORY_FLOQAI_DIALOG[0]);
@@ -2920,20 +2952,12 @@
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.eventsToRecords(events) : Object.entries(events).map(([id,e]) => ({id, data:e, title:e.eventName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"events"}) : sourceRecords;
     const context = await userLocationContext();
-    context.query = s;
-    const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
-    setText(
-      "locationRankingStatus",
-      tt(
-        "listing.rankingActive",
-        { source: context.source || context.locationSource || "profile/browser" },
-        `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`
-      )
-    );
-    const matches = ranked
+    const filtered = searched
       .map(record => [record.id, record.data || events[record.id]])
       .filter(([id,e]) => e && (!country || e.country === country) && (!region || e.region === region) && (!city || e.city === city) && (!genre || (e.genres||[]).includes(genre)))
       .filter(([id,e]) => !parsed || window.FLOQRVenueQuery.matchesFilters(parsed, e, getLocation(e.locationId)?.locationName || ""));
+    const coordsOfEvent = ([id,e]) => window.FLOQRGeoSearch?.recordCoordinates(e) || window.FLOQRGeoSearch?.recordCoordinates(getLocation(e.locationId)) || null;
+    const matches = sortListingNearest(filtered, context, coordsOfEvent, ([id,e]) => e.eventName || id);
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching events found.</div>';
     matches.forEach(([id,e]) => {
       const loc = getLocation(e.locationId);
@@ -2963,17 +2987,7 @@
     const sourceRecords = window.FLOQRAISearch ? window.FLOQRAISearch.locationsToRecords(locations) : Object.entries(locations).map(([id,l]) => ({id, data:l, title:l.locationName || id}));
     const searched = window.floqrSearch ? await window.floqrSearch(textQuery, {records:sourceRecords, db, currentUser, profile:cachedUserProfile, role:"patron", source:"clubLocations"}) : sourceRecords;
     const context = await userLocationContext();
-    context.query = s;
-    const ranked = window.FLOQRLocationAI ? await window.FLOQRLocationAI.rankLocationsForUser(searched, context) : searched;
-    setText(
-      "locationRankingStatus",
-      tt(
-        "listing.rankingActive",
-        { source: context.source || context.locationSource || "profile/browser" },
-        `Ranking active: using ${context.source || context.locationSource || "profile/browser"} location plus preferred cities, genres, venue types, and interests. Deny browser location to confirm profile fallback.`
-      )
-    );
-    const matches = ranked.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
+    const filtered = searched.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
       if (!l) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
       const effectiveType = type.startsWith("club-action:") ? actionBase : type;
@@ -2986,6 +3000,7 @@
       return l && typeOk && (!country || l.country === country) && (!region || l.region === region) && (!city || l.city === city) && (!genre || (l.genres||[]).includes(genre))
         && (!parsed || window.FLOQRVenueQuery.matchesFilters(parsed, l));
     });
+    const matches = sortListingNearest(filtered, context, ([id,l]) => window.FLOQRGeoSearch?.recordCoordinates(l) || null, ([id,l]) => l.locationName || id);
     grid.innerHTML = matches.length ? "" : '<div class="empty">No matching results found.</div>';
     matches.forEach(([id,l]) => {
       const card = document.createElement("div");
@@ -4391,6 +4406,10 @@
       await afterLogin();
     });
     bindCategoryFloqAi();
+    window.addEventListener("floqr:location-updated", () => {
+      resetUserLocationContext();
+      if (byId("listingPage")?.classList.contains("active")) renderGrid();
+    });
     bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
     bind("dropdownSignInBtn", () => {
       byId("userDropdown")?.classList.add("hidden");
@@ -4399,7 +4418,7 @@
     });
     ["logoutBtn1","logoutBtn2","logoutBtn3","logoutBtn4","logoutBtn5","logoutBtn6","logoutBtnClubActions"].forEach(id => bind(id, logout));
     bind("eventsBtn", () => openCategory("events")); bind("clubsBtn", () => openCategory("clubs")); bind("loungesBtn", () => openCategory("lounges")); bind("loungeClubBtn", () => openCategory("lounge-club")); bind("beachClubsBtn", () => openCategory("beach-clubs")); bind("shoutoutBtn", () => openCategory("shoutout"));
-    bind("eventsBtnCard", () => openCategory("events")); bind("clubsBtnCard", () => openCategory("clubs")); bind("loungesBtnCard", () => openCategory("lounges")); bind("loungeClubBtnCard", () => openCategory("lounge-club")); bind("beachClubsBtnCard", () => openCategory("beach-clubs")); bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
+    bind("shoutoutBtnCard", showShoutoutLanding); bind("minglBtnCard", () => showAdSplash("mingl", () => showMinglLanding()));
     bind("backToWelcomeFromProfileBtn", () => showPage("landingPage"));
     bind("backToWelcomeBtn", () => showPage("landingPage"));
     bind("backToCategoriesFromShoutoutLandingBtn", () => showPage("categoryPage"));

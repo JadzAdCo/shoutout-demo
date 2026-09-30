@@ -13,6 +13,7 @@ module.exports = {
   ...require("./venue-ingest-functions"),
   ...require("./suprstr-functions"),
   ...require("./privacy-dsar-functions"),
+  ...require("./venue-geocode-functions"),
   onShoutoutComplianceWrite: require("./shoutout-compliance-functions").onShoutoutComplianceWrite,
   purgeExpiredShoutoutMedia: require("./shoutout-compliance-functions").purgeExpiredShoutoutMedia,
   anonymizeExpiredComplianceLogs: require("./shoutout-compliance-functions").anonymizeExpiredComplianceLogs,

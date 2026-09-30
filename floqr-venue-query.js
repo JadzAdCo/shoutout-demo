@@ -8,7 +8,7 @@
 })(typeof window !== "undefined" ? window : null, function () {
   "use strict";
 
-  const VERSION = "s3.0.105";
+  const VERSION = "s3.0.106";
 
   const VENUE_TYPES = [
     {
@@ -125,7 +125,27 @@
     {id: "berlin", label: "Berlin", detect: ["berlin"], match: ["berlin"]},
     {id: "dubai", label: "Dubai", detect: ["dubai"], match: ["dubai"]},
     {id: "lagos", label: "Lagos", detect: ["lagos"], match: ["lagos"]},
-    {id: "mexico-city", label: "Mexico City", detect: ["mexico city", "cdmx", "ciudad de mexico"], match: ["mexico city", "ciudad de mexico", "cdmx"]}
+    {id: "mexico-city", label: "Mexico City", detect: ["mexico city", "cdmx", "ciudad de mexico"], match: ["mexico city", "ciudad de mexico", "cdmx"]},
+    {id: "monaco", label: "Monaco", detect: ["monaco", "monte carlo", "montecarlo"], match: ["monaco", "monte carlo"]},
+    {id: "cannes", label: "Cannes", detect: ["cannes"], match: ["cannes"]},
+    {id: "mykonos", label: "Mykonos", detect: ["mykonos", "μυκονος"], match: ["mykonos"]},
+    {id: "milan", label: "Milan", detect: ["milan", "milano"], match: ["milan", "milano"]}
+  ];
+
+  /* "Near me" in every supported language: the user's own location (GPS, then IP), not a place name. */
+  const NEAR_ME = [
+    "near me", "nearby", "near by", "near here", "close to me", "close by", "closest", "nearest",
+    "around me", "around here", "near my location", "in my area",
+    "cerca de mi", "cerca", "mas cercano", "mas cercanos", "cercanos",
+    "pres de moi", "a proximite", "autour de moi", "le plus proche", "les plus proches",
+    "in der nahe", "in meiner nahe", "in der naehe", "nahe", "nachste", "in meiner umgebung",
+    "vicino a me", "qui vicino", "nelle vicinanze", "piu vicino", "piu vicini",
+    "perto de mim", "proximo de mim", "perto", "mais proximo", "mais proximos",
+    "рядом", "рядом со мной", "поблизости", "ближайшие", "ближайший",
+    "κοντα μου", "κοντα", "πλησιεστερα", "πλησιεστερο",
+    "w poblizu", "blisko mnie", "blisko", "najblizsze", "najblizej",
+    "in de buurt", "bij mij in de buurt", "dichtbij", "dichtbij mij", "dichtstbijzijnde",
+    "بالقرب مني", "قريب مني", "قريب", "الاقرب"
   ];
 
   const PLACE_PREPOSITIONS = new Set(["in", "near", "around", "en", "em", "im", "w", "в", "σε", "στο", "στη", "στην", "في"]);
@@ -169,6 +189,7 @@
       if (!key || map.has(key)) return;
       map.set(key, entry);
     };
+    NEAR_ME.forEach(word => add(word, {kind: "near", id: "near-me"}));
     PLACES.forEach(place => place.detect.forEach(word => add(word, {kind: "place", id: place.id})));
     VENUE_TYPES.forEach(type => type.words.forEach(word => add(word, {kind: "type", id: type.id})));
     GENRES.forEach(genre => genre.words.forEach(word => add(word, {kind: "genre", id: genre.id})));
@@ -246,6 +267,7 @@
     const typeHits = [];
     const genres = [];
     let place = null;
+    let nearMe = false;
 
     for (let i = 0; i < tokens.length; i += 1) {
       if (consumed[i]) continue;
@@ -256,6 +278,7 @@
         for (let k = i; k < i + span; k += 1) consumed[k] = true;
         if (hit.kind === "type" && !typeHits.includes(hit.id)) typeHits.push(hit.id);
         if (hit.kind === "genre" && !genres.includes(hit.id)) genres.push(hit.id);
+        if (hit.kind === "near") nearMe = true;
         if (hit.kind === "place") {
           const known = placeById(hit.id);
           place = {id: known.id, label: known.label, match: Array.from(new Set([...known.detect, ...known.match]))};
@@ -295,6 +318,7 @@
       venueHint: typeHits.find(id => id !== "events") || "",
       genres,
       place,
+      nearMe: nearMe && !place,
       when,
       residual,
       entry

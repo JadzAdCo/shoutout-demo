@@ -152,11 +152,44 @@ test("index.html wires the stationary FloqAi category search", () => {
   assert.match(html, /id="categoryFloqAiSpeech"/);
   assert.match(html, /id="categoryFloqAiInput"/);
   assert.match(html, /data-i18n="cat\.floqaiWelcome"/);
-  assert.match(html, /floqr-venue-query\.js\?v=s3\.0\.105/);
+  assert.match(html, /floqr-venue-query\.js\?v=s3\.0\.106/);
   assert.ok(html.indexOf("categoryFloqAiSpeech") < html.indexOf("categoryFloqAiInput"), "FloqAi sits above the input");
   assert.doesNotMatch(html, /id="continueBtn"/);
   assert.doesNotMatch(html, /class="login-copy"/);
   assert.match(html, /data-floqr-help-id="help-welcome"/);
+});
+
+test("category page has no Search for heading and no venue-type tiles", () => {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const page = html.slice(html.indexOf('id="categoryPage"'), html.indexOf('id="intentSearchPage"'));
+  assert.doesNotMatch(page, /data-i18n="nav\.searchFor"/);
+  ["eventsBtnCard", "clubsBtnCard", "beachClubsBtnCard", "loungesBtnCard", "loungeClubBtnCard"].forEach(id =>
+    assert.doesNotMatch(page, new RegExp(`id="${id}"`), id));
+  assert.match(page, /id="shoutoutBtnCard"/);
+  assert.match(page, /class="category-floqai-mark-halo"/);
+});
+
+test("near me in every language means the user's location, not a place", () => {
+  ["EDM clubs near me", "clubs nearby", "closest lounges", "clubs cerca de mí", "clubs près de moi",
+    "Clubs in der Nähe", "club vicino a me", "clubes perto de mim", "клубы рядом", "κλαμπ κοντά μου",
+    "kluby w pobliżu", "clubs in de buurt", "نوادي بالقرب مني"].forEach(q => {
+    const p = VQ.parse(q);
+    assert.equal(p.nearMe, true, q);
+    assert.equal(p.place, null, q);
+  });
+  const edm = VQ.parse("EDM clubs near me");
+  assert.equal(edm.type, "clubs");
+  assert.deepEqual(edm.genres, ["EDM"]);
+  assert.equal(edm.residual, "");
+});
+
+test("an explicit place wins over near me; Monaco is a known place", () => {
+  const p = VQ.parse("Clubs in Monaco");
+  assert.equal(p.place.id, "monaco");
+  assert.equal(p.nearMe, false);
+  assert.equal(VQ.parse("clubs near me in Miami").place.id, "miami");
+  assert.equal(VQ.parse("clubs near me in Miami").nearMe, false);
+  assert.equal(VQ.parse("Monte Carlo lounges").place.id, "monaco");
 });
 
 test("chrome pack carries the FloqAi category dialog copy", () => {

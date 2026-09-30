@@ -217,7 +217,7 @@ test("App language chrome keys cover portal tabs and language settings radios", 
   assert.match(portal, /data-i18n="lang.webappLanguage"/);
   assert.match(portal, /data-i18n="lang.testHint"/);
   const index = readReleaseFile("index.html");
-  assert.match(index, /data-i18n="cat.events"/);
+  assert.match(index, /data-i18n="cat.floqaiWelcome"/);
   assert.match(index, /data-i18n="nav.backToWelcome"/);
   assert.match(index, /help-attach\.js\?v=s3\./);
   const helpAttach = readReleaseFile("help-attach.js");
