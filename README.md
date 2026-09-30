@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.106 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.107 (stable)
 
+- s3.0.107: WhatsApp OTP sign-in (Worldwide) via Twilio (`requestWhatsAppOtp`, `verifyWhatsAppOtp`) with forced compliance rows for every send / delivery status / verify; SMS OTP limited to US (+1); OTP divider removed; Privacy Policy · Do Not Sell links moved below the sign-in buttons in white; Welcome `?` explains OTP in 11 languages.
 - s3.0.106: Location-aware search — nearest first then by name (GPS, then IP estimate, then profile city); "near me" in 11 languages; Google venue geocoding trigger + backfill (`onClubLocationGeocode`, `scheduledVenueGeocodeBackfill`); animated borderless FloqAi dialog; Search for heading and venue tiles removed.
 - s3.0.105: FloqAi venue search on Search for (Events / Clubs / Beach Clubs / Lounges / Lounge-Clubs + genre + city word lists); Welcome `?` help; signed-in users skip the Continue interstitial.
 - s3.0.104: Publish floqr-ad-pricing.js + patron-ad-campaigns.js to main so Functions CI (ad-campaigns-business tests) passes.

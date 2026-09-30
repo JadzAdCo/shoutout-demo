@@ -17,7 +17,7 @@
   <main class="privacy-shell card">
     <p class="eyebrow">FLOQR · FloqR</p>
     <h1>Privacy Policy</h1>
-    <p class="sub small">Version s3.0.106 · Effective for the demo at GitHub Pages and for production at <strong>https://www.floqr.com</strong> after cutover. This page is product notice, not legal advice. Controller entity name and contact will be finalized at cutover.</p>
+    <p class="sub small">Version s3.0.107 · Effective for the demo at GitHub Pages and for production at <strong>https://www.floqr.com</strong> after cutover. This page is product notice, not legal advice. Controller entity name and contact will be finalized at cutover.</p>
     <p><a id="privacyBackLink" href="./patron-portal.html?tab=privacy">← Back to My Privacy</a></p>
 
     <h2>Who we are</h2>
@@ -31,6 +31,7 @@
       <li>Security signals: App Check / reCAPTCHA, optional client IP for display security and compliance logs</li>
       <li>Device / browser signals needed to run the web app (and later hybrid native apps)</li>
       <li>Approximate location for search: your device location (GPS) only when you allow it; otherwise a city-level estimate from your IP address. It is used to list the closest events and venues first, kept in your browser session only, and not saved to your profile.</li>
+      <li>One Time Password (OTP) sign-in: when you ask for a code by WhatsApp or SMS, we send one sign-in message to that number through Twilio (WhatsApp is operated by Meta). We keep a masked number, a one-way hash, the delivery status, and the sign-in result in security logs; the code itself is stored only as a hash and deleted once used.</li>
     </ul>
 
     <h2>Why we process data</h2>

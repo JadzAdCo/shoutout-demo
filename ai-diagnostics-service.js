@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.106";
+  const PREVIEW_LINKS_PACKAGE = "s3.0.107";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1122,13 +1122,33 @@
         {label:"Listing nearest-first sort", file:"patron-app.js", includes:["sortListingNearest", "floqr:location-updated", "cat.floqaiNearYou"]},
         {label:"Geo module loaded before location AI", file:"index.html", includes:["floqr-geo-search.js?v=s3.0.106", "help-location-search", "category-floqai-mark-halo"]},
         {label:"Google venue geocode trigger", file:"functions/venue-geocode-functions.js", includes:["onClubLocationGeocode", "scheduledVenueGeocodeBackfill", "GOOGLE_PLACES_API_KEY"]},
-        {label:"Privacy discloses location", file:"privacy.html", includes:["Approximate location for search", "GeoJS"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.106\""]}
+        {label:"Privacy discloses location", file:"privacy.html", includes:["Approximate location for search", "GeoJS"]}
+      ]
+    },
+    {
+      version: "s3.0.107-whatsapp-otp",
+      title: "WhatsApp OTP sign-in (Twilio) + SMS US only + privacy links at bottom",
+      checks: [
+        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "Continue with WhatsApp OTP (Worldwide)", "Continue with SMS OTP (US Only)", "login-legal"]},
+        {label:"WhatsApp OTP client", file:"patron-app.js", includes:["requestWhatsAppOtp", "verifyWhatsAppOtp", "signInWithCustomToken"]},
+        {label:"WhatsApp OTP callables", file:"functions/whatsapp-otp-functions.js", includes:["exports.requestWhatsAppOtp", "exports.verifyWhatsAppOtp", "forceSecurity: true", "fetchTwilioMessage"]},
+        {label:"Compliance row forced for auth events", file:"functions/twilio-log.js", includes:["forceSecurity === true", "ContentSid: template"]},
+        {label:"Welcome help explains OTP", file:"floqai-help-repository.js", includes:["One Time Password (OTP)", "whatsapp otp"]},
+        {label:"Privacy discloses OTP logging", file:"privacy.html", includes:["One Time Password (OTP) sign-in"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.107\""]}
       ]
     }
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-0-107-whatsapp-otp",
+      area:"Sign-in / Welcome",
+      feature:"WhatsApp OTP (Worldwide), SMS OTP (US Only), privacy links at the bottom",
+      changed:"Welcome adds Continue with WhatsApp OTP (Worldwide). SMS OTP is US (+1) only. The OTP divider is gone. Privacy Policy · Do Not Sell or Share moved below all sign-in buttons in white. The Welcome ? explains what an OTP is and how it works.",
+      howToTest:"Signed out, hard-refresh https://jadzadco.github.io/shoutout-demo/?v=s3.0.107. Tap ? beside Welcome and read the OTP paragraph. Tap Continue with WhatsApp OTP (Worldwide), pick a country code, enter a WhatsApp number, tap Send WhatsApp code, then enter the 6-digit code from WhatsApp. Master Admin → Twilio → WhatsApp Logs and Compliance Logs show the send, delivery status and verify rows. Switch language and repeat.",
+      expected:"Code arrives on WhatsApp and signs you in, or a clear reason is shown if WhatsApp could not deliver. SMS country code shows United States (+1) only. Privacy links are white at the bottom. Text is translated."
+    },
     {
       id:"s3-0-106-location-aware-search",
       area:"Search / FloqAi",
