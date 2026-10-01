@@ -180,44 +180,38 @@
     }
   }
 
-  function loadAdStories(profile = {}) {
-    const campaigns = (window.FLOQRAdCampaigns?.campaigns?.() || []).filter(isMinglAdCampaign);
-    if (!campaigns.length) {
-      const picked = window.FLOQRAdCampaigns?.pickCampaign?.("mingl-gist", profile)
-        || window.FLOQRAdCampaigns?.pickCampaign?.("mingl", profile);
-      if (!picked) return [];
-      return [{
-        id: `ad:${picked.campaignId || "mingl"}`,
-        ringId: `ad:${picked.campaignId || "mingl"}`,
-        type: "ad",
-        authorName: picked.title || "Sponsored",
-        avatarUrl: picked.image || "",
-        mediaUrl: picked.image || "",
-        mediaType: "image",
-        title: picked.title || "Sponsored",
-        body: picked.body || "",
-        chips: ["#Sponsored"],
-        createdAt: Date.now(),
-        ctaLabel: picked.callToAction || "Learn more",
-        ctaHref: picked.sourceUrl || "#"
-      }];
-    }
-    return campaigns.slice(0, 8).map((campaign) => ({
+  function adStory(campaign) {
+    const isVideo = campaign.creativeType === "video" && campaign.videoUrl;
+    return {
       id: `ad:${campaign.id}`,
       ringId: `ad:${campaign.id}`,
       type: "ad",
       authorName: campaign.advertiser || campaign.title || "Sponsored",
       avatarUrl: campaign.image || "",
-      mediaUrl: campaign.image || "",
-      mediaType: "image",
+      mediaUrl: isVideo ? campaign.videoUrl : (campaign.image || ""),
+      mediaType: isVideo ? "video" : "image",
       title: campaign.title || "Sponsored",
       body: campaign.body || "",
       chips: ["#Sponsored", campaign.badge ? hashTag(campaign.badge) : ""].filter(Boolean),
       createdAt: Date.now(),
       ctaLabel: campaign.callToAction || "Learn more",
-      ctaHref: campaign.sourceUrl || "#",
-      campaignId: campaign.id
-    }));
+      ctaHref: /^https:\/\//i.test(String(campaign.sourceUrl || "")) ? campaign.sourceUrl : "#",
+      campaignId: campaign.id,
+      packaged: !campaign.firestore
+    };
+  }
+
+  /** Only campaigns the scorer allows (status, flight dates, demographics, Master Admin settings); paid ads first. */
+  function loadAdStories(profile = {}) {
+    const api = window.FLOQRAdCampaigns;
+    if (!api?.campaigns || !api.scoreCampaign) return [];
+    return api.campaigns()
+      .filter(isMinglAdCampaign)
+      .map(campaign => ({campaign, score: Math.max(api.scoreCampaign(campaign, profile, "mingl-gist"), api.scoreCampaign(campaign, profile, "mingl"))}))
+      .filter(item => item.score > -100 && !item.campaign.isHouseFallback)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8)
+      .map(item => adStory(item.campaign));
   }
 
   function interleaveAds(contentStories, adStories) {
@@ -361,7 +355,11 @@
       cta.textContent = story.ctaLabel || "Learn more";
       cta.href = story.ctaHref && story.ctaHref !== "#" ? story.ctaHref : `./?v=${APP_V}&start=mingl`;
       if (!showCta && story.type === "ad") cta.classList.remove("hidden");
+      cta.onclick = story.type === "ad" && story.campaignId
+        ? () => { window.FLOQRAdTracking?.click?.(story, "mingl-gist"); }
+        : null;
     }
+    if (story.type === "ad" && story.campaignId) window.FLOQRAdTracking?.impression?.(story, "mingl-gist");
 
     stopProgress();
     progressStartedAt = Date.now();
@@ -410,6 +408,7 @@
         return !author || !blocked.has(author);
       })
       .sort((a, b) => b.createdAt - a.createdAt);
+    await window.FLOQRAdCampaigns?.loadFirestoreSpotAds?.(db)?.catch?.(() => {});
     const ads = loadAdStories();
     stories = interleaveAds(content, ads);
     rings = buildRings(stories);

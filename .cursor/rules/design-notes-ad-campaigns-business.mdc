@@ -1,6 +1,6 @@
 # Ad campaigns — business accounts, placements, pricing
 
-Design notes only (not FloqAi help). Resume: `@ad-campaigns$`.
+Design notes only (not FloqAi help). Resume: `@ad-campaigns$` / `$ads$`. Current: **s3.1.0** (paid ads, Ad Management, measurement, SMS/WhatsApp intake).
 
 ## Placement types (product categories)
 
@@ -31,13 +31,75 @@ Personal accounts cannot open Ad Campaigns. Business accounts keep `IsPatron` (s
 | `image` / flyer | PNG, JPEG, or GIF upload → Storage `spotAds/{uid}/{campaignId}` |
 | `html` | Patron pastes HTML (image URLs allowed). Render in sandboxed iframe only — never `innerHTML` into the host page |
 
-## Workflow
+## Workflow (s3.1.0 — server-only, paid before live)
 
-1. Business patron composes in My Profile → **Ad Campaigns**
-2. Submit → `spotAdCampaigns/{id}` `status: pending_approval`, `paymentStatus: unpaid|paid|waived`
-3. Master Admin → Ad Campaign Management → approve / reject + set `startsAt` / `endsAt`
-4. Approve → `status: active` (only while schedule window is open; picker also checks dates)
-5. Active campaigns enter `FLOQRAdCampaigns` pool via `loadFirestoreSpotAds`
+**Every write to `spotAdCampaigns` goes through Functions** (`functions/ad-functions.js`, pure helpers in `functions/ad-core.js`). Firestore rules deny all client writes to `spotAdCampaigns`, `adCampaignPrivate`, `adStats*`, `adSettings`, `adInvoices`, `adInvoiceAccounts`, `adIntakeSubmissions`, `adAuditLogs`, `adPosterDelegations`, `promotionGroups`. Storage `adMedia/{uid}/…` is owner-create, image (< 8 MB) or video (< 60 MB) content types only; `adIntake/…` is Functions-only; legacy `spotAds/{uid}/…` stays image-only.
+
+1. Poster composes in the shared composer `floqr-ad-composer.js` (My Profile → **Ad Campaigns** via `patron-ad-campaigns.js`; Club Admin → **In-App Marketing** via `admin-spot-ads.js`). Poster identity comes from `getAdPostingIdentities`.
+2. `createAdCampaign` validates (`validateCampaignInput`), re-inspects uploaded media server-side (`inspectAdMedia`: magic bytes; MP4/MOV `mvhd` duration ≤ **30 s** + 0.5 s tolerance; image ≤ 8 MB, video ≤ 60 MB) → `status: awaiting_payment`.
+3. Payment: `payg` / `subscription` → Stripe Checkout (`orderType: "adCampaign"`, `serviceOrders`). `invoice` only when `adInvoiceAccounts/{posterKey}.enabled` → straight to `pending_approval` with `paymentStatus: invoiced`.
+4. Stripe webhook / `confirmFloqrCheckoutSession` → `fulfillAdOrder` → `paymentStatus: paid`, `status: pending_approval`, `adInvoices/{invoiceNumber}` written, Master Admin Inbox row (`#adApprovalQueue`).
+5. `onAdInvoiceCreated` sends the invoice to the payer (Inbox + email; SMS/WhatsApp reply for intake) with `ad-invoice.html` link.
+6. Master Admin **Approve** (`approveAdCampaign`, SOS2FA) — refused unless paid / invoiced / waived (`canApprove`); waive needs a reason. Sets flight `startsAtMs`/`endsAtMs` → `status: active`.
+7. `expireAdCampaigns` (hourly) flips past-`endsAtMs` to `expired`, prunes dedupe + stale intake.
+8. Patron Search splash / Mingl / Gist / RydR read `active` docs via `FLOQRAdCampaigns` (servable = `active` | `live` only).
+
+Statuses: `awaiting_payment`, `pending_approval`, `active`, `paused`, `rejected`, `expired`, `cancelled`. Paid states: `paid`, `invoiced`, `waived`. Reject with a paid Stripe order offers a refund.
+
+Public fields live on `spotAdCampaigns`; contact name/email/phone + Stripe ids live in `adCampaignPrivate/{id}` (Master Admin read only).
+
+## Who may post (poster identities)
+
+`resolvePosterIdentities` → `{posterType, posterId, label, via, key}`; `posterKey = "{type}:{id}"`.
+
+| posterType | Source |
+|---|---|
+| `club` | Club Admin of the venue (`adminUids`, `masterAdminUids`, `adminEmails`, `clubAdminAssignments`) **or** a delegated **Club Ad Poster** (`adPosterDelegations`, role **Club Ad Poster** added to `users.approvedRoles` + `adPosterClubIds`, set by Club Admin via `setClubAdPoster`) |
+| `promotionGroup` | Member with `canPostAds` in `promotionGroups` (owner manages members via `upsertPromotionGroup` / `setPromotionGroupMember`) |
+| `promoter`, `dj`, `mediaCreator` | Approved role text on `users.approvedRoles` / `roles` |
+| `serviceMember` | `IsServiceMember` / legacy aliases |
+| `business` | `accountType: business` |
+| `floqq` | FloqQ / ticketing role or Master Admin (ticketed events) |
+| `thirdParty` | SMS / WhatsApp intake only |
+
+## Splash rotation (restored s3.1.0)
+
+Search category / club tap → 5 s splash (`patron-app.js` `renderSplashAd` → `#adCreative`): club logo, FLOQR logo, “Powered by Papi and Social OS”, loading text **plus** the picked creative (image or muted looping video ≤ 30 s), Sponsored badge, Learn more. Picker: `FLOQRAdCampaigns.pick(slot)` scores targeting (gender, min/max age, tags), paid real campaigns outrank packaged demos, advertiser-diversified rotation. Controls in `adSettings/global`: `splashEnabled`, `splashSeconds` (3–10, default 5), `showDemoAds`, `packagedAdsEnabled`.
+
+## Measurement (s3.1.0 — real, not formulas)
+
+`floqr-ad-tracking.js` → callable `recordAdEvent({campaignId, event: impression|click, slot, packaged})`. Server: only servable campaigns (or packaged ids) count; per-viewer dedupe window (`adEventDedupe`) + throttle (`adEventThrottle`); increments `adStats/{id}` (`impressions`, `clicks`, `bySlot`) and `adStatsDaily/{id}_{yyyymmdd}`. CTR = clicks / impressions from those docs. The old `Math.max(10000, …)` × 3.5 % estimate is removed (test-guarded).
+
+Clear: `resetAdStats({campaignId | "all", reason})` — SOS2FA, reason, audited (`ad.stats_reset` with before snapshot). “Clear all” requires typing CLEAR in the UI.
+
+## Master Admin → Ad Management (tab group)
+
+`master-admin.html` tab group `adManagement`, mounted by `master-ad-management.js` after SOS2FA unlock (`floqr:sos2fa-unlocked`):
+
+| Subtab | Panel id | Does |
+|---|---|---|
+| Approval queue | `adApprovalQueue` | Awaiting payment + pending: edit (copy, link, demographics, dates via `updateAdCampaign`), Approve, Waive & approve, Mark invoice paid, Reject (+ refund) |
+| Live campaigns | `adLiveCampaigns` | Pause / Resume / End (`setAdCampaignState`), clear stats per campaign |
+| Stats | `adStatsPanel` | Measured totals, per-campaign table, 14-day daily; Clear one / Clear all |
+| SMS & WhatsApp intake | `adIntakePanel` | Intake rows (masked phone, media, status), purge expired / unpaid (`purgeAdIntake`) |
+| Settings | `adSettingsPanel` | `setAdSettings`, invoice accounts (`setAdInvoiceAccount`), audit log (`adAuditLogs`) |
+| Packaged demos | `adCampaignManagement` | Legacy packaged demo editor (localStorage overrides only) |
+
+All Master callables: `assertSos2faSession` (scope `entityManagement`), reason ≥ 8 chars where state changes, audited to `adAuditLogs`.
+
+## SMS / WhatsApp third-party intake
+
+1. Advertiser texts / WhatsApps a flyer (JPG/PNG/GIF/WebP) or video ≤ 30 s (or `AD`) to the FLOQR number. Twilio → `adIntakeWebhook` (dedicated number) or `messagingInboundWebhook` (shared number hook). Twilio signature validated; STOP/START/HELP honored (`adIntakeOptOuts`); daily cap per phone (`maxIntakePerPhonePerDay`); `intakeEnabled` kill switch.
+2. Media downloaded from Twilio only, inspected, stored at `adIntake/{id}/creative.*`. `adIntakeSubmissions/{sha256(token)}` (phone hashed + masked; token never stored).
+3. Reply (via `sendTwilioMessagesApi` — compliance rows) with `ad-submit.html?v=&t=<token>` (72 h).
+4. `ad-submit.html` (public, `data-floqr-public`): title, copy, link, placement, payment mode (`payg` | `subscription`; invoice refused), run days, start date, **demographics** (age, gender, cities, countries, interests, music), contact → `startAdIntakeCheckout` → Stripe → `confirmAdIntakePayment` → campaign `pending_approval` (`posterType: thirdParty`, `source: intake`) + invoice link `ad-invoice.html?t=`.
+5. Master Admin edits demographics in the queue before approve.
+
+WhatsApp replies are session replies inside the 24 h window the advertiser opened; production delivery still needs the production WhatsApp sender (see `whatsapp-twilio-incomplete.mdc`).
+
+## Invoices
+
+`adInvoices/{invoiceNumber}` (`FLQ-AD-…`, `buildInvoiceLines`). `getAdInvoice` by intake token (public) or by invoice number (payer / poster / Master Admin). `ad-invoice.html` prints.
 
 ## Pricing (DOOH-informed)
 
@@ -92,4 +154,8 @@ Packaged DC spots often have **empty** `targetTags`, so they always pass scoring
 
 - Do not put design notes in FloqAi help bodies
 - Do not execute unsandboxed HTML ads in the host DOM
-- Do not let personal accounts create campaigns
+- Do not let clients write `spotAdCampaigns` (or set `status` / `paymentStatus`) — callables only
+- Do not show invented impressions / CTR — `adStats` only
+- Do not approve unpaid ads without an explicit, reasoned waive
+- Do not add a second WhatsApp/SMS sender path — intake replies use `sendTwilioMessagesApi`
+- Do not store intake tokens or raw phone numbers in public docs (hash + mask)

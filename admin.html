@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.111"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.0"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.2"/>
 </head>
 <body>
@@ -517,32 +517,14 @@
             data-i18n="admin.inAppMarketingTitle"
             data-floqr-help-id="help-club-in-app-marketing"
             data-floqr-help-title="In-app marketing"
-            data-floqr-help-search="spot ad|in-app marketing|advertisement pool|mingl ad|rydr ad|interstitial"
-            data-floqr-help-body="Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required."
+            data-floqr-help-search="spot ad|in-app marketing|post an ad for my club|club ad|flyer ad|video ad|ad poster|who can post ads|mingl ad|rydr ad"
+            data-floqr-help-body="Post a flyer image or a video of 30 seconds or less for your club. It shows on the Search loading splash and feature screens (Inline) or in the Mingl Gist story scroll. Pick the run length and who should see it, then pay by card, monthly subscription, or invoice if FLOQR opened an invoice account for your club. FLOQR reviews every paid ad before it runs; rejected ads are refunded. Under Club ad posters you can let a team member post ads for the club — they get the Club Ad Poster role."
           >Start a spot advertisement campaign</h2>
-          <div class="profile-grid">
-            <label>Spot template
-              <select id="spotTemplateSelect"></select>
-            </label>
-            <label>Event / activity focus<input id="spotEventFocus" placeholder="e.g. Sunset Sundays, Feel Good Fridays"/></label>
-            <label>Badge / eyebrow<input id="spotBadge" placeholder="Tonight"/></label>
-            <label>Headline<input id="spotHeadline" placeholder="Tonight at the club"/></label>
-            <label>CTA<input id="spotCta" placeholder="Open club"/></label>
-            <div class="url-media-field profile-grid-wide" data-prefer-video="1" data-media-button="Add Video / Image" data-media-label="Spot ad media">
-              <label>Spot image / video (optional)<input id="spotImageFile" type="file" accept="image/*,video/*"/></label>
-              <div id="spotImagePreview" class="url-media-preview hidden"></div>
-              <label>or paste URL<input id="spotImageUrl" placeholder="https://… file, YouTube, TikTok, or leave blank for auto banner"/></label>
-            </div>
-            <label>Link URL<input id="spotLinkUrl" placeholder="https://…"/></label>
-          </div>
-          <label>Body<textarea id="spotBody" rows="3" placeholder="Event copy from your public site"></textarea></label>
-          <label>Slots (comma-separated)<input id="spotSlots" value="clubs,events,mingl,mingl-gist,rydr,shoutout,default"/></label>
-          <div class="queue-actions" style="margin-top:10px">
-            <button id="publishSpotAdBtn" class="primary" type="button">Publish to advertisement pool</button>
-            <button id="seedClubSpotAdsBtn" type="button">Seed venue event spots from website data</button>
-          </div>
           <p id="spotAdStatus" class="status"></p>
-          <div id="spotAdReport" class="report-block"></div>
+          <div id="spotAdComposerHost"></div>
+        </div>
+        <div class="card">
+          <div id="spotAdPostersHost"></div>
         </div>
       </section>
 
@@ -931,7 +913,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.0.5"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=s3.0.112"></script>
@@ -942,9 +924,9 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.82"></script>
-<script src="./floqai-help-repository.js?v=s3.0.81"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.81"></script>
+<script src="./floqr-i18n.js?v=s3.1.0"></script>
+<script src="./floqai-help-repository.js?v=s3.1.0"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.0"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -953,16 +935,18 @@
 <script src="./messaging-credits.js?v=29.09.12"></script>
 <script src="./marketing-templates.js?v=29.09.14"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
-<script src="./ad-campaigns.js?v=29.09.34"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
+<script src="./ad-campaigns.js?v=s3.1.0"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.0"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
 <script src="./admin-app.js?v=s3.0.81"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
-<script src="./admin-rep-extension.js?v=29.09.11"></script>
+<script src="./admin-rep-extension.js?v=s3.1.0"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
 <script src="./admin-marketing.js?v=s3.0.81"></script>
 <script src="./master-twilio-logging.js?v=s3.0.78"></script>
-<script src="./admin-spot-ads.js?v=29.09.17"></script>
+<script src="./admin-spot-ads.js?v=s3.1.0"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./admin-scheduling.js?v=s3.0.0"></script>
 <script src="./notification-center.js?v=29.09.8"></script>

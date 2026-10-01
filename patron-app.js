@@ -681,9 +681,80 @@
   };
 
   const AD_SPLASH_MS = 5000;
+  const SPLASH_AD_SLOTS = ["clubs", "events", "lounges", "lounge-club", "beach-clubs", "shoutout", "mingl", "rydr"];
   let pendingCategoryAfterAd = null;
   let adTimer = null;
   let adStatementTimers = [];
+
+  function splashDurationMs() {
+    const seconds = Number(window.FLOQRAdCampaigns?.settings?.().splashSeconds || 0);
+    return seconds >= 3 && seconds <= 10 ? seconds * 1000 : AD_SPLASH_MS;
+  }
+
+  function safeAdHref(value) {
+    const raw = String(value || "").trim();
+    if (/^\.\/[\w./?=&%#-]*$/.test(raw)) return raw;
+    try {
+      const url = new URL(raw);
+      return url.protocol === "https:" ? url.href : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function clearSplashAd() {
+    const media = byId("adCreativeMedia");
+    media?.querySelectorAll("video").forEach(video => { try { video.pause(); } catch (_) {} });
+    if (media) media.innerHTML = "";
+    byId("adCreative")?.classList.add("hidden");
+  }
+
+  /** Picks the next campaign for this path (paid Firestore ads outrank packaged demos) and counts the impression server-side. */
+  function renderSplashAd(type) {
+    clearSplashAd();
+    const ads = window.FLOQRAdCampaigns;
+    const figure = byId("adCreative");
+    const media = byId("adCreativeMedia");
+    if (!ads?.pickCampaign || !figure || !media) return null;
+    const enabled = ads.settings?.().splashEnabled;
+    if (enabled === 0 || enabled === false || enabled === "0") return null;
+    const slot = SPLASH_AD_SLOTS.includes(type) ? type : "default";
+    const ad = ads.pickCampaign(slot, cachedUserProfile || {});
+    if (!ad || (!ad.image && !ad.videoUrl)) return null;
+    if (ad.creativeType === "video" && ad.videoUrl) {
+      const video = document.createElement("video");
+      video.src = ad.videoUrl;
+      video.muted = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.setAttribute("muted", "");
+      media.appendChild(video);
+      video.play?.()?.catch?.(() => {});
+    } else {
+      const img = document.createElement("img");
+      img.src = ad.image;
+      img.alt = ad.title || "Sponsored";
+      img.decoding = "async";
+      media.appendChild(img);
+    }
+    setText("adCreativeTitle", ad.title || "");
+    setText("adCreativeBody", ad.body || "");
+    const cta = byId("adCreativeCta");
+    if (cta) {
+      const href = safeAdHref(ad.sourceUrl);
+      cta.classList.toggle("hidden", !href);
+      if (href) {
+        cta.href = href;
+        cta.textContent = ad.callToAction || window.FLOQRI18n?.t?.("ad.splash.learnMore") || "Learn more";
+        cta.onclick = () => { window.FLOQRAdTracking?.click?.(ad, slot); };
+      }
+    }
+    figure.classList.remove("hidden");
+    window.FLOQRAdTracking?.impression?.(ad, slot);
+    return ad;
+  }
 
   function showAdSplash(type, nextFn) {
     pendingCategoryAfterAd = nextFn;
@@ -720,16 +791,19 @@
     statementSecondary?.classList.remove("is-hidden");
     showPage("adSplashPage");
     clearAdSplashTimers();
+    renderSplashAd(type);
+    const durationMs = splashDurationMs();
     adStatementTimers = [
-      setTimeout(() => statementPrimary?.classList.add("is-hidden"), AD_SPLASH_MS * 0.4),
-      setTimeout(() => statementSecondary?.classList.add("is-hidden"), AD_SPLASH_MS * 0.7)
+      setTimeout(() => statementPrimary?.classList.add("is-hidden"), durationMs * 0.4),
+      setTimeout(() => statementSecondary?.classList.add("is-hidden"), durationMs * 0.7)
     ];
     adTimer = setTimeout(() => {
       clearAdSplashTimers();
+      clearSplashAd();
       const fn = pendingCategoryAfterAd;
       pendingCategoryAfterAd = null;
       if (typeof fn === "function") fn();
-    }, AD_SPLASH_MS);
+    }, durationMs);
   }
 
   function clearAdSplashTimers() {
@@ -741,6 +815,7 @@
 
   function cancelAdSplash() {
     clearAdSplashTimers();
+    clearSplashAd();
     pendingCategoryAfterAd = null;
     showPage("categoryPage");
   }
@@ -2257,19 +2332,27 @@
       card.querySelector("button").addEventListener("click", () => handleMinglAction(profile));
       grid.appendChild(card);
       if ((index + 1) % 4 === 0) {
-        const ad = window.FLOQRAdCampaigns?.pickCampaign?.("mingl", cachedUserProfile || profile || {}) || AD_CONTENT.mingl || AD_CONTENT.default;
+        const ad = window.FLOQRAdCampaigns
+          ? window.FLOQRAdCampaigns.pickCampaign?.("mingl", cachedUserProfile || {})
+          : (AD_CONTENT.mingl || AD_CONTENT.default);
         if (ad) {
           const adCard = document.createElement("div");
           adCard.className = "mingl-person-ad-card";
+          const href = safeAdHref(ad.sourceUrl);
+          const mediaHtml = ad.creativeType === "video" && ad.videoUrl
+            ? `<video src="${esc(ad.videoUrl)}" muted autoplay loop playsinline></video>`
+            : (ad.image ? `<img src="${esc(ad.image)}" alt="${esc(ad.title || "Sponsored")}">` : `<span>Ad</span>`);
           adCard.innerHTML = `
-            <div class="mingl-person-photo">${ad.image ? `<img src="${esc(ad.image)}" alt="${esc(ad.title || "Sponsored")}">` : `<span>Ad</span>`}</div>
+            <div class="mingl-person-photo">${mediaHtml}</div>
             <div>
               <span class="ad-badge">${esc(ad.badge || "Sponsored")}</span>
               <h3>${esc(ad.title || "Sponsored")}</h3>
               <p>${esc(ad.body || "")}</p>
-              <small>${esc(ad.callToAction || "Learn more")}</small>
+              ${href ? `<a class="button-link" href="${esc(href)}" target="_blank" rel="sponsored noopener">${esc(ad.callToAction || "Learn more")}</a>` : `<small>${esc(ad.callToAction || "Learn more")}</small>`}
             </div>`;
           grid.appendChild(adCard);
+          window.FLOQRAdTracking?.impression?.(ad, "mingl");
+          window.FLOQRAdTracking?.bindClick?.(adCard.querySelector("a"), ad, "mingl");
         }
       }
     });

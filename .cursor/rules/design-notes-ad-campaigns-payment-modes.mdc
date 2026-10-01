@@ -34,6 +34,16 @@ There should be **three different Ad payment modes**. Do not invent a fourth unt
 
 Creative / schedule approval (pending_approval → active) remains required for all modes; payment mode only answers **how** the advertiser pays.
 
+## Built in s3.1.0
+
+| Mode | Implementation |
+|---|---|
+| `payg` | `startAdCampaignCheckout` / `startAdIntakeCheckout` → Stripe Checkout `mode: payment`, price from `PRICE_TABLE_CENTS[placement][runDays]` (inline 7/14/21/31 = $45/$85/$120/$170; Mingl Gist $25/$45/$65/$90) |
+| `subscription` | Stripe Checkout `mode: subscription`, monthly, 31-day run per cycle; `syncAdSubscription` on `customer.subscription.*` webhooks stores `subscriptionStatus` and extends `endsAtMs` to the new period end while the subscription is active; a lapsed subscription stops extending, so the flight expires at the paid period end |
+| `invoice` | `adInvoiceAccounts/{posterKey}` `{enabled, contractRef, netDays, billingEmail}` set by Master Admin (`setAdInvoiceAccount`, SOS2FA + reason). Campaign → `paymentStatus: invoiced`; Master Admin **Mark invoice paid** (`markAdInvoicePaid`, reference) when money lands. Not offered on SMS/WhatsApp intake |
+
+Server owns prices (`functions/ad-core.js`); `floqr-ad-pricing.js` mirrors them for display only. Owner setup: Stripe webhook must include `customer.subscription.updated` / `.deleted`.
+
 ## Forbidden
 
 - Do not ship subscription tiers that are not DOOH-similar

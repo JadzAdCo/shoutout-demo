@@ -493,7 +493,7 @@
     {
       id: "help-ad-campaigns",
       title: "Ad Campaigns",
-      body: "Elect a Business account in My Profile to open Ad Campaigns. Choose Inline ($45 / 7 days — shows while using FloqR features) or Mingl Gist ($25 / 7 days — shows while scrolling Mingl stories). Upload a PNG/JPEG/GIF flyer or paste HTML. Target all patrons or match profile datapoints. Submit sends the campaign to Master Admin for approval and scheduling.",
+      body: "Post a flyer image or a video of 30 seconds or less for your business, club, promotion group or service (DJ, photographer, promoter, FloqQ). Choose Inline ($45 / 7 days — Search loading splash and feature screens) or Mingl Gist ($25 / 7 days — story scroll), the run length and who should see it (age, gender, cities, interests). Pay by card or monthly subscription; approved accounts can use an invoice. FLOQR reviews every paid ad before it runs, and rejected ads are refunded. My ads shows the status, views, clicks and your invoice.",
       searchPhrases: [
         "ad campaigns", "advertise", "business account", "inline ad", "mingl gist ad",
         "flyer ad", "html ad", "sponsored", "post an ad", "advertisement"
@@ -508,19 +508,64 @@
     },
     {
       id: "help-ad-campaign-mgmt",
-      title: "Ad Campaign Mgmt",
-      body: "Master Admin → Ad Campaign Mgmt. Approve pending business ads and set flight dates. On live / packaged campaigns, edit who should see the ad with plain match tags and optional category rows — no JSON. Preview creative shows the flyer or sandboxed HTML. The top-right badge is Status (Live, Demo not live, Awaiting approval) and Shows on (Inline package, Mingl Gist package, or a feature path such as ShoutOut). Demo (not live) is a packaged test creative, not an approved paid flight. Required match groups are optional hard filters. Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
+      title: "Ad Management",
+      body: "Master Admin → Ad Management. Approval queue: approve, waive payment with a reason, mark an invoice paid, or reject with an optional refund. Live & scheduled: pause, resume, end, edit audience and dates. Ad stats: measured impressions, clicks and click rate, with Clear for one ad or all. SMS / WhatsApp intake: texted flyers and videos waiting for payment. Settings & billing: splash on/off and seconds, house and demo ads, intake on/off, invoice accounts and the ad audit log. Packaged demos: the built-in house creatives. Inline $45 / 7 days; Mingl Gist $25 / 7 days.",
       searchPhrases: [
-        "ad campaign mgmt", "approve ad", "preview creative", "match tags",
-        "required match groups", "live pool targeting", "schedule ad flight",
-        "inline package", "mingl gist package", "demo not live", "shows on",
-        "shoutout path", "campaign status badge", "preview shoutout"
+        "ad management", "ad campaign mgmt", "approve ad", "preview creative", "match tags",
+        "schedule ad flight", "inline package", "mingl gist package", "demo not live",
+        "packaged demos", "house ads", "campaign status badge"
       ],
       links: [
-        {label: "Ad Campaign Mgmt", href: vUrl("./master-admin.html", {from: "floqai", tab: "adCampaignManagement"})}
+        {label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"},
+        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
       ],
       source: "help-repository-seed",
-      page: "master-admin.html#adCampaignManagement"
+      page: "master-admin.html#adApprovalQueue"
+    },
+    {
+      id: "help-master-ad-approval",
+      title: "Ad approval queue",
+      body: "Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the payment reference. Reject asks for a reason the poster will see and can refund a card payment.",
+      searchPhrases: ["ad approval", "approve ad", "pending ads", "reject ad", "refund ad", "waive payment", "mark invoice paid", "ad queue"],
+      links: [{label: "Ad approval queue", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adApprovalQueue"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adApprovalQueue"
+    },
+    {
+      id: "help-master-ad-live",
+      title: "Live and scheduled ads",
+      body: "Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log.",
+      searchPhrases: ["live ads", "pause ad", "end ad", "resume ad", "edit ad audience", "ad dates", "ad targeting"],
+      links: [{label: "Live & scheduled", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adLiveCampaigns"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adLiveCampaigns"
+    },
+    {
+      id: "help-master-ad-stats",
+      title: "Ad stats",
+      body: "Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged.",
+      searchPhrases: ["ad stats", "impressions", "clicks", "ctr", "click rate", "clear ad stats", "reset ad stats", "ad measurement"],
+      links: [{label: "Ad stats", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adStatsPanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adStatsPanel"
+    },
+    {
+      id: "help-master-ad-intake",
+      title: "SMS and WhatsApp ad intake",
+      body: "Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here.",
+      searchPhrases: ["text an ad", "sms ad", "whatsapp ad", "ad intake", "send flyer", "ad payment link", "delete ad submissions"],
+      links: [{label: "SMS / WhatsApp intake", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adIntakePanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adIntakePanel"
+    },
+    {
+      id: "help-master-ad-settings",
+      title: "Ad settings and billing",
+      body: "Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad decision.",
+      searchPhrases: ["ad settings", "splash ads", "splash seconds", "house ads", "demo ads", "invoice account", "net terms", "ad audit log"],
+      links: [{label: "Settings & billing", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adSettingsPanel"}],
+      source: "help-repository-seed",
+      page: "master-admin.html#adSettingsPanel"
     },
     {
       id: "help-ad-campaign-status-badge",
@@ -531,7 +576,7 @@
         "campaign badge", "status live", "shoutout path", "what does preview mean on ad"
       ],
       links: [
-        {label: "Ad Campaign Mgmt", href: vUrl("./master-admin.html", {from: "floqai", tab: "adCampaignManagement"})}
+        {label: "Packaged demos", href: vUrl("./master-admin.html", {from: "floqai"}) + "#adCampaignManagement"}
       ],
       source: "help-repository-seed",
       page: "master-admin.html#adCampaignManagement"
@@ -1217,7 +1262,7 @@
     {
       id: "help-club-in-app-marketing",
       title: "In-app marketing",
-      body: "Publish an interstitial spot ad into the FLOQR advertisement pool (Mingl, RydR, clubs, shoutout slots). Use templates based on your venue's upcoming events. No SMS credits required.",
+      body: "Post a flyer or a video of 30 seconds or less as your club. Once it is paid and approved by FLOQR it shows on the Search loading splash, Mingl, RydR and other FLOQR screens. Club ad posters lets a team member post ads for the club (Club Ad Poster role). No SMS credits required.",
       searchPhrases: [
         "spot ad", "in-app marketing", "advertisement pool", "mingl ad", "rydr ad", "interstitial"
       ],

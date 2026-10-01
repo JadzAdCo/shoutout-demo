@@ -27,34 +27,54 @@ test("ad pricing packages match DOOH-informed Inline $45 and Mingl Gist $25", ()
   assert.ok(!pricing.packageFor("minglGist").slots.includes("default"));
 });
 
-test("patron portal wires business account election and Ad Campaigns module", () => {
+test("patron portal and Club Admin mount the shared server-backed ad composer", () => {
   const html = fs.readFileSync(path.join(root, "patron-portal.html"), "utf8");
   const app = fs.readFileSync(path.join(root, "patron-portal-app.js"), "utf8");
   const module = fs.readFileSync(path.join(root, "patron-ad-campaigns.js"), "utf8");
+  const composer = fs.readFileSync(path.join(root, "floqr-ad-composer.js"), "utf8");
+  const adminHtml = fs.readFileSync(path.join(root, "admin.html"), "utf8");
+  const adminAds = fs.readFileSync(path.join(root, "admin-spot-ads.js"), "utf8");
   assert.match(html, /id="editAccountType"/);
   assert.match(html, /id="portalAdCampaignsTab"/);
-  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.0\.103/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.103/);
-  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.0\.103/);
+  assert.match(html, /id="adComposerHost"/);
+  assert.match(html, /floqr-ad-composer\.js\?v=s3\.1\.0/);
+  assert.match(html, /patron-ad-campaigns\.js\?v=s3\.1\.0/);
   assert.match(html, /id="privacyDoNotSell"/);
   assert.match(app, /IsBusinessAccount/);
-  assert.match(app, /accountType/);
   assert.match(app, /FLOQRPatronAdCampaigns/);
-  assert.match(module, /pending_approval/);
-  assert.match(module, /placementType/);
-  assert.match(module, /creativeType/);
-  assert.match(module, /targetMode/);
+  assert.match(module, /FLOQRAdComposer/);
+  assert.match(module, /FLOQRTabGates/);
+  assert.match(composer, /MAX_VIDEO_SECONDS = 30/);
+  assert.match(composer, /createAdCampaign/);
+  assert.match(composer, /getAdPostingIdentities/);
+  assert.doesNotMatch(composer, /collection\("spotAdCampaigns"\)\.(add|doc)/);
+  assert.match(adminHtml, /id="spotAdComposerHost"/);
+  assert.match(adminHtml, /floqr-ad-composer\.js\?v=s3\.1\.0/);
+  assert.match(adminAds, /mountClubPosters/);
+  assert.doesNotMatch(adminAds, /status:\s*"active"/);
 });
 
-test("master admin has pending ad approval queue", () => {
+test("master admin Ad Management tab group wires queue, live, stats, intake and settings", () => {
   const html = fs.readFileSync(path.join(root, "master-admin.html"), "utf8");
   const app = fs.readFileSync(path.join(root, "master-admin-app.js"), "utf8");
+  const mgmt = fs.readFileSync(path.join(root, "master-ad-management.js"), "utf8");
+  const sos = fs.readFileSync(path.join(root, "sos2fa.js"), "utf8");
   const ads = fs.readFileSync(path.join(root, "ad-campaigns.js"), "utf8");
-  assert.match(html, /id="adCampaignPendingQueue"/);
-  assert.match(html, /floqr-ad-pricing\.js\?v=s3\.0\.103/);
-  assert.match(html, /ad-campaigns\.js\?v=s3\.0\.103/);
-  assert.match(html, /floqr-privacy-prefs\.js\?v=s3\.0\.103/);
-  assert.match(app, /renderPendingApprovalQueue/);
+  assert.match(html, /data-tab-group="adManagement"/);
+  ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel", "adCampaignManagement"].forEach(id => {
+    assert.match(html, new RegExp(`<section id="${id}"`));
+    assert.match(html, new RegExp(`data-panel="${id}"`));
+  });
+  assert.match(html, /master-ad-management\.js\?v=s3\.1\.0/);
+  assert.match(html, /ad-campaigns\.js\?v=s3\.1\.0/);
+  ["approveAdCampaign", "rejectAdCampaign", "setAdCampaignState", "resetAdStats", "purgeAdIntake", "setAdSettings", "setAdInvoiceAccount", "markAdInvoicePaid", "updateAdCampaign"].forEach(name => {
+    assert.match(mgmt, new RegExp(`"${name}"`));
+  });
+  assert.match(sos, /adApprovalQueue/);
+  assert.match(app, /FLOQRMasterAdManagement/);
+  assert.doesNotMatch(app, /Math\.max\(10000/);
+  assert.doesNotMatch(app, /0\.035/);
+  assert.match(ads, /approveAdCampaign/);
   assert.match(ads, /approveCampaign/);
   assert.match(ads, /loadPendingSpotAds/);
   assert.match(ads, /targetMode === "targeted"/);
@@ -125,10 +145,53 @@ test("ad campaign form serializers build datapoints and required groups from pla
   assert.match(api.campaignBadgeTitle({status: "preview", slots: ["shoutout"]}), /packaged demo/i);
 });
 
-test("firestore and storage rules allow spotAds uploads and owned campaign writes", () => {
+function rulesBlock(rules, collection) {
+  const start = rules.indexOf(`match /${collection}/{id}`);
+  assert.ok(start >= 0, `missing rules block for ${collection}`);
+  return rules.slice(start, rules.indexOf("}", rules.indexOf("allow", start)) + 1);
+}
+
+test("ad rules are server-only: no client can create, edit or activate an ad", () => {
   const rules = fs.readFileSync(path.join(root, "firestore.rules"), "utf8");
   const storage = fs.readFileSync(path.join(root, "storage.rules"), "utf8");
-  assert.match(rules, /match \/spotAdCampaigns\/\{id\}/);
-  assert.match(rules, /publishedByUid == request\.auth\.uid/);
+  const campaigns = rulesBlock(rules, "spotAdCampaigns");
+  assert.match(campaigns, /allow create, update, delete: if false;/);
+  assert.match(campaigns, /resource\.data\.status == "active"/);
+  assert.match(campaigns, /publishedByUid == request\.auth\.uid/);
+  ["adCampaignPrivate", "adInvoices", "adSettings", "adStats", "adStatsDaily", "adIntakeSubmissions", "adInvoiceAccounts", "adAuditLogs", "promotionGroups"].forEach(name => {
+    assert.match(rulesBlock(rules, name), /allow write: if false;/, `${name} must be Functions-only`);
+  });
+  assert.match(rulesBlock(rules, "adStats"), /allow read: if isMasterAdmin\(\);/);
+  assert.match(rulesBlock(rules, "adIntakeSubmissions"), /allow read: if isMasterAdmin\(\);/);
   assert.match(storage, /match \/spotAds\/\{userId\}\/\{allPaths=\*\*\}/);
+  assert.match(storage, /match \/adMedia\/\{userId\}\/\{allPaths=\*\*\}/);
+  assert.match(storage, /match \/adIntake\/\{allPaths=\*\*\}/);
+});
+
+test("search splash rotates a real campaign again and records measured impressions", () => {
+  const app = fs.readFileSync(path.join(root, "patron-app.js"), "utf8");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const tracking = fs.readFileSync(path.join(root, "floqr-ad-tracking.js"), "utf8");
+  assert.match(app, /function renderSplashAd\(/);
+  assert.match(app, /pickCampaign\(/);
+  assert.match(app, /FLOQRAdTracking/);
+  assert.match(html, /id="adCreative"/);
+  assert.match(html, /floqr-ad-tracking\.js\?v=s3\.1\.0/);
+  assert.match(tracking, /recordAdEvent/);
+});
+
+test("rotation serves only approved Firestore ads and honours age, gender and settings", () => {
+  const api = loadAdCampaigns();
+  const base = {firestore: true, title: "Flyer", slots: ["default", "events"], placementType: "inline", targetMode: "all", paymentStatus: "paid"};
+  assert.ok(api.scoreCampaign({...base, status: "awaiting_payment"}, {}, "events") <= -999);
+  assert.ok(api.scoreCampaign({...base, status: "pending_approval"}, {}, "events") <= -999);
+  assert.ok(api.scoreCampaign({...base, status: "paused"}, {}, "events") <= -999);
+  const live = api.scoreCampaign({...base, status: "active"}, {}, "events");
+  assert.ok(live > -100);
+  assert.ok(api.scoreCampaign({...base, status: "active", genders: ["female"]}, {gender: "male"}, "events") <= -999);
+  assert.ok(api.scoreCampaign({...base, status: "active", genders: ["female"]}, {gender: "female"}, "events") > -100);
+  assert.ok(api.scoreCampaign({...base, status: "active", minimumAge: 25}, {}, "events") <= -999);
+  const unpaid = api.scoreCampaign({...base, status: "active", paymentStatus: "unpaid"}, {}, "events");
+  assert.ok(live > unpaid, "paid ads outrank unpaid");
+  assert.equal(api.settings().splashSeconds, 5);
 });

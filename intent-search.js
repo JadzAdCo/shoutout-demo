@@ -14,9 +14,9 @@
       id: "ad-campaigns",
       kind: "product",
       label: "Advertise on FloqR",
-      blurb: "Business accounts post Inline or Mingl Gist ads for Master Admin approval.",
+      blurb: "Clubs, promoters, DJs, photographers and businesses post a flyer or a 30-second video; FLOQR approves it after payment.",
       href: vUrl("./patron-portal.html", {from: "search", tab: "ad-campaigns"}),
-      patterns: [/advertise/, /advertis/, /\bads?\b/, /ad\s*campaign/, /sponsor/, /inline\s*ad/, /mingl\s*gist\s*ad/, /business\s*account/, /post\s*(an?\s*)?ad/]
+      patterns: [/advertise/, /advertis/, /\bads?\b/, /ad\s*campaign/, /sponsor/, /inline\s*ad/, /mingl\s*gist\s*ad/, /business\s*account/, /post\s*(an?\s*)?ad/, /promote\s*(my\s*)?(event|party|club|night)/, /flyer/, /video\s*ad/, /boost\s*(my\s*)?event/]
     },
     {
       id: "mingl",
@@ -82,6 +82,28 @@
 
   /* “I want to be able to…” / how-to help for patrons & service members */
   const HELP_INTENTS = [
+    {
+      id: "help-post-ad",
+      kind: "help",
+      label: "Post an ad on FLOQR",
+      blurb: "Flyer image or a video up to 30 seconds. Inline $45 / 7 days or Mingl Gist $25 / 7 days. Pay, FLOQR approves, then it rotates on the Search loading splash, Mingl, Mingl Gist and RydR.",
+      steps: [
+        "Open My Profile → Ad Campaigns (Club Admins: Club Admin → In-app marketing).",
+        "Pick who you post as: your club, promotion group, or your DJ / photographer / promoter profile.",
+        "Upload the flyer or video (30 seconds max) and choose placement, run length and audience.",
+        "Pay by card or monthly subscription; approved accounts can choose invoice.",
+        "FLOQR reviews the ad. You get an Inbox message when it is live, and My ads shows views and clicks.",
+        "No account? Text or WhatsApp the flyer or video to the FLOQR advertising number to get a payment link."
+      ],
+      links: [
+        {label: "Ad Campaigns", href: vUrl("./patron-portal.html", {from: "floqai", tab: "ad-campaigns"})}
+      ],
+      searchPhrases: [
+        "post an ad", "post ad", "advertise", "advertise my event", "promote my event", "promote my party",
+        "promote my club", "flyer ad", "video ad", "30 second video ad", "text an ad", "whatsapp an ad",
+        "ad invoice", "sponsored ad", "boost my event", "how much is an ad"
+      ]
+    },
     {
       id: "help-suprstr",
       kind: "help",

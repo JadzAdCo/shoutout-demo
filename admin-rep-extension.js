@@ -12,7 +12,8 @@
     ["manageSchedules", "Create and manage staff schedules"],
     ["postPublicContent", "Post to the club public page"],
     ["customerSupport", "Act as a Customer Service Representative"],
-    ["manageCommerce", "Manage club Commerce products and orders"]
+    ["manageCommerce", "Manage club Commerce products and orders"],
+    ["postAds", "Post in-app ads on behalf of the club (Club Ad Poster)"]
   ];
 
   function roleName(row = {}) { return row.roleElectionType || (row.workerRoles || [])[0] || "Club Worker"; }
@@ -45,14 +46,37 @@
     renderActivities();
   }
 
+  /** postAds is enforced server-side through adPosterDelegations (setClubAdPoster), not by this checkbox alone. */
+  async function syncAdPosters(changes) {
+    if (!changes.length) return [];
+    const setPoster = firebase.app().functions("us-central1").httpsCallable("setClubAdPoster");
+    const failures = [];
+    for (const change of changes) {
+      try {
+        await setPoster({clubLocationId: locationId, uid: change.uid, email: change.email, enabled: change.enabled});
+      } catch (error) {
+        failures.push(`${change.email || change.uid}: ${error?.message || error}`);
+      }
+    }
+    return failures;
+  }
+
   async function savePolicies() {
     const batch = db.batch();
+    const adChanges = [];
     document.querySelectorAll(".rep-worker-policy").forEach(card => {
       const permissions = Array.from(card.querySelectorAll("[data-rep-permission]:checked")).map(input => input.dataset.repPermission);
+      const row = designations.find(item => item.id === card.dataset.repId) || {};
+      const hadAds = (row.rolePermissions || []).includes("postAds");
+      const hasAds = permissions.includes("postAds");
+      if (hadAds !== hasAds) adChanges.push({uid: row.workerUid || row.uid || "", email: row.workerEmail || "", enabled: hasAds});
       batch.set(db.collection("clubEmployeeDesignations").doc(card.dataset.repId), {rolePermissions:permissions, requireApproval:!!card.querySelector("[data-rep-approval]")?.checked, updatedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     });
     await batch.commit();
-    byId("repStatus").textContent = "Individual duties and approval requirements saved.";
+    const failures = await syncAdPosters(adChanges);
+    byId("repStatus").textContent = failures.length
+      ? `Duties saved, but the Club Ad Poster role could not be updated for: ${failures.join("; ")}`
+      : "Individual duties and approval requirements saved.";
     await loadRep();
   }
 

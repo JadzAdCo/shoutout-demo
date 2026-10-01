@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.0.112 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.0 (stable)
+
+- s3.1.0: Paid in-app ads, end to end. The Search loading splash rotates a real ad again (image or muted video, Sponsored badge, Learn more) and Mingl, Mingl Gist and RydR use the same rotation. Ads are created only through Functions (`createAdCampaign` → Stripe Checkout or invoice → `pending_approval` → Master Admin approve with SOS2FA); clients can no longer write `spotAdCampaigns`. Real impressions and clicks (`recordAdEvent`, de-duplicated, `adStats` / `adStatsDaily`) replace the made-up estimates. Shared ad composer (flyer or ≤30 s video, demographics) for Club Admins, Club Ad Posters (new REP permission / role), promoters, promotion groups and their elected members, DJs, photographers, service members, business accounts and FloqQ. SMS / WhatsApp intake: text a flyer or video to the advertising number, get a payment link (`ad-submit.html`), pay, receive an invoice (`ad-invoice.html`). Master Admin → Ad Management: Approval queue, Live & scheduled, Ad stats (clear one / all), SMS / WhatsApp intake (purge), Settings & billing (splash on/off and seconds, house/demo ads, intake, invoice accounts, audit log), Packaged demos.
 
 - s3.0.112: Heist Washington DC — 96×48 display enabled and set as the default (Display 1, `display.html?location=heist-washington-dc`); Display 2 stays 64×32; 64×48 stays off. Firestore `clubLocations/heist-washington-dc` and the packaged venue both updated.
 

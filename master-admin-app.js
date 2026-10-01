@@ -86,10 +86,22 @@
     "clubOnboarding",
     "templateManagement",
     "recommendationModeration",
-    "featuresServices"
+    "featuresServices",
+    "adApprovalQueue",
+    "adLiveCampaigns",
+    "adStatsPanel",
+    "adIntakePanel",
+    "adSettingsPanel"
   ];
+  const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
   const PANEL_LABELS = {
     featuresServices: "Features & Services",
+    adApprovalQueue: "Ad Management · Approval queue",
+    adLiveCampaigns: "Ad Management · Live & scheduled",
+    adStatsPanel: "Ad Management · Stats",
+    adIntakePanel: "Ad Management · SMS / WhatsApp intake",
+    adSettingsPanel: "Ad Management · Settings & billing",
+    adCampaignManagement: "Ad Management · Packaged demos",
     entityManagement: "Manage Entities",
     clubAdminUrls: "Venue Links",
     allQueues: "All ShoutOut Queues",
@@ -230,6 +242,9 @@
       }
       if (panelId === "featuresServices") {
         window.FLOQRMasterFeatureServices?.mount?.();
+      }
+      if (AD_MGMT_PANEL_IDS.includes(panelId)) {
+        window.FLOQRMasterAdManagement?.mount?.(panelId);
       }
       if (window.FLOQRSOS2FA?.isEntityMgmtPanel?.(panelId)) {
         window.FLOQRSOS2FA.mount({
@@ -1614,10 +1629,8 @@
     const patrons = users.filter(isPatronProfile);
     const campaigns = window.FLOQRAdCampaigns.campaigns();
     const analytics = window.FLOQRAdCampaigns.campaignAnalytics(patrons);
-    const pending = window.FLOQRAdCampaigns.pendingCampaigns?.() || [];
     summary.innerHTML = simpleRows([
-      ["Pending approval", pending.length.toLocaleString()],
-      ["Campaigns in live pool", campaigns.length.toLocaleString()],
+      ["Campaigns in pool (packaged + live paid)", campaigns.length.toLocaleString()],
       ["Draft / preview status", campaigns.filter(item => item.status === "preview").length.toLocaleString()],
       ["Needs verification", campaigns.filter(item => item.status === "needs-verification").length.toLocaleString()],
       ["Patron profiles scanned", patrons.length.toLocaleString()],
@@ -1625,26 +1638,10 @@
       ["Inline package", window.FLOQRAdPricing?.packageFor?.("inline")?.packageLabel || "$45 / 7 days"],
       ["Mingl Gist package", window.FLOQRAdPricing?.packageFor?.("minglGist")?.packageLabel || "$25 / 7 days"]
     ]);
+    window.FLOQRAdCampaigns.loadFirestoreSpotAds?.(db)
+      .then(() => window.FLOQRAdCampaigns.renderAdminCampaignManager("adCampaignManagementList", patrons))
+      .catch(console.warn);
     window.FLOQRAdCampaigns.renderAdminCampaignManager("adCampaignManagementList", patrons);
-    const refreshPending = async () => {
-      await window.FLOQRAdCampaigns.loadPendingSpotAds?.(db);
-      await window.FLOQRAdCampaigns.loadFirestoreSpotAds?.(db);
-      window.FLOQRAdCampaigns.renderPendingApprovalQueue?.("adCampaignPendingQueue", db);
-      const nextPending = window.FLOQRAdCampaigns.pendingCampaigns?.() || [];
-      const nextAnalytics = window.FLOQRAdCampaigns.campaignAnalytics(patrons);
-      summary.innerHTML = simpleRows([
-        ["Pending approval", nextPending.length.toLocaleString()],
-        ["Campaigns in live pool", window.FLOQRAdCampaigns.campaigns().length.toLocaleString()],
-        ["Draft / preview status", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "preview").length.toLocaleString()],
-        ["Needs verification", window.FLOQRAdCampaigns.campaigns().filter(item => item.status === "needs-verification").length.toLocaleString()],
-        ["Patron profiles scanned", patrons.length.toLocaleString()],
-        ["Top campaign match", nextAnalytics.sort((a,b) => b.matchedPatrons - a.matchedPatrons)[0]?.title || "Not enough patron data"],
-        ["Inline package", window.FLOQRAdPricing?.packageFor?.("inline")?.packageLabel || "$45 / 7 days"],
-        ["Mingl Gist package", window.FLOQRAdPricing?.packageFor?.("minglGist")?.packageLabel || "$25 / 7 days"]
-      ]);
-    };
-    byId("refreshAdCampaignPendingBtn")?.addEventListener("click", () => refreshPending().catch(console.warn), {once: false});
-    refreshPending().catch(console.warn);
   }
 
   async function loadNetworkPaymentLedger() {
@@ -1774,8 +1771,6 @@
     updateEntityAssignmentSummary();
     const pending = shoutouts.filter(x => (x.status || "pending") === "pending");
     const revenue = pending.length * 10 + liveDocs.length * 25;
-    const impressions = Math.max(10000, locationRows.length * 1250 + pending.length * 50);
-    const clicks = Math.round(impressions * 0.035);
 
     setText("netLocations", locationRows.length.toLocaleString());
     setText("netUsers", users.length.toLocaleString());
@@ -1818,13 +1813,13 @@
       ["Eventbrite API", "Useful for event creation, management, attendee/order workflows"]
     ]);
 
-    byId("networkAdReport").innerHTML = simpleRows([
-      ["Estimated impressions", impressions.toLocaleString()],
-      ["Estimated clicks", clicks.toLocaleString()],
-      ["Estimated CTR", `${((clicks / impressions) * 100).toFixed(2)}%`],
-      ["Top sponsor categories", "Spirits, fashion, fragrance, sneakers, luxury, rideshare"],
-      ["Best media units", "Splash ads, LED display wall, portable displays, window displays"]
-    ]);
+    if (window.FLOQRMasterAdManagement?.renderNetworkAdReport) {
+      window.FLOQRMasterAdManagement.renderNetworkAdReport("networkAdReport").catch(error => {
+        byId("networkAdReport").innerHTML = `<p class="sub">Could not load ad stats: ${esc(error?.message || error)}</p>`;
+      });
+    } else {
+      byId("networkAdReport").innerHTML = "<p class='sub'>Ad measurement module did not load.</p>";
+    }
 
     if (byId("networkTemplateCatalogReport") && window.FLOQRScreenDatapoints?.catalogReportHtml) {
       const catalog = window.FLOQRScreenDatapoints.mergeCatalog(window.SHOUTOUT_TEMPLATES, templateDocs);

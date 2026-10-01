@@ -4,6 +4,7 @@ const sos2faFns = require("./sos2fa-functions");
 const twilioDebuggerFns = require("./twilio-debugger-webhook");
 const mailLogFns = require("./mail-log-functions");
 const featureServiceFns = require("./feature-services-functions");
+const adFns = require("./ad-functions");
 
 module.exports = {
   ...require("./ai-discovery-functions"),
@@ -52,5 +53,31 @@ module.exports = {
   assignVenueEmployee: sos2faFns.assignVenueEmployee,
   removeVenueEmployee: sos2faFns.removeVenueEmployee,
   twilioDebuggerWebhook: twilioDebuggerFns.twilioDebuggerWebhook,
-  sendgridMailEvents: mailLogFns.sendgridMailEvents
+  sendgridMailEvents: mailLogFns.sendgridMailEvents,
+  getAdPostingIdentities: adFns.getAdPostingIdentities,
+  createAdCampaign: adFns.createAdCampaign,
+  startAdCampaignCheckout: adFns.startAdCampaignCheckout,
+  listMyAdCampaigns: adFns.listMyAdCampaigns,
+  setClubAdPoster: adFns.setClubAdPoster,
+  listClubAdPosters: adFns.listClubAdPosters,
+  upsertPromotionGroup: adFns.upsertPromotionGroup,
+  setPromotionGroupMember: adFns.setPromotionGroupMember,
+  listMyPromotionGroups: adFns.listMyPromotionGroups,
+  approveAdCampaign: adFns.approveAdCampaign,
+  rejectAdCampaign: adFns.rejectAdCampaign,
+  updateAdCampaign: adFns.updateAdCampaign,
+  setAdCampaignState: adFns.setAdCampaignState,
+  markAdInvoicePaid: adFns.markAdInvoicePaid,
+  resetAdStats: adFns.resetAdStats,
+  purgeAdIntake: adFns.purgeAdIntake,
+  setAdSettings: adFns.setAdSettings,
+  setAdInvoiceAccount: adFns.setAdInvoiceAccount,
+  recordAdEvent: adFns.recordAdEvent,
+  adIntakeWebhook: adFns.adIntakeWebhook,
+  getAdIntake: adFns.getAdIntake,
+  startAdIntakeCheckout: adFns.startAdIntakeCheckout,
+  confirmAdIntakePayment: adFns.confirmAdIntakePayment,
+  getAdInvoice: adFns.getAdInvoice,
+  onAdInvoiceCreated: adFns.onAdInvoiceCreated,
+  expireAdCampaigns: adFns.expireAdCampaigns
 };

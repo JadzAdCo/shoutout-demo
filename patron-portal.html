@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="portal.title">My Profile and Settings</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.0.32"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.0"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.66"/>
 </head>
 <body>
@@ -206,60 +206,18 @@
       </section>
 
       <section id="portalAdCampaigns" class="admin-panel-section">
-        <div class="card" id="adCampBusinessGate">
-          <h2 data-i18n="nav.adCampaigns">Ad Campaigns</h2>
-          <p class="sub small">Elect a <strong>Business account</strong> under My Profile to post Inline or Mingl Gist advertisements. Campaigns go to Master Admin for approval and scheduling.</p>
-        </div>
-        <div class="card hidden" id="adCampComposer">
+        <div class="card" id="adCampComposer">
           <h2
+            data-i18n="nav.adCampaigns"
+            data-floqr-help-id="help-ad-campaigns"
             data-floqr-help-title="Ad Campaigns"
-            data-floqr-help-body="Business accounts can post Inline ads (during feature use) or Mingl Gist ads (while scrolling Mingl stories). Upload a PNG/JPEG/GIF flyer or paste HTML. Choose All patrons or target profile datapoints. Submit sends the campaign to Master Admin Ad Campaign Management for approval and scheduling."
-            data-floqr-help-search="ad campaigns|inline ad|mingl gist ad|business advertise|flyer html ad"
+            data-floqr-help-body="Post a flyer image or a video of 30 seconds or less for your club, promotion group, or your own services (promoter, DJ, photographer, service member). Pick Inline (Search loading splash and feature screens) or Mingl Gist (story scroll), the run length, and who should see it. Pay by card, monthly subscription, or invoice if FLOQR opened an invoice account for you. FLOQR reviews every paid ad before it runs; rejected ads are refunded. Your invoice is in My ads."
+            data-floqr-help-search="ad campaigns|post an ad|advertise my event|flyer ad|video ad|promote my party|inline ad|mingl gist ad|ad invoice"
           >Ad Campaigns</h2>
-          <p class="sub small">Inline package <strong>$45 / 7 days</strong> (feature-path, DOOH-like attention). Mingl Gist package <strong>$25 / 7 days</strong> (scroll feed). Payment can be marked unpaid until checkout is wired; Master Admin may waive.</p>
-          <div class="profile-grid">
-            <label>Placement
-              <select id="adCampPlacement">
-                <option value="inline">Inline advertisement</option>
-                <option value="minglGist">Mingl Gist advertisement</option>
-              </select>
-            </label>
-            <label>Creative type
-              <select id="adCampCreativeType">
-                <option value="image">Flyer (PNG / JPEG / GIF)</option>
-                <option value="html">HTML ad (paste code)</option>
-              </select>
-            </label>
-            <label>Campaign title <input id="adCampTitle" maxlength="80" placeholder="Weekend brunch at…"/></label>
-            <label>Call to action <input id="adCampCta" maxlength="40" placeholder="Learn more"/></label>
-            <label class="profile-grid-wide">Body copy <textarea id="adCampBody" rows="3" maxlength="400" placeholder="Short sponsored message"></textarea></label>
-            <label class="profile-grid-wide">Destination link <input id="adCampLink" type="url" placeholder="https://…"/></label>
-            <label>Audience
-              <select id="adCampTargetMode">
-                <option value="all">All patrons</option>
-                <option value="targeted">Targeted datapoints</option>
-              </select>
-            </label>
-          </div>
-          <p id="adCampPriceHint" class="sub small"></p>
-          <div id="adCampImageBlock">
-            <label>Flyer file <input id="adCampFlyer" type="file" accept="image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif"/></label>
-          </div>
-          <div id="adCampHtmlBlock" class="hidden">
-            <label class="profile-grid-wide">HTML (include image links) <textarea id="adCampHtml" rows="8" placeholder="&lt;div&gt;…&lt;img src=&quot;https://…&quot;&gt;…&lt;/div&gt;"></textarea></label>
-          </div>
-          <div id="adCampTargetBlock" class="hidden">
-            <p class="sub small">Enter comma-separated values that should match patron profile datapoints.</p>
-            <div id="adCampTargetFields" class="profile-grid"></div>
-            <label class="profile-grid-wide">Extra tags <input id="adCampTargetTags" placeholder="Optional extra tags"/></label>
-          </div>
-          <div class="queue-actions">
-            <button id="adCampSubmitBtn" class="primary" type="button">Submit for approval</button>
-            <button id="adCampRefreshMineBtn" type="button">Refresh my campaigns</button>
-          </div>
-          <p id="adCampStatus" class="status"></p>
-          <h3>My campaigns</h3>
-          <div id="adCampMineList" class="report-block"></div>
+          <div id="adComposerHost"></div>
+        </div>
+        <div class="card">
+          <div id="adGroupsHost"></div>
         </div>
       </section>
 
@@ -766,7 +724,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.0.110"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=s3.0.112"></script>
@@ -779,9 +737,9 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
-<script src="./floqr-i18n.js?v=s3.0.86"></script>
-<script src="./floqai-help-repository.js?v=s3.0.103"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.103"></script>
+<script src="./floqr-i18n.js?v=s3.1.0"></script>
+<script src="./floqai-help-repository.js?v=s3.1.0"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.0"></script>
 <script src="./help-attach.js?v=s3.0.32"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.8"></script>
@@ -793,10 +751,11 @@
 <script src="./floqr-canonical.js?v=s3.0.103"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
 <script src="./floqr-consent-mode.js?v=s3.0.103"></script>
-<script src="./floqr-ad-pricing.js?v=s3.0.103"></script>
-<script src="./ad-campaigns.js?v=s3.0.103"></script>
-<script src="./patron-ad-campaigns.js?v=s3.0.103"></script>
-<script src="./patron-portal-app.js?v=s3.0.108"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
+<script src="./ad-campaigns.js?v=s3.1.0"></script>
+<script src="./floqr-ad-composer.js?v=s3.1.0"></script>
+<script src="./patron-ad-campaigns.js?v=s3.1.0"></script>
+<script src="./patron-portal-app.js?v=s3.1.0"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

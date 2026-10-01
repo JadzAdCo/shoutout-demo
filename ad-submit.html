@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <meta name="robots" content="noindex"/>
+  <title data-i18n="adsubmit.title">Finish your FLOQR ad</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.0"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.102"/>
+</head>
+<body data-floqr-public>
+<main class="app admin-shell ad-submit-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">FLOQR Ads</p>
+        <h1 data-i18n="adsubmit.title">Finish your FLOQR ad</h1>
+        <p class="sub" data-i18n="adsubmit.intro">You sent us a flyer or a video. Choose when it runs and who should see it, then pay. FLOQR reviews every ad before it goes live, and you get an invoice by text or email.</p>
+        <p id="adSubmitStatus" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </header>
+
+    <div id="adSubmitMediaCard" class="card hidden">
+      <h2 data-i18n="adsubmit.media">Your flyer or video</h2>
+      <div id="adSubmitMedia" class="ad-submit-media"></div>
+    </div>
+
+    <form id="adSubmitForm" class="card hidden" novalidate>
+      <h2 data-i18n="adsubmit.details">Ad details</h2>
+      <label><span data-i18n="ads.c.headline">Headline</span> <input id="adSubmitTitle" maxlength="80" required></label>
+      <label><span data-i18n="ads.c.body">Short text</span> <input id="adSubmitBody" maxlength="240"></label>
+      <label><span data-i18n="ads.c.advertiser">Business or event name</span> <input id="adSubmitAdvertiser" maxlength="80"></label>
+      <label><span data-i18n="ads.c.link">Link (https://…), optional</span> <input id="adSubmitLink" type="url" maxlength="600" placeholder="https://"></label>
+
+      <h2 data-i18n="adsubmit.when">Where and when</h2>
+      <label><span data-i18n="ads.c.placement">Where it shows</span>
+        <select id="adSubmitPlacement">
+          <option value="inline" data-i18n="ads.c.placementInline">Search splash and app pages</option>
+          <option value="minglGist" data-i18n="ads.c.placementGist">Mingl Gist stories</option>
+        </select>
+      </label>
+      <label><span data-i18n="ads.c.payment">How you pay</span>
+        <select id="adSubmitPaymentMode">
+          <option value="payg" data-i18n="ads.c.payg">Pay once</option>
+          <option value="subscription" data-i18n="ads.c.subscription">Monthly subscription</option>
+        </select>
+      </label>
+      <label id="adSubmitRunDaysWrap"><span data-i18n="ads.c.runDays">How long</span>
+        <select id="adSubmitRunDays"></select>
+      </label>
+      <label><span data-i18n="ads.c.startDate">Start date</span> <input id="adSubmitStart" type="date"></label>
+
+      <h2 data-i18n="ads.c.audience">Who should see it</h2>
+      <p class="sub small" data-i18n="adsubmit.audienceHint">Leave blank to show it to everyone. FLOQR may adjust the audience before approval.</p>
+      <div class="ad-submit-grid">
+        <label><span data-i18n="ads.c.ageMin">Minimum age</span> <input id="adSubmitAgeMin" type="number" min="18" max="99" value="18"></label>
+        <label><span data-i18n="ads.c.ageMax">Maximum age</span> <input id="adSubmitAgeMax" type="number" min="18" max="99" value="99"></label>
+        <label><span data-i18n="ads.c.genders">Gender</span>
+          <select id="adSubmitGender">
+            <option value="any" data-i18n="ads.c.genderAny">Everyone</option>
+            <option value="female" data-i18n="ads.c.genderFemale">Women</option>
+            <option value="male" data-i18n="ads.c.genderMale">Men</option>
+            <option value="nonbinary" data-i18n="ads.c.genderNonbinary">Non-binary</option>
+          </select>
+        </label>
+        <label><span data-i18n="ads.c.cities">Cities</span> <input id="adSubmitCities" maxlength="400"></label>
+        <label><span data-i18n="ads.c.countries">Countries</span> <input id="adSubmitCountries" maxlength="400"></label>
+        <label><span data-i18n="ads.c.interests">Interests</span> <input id="adSubmitInterests" maxlength="400"></label>
+        <label><span data-i18n="ads.c.music">Music genres</span> <input id="adSubmitMusic" maxlength="400"></label>
+      </div>
+
+      <h2 data-i18n="adsubmit.contact">Your contact for the invoice</h2>
+      <label><span data-i18n="adsubmit.name">Name</span> <input id="adSubmitName" maxlength="120" autocomplete="name"></label>
+      <label><span data-i18n="adsubmit.email">Email (optional)</span> <input id="adSubmitEmail" type="email" maxlength="200" autocomplete="email"></label>
+
+      <p id="adSubmitPrice" class="ad-submit-price"></p>
+      <button id="adSubmitPayBtn" class="primary" type="submit" data-i18n="adsubmit.pay">Pay and submit</button>
+    </form>
+
+    <div id="adSubmitDone" class="card hidden">
+      <h2 data-i18n="adsubmit.doneTitle">Thank you</h2>
+      <p id="adSubmitDoneText" class="sub"></p>
+      <p><a id="adSubmitInvoiceLink" class="buttonlike hidden" href="#" data-i18n="adsubmit.invoice">View invoice</a></p>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./floqr-i18n.js?v=s3.1.0"></script>
+<script src="./floqr-session-shell.js?v=s3.0.110"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
+<script src="./ad-submit-app.js?v=s3.1.0"></script>
+</body>
+</html>
