@@ -710,8 +710,8 @@ exports.rotateClubDailyAuthCodes = onSchedule({
 exports.messagingInboundWebhook = onRequest({
   region: "us-central1",
   secrets: MESSAGING_SECRETS,
-  timeoutSeconds: 60,
-  memory: "256MiB"
+  timeoutSeconds: 120,
+  memory: "1GiB"
 }, async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).send("Method Not Allowed");
@@ -728,6 +728,21 @@ exports.messagingInboundWebhook = onRequest({
   const from = normalizeE164(String(form.From || "").replace(/^whatsapp:/i, ""));
   const body = String(form.Body || "");
   const parsed = parseOpsReply(body);
+
+  if (!(parsed.action && parsed.code)) {
+    try {
+      const handled = await require("./ad-functions").__adHelpers.handleAdIntakeMessage(req, form, {
+        functionName: "messagingInboundWebhook",
+        creds: twilioCredentials()
+      });
+      if (handled) {
+        res.status(200).type("text/xml").send("<Response></Response>");
+        return;
+      }
+    } catch (error) {
+      console.error("ad intake routing failed", error?.message || error);
+    }
+  }
 
   await db.collection("clubMessageInbound").add({
     from,

@@ -2098,6 +2098,11 @@ async function finalizePaidOrder(orderId, session) {
       fulfilledRecordId:requestId
     }, {merge:true});
   }
+
+  if (order.orderType === "adCampaign") {
+    await require("./ad-functions").__adHelpers.fulfillAdOrder(orderId, order, session);
+    await ref.set({fulfillmentStatus:"ad-pending-approval", fulfilledRecordId:text(order.campaignId, 160)}, {merge:true});
+  }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});
 }
 
@@ -2273,7 +2278,8 @@ exports.stripeFloqrWebhook = onRequest({
     } else if (["charge.dispute.created", "charge.dispute.updated", "charge.dispute.closed"].includes(event.type)) {
       await recordDisputeEvent(session, event.type);
     } else if (["customer.subscription.updated", "customer.subscription.deleted"].includes(event.type)) {
-      await syncSchedulingSubscriptionFromStripe(session);
+      if (text(session.metadata?.orderType, 80) === "adCampaign") await require("./ad-functions").__adHelpers.syncAdSubscription(session);
+      else await syncSchedulingSubscriptionFromStripe(session);
     }
     await claim.ref.set({status:"processed", processedAt:admin.firestore.FieldValue.serverTimestamp(), updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
     response.json({received:true});

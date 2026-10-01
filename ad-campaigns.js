@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  const VERSION = "s3.0.103";
+  const VERSION = "s3.1.0";
   const OVERRIDE_KEY = "floqrAdCampaignOverrides:v28.99";
 
   /** Profile fields operators can require for a match group (same keys as profileTags). */
@@ -328,6 +328,17 @@
       host.appendChild(frame);
       return;
     }
+    if (campaign.creativeType === "video" && campaign.videoUrl) {
+      const video = document.createElement("video");
+      video.src = String(campaign.videoUrl);
+      video.controls = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.style.cssText = "max-width:100%;max-width:360px;max-height:280px;border-radius:12px;background:#050819;display:block";
+      host.appendChild(video);
+      return;
+    }
     if (campaign.image) {
       const img = document.createElement("img");
       img.src = String(campaign.image);
@@ -372,6 +383,35 @@
 
   let firestoreSpotAds = [];
   let firestorePendingAds = [];
+  const SERVABLE_STATUSES = ["active", "live"];
+  const PAID_STATUSES = ["paid", "invoiced", "waived"];
+  const DEFAULT_SETTINGS = Object.freeze({
+    splashEnabled: 1,
+    splashSeconds: 5,
+    showDemoAds: 1,
+    packagedAdsEnabled: 1,
+    intakeEnabled: 1
+  });
+  let adSettings = {...DEFAULT_SETTINGS};
+
+  function settings() {
+    return {...adSettings};
+  }
+
+  async function loadAdSettings(db) {
+    if (!db?.collection) return settings();
+    try {
+      const snap = await db.collection("adSettings").doc("global").get();
+      if (snap.exists) adSettings = {...DEFAULT_SETTINGS, ...(snap.data() || {})};
+    } catch (error) {
+      adSettings = {...DEFAULT_SETTINGS};
+    }
+    return settings();
+  }
+
+  function isOn(value) {
+    return value === 1 || value === true || value === "1";
+  }
 
   function isScheduleLive(campaign, nowMs = Date.now()) {
     const starts = Number(campaign.startsAtMs || campaign.proposedStartsAtMs || 0);
@@ -406,13 +446,26 @@
       title: row.title || row.headline || "Spot ad",
       badge: row.badge || row.eyebrow || "Sponsored",
       advertiser: row.advertiser || row.businessName || row.clubName || "Advertiser",
-      status: row.status || "active",
+      status: row.status || "",
       sourceUrl: row.sourceUrl || row.linkUrl || "",
       image: row.image || row.imageUrl || row.backgroundImageUrl || "",
+      videoUrl: row.videoUrl || "",
       htmlBody: row.htmlBody || "",
-      creativeType: row.creativeType || (row.htmlBody ? "html" : "image"),
+      creativeType: row.creativeType || (row.videoUrl ? "video" : (row.htmlBody ? "html" : "image")),
       body: row.body || "",
       callToAction: row.cta || row.callToAction || "Learn more",
+      minimumAge: Number(row.minimumAge || 0) || null,
+      maximumAge: Number(row.maximumAge || 0) || null,
+      genders: Array.isArray(row.genders) ? row.genders : ["any"],
+      demographics: row.demographics || null,
+      requiredTargetGroups: Array.isArray(row.requiredTargetGroups) ? row.requiredTargetGroups : [],
+      campaignDatapoints: Array.isArray(row.campaignDatapoints) ? row.campaignDatapoints : [],
+      posterType: row.posterType || "",
+      posterLabel: row.posterLabel || "",
+      paymentMode: row.paymentMode || "",
+      runDays: Number(row.runDays || 0) || null,
+      invoiceNumber: row.invoiceNumber || "",
+      firestore: true,
       slots: Array.isArray(row.slots) && row.slots.length
         ? row.slots
         : (pricing?.slots || ["clubs", "events", "mingl", "mingl-gist", "rydr", "default"]),
@@ -437,6 +490,7 @@
 
   async function loadFirestoreSpotAds(db) {
     if (!db?.collection) return campaigns();
+    await loadAdSettings(db);
     try {
       const snap = await db.collection("spotAdCampaigns").where("status", "==", "active").limit(80).get();
       firestoreSpotAds = snap.docs.map(mapSpotDoc).filter((row) => isScheduleLive(row));
@@ -540,14 +594,35 @@
     });
   }
 
+  function isPaidFirestoreAd(campaign) {
+    return !!campaign.firestore && PAID_STATUSES.includes(String(campaign.paymentStatus || ""));
+  }
+
+  function genderMatches(campaign, profile = {}) {
+    const wanted = (Array.isArray(campaign.genders) ? campaign.genders : []).map(normalize).filter(Boolean);
+    if (!wanted.length || wanted.includes("any")) return true;
+    const gender = normalize(profile.gender || profile.sex || "");
+    if (!gender) return true;
+    const aliases = {woman: "female", women: "female", man: "male", men: "male", "non binary": "nonbinary"};
+    return wanted.includes(aliases[gender] || gender);
+  }
+
   function scoreCampaign(campaign, profile = {}, slot = "default") {
-    if (String(campaign.status || "active") === "pending_approval") return -999;
-    if (String(campaign.status || "") === "rejected") return -999;
+    const status = String(campaign.status || "active");
+    if (status === "pending_approval" || status === "rejected") return -999;
+    if (campaign.firestore) {
+      if (!SERVABLE_STATUSES.includes(status)) return -999;
+    } else {
+      if (!isOn(adSettings.packagedAdsEnabled)) return -999;
+      if (status === "preview" && !isOn(adSettings.showDemoAds)) return -999;
+    }
     if (!isScheduleLive(campaign)) return -999;
+    const age = profileAgeNumber(profile);
     if (campaign.minimumAge) {
-      const age = profileAgeNumber(profile);
       if (!age || age < campaign.minimumAge) return -999;
     }
+    if (campaign.maximumAge && age && age > campaign.maximumAge) return -999;
+    if (!genderMatches(campaign, profile)) return -999;
     const placement = String(campaign.placementType || "");
     if (placement === "minglGist" && slot !== "mingl-gist" && slot !== "mingl") return -999;
     if (placement === "inline" && (slot === "mingl-gist")) {
@@ -573,7 +648,7 @@
     if (campaign.status === "active") score += 5;
     if (campaign.status === "needs-verification") score -= 15;
     if (campaign.source === "patron_business") score += 3;
-    // Soft diversify: lightly prefer campaigns that are not the last shown advertiser.
+    if (isPaidFirestoreAd(campaign)) score += 40;
     return score;
   }
 
@@ -585,19 +660,26 @@
       .sort((a, b) => b.score - a.score);
     const topScore = ranked[0]?.score || 0;
     const pool = ranked.filter(item => item.score >= Math.max(0, topScore - 10));
-    const selected = nextRotatingCampaign(slot, pool.map(item => item.campaign)) || ranked[0]?.campaign || allCampaigns.find(item => item.isHouseFallback) || allCampaigns.find(item => item.id === "advertise-here");
+    const houseAllowed = isOn(adSettings.packagedAdsEnabled);
+    const selected = nextRotatingCampaign(slot, pool.map(item => item.campaign))
+      || ranked[0]?.campaign
+      || (houseAllowed ? allCampaigns.find(item => item.isHouseFallback) || allCampaigns.find(item => item.id === "advertise-here") : null);
+    if (!selected) return null;
     return {
       title: selected.title,
       body: selected.body,
       badge: selected.badge,
       image: selected.image,
+      videoUrl: selected.videoUrl || "",
       htmlBody: selected.htmlBody || "",
       creativeType: selected.creativeType || "image",
       campaignId: selected.id,
       advertiser: selected.advertiser || "",
       placementType: selected.placementType || "",
       callToAction: selected.callToAction || "Learn more",
-      sourceUrl: selected.sourceUrl || ""
+      sourceUrl: selected.sourceUrl || "",
+      packaged: !selected.firestore,
+      paid: isPaidFirestoreAd(selected)
     };
   }
 
@@ -640,36 +722,33 @@
     return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   }
 
-  async function approveCampaign(db, campaignId, {startsAtMs, endsAtMs, waivePayment = false} = {}) {
-    if (!db?.collection || !campaignId) throw new Error("Missing campaign.");
-    const ref = db.collection("spotAdCampaigns").doc(campaignId);
-    const snap = await ref.get();
-    if (!snap.exists) throw new Error("Campaign not found.");
-    const row = snap.data() || {};
-    const now = Date.now();
-    const flightDays = Number(row.flightDays || 7);
-    const starts = Number(startsAtMs || row.proposedStartsAtMs || now);
-    const ends = Number(endsAtMs || row.proposedEndsAtMs || (starts + flightDays * 24 * 60 * 60 * 1000));
-    const patch = {
-      status: "active",
-      startsAtMs: starts,
-      endsAtMs: ends,
-      approvedAtMs: now,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    if (waivePayment) patch.paymentStatus = "waived";
-    await ref.set(patch, {merge: true});
-    return patch;
+  /** Master Admin ad writes go through SOS2FA callables; Firestore rules refuse client writes. */
+  async function callAdAdmin(name, data = {}) {
+    if (typeof firebase === "undefined" || !firebase.functions) throw new Error("Functions SDK is not loaded on this page.");
+    const sos2faSessionId = window.FLOQRSOS2FA?.getSessionId?.("entityManagement") || "";
+    if (!sos2faSessionId) throw new Error("Unlock Entity Management with an SOS2FA code first.");
+    const result = await firebase.app().functions("us-central1").httpsCallable(name)({...data, sos2faSessionId});
+    return result?.data || {};
   }
 
-  async function rejectCampaign(db, campaignId, reason = "") {
-    if (!db?.collection || !campaignId) throw new Error("Missing campaign.");
-    await db.collection("spotAdCampaigns").doc(campaignId).set({
-      status: "rejected",
-      rejectedAtMs: Date.now(),
-      rejectionReason: String(reason || "").slice(0, 400),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
+  function dateKey(ms) {
+    return ms ? new Date(ms).toISOString().slice(0, 10) : "";
+  }
+
+  async function approveCampaign(db, campaignId, {startsAtMs, endsAtMs, waivePayment = false, reason = ""} = {}) {
+    if (!campaignId) throw new Error("Missing campaign.");
+    return callAdAdmin("approveAdCampaign", {
+      campaignId,
+      waivePayment: !!waivePayment,
+      reason: String(reason || ""),
+      startDate: dateKey(startsAtMs),
+      endDate: dateKey(endsAtMs)
+    });
+  }
+
+  async function rejectCampaign(db, campaignId, reason = "", {refund = true} = {}) {
+    if (!campaignId) throw new Error("Missing campaign.");
+    return callAdAdmin("rejectAdCampaign", {campaignId, reason: String(reason || ""), refund: refund !== false});
   }
 
   function campaignStatusLabel(status) {
@@ -965,6 +1044,8 @@
     saveOverride,
     loadFirestoreSpotAds,
     loadPendingSpotAds,
+    loadAdSettings,
+    settings,
     isScheduleLive,
     PROFILE_FIELD_OPTIONS,
     normalizeDatapoints,

@@ -24,7 +24,7 @@
       },
       "help-ad-campaigns": {
         title: "Рекламные кампании",
-        body: "Выберите Business account в My Profile, чтобы открыть Ad Campaigns. Inline ($45 / 7 дней — во время использования FloqR) или Mingl Gist ($25 / 7 дней — при прокрутке Mingl). Загрузите PNG/JPEG/GIF или вставьте HTML. Аудитория: все или datapoints профиля. Отправка уходит Master Admin на одобрение и расписание."
+        body: "Публикуйте изображение флаера или видео до 30 секунд от имени своего бизнеса, клуба, промо-группы или услуги (DJ, фотограф, промоутер, FloqQ). Выберите Inline ($45 / 7 дней — экран загрузки поиска и экраны функций) или Mingl Gist ($25 / 7 дней — лента историй), срок показа и аудиторию (возраст, пол, города, интересы). Оплата картой или ежемесячной подпиской; одобренные аккаунты могут платить по счёту. FLOQR проверяет каждое оплаченное объявление перед показом, за отклонённые деньги возвращаются. В разделе «Мои объявления» видны статус, показы, клики и счёт."
       },
       "help-completed-shoutouts": {
         title: "Завершённые ShoutOuts",
@@ -184,7 +184,7 @@
       },
       "help-club-in-app-marketing": {
         title: "In-app маркетинг",
-        body: "Опубликуйте spot interstitial в пуле рекламы FLOQR (Mingl, RydR, клубы, слоты ShoutOut). Шаблоны по предстоящим событиям площадки. Кредиты SMS не нужны."
+        body: "Публикуйте флаер или видео до 30 секунд от имени клуба. После оплаты и одобрения FLOQR реклама показывается на экране загрузки поиска, в Mingl, RydR и на других экранах FLOQR. В разделе «Публикаторы рекламы клуба» можно разрешить сотруднику публиковать рекламу (роль Club Ad Poster). SMS-кредиты не нужны."
       },
       "help-public-media-sharing": {
         title: "Публичные медиа и обмен данными",
@@ -210,7 +210,7 @@
       },
       "help-ad-campaigns": {
         title: "Advertentiecampagnes",
-        body: "Kies een Business account in My Profile om Ad Campaigns te openen. Inline ($45 / 7 dagen — tijdens FloqR-gebruik) of Mingl Gist ($25 / 7 dagen — tijdens Mingl-scrollen). Upload PNG/JPEG/GIF of plak HTML. Richt je op alle patrons of op profiel-datapoints. Indienen gaat naar Master Admin voor goedkeuring en planning."
+        body: "Plaats een flyerafbeelding of een video van maximaal 30 seconden voor je bedrijf, club, promotiegroep of dienst (DJ, fotograaf, promoter, FloqQ). Kies Inline ($45 / 7 dagen — laadscherm van Zoeken en functieschermen) of Mingl Gist ($25 / 7 dagen — storyfeed), de looptijd en wie het moet zien (leeftijd, geslacht, steden, interesses). Betaal per kaart of met een maandabonnement; goedgekeurde accounts kunnen op factuur betalen. FLOQR controleert elke betaalde advertentie voordat ze draait en afgewezen advertenties worden terugbetaald. Mijn advertenties toont de status, weergaven, klikken en je factuur."
       },
       "help-completed-shoutouts": {
         title: "Voltooide ShoutOuts",
@@ -370,7 +370,7 @@
       },
       "help-club-in-app-marketing": {
         title: "In-app marketing",
-        body: "Publiceer een interstitiale spot-ad in de FLOQR-advertentiepool (Mingl, RydR, clubs, shoutout-slots). Sjablonen op basis van komende events. Geen SMS-tegoed nodig."
+        body: "Plaats een flyer of een video van maximaal 30 seconden namens je club. Zodra hij betaald en door FLOQR goedgekeurd is, verschijnt hij op het laadscherm van Zoeken, in Mingl, RydR en op andere FLOQR-schermen. Met Advertentieplaatsers van de club laat je een teamlid advertenties plaatsen (rol Club Ad Poster). Geen sms-tegoed nodig."
       },
       "help-public-media-sharing": {
         title: "Openbare media en gegevensdeling",
@@ -396,7 +396,7 @@
       },
       "help-ad-campaigns": {
         title: "Campagnes publicitaires",
-        body: "Choisissez un compte Business dans My Profile pour ouvrir Ad Campaigns. Inline (45 $ / 7 jours — pendant l’usage de FloqR) ou Mingl Gist (25 $ / 7 jours — en scrollant Mingl). Téléversez PNG/JPEG/GIF ou collez du HTML. Ciblez tous les patrons ou des datapoints. L’envoi part vers Master Admin pour approbation et planning."
+        body: "Publiez une image de flyer ou une vidéo de 30 secondes maximum pour votre entreprise, votre club, votre groupe de promotion ou votre service (DJ, photographe, promoteur, FloqQ). Choisissez Inline (45 $ / 7 jours — écran de chargement de la recherche et pages des fonctions) ou Mingl Gist (25 $ / 7 jours — fil de stories), la durée et qui doit la voir (âge, genre, villes, centres d'intérêt). Payez par carte ou par abonnement mensuel ; les comptes approuvés peuvent payer sur facture. FLOQR vérifie chaque publicité payée avant diffusion et les publicités refusées sont remboursées. Mes publicités affiche le statut, les vues, les clics et votre facture."
       },
       "help-completed-shoutouts": {
         title: "ShoutOuts terminés",
@@ -556,7 +556,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Publiez une annonce spot interstitielle dans le pool FLOQR (Mingl, RydR, clubs, emplacements ShoutOut). Modèles basés sur les événements du lieu. Aucun crédit SMS requis."
+        body: "Publiez un flyer ou une vidéo de 30 secondes maximum au nom de votre club. Une fois payée et approuvée par FLOQR, elle s'affiche sur l'écran de chargement de la recherche, dans Mingl, RydR et sur d'autres écrans FLOQR. Publicateurs d'annonces du club permet à un membre de l'équipe de publier pour le club (rôle Club Ad Poster). Aucun crédit SMS nécessaire."
       },
       "help-public-media-sharing": {
         title: "Médias publics et partage",
@@ -582,7 +582,7 @@
       },
       "help-ad-campaigns": {
         title: "Werbekampagnen",
-        body: "Wählen Sie in My Profile ein Business-Konto, um Ad Campaigns zu öffnen. Inline (45 $ / 7 Tage — während FloqR-Nutzung) oder Mingl Gist (25 $ / 7 Tage — beim Mingl-Scrollen). PNG/JPEG/GIF hochladen oder HTML einfügen. Zielgruppe: alle oder Profildatenpunkte. Einreichung geht an Master Admin zur Freigabe und Planung."
+        body: "Veröffentliche ein Flyer-Bild oder ein Video bis 30 Sekunden für dein Unternehmen, deinen Club, deine Promotion-Gruppe oder deinen Service (DJ, Fotograf, Promoter, FloqQ). Wähle Inline (45 $ / 7 Tage — Ladebildschirm der Suche und Funktionsseiten) oder Mingl Gist (25 $ / 7 Tage — Story-Feed), die Laufzeit und wer die Anzeige sehen soll (Alter, Geschlecht, Städte, Interessen). Bezahle per Karte oder Monatsabo; freigegebene Konten können auf Rechnung zahlen. FLOQR prüft jede bezahlte Anzeige vor dem Start, abgelehnte Anzeigen werden erstattet. Unter Meine Anzeigen siehst du Status, Aufrufe, Klicks und deine Rechnung."
       },
       "help-completed-shoutouts": {
         title: "Abgeschlossene ShoutOuts",
@@ -742,7 +742,7 @@
       },
       "help-club-in-app-marketing": {
         title: "In-App-Marketing",
-        body: "Veröffentlichen Sie eine Spot-Interstitial-Anzeige im FLOQR-Werbe-Pool (Mingl, RydR, Clubs, ShoutOut-Slots). Vorlagen aus kommenden Events des Standorts. Kein SMS-Guthaben nötig."
+        body: "Veröffentliche einen Flyer oder ein Video bis 30 Sekunden im Namen deines Clubs. Sobald die Anzeige bezahlt und von FLOQR freigegeben ist, erscheint sie auf dem Ladebildschirm der Suche, in Mingl, RydR und auf weiteren FLOQR-Seiten. Unter Anzeigen-Poster des Clubs kannst du einem Teammitglied das Veröffentlichen erlauben (Rolle Club Ad Poster). Keine SMS-Guthaben nötig."
       },
       "help-public-media-sharing": {
         title: "Öffentliche Medien und Datenfreigabe",
@@ -768,7 +768,7 @@
       },
       "help-ad-campaigns": {
         title: "Campañas publicitarias",
-        body: "Elige una cuenta Business en My Profile para abrir Ad Campaigns. Inline (45 $ / 7 días — al usar FloqR) o Mingl Gist (25 $ / 7 días — al desplazarte en Mingl). Sube PNG/JPEG/GIF o pega HTML. Dirige a todos o a datapoints del perfil. El envío va a Master Admin para aprobación y programación."
+        body: "Publica una imagen de flyer o un video de hasta 30 segundos para tu negocio, club, grupo de promoción o servicio (DJ, fotógrafo, promotor, FloqQ). Elige Inline ($45 / 7 días — pantalla de carga de la búsqueda y pantallas de funciones) o Mingl Gist ($25 / 7 días — historias), la duración y quién debe verlo (edad, género, ciudades, intereses). Paga con tarjeta o suscripción mensual; las cuentas aprobadas pueden pagar con factura. FLOQR revisa cada anuncio pagado antes de publicarlo y los anuncios rechazados se reembolsan. Mis anuncios muestra el estado, las vistas, los clics y tu factura."
       },
       "help-completed-shoutouts": {
         title: "ShoutOuts completados",
@@ -928,7 +928,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Publique un anuncio spot intersticial en el pool FLOQR (Mingl, RydR, clubs, slots ShoutOut). Plantillas según eventos del local. No requiere créditos SMS."
+        body: "Publica un flyer o un video de hasta 30 segundos en nombre de tu club. Cuando está pagado y aprobado por FLOQR, aparece en la pantalla de carga de la búsqueda, en Mingl, RydR y en otras pantallas de FLOQR. Publicadores de anuncios del club permite que un miembro del equipo publique anuncios para el club (rol Club Ad Poster). No necesitas créditos SMS."
       },
       "help-public-media-sharing": {
         title: "Medios públicos y uso compartido de datos",
@@ -954,7 +954,7 @@
       },
       "help-ad-campaigns": {
         title: "Campagne pubblicitarie",
-        body: "Scegli un account Business in My Profile per aprire Ad Campaigns. Inline (45 $ / 7 giorni — durante l’uso di FloqR) o Mingl Gist (25 $ / 7 giorni — scorrendo Mingl). Carica PNG/JPEG/GIF o incolla HTML. Pubblico: tutti o datapoint del profilo. L’invio va a Master Admin per approvazione e pianificazione."
+        body: "Pubblica un'immagine del flyer o un video fino a 30 secondi per la tua attività, il tuo club, il tuo gruppo promozionale o il tuo servizio (DJ, fotografo, promoter, FloqQ). Scegli Inline ($45 / 7 giorni — schermata di caricamento della ricerca e schermate delle funzioni) o Mingl Gist ($25 / 7 giorni — storie), la durata e chi deve vederlo (età, genere, città, interessi). Paga con carta o abbonamento mensile; gli account approvati possono pagare con fattura. FLOQR controlla ogni annuncio pagato prima della pubblicazione e gli annunci rifiutati vengono rimborsati. I miei annunci mostra stato, visualizzazioni, clic e fattura."
       },
       "help-completed-shoutouts": {
         title: "ShoutOuts completati",
@@ -1114,7 +1114,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Pubblica uno spot interstitial nel pool pubblicitario FLOQR (Mingl, RydR, club, slot ShoutOut). Modelli dagli eventi in programma. Nessun credito SMS richiesto."
+        body: "Pubblica un flyer o un video fino a 30 secondi a nome del tuo club. Una volta pagato e approvato da FLOQR, appare nella schermata di caricamento della ricerca, in Mingl, RydR e in altre schermate FLOQR. Pubblicatori di annunci del club consente a un membro del team di pubblicare annunci per il club (ruolo Club Ad Poster). Nessun credito SMS necessario."
       },
       "help-public-media-sharing": {
         title: "Public Media and Data Sharing",
@@ -1140,7 +1140,7 @@
       },
       "help-ad-campaigns": {
         title: "Campanhas publicitárias",
-        body: "Escolha uma conta Business em My Profile para abrir Ad Campaigns. Inline (45 $ / 7 dias — ao usar o FloqR) ou Mingl Gist (25 $ / 7 dias — ao percorrer o Mingl). Carregue PNG/JPEG/GIF ou cole HTML. Público: todos ou datapoints do perfil. O envio vai para Master Admin para aprovação e agendamento."
+        body: "Publique uma imagem de flyer ou um vídeo até 30 segundos para o seu negócio, clube, grupo de promoção ou serviço (DJ, fotógrafo, promotor, FloqQ). Escolha Inline ($45 / 7 dias — ecrã de carregamento da pesquisa e ecrãs de funcionalidades) ou Mingl Gist ($25 / 7 dias — histórias), a duração e quem o deve ver (idade, género, cidades, interesses). Pague com cartão ou subscrição mensal; contas aprovadas podem pagar com fatura. A FLOQR revê cada anúncio pago antes de ir para o ar e os anúncios rejeitados são reembolsados. Os meus anúncios mostra o estado, as visualizações, os cliques e a sua fatura."
       },
       "help-completed-shoutouts": {
         title: "ShoutOuts concluídos",
@@ -1300,7 +1300,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Publique um spot interstitial no pool FLOQR (Mingl, RydR, clubes, slots ShoutOut). Modelos com base nos eventos do local. Sem créditos SMS."
+        body: "Publique um flyer ou um vídeo até 30 segundos em nome do seu clube. Depois de pago e aprovado pela FLOQR, aparece no ecrã de carregamento da pesquisa, no Mingl, no RydR e noutros ecrãs FLOQR. Publicadores de anúncios do clube permite que um membro da equipa publique anúncios para o clube (função Club Ad Poster). Não são necessários créditos SMS."
       },
       "help-public-media-sharing": {
         title: "Mídia pública e compartilhamento de dados",
@@ -1326,7 +1326,7 @@
       },
       "help-ad-campaigns": {
         title: "Διαφημιστικές καμπάνιες",
-        body: "Επιλέξτε Business account στο My Profile για Ad Campaigns. Inline (45 $ / 7 ημέρες — κατά τη χρήση FloqR) ή Mingl Gist (25 $ / 7 ημέρες — στο scroll του Mingl). Ανεβάστε PNG/JPEG/GIF ή επικολλήστε HTML. Κοινό: όλοι ή datapoints προφίλ. Υποβολή στον Master Admin για έγκριση και προγραμματισμό."
+        body: "Δημοσιεύστε εικόνα flyer ή βίντεο έως 30 δευτερόλεπτα για την επιχείρηση, το club, την ομάδα προώθησης ή την υπηρεσία σας (DJ, φωτογράφος, promoter, FloqQ). Επιλέξτε Inline ($45 / 7 ημέρες — οθόνη φόρτωσης αναζήτησης και οθόνες λειτουργιών) ή Mingl Gist ($25 / 7 ημέρες — ιστορίες), τη διάρκεια και ποιος θα τη βλέπει (ηλικία, φύλο, πόλεις, ενδιαφέροντα). Πληρώστε με κάρτα ή μηνιαία συνδρομή· οι εγκεκριμένοι λογαριασμοί μπορούν να πληρώνουν με τιμολόγιο. Το FLOQR ελέγχει κάθε πληρωμένη διαφήμιση πριν προβληθεί και οι απορριφθείσες επιστρέφονται. Στο Οι διαφημίσεις μου βλέπετε κατάσταση, προβολές, κλικ και τιμολόγιο."
       },
       "help-completed-shoutouts": {
         title: "Ολοκληρωμένα ShoutOuts",
@@ -1486,7 +1486,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Δημοσιεύστε spot interstitial στο pool διαφημίσεων FLOQR (Mingl, RydR, clubs, θέσεις ShoutOut). Πρότυπα από επερχόμενα events. Δεν απαιτούνται πίστωση SMS."
+        body: "Δημοσιεύστε ένα flyer ή ένα βίντεο έως 30 δευτερόλεπτα εκ μέρους του club σας. Μόλις πληρωθεί και εγκριθεί από το FLOQR, εμφανίζεται στην οθόνη φόρτωσης της αναζήτησης, στο Mingl, στο RydR και σε άλλες οθόνες του FLOQR. Με τους Δημοσιευτές διαφημίσεων του club επιτρέπετε σε μέλος της ομάδας να δημοσιεύει για το club (ρόλος Club Ad Poster). Δεν χρειάζονται μονάδες SMS."
       },
       "help-public-media-sharing": {
         title: "Δημόσια Μέσα και Κοινοποίηση Δεδομένων",
@@ -1512,7 +1512,7 @@
       },
       "help-ad-campaigns": {
         title: "Kampanie reklamowe",
-        body: "Wybierz konto Business w My Profile, aby otworzyć Ad Campaigns. Inline (45 $ / 7 dni — podczas używania FloqR) lub Mingl Gist (25 $ / 7 dni — podczas przewijania Mingl). Prześlij PNG/JPEG/GIF lub wklej HTML. Grupy: wszyscy lub datapointy profilu. Wysłanie trafia do Master Admin do zatwierdzenia i harmonogramu."
+        body: "Opublikuj obraz ulotki lub wideo do 30 sekund dla swojej firmy, klubu, grupy promocyjnej lub usługi (DJ, fotograf, promotor, FloqQ). Wybierz Inline ($45 / 7 dni — ekran ładowania wyszukiwania i ekrany funkcji) lub Mingl Gist ($25 / 7 dni — relacje), czas emisji i odbiorców (wiek, płeć, miasta, zainteresowania). Zapłać kartą lub subskrypcją miesięczną; zatwierdzone konta mogą płacić na fakturę. FLOQR sprawdza każdą opłaconą reklamę przed emisją, a odrzucone są zwracane. Moje reklamy pokazuje status, wyświetlenia, kliknięcia i fakturę."
       },
       "help-completed-shoutouts": {
         title: "Zakończone ShoutOuts",
@@ -1672,7 +1672,7 @@
       },
       "help-club-in-app-marketing": {
         title: "Marketing in-app",
-        body: "Opublikuj spot interstitial w puli reklam FLOQR (Mingl, RydR, kluby, sloty ShoutOut). Szablony z nadchodzących wydarzeń lokalu. Bez kredytu SMS."
+        body: "Opublikuj ulotkę lub wideo do 30 sekund w imieniu klubu. Po opłaceniu i zatwierdzeniu przez FLOQR reklama pojawia się na ekranie ładowania wyszukiwania, w Mingl, RydR i na innych ekranach FLOQR. Publikujący reklamy klubu pozwala członkowi zespołu publikować reklamy dla klubu (rola Club Ad Poster). Kredyty SMS nie są potrzebne."
       },
       "help-public-media-sharing": {
         title: "Udostępnianie mediów publicznych i danych",
@@ -1698,7 +1698,7 @@
       },
       "help-ad-campaigns": {
         title: "حملات إعلانية",
-        body: "اختر حساب Business في My Profile لفتح Ad Campaigns. Inline (45$ / 7 أيام — أثناء استخدام FloqR) أو Mingl Gist (25$ / 7 أيام — أثناء التمرير في Mingl). ارفع PNG/JPEG/GIF أو الصق HTML. الجمهور: الجميع أو نقاط بيانات الملف. الإرسال يذهب إلى Master Admin للموافقة والجدولة."
+        body: "انشر صورة منشور دعائي أو فيديو حتى 30 ثانية لنشاطك التجاري أو ناديك أو مجموعة الترويج أو خدمتك (DJ، مصوّر، مروّج، FloqQ). اختر Inline (45$ / 7 أيام — شاشة تحميل البحث وشاشات الميزات) أو Mingl Gist (25$ / 7 أيام — القصص)، ومدة العرض ومن يجب أن يراه (العمر، الجنس، المدن، الاهتمامات). ادفع بالبطاقة أو باشتراك شهري؛ ويمكن للحسابات المعتمدة الدفع بفاتورة. تراجع FLOQR كل إعلان مدفوع قبل عرضه، وتُسترد قيمة الإعلانات المرفوضة. تعرض إعلاناتي الحالة والمشاهدات والنقرات وفاتورتك."
       },
       "help-completed-shoutouts": {
         title: "ShoutOuts المكتملة",
@@ -1858,7 +1858,7 @@
       },
       "help-club-in-app-marketing": {
         title: "التسويق داخل التطبيق",
-        body: "انشر إعلان spot بينيًا في مجمع إعلانات FLOQR (Mingl وRydR والأندية ومواقع ShoutOut). قوالب من فعاليات المكان القادمة. لا يلزم رصيد SMS."
+        body: "انشر منشورًا دعائيًا أو فيديو حتى 30 ثانية باسم ناديك. بعد الدفع وموافقة FLOQR يظهر على شاشة تحميل البحث وفي Mingl وRydR وشاشات FLOQR الأخرى. يتيح ناشرو إعلانات النادي لأحد أعضاء الفريق نشر إعلانات للنادي (دور Club Ad Poster). لا حاجة إلى رصيد SMS."
       },
       "help-public-media-sharing": {
         title: "وسائل الإعلام العامة ومشاركة البيانات",

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.0.112";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.0";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1193,6 +1193,18 @@
         {label:"Heist packaged default", file:"shared-data.js", includes:["secondaryDisplayScreenFormatId:\"led-64x32\"", "VenueSupports96x48:1, VenueSupports64x48:0, VenueSupports64x32:1"]},
         {label:"Display cache bust", file:"display.html", includes:["shared-data.js?v=s3.0.112"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.0.112\""]}
+      ]
+    },
+    {
+      version: "s3.1.0-paid-ads",
+      title: "Paid in-app ads: splash rotation, measurement, server-only ads, intake and Ad Management",
+      checks: [
+        {label:"Splash renders a campaign", file:"patron-app.js", includes:["function renderSplashAd(", "FLOQRAdTracking"]},
+        {label:"Splash ad markup", file:"index.html", includes:["id=\"adCreative\"", "floqr-ad-tracking.js?v=s3.1.0"]},
+        {label:"Ads are server-only", file:"firestore.rules", includes:["match /adStats/{id}", "match /adIntakeSubmissions/{id}"]},
+        {label:"Master Admin Ad Management", file:"master-admin.html", includes:["data-tab-group=\"adManagement\"", "master-ad-management.js?v=s3.1.0"]},
+        {label:"SMS / WhatsApp intake page", file:"ad-submit.html", includes:["ad-submit-app.js?v=s3.1.0"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.0\""]}
       ]
     }
   ];

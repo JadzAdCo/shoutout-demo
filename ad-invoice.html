@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <meta name="robots" content="noindex"/>
+  <title data-i18n="adinvoice.title">FLOQR ad invoice</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.0"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.0.102"/>
+</head>
+<body data-floqr-public>
+<main class="app admin-shell ad-invoice-shell">
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">FLOQR Ads</p>
+        <h1 data-i18n="adinvoice.title">FLOQR ad invoice</h1>
+        <p id="adInvoiceStatus" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </header>
+    <div id="adInvoiceCard" class="card hidden">
+      <div class="report-table">
+        <div><span data-i18n="adinvoice.number">Invoice</span><strong id="adInvoiceNumber"></strong></div>
+        <div><span data-i18n="adinvoice.item">Ad</span><strong id="adInvoiceItem"></strong></div>
+        <div><span data-i18n="adinvoice.total">Total</span><strong id="adInvoiceTotal"></strong></div>
+        <div><span data-i18n="adinvoice.state">Status</span><strong id="adInvoiceState"></strong></div>
+        <div><span data-i18n="adinvoice.issued">Issued</span><strong id="adInvoiceIssued"></strong></div>
+      </div>
+      <pre id="adInvoiceLines" class="ad-invoice-lines"></pre>
+      <button id="adInvoicePrintBtn" class="secondary" type="button" data-i18n="adinvoice.print">Print or save as PDF</button>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./floqr-i18n.js?v=s3.1.0"></script>
+<script src="./floqr-session-shell.js?v=s3.0.110"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
+<script src="./ad-invoice-app.js?v=s3.1.0"></script>
+</body>
+</html>

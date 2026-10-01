@@ -440,7 +440,8 @@
 
   function showAdStep() {
     showWizardStep("b");
-    const ad = window.FLOQRAdCampaigns?.pickCampaign?.("rydr", userProfile) || {
+    const picked = window.FLOQRAdCampaigns?.pickCampaign?.("rydr", userProfile || {});
+    const ad = picked || {
       title:"Advertise Here",
       body:"Your brand can own this moment before patrons hail a RydR.",
       badge:"FLOQR Media Slot",
@@ -450,7 +451,17 @@
     if (byId("pickupAdTitle")) byId("pickupAdTitle").textContent = ad.title || "Spot advertisement";
     if (byId("pickupAdBody")) byId("pickupAdBody").textContent = ad.body || "";
     if (byId("pickupAdImage")) {
-      byId("pickupAdImage").innerHTML = `<img src="${esc(ad.image || FALLBACK_AD_SVG)}" alt="${esc(ad.title || "Advertisement")}"/>`;
+      const href = /^https:\/\//i.test(String(ad.sourceUrl || "")) ? ad.sourceUrl : "";
+      const media = ad.creativeType === "video" && ad.videoUrl
+        ? `<video src="${esc(ad.videoUrl)}" muted autoplay loop playsinline></video>`
+        : `<img src="${esc(ad.image || FALLBACK_AD_SVG)}" alt="${esc(ad.title || "Advertisement")}"/>`;
+      byId("pickupAdImage").innerHTML = href
+        ? `<a href="${esc(href)}" target="_blank" rel="sponsored noopener">${media}</a>`
+        : media;
+      if (picked) {
+        window.FLOQRAdTracking?.impression?.(picked, "rydr");
+        window.FLOQRAdTracking?.bindClick?.(byId("pickupAdImage").querySelector("a"), picked, "rydr");
+      }
     }
     let remaining = 8;
     if (byId("pickupAdCountdown")) byId("pickupAdCountdown").textContent = String(remaining);
@@ -576,6 +587,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    window.FLOQRAdCampaigns?.loadFirestoreSpotAds?.(db)?.catch?.(() => {});
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",

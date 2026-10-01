@@ -20,6 +20,11 @@
     return `$${(Math.max(0, Number(cents) || 0) / 100).toFixed(2)}`;
   }
 
+  function tr(key, fallback) {
+    const value = window.FLOQRI18n?.t?.(key);
+    return value && value !== key ? value : fallback;
+  }
+
   function paidAtLabel(order = {}) {
     if (order.paidAtIso) return order.paidAtIso;
     if (order.receipt?.paidAtIso) return order.receipt.paidAtIso;
@@ -132,6 +137,18 @@
         ${backLink}
       </div>`;
       armPopupClose();
+      return;
+    }
+
+    if (order.orderType === "adCampaign") {
+      const portal = `./patron-portal.html?v=${encodeURIComponent(window.FLOQRNav?.appVersion || "")}&tab=ad-campaigns`;
+      byId("paymentReturnTitle").textContent = paid ? tr("adreturn.title", "Ad paid") : byId("paymentReturnTitle").textContent;
+      if (paid) byId("paymentReturnStatus").textContent = tr("adreturn.status", "FLOQR reviews every ad before it goes live. You will get an Inbox message when it is approved. Your invoice is under My Profile → Ad Campaigns.");
+      byId("paymentReturnDetails").innerHTML = `<div class="receipt payment-shoutout-receipt">
+        <p><strong>${esc(tr("adreturn.ad", "Ad"))}:</strong> ${esc(order.itemName || order.payload?.title || "—")}</p>
+        <p><strong>${esc(tr("adreturn.total", "Total"))}:</strong> ${esc(money(order.amountCents))}</p>
+        <p><a class="buttonlike" href="${esc(portal)}">${esc(tr("adreturn.open", "Open my ads"))}</a></p>
+      </div>`;
       return;
     }
 

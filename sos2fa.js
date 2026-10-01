@@ -13,7 +13,12 @@
     "clubOnboarding",
     "templateManagement",
     "recommendationModeration",
-    "featuresServices"
+    "featuresServices",
+    "adApprovalQueue",
+    "adLiveCampaigns",
+    "adStatsPanel",
+    "adIntakePanel",
+    "adSettingsPanel"
   ];
 
   let uiBound = false;

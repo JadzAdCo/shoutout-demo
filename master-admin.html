@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=29.09.98"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.0"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.102"/>
 </head>
 <body>
@@ -87,7 +87,17 @@
             <button class="admin-subtab" data-panel="duplicateRecords" type="button">Duplicate Records</button>
           </div>
         </div>
-        <button class="admin-tab" data-panel="adCampaignManagement" type="button" data-i18n="master.adCampaigns">Ad Campaign Mgmt</button>
+        <div class="admin-tab-group" data-tab-group="adManagement" data-default-panel="adApprovalQueue">
+          <button class="admin-tab admin-tab-parent" data-group="adManagement" type="button" aria-expanded="false" data-i18n="master.adManagement">Ad Management</button>
+          <div class="admin-subtabs hidden" id="adManagementSubtabs" role="group" aria-label="Ad Management pages">
+            <button class="admin-subtab" data-panel="adApprovalQueue" type="button" data-i18n="master.adApprovalQueue">Approval queue</button>
+            <button class="admin-subtab" data-panel="adLiveCampaigns" type="button" data-i18n="master.adLiveCampaigns">Live &amp; scheduled</button>
+            <button class="admin-subtab" data-panel="adStatsPanel" type="button" data-i18n="master.adStats">Ad stats</button>
+            <button class="admin-subtab" data-panel="adIntakePanel" type="button" data-i18n="master.adIntake">SMS / WhatsApp intake</button>
+            <button class="admin-subtab" data-panel="adSettingsPanel" type="button" data-i18n="master.adSettings">Settings &amp; billing</button>
+            <button class="admin-subtab" data-panel="adCampaignManagement" type="button" data-i18n="master.adPackagedDemos">Packaged demos</button>
+          </div>
+        </div>
         <button class="admin-tab" data-panel="translationOverrides" type="button" data-i18n="master.translationOverrides">Translation Overrides</button>
         <button class="admin-tab" data-panel="promoterNetwork" type="button" data-i18n="master.promoters">Promoters</button>
         <button class="admin-tab" data-panel="networkReconciliation" type="button" data-i18n="master.reconciliation">Network Reconciliation</button>
@@ -838,20 +848,80 @@
         </div>
       </section>
 
+      <section id="adApprovalQueue" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · approval</p>
+          <h2
+            data-floqr-help-id="help-master-ad-approval"
+            data-floqr-help-title="Ad approval queue"
+            data-floqr-help-body="Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the payment reference. Reject asks for a reason the poster will see and can refund a card payment."
+            data-floqr-help-search="ad approval|approve ad|pending ads|reject ad|refund ad|waive payment|mark invoice paid|ad queue"
+          >Approval queue</h2>
+          <div id="adApprovalQueueHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adLiveCampaigns" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · live</p>
+          <h2
+            data-floqr-help-id="help-master-ad-live"
+            data-floqr-help-title="Live and scheduled ads"
+            data-floqr-help-body="Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log."
+            data-floqr-help-search="live ads|pause ad|end ad|resume ad|edit ad audience|ad dates|ad targeting"
+          >Live &amp; scheduled</h2>
+          <div id="adLiveCampaignsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adStatsPanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · measurement</p>
+          <h2
+            data-floqr-help-id="help-master-ad-stats"
+            data-floqr-help-title="Ad stats"
+            data-floqr-help-body="Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged."
+            data-floqr-help-search="ad stats|impressions|clicks|ctr|click rate|clear ad stats|reset ad stats|ad measurement"
+          >Ad stats</h2>
+          <div id="adStatsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adIntakePanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · SMS / WhatsApp</p>
+          <h2
+            data-floqr-help-id="help-master-ad-intake"
+            data-floqr-help-title="SMS and WhatsApp ad intake"
+            data-floqr-help-body="Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here."
+            data-floqr-help-search="text an ad|sms ad|whatsapp ad|ad intake|send flyer|ad payment link|delete ad submissions"
+          >SMS / WhatsApp intake</h2>
+          <div id="adIntakeHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
+      <section id="adSettingsPanel" class="admin-panel-section">
+        <div class="card">
+          <p class="eyebrow">Ad Management · settings</p>
+          <h2
+            data-floqr-help-id="help-master-ad-settings"
+            data-floqr-help-title="Ad settings and billing"
+            data-floqr-help-body="Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad decision."
+            data-floqr-help-search="ad settings|splash ads|splash seconds|house ads|demo ads|invoice account|net terms|ad audit log"
+          >Settings &amp; billing</h2>
+          <div id="adSettingsHost" class="entity-mgmt-content"></div>
+        </div>
+      </section>
+
       <section id="adCampaignManagement" class="admin-panel-section">
         <div class="card">
+          <p class="eyebrow">Ad Management · packaged demos</p>
           <h2
-            data-i18n="master.adCampaigns"
-            data-floqr-help-title="Ad Campaign Mgmt"
-            data-floqr-help-body="Approve business-account ads, set start and end dates, then tune who sees each live creative. Use plain text for match tags and optional categories — FLOQR stores the structured rules. Preview creative shows the flyer or sandboxed HTML. Each card’s top-right badge is Status (Live / Demo not live / Awaiting approval) and Shows on (Inline package, Mingl Gist package, or a feature path such as ShoutOut). Demo (not live) means a packaged test creative, not an approved paid flight. Inline is $45 / 7 days on feature paths; Mingl Gist is $25 / 7 days in the story scroll."
-            data-floqr-help-search="ad campaign mgmt|preview creative|match tags|required match groups|inline ad|mingl gist ad|approve schedule|demo not live|shows on shoutout|campaign status badge"
-          >Ad Campaign Mgmt</h2>
-          <p class="sub small">Approve pending business ads, schedule flights, and edit live-pool targeting with plain text fields. Preview shows the flyer or HTML creative before you save.</p>
-          <div class="queue-actions">
-            <button id="refreshAdCampaignPendingBtn" class="primary" type="button">Refresh pending queue</button>
-          </div>
-          <h3>Pending approval</h3>
-          <div id="adCampaignPendingQueue" class="report-block"></div>
+            data-i18n="master.adPackagedDemos"
+            data-floqr-help-title="Packaged demos"
+            data-floqr-help-body="Packaged house and demo creatives that ship with FLOQR. They fill the rotation only when Settings allows it and no paid ad matches the patron. Paid ads are approved in the Approval queue, not here. Inline is $45 / 7 days on feature paths; Mingl Gist is $25 / 7 days in the story scroll."
+            data-floqr-help-search="packaged ads|house ads|demo ads|ad pool|inline ad|mingl gist ad|demo not live"
+          >Packaged demos</h2>
           <h3
             data-floqr-help-title="Live / packaged pool badge"
             data-floqr-help-body="Top-right on each card: Status and Shows on. Status Demo (not live) = packaged demo for targeting tests, not a paid approved flight. Live = can serve patrons in the flight window. Shows on names the package (Inline / Mingl Gist) or the first feature path (for example ShoutOut path) where the creative may appear. Hover the badge for the full sentence. Preview creative is a separate button that opens the flyer or HTML."
@@ -1503,15 +1573,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.0.110"></script>
+<script src="./floqr-i18n.js?v=s3.1.0"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.0.79"></script>
+<script src="./floqr-nav.js?v=s3.1.0"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
 <script src="./shared-data.js?v=s3.0.112"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./sos2fa.js?v=s3.0.108"></script>
+<script src="./sos2fa.js?v=s3.1.0"></script>
 <script src="./entity-management.js?v=s3.0.3"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
@@ -1519,19 +1589,20 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.0.110"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.110"></script>
+<script src="./floqai-help-repository.js?v=s3.1.0"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.0"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./floqr-ad-pricing.js?v=s3.0.103"></script>
+<script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
 <script src="./dc-spot-ad-campaigns.js?v=s3.0.103"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
-<script src="./ad-campaigns.js?v=s3.0.103"></script>
-<script src="./ai-diagnostics-service.js?v=s3.0.108"></script>
+<script src="./ad-campaigns.js?v=s3.1.0"></script>
+<script src="./ai-diagnostics-service.js?v=s3.1.0"></script>
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.0.108"></script>
+<script src="./master-admin-app.js?v=s3.1.0"></script>
+<script src="./master-ad-management.js?v=s3.1.0"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
 <script src="./floqr-feature-services.js?v=s3.0.110"></script>
 <script src="./master-feature-services.js?v=s3.0.110"></script>

@@ -1,7 +1,10 @@
 rules_version = '2';
 
-// FLOQR STORAGE RULES VERSION: v29.06
-// EXPECTED DEPLOYED STORAGE RULES VERSION: v29.06 or newer
+// FLOQR STORAGE RULES VERSION: s3.1.0-ad-media
+// EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.0-ad-media or newer
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v29.06
+// - adMedia/{uid}/... ad flyers (image < 8 MB) and videos (< 60 MB, length checked by Functions)
+// - adIntake/... SMS / WhatsApp ad media, written by Functions only
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.59-storage-lifecycle-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v28.57-storage-media-rules
 // Required media paths:
@@ -121,6 +124,25 @@ service firebase.storage {
 
       allow delete: if request.auth != null
         && request.auth.uid == userId;
+    }
+
+    match /adMedia/{userId}/{allPaths=**} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && (
+          (request.resource.contentType.matches('image/(jpeg|png|gif|webp)') && request.resource.size < 8 * 1024 * 1024) ||
+          (request.resource.contentType.matches('video/(mp4|quicktime|3gpp)') && request.resource.size < 60 * 1024 * 1024)
+        );
+
+      allow delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    match /adIntake/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

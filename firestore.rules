@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.0.108-feature-services-beta
+// FLOQR FIRESTORE RULES VERSION: s3.1.0-ads-server-only
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.108-feature-services-beta
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.23-entity-feature-gates
@@ -1141,16 +1142,76 @@ service cloud.firestore {
  );
  }
 
+ // s3.1.0 ads: every write goes through Functions (createAdCampaign → Stripe → approveAdCampaign).
+ // Design notes: .cursor/rules/design-notes-ad-campaigns-business.mdc
  match /spotAdCampaigns/{id} {
+ allow read: if resource.data.status == "active"
+ || isMasterAdmin()
+ || (signedIn() && resource.data.publishedByUid == request.auth.uid);
+ allow create, update, delete: if false;
+ }
+
+ match /adCampaignPrivate/{id} {
+ allow read: if isMasterAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+ allow write: if false;
+ }
+
+ match /adInvoices/{id} {
+ allow read: if isMasterAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+ allow write: if false;
+ }
+
+ match /adSettings/{id} {
  allow read: if true;
- // Business patrons create pending campaigns; owners may update their own docs; Master Admin approves/schedules.
- allow create: if signedIn()
- && request.resource.data.publishedByUid == request.auth.uid;
- allow update: if signedIn() && (
- isMasterAdmin()
- || resource.data.publishedByUid == request.auth.uid
- );
- allow delete: if signedIn() && (isMasterAdmin() || resource.data.publishedByUid == request.auth.uid);
+ allow write: if false;
+ }
+
+ match /adStats/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /adStatsDaily/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /adPosterDelegations/{id} {
+ allow read: if isMasterAdmin()
+ || (signedIn() && (resource.data.uid == request.auth.uid || isClubManager(resource.data.clubLocationId)));
+ allow write: if false;
+ }
+
+ match /promotionGroups/{id} {
+ allow read: if isMasterAdmin() || (signedIn() && request.auth.uid in resource.data.memberUids);
+ allow write: if false;
+ }
+
+ match /adIntakeSubmissions/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /adInvoiceAccounts/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /adAuditLogs/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /adEventDedupe/{id} {
+ allow read, write: if false;
+ }
+
+ match /adEventThrottle/{id} {
+ allow read, write: if false;
+ }
+
+ match /adIntakeOptOuts/{id} {
+ allow read, write: if false;
  }
 
  match /chatRooms/{roomId} {
