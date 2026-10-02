@@ -205,6 +205,24 @@
     }
   }
 
+  async function verifyRecoveryCode() {
+    const authUser = firebase.auth().currentUser;
+    if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
+    const input = byId("sos2faRecoveryCode");
+    const recoveryCode = String(input?.value || "").trim();
+    if (!recoveryCode) throw new Error("Enter the recovery code.");
+    setStatus("Checking recovery code…");
+    const result = await callable("verifySos2faRecoveryCode")({recoveryCode});
+    if (input) input.value = "";
+    unlock("entityManagement", result?.data || {});
+    challengeRequested = false;
+    setStatus("SOS2FA unlocked with the recovery code for this browser session.");
+    syncGateUi("entityManagement", true);
+    await logActivity("entity_management_unlocked", {panel: activeEntityPanel()?.id || "entityManagement", via: "recovery-code"});
+    fireUnlock("entityManagement");
+    return true;
+  }
+
   async function requireUnlock(scope, options = {}) {
     const authUser = firebase.auth().currentUser;
     if (!authUser) {
@@ -269,6 +287,19 @@
         await logActivity("entity_management_locked", {});
       } catch (_) {}
     });
+    byId("sos2faRecoveryBtn")?.addEventListener("click", async () => {
+      try {
+        await verifyRecoveryCode();
+      } catch (e) {
+        setStatus(e.message || String(e));
+      }
+    });
+    byId("sos2faRecoveryCode")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        byId("sos2faRecoveryBtn")?.click();
+      }
+    });
     byId("sos2faCode")?.addEventListener("keydown", event => {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -297,6 +328,7 @@
     lock,
     sendCode,
     verifyCode,
+    verifyRecoveryCode,
     requireUnlock,
     onPanelActivate,
     mount,

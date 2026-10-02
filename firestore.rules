@@ -669,6 +669,9 @@ service cloud.firestore {
  match /sos2faSessions/{id} {
  allow read, write: if false;
  }
+ match /sos2faRecoveryAttempts/{uid} {
+ allow read, write: if false;
+ }
  match /sos2faTotp/{uid} {
  allow read, write: if false;
  }
