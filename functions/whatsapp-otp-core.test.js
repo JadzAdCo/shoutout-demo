@@ -83,9 +83,9 @@ test("Welcome sign-in: WhatsApp worldwide and last, SMS US & Canada, no OTP divi
   assert.doesNotMatch(card, /Or use One Time Password/);
   assert.doesNotMatch(card, /class="divider"/);
   assert.match(card, /id="showWhatsAppOtpBtn"[^>]*data-i18n="app\.whatsappOtp"/);
-  assert.match(card, /Continue with WhatsApp OTP \(Worldwide\)/);
+  assert.match(card, /<span class="i18n-text signin-label">Continue with WhatsApp OTP<\/span><span class="signin-sub" data-i18n="app\.whatsappOtpRegion">\(Worldwide\)<\/span><\/button>/);
   assert.match(card, /id="showSmsOtpBtn"[^>]*data-i18n="app\.smsOtp"/);
-  assert.match(card, /Continue with SMS OTP \(US &amp; Canada Only\)/);
+  assert.match(card, /<span class="i18n-text signin-label">Continue with SMS OTP<\/span><span class="signin-sub" data-i18n="app\.smsOtpRegion">\(US &amp; Canada Only\)<\/span><\/button>/);
   const smsSelect = card.slice(card.indexOf('id="phoneCountryCode"'), card.indexOf("</select>", card.indexOf('id="phoneCountryCode"')));
   assert.equal((smsSelect.match(/<option/g) || []).length, 1, "SMS OTP is +1 (US & Canada) only");
   assert.match(smsSelect, /United States \/ Canada \(\+1\)/);

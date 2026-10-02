@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.1";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.2";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1131,7 +1131,7 @@
       version: "s3.0.107-whatsapp-otp",
       title: "WhatsApp OTP sign-in (Twilio) + SMS US only + privacy links at bottom",
       checks: [
-        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "Continue with WhatsApp OTP (Worldwide)", "Continue with SMS OTP (US Only)", "login-legal"]},
+        {label:"WhatsApp OTP UI", file:"index.html", includes:["showWhatsAppOtpBtn", "whatsappOtpPanel", "Continue with WhatsApp OTP", "Continue with SMS OTP", "login-legal"]},
         {label:"WhatsApp OTP client", file:"patron-app.js", includes:["requestWhatsAppOtp", "verifyWhatsAppOtp", "signInWithCustomToken"]},
         {label:"WhatsApp OTP callables", file:"functions/whatsapp-otp-functions.js", includes:["exports.requestWhatsAppOtp", "exports.verifyWhatsAppOtp", "forceSecurity: true", "fetchTwilioMessage"]},
         {label:"Compliance row forced for auth events", file:"functions/twilio-log.js", includes:["forceSecurity === true", "ContentSid: template"]},
@@ -1215,6 +1215,17 @@
         {label:"Save button preview", file:"patron-portal-app.js", includes:["function renderUiLanguagePreview(", "\" (\""]},
         {label:"Preview hint markup", file:"patron-portal.html", includes:["id=\"uiAppLanguagePreview\"", "patron-portal-app.js?v=s3.1.1"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.1\""]}
+      ]
+    },
+    {
+      version: "s3.1.2-welcome-vertical-gradient",
+      title: "Welcome sign-in buttons share one top-to-bottom gradient; SMS / WhatsApp region on a second line",
+      checks: [
+        {label:"Vertical gradient slices", file:"styles.css", includes:["linear-gradient(180deg,#1f8fff 0%,#5b5cff 52%,#a64dff 100%) 0 calc(-1 * var(--stack-y,0px))"]},
+        {label:"Stack measurement", file:"welcome-button-gradient.js", includes:["FLOQRWelcomeGradient", "--stack-h"]},
+        {label:"Two-line OTP labels", file:"index.html", includes:["data-i18n=\"app.smsOtpRegion\"", "data-i18n=\"app.whatsappOtpRegion\"", "welcome-button-gradient.js?v=s3.1.2"]},
+        {label:"Region keys translated", file:"floqr-i18n.js", includes:["\"app.smsOtpRegion\"", "\"app.whatsappOtpRegion\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.2\""]}
       ]
     }
   ];
