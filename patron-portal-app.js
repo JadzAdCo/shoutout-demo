@@ -960,6 +960,7 @@
     if (byId("languagePreferredLanguage")) byId("languagePreferredLanguage").value = settings.preferredLanguage || "auto";
     if (byId("uiAppLanguage") && window.FLOQRI18n) {
       byId("uiAppLanguage").innerHTML = window.FLOQRI18n.languageOptionsHtml(window.FLOQRI18n.getLanguage() || "en");
+      renderUiLanguagePreview();
     }
     if (byId("languageTonePreference")) byId("languageTonePreference").value = settings.tonePreference || "keepTone";
     if (byId("languageEmojiSkinTone")) byId("languageEmojiSkinTone").value = settings.emojiSkinTone || "yellow";
@@ -1122,6 +1123,44 @@
     });
   }
 
+  function langSpan(i18n, code, text) {
+    const span = document.createElement("bdi");
+    span.lang = code;
+    span.dir = i18n.meta(code)?.dir || "ltr";
+    span.textContent = text;
+    return span;
+  }
+
+  function renderUiLanguagePreview() {
+    const i18n = window.FLOQRI18n;
+    const btn = byId("saveUiAppLanguageBtn");
+    const hint = byId("uiAppLanguagePreview");
+    if (!i18n?.tIn || !btn) return;
+    const current = i18n.getLanguage?.() || "en";
+    const picked = i18n.normalizeCode?.(byId("uiAppLanguage")?.value) || current;
+    const pickedSave = i18n.tIn(picked, "app.save");
+    const englishSave = i18n.tIn("en", "app.save");
+    const bilingual = picked !== current && picked !== "en";
+    btn.replaceChildren(langSpan(i18n, picked, pickedSave));
+    if (bilingual) btn.append(" (", langSpan(i18n, "en", englishSave), ")");
+    btn.setAttribute("aria-label", bilingual ? `${pickedSave} (${englishSave})` : pickedSave);
+    if (!hint) return;
+    if (picked === current) {
+      hint.replaceChildren();
+      hint.classList.add("hidden");
+      return;
+    }
+    const info = i18n.meta(picked) || {};
+    const lines = [langSpan(i18n, picked, i18n.tIn(picked, "lang.switchHint", {native: info.native || picked}))];
+    if (picked !== "en") {
+      const english = document.createElement("small");
+      english.append("(", langSpan(i18n, "en", i18n.tIn("en", "lang.switchHint", {native: info.label || picked})), ")");
+      lines.push(english);
+    }
+    hint.replaceChildren(...lines);
+    hint.classList.remove("hidden");
+  }
+
   async function saveUiAppLanguage() {
     const code = byId("uiAppLanguage")?.value || "en";
     const status = byId("uiAppLanguageStatus");
@@ -1129,6 +1168,7 @@
       if (status) status.textContent = "…";
       await window.FLOQRI18n?.setLanguage?.(code, {persist: true, markPrompt: true});
       window.FLOQRI18n?.applyDom?.();
+      renderUiLanguagePreview();
       const native = window.FLOQRI18n?.meta?.(code)?.native || code;
       if (status) status.textContent = window.FLOQRI18n?.t?.("lang.languageSaved", {native}) || `FloqR language set to ${native}.`;
     } catch (error) {
@@ -4258,10 +4298,13 @@
     bind("savePrivacyBtn", savePrivacy);
     bind("saveLanguageSettingsBtn", saveLanguageSettings);
     bind("saveUiAppLanguageBtn", saveUiAppLanguage);
+    byId("uiAppLanguage")?.addEventListener("change", renderUiLanguagePreview);
+    renderUiLanguagePreview();
     window.addEventListener("floqr:ui-language", () => {
       renderLanguageSettingsReport(currentLanguageSettings);
       if (currentProfile) renderPolicies(currentProfile);
       window.FLOQRI18n?.applyDom?.();
+      renderUiLanguagePreview();
     });
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
     bind("exportDataBtn", downloadData);

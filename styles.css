@@ -83,6 +83,8 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .ad-submit-preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#050819}
 .ad-submit-price{font-weight:900;font-size:1.15em;margin:14px 0 8px}
+.ui-lang-preview{margin:10px 0 0;padding:8px 10px;border-left:3px solid #3d8bff;border-radius:6px;background:rgba(61,139,255,.16);font-size:13px;line-height:1.4;display:grid;gap:2px}
+.ui-lang-preview small{font-size:12px;opacity:.78}
 .ad-invoice-lines{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:13px;padding:12px;border:1px solid var(--line);border-radius:12px}
 .ad-mgmt-card{margin:12px 0}
 .ad-mgmt-row{display:grid;gap:14px;grid-template-columns:minmax(120px,220px) 1fr;align-items:start}

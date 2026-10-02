@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.0";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.1";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1205,6 +1205,16 @@
         {label:"Master Admin Ad Management", file:"master-admin.html", includes:["data-tab-group=\"adManagement\"", "master-ad-management.js?v=s3.1.0"]},
         {label:"SMS / WhatsApp intake page", file:"ad-submit.html", includes:["ad-submit-app.js?v=s3.1.0"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.0\""]}
+      ]
+    },
+    {
+      version: "s3.1.1-save-language-preview",
+      title: "App language Save button previews the picked language: Salva (Save)",
+      checks: [
+        {label:"Translate in a chosen language", file:"floqr-i18n.js", includes:["function tIn(", "\"lang.switchHint\""]},
+        {label:"Save button preview", file:"patron-portal-app.js", includes:["function renderUiLanguagePreview(", "\" (\""]},
+        {label:"Preview hint markup", file:"patron-portal.html", includes:["id=\"uiAppLanguagePreview\"", "patron-portal-app.js?v=s3.1.1"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.1\""]}
       ]
     }
   ];
