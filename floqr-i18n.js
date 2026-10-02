@@ -575,6 +575,7 @@
       "lang.highlightGrammar": "Highlight grammar suggestions in yellow or underline",
       "lang.highlightSpelling": "Highlight possible spelling errors in red before correction",
       "lang.languageSaved": "FloqR language set to {native}.",
+      "lang.switchHint": "Tap Save to switch FloqR to {native}.",
       "lang.notSelected": "Not selected",
       "lang.pageHint": "Control profile-wide grammar and spelling help for chats, messages, ShoutOut text, profile updates, and future BartR descriptions.",
       "lang.pageTitle": "Language Settings",
@@ -1151,6 +1152,7 @@
       "lang.highlightGrammar": "Surligner les suggestions grammaticales en jaune ou les souligner",
       "lang.highlightSpelling": "Surligner les fautes d'orthographe possibles en rouge avant correction",
       "lang.languageSaved": "Langue FloqR définie sur {native}.",
+      "lang.switchHint": "Touchez Enregistrer pour passer FloqR en {native}.",
       "lang.notSelected": "Non sélectionné",
       "lang.pageHint": "Contrôlez la grammaire et l'orthographe pour les chats, messages, ShoutOuts, le profil et BartR.",
       "lang.pageTitle": "Paramètres de langue",
@@ -1727,6 +1729,7 @@
       "lang.highlightGrammar": "Grammatikvorschläge gelb markieren oder unterstreichen",
       "lang.highlightSpelling": "Mögliche Rechtschreibfehler vor der Korrektur rot markieren",
       "lang.languageSaved": "FloqR-Sprache auf {native} gesetzt.",
+      "lang.switchHint": "Tippe auf Speichern, um FloqR auf {native} umzustellen.",
       "lang.notSelected": "Nicht ausgewählt",
       "lang.pageHint": "Steuere Grammatik- und Rechtschreibhilfe für Chats, Nachrichten, ShoutOut-Text, Profilupdates und künftige BartR-Beschreibungen.",
       "lang.pageTitle": "Spracheinstellungen",
@@ -2303,6 +2306,7 @@
       "lang.highlightGrammar": "Resaltar sugerencias gramaticales en amarillo o subrayarlas",
       "lang.highlightSpelling": "Resaltar posibles errores de ortografía en rojo antes de corregir",
       "lang.languageSaved": "Idioma de FloqR establecido en {native}.",
+      "lang.switchHint": "Toca Guardar para cambiar FloqR a {native}.",
       "lang.notSelected": "No seleccionado",
       "lang.pageHint": "Controla la ayuda de gramática y ortografía para chats, mensajes, texto de ShoutOut, actualizaciones de perfil y futuras descripciones de BartR.",
       "lang.pageTitle": "Ajustes de idioma",
@@ -2879,6 +2883,7 @@
       "lang.highlightGrammar": "Grammaticasuggesties geel markeren of onderstrepen",
       "lang.highlightSpelling": "Mogelijke spelfouten rood markeren vóór correctie",
       "lang.languageSaved": "FloqR-taal ingesteld op {native}.",
+      "lang.switchHint": "Tik op Opslaan om de taal van FloqR in te stellen op {native}.",
       "lang.notSelected": "Niet geselecteerd",
       "lang.pageHint": "Beheer grammatica- en spellingscontrole voor chats, berichten, ShoutOut-tekst, profielupdates en toekomstige BartR-beschrijvingen.",
       "lang.pageTitle": "Taalinstellingen",
@@ -3455,6 +3460,7 @@
       "lang.highlightGrammar": "Подсвечивать грамматические предложения жёлтым или подчёркиванием",
       "lang.highlightSpelling": "Подсвечивать возможные орфографические ошибки красным до исправления",
       "lang.languageSaved": "Язык FloqR установлен: {native}.",
+      "lang.switchHint": "Нажмите «Сохранить», чтобы переключить FloqR на язык: {native}.",
       "lang.notSelected": "Не выбрано",
       "lang.pageHint": "Управляйте проверкой грамматики и орфографии для чатов, сообщений, текста ShoutOut, обновлений профиля и будущих описаний BartR.",
       "lang.pageTitle": "Языковые настройки",
@@ -4031,6 +4037,7 @@
       "lang.highlightGrammar": "Evidenzia i suggerimenti grammaticali in giallo o sottolinea",
       "lang.highlightSpelling": "Evidenzia in rosso eventuali errori di ortografia prima della correzione",
       "lang.languageSaved": "Lingua FloqR impostata su {native}.",
+      "lang.switchHint": "Tocca Salva per impostare FloqR su {native}.",
       "lang.notSelected": "Non selezionato",
       "lang.pageHint": "Controlla la guida grammaticale e ortografica a livello di profilo per chat, messaggi, testo ShoutOut, aggiornamenti del profilo e future descrizioni BartR.",
       "lang.pageTitle": "Impostazioni della lingua",
@@ -4607,6 +4614,7 @@
       "lang.highlightGrammar": "Destacar sugestões gramaticais em amarelo ou sublinhado",
       "lang.highlightSpelling": "Destacar possíveis erros ortográficos em vermelho antes da correção",
       "lang.languageSaved": "Idioma do FloqR definido como {native}.",
+      "lang.switchHint": "Toque em Salvar para mudar o FloqR para {native}.",
       "lang.notSelected": "Não selecionado",
       "lang.pageHint": "Controle a ajuda gramatical e ortográfica em todo o perfil para conversas, mensagens, ShoutOut texto, atualizações de perfil e futuras BartR descrições.",
       "lang.pageTitle": "Configurações de Idioma",
@@ -5183,6 +5191,7 @@
       "lang.highlightGrammar": "Επισημάνετε τις προτάσεις γραμματικής με κίτρινο χρώμα ή υπογράμμιση",
       "lang.highlightSpelling": "Επισημάνετε πιθανά ορθογραφικά λάθη με κόκκινο χρώμα πριν από τη διόρθωση",
       "lang.languageSaved": "Η γλώσσα FloqR έχει οριστεί σε {native}.",
+      "lang.switchHint": "Πατήστε Αποθήκευση για να αλλάξει η γλώσσα του FloqR σε {native}.",
       "lang.notSelected": "Δεν έχει επιλεγεί",
       "lang.pageHint": "Ελέγξτε τη γραμματική και την ορθογραφία σε όλο το προφίλ για συνομιλίες, μηνύματα, ShoutOut κείμενο, ενημερώσεις προφίλ και μελλοντικές BartR περιγραφές.",
       "lang.pageTitle": "Ρυθμίσεις γλώσσας",
@@ -5759,6 +5768,7 @@
       "lang.highlightGrammar": "Podkreśl sugestie gramatyczne na żółto lub podkreśl",
       "lang.highlightSpelling": "Zaznacz możliwe błędy ortograficzne na czerwono przed korektą",
       "lang.languageSaved": "Język FloqR ustawiono na {native}.",
+      "lang.switchHint": "Stuknij Zapisz, aby przełączyć FloqR na język: {native}.",
       "lang.notSelected": "Nie wybrano",
       "lang.pageHint": "Kontroluj pomoc dotyczącą gramatyki i pisowni w całym profilu dla czatów, wiadomości, ShoutOut tekstu, aktualizacji profilu i przyszłych BartR opisów.",
       "lang.pageTitle": "Ustawienia językowe",
@@ -6335,6 +6345,7 @@
       "lang.highlightGrammar": "تسليط الضوء على اقتراحات القواعد النحوية باللون الأصفر أو تحتها خط",
       "lang.highlightSpelling": "تسليط الضوء على الأخطاء الإملائية المحتملة باللون الأحمر قبل التصحيح",
       "lang.languageSaved": "تم ضبط لغة FloqR على {native}.",
+      "lang.switchHint": "اضغط حفظ لتغيير لغة FloqR إلى {native}.",
       "lang.notSelected": "لم يتم اختياره",
       "lang.pageHint": "تحكم في القواعد النحوية والإملاء على مستوى الملف الشخصي للدردشات والرسائل والنص ShoutOut وتحديثات الملف الشخصي والأوصاف BartR المستقبلية.",
       "lang.pageTitle": "اعدادات اللغة",
@@ -6710,6 +6721,17 @@
     return text;
   }
 
+  function tIn(lang, key, vars = {}) {
+    const code = normalizeCode(lang) || "en";
+    const pack = STRINGS[code] || STRINGS.en;
+    const overridePack = overrides[code] || {};
+    let text = overridePack[key] || pack[key] || STRINGS.en[key] || key;
+    Object.keys(vars).forEach(name => {
+      text = text.replace(new RegExp(`\\{${name}\\}`, "g"), String(vars[name]));
+    });
+    return text;
+  }
+
   function applyText(el, value) {
     const attr = el.getAttribute("data-i18n-attr");
     if (attr) {
@@ -6904,6 +6926,7 @@
     SUPPORTED,
     STRINGS,
     t,
+    tIn,
     meta,
     normalizeCode,
     browserPreferred,
