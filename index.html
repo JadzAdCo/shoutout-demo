@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.2"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.4"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -450,6 +450,16 @@
         </div>
         <h1 id="adTitle" data-i18n="ad.splash.getReady">Get Ready</h1>
         <p id="adBody" class="sub" data-i18n="ad.splash.body">Your shoutout is almost live.</p>
+        <div id="splashHouseCard" class="splash-house hidden">
+          <h1 class="splash-house-title" data-i18n="ad.house.poweredBy">Ad Powered by FloqMedia</h1>
+          <p class="splash-house-contact" data-i18n="ad.house.contactUs">Contact Us</p>
+          <ul class="splash-house-list">
+            <li>Facebook &amp; Instagram: <a href="https://www.instagram.com/floqmedia" target="_blank" rel="noopener">@FloqMedia</a></li>
+            <li><span data-i18n="ad.house.web">Web</span>: <a href="https://www.floqmedia.com" target="_blank" rel="noopener">www.floqmedia.com</a></li>
+            <li><span data-i18n="ad.house.email">Email</span>: <a href="mailto:sales@floqmedia.com">sales@floqmedia.com</a></li>
+            <li><span data-i18n="ad.house.tel">Tel</span>: <a href="tel:+18889335677">+1 (888) WE-FLOQQ</a></li>
+          </ul>
+        </div>
         <figure id="adCreative" class="splash-ad hidden" aria-label="Sponsored">
           <span class="ad-badge splash-ad-badge" data-i18n="ad.splash.sponsored">Sponsored</span>
           <div id="adCreativeMedia" class="splash-ad-media"></div>
@@ -761,8 +771,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.0"></script>
-<script src="./floqr-i18n.js?v=s3.1.2"></script>
+<script src="./floqr-nav.js?v=s3.1.4"></script>
+<script src="./floqr-i18n.js?v=s3.1.4"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
 <script src="./floqai-help-repository.js?v=s3.1.0"></script>
 <script src="./floqr-i18n-help.js?v=s3.1.0"></script>
@@ -788,12 +798,12 @@
 <script src="./ai-grammar-service.js?v=29.09.33"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./dc-spot-ad-campaigns.js?v=29.09.33"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.1.4"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
 <script src="./floqr-consent-mode.js?v=s3.0.103"></script>
 <script src="./floqr-canonical.js?v=s3.0.103"></script>
 <script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
-<script src="./ad-campaigns.js?v=s3.1.0"></script>
+<script src="./ad-campaigns.js?v=s3.1.4"></script>
 <script src="./floqr-ad-tracking.js?v=s3.1.0"></script>
 <script src="./floqr-identity.js?v=29.09.33"></script>
 <script src="./floqr-blocks.js?v=29.09.57"></script>
@@ -801,7 +811,7 @@
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
 <script src="./welcome-button-gradient.js?v=s3.1.2"></script>
-<script src="./patron-app.js?v=s3.1.0"></script>
+<script src="./patron-app.js?v=s3.1.4"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

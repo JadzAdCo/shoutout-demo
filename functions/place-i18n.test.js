@@ -43,7 +43,7 @@ test("placeLine localizes city and region; no locationName API", () => {
 test("index loads floqr-place-i18n before patron-app", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   assert.match(html, /floqr-place-i18n\.js\?v=s3\.0\.87/);
-  assert.match(html, /patron-app\.js\?v=s3\.1\.0/);
+  assert.match(html, /patron-app\.js\?v=s3\.1\.\d+/);
   assert.ok(html.indexOf("floqr-place-i18n.js") < html.indexOf("patron-app.js"));
   const patron = fs.readFileSync(path.join(__dirname, "..", "patron-app.js"), "utf8");
   assert.match(patron, /FLOQRPlaceI18n/);

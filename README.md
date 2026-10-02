@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.3 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.4 (stable)
+
+- s3.1.4: Search in-app ad splash no longer shows a hardcoded venue (Zebbies Garden). Search paths (Clubs, Events, Lounges, Beach Clubs, Mingl, venue search) show the FloqMedia house card: "Ad Powered by FloqMedia", Contact Us, Facebook & Instagram @FloqMedia, www.floqmedia.com, sales@floqmedia.com, +1 (888) WE-FLOQQ (tap to call). Only club actions on a picked venue keep that venue's logo and name. The Zebbies demo campaign is `venueOnly` and rotates only at Zebbies. House labels translated in all 11 languages.
 
 - s3.1.3: SOS2FA break-glass recovery code for the listed Super Admin accounts while SendGrid and Twilio are unpaid. Master Admin → SOS2FA gate → "No code arriving? Use recovery code". The code lives only in Secret Manager (`SOS2FA_RECOVERY_CODE`, owner-set, 12+ characters), works until 2026-10-16 04:00 UTC, 5 attempts per hour, verified Google email required, every use audited in `entityManagementAuditLogs`. New callable `verifySos2faRecoveryCode`.
 - s3.1.2: Welcome sign-in buttons share one top-to-bottom blue → indigo → purple gradient, as if the stack were one block cut into buttons (`welcome-button-gradient.js` measures the visible stack). SMS and WhatsApp put their region on a second line, "(US & Canada Only)" and "(Worldwide)", with no wrapping. New chrome keys `app.smsOtpRegion` / `app.whatsappOtpRegion` in all 11 languages.
