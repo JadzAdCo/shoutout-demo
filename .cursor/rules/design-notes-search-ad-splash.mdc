@@ -1,0 +1,26 @@
+---
+description: Search in-app ad splash header — FloqMedia house card vs picked-venue header, venue-only demo campaigns (s3.1.4)
+alwaysApply: false
+---
+# Search ad splash header (s3.1.4)
+
+Resume: `@ad-splash$`.
+
+The splash (`#adSplashPage`, `patron-app.js` `showAdSplash`) used to title itself with `getLocation()`, which falls back to `zebbies-garden-washington-dc` when nothing is picked. That is why every Search path said "Zebbies Garden".
+
+## Contract
+
+- `showAdSplash(type, nextFn, options)` — the venue header (club logo + name + venue body) shows **only** when `options.venue === true` **and** a venue is actually picked (`selectedLocationId || pendingDirectLocation`). Club-action buttons (`clubShoutoutBtn`, `reserveTableBtn`, `joinGuestListBtn`, `pay*EntryBtn`) pass `{ venue: true }`.
+- Every other path (category tiles, venue search, Mingl) shows `#splashHouseCard`: "Ad Powered by FloqMedia", Contact Us, Facebook & Instagram `@FloqMedia`, `https://www.floqmedia.com`, `mailto:sales@floqmedia.com`, `tel:+18889335677` shown as `+1 (888) WE-FLOQQ`. FLOQR logo stays; the club logo tile is hidden (`.splash-logo-row-single`).
+- Paid / packaged campaigns still rotate in `#adCreative` below the header.
+- Never fall back to the default location for display copy on the splash.
+
+## Venue-only campaigns
+
+`scoreCampaign(campaign, profile, slot, context)` / `pickCampaign(slot, profile, context)`: a campaign with `venueOnly: true` is served only when `context.locationId === campaign.clubLocationId`. `dc-zebbies-demo` is `venueOnly`. The splash passes the picked venue id only on the venue path.
+
+## i18n
+
+Keys `ad.house.poweredBy`, `ad.house.contactUs`, `ad.house.web`, `ad.house.email`, `ad.house.tel`, `ad.splash.venueBody` in all 11 packs (`scripts/patch-ad-house-i18n.js`). FloqMedia, Facebook, Instagram are brands — not translated.
+
+Tests: `functions/search-ad-house-card.test.js`.

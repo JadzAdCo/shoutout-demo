@@ -710,7 +710,7 @@
   }
 
   /** Picks the next campaign for this path (paid Firestore ads outrank packaged demos) and counts the impression server-side. */
-  function renderSplashAd(type) {
+  function renderSplashAd(type, venueId = "") {
     clearSplashAd();
     const ads = window.FLOQRAdCampaigns;
     const figure = byId("adCreative");
@@ -719,7 +719,7 @@
     const enabled = ads.settings?.().splashEnabled;
     if (enabled === 0 || enabled === false || enabled === "0") return null;
     const slot = SPLASH_AD_SLOTS.includes(type) ? type : "default";
-    const ad = ads.pickCampaign(slot, cachedUserProfile || {});
+    const ad = ads.pickCampaign(slot, cachedUserProfile || {}, { locationId: venueId });
     if (!ad || (!ad.image && !ad.videoUrl)) return null;
     if (ad.creativeType === "video" && ad.videoUrl) {
       const video = document.createElement("video");
@@ -756,13 +756,29 @@
     return ad;
   }
 
-  function showAdSplash(type, nextFn) {
+  /** Search paths get the FloqMedia house card; only club actions on a picked venue show that venue. */
+  function applySplashHeader(venuePicked) {
+    byId("splashHouseCard")?.classList.toggle("hidden", venuePicked);
+    byId("adTitle")?.classList.toggle("hidden", !venuePicked);
+    byId("adBody")?.classList.toggle("hidden", !venuePicked);
+    byId("splashClubLogoWrap")?.classList.toggle("hidden", !venuePicked);
+    document.querySelector("#adSplashPage .splash-logo-row")?.classList.toggle("splash-logo-row-single", !venuePicked);
+  }
+
+  function showAdSplash(type, nextFn, options = {}) {
     pendingCategoryAfterAd = nextFn;
+    const venuePicked = !!options.venue && !!(selectedLocationId || pendingDirectLocation);
+    applySplashHeader(venuePicked);
+    if (venuePicked) renderSplashVenue();
+    startSplash(type, venuePicked ? locationId() : "");
+  }
+
+  function renderSplashVenue() {
     const activeLocation = getLocation?.() || {};
     const clubName = activeLocation.locationName || activeLocation.brandName || "Club";
     const clubLogoUrl = activeLocation.logoUrl || activeLocation.clubLogoUrl || "";
     setText("adTitle", clubName);
-    setText("adBody", "Your shoutout goes live after this splash.");
+    setText("adBody", window.FLOQRI18n?.t?.("ad.splash.venueBody") || "Your shoutout goes live after this splash.");
     const clubLogo = byId("splashClubLogo");
     const clubLogoFallback = byId("splashClubLogoFallback");
     if (clubLogo) {
@@ -785,13 +801,16 @@
         }
       }
     }
+  }
+
+  function startSplash(type, venueId) {
     const statementPrimary = byId("splashStatementPrimary");
     const statementSecondary = byId("splashStatementSecondary");
     statementPrimary?.classList.remove("is-hidden");
     statementSecondary?.classList.remove("is-hidden");
     showPage("adSplashPage");
     clearAdSplashTimers();
-    renderSplashAd(type);
+    renderSplashAd(type, venueId);
     const durationMs = splashDurationMs();
     adStatementTimers = [
       setTimeout(() => statementPrimary?.classList.add("is-hidden"), durationMs * 0.4),
@@ -4623,14 +4642,14 @@
     });
     bind("backFromAdBtn", cancelAdSplash);
     bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
-    bind("clubShoutoutBtn", () => showAdSplash("shoutout", () => openCategoryAfterAd("shoutout")));
+    bind("clubShoutoutBtn", () => showAdSplash("shoutout", () => openCategoryAfterAd("shoutout"), { venue: true }));
     bind("backToCategoriesBtn", () => showPage("categoryPage"));
     bind("backToCategoriesFromActionsBtn", () => showPage("categoryPage"));
-    bind("reserveTableBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:reserve-a-table")));
-    bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list")));
-    bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry")));
-    bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry")));
-    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"))); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
+    bind("reserveTableBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:reserve-a-table"), { venue: true }));
+    bind("joinGuestListBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:join-guest-list"), { venue: true }));
+    bind("payVipEntryBtn", () => showAdSplash("lounge-club", () => openCategoryAfterAd("club-action:pay-vip-entry"), { venue: true }));
+    bind("payEventEntryBtn", () => showAdSplash("events", () => openCategoryAfterAd("club-action:pay-event-entry"), { venue: true }));
+    bind("payStdEntryBtn", () => showAdSplash("clubs", () => openCategoryAfterAd("club-action:pay-std-entry"), { venue: true })); bind("backToListingBtn", () => showListing()); bind("backToTemplatesBtn", showTemplateSelection); bind("goToEditorBtn", goToEditor); bind("previewShoutoutBtn", openShoutoutPreviewModal); bind("closeShoutoutPreviewBtn", closeShoutoutPreviewModal); bind("submitShoutoutBtn", submitShoutout); bind("aiSuggestBtn", () => applyAiSuggestion()); bind("pastShoutoutsBtn", loadPastShoutoutsForReuse); bind("editSubmittedShoutoutBtn", editSubmittedShoutout); bind("confirmGoMinglBtn", goToMinglFromConfirmation); bind("confirmGoBartrBtn", goToBartrFromConfirmation); bind("skipConfirmationBtn", returnToMainFromConfirmation); bind("minglQuickChatBtn", openMinglChatShortcut); bind("minglQuickSearchBtn", focusMinglPeopleSearch);
     document.querySelectorAll("[data-ai-tone]").forEach(btn => btn.addEventListener("click", () => applyAiSuggestion(btn.dataset.aiTone || "")));
     bind("userMenuBtn", toggleUserDropdown);
     bind("dropdownSignOutBtn", logout);

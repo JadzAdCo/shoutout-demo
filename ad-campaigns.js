@@ -607,9 +607,10 @@
     return wanted.includes(aliases[gender] || gender);
   }
 
-  function scoreCampaign(campaign, profile = {}, slot = "default") {
+  function scoreCampaign(campaign, profile = {}, slot = "default", context = {}) {
     const status = String(campaign.status || "active");
     if (status === "pending_approval" || status === "rejected") return -999;
+    if (campaign.venueOnly && String(campaign.clubLocationId || "") !== String(context.locationId || "")) return -999;
     if (campaign.firestore) {
       if (!SERVABLE_STATUSES.includes(status)) return -999;
     } else {
@@ -652,10 +653,10 @@
     return score;
   }
 
-  function pickCampaign(slot = "default", profile = {}) {
+  function pickCampaign(slot = "default", profile = {}, context = {}) {
     const allCampaigns = campaigns();
     const ranked = allCampaigns
-      .map(campaign => ({campaign, score:scoreCampaign(campaign, profile, slot)}))
+      .map(campaign => ({campaign, score:scoreCampaign(campaign, profile, slot, context)}))
       .filter(item => item.score > -100 && !item.campaign.isHouseFallback)
       .sort((a, b) => b.score - a.score);
     const topScore = ranked[0]?.score || 0;

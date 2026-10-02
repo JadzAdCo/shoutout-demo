@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.3";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.4";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1236,6 +1236,17 @@
         {label:"Recovery UI", file:"master-admin.html", includes:["id=\"sos2faRecoveryCode\"", "sos2fa.js?v=s3.1.3"]},
         {label:"Recovery client", file:"sos2fa.js", includes:["verifySos2faRecoveryCode"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.3\""]}
+      ]
+    },
+    {
+      version: "s3.1.4-floqmedia-house-card",
+      title: "Search ad splash shows the FloqMedia house card instead of a hardcoded venue",
+      checks: [
+        {label:"House card markup", file:"index.html", includes:["id=\"splashHouseCard\"", "tel:+18889335677", "mailto:sales@floqmedia.com", "patron-app.js?v=s3.1.4"]},
+        {label:"Venue header only on club actions", file:"patron-app.js", includes:["function applySplashHeader(", "{ venue: true }"]},
+        {label:"Zebbies demo venue-only", file:"dc-spot-ad-campaigns.js", includes:["venueOnly: true"]},
+        {label:"House labels translated", file:"floqr-i18n.js", includes:["\"ad.house.poweredBy\"", "\"ad.house.contactUs\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.4\""]}
       ]
     }
   ];

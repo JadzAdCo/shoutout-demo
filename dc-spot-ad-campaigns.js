@@ -173,6 +173,7 @@
     {
       id: "dc-zebbies-demo",
       clubLocationId: "zebbies-garden-washington-dc",
+      venueOnly: true,
       title: "Zebbies Garden",
       badge: "Demo venue · FLOQR",
       advertiser: "Zebbies Garden",
