@@ -4,6 +4,7 @@
  */
 "use strict";
 
+const crypto = require("crypto");
 const {workerAllowsNotifyChannel} = require("./scheduling-core");
 
 function maskPhoneLast5(phone = "") {
@@ -65,9 +66,40 @@ function formatDeliveryNotes({
   return failures.length ? `${delivered} — ${failures.join("; ")}` : delivered;
 }
 
+const RECOVERY_MIN_LENGTH = 12;
+const RECOVERY_MAX_ATTEMPTS = 5;
+const RECOVERY_WINDOW_MS = 60 * 60 * 1000;
+
+function recoveryWindowOpen(untilIso = "", nowMs = Date.now()) {
+  const untilMs = Date.parse(String(untilIso || ""));
+  return Number.isFinite(untilMs) && nowMs < untilMs;
+}
+
+function recoveryCodeMatches(secret = "", entered = "") {
+  const expected = String(secret || "").trim();
+  const actual = String(entered || "").trim();
+  if (expected.length < RECOVERY_MIN_LENGTH || !actual) return false;
+  const digest = value => crypto.createHash("sha256").update(value).digest();
+  return crypto.timingSafeEqual(digest(expected), digest(actual));
+}
+
+/** Returns the next throttle row, or null when the uid is locked out for this window. */
+function nextRecoveryAttempt(row = {}, nowMs = Date.now()) {
+  const start = Number(row.windowStartMs || 0);
+  const fresh = !start || nowMs - start >= RECOVERY_WINDOW_MS;
+  const count = fresh ? 0 : Number(row.count || 0);
+  if (count >= RECOVERY_MAX_ATTEMPTS) return null;
+  return {windowStartMs: fresh ? nowMs : start, count: count + 1};
+}
+
 module.exports = {
   maskPhoneLast5,
   maskEmail,
   resolveSos2faChannels,
-  formatDeliveryNotes
+  formatDeliveryNotes,
+  RECOVERY_MIN_LENGTH,
+  RECOVERY_MAX_ATTEMPTS,
+  recoveryWindowOpen,
+  recoveryCodeMatches,
+  nextRecoveryAttempt
 };

@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.2 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.3 (stable)
 
+- s3.1.3: SOS2FA break-glass recovery code for the listed Super Admin accounts while SendGrid and Twilio are unpaid. Master Admin → SOS2FA gate → "No code arriving? Use recovery code". The code lives only in Secret Manager (`SOS2FA_RECOVERY_CODE`, owner-set, 12+ characters), works until 2026-10-16 04:00 UTC, 5 attempts per hour, verified Google email required, every use audited in `entityManagementAuditLogs`. New callable `verifySos2faRecoveryCode`.
 - s3.1.2: Welcome sign-in buttons share one top-to-bottom blue → indigo → purple gradient, as if the stack were one block cut into buttons (`welcome-button-gradient.js` measures the visible stack). SMS and WhatsApp put their region on a second line, "(US & Canada Only)" and "(Worldwide)", with no wrapping. New chrome keys `app.smsOtpRegion` / `app.whatsappOtpRegion` in all 11 languages.
 - s3.1.1: My Profile → App language. Picking a different language previews the Save button in that language with English in parentheses, for example "Salva (Save)", plus a short hint ("Tocca Salva per impostare FloqR su Italiano." with the English line in parentheses). After Save the page switches and the button returns to one word. New `FLOQRI18n.tIn(lang, key)` and chrome key `lang.switchHint` in all 11 languages.
 

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.2";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.3";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1226,6 +1226,16 @@
         {label:"Two-line OTP labels", file:"index.html", includes:["data-i18n=\"app.smsOtpRegion\"", "data-i18n=\"app.whatsappOtpRegion\"", "welcome-button-gradient.js?v=s3.1.2"]},
         {label:"Region keys translated", file:"floqr-i18n.js", includes:["\"app.smsOtpRegion\"", "\"app.whatsappOtpRegion\""]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.2\""]}
+      ]
+    },
+    {
+      version: "s3.1.3-sos2fa-recovery-code",
+      title: "SOS2FA break-glass recovery code while email and SMS delivery are down",
+      checks: [
+        {label:"Recovery callable", file:"functions/sos2fa-functions.js", includes:["exports.verifySos2faRecoveryCode", "SOS2FA_RECOVERY_CODE", "sos2fa_recovery_verified"]},
+        {label:"Recovery UI", file:"master-admin.html", includes:["id=\"sos2faRecoveryCode\"", "sos2fa.js?v=s3.1.3"]},
+        {label:"Recovery client", file:"sos2fa.js", includes:["verifySos2faRecoveryCode"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.3\""]}
       ]
     }
   ];

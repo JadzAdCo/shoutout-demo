@@ -12,7 +12,14 @@ const {defineSecret} = require("firebase-functions/params");
 const {normalizeE164} = require("./messaging-core");
 const {sendTwilioSms} = require("./receipt-delivery");
 const {sendSystemMail} = require("./mail-log");
-const {resolveSos2faChannels, formatDeliveryNotes, maskEmail} = require("./sos2fa-core");
+const {
+  resolveSos2faChannels,
+  formatDeliveryNotes,
+  maskEmail,
+  recoveryWindowOpen,
+  recoveryCodeMatches,
+  nextRecoveryAttempt
+} = require("./sos2fa-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -22,6 +29,9 @@ const TWILIO_AUTH_TOKEN = defineSecret("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = defineSecret("TWILIO_FROM_NUMBER");
 const SOS2FA_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+const SOS2FA_RECOVERY_CODE = defineSecret("SOS2FA_RECOVERY_CODE");
+// Break-glass while SendGrid and Twilio are unpaid. Extending it is a deliberate code change.
+const RECOVERY_UNTIL_ISO = "2026-10-16T04:00:00Z";
 
 const SOS2FA_SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, SOS2FA_PEPPER, SENDGRID_API_KEY];
 const SOS2FA_FROM_EMAIL = "login@floqr.com";
@@ -29,6 +39,7 @@ const SESSION_TTL_MS = 60 * 60 * 1000;
 const CODE_TTL_MS = 10 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 const MAX_ATTEMPTS = 5;
+const WRONG_RECOVERY_MESSAGE = "Wrong recovery code.";
 
 /* Master Admin = Super Admin */
 const SUPER_ADMIN_EMAILS = String(
@@ -329,6 +340,51 @@ exports.verifySos2faCode = onCall({region: "us-central1", secrets: [SOS2FA_PEPPE
 
   await writeEntityManagementAudit({uid, email, action: "sos2fa_verified", detail: {sessionId}, sessionId});
 
+  return {ok: true, sessionId, expiresInSeconds: Math.floor(SESSION_TTL_MS / 1000)};
+});
+
+exports.verifySos2faRecoveryCode = onCall({region: "us-central1", secrets: [SOS2FA_RECOVERY_CODE], timeoutSeconds: 30, memory: "256MiB"}, async request => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Super Admin sign-in is required.");
+  const email = emailOf(request.auth);
+  const uid = request.auth.uid;
+  if (!SUPER_ADMIN_EMAILS.includes(email) || request.auth.token?.email_verified !== true) {
+    await writeEntityManagementAudit({uid, email, action: "sos2fa_recovery_denied", detail: {reason: "not_listed_super_admin"}});
+    throw new HttpsError("permission-denied", "The recovery code is limited to the listed Super Admin accounts.");
+  }
+  if (!recoveryWindowOpen(RECOVERY_UNTIL_ISO)) {
+    throw new HttpsError("failed-precondition", "The SOS2FA recovery code has expired. Use Request SOS2FA Code.");
+  }
+  const entered = text(request.data?.recoveryCode, 200);
+  if (!entered) throw new HttpsError("invalid-argument", "Enter the recovery code.");
+
+  const throttleRef = db.collection("sos2faRecoveryAttempts").doc(uid);
+  await db.runTransaction(async transaction => {
+    const snap = await transaction.get(throttleRef);
+    const next = nextRecoveryAttempt(snap.exists ? snap.data() || {} : {});
+    if (!next) throw new HttpsError("resource-exhausted", "Too many recovery attempts. Try again in an hour.");
+    transaction.set(throttleRef, {...next, uid, updatedAtMs: Date.now()});
+  });
+
+  let secret = "";
+  try {
+    secret = String(SOS2FA_RECOVERY_CODE.value() || "");
+  } catch (_) {}
+  if (!recoveryCodeMatches(secret, entered)) {
+    await writeEntityManagementAudit({uid, email, action: "sos2fa_recovery_failed", detail: {reason: secret ? "wrong_code" : "not_configured"}});
+    throw new HttpsError("permission-denied", WRONG_RECOVERY_MESSAGE);
+  }
+
+  const sessionId = crypto.randomBytes(24).toString("hex");
+  await db.collection("sos2faSessions").doc(sessionId).set({
+    uid,
+    email,
+    scope: "entityManagement",
+    via: "recovery-code",
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAtMs: Date.now() + SESSION_TTL_MS
+  });
+  await throttleRef.set({count: 0, windowStartMs: 0, uid, updatedAtMs: Date.now()});
+  await writeEntityManagementAudit({uid, email, action: "sos2fa_recovery_verified", detail: {sessionId, until: RECOVERY_UNTIL_ISO}, sessionId});
   return {ok: true, sessionId, expiresInSeconds: Math.floor(SESSION_TTL_MS / 1000)};
 });
 
