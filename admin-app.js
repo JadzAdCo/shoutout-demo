@@ -2194,7 +2194,7 @@
   }
 
   async function approve(id, item) {
-    const defaultMain = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
+    const defaultMain = `Use ShoutOut @ ${loc.locationName || locationId}`;
     const textCaps = adminShoutoutTextCaps(item);
     const packaged = window.SHOUTOUT_TEMPLATES?.[item.template || item.templateId] || {};
     const itemSport = String(item.sport || packaged.sport || "").toLowerCase();
@@ -2307,7 +2307,7 @@
       setText("adminStatus", "Please sign in first.");
       return;
     }
-    const main = String(loc.defaultMain || `USE ShoutOut @ ${loc.locationName || locationId}`).replace(/USE SHOUT\s*OUT/gi, "USE ShoutOut").replace(/USE SHOUTOUT/gi, "USE ShoutOut");
+    const main = `Use ShoutOut @ ${loc.locationName || locationId}`;
     const screenFormatId = loc.primaryDisplayScreenFormatId || "led-96x48";
     const textCaps = window.FLOQRTextLayout?.resolve?.(window.SHOUTOUT_TEMPLATES?.blackwhite || {id:"blackwhite", className:"classic-bw"}, screenFormatId) || {main:45,sub:20,lineCount:3,perLine:15,mainTextSizePercent:20.8,subTextSizePercent:7.8};
     const payload = {
@@ -2334,6 +2334,7 @@
       mediaFileName: "",
       mediaStoragePath: "",
       status: "default",
+      idleCta: true,
       source: "clubDefaultReset",
       resetByUid: user.uid || "",
       resetByEmail: safeUser(user),

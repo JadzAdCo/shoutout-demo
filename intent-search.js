@@ -52,6 +52,28 @@
       patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
     },
     {
+      id: "football-intro",
+      kind: "product",
+      label: "Zebbies All-Stars Football Intro",
+      blurb: "Four-player, 20-second stadium intro ShoutOut at Zebbies Garden DC, Heist Washington DC and Aurelia.",
+      href: `./?v=${APP_V}&start=search`,
+      action: "template",
+      templateId: "zebbiesFootballTeamIntro",
+      searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars", "team intro"],
+      patterns: [/football\s*intro/, /all\s*-?\s*stars?\b/, /zebbies\s*all/, /team\s*intro/]
+    },
+    {
+      id: "tengo-muchos-dolares",
+      kind: "product",
+      label: "Tengo muchos dólares",
+      blurb: "Heist Washington DC vault ShoutOut — the vault door blows open and $100 bills flood the LED.",
+      href: `./?v=${APP_V}&start=search`,
+      action: "template",
+      templateId: "heistVaultDollars",
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "money rain", "vault night"],
+      patterns: [/tengo\s*muchos?\s*d[oó]l+ares/, /money\s*rain/, /make\s*it\s*rain/, /vault\s*night/]
+    },
+    {
       id: "suprstr",
       kind: "product",
       label: "supRstar — go live / be a superstar",
@@ -1059,6 +1081,10 @@
         return;
       }
     }
+    if (top.action === "template" && typeof global.startTemplateShoutout === "function") {
+      global.startTemplateShoutout(top.templateId);
+      return;
+    }
     if (top.action === "shoutout" && typeof global.showShoutoutLanding === "function") {
       global.showShoutoutLanding();
       return;
@@ -1104,6 +1130,12 @@
       const card = event.target.closest("[data-intent]");
       if (!card) return;
       if (card.dataset.kind === "help") return;
+      const templateIntent = PRODUCT_INTENTS.find(intent => intent.id === card.dataset.intent && intent.action === "template");
+      if (templateIntent && typeof global.startTemplateShoutout === "function") {
+        event.preventDefault();
+        global.startTemplateShoutout(templateIntent.templateId);
+        return;
+      }
       if (card.dataset.intent === "shoutout" && typeof opts.onShoutout === "function") {
         event.preventDefault();
         opts.onShoutout();

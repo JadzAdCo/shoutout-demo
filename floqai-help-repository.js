@@ -1292,8 +1292,8 @@
     {
       id: "help-default-template",
       title: "Default Template",
-      body: "Free Traditional Black and White Classic. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
-      searchPhrases: ["default template", "black and white", "classic shoutout"],
+      body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Zebbies All-Stars Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
+      searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1306,6 +1306,36 @@
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       source: "help-repository-seed",
       page: "index.html#templates"
+    },
+    {
+      id: "help-football-intro",
+      title: "Zebbies All-Stars Football Intro",
+      body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” or “Zebbies All-Stars” in Search, pick one of those venues, then upload four photos you have permission to use.",
+      searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars template", "team intro", "four player intro"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-tengo-muchos-dolares",
+      title: "Tengo muchos dólares",
+      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then write up to 3 lines of 14 characters.",
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
+    },
+    {
+      id: "help-display-idle-default",
+      title: "Idle board: Use ShoutOut @ venue",
+      body: "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away.",
+      searchPhrases: ["use shoutout @", "idle board", "default display message", "board stuck on shoutout", "reset display"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
     },
     {
       id: "help-mingl-requests",

@@ -1103,7 +1103,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   sports: { id:'sports', name:'Sports Night', scope:'Shared', className:'fire', category:'Lifestyle', mediaMode:'No image/video', supportsMedia:false, Is96x48:1, Is64x48:1, Is64x32:1, tags:["sports","game night","team","championship","watch party"] },
   zebbiesFootballTeamIntro: {
     id:'zebbiesFootballTeamIntro',
-    name:'Football Intro',
+    name:'Zebbies All-Stars Football Intro',
+    searchAliases:['football intro','zebbies all star','zebbies all stars','zebbies allstar','zebbies allstars','all stars football','all star football'],
     scope:'Club',
     venueIds:['zebbies-garden-washington-dc','heist-washington-dc','temp-democlub-1'],
     className:'football-team-intro',
@@ -1125,7 +1126,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxMainCharacters:36,
     maxSubCharacters:36,
     description:'Football Intro (All-Stars): a 20-second American football stadium sequence at Zebbies Garden, Heist Washington DC, and Aurelia with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
-    tags:["football intro","all-stars","all stars","zebbies","heist","aurelia","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
+    tags:["football intro","zebbies all stars","zebbies all star","all-stars","all stars","all star","zebbies","heist","aurelia","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
   christine: {
     id:"christine",
@@ -1269,6 +1270,9 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
   heistVaultDollars: {
     id:'heistVaultDollars',
     name:'Tengo muchos dólares',
+    searchAliases:['tengo mucho dolares','tengo muchos dolares','tengo mucho dollars','tengo muchos dollars'],
+    moneyRain:true,
+    moneyRainDelaySeconds:40,
     scope:'Club',
     venueIds:['heist-washington-dc'],
     className:'classic-bw',
@@ -1297,13 +1301,15 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Vault Night background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: Vault Night background with floating transparent framed text (3×14). About 40 seconds in, the vault door blows open, $100 bills flood the board, then keep splashing behind the text. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
     tags:["heist","tengo muchos dolares","vault night","vault","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   /* Legacy alias — redirects old Courthouse / Red Lux links to Vault Night dollars template */
   heistRedLux: {
     id:'heistVaultDollars',
     name:'Tengo muchos dólares',
+    moneyRain:true,
+    moneyRainDelaySeconds:40,
     scope:'Club',
     venueIds:['heist-washington-dc'],
     className:'classic-bw',

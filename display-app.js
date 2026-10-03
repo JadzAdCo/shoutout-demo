@@ -687,6 +687,132 @@
     mount.innerHTML = "";
   }
 
+  const MONEY_RAIN_DELAY_SECONDS = 40;
+  const MONEY_BLAST_MS = 2600;
+  const MONEY_FLOOD_MS = 7400;
+  const MONEY_STREAM_AFTER_MS = 4200;
+  const MONEY_FLOOD_COLS = 8;
+  const MONEY_FLOOD_ROWS = 6;
+  const MONEY_STREAM_BILLS = 30;
+  const MONEY_SHARDS = 12;
+  const MONEY_SMOKE = 6;
+  let moneyRainKey = "";
+  let moneyRainTimers = [];
+
+  function moneyBillHtml(className, vars) {
+    const style = Object.entries(vars).map(([k, v]) => `--${k}:${v}`).join(";");
+    return `<span class="money-bill ${className}" style="${style}"><span class="money-bill-face"><b class="mb-n mb-tl">100</b><i class="mb-oval"></i><b class="mb-n mb-br">100</b></span></span>`;
+  }
+
+  function moneyFloodBills() {
+    const bills = [];
+    for (let row = 0; row < MONEY_FLOOD_ROWS; row += 1) {
+      for (let col = 0; col < MONEY_FLOOD_COLS; col += 1) {
+        const i = row * MONEY_FLOOD_COLS + col;
+        const x = (col + 0.5) * (100 / MONEY_FLOOD_COLS) + (((i * 29) % 9) - 4);
+        const y = (row + 0.5) * (100 / MONEY_FLOOD_ROWS) + (((i * 17) % 9) - 4);
+        bills.push(moneyBillHtml("money-bill-flood", {
+          dx: `${(x - 48).toFixed(1)}vw`,
+          dy: `${(y - 43).toFixed(1)}vh`,
+          rot: `${((i * 47) % 90) - 45}deg`,
+          spin: `${(i % 2 ? 1 : -1) * (360 + ((i * 61) % 360))}deg`,
+          fall: `${70 + ((i * 13) % 30)}vh`,
+          delay: `${(0.3 + (i * 0.017) % 0.45).toFixed(2)}s`,
+          scale: (1 + ((i * 11) % 30) / 100).toFixed(2)
+        }));
+      }
+    }
+    return bills.join("");
+  }
+
+  function moneyStreamBills() {
+    const bills = [];
+    for (let i = 0; i < MONEY_STREAM_BILLS; i += 1) {
+      const side = i % 2 ? 1 : -1;
+      bills.push(moneyBillHtml("money-bill-stream", {
+        dx: `${side * (8 + ((i * 37) % 40))}vw`,
+        peak: `${-(10 + ((i * 23) % 22))}vh`,
+        fall: `${60 + ((i * 17) % 25)}vh`,
+        rot: `${side * (180 + ((i * 53) % 360))}deg`,
+        delay: `${((i * 0.23) % 3.6).toFixed(2)}s`,
+        dur: `${(3.2 + ((i * 0.29) % 1.6)).toFixed(2)}s`,
+        scale: (0.85 + ((i * 13) % 45) / 100).toFixed(2)
+      }));
+    }
+    return bills.join("");
+  }
+
+  function moneyBlastParts() {
+    const shards = [];
+    for (let i = 0; i < MONEY_SHARDS; i += 1) {
+      const angle = (i / MONEY_SHARDS) * Math.PI * 2 + (i % 3) * 0.2;
+      const dist = 38 + ((i * 19) % 30);
+      shards.push(`<span class="money-shard" style="--sx:${(Math.cos(angle) * dist).toFixed(1)}vw;--sy:${(Math.sin(angle) * dist).toFixed(1)}vh;--srot:${(i % 2 ? 1 : -1) * (240 + i * 37)}deg;--ssize:${(1.6 + (i % 4) * 0.7).toFixed(1)}vw"></span>`);
+    }
+    const smoke = [];
+    for (let i = 0; i < MONEY_SMOKE; i += 1) {
+      smoke.push(`<span class="money-smoke" style="--mx:${((i - 2.5) * 9).toFixed(1)}vw;--my:${(((i * 7) % 11) - 5).toFixed(1)}vh;--mdelay:${(i * 0.08).toFixed(2)}s"></span>`);
+    }
+    return `<span class="money-vault-flash"></span><span class="money-vault-ring"></span><span class="money-vault-door"><i></i></span>${shards.join("")}${smoke.join("")}`;
+  }
+
+  function stopMoneyRain() {
+    moneyRainTimers.forEach(timer => window.clearTimeout(timer));
+    moneyRainTimers = [];
+    moneyRainKey = "";
+    byId("displayMoneyRain")?.remove();
+    byId("displayCanvas")?.classList.remove("money-rain-active", "money-shake");
+  }
+
+  function moneyRainStartMs(data = {}) {
+    const approved = Number(data.approvedAt?.toMillis?.() || 0);
+    const now = Date.now();
+    return approved && approved <= now && now - approved < DEFAULT_LIVE_SHOUTOUT_SECONDS * 1000 ? approved : now;
+  }
+
+  function scheduleMoneyRain(canvas, layer, startMs, delaySeconds) {
+    const at = (ms, fn) => moneyRainTimers.push(window.setTimeout(fn, Math.max(0, ms)));
+    const elapsed = Date.now() - startMs;
+    const blastAt = delaySeconds * 1000 - elapsed;
+    if (blastAt + MONEY_STREAM_AFTER_MS <= 0) {
+      layer.classList.add("is-stream");
+      return;
+    }
+    at(blastAt, () => {
+      layer.classList.add("is-blast", "is-flood");
+      canvas.classList.add("money-shake");
+    });
+    at(blastAt + 700, () => canvas.classList.remove("money-shake"));
+    at(blastAt + MONEY_BLAST_MS, () => layer.classList.remove("is-blast"));
+    at(blastAt + MONEY_STREAM_AFTER_MS, () => layer.classList.add("is-stream"));
+    at(blastAt + MONEY_FLOOD_MS, () => layer.classList.remove("is-flood"));
+  }
+
+  function syncMoneyRain(canvas, enabled, data = {}, template = {}) {
+    if (!enabled || !canvas) {
+      stopMoneyRain();
+      return;
+    }
+    const key = livePlaybackKey(data);
+    if (byId("displayMoneyRain") && key === moneyRainKey) {
+      canvas.classList.add("money-rain-active");
+      return;
+    }
+    stopMoneyRain();
+    moneyRainKey = key;
+    const layer = document.createElement("div");
+    layer.id = "displayMoneyRain";
+    layer.className = "money-rain";
+    layer.setAttribute("aria-hidden", "true");
+    layer.innerHTML = `<div class="money-blast">${moneyBlastParts()}</div><div class="money-flood">${moneyFloodBills()}</div><div class="money-stream"><span class="money-rain-glow"></span>${moneyStreamBills()}</div>`;
+    const bg = byId("displayBackground");
+    if (bg && bg.parentNode === canvas) canvas.insertBefore(layer, bg.nextSibling);
+    else canvas.appendChild(layer);
+    canvas.classList.add("money-rain-active");
+    const delay = Number(template.moneyRainDelaySeconds);
+    scheduleMoneyRain(canvas, layer, moneyRainStartMs(data), Number.isFinite(delay) && delay >= 0 ? delay : MONEY_RAIN_DELAY_SECONDS);
+  }
+
   function resetBackgroundLayer(bgEl) {
     if (!bgEl) return;
     bgEl.className = "display-background";
@@ -1046,9 +1172,6 @@
       // display2 / Xibo SupRStar board idle CTA
       return `Awaiting live Feed. Be a SupRstar @ ${clubName}`;
     }
-    const configured = String(location.defaultMain || "").trim();
-    if (configured && !/^USE\s*SHOUT\s*OUT\b/i.test(configured)) return configured;
-    // Typical club idle board: Use ShoutOut @ Clubname
     return `Use ShoutOut @ ${clubName}`;
   }
 
@@ -1171,6 +1294,7 @@
     hideHeistBrandSlide();
     hideJerseyMount();
     byId("displayNflShoutPanel")?.remove();
+    stopMoneyRain();
     const canvas = byId("displayCanvas");
     if (canvas) {
       canvas.className = "display-canvas";
@@ -1555,6 +1679,7 @@
     canvas.classList.toggle("has-background-layer", hasBackgroundLayer);
     const frameUrl = resolveFrameOverlayUrl(t, data);
     const hasFrameOverlay = applyFrameOverlay(byId("displayFrameOverlay"), isTextOverlay ? frameUrl : "", t);
+    syncMoneyRain(canvas, !isIdleCta && (t.moneyRain === true || templateId === "heistVaultDollars" || rawTemplateId === "heistRedLux"), data, t);
     canvas.classList.toggle("frame-overlay-template", hasFrameOverlay);
     canvas.style.backgroundImage = "";
     canvas.style.background = "";
@@ -2146,12 +2271,11 @@
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
       let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
-      if (DISPLAY_BOARD === "secondary") {
-        const status = String(payload.status || "").toLowerCase();
-        const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
-        if (!doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage) || isLegacyShoutOutIdleText(payload.mainText)) {
-          payload = defaultClubDisplayPayload();
-        }
+      const status = String(payload.status || "").toLowerCase();
+      const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
+      const isIdleDoc = !doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage);
+      if (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText))) {
+        payload = defaultClubDisplayPayload();
       }
       if (!payload.screenFormatId) payload.screenFormatId = boardAssignedFormatId(loc);
       renderTimedLiveContent(payload);

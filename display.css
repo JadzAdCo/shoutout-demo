@@ -726,6 +726,75 @@ body.display.display-booting .display-canvas:not(.has-background-layer){
   background-repeat:no-repeat!important;
 }
 
+/* Tengo muchos dólares: $100 bills burst out of the vault door (48% / 43% on a cover-fit board) */
+/* Timeline (display-app.js): calm until moneyRainDelaySeconds (40s) → .is-blast door explosion + .is-flood bills fill the board → .is-stream smaller splash. Verbiage stays on the top layer. */
+.money-rain{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;perspective:60vw}
+.money-blast,.money-flood,.money-stream{position:absolute;inset:0;display:none}
+.money-rain.is-blast .money-blast,.money-rain.is-flood .money-flood,.money-rain.is-stream .money-stream{display:block}
+.display-canvas.money-rain-active .display-text-overlay{z-index:5}
+.display-canvas.money-rain-active #displayMain,
+.display-canvas.money-rain-active #displaySub,
+.display-canvas.money-rain-active .classic-board-lines b{text-shadow:0 0 .25vw #000,0 0 .6vw #000,0 .25vw 1.4vw rgba(0,0,0,.95),0 0 2.4vw rgba(0,0,0,.8)!important}
+.display-canvas.money-shake .display-background,
+.display-canvas.money-shake .money-rain{animation:moneyShake .7s linear both!important}
+.display-canvas.heist-brand-slide-active .money-rain{opacity:0;transition:opacity .35s ease}
+
+.money-vault-flash{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 48% 43%,#fffef2 0,#ffe9a0 14%,rgba(255,190,70,.75) 32%,rgba(255,140,30,.25) 55%,transparent 75%);animation:moneyFlash 1.3s ease-out both}
+.money-vault-ring{position:absolute;left:48%;top:43%;width:2vw;height:2vw;border-radius:50%;border:.9vw solid rgba(255,236,170,.95);box-shadow:0 0 3vw rgba(255,210,110,.9);transform:translate(-50%,-50%);animation:moneyRing 1s cubic-bezier(.1,.7,.3,1) both}
+.money-vault-door{position:absolute;left:48%;top:43%;width:24vw;height:24vw;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 38% 34%,#e8edf2 0,#9aa4ae 22%,#59626c 48%,#2b3138 72%,#16191d 100%);border:1.1vw solid #3a4149;box-shadow:inset 0 0 2vw rgba(0,0,0,.8),0 0 3vw rgba(255,190,90,.75);animation:moneyDoorBlow 1.15s cubic-bezier(.5,0,.75,.4) both}
+.money-vault-door i{position:absolute;left:50%;top:50%;width:62%;height:62%;transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(from 0deg,#c9d0d6 0 4%,transparent 4% 21%,#c9d0d6 21% 25%,transparent 25% 46%,#c9d0d6 46% 50%,transparent 50% 71%,#c9d0d6 71% 75%,transparent 75%);border:.8vw solid #aab3bc}
+.money-shard{position:absolute;left:48%;top:43%;width:var(--ssize);height:calc(var(--ssize) * .7);background:linear-gradient(135deg,#c3cbd2,#4a525b 60%,#1d2126);clip-path:polygon(0 20%,60% 0,100% 45%,70% 100%,15% 80%);opacity:0;animation:moneyShard 1.25s cubic-bezier(.15,.75,.35,1) both}
+.money-smoke{position:absolute;left:calc(48% + var(--mx));top:calc(43% + var(--my));width:8vw;height:8vw;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(190,180,165,.75),rgba(110,100,90,.45) 45%,transparent 70%);opacity:0;animation:moneySmoke 2.5s ease-out var(--mdelay,0s) both}
+
+.money-rain-glow{position:absolute;left:48%;top:43%;width:38vw;height:38vw;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,222,140,.45),rgba(60,200,90,.22) 45%,transparent 70%);animation:moneyVaultGlow 2.2s ease-in-out infinite alternate}
+.money-bill{--bw:15vw;position:absolute;left:48%;top:43%;width:var(--bw);height:calc(var(--bw) * .43);opacity:0;transform:translate(-50%,-50%) scale(.1);will-change:transform,opacity}
+.money-bill-stream{animation:moneyStreamBurst var(--dur,4s) cubic-bezier(.22,.7,.35,1) var(--delay,0s) infinite}
+.money-bill-flood{--bw:25vw;animation:moneyFloodBurst 7s cubic-bezier(.2,.75,.3,1) var(--delay,0s) both}
+.money-bill-face{position:absolute;inset:0;display:block;border-radius:calc(var(--bw) * .03);background:linear-gradient(115deg,#4fd46a 0%,#1f9a44 28%,#7dea7a 50%,#178a3a 74%,#45c85e 100%);border:calc(var(--bw) * .025) solid #0b5a25;box-shadow:0 calc(var(--bw) * .04) calc(var(--bw) * .09) rgba(0,0,0,.6),inset 0 0 calc(var(--bw) * .06) rgba(5,60,25,.65);animation:moneyFlutter .55s ease-in-out infinite alternate;transform-origin:center}
+.money-bill-flood .money-bill-face{animation-duration:.8s}
+.money-bill .mb-oval{position:absolute;left:50%;top:50%;width:calc(var(--bw) * .26);height:calc(var(--bw) * .33);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#d9f7c9 0 30%,#2f8a43 31% 38%,#9fe08f 39% 100%);border:calc(var(--bw) * .014) solid #0e6a2c}
+.money-bill .mb-n{position:absolute;font:900 calc(var(--bw) * .14)/1 "Arial Black",Impact,sans-serif;color:#063d18;letter-spacing:-.02em}
+.money-bill .mb-tl{left:calc(var(--bw) * .04);top:calc(var(--bw) * .03)}
+.money-bill .mb-br{right:calc(var(--bw) * .04);bottom:calc(var(--bw) * .03)}
+
+@keyframes moneyShake{
+  0%,100%{transform:translate(0,0)}
+  10%{transform:translate(-1.4vw,.9vh)}
+  25%{transform:translate(1.2vw,-1.1vh)}
+  40%{transform:translate(-.9vw,.7vh)}
+  60%{transform:translate(.6vw,-.5vh)}
+  80%{transform:translate(-.3vw,.3vh)}
+}
+@keyframes moneyFlash{0%{opacity:0}8%{opacity:1}35%{opacity:.75}100%{opacity:0}}
+@keyframes moneyRing{0%{opacity:1;width:2vw;height:2vw}100%{opacity:0;width:170vw;height:170vw;border-width:.2vw}}
+@keyframes moneyDoorBlow{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  14%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(-4deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) translateY(-14vh) scale(4.2) rotate(48deg)}
+}
+@keyframes moneyShard{
+  0%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(.6)}
+  80%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) translate(var(--sx),var(--sy)) rotate(var(--srot)) scale(1.3)}
+}
+@keyframes moneySmoke{0%{opacity:0;width:6vw;height:6vw}15%{opacity:.85}100%{opacity:0;width:46vw;height:46vw}}
+@keyframes moneyStreamBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) translate(0,0) rotate(0deg) scale(.1)}
+  6%{opacity:1}
+  32%{transform:translate(-50%,-50%) translate(calc(var(--dx) * .55),var(--peak)) rotate(calc(var(--rot) * .45)) scale(var(--scale))}
+  85%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) translate(var(--dx),var(--fall)) rotate(var(--rot)) scale(var(--scale))}
+}
+@keyframes moneyFloodBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) translate(0,0) rotate(0deg) scale(.15)}
+  3%{opacity:1}
+  14%{transform:translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(var(--scale))}
+  60%{opacity:1;transform:translate(-50%,-50%) translate(var(--dx),calc(var(--dy) + 2vh)) rotate(calc(var(--rot) + 8deg)) scale(var(--scale))}
+  100%{opacity:0;transform:translate(-50%,-50%) translate(calc(var(--dx) * 1.15),calc(var(--dy) + var(--fall))) rotate(var(--spin)) scale(var(--scale))}
+}
+@keyframes moneyFlutter{from{transform:rotateX(0deg) skewX(0deg)}to{transform:rotateX(62deg) skewX(-8deg)}}
+@keyframes moneyVaultGlow{from{opacity:.35;transform:translate(-50%,-50%) scale(.9)}to{opacity:.85;transform:translate(-50%,-50%) scale(1.08)}}
+
 /* Heist closing brand slide: logo left, HEIST DC right (after 20s message) */
 .heist-brand-slide{
   position:absolute;

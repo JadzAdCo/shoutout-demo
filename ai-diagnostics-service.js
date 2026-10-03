@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.6";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.7";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -842,7 +842,7 @@
       title:"Football Intro animation + FloqR handles + Refined Discovery Crawl",
       checks:[
         {label:"Current diagnostics package marker", file:"ai-diagnostics-service.js", includes:["CURRENT_DIAGNOSTICS_PACKAGE_VERSION = \"v29.09.6\""]},
-        {label:"Football Intro template rename", file:"shared-data.js", includes:["name:'Football Intro'", "zebbiesFootballTeamIntro"]},
+        {label:"Football Intro template rename", file:"shared-data.js", includes:["name:'Zebbies All-Stars Football Intro'", "zebbiesFootballTeamIntro"]},
         {label:"64x32 reduced layout enabled", file:"shared-data.js", includes:["skipFinaleLineup:true"]},
         {label:"Per-player identity + portrait motion UI", file:"index.html", includes:["footballTeamIdentity1", "footballAiTreatment", "footballColorTheme"]},
         {label:"5-second portrait motion path", file:"patron-app.js", includes:["football-portrait-motion", "FOOTBALL_AI_TIMEOUT_MS", "aiPortraitMotion"]},
@@ -1269,6 +1269,19 @@
         {label:"Landing skipped", file:"patron-app.js", includes:["function showShoutoutLanding(", "openCategory(\"shoutout\");"]},
         {label:"Splash logo unframed, links plain", file:"styles.css", includes:["#splashFloqrLogoWrap{border:0", ".splash-house-list a{color:#fff;text-decoration:none}"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.6\""]}
+      ]
+    },
+    {
+      version: "s3.1.7-template-discovery-idle",
+      title: "Venue-exclusive templates discoverable; Tengo muchos dólares money rain; idle board always Use ShoutOut @ club",
+      checks: [
+        {label:"Exclusive section in picker", file:"patron-app.js", includes:["template-section-exclusive", "function startTemplateShoutout("]},
+        {label:"Template names from Search", file:"patron-app.js", includes:["function exclusiveTemplateForQuery("]},
+        {label:"FloqAi template intents", file:"intent-search.js", includes:["id: \"football-intro\"", "id: \"tengo-muchos-dolares\""]},
+        {label:"Money rain on display", file:"display-app.js", includes:["function syncMoneyRain(", "MONEY_RAIN_BILLS"]},
+        {label:"Idle doc renders club default", file:"display-app.js", includes:["const isIdleDoc ="]},
+        {label:"Server reset to Use ShoutOut @", file:"functions/commerce-functions.js", includes:["function idleLiveContentAfterExpiry("]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.7\""]}
       ]
     }
   ];
