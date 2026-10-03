@@ -1328,6 +1328,16 @@
       page: "index.html#templates"
     },
     {
+      id: "help-club-template-repository",
+      title: "Your club's templates",
+      body: "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo.",
+      searchPhrases: ["club templates", "exclusive templates", "assign template", "remove template", "tengo muchos dolares", "heist templates"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
       id: "help-display-idle-default",
       title: "Idle board: Use ShoutOut @ venue",
       body: "When no ShoutOut is playing, Display 1 shows “Use ShoutOut @” followed by your venue name. Each approved ShoutOut plays for 10 minutes, then the board returns to that message on its own. Reset display to default in Club Admin does the same right away.",

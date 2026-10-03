@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.7";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.8";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1269,6 +1269,16 @@
         {label:"Landing skipped", file:"patron-app.js", includes:["function showShoutoutLanding(", "openCategory(\"shoutout\");"]},
         {label:"Splash logo unframed, links plain", file:"styles.css", includes:["#splashFloqrLogoWrap{border:0", ".splash-house-list a{color:#fff;text-decoration:none}"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.6\""]}
+      ]
+    },
+    {
+      version: "s3.1.8-heist-template-availability",
+      title: "Heist templates findable in Club Admin and patron Search; typo-tolerant template match",
+      checks: [
+        {label:"Shared template matcher", file:"shared-data.js", includes:["window.FLOQRTemplateMatch", "phraseMatches"]},
+        {label:"Club Admin exclusive-first repository", file:"admin-app.js", includes:["function templateMatchesQuery(", "template-exclusive-tag"]},
+        {label:"Patron Search fuzzy template route", file:"patron-app.js", includes:["matcher.phraseMatches(q, phrase)"]},
+        {label:"Club template help", file:"floqai-help-repository.js", includes:["help-club-template-repository"]}
       ]
     },
     {

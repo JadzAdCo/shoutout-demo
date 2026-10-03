@@ -14,6 +14,15 @@ Resume: `@templates$` / `$money-rain$`.
 - Search box (`submitCategoryVenueQuery`) and FloqAi intents (`action:"template"`) route template names through `exclusiveTemplateForQuery` (name + `searchAliases`, accent/punctuation-insensitive, ≥ 4 chars) → `startTemplateShoutout`: one venue → ad splash → composer; several → venue grid filtered to `venueIds`; the name is pre-filled into `#templateSearch`.
 - Zebbies All-Stars Football Intro: `zebbies-garden-washington-dc`, `heist-washington-dc`, `temp-democlub-1` (Aurelia). Backend checkout set must match.
 
+## Club Admin template repository + forgiving match (s3.1.8)
+
+- Heist was already assigned every Heist template (live `clubLocations/heist-washington-dc.templates` + packaged `templates` + `venueIds`; checkout `HEIST_ART_TEMPLATE_IDS`). The s3.1.8 bug was **findability**, not assignment.
+- `window.FLOQRTemplateMatch` (`shared-data.js`): `normalize` (NFD, accent strip, lowercase), `phraseMatches(query, phrase)` (every phrase word must match; plural `s` stems; **one** typo allowed only when the phrase has ≥ 2 words of ≥ 4 chars, so "looked up" never routes to "Locked Up"), `textMatches(query, text)` (admin filter: each query word is a substring or within edit distance 1, 2 for ≥ 7 chars), `templateText(template)`.
+- Used by patron `exclusiveTemplateForQuery`, Club Admin `templateMatchesQuery`. FloqAi tengo intent regex accepts `te\w{2,3} mucho(s) d[oó]lar`.
+- `renderClubTemplateBackgrounds` dedupes by `template.id` (alias `heistRedLux` shares `id:"heistVaultDollars"`), orders club-exclusive (`venueIds` includes the club) → assigned → rest, and tags exclusives with **Exclusive at {venue}**.
+- Seed script `functions/scripts/onboard-dc-venues.js` assigns `heistVaultDollars` (not the alias).
+- Admin help id `help-club-template-repository` (venueAdmin, all 11 langs).
+
 ## Tengo muchos dólares (`heistVaultDollars`, legacy `heistRedLux`)
 
 Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` `syncMoneyRain` builds `#displayMoneyRain` right after `#displayBackground` (z-index 1).
@@ -38,4 +47,4 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 - `expireLiveShoutouts` (every minute) overwrites expired `liveContent` with `idleLiveContentAfterExpiry` (blackwhite, `Use ShoutOut @ {club}`, `idleCta:true`, `source:"automaticTenMinuteReset"`). No Heist exception. The helper is **not** exported (index.js spreads module exports into deployed functions).
 - Club Admin approve and **Reset display to default** write the same text + `idleCta:true`.
 
-Tests: `functions/template-discovery-idle.test.js`.
+Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`.
