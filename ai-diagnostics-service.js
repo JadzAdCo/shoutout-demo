@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.8";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.9";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1269,6 +1269,15 @@
         {label:"Landing skipped", file:"patron-app.js", includes:["function showShoutoutLanding(", "openCategory(\"shoutout\");"]},
         {label:"Splash logo unframed, links plain", file:"styles.css", includes:["#splashFloqrLogoWrap{border:0", ".splash-house-list a{color:#fff;text-decoration:none}"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.6\""]}
+      ]
+    },
+    {
+      version: "s3.1.9-approve-after-idle-reset",
+      title: "Approved ShoutOut shows even when the board was just reset to Use ShoutOut @",
+      checks: [
+        {label:"Board ignores stale idle flag on approved", file:"display-app.js", includes:["function isIdlePayload(", "isIdlePayload(payload)"]},
+        {label:"Club Admin approve clears idle flag", file:"admin-app.js", includes:["source: \"clubAdminApproval\""]},
+        {label:"SMS/WhatsApp approve clears idle flag", file:"functions/messaging-functions.js", includes:["source: \"messagingApproval\""]}
       ]
     },
     {
