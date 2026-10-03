@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.8 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.9 (stable)
+
+- s3.1.9: Fix — a ShoutOut approved after a board's 10-minute reset stayed hidden behind "Use ShoutOut @ {club}". The board now always plays an approved ShoutOut, and Club Admin / SMS / WhatsApp approval clears the leftover idle marker.
 
 - s3.1.8: Heist templates are easy to find for Club Admins and patrons. Club Admin → Customize a Template lists the club's own templates first, tagged "Exclusive at Heist", with one card per template (no duplicate Tengo card). Template search in Club Admin, the patron picker, Search and FloqAi now forgives missing accents, a missing plural "s" and a small typo, so "Tendo mucho dolares" finds Tengo muchos dólares. Heist keeps every Heist template assigned (Vault Night, Police Car, Interrogation, Tengo muchos dólares, Zebbies All-Stars Football Intro).
 

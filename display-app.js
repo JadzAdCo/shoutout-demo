@@ -1179,6 +1179,13 @@
     return /^USE\s*SHOUT\s*OUT\b/i.test(String(value || "").trim());
   }
 
+  // An approve merges onto the idle doc, so a stale idleCta must never hide an approved ShoutOut.
+  function isIdlePayload(data = {}) {
+    const status = String(data.status || "").toLowerCase();
+    if (status === "approved" || status === "live" || status === "preview") return false;
+    return !!data.idleCta || status === "default";
+  }
+
   function isSuprstarIdlePayload(data = {}) {
     if (DISPLAY_BOARD !== "secondary") return false;
     if (isUrlPreviewMode() && (urlSearchParams().has("template") || urlSearchParams().has("main"))) return false;
@@ -1609,7 +1616,7 @@
     }
     const isClassicBlackWhite = templateId === "blackwhite" || t.id === "blackwhite";
     const isClassicBoard = isClassicBlackWhite || t.className === "classic-bw" || t.identityRail === true;
-    const isIdleCta = !!(data.idleCta || String(data.status || "").toLowerCase() === "default");
+    const isIdleCta = isIdlePayload(data);
     const isSoccerJersey = isSoccerJerseyTemplate(t, templateId) || isSoccerJerseyTemplate(t, rawTemplateId);
     const isTextOverlay = isTextOverlayTemplate(t, templateId);
     const isFootballTeamIntro = templateId === "zebbiesFootballTeamIntro" || t.layout === "football-team-intro";
@@ -1694,7 +1701,7 @@
       ? String(data.mainText || "")
       : String((!data.mainText || staleZebbiesDefault(data.mainText)) ? locationDefaultMain : data.mainText);
     // Idle classic board keeps "Use ShoutOut @ Clubname"; do not strip intentional CTA.
-    const mainSource = (data.idleCta || data.status === "default") && !isSoccerJersey && !isTextOverlay
+    const mainSource = isIdleCta && !isSoccerJersey && !isTextOverlay
       ? (rawMain || locationDefaultMain)
       : rawMain;
     // s3.0.44: also trust template-id pattern so stale Firestore records (missing nflDualLayout field)
@@ -2273,7 +2280,7 @@
       let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
       const status = String(payload.status || "").toLowerCase();
       const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
-      const isIdleDoc = !doc.exists || status === "default" || payload.idleCta || (!status && !hasLiveMessage);
+      const isIdleDoc = !doc.exists || isIdlePayload(payload) || (!status && !hasLiveMessage);
       if (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText))) {
         payload = defaultClubDisplayPayload();
       }

@@ -73,7 +73,7 @@ test("Tengo muchos dólares: calm start, vault blast at 40s, full flood, then sm
 test("every club idles on Use ShoutOut @ {club} after a ShoutOut ends", () => {
   const display = read("display-app.js");
   assert.match(display, /return `Use ShoutOut @ \$\{clubName\}`;/);
-  assert.match(display, /const isIdleDoc = !doc\.exists \|\| status === "default" \|\| payload\.idleCta/);
+  assert.match(display, /const isIdleDoc = !doc\.exists \|\| isIdlePayload\(payload\)/);
   const backend = read("functions/commerce-functions.js");
   assert.match(backend, /function idleLiveContentAfterExpiry\(/);
   assert.doesNotMatch(backend, /exports\.idleLiveContentAfterExpiry/);
@@ -84,4 +84,25 @@ test("every club idles on Use ShoutOut @ {club} after a ShoutOut ends", () => {
   const admin = read("admin-app.js");
   assert.match(admin, /const defaultMain = `Use ShoutOut @ \$\{loc\.locationName \|\| locationId\}`;/);
   assert.match(admin, /const main = `Use ShoutOut @ \$\{loc\.locationName \|\| locationId\}`;/);
+});
+
+test("approving after a 10-minute reset shows the new ShoutOut, not the idle board", () => {
+  const display = read("display-app.js");
+  const start = display.indexOf("function isIdlePayload(");
+  const body = display.slice(start, display.indexOf("\n  }\n", start) + 4);
+  const isIdlePayload = new Function(`${body}; return isIdlePayload;`)();
+  const leftoverIdle = {idleCta: true, source: "automaticTenMinuteReset"};
+  assert.equal(isIdlePayload({...leftoverIdle, status: "approved", template: "heistVaultDollars", mainText: "@Ale"}), false);
+  assert.equal(isIdlePayload({...leftoverIdle, status: "default"}), true);
+  assert.equal(isIdlePayload({status: "default"}), true);
+  assert.equal(isIdlePayload({idleCta: true}), true);
+  assert.match(display, /const isIdleCta = isIdlePayload\(data\);/);
+  assert.match(display, /const mainSource = isIdleCta && !isSoccerJersey/);
+
+  const admin = read("admin-app.js");
+  const approve = admin.slice(admin.indexOf("async function approve("), admin.indexOf("}, {merge:true});", admin.indexOf("async function approve(")));
+  assert.match(approve, /idleCta: false,/);
+  assert.match(approve, /expiredAt: firebase\.firestore\.FieldValue\.delete\(\),/);
+  const messaging = read("functions/messaging-functions.js");
+  assert.match(messaging, /status: "approved",\r?\n    idleCta: false,\r?\n    source: "messagingApproval",\r?\n    expiredAt: admin\.firestore\.FieldValue\.delete\(\),/);
 });

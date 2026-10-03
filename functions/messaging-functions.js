@@ -413,12 +413,16 @@ async function applyInboundDecision(clubLocationId, action, shoutoutHint = "") {
     mediaType: item.mediaType || "",
     screenFormatId: item.screenFormatId || "led-96x48",
     status: "approved",
+    idleCta: false,
+    source: "messagingApproval",
+    expiredAt: admin.firestore.FieldValue.delete(),
     displayDurationSeconds: 600,
     submittedBy: item.submittedBy || "unknown",
     approvedBy: "messaging-inbound",
     referenceNumber: item.referenceNumber || "",
     shoutoutId: doc.id,
-    approvedAt: admin.firestore.FieldValue.serverTimestamp()
+    approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge: true});
   // Keep shoutout for patron Completed history (do not delete).
   await doc.ref.set({

@@ -45,6 +45,7 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 - Display 1 idle text is always `Use ShoutOut @ {club}` (`clubDefaultMainText`; configured `defaultMain` is ignored on primary). Display 2 keeps the SupRstar idle CTA.
 - Display treats any doc with `status:"default"`, `idleCta`, missing doc, or no status + no text/media as idle → `defaultClubDisplayPayload()`.
 - `expireLiveShoutouts` (every minute) overwrites expired `liveContent` with `idleLiveContentAfterExpiry` (blackwhite, `Use ShoutOut @ {club}`, `idleCta:true`, `source:"automaticTenMinuteReset"`). No Heist exception. The helper is **not** exported (index.js spreads module exports into deployed functions).
-- Club Admin approve and **Reset display to default** write the same text + `idleCta:true`.
+- **Reset display to default** writes the same text + `idleCta:true`.
+- **s3.1.9 bug + fix:** approve merges onto the idle doc, so `idleCta:true` / `source:automaticTenMinuteReset` survived and the board hid the approved ShoutOut (Heist SO-0752287). Board uses `isIdlePayload` (status `approved`/`live`/`preview` is never idle). Club Admin approve and `messagingInboundWebhook` approve write `idleCta:false`, a `source`, and delete `expiredAt`.
 
 Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`.

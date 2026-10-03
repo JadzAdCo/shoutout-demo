@@ -2294,13 +2294,17 @@
       backgroundGradient: item.backgroundGradient || "",
       backgroundStoragePath: item.backgroundStoragePath || "",
       status: "approved",
+      idleCta: false,
+      source: "clubAdminApproval",
+      expiredAt: firebase.firestore.FieldValue.delete(),
       displayDurationSeconds: 600,
       defaultMain,
       submittedBy: item.submittedBy || "unknown",
       approvedBy: safeUser(auth.currentUser),
       referenceNumber: item.referenceNumber || "",
       shoutoutId: id,
-      approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
 
     await createStatusNotification(item,"approved","ShoutOut Approved");
