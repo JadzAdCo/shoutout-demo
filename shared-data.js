@@ -105,7 +105,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     reservationsUrl:"https://www.sevenrooms.com/events/heistdc",
     activityStatus:"Active Dupont Circle nightclub / lounge",
     activityDates:["Thursday late night","Friday HEIST","Saturday HEIST"],
-    templates:["heistVaultNight","heistPoliceCar","heistInterrogation","heistVaultDollars","soccerJersey"],
+    templates:["heistVaultNight","heistPoliceCar","heistInterrogation","heistVaultDollars","soccerJersey","zebbiesFootballTeamIntro"],
     soccerJerseyTeamIds:["soccerCameroon","soccerRussia","soccerUkraine"],
     restrictTemplatesToLocationSet:true,
     displayScreenFormatIds:["led-96x48","led-64x32"],
@@ -1105,7 +1105,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     id:'zebbiesFootballTeamIntro',
     name:'Football Intro',
     scope:'Club',
-    venueIds:['zebbies-garden-washington-dc'],
+    venueIds:['zebbies-garden-washington-dc','heist-washington-dc','temp-democlub-1'],
     className:'football-team-intro',
     category:'Sports',
     mediaMode:'4 patron photos + 20-second animation',
@@ -1124,8 +1124,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     defaultSub:'GAME NIGHT LINEUP',
     maxMainCharacters:36,
     maxSubCharacters:36,
-    description:'Football Intro: a Zebbies-only, 20-second American football stadium sequence with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
-    tags:["football intro","zebbies","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
+    description:'Football Intro (All-Stars): a 20-second American football stadium sequence at Zebbies Garden, Heist Washington DC, and Aurelia with four authorized patron photos. Each player gets a cinematic reveal; large displays finish with the full lineup, while 64×32 panels use a reduced layout. Choose per-player identity (display name, Instagram, or FloqR / Mingl handle), color themes, and optional portrait motion (≤5 seconds, originals as fallback).',
+    tags:["football intro","all-stars","all stars","zebbies","heist","aurelia","american football","football","team intro","4 photos","four players","20 seconds","stadium","64x32","reduced layout","color themes","portrait motion","per-player identity","game night","collaboration","$30","background editable"]
   },
   christine: {
     id:"christine",

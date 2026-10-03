@@ -1,0 +1,25 @@
+---
+description: Zebbies All-Stars Football Intro venue list (Zebbies, Heist DC, Aurelia) — s3.1.5
+alwaysApply: false
+---
+# Football Intro (All-Stars) venues (s3.1.5)
+
+Resume: `@all-stars$`.
+
+Template id stays `zebbiesFootballTeamIntro` (old orders, rules, and diagnostics key on it). It is offered at:
+
+| Venue | Location id |
+|---|---|
+| Zebbies Garden DC | `zebbies-garden-washington-dc` |
+| Heist Washington DC | `heist-washington-dc` (also in its restricted `templates` list) |
+| Aurelia (QA demo club) | `temp-democlub-1` |
+
+Three places must agree when the list changes:
+
+1. `shared-data.js` → `SHOUTOUT_TEMPLATES.zebbiesFootballTeamIntro.venueIds` (composer offering; `patron-app.js` `footballIntroAllowedHere()` reads it).
+2. `functions/commerce-functions.js` → `FOOTBALL_TEAM_INTRO_LOCATION_IDS` (server gate in `normalizeCheckoutPayload` + `describeOrder`; order keeps the requested club). Redeploy `createFloqrCheckoutSession`.
+3. Restricted venues (`restrictTemplatesToLocationSet`) also list the id in their `templates`.
+
+Headline default and finale label are `{BRAND} ALL-STARS` from the venue `brandName` (composer `footballIntroDefaultMain()`, board `allStarsLabel` in `display-app.js`).
+
+Tests: `functions/football-intro-venues.test.js`.

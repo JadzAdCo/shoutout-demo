@@ -121,6 +121,15 @@
   function isFootballTeamIntro(templateId = selectedTemplate) {
     return String(templateId || "") === FOOTBALL_TEAM_INTRO_TEMPLATE_ID;
   }
+  function footballIntroAllowedHere() {
+    const venueIds = window.SHOUTOUT_TEMPLATES?.[FOOTBALL_TEAM_INTRO_TEMPLATE_ID]?.venueIds || [];
+    return venueIds.includes(locationId());
+  }
+  function footballIntroDefaultMain() {
+    const loc = getLocation() || {};
+    const brand = String(loc.brandName || loc.locationName || "Zebbies").trim().toUpperCase();
+    return `${brand} ALL-STARS`;
+  }
   function isSoccerJerseyTemplate(templateId = selectedTemplate) {
     const id = String(templateId || selectedTemplate || "");
     const t = getTemplate(id);
@@ -4177,7 +4186,7 @@
       const caps = templateDisplayCaps(t);
       if (caps.supported === false) throw new Error(caps.advice || "Choose a supported display size for this template.");
       const footballIntro = isFootballTeamIntro();
-      if (footballIntro && locationId() !== "zebbies-garden-washington-dc") throw new Error("This advanced football template is available only at Zebbies Garden DC.");
+      if (footballIntro && !footballIntroAllowedHere()) throw new Error("This advanced football template is available only at Zebbies Garden DC, Heist Washington DC, and Aurelia.");
       if (window.FLOQRLog) {
         window.FLOQRLog.write({
           level: "info",
@@ -4367,7 +4376,7 @@
       mainInput.maxLength = caps.main + Math.max(0, caps.lineCount - 1);
       mainInput.rows = Math.max(2, caps.lineCount || 2);
       mainInput.placeholder = caps.supported === false ? "Choose a supported display size" : `Enter ShoutOut Here - maximum ${caps.main} visible characters`;
-      if (footballIntro && !mainInput.value.trim()) mainInput.value = t.defaultMain || "ZEBBIES ALL-STARS";
+      if (footballIntro && !mainInput.value.trim()) mainInput.value = footballIntroDefaultMain();
       mainInput.value = fitTemplateText(mainInput.value, "main");
     }
     const subInput = byId("subText");

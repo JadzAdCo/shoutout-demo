@@ -1406,7 +1406,8 @@
   function renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps}) {
     const members = normalizedFootballTeamMembers(data, textCaps);
     const stadiumMessageRows = footballStadiumMessageRows(data.stadiumMessage, textCaps);
-    const openingRows = displayTextRows(mainText || "ZEBBIES ALL-STARS", textCaps);
+    const allStarsLabel = `${String(data.brandName || "Zebbies").trim().toUpperCase()} ALL-STARS`;
+    const openingRows = displayTextRows(mainText || allStarsLabel, textCaps);
     const themeId = String(data.colorTheme || "stadiumGold");
     const theme = window.FLOQRIdentity?.footballTheme?.(themeId) || {accent:data.themeAccent || "#dfff5a", field:"#06180f", ink:"#ffffff", frame:"#5c4700"};
     const formatId = String(data.screenFormatId || textCaps.formatId || "");
@@ -1429,7 +1430,7 @@
       ? `<img data-media-url="${esc(member.mediaUrl)}" data-initials="${esc(member.initials)}" alt="${esc(member.name)}">`
       : `<span class="football-player-initials">${esc(member.initials)}</span>`;
     const finaleHtml = skipFinale ? "" : `<div class="football-final-lineup">
-          <header><span>ZEBBIES ALL-STARS</span><strong>${openingRows.map(row => esc(row)).join("<br>")}</strong></header>
+          <header><span>${esc(allStarsLabel)}</span><strong>${openingRows.map(row => esc(row)).join("<br>")}</strong></header>
           <div class="football-final-grid">${members.map((member, index) => `<article>
             <div class="football-final-photo">${playerImage(member)}</div>
             <b>${esc(member.name)}</b><small>${esc(member.position)}</small><em>0${index + 1}</em>

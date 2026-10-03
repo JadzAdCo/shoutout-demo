@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.4 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.5 (stable)
+
+- s3.1.5: The "Zebbies All-Stars" Football Intro template (`zebbiesFootballTeamIntro`, $30, four photos, 20 seconds) is now available at Heist Washington DC and Aurelia (`temp-democlub-1`) as well as Zebbies Garden. Composer, checkout (`commerce-functions.js`) and board all accept the three venues; the order keeps the venue it was bought for. The All-Stars headline and finale label use the venue brand (HEIST ALL-STARS, AURELIA ALL-STARS, ZEBBIES ALL-STARS).
 
 - s3.1.4: Search in-app ad splash no longer shows a hardcoded venue (Zebbies Garden). Search paths (Clubs, Events, Lounges, Beach Clubs, Mingl, venue search) show the FloqMedia house card: "Ad Powered by FloqMedia", Contact Us, Facebook & Instagram @FloqMedia, www.floqmedia.com, sales@floqmedia.com, +1 (888) WE-FLOQQ (tap to call). Only club actions on a picked venue keep that venue's logo and name. The Zebbies demo campaign is `venueOnly` and rotates only at Zebbies. House labels translated in all 11 languages.
 

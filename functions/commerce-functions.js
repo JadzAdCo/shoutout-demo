@@ -38,6 +38,9 @@ const COMMERCE_RESERVATION_SECONDS = 31 * 60;
 const FOOTBALL_TEAM_INTRO_TEMPLATE_ID = "zebbiesFootballTeamIntro";
 const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
 const HEIST_DC_LOCATION_ID = "heist-washington-dc";
+const AURELIA_LOCATION_ID = "temp-democlub-1";
+const FOOTBALL_TEAM_INTRO_LOCATION_IDS = new Set([ZEBBIES_GARDEN_DC_LOCATION_ID, HEIST_DC_LOCATION_ID, AURELIA_LOCATION_ID]);
+const FOOTBALL_TEAM_INTRO_VENUE_MESSAGE = "The four-player football intro is available only at Zebbies Garden DC, Heist Washington DC, and Aurelia.";
 const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
 const HEIST_ART_PRICE_CENTS = 3000;
 const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
@@ -365,17 +368,17 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
   }
   if (templateId !== FOOTBALL_TEAM_INTRO_TEMPLATE_ID) return {...rawPayload, shoutout};
   const requestedClubId = text(rawShoutout.clubLocationId || rawShoutout.location || rawPayload.clubLocationId, 120);
-  if (requestedClubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
+  if (!FOOTBALL_TEAM_INTRO_LOCATION_IDS.has(requestedClubId)) throw new HttpsError("failed-precondition", FOOTBALL_TEAM_INTRO_VENUE_MESSAGE);
   if (rawShoutout.photoPermissionConfirmed !== true) throw new HttpsError("failed-precondition", "Photo permission confirmation is required for all four people.");
   const teamMembers = normalizeFootballTeamMembers(rawShoutout.teamMembers, authContext.uid || "", caps.playerName || 14);
   return {
     ...rawPayload,
-    clubLocationId:ZEBBIES_GARDEN_DC_LOCATION_ID,
+    clubLocationId:requestedClubId,
     videoEnabled:false,
     shoutout:{
       ...shoutout,
-      clubLocationId:ZEBBIES_GARDEN_DC_LOCATION_ID,
-      location:ZEBBIES_GARDEN_DC_LOCATION_ID,
+      clubLocationId:requestedClubId,
+      location:requestedClubId,
       mediaType:"team-intro",
       mediaUrl:teamMembers[0].mediaUrl,
       teamMembers,
@@ -670,7 +673,7 @@ exports.createFloqrConnectOnboardingLink = onCall({
     const split = moneyParts(pricedAmountCents, SHOUTOUT_CLUB_SHARE_PERCENT);
     const clubId = text(shoutout.clubLocationId || shoutout.location || payload.clubLocationId, 120);
     if (!clubId) throw new HttpsError("invalid-argument", "A club is required for a paid ShoutOut.");
-    if (footballTeamIntro && clubId !== ZEBBIES_GARDEN_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "The four-player football intro is available only at Zebbies Garden DC.");
+    if (footballTeamIntro && !FOOTBALL_TEAM_INTRO_LOCATION_IDS.has(clubId)) throw new HttpsError("failed-precondition", FOOTBALL_TEAM_INTRO_VENUE_MESSAGE);
     if (heistArt && clubId !== HEIST_DC_LOCATION_ID) throw new HttpsError("failed-precondition", "Heist art templates are available only at Heist Washington DC.");
     return {
       amountCents:pricedAmountCents,

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.4";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.5";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1247,6 +1247,17 @@
         {label:"Zebbies demo venue-only", file:"dc-spot-ad-campaigns.js", includes:["venueOnly: true"]},
         {label:"House labels translated", file:"floqr-i18n.js", includes:["\"ad.house.poweredBy\"", "\"ad.house.contactUs\""]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.4\""]}
+      ]
+    },
+    {
+      version: "s3.1.5-all-stars-heist-aurelia",
+      title: "Zebbies All-Stars Football Intro available at Heist Washington DC and Aurelia",
+      checks: [
+        {label:"Template venues", file:"shared-data.js", includes:["venueIds:['zebbies-garden-washington-dc','heist-washington-dc','temp-democlub-1']"]},
+        {label:"Checkout venues", file:"functions/commerce-functions.js", includes:["FOOTBALL_TEAM_INTRO_LOCATION_IDS", "AURELIA_LOCATION_ID = \"temp-democlub-1\""]},
+        {label:"Venue-branded headline", file:"display-app.js", includes:["allStarsLabel"]},
+        {label:"Composer gate", file:"patron-app.js", includes:["function footballIntroAllowedHere("]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.5\""]}
       ]
     }
   ];
