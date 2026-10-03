@@ -91,7 +91,17 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .splash-card h1.splash-house-title{font-size:clamp(26px,5vw,52px);line-height:1;letter-spacing:-.03em;margin:4px 0 2px;text-transform:none}
 .splash-house-contact{margin:0;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
 .splash-house-list{list-style:none;margin:0;padding:0;display:grid;gap:4px;color:var(--muted);font-weight:700}
-.splash-house-list a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.splash-house-list a{color:#fff;text-decoration:none}
+#splashFloqrLogoWrap{border:0;background:none;padding:0;min-height:0;border-radius:0}
+#splashFloqrLogoWrap .splash-logo{width:min(220px,50vw);max-width:none;max-height:72px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
+.category-brand-stack{display:grid;justify-items:center;margin:44px 0 12px}
+.category-brand-stack .product-parent-logo{justify-self:center}
+.shoutout-icon-card{display:grid;justify-items:center;gap:6px;width:fit-content;min-height:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:var(--text);cursor:pointer}
+.shoutout-icon-card:hover{border:0;transform:translateY(-2px)}
+.shoutout-icon-card.hidden{display:none}
+.shoutout-icon-img{display:block;width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(38,216,255,.48))}
+.shoutout-icon-title{font-size:16px;font-weight:900;line-height:1.1;white-space:nowrap}
+@media(max-width:520px){.category-brand-stack{margin-top:40px}.category-brand-stack .product-parent-logo{width:min(170px,48vw);max-height:58px}.shoutout-icon-img{width:116px;height:116px}}
 .ad-submit-shell form label,.ad-submit-grid label{display:grid;gap:4px;margin:8px 0}
 .ad-submit-grid,.ad-mgmt-grid{display:grid;gap:8px 12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .ad-submit-preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#050819}

@@ -2149,15 +2149,16 @@
       setStatus("ShoutOut is currently disabled for patrons.");
       return;
     }
-    showPage("shoutoutLandingPage");
     const draft = readReuseShoutoutDraft();
     if (draft?.locationId) {
       try {
         await selectLocationForShoutOut(draft.locationId);
+        return;
       } catch (err) {
         console.warn("reuse location select failed", err?.message || err);
       }
     }
+    openCategory("shoutout");
   }
 
   function readReuseShoutoutDraft() {

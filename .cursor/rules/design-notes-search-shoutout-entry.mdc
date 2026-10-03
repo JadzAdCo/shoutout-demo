@@ -1,0 +1,16 @@
+---
+description: Search page ShoutOut entry (s3.1.6) — FLOQR logo, ShoutOut icon button, landing page bypassed, unframed splash logo
+alwaysApply: false
+---
+
+# Search ShoutOut entry (s3.1.6)
+
+Resume: `@shoutout-entry$`.
+
+- `#categoryPage` shows `.category-brand-stack` (FLOQR `images/floqr-color.png`, same `.product-parent-logo` as the old landing page) above FloqAi, pushing FloqAi + the search input down.
+- `#shoutoutBtnCard` is a `.shoutout-icon-card`: ShoutOut logo image + `cat.shoutout` title directly under it (no `<br>`, `white-space:nowrap`). Keep the id — feature gates (`feature-gates.js`, `floqr-feature-services.js` `buttonIds`) hide/show it.
+- `showShoutoutLanding()` no longer shows `#shoutoutLandingPage`. Reuse draft with a location → `selectLocationForShoutOut`; otherwise `openCategory("shoutout")` (ad splash → Choose Location for ShoutOut).
+- `#shoutoutLandingPage` markup, `startShoutoutFlowBtn` and `backToCategoriesFromShoutoutLandingBtn*` bindings are **dead but kept** until the owner approves deletion after testing. Delete them together with their CSS when asked.
+- Ad splash: `#splashFloqrLogoWrap` has no frame/background; FloqMedia house-card links are `text-decoration:none`.
+
+Test: `functions/search-shoutout-entry.test.js`.
