@@ -1,0 +1,41 @@
+---
+description: Venue-exclusive template discovery, Tengo muchos dólares vault blast + money splash timeline, idle board always "Use ShoutOut @ {club}" (s3.1.7)
+alwaysApply: false
+---
+
+# Template discovery, money splash, idle board (s3.1.7)
+
+Resume: `@templates$` / `$money-rain$`.
+
+## Venue-exclusive templates
+
+- Patron picker reads only packaged `window.SHOUTOUT_TEMPLATES` (never the Firestore `templates` collection). Ids = `blackwhite` + `location.templates` + templates whose `venueIds` include the venue + standard ids, then `status==='active'` + `templateFitsVenue`.
+- Default view: Default Template card, then **Exclusive at {venue}** (`template.venueExclusive`, all 11 chrome packs) listing every record whose `venueIds` includes the current venue.
+- Search box (`submitCategoryVenueQuery`) and FloqAi intents (`action:"template"`) route template names through `exclusiveTemplateForQuery` (name + `searchAliases`, accent/punctuation-insensitive, ≥ 4 chars) → `startTemplateShoutout`: one venue → ad splash → composer; several → venue grid filtered to `venueIds`; the name is pre-filled into `#templateSearch`.
+- Zebbies All-Stars Football Intro: `zebbies-garden-washington-dc`, `heist-washington-dc`, `temp-democlub-1` (Aurelia). Backend checkout set must match.
+
+## Tengo muchos dólares (`heistVaultDollars`, legacy `heistRedLux`)
+
+Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` `syncMoneyRain` builds `#displayMoneyRain` right after `#displayBackground` (z-index 1).
+
+| Time from presentation start | Layer classes | What shows |
+|---|---|---|
+| 0 → 40 s | none | Normal ShoutOut (vault background) |
+| 40 s | `is-blast` (2.6 s) + canvas `money-shake` (0.7 s, background only) | Flash, shockwave ring, steel door disc blows toward the viewer, shards, smoke |
+| 40.3 s | `is-flood` (7.4 s) | 8×6 grid of 25vw bills bursts from the vault (48% / 43%) and covers the whole board, then falls away |
+| 44.2 s → end | `is-stream` | 30 smaller (15vw) bills keep splashing from the vault |
+
+- Presentation start = `approvedAt` when it is within the last 10 minutes, else first render. A Xibo reload after the blast window resumes directly in `is-stream`.
+- Timeline restarts only when `livePlaybackKey(data)` changes. `purgeDisplaySurface` → `stopMoneyRain` clears timers.
+- **Verbiage on top:** `.money-rain-active .display-text-overlay{z-index:5}` + heavy dark text-shadow on `#displayMain`, `#displaySub`, `.classic-board-lines b`. Never put bills above the text overlay.
+- Heist brand slide (20 s message / 8 s slide cycle) hides the money layer; 40 s lands in the second message phase.
+- Bills are pure CSS (no image asset). Colors: saturated green `#1f9a44`–`#7dea7a`, border `#0b5a25`.
+
+## Idle board
+
+- Display 1 idle text is always `Use ShoutOut @ {club}` (`clubDefaultMainText`; configured `defaultMain` is ignored on primary). Display 2 keeps the SupRstar idle CTA.
+- Display treats any doc with `status:"default"`, `idleCta`, missing doc, or no status + no text/media as idle → `defaultClubDisplayPayload()`.
+- `expireLiveShoutouts` (every minute) overwrites expired `liveContent` with `idleLiveContentAfterExpiry` (blackwhite, `Use ShoutOut @ {club}`, `idleCta:true`, `source:"automaticTenMinuteReset"`). No Heist exception. The helper is **not** exported (index.js spreads module exports into deployed functions).
+- Club Admin approve and **Reset display to default** write the same text + `idleCta:true`.
+
+Tests: `functions/template-discovery-idle.test.js`.

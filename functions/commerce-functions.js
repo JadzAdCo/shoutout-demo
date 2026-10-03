@@ -2293,6 +2293,30 @@ exports.stripeFloqrWebhook = onRequest({
   }
 });
 
+function idleLiveContentAfterExpiry(docId, data = {}, expiredAt = null) {
+  const clubLocationId = text(data.clubLocationId || data.location || docId, 160);
+  const clubName = text(data.locationName || data.brandName || clubLocationId, 80);
+  return {
+    location: clubLocationId,
+    clubLocationId,
+    locationName: text(data.locationName, 120),
+    brandName: text(data.brandName, 120),
+    template: "blackwhite",
+    templateName: "Traditional Black and White ShoutOut",
+    mainText: `Use ShoutOut @ ${clubName}`,
+    subText: "",
+    screenFormatId: text(data.screenFormatId, 40),
+    status: "default",
+    idleCta: true,
+    source: "automaticTenMinuteReset",
+    previousReferenceNumber: text(data.referenceNumber, 120),
+    previousTemplate: text(data.template, 80),
+    previousShoutoutId: text(data.shoutoutId, 160),
+    expiredAt,
+    updatedAt: expiredAt
+  };
+}
+
 exports.expireLiveShoutouts = onSchedule({
   region:"us-central1",
   schedule:"every 1 minutes",
@@ -2306,31 +2330,7 @@ exports.expireLiveShoutouts = onSchedule({
   const batch = db.batch();
   const expiredAt = admin.firestore.FieldValue.serverTimestamp();
   expired.docs.forEach(doc => {
-    const data = doc.data() || {};
-    const previousTemplate = text(data.template, 80);
-    const keepHeist = /^heist/i.test(previousTemplate);
-    // Idle boards stay blank — never flash the legacy "USE ShoutOut" CTA.
-    const configuredDefault = text(data.defaultMain, 45);
-    const idleMain = /^USE\s*SHOUT\s*OUT\b/i.test(configuredDefault) ? "" : configuredDefault;
-    batch.set(doc.ref, {
-      template: keepHeist ? previousTemplate : "blackwhite",
-      templateName: keepHeist ? text(data.templateName, 120) : "Traditional Black and White ShoutOut",
-      mainText: idleMain,
-      subText:"",
-      mediaUrl:"",
-      mediaType:"",
-      mediaFileName:"",
-      mediaStoragePath:"",
-      teamMembers:[],
-      status:"default",
-      source:"automaticTenMinuteReset",
-      previousReferenceNumber:text(data.referenceNumber, 120),
-      referenceNumber:"",
-      approvedAt:admin.firestore.FieldValue.delete(),
-      displayDurationSeconds:admin.firestore.FieldValue.delete(),
-      expiredAt,
-      updatedAt:expiredAt
-    }, {merge:true});
+    batch.set(doc.ref, idleLiveContentAfterExpiry(doc.id, doc.data() || {}, expiredAt));
   });
   await batch.commit();
 });

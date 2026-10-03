@@ -57,7 +57,7 @@ test("browser code cannot supply connected-account IDs", () => {
 
 test("Zebbies football intro is four-photo, 20-second, and server-priced at 30 dollars", () => {
   assert.match(sharedData, /zebbiesFootballTeamIntro/);
-  assert.match(sharedData, /name:'Football Intro'/);
+  assert.match(sharedData, /name:'Zebbies All-Stars Football Intro'/);
   assert.match(sharedData, /teamMemberSlots:4/);
   assert.match(sharedData, /durationSeconds:20/);
   assert.match(sharedData, /"led-96x48"[\s\S]*pixelWidth:624, pixelHeight:312/);

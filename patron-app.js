@@ -58,6 +58,8 @@
   let confirmationReturnTimer = null;
   let confirmationCountdownTimer = null;
   let pendingCheckoutUrl = "";
+  let pendingTemplateQuery = "";
+  let shoutoutTemplateVenueIds = null;
   let personalizedSuggestionTimer = null;
   let pastShoutoutMemoryPromise = null;
   let approvedRecommendationLibrary = [];
@@ -1280,6 +1282,11 @@
   function submitCategoryVenueQuery(query) {
     const q = String(query || "").trim();
     if (!q) return false;
+    const exclusiveTemplate = exclusiveTemplateForQuery(q);
+    if (exclusiveTemplate) {
+      startTemplateShoutout(exclusiveTemplate);
+      return true;
+    }
     const parsed = parsedListingQuery(q, "category");
     const type = parsed?.type || "events";
     showAdSplash(type, () => openVenueSearch(type, q));
@@ -1703,6 +1710,7 @@
   }
 
   function openCategoryAfterAd(type) {
+    if (type !== "shoutout") shoutoutTemplateVenueIds = null;
     if (type === "clubs" || type === "lounges" || type === "lounge-club" || type === "beach-clubs") {
       byId("clubActionsPage")?.setAttribute("data-category-type", type);
       showPage("clubActionsPage");
@@ -2158,8 +2166,48 @@
         console.warn("reuse location select failed", err?.message || err);
       }
     }
+    shoutoutTemplateVenueIds = null;
     openCategory("shoutout");
   }
+
+  function normalizeTemplateQuery(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  function exclusiveTemplateForQuery(query) {
+    const q = normalizeTemplateQuery(query);
+    if (q.length < 4) return null;
+    return Object.values(window.SHOUTOUT_TEMPLATES || {}).find(template => {
+      if (!Array.isArray(template.venueIds) || !template.venueIds.length) return false;
+      if (String(template.status || "active") !== "active") return false;
+      const phrases = [template.name, ...(template.searchAliases || [])].map(normalizeTemplateQuery).filter(p => p.length >= 4);
+      return phrases.some(phrase => q.includes(phrase));
+    }) || null;
+  }
+
+  async function startTemplateShoutout(templateOrId) {
+    const template = typeof templateOrId === "string" ? window.SHOUTOUT_TEMPLATES?.[templateOrId] : templateOrId;
+    if (!template?.venueIds?.length) {
+      showShoutoutLanding();
+      return;
+    }
+    const g = window.FLOQRFeatureGates;
+    if (g && !g.patronMayUse("shoutOut", currentUser, cachedUserProfile)) {
+      setStatus("ShoutOut is currently disabled for patrons.");
+      return;
+    }
+    pendingTemplateQuery = template.name || "";
+    const venueIds = template.venueIds.map(id => String(id).toLowerCase());
+    await Promise.all(venueIds.map(id => loadLocationById(id).catch(() => null)));
+    if (venueIds.length === 1) {
+      shoutoutTemplateVenueIds = null;
+      showAdSplash("shoutout", () => selectLocationForShoutOut(venueIds[0]).catch(err => setStatus(err?.message || String(err))));
+      return;
+    }
+    shoutoutTemplateVenueIds = new Set(venueIds);
+    openCategory("shoutout");
+  }
+  window.startTemplateShoutout = startTemplateShoutout;
 
   function readReuseShoutoutDraft() {
     try {
@@ -3180,6 +3228,7 @@
     const context = await userLocationContext();
     const filtered = searched.map(record => [record.id, record.data || locations[record.id]]).filter(([id,l]) => {
       if (!l) return false;
+      if (type === "shoutout" && shoutoutTemplateVenueIds && !shoutoutTemplateVenueIds.has(canonicalLocationId(id))) return false;
       const actionBase = byId("clubActionsPage")?.getAttribute("data-category-type") || "clubs";
       const effectiveType = type.startsWith("club-action:") ? actionBase : type;
       const typeOk =
@@ -3228,7 +3277,11 @@
     selectedScreenFormatId = loc.primaryDisplayScreenFormatId || loc.displayScreenFormatIds?.[0] || "led-96x48";
     selectedTemplateVariant = null;
     await loadTemplateVariants();
-    if (byId("templateSearch")) byId("templateSearch").value = "";
+    const templateQuery = pendingTemplateQuery;
+    pendingTemplateQuery = "";
+    shoutoutTemplateVenueIds = null;
+    if (byId("templateSearch")) byId("templateSearch").value = templateQuery;
+    if (templateQuery) byId("templateSearchPanel")?.classList.remove("hidden");
     renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
@@ -3385,6 +3438,8 @@
     const allVariants = [...club, ...mine, ...community];
     if (!discoveryQuery) {
       const defaultRecord = official.find(record => record.id === "blackwhite") || official.find(record => !record.data.priceCents) || official[0];
+      const exclusiveRecords = official.filter(record => record !== defaultRecord && (record.data.venueIds || []).includes(locationId()));
+      const venueName = location.brandName || location.locationName || "";
       grid.innerHTML = `
         <section class="template-section template-section-default">
           <div class="section-heading-row template-heading-row">
@@ -3392,6 +3447,10 @@
           </div>
           <div class="template-grid">${defaultRecord ? templateCard(defaultRecord.data) : `<div class="empty">${esc(tt("template.noDefaultAvailable", {}, "No default template is available."))}</div>`}</div>
         </section>
+        ${exclusiveRecords.length ? `<section class="template-section template-section-exclusive">
+          <h3>${esc(tt("template.venueExclusive", {venue: venueName}, `Exclusive at ${venueName}`))}</h3>
+          <div class="template-grid">${exclusiveRecords.map(record => templateCard(record.data)).join("")}</div>
+        </section>` : ""}
         <section class="template-section template-section-floqai" id="templateFloqAiHost">
           <div class="section-heading-row template-heading-row">
             <h3 data-floqr-help-id="help-floqai-template-search">${esc(tt("template.floqaiSection", {}, "FloqAi template search"))}</h3>

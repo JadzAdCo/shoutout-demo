@@ -160,11 +160,23 @@
       },
       "help-default-template": {
         title: "Шаблон по умолчанию",
-        body: "Бесплатный Traditional Black and White Classic. Ниже через FloqAi — шаблоны Sports, Jersey, VIP, Humor, Cars, Video, Pictures и Ballers."
+        body: "Бесплатный Traditional Black and White Classic. Шаблоны только для этой площадки, например Zebbies All-Stars Football Intro или Tengo muchos dólares, собраны в разделе «Эксклюзивно в» с названием площадки. Ниже через FloqAi — шаблоны Sports, Jersey, VIP, Humor, Cars, Video, Pictures и Ballers."
       },
       "help-floqai-template-search": {
         title: "Поиск шаблонов FloqAi",
         body: "Нажмите движущийся знак FloqAi (или дождитесь речевых пузырей) и попросите Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures или Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Стадионное интро на 20 секунд для четырёх игроков за $30 — в Zebbies Garden DC, Heist Washington DC и Aurelia. Введите в поиске «Football Intro» или «Zebbies All-Stars», выберите одну из этих площадок и загрузите четыре фото, на которые у вас есть разрешение."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Эксклюзив Heist Washington DC за $30. Ваше сообщение идёт на фоне хранилища; примерно через 40 секунд дверь сейфа взрывается, купюры по $100 заполняют весь экран, а затем продолжают разлетаться за вашим текстом. Введите в поиске «Tengo muchos dólares» и напишите до 3 строк по 14 символов."
+      },
+      "help-display-idle-default": {
+        title: "Экран ожидания: Use ShoutOut @ площадка",
+        body: "Когда ShoutOut не показывается, Display 1 показывает «Use ShoutOut @» и название вашей площадки. Каждый одобренный ShoutOut идёт 10 минут, затем экран сам возвращается к этому сообщению. Сброс экрана по умолчанию в Club Admin делает это сразу."
       },
       "help-mingl-requests": {
         title: "О запросах Mingl",
@@ -346,11 +358,23 @@
       },
       "help-default-template": {
         title: "Standaardsjabloon",
-        body: "Gratis Traditional Black and White Classic. Gebruik FloqAi hieronder voor Sports-, Jersey-, VIP-, Humor-, Cars-, Video-, Pictures- en Ballers-sjablonen."
+        body: "Gratis Traditional Black and White Classic. Sjablonen die alleen voor deze locatie zijn, zoals Zebbies All-Stars Football Intro of Tengo muchos dólares, staan onder ‘Exclusief bij’ met de naam van de locatie. Gebruik FloqAi hieronder voor Sports, Jersey, VIP, Humor, Cars, Video, Pictures en Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi-sjabloonzoeken",
         body: "Tik op het bewegende FloqAi-merkteken (of wacht op de speech bubbles) en vraag om Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures of Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Een stadionintro van 20 seconden voor vier spelers voor $30, bij Zebbies Garden DC, Heist Washington DC en Aurelia. Typ ‘Football Intro’ of ‘Zebbies All-Stars’ in Zoeken, kies een van die locaties en upload vier foto’s waarvoor je toestemming hebt."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Exclusief bij Heist Washington DC voor $30. Je bericht speelt voor de kluis; na ongeveer 40 seconden vliegt de kluisdeur open, vullen biljetten van $100 het hele scherm en blijven ze daarna achter je tekst rondvliegen. Typ ‘Tengo muchos dólares’ in Zoeken en schrijf maximaal 3 regels van 14 tekens."
+      },
+      "help-display-idle-default": {
+        title: "Rustscherm: Use ShoutOut @ locatie",
+        body: "Als er geen ShoutOut speelt, toont Display 1 ‘Use ShoutOut @’ met de naam van je locatie. Elke goedgekeurde ShoutOut speelt 10 minuten; daarna keert het scherm vanzelf terug naar die tekst. Scherm terugzetten naar standaard in Club Admin doet dat meteen."
       },
       "help-mingl-requests": {
         title: "Over Mingl Requests",
@@ -532,11 +556,23 @@
       },
       "help-default-template": {
         title: "Modèle par défaut",
-        body: "Classique traditionnel noir et blanc gratuit. Utilisez FloqAi ci-dessous pour les modèles Sports, Jersey, VIP, Humour, Voitures, Vidéo, Images et Ballers."
+        body: "Traditional Black and White Classic gratuit. Les modèles réservés à ce lieu, comme Zebbies All-Stars Football Intro ou Tengo muchos dólares, apparaissent sous « Exclusif à » suivi du nom du lieu. Utilisez FloqAi ci-dessous pour les modèles Sports, Jersey, VIP, Humor, Cars, Video, Pictures et Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi recherche de modèles",
         body: "Appuyez sur la marque FloqAi en mouvement (ou attendez ses bulles), puis demandez Sports, Jersey, NBA, NFL, Cars, Humour, VIP, Video, Pictures ou Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Une intro de stade de 20 secondes pour quatre joueurs, à 30 $, proposée à Zebbies Garden DC, Heist Washington DC et Aurelia. Tapez « Football Intro » ou « Zebbies All-Stars » dans Recherche, choisissez l’un de ces lieux, puis importez quatre photos que vous avez le droit d’utiliser."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Exclusivité Heist Washington DC à 30 $. Votre message s’affiche devant la chambre forte ; vers 40 secondes, la porte du coffre explose, des billets de 100 $ envahissent tout l’écran, puis continuent de jaillir derrière votre texte. Tapez « Tengo muchos dólares » dans Recherche, puis écrivez jusqu’à 3 lignes de 14 caractères."
+      },
+      "help-display-idle-default": {
+        title: "Écran d’attente : Use ShoutOut @ lieu",
+        body: "Quand aucun ShoutOut n’est diffusé, Display 1 affiche « Use ShoutOut @ » suivi du nom de votre lieu. Chaque ShoutOut approuvé passe 10 minutes, puis l’écran revient seul à ce message. La réinitialisation de l’affichage par défaut dans Club Admin le fait immédiatement."
       },
       "help-mingl-requests": {
         title: "Environ Mingl demandes",
@@ -718,11 +754,23 @@
       },
       "help-default-template": {
         title: "Standardvorlage",
-        body: "Kostenloser traditioneller Schwarz-Weiß-Klassiker. Verwenden Sie FloqAi unten für die Vorlagen „Sport“, „Trikot“, „VIP“, „Humor“, „Autos“, „Video“, „Bilder“ und „Baller“."
+        body: "Kostenloses Traditional Black and White Classic. Vorlagen nur für diese Location, etwa Zebbies All-Stars Football Intro oder Tengo muchos dólares, stehen unter „Exklusiv bei“ mit dem Namen der Location. Nutze FloqAi unten für Sports, Jersey, VIP, Humor, Cars, Video, Pictures und Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi Vorlagensuche",
         body: "Tippen Sie auf die bewegliche FloqAi-Marke (oder warten Sie auf die Sprechblasen) und fragen Sie dann nach „Sport“, „Trikot“, „NBA“, „NFL“, „Autos“, „Humor“, „VIP“, „Video“, „Bilder“ oder „Ballspieler“."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Ein 20-sekündiges Stadion-Intro für vier Spieler für 30 $, verfügbar bei Zebbies Garden DC, Heist Washington DC und Aurelia. Gib „Football Intro“ oder „Zebbies All-Stars“ in der Suche ein, wähle eine dieser Locations und lade vier Fotos hoch, für die du die Erlaubnis hast."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Exklusiv bei Heist Washington DC für 30 $. Deine Nachricht läuft vor dem Tresorraum; nach etwa 40 Sekunden fliegt die Tresortür auf, 100-$-Scheine füllen den ganzen Bildschirm und wirbeln danach weiter hinter deinem Text. Gib „Tengo muchos dólares“ in der Suche ein und schreibe bis zu 3 Zeilen mit je 14 Zeichen."
+      },
+      "help-display-idle-default": {
+        title: "Ruhebildschirm: Use ShoutOut @ Location",
+        body: "Wenn kein ShoutOut läuft, zeigt Display 1 „Use ShoutOut @“ mit dem Namen deiner Location. Jeder freigegebene ShoutOut läuft 10 Minuten, danach kehrt die Anzeige von selbst zu diesem Text zurück. Anzeige auf Standard zurücksetzen in Club Admin macht das sofort."
       },
       "help-mingl-requests": {
         title: "Ungefähr Mingl Anfragen",
@@ -904,11 +952,23 @@
       },
       "help-default-template": {
         title: "Plantilla predeterminada",
-        body: "Clásico tradicional en blanco y negro gratuito. Utilice FloqAi a continuación para plantillas de Deportes, Jersey, VIP, Humor, Autos, Vídeo, Imágenes y Jugadores."
+        body: "Traditional Black and White Classic gratis. Las plantillas exclusivas de este local, como Zebbies All-Stars Football Intro o Tengo muchos dólares, aparecen en «Exclusivo de» con el nombre del local. Usa FloqAi abajo para plantillas Sports, Jersey, VIP, Humor, Cars, Video, Pictures y Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi búsqueda de plantillas",
         body: "Toque la marca FloqAi en movimiento (o espere a que aparezcan los globos de diálogo) y luego pregunte por Deportes, Jersey, NBA, NFL, Autos, Humor, VIP, Video, Imágenes o Jugadores de béisbol."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Una intro de estadio de 20 segundos para cuatro jugadores por $30, disponible en Zebbies Garden DC, Heist Washington DC y Aurelia. Escribe «Football Intro» o «Zebbies All-Stars» en Buscar, elige uno de esos locales y sube cuatro fotos que tengas permiso para usar."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Exclusivo de Heist Washington DC por $30. Tu mensaje aparece frente a la bóveda; a los 40 segundos aproximadamente, la puerta de la caja fuerte explota, billetes de $100 llenan toda la pantalla y luego siguen saltando detrás de tu texto. Escribe «Tengo muchos dólares» en Buscar y escribe hasta 3 líneas de 14 caracteres."
+      },
+      "help-display-idle-default": {
+        title: "Pantalla en espera: Use ShoutOut @ local",
+        body: "Cuando no se muestra ningún ShoutOut, Display 1 muestra «Use ShoutOut @» con el nombre de tu local. Cada ShoutOut aprobado se muestra 10 minutos y luego la pantalla vuelve sola a ese mensaje. Restablecer la pantalla predeterminada en Club Admin lo hace al instante."
       },
       "help-mingl-requests": {
         title: "Acerca de Mingl Solicitudes",
@@ -1090,11 +1150,23 @@
       },
       "help-default-template": {
         title: "Modello predefinito",
-        body: "Classico tradizionale in bianco e nero. Utilizza FloqAi qui sotto per i modelli Sport, Maglia, VIP, Umorismo, Automobili, Video, Immagini e Ballerini."
+        body: "Traditional Black and White Classic gratuito. I modelli esclusivi di questo locale, come Zebbies All-Stars Football Intro o Tengo muchos dólares, sono elencati in «Esclusivo da» con il nome del locale. Usa FloqAi qui sotto per i modelli Sports, Jersey, VIP, Humor, Cars, Video, Pictures e Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi ricerca modello",
         body: "Tocca il simbolo FloqAi in movimento (o attendi i fumetti), quindi chiedi Sport, Maglia, NBA, NFL, Automobili, Umorismo, VIP, Video, Immagini o Ballerini."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Un’intro da stadio di 20 secondi per quattro giocatori a 30 $, disponibile da Zebbies Garden DC, Heist Washington DC e Aurelia. Scrivi «Football Intro» o «Zebbies All-Stars» in Cerca, scegli uno di questi locali e carica quattro foto che hai il permesso di usare."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Esclusiva Heist Washington DC a 30 $. Il tuo messaggio appare davanti al caveau; dopo circa 40 secondi la porta della cassaforte esplode, banconote da 100 $ riempiono tutto lo schermo e poi continuano a volare dietro il tuo testo. Scrivi «Tengo muchos dólares» in Cerca, poi scrivi fino a 3 righe da 14 caratteri."
+      },
+      "help-display-idle-default": {
+        title: "Schermo di attesa: Use ShoutOut @ locale",
+        body: "Quando non c’è nessuno ShoutOut in onda, Display 1 mostra «Use ShoutOut @» con il nome del tuo locale. Ogni ShoutOut approvato resta 10 minuti, poi lo schermo torna da solo a quel messaggio. Il ripristino del display predefinito in Club Admin lo fa subito."
       },
       "help-mingl-requests": {
         title: "Circa Mingl richieste",
@@ -1276,11 +1348,23 @@
       },
       "help-default-template": {
         title: "Modelo padrão",
-        body: "Clássico tradicional preto e branco grátis. Use FloqAi abaixo para modelos de Esportes, Jersey, VIP, Humor, Carros, Vídeo, Fotos e Ballers."
+        body: "Traditional Black and White Classic grátis. Os modelos exclusivos deste local, como Zebbies All-Stars Football Intro ou Tengo muchos dólares, aparecem em «Exclusivo em» com o nome do local. Use o FloqAi abaixo para modelos Sports, Jersey, VIP, Humor, Cars, Video, Pictures e Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi pesquisa de modelos",
         body: "Toque na marca móvel FloqAi (ou espere pelos balões de fala) e peça Esportes, Jersey, NBA, NFL, Carros, Humor, VIP, Vídeo, Fotos ou Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Uma intro de estádio de 20 segundos para quatro jogadores por US$ 30, disponível no Zebbies Garden DC, Heist Washington DC e Aurelia. Digite «Football Intro» ou «Zebbies All-Stars» na Busca, escolha um desses locais e envie quatro fotos que você tem permissão para usar."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Exclusivo do Heist Washington DC por US$ 30. Sua mensagem aparece diante da caixa-forte; por volta dos 40 segundos, a porta do cofre explode, notas de US$ 100 enchem a tela inteira e depois continuam voando atrás do seu texto. Digite «Tengo muchos dólares» na Busca e escreva até 3 linhas de 14 caracteres."
+      },
+      "help-display-idle-default": {
+        title: "Tela de espera: Use ShoutOut @ local",
+        body: "Quando nenhum ShoutOut está no ar, o Display 1 mostra «Use ShoutOut @» com o nome do seu local. Cada ShoutOut aprovado fica 10 minutos e depois a tela volta sozinha para essa mensagem. Redefinir a tela padrão no Club Admin faz isso na hora."
       },
       "help-mingl-requests": {
         title: "Sobre Mingl solicitações",
@@ -1462,11 +1546,23 @@
       },
       "help-default-template": {
         title: "Προεπιλεγμένο πρότυπο",
-        body: "Δωρεάν Παραδοσιακό Ασπρόμαυρο Κλασικό. Χρησιμοποιήστε το FloqAi παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
+        body: "Δωρεάν Traditional Black and White Classic. Τα πρότυπα μόνο για αυτόν τον χώρο, όπως Zebbies All-Stars Football Intro ή Tengo muchos dólares, εμφανίζονται στο «Αποκλειστικά στο» με το όνομα του χώρου. Χρησιμοποιήστε το FloqAi παρακάτω για πρότυπα Sports, Jersey, VIP, Humor, Cars, Video, Pictures και Ballers."
       },
       "help-floqai-template-search": {
         title: "FloqAi αναζήτηση προτύπου",
         body: "Αγγίξτε την κινούμενη ένδειξη FloqAi (ή περιμένετε τα συννεφάκια ομιλίας του), μετά ζητήστε Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures ή Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "Εισαγωγή γηπέδου 20 δευτερολέπτων για τέσσερις παίκτες με $30, διαθέσιμη στα Zebbies Garden DC, Heist Washington DC και Aurelia. Πληκτρολογήστε «Football Intro» ή «Zebbies All-Stars» στην Αναζήτηση, επιλέξτε έναν από αυτούς τους χώρους και ανεβάστε τέσσερις φωτογραφίες για τις οποίες έχετε άδεια."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Αποκλειστικό του Heist Washington DC με $30. Το μήνυμά σας παίζει μπροστά στο θησαυροφυλάκιο· περίπου στα 40 δευτερόλεπτα η πόρτα του χρηματοκιβωτίου εκρήγνυται, χαρτονομίσματα των $100 γεμίζουν όλη την οθόνη και μετά συνεχίζουν να πετούν πίσω από το κείμενό σας. Πληκτρολογήστε «Tengo muchos dólares» στην Αναζήτηση και γράψτε έως 3 γραμμές των 14 χαρακτήρων."
+      },
+      "help-display-idle-default": {
+        title: "Οθόνη αναμονής: Use ShoutOut @ χώρος",
+        body: "Όταν δεν παίζει κανένα ShoutOut, το Display 1 δείχνει «Use ShoutOut @» με το όνομα του χώρου σας. Κάθε εγκεκριμένο ShoutOut παίζει 10 λεπτά και μετά η οθόνη επιστρέφει μόνη της σε αυτό το μήνυμα. Η επαναφορά της προεπιλεγμένης οθόνης στο Club Admin το κάνει αμέσως."
       },
       "help-mingl-requests": {
         title: "Περίπου Mingl Αιτήματα",
@@ -1648,11 +1744,23 @@
       },
       "help-default-template": {
         title: "Domyślny szablon",
-        body: "Darmowy tradycyjny czarno-biały klasyk. Użyj FloqAi poniżej do szablonów Sport, Koszulka, VIP, Humor, Samochody, Wideo, Zdjęcia i Ballers."
+        body: "Darmowy Traditional Black and White Classic. Szablony dostępne tylko w tym lokalu, np. Zebbies All-Stars Football Intro lub Tengo muchos dólares, są w sekcji „Na wyłączność w” z nazwą lokalu. Poniżej użyj FloqAi, aby znaleźć szablony Sports, Jersey, VIP, Humor, Cars, Video, Pictures i Ballers."
       },
       "help-floqai-template-search": {
         title: "Wyszukiwanie szablonów FloqAi",
         body: "Stuknij w poruszający się znak FloqAi (lub poczekaj na jego dymki mowy), a następnie poproś o Sport, Koszulka, NBA, NFL, Samochody, Humor, VIP, Wideo, Zdjęcia lub Ballers."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "20-sekundowe stadionowe intro dla czterech graczy za 30 $, dostępne w Zebbies Garden DC, Heist Washington DC i Aurelia. Wpisz „Football Intro” lub „Zebbies All-Stars” w wyszukiwarce, wybierz jeden z tych lokali i prześlij cztery zdjęcia, na które masz zgodę."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "Wyłącznie w Heist Washington DC za 30 $. Twoja wiadomość wyświetla się przed skarbcem; po około 40 sekundach drzwi sejfu wybuchają, banknoty 100 $ wypełniają cały ekran, a potem dalej fruwają za Twoim tekstem. Wpisz „Tengo muchos dólares” w wyszukiwarce i napisz do 3 linii po 14 znaków."
+      },
+      "help-display-idle-default": {
+        title: "Ekran oczekiwania: Use ShoutOut @ lokal",
+        body: "Gdy nie leci żaden ShoutOut, Display 1 pokazuje „Use ShoutOut @” z nazwą Twojego lokalu. Każdy zatwierdzony ShoutOut trwa 10 minut, potem ekran sam wraca do tego komunikatu. Przywrócenie domyślnego ekranu w Club Admin robi to od razu."
       },
       "help-mingl-requests": {
         title: "O żądaniach Mingl",
@@ -1834,11 +1942,23 @@
       },
       "help-default-template": {
         title: "القالب الافتراضي",
-        body: "الكلاسيكية السوداء والبيضاء التقليدية المجانية. استخدم FloqAi أدناه للرياضة، القمصان، كبار الشخصيات، الفكاهة، السيارات، الفيديو، الصور، وقوالب اللاعبين."
+        body: "قالب Traditional Black and White Classic مجاني. القوالب الخاصة بهذا المكان فقط، مثل Zebbies All-Stars Football Intro أو Tengo muchos dólares، تظهر تحت «حصريًا في» مع اسم المكان. استخدم FloqAi أدناه لقوالب Sports وJersey وVIP وHumor وCars وVideo وPictures وBallers."
       },
       "help-floqai-template-search": {
         title: "بحث قالب FloqAi",
         body: "اضغط على العلامة المتحركة FloqAi (أو انتظر فقاعات حديثها)، ثم اطلب الرياضة، القمصان، NBA، NFL، السيارات، الفكاهة، كبار الشخصيات، الفيديو، الصور، أو اللاعبين."
+      },
+      "help-football-intro": {
+        title: "Zebbies All-Stars Football Intro",
+        body: "مقدمة ملعب مدتها 20 ثانية لأربعة لاعبين مقابل 30 دولارًا، متاحة في Zebbies Garden DC وHeist Washington DC وAurelia. اكتب «Football Intro» أو «Zebbies All-Stars» في البحث، واختر أحد هذه الأماكن، ثم ارفع أربع صور لديك إذن باستخدامها."
+      },
+      "help-tengo-muchos-dolares": {
+        title: "Tengo muchos dólares",
+        body: "حصري لـ Heist Washington DC مقابل 30 دولارًا. تظهر رسالتك أمام غرفة الخزنة؛ وبعد نحو 40 ثانية ينفجر باب الخزنة وتملأ أوراق المئة دولار الشاشة بالكامل، ثم تواصل التطاير خلف نصك. اكتب «Tengo muchos dólares» في البحث، ثم اكتب حتى 3 أسطر من 14 حرفًا."
+      },
+      "help-display-idle-default": {
+        title: "شاشة الانتظار: Use ShoutOut @ المكان",
+        body: "عندما لا يُعرض أي ShoutOut، يعرض Display 1 عبارة «Use ShoutOut @» مع اسم مكانك. يُعرض كل ShoutOut معتمد لمدة 10 دقائق ثم تعود الشاشة تلقائيًا إلى هذه الرسالة. إعادة ضبط الشاشة إلى الوضع الافتراضي في Club Admin تفعل ذلك فورًا."
       },
       "help-mingl-requests": {
         title: "حول طلبات Mingl",

@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.6 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.7 (stable)
+
+- s3.1.7: Venue-only templates are easy to find. The template picker lists them under "Exclusive at {venue}" right below the Default Template, and typing a template name ("Football Intro", "Zebbies All-Stars", "Tengo muchos dólares") in Search or FloqAi jumps to the venues that offer it. Zebbies All-Stars Football Intro is offered at Zebbies, Heist and Aurelia. Tengo muchos dólares starts like a normal ShoutOut; about 40 seconds in, the vault door blows open, big green $100 bills flood the whole board, then a smaller splash keeps going behind the text (the text always stays on top). Every club's idle board is "Use ShoutOut @ {club}"; a ShoutOut that ends (10-minute reset or Club Admin reset) returns the board to that message instead of leaving the last template up.
 
 - s3.1.6: Search page content drops below the profile card and opens with the FLOQR logo (same unframed logo as the ShoutOut page). The "Throw a ShoutOut" button is now the ShoutOut icon with the title underneath; tapping either goes straight to choosing a venue — the old ShoutOut landing page ("Start ShoutOut" / "Back to Search") is skipped (markup kept until removal is approved). Ad splash FLOQR logo is unframed; FloqMedia contact links are no longer underlined.
 
