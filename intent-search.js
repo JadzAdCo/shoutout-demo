@@ -71,7 +71,7 @@
       action: "template",
       templateId: "heistVaultDollars",
       searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "money rain", "vault night"],
-      patterns: [/tengo\s*muchos?\s*d[oó]l+ares/, /money\s*rain/, /make\s*it\s*rain/, /vault\s*night/]
+      patterns: [/te\w{2,3}\s*muchos?\s*d[oó]l+ar/, /muchos?\s*d[oó]l+ares/, /money\s*rain/, /make\s*it\s*rain/, /vault\s*night/]
     },
     {
       id: "suprstr",

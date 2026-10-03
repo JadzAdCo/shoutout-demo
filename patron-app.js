@@ -2177,11 +2177,12 @@
   function exclusiveTemplateForQuery(query) {
     const q = normalizeTemplateQuery(query);
     if (q.length < 4) return null;
+    const matcher = window.FLOQRTemplateMatch;
     return Object.values(window.SHOUTOUT_TEMPLATES || {}).find(template => {
       if (!Array.isArray(template.venueIds) || !template.venueIds.length) return false;
       if (String(template.status || "active") !== "active") return false;
       const phrases = [template.name, ...(template.searchAliases || [])].map(normalizeTemplateQuery).filter(p => p.length >= 4);
-      return phrases.some(phrase => q.includes(phrase));
+      return phrases.some(phrase => matcher ? matcher.phraseMatches(q, phrase) : q.includes(phrase));
     }) || null;
   }
 
@@ -3286,7 +3287,7 @@
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
   function templateSearchText(t) {
-    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
   function templateContextQuery() {
     const explicitContext = window.FLOQR_TEMPLATE_CONTEXT_QUERY || document.body?.dataset?.templateContextQuery || "";

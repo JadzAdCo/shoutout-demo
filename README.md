@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.7 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.8 (stable)
+
+- s3.1.8: Heist templates are easy to find for Club Admins and patrons. Club Admin → Customize a Template lists the club's own templates first, tagged "Exclusive at Heist", with one card per template (no duplicate Tengo card). Template search in Club Admin, the patron picker, Search and FloqAi now forgives missing accents, a missing plural "s" and a small typo, so "Tendo mucho dolares" finds Tengo muchos dólares. Heist keeps every Heist template assigned (Vault Night, Police Car, Interrogation, Tengo muchos dólares, Zebbies All-Stars Football Intro).
 
 - s3.1.7: Venue-only templates are easy to find. The template picker lists them under "Exclusive at {venue}" right below the Default Template, and typing a template name ("Football Intro", "Zebbies All-Stars", "Tengo muchos dólares") in Search or FloqAi jumps to the venues that offer it. Zebbies All-Stars Football Intro is offered at Zebbies, Heist and Aurelia. Tengo muchos dólares starts like a normal ShoutOut; about 40 seconds in, the vault door blows open, big green $100 bills flood the whole board, then a smaller splash keeps going behind the text (the text always stays on top). Every club's idle board is "Use ShoutOut @ {club}"; a ShoutOut that ends (10-minute reset or Club Admin reset) returns the board to that message instead of leaving the last template up.
 

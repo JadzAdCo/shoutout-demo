@@ -552,30 +552,46 @@
   }
 
   function templateBackgroundSearchText(template = {}) {
-    return [template.id, template.name, template.category, template.description, ...(template.tags || [])].join(" ").toLowerCase();
+    return window.FLOQRTemplateMatch?.templateText?.(template)
+      || [template.id, template.name, template.category, template.description, ...(template.tags || [])].join(" ").toLowerCase();
+  }
+
+  function templateMatchesQuery(template, query) {
+    if (!query) return true;
+    const text = templateBackgroundSearchText(template);
+    return window.FLOQRTemplateMatch ? window.FLOQRTemplateMatch.textMatches(query, text) : text.toLowerCase().includes(query);
+  }
+
+  function clubExclusiveLabel() {
+    const venue = publicClubProfile.brandName || loc.brandName || publicClubProfile.locationName || loc.locationName || "";
+    return window.FLOQRI18n?.t ? window.FLOQRI18n.t("template.venueExclusive", {venue}) : `Exclusive at ${venue}`;
   }
 
   function renderClubTemplateBackgrounds() {
     const wrap = byId("clubTemplateBackgroundList");
     if (!wrap) return;
     const query = String(byId("clubTemplateBackgroundSearch")?.value || "").trim().toLowerCase();
-    const formats = publicClubProfile.displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
     const assignedIds = new Set(publicClubProfile.templates || loc.templates || []);
-    const rows = Object.values(clubTemplates)
+    const isExclusive = template => (template.venueIds || []).includes(locationId);
+    const byTemplateId = new Map();
+    Object.values(clubTemplates).forEach(template => { if (template?.id && !byTemplateId.has(template.id)) byTemplateId.set(template.id, template); });
+    const rank = template => isExclusive(template) ? 0 : assignedIds.has(template.id) ? 1 : 2;
+    const rows = Array.from(byTemplateId.values())
       .filter(template => String(template.status || "active") === "active")
       .map(template => window.FLOQRScreenDatapoints?.applyTemplate?.({...template}) || template)
       .filter(template => window.FLOQRScreenDatapoints?.templateFitsVenue?.(template, publicClubProfile || loc) !== false)
-      .filter(template => !query || templateBackgroundSearchText(template).includes(query))
-      .sort((a,b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+      .filter(template => templateMatchesQuery(template, query))
+      .sort((a,b) => rank(a) - rank(b) || String(a.name || a.id).localeCompare(String(b.name || b.id)));
+    const exclusiveLabel = clubExclusiveLabel();
     wrap.innerHTML = rows.map(template => {
       const editable = template.backgroundEditable !== false;
       const count = clubTemplateVariants.filter(variant => variant.baseTemplateId === template.id && String(variant.status || "active") === "active").length;
-      const assigned = assignedIds.has(template.id) || (template.venueIds || []).includes(locationId);
-      return `<article class="template ${esc(template.className || "neon")}">
+      const assigned = assignedIds.has(template.id) || isExclusive(template);
+      return `<article class="template ${esc(template.className || "neon")}" data-template-id="${esc(template.id)}">
         <div class="template-mini-preview"><strong>${esc(template.defaultMain || "SHOUTOUT")}</strong><span>${esc(template.defaultSub || template.category || "")}</span></div>
         <div class="name">${esc(template.name || template.id)}</div>
         <div class="tag">${editable ? "Editable background" : "Background locked by Master Admin"}</div>
-        <div class="tag-row"><span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
+        <div class="tag-row">${isExclusive(template) ? `<span class="template-exclusive-tag">${esc(exclusiveLabel)}</span>` : ""}<span>${esc(template.category || "Shared")}</span><span>${count} club background${count === 1 ? "" : "s"}</span><span>${assigned ? "Assigned" : "Not assigned"}</span></div>
         <div class="queue-actions">
           ${editable ? `<button type="button" data-club-template-customize="${esc(template.id)}">Customize for this club</button>` : '<button type="button" disabled>Use original design only</button>'}
           ${assigned ? `<button type="button" data-club-template-remove="${esc(template.id)}">Remove template</button>` : `<button type="button" data-club-template-assign="${esc(template.id)}">Assign template</button>`}

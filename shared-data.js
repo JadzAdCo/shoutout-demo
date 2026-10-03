@@ -2011,3 +2011,62 @@ window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*10
     });
   }
 })();
+
+/* Template name matching: accents, plural "s" and one-letter typos ("tendo mucho dolares"). Design notes: .cursor/rules/design-notes-template-discovery-idle.mdc */
+(function(){
+  function normalize(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  }
+  function tokens(value) {
+    return normalize(value).split(" ").filter(Boolean);
+  }
+  function withinDistance(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return false;
+    let prev = Array.from({length: b.length + 1}, (_, i) => i);
+    for (let i = 1; i <= a.length; i += 1) {
+      const row = [i];
+      let best = i;
+      for (let j = 1; j <= b.length; j += 1) {
+        row[j] = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        best = Math.min(best, row[j]);
+      }
+      if (best > max) return false;
+      prev = row;
+    }
+    return prev[b.length] <= max;
+  }
+  function stem(token) {
+    return token.length > 4 && token.endsWith("s") ? token.slice(0, -1) : token;
+  }
+  function tokenMatches(want, have) {
+    if (stem(want) === stem(have)) return true;
+    if (want.length <= 3 || have.length <= 3) return false;
+    return withinDistance(want, have, want.length >= 7 ? 2 : 1);
+  }
+  function phraseMatches(query, phrase) {
+    const have = tokens(query);
+    const want = tokens(phrase).filter(token => token.length >= 2);
+    if (!want.length) return false;
+    const exact = token => have.some(candidate => stem(token) === stem(candidate));
+    const allowTypo = want.filter(token => token.length >= 4).length >= 2;
+    let typos = 0;
+    return want.every(token => {
+      if (exact(token)) return true;
+      if (!allowTypo || typos >= 1 || token.length < 4) return false;
+      typos += 1;
+      return have.some(candidate => tokenMatches(token, candidate));
+    });
+  }
+  function textMatches(query, text) {
+    const want = tokens(query).filter(token => token.length >= 2);
+    if (!want.length) return true;
+    const haystack = normalize(text);
+    const have = haystack.split(" ").filter(Boolean);
+    return want.every(token => haystack.includes(token) || have.some(candidate => tokenMatches(token, candidate)));
+  }
+  function templateText(template) {
+    template = template || {};
+    return [template.id, template.name, template.category, template.description].concat(template.tags || [], template.searchAliases || [], template.searchKeywords || []).join(" ");
+  }
+  window.FLOQRTemplateMatch = {normalize: normalize, phraseMatches: phraseMatches, textMatches: textMatches, templateText: templateText};
+})();

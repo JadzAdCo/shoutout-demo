@@ -174,6 +174,10 @@
         title: "Tengo muchos dólares",
         body: "Эксклюзив Heist Washington DC за $30. Ваше сообщение идёт на фоне хранилища; примерно через 40 секунд дверь сейфа взрывается, купюры по $100 заполняют весь экран, а затем продолжают разлетаться за вашим текстом. Введите в поиске «Tengo muchos dólares» и напишите до 3 строк по 14 символов."
       },
+      "help-club-template-repository": {
+        title: "Шаблоны вашего клуба",
+        body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
+      },
       "help-display-idle-default": {
         title: "Экран ожидания: Use ShoutOut @ площадка",
         body: "Когда ShoutOut не показывается, Display 1 показывает «Use ShoutOut @» и название вашей площадки. Каждый одобренный ShoutOut идёт 10 минут, затем экран сам возвращается к этому сообщению. Сброс экрана по умолчанию в Club Admin делает это сразу."
@@ -371,6 +375,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Exclusief bij Heist Washington DC voor $30. Je bericht speelt voor de kluis; na ongeveer 40 seconden vliegt de kluisdeur open, vullen biljetten van $100 het hele scherm en blijven ze daarna achter je tekst rondvliegen. Typ ‘Tengo muchos dólares’ in Zoeken en schrijf maximaal 3 regels van 14 tekens."
+      },
+      "help-club-template-repository": {
+        title: "Sjablonen van je club",
+        body: "Sjablonen die alleen voor je club zijn, staan bovenaan met ‘Exclusief bij’ en de naam van je locatie. Toegewezen sjablonen kunnen gasten bij je club kiezen; wijzig dat met Sjabloon toewijzen of Sjabloon verwijderen. Zoeken vindt een sjabloon ook zonder accent of met een kleine typfout."
       },
       "help-display-idle-default": {
         title: "Rustscherm: Use ShoutOut @ locatie",
@@ -570,6 +578,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivité Heist Washington DC à 30 $. Votre message s’affiche devant la chambre forte ; vers 40 secondes, la porte du coffre explose, des billets de 100 $ envahissent tout l’écran, puis continuent de jaillir derrière votre texte. Tapez « Tengo muchos dólares » dans Recherche, puis écrivez jusqu’à 3 lignes de 14 caractères."
       },
+      "help-club-template-repository": {
+        title: "Les modèles de votre club",
+        body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
+      },
       "help-display-idle-default": {
         title: "Écran d’attente : Use ShoutOut @ lieu",
         body: "Quand aucun ShoutOut n’est diffusé, Display 1 affiche « Use ShoutOut @ » suivi du nom de votre lieu. Chaque ShoutOut approuvé passe 10 minutes, puis l’écran revient seul à ce message. La réinitialisation de l’affichage par défaut dans Club Admin le fait immédiatement."
@@ -767,6 +779,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Exklusiv bei Heist Washington DC für 30 $. Deine Nachricht läuft vor dem Tresorraum; nach etwa 40 Sekunden fliegt die Tresortür auf, 100-$-Scheine füllen den ganzen Bildschirm und wirbeln danach weiter hinter deinem Text. Gib „Tengo muchos dólares“ in der Suche ein und schreibe bis zu 3 Zeilen mit je 14 Zeichen."
+      },
+      "help-club-template-repository": {
+        title: "Vorlagen deines Clubs",
+        body: "Vorlagen nur für deinen Club stehen ganz oben und sind mit „Exklusiv bei“ und dem Namen deiner Location markiert. Zugewiesene Vorlagen können Gäste in deinem Club wählen; ändere das mit Vorlage zuweisen oder Vorlage entfernen. Die Suche findet eine Vorlage auch ohne Akzent oder mit einem kleinen Tippfehler."
       },
       "help-display-idle-default": {
         title: "Ruhebildschirm: Use ShoutOut @ Location",
@@ -966,6 +982,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivo de Heist Washington DC por $30. Tu mensaje aparece frente a la bóveda; a los 40 segundos aproximadamente, la puerta de la caja fuerte explota, billetes de $100 llenan toda la pantalla y luego siguen saltando detrás de tu texto. Escribe «Tengo muchos dólares» en Buscar y escribe hasta 3 líneas de 14 caracteres."
       },
+      "help-club-template-repository": {
+        title: "Plantillas de tu club",
+        body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
+      },
       "help-display-idle-default": {
         title: "Pantalla en espera: Use ShoutOut @ local",
         body: "Cuando no se muestra ningún ShoutOut, Display 1 muestra «Use ShoutOut @» con el nombre de tu local. Cada ShoutOut aprobado se muestra 10 minutos y luego la pantalla vuelve sola a ese mensaje. Restablecer la pantalla predeterminada en Club Admin lo hace al instante."
@@ -1163,6 +1183,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Esclusiva Heist Washington DC a 30 $. Il tuo messaggio appare davanti al caveau; dopo circa 40 secondi la porta della cassaforte esplode, banconote da 100 $ riempiono tutto lo schermo e poi continuano a volare dietro il tuo testo. Scrivi «Tengo muchos dólares» in Cerca, poi scrivi fino a 3 righe da 14 caratteri."
+      },
+      "help-club-template-repository": {
+        title: "I modelli del tuo club",
+        body: "I modelli creati solo per il tuo club compaiono per primi, contrassegnati da «Esclusivo da» e dal nome del locale. I modelli assegnati sono quelli che i clienti possono scegliere nel tuo club; modificali con Assegna modello o Rimuovi modello. La ricerca trova un modello anche senza accento o con un piccolo errore di battitura."
       },
       "help-display-idle-default": {
         title: "Schermo di attesa: Use ShoutOut @ locale",
@@ -1362,6 +1386,10 @@
         title: "Tengo muchos dólares",
         body: "Exclusivo do Heist Washington DC por US$ 30. Sua mensagem aparece diante da caixa-forte; por volta dos 40 segundos, a porta do cofre explode, notas de US$ 100 enchem a tela inteira e depois continuam voando atrás do seu texto. Digite «Tengo muchos dólares» na Busca e escreva até 3 linhas de 14 caracteres."
       },
+      "help-club-template-repository": {
+        title: "Modelos do seu clube",
+        body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
+      },
       "help-display-idle-default": {
         title: "Tela de espera: Use ShoutOut @ local",
         body: "Quando nenhum ShoutOut está no ar, o Display 1 mostra «Use ShoutOut @» com o nome do seu local. Cada ShoutOut aprovado fica 10 minutos e depois a tela volta sozinha para essa mensagem. Redefinir a tela padrão no Club Admin faz isso na hora."
@@ -1559,6 +1587,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "Αποκλειστικό του Heist Washington DC με $30. Το μήνυμά σας παίζει μπροστά στο θησαυροφυλάκιο· περίπου στα 40 δευτερόλεπτα η πόρτα του χρηματοκιβωτίου εκρήγνυται, χαρτονομίσματα των $100 γεμίζουν όλη την οθόνη και μετά συνεχίζουν να πετούν πίσω από το κείμενό σας. Πληκτρολογήστε «Tengo muchos dólares» στην Αναζήτηση και γράψτε έως 3 γραμμές των 14 χαρακτήρων."
+      },
+      "help-club-template-repository": {
+        title: "Τα πρότυπα του club σας",
+        body: "Τα πρότυπα που έγιναν μόνο για το club σας εμφανίζονται πρώτα, με την ένδειξη «Αποκλειστικά στο» και το όνομα του χώρου. Τα ανατεθειμένα πρότυπα είναι αυτά που μπορούν να επιλέξουν οι πελάτες στο club σας· αλλάξτε τα με Ανάθεση ή Αφαίρεση προτύπου. Η αναζήτηση βρίσκει ένα πρότυπο ακόμη και χωρίς τόνο ή με μικρό ορθογραφικό λάθος."
       },
       "help-display-idle-default": {
         title: "Οθόνη αναμονής: Use ShoutOut @ χώρος",
@@ -1758,6 +1790,10 @@
         title: "Tengo muchos dólares",
         body: "Wyłącznie w Heist Washington DC za 30 $. Twoja wiadomość wyświetla się przed skarbcem; po około 40 sekundach drzwi sejfu wybuchają, banknoty 100 $ wypełniają cały ekran, a potem dalej fruwają za Twoim tekstem. Wpisz „Tengo muchos dólares” w wyszukiwarce i napisz do 3 linii po 14 znaków."
       },
+      "help-club-template-repository": {
+        title: "Szablony Twojego klubu",
+        body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
+      },
       "help-display-idle-default": {
         title: "Ekran oczekiwania: Use ShoutOut @ lokal",
         body: "Gdy nie leci żaden ShoutOut, Display 1 pokazuje „Use ShoutOut @” z nazwą Twojego lokalu. Każdy zatwierdzony ShoutOut trwa 10 minut, potem ekran sam wraca do tego komunikatu. Przywrócenie domyślnego ekranu w Club Admin robi to od razu."
@@ -1955,6 +1991,10 @@
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
         body: "حصري لـ Heist Washington DC مقابل 30 دولارًا. تظهر رسالتك أمام غرفة الخزنة؛ وبعد نحو 40 ثانية ينفجر باب الخزنة وتملأ أوراق المئة دولار الشاشة بالكامل، ثم تواصل التطاير خلف نصك. اكتب «Tengo muchos dólares» في البحث، ثم اكتب حتى 3 أسطر من 14 حرفًا."
+      },
+      "help-club-template-repository": {
+        title: "قوالب ناديك",
+        body: "تظهر القوالب المصممة لناديك فقط في المقدمة مع عبارة «حصريًا في» واسم المكان. القوالب المعيّنة هي التي يمكن للزبائن اختيارها في ناديك؛ غيّر ذلك عبر تعيين القالب أو إزالة القالب. يعثر البحث على القالب حتى بدون علامات التشكيل أو مع خطأ إملائي بسيط."
       },
       "help-display-idle-default": {
         title: "شاشة الانتظار: Use ShoutOut @ المكان",
