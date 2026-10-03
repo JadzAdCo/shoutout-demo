@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.4"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.6"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -274,6 +274,10 @@
       <button id="logoutBtn2" type="button" data-i18n="app.signOut">Sign out</button>
     </header>
 
+    <div class="category-brand-stack">
+      <img src="./images/floqr-color.png" alt="FLOQR" class="product-parent-logo" onerror="this.classList.add('hidden')"/>
+    </div>
+
     <div id="categoryFloqAiSearch" class="category-floqai-search">
       <div class="category-floqai-intro">
         <span class="category-floqai-mark" aria-hidden="true"><span class="category-floqai-mark-halo"></span><img src="./images/floqr-tiles-transparent.png" alt="" width="56" height="56"/></span>
@@ -287,7 +291,10 @@
 
     <div class="category-grid compact-category-grid">
       <div class="category-or" data-i18n="cat.or">Or</div>
-      <button id="shoutoutBtnCard" class="category-card hot" type="button" data-feature-key="shoutOut" data-i18n="cat.shoutout">Throw a ShoutOut</button>
+      <button id="shoutoutBtnCard" class="shoutout-icon-card" type="button" data-feature-key="shoutOut">
+        <img src="./shoutout-logo.png?v=29.09.33" alt="" class="shoutout-icon-img" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='./images/shoutout-logo.png?v=29.09.33'}else{this.classList.add('hidden')}"/>
+        <span class="shoutout-icon-title" data-i18n="cat.shoutout">Throw a ShoutOut</span>
+      </button>
       <button id="minglBtnCard" class="category-card mingl-card hidden" type="button" data-feature-key="mingl" data-i18n="cat.mingl">Mingl</button>
       <a id="bartrBtnCard" class="category-card bartr-card hidden" href="./commerce.html?v=s3.0.108&from=search" data-feature-key="bartr" data-i18n="cat.bartr">Trade by BartR</a>
       <a id="rydrBtnCard" class="category-card rydr-card hidden" href="./rydr.html?v=s3.0.108&from=search" data-feature-key="rydr" data-i18n="cat.rydr">RydR</a>
@@ -771,7 +778,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.4"></script>
+<script src="./floqr-nav.js?v=s3.1.6"></script>
 <script src="./floqr-i18n.js?v=s3.1.4"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
 <script src="./floqai-help-repository.js?v=s3.1.0"></script>
@@ -811,7 +818,7 @@
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
 <script src="./welcome-button-gradient.js?v=s3.1.2"></script>
-<script src="./patron-app.js?v=s3.1.5"></script>
+<script src="./patron-app.js?v=s3.1.6"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

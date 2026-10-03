@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.5 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.6 (stable)
+
+- s3.1.6: Search page content drops below the profile card and opens with the FLOQR logo (same unframed logo as the ShoutOut page). The "Throw a ShoutOut" button is now the ShoutOut icon with the title underneath; tapping either goes straight to choosing a venue — the old ShoutOut landing page ("Start ShoutOut" / "Back to Search") is skipped (markup kept until removal is approved). Ad splash FLOQR logo is unframed; FloqMedia contact links are no longer underlined.
 
 - s3.1.5: The "Zebbies All-Stars" Football Intro template (`zebbiesFootballTeamIntro`, $30, four photos, 20 seconds) is now available at Heist Washington DC and Aurelia (`temp-democlub-1`) as well as Zebbies Garden. Composer, checkout (`commerce-functions.js`) and board all accept the three venues; the order keeps the venue it was bought for. The All-Stars headline and finale label use the venue brand (HEIST ALL-STARS, AURELIA ALL-STARS, ZEBBIES ALL-STARS).
 
