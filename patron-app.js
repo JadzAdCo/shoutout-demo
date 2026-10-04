@@ -130,7 +130,7 @@
   function footballIntroDefaultMain() {
     const loc = getLocation() || {};
     const brand = String(loc.brandName || loc.locationName || "Zebbies").trim().toUpperCase();
-    return `${brand} ALL-STARS`;
+    return `${brand} FOOTBALL INTRO`;
   }
   function isSoccerJerseyTemplate(templateId = selectedTemplate) {
     const id = String(templateId || selectedTemplate || "");
@@ -3335,8 +3335,21 @@
     renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage");
   }
   function showTemplateSelection(){ renderTemplates(); updateTemplateSummary(); showPage("templateSelectPage"); }
+  let venueTemplateTags = {locationId:"", map:{}};
+  async function ensureVenueTemplateTags() {
+    const id = locationId();
+    if (venueTemplateTags.locationId === id) return venueTemplateTags.map;
+    let map = {};
+    try { map = await window.FLOQRTemplateTags?.loadVenueTags?.(db, id) || {}; }
+    catch (error) { console.warn("Venue template tags unavailable", error?.code || "", error?.message || error); }
+    venueTemplateTags = {locationId:id, map};
+    return map;
+  }
+  function venueTagsFor(t = {}) {
+    return venueTemplateTags.locationId === locationId() ? (venueTemplateTags.map[t.id] || []) : [];
+  }
   function templateSearchText(t) {
-    return `${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
+    return `${venueTagsFor(t).join(" ")} ${t.name || ""} ${t.category || ""} ${t.scope || ""} ${t.mediaMode || ""} ${t.description || ""} ${(t.tags || []).join(" ")} ${(t.searchKeywords || []).join(" ")} ${(t.searchAliases || []).join(" ")} ${t.supportsMedia || t.supportsImage || t.supportsVideo ? "image video photo media placeholder upload" : "no image no video classic text only"}`.toLowerCase();
   }
   function templateContextQuery() {
     const explicitContext = window.FLOQR_TEMPLATE_CONTEXT_QUERY || document.body?.dataset?.templateContextQuery || "";
@@ -3424,7 +3437,7 @@
     const supportedFormats = venueFormats.filter(id => window.FLOQRTextLayout?.resolve?.(template, id)?.supported !== false);
     const sizeLabels = { "led-96x48": "96×48", "led-64x48": "64×48", "led-64x32": "64×32" };
     const sizeChips = supportedFormats.map(id => sizeLabels[id] || id).filter((label, i, arr) => arr.indexOf(label) === i).slice(0, 3);
-    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : (template.tags || []).slice(0, 3);
+    const tags = ((template.sport === "soccer" || template.sport === "nfl") && template.defaultBackgroundUrl) ? jerseyPublicTags(template) : Array.from(new Set([...venueTagsFor(template), ...(template.tags || [])])).slice(0, 3);
     const jerseyTagLine = template.sport === "nfl" && template.defaultBackgroundUrl
       ? `NFL · Jersey · ${template.league || "NFL"}`
       : (template.sport === "soccer" && template.defaultBackgroundUrl ? `Soccer · Jersey · ${template.league === "National teams" ? "Country" : "Club"}` : (template.mediaMode || (template.supportsMedia ? tt("template.mediaPlaceholder", {}, "Image/video placeholder") : tt("template.noMedia", {}, "No image/video"))));
@@ -3435,6 +3448,7 @@
       <div class="tag-row">${template.priceCents ? `<span>${esc(template.priceLabel || `$${(Number(template.priceCents) / 100).toFixed(2)}`)}</span>` : ""}${sizeChips.map(label => `<span>${esc(label)}</span>`).join("")}${tags.map(tag => `<span>${esc(tag)}</span>`).join("")}</div>
       <div class="button-row template-card-actions">
         <button type="button" data-template-open="${esc(template.id)}">${esc(tt("template.use", {}, "Use"))}</button>
+        <button type="button" class="secondary" data-template-preview="${esc(template.id)}">${esc(tt("templatePreview.button", {}, "Preview"))}</button>
         ${canCustomize ? `<button type="button" data-template-customize="${esc(template.id)}">${esc(tt("template.customizeBackground", {}, "Customize Background"))}</button>` : `<span class="template-background-lock">${esc(template.backgroundEditable === false ? tt("template.backgroundLocked", {}, "Background locked") : tt("template.clubCustomizationOff", {}, "Club customization off"))}</span>`}
       </div>
     </div>`;
@@ -3453,6 +3467,7 @@
   }
   async function renderTemplates() {
     const grid = byId("templateGrid"); if (!grid) return; grid.innerHTML = "";
+    await ensureVenueTemplateTags();
     const query = (byId("templateSearch")?.value || "").trim().toLowerCase();
     const discoveryQuery = query || templateContextQuery();
     const locationFormats = getLocation().displayScreenFormatIds || window.FLOQR_DEFAULT_DISPLAY_FORMAT_IDS || ["led-96x48"];
@@ -3548,6 +3563,12 @@
     grid.querySelectorAll("[data-template-customize]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();
       openStudioForTemplate(getTemplate(btn.dataset.templateCustomize));
+    }));
+    grid.querySelectorAll("[data-template-preview]").forEach(btn => btn.addEventListener("click", event => {
+      event.stopPropagation();
+      const id = btn.dataset.templatePreview;
+      const template = (window.FLOQRSoccerPhotoTeams?.() || []).find(team => team.id === id) || getTemplate(id);
+      window.FLOQRTemplatePreview?.open(template, {locationId:locationId(), location:getLocation() || {}});
     }));
     grid.querySelectorAll("[data-variant-open]").forEach(btn => btn.addEventListener("click", event => {
       event.stopPropagation();

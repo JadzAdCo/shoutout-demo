@@ -1,12 +1,14 @@
 ---
-description: Zebbies All-Stars Football Intro venue list (Zebbies, Heist DC, Aurelia) — s3.1.5
+description: Football Intro (formerly Zebbies All-Stars) venue list (Zebbies, Heist DC, Aurelia) and 96×48-only playback — s3.1.5 / s3.1.11
 alwaysApply: false
 ---
-# Football Intro (All-Stars) venues (s3.1.5)
+# Football Intro venues (s3.1.5, renamed + 96×48 only in s3.1.11)
 
-Resume: `@all-stars$`.
+Resume: `@football-intro$` / `@all-stars$`.
 
-Template id stays `zebbiesFootballTeamIntro` (old orders, rules, and diagnostics key on it). It is offered at:
+**Name (s3.1.11):** visible name is **Football Intro** everywhere (template `name`, help titles in 11 languages, intent label, checkout error, composer eyebrow). Old phrasing still finds it: `searchAliases` + tags keep `zebbies all star(s)`, `all stars`. Template id stays `zebbiesFootballTeamIntro` (old orders, rules, and diagnostics key on it).
+
+It is offered at:
 
 | Venue | Location id |
 |---|---|
@@ -20,6 +22,8 @@ Three places must agree when the list changes:
 2. `functions/commerce-functions.js` → `FOOTBALL_TEAM_INTRO_LOCATION_IDS` (server gate in `normalizeCheckoutPayload` + `describeOrder`; order keeps the requested club). Redeploy `createFloqrCheckoutSession`.
 3. Restricted venues (`restrictTemplatesToLocationSet`) also list the id in their `templates`.
 
-Headline default and finale label are `{BRAND} ALL-STARS` from the venue `brandName` (composer `footballIntroDefaultMain()`, board `allStarsLabel` in `display-app.js`).
+**96×48 only (s3.1.11, owner request):** `Is96x48:1, Is64x48:0, Is64x32:0`, `screenFormatIds` / `preferredFormatIds` = `['led-96x48']`. Same for Tengo muchos dólares (`heistVaultDollars` + alias `heistRedLux`). Checkout forces `screenFormatId:"led-96x48"` via `LED_96X48_ONLY_TEMPLATE_IDS` (Heist art used to default to `led-64x32`). All three venues have a 96×48 board (Heist: primary 96×48, secondary 64×32 → these play on `display.html` only).
+
+Headline default and finale label are `{BRAND} FOOTBALL INTRO` from the venue `brandName` (composer `footballIntroDefaultMain()`, board `allStarsLabel` in `display-app.js`; variable name kept).
 
 Tests: `functions/football-intro-venues.test.js`.

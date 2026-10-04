@@ -1,5 +1,5 @@
 ---
-description: Venue-exclusive template discovery, Tengo muchos dólares vault blast + money splash timeline, idle board always "Use ShoutOut @ {club}" (s3.1.7)
+description: Venue-exclusive template discovery, Tengo muchos dólares vault blast + money splash timeline, idle board always "Use ShoutOut @ {club}" (s3.1.7), template Preview + venue template tags with Administer / Manage Templates roles (s3.1.11)
 alwaysApply: false
 ---
 
@@ -12,7 +12,23 @@ Resume: `@templates$` / `$money-rain$`.
 - Patron picker reads only packaged `window.SHOUTOUT_TEMPLATES` (never the Firestore `templates` collection). Ids = `blackwhite` + `location.templates` + templates whose `venueIds` include the venue + standard ids, then `status==='active'` + `templateFitsVenue`.
 - Default view: Default Template card, then **Exclusive at {venue}** (`template.venueExclusive`, all 11 chrome packs) listing every record whose `venueIds` includes the current venue.
 - Search box (`submitCategoryVenueQuery`) and FloqAi intents (`action:"template"`) route template names through `exclusiveTemplateForQuery` (name + `searchAliases`, accent/punctuation-insensitive, ≥ 4 chars) → `startTemplateShoutout`: one venue → ad splash → composer; several → venue grid filtered to `venueIds`; the name is pre-filled into `#templateSearch`.
-- Zebbies All-Stars Football Intro: `zebbies-garden-washington-dc`, `heist-washington-dc`, `temp-democlub-1` (Aurelia). Backend checkout set must match.
+- Football Intro (formerly Zebbies All-Stars): `zebbies-garden-washington-dc`, `heist-washington-dc`, `temp-democlub-1` (Aurelia). Backend checkout set must match. 96×48 only since s3.1.11 — see `design-notes-football-intro-venues.mdc`.
+
+## Template Preview (s3.1.11)
+
+- `floqr-template-preview.js` → `window.FLOQRTemplatePreview` (`sampleFor`, `formatsFor`, `previewUrl`, `open`). Patron picker `templateCard` adds **Preview** (`data-template-preview`) on every official card (default, Exclusive, search results). Soccer photo-team cards resolve through `FLOQRSoccerPhotoTeams()`.
+- Modal iframe = `display.html?location=…&template=…&main=…&screen=<fmt>&preview=1` (URL-preview mode paints from the URL and never reads Firestore). **No `?v=`** on this Display URL. Size buttons = `overlappingFormatIds(template, venue)` ∩ supported layouts, largest first.
+- Sample by `FLOQRTextLayout.profileId`: `splitMedia` → `images/template-preview/sample-birthday.jpg` (birthday) / `sample-romance.jpg` (anniversary, engagement, fiancé); `christine` → `sample-club-night.jpg`; `footballIntro` → four `football-player-{1..4}.svg` + `{BRAND} FOOTBALL INTRO`; `nameOnly` → `@FloqrStar`; `classicBoard` → uppercase, no emoji; `car` → RIDIN' RARI; jerseys → NYX + number with the team photo back; others → HAPPY BIRTHDAY MAYA! 🎉. Photos are AI-generated still lifes (no people), 640 px JPEG.
+- Strings `templatePreview.*` (11 chrome packs); help `help-template-preview` (patron).
+
+## Venue template tags + template roles (s3.1.11)
+
+- Owner ask: venue/club admins **or their assigned operatives** add tags to every template offered at their venue. Roles: **Administer Templates** → Template Administrator (read, write, delete); **Manage Templates** → Template Manager (read, write).
+- Data: `venueTemplateTags/{locationId}__{templateId}` `{clubLocationId, templateId, tags[] ≤30, updatedByUid, updatedByEmail, updatedAt, revision}`; `venueTemplateRoles/{locationId}_{uid}` `{clubLocationId, uid, email, displayName, role: administrator|manager, status: active|revoked, grantedByUid, grantedByEmail, updatedAt}`.
+- Rules (control, not the UI): tags public read (patron search). Create = `canManageTemplates`. Update = administrator, **or** manager only when `tags.hasAll(oldTags)` (a manager can add, never remove). Delete = administrator. Club managers (`isClubManager`) are always administrators. Role docs: only `isClubManager(clubId)` can write; `get` by the holder or a club manager (no list queries — read by doc id).
+- Why not `clubEmployeeDesignations.rolePermissions`: that collection is writable by any signed-in user (open finding), so it is only the **editor**. Club Admin → REP ticks `administerTemplates` / `manageTemplates`; `admin-rep-extension.js` `syncTemplateRoles` writes the role doc (Administer wins) and sends an Inbox row `type:"templateRole"` → `./template-tags.html?location=…&v=<APP_V>` (label “Open template tags”). Unticking writes `status:"revoked"`.
+- Page `template-tags.html` (satellite, `FLOQRSessionShell`) lists `FLOQRTemplateTags.templatesForVenue` (same set as the patron picker), shows FLOQR tags read-only and venue tags as chips (× only for administrators). Club Admin card “Manage template tags” links there.
+- Search: patron `templateSearchText` and card tag chips include venue tags (`ensureVenueTemplateTags` per venue); Club Admin repository search too. Help `help-template-tags` (venueAdmin + serviceMember).
 
 ## Club Admin template repository + forgiving match (s3.1.8)
 
@@ -42,9 +58,9 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 
 ### Name-only + typed line (s3.1.10)
 
-- Template fields: `nameOnly:true`, `maxNameCharacters:14`, `typedLine:'Tengo muchos dólares.. just completed a heist!'` (official spelling; the owner typed "Tendo mucho dolares"). `lineCount` / caps unchanged, so checkout `fitCheckoutDisplayText` keeps the ≤ 14-glyph name on one row (no backend change).
+- Template fields: `nameOnly:true`, `maxNameCharacters:14`, `typedLine:'Tengo muchos dólares... I just did a heist!'` (official spelling; the owner typed "Tendo mucho dolares"). `lineCount` / caps unchanged, so checkout `fitCheckoutDisplayText` keeps the ≤ 14-glyph name on one row (no backend change).
 - Composer: `floqr-name-shoutout.js` → `window.FLOQRNameShoutout` (`isNameOnly`, `maxName`, `capName`, `suggestions`, `bind`). `patron-app.js` `syncNameShoutoutFields()` (called from `syncSoccerJerseyFields`) hides `#mainText`, attribution controls and the recommendations card, shows `#nameShoutoutFields`, writes the name into `#mainText` and clears `#subText`. Suggestions: own Mingl handle → own Instagram → own display name, then public profiles (`users` where `publicProfileVisibility === "public"`, ≤ 500, lazy on focus) Mingl + Instagram handles. Accent/`@`-folded substring on value or display name; starts-with first; dedupe; max 8. Free text is allowed (a name needn't be a FLOQR user).
-- Board: `display-app.js` text-overlay branch → `typedLineBoardHtml(name, typedLine)` (big name, then a monospace gold line). `startTypedLine()` types one glyph every 110 ms after 900 ms with a blinking caret; re-runs every Heist message phase (after the brand slide). Idle CTA never uses the typed board. `stopTypedLine()` on every render and in `purgeDisplaySurface`.
+- Board: `display-app.js` text-overlay branch → `typedLineBoardHtml(name, typedLine)` (big name, then a monospace gold line). `startTypedLine()` types one glyph every 110 ms after 900 ms with a blinking caret; re-runs every Heist message phase (after the brand slide). Idle CTA never uses the typed board. s3.1.11: line text “Tengo muchos dólares... I just did a heist!” and bigger type (`.typed-line` `font-size:min(10.5vh,5.6vw)`, `width:96%`, two rows on 96×48). `stopTypedLine()` on every render and in `purgeDisplaySurface`.
 
 ## Search box: partial names + events and clubs (s3.1.10)
 
@@ -59,4 +75,4 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 - **Reset display to default** writes the same text + `idleCta:true`.
 - **s3.1.9 bug + fix:** approve merges onto the idle doc, so `idleCta:true` / `source:automaticTenMinuteReset` survived and the board hid the approved ShoutOut (Heist SO-0752287). Board uses `isIdlePayload` (status `approved`/`live`/`preview` is never idle). Club Admin approve and `messagingInboundWebhook` approve write `idleCta:false`, a `source`, and delete `expiredAt`.
 
-Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`, `functions/heist-name-shoutout.test.js`.
+Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`, `functions/heist-name-shoutout.test.js`, `functions/template-preview-tags.test.js`.

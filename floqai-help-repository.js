@@ -1292,7 +1292,7 @@
     {
       id: "help-default-template",
       title: "Default Template",
-      body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Zebbies All-Stars Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
+      body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
       searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       source: "help-repository-seed",
@@ -1309,8 +1309,8 @@
     },
     {
       id: "help-football-intro",
-      title: "Zebbies All-Stars Football Intro",
-      body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” or “Zebbies All-Stars” in Search, pick one of those venues, then upload four photos you have permission to use.",
+      title: "Football Intro",
+      body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only.",
       searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars template", "team intro", "four player intro"],
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       audiences: ["patron"],
@@ -1320,8 +1320,8 @@
     {
       id: "help-tengo-muchos-dolares",
       title: "Tengo muchos dólares",
-      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares.. just completed a heist!” letter by letter.",
-      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just completed a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
+      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares... I just did a heist!” letter by letter. Plays on 96×48 displays only.",
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just did a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       audiences: ["patron"],
       source: "help-repository-seed",
@@ -1336,6 +1336,26 @@
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
+    },
+    {
+      id: "help-template-tags",
+      title: "Template tags",
+      body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",
+      searchPhrases: ["template tags", "add tags", "tag templates", "administer templates", "manage templates", "template administrator", "template manager"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin", "serviceMember"],
+      source: "help-repository-seed",
+      page: "template-tags.html"
+    },
+    {
+      id: "help-template-preview",
+      title: "Preview a template",
+      body: "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos.",
+      searchPhrases: ["preview template", "template preview", "see template", "try template", "what does the template look like"],
+      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#templates"
     },
     {
       id: "help-display-idle-default",

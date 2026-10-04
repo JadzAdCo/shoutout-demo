@@ -551,9 +551,18 @@
     });
   }
 
+  let clubVenueTemplateTags = null;
+  function loadClubVenueTemplateTags() {
+    if (clubVenueTemplateTags || !window.FLOQRTemplateTags) return;
+    clubVenueTemplateTags = {};
+    window.FLOQRTemplateTags.loadVenueTags(db, locationId)
+      .then(map => { clubVenueTemplateTags = map; renderClubTemplateBackgrounds(); })
+      .catch(error => console.warn("Venue template tags unavailable", error?.code || "", error?.message || error));
+  }
   function templateBackgroundSearchText(template = {}) {
-    return window.FLOQRTemplateMatch?.templateText?.(template)
-      || [template.id, template.name, template.category, template.description, ...(template.tags || [])].join(" ").toLowerCase();
+    const venueTags = (clubVenueTemplateTags?.[template.id] || []).join(" ").toLowerCase();
+    return `${venueTags} ${window.FLOQRTemplateMatch?.templateText?.(template)
+      || [template.id, template.name, template.category, template.description, ...(template.tags || [])].join(" ").toLowerCase()}`;
   }
 
   function templateMatchesQuery(template, query) {
@@ -570,6 +579,7 @@
   function renderClubTemplateBackgrounds() {
     const wrap = byId("clubTemplateBackgroundList");
     if (!wrap) return;
+    loadClubVenueTemplateTags();
     const query = String(byId("clubTemplateBackgroundSearch")?.value || "").trim().toLowerCase();
     const assignedIds = new Set(publicClubProfile.templates || loc.templates || []);
     const isExclusive = template => (template.venueIds || []).includes(locationId);

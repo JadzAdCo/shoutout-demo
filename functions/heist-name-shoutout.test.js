@@ -9,7 +9,7 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const plain = value => JSON.parse(JSON.stringify(value));
-const TYPED_LINE = "Tengo muchos dólares.. just completed a heist!";
+const TYPED_LINE = "Tengo muchos dólares... I just did a heist!";
 
 function load(file) {
   const sandbox = {};

@@ -33,6 +33,7 @@ This failed in production as: parent `patron-portal.html` signed in, child ifram
 | `payment-return.html` | Stripe return |
 | `promoter-admin.html` | Promoter tools |
 | `suprstr-search.html` / `suprstar-preview.html` | SupRstR |
+| `template-tags.html` | Club Admin “Manage template tags” + Inbox `templateRole` |
 
 **Exceptions (no patron session UI):** `display.html` / `display2.html` (Xibo), seed/debug/onboarding tools.
 

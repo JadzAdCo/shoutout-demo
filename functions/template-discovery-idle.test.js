@@ -28,7 +28,7 @@ function loadExclusiveMatcher() {
 
 test("venue-only templates are searchable by name and alias", () => {
   const { SHOUTOUT_TEMPLATES: t } = loadSharedData();
-  assert.equal(t.zebbiesFootballTeamIntro.name, "Zebbies All-Stars Football Intro");
+  assert.equal(t.zebbiesFootballTeamIntro.name, "Football Intro");
   assert.ok(t.zebbiesFootballTeamIntro.searchAliases.includes("football intro"));
   assert.ok(t.zebbiesFootballTeamIntro.searchAliases.includes("zebbies all star"));
   assert.ok(t.heistVaultDollars.searchAliases.includes("tengo mucho dolares"));

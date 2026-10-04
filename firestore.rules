@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.1.0-ads-server-only
+// FLOQR FIRESTORE RULES VERSION: s3.1.11-template-rbac
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.0-ads-server-only
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.108-feature-services-beta
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v29.09.128-shoutout-compliance-logs
@@ -502,6 +503,63 @@ service cloud.firestore {
  match /templates/{id} {
  allow read: if true;
  allow write: if isMasterAdmin();
+ }
+
+ // Template RBAC (s3.1.11) — design notes: .cursor/rules/design-notes-template-discovery-idle.mdc
+ function hasTemplateRole(clubId, roles) {
+ return signedIn()
+ && exists(/databases/$(database)/documents/venueTemplateRoles/$(clubId + "_" + request.auth.uid))
+ && get(/databases/$(database)/documents/venueTemplateRoles/$(clubId + "_" + request.auth.uid)).data.status == "active"
+ && get(/databases/$(database)/documents/venueTemplateRoles/$(clubId + "_" + request.auth.uid)).data.role in roles;
+ }
+
+ function canAdministerTemplates(clubId) {
+ return isClubManager(clubId) || hasTemplateRole(clubId, ["administrator"]);
+ }
+
+ function canManageTemplates(clubId) {
+ return canAdministerTemplates(clubId) || hasTemplateRole(clubId, ["manager"]);
+ }
+
+ function validVenueTemplateTags(tagId) {
+ return signedIn()
+ && request.resource.data.keys().hasOnly(["clubLocationId", "templateId", "tags", "updatedByUid", "updatedByEmail", "updatedAt", "revision"])
+ && request.resource.data.clubLocationId is string
+ && request.resource.data.templateId is string
+ && tagId == request.resource.data.clubLocationId + "__" + request.resource.data.templateId
+ && request.resource.data.tags is list
+ && request.resource.data.tags.size() <= 30
+ && request.resource.data.updatedByUid == request.auth.uid;
+ }
+
+ match /venueTemplateRoles/{roleId} {
+ allow get: if signedIn()
+ && (resource.data.uid == request.auth.uid || isClubManager(resource.data.clubLocationId));
+ allow create, update: if signedIn()
+ && request.resource.data.keys().hasOnly(["clubLocationId", "uid", "email", "displayName", "role", "status", "grantedByUid", "grantedByEmail", "updatedAt"])
+ && request.resource.data.clubLocationId is string
+ && request.resource.data.uid is string
+ && roleId == request.resource.data.clubLocationId + "_" + request.resource.data.uid
+ && request.resource.data.role in ["administrator", "manager"]
+ && request.resource.data.status in ["active", "revoked"]
+ && request.resource.data.grantedByUid == request.auth.uid
+ && isClubManager(request.resource.data.clubLocationId)
+ && (resource == null || resource.data.clubLocationId == request.resource.data.clubLocationId);
+ allow delete: if signedIn() && isClubManager(resource.data.clubLocationId);
+ }
+
+ match /venueTemplateTags/{tagId} {
+ allow read: if true;
+ allow create: if validVenueTemplateTags(tagId)
+ && canManageTemplates(request.resource.data.clubLocationId);
+ allow update: if validVenueTemplateTags(tagId)
+ && request.resource.data.clubLocationId == resource.data.clubLocationId
+ && request.resource.data.templateId == resource.data.templateId
+ && (
+ canAdministerTemplates(resource.data.clubLocationId)
+ || (canManageTemplates(resource.data.clubLocationId) && request.resource.data.tags.hasAll(resource.data.tags))
+ );
+ allow delete: if signedIn() && canAdministerTemplates(resource.data.clubLocationId);
  }
 
  function validPatronShoutoutCreate() {
