@@ -17,7 +17,7 @@ Resume: `@templates$` / `$money-rain$`.
 ## Club Admin template repository + forgiving match (s3.1.8)
 
 - Heist was already assigned every Heist template (live `clubLocations/heist-washington-dc.templates` + packaged `templates` + `venueIds`; checkout `HEIST_ART_TEMPLATE_IDS`). The s3.1.8 bug was **findability**, not assignment.
-- `window.FLOQRTemplateMatch` (`shared-data.js`): `normalize` (NFD, accent strip, lowercase), `phraseMatches(query, phrase)` (every phrase word must match; plural `s` stems; **one** typo allowed only when the phrase has ≥ 2 words of ≥ 4 chars, so "looked up" never routes to "Locked Up"), `textMatches(query, text)` (admin filter: each query word is a substring or within edit distance 1, 2 for ≥ 7 chars), `templateText(template)`.
+- `window.FLOQRTemplateMatch` (`shared-data.js`): `normalize` (NFD, accent strip, lowercase), `phraseMatches(query, phrase)` (every phrase word must match, or the first two of a 3+ word name since s3.1.10; plural `s` stems; **one** typo allowed only when the phrase has ≥ 2 words of ≥ 4 chars, so "looked up" never routes to "Locked Up"), `textMatches(query, text)` (admin filter: each query word is a substring or within edit distance 1, 2 for ≥ 7 chars), `templateText(template)`.
 - Used by patron `exclusiveTemplateForQuery`, Club Admin `templateMatchesQuery`. FloqAi tengo intent regex accepts `te\w{2,3} mucho(s) d[oó]lar`.
 - `renderClubTemplateBackgrounds` dedupes by `template.id` (alias `heistRedLux` shares `id:"heistVaultDollars"`), orders club-exclusive (`venueIds` includes the club) → assigned → rest, and tags exclusives with **Exclusive at {venue}**.
 - Seed script `functions/scripts/onboard-dc-venues.js` assigns `heistVaultDollars` (not the alias).
@@ -38,7 +38,18 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 - Timeline restarts only when `livePlaybackKey(data)` changes. `purgeDisplaySurface` → `stopMoneyRain` clears timers.
 - **Verbiage on top:** `.money-rain-active .display-text-overlay{z-index:5}` + heavy dark text-shadow on `#displayMain`, `#displaySub`, `.classic-board-lines b`. Never put bills above the text overlay.
 - Heist brand slide (20 s message / 8 s slide cycle) hides the money layer; 40 s lands in the second message phase.
-- Bills are pure CSS (no image asset). Colors: saturated green `#1f9a44`–`#7dea7a`, border `#0b5a25`.
+- **Bill art (s3.1.10):** `.money-bill-face` uses `images/heist/heist-novelty-100-trump.jpg` (800×450, 16:9 → bill height `--bw * .5625`). Owner asked for an official-looking $100 with Donald Trump in the portrait. It is a **novelty** prop: no real signatures, no Treasury seal, no serial numbers, no "legal tender" wording. Never regenerate with real officials' signatures or a Treasury-like seal.
+
+### Name-only + typed line (s3.1.10)
+
+- Template fields: `nameOnly:true`, `maxNameCharacters:14`, `typedLine:'Tengo muchos dólares.. just completed a heist!'` (official spelling; the owner typed "Tendo mucho dolares"). `lineCount` / caps unchanged, so checkout `fitCheckoutDisplayText` keeps the ≤ 14-glyph name on one row (no backend change).
+- Composer: `floqr-name-shoutout.js` → `window.FLOQRNameShoutout` (`isNameOnly`, `maxName`, `capName`, `suggestions`, `bind`). `patron-app.js` `syncNameShoutoutFields()` (called from `syncSoccerJerseyFields`) hides `#mainText`, attribution controls and the recommendations card, shows `#nameShoutoutFields`, writes the name into `#mainText` and clears `#subText`. Suggestions: own Mingl handle → own Instagram → own display name, then public profiles (`users` where `publicProfileVisibility === "public"`, ≤ 500, lazy on focus) Mingl + Instagram handles. Accent/`@`-folded substring on value or display name; starts-with first; dedupe; max 8. Free text is allowed (a name needn't be a FLOQR user).
+- Board: `display-app.js` text-overlay branch → `typedLineBoardHtml(name, typedLine)` (big name, then a monospace gold line). `startTypedLine()` types one glyph every 110 ms after 900 ms with a blinking caret; re-runs every Heist message phase (after the brand slide). Idle CTA never uses the typed board. `stopTypedLine()` on every render and in `purgeDisplaySurface`.
+
+## Search box: partial names + events and clubs (s3.1.10)
+
+- `phraseMatches` also accepts the **first two words** of a 3+ word name when both are ≥ 4 chars (still one typo max): "Tendo Mucho" → Tengo muchos dólares. "police car" does not route to "police car arrest" (second word < 4).
+- `submitCategoryVenueQuery`: when `FLOQRVenueQuery.parse` finds no type in the query (`typeSource !== "query"`), listing type is `all` → `renderAllGrid` renders an **Events** section and a **Clubs & venues** section (`listing.searchAll`, `listing.sectionEvents`, `listing.sectionVenues`). Typing a type later in the listing box switches to that type. Ad splash still gets `events` for `all`.
 
 ## Idle board
 
@@ -48,4 +59,4 @@ Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` 
 - **Reset display to default** writes the same text + `idleCta:true`.
 - **s3.1.9 bug + fix:** approve merges onto the idle doc, so `idleCta:true` / `source:automaticTenMinuteReset` survived and the board hid the approved ShoutOut (Heist SO-0752287). Board uses `isIdlePayload` (status `approved`/`live`/`preview` is never idle). Club Admin approve and `messagingInboundWebhook` approve write `idleCta:false`, a `source`, and delete `expiredAt`.
 
-Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`.
+Tests: `functions/template-discovery-idle.test.js`, `functions/heist-template-availability.test.js`, `functions/heist-name-shoutout.test.js`.

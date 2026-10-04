@@ -1320,8 +1320,8 @@
     {
       id: "help-tengo-muchos-dolares",
       title: "Tengo muchos dólares",
-      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then write up to 3 lines of 14 characters.",
-      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
+      body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares.. just completed a heist!” letter by letter.",
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just completed a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
       links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
       audiences: ["patron"],
       source: "help-repository-seed",
