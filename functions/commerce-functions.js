@@ -40,8 +40,9 @@ const ZEBBIES_GARDEN_DC_LOCATION_ID = "zebbies-garden-washington-dc";
 const HEIST_DC_LOCATION_ID = "heist-washington-dc";
 const AURELIA_LOCATION_ID = "temp-democlub-1";
 const FOOTBALL_TEAM_INTRO_LOCATION_IDS = new Set([ZEBBIES_GARDEN_DC_LOCATION_ID, HEIST_DC_LOCATION_ID, AURELIA_LOCATION_ID]);
-const FOOTBALL_TEAM_INTRO_VENUE_MESSAGE = "The four-player football intro is available only at Zebbies Garden DC, Heist Washington DC, and Aurelia.";
+const FOOTBALL_TEAM_INTRO_VENUE_MESSAGE = "The Football Intro template is available only at Zebbies Garden DC, Heist Washington DC, and Aurelia.";
 const HEIST_ART_TEMPLATE_IDS = new Set(["heistVaultNight", "heistPoliceCar", "heistInterrogation", "heistVaultDollars", "heistRedLux"]);
+const LED_96X48_ONLY_TEMPLATE_IDS = new Set(["heistVaultDollars", "heistRedLux", FOOTBALL_TEAM_INTRO_TEMPLATE_ID]);
 const HEIST_ART_PRICE_CENTS = 3000;
 const SOCCER_JERSEY_TEMPLATE_IDS = new Set([
   "soccerJersey", "soccerMorocco", "soccerSpain", "soccerChelsea", "soccerParisSaintGermain", "soccerMonaco"
@@ -307,7 +308,7 @@ function normalizeCheckoutPayload(type, rawPayload = {}, authContext = {}) {
   if (type !== "shoutout") return rawPayload;
   const rawShoutout = rawPayload.shoutout && typeof rawPayload.shoutout === "object" ? rawPayload.shoutout : {};
   const templateId = text(rawShoutout.template || rawShoutout.templateId, 80);
-  const screenFormatId = text(rawShoutout.screenFormatId, 40);
+  const screenFormatId = LED_96X48_ONLY_TEMPLATE_IDS.has(templateId) ? "led-96x48" : text(rawShoutout.screenFormatId, 40);
   const caps = checkoutTextCaps(templateId, screenFormatId);
   const nflDual = isNflDualJerseyTemplateId(templateId);
   const rawMain = String(rawShoutout.mainText || "").trim();

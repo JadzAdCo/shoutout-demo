@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title data-i18n="templateTags.title">Template tags</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.11"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.11"/>
+</head>
+<body>
+<main class="app admin-shell">
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="portal" href="./patron-portal.html?v=s3.1.11">&larr; Back to My Profile and Settings</a>
+  <section class="page active">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="templateTagsVenue">FLOQR</p>
+        <h1
+          data-i18n="templateTags.title"
+          data-floqr-help-id="help-template-tags"
+          data-floqr-help-title="Template tags"
+          data-floqr-help-search="template tags|add tags|administer templates|manage templates|template administrator|template manager"
+          data-floqr-help-body="Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission."
+        >Template tags</h1>
+        <p class="sub" data-i18n="templateTags.body">Add search tags to the templates offered at this venue so patrons find them faster.</p>
+        <p id="templateTagsStatus" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </header>
+    <div class="card hidden" data-floqr-auth-chrome>
+      <a class="buttonlike" href="./patron-portal.html?v=s3.1.11&from=template-tags" data-i18n="nav.backToPortal">Open My Profile and Settings</a>
+    </div>
+    <div id="templateTagsPanel" class="card hidden">
+      <p id="templateTagsRole" class="sub small"></p>
+      <label><span data-i18n="templateTags.search">Search templates</span><input id="templateTagsSearch" type="search" autocomplete="off"/></label>
+      <div id="templateTagsList" class="template-tags-list"></div>
+    </div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./shared-data.js?v=s3.1.11"></script>
+<script src="./floqr-i18n.js?v=s3.1.11"></script>
+<script src="./floqr-session-shell.js?v=s3.0.110"></script>
+<script src="./floqr-nav.js?v=s3.1.11"></script>
+<script src="./floqai-help-repository.js?v=s3.1.11"></script>
+<script src="./help-attach.js?v=s3.0.28"></script>
+<script src="./floqr-template-tags.js?v=s3.1.11"></script>
+<script src="./template-tags-app.js?v=s3.1.11"></script>
+</body>
+</html>

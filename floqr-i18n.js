@@ -878,6 +878,58 @@
       "nameShoutout.placeholder": "Name, @instagram or @mingl handle",
       "nameShoutout.hint": "Type a name or start an @handle — pick from the suggestions. The board adds the rest of the line.",
       "nameShoutout.required": "Enter a name or pick an @handle first.",
+
+      "templatePreview.button": "Preview",
+
+      "templatePreview.title": "Preview: {name}",
+
+      "templatePreview.close": "Close",
+
+      "templatePreview.note": "Sample text and pictures. Your ShoutOut shows your own words and photos.",
+
+      "templateTags.title": "Template tags",
+
+      "templateTags.body": "Add search tags to the templates offered at this venue so patrons find them faster.",
+
+      "templateTags.search": "Search templates",
+
+      "templateTags.roleAdministrator": "You are a Template Administrator here: you can add and remove tags.",
+
+      "templateTags.roleManager": "You are a Template Manager here: you can add tags. Ask a Template Administrator or Club Admin to remove one.",
+
+      "templateTags.remove": "Remove tag {tag}",
+
+      "templateTags.builtIn": "FLOQR tags:",
+
+      "templateTags.none": "No venue tags yet.",
+
+      "templateTags.placeholder": "Add a tag, e.g. game night",
+
+      "templateTags.add": "Add tag",
+
+      "templateTags.noMatch": "No templates match.",
+
+      "templateTags.saving": "Saving…",
+
+      "templateTags.saved": "Tags saved.",
+
+      "templateTags.denied": "You can't change that tag. Ask your Club Admin for the Template Administrator role.",
+
+      "templateTags.tooMany": "A template can have up to 30 venue tags.",
+
+      "templateTags.noVenue": "Open this page from Club Admin or your Inbox link so FLOQR knows the venue.",
+
+      "templateTags.loading": "Loading templates…",
+
+      "templateTags.noRole": "You don't have a template role at this venue. Ask your Club Admin for Manage Templates or Administer Templates.",
+
+      "templateTags.loadFailed": "Templates could not be loaded. Refresh and try again.",
+
+      "templateTags.openFromAdmin": "Manage template tags",
+
+      "rep.administerTemplates": "Administer Templates — Template Administrator: read, add and remove template tags",
+
+      "rep.manageTemplates": "Manage Templates — Template Manager: read and add template tags",
       "nameShoutout.kind.ownMingl": "Your Mingl handle",
       "nameShoutout.kind.ownInstagram": "Your Instagram",
       "nameShoutout.kind.ownName": "Your display name",
@@ -1476,6 +1528,58 @@
       "nameShoutout.placeholder": "Nom, @instagram ou @pseudo Mingl",
       "nameShoutout.hint": "Tapez un nom ou commencez un @pseudo — choisissez dans les suggestions. L’écran ajoute le reste de la phrase.",
       "nameShoutout.required": "Saisissez d’abord un nom ou choisissez un @pseudo.",
+
+      "templatePreview.button": "Aperçu",
+
+      "templatePreview.title": "Aperçu : {name}",
+
+      "templatePreview.close": "Fermer",
+
+      "templatePreview.note": "Texte et images d’exemple. Votre ShoutOut affiche vos propres mots et photos.",
+
+      "templateTags.title": "Tags des modèles",
+
+      "templateTags.body": "Ajoutez des tags de recherche aux modèles proposés dans ce lieu pour que les clients les trouvent plus vite.",
+
+      "templateTags.search": "Rechercher des modèles",
+
+      "templateTags.roleAdministrator": "Vous êtes Administrateur des modèles ici : vous pouvez ajouter et retirer des tags.",
+
+      "templateTags.roleManager": "Vous êtes Gestionnaire des modèles ici : vous pouvez ajouter des tags. Demandez à un Administrateur des modèles ou au Club Admin d’en retirer un.",
+
+      "templateTags.remove": "Retirer le tag {tag}",
+
+      "templateTags.builtIn": "Tags FLOQR :",
+
+      "templateTags.none": "Pas encore de tags du lieu.",
+
+      "templateTags.placeholder": "Ajoutez un tag, ex. soirée match",
+
+      "templateTags.add": "Ajouter le tag",
+
+      "templateTags.noMatch": "Aucun modèle ne correspond.",
+
+      "templateTags.saving": "Enregistrement…",
+
+      "templateTags.saved": "Tags enregistrés.",
+
+      "templateTags.denied": "Vous ne pouvez pas modifier ce tag. Demandez le rôle Administrateur des modèles à votre Club Admin.",
+
+      "templateTags.tooMany": "Un modèle peut avoir jusqu’à 30 tags du lieu.",
+
+      "templateTags.noVenue": "Ouvrez cette page depuis Club Admin ou le lien de votre boîte de réception pour que FLOQR connaisse le lieu.",
+
+      "templateTags.loading": "Chargement des modèles…",
+
+      "templateTags.noRole": "Vous n’avez pas de rôle sur les modèles dans ce lieu. Demandez Gérer les modèles ou Administrer les modèles à votre Club Admin.",
+
+      "templateTags.loadFailed": "Impossible de charger les modèles. Actualisez et réessayez.",
+
+      "templateTags.openFromAdmin": "Gérer les tags des modèles",
+
+      "rep.administerTemplates": "Administrer les modèles — Administrateur des modèles : lire, ajouter et retirer des tags",
+
+      "rep.manageTemplates": "Gérer les modèles — Gestionnaire des modèles : lire et ajouter des tags",
       "nameShoutout.kind.ownMingl": "Votre pseudo Mingl",
       "nameShoutout.kind.ownInstagram": "Votre Instagram",
       "nameShoutout.kind.ownName": "Votre nom d’affichage",
@@ -2074,6 +2178,58 @@
       "nameShoutout.placeholder": "Name, @instagram oder @Mingl-Handle",
       "nameShoutout.hint": "Gib einen Namen ein oder beginne ein @Handle — wähle aus den Vorschlägen. Die Anzeige ergänzt den Rest der Zeile.",
       "nameShoutout.required": "Gib zuerst einen Namen ein oder wähle ein @Handle.",
+
+      "templatePreview.button": "Vorschau",
+
+      "templatePreview.title": "Vorschau: {name}",
+
+      "templatePreview.close": "Schließen",
+
+      "templatePreview.note": "Beispieltext und -bilder. Dein ShoutOut zeigt deine eigenen Worte und Fotos.",
+
+      "templateTags.title": "Vorlagen-Tags",
+
+      "templateTags.body": "Füge den Vorlagen dieser Location Such-Tags hinzu, damit Gäste sie schneller finden.",
+
+      "templateTags.search": "Vorlagen suchen",
+
+      "templateTags.roleAdministrator": "Du bist hier Vorlagen-Administrator: Du kannst Tags hinzufügen und entfernen.",
+
+      "templateTags.roleManager": "Du bist hier Vorlagen-Manager: Du kannst Tags hinzufügen. Bitte einen Vorlagen-Administrator oder Club Admin, einen Tag zu entfernen.",
+
+      "templateTags.remove": "Tag {tag} entfernen",
+
+      "templateTags.builtIn": "FLOQR-Tags:",
+
+      "templateTags.none": "Noch keine Location-Tags.",
+
+      "templateTags.placeholder": "Tag hinzufügen, z. B. Spieleabend",
+
+      "templateTags.add": "Tag hinzufügen",
+
+      "templateTags.noMatch": "Keine passenden Vorlagen.",
+
+      "templateTags.saving": "Wird gespeichert…",
+
+      "templateTags.saved": "Tags gespeichert.",
+
+      "templateTags.denied": "Du kannst diesen Tag nicht ändern. Bitte deinen Club Admin um die Rolle Vorlagen-Administrator.",
+
+      "templateTags.tooMany": "Eine Vorlage kann bis zu 30 Location-Tags haben.",
+
+      "templateTags.noVenue": "Öffne diese Seite aus Club Admin oder über deinen Inbox-Link, damit FLOQR die Location kennt.",
+
+      "templateTags.loading": "Vorlagen werden geladen…",
+
+      "templateTags.noRole": "Du hast an dieser Location keine Vorlagen-Rolle. Bitte deinen Club Admin um Vorlagen verwalten oder Vorlagen administrieren.",
+
+      "templateTags.loadFailed": "Vorlagen konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
+
+      "templateTags.openFromAdmin": "Vorlagen-Tags verwalten",
+
+      "rep.administerTemplates": "Vorlagen administrieren — Vorlagen-Administrator: Tags lesen, hinzufügen und entfernen",
+
+      "rep.manageTemplates": "Vorlagen verwalten — Vorlagen-Manager: Tags lesen und hinzufügen",
       "nameShoutout.kind.ownMingl": "Dein Mingl-Handle",
       "nameShoutout.kind.ownInstagram": "Dein Instagram",
       "nameShoutout.kind.ownName": "Dein Anzeigename",
@@ -2672,6 +2828,58 @@
       "nameShoutout.placeholder": "Nombre, @instagram o @usuario de Mingl",
       "nameShoutout.hint": "Escribe un nombre o empieza un @usuario — elige de las sugerencias. La pantalla añade el resto de la frase.",
       "nameShoutout.required": "Primero escribe un nombre o elige un @usuario.",
+
+      "templatePreview.button": "Vista previa",
+
+      "templatePreview.title": "Vista previa: {name}",
+
+      "templatePreview.close": "Cerrar",
+
+      "templatePreview.note": "Texto e imágenes de ejemplo. Tu ShoutOut muestra tus propias palabras y fotos.",
+
+      "templateTags.title": "Etiquetas de plantillas",
+
+      "templateTags.body": "Añade etiquetas de búsqueda a las plantillas de este local para que los clientes las encuentren más rápido.",
+
+      "templateTags.search": "Buscar plantillas",
+
+      "templateTags.roleAdministrator": "Aquí eres Administrador de plantillas: puedes añadir y quitar etiquetas.",
+
+      "templateTags.roleManager": "Aquí eres Gestor de plantillas: puedes añadir etiquetas. Pide a un Administrador de plantillas o al Club Admin que quite una.",
+
+      "templateTags.remove": "Quitar la etiqueta {tag}",
+
+      "templateTags.builtIn": "Etiquetas de FLOQR:",
+
+      "templateTags.none": "Aún no hay etiquetas del local.",
+
+      "templateTags.placeholder": "Añade una etiqueta, p. ej. noche de partido",
+
+      "templateTags.add": "Añadir etiqueta",
+
+      "templateTags.noMatch": "Ninguna plantilla coincide.",
+
+      "templateTags.saving": "Guardando…",
+
+      "templateTags.saved": "Etiquetas guardadas.",
+
+      "templateTags.denied": "No puedes cambiar esa etiqueta. Pide a tu Club Admin el rol de Administrador de plantillas.",
+
+      "templateTags.tooMany": "Una plantilla puede tener hasta 30 etiquetas del local.",
+
+      "templateTags.noVenue": "Abre esta página desde Club Admin o el enlace de tu bandeja de entrada para que FLOQR sepa cuál es el local.",
+
+      "templateTags.loading": "Cargando plantillas…",
+
+      "templateTags.noRole": "No tienes un rol de plantillas en este local. Pide a tu Club Admin Gestionar plantillas o Administrar plantillas.",
+
+      "templateTags.loadFailed": "No se pudieron cargar las plantillas. Actualiza e inténtalo de nuevo.",
+
+      "templateTags.openFromAdmin": "Gestionar etiquetas de plantillas",
+
+      "rep.administerTemplates": "Administrar plantillas — Administrador de plantillas: leer, añadir y quitar etiquetas",
+
+      "rep.manageTemplates": "Gestionar plantillas — Gestor de plantillas: leer y añadir etiquetas",
       "nameShoutout.kind.ownMingl": "Tu usuario de Mingl",
       "nameShoutout.kind.ownInstagram": "Tu Instagram",
       "nameShoutout.kind.ownName": "Tu nombre visible",
@@ -3270,6 +3478,58 @@
       "nameShoutout.placeholder": "Naam, @instagram of @Mingl-handle",
       "nameShoutout.hint": "Typ een naam of begin een @handle — kies uit de suggesties. Het scherm vult de rest van de zin aan.",
       "nameShoutout.required": "Vul eerst een naam in of kies een @handle.",
+
+      "templatePreview.button": "Voorbeeld",
+
+      "templatePreview.title": "Voorbeeld: {name}",
+
+      "templatePreview.close": "Sluiten",
+
+      "templatePreview.note": "Voorbeeldtekst en -beelden. Je ShoutOut toont je eigen woorden en foto’s.",
+
+      "templateTags.title": "Sjabloontags",
+
+      "templateTags.body": "Voeg zoektags toe aan de sjablonen van deze locatie, zodat gasten ze sneller vinden.",
+
+      "templateTags.search": "Sjablonen zoeken",
+
+      "templateTags.roleAdministrator": "Je bent hier Sjabloonbeheerder: je kunt tags toevoegen en verwijderen.",
+
+      "templateTags.roleManager": "Je bent hier Sjabloonmanager: je kunt tags toevoegen. Vraag een Sjabloonbeheerder of Club Admin om er een te verwijderen.",
+
+      "templateTags.remove": "Tag {tag} verwijderen",
+
+      "templateTags.builtIn": "FLOQR-tags:",
+
+      "templateTags.none": "Nog geen locatietags.",
+
+      "templateTags.placeholder": "Voeg een tag toe, bijv. wedstrijdavond",
+
+      "templateTags.add": "Tag toevoegen",
+
+      "templateTags.noMatch": "Geen sjablonen gevonden.",
+
+      "templateTags.saving": "Opslaan…",
+
+      "templateTags.saved": "Tags opgeslagen.",
+
+      "templateTags.denied": "Je kunt die tag niet wijzigen. Vraag je Club Admin om de rol Sjabloonbeheerder.",
+
+      "templateTags.tooMany": "Een sjabloon kan maximaal 30 locatietags hebben.",
+
+      "templateTags.noVenue": "Open deze pagina vanuit Club Admin of via je Inbox-link, zodat FLOQR de locatie kent.",
+
+      "templateTags.loading": "Sjablonen laden…",
+
+      "templateTags.noRole": "Je hebt geen sjabloonrol op deze locatie. Vraag je Club Admin om Sjablonen beheren of Sjablonen administreren.",
+
+      "templateTags.loadFailed": "Sjablonen konden niet worden geladen. Vernieuw en probeer opnieuw.",
+
+      "templateTags.openFromAdmin": "Sjabloontags beheren",
+
+      "rep.administerTemplates": "Sjablonen administreren — Sjabloonbeheerder: tags lezen, toevoegen en verwijderen",
+
+      "rep.manageTemplates": "Sjablonen beheren — Sjabloonmanager: tags lezen en toevoegen",
       "nameShoutout.kind.ownMingl": "Jouw Mingl-handle",
       "nameShoutout.kind.ownInstagram": "Jouw Instagram",
       "nameShoutout.kind.ownName": "Jouw weergavenaam",
@@ -3868,6 +4128,58 @@
       "nameShoutout.placeholder": "Имя, @instagram или @ник в Mingl",
       "nameShoutout.hint": "Введите имя или начните @ник — выберите из подсказок. Экран допишет остальную часть фразы.",
       "nameShoutout.required": "Сначала введите имя или выберите @ник.",
+
+      "templatePreview.button": "Предпросмотр",
+
+      "templatePreview.title": "Предпросмотр: {name}",
+
+      "templatePreview.close": "Закрыть",
+
+      "templatePreview.note": "Пример текста и картинок. Ваш ShoutOut покажет ваши собственные слова и фото.",
+
+      "templateTags.title": "Теги шаблонов",
+
+      "templateTags.body": "Добавьте поисковые теги к шаблонам этой площадки, чтобы гости находили их быстрее.",
+
+      "templateTags.search": "Поиск шаблонов",
+
+      "templateTags.roleAdministrator": "Здесь вы администратор шаблонов: можете добавлять и удалять теги.",
+
+      "templateTags.roleManager": "Здесь вы менеджер шаблонов: можете добавлять теги. Чтобы удалить тег, обратитесь к администратору шаблонов или Club Admin.",
+
+      "templateTags.remove": "Удалить тег {tag}",
+
+      "templateTags.builtIn": "Теги FLOQR:",
+
+      "templateTags.none": "Тегов площадки пока нет.",
+
+      "templateTags.placeholder": "Добавьте тег, например вечер матча",
+
+      "templateTags.add": "Добавить тег",
+
+      "templateTags.noMatch": "Подходящих шаблонов нет.",
+
+      "templateTags.saving": "Сохранение…",
+
+      "templateTags.saved": "Теги сохранены.",
+
+      "templateTags.denied": "Вы не можете изменить этот тег. Попросите у Club Admin роль администратора шаблонов.",
+
+      "templateTags.tooMany": "У шаблона может быть до 30 тегов площадки.",
+
+      "templateTags.noVenue": "Откройте эту страницу из Club Admin или по ссылке во входящих, чтобы FLOQR знал площадку.",
+
+      "templateTags.loading": "Загрузка шаблонов…",
+
+      "templateTags.noRole": "У вас нет роли для шаблонов на этой площадке. Попросите у Club Admin «Управление шаблонами» или «Администрирование шаблонов».",
+
+      "templateTags.loadFailed": "Не удалось загрузить шаблоны. Обновите страницу и попробуйте снова.",
+
+      "templateTags.openFromAdmin": "Управлять тегами шаблонов",
+
+      "rep.administerTemplates": "Администрирование шаблонов — администратор шаблонов: читать, добавлять и удалять теги",
+
+      "rep.manageTemplates": "Управление шаблонами — менеджер шаблонов: читать и добавлять теги",
       "nameShoutout.kind.ownMingl": "Ваш ник в Mingl",
       "nameShoutout.kind.ownInstagram": "Ваш Instagram",
       "nameShoutout.kind.ownName": "Ваше отображаемое имя",
@@ -4466,6 +4778,58 @@
       "nameShoutout.placeholder": "Nome, @instagram o @handle Mingl",
       "nameShoutout.hint": "Scrivi un nome o inizia un @handle — scegli dai suggerimenti. Lo schermo aggiunge il resto della frase.",
       "nameShoutout.required": "Inserisci prima un nome o scegli un @handle.",
+
+      "templatePreview.button": "Anteprima",
+
+      "templatePreview.title": "Anteprima: {name}",
+
+      "templatePreview.close": "Chiudi",
+
+      "templatePreview.note": "Testo e immagini di esempio. Il tuo ShoutOut mostra le tue parole e le tue foto.",
+
+      "templateTags.title": "Tag dei modelli",
+
+      "templateTags.body": "Aggiungi tag di ricerca ai modelli offerti in questo locale, così i clienti li trovano più in fretta.",
+
+      "templateTags.search": "Cerca modelli",
+
+      "templateTags.roleAdministrator": "Qui sei Amministratore dei modelli: puoi aggiungere e rimuovere tag.",
+
+      "templateTags.roleManager": "Qui sei Gestore dei modelli: puoi aggiungere tag. Chiedi a un Amministratore dei modelli o al Club Admin di rimuoverne uno.",
+
+      "templateTags.remove": "Rimuovi il tag {tag}",
+
+      "templateTags.builtIn": "Tag FLOQR:",
+
+      "templateTags.none": "Ancora nessun tag del locale.",
+
+      "templateTags.placeholder": "Aggiungi un tag, es. serata partita",
+
+      "templateTags.add": "Aggiungi tag",
+
+      "templateTags.noMatch": "Nessun modello corrisponde.",
+
+      "templateTags.saving": "Salvataggio…",
+
+      "templateTags.saved": "Tag salvati.",
+
+      "templateTags.denied": "Non puoi modificare quel tag. Chiedi al tuo Club Admin il ruolo di Amministratore dei modelli.",
+
+      "templateTags.tooMany": "Un modello può avere fino a 30 tag del locale.",
+
+      "templateTags.noVenue": "Apri questa pagina da Club Admin o dal link nella tua Inbox, così FLOQR sa qual è il locale.",
+
+      "templateTags.loading": "Caricamento modelli…",
+
+      "templateTags.noRole": "Non hai un ruolo sui modelli in questo locale. Chiedi al tuo Club Admin Gestire i modelli o Amministrare i modelli.",
+
+      "templateTags.loadFailed": "Impossibile caricare i modelli. Aggiorna e riprova.",
+
+      "templateTags.openFromAdmin": "Gestisci i tag dei modelli",
+
+      "rep.administerTemplates": "Amministrare i modelli — Amministratore dei modelli: leggere, aggiungere e rimuovere tag",
+
+      "rep.manageTemplates": "Gestire i modelli — Gestore dei modelli: leggere e aggiungere tag",
       "nameShoutout.kind.ownMingl": "Il tuo handle Mingl",
       "nameShoutout.kind.ownInstagram": "Il tuo Instagram",
       "nameShoutout.kind.ownName": "Il tuo nome visualizzato",
@@ -5064,6 +5428,58 @@
       "nameShoutout.placeholder": "Nome, @instagram ou @usuário do Mingl",
       "nameShoutout.hint": "Digite um nome ou comece um @usuário — escolha nas sugestões. O painel completa o resto da frase.",
       "nameShoutout.required": "Digite um nome ou escolha um @usuário primeiro.",
+
+      "templatePreview.button": "Pré-visualizar",
+
+      "templatePreview.title": "Pré-visualização: {name}",
+
+      "templatePreview.close": "Fechar",
+
+      "templatePreview.note": "Texto e imagens de exemplo. Seu ShoutOut mostra suas próprias palavras e fotos.",
+
+      "templateTags.title": "Tags de modelos",
+
+      "templateTags.body": "Adicione tags de busca aos modelos oferecidos neste local para que os clientes os encontrem mais rápido.",
+
+      "templateTags.search": "Buscar modelos",
+
+      "templateTags.roleAdministrator": "Aqui você é Administrador de modelos: pode adicionar e remover tags.",
+
+      "templateTags.roleManager": "Aqui você é Gestor de modelos: pode adicionar tags. Peça a um Administrador de modelos ou ao Club Admin para remover uma.",
+
+      "templateTags.remove": "Remover a tag {tag}",
+
+      "templateTags.builtIn": "Tags da FLOQR:",
+
+      "templateTags.none": "Ainda não há tags do local.",
+
+      "templateTags.placeholder": "Adicione uma tag, ex. noite de jogo",
+
+      "templateTags.add": "Adicionar tag",
+
+      "templateTags.noMatch": "Nenhum modelo corresponde.",
+
+      "templateTags.saving": "Salvando…",
+
+      "templateTags.saved": "Tags salvas.",
+
+      "templateTags.denied": "Você não pode alterar essa tag. Peça ao seu Club Admin o papel de Administrador de modelos.",
+
+      "templateTags.tooMany": "Um modelo pode ter até 30 tags do local.",
+
+      "templateTags.noVenue": "Abra esta página pelo Club Admin ou pelo link da sua caixa de entrada para que a FLOQR saiba qual é o local.",
+
+      "templateTags.loading": "Carregando modelos…",
+
+      "templateTags.noRole": "Você não tem um papel de modelos neste local. Peça ao seu Club Admin Gerenciar modelos ou Administrar modelos.",
+
+      "templateTags.loadFailed": "Não foi possível carregar os modelos. Atualize e tente de novo.",
+
+      "templateTags.openFromAdmin": "Gerenciar tags de modelos",
+
+      "rep.administerTemplates": "Administrar modelos — Administrador de modelos: ler, adicionar e remover tags",
+
+      "rep.manageTemplates": "Gerenciar modelos — Gestor de modelos: ler e adicionar tags",
       "nameShoutout.kind.ownMingl": "Seu usuário do Mingl",
       "nameShoutout.kind.ownInstagram": "Seu Instagram",
       "nameShoutout.kind.ownName": "Seu nome de exibição",
@@ -5662,6 +6078,58 @@
       "nameShoutout.placeholder": "Όνομα, @instagram ή @handle Mingl",
       "nameShoutout.hint": "Γράψτε ένα όνομα ή ξεκινήστε ένα @handle — διαλέξτε από τις προτάσεις. Η οθόνη συμπληρώνει την υπόλοιπη φράση.",
       "nameShoutout.required": "Γράψτε πρώτα ένα όνομα ή διαλέξτε ένα @handle.",
+
+      "templatePreview.button": "Προεπισκόπηση",
+
+      "templatePreview.title": "Προεπισκόπηση: {name}",
+
+      "templatePreview.close": "Κλείσιμο",
+
+      "templatePreview.note": "Δείγμα κειμένου και εικόνων. Το ShoutOut σας δείχνει τα δικά σας λόγια και φωτογραφίες.",
+
+      "templateTags.title": "Ετικέτες προτύπων",
+
+      "templateTags.body": "Προσθέστε ετικέτες αναζήτησης στα πρότυπα αυτού του χώρου, ώστε οι πελάτες να τα βρίσκουν πιο γρήγορα.",
+
+      "templateTags.search": "Αναζήτηση προτύπων",
+
+      "templateTags.roleAdministrator": "Εδώ είστε Διαχειριστής προτύπων: μπορείτε να προσθέτετε και να αφαιρείτε ετικέτες.",
+
+      "templateTags.roleManager": "Εδώ είστε Υπεύθυνος προτύπων: μπορείτε να προσθέτετε ετικέτες. Ζητήστε από έναν Διαχειριστή προτύπων ή τον Club Admin να αφαιρέσει μία.",
+
+      "templateTags.remove": "Αφαίρεση ετικέτας {tag}",
+
+      "templateTags.builtIn": "Ετικέτες FLOQR:",
+
+      "templateTags.none": "Δεν υπάρχουν ακόμη ετικέτες χώρου.",
+
+      "templateTags.placeholder": "Προσθέστε ετικέτα, π.χ. βραδιά αγώνα",
+
+      "templateTags.add": "Προσθήκη ετικέτας",
+
+      "templateTags.noMatch": "Κανένα πρότυπο δεν ταιριάζει.",
+
+      "templateTags.saving": "Αποθήκευση…",
+
+      "templateTags.saved": "Οι ετικέτες αποθηκεύτηκαν.",
+
+      "templateTags.denied": "Δεν μπορείτε να αλλάξετε αυτή την ετικέτα. Ζητήστε από τον Club Admin τον ρόλο Διαχειριστή προτύπων.",
+
+      "templateTags.tooMany": "Ένα πρότυπο μπορεί να έχει έως 30 ετικέτες χώρου.",
+
+      "templateTags.noVenue": "Ανοίξτε αυτή τη σελίδα από το Club Admin ή από τον σύνδεσμο στα εισερχόμενα, ώστε το FLOQR να ξέρει τον χώρο.",
+
+      "templateTags.loading": "Φόρτωση προτύπων…",
+
+      "templateTags.noRole": "Δεν έχετε ρόλο προτύπων σε αυτόν τον χώρο. Ζητήστε από τον Club Admin Διαχείριση ή Διοίκηση προτύπων.",
+
+      "templateTags.loadFailed": "Δεν ήταν δυνατή η φόρτωση των προτύπων. Ανανεώστε και δοκιμάστε ξανά.",
+
+      "templateTags.openFromAdmin": "Διαχείριση ετικετών προτύπων",
+
+      "rep.administerTemplates": "Διοίκηση προτύπων — Διαχειριστής προτύπων: ανάγνωση, προσθήκη και αφαίρεση ετικετών",
+
+      "rep.manageTemplates": "Διαχείριση προτύπων — Υπεύθυνος προτύπων: ανάγνωση και προσθήκη ετικετών",
       "nameShoutout.kind.ownMingl": "Το Mingl handle σας",
       "nameShoutout.kind.ownInstagram": "Το Instagram σας",
       "nameShoutout.kind.ownName": "Το εμφανιζόμενο όνομά σας",
@@ -6260,6 +6728,58 @@
       "nameShoutout.placeholder": "Imię, @instagram lub @nick Mingl",
       "nameShoutout.hint": "Wpisz imię albo zacznij @nick — wybierz z podpowiedzi. Ekran dopisze resztę zdania.",
       "nameShoutout.required": "Najpierw wpisz imię lub wybierz @nick.",
+
+      "templatePreview.button": "Podgląd",
+
+      "templatePreview.title": "Podgląd: {name}",
+
+      "templatePreview.close": "Zamknij",
+
+      "templatePreview.note": "Przykładowy tekst i obrazy. Twój ShoutOut pokaże Twoje własne słowa i zdjęcia.",
+
+      "templateTags.title": "Tagi szablonów",
+
+      "templateTags.body": "Dodaj tagi wyszukiwania do szablonów w tym lokalu, aby goście szybciej je znajdowali.",
+
+      "templateTags.search": "Szukaj szablonów",
+
+      "templateTags.roleAdministrator": "Jesteś tu Administratorem szablonów: możesz dodawać i usuwać tagi.",
+
+      "templateTags.roleManager": "Jesteś tu Menedżerem szablonów: możesz dodawać tagi. Aby usunąć tag, poproś Administratora szablonów lub Club Admin.",
+
+      "templateTags.remove": "Usuń tag {tag}",
+
+      "templateTags.builtIn": "Tagi FLOQR:",
+
+      "templateTags.none": "Brak tagów lokalu.",
+
+      "templateTags.placeholder": "Dodaj tag, np. wieczór meczowy",
+
+      "templateTags.add": "Dodaj tag",
+
+      "templateTags.noMatch": "Brak pasujących szablonów.",
+
+      "templateTags.saving": "Zapisywanie…",
+
+      "templateTags.saved": "Tagi zapisane.",
+
+      "templateTags.denied": "Nie możesz zmienić tego tagu. Poproś Club Admin o rolę Administratora szablonów.",
+
+      "templateTags.tooMany": "Szablon może mieć do 30 tagów lokalu.",
+
+      "templateTags.noVenue": "Otwórz tę stronę z Club Admin lub z linku w skrzynce odbiorczej, aby FLOQR znał lokal.",
+
+      "templateTags.loading": "Ładowanie szablonów…",
+
+      "templateTags.noRole": "Nie masz roli dla szablonów w tym lokalu. Poproś Club Admin o Zarządzanie szablonami lub Administrowanie szablonami.",
+
+      "templateTags.loadFailed": "Nie udało się wczytać szablonów. Odśwież i spróbuj ponownie.",
+
+      "templateTags.openFromAdmin": "Zarządzaj tagami szablonów",
+
+      "rep.administerTemplates": "Administrowanie szablonami — Administrator szablonów: odczyt, dodawanie i usuwanie tagów",
+
+      "rep.manageTemplates": "Zarządzanie szablonami — Menedżer szablonów: odczyt i dodawanie tagów",
       "nameShoutout.kind.ownMingl": "Twój nick Mingl",
       "nameShoutout.kind.ownInstagram": "Twój Instagram",
       "nameShoutout.kind.ownName": "Twoja nazwa wyświetlana",
@@ -6858,6 +7378,58 @@
       "nameShoutout.placeholder": "الاسم أو @instagram أو معرّف Mingl",
       "nameShoutout.hint": "اكتب اسمًا أو ابدأ بـ @معرّف — اختر من الاقتراحات. تضيف الشاشة بقية العبارة.",
       "nameShoutout.required": "أدخل اسمًا أو اختر @معرّفًا أولًا.",
+
+      "templatePreview.button": "معاينة",
+
+      "templatePreview.title": "معاينة: {name}",
+
+      "templatePreview.close": "إغلاق",
+
+      "templatePreview.note": "نص وصور تجريبية. يعرض ShoutOut الخاص بك كلماتك وصورك أنت.",
+
+      "templateTags.title": "وسوم القوالب",
+
+      "templateTags.body": "أضف وسوم بحث إلى القوالب المتاحة في هذا المكان ليعثر عليها الزبائن أسرع.",
+
+      "templateTags.search": "ابحث في القوالب",
+
+      "templateTags.roleAdministrator": "أنت مسؤول القوالب هنا: يمكنك إضافة الوسوم وإزالتها.",
+
+      "templateTags.roleManager": "أنت مدير القوالب هنا: يمكنك إضافة الوسوم. اطلب من مسؤول القوالب أو Club Admin إزالة أي وسم.",
+
+      "templateTags.remove": "إزالة الوسم {tag}",
+
+      "templateTags.builtIn": "وسوم FLOQR:",
+
+      "templateTags.none": "لا توجد وسوم للمكان بعد.",
+
+      "templateTags.placeholder": "أضف وسمًا، مثل ليلة المباراة",
+
+      "templateTags.add": "إضافة وسم",
+
+      "templateTags.noMatch": "لا توجد قوالب مطابقة.",
+
+      "templateTags.saving": "جارٍ الحفظ…",
+
+      "templateTags.saved": "تم حفظ الوسوم.",
+
+      "templateTags.denied": "لا يمكنك تغيير هذا الوسم. اطلب من Club Admin دور مسؤول القوالب.",
+
+      "templateTags.tooMany": "يمكن أن يحتوي القالب على 30 وسمًا للمكان كحد أقصى.",
+
+      "templateTags.noVenue": "افتح هذه الصفحة من Club Admin أو من الرابط في صندوق الوارد ليعرف FLOQR المكان.",
+
+      "templateTags.loading": "جارٍ تحميل القوالب…",
+
+      "templateTags.noRole": "ليس لديك دور للقوالب في هذا المكان. اطلب من Club Admin دور إدارة القوالب أو الإشراف على القوالب.",
+
+      "templateTags.loadFailed": "تعذّر تحميل القوالب. حدّث الصفحة وحاول مرة أخرى.",
+
+      "templateTags.openFromAdmin": "إدارة وسوم القوالب",
+
+      "rep.administerTemplates": "الإشراف على القوالب — مسؤول القوالب: قراءة الوسوم وإضافتها وإزالتها",
+
+      "rep.manageTemplates": "إدارة القوالب — مدير القوالب: قراءة الوسوم وإضافتها",
       "nameShoutout.kind.ownMingl": "معرّفك على Mingl",
       "nameShoutout.kind.ownInstagram": "حسابك على Instagram",
       "nameShoutout.kind.ownName": "اسمك المعروض",

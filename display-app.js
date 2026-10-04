@@ -1576,7 +1576,7 @@
   function renderFootballTeamIntro({canvas, center, mediaSlot, mainText, subText, data, textCaps}) {
     const members = normalizedFootballTeamMembers(data, textCaps);
     const stadiumMessageRows = footballStadiumMessageRows(data.stadiumMessage, textCaps);
-    const allStarsLabel = `${String(data.brandName || "Zebbies").trim().toUpperCase()} ALL-STARS`;
+    const allStarsLabel = `${String(data.brandName || "Zebbies").trim().toUpperCase()} FOOTBALL INTRO`;
     const openingRows = displayTextRows(mainText || allStarsLabel, textCaps);
     const themeId = String(data.colorTheme || "stadiumGold");
     const theme = window.FLOQRIdentity?.footballTheme?.(themeId) || {accent:data.themeAccent || "#dfff5a", field:"#06180f", ink:"#ffffff", frame:"#5c4700"};

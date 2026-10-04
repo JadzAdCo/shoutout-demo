@@ -54,8 +54,8 @@
     {
       id: "football-intro",
       kind: "product",
-      label: "Zebbies All-Stars Football Intro",
-      blurb: "Four-player, 20-second stadium intro ShoutOut at Zebbies Garden DC, Heist Washington DC and Aurelia.",
+      label: "Football Intro",
+      blurb: "Four-player, 20-second stadium intro ShoutOut on 96×48 boards at Zebbies Garden DC, Heist Washington DC and Aurelia.",
       href: `./?v=${APP_V}&start=search`,
       action: "template",
       templateId: "zebbiesFootballTeamIntro",
@@ -66,11 +66,11 @@
       id: "tengo-muchos-dolares",
       kind: "product",
       label: "Tengo muchos dólares",
-      blurb: "Heist Washington DC vault ShoutOut — enter a name or @handle; the board types “Tengo muchos dólares.. just completed a heist!” and $100 bills flood the LED.",
+      blurb: "Heist Washington DC vault ShoutOut — enter a name or @handle; the board types “Tengo muchos dólares... I just did a heist!” and $100 bills flood the LED.",
       href: `./?v=${APP_V}&start=search`,
       action: "template",
       templateId: "heistVaultDollars",
-      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho", "just completed a heist", "money rain", "vault night"],
+      searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho", "just did a heist", "money rain", "vault night"],
       patterns: [/te\w{2,3}\s*muchos?\s*d[oó]l+ar/, /\bte[nd][gd]o\s+muchos?\b/, /muchos?\s*d[oó]l+ares/, /money\s*rain/, /make\s*it\s*rain/, /vault\s*night/]
     },
     {

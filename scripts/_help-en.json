@@ -133,7 +133,7 @@
   },
   "help-default-template": {
     "title": "Default Template",
-    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Zebbies All-Stars Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
+    "body": "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates."
   },
   "help-floqai-template-search": {
     "title": "FloqAi template search",
@@ -180,12 +180,12 @@
     "body": "FLOQR sometimes invites patrons to try new features early. The invitation arrives in your Inbox; open it while signed in to the same account and choose Accept. Only the features FLOQR chose for you then appear on Search with a Beta label. They may change or be switched off during testing. Invitations expire after 7 days and only work for the account they were sent to."
   },
   "help-football-intro": {
-    "title": "Zebbies All-Stars Football Intro",
-    "body": "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” or “Zebbies All-Stars” in Search, pick one of those venues, then upload four photos you have permission to use."
+    "title": "Football Intro",
+    "body": "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only."
   },
   "help-tengo-muchos-dolares": {
     "title": "Tengo muchos dólares",
-    "body": "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares.. just completed a heist!” letter by letter."
+    "body": "$30 Heist Washington DC exclusive. Your message plays in front of the vault; about 40 seconds in, the vault door blows open, $100 bills flood the screen, then keep splashing behind your words. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares... I just did a heist!” letter by letter. Plays on 96×48 displays only."
   },
   "help-display-idle-default": {
     "title": "Idle board: Use ShoutOut @ venue",
@@ -194,5 +194,13 @@
   "help-club-template-repository": {
     "title": "Your club's templates",
     "body": "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo."
+  },
+  "help-template-tags": {
+    "title": "Template tags",
+    "body": "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission."
+  },
+  "help-template-preview": {
+    "title": "Preview a template",
+    "body": "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos."
   }
 }

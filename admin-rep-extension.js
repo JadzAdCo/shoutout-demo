@@ -13,8 +13,14 @@
     ["postPublicContent", "Post to the club public page"],
     ["customerSupport", "Act as a Customer Service Representative"],
     ["manageCommerce", "Manage club Commerce products and orders"],
-    ["postAds", "Post in-app ads on behalf of the club (Club Ad Poster)"]
+    ["postAds", "Post in-app ads on behalf of the club (Club Ad Poster)"],
+    ["administerTemplates", "Administer Templates — Template Administrator: read, add and remove template tags"],
+    ["manageTemplates", "Manage Templates — Template Manager: read and add template tags"]
   ];
+  const repLabel = (key, fallback) => {
+    const out = window.FLOQRI18n?.t?.(`rep.${key}`);
+    return out && out !== `rep.${key}` ? out : fallback;
+  };
 
   function roleName(row = {}) { return row.roleElectionType || (row.workerRoles || [])[0] || "Club Worker"; }
 
@@ -23,7 +29,7 @@
     if (!wrap) return;
     wrap.innerHTML = designations.length ? designations.map(row => {
       const permissions = new Set(row.rolePermissions || []);
-      return `<article class="queue-item rep-worker-policy" data-rep-id="${esc(row.id)}"><div class="message-envelope-head"><strong>${esc(row.workerName || row.workerEmail || "Club worker")}</strong><span>${esc(roleName(row))}</span></div><div class="privacy-datapoint-grid">${permissionOptions.map(([key,label]) => `<label><input type="checkbox" data-rep-permission="${key}" ${permissions.has(key) ? "checked" : ""}/> ${esc(label)}</label>`).join("")}<label><input type="checkbox" data-rep-approval ${row.requireApproval !== false ? "checked" : ""}/> Club Admin must approve this worker's postings</label></div></article>`;
+      return `<article class="queue-item rep-worker-policy" data-rep-id="${esc(row.id)}"><div class="message-envelope-head"><strong>${esc(row.workerName || row.workerEmail || "Club worker")}</strong><span>${esc(roleName(row))}</span></div><div class="privacy-datapoint-grid">${permissionOptions.map(([key,label]) => `<label><input type="checkbox" data-rep-permission="${key}" ${permissions.has(key) ? "checked" : ""}/> ${esc(repLabel(key, label))}</label>`).join("")}<label><input type="checkbox" data-rep-approval ${row.requireApproval !== false ? "checked" : ""}/> Club Admin must approve this worker's postings</label></div></article>`;
     }).join("") : `<p class="sub">Approve or elect workers on Employee/Workers before assigning REP duties.</p>`;
   }
 
@@ -61,21 +67,72 @@
     return failures;
   }
 
+  /** Template roles live in venueTemplateRoles (rules-enforced); the REP checkbox is only the editor. */
+  async function syncTemplateRoles(changes) {
+    const TT = window.FLOQRTemplateTags;
+    if (!changes.length || !TT) return [];
+    const user = auth.currentUser;
+    const failures = [];
+    for (const change of changes) {
+      try {
+        await db.collection("venueTemplateRoles").doc(TT.roleDocId(locationId, change.uid)).set({
+          clubLocationId: locationId,
+          uid: change.uid,
+          email: String(change.email || "").toLowerCase(),
+          displayName: change.name || "",
+          role: change.role || change.previousRole,
+          status: change.role ? "active" : "revoked",
+          grantedByUid: user.uid,
+          grantedByEmail: String(user.email || "").toLowerCase(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        if (change.role) {
+          const roleName = change.role === "administrator" ? "Template Administrator" : "Template Manager";
+          await db.collection("inboxNotifications").add({
+            type: "templateRole",
+            title: `You are now a ${roleName}`,
+            subject: `You are now a ${roleName}`,
+            body: change.role === "administrator"
+              ? "You can add and remove search tags on this venue's templates."
+              : "You can add search tags to this venue's templates.",
+            recipientUid: change.uid,
+            recipientEmail: String(change.email || "").toLowerCase(),
+            clubLocationId: locationId,
+            link: `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
+            read: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      } catch (error) {
+        failures.push(`${change.email || change.uid}: ${error?.message || error}`);
+      }
+    }
+    return failures;
+  }
+
   async function savePolicies() {
     const batch = db.batch();
     const adChanges = [];
+    const templateChanges = [];
+    const TT = window.FLOQRTemplateTags;
     document.querySelectorAll(".rep-worker-policy").forEach(card => {
       const permissions = Array.from(card.querySelectorAll("[data-rep-permission]:checked")).map(input => input.dataset.repPermission);
       const row = designations.find(item => item.id === card.dataset.repId) || {};
       const hadAds = (row.rolePermissions || []).includes("postAds");
       const hasAds = permissions.includes("postAds");
       if (hadAds !== hasAds) adChanges.push({uid: row.workerUid || row.uid || "", email: row.workerEmail || "", enabled: hasAds});
+      const previousRole = TT ? TT.roleFromPermissions(row.rolePermissions) : "";
+      const nextRole = TT ? TT.roleFromPermissions(permissions) : "";
+      const workerUid = row.workerUid || row.uid || "";
+      if (workerUid && previousRole !== nextRole) templateChanges.push({uid: workerUid, email: row.workerEmail || "", name: row.workerName || "", role: nextRole, previousRole});
       batch.set(db.collection("clubEmployeeDesignations").doc(card.dataset.repId), {rolePermissions:permissions, requireApproval:!!card.querySelector("[data-rep-approval]")?.checked, updatedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     });
     await batch.commit();
     const failures = await syncAdPosters(adChanges);
-    byId("repStatus").textContent = failures.length
-      ? `Duties saved, but the Club Ad Poster role could not be updated for: ${failures.join("; ")}`
+    const templateFailures = await syncTemplateRoles(templateChanges);
+    byId("repStatus").textContent = failures.length || templateFailures.length
+      ? [failures.length ? `Duties saved, but the Club Ad Poster role could not be updated for: ${failures.join("; ")}` : "",
+        templateFailures.length ? `Duties saved, but the template role could not be updated for: ${templateFailures.join("; ")}` : ""].filter(Boolean).join(" ")
       : "Individual duties and approval requirements saved.";
     await loadRep();
   }
@@ -102,6 +159,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const tagsLink = byId("clubTemplateTagsLink");
+    if (tagsLink) tagsLink.href = `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`;
     byId("saveRepPoliciesBtn")?.addEventListener("click", () => savePolicies().catch(error => { byId("repStatus").textContent = error.message; }));
     auth.onAuthStateChanged(user => { if (user) loadRep().catch(error => { byId("repStatus").textContent = error.message; }); });
   });
