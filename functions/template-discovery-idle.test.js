@@ -89,7 +89,8 @@ test("every club idles on Use ShoutOut @ {club} after a ShoutOut ends", () => {
 test("approving after a 10-minute reset shows the new ShoutOut, not the idle board", () => {
   const display = read("display-app.js");
   const start = display.indexOf("function isIdlePayload(");
-  const body = display.slice(start, display.indexOf("\n  }\n", start) + 4);
+  const end = /\r?\n  \}\r?\n/.exec(display.slice(start));
+  const body = display.slice(start, start + end.index + end[0].length);
   const isIdlePayload = new Function(`${body}; return isIdlePayload;`)();
   const leftoverIdle = {idleCta: true, source: "automaticTenMinuteReset"};
   assert.equal(isIdlePayload({...leftoverIdle, status: "approved", template: "heistVaultDollars", mainText: "@Ale"}), false);

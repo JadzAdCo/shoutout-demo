@@ -172,7 +172,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Эксклюзив Heist Washington DC за $30. Ваше сообщение идёт на фоне хранилища; примерно через 40 секунд дверь сейфа взрывается, купюры по $100 заполняют весь экран, а затем продолжают разлетаться за вашим текстом. Введите в поиске «Tengo muchos dólares» и напишите до 3 строк по 14 символов."
+        body: "Эксклюзив Heist Washington DC за $30. Ваше сообщение идёт на фоне хранилища; примерно через 40 секунд дверь сейфа взрывается, купюры по $100 заполняют весь экран, а затем продолжают разлетаться за вашим текстом. Введите в поиске «Tengo muchos dólares», затем укажите только имя или выберите @ник Instagram / Mingl (до 14 символов). Экран покажет имя и по буквам напечатает «Tengo muchos dólares.. just completed a heist!»."
       },
       "help-club-template-repository": {
         title: "Шаблоны вашего клуба",
@@ -374,7 +374,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Exclusief bij Heist Washington DC voor $30. Je bericht speelt voor de kluis; na ongeveer 40 seconden vliegt de kluisdeur open, vullen biljetten van $100 het hele scherm en blijven ze daarna achter je tekst rondvliegen. Typ ‘Tengo muchos dólares’ in Zoeken en schrijf maximaal 3 regels van 14 tekens."
+        body: "Exclusief bij Heist Washington DC voor $30. Je bericht speelt voor de kluis; na ongeveer 40 seconden vliegt de kluisdeur open, vullen biljetten van $100 het hele scherm en blijven ze daarna achter je tekst rondvliegen. Typ ‘Tengo muchos dólares’ in Zoeken en vul alleen een naam in of kies een @Instagram- / @Mingl-handle (max. 14). Het scherm toont de naam en typt letter voor letter ‘Tengo muchos dólares.. just completed a heist!’."
       },
       "help-club-template-repository": {
         title: "Sjablonen van je club",
@@ -576,7 +576,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Exclusivité Heist Washington DC à 30 $. Votre message s’affiche devant la chambre forte ; vers 40 secondes, la porte du coffre explose, des billets de 100 $ envahissent tout l’écran, puis continuent de jaillir derrière votre texte. Tapez « Tengo muchos dólares » dans Recherche, puis écrivez jusqu’à 3 lignes de 14 caractères."
+        body: "Exclusivité Heist Washington DC à 30 $. Votre message s’affiche devant la chambre forte ; vers 40 secondes, la porte du coffre explose, des billets de 100 $ envahissent tout l’écran, puis continuent de jaillir derrière votre texte. Tapez « Tengo muchos dólares » dans Recherche, puis saisissez seulement un nom ou choisissez un @pseudo Instagram / Mingl (14 max.). L’écran affiche le nom et tape « Tengo muchos dólares.. just completed a heist! » lettre par lettre."
       },
       "help-club-template-repository": {
         title: "Les modèles de votre club",
@@ -778,7 +778,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Exklusiv bei Heist Washington DC für 30 $. Deine Nachricht läuft vor dem Tresorraum; nach etwa 40 Sekunden fliegt die Tresortür auf, 100-$-Scheine füllen den ganzen Bildschirm und wirbeln danach weiter hinter deinem Text. Gib „Tengo muchos dólares“ in der Suche ein und schreibe bis zu 3 Zeilen mit je 14 Zeichen."
+        body: "Exklusiv bei Heist Washington DC für 30 $. Deine Nachricht läuft vor dem Tresorraum; nach etwa 40 Sekunden fliegt die Tresortür auf, 100-$-Scheine füllen den ganzen Bildschirm und wirbeln danach weiter hinter deinem Text. Gib „Tengo muchos dólares“ in der Suche ein und trage nur einen Namen ein oder wähle ein @Instagram- / @Mingl-Handle (max. 14). Die Anzeige zeigt den Namen und tippt „Tengo muchos dólares.. just completed a heist!“ Buchstabe für Buchstabe."
       },
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
@@ -980,7 +980,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Exclusivo de Heist Washington DC por $30. Tu mensaje aparece frente a la bóveda; a los 40 segundos aproximadamente, la puerta de la caja fuerte explota, billetes de $100 llenan toda la pantalla y luego siguen saltando detrás de tu texto. Escribe «Tengo muchos dólares» en Buscar y escribe hasta 3 líneas de 14 caracteres."
+        body: "Exclusivo de Heist Washington DC por $30. Tu mensaje aparece frente a la bóveda; a los 40 segundos aproximadamente, la puerta de la caja fuerte explota, billetes de $100 llenan toda la pantalla y luego siguen saltando detrás de tu texto. Escribe «Tengo muchos dólares» en Buscar y pon solo un nombre o elige un @usuario de Instagram / Mingl (máx. 14). La pantalla muestra el nombre y escribe «Tengo muchos dólares.. just completed a heist!» letra por letra."
       },
       "help-club-template-repository": {
         title: "Plantillas de tu club",
@@ -1182,7 +1182,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Esclusiva Heist Washington DC a 30 $. Il tuo messaggio appare davanti al caveau; dopo circa 40 secondi la porta della cassaforte esplode, banconote da 100 $ riempiono tutto lo schermo e poi continuano a volare dietro il tuo testo. Scrivi «Tengo muchos dólares» in Cerca, poi scrivi fino a 3 righe da 14 caratteri."
+        body: "Esclusiva Heist Washington DC a 30 $. Il tuo messaggio appare davanti al caveau; dopo circa 40 secondi la porta della cassaforte esplode, banconote da 100 $ riempiono tutto lo schermo e poi continuano a volare dietro il tuo testo. Scrivi «Tengo muchos dólares» in Cerca, poi inserisci solo un nome o scegli un @handle Instagram / Mingl (max 14). Lo schermo mostra il nome e scrive «Tengo muchos dólares.. just completed a heist!» lettera per lettera."
       },
       "help-club-template-repository": {
         title: "I modelli del tuo club",
@@ -1384,7 +1384,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Exclusivo do Heist Washington DC por US$ 30. Sua mensagem aparece diante da caixa-forte; por volta dos 40 segundos, a porta do cofre explode, notas de US$ 100 enchem a tela inteira e depois continuam voando atrás do seu texto. Digite «Tengo muchos dólares» na Busca e escreva até 3 linhas de 14 caracteres."
+        body: "Exclusivo do Heist Washington DC por US$ 30. Sua mensagem aparece diante da caixa-forte; por volta dos 40 segundos, a porta do cofre explode, notas de US$ 100 enchem a tela inteira e depois continuam voando atrás do seu texto. Digite «Tengo muchos dólares» na Busca e informe só um nome ou escolha um @usuário do Instagram / Mingl (máx. 14). O painel mostra o nome e digita «Tengo muchos dólares.. just completed a heist!» letra por letra."
       },
       "help-club-template-repository": {
         title: "Modelos do seu clube",
@@ -1586,7 +1586,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Αποκλειστικό του Heist Washington DC με $30. Το μήνυμά σας παίζει μπροστά στο θησαυροφυλάκιο· περίπου στα 40 δευτερόλεπτα η πόρτα του χρηματοκιβωτίου εκρήγνυται, χαρτονομίσματα των $100 γεμίζουν όλη την οθόνη και μετά συνεχίζουν να πετούν πίσω από το κείμενό σας. Πληκτρολογήστε «Tengo muchos dólares» στην Αναζήτηση και γράψτε έως 3 γραμμές των 14 χαρακτήρων."
+        body: "Αποκλειστικό του Heist Washington DC με $30. Το μήνυμά σας παίζει μπροστά στο θησαυροφυλάκιο· περίπου στα 40 δευτερόλεπτα η πόρτα του χρηματοκιβωτίου εκρήγνυται, χαρτονομίσματα των $100 γεμίζουν όλη την οθόνη και μετά συνεχίζουν να πετούν πίσω από το κείμενό σας. Πληκτρολογήστε «Tengo muchos dólares» στην Αναζήτηση και βάλτε μόνο ένα όνομα ή διαλέξτε ένα @handle Instagram / Mingl (έως 14). Η οθόνη δείχνει το όνομα και πληκτρολογεί γράμμα-γράμμα «Tengo muchos dólares.. just completed a heist!»."
       },
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
@@ -1788,7 +1788,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "Wyłącznie w Heist Washington DC za 30 $. Twoja wiadomość wyświetla się przed skarbcem; po około 40 sekundach drzwi sejfu wybuchają, banknoty 100 $ wypełniają cały ekran, a potem dalej fruwają za Twoim tekstem. Wpisz „Tengo muchos dólares” w wyszukiwarce i napisz do 3 linii po 14 znaków."
+        body: "Wyłącznie w Heist Washington DC za 30 $. Twoja wiadomość wyświetla się przed skarbcem; po około 40 sekundach drzwi sejfu wybuchają, banknoty 100 $ wypełniają cały ekran, a potem dalej fruwają za Twoim tekstem. Wpisz „Tengo muchos dólares” w wyszukiwarce i podaj tylko imię albo wybierz @nick z Instagrama / Mingl (maks. 14). Ekran pokaże imię i litera po literze wypisze „Tengo muchos dólares.. just completed a heist!”."
       },
       "help-club-template-repository": {
         title: "Szablony Twojego klubu",
@@ -1990,7 +1990,7 @@
       },
       "help-tengo-muchos-dolares": {
         title: "Tengo muchos dólares",
-        body: "حصري لـ Heist Washington DC مقابل 30 دولارًا. تظهر رسالتك أمام غرفة الخزنة؛ وبعد نحو 40 ثانية ينفجر باب الخزنة وتملأ أوراق المئة دولار الشاشة بالكامل، ثم تواصل التطاير خلف نصك. اكتب «Tengo muchos dólares» في البحث، ثم اكتب حتى 3 أسطر من 14 حرفًا."
+        body: "حصري لـ Heist Washington DC مقابل 30 دولارًا. تظهر رسالتك أمام غرفة الخزنة؛ وبعد نحو 40 ثانية ينفجر باب الخزنة وتملأ أوراق المئة دولار الشاشة بالكامل، ثم تواصل التطاير خلف نصك. اكتب «Tengo muchos dólares» في البحث، ثم أدخل اسمًا فقط أو اختر @معرّف Instagram / Mingl (14 حرفًا كحد أقصى). تعرض الشاشة الاسم ثم تكتب «Tengo muchos dólares.. just completed a heist!» حرفًا حرفًا."
       },
       "help-club-template-repository": {
         title: "قوالب ناديك",

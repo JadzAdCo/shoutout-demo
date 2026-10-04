@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.9 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.10 (stable)
+
+- s3.1.10: Tengo muchos dólares (Heist DC) now takes just a name or @handle (max 14). The field suggests your own display name, Instagram and Mingl handles, plus public FLOQR profiles, as you type. The board shows the name, then types "Tengo muchos dólares.. just completed a heist!" one letter at a time over the vault, and the money flood uses novelty $100 bill art (not legal tender). Search: typing just the start of a template name ("Tendo Mucho") opens that template, and a search that doesn't say "events" or "clubs" now lists both matching events and matching clubs/venues.
 
 - s3.1.9: Fix — a ShoutOut approved after a board's 10-minute reset stayed hidden behind "Use ShoutOut @ {club}". The board now always plays an approved ShoutOut, and Club Admin / SMS / WhatsApp approval clears the leftover idle marker.
 

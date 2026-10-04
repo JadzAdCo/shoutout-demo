@@ -1273,6 +1273,9 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     searchAliases:['tengo mucho dolares','tengo muchos dolares','tengo mucho dollars','tengo muchos dollars'],
     moneyRain:true,
     moneyRainDelaySeconds:40,
+    nameOnly:true,
+    maxNameCharacters:14,
+    typedLine:'Tengo muchos dólares.. just completed a heist!',
     scope:'Club',
     venueIds:['heist-washington-dc'],
     className:'classic-bw',
@@ -1301,7 +1304,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Vault Night background with floating transparent framed text (3×14). About 40 seconds in, the vault door blows open, $100 bills flood the board, then keep splashing behind the text. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: the patron enters only a name or @handle (max 14). The board shows the name, then types “Tengo muchos dólares.. just completed a heist!” one letter at a time over the vault. About 40 seconds in, the vault door blows open, novelty $100 bills flood the board, then keep splashing behind the text. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
     tags:["heist","tengo muchos dolares","vault night","vault","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   /* Legacy alias — redirects old Courthouse / Red Lux links to Vault Night dollars template */
@@ -1310,6 +1313,9 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     name:'Tengo muchos dólares',
     moneyRain:true,
     moneyRainDelaySeconds:40,
+    nameOnly:true,
+    maxNameCharacters:14,
+    typedLine:'Tengo muchos dólares.. just completed a heist!',
     scope:'Club',
     venueIds:['heist-washington-dc'],
     className:'classic-bw',
@@ -2043,10 +2049,7 @@ window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*10
     if (want.length <= 3 || have.length <= 3) return false;
     return withinDistance(want, have, want.length >= 7 ? 2 : 1);
   }
-  function phraseMatches(query, phrase) {
-    const have = tokens(query);
-    const want = tokens(phrase).filter(token => token.length >= 2);
-    if (!want.length) return false;
+  function allWordsMatch(have, want) {
     const exact = token => have.some(candidate => stem(token) === stem(candidate));
     const allowTypo = want.filter(token => token.length >= 4).length >= 2;
     let typos = 0;
@@ -2056,6 +2059,15 @@ window.SHOUTOUT_UPLOAD_LIMITS = {imageBytes: 8*1024*1024, videoBytes: 30*1024*10
       typos += 1;
       return have.some(candidate => tokenMatches(token, candidate));
     });
+  }
+  // Names of 3+ words also match on their first two words ("tendo mucho" -> "tengo muchos dolares").
+  function phraseMatches(query, phrase) {
+    const have = tokens(query);
+    const want = tokens(phrase).filter(token => token.length >= 2);
+    if (!want.length) return false;
+    if (allWordsMatch(have, want)) return true;
+    const lead = want.slice(0, 2);
+    return want.length >= 3 && lead.every(token => token.length >= 4) && allWordsMatch(have, lead);
   }
   function textMatches(query, text) {
     const want = tokens(query).filter(token => token.length >= 2);

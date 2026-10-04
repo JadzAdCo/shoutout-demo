@@ -277,6 +277,46 @@
     if (!isSoccerJerseyTemplate()) return "";
     return graphemes(soccerNameFromSource()).slice(0, 30).join("");
   }
+  const nameShoutout = () => window.FLOQRNameShoutout || {};
+  function isNameOnlyTemplate() {
+    return !!nameShoutout().isNameOnly?.(getTemplate());
+  }
+  function nameShoutoutKindLabel(kind) {
+    const fallbacks = {ownMingl: "Your Mingl handle", ownInstagram: "Your Instagram", ownName: "Your display name", mingl: "Mingl", instagram: "Instagram"};
+    return tt(`nameShoutout.kind.${kind}`, null, fallbacks[kind] || "");
+  }
+  async function loadNameShoutoutPool() {
+    const me = currentUser?.uid || "";
+    return getCollectionSafe("users", profile => profile.id !== me && profile.publicProfileVisibility === "public", 500);
+  }
+  function bindNameShoutoutInput() {
+    nameShoutout().bind?.({
+      input: byId("nameShoutoutInput"),
+      list: byId("nameShoutoutSuggestions"),
+      maxLength: () => nameShoutout().maxName?.(getTemplate()) || 14,
+      getContext: () => ({profile: cachedUserProfile || {}, user: currentUser || {}, identity: floqrId()}),
+      loadPool: loadNameShoutoutPool,
+      kindLabel: nameShoutoutKindLabel,
+      onChange: () => { syncSoccerJerseyFields(); updatePreview(); }
+    });
+  }
+  // Returns true when the active template takes only a name / @handle.
+  function syncNameShoutoutFields() {
+    const nameOnly = isNameOnlyTemplate();
+    byId("nameShoutoutFields")?.classList.toggle("hidden", !nameOnly);
+    document.querySelector(".shoutout-recommendations-card")?.classList.toggle("hidden", nameOnly);
+    if (!nameOnly) return false;
+    byId("mainText")?.closest("label")?.classList.add("hidden");
+    document.querySelector(".attribution-controls")?.classList.add("hidden");
+    if (byId("includeAttribution")) byId("includeAttribution").checked = false;
+    bindNameShoutoutInput();
+    const input = byId("nameShoutoutInput");
+    const limit = nameShoutout().maxName?.(getTemplate()) || 14;
+    const name = glyphCap(String(input?.value || "").replace(/\s+/g, " ").trim(), limit);
+    if (byId("mainText")) byId("mainText").value = name;
+    if (byId("subText")) byId("subText").value = "";
+    return true;
+  }
   function syncSoccerJerseyFields() {
     const soccer = isSoccerJerseyTemplate();
     const nflDual = isNflDualJerseyTemplate();
@@ -297,6 +337,7 @@
     } else if (floqrAttrLabel) {
       floqrAttrLabel.textContent = "Show my name or social handle in the animated identity rail";
     }
+    if (syncNameShoutoutFields()) return;
     if (!soccer) return;
     if (consolidated) {
       const select = byId("soccerTeamId");
@@ -1244,6 +1285,7 @@
   function listingTitleFor(type) {
     if (type === "events") return tt("listing.searchEvents", {}, "Search Events");
     if (type === "clubs") return tt("listing.searchClubs", {}, "Search Clubs");
+    if (type === "all") return tt("listing.searchAll", {}, "Search Events & Clubs");
     return `${tt("app.search", {}, "Search")} ${venueTypeLabel(type)}`;
   }
 
@@ -1288,8 +1330,8 @@
       return true;
     }
     const parsed = parsedListingQuery(q, "category");
-    const type = parsed?.type || "events";
-    showAdSplash(type, () => openVenueSearch(type, q));
+    const type = parsed?.typeSource === "query" ? parsed.type : "all";
+    showAdSplash(type === "all" ? "events" : type, () => openVenueSearch(type, q));
     return true;
   }
 
@@ -1753,8 +1795,8 @@
         const run = async () => {
           if (id !== "locationSearch" && id !== "genreFilter") {
             const listingType = byId("listingType")?.value || "clubs";
-            if (listingType === "events") await hydrateEventsByRegionQuery();
-            else await hydrateLocationsByRegionQuery();
+            if (listingType === "events" || listingType === "all") await hydrateEventsByRegionQuery();
+            if (listingType !== "events") await hydrateLocationsByRegionQuery();
           }
           renderGrid();
         };
@@ -1769,13 +1811,22 @@
   function renderGrid() {
     let type = byId("listingType").value || "clubs";
     const parsed = parsedListingQuery(byId("locationSearch")?.value, type);
-    if (parsed && parsed.typeSource === "query" && parsed.type !== type && VENUE_LISTING_TYPES.includes(type)) {
+    if (parsed && parsed.typeSource === "query" && parsed.type !== type && (VENUE_LISTING_TYPES.includes(type) || type === "all")) {
       type = parsed.type;
       setListingType(type);
       populateFilters();
     }
     if (type === "events") return renderEventGrid();
+    if (type === "all") return renderAllGrid();
     return renderLocationGrid();
+  }
+  async function renderAllGrid() {
+    const grid = byId("locationGrid");
+    grid.innerHTML = `<section class="listing-section"><h3>${esc(tt("listing.sectionEvents", {}, "Events"))}</h3><div class="club-grid" data-listing-part="events"></div></section><section class="listing-section"><h3>${esc(tt("listing.sectionVenues", {}, "Clubs & venues"))}</h3><div class="club-grid" data-listing-part="venues"></div></section>`;
+    await Promise.all([
+      renderEventGrid(grid.querySelector('[data-listing-part="events"]')),
+      renderLocationGrid(grid.querySelector('[data-listing-part="venues"]'))
+    ]);
   }
 
   const SEARCH_STOP_WORDS = new Set(["a","an","and","am","are","at","for","i","in","interested","interest","into","like","likes","looking","near","of","on","people","person","the","to","want","who","with","going","go","club","clubs","venue","venues","event","events","night","nightlife"]);
@@ -3183,8 +3234,7 @@
     input.focus();
   }
 
-  async function renderEventGrid() {
-    const grid = byId("locationGrid");
+  async function renderEventGrid(grid = byId("locationGrid")) {
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
     const parsed = parsedListingQuery(s, "events");
@@ -3217,8 +3267,7 @@
     });
   }
 
-  async function renderLocationGrid() {
-    const grid = byId("locationGrid");
+  async function renderLocationGrid(grid = byId("locationGrid")) {
     const type = byId("listingType").value || "clubs";
     const s = byId("locationSearch")?.value || "";
     const country = byId("countryFilter")?.value || "", region = byId("regionFilter")?.value || "", city = byId("cityFilter")?.value || "", genre = byId("genreFilter")?.value || "";
@@ -4342,6 +4391,11 @@
         backgroundSource:selectedTemplateVariant.variantScope === "club" ? "clubAdminVariant" : "patronVariant"
       } : {};
       syncSoccerJerseyFields();
+      if (isNameOnlyTemplate() && !String(byId("mainText")?.value || "").trim()) {
+        status.textContent = tt("nameShoutout.required", null, "Enter a name or pick an @handle first.");
+        byId("nameShoutoutInput")?.focus?.();
+        return;
+      }
       const jerseyFields = soccerJerseyPayloadFields();
       if (isConsolidatedSoccerTemplate() && !jerseyFields.jerseyTeamId) {
         status.textContent = "Select a soccer team or club before submitting.";
@@ -4424,7 +4478,7 @@
       }
     }
   }
-  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
+  function startAnother(){ selectedTemplateVariant=null; byId("mainText").value=""; if(byId("includeAttribution"))byId("includeAttribution").checked=false; if(byId("soccerJerseyNumber"))byId("soccerJerseyNumber").value=""; if(byId("soccerManualName"))byId("soccerManualName").value=""; if(byId("soccerNameSource"))byId("soccerNameSource").value="displayName"; if(byId("soccerTeamId"))byId("soccerTeamId").value=""; if(byId("nameShoutoutInput"))byId("nameShoutoutInput").value=""; syncAttribution(); syncSoccerJerseyFields(); byId("mediaUrl").value=""; if(byId("shoutoutMediaUrl")) byId("shoutoutMediaUrl").value=""; if(byId("shoutoutMediaType")) byId("shoutoutMediaType").value=""; if(byId("shoutoutPhoto")) byId("shoutoutPhoto").value=""; if(byId("shoutoutMediaUpload")) byId("shoutoutMediaUpload").value=""; resetFootballTeamEditor(); showTemplateSelection(); }
 
   function updateMediaEditorForTemplate() {
     const t = getTemplate();

@@ -57,6 +57,9 @@
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
+  const TYPED_LINE_START_MS = 900;
+  const TYPED_LINE_CHAR_MS = 110;
+  let typedLineTimer = null;
   const frameLoop = () => window.FLOQRFrameLoop;
 
   function canonicalStaticLocationId(id = "") {
@@ -701,7 +704,41 @@
 
   function moneyBillHtml(className, vars) {
     const style = Object.entries(vars).map(([k, v]) => `--${k}:${v}`).join(";");
-    return `<span class="money-bill ${className}" style="${style}"><span class="money-bill-face"><b class="mb-n mb-tl">100</b><i class="mb-oval"></i><b class="mb-n mb-br">100</b></span></span>`;
+    return `<span class="money-bill ${className}" style="${style}"><span class="money-bill-face"></span></span>`;
+  }
+
+  function stopTypedLine() {
+    if (typedLineTimer) window.clearTimeout(typedLineTimer);
+    typedLineTimer = null;
+  }
+
+  // Types the template line one character at a time under the patron name.
+  function startTypedLine() {
+    stopTypedLine();
+    const host = document.querySelector("#displayMain .typed-line");
+    const out = host?.querySelector(".typed-line-text");
+    if (!host || !out) return;
+    const chars = glyphs(host.getAttribute("data-line") || "");
+    let shown = 0;
+    out.textContent = "";
+    host.classList.remove("is-done");
+    const step = () => {
+      if (!out.isConnected) return stopTypedLine();
+      shown += 1;
+      out.textContent = chars.slice(0, shown).join("");
+      if (shown >= chars.length) {
+        host.classList.add("is-done");
+        typedLineTimer = null;
+        return;
+      }
+      typedLineTimer = window.setTimeout(step, TYPED_LINE_CHAR_MS);
+    };
+    typedLineTimer = window.setTimeout(step, TYPED_LINE_START_MS);
+  }
+
+  function typedLineBoardHtml(name, line) {
+    const nameGlyphs = Math.max(6, glyphs(name).length);
+    return `<span class="typed-line-board" style="--name-glyphs:${nameGlyphs}"><b class="typed-line-name">${esc(name)}</b><span class="typed-line" data-line="${esc(line)}" aria-label="${esc(line)}"><span class="typed-line-ghost" aria-hidden="true">${esc(line)}</span><span class="typed-line-live" aria-hidden="true"><span class="typed-line-text"></span><i class="typed-line-caret"></i></span></span></span>`;
   }
 
   function moneyFloodBills() {
@@ -1028,6 +1065,7 @@
       showHeistBrandSlide();
       heistPhaseLoopTimer = window.setTimeout(() => {
         hideHeistBrandSlide();
+        startTypedLine();
         // Restart the identity rail and message phase for continuous venue playback.
         if (template.identityRail !== false) {
           const subText = String(byId("displaySub")?.getAttribute("data-patron-sub") || "");
@@ -1295,6 +1333,7 @@
   }
 
   function purgeDisplaySurface() {
+    stopTypedLine();
     stopHeistIdentityCycle();
     stopHeistPhaseTimers();
     stopSplitMediaLoop();
@@ -2019,12 +2058,20 @@
       railClear.className = "display-identity-rail hidden";
       railClear.innerHTML = "";
     }
+    stopTypedLine();
     if (isClassicBoard && isTextOverlay) {
-      const rows = mainText.trim()
-        ? classicBoardRows(mainText, textCaps)
-        : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
       byId("displayMain").classList.add("text-overlay-main");
-      byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
+      if (t.nameOnly === true && t.typedLine && !isIdleCta) {
+        const name = glyphSlice(String(data.mainText || "").replace(/\s+/g, " ").trim(), 0, Number(t.maxNameCharacters || 14));
+        byId("displayMain").classList.add("typed-line-main");
+        byId("displayMain").innerHTML = typedLineBoardHtml(name, t.typedLine);
+        startTypedLine();
+      } else {
+        const rows = mainText.trim()
+          ? classicBoardRows(mainText, textCaps)
+          : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
+        byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
+      }
       if (t.identityRail !== false) {
         renderHeistIdentityRail(t, subText);
       } else {

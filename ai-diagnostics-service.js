@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.9";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.10";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1269,6 +1269,18 @@
         {label:"Landing skipped", file:"patron-app.js", includes:["function showShoutoutLanding(", "openCategory(\"shoutout\");"]},
         {label:"Splash logo unframed, links plain", file:"styles.css", includes:["#splashFloqrLogoWrap{border:0", ".splash-house-list a{color:#fff;text-decoration:none}"]},
         {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.6\""]}
+      ]
+    },
+    {
+      version: "s3.1.10-tengo-name-typed-line",
+      title: "Tengo muchos dólares: name-only input with autocomplete, typed heist line, novelty $100 bills; Search lists events and clubs",
+      checks: [
+        {label:"Name-only template fields", file:"shared-data.js", includes:["nameOnly:true", "typedLine:'Tengo muchos dólares.. just completed a heist!'"]},
+        {label:"Name / @handle suggestions module", file:"floqr-name-shoutout.js", includes:["window.FLOQRNameShoutout", "function suggestions("]},
+        {label:"Typewriter board", file:"display-app.js", includes:["function typedLineBoardHtml(", "function startTypedLine("]},
+        {label:"Novelty bill art", file:"display.css", includes:["heist-novelty-100-trump.jpg"]},
+        {label:"Two-word template match", file:"shared-data.js", includes:["function allWordsMatch("]},
+        {label:"Search lists events and clubs", file:"patron-app.js", includes:["async function renderAllGrid("]}
       ]
     },
     {
