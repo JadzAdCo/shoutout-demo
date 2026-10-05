@@ -68,13 +68,38 @@ test("board shows the name, then types the heist line one letter at a time over 
   const display = read("display-app.js");
   assert.match(display, /function typedLineBoardHtml\(name, line\)/);
   assert.match(display, /if \(t\.nameOnly === true && t\.typedLine && !isIdleCta\)/);
-  assert.match(display, /const TYPED_LINE_CHAR_MS = 110;/);
+  const startMs = Number(display.match(/const TYPED_LINE_START_MS = (\d+);/)[1]);
+  const charMs = Number(display.match(/const TYPED_LINE_CHAR_MS = (\d+);/)[1]);
+  const lineGlyphs = Array.from(TYPED_LINE).length;
+  assert.ok(startMs + (lineGlyphs - 1) * charMs <= 5000, "line finishes typing inside the 5s words window");
   const start = display.slice(display.indexOf("function startTypedLine"), display.indexOf("function typedLineBoardHtml"));
   assert.match(start, /setInterval|setTimeout/);
   const css = read("display.css");
+  assert.match(css, /\.typed-line-name\{[^}]*font-size:min\(19\.55vh,calc\(138vw \/ var\(--name-glyphs,8\)\)\)/, "name +15%");
+  assert.match(css, /\.typed-line\{[^}]*font-size:min\(12\.08vh,6\.44vw\)/, "typed line +15%");
+  assert.match(css, /\.typed-line-board\{[^}]*transform:translateY\(-6vh\)/, "name and line sit higher");
   assert.match(css, /images\/heist\/heist-novelty-100-trump\.jpg/);
   assert.match(css, /\.typed-line-caret/);
   assert.ok(fs.statSync(path.join(root, "images/heist/heist-novelty-100-trump.jpg")).size < 300000, "bill art stays small");
+});
+
+test("Heist closing slide: HEIST logo over WASHINGTON DC, both centered, no HEIST DC wording", () => {
+  for (const page of ["display.html", "display2.html"]) {
+    const html = read(page);
+    assert.match(html, /<strong id="heistBrandName" class="heist-brand-name">WASHINGTON DC<\/strong>/, page);
+    assert.doesNotMatch(html, />HEIST DC</, `${page} no HEIST DC word next to the logo`);
+  }
+  const display = read("display-app.js");
+  assert.match(display, /const HEIST_BRAND_SLIDE_LABEL = "WASHINGTON DC";/);
+  assert.match(display, /label\.textContent = heistBrandSlideLabel\(\)/);
+  const phase = display.slice(display.indexOf("function scheduleHeistMessageThenBrandSlide"), display.indexOf("function renderHeistIdentityRail"));
+  assert.match(phase, /primeHeistBrandSlide\(\);/, "logo loads during the message, before the slide opens");
+  const { SHOUTOUT_CLUB_LOCATIONS: locs } = load("shared-data.js");
+  assert.equal(locs["heist-washington-dc"].brandSlideLabel, "Washington DC");
+  const css = read("display.css");
+  assert.match(css, /\.heist-brand-slide\{[^}]*place-items:center/);
+  assert.match(css, /\.heist-brand-slide-inner\{[^}]*flex-direction:column;[^}]*align-items:center;[^}]*justify-content:center/);
+  assert.match(css, /\.heist-brand-name\{[^}]*text-transform:uppercase/);
 });
 
 test("Search box: two leading words find a template; plain queries list events and clubs", () => {

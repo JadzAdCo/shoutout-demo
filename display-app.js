@@ -51,14 +51,15 @@
   const HEIST_MESSAGE_SECONDS = 20;
   const HEIST_BRAND_SLIDE_SECONDS = 8;
   const HEIST_LOCAL_LOGO = "./images/heist/heist-dc-logo.png";
+  const HEIST_BRAND_SLIDE_LABEL = "WASHINGTON DC";
   const SUPRSTAR_LOGO = "./images/suprstr-logo.png";
   let liveContentExpiryTimer = null;
   let expiredLiveKey = "";
   let screenFormatOverride = "";
   let heistPhaseTimer = null;
   let heistPhaseLoopTimer = null;
-  const TYPED_LINE_START_MS = 900;
-  const TYPED_LINE_CHAR_MS = 110;
+  const TYPED_LINE_START_MS = 500;
+  const TYPED_LINE_CHAR_MS = 100;
   let typedLineTimer = null;
   const frameLoop = () => window.FLOQRFrameLoop;
 
@@ -801,20 +802,26 @@
     byId("displayCanvas")?.classList.remove("money-rain-active", "money-shake");
   }
 
-  function moneyRainStartMs(data = {}) {
-    const approved = Number(data.approvedAt?.toMillis?.() || 0);
-    const now = Date.now();
-    return approved && approved <= now && now - approved < DEFAULT_LIVE_SHOUTOUT_SECONDS * 1000 ? approved : now;
+  function moneyRainDelaySeconds(template = {}) {
+    const delay = Number(template.moneyRainDelaySeconds);
+    return Number.isFinite(delay) && delay >= 0 ? delay : MONEY_RAIN_DELAY_SECONDS;
   }
 
-  function scheduleMoneyRain(canvas, layer, startMs, delaySeconds) {
+  // Restarts the vault blast → flood → stream timeline from "now" (start of each Heist message phase).
+  function replayMoneyRain(template = {}) {
+    const canvas = byId("displayCanvas");
+    const layer = byId("displayMoneyRain");
+    if (!canvas || !layer) return;
+    moneyRainTimers.forEach(timer => window.clearTimeout(timer));
+    moneyRainTimers = [];
+    layer.classList.remove("is-blast", "is-flood", "is-stream");
+    canvas.classList.remove("money-shake");
+    scheduleMoneyRain(canvas, layer, moneyRainDelaySeconds(template));
+  }
+
+  function scheduleMoneyRain(canvas, layer, delaySeconds) {
     const at = (ms, fn) => moneyRainTimers.push(window.setTimeout(fn, Math.max(0, ms)));
-    const elapsed = Date.now() - startMs;
-    const blastAt = delaySeconds * 1000 - elapsed;
-    if (blastAt + MONEY_STREAM_AFTER_MS <= 0) {
-      layer.classList.add("is-stream");
-      return;
-    }
+    const blastAt = delaySeconds * 1000;
     at(blastAt, () => {
       layer.classList.add("is-blast", "is-flood");
       canvas.classList.add("money-shake");
@@ -846,8 +853,7 @@
     if (bg && bg.parentNode === canvas) canvas.insertBefore(layer, bg.nextSibling);
     else canvas.appendChild(layer);
     canvas.classList.add("money-rain-active");
-    const delay = Number(template.moneyRainDelaySeconds);
-    scheduleMoneyRain(canvas, layer, moneyRainStartMs(data), Number.isFinite(delay) && delay >= 0 ? delay : MONEY_RAIN_DELAY_SECONDS);
+    scheduleMoneyRain(canvas, layer, moneyRainDelaySeconds(template));
   }
 
   function resetBackgroundLayer(bgEl) {
@@ -1038,19 +1044,34 @@
     canvas?.classList.remove("heist-brand-slide-active");
   }
 
+  function heistBrandSlideLabel() {
+    return String(loc.brandSlideLabel || HEIST_BRAND_SLIDE_LABEL).trim() || HEIST_BRAND_SLIDE_LABEL;
+  }
+
+  // Loads the logo while the message plays so the slide never opens on an empty image.
+  function primeHeistBrandSlide() {
+    const logo = byId("heistBrandLogo");
+    const label = byId("heistBrandName");
+    if (label) label.textContent = heistBrandSlideLabel();
+    if (!logo) return;
+    const src = heistBrandLogoUrl();
+    if (logo.getAttribute("src") !== src && !logo.dataset.fallback) {
+      logo.onerror = () => {
+        if (logo.src.indexOf(HEIST_LOCAL_LOGO) === -1) {
+          logo.dataset.fallback = "1";
+          logo.src = HEIST_LOCAL_LOGO;
+        }
+      };
+      logo.src = src;
+    }
+  }
+
   function showHeistBrandSlide() {
     const slide = byId("heistBrandSlide");
-    const logo = byId("heistBrandLogo");
     const canvas = byId("displayCanvas");
     if (!slide || !canvas) return;
     stopHeistIdentityCycle();
-    if (logo) {
-      const src = heistBrandLogoUrl();
-      logo.src = src;
-      logo.onerror = () => {
-        if (logo.src.indexOf(HEIST_LOCAL_LOGO) === -1) logo.src = HEIST_LOCAL_LOGO;
-      };
-    }
+    primeHeistBrandSlide();
     slide.classList.remove("hidden");
     slide.setAttribute("aria-hidden", "false");
     canvas.classList.add("heist-brand-slide-active");
@@ -1059,6 +1080,8 @@
   function scheduleHeistMessageThenBrandSlide(template = {}) {
     stopHeistPhaseTimers();
     hideHeistBrandSlide();
+    primeHeistBrandSlide();
+    replayMoneyRain(template);
     const messageSeconds = Math.max(5, Number(template.messageDurationSeconds || HEIST_MESSAGE_SECONDS));
     const brandSeconds = Math.max(3, Number(template.brandSlideSeconds || HEIST_BRAND_SLIDE_SECONDS));
     heistPhaseTimer = window.setTimeout(() => {

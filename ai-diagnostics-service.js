@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.11";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.12";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1281,6 +1281,17 @@
         {label:"Novelty bill art", file:"display.css", includes:["heist-novelty-100-trump.jpg"]},
         {label:"Two-word template match", file:"shared-data.js", includes:["function allWordsMatch("]},
         {label:"Search lists events and clubs", file:"patron-app.js", includes:["async function renderAllGrid("]}
+      ]
+    },
+    {
+      version: "s3.1.12-tengo-timeline-brand-slide",
+      title: "Tengo muchos dólares: higher, 15% bigger text; 5 s words then 10 s money splash every loop; closing slide = HEIST logo over WASHINGTON DC, centered",
+      checks: [
+        {label:"Splash replays every message phase", file:"display-app.js", includes:["function replayMoneyRain(", "replayMoneyRain(template);"]},
+        {label:"5 s words + 10 s splash", file:"shared-data.js", includes:["moneyRainDelaySeconds:5,", "moneySplashSeconds:10,", "messageDurationSeconds:15,"]},
+        {label:"Brand slide label", file:"display.html", includes:["id=\"heistBrandName\"", ">WASHINGTON DC<"]},
+        {label:"Brand slide centered stack", file:"display.css", includes:["flex-direction:column;"]},
+        {label:"Bigger typed line", file:"display.css", includes:["font-size:min(12.08vh,6.44vw)"]}
       ]
     },
     {
