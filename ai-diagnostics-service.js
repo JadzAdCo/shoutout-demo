@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.12";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.13";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1281,6 +1281,16 @@
         {label:"Novelty bill art", file:"display.css", includes:["heist-novelty-100-trump.jpg"]},
         {label:"Two-word template match", file:"shared-data.js", includes:["function allWordsMatch("]},
         {label:"Search lists events and clubs", file:"patron-app.js", includes:["async function renderAllGrid("]}
+      ]
+    },
+    {
+      version: "s3.1.13-employee-network-club-scope",
+      title: "Club Admin Employee / Worker Network lists only people linked to this club; Elect Patron for Role shows matching patrons, needs Select, and asks to confirm",
+      checks: [
+        {label:"Club linkage helper", file:"floqr-employee-network.js", includes:["function isLinkedToClub(", "function electionCandidates("]},
+        {label:"Roster scoped to club", file:"admin-app.js", includes:["function clubRoster(", "const roster = clubRoster();"]},
+        {label:"Elect picker + confirm", file:"admin-app.js", includes:["function renderElectionMatches(", "window.confirm(employeeText(\"electConfirm\""]},
+        {label:"Elect picker markup", file:"admin.html", includes:["id=\"roleElectionMatches\"", "floqr-employee-network.js"]}
       ]
     },
     {

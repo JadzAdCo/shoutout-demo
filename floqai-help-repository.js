@@ -1338,6 +1338,16 @@
       page: "admin.html"
     },
     {
+      id: "help-employee-network",
+      title: "Employee / Worker Network",
+      body: "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR).",
+      searchPhrases: ["employee network", "worker network", "elect patron", "elect role", "give staff a role", "add a waitress", "add staff", "club staff list", "designate csr", "customer service representative"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
       id: "help-template-tags",
       title: "Template tags",
       body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",

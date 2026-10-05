@@ -178,6 +178,10 @@
         title: "Шаблоны вашего клуба",
         body: "Шаблоны, созданные только для вашего клуба, идут первыми с пометкой «Эксклюзивно в» и названием площадки. Назначенные шаблоны — те, что посетители могут выбрать в вашем клубе; меняйте это кнопками назначения и удаления шаблона. Поиск находит шаблон даже без диакритики или с небольшой опечаткой."
       },
+      "help-employee-network": {
+        title: "Сеть сотрудников и персонала",
+        body: "Показаны только люди, связанные с этим клубом: персонал, назначенный или одобренный здесь, администраторы клуба и персонал, привязанный к этому клубу. Чтобы дать человеку роль, введите имя, имя пользователя или email в поле «Назначить посетителя на роль», нажмите «Выбрать» рядом с нужным человеком, выберите роль, затем нажмите «Назначить выбранного посетителя на роль» и подтвердите. Сначала человеку нужен аккаунт посетителя FLOQR. Официантов, официанток и bottle girls из списка можно сделать представителями службы поддержки (CSR)."
+      },
       "help-template-tags": {
         title: "Теги шаблонов",
         body: "Добавьте слова, которые гости могут ввести при поиске шаблона на вашей площадке, например вечер матча или день рождения. Менеджеры шаблонов могут добавлять теги. Администраторы шаблонов и Club Admin могут также удалять теги. Club Admin назначает эти роли в разделе Role Activity & Permission."
@@ -387,6 +391,10 @@
       "help-club-template-repository": {
         title: "Sjablonen van je club",
         body: "Sjablonen die alleen voor je club zijn, staan bovenaan met ‘Exclusief bij’ en de naam van je locatie. Toegewezen sjablonen kunnen gasten bij je club kiezen; wijzig dat met Sjabloon toewijzen of Sjabloon verwijderen. Zoeken vindt een sjabloon ook zonder accent of met een kleine typfout."
+      },
+      "help-employee-network": {
+        title: "Netwerk van medewerkers en personeel",
+        body: "Alleen mensen die aan deze club gekoppeld zijn staan in de lijst: personeel dat hier is aangewezen of goedgekeurd, clubbeheerders en personeel dat aan deze club verbonden is. Om iemand een rol te geven, typ je naam, gebruikersnaam of e-mail bij Gast aanwijzen voor een rol, tik je op Selecteren naast de juiste persoon, kies je de rol, tik je op Geselecteerde gast aanwijzen voor rol en bevestig je. De persoon heeft eerst een FLOQR-gastaccount nodig. Obers, serveersters en bottle girls op de lijst kun je klantenservicemedewerker (CSR) maken."
       },
       "help-template-tags": {
         title: "Sjabloontags",
@@ -598,6 +606,10 @@
         title: "Les modèles de votre club",
         body: "Les modèles créés uniquement pour votre club apparaissent en premier avec la mention « Exclusif à » suivie du nom du lieu. Les modèles attribués sont ceux que les clients peuvent choisir dans votre club ; modifiez-les avec Attribuer ou Retirer le modèle. La recherche trouve un modèle même sans accent ou avec une petite faute de frappe."
       },
+      "help-employee-network": {
+        title: "Réseau des employés et du personnel",
+        body: "Seules les personnes liées à ce club sont listées : personnel désigné ou approuvé ici, admins du club et personnel affilié à ce club. Pour donner un rôle à quelqu’un, saisissez son nom, son nom d’utilisateur ou son e-mail sous Attribuer un rôle à un client, appuyez sur Sélectionner à côté de la bonne personne, choisissez le rôle, puis appuyez sur Attribuer le rôle au client sélectionné et confirmez. La personne doit d’abord avoir un compte client FLOQR. Les serveurs, serveuses et bottle girls de la liste peuvent devenir représentants du service client (CSR)."
+      },
       "help-template-tags": {
         title: "Tags des modèles",
         body: "Ajoutez des mots que les clients pourraient taper pour trouver un modèle dans votre lieu, comme soirée match ou anniversaire. Les Gestionnaires des modèles peuvent ajouter des tags. Les Administrateurs des modèles et les Club Admins peuvent aussi en retirer. Le Club Admin attribue ces rôles dans Role Activity & Permission."
@@ -807,6 +819,10 @@
       "help-club-template-repository": {
         title: "Vorlagen deines Clubs",
         body: "Vorlagen nur für deinen Club stehen ganz oben und sind mit „Exklusiv bei“ und dem Namen deiner Location markiert. Zugewiesene Vorlagen können Gäste in deinem Club wählen; ändere das mit Vorlage zuweisen oder Vorlage entfernen. Die Suche findet eine Vorlage auch ohne Akzent oder mit einem kleinen Tippfehler."
+      },
+      "help-employee-network": {
+        title: "Mitarbeiter- und Personalnetzwerk",
+        body: "Nur Personen mit Bezug zu diesem Club werden angezeigt: hier ernanntes oder genehmigtes Personal, Club-Admins und mit diesem Club verbundenes Personal. Um jemandem eine Rolle zu geben, gib unter Gast für eine Rolle ernennen Name, Benutzername oder E-Mail ein, tippe neben der richtigen Person auf Auswählen, wähle die Rolle, tippe dann auf Ausgewählten Gast für die Rolle ernennen und bestätige. Die Person braucht zuerst ein FLOQR-Gastkonto. Kellner, Kellnerinnen und Bottle Girls auf der Liste können zu Kundenservice-Vertretern (CSR) gemacht werden."
       },
       "help-template-tags": {
         title: "Vorlagen-Tags",
@@ -1018,6 +1034,10 @@
         title: "Plantillas de tu club",
         body: "Las plantillas creadas solo para tu club aparecen primero, marcadas con «Exclusivo de» y el nombre del local. Las plantillas asignadas son las que los clientes pueden elegir en tu club; cámbialas con Asignar plantilla o Quitar plantilla. La búsqueda encuentra una plantilla aunque falte una tilde o haya una pequeña errata."
       },
+      "help-employee-network": {
+        title: "Red de empleados y personal",
+        body: "Solo se muestran personas vinculadas a este club: personal designado o aprobado aquí, administradores del club y personal afiliado a este club. Para dar un rol a alguien, escribe su nombre, usuario o email en Designar cliente para un rol, toca Seleccionar junto a la persona correcta, elige el rol, luego toca Designar rol al cliente seleccionado y confirma. La persona necesita primero una cuenta de cliente FLOQR. Los camareros, camareras y bottle girls de la lista pueden ser representantes de atención al cliente (CSR)."
+      },
       "help-template-tags": {
         title: "Etiquetas de plantillas",
         body: "Añade palabras que los clientes podrían escribir al buscar una plantilla en tu local, como noche de partido o cumpleaños. Los Gestores de plantillas pueden añadir etiquetas. Los Administradores de plantillas y los Club Admins también pueden quitarlas. El Club Admin asigna estos roles en Role Activity & Permission."
@@ -1227,6 +1247,10 @@
       "help-club-template-repository": {
         title: "I modelli del tuo club",
         body: "I modelli creati solo per il tuo club compaiono per primi, contrassegnati da «Esclusivo da» e dal nome del locale. I modelli assegnati sono quelli che i clienti possono scegliere nel tuo club; modificali con Assegna modello o Rimuovi modello. La ricerca trova un modello anche senza accento o con un piccolo errore di battitura."
+      },
+      "help-employee-network": {
+        title: "Rete di dipendenti e personale",
+        body: "Sono elencate solo le persone collegate a questo club: personale nominato o approvato qui, admin del club e personale affiliato a questo club. Per dare un ruolo a qualcuno, scrivi nome, username o email in Nomina un cliente per un ruolo, tocca Seleziona accanto alla persona giusta, scegli il ruolo, poi tocca Nomina il cliente selezionato per il ruolo e conferma. La persona deve prima avere un account cliente FLOQR. Camerieri, cameriere e bottle girl in elenco possono diventare rappresentanti del servizio clienti (CSR)."
       },
       "help-template-tags": {
         title: "Tag dei modelli",
@@ -1438,6 +1462,10 @@
         title: "Modelos do seu clube",
         body: "Os modelos feitos só para o seu clube aparecem primeiro, marcados com «Exclusivo em» e o nome do local. Os modelos atribuídos são os que os clientes podem escolher no seu clube; altere isso com Atribuir modelo ou Remover modelo. A busca encontra um modelo mesmo sem acento ou com um pequeno erro de digitação."
       },
+      "help-employee-network": {
+        title: "Rede de funcionários e equipe",
+        body: "Só aparecem pessoas vinculadas a este clube: equipe designada ou aprovada aqui, admins do clube e equipe afiliada a este clube. Para dar uma função a alguém, digite o nome, usuário ou e-mail em Designar cliente para uma função, toque em Selecionar ao lado da pessoa certa, escolha a função, depois toque em Designar função ao cliente selecionado e confirme. A pessoa precisa primeiro de uma conta de cliente FLOQR. Garçons, garçonetes e bottle girls da lista podem ser representantes de atendimento ao cliente (CSR)."
+      },
       "help-template-tags": {
         title: "Tags de modelos",
         body: "Adicione palavras que os clientes possam digitar ao procurar um modelo no seu local, como noite de jogo ou aniversário. Gestores de modelos podem adicionar tags. Administradores de modelos e Club Admins também podem removê-las. O Club Admin atribui esses papéis em Role Activity & Permission."
@@ -1647,6 +1675,10 @@
       "help-club-template-repository": {
         title: "Τα πρότυπα του club σας",
         body: "Τα πρότυπα που έγιναν μόνο για το club σας εμφανίζονται πρώτα, με την ένδειξη «Αποκλειστικά στο» και το όνομα του χώρου. Τα ανατεθειμένα πρότυπα είναι αυτά που μπορούν να επιλέξουν οι πελάτες στο club σας· αλλάξτε τα με Ανάθεση ή Αφαίρεση προτύπου. Η αναζήτηση βρίσκει ένα πρότυπο ακόμη και χωρίς τόνο ή με μικρό ορθογραφικό λάθος."
+      },
+      "help-employee-network": {
+        title: "Δίκτυο υπαλλήλων και προσωπικού",
+        body: "Εμφανίζονται μόνο άτομα συνδεδεμένα με αυτό το club: προσωπικό που ορίστηκε ή εγκρίθηκε εδώ, διαχειριστές του club και προσωπικό συνδεδεμένο με αυτό το club. Για να δώσετε ρόλο σε κάποιον, πληκτρολογήστε όνομα, όνομα χρήστη ή email στο Ορισμός πελάτη σε ρόλο, πατήστε Επιλογή δίπλα στο σωστό άτομο, διαλέξτε τον ρόλο, μετά πατήστε Ορισμός ρόλου στον επιλεγμένο πελάτη και επιβεβαιώστε. Το άτομο χρειάζεται πρώτα λογαριασμό πελάτη FLOQR. Σερβιτόροι, σερβιτόρες και bottle girls της λίστας μπορούν να γίνουν εκπρόσωποι εξυπηρέτησης πελατών (CSR)."
       },
       "help-template-tags": {
         title: "Ετικέτες προτύπων",
@@ -1858,6 +1890,10 @@
         title: "Szablony Twojego klubu",
         body: "Szablony stworzone tylko dla Twojego klubu są na początku listy, oznaczone „Na wyłączność w” z nazwą lokalu. Przypisane szablony to te, które goście mogą wybrać w Twoim klubie; zmienisz to przyciskami Przypisz szablon lub Usuń szablon. Wyszukiwarka znajdzie szablon nawet bez polskich znaków lub z drobną literówką."
       },
+      "help-employee-network": {
+        title: "Sieć pracowników i personelu",
+        body: "Widoczne są tylko osoby powiązane z tym klubem: personel wyznaczony lub zatwierdzony tutaj, administratorzy klubu i personel powiązany z tym klubem. Aby nadać komuś rolę, wpisz imię, nazwę użytkownika lub e-mail w polu Wyznacz gościa do roli, stuknij Wybierz obok właściwej osoby, wybierz rolę, potem stuknij Wyznacz wybranego gościa do roli i potwierdź. Ta osoba potrzebuje najpierw konta gościa FLOQR. Kelnerzy, kelnerki i bottle girls z listy mogą zostać przedstawicielami obsługi klienta (CSR)."
+      },
       "help-template-tags": {
         title: "Tagi szablonów",
         body: "Dodaj słowa, które goście mogą wpisać, szukając szablonu w Twoim lokalu, np. wieczór meczowy albo urodziny. Menedżerowie szablonów mogą dodawać tagi. Administratorzy szablonów i Club Admin mogą je też usuwać. Club Admin przydziela te role w sekcji Role Activity & Permission."
@@ -2067,6 +2103,10 @@
       "help-club-template-repository": {
         title: "قوالب ناديك",
         body: "تظهر القوالب المصممة لناديك فقط في المقدمة مع عبارة «حصريًا في» واسم المكان. القوالب المعيّنة هي التي يمكن للزبائن اختيارها في ناديك؛ غيّر ذلك عبر تعيين القالب أو إزالة القالب. يعثر البحث على القالب حتى بدون علامات التشكيل أو مع خطأ إملائي بسيط."
+      },
+      "help-employee-network": {
+        title: "شبكة الموظفين والعاملين",
+        body: "تظهر هنا فقط الأشخاص المرتبطون بهذا النادي: العاملون المعيّنون أو الموافق عليهم هنا، ومسؤولو النادي، والعاملون المنتسبون إلى هذا النادي. لمنح شخص دورًا، اكتب اسمه أو اسم المستخدم أو بريده الإلكتروني في تعيين زبون لدور، ثم اضغط اختيار بجانب الشخص الصحيح، واختر الدور، ثم اضغط تعيين الزبون المحدد للدور وأكّد. يحتاج الشخص أولًا إلى حساب زبون في FLOQR. يمكن جعل النُدُل والنادلات والـ bottle girls في القائمة ممثلين لخدمة العملاء (CSR)."
       },
       "help-template-tags": {
         title: "وسوم القوالب",

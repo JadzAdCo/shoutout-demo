@@ -25,6 +25,7 @@
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+  let selectedElectionUid = "";
   let workerAssociationRequests = [];
   let clubMedia = [];
   let clubMediaEditTargetId = "";
@@ -1753,19 +1754,6 @@
     return Array.from(roles);
   }
 
-  function isHospitalityWorker(profile = {}) {
-    return approvedRoles(profile).some(role => role.includes("Waiter"));
-  }
-
-  function isClubWorkerOrAffiliate(profile = {}) {
-    return approvedRoles(profile).some(role => (
-      role === "Club Admin" ||
-      role === "Promoter" ||
-      role === "DJ" ||
-      role === "Waiter / Waitress / Bottle Girl" || role === "Bus Boys or Security" || role === "Venue Manager" || role === "Bartender / Barman" || role === "Videographer / Camera Operator"
-    ));
-  }
-
   function promoterCompanyLabel(profile = {}) {
     return profile.promoterCompany || profile.promotionCompany || profile.companyName || profile.company || (profile.independentPromoter ? "Independent promoter" : "");
   }
@@ -1794,10 +1782,48 @@
     return requested.includes(locationId) || nested;
   }
 
+  function employeeText(key, params = {}, fallback = "") {
+    const fullKey = `employees.${key}`;
+    const value = window.FLOQRI18n?.t ? window.FLOQRI18n.t(fullKey, params) : "";
+    if (value && value !== fullKey) return value;
+    return fallback.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+  }
+
+  function employeeClubName() {
+    return publicClubProfile?.locationName || loc.locationName || locationId;
+  }
+
+  function employeeClubContext() {
+    return {locationId, designations: adminDesignations, club: {...loc, ...publicClubProfile}};
+  }
+
+  function isLinkedToThisClub(profile = {}) {
+    return !!window.FLOQREmployeeNetwork?.isLinkedToClub(profile, employeeClubContext());
+  }
+
+  function isThisClubAdmin(profile = {}) {
+    const club = employeeClubContext().club;
+    const uid = profile.uid || profile.id;
+    const email = String(profile.email || "").toLowerCase();
+    return !!((uid && (club.adminUids || []).includes(uid)) ||
+      (email && (club.adminEmails || []).map(value => String(value).toLowerCase()).includes(email)));
+  }
+
+  function rolesAtThisClub(profile = {}) {
+    const designation = window.FLOQREmployeeNetwork?.designationFor(profile.uid || profile.id, adminDesignations);
+    const designated = designation ? approvedRoles({roles: designation.workerRoles, role: designation.roleElectionType}) : [];
+    const roles = designated.length ? designated : approvedRoles(profile);
+    return isThisClubAdmin(profile) && !roles.includes("Club Admin") ? ["Club Admin", ...roles] : roles;
+  }
+
+  function clubRoster() {
+    return adminUsers.filter(isLinkedToThisClub).filter(profile => rolesAtThisClub(profile).length);
+  }
+
   function employeeSearchText(profile = {}) {
     return [
       profile.displayName, profile.fullName, profile.username, profile.email, profile.city, profile.country,
-      promoterCompanyLabel(profile), approvedRoles(profile).join(" "), profileLocationText(profile)
+      promoterCompanyLabel(profile), rolesAtThisClub(profile).join(" "), profileLocationText(profile)
     ].join(" ");
   }
 
@@ -1805,8 +1831,12 @@
     return `${locationId}_${uid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
   }
 
+  function isCsrRow(designation = {}) {
+    return !!window.FLOQREmployeeNetwork?.isCsrDesignation(designation);
+  }
+
   function isDesignatedCSR(uid) {
-    return adminDesignations.some(x => (x.workerUid || x.uid) === uid && x.isCSR !== false);
+    return adminDesignations.some(x => (x.workerUid || x.uid) === uid && isCsrRow(x));
   }
 
   async function setCSR(profile, enabled) {
@@ -1839,14 +1869,75 @@
     await loadEmployeeDesignations();
   }
 
-  async function electClubRole() {
+  function electionProfile(uid) {
+    return uid ? adminUsers.find(profile => (profile.uid || profile.id) === uid) || null : null;
+  }
+
+  function electionName(profile = {}) {
+    return profile.displayName || profile.fullName || profile.username || profile.email || "Patron";
+  }
+
+  function renderElectionMatches() {
+    const wrap = byId("roleElectionMatches");
+    const electBtn = byId("electClubRoleBtn");
+    const selected = electionProfile(selectedElectionUid);
+    if (electBtn) electBtn.disabled = !selected;
+    if (!wrap) return;
+    if (selected) {
+      wrap.innerHTML = `<div class="queue-item employee-row role-election-selected">
+        <div>
+          <strong>${esc(employeeText("electSelected", {name: electionName(selected)}, "Selected: {name}"))}</strong>
+          <p>${esc(selected.username ? `@${selected.username}` : selected.email || "")}</p>
+        </div>
+        <button type="button" data-election-clear>${esc(employeeText("electClear", {}, "Clear"))}</button>
+      </div>`;
+      wrap.querySelector("[data-election-clear]")?.addEventListener("click", () => selectElectionCandidate(""));
+      return;
+    }
     const query = byId("roleElectionSearch")?.value || "";
+    if (!query.trim()) {
+      wrap.innerHTML = "";
+      return;
+    }
+    const candidates = window.FLOQREmployeeNetwork?.electionCandidates(adminUsers, query, {...employeeClubContext(), limit: 8}) || [];
+    if (!candidates.length) {
+      const tooShort = query.replace(/\s+/g, "").length < 2;
+      wrap.innerHTML = `<p class="sub">${esc(tooShort
+        ? employeeText("electTypeMore", {}, "Type at least 2 letters to find a patron.")
+        : employeeText("electNoMatch", {}, "No patron matched. The person needs a FLOQR patron account first."))}</p>`;
+      return;
+    }
+    wrap.innerHTML = candidates.map(candidate => `<div class="queue-item employee-row">
+      <div>
+        <strong>${esc(candidate.name)}</strong>
+        <p>${esc(candidate.handle)}</p>
+        ${candidate.linked ? `<small>${esc(employeeText("alreadyHere", {}, "Already linked to this club"))}</small>` : ""}
+      </div>
+      <button type="button" data-election-uid="${esc(candidate.uid)}">${esc(employeeText("electPick", {}, "Select"))}</button>
+    </div>`).join("");
+    wrap.querySelectorAll("[data-election-uid]").forEach(btn => btn.addEventListener("click", () => selectElectionCandidate(btn.dataset.electionUid)));
+  }
+
+  function selectElectionCandidate(uid) {
+    selectedElectionUid = uid || "";
+    const input = byId("roleElectionSearch");
+    const profile = electionProfile(selectedElectionUid);
+    if (input) input.value = profile ? electionName(profile) : "";
+    renderElectionMatches();
+  }
+
+  async function electClubRole() {
     const role = byId("roleElectionRole")?.value || "Club Admin";
-    const match = adminUsers.find(profile => contextualTextMatch(query, [
-      profile.displayName, profile.fullName, profile.username, profile.email
-    ].join(" ")));
-    if (!match || !(match.uid || match.id)) {
-      setText("adminStatus", "No patron matched the role election search. The person must be a patron first.");
+    const match = electionProfile(selectedElectionUid);
+    if (!match) {
+      setText("adminStatus", employeeText("electChooseFirst", {}, "Pick a patron from the list first."));
+      renderElectionMatches();
+      return;
+    }
+    const club = employeeClubName();
+    const confirmName = electionName(match);
+    if (!window.confirm(employeeText("electConfirm", {name: confirmName, role, club}, "Elect {name} as {role} for {club}?"))) {
+      setText("adminStatus", employeeText("electCancelled", {}, "Election cancelled. Nothing was saved."));
       return;
     }
     const uid = match.uid || match.id;
@@ -1866,7 +1957,13 @@
       status: "elected",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
-    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set(payload, {merge:true});
+    try {
+      await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set(payload, {merge:true});
+    } catch (e) {
+      setText("adminStatus", employeeText("electFailed", {}, "The role could not be saved. Check your Club Admin access and try again."));
+      console.warn("Role election failed:", e.message);
+      return;
+    }
     try {
       await db.collection("users").doc(uid).set({
         approvedRoles: firebase.firestore.FieldValue.arrayUnion(role),
@@ -1876,7 +1973,8 @@
     } catch (e) {
       console.warn("Role election saved, but user profile mirror was not updated:", e.message);
     }
-    setText("adminStatus", `${payload.workerName} elected as ${role} for this club.`);
+    setText("adminStatus", employeeText("electDone", {name: confirmName, role, club}, "{name} elected as {role} for {club}."));
+    selectElectionCandidate("");
     await loadEmployeeDesignations();
   }
 
@@ -1885,15 +1983,16 @@
     const csrWrap = byId("csrList");
     if (!candidateWrap || !csrWrap) return;
     const query = byId("employeeSearch")?.value || "";
-    const workers = adminUsers
-      .filter(isClubWorkerOrAffiliate)
+    const roster = clubRoster();
+    const workers = roster
       .filter(profile => contextualTextMatch(query, employeeSearchText(profile)))
       .slice(0, 40);
+    setText("employeeRosterHint", employeeText("rosterHint", {club: employeeClubName()}, "Only people linked to {club} are listed: elected or approved here, club admins, and staff affiliated with this club."));
     candidateWrap.innerHTML = workers.length ? workers.map(profile => {
       const uid = profile.uid || profile.id;
       const checked = isDesignatedCSR(uid);
-      const roles = approvedRoles(profile);
-      const canBeCSR = isHospitalityWorker(profile);
+      const roles = rolesAtThisClub(profile);
+      const canBeCSR = roles.some(role => role.includes("Waiter"));
       const company = promoterCompanyLabel(profile);
       return `<div class="queue-item employee-row">
         <div>
@@ -1903,15 +2002,15 @@
         </div>
         ${canBeCSR ? `<button type="button" data-uid="${esc(uid)}" data-action="${checked ? "remove" : "add"}">${checked ? "Remove CSR" : "Designate CSR"}</button>` : `<span class="status-pill">${roles.includes("Promoter") ? "Promoter / affiliate" : roles[0] || "Worker"}</span>`}
       </div>`;
-    }).join("") : "<p class='sub'>No approved workers or affiliates matched this search.</p>";
+    }).join("") : `<p class='sub'>${esc(employeeText("rosterEmpty", {}, "No workers or affiliates linked to this club matched this search."))}</p>`;
     candidateWrap.querySelectorAll("button[data-uid]").forEach(btn => {
       const profile = workers.find(x => (x.uid || x.id) === btn.dataset.uid);
       btn.addEventListener("click", () => setCSR(profile, btn.dataset.action === "add"));
     });
 
     const roleCounts = new Map();
-    adminUsers.filter(isClubWorkerOrAffiliate).forEach(profile => {
-      approvedRoles(profile).forEach(role => roleCounts.set(role, (roleCounts.get(role) || 0) + 1));
+    roster.forEach(profile => {
+      rolesAtThisClub(profile).forEach(role => roleCounts.set(role, (roleCounts.get(role) || 0) + 1));
     });
     byId("workerSummaryReport").innerHTML = simpleRows([
       ["Club admins", roleCounts.get("Club Admin") || 0],
@@ -1919,13 +2018,13 @@
       ["Promoters / companies", roleCounts.get("Promoter") || 0],
       ["Waiters / waitresses / bottle girls", roleCounts.get("Waiter / Waitress / Bottle Girl") || 0],
       ["Videographers / camera operators", roleCounts.get("Videographer / Camera Operator") || 0],
-      ["Designated CSRs", adminDesignations.filter(x => x.isCSR !== false).length]
+      ["Designated CSRs", adminDesignations.filter(isCsrRow).length]
     ]);
     byId("workerRoleReport").innerHTML = workers.length ? workers.slice(0, 12).map(profile => {
       const company = promoterCompanyLabel(profile);
       return `<div class="queue-item">
         <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Worker")}</strong>
-        <p>${esc(approvedRoles(profile).join(", ") || "Role not labeled")}</p>
+        <p>${esc(rolesAtThisClub(profile).join(", ") || "Role not labeled")}</p>
         ${company ? `<small>${esc(company)}</small>` : ""}
       </div>`;
     }).join("") : "<p class='sub'>Search or approve role members to populate role groups.</p>";
@@ -1939,7 +2038,7 @@
     </div>`).join("") : "<p class='sub'>No pending worker requests for this club location yet.</p>";
     byId("pendingWorkerRequests").querySelectorAll("[data-worker-request]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerRequest, button.dataset.workerStatus)));
 
-    const active = adminDesignations.filter(x => x.isCSR !== false);
+    const active = adminDesignations.filter(isCsrRow);
     csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">
       <div>
         <strong>${esc(item.workerName || item.workerEmail || "CSR")}</strong>
@@ -1970,6 +2069,7 @@
       return `<option value="${esc(name)}">${esc(role)}</option>`;
     }).join("");
     renderEmployeeDesignations();
+    renderElectionMatches();
   }
 
   function workerRoleLabel(request = {}) {
@@ -2695,6 +2795,10 @@
     bind("electClubRoleBtn", electClubRole);
     bind("createGuestCampaignBtn", createGuestCampaign);
     byId("employeeSearch")?.addEventListener("input", renderEmployeeDesignations);
+    byId("roleElectionSearch")?.addEventListener("input", () => {
+      selectedElectionUid = "";
+      renderElectionMatches();
+    });
     byId("clubTemplateBackgroundSearch")?.addEventListener("input", renderClubTemplateBackgrounds);
     byId("clubMediaUnifiedFiles")?.addEventListener("change", updateClubMediaTrimVisibility);
     byId("clubMediaPlacement")?.addEventListener("change", updateClubMediaTrimVisibility);

@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.12"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.13"/>
   <link rel="stylesheet" href="./admin.css?v=s3.0.2"/>
 </head>
 <body>
@@ -820,12 +820,17 @@
       </section>
       <section id="panelEmployees" class="admin-panel-section">
         <div class="card">
-          <h2>Employee / Worker Network</h2>
-          <p class="sub small">View club admins, resident and visiting DJs, affiliated promoters, promoting companies, waiters, waitresses, bottle girls, and designated customer service representatives for this club location.</p>
-          <label>Search workers / affiliates<input id="employeeSearch" placeholder="Search display name, username, email, role, company, or location"/></label>
+          <h2
+            data-i18n="employees.title"
+            data-floqr-help-id="help-employee-network"
+            data-floqr-help-title="Employee / Worker Network"
+            data-floqr-help-search="employee network|worker network|elect patron|elect role|add a waitress|add staff|designate csr"
+            data-floqr-help-body="Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR)."
+          >Employee / Worker Network</h2>
+          <label><span data-i18n="employees.search">Search workers / affiliates</span><input id="employeeSearch" data-i18n-placeholder="employees.searchPlaceholder" placeholder="Search display name, username, email, role, company, or location"/></label>
           <div class="profile-grid">
-            <label>Elect Patron for Role<input id="roleElectionSearch" placeholder="Search patron display name, username, or email"/></label>
-            <label>Role<select id="roleElectionRole">
+            <label><span data-i18n="employees.electLabel">Elect Patron for Role</span><input id="roleElectionSearch" autocomplete="off" data-i18n-placeholder="employees.electPlaceholder" placeholder="Type a patron's name, username, or email"/></label>
+            <label><span data-i18n="employees.role">Role</span><select id="roleElectionRole">
               <option>Club Admin</option>
               <option>DJ</option>
               <option>Promoter</option>
@@ -836,29 +841,31 @@
               <option>Bartender / Barman</option>
               <option>Videographer / Camera Operator</option>
             </select></label>
-            <label>Promotion Company<input id="roleElectionCompany" placeholder="Required only for promoter company affiliation"/></label>
-            <label><input id="roleElectionIndependentPromoter" type="checkbox"/> Independent promoter</label>
+            <label><span data-i18n="employees.company">Promotion Company</span><input id="roleElectionCompany" data-i18n-placeholder="employees.companyPlaceholder" placeholder="Required only for promoter company affiliation"/></label>
+            <label><input id="roleElectionIndependentPromoter" type="checkbox"/> <span data-i18n="employees.independent">Independent promoter</span></label>
           </div>
-          <button id="electClubRoleBtn" type="button">Elect Selected Patron Role</button>
+          <div id="roleElectionMatches" class="report-block role-election-matches" aria-live="polite"></div>
+          <button id="electClubRoleBtn" type="button" disabled data-i18n="employees.electButton">Elect Selected Patron Role</button>
+          <p id="employeeRosterHint" class="sub small"></p>
           <div id="employeeCandidates" class="report-block"></div>
         </div>
         <div class="admin-grid">
           <div class="card">
-            <h2>Worker / Affiliate Summary</h2>
+            <h2 data-i18n="employees.summary">Worker / Affiliate Summary</h2>
             <div id="workerSummaryReport" class="report-block"></div>
           </div>
           <div class="card">
-            <h2>Role Groups</h2>
+            <h2 data-i18n="employees.roleGroups">Role Groups</h2>
             <div id="workerRoleReport" class="report-block"></div>
           </div>
         </div>
         <div class="card">
-          <h2>Pending Worker Requests</h2>
-          <p class="sub small">Approve waitresses, DJs, promoters, and other service members who submitted from My Profile → Services &amp; Service Members. Same list appears on that tab under Review &amp; elect.</p>
+          <h2 data-i18n="employees.pending">Pending Worker Requests</h2>
+          <p class="sub small" data-keep-visible="true" data-i18n="employees.pendingHint">Approve waitresses, DJs, promoters, and other service members who submitted from My Profile → Services &amp; Service Members. The same list appears on that tab under Review &amp; elect.</p>
           <div id="pendingWorkerRequests" class="report-block"></div>
         </div>
         <div class="card">
-          <h2>Current Customer Service Representatives</h2>
+          <h2 data-i18n="employees.csr">Current Customer Service Representatives</h2>
           <div id="csrList" class="report-block"></div>
         </div>
         <div class="card">
@@ -919,10 +926,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.12"></script>
+<script src="./floqr-nav.js?v=s3.1.13"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
 <script src="./floqr-temp-qa-showcase.js?v=29.09.112"></script>
-<script src="./shared-data.js?v=s3.1.12"></script>
+<script src="./shared-data.js?v=s3.1.13"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./media-source-picker.js?v=29.09.52"></script>
@@ -930,9 +937,9 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.1.12"></script>
-<script src="./floqai-help-repository.js?v=s3.1.12"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.12"></script>
+<script src="./floqr-i18n.js?v=s3.1.13"></script>
+<script src="./floqai-help-repository.js?v=s3.1.13"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.13"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -946,10 +953,11 @@
 <script src="./floqr-ad-composer.js?v=s3.1.0"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./admin-app.js?v=s3.1.9"></script>
+<script src="./floqr-employee-network.js?v=s3.1.13"></script>
+<script src="./admin-app.js?v=s3.1.13"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
-<script src="./floqr-template-tags.js?v=s3.1.12"></script>
-<script src="./admin-rep-extension.js?v=s3.1.12"></script>
+<script src="./floqr-template-tags.js?v=s3.1.13"></script>
+<script src="./admin-rep-extension.js?v=s3.1.13"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
 <script src="./admin-marketing.js?v=s3.0.81"></script>
 <script src="./master-twilio-logging.js?v=s3.0.78"></script>
