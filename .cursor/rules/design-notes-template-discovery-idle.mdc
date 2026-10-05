@@ -41,26 +41,30 @@ Resume: `@templates$` / `$money-rain$`.
 
 ## Tengo muchos dólares (`heistVaultDollars`, legacy `heistRedLux`)
 
-Template fields: `moneyRain:true`, `moneyRainDelaySeconds:40`. `display-app.js` `syncMoneyRain` builds `#displayMoneyRain` right after `#displayBackground` (z-index 1).
+Template fields (s3.1.12): `moneyRain:true`, `moneyRainDelaySeconds:5`, `moneySplashSeconds:10` (documentary), `messageDurationSeconds:15` (= words + splash), `brandSlideSeconds:8`. `display-app.js` `syncMoneyRain` builds `#displayMoneyRain` right after `#displayBackground` (z-index 1). `MONEY_RAIN_DELAY_SECONDS = 40` is only the fallback for templates without the field.
 
-| Time from presentation start | Layer classes | What shows |
+Every Heist message phase (`scheduleHeistMessageThenBrandSlide`) calls `replayMoneyRain(template)`, so the timeline restarts from 0 on the first run **and** after every brand slide:
+
+| Time from message-phase start | Layer classes | What shows |
 |---|---|---|
-| 0 → 40 s | none | Normal ShoutOut (vault background) |
-| 40 s | `is-blast` (2.6 s) + canvas `money-shake` (0.7 s, background only) | Flash, shockwave ring, steel door disc blows toward the viewer, shards, smoke |
-| 40.3 s | `is-flood` (7.4 s) | 8×6 grid of 25vw bills bursts from the vault (48% / 43%) and covers the whole board, then falls away |
-| 44.2 s → end | `is-stream` | 30 smaller (15vw) bills keep splashing from the vault |
+| 0 → 5 s | none | Name + typed line over the vault (typing finishes ≤ 5 s: `TYPED_LINE_START_MS 500` + 100 ms/glyph) |
+| 5 s | `is-blast` (2.6 s) + canvas `money-shake` (0.7 s, background only) | Flash, shockwave ring, steel door disc blows toward the viewer, shards, smoke |
+| 5 s | `is-flood` (7.4 s) | 8×6 grid of 25vw bills bursts from the vault (48% / 43%) and covers the whole board, then falls away |
+| 9.2 s → 15 s | `is-stream` | 30 smaller (15vw) bills keep splashing from the vault |
+| 15 s → 23 s | brand slide | HEIST logo over WASHINGTON DC; money layer faded out; then loop |
 
-- Presentation start = `approvedAt` when it is within the last 10 minutes, else first render. A Xibo reload after the blast window resumes directly in `is-stream`.
-- Timeline restarts only when `livePlaybackKey(data)` changes. `purgeDisplaySurface` → `stopMoneyRain` clears timers.
+- s3.1.11 and earlier keyed the blast to `approvedAt` + 40 s, which landed after the first 20 s brand slide — the owner saw no splash on the first run. `moneyRainStartMs` was removed; do not reintroduce an approvedAt-based offset.
+- `purgeDisplaySurface` → `stopMoneyRain` clears timers. A re-render restarts the phase (same as the typed line).
 - **Verbiage on top:** `.money-rain-active .display-text-overlay{z-index:5}` + heavy dark text-shadow on `#displayMain`, `#displaySub`, `.classic-board-lines b`. Never put bills above the text overlay.
-- Heist brand slide (20 s message / 8 s slide cycle) hides the money layer; 40 s lands in the second message phase.
+- **Brand slide (s3.1.12, all Heist templates):** `display.html` / `display2.html` `#heistBrandLogo` + `#heistBrandName`. The logo spells HEIST, so no "HEIST DC" word; label = `loc.brandSlideLabel` (Heist: "Washington DC") else `HEIST_BRAND_SLIDE_LABEL` "WASHINGTON DC", uppercase. Logo stacked over label in a flex column, centered horizontally and vertically on the board (vw/vh sizing, works on 96×48 / 64×48 / 64×32). `primeHeistBrandSlide()` sets the logo `src` at message-phase start so the slide never opens on an unloaded image.
+- **Typed board size (s3.1.12):** name `min(19.55vh, 138vw / glyphs)`, line `min(12.08vh, 6.44vw)` (+15% over s3.1.11), board `translateY(-6vh)`.
 - **Bill art (s3.1.10):** `.money-bill-face` uses `images/heist/heist-novelty-100-trump.jpg` (800×450, 16:9 → bill height `--bw * .5625`). Owner asked for an official-looking $100 with Donald Trump in the portrait. It is a **novelty** prop: no real signatures, no Treasury seal, no serial numbers, no "legal tender" wording. Never regenerate with real officials' signatures or a Treasury-like seal.
 
 ### Name-only + typed line (s3.1.10)
 
 - Template fields: `nameOnly:true`, `maxNameCharacters:14`, `typedLine:'Tengo muchos dólares... I just did a heist!'` (official spelling; the owner typed "Tendo mucho dolares"). `lineCount` / caps unchanged, so checkout `fitCheckoutDisplayText` keeps the ≤ 14-glyph name on one row (no backend change).
 - Composer: `floqr-name-shoutout.js` → `window.FLOQRNameShoutout` (`isNameOnly`, `maxName`, `capName`, `suggestions`, `bind`). `patron-app.js` `syncNameShoutoutFields()` (called from `syncSoccerJerseyFields`) hides `#mainText`, attribution controls and the recommendations card, shows `#nameShoutoutFields`, writes the name into `#mainText` and clears `#subText`. Suggestions: own Mingl handle → own Instagram → own display name, then public profiles (`users` where `publicProfileVisibility === "public"`, ≤ 500, lazy on focus) Mingl + Instagram handles. Accent/`@`-folded substring on value or display name; starts-with first; dedupe; max 8. Free text is allowed (a name needn't be a FLOQR user).
-- Board: `display-app.js` text-overlay branch → `typedLineBoardHtml(name, typedLine)` (big name, then a monospace gold line). `startTypedLine()` types one glyph every 110 ms after 900 ms with a blinking caret; re-runs every Heist message phase (after the brand slide). Idle CTA never uses the typed board. s3.1.11: line text “Tengo muchos dólares... I just did a heist!” and bigger type (`.typed-line` `font-size:min(10.5vh,5.6vw)`, `width:96%`, two rows on 96×48). `stopTypedLine()` on every render and in `purgeDisplaySurface`.
+- Board: `display-app.js` text-overlay branch → `typedLineBoardHtml(name, typedLine)` (big name, then a monospace gold line). `startTypedLine()` types one glyph every 100 ms after 500 ms (s3.1.12; was 110 / 900) with a blinking caret; re-runs every Heist message phase (after the brand slide). Idle CTA never uses the typed board. s3.1.11: line text “Tengo muchos dólares... I just did a heist!” and bigger type (`.typed-line` `font-size:min(10.5vh,5.6vw)`, `width:96%`, two rows on 96×48). `stopTypedLine()` on every render and in `purgeDisplaySurface`.
 
 ## Search box: partial names + events and clubs (s3.1.10)
 

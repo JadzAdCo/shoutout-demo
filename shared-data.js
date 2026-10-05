@@ -86,7 +86,7 @@ window.SHOUTOUT_CLUB_LOCATIONS = {
     active:true
   },
   "heist-washington-dc": {
-    brandName:"Heist", locationName:"Heist Washington DC", type:"club",
+    brandName:"Heist", locationName:"Heist Washington DC", type:"club", brandSlideLabel:"Washington DC",
     categories:["Clubs","Lounge","Nightlife","Events","ShoutOut"],
     country:"United States", regionType:"District", region:"District of Columbia", city:"Washington",
     streetAddress:"1802 Jefferson Pl. NW", postalCode:"20036",
@@ -1196,7 +1196,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Jail Bars background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: Jail Bars background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","locked up","jail","bars","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistPoliceCar: {
@@ -1230,7 +1230,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Police Car background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: Police Car background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","police car arrest","police","cruiser","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistInterrogation: {
@@ -1264,7 +1264,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: Interrogation background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: Interrogation background with floating transparent framed text (3×14). Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to the HEIST logo over WASHINGTON DC (centered), then loops.',
     tags:["heist","i aint no snitch","interrogation","handcuffs","heist art","noir","framed overlay","$30","64x32","nightlife","text overlay","club exclusive"]
   },
   heistVaultDollars: {
@@ -1272,7 +1272,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     name:'Tengo muchos dólares',
     searchAliases:['tengo mucho dolares','tengo muchos dolares','tengo mucho dollars','tengo muchos dollars'],
     moneyRain:true,
-    moneyRainDelaySeconds:40,
+    moneyRainDelaySeconds:5,
+    moneySplashSeconds:10,
     nameOnly:true,
     maxNameCharacters:14,
     typedLine:'Tengo muchos dólares... I just did a heist!',
@@ -1292,7 +1293,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
     identityAnimation:'burst-away',
     identityAnimationSeconds:3,
-    messageDurationSeconds:20,
+    messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',
@@ -1304,7 +1305,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     maxCharactersPerLine:14,
     maxMainCharacters:42,
     maxSubCharacters:28,
-    description:'Heist DC exclusive: the patron enters only a name or @handle (max 14). The board shows the name, then types “Tengo muchos dólares... I just did a heist!” one letter at a time over the vault. About 40 seconds in, the vault door blows open, novelty $100 bills flood the board, then keep splashing behind the text. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). After 20 seconds the board cuts to a HEIST DC brand slide (logo left, HEIST DC right), then loops.',
+    description:'Heist DC exclusive: the patron enters only a name or @handle (max 14). The board shows the name, then types “Tengo muchos dólares... I just did a heist!” one letter at a time over the vault. After 5 seconds the vault door blows open and novelty $100 bills splash behind the text for 10 seconds. Identity rail cycles optional patron handle (3s), then “Caught in a HEIST” (3s), then “Powered by FloqR Social OS” (3s). Then the board shows the HEIST logo over WASHINGTON DC, centered, and the whole sequence loops (the splash replays every loop).',
     tags:["heist","tengo muchos dolares","vault night","vault","heist art","noir","framed overlay","$30","96x48","nightlife","text overlay","club exclusive"]
   },
   /* Legacy alias — redirects old Courthouse / Red Lux links to Vault Night dollars template */
@@ -1312,7 +1313,8 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     id:'heistVaultDollars',
     name:'Tengo muchos dólares',
     moneyRain:true,
-    moneyRainDelaySeconds:40,
+    moneyRainDelaySeconds:5,
+    moneySplashSeconds:10,
     nameOnly:true,
     maxNameCharacters:14,
     typedLine:'Tengo muchos dólares... I just did a heist!',
@@ -1332,7 +1334,7 @@ Object.assign(window.SHOUTOUT_TEMPLATES, {
     identityMessages:['Caught in a HEIST','Powered by FloqR Social OS'],
     identityAnimation:'burst-away',
     identityAnimationSeconds:3,
-    messageDurationSeconds:20,
+    messageDurationSeconds:15,
     brandSlideSeconds:8,
     priceCents:3000,
     priceLabel:'$30',

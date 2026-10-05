@@ -50,12 +50,21 @@ test("picker shows an Exclusive at {venue} section and Search routes template na
   assert.match(intents, /id: "tengo-muchos-dolares"[\s\S]*?templateId: "heistVaultDollars"/);
 });
 
-test("Tengo muchos dólares: calm start, vault blast at 40s, full flood, then smaller splash under the text", () => {
+test("Tengo muchos dólares: words for 5s, then the money splash for 10s, every loop, then the brand slide", () => {
   const { SHOUTOUT_TEMPLATES: t } = loadSharedData();
-  assert.equal(t.heistVaultDollars.moneyRain, true);
-  assert.equal(t.heistVaultDollars.moneyRainDelaySeconds, 40);
+  for (const id of ["heistVaultDollars", "heistRedLux"]) {
+    assert.equal(t[id].moneyRain, true);
+    assert.equal(t[id].moneyRainDelaySeconds, 5, `${id} words hold 5s`);
+    assert.equal(t[id].moneySplashSeconds, 10, `${id} splash 10s`);
+    assert.equal(t[id].messageDurationSeconds, 15, `${id} message phase = words + splash`);
+  }
   const display = read("display-app.js");
   assert.match(display, /const MONEY_RAIN_DELAY_SECONDS = 40;/);
+  const phase = display.slice(display.indexOf("function scheduleHeistMessageThenBrandSlide"), display.indexOf("function renderHeistIdentityRail"));
+  assert.match(phase, /hideHeistBrandSlide\(\);[\s\S]{0,80}?replayMoneyRain\(template\);[\s\S]*?setTimeout/, "splash replays at the start of every message phase");
+  const replay = display.slice(display.indexOf("function replayMoneyRain"), display.indexOf("function scheduleMoneyRain"));
+  assert.match(replay, /layer\.classList\.remove\("is-blast", "is-flood", "is-stream"\)/);
+  assert.doesNotMatch(display, /moneyRainStartMs/, "splash no longer keyed to approvedAt (it used to land after the first brand slide)");
   assert.match(display, /layer\.classList\.add\("is-blast", "is-flood"\)/);
   assert.match(display, /layer\.classList\.add\("is-stream"\)/);
   assert.match(display, /const MONEY_FLOOD_COLS = 8;/);
