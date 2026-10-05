@@ -1,0 +1,37 @@
+---
+description: Club Admin Employee / Worker Network — club-scoped roster, Elect Patron for Role picker + confirm, CSR count (s3.1.13)
+alwaysApply: false
+---
+
+# Employee / Worker Network (s3.1.13)
+
+Resume: `@employees$` / `$worker-network$`.
+
+Club Admin → `admin.html#panelEmployees`. Logic module: `floqr-employee-network.js` (`window.FLOQREmployeeNetwork`, also `module.exports` for tests). Panel code: `admin-app.js` (`clubRoster`, `rolesAtThisClub`, `renderEmployeeDesignations`, `renderElectionMatches`, `electClubRole`). Test: `functions/employee-network.test.js`.
+
+## Roster = people linked to the open club
+
+`isLinkedToClub(profile, {locationId, designations, club})` is true when any of:
+
+| Source | Field |
+|---|---|
+| `clubEmployeeDesignations` for this club | row for the uid whose `status` is not rejected / removed / revoked / declined |
+| Club doc (`publicClubProfile` merged over static `loc`) | `adminUids` contains uid, or `adminEmails` contains email (case-insensitive) |
+| `users/{uid}` | `affiliatedClubId`, `affiliatedClubLocationId`, `clubLocationId` == club; or `approvedLocations`, `affiliatedClubLocationIds`, `clubLocationIds`, `designatedCSRLocations` include club |
+
+Pending requests (`requestedClubLocationId…`) are **not** links — they live in Pending Worker Requests until approved. Roles shown per row come from this club's designation (`workerRoles` + `roleElectionType`), falling back to the profile's global roles; club admins from the club doc always show **Club Admin**. Summary counts and Role Groups use the same roster.
+
+## Elect Patron for Role
+
+1. Typing in `#roleElectionSearch` (≥ 2 letters) lists up to 8 matching users (name / username / email, accent-insensitive) in `#roleElectionMatches`, each with **Select**; already-linked people are marked.
+2. Select stores `selectedElectionUid`, fills the input, enables `#electClubRoleBtn`. Typing again clears the selection.
+3. Elect asks `window.confirm("Elect {name} as {role} for {club}?")`. Cancel saves nothing.
+4. Writes are unchanged: `clubEmployeeDesignations/{club}_{uid}` (`status: "elected"`, `workerRoles` arrayUnion) + `users/{uid}` `approvedRoles` / `approvedLocations` mirror.
+
+## CSR
+
+A designation counts as CSR only when `isCSR === true` (or legacy rows with no `isCSR` and `designationType: "customer_service_representative"`). Elected / approved rows without `isCSR` are no longer CSRs in Club Admin. `patron-portal-app.js` message recipients still use `isCSR !== false` (all staff designations) — unchanged on purpose.
+
+## i18n / help
+
+Panel chrome keys `employees.*` (all 11 packs). Help id `help-employee-network` (venueAdmin) on the panel heading via `data-floqr-help-*`. Role option names stay English: they are stored values matched by Functions (`/club admin/i`).

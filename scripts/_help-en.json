@@ -195,6 +195,10 @@
     "title": "Your club's templates",
     "body": "Templates made only for your club are listed first and marked Exclusive at your venue name. Assigned templates are the ones patrons can pick at your club; use Assign template or Remove template to change that. Search finds a template even with a missing accent or a small typo."
   },
+  "help-employee-network": {
+    "title": "Employee / Worker Network",
+    "body": "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR)."
+  },
   "help-template-tags": {
     "title": "Template tags",
     "body": "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission."
