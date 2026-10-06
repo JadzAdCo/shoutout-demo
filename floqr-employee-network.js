@@ -102,6 +102,18 @@
     return Array.from(groups.values());
   }
 
+  function hasMadeElectionRequest(profile = {}) {
+    const flag = profile.hasMadeElectionRequest;
+    return flag === 1 || flag === true || flag === "1";
+  }
+
+  function duplicateElectionVenues(profile = {}, venueNames = []) {
+    if (!hasMadeElectionRequest(profile)) return [];
+    const prior = new Set(list(profile.electedRequestMadeTo).map(normalize).filter(Boolean));
+    if (!prior.size) return [];
+    return venueNames.filter(name => prior.has(normalize(name)));
+  }
+
   const api = {
     normalize,
     matches,
@@ -111,7 +123,9 @@
     isLinkedToClub,
     electionCandidates,
     isPendingRequest,
-    groupPendingRequests
+    groupPendingRequests,
+    hasMadeElectionRequest,
+    duplicateElectionVenues
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

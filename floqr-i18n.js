@@ -962,6 +962,7 @@
       "employees.requestApproved": "{name} approved as {role}.",
       "employees.requestRejected": "{name}'s request was rejected.",
       "employees.requestFailed": "The request could not be updated. Refresh and try again.",
+      "portal.serviceMembers.statusAlreadyRequested": "You already sent a request to {clubs}. Remove that club and try again.",
 
       "rep.administerTemplates": "Administer Templates — Template Administrator: read, add and remove template tags",
 
@@ -1648,6 +1649,7 @@
       "employees.requestApproved": "{name} approuvé(e) comme {role}.",
       "employees.requestRejected": "La demande de {name} a été refusée.",
       "employees.requestFailed": "La demande n’a pas pu être mise à jour. Actualisez et réessayez.",
+      "portal.serviceMembers.statusAlreadyRequested": "Vous avez déjà envoyé une demande à {clubs}. Retirez ce club et réessayez.",
 
       "rep.administerTemplates": "Administrer les modèles — Administrateur des modèles : lire, ajouter et retirer des tags",
 
@@ -2334,6 +2336,7 @@
       "employees.requestApproved": "{name} als {role} genehmigt.",
       "employees.requestRejected": "Die Anfrage von {name} wurde abgelehnt.",
       "employees.requestFailed": "Die Anfrage konnte nicht aktualisiert werden. Lade neu und versuche es erneut.",
+      "portal.serviceMembers.statusAlreadyRequested": "Du hast bereits eine Anfrage an {clubs} gesendet. Entferne diesen Club und versuche es erneut.",
 
       "rep.administerTemplates": "Vorlagen administrieren — Vorlagen-Administrator: Tags lesen, hinzufügen und entfernen",
 
@@ -3020,6 +3023,7 @@
       "employees.requestApproved": "{name} aprobado como {role}.",
       "employees.requestRejected": "Se rechazó la solicitud de {name}.",
       "employees.requestFailed": "No se pudo actualizar la solicitud. Recarga e inténtalo de nuevo.",
+      "portal.serviceMembers.statusAlreadyRequested": "Ya enviaste una solicitud a {clubs}. Quita ese club e inténtalo de nuevo.",
 
       "rep.administerTemplates": "Administrar plantillas — Administrador de plantillas: leer, añadir y quitar etiquetas",
 
@@ -3706,6 +3710,7 @@
       "employees.requestApproved": "{name} goedgekeurd als {role}.",
       "employees.requestRejected": "Het verzoek van {name} is afgewezen.",
       "employees.requestFailed": "Het verzoek kon niet worden bijgewerkt. Vernieuw de pagina en probeer het opnieuw.",
+      "portal.serviceMembers.statusAlreadyRequested": "Je hebt al een verzoek gestuurd naar {clubs}. Verwijder die club en probeer het opnieuw.",
 
       "rep.administerTemplates": "Sjablonen administreren — Sjabloonbeheerder: tags lezen, toevoegen en verwijderen",
 
@@ -4392,6 +4397,7 @@
       "employees.requestApproved": "{name}: одобрено на роль {role}.",
       "employees.requestRejected": "Заявка {name} отклонена.",
       "employees.requestFailed": "Не удалось обновить заявку. Обновите страницу и попробуйте снова.",
+      "portal.serviceMembers.statusAlreadyRequested": "Вы уже отправили заявку в {clubs}. Уберите этот клуб и попробуйте снова.",
 
       "rep.administerTemplates": "Администрирование шаблонов — администратор шаблонов: читать, добавлять и удалять теги",
 
@@ -5078,6 +5084,7 @@
       "employees.requestApproved": "{name} approvato come {role}.",
       "employees.requestRejected": "La richiesta di {name} è stata rifiutata.",
       "employees.requestFailed": "Impossibile aggiornare la richiesta. Ricarica e riprova.",
+      "portal.serviceMembers.statusAlreadyRequested": "Hai già inviato una richiesta a {clubs}. Rimuovi quel club e riprova.",
 
       "rep.administerTemplates": "Amministrare i modelli — Amministratore dei modelli: leggere, aggiungere e rimuovere tag",
 
@@ -5764,6 +5771,7 @@
       "employees.requestApproved": "{name} aprovado como {role}.",
       "employees.requestRejected": "O pedido de {name} foi recusado.",
       "employees.requestFailed": "Não foi possível atualizar o pedido. Recarregue e tente de novo.",
+      "portal.serviceMembers.statusAlreadyRequested": "Você já enviou um pedido para {clubs}. Remova esse clube e tente de novo.",
 
       "rep.administerTemplates": "Administrar modelos — Administrador de modelos: ler, adicionar e remover tags",
 
@@ -6450,6 +6458,7 @@
       "employees.requestApproved": "Ο/Η {name} εγκρίθηκε ως {role}.",
       "employees.requestRejected": "Το αίτημα του/της {name} απορρίφθηκε.",
       "employees.requestFailed": "Το αίτημα δεν ενημερώθηκε. Ανανεώστε τη σελίδα και δοκιμάστε ξανά.",
+      "portal.serviceMembers.statusAlreadyRequested": "Έχετε ήδη στείλει αίτημα στο {clubs}. Αφαιρέστε αυτό το club και δοκιμάστε ξανά.",
 
       "rep.administerTemplates": "Διοίκηση προτύπων — Διαχειριστής προτύπων: ανάγνωση, προσθήκη και αφαίρεση ετικετών",
 
@@ -7136,6 +7145,7 @@
       "employees.requestApproved": "{name} zatwierdzono w roli {role}.",
       "employees.requestRejected": "Zgłoszenie {name} zostało odrzucone.",
       "employees.requestFailed": "Nie udało się zaktualizować zgłoszenia. Odśwież stronę i spróbuj ponownie.",
+      "portal.serviceMembers.statusAlreadyRequested": "Już wysłano zgłoszenie do {clubs}. Usuń ten klub i spróbuj ponownie.",
 
       "rep.administerTemplates": "Administrowanie szablonami — Administrator szablonów: odczyt, dodawanie i usuwanie tagów",
 
@@ -7822,6 +7832,7 @@
       "employees.requestApproved": "تمت الموافقة على {name} بدور {role}.",
       "employees.requestRejected": "تم رفض طلب {name}.",
       "employees.requestFailed": "تعذّر تحديث الطلب. حدّث الصفحة وحاول مرة أخرى.",
+      "portal.serviceMembers.statusAlreadyRequested": "لقد أرسلت طلبًا بالفعل إلى {clubs}. أزل هذا النادي وحاول مرة أخرى.",
 
       "rep.administerTemplates": "الإشراف على القوالب — مسؤول القوالب: قراءة الوسوم وإضافتها وإزالتها",
 

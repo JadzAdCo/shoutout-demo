@@ -3738,6 +3738,15 @@
       showSmStatus("smRoleStatus", "statusChooseClub", {}, "Select at least one club for the association request.");
       return;
     }
+    const venueNames = (smVenuePicker?.getSelectedVenues?.() || relatedLocations.map(id => ({id, name: clubLocationLabel(id)}))).map(venue => venue.name);
+    const freshSnap = await db.collection("users").doc(user.uid).get().catch(() => null);
+    const freshProfile = freshSnap?.exists ? freshSnap.data() : currentProfile;
+    const alreadyRequested = window.FLOQREmployeeNetwork?.duplicateElectionVenues(freshProfile, venueNames) || [];
+    if (alreadyRequested.length) {
+      showSmStatus("smRoleStatus", "statusAlreadyRequested", {clubs: alreadyRequested.join(", ")},
+        `You already sent a request to ${alreadyRequested.join(", ")}. Remove that club and try again.`);
+      return;
+    }
     const request = {
       uid: user.uid,
       email: user.email || "",
@@ -3777,6 +3786,8 @@
     batch.set(db.collection("users").doc(user.uid), serviceMembershipPatch({
       requestedRoles: firebase.firestore.FieldValue.arrayUnion(serviceSubtype),
       requestedClubLocationIds: relatedLocations,
+      hasMadeElectionRequest: 1,
+      electedRequestMadeTo: firebase.firestore.FieldValue.arrayUnion(...venueNames),
       publicProfileType: serviceAccess.publicProfileTypeForSpecialty?.(serviceSubtype) || publicProfileTypeForRole(roleType),
       serviceSubtype,
       memberType: serviceSubtype,

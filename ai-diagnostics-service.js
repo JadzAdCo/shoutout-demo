@@ -1289,7 +1289,9 @@
       checks: [
         {label:"Duplicate requests grouped", file:"floqr-employee-network.js", includes:["function groupPendingRequests("]},
         {label:"Approve closes every duplicate", file:"admin-app.js", includes:["async function approveWorkerGroup(", "group.ids.forEach(id => batch.set("]},
-        {label:"Status inside the card", file:"admin.html", includes:["id=\"pendingWorkerStatus\""]}
+        {label:"Status inside the card", file:"admin.html", includes:["id=\"pendingWorkerStatus\""]},
+        {label:"One request per venue", file:"patron-portal-app.js", includes:["duplicateElectionVenues(", "hasMadeElectionRequest: 1,"]},
+        {label:"One request per venue (role page)", file:"role-request-app.js", includes:["duplicateElectionVenues(", "electedRequestMadeTo:"]}
       ]
     },
     {

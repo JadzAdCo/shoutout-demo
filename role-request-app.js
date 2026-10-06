@@ -49,6 +49,16 @@
       setText("roleStatus", "Select at least one club for the association request.");
       return;
     }
+    const venueNames = (venuePicker?.getSelectedVenues?.() || relatedLocations.map(id => ({id, name: id}))).map(venue => venue.name);
+    const profileSnap = await db.collection("users").doc(user.uid).get().catch(() => null);
+    const alreadyRequested = window.FLOQREmployeeNetwork?.duplicateElectionVenues(profileSnap?.exists ? profileSnap.data() : {}, venueNames) || [];
+    if (alreadyRequested.length) {
+      const clubs = alreadyRequested.join(", ");
+      const key = "portal.serviceMembers.statusAlreadyRequested";
+      const translated = window.FLOQRI18n?.t?.(key, {clubs});
+      setText("roleStatus", translated && translated !== key ? translated : `You already sent a request to ${clubs}. Remove that club and try again.`);
+      return;
+    }
 
     const request = {
       uid: user.uid,
@@ -92,6 +102,8 @@
       serviceMember: roleType !== "clubAdmin",
       requestedRoles: firebase.firestore.FieldValue.arrayUnion(serviceSubtype),
       requestedClubLocationIds: relatedLocations,
+      hasMadeElectionRequest: 1,
+      electedRequestMadeTo: firebase.firestore.FieldValue.arrayUnion(...venueNames),
       publicProfileType: access.publicProfileTypeForSpecialty?.(serviceSubtype) || "patron",
       serviceSubtype,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()

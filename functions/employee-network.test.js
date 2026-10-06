@@ -94,6 +94,33 @@ test("pending requests from the same worker and role collapse into one row", () 
   ]);
 });
 
+test("hasMadeElectionRequest gates the electedRequestMadeTo duplicate check", () => {
+  const N = loadNetwork();
+  const dupes = (profile, names) => Array.from(N.duplicateElectionVenues(profile, names));
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 0, electedRequestMadeTo: ["Aurelia"] }, ["Aurelia"]), [], "flag 0: list is not searched");
+  assert.deepEqual(dupes({ electedRequestMadeTo: ["Aurelia"] }, ["Aurelia"]), [], "flag missing counts as 0");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1, electedRequestMadeTo: ["Aurelia", "Heist"] }, ["aurélia", "Zebbies Garden"]), ["aurélia"], "flag 1: case/accent-insensitive venue-name match");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1, electedRequestMadeTo: ["Aurelia", "Heist"] }, ["Heist", "Aurelia"]), ["Heist", "Aurelia"], "every repeated club is reported");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1 }, ["Aurelia"]), [], "flag 1 with an empty list");
+});
+
+test("both request forms block repeats and record the venue names", () => {
+  for (const file of ["patron-portal-app.js", "role-request-app.js"]) {
+    const src = read(file);
+    assert.match(src, /duplicateElectionVenues\(/, `${file} checks for repeat requests`);
+    assert.match(src, /statusAlreadyRequested/, `${file} shows which clubs were already requested`);
+    assert.match(src, /hasMadeElectionRequest: 1,\s*electedRequestMadeTo: firebase\.firestore\.FieldValue\.arrayUnion\(\.\.\.venueNames\)/, `${file} writes both datapoints`);
+    const check = src.indexOf("duplicateElectionVenues(");
+    const write = src.indexOf('collection("workerAssociationRequests").doc()');
+    assert.ok(check > 0 && check < write, `${file} checks before creating any request`);
+  }
+  for (const page of ["patron-portal.html", "role-request.html"]) {
+    const html = read(page);
+    assert.ok(html.indexOf("floqr-employee-network.js") > 0 && html.indexOf("floqr-employee-network.js") < html.indexOf(page === "role-request.html" ? "role-request-app.js" : "patron-portal-app.js"), `${page} loads the helper first`);
+  }
+  assert.match(read("floqr-venue-picker.js"), /function getSelectedVenues\(/);
+});
+
 test("Approve survives the patron-only users rule and reports the result in the card", () => {
   const app = read("admin-app.js");
   const portal = read("patron-portal-app.js");
