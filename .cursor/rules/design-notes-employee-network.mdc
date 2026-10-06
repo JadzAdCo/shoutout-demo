@@ -28,6 +28,24 @@ Pending requests (`requestedClubLocationId…`) are **not** links — they live 
 3. Elect asks `window.confirm("Elect {name} as {role} for {club}?")`. Cancel saves nothing.
 4. Writes are unchanged: `clubEmployeeDesignations/{club}_{uid}` (`status: "elected"`, `workerRoles` arrayUnion) + `users/{uid}` `approvedRoles` / `approvedLocations` mirror.
 
+## Pending Worker Requests (s3.1.14 — first card in the panel)
+
+- `groupPendingRequests(requests, workerRoleLabel)` merges pending rows by `uid|role` (case-insensitive); the row shows “{count} requests” and Approve / Reject closes **every** id in the group in one batch.
+- Approve order: `clubEmployeeDesignations/{club}_{uid}` (`status: "approved"`) → best-effort `users/{uid}` mirror → best-effort Inbox `workerAssociation` → batch-close requests → reload.
+- **Pitfall:** `firestore.rules` `users/{userId}` update is `isSelf` only. A Club Admin writing another patron's `users` doc is denied. Any admin-side `users` mirror (elect, approve, CSR) must be wrapped in try/catch — an unguarded await made Approve look dead (designation saved, request stayed pending, no message). Same fix in `patron-portal-app.js` `setServiceMemberRequest`. The designation row is the club link everywhere (`isLinkedToClub`, Work Calendar gate).
+- Result / error text goes to `#pendingWorkerStatus` inside the card (the page-level `#adminStatus` is off-screen there).
+
+## One request per venue (s3.1.14)
+
+| `users/{uid}` field | Type | Written by |
+|---|---|---|
+| `hasMadeElectionRequest` | `0` / `1` (missing = 0) | worker's own request submit (patron-portal `submitServiceMemberRequest`, `role-request-app.js`) |
+| `electedRequestMadeTo` | array of **venue names** (`FLOQRVenuePicker.getSelectedVenues()` → `locationName` / `brandName` / `name`) | same write, `arrayUnion` |
+
+`duplicateElectionVenues(profile, venueNames)`: flag ≠ 1 → `[]` without reading the list; flag = 1 → selected names already in the list (case/accent-insensitive). Any hit → no request docs are created; status shows `portal.serviceMembers.statusAlreadyRequested` with the club names. The profile is re-read fresh before the check.
+
+Limits: client-side guard (a worker can edit their own `users` doc; rules do not enforce it). Names, not ids — two venues with the same name collide. Rejected requests stay in the list, and a Club Admin cannot clear it (`users` update is `isSelf` only); clearing needs a Functions callable if product wants re-requests after rejection. Legacy duplicates (flag missing) are not blocked until the worker's next request sets the flag.
+
 ## CSR
 
 A designation counts as CSR only when `isCSR === true` (or legacy rows with no `isCSR` and `designationType: "customer_service_representative"`). Elected / approved rows without `isCSR` are no longer CSRs in Club Admin. `patron-portal-app.js` message recipients still use `isCSR !== false` (all staff designations) — unchanged on purpose.

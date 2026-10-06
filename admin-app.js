@@ -26,6 +26,7 @@
   let adminUsers = [];
   let adminDesignations = [];
   let selectedElectionUid = "";
+  let pendingWorkerGroups = [];
   let workerAssociationRequests = [];
   let clubMedia = [];
   let clubMediaEditTargetId = "";
@@ -2029,14 +2030,18 @@
       </div>`;
     }).join("") : "<p class='sub'>Search or approve role members to populate role groups.</p>";
 
-    const pending = workerAssociationRequests.filter(request => String(request.status || "pending").toLowerCase() === "pending");
-    byId("pendingWorkerRequests").innerHTML = pending.length ? pending.map(request => `<div class="queue-item">
+    pendingWorkerGroups = window.FLOQREmployeeNetwork?.groupPendingRequests(workerAssociationRequests, workerRoleLabel) || [];
+    byId("pendingWorkerRequests").innerHTML = pendingWorkerGroups.length ? pendingWorkerGroups.map(group => {
+      const request = group.request;
+      const repeats = group.ids.length > 1 ? ` · ${esc(employeeText("requestCount", {count: group.ids.length}, "{count} requests"))}` : "";
+      return `<div class="queue-item">
       <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
-      <p>${esc(request.serviceSubtype || workerRoleLabel(request))}</p>
-      <small>${esc(request.email || "")}</small>
-      <div class="queue-actions"><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="approved">Approve</button><button type="button" data-worker-request="${esc(request.id)}" data-worker-status="rejected">Reject</button></div>
-    </div>`).join("") : "<p class='sub'>No pending worker requests for this club location yet.</p>";
-    byId("pendingWorkerRequests").querySelectorAll("[data-worker-request]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerRequest, button.dataset.workerStatus)));
+      <p>${esc(group.role)}</p>
+      <small>${esc(request.email || "")}${repeats}</small>
+      <div class="queue-actions"><button type="button" data-worker-group="${esc(group.key)}" data-worker-status="approved">${esc(employeeText("approve", {}, "Approve"))}</button><button type="button" data-worker-group="${esc(group.key)}" data-worker-status="rejected">${esc(employeeText("reject", {}, "Reject"))}</button></div>
+    </div>`;
+    }).join("") : `<p class='sub'>${esc(employeeText("pendingEmpty", {}, "No pending worker requests for this club location yet."))}</p>`;
+    byId("pendingWorkerRequests").querySelectorAll("[data-worker-group]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerGroup, button.dataset.workerStatus)));
 
     const active = adminDesignations.filter(isCsrRow);
     csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">
@@ -2085,19 +2090,48 @@
     return request.serviceSubtype || "Waiter / Waitress / Bottle Girl";
   }
 
-  async function setWorkerAssociationRequest(requestId, status) {
-    const request = workerAssociationRequests.find(item => item.id === requestId);
-    if (!request) return;
-    const role = workerRoleLabel(request);
-    if (status === "approved") {
-      const uid = request.uid || request.workerUid;
-      await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:request.email || "", workerName:request.publicName || request.displayName || request.email || "Club worker", workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+  async function approveWorkerGroup(group, name) {
+    const uid = group.uid;
+    if (!uid) throw new Error("Worker request has no account id.");
+    const role = group.role;
+    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:group.request.email || "", workerName:name, workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    // Firestore rules only let a patron update their own users doc; the designation row above is the club link.
+    try {
       await db.collection("users").doc(uid).set({approvedRoles:firebase.firestore.FieldValue.arrayUnion(role), approvedLocations:firebase.firestore.FieldValue.arrayUnion(locationId), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
-      await db.collection("inboxNotifications").add({recipientUid:uid, type:"workerAssociation", title:"Club association approved", body:`${loc.locationName || locationId} approved your ${role} association.`, clubLocationId:locationId, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    } catch (e) {
+      console.warn("Worker approved, but user profile mirror was not updated:", e.message);
     }
-    await db.collection("workerAssociationRequests").doc(requestId).set({status, reviewedByUid:auth.currentUser?.uid || "", reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
-    setText("adminStatus", `Worker association ${status}.`);
-    await loadEmployeeDesignations();
+    try {
+      await db.collection("inboxNotifications").add({recipientUid:uid, type:"workerAssociation", title:"Club association approved", body:`${employeeClubName()} approved your ${role} association.`, clubLocationId:locationId, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    } catch (e) {
+      console.warn("Worker approved, but the Inbox notice was not sent:", e.message);
+    }
+  }
+
+  async function setWorkerAssociationRequest(groupKey, status) {
+    const group = pendingWorkerGroups.find(item => item.key === groupKey);
+    if (!group) return;
+    const name = group.request.publicName || group.request.displayName || group.request.email || "Club worker";
+    const buttons = Array.from(byId("pendingWorkerRequests")?.querySelectorAll("[data-worker-group]") || [])
+      .filter(button => button.dataset.workerGroup === groupKey);
+    buttons.forEach(button => { button.disabled = true; });
+    setText("pendingWorkerStatus", employeeText("saving", {}, "Saving…"));
+    try {
+      if (status === "approved") await approveWorkerGroup(group, name);
+      const batch = db.batch();
+      group.ids.forEach(id => batch.set(db.collection("workerAssociationRequests").doc(id), {status, reviewedByUid:auth.currentUser?.uid || "", reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true}));
+      await batch.commit();
+      const message = status === "approved"
+        ? employeeText("requestApproved", {name, role: group.role}, "{name} approved as {role}.")
+        : employeeText("requestRejected", {name}, "{name}'s request was rejected.");
+      setText("adminStatus", message);
+      await loadEmployeeDesignations();
+      setText("pendingWorkerStatus", message);
+    } catch (e) {
+      console.warn("Worker association update failed:", e);
+      buttons.forEach(button => { button.disabled = false; });
+      setText("pendingWorkerStatus", employeeText("requestFailed", {}, "The request could not be updated. Refresh and try again."));
+    }
   }
 
   function guestCampaignPayload() {

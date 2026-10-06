@@ -76,6 +76,64 @@ test("elect candidates need 2+ letters, match name/username/email, and flag club
   assert.equal(N.electionCandidates(many, "sam", { ...ctx, limit: 8 }).length, 8);
 });
 
+test("pending requests from the same worker and role collapse into one row", () => {
+  const N = loadNetwork();
+  const groups = N.groupPendingRequests([
+    { id: "r1", uid: "priya", serviceSubtype: "Waitress", status: "pending" },
+    { id: "r2", workerUid: "priya", serviceSubtype: "Waitress" },
+    { id: "r3", uid: "priya", serviceSubtype: "waitress", status: "pending" },
+    { id: "r4", uid: "priya", serviceSubtype: "Bottle Girl", status: "pending" },
+    { id: "r5", uid: "ale", serviceSubtype: "Bottle Girl", status: "approved" },
+    { id: "r6", serviceSubtype: "DJ", status: "pending" }
+  ]);
+  const rows = Array.from(groups, g => ({ uid: g.uid, role: g.role, ids: Array.from(g.ids) }));
+  assert.deepEqual(rows, [
+    { uid: "priya", role: "Waitress", ids: ["r1", "r2", "r3"] },
+    { uid: "priya", role: "Bottle Girl", ids: ["r4"] },
+    { uid: "", role: "DJ", ids: ["r6"] }
+  ]);
+});
+
+test("hasMadeElectionRequest gates the electedRequestMadeTo duplicate check", () => {
+  const N = loadNetwork();
+  const dupes = (profile, names) => Array.from(N.duplicateElectionVenues(profile, names));
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 0, electedRequestMadeTo: ["Aurelia"] }, ["Aurelia"]), [], "flag 0: list is not searched");
+  assert.deepEqual(dupes({ electedRequestMadeTo: ["Aurelia"] }, ["Aurelia"]), [], "flag missing counts as 0");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1, electedRequestMadeTo: ["Aurelia", "Heist"] }, ["aurélia", "Zebbies Garden"]), ["aurélia"], "flag 1: case/accent-insensitive venue-name match");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1, electedRequestMadeTo: ["Aurelia", "Heist"] }, ["Heist", "Aurelia"]), ["Heist", "Aurelia"], "every repeated club is reported");
+  assert.deepEqual(dupes({ hasMadeElectionRequest: 1 }, ["Aurelia"]), [], "flag 1 with an empty list");
+});
+
+test("both request forms block repeats and record the venue names", () => {
+  for (const file of ["patron-portal-app.js", "role-request-app.js"]) {
+    const src = read(file);
+    assert.match(src, /duplicateElectionVenues\(/, `${file} checks for repeat requests`);
+    assert.match(src, /statusAlreadyRequested/, `${file} shows which clubs were already requested`);
+    assert.match(src, /hasMadeElectionRequest: 1,\s*electedRequestMadeTo: firebase\.firestore\.FieldValue\.arrayUnion\(\.\.\.venueNames\)/, `${file} writes both datapoints`);
+    const check = src.indexOf("duplicateElectionVenues(");
+    const write = src.indexOf('collection("workerAssociationRequests").doc()');
+    assert.ok(check > 0 && check < write, `${file} checks before creating any request`);
+  }
+  for (const page of ["patron-portal.html", "role-request.html"]) {
+    const html = read(page);
+    assert.ok(html.indexOf("floqr-employee-network.js") > 0 && html.indexOf("floqr-employee-network.js") < html.indexOf(page === "role-request.html" ? "role-request-app.js" : "patron-portal-app.js"), `${page} loads the helper first`);
+  }
+  assert.match(read("floqr-venue-picker.js"), /function getSelectedVenues\(/);
+});
+
+test("Approve survives the patron-only users rule and reports the result in the card", () => {
+  const app = read("admin-app.js");
+  const portal = read("patron-portal-app.js");
+  const html = read("admin.html");
+  assert.match(app, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(\{approvedRoles/, "Club Admin approve must not fail on the users mirror");
+  assert.match(portal, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(userPatch/, "Review & elect approve must not fail on the users mirror");
+  assert.match(app, /group\.ids\.forEach\(id => batch\.set\(db\.collection\("workerAssociationRequests"\)/, "every duplicate request is closed");
+  assert.match(app, /setText\("pendingWorkerStatus", employeeText\("requestFailed"/);
+  assert.match(html, /id="pendingWorkerStatus"/);
+  const panel = html.slice(html.indexOf('id="panelEmployees"'));
+  assert.ok(panel.indexOf('id="pendingWorkerRequests"') < panel.indexOf('id="roleElectionSearch"'), "Pending Worker Requests is the first card");
+});
+
 test("Club Admin panel uses the club roster and a select + confirm election", () => {
   const app = read("admin-app.js");
   const html = read("admin.html");

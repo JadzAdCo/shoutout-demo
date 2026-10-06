@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.13";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.14";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1281,6 +1281,17 @@
         {label:"Novelty bill art", file:"display.css", includes:["heist-novelty-100-trump.jpg"]},
         {label:"Two-word template match", file:"shared-data.js", includes:["function allWordsMatch("]},
         {label:"Search lists events and clubs", file:"patron-app.js", includes:["async function renderAllGrid("]}
+      ]
+    },
+    {
+      version: "s3.1.14-worker-request-approve",
+      title: "Pending Worker Requests: Approve works (users mirror is best-effort), duplicates merge into one row, card is first in Employee / Worker Network",
+      checks: [
+        {label:"Duplicate requests grouped", file:"floqr-employee-network.js", includes:["function groupPendingRequests("]},
+        {label:"Approve closes every duplicate", file:"admin-app.js", includes:["async function approveWorkerGroup(", "group.ids.forEach(id => batch.set("]},
+        {label:"Status inside the card", file:"admin.html", includes:["id=\"pendingWorkerStatus\""]},
+        {label:"One request per venue", file:"patron-portal-app.js", includes:["duplicateElectionVenues(", "hasMadeElectionRequest: 1,"]},
+        {label:"One request per venue (role page)", file:"role-request-app.js", includes:["duplicateElectionVenues(", "electedRequestMadeTo:"]}
       ]
     },
     {

@@ -19,6 +19,10 @@
     return parts.join(" · ") || String(row.id || "").trim() || "Venue";
   }
 
+  function venueName(row = {}) {
+    return String(row.locationName || row.brandName || row.name || row.locationLabel || row.id || "").trim();
+  }
+
   function searchBlob(row = {}) {
     return [
       row.id,
@@ -205,15 +209,22 @@
       return [...selected.keys()];
     }
 
+    function getSelectedVenues() {
+      return getSelectedIds().map(id => {
+        const row = index.find(item => item.id === id) || staticCatalog[id] || {id};
+        return {id, name: venueName({id, ...row})};
+      });
+    }
+
     function setSelectedIds(ids = []) {
       selected.clear();
       hydrateSelected(ids);
       options.onChange?.(getSelectedIds());
     }
 
-    return {getSelectedIds, setSelectedIds, venueLabel};
+    return {getSelectedIds, getSelectedVenues, setSelectedIds, venueLabel};
   }
 
-  root.FLOQRVenuePicker = {mount, venueLabel, loadVenueIndex};
+  root.FLOQRVenuePicker = {mount, venueLabel, venueName, loadVenueIndex};
   if (typeof module !== "undefined" && module.exports) module.exports = root.FLOQRVenuePicker;
 })(typeof window !== "undefined" ? window : globalThis);
