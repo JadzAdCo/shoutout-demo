@@ -6,7 +6,8 @@
   const REL = "./images/temp-qa";
 
   const CLUBS = [
-    {n:1, brand:"Aurelia", vibe:"Champagne lounge", tagline:"Where the night pours gold.", genres:["House","R&B","Open Format"], street:"1001 U St NW"},
+    {n:1, brand:"Aurelia", vibe:"Champagne lounge", tagline:"Where the night pours gold.", genres:["House","R&B","Open Format"], street:"1001 6th Ave",
+      locationName:"Aurelia (Demo Club)", city:"New York", region:"New York", regionType:"State", postalCode:"10018", area:"New York"},
     {n:2, brand:"Volt Room", vibe:"Late electro warehouse", tagline:"Bass first. Lights second.", genres:["EDM","Techno","Open Format"], street:"1002 14th St NW"},
     {n:3, brand:"Nectar", vibe:"Afrobeats supperclub", tagline:"Sweat, silk, and Saturday.", genres:["Afrobeats","Amapiano","Hip Hop"], street:"1003 Florida Ave NW"},
     {n:4, brand:"Panthera", vibe:"Hip-hop den", tagline:"Black-cat energy after midnight.", genres:["Hip Hop","Trap","R&B"], street:"1004 H St NE"},
@@ -175,6 +176,16 @@
     };
   }
 
+  function clubPlace(row = {}) {
+    return {
+      city: row.city || "Washington",
+      region: row.region || "District of Columbia",
+      regionType: row.regionType || "District",
+      postalCode: row.postalCode || "20001",
+      area: row.area || "DC"
+    };
+  }
+
   function clubRecord(n, absolute) {
     const row = CLUBS[n - 1];
     const url = file => (absolute ? absUrl(file) : relUrl(file));
@@ -197,29 +208,30 @@
     const galleryA = url(PHOTOS.galleryA);
     const galleryB = url(PHOTOS.galleryB);
     const promoLogo = url(PHOTOS.promo);
+    const place = clubPlace(row);
     return {
       n,
       id: `temp-democlub-${n}`,
       brandName: row.brand,
-      locationName: `${row.brand} (Temp Demo ${n})`,
+      locationName: row.locationName || `${row.brand} (Temp Demo ${n})`,
       type: "club",
       venueType: "club",
       categories: ["Clubs", "Lounge", "Nightlife", "Events", "ShoutOut", "QA Demo"],
       country: "United States",
-      regionType: "District",
-      region: "District of Columbia",
-      stateRegion: "District of Columbia",
-      city: "Washington",
+      regionType: place.regionType,
+      region: place.region,
+      stateRegion: place.region,
+      city: place.city,
       streetAddress: row.street,
-      postalCode: "20001",
-      locationLabel: "Washington, District of Columbia",
-      fullAddress: `${row.street}, Washington, District of Columbia 20001, United States`,
+      postalCode: place.postalCode,
+      locationLabel: `${place.city}, ${place.region}`,
+      fullAddress: `${row.street}, ${place.city}, ${place.region} ${place.postalCode}, United States`,
       brand: `${row.brand.toUpperCase()} x FLOQR`,
       defaultMain: `USE ShoutOut @ ${row.brand.toUpperCase()}`,
       defaultSub: row.vibe,
       tagline: row.tagline,
       publicTagline: row.tagline,
-      description: `${row.brand} is a ${row.vibe} in DC built to showcase FLOQR public profiles: VIP ShoutOut on the handheld DonPapi LED wall (busboys carry it in the air in front of patrons), table LEDs (64×32), and full-size portrait LED walls (960×1900) for birthday-style ShoutOuts. ${row.tagline}`,
+      description: `${row.brand} is a ${row.vibe} in ${place.area} built to showcase FLOQR public profiles: VIP ShoutOut on the handheld DonPapi LED wall (busboys carry it in the air in front of patrons), table LEDs (64×32), and full-size portrait LED walls (960×1900) for birthday-style ShoutOuts. ${row.tagline}`,
       genres: row.genres,
       artists: [dj.name, guestDj.name],
       artistsOrDjs: [dj.name, guestDj.name],
@@ -355,7 +367,7 @@
       favoriteBeverages: ["Champagne", "Espresso martini"],
       instagramHandle: person.instagram,
       floqrHandle: `@temp_${roleKey}_${n}`,
-      city: "Washington",
+      city: clubPlace(club).city,
       country: "United States",
       affiliatedClubId: `temp-democlub-${n}`,
       affiliatedClubName: club.brand,

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.15";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.16";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,12 +1284,20 @@
       ]
     },
     {
+      version: "s3.1.16-aurelia-new-york",
+      title: "Aurelia demo club renamed to Aurelia (Demo Club) and moved to New York (1001 6th Ave, NY 10018); other temp demo clubs stay in DC",
+      checks: [
+        {label:"Aurelia New York seed", file:"floqr-temp-qa-showcase.js", includes:["locationName:\"Aurelia (Demo Club)\"", "function clubPlace("]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.16\""]}
+      ]
+    },
+    {
       version: "s3.1.15-one-row-per-request",
       title: "Pending Worker Requests: one row per request (no merged \"{count} requests\" rows); repeats are blocked at the source by hasMadeElectionRequest + electedRequestMadeTo",
       checks: [
         {label:"One row per pending request", file:"floqr-employee-network.js", includes:["function pendingRequests("]},
         {label:"Approve / Reject closes that request", file:"admin-app.js", includes:["async function approveWorkerRequest(", "await db.collection(\"workerAssociationRequests\").doc(row.id).set("]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.15\""]}
+        {label:"Pending Worker Requests card", file:"admin.html", includes:["id=\"pendingWorkerStatus\""]}
       ]
     },
     {

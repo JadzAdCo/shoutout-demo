@@ -48,6 +48,8 @@ Limits: client-side guard (a worker can edit their own `users` doc; rules do not
 
 Backfill done Oct 6 2026 (s3.1.15): the only pre-rule requesters were Priya Shah (`YdkLkft…`, Aurelia + Zebbies Garden, 3 rows each) and Ale (`g0SWaKq…`, Aurelia). Both got `hasMadeElectionRequest: 1` + `electedRequestMadeTo` (`"Aurelia (Temp Demo 1)"`, `"Zebbies Garden DC"`). Priya's 4 extra rows were set `status: "duplicate"` with `duplicateOf` = the oldest row per club (`eL8oKOB4…` Aurelia, `ECQV4LS7…` Zebbies). Any future data-only backfill uses the same shape.
 
+**Venue rename = list update.** `electedRequestMadeTo` matches by name, so renaming a venue must also add the new name to every requester's list (keep the old name too). Done for Aurelia in s3.1.16: `"Aurelia (Temp Demo 1)"` → `"Aurelia (Demo Club)"` on Priya + Ale, plus `clubEmployeeDesignations.clubLocationName` on all `temp-democlub-1_*` rows.
+
 ## CSR
 
 A designation counts as CSR only when `isCSR === true` (or legacy rows with no `isCSR` and `designationType: "customer_service_representative"`). Elected / approved rows without `isCSR` are no longer CSRs in Club Admin. `patron-portal-app.js` message recipients still use `isCSR !== false` (all staff designations) — unchanged on purpose.
