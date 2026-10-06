@@ -1,0 +1,39 @@
+---
+description: Master Admin Entity Management hashes, default tab, auth then SOS2FA resume, venue link output panel (Xibo Diag), Application access switch
+globs: master-admin.html,master-admin-app.js,entity-management.js,admin.css,sos2fa.js,floqai-help-repository.js
+alwaysApply: false
+---
+
+# Design notes — Master Admin Entity Management
+
+## Default tab and hash
+
+- Parent **Entity Management** opens **Manage Entities** (`data-default-panel="entityManagement"`).
+- URL hash must be `#entityManagement`, never `#clubAdminUrls` for that parent click.
+- Subtabs keep their own hashes: `#clubAdminUrls`, `#allQueues`, `#clubOnboarding`, `#templateManagement`, `#recommendationModeration`.
+
+## Shared-link resume (all Entity Management panels)
+
+1. Unauthenticated deep link → Master Admin sign-in (Google/Microsoft). Persist intended panel (`floqr_master_admin_deeplink`) so Microsoft redirect does not lose the hash.
+2. After primary auth → resume the hashed panel.
+3. Panel stays behind **SOS2FA** until Verify & unlock; then show gated content.
+
+Same order for every Entity Management subtab. Security / Reports / Diagnostics groups are separate (not SOS2FA Entity Management).
+
+## Help vs this file
+
+Privilege Admin Access `?` help is SOS2FA how-to only. Do **not** put this hash/resume essay in served help — keep it here.
+
+## Manage selected — venue links are an output panel (s3.1.17)
+
+Purpose: engineers/admins grab the exact link to paste (Xibo, chat, ticket). The buttons **do not navigate**.
+
+- Buttons (club only): **Open Club Admin**, **Display 1**, **Display 2**, **Public profile**, **Xibo Diag** — `<button data-entity-link="admin|display1|display2|profile|xibo">`, built from `clubLinkOutputs(id)` in `entity-management.js`.
+- Click → `#entityLinkOutput` panel under the head: title, one-line hint, per link a read-only monospace `<textarea>` (wraps long URLs), **Copy** (`navigator.clipboard`; on failure the text is selected and the status says so) and **Open in new tab**. Close hides it. Active button gets `.active` + `aria-expanded`.
+- URLs are **absolute** on the current host (`new URL(rel, location.href)`), so the cutover to `www.floqr.com` needs no code change. Display URLs stay `display.html?location=` / `display2.html?location=` (no `?v=`); Club Admin / profile keep `FLOQRNav` version stamps.
+- **Xibo Diag** = the fallback page per board: `display-error.html?location=<id>&board=1|2&reason=xibo_page_load_error`. Paste into the Xibo Webpage widget of each board's error/fallback layout; loads write `appLogs` category `displayFallback` (`reportDisplayLoadError`) and appear in Diagnostics → Display / Xibo Load Errors. Same contract as `master-diagnostics-panels.js` `buildFallbackUrl`.
+- Layout (`admin.css` `.entity-link-*`): PC = buttons right of the title, URL row `label | url | actions`; ≤1024px tablet = buttons left-aligned under the title, label above url; ≤560px phone = 2-column button grid, url full width, Copy / Open as a 2-column grid. Buttons ≥40px tall for touch.
+
+## Application access switch
+
+Label **Allow application access** (`setEntityAppEnabled`, SOS2FA). Club: writes `appEnabled` / `active` / `status: disabled`. Effects: Club Admin locks every control (`admin-app.js`), Search hides the venue (`patron-app.js`), `venueMayUse` false on the client and `assertClubFeature` refuses ShoutOut / supRstar / BartR / ad callables on the server. Reversible; profile data stays. **Offboard** is the permanent path (clears public profile datapoints, cannot be re-enabled from the switch). Event / patron rows use the same switch with their own one-line explanation. Kept on purpose — it is the venue kill switch.

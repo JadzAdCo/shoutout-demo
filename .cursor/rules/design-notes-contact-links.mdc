@@ -1,0 +1,31 @@
+---
+description: Phone / email links without underline site-wide, FloqR handle = Mingl label on club profile, Papi's ClubTech 64x48 gallery photos (s3.1.17)
+globs: styles.css,club-profile-app.js,floqr-temp-qa-showcase.js,images/temp-qa/**
+alwaysApply: false
+---
+
+# Design notes — contact links, Mingl handle, Papi's ClubTech gallery photos
+
+Resume: `@contact-links$`.
+
+## Phone and email (every page)
+
+- Telephone and email stay real links (`tel:` / `mailto:`) so a tap dials or opens mail.
+- **No underline**: one global rule in `styles.css` — `a[href^="tel:"],a[href^="mailto:"]{text-decoration:none!important}` plus a `:focus-visible` outline so keyboard users still see focus. Every page that shows contact info loads `styles.css` (Display / preview pages do not show contact info).
+- Do not add per-page underline overrides or turn phone/email into plain text.
+
+## Mingl handle
+
+`floqr-identity.js`: **FloqR handle = Mingl handle**. On the Club Public Profile Contact & Socials row the first button is that handle; it is labeled **Mingl** with the `@handle` beside it (`.club-mingl-handle`), matching the other platform-labeled buttons (Instagram, TikTok, Facebook, X). Brand name is never translated.
+
+## Papi's ClubTech 64x48 gallery photos (demo clubs)
+
+| Gallery title | File (`images/temp-qa/`) |
+|---|---|
+| BusBoy - Papi's ClubTech Led 64x48 Mobile display | `busboy-papis-clubtech-64x48.jpg` — busboy carries the 64x48 overhead, three centered lines BAD BOYS / BAD BOYS / NITE OUT on the red/white classic frame |
+| VIP table — Maya's birthday crew + portrait LED wall | `club-aurelia-vip-maya-guests.jpg` (`PHOTOS.dualLed`, replaces `club-aurelia-dual-led.png`) |
+| Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut | `club-aurelia-vip-maya-busboy-64x48.jpg` (`PHOTOS.dualLedCarry`) |
+
+- The busboy gallery slot uses `PHOTOS.busboyLed`; staff profile photos (`staff-andre.png` / `staff-jamal.png`) are unchanged.
+- Live club profiles read `clubLocations/{id}.publicGallery` from Firestore first; changing titles/files needs the seed (`floqr-temp-qa-showcase.js`) **and** the Firestore gallery rows, after the images are on `origin/main`.
+- Main's showcase file is patched with `scripts/apply-s3-1-17-showcase-gallery.js` (the workspace copy holds unpublished DonPapi stills).

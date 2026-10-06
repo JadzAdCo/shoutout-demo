@@ -27,6 +27,103 @@
     return `./admin.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(v)}&from=master`;
   }
 
+  function absoluteUrl(href = "") {
+    try { return new URL(href, window.location.href).toString(); }
+    catch (_) { return String(href || ""); }
+  }
+
+  /** Xibo fallback page per board; display-error.html never carries ?v=. */
+  function xiboDiagUrl(locationId, board) {
+    const url = new URL("./display-error.html", window.location.href);
+    url.searchParams.set("location", String(locationId || "").trim().toLowerCase());
+    url.searchParams.set("board", String(board));
+    url.searchParams.set("reason", "xibo_page_load_error");
+    return url.toString();
+  }
+
+  function clubLinkOutputs(id) {
+    const displayUrl = window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`;
+    const display2Url = window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`;
+    const profileUrl = window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
+      || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`;
+    return {
+      admin: {label: "Open Club Admin", hint: "Club Admin console for this venue (opens as Master Admin).", links: [{name: "Club Admin", url: absoluteUrl(masterAdminUrl(id))}]},
+      display1: {label: "Display 1", hint: "Primary LED board. Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 1", url: absoluteUrl(displayUrl)}]},
+      display2: {label: "Display 2", hint: "Secondary LED board (supRstar). Paste into the Xibo Webpage widget exactly as shown.", links: [{name: "Display 2", url: absoluteUrl(display2Url)}]},
+      profile: {label: "Public profile", hint: "Patron-facing Club Public Profile.", links: [{name: "Public profile", url: absoluteUrl(profileUrl)}]},
+      xibo: {label: "Xibo Diag", hint: "Paste into the Xibo Webpage widget on each board's error / fallback layout. Load failures appear under Diagnostics → Display / Xibo Load Errors.", links: [
+        {name: "Display 1 fallback", url: xiboDiagUrl(id, 1)},
+        {name: "Display 2 fallback", url: xiboDiagUrl(id, 2)}
+      ]}
+    };
+  }
+
+  function renderLinkOutput(kind) {
+    const host = byId("entityLinkOutput");
+    if (!host || !selected || selected.type !== "club") return;
+    const entry = clubLinkOutputs(selected.id)[kind];
+    if (!entry) return;
+    markActiveLinkButton(kind);
+    host.hidden = false;
+    host.innerHTML = `
+      <div class="entity-link-output-head">
+        <h4 id="entityLinkOutputTitle">${esc(entry.label)}</h4>
+        <button type="button" class="entity-link-close" data-entity-link-close aria-label="Close link output">Close</button>
+      </div>
+      <p class="sub small">${esc(entry.hint)}</p>
+      ${entry.links.map((link, idx) => `
+        <div class="entity-link-row">
+          <label for="entityLinkUrl${idx}">${esc(link.name)}</label>
+          <textarea id="entityLinkUrl${idx}" class="entity-link-url" rows="2" readonly spellcheck="false">${esc(link.url)}</textarea>
+          <div class="entity-link-row-actions">
+            <button type="button" class="primary" data-entity-link-copy="${idx}">Copy</button>
+            <a class="buttonlike" href="${esc(link.url)}" target="_blank" rel="noopener">Open in new tab</a>
+          </div>
+        </div>`).join("")}
+      <p class="sub small entity-link-copied" role="status" aria-live="polite"></p>
+    `;
+    fitLinkFields(host);
+    host.querySelectorAll("[data-entity-link-copy]").forEach(btn => {
+      btn.addEventListener("click", () => copyLinkOutput(host, btn));
+    });
+    host.querySelector("[data-entity-link-close]")?.addEventListener("click", () => {
+      host.hidden = true;
+      host.innerHTML = "";
+      markActiveLinkButton("");
+    });
+    host.scrollIntoView?.({block: "nearest", behavior: "smooth"});
+  }
+
+  function fitLinkFields(host = byId("entityLinkOutput")) {
+    host?.querySelectorAll(".entity-link-url").forEach(field => {
+      field.style.height = "auto";
+      field.style.height = `${field.scrollHeight + 2}px`;
+    });
+  }
+  window.addEventListener("resize", () => fitLinkFields());
+
+  function markActiveLinkButton(kind) {
+    document.querySelectorAll("[data-entity-link]").forEach(btn => {
+      const on = btn.dataset.entityLink === kind;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-expanded", on ? "true" : "false");
+    });
+  }
+
+  async function copyLinkOutput(host, btn) {
+    const field = host.querySelector(`#entityLinkUrl${btn.dataset.entityLinkCopy}`);
+    const note = host.querySelector(".entity-link-copied");
+    const value = field?.value || "";
+    try {
+      await navigator.clipboard.writeText(value);
+      if (note) note.textContent = "Copied to clipboard.";
+    } catch (_) {
+      field?.focus();
+      field?.select();
+      if (note) note.textContent = "Copy blocked by the browser — the link is selected; press Ctrl+C / long-press Copy.";
+    }
+  }
+
   function mergeClubRows(locationRows = [], clubRows = []) {
     const merged = new Map();
     locationRows.forEach((row = {}) => {
@@ -214,35 +311,31 @@
     const enabled = g?.entityIsAppEnabled(row);
     const offboarded = g?.entityIsOffboarded(row);
     const isSuper = type === "user" && (g?.isSuperAdmin(row.email, row) || row.superAdmin);
-    const adminUrl = type === "club" ? masterAdminUrl(id) : "";
-    const displayUrl = type === "club" ? (window.FLOQRNav?.stableDisplayUrl?.(id) || `./display.html?location=${encodeURIComponent(id)}`) : "";
-    const display2Url = type === "club" ? (window.FLOQRNav?.stableSecondaryDisplayUrl?.(id) || `./display2.html?location=${encodeURIComponent(id)}`) : "";
-    const profileUrl = type === "club"
-      ? (window.FLOQRNav?.stampCurrentVersion?.(`./club-profile.html`, {location: id})
-        || window.FLOQRNav?.adminLink?.("./club-profile.html", {location: id})
-        || `./club-profile.html?location=${encodeURIComponent(id)}&v=${encodeURIComponent(window.FLOQRNav?.appVersion || "s3.0.3")}`)
-      : "";
+    const linkKinds = type === "club" ? Object.entries(clubLinkOutputs(id)) : [];
 
     wrap.innerHTML = `
       <div class="entity-manage-head">
-        <div>
+        <div class="entity-manage-title">
           <p class="eyebrow">${esc(type)}</p>
           <h3>${esc(entityTitle(row, type))}</h3>
           <p class="sub small">${esc(entityMeta(row, type))}</p>
           ${statusBadge(row)}
         </div>
-        ${type === "club" ? `<div class="queue-actions">
-          <a class="buttonlike" href="${esc(adminUrl)}">Open Club Admin</a>
-          <a class="buttonlike" href="${esc(displayUrl)}" target="_blank" rel="noopener">Display 1</a>
-          <a class="buttonlike" href="${esc(display2Url)}" target="_blank" rel="noopener">Display 2</a>
-          <a class="buttonlike" href="${esc(profileUrl)}" target="_blank" rel="noopener">Public profile</a>
+        ${type === "club" ? `<div class="entity-link-buttons" role="group" aria-label="Venue links">
+          ${linkKinds.map(([kind, entry]) => `<button type="button" class="buttonlike" data-entity-link="${esc(kind)}" aria-controls="entityLinkOutput" aria-expanded="false">${esc(entry.label)}</button>`).join("")}
         </div>` : ""}
       </div>
+      ${type === "club" ? `<section id="entityLinkOutput" class="entity-link-output" aria-labelledby="entityLinkOutputTitle" hidden></section>` : ""}
       <div class="entity-manage-controls">
         <label class="entity-gate-toggle entity-enable-switch">
           <input id="entityAppEnabledToggle" type="checkbox" ${enabled ? "checked" : ""} ${offboarded || isSuper ? "disabled" : ""}/>
-          Application access enabled
+          <span>Allow application access</span>
         </label>
+        <p class="sub small entity-enable-help">${type === "club"
+          ? "Master switch for this venue. Unticked: Club Admin is locked, the venue is hidden from Search, and the server refuses its ShoutOut, supRstar, BartR and ad features. Reversible — the profile and data stay. Use Offboard to remove the venue permanently."
+          : type === "event"
+            ? "Unticked: the event is hidden and inactive. Reversible."
+            : "Unticked: this account is blocked from FLOQR features. Reversible."}</p>
         ${isSuper ? `<p class="sub small">Super Admin is exempt from disable/offboard in this tool.</p>` : ""}
         ${offboarded ? `<p class="sub small">This entity is offboarded. Public profile datapoints were removed.</p>` : ""}
       </div>
@@ -263,6 +356,10 @@
           <button id="entityOffboardBtn" class="danger" type="button">Offboard Entity</button>
         </div>` : ""}
     `;
+
+    wrap.querySelectorAll("[data-entity-link]").forEach(btn => {
+      btn.addEventListener("click", () => renderLinkOutput(btn.dataset.entityLink));
+    });
 
     byId("entityAppEnabledToggle")?.addEventListener("change", async (event) => {
       const next = !!event.target.checked;

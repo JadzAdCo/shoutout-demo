@@ -280,7 +280,7 @@
   function renderContact() {
     const socials = club.socialMediaHandles || club.socialHandles || {};
     const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(socials.floqrHandle || club.floqrHandle || "") || "";
-    const floqrLink = floqrHandle ? `<span class="buttonlike">${esc(floqrHandle)}</span>` : "";
+    const floqrLink = floqrHandle ? `<span class="buttonlike club-mingl-handle" title="Mingl handle">Mingl <small>${esc(floqrHandle)}</small></span>` : "";
     const socialLink = (label, value, base) => {
       if (!value) return "";
       const clean = String(value).replace(/^@/, "");
