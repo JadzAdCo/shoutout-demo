@@ -29,3 +29,4 @@ Resume: `@contact-links$`.
 - The busboy gallery slot uses `PHOTOS.busboyLed`; staff profile photos (`staff-andre.png` / `staff-jamal.png`) are unchanged.
 - Live club profiles read `clubLocations/{id}.publicGallery` from Firestore first; changing titles/files needs the seed (`floqr-temp-qa-showcase.js`) **and** the Firestore gallery rows, after the images are on `origin/main`.
 - Main's showcase file is patched with `scripts/apply-s3-1-17-showcase-gallery.js` (the workspace copy holds unpublished DonPapi stills).
+- Oct 6 2026: Firestore `publicGallery` on `clubLocations/temp-democlub-1` … `-10` rewritten to main's 16-row seed (Maya rows at 6–7, BusBoy Papi's ClubTech at 16). Pages main `ca7af62`.
