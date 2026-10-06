@@ -26,7 +26,7 @@
   let adminUsers = [];
   let adminDesignations = [];
   let selectedElectionUid = "";
-  let pendingWorkerGroups = [];
+  let pendingWorkerRows = [];
   let workerAssociationRequests = [];
   let clubMedia = [];
   let clubMediaEditTargetId = "";
@@ -2030,18 +2030,17 @@
       </div>`;
     }).join("") : "<p class='sub'>Search or approve role members to populate role groups.</p>";
 
-    pendingWorkerGroups = window.FLOQREmployeeNetwork?.groupPendingRequests(workerAssociationRequests, workerRoleLabel) || [];
-    byId("pendingWorkerRequests").innerHTML = pendingWorkerGroups.length ? pendingWorkerGroups.map(group => {
-      const request = group.request;
-      const repeats = group.ids.length > 1 ? ` · ${esc(employeeText("requestCount", {count: group.ids.length}, "{count} requests"))}` : "";
+    pendingWorkerRows = window.FLOQREmployeeNetwork?.pendingRequests(workerAssociationRequests, workerRoleLabel) || [];
+    byId("pendingWorkerRequests").innerHTML = pendingWorkerRows.length ? pendingWorkerRows.map(row => {
+      const request = row.request;
       return `<div class="queue-item">
       <strong>${esc(request.publicName || request.displayName || request.email || "Worker request")}</strong>
-      <p>${esc(group.role)}</p>
-      <small>${esc(request.email || "")}${repeats}</small>
-      <div class="queue-actions"><button type="button" data-worker-group="${esc(group.key)}" data-worker-status="approved">${esc(employeeText("approve", {}, "Approve"))}</button><button type="button" data-worker-group="${esc(group.key)}" data-worker-status="rejected">${esc(employeeText("reject", {}, "Reject"))}</button></div>
+      <p>${esc(row.role)}</p>
+      <small>${esc(request.email || "")}</small>
+      <div class="queue-actions"><button type="button" data-worker-request="${esc(row.id)}" data-worker-status="approved">${esc(employeeText("approve", {}, "Approve"))}</button><button type="button" data-worker-request="${esc(row.id)}" data-worker-status="rejected">${esc(employeeText("reject", {}, "Reject"))}</button></div>
     </div>`;
     }).join("") : `<p class='sub'>${esc(employeeText("pendingEmpty", {}, "No pending worker requests for this club location yet."))}</p>`;
-    byId("pendingWorkerRequests").querySelectorAll("[data-worker-group]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerGroup, button.dataset.workerStatus)));
+    byId("pendingWorkerRequests").querySelectorAll("[data-worker-request]").forEach(button => button.addEventListener("click", () => setWorkerAssociationRequest(button.dataset.workerRequest, button.dataset.workerStatus)));
 
     const active = adminDesignations.filter(isCsrRow);
     csrWrap.innerHTML = active.length ? active.map(item => `<div class="queue-item employee-row">
@@ -2090,11 +2089,11 @@
     return request.serviceSubtype || "Waiter / Waitress / Bottle Girl";
   }
 
-  async function approveWorkerGroup(group, name) {
-    const uid = group.uid;
+  async function approveWorkerRequest(row, name) {
+    const uid = row.uid;
     if (!uid) throw new Error("Worker request has no account id.");
-    const role = group.role;
-    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:group.request.email || "", workerName:name, workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    const role = row.role;
+    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:row.request.email || "", workerName:name, workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     // Firestore rules only let a patron update their own users doc; the designation row above is the club link.
     try {
       await db.collection("users").doc(uid).set({approvedRoles:firebase.firestore.FieldValue.arrayUnion(role), approvedLocations:firebase.firestore.FieldValue.arrayUnion(locationId), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
@@ -2108,21 +2107,19 @@
     }
   }
 
-  async function setWorkerAssociationRequest(groupKey, status) {
-    const group = pendingWorkerGroups.find(item => item.key === groupKey);
-    if (!group) return;
-    const name = group.request.publicName || group.request.displayName || group.request.email || "Club worker";
-    const buttons = Array.from(byId("pendingWorkerRequests")?.querySelectorAll("[data-worker-group]") || [])
-      .filter(button => button.dataset.workerGroup === groupKey);
+  async function setWorkerAssociationRequest(requestId, status) {
+    const row = pendingWorkerRows.find(item => item.id === requestId);
+    if (!row) return;
+    const name = row.request.publicName || row.request.displayName || row.request.email || "Club worker";
+    const buttons = Array.from(byId("pendingWorkerRequests")?.querySelectorAll("[data-worker-request]") || [])
+      .filter(button => button.dataset.workerRequest === requestId);
     buttons.forEach(button => { button.disabled = true; });
     setText("pendingWorkerStatus", employeeText("saving", {}, "Saving…"));
     try {
-      if (status === "approved") await approveWorkerGroup(group, name);
-      const batch = db.batch();
-      group.ids.forEach(id => batch.set(db.collection("workerAssociationRequests").doc(id), {status, reviewedByUid:auth.currentUser?.uid || "", reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true}));
-      await batch.commit();
+      if (status === "approved") await approveWorkerRequest(row, name);
+      await db.collection("workerAssociationRequests").doc(row.id).set({status, reviewedByUid:auth.currentUser?.uid || "", reviewedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
       const message = status === "approved"
-        ? employeeText("requestApproved", {name, role: group.role}, "{name} approved as {role}.")
+        ? employeeText("requestApproved", {name, role: row.role}, "{name} approved as {role}.")
         : employeeText("requestRejected", {name}, "{name}'s request was rejected.");
       setText("adminStatus", message);
       await loadEmployeeDesignations();

@@ -88,18 +88,13 @@
     return String(request.status || "pending").toLowerCase() === "pending";
   }
 
-  function groupPendingRequests(requests = [], roleOf = request => request.serviceSubtype || request.roleLabel || "") {
-    const groups = new Map();
-    requests.filter(isPendingRequest).forEach(request => {
-      const uid = request.uid || request.workerUid || "";
-      const role = roleOf(request) || "";
-      const key = uid ? `${uid}|${String(role).toLowerCase()}` : `id|${request.id}`;
-      const existing = groups.get(key);
-      groups.set(key, existing
-        ? {...existing, ids: [...existing.ids, request.id]}
-        : {key, uid, role, request, ids: [request.id]});
-    });
-    return Array.from(groups.values());
+  function pendingRequests(requests = [], roleOf = request => request.serviceSubtype || request.roleLabel || "") {
+    return requests.filter(isPendingRequest).map(request => ({
+      id: request.id,
+      uid: request.uid || request.workerUid || "",
+      role: roleOf(request) || "",
+      request
+    }));
   }
 
   function hasMadeElectionRequest(profile = {}) {
@@ -123,7 +118,7 @@
     isLinkedToClub,
     electionCandidates,
     isPendingRequest,
-    groupPendingRequests,
+    pendingRequests,
     hasMadeElectionRequest,
     duplicateElectionVenues
   };

@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.14";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.15";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,11 +1284,18 @@
       ]
     },
     {
-      version: "s3.1.14-worker-request-approve",
-      title: "Pending Worker Requests: Approve works (users mirror is best-effort), duplicates merge into one row, card is first in Employee / Worker Network",
+      version: "s3.1.15-one-row-per-request",
+      title: "Pending Worker Requests: one row per request (no merged \"{count} requests\" rows); repeats are blocked at the source by hasMadeElectionRequest + electedRequestMadeTo",
       checks: [
-        {label:"Duplicate requests grouped", file:"floqr-employee-network.js", includes:["function groupPendingRequests("]},
-        {label:"Approve closes every duplicate", file:"admin-app.js", includes:["async function approveWorkerGroup(", "group.ids.forEach(id => batch.set("]},
+        {label:"One row per pending request", file:"floqr-employee-network.js", includes:["function pendingRequests("]},
+        {label:"Approve / Reject closes that request", file:"admin-app.js", includes:["async function approveWorkerRequest(", "await db.collection(\"workerAssociationRequests\").doc(row.id).set("]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.15\""]}
+      ]
+    },
+    {
+      version: "s3.1.14-worker-request-approve",
+      title: "Pending Worker Requests: Approve works (users mirror is best-effort), card is first in Employee / Worker Network, one request per venue",
+      checks: [
         {label:"Status inside the card", file:"admin.html", includes:["id=\"pendingWorkerStatus\""]},
         {label:"One request per venue", file:"patron-portal-app.js", includes:["duplicateElectionVenues(", "hasMadeElectionRequest: 1,"]},
         {label:"One request per venue (role page)", file:"role-request-app.js", includes:["duplicateElectionVenues(", "electedRequestMadeTo:"]}

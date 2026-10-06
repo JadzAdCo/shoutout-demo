@@ -76,21 +76,20 @@ test("elect candidates need 2+ letters, match name/username/email, and flag club
   assert.equal(N.electionCandidates(many, "sam", { ...ctx, limit: 8 }).length, 8);
 });
 
-test("pending requests from the same worker and role collapse into one row", () => {
+test("each pending request is its own row; closed and duplicate rows are hidden", () => {
   const N = loadNetwork();
-  const groups = N.groupPendingRequests([
+  assert.equal(typeof N.groupPendingRequests, "undefined", "requests are no longer merged");
+  const rows = Array.from(N.pendingRequests([
     { id: "r1", uid: "priya", serviceSubtype: "Waitress", status: "pending" },
-    { id: "r2", workerUid: "priya", serviceSubtype: "Waitress" },
-    { id: "r3", uid: "priya", serviceSubtype: "waitress", status: "pending" },
-    { id: "r4", uid: "priya", serviceSubtype: "Bottle Girl", status: "pending" },
-    { id: "r5", uid: "ale", serviceSubtype: "Bottle Girl", status: "approved" },
-    { id: "r6", serviceSubtype: "DJ", status: "pending" }
-  ]);
-  const rows = Array.from(groups, g => ({ uid: g.uid, role: g.role, ids: Array.from(g.ids) }));
+    { id: "r2", workerUid: "ale", serviceSubtype: "Bottle Girl" },
+    { id: "r3", uid: "priya", serviceSubtype: "Waitress", status: "duplicate" },
+    { id: "r4", uid: "sam", serviceSubtype: "DJ", status: "approved" },
+    { id: "r5", serviceSubtype: "DJ", status: "pending" }
+  ]), row => ({ id: row.id, uid: row.uid, role: row.role }));
   assert.deepEqual(rows, [
-    { uid: "priya", role: "Waitress", ids: ["r1", "r2", "r3"] },
-    { uid: "priya", role: "Bottle Girl", ids: ["r4"] },
-    { uid: "", role: "DJ", ids: ["r6"] }
+    { id: "r1", uid: "priya", role: "Waitress" },
+    { id: "r2", uid: "ale", role: "Bottle Girl" },
+    { id: "r5", uid: "", role: "DJ" }
   ]);
 });
 
@@ -127,7 +126,8 @@ test("Approve survives the patron-only users rule and reports the result in the 
   const html = read("admin.html");
   assert.match(app, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(\{approvedRoles/, "Club Admin approve must not fail on the users mirror");
   assert.match(portal, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(userPatch/, "Review & elect approve must not fail on the users mirror");
-  assert.match(app, /group\.ids\.forEach\(id => batch\.set\(db\.collection\("workerAssociationRequests"\)/, "every duplicate request is closed");
+  assert.match(app, /await db\.collection\("workerAssociationRequests"\)\.doc\(row\.id\)\.set\(\{status/, "Approve / Reject closes exactly that request");
+  assert.doesNotMatch(app, /groupPendingRequests|requestCount/, "no merged \"{count} requests\" rows");
   assert.match(app, /setText\("pendingWorkerStatus", employeeText\("requestFailed"/);
   assert.match(html, /id="pendingWorkerStatus"/);
   const panel = html.slice(html.indexOf('id="panelEmployees"'));
