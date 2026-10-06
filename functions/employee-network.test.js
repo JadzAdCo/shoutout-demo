@@ -76,6 +76,37 @@ test("elect candidates need 2+ letters, match name/username/email, and flag club
   assert.equal(N.electionCandidates(many, "sam", { ...ctx, limit: 8 }).length, 8);
 });
 
+test("pending requests from the same worker and role collapse into one row", () => {
+  const N = loadNetwork();
+  const groups = N.groupPendingRequests([
+    { id: "r1", uid: "priya", serviceSubtype: "Waitress", status: "pending" },
+    { id: "r2", workerUid: "priya", serviceSubtype: "Waitress" },
+    { id: "r3", uid: "priya", serviceSubtype: "waitress", status: "pending" },
+    { id: "r4", uid: "priya", serviceSubtype: "Bottle Girl", status: "pending" },
+    { id: "r5", uid: "ale", serviceSubtype: "Bottle Girl", status: "approved" },
+    { id: "r6", serviceSubtype: "DJ", status: "pending" }
+  ]);
+  const rows = Array.from(groups, g => ({ uid: g.uid, role: g.role, ids: Array.from(g.ids) }));
+  assert.deepEqual(rows, [
+    { uid: "priya", role: "Waitress", ids: ["r1", "r2", "r3"] },
+    { uid: "priya", role: "Bottle Girl", ids: ["r4"] },
+    { uid: "", role: "DJ", ids: ["r6"] }
+  ]);
+});
+
+test("Approve survives the patron-only users rule and reports the result in the card", () => {
+  const app = read("admin-app.js");
+  const portal = read("patron-portal-app.js");
+  const html = read("admin.html");
+  assert.match(app, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(\{approvedRoles/, "Club Admin approve must not fail on the users mirror");
+  assert.match(portal, /try \{\s*await db\.collection\("users"\)\.doc\(uid\)\.set\(userPatch/, "Review & elect approve must not fail on the users mirror");
+  assert.match(app, /group\.ids\.forEach\(id => batch\.set\(db\.collection\("workerAssociationRequests"\)/, "every duplicate request is closed");
+  assert.match(app, /setText\("pendingWorkerStatus", employeeText\("requestFailed"/);
+  assert.match(html, /id="pendingWorkerStatus"/);
+  const panel = html.slice(html.indexOf('id="panelEmployees"'));
+  assert.ok(panel.indexOf('id="pendingWorkerRequests"') < panel.indexOf('id="roleElectionSearch"'), "Pending Worker Requests is the first card");
+});
+
 test("Club Admin panel uses the club roster and a select + confirm election", () => {
   const app = read("admin-app.js");
   const html = read("admin.html");

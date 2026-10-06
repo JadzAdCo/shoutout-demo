@@ -3836,7 +3836,12 @@
         memberLevel: role,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      await db.collection("users").doc(uid).set(userPatch, {merge: true});
+      // Firestore rules only let a patron update their own users doc; the designation row above is the club link.
+      try {
+        await db.collection("users").doc(uid).set(userPatch, {merge: true});
+      } catch (e) {
+        console.warn("Worker approved, but user profile mirror was not updated:", e.message);
+      }
       await db.collection("inboxNotifications").add({
         recipientUid: uid,
         type: "workerAssociation",

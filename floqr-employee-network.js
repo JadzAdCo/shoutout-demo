@@ -84,6 +84,24 @@
       }));
   }
 
+  function isPendingRequest(request = {}) {
+    return String(request.status || "pending").toLowerCase() === "pending";
+  }
+
+  function groupPendingRequests(requests = [], roleOf = request => request.serviceSubtype || request.roleLabel || "") {
+    const groups = new Map();
+    requests.filter(isPendingRequest).forEach(request => {
+      const uid = request.uid || request.workerUid || "";
+      const role = roleOf(request) || "";
+      const key = uid ? `${uid}|${String(role).toLowerCase()}` : `id|${request.id}`;
+      const existing = groups.get(key);
+      groups.set(key, existing
+        ? {...existing, ids: [...existing.ids, request.id]}
+        : {key, uid, role, request, ids: [request.id]});
+    });
+    return Array.from(groups.values());
+  }
+
   const api = {
     normalize,
     matches,
@@ -91,7 +109,9 @@
     isCsrDesignation,
     designationFor,
     isLinkedToClub,
-    electionCandidates
+    electionCandidates,
+    isPendingRequest,
+    groupPendingRequests
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

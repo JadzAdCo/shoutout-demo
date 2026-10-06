@@ -954,6 +954,14 @@
       "employees.electCancelled": "Election cancelled. Nothing was saved.",
       "employees.electDone": "{name} elected as {role} for {club}.",
       "employees.electFailed": "The role could not be saved. Check your Club Admin access and try again.",
+      "employees.approve": "Approve",
+      "employees.reject": "Reject",
+      "employees.pendingEmpty": "No pending worker requests for this club location yet.",
+      "employees.requestCount": "{count} requests",
+      "employees.saving": "Saving…",
+      "employees.requestApproved": "{name} approved as {role}.",
+      "employees.requestRejected": "{name}'s request was rejected.",
+      "employees.requestFailed": "The request could not be updated. Refresh and try again.",
 
       "rep.administerTemplates": "Administer Templates — Template Administrator: read, add and remove template tags",
 
@@ -1632,6 +1640,14 @@
       "employees.electCancelled": "Attribution annulée. Rien n’a été enregistré.",
       "employees.electDone": "{name} a reçu le rôle {role} pour {club}.",
       "employees.electFailed": "Le rôle n’a pas pu être enregistré. Vérifiez votre accès Club Admin et réessayez.",
+      "employees.approve": "Approuver",
+      "employees.reject": "Refuser",
+      "employees.pendingEmpty": "Aucune demande de personnel en attente pour ce lieu.",
+      "employees.requestCount": "{count} demandes",
+      "employees.saving": "Enregistrement…",
+      "employees.requestApproved": "{name} approuvé(e) comme {role}.",
+      "employees.requestRejected": "La demande de {name} a été refusée.",
+      "employees.requestFailed": "La demande n’a pas pu être mise à jour. Actualisez et réessayez.",
 
       "rep.administerTemplates": "Administrer les modèles — Administrateur des modèles : lire, ajouter et retirer des tags",
 
@@ -2310,6 +2326,14 @@
       "employees.electCancelled": "Ernennung abgebrochen. Nichts wurde gespeichert.",
       "employees.electDone": "{name} wurde als {role} für {club} ernannt.",
       "employees.electFailed": "Die Rolle konnte nicht gespeichert werden. Prüfe deinen Club-Admin-Zugang und versuche es erneut.",
+      "employees.approve": "Genehmigen",
+      "employees.reject": "Ablehnen",
+      "employees.pendingEmpty": "Noch keine offenen Personalanfragen für diese Location.",
+      "employees.requestCount": "{count} Anfragen",
+      "employees.saving": "Wird gespeichert…",
+      "employees.requestApproved": "{name} als {role} genehmigt.",
+      "employees.requestRejected": "Die Anfrage von {name} wurde abgelehnt.",
+      "employees.requestFailed": "Die Anfrage konnte nicht aktualisiert werden. Lade neu und versuche es erneut.",
 
       "rep.administerTemplates": "Vorlagen administrieren — Vorlagen-Administrator: Tags lesen, hinzufügen und entfernen",
 
@@ -2988,6 +3012,14 @@
       "employees.electCancelled": "Designación cancelada. No se guardó nada.",
       "employees.electDone": "{name} designado como {role} en {club}.",
       "employees.electFailed": "No se pudo guardar el rol. Comprueba tu acceso de Club Admin e inténtalo de nuevo.",
+      "employees.approve": "Aprobar",
+      "employees.reject": "Rechazar",
+      "employees.pendingEmpty": "Todavía no hay solicitudes de personal pendientes para este local.",
+      "employees.requestCount": "{count} solicitudes",
+      "employees.saving": "Guardando…",
+      "employees.requestApproved": "{name} aprobado como {role}.",
+      "employees.requestRejected": "Se rechazó la solicitud de {name}.",
+      "employees.requestFailed": "No se pudo actualizar la solicitud. Recarga e inténtalo de nuevo.",
 
       "rep.administerTemplates": "Administrar plantillas — Administrador de plantillas: leer, añadir y quitar etiquetas",
 
@@ -3666,6 +3698,14 @@
       "employees.electCancelled": "Aanwijzing geannuleerd. Er is niets opgeslagen.",
       "employees.electDone": "{name} is aangewezen als {role} voor {club}.",
       "employees.electFailed": "De rol kon niet worden opgeslagen. Controleer je Club Admin-toegang en probeer het opnieuw.",
+      "employees.approve": "Goedkeuren",
+      "employees.reject": "Afwijzen",
+      "employees.pendingEmpty": "Nog geen openstaande personeelsverzoeken voor deze locatie.",
+      "employees.requestCount": "{count} verzoeken",
+      "employees.saving": "Opslaan…",
+      "employees.requestApproved": "{name} goedgekeurd als {role}.",
+      "employees.requestRejected": "Het verzoek van {name} is afgewezen.",
+      "employees.requestFailed": "Het verzoek kon niet worden bijgewerkt. Vernieuw de pagina en probeer het opnieuw.",
 
       "rep.administerTemplates": "Sjablonen administreren — Sjabloonbeheerder: tags lezen, toevoegen en verwijderen",
 
@@ -4344,6 +4384,14 @@
       "employees.electCancelled": "Назначение отменено. Ничего не сохранено.",
       "employees.electDone": "{name} назначен(а) на роль {role} в {club}.",
       "employees.electFailed": "Не удалось сохранить роль. Проверьте доступ Club Admin и попробуйте снова.",
+      "employees.approve": "Одобрить",
+      "employees.reject": "Отклонить",
+      "employees.pendingEmpty": "Для этой площадки пока нет ожидающих заявок персонала.",
+      "employees.requestCount": "Заявок: {count}",
+      "employees.saving": "Сохранение…",
+      "employees.requestApproved": "{name}: одобрено на роль {role}.",
+      "employees.requestRejected": "Заявка {name} отклонена.",
+      "employees.requestFailed": "Не удалось обновить заявку. Обновите страницу и попробуйте снова.",
 
       "rep.administerTemplates": "Администрирование шаблонов — администратор шаблонов: читать, добавлять и удалять теги",
 
@@ -5022,6 +5070,14 @@
       "employees.electCancelled": "Nomina annullata. Non è stato salvato nulla.",
       "employees.electDone": "{name} nominato come {role} per {club}.",
       "employees.electFailed": "Impossibile salvare il ruolo. Controlla il tuo accesso Club Admin e riprova.",
+      "employees.approve": "Approva",
+      "employees.reject": "Rifiuta",
+      "employees.pendingEmpty": "Ancora nessuna richiesta del personale in attesa per questo locale.",
+      "employees.requestCount": "{count} richieste",
+      "employees.saving": "Salvataggio…",
+      "employees.requestApproved": "{name} approvato come {role}.",
+      "employees.requestRejected": "La richiesta di {name} è stata rifiutata.",
+      "employees.requestFailed": "Impossibile aggiornare la richiesta. Ricarica e riprova.",
 
       "rep.administerTemplates": "Amministrare i modelli — Amministratore dei modelli: leggere, aggiungere e rimuovere tag",
 
@@ -5700,6 +5756,14 @@
       "employees.electCancelled": "Designação cancelada. Nada foi salvo.",
       "employees.electDone": "{name} designado como {role} em {club}.",
       "employees.electFailed": "Não foi possível salvar a função. Verifique seu acesso de Club Admin e tente de novo.",
+      "employees.approve": "Aprovar",
+      "employees.reject": "Recusar",
+      "employees.pendingEmpty": "Ainda não há pedidos de equipe pendentes para este local.",
+      "employees.requestCount": "{count} pedidos",
+      "employees.saving": "Salvando…",
+      "employees.requestApproved": "{name} aprovado como {role}.",
+      "employees.requestRejected": "O pedido de {name} foi recusado.",
+      "employees.requestFailed": "Não foi possível atualizar o pedido. Recarregue e tente de novo.",
 
       "rep.administerTemplates": "Administrar modelos — Administrador de modelos: ler, adicionar e remover tags",
 
@@ -6378,6 +6442,14 @@
       "employees.electCancelled": "Ο ορισμός ακυρώθηκε. Δεν αποθηκεύτηκε τίποτα.",
       "employees.electDone": "Ο/Η {name} ορίστηκε ως {role} για το {club}.",
       "employees.electFailed": "Ο ρόλος δεν αποθηκεύτηκε. Ελέγξτε την πρόσβασή σας Club Admin και δοκιμάστε ξανά.",
+      "employees.approve": "Έγκριση",
+      "employees.reject": "Απόρριψη",
+      "employees.pendingEmpty": "Δεν υπάρχουν ακόμη εκκρεμή αιτήματα προσωπικού για αυτόν τον χώρο.",
+      "employees.requestCount": "{count} αιτήματα",
+      "employees.saving": "Αποθήκευση…",
+      "employees.requestApproved": "Ο/Η {name} εγκρίθηκε ως {role}.",
+      "employees.requestRejected": "Το αίτημα του/της {name} απορρίφθηκε.",
+      "employees.requestFailed": "Το αίτημα δεν ενημερώθηκε. Ανανεώστε τη σελίδα και δοκιμάστε ξανά.",
 
       "rep.administerTemplates": "Διοίκηση προτύπων — Διαχειριστής προτύπων: ανάγνωση, προσθήκη και αφαίρεση ετικετών",
 
@@ -7056,6 +7128,14 @@
       "employees.electCancelled": "Wyznaczenie anulowane. Nic nie zapisano.",
       "employees.electDone": "{name} wyznaczono do roli {role} w {club}.",
       "employees.electFailed": "Nie udało się zapisać roli. Sprawdź swój dostęp Club Admin i spróbuj ponownie.",
+      "employees.approve": "Zatwierdź",
+      "employees.reject": "Odrzuć",
+      "employees.pendingEmpty": "Brak oczekujących zgłoszeń personelu dla tego lokalu.",
+      "employees.requestCount": "Zgłoszenia: {count}",
+      "employees.saving": "Zapisywanie…",
+      "employees.requestApproved": "{name} zatwierdzono w roli {role}.",
+      "employees.requestRejected": "Zgłoszenie {name} zostało odrzucone.",
+      "employees.requestFailed": "Nie udało się zaktualizować zgłoszenia. Odśwież stronę i spróbuj ponownie.",
 
       "rep.administerTemplates": "Administrowanie szablonami — Administrator szablonów: odczyt, dodawanie i usuwanie tagów",
 
@@ -7734,6 +7814,14 @@
       "employees.electCancelled": "أُلغي التعيين. لم يُحفظ شيء.",
       "employees.electDone": "تم تعيين {name} بدور {role} في {club}.",
       "employees.electFailed": "تعذّر حفظ الدور. تحقق من صلاحية Club Admin لديك وحاول مرة أخرى.",
+      "employees.approve": "موافقة",
+      "employees.reject": "رفض",
+      "employees.pendingEmpty": "لا توجد طلبات عاملين معلّقة لهذا المكان بعد.",
+      "employees.requestCount": "عدد الطلبات: {count}",
+      "employees.saving": "جارٍ الحفظ…",
+      "employees.requestApproved": "تمت الموافقة على {name} بدور {role}.",
+      "employees.requestRejected": "تم رفض طلب {name}.",
+      "employees.requestFailed": "تعذّر تحديث الطلب. حدّث الصفحة وحاول مرة أخرى.",
 
       "rep.administerTemplates": "الإشراف على القوالب — مسؤول القوالب: قراءة الوسوم وإضافتها وإزالتها",
 
