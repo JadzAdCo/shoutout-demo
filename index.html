@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ShoutOut App</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.17"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.18"/>
   <link rel="stylesheet" href="./mingl-gist.css?v=29.09.33"/>
   <link rel="stylesheet" href="./floqai-search.css?v=s3.0.106"/>
   <script>try{if(localStorage.getItem("floqr.signedInHint")==="1")document.documentElement.classList.add("floqr-auth-resolving");}catch(_){}</script>
@@ -678,8 +678,7 @@
       </div>
       <div class="card shoutout-recommendations-card">
         <div class="section-heading-row">
-          <h2>ShoutOut Recommendations</h2>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Recommendations are grouped by AI context, platform trends, and generic occasion ideas. Every recommendation is rewritten to respect the selected template and display's line count, per-line allowance, and total visible-character limit.</div></details>
+          <h2 data-floqr-help-id="help-shoutout-recommendations" data-floqr-help-title="ShoutOut Recommendations" data-floqr-help-body="Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages." data-floqr-help-search="shoutout recommendations|shoutout ideas|improve my shoutout|use past shoutout">ShoutOut Recommendations</h2>
         </div>
         <label>Recommendation style
           <select id="shoutoutTone">
@@ -711,18 +710,15 @@
           <button id="pastShoutoutsBtn" type="button">Use Past ShoutOut</button>
         </div>
         <div class="recommendation-group">
-          <h3>AI Recommendations</h3>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Personalized recommendations are built from venue context, event/audience type, template limits, your profile datapoints, and your current draft.</div></details>
-          <div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose recommendation context to generate personalized ideas.</p></div>
+          <h3 data-floqr-help-id="help-ai-recommendations" data-floqr-help-title="AI Recommendations" data-floqr-help-body="Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it." data-floqr-help-search="ai recommendations|ai shoutout|ai ideas">AI Recommendations</h3>
+          <div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small" data-keep-visible="true">Type a message or choose recommendation context to generate personalized ideas.</p></div>
         </div>
         <div class="recommendation-group">
-          <h3>Trending ShoutOuts</h3>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Trending ShoutOuts are phrases patrons commonly select from recommendations. Live analytics can replace these local examples when production tracking is enabled.</div></details>
+          <h3 data-floqr-help-id="help-trending-shoutouts" data-floqr-help-title="Trending ShoutOuts" data-floqr-help-body="Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it." data-floqr-help-search="trending shoutouts|popular shoutouts">Trending ShoutOuts</h3>
           <div id="trendingSuggestionList" class="dynamic-recommendation-list"></div>
         </div>
         <div class="recommendation-group">
-          <h3>Generic ShoutOuts</h3>
-          <details class="info-popout"><summary>?</summary><div class="info-popout-bubble">Generic suggestions cover birthdays, anniversaries, holidays, guest-list moments, and other common occasions using available profile and calendar context.</div></details>
+          <h3 data-floqr-help-id="help-generic-shoutouts" data-floqr-help-title="Generic ShoutOuts" data-floqr-help-body="Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own." data-floqr-help-search="generic shoutouts|birthday shoutout ideas">Generic ShoutOuts</h3>
           <div id="genericSuggestionList" class="dynamic-recommendation-list"></div>
         </div>
         <div id="shoutoutSuggestionBox" class="selected-summary hidden"></div>
@@ -786,17 +782,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.17"></script>
-<script src="./floqr-i18n.js?v=s3.1.17"></script>
+<script src="./floqr-nav.js?v=s3.1.18"></script>
+<script src="./floqr-i18n.js?v=s3.1.18"></script>
 <script src="./floqr-place-i18n.js?v=s3.0.87"></script>
-<script src="./floqai-help-repository.js?v=s3.1.17"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.17"></script>
+<script src="./floqai-help-repository.js?v=s3.1.18"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.18"></script>
 <script src="./floqr-venue-query.js?v=s3.0.106"></script>
-<script src="./intent-search.js?v=s3.1.17"></script>
+<script src="./intent-search.js?v=s3.1.18"></script>
 <script src="./floqai-search.js?v=s3.0.86"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.17"></script>
-<script src="./shared-data.js?v=s3.1.17"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.18"></script>
+<script src="./shared-data.js?v=s3.1.18"></script>
 <script src="./national-teams-data.js?v=s3.0.20"></script>
 <script src="./jersey-catalog.js?v=s3.0.62"></script>
 <script src="./feature-gates.js?v=29.09.33"></script>
@@ -826,10 +822,10 @@
 <script src="./floqr-client-ip.js?v=s3.0.69"></script>
 <script src="./payment-service.js?v=s3.0.69"></script>
 <script src="./welcome-button-gradient.js?v=s3.1.2"></script>
-<script src="./floqr-name-shoutout.js?v=s3.1.17"></script>
-<script src="./floqr-template-preview.js?v=s3.1.17"></script>
-<script src="./floqr-template-tags.js?v=s3.1.17"></script>
-<script src="./patron-app.js?v=s3.1.17"></script>
+<script src="./floqr-name-shoutout.js?v=s3.1.18"></script>
+<script src="./floqr-template-preview.js?v=s3.1.18"></script>
+<script src="./floqr-template-tags.js?v=s3.1.18"></script>
+<script src="./patron-app.js?v=s3.1.18"></script>
 <script src="./ai-assistant-ui.js?v=29.09.33"></script>
 <script src="./ai-media-service.js?v=29.09.33"></script>
 <script src="./notification-center.js?v=29.09.33"></script>

@@ -1,0 +1,24 @@
+---
+description: ShoutOut Recommendations card on the composer — one ? per heading, keep-visible status lines, Gemini aiSuggestShoutOut status and credits (s3.1.18)
+alwaysApply: false
+---
+
+# ShoutOut Recommendations (s3.1.18)
+
+Resume: `@recommendations$` / `$ai-suggest$`.
+
+## Help (single `?` per heading)
+
+The card in `index.html` (`.shoutout-recommendations-card`) and the fallback box in `patron-app.js` use **declarative** `data-floqr-help-id/title/body/search` on the h2/h3 only. Ids: `help-shoutout-recommendations`, `help-ai-recommendations`, `help-trending-shoutouts`, `help-generic-shoutouts` (repository + all 10 help packs + `scripts/_help-en.json`).
+
+Double-`?` root cause (fixed): a legacy `details.info-popout` under the heading **plus** `helper-popouts.js` converting the empty-state `p.sub.small` inside each suggestion list into a second `?` (and hiding the status text). Every status paragraph in those lists must carry `data-keep-visible="true"` (`renderSuggestionButtons`, “Building personalized ShoutOut ideas…”, the index placeholder). Guard: `functions/recommendation-help.test.js`.
+
+Do not mention Gemini / Firebase in patron help bodies.
+
+## AI pipeline
+
+`patron-app.js` `buildPersonalizedShoutOutSuggestions` → `window.floqrSuggestShoutOutAsync` (`ai-service.js`) → callable `aiSuggestShoutOut` (us-central1, `functions/ai-discovery-functions.js`) → Gemini `generateContent` with secret `GEMINI_API_KEY`, model `FLOQR_GEMINI_TEXT_MODEL` or `gemini-3.6-flash`. Any Gemini error → `fallbackShoutOutSuggestion` (local ideas; the patron still sees suggestions). Client gate `FLOQR_AI_TEMPLATE_HELP_ENABLED`; `FLOQR_AI_ENABLED=false` only affects search/location ranking.
+
+## Status Oct 6 2026
+
+Wired and deployed; secret set. Function logs (Oct 4 + Oct 6): `Gemini ShoutOut suggestion fallback: … Your prepayment credits are depleted`. Owner action: top up prepaid credits or enable billing in Google AI Studio for the project that owns `GEMINI_API_KEY`. No redeploy needed unless the key itself changes (then `firebase functions:secrets:set GEMINI_API_KEY` + redeploy the Gemini callables). Same key powers `aiEnhanceShoutOutMedia`, `aiRankLocations`, `aiSuggestGrammarCorrection`. Verify after top-up: Improve My ShoutOut → logs show no “fallback” line.

@@ -25,7 +25,7 @@ test("chrome packs match en key count for every supported language", () => {
 
 test("help packs cover the canonical help ids for every localized language", () => {
   const { help } = analyze();
-  assert.equal(help.canonical, 52);
+  assert.equal(help.canonical, 56);
   for (const code of HELP_LANGS) {
     assert.ok(help.packsPresent.includes(code), `missing help pack ${code}`);
   }
