@@ -92,6 +92,9 @@ button,.buttonlike{min-height:38px;padding:9px 12px;border-radius:12px}
 .splash-house-contact{margin:0;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
 .splash-house-list{list-style:none;margin:0;padding:0;display:grid;gap:4px;color:var(--muted);font-weight:700}
 .splash-house-list a{color:#fff;text-decoration:none}
+a[href^="tel:"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="tel:"]:focus-visible,a[href^="mailto:"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.club-mingl-handle small{font-weight:700;opacity:.82;margin-left:4px}
 #splashFloqrLogoWrap{border:0;background:none;padding:0;min-height:0;border-radius:0}
 #splashFloqrLogoWrap .splash-logo{width:min(220px,50vw);max-width:none;max-height:72px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
 .category-brand-stack{display:grid;justify-items:center;margin:44px 0 12px}

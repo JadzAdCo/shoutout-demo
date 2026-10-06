@@ -635,6 +635,40 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .sos2fa-code-row input{flex:1;min-width:140px;max-width:220px}
 @media(max-width:820px){.entity-manage-head{flex-direction:column}.sos2fa-gate-head{grid-template-columns:1fr}}
 
+/* Entity Management venue links → copyable output (s3.1.17) */
+.entity-manage-title{min-width:0;overflow-wrap:anywhere}
+.entity-link-buttons{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;justify-content:flex-end;max-width:660px}
+.entity-link-buttons .buttonlike{cursor:pointer;min-height:40px;white-space:nowrap}
+.entity-link-buttons .buttonlike.active{border-color:#5eeaff;background:rgba(94,234,255,.16);color:#5eeaff}
+.entity-link-output{margin:0 0 14px;padding:14px;border:1px solid rgba(94,234,255,.35);border-radius:14px;background:rgba(4,12,26,.72)}
+.entity-link-output-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.entity-link-output-head h4{margin:0}
+.entity-link-close{min-height:36px}
+.entity-link-row{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:8px 12px;align-items:center;margin-top:10px}
+.entity-link-row label{margin:0;font-weight:800}
+.entity-link-url{width:100%;min-height:44px;resize:vertical;font:13px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all;overflow-wrap:anywhere;white-space:pre-wrap}
+.entity-link-row-actions{display:flex;gap:8px;flex-wrap:wrap}
+.entity-link-row-actions>*{min-height:40px}
+.entity-link-copied{margin:8px 0 0;min-height:1.2em}
+.entity-enable-switch{width:fit-content;max-width:100%}
+.entity-enable-switch input{flex:0 0 auto;width:20px;height:20px}
+.entity-enable-help{margin:-4px 0 4px;max-width:760px}
+@media(max-width:1024px){
+  .entity-link-buttons{justify-content:flex-start;max-width:none}
+  .entity-link-row{grid-template-columns:minmax(0,1fr) auto}
+  .entity-link-row label{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .entity-link-buttons{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .entity-link-buttons .buttonlike{width:100%;white-space:normal;text-align:center}
+  .entity-link-buttons .buttonlike:last-child:nth-child(odd){grid-column:1/-1}
+  .entity-link-output{padding:12px;border-radius:12px}
+  .entity-link-row{grid-template-columns:1fr}
+  .entity-link-row-actions{display:grid;grid-template-columns:1fr 1fr}
+  .entity-link-row-actions>*{width:100%;text-align:center}
+  .entity-enable-switch{width:100%;align-items:flex-start}
+}
+
 /* Feature: Display Security access log — real HTML table (do not use .report-table; that class is a div-grid). */
 .display-access-log-wrap{
   width:100%;

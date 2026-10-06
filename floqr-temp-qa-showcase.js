@@ -24,7 +24,9 @@
     venue: n => (n % 3 === 1 ? "club-1-venue.png" : n % 3 === 2 ? "club-rooftop.png" : "club-speakeasy.png"),
     galleryA: "club-gallery-vip.png",
     galleryB: "club-gallery-entrance.png",
-    dualLed: "club-aurelia-dual-led.png",
+    dualLed: "club-aurelia-vip-maya-guests.jpg",
+    dualLedCarry: "club-aurelia-vip-maya-busboy-64x48.jpg",
+    busboyLed: "busboy-papis-clubtech-64x48.jpg",
     vipShoutout: "vip-donpapi-led-hbd.png",
     vipShoutoutLed: "vip-donpapi-led-checking-in.png",
     vipShoutoutCarry: "vip-donpapi-led-carry.png",
@@ -315,7 +317,9 @@
         {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 26},
         {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 27},
         {mediaUrl: url(PHOTOS.waiterTable(n)), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 28},
-        {mediaUrl: url(PHOTOS.busboy(n)), mediaType: "image", slotType: "gallery", title: "Busboy — DonPapi LED wall", galleryOrder: 29}
+        {mediaUrl: url(PHOTOS.busboyLed), mediaType: "image", slotType: "gallery", title: "BusBoy - Papi's ClubTech Led 64x48 Mobile display", galleryOrder: 29},
+        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table — Maya's birthday crew + portrait LED wall", galleryOrder: 30},
+        {mediaUrl: url(PHOTOS.dualLedCarry), mediaType: "image", slotType: "gallery", title: "Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut", galleryOrder: 31}
       ],
       extractedImages: [
         {url: logo, mediaUrl: logo, mediaType: "image", title: "Logo", slotType: "logo"},

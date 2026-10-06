@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.16";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.17";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,11 +1284,22 @@
       ]
     },
     {
+      version: "s3.1.17-entity-link-output",
+      title: "Master Admin Entity Management: venue link buttons (incl. new Xibo Diag) show a copyable link panel; Application access explained; tel/mailto without underline; Papi's ClubTech 64x48 busboy + Maya VIP photos",
+      checks: [
+        {label:"Copyable link output", file:"entity-management.js", includes:["function renderLinkOutput(", "label: \"Xibo Diag\"", "function xiboDiagUrl("]},
+        {label:"Responsive link panel", file:"admin.css", includes:[".entity-link-output{", ".entity-link-row{"]},
+        {label:"No underline on tel/mailto", file:"styles.css", includes:["a[href^=\"tel:\"],a[href^=\"mailto:\"]{text-decoration:none!important}"]},
+        {label:"Mingl handle label", file:"club-profile-app.js", includes:["club-mingl-handle"]},
+        {label:"Papi's ClubTech gallery photos", file:"floqr-temp-qa-showcase.js", includes:["busboy-papis-clubtech-64x48.jpg", "club-aurelia-vip-maya-guests.jpg"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.17\""]}
+      ]
+    },
+    {
       version: "s3.1.16-aurelia-new-york",
       title: "Aurelia demo club renamed to Aurelia (Demo Club) and moved to New York (1001 6th Ave, NY 10018); other temp demo clubs stay in DC",
       checks: [
-        {label:"Aurelia New York seed", file:"floqr-temp-qa-showcase.js", includes:["locationName:\"Aurelia (Demo Club)\"", "function clubPlace("]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.16\""]}
+        {label:"Aurelia New York seed", file:"floqr-temp-qa-showcase.js", includes:["locationName:\"Aurelia (Demo Club)\"", "function clubPlace("]}
       ]
     },
     {
