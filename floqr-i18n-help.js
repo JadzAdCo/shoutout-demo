@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-featured-staff": {
+        title: "Избранный персонал",
+        body: "Отметьте сотрудников для публичной страницы клуба. Для каждого нажмите на одно из его фото в FLOQR или выберите «Загрузить с компьютера». Роль под именем можно изменить. Нажмите «Save Public Profile», чтобы опубликовать."
+      },
       "help-shoutout-recommendations": {
         title: "Рекомендации ShoutOut",
         body: "Выберите стиль и тип события, затем нажмите «Improve My ShoutOut», чтобы получить идеи под ваш шаблон и размер экрана. Нажмите на идею, чтобы вставить её в сообщение, и при желании отредактируйте. «Use Past ShoutOut» возвращает одно из ваших прежних сообщений."
@@ -236,6 +240,10 @@
       }
     },
     nl: {
+      "help-featured-staff": {
+        title: "Uitgelicht servicepersoneel",
+        body: "Vink het personeel aan dat op de openbare clubpagina moet staan. Tik voor elke persoon op een van hun FLOQR-foto’s of kies ‘Uploaden vanaf computer’. Je kunt de rol onder hun naam aanpassen. Tik op ‘Save Public Profile’ om te publiceren."
+      },
       "help-shoutout-recommendations": {
         title: "ShoutOut-aanbevelingen",
         body: "Kies een stijl en een soort evenement en tik op 'Improve My ShoutOut' voor ideeën die passen bij je sjabloon en schermformaat. Tik op een idee om het in je bericht te zetten en pas het aan als je wilt. 'Use Past ShoutOut' haalt een van je eerdere berichten terug."
@@ -466,6 +474,10 @@
       }
     },
     fr: {
+      "help-featured-staff": {
+        title: "Personnel mis en avant",
+        body: "Cochez les membres du personnel à afficher sur la page publique du club. Pour chaque personne, touchez une de ses photos FLOQR ou choisissez « Importer depuis l’ordinateur ». Vous pouvez modifier le rôle affiché sous son nom. Appuyez sur « Save Public Profile » pour publier."
+      },
       "help-shoutout-recommendations": {
         title: "Recommandations ShoutOut",
         body: "Choisissez un style et un type d'événement, puis touchez « Improve My ShoutOut » pour obtenir des idées adaptées à votre modèle et à la taille de l'écran. Touchez une idée pour la placer dans votre message, puis modifiez-la si vous le souhaitez. « Use Past ShoutOut » reprend l'un de vos anciens messages."
@@ -696,6 +708,10 @@
       }
     },
     de: {
+      "help-featured-staff": {
+        title: "Hervorgehobenes Servicepersonal",
+        body: "Hake das Personal an, das auf der öffentlichen Clubseite erscheinen soll. Tippe für jede Person auf eines ihrer FLOQR-Fotos oder wähle „Vom Computer hochladen“. Du kannst die Rolle unter dem Namen ändern. Tippe auf „Save Public Profile“, um zu veröffentlichen."
+      },
       "help-shoutout-recommendations": {
         title: "ShoutOut-Empfehlungen",
         body: "Wähle einen Stil und eine Veranstaltungsart und tippe dann auf „Improve My ShoutOut“, um Ideen zu erhalten, die zu deiner Vorlage und Displaygröße passen. Tippe auf eine Idee, um sie in deine Nachricht zu übernehmen, und bearbeite sie bei Bedarf. „Use Past ShoutOut“ holt eine deiner früheren Nachrichten zurück."
@@ -926,6 +942,10 @@
       }
     },
     es: {
+      "help-featured-staff": {
+        title: "Personal destacado",
+        body: "Marca el personal que quieres en la página pública del club. Para cada persona, toca una de sus fotos de FLOQR o elige «Subir desde el ordenador». Puedes cambiar el puesto que aparece bajo su nombre. Pulsa «Save Public Profile» para publicar."
+      },
       "help-shoutout-recommendations": {
         title: "Recomendaciones de ShoutOut",
         body: "Elige un estilo y un tipo de evento y toca «Improve My ShoutOut» para recibir ideas que se ajustan a tu plantilla y al tamaño de la pantalla. Toca una idea para ponerla en tu mensaje y edítala si quieres. «Use Past ShoutOut» recupera uno de tus mensajes anteriores."
@@ -1156,6 +1176,10 @@
       }
     },
     it: {
+      "help-featured-staff": {
+        title: "Personale in evidenza",
+        body: "Seleziona il personale da mostrare nella pagina pubblica del club. Per ogni persona tocca una delle sue foto FLOQR o scegli «Carica dal computer». Puoi cambiare il ruolo mostrato sotto il nome. Tocca «Save Public Profile» per pubblicare."
+      },
       "help-shoutout-recommendations": {
         title: "Consigli ShoutOut",
         body: "Scegli uno stile e un tipo di evento, poi tocca «Improve My ShoutOut» per avere idee adatte al tuo modello e alla dimensione dello schermo. Tocca un'idea per inserirla nel messaggio e modificala se vuoi. «Use Past ShoutOut» recupera uno dei tuoi messaggi precedenti."
@@ -1386,6 +1410,10 @@
       }
     },
     pt: {
+      "help-featured-staff": {
+        title: "Equipe em destaque",
+        body: "Marque a equipe que deve aparecer na página pública do clube. Para cada pessoa, toque em uma das fotos dela no FLOQR ou escolha “Enviar do computador”. Você pode mudar a função exibida abaixo do nome. Toque em “Save Public Profile” para publicar."
+      },
       "help-shoutout-recommendations": {
         title: "Recomendações de ShoutOut",
         body: "Escolha um estilo e um tipo de evento e toque em «Improve My ShoutOut» para receber ideias que cabem no seu modelo e no tamanho da tela. Toque em uma ideia para colocá-la na sua mensagem e edite-a se quiser. «Use Past ShoutOut» recupera uma das suas mensagens anteriores."
@@ -1616,6 +1644,10 @@
       }
     },
     el: {
+      "help-featured-staff": {
+        title: "Προβεβλημένο προσωπικό",
+        body: "Επιλέξτε το προσωπικό για τη δημόσια σελίδα του κλαμπ. Για κάθε άτομο, πατήστε μία από τις φωτογραφίες του στο FLOQR ή επιλέξτε «Μεταφόρτωση από υπολογιστή». Μπορείτε να αλλάξετε τον ρόλο κάτω από το όνομα. Πατήστε «Save Public Profile» για δημοσίευση."
+      },
       "help-shoutout-recommendations": {
         title: "Προτάσεις ShoutOut",
         body: "Επιλέξτε στυλ και τύπο εκδήλωσης και πατήστε «Improve My ShoutOut» για ιδέες που ταιριάζουν στο πρότυπο και στο μέγεθος της οθόνης σας. Πατήστε μια ιδέα για να μπει στο μήνυμά σας και επεξεργαστείτε την αν θέλετε. Το «Use Past ShoutOut» φέρνει πίσω ένα από τα παλαιότερα μηνύματά σας."
@@ -1846,6 +1878,10 @@
       }
     },
     pl: {
+      "help-featured-staff": {
+        title: "Wyróżniony personel",
+        body: "Zaznacz pracowników, którzy mają być na publicznej stronie klubu. Dla każdej osoby dotknij jednego z jej zdjęć w FLOQR lub wybierz „Prześlij z komputera”. Możesz zmienić rolę pod imieniem. Naciśnij „Save Public Profile”, aby opublikować."
+      },
       "help-shoutout-recommendations": {
         title: "Rekomendacje ShoutOut",
         body: "Wybierz styl i rodzaj wydarzenia, a potem dotknij „Improve My ShoutOut”, aby dostać pomysły dopasowane do szablonu i rozmiaru ekranu. Dotknij pomysłu, aby wstawić go do wiadomości, i w razie potrzeby go zmień. „Use Past ShoutOut” przywraca jedną z Twoich wcześniejszych wiadomości."
@@ -2076,6 +2112,10 @@
       }
     },
     ar: {
+      "help-featured-staff": {
+        title: "طاقم الخدمة المميز",
+        body: "حدّد أفراد الطاقم الذين تريدهم في صفحة النادي العامة. لكل شخص، اضغط على إحدى صوره في FLOQR أو اختر «رفع من الكمبيوتر». يمكنك تغيير الدور الظاهر تحت اسمه. اضغط «Save Public Profile» للنشر."
+      },
       "help-shoutout-recommendations": {
         title: "توصيات ShoutOut",
         body: "اختر أسلوبًا ونوع المناسبة، ثم اضغط «Improve My ShoutOut» للحصول على أفكار تناسب القالب وحجم الشاشة. اضغط على أي فكرة لوضعها في رسالتك، ثم عدّلها إن شئت. يعيد «Use Past ShoutOut» إحدى رسائلك السابقة."

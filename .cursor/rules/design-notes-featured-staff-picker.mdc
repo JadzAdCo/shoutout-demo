@@ -1,0 +1,32 @@
+---
+description: Club Admin Featured service staff picker — checkbox list from roster + existing featuredStaff, photo from staff's FLOQR pictures or computer upload, no URL input (s3.1.19)
+alwaysApply: false
+---
+
+# Featured service staff picker (s3.1.19)
+
+Resume: `@featured-staff$` / `$staff-picker$`.
+
+Owner decision (Oct 7 2026): **keep the featured-staff logic as originally programmed** — `clubLocations/{id}.featuredStaff` is a hand-curated list and `club-profile-app.js` `renderPeople` shows exactly that list. Only the **input** changed. Do not auto-publish the roster, and do not add `isDisplayedOnClubPage` / `displayGroup` datapoints unless the owner asks again.
+
+## UI (`admin.html` → Club Public Profile → card `.featured-staff-card`)
+
+- `#featuredStaffPicker` replaces the old `#clubProfileFeaturedStaff` textarea. DJs and promotion groups keep their textareas.
+- One row per person: checkbox, avatar, name and club roles. When ticked: **Role on the club page** input (prefilled) and a photo strip.
+- Photo strip = the person's own pictures (`photoURL`, `profilePhotoUrl`, `publicPhotoUrl`, `avatarUrl`, image `profileMediaSlots`), https only, plus **Upload from computer** (JPG/PNG/WebP/GIF ≤ 10 MB) → Storage `clubMedia/{locationId}/featuredStaff/{ts}-{file}` (public read, signed-in write). No URL fields.
+- Changes are a draft (`featuredStaffDraft` Map keyed `uid:{uid}` or `name:{normalized}`) until **Save Public Profile**, which writes `featuredStaff: FLOQRFeaturedStaff.toFeatured(featuredStaffRows())`.
+
+## Logic (`floqr-featured-staff.js`, `window.FLOQRFeaturedStaff` + `module.exports`)
+
+`buildRows({roster, featured, rolesOf})`: saved entries first (ticked, original order, matched to roster by uid then by normalized name), then remaining roster people (unticked, role = first non-“Club Admin” role). Roster = `clubRoster()` (Employee Network: linked to this club with a role). Entries not on the roster stay listed as “Added by hand”; unticking and saving removes them.
+
+`toFeatured(rows)`: ticked rows → `{...original, name, role, photoUrl, uid?, photoStoragePath?}`; extra fields of existing entries (`bio`, `instagram`, `publicProfileType`…) are preserved; empty fields dropped. Shape stays compatible with `club-profile-app.js` and the AI index.
+
+Render runs after both `loadClubPublicProfile` (clears the draft) and `loadEmployeeDesignations`, so whichever finishes last fills the list.
+
+## Caveats
+
+- Picking a staff profile picture stores its Storage download URL (token URL, works signed-out). If the person deletes that picture, the club card falls back to their initial. Uploads from the computer live under the club and are not affected.
+- `firestore.rules` `users` is readable by signed-in users (open finding in `design-notes-feature-services.mdc`); the picker reads the same `users` list the Employee Network already loads.
+
+Tests: `functions/featured-staff-picker.test.js`. i18n: chrome `featuredStaff.*` (15 keys × 11 packs), help `help-featured-staff` (venueAdmin).

@@ -25,6 +25,7 @@
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+  const featuredStaffDraft = new Map();
   let selectedElectionUid = "";
   let pendingWorkerRows = [];
   let workerAssociationRequests = [];
@@ -354,7 +355,8 @@
     if (byId("clubCommerceEnabled")) byId("clubCommerceEnabled").checked = !!publicClubProfile.commerceEnabled;
     if (byId("clubCommerceStoreName")) byId("clubCommerceStoreName").value = publicClubProfile.commerceStoreName || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`;
     if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
-    if (byId("clubProfileFeaturedStaff")) byId("clubProfileFeaturedStaff").value = peopleLines(publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff);
+    featuredStaffDraft.clear();
+    renderFeaturedStaffPicker();
     if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
     if (byId("clubProfilePublished")) byId("clubProfilePublished").checked = publicClubProfile.publicProfilePublished !== false;
     const sectionSettings = publicClubProfile.publicProfileSections || {};
@@ -513,7 +515,7 @@
       commerceEnabled:!!byId("clubCommerceEnabled")?.checked,
       commerceStoreName:byId("clubCommerceStoreName")?.value.trim() || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`,
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
-      featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
+      featuredStaff:window.FLOQRFeaturedStaff.toFeatured(featuredStaffRows()),
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
       VenueSupports96x48: screenFlags.VenueSupports96x48,
       VenueSupports64x48: screenFlags.VenueSupports64x48,
@@ -2074,6 +2076,107 @@
     }).join("");
     renderEmployeeDesignations();
     renderElectionMatches();
+    renderFeaturedStaffPicker();
+  }
+
+  function featuredStaffText(key, params = {}, fallback = "") {
+    const fullKey = `featuredStaff.${key}`;
+    const value = window.FLOQRI18n?.t ? window.FLOQRI18n.t(fullKey, params) : "";
+    if (value && value !== fullKey) return value;
+    return fallback.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+  }
+
+  function featuredStaffRows() {
+    const api = window.FLOQRFeaturedStaff;
+    const rows = api.buildRows({
+      roster: clubRoster(),
+      featured: publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff || [],
+      rolesOf: rolesAtThisClub
+    });
+    return api.applyDraft(rows, featuredStaffDraft);
+  }
+
+  function updateFeaturedStaffDraft(key, change) {
+    featuredStaffDraft.set(key, {...(featuredStaffDraft.get(key) || {}), ...change});
+  }
+
+  function featuredStaffRowHtml(row) {
+    const photos = row.photos.map(url => `<button type="button" class="featured-staff-photo${url === row.photoUrl ? " selected" : ""}" data-fs-photo="${esc(url)}" aria-pressed="${url === row.photoUrl}" title="${esc(featuredStaffText("photoOption", {}, "Use this photo"))}"><img src="${esc(url)}" alt="" loading="lazy"/></button>`).join("");
+    const avatar = row.photoUrl
+      ? `<img src="${esc(row.photoUrl)}" alt=""/>`
+      : `<span>${esc(String(row.name || "?").slice(0, 1).toUpperCase())}</span>`;
+    const subtitle = row.roles.length ? row.roles.join(", ") : featuredStaffText("notOnFloqr", {}, "Added by hand");
+    return `<div class="featured-staff-row${row.checked ? " checked" : ""}" data-fs-key="${esc(row.key)}">
+      <label class="featured-staff-pick">
+        <input type="checkbox" data-fs-check ${row.checked ? "checked" : ""}/>
+        <span class="featured-staff-avatar">${avatar}</span>
+        <span class="featured-staff-name"><strong>${esc(row.name)}</strong><small>${esc(subtitle)}</small></span>
+      </label>
+      <div class="featured-staff-details${row.checked ? "" : " hidden"}">
+        <label>${esc(featuredStaffText("roleLabel", {}, "Role on the club page"))}<input data-fs-role value="${esc(row.role)}" maxlength="40"/></label>
+        <div class="featured-staff-photo-label">${esc(featuredStaffText("photoLabel", {}, "Photo"))}</div>
+        <div class="featured-staff-photos">
+          ${photos || `<span class="sub small">${esc(featuredStaffText("noPhoto", {}, "No photos yet. Upload one."))}</span>`}
+          <label class="buttonlike featured-staff-upload">${esc(featuredStaffText("upload", {}, "Upload from computer"))}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-fs-upload hidden/></label>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderFeaturedStaffPicker() {
+    const wrap = byId("featuredStaffPicker");
+    if (!wrap || !window.FLOQRFeaturedStaff) return;
+    const rows = featuredStaffRows();
+    const selected = rows.filter(row => row.checked).length;
+    setText("featuredStaffCount", rows.length ? featuredStaffText("selected", {count: selected}, "{count} selected") : "");
+    wrap.innerHTML = rows.length
+      ? rows.map(featuredStaffRowHtml).join("")
+      : `<p class="sub">${esc(featuredStaffText("empty", {}, "No staff yet. Approve or elect people in Employee / Worker Network, then tick who to feature here."))}</p>`;
+    wrap.querySelectorAll("[data-fs-key]").forEach(rowEl => {
+      const key = rowEl.dataset.fsKey;
+      rowEl.querySelector("[data-fs-check]")?.addEventListener("change", event => {
+        updateFeaturedStaffDraft(key, {checked: event.target.checked});
+        renderFeaturedStaffPicker();
+        setText("featuredStaffStatus", featuredStaffText("saveHint", {}, "Changes go live when you press Save Public Profile."));
+      });
+      rowEl.querySelector("[data-fs-role]")?.addEventListener("input", event => {
+        updateFeaturedStaffDraft(key, {role: event.target.value});
+      });
+      rowEl.querySelectorAll("[data-fs-photo]").forEach(button => button.addEventListener("click", () => {
+        updateFeaturedStaffDraft(key, {photoUrl: button.dataset.fsPhoto, photoStoragePath: ""});
+        renderFeaturedStaffPicker();
+      }));
+      rowEl.querySelector("[data-fs-upload]")?.addEventListener("change", event => {
+        const name = rowEl.querySelector(".featured-staff-name strong")?.textContent || "";
+        uploadFeaturedStaffPhoto(key, name, event.target.files?.[0]);
+      });
+    });
+  }
+
+  async function uploadFeaturedStaffPhoto(key, name, file) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type || "")) {
+      setText("featuredStaffStatus", featuredStaffText("notImage", {}, "Choose an image file (JPG, PNG, WebP or GIF)."));
+      return;
+    }
+    if (!storage || file.size > 10 * 1024 * 1024) {
+      setText("featuredStaffStatus", featuredStaffText("uploadFailed", {}, "The photo could not be uploaded. Try a JPG or PNG under 10 MB."));
+      return;
+    }
+    setText("featuredStaffStatus", featuredStaffText("uploading", {}, "Uploading photo…"));
+    try {
+      const path = `clubMedia/${locationId}/featuredStaff/${Date.now()}-${cleanFileName(file.name)}`;
+      const ref = storage.ref(path);
+      await ref.put(file, {contentType: file.type});
+      const url = await ref.getDownloadURL();
+      const uploaded = [...(featuredStaffDraft.get(key)?.uploaded || []), url];
+      updateFeaturedStaffDraft(key, {photoUrl: url, photoStoragePath: path, uploaded, checked: true});
+      renderFeaturedStaffPicker();
+      setText("featuredStaffStatus", featuredStaffText("uploaded", {name}, "Photo added for {name}. Save Public Profile to publish."));
+    } catch (error) {
+      console.warn("featured staff photo upload", error?.code || error?.message || error);
+      setText("featuredStaffStatus", featuredStaffText("uploadFailed", {}, "The photo could not be uploaded. Try a JPG or PNG under 10 MB."));
+    }
   }
 
   function workerRoleLabel(request = {}) {

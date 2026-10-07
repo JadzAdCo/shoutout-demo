@@ -1388,6 +1388,16 @@
       page: "admin.html"
     },
     {
+      id: "help-featured-staff",
+      title: "Featured service staff",
+      body: "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes.",
+      searchPhrases: ["featured staff","featured service staff","staff on club page","show staff on club page","staff photo","waiters on club page","bottle service on club page"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
       id: "help-template-tags",
       title: "Template tags",
       body: "Add words patrons might type when they look for a template at your venue, such as game night or birthday. Template Managers can add tags. Template Administrators and Club Admins can also remove tags. Club Admin assigns these roles under Role Activity & Permission.",

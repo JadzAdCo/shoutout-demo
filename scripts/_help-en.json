@@ -222,5 +222,9 @@
   "help-generic-shoutouts": {
     "title": "Generic ShoutOuts",
     "body": "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own."
+  },
+  "help-featured-staff": {
+    "title": "Featured service staff",
+    "body": "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes."
   }
 }

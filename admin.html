@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="admin.venueCommand">FLOQR Club Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.18"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.18"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.19"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.19"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./admin.html?v=29.09.46">&larr; Venue Command Center</a>
@@ -253,8 +253,19 @@
             <h3>Featured people & promotion groups</h3>
             <p class="sub small">One entry per line: <strong>Name | Role | Short bio | Photo URL | Instagram</strong>. Patron pages use compact cards and open details in a popout.</p>
             <label>Featured DJs<textarea id="clubProfileFeaturedDjs" rows="4" placeholder="DJ Nova | Resident DJ | Afrobeats and Hip Hop | https://... | @djnovaa"></textarea></label>
-            <label>Featured waiters / waitresses / bottle service<textarea id="clubProfileFeaturedStaff" rows="4" placeholder="Ava | Bottle Service | VIP host | https://... | @ava"></textarea></label>
             <label>Promotion groups<textarea id="clubProfilePromotionGroups" rows="4" placeholder="District Nights | Promotion Group | Thursday event partner | https://... | @districtnights"></textarea></label>
+          </div>
+          <div class="card nested-card featured-staff-card">
+            <h3 data-i18n="featuredStaff.title"
+              data-floqr-help-id="help-featured-staff"
+              data-floqr-help-title="Featured service staff"
+              data-floqr-help-body="Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes."
+              data-floqr-help-search="featured staff|featured service staff|staff on club page|staff photo|waiters on club page"
+            >Featured service staff</h3>
+            <p class="sub small" data-keep-visible="true" data-i18n="featuredStaff.intro">Tick the staff to show on your public club page. For each person, pick one of their FLOQR photos or upload a picture from your computer.</p>
+            <p id="featuredStaffCount" class="status small"></p>
+            <div id="featuredStaffPicker" class="featured-staff-list"></div>
+            <p id="featuredStaffStatus" class="status small" role="status" aria-live="polite"></p>
           </div>
           <div class="card nested-card">
             <h3>Public page controls</h3>
@@ -927,10 +938,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
-<script src="./floqr-nav.js?v=s3.1.18"></script>
+<script src="./floqr-nav.js?v=s3.1.19"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.18"></script>
-<script src="./shared-data.js?v=s3.1.18"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.19"></script>
+<script src="./shared-data.js?v=s3.1.19"></script>
 <script src="./feature-gates.js?v=29.09.66"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
 <script src="./media-source-picker.js?v=29.09.52"></script>
@@ -938,9 +949,9 @@
 <script src="./ai-index-service.js?v=29.09.8"></script>
 <script src="./ai-template-studio.js?v=29.09.8"></script>
 <script src="./floqr-action-feedback.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.1.18"></script>
-<script src="./floqai-help-repository.js?v=s3.1.18"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.18"></script>
+<script src="./floqr-i18n.js?v=s3.1.19"></script>
+<script src="./floqai-help-repository.js?v=s3.1.19"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.19"></script>
 <script src="./help-attach.js?v=s3.0.28"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-identity.js?v=29.09.98"></script>
@@ -954,11 +965,12 @@
 <script src="./floqr-ad-composer.js?v=s3.1.0"></script>
 <script src="./floqr-tab-gates.js?v=29.09.117"></script>
 <script src="./floqr-venue-calendar.js?v=29.09.105"></script>
-<script src="./floqr-employee-network.js?v=s3.1.18"></script>
-<script src="./admin-app.js?v=s3.1.18"></script>
+<script src="./floqr-employee-network.js?v=s3.1.19"></script>
+<script src="./floqr-featured-staff.js?v=s3.1.19"></script>
+<script src="./admin-app.js?v=s3.1.19"></script>
 <script src="./admin-venue-hours.js?v=29.09.103"></script>
-<script src="./floqr-template-tags.js?v=s3.1.18"></script>
-<script src="./admin-rep-extension.js?v=s3.1.18"></script>
+<script src="./floqr-template-tags.js?v=s3.1.19"></script>
+<script src="./admin-rep-extension.js?v=s3.1.19"></script>
 <script src="./admin-notifications.js?v=s3.0.1"></script>
 <script src="./admin-marketing.js?v=s3.0.81"></script>
 <script src="./master-twilio-logging.js?v=s3.0.78"></script>
