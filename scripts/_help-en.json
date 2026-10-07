@@ -206,5 +206,21 @@
   "help-template-preview": {
     "title": "Preview a template",
     "body": "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos."
+  },
+  "help-shoutout-recommendations": {
+    "title": "ShoutOut Recommendations",
+    "body": "Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages."
+  },
+  "help-ai-recommendations": {
+    "title": "AI Recommendations",
+    "body": "Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it."
+  },
+  "help-trending-shoutouts": {
+    "title": "Trending ShoutOuts",
+    "body": "Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it."
+  },
+  "help-generic-shoutouts": {
+    "title": "Generic ShoutOuts",
+    "body": "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own."
   }
 }

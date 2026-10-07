@@ -965,6 +965,46 @@
       page: "index.html#landingPage"
     },
     {
+      id: "help-shoutout-recommendations",
+      title: "ShoutOut Recommendations",
+      body: "Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages.",
+      searchPhrases: ["shoutout recommendations","shoutout ideas","improve my shoutout","use past shoutout","what should i write","help me write a shoutout","recommendation style"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-ai-recommendations",
+      title: "AI Recommendations",
+      body: "Ideas written for you from the venue, the event type, your draft and your profile. Every idea already fits the lines and characters your chosen display allows. Tap one to use it.",
+      searchPhrases: ["ai recommendations","ai shoutout","ai ideas","write my shoutout with ai","personalized shoutout"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-trending-shoutouts",
+      title: "Trending ShoutOuts",
+      body: "Popular ShoutOuts approved by FLOQR, with picks that suit this venue's music first. Tap one to use it.",
+      searchPhrases: ["trending shoutouts","popular shoutouts","top shoutouts","approved shoutouts"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
+      id: "help-generic-shoutouts",
+      title: "Generic ShoutOuts",
+      body: "Ready-made ideas for common moments such as birthdays and celebrations. Tap one to use it, then make it your own.",
+      searchPhrases: ["generic shoutouts","birthday shoutout ideas","celebration shoutout","ready made shoutout"],
+      links: [{label: "Search", href: vUrl("./", {start: "search", from: "floqai"})}],
+      audiences: ["patron"],
+      source: "help-repository-seed",
+      page: "index.html#shoutoutRecommendations"
+    },
+    {
       id: "help-location-search",
       title: "Location-aware search",
       body: "FLOQR lists events and clubs closest to you first, then by name. When you allow it, FLOQR uses your phone or browser location (GPS); otherwise it estimates your city from your internet connection (IP). Type a place, like Clubs in Monaco, to search somewhere else — results there still start with the closest to you. You can turn location access off in your browser or phone settings.",

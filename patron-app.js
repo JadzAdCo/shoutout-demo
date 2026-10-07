@@ -4116,7 +4116,7 @@
     const list = byId(targetId);
     if (!list) return;
     const caps = templateDisplayCaps();
-    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-suggestion-target="${esc(targetId)}" data-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")} - fits ${caps.lineCount} x ${caps.perLine}, ${caps.main} max</small></button>`).join("") : `<p class='sub small'>${esc(emptyText)}</p>`;
+    list.innerHTML = suggestions.length ? suggestions.map((item, index) => `<button type="button" class="ghost ai-suggestion personalized-ai-suggestion" data-suggestion-target="${esc(targetId)}" data-suggestion-index="${index}"><strong>${esc(item.mainText || item.main || "")}</strong><span>${esc(item.subText || item.sub || "")}</span><small>${esc(item.providerMode || item.provider || "contextual")} - fits ${caps.lineCount} x ${caps.perLine}, ${caps.main} max</small></button>`).join("") : `<p class='sub small' data-keep-visible='true'>${esc(emptyText)}</p>`;
     list.querySelectorAll("[data-suggestion-index]").forEach(button => {
       button.addEventListener("click", () => applySuggestionItem(suggestions[Number(button.dataset.suggestionIndex)]));
     });
@@ -4194,7 +4194,7 @@
       renderSuggestionButtons("genericSuggestionList", [], "Select another display size.");
       return;
     }
-    list.innerHTML = "<p class='sub small'>Building personalized ShoutOut ideas...</p>";
+    list.innerHTML = "<p class='sub small' data-keep-visible='true'>Building personalized ShoutOut ideas...</p>";
     const [suggestions] = await Promise.all([
       buildPersonalizedShoutOutSuggestions(options.toneOverride || ""),
       loadApprovedRecommendationLibrary()
@@ -5044,7 +5044,7 @@ function ensureTemplates(){
 }
 function ensureSuggestions(){
  const host=editorHost(); if(!host||byId("aiSuggestionsBox")||byId("aiSuggestionList"))return;
- const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2>ShoutOut Recommendations</h2><details class="info-popout ai-recommendation-popout"><summary>How recommendations work</summary><div class="info-popout-bubble">FLOQR uses your own profile, selected tone, current ShoutOut draft, selected template, venue context, and your past ShoutOuts to build LED-safe suggestions. Gemini runs through Firebase Functions when available; otherwise FLOQR uses a local contextual fallback.</div></details><div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small">Type a message or choose a tone to generate personalized ideas.</p></div>`; host.appendChild(box);
+ const box=document.createElement("div"); box.id="aiSuggestionsBox"; box.className="card"; box.innerHTML=`<h2 data-floqr-help-id="help-shoutout-recommendations" data-floqr-help-title="ShoutOut Recommendations" data-floqr-help-body="Pick a style and an event type, then tap Improve My ShoutOut for ideas that fit your template and display size. Tap any idea to put it in your message, then edit it if you like. Use Past ShoutOut brings back one of your earlier messages.">ShoutOut Recommendations</h2><div id="aiSuggestionList" class="dynamic-recommendation-list"><p class="sub small" data-keep-visible="true">Type a message or choose a tone to generate personalized ideas.</p></div>`; host.appendChild(box);
  if(typeof window.refreshPersonalizedShoutOutRecommendations==="function") window.refreshPersonalizedShoutOutRecommendations();
 }
 window.jadzUploadSelectedShoutoutMedia=uploadSelectedMedia;
