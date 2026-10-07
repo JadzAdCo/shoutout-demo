@@ -73,3 +73,9 @@ test("Papi's ClubTech 64x48 busboy and Maya VIP room photos are wired and shippe
   assert.ok(busboy, "busboy staff card");
   assert.doesNotMatch(JSON.stringify(busboy), /busboy-papis-clubtech/);
 });
+
+test("club profile page has no mojibake punctuation", () => {
+  const html = read("club-profile.html");
+  assert.doesNotMatch(html, /â€|Ã—/);
+  assert.match(html, /Tonight&rsquo;s network/);
+});
