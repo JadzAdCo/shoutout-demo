@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.22 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.23 (stable)
+
+- s3.1.23: Security rules Stage 1. Patron profiles are readable only by their owner and Master Admins; Search, Mingl, Services, My Profile, Club Admin and promoter reports load other members through the people directory, which leaves out contact details, consents, payment and security fields (Club Admins still see contacts for their own staff). Messages and Inbox are limited to the people in them, door codes and club message logs are server-written, and the SupRstR board can only add connection data to a live session.
 
 - s3.1.22: Data classification explains what to do at the top, saves every row with one **Save all classifications** button (SOS2FA + reason, one audit record), shows each row as Saved / Default / Edited / Needs review with a recommendation, filters to rows that need review, and lists what needs fixing in the live security rules. The retention column is now **Delete after (days)**.
 

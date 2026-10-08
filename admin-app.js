@@ -2084,7 +2084,7 @@
 
   async function loadEmployeeDesignations() {
     const [users, designations, requests] = await Promise.all([
-      getCollectionSafe("users"),
+      window.FLOQRPeople?.listSafe("club", {clubLocationId:locationId}) || [],
       getCollectionSafe("clubEmployeeDesignations"),
       queryCollectionWhere("workerAssociationRequests", "clubLocationId", locationId, 200)
     ]);
@@ -2326,7 +2326,7 @@
       console.warn("Worker approved, but user profile mirror was not updated:", e.message);
     }
     try {
-      await db.collection("inboxNotifications").add({recipientUid:uid, type:"workerAssociation", title:"Club association approved", body:`${employeeClubName()} approved your ${role} association.`, clubLocationId:locationId, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      await db.collection("inboxNotifications").add({recipientUid:uid, createdByUid:firebase.auth().currentUser?.uid || "", type:"workerAssociation", title:"Club association approved", body:`${employeeClubName()} approved your ${role} association.`, clubLocationId:locationId, read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     } catch (e) {
       console.warn("Worker approved, but the Inbox notice was not sent:", e.message);
     }
@@ -2375,7 +2375,7 @@
       status: "enabled",
       active: true,
       eligibleMembers: "floqr-patrons-only",
-      createdByUid: auth.currentUser?.uid || "",
+      createdByUid: firebase.auth().currentUser?.uid || "",
       createdByEmail: safeUser(auth.currentUser),
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2516,6 +2516,7 @@
       await db.collection("inboxNotifications").add({
         recipientUid: item.submittedByUid || "",
         recipientEmail: item.submittedBy || item.submittedByEmail || "",
+        createdByUid: firebase.auth().currentUser?.uid || "",
         type: "shoutoutStatus",
         title: title || `ShoutOut ${status}`,
         body: `Your ShoutOut status is now ${status}.`,
@@ -2804,7 +2805,7 @@
 
   async function loadReports() {
     const [users, shoutouts, liveDocs, events, guestLists, templateDocs] = await Promise.all([
-      getCollectionSafe("users"),
+      window.FLOQRPeople?.listSafe("club", {clubLocationId:locationId}) || [],
       getCollectionSafe("shoutouts"),
       getCollectionSafe("liveContent"),
       getCollectionSafe("events"),

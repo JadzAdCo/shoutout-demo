@@ -287,7 +287,8 @@
   }
   async function loadNameShoutoutPool() {
     const me = currentUser?.uid || "";
-    return getCollectionSafe("users", profile => profile.id !== me && profile.publicProfileVisibility === "public", 500);
+    const people = await (window.FLOQRPeople?.listSafe("public") || Promise.resolve([]));
+    return people.filter(profile => profile.id !== me);
   }
   function bindNameShoutoutInput() {
     nameShoutout().bind?.({
@@ -2341,7 +2342,8 @@
     const blocked = window.FLOQRBlocks?.blockedUidSet
       ? window.FLOQRBlocks.blockedUidSet(blocks, currentUser.uid)
       : new Set();
-    const users = await getCollectionSafe("users", x => {
+    const people = await (window.FLOQRPeople?.listSafe("public") || Promise.resolve([]));
+    const users = people.filter(x => {
       const uid = x.uid || x.id;
       return uid !== currentUser.uid && !blocked.has(uid) && isPublicMinglCandidate(x);
     });
@@ -2582,6 +2584,7 @@
           subject:"Friend or Mingl Request Update",
           body:`${cachedUserProfile?.displayName || currentUser.displayName || "A FLOQR patron"} declined the Friend or Mingl Request.`,
           recipientUid:otherUid,
+          createdByUid:currentUser.uid,
           connectionId,
           read:false,
           createdAt:firebase.firestore.FieldValue.serverTimestamp()

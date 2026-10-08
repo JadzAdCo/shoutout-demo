@@ -155,3 +155,25 @@ Firestore `dataClassification/{collection}` (+ optional `fields.{field}` overrid
 
 - Oct 7 2026 — proposal written; waiting for owner approval (or changes) before phase 1.
 - Oct 8 2026 — **owner approved all phases** ("build phase 1 now, then continue phases 2–5"). Phase 3 production migration still runs dry-run first and needs an explicit owner go-ahead before writing production data.
+- Oct 8 2026 2:22 PM — owner replied **"all"**: fix every exposure-report gap (69 gaps / 45 collections) in staged, tested deploys.
+
+## Rules Stage 1 (s3.1.23) — 69 → 37 gaps, 45 → 24 collections
+
+Pitfall that drives every stage: every page loads through `getCollectionSafe`, which returns `[]` on permission errors. Tightening a rule without moving its loaders makes screens silently empty instead of failing. So each collection is click-path audited first (`.tmp-audit`-style grep of client string literals); loaders that need other people's rows move to a callable.
+
+| Collection | Rule now | Client change |
+|---|---|---|
+| `users` | read: self + Master Admin | `getPeopleDirectory` callable (`people-directory-core.js`, System job `peopleDirectory`) + `floqr-people-directory.js` (`FLOQRPeople.list/listSafe`). Modes: `public` (Search name pool, Mingl), `services` (Services directory), `contacts` (My Profile: public + service members + Mingl/chat contacts as name cards), `uids` (Mingl Chat names: name + photo), `club` (Club Admin roster/reports; club-manager check server-side; email for affiliated + service members, phone for affiliated only; everyone else name card unless public), `referrals` (promoter counts, no identity). Private keys stripped by regex (email/phone/stripe/token/address/birth/consent/notification/sos2fa/payment/privacy/geo/ip…) + backend identity keys; Timestamps → `{__ms}` revived client-side. Master pages keep direct reads. `admin-scheduling.js` (not editable) degrades to designation names. No data migration. |
+| `messages` | read/delete: parties (sender/recipient uid or email, participants) + master; create: `senderUid == auth.uid` or system Mingl request with `requesterUid == auth.uid`; update: parties, cannot rewrite sender/recipient | none |
+| `inboxNotifications` | read/update/delete: recipient (uid or email) + master; create: master or attributed (`recipientUid == auth.uid` or `createdByUid`/`requesterUid == auth.uid`), server-only types refused (betaInvite, receipts, ads, supRstar approvals, entityCampaign, orderTracking, displaySecurity, twilioDebugger, scheduleShift), `link` must be `./page.html…`, `deleted` false | `createdByUid` added to 7 client writers |
+| `clubDailyAuthCodes`, `clubMessageDeliveries` | read: master + `isClubManager(resource.data.clubLocationId)`; writes server-only | none (Functions only) |
+| `clubMessageInbound`, `scheduleNotifyQueue` | master read; server writes | none |
+| `scheduleShifts`, `scheduleShiftAudit`, `schedulingSubscriptions` | master, club manager (by `clubLocationId`), shift worker (`workerUid`) | none (callables) |
+| `suprstrSessions/*/calleeCandidates` | create only while the parent session is `waiting/offering/connected` and < 4 h old; keys only `candidate/sdpMid/sdpMLineIndex/usernameFragment`, candidate ≤ 2 KB | none — Xibo display2 still needs no login; Display URLs unchanged |
+| `aiDiagnosticsReports`, `friendRequests`, `friendships`, `audienceCampaigns`, `clubOnboardingRecords`, `promoterOnboardingRecords` | Master Admin only (only Master Admin pages use them) | none |
+| `patronRanks`, `approvedShoutOutLibrary`, `translationSettings` | public read kept; writes Master Admin | none |
+| `aiRecommendations` | create: master or own `uid`/`recipientUid` | none |
+
+Known follow-up (not changed — `functions/suprstr-functions.js` carries unrelated uncommitted work): `suprstrSessions` is public-read for the kiosk and stores `broadcasterEmail`; drop that field from the session doc (keep it on `suprstarRequests`).
+
+Tests: `functions/rules-tightening.test.js` (rules text, exposure count, projection matrix, client switch-over). Stage 2 / 3 remaining (24 collections): club data loaded by Club Admin / patron pages with unfiltered `getCollectionSafe` scans (`shoutouts`, `guestListRequests`, `clubEmployeeDesignations`, `workerAssociationRequests`, `roleRequests`, `clubRoleActivity`, `clubRolePolicies`, `clubNotificationSettings`, `clubMessagingCredits`, `clubMarketingCampaigns`, `clubAdminNotifications`, `notifications`, `pickupRequests`, `entityFollows`) and published listings edited by any signed-in user (`clubs`, `events`, `clubMedia`, `clubLocationAliases`, `clubTemplateVariants`, `djProfiles`, `promoterProfiles`, `liveContent`, `guestListCampaigns`, `displayDevices`). Each needs its loaders changed to club-filtered queries (rules provable from `where(clubLocationId == …)`) or callables before the rule tightens.

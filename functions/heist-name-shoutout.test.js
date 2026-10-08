@@ -60,7 +60,8 @@ test("composer shows one name field with autocomplete for name-only templates", 
   assert.ok(html.indexOf("floqr-name-shoutout.js") < html.indexOf("patron-app.js"), "module loads before patron-app");
   const app = read("patron-app.js");
   assert.match(app, /if \(syncNameShoutoutFields\(\)\) return;/);
-  assert.match(app, /profile\.publicProfileVisibility === "public"/);
+  const pool = app.slice(app.indexOf("async function loadNameShoutoutPool"), app.indexOf("function bindNameShoutoutInput"));
+  assert.match(pool, /FLOQRPeople\?\.listSafe\("public"\)/, "name suggestions come only from public profiles (server-filtered)");
   assert.match(app, /isNameOnlyTemplate\(\) && !String\(byId\("mainText"\)\?\.value \|\| ""\)\.trim\(\)/);
 });
 

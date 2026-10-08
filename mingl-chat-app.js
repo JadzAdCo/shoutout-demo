@@ -93,12 +93,11 @@
   async function summaryForUid(uid) {
     if (!uid) return {};
     try {
-      const snap = await db.collection("users").doc(uid).get();
-      if (!snap.exists) return {};
-      const user = snap.data() || {};
+      const [user] = await window.FLOQRPeople.list("uids", {uids:[uid]});
+      if (!user) return {};
       return {
         uid,
-        displayName:user.displayName || user.publicName || user.username || user.email || "Member",
+        displayName:user.displayName || user.publicName || user.username || "Member",
         photoURL:user.photoURL || user.profilePhotoUrl || user.mainPhotoUrl || ""
       };
     } catch(e) {
