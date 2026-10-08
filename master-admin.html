@@ -5,8 +5,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FLOQR Master Admin</title>
-  <link rel="stylesheet" href="./styles.css?v=s3.1.21"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.1.21"/>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.22"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.22"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
@@ -347,22 +347,35 @@
             data-floqr-help-id="help-data-classification"
             data-floqr-help-title="Data classification"
             data-floqr-help-search="data classification|classify data|who can read|data access|personal data|pii|retention|exposure report|system access"
-            data-floqr-help-body="Each row is a Firestore collection. Tick who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make a collection Secret. System is the FLOQR server: it always has access, only from server code for a stated job, and it never gives a person more than their own tier. Every change needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi only shows answers that the reader's tier allows. Run the exposure report to find collections that the live security rules leave more open than this register."
+            data-floqr-help-body="Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release."
           ><span data-i18n="dataClass.title">Data classification</span></h2>
+          <div class="report-block">
+            <strong data-i18n="dataClass.purposeTitle">What to do on this screen</strong>
+            <ol class="sub small" style="margin:6px 0 0 1.2em;padding:0">
+              <li data-i18n="dataClass.purpose1">Each row is one type of FLOQR data. The ticks say who may read it.</li>
+              <li data-i18n="dataClass.purpose2">Check the rows marked Needs review first. Each one has a recommendation underneath.</li>
+              <li data-i18n="dataClass.purpose3">Change ticks where you disagree, write a reason, then press Save all classifications once.</li>
+              <li data-i18n="dataClass.purpose4">The saved register is what FloqAi and the exposure report use. Rows never saved use FLOQR's packaged defaults.</li>
+            </ol>
+          </div>
           <p class="sub small" data-i18n="dataClass.intro">Each row is a Firestore collection. Tick who may read it. Higher tiers include lower ones, and Master Admins can read anything anyone else can. Turn every switch off to make a collection Secret.</p>
           <p class="sub small" data-i18n="dataClass.systemNote">System is the FLOQR server. It can read every collection, but only from server code, for a stated job, and it never gives a person more than their own tier allows. It cannot be switched off here.</p>
           <p class="sub small" data-i18n="dataClass.auditNote">Every change needs SOS2FA and a reason, and is written to the tamper-evident audit trail on Features &amp; Services.</p>
+          <p id="dataClassSummary" class="sub small" aria-live="polite"></p>
           <p id="dataClassStatus" class="status" aria-live="polite"></p>
           <label><span data-i18n="dataClass.reason">Reason for change (required, 8+ characters)</span>
             <input id="dataClassReason" type="text" maxlength="500" autocomplete="off"/>
           </label>
+          <div class="queue-actions" style="margin-top:8px">
+            <button type="button" id="dataClassSaveAllBtn" class="primary" data-i18n="dataClass.saveAll">Save all classifications</button>
+          </div>
           <div class="profile-grid" style="align-items:end;margin-top:8px">
             <label><span data-i18n="dataClass.filter">Filter collections</span>
               <input id="dataClassFilter" type="search" autocomplete="off"/>
             </label>
+            <label class="toggle-inline"><input id="dataClassOnlyReview" type="checkbox"/> <span data-i18n="dataClass.onlyReview">Show only rows that need review</span></label>
             <div class="queue-actions">
               <button type="button" id="dataClassReloadBtn" data-i18n="dataClass.reload">Reload</button>
-              <button type="button" id="dataClassSeedBtn" data-i18n="dataClass.seed">Save missing rows</button>
               <button type="button" id="dataClassExportBtn" data-i18n="dataClass.exportCsv">Export CSV</button>
             </div>
           </div>
@@ -371,6 +384,7 @@
               <thead>
                 <tr>
                   <th scope="col" style="text-align:left" data-i18n="dataClass.colCollection">Collection</th>
+                  <th scope="col" data-i18n="dataClass.colStatus">Status</th>
                   <th scope="col" data-i18n="dataClass.colLevel">Level</th>
                   <th scope="col"><span data-i18n="dataClass.colPublic">Public</span><br/><small>isPublicAccessible</small></th>
                   <th scope="col"><span data-i18n="dataClass.colPatron">Patron</span><br/><small>isPatronAccessible</small></th>
@@ -381,7 +395,7 @@
                   <th scope="col"><span data-i18n="dataClass.colSystem">System</span><br/><small>isSystemAccessible</small></th>
                   <th scope="col"><span data-i18n="dataClass.colOwn">Own record</span><br/><small>ownRecordReadable</small></th>
                   <th scope="col"><span data-i18n="dataClass.colPii">Personal data</span><br/><small>containsPII</small></th>
-                  <th scope="col"><span data-i18n="dataClass.colRetention">Keep (days)</span><br/><small data-i18n="dataClass.retentionHint">0 = keep until deleted</small></th>
+                  <th scope="col"><span data-i18n="dataClass.colRetention">Delete after (days)</span><br/><small data-i18n="dataClass.retentionHint">0 = no limit. Recorded only; nothing is deleted automatically yet.</small></th>
                   <th scope="col" data-i18n="dataClass.colRules">Rules today (read / write)</th>
                   <th scope="col"></th>
                 </tr>
@@ -423,6 +437,16 @@
           <p class="sub small" data-i18n="dataClass.exposureIntro">Compares this register with the live security rules and lists collections that more people can read or write than the register allows.</p>
           <div class="queue-actions"><button type="button" id="dataClassExposureBtn" data-i18n="dataClass.exposureRun">Run exposure report</button></div>
           <p id="dataClassExposureStatus" class="status" aria-live="polite"></p>
+          <h3 data-i18n="dataClass.fixTitle">What needs fixing</h3>
+          <p class="sub small" data-i18n="dataClass.fixIntro">These are gaps between this register and the live security rules. They are fixed in code releases, not on this screen.</p>
+          <div id="dataClassFixList"></div>
+          <h3 data-i18n="dataClass.phasesTitle">Still to do (needs your go-ahead)</h3>
+          <ul class="sub small" style="margin:6px 0 0 1.2em;padding:0">
+            <li data-i18n="dataClass.phase.pii">Move email and phone out of the open patron records (dry run first; nothing changes without your approval).</li>
+            <li data-i18n="dataClass.phase.appCheck">Turn on App Check enforcement so only the real FLOQR app can call the server.</li>
+            <li data-i18n="dataClass.phase.rules">Generate the security rules from this register so they cannot drift apart again.</li>
+            <li data-i18n="dataClass.phase.retention">Delete records automatically after the number of days set in Delete after.</li>
+          </ul>
           <div class="report-block" style="overflow:auto">
             <table class="admin-table" style="width:100%;border-collapse:collapse">
               <tbody id="dataClassExposureRows"></tbody>
@@ -1676,24 +1700,24 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.1.21"></script>
+<script src="./floqr-i18n.js?v=s3.1.22"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.1.0"></script>
 <script src="./global-profile-status.js?v=s3.0.5"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.1.21"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.1.22"></script>
 <script src="./shared-data.js?v=s3.1.5"></script>
 <script src="./feature-gates.js?v=29.09.23"></script>
-<script src="./sos2fa.js?v=s3.1.21"></script>
-<script src="./entity-management.js?v=s3.1.21"></script>
+<script src="./sos2fa.js?v=s3.1.22"></script>
+<script src="./entity-management.js?v=s3.1.22"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=29.09.22"></script>
 <script src="./ai-search-service.js?v=29.09.22"></script>
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.1.21"></script>
-<script src="./floqr-i18n-help.js?v=s3.1.21"></script>
+<script src="./floqai-help-repository.js?v=s3.1.22"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.22"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
 <script src="./floqr-ad-pricing.js?v=s3.1.0"></script>
@@ -1704,13 +1728,13 @@
 <script src="./duplicate-record-service.js?v=29.09.22"></script>
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
-<script src="./master-admin-app.js?v=s3.1.21"></script>
+<script src="./master-admin-app.js?v=s3.1.22"></script>
 <script src="./master-ad-management.js?v=s3.1.0"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
 <script src="./floqr-feature-services.js?v=s3.1.20"></script>
 <script src="./master-feature-services.js?v=s3.0.110"></script>
-<script src="./floqr-data-classification.js?v=s3.1.21"></script>
-<script src="./master-data-classification.js?v=s3.1.21"></script>
+<script src="./floqr-data-classification.js?v=s3.1.22"></script>
+<script src="./master-data-classification.js?v=s3.1.22"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.98"></script>
 <script src="./master-display-security.js?v=29.09.92"></script>
 <script src="./master-diagnostics-panels.js?v=29.09.92"></script>

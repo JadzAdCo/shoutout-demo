@@ -7,6 +7,18 @@ alwaysApply: false
 
 Resume: `@data-class$`. Status: **approved Oct 8 2026**. Phase 1 (register + Master Admin tab + exposure report) and FloqAi enforcement (phase 5 pulled forward) shipped in **s3.1.21**. Phases 2–4 open; phase 3 needs an explicit owner go-ahead before writing production data. The proposal text below is kept for history; the "Shipped (s3.1.21)" section wins where they differ.
 
+## Shipped (s3.1.22) — owner review UX
+
+Owner could not find "Seed" (the button was labelled **Save missing rows**) and did not know what **Keep (days)** meant. Changes:
+
+- **One primary button: Save all classifications** → callable `saveAllDataClassifications({rows, reason})`. SOS2FA (`entityManagement`), reason ≥ 8. One Firestore transaction: reads every register doc + audit head, creates never-saved rows (request values, else packaged default), writes saved rows only when they changed (`core.planSaveAll`), one chained audit record `dataClass.savedAll` with before/after keyed by `docIdFor` + `{created, changed[{collection, fields}], unchangedCount}`. Guard: writes + 2 ≤ 500 (`MAX_TX_WRITES`). Nothing to write → `failed-precondition`. Seed button removed from the UI; `seedDataClassification` stays deployed (unused).
+- Per-row **Save** kept; `setDataClassification` now creates a never-saved row even when values equal the default.
+- **Keep (days)** renamed **Delete after (days)** — `retentionDays` is recorded only; no job deletes data yet (phase "retention" in the fix list).
+- Row status (`core.rowStatus`): Saved / Default (not saved) / Edited (not saved) + **Needs review**. Grid edits are drafts; tiers re-apply `cumulative` on screen so what is shown is what is saved.
+- Review guidance (`core.reviewNotes`): decide = `piiPublic`, `piiPatron`, `judgment` (packaged defaults that depend on venue use: `REVIEW_RECOMMENDATIONS` → `dataClass.rec.<key>`); fix = `rulesRead` / `rulesWrite` from the exposure report. `judgment` clears once the row is saved unedited; PII opened to Public/Patron stays flagged.
+- Exposure report runs on load. **What needs fixing** (`core.fixList`) groups gaps: `piiRead`, `restrictedWrite`, `clubRead`, `publicWrite`, `openWrite`, plus the phases still needing go-ahead (PII move dry run, App Check enforcement, rules generated from the register, retention deletes).
+- Live count at ship: 69 gaps across 45 of 128 collections — piiRead 14, restrictedWrite 25, clubRead 16, publicWrite 13, openWrite 1. Needs review at ship: 12 rows (the `REVIEW_RECOMMENDATIONS` set; register empty, nothing saved yet).
+
 ## Shipped (s3.1.21)
 
 ### Register

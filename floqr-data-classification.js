@@ -285,6 +285,115 @@
     return COMPARE_KEYS.filter(key => Number(before[key] || 0) !== Number(after[key] || 0));
   }
 
+  /** Firestore transactions allow 500 writes; Save all writes every row plus the audit record and chain head. */
+  const MAX_TX_WRITES = 500;
+
+  /** Validates a Save all request: every listed row must be a known, unique collection. Returns {next: {collection: row}, reason}. */
+  function validateSaveAll(data) {
+    const reason = String(data?.reason || "").trim();
+    if (reason.length < 8) throw invalid("Enter a reason of at least 8 characters.");
+    if (reason.length > 500) throw invalid("Keep the reason under 500 characters.");
+    const list = Array.isArray(data?.rows) ? data.rows : [];
+    if (!list.length) throw invalid("Nothing to save.");
+    if (list.length > COLLECTIONS.length) throw invalid("Too many rows.");
+    const next = {};
+    list.forEach(row => {
+      const {collection, next: values} = validateChange({...row, reason});
+      if (next[collection]) throw invalid(`${collection} is listed twice.`);
+      next[collection] = values;
+    });
+    return {next, reason};
+  }
+
+  /**
+   * Plans a Save all against the stored register (saved: {collection: doc|undefined}).
+   * Rows never saved are created (from the request, else the packaged default); saved rows are written only when they change.
+   */
+  function planSaveAll(next, saved) {
+    const writes = [];
+    const unchanged = [];
+    COLLECTIONS.forEach(collection => {
+      const doc = saved?.[collection] || null;
+      const before = normalize(collection, doc);
+      const wanted = next?.[collection] || (doc ? null : before);
+      if (!wanted) {
+        unchanged.push(collection);
+        return;
+      }
+      const after = normalize(collection, {...wanted, revision: before.revision + 1});
+      const changed = diff(before, after);
+      if (doc && !changed.length) unchanged.push(collection);
+      else writes.push({collection, created: !doc, before, after, changed});
+    });
+    if (writes.length + 2 > MAX_TX_WRITES) throw invalid("Too many rows for one save.");
+    return {writes, unchanged};
+  }
+
+  // ---- Owner review guidance ----
+
+  /** Packaged defaults that depend on how the venue uses the data; each has a recommendation key (dataClass.rec.<key>). */
+  const REVIEW_RECOMMENDATIONS = {
+    shoutouts: "shoutouts",
+    patronRanks: "patronRanks",
+    displayDevices: "displayDevices",
+    suprstrSessions: "suprstrSessions",
+    "suprstrSessions/calleeCandidates": "suprstrSessions",
+    "suprstrSessions/callerCandidates": "suprstrSessions",
+    minglGists: "minglGists",
+    guestListRequests: "guestListRequests",
+    clubEmployeeDesignations: "clubEmployeeDesignations",
+    featureServices: "featureServices",
+    aiIndex: "aiIndex",
+    paymentLedger: "paymentLedger"
+  };
+
+  /**
+   * decide: owner judgment (personal data opened to everyone / all patrons, or a default that depends on venue use).
+   * fix: live rules broader than the register (fixed by a rules release, not on the screen).
+   */
+  function reviewNotes(row, issues = []) {
+    const decide = [];
+    const fix = [];
+    if (!row) return {decide, fix, recommendation: ""};
+    if (row.containsPII && row.isPublicAccessible) decide.push("piiPublic");
+    else if (row.containsPII && row.isPatronAccessible) decide.push("piiPatron");
+    const recommendation = REVIEW_RECOMMENDATIONS[row.collection] || "";
+    if (recommendation) decide.push("judgment");
+    (issues || []).filter(issue => issue.collection === row.collection).forEach(issue => {
+      const code = issue.kind === "writeOpen" ? "rulesWrite" : "rulesRead";
+      if (!fix.includes(code)) fix.push(code);
+    });
+    return {decide, fix, recommendation};
+  }
+
+  /** Row status for the grid: edited (unsaved changes) > default (never saved) > saved; needsReview while owner judgment is unconfirmed. */
+  function rowStatus({saved, edited, notes}) {
+    const status = edited ? "edited" : saved ? "saved" : "default";
+    const decide = notes?.decide || [];
+    const needsReview = decide.some(code => code !== "judgment") || (decide.includes("judgment") && status !== "saved");
+    return {status, needsReview};
+  }
+
+  /** Groups exposure issues into the fix list shown to the owner. */
+  const FIX_GROUPS = ["piiRead", "restrictedWrite", "clubRead", "publicWrite", "openWrite"];
+
+  function fixGroupFor(issue) {
+    if (issue.kind === "writeOpen") {
+      if (issue.rule === "public") return "openWrite";
+      return issue.level === "public" || issue.level === "internal" ? "publicWrite" : "restrictedWrite";
+    }
+    return issue.severity === "high" ? "piiRead" : "clubRead";
+  }
+
+  function fixList(issues) {
+    const groups = Object.fromEntries(FIX_GROUPS.map(key => [key, []]));
+    (issues || []).forEach(issue => {
+      const list = groups[fixGroupFor(issue)];
+      if (!list.includes(issue.collection)) list.push(issue.collection);
+    });
+    return FIX_GROUPS.map(key => ({group: key, collections: groups[key].sort()})).filter(entry => entry.collections.length);
+  }
+
   /** viewer: {role, sameClub, own}. Returns "yes" | "own" | "no". */
   function access(row, viewer) {
     if (!row) return "no";
@@ -425,7 +534,7 @@
   const SYSTEM_JOBS = {
     floqAiAccess: {purpose: "Resolve the caller's tier so FloqAi shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "floqAiAccessThrottle", "betaTesters"]},
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
-    dataClassificationAdmin: {purpose: "Seed and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]}
+    dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]}
   };
 
   function systemJob(job, collection) {
@@ -541,6 +650,7 @@
   return {
     COLLECTION, TIERS, FLAGS, SYSTEM_FLAG, LEVELS, ROLES, CLIENT_ROLES, PRESETS, CATALOG, FIELD_CATALOG, COLLECTIONS, SYSTEM_JOBS, AUDIENCE_FLAG,
     flag, normalize, cumulative, deriveLevel, validateChange, diff, docIdFor, collectionFromDocId,
+    MAX_TX_WRITES, validateSaveAll, planSaveAll, REVIEW_RECOMMENDATIONS, reviewNotes, rowStatus, FIX_GROUPS, fixGroupFor, fixList,
     access, simulate, exprBreadth, parseRulesAccess, exposureReport, toCsv,
     systemJob, resolveViewerRole, classifyAudiences, contentRow, filterContent,
     MAX_CONTENT_IDS, sanitizeSourceIds, denialsToLog

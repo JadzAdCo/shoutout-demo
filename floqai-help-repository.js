@@ -706,10 +706,11 @@
     {
       id: "help-data-classification",
       title: "Data classification",
-      body: "Each row is a Firestore collection. Tick who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make a collection Secret. System is the FLOQR server: it always has access, only from server code for a stated job, and it never gives a person more than their own tier. Every change needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi only shows answers that the reader's tier allows. Run the exposure report to find collections that the live security rules leave more open than this register.",
+      body: "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with the rows marked Needs review: each has a recommendation underneath. Change what you disagree with, write a reason, and press Save all classifications once. Delete after (days) records how long the data should be kept; nothing is deleted automatically yet. System is the FLOQR server: it always has access, only from server code for a stated job, and never gives a person more than their own tier. Every save needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi and the exposure report use the saved register. What needs fixing lists gaps in the live security rules that are fixed in a release.",
       searchPhrases: [
         "data classification", "classify data", "who can read", "data access", "personal data", "pii",
-        "retention", "exposure report", "system access", "security tab", "floqai access"
+        "retention", "exposure report", "system access", "security tab", "floqai access",
+        "save all classifications", "needs review", "what needs fixing", "delete after", "seed classification"
       ],
       links: [{label: "Open Data classification", href: `./master-admin.html?v=${APP_V}#dataClassification`}],
       audiences: ["masterAdmin"],

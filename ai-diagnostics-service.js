@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.21";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.22";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,14 +1284,23 @@
       ]
     },
     {
+      version: "s3.1.22-data-classification-review",
+      title: "Data classification: one Save all classifications button, per-row status and recommendations, Needs review filter, and a What needs fixing list",
+      checks: [
+        {label:"Save all button", file:"master-admin.html", includes:["id=\"dataClassSaveAllBtn\""]},
+        {label:"Review guidance", file:"floqr-data-classification.js", includes:["function reviewNotes(", "function fixList("]},
+        {label:"Save all call", file:"master-data-classification.js", includes:["saveAllDataClassifications"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.22\""]}
+      ]
+    },
+    {
       version: "s3.1.21-data-classification",
       title: "Data classification register with a Master Admin Security tab, server-only System tier, FloqAi results filtered by classification on the server, and staff marketing media consent",
       checks: [
         {label:"Classification core", file:"floqr-data-classification.js", includes:["function filterContent(", "SYSTEM_JOBS"]},
         {label:"Security tab", file:"master-admin.html", includes:["id=\"dataClassification\""]},
         {label:"FloqAi access gate", file:"floqai-access.js", includes:["getFloqAiAccess"]},
-        {label:"FloqAi classified intents", file:"intent-search.js", includes:["INTENT_AUDIENCES"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.21\""]}
+        {label:"FloqAi classified intents", file:"intent-search.js", includes:["INTENT_AUDIENCES"]}
       ]
     },
     {

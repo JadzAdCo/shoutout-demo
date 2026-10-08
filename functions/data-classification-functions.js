@@ -87,7 +87,7 @@ exports.setDataClassification = onCall(CALL_OPTS, async request => {
       const before = core.normalize(collection, snap.exists ? snap.data() : null);
       const after = core.normalize(collection, {...next, revision: before.revision + 1});
       const changed = core.diff(before, after);
-      if (!changed.length) throw new HttpsError("failed-precondition", "Nothing changed — the collection already has those values.");
+      if (!changed.length && snap.exists) throw new HttpsError("failed-precondition", "Nothing changed — the collection already has those values.");
       tx.set(docRef, stored(after, request, email, reason, nowMs), {merge: true});
       const eventId = audit.appendChainedAudit(tx, head, audit.auditRecord(request, {
         eventType: "dataClass.changed",
@@ -100,6 +100,45 @@ exports.setDataClassification = onCall(CALL_OPTS, async request => {
         nowMs
       }));
       return {ok: true, eventId, row: snapshot(after), changed};
+    });
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+/** One SOS2FA-gated save of every row as shown: creates never-saved rows, updates changed ones, one chained audit record. */
+exports.saveAllDataClassifications = onCall(CALL_OPTS, async request => {
+  const {email, sessionId} = await audit.assertAdmin(request, "dataClass.saveAll");
+  try {
+    const {next, reason} = core.validateSaveAll(request.data || {});
+    const nowMs = Date.now();
+    return await db.runTransaction(async tx => {
+      const snaps = await Promise.all(core.COLLECTIONS.map(collection => tx.get(ref(collection))));
+      const head = await tx.get(audit.headRef());
+      const saved = {};
+      core.COLLECTIONS.forEach((collection, i) => { if (snaps[i].exists) saved[collection] = snaps[i].data(); });
+      const {writes, unchanged} = core.planSaveAll(next, saved);
+      if (!writes.length) throw new HttpsError("failed-precondition", "Nothing to save — every row is already saved with these values.");
+      const before = {};
+      const after = {};
+      writes.forEach(write => {
+        tx.set(ref(write.collection), stored(write.after, request, email, reason, nowMs), {merge: true});
+        if (!write.created) before[core.docIdFor(write.collection)] = snapshot(write.before);
+        after[core.docIdFor(write.collection)] = snapshot(write.after);
+      });
+      const created = writes.filter(write => write.created).map(write => write.collection);
+      const changed = writes.filter(write => !write.created).map(write => ({collection: write.collection, fields: write.changed}));
+      const eventId = audit.appendChainedAudit(tx, head, audit.auditRecord(request, {
+        eventType: "dataClass.savedAll",
+        target: {type: "dataClassification", id: core.COLLECTION},
+        before,
+        after,
+        detail: {created, changed, unchangedCount: unchanged.length},
+        reason,
+        sessionId,
+        nowMs
+      }));
+      return {ok: true, eventId, created, changed: changed.map(row => row.collection), unchanged: unchanged.length};
     });
   } catch (error) {
     throw asHttps(error);
