@@ -340,7 +340,7 @@
         helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
         links: (entry.links || []).length
           ? entry.links
-          : [{label: localized.title || entry.title, href: `./?v=${APP_V}&start=intent`}],
+          : [{label: localized.title || entry.title, href: `./floqai.html?v=${APP_V}`}],
         searchPhrases,
         patterns: []
       };
@@ -355,11 +355,21 @@
       body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open FloqAi", href: `./?v=${APP_V}&start=intent`},
+        {label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`},
         {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
       page: "index.html#floqAiHelpPopout"
+    },
+    {
+      id: "help-floqai-page",
+      title: "FloqAi",
+      body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, supRstar, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
+      searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
+      links: [{label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "floqai.html#floqAiHelpPopout"
     },
     {
       id: "help-soccer-jersey",
@@ -1382,6 +1392,26 @@
       title: "Employee / Worker Network",
       body: "Only people linked to this club are listed: staff elected or approved here, club admins, and staff affiliated with this club. To give someone a role, type their name, username, or email under Elect Patron for Role, tap Select next to the right person, choose the role, then tap Elect Selected Patron Role and confirm. The person needs a FLOQR patron account first. Waiters, waitresses, and bottle girls on the list can be made customer service representatives (CSR).",
       searchPhrases: ["employee network", "worker network", "elect patron", "elect role", "give staff a role", "add a waitress", "add staff", "club staff list", "designate csr", "customer service representative"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-featured-staff",
+      title: "Featured service staff",
+      body: "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes. Before publishing photos, get each person's agreement and tick the photo consent box.",
+      searchPhrases: ["featured staff","featured service staff","staff on club page","show staff on club page","staff photo","waiters on club page","bottle service on club page"],
+      links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
+      audiences: ["venueAdmin"],
+      source: "help-repository-seed",
+      page: "admin.html"
+    },
+    {
+      id: "help-club-website-feed",
+      title: "Club website feed",
+      body: "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links.",
+      searchPhrases: ["club website feed","website feed","embed on my website","put events on my website","iframe","rss feed","club api","website widget","staff list on website"],
       links: [{label: "Club Admin", href: vUrl("./admin.html", {from: "floqai"})}],
       audiences: ["venueAdmin"],
       source: "help-repository-seed",

@@ -29,6 +29,10 @@ test("feed URLs and RSS omit draft-looking payloads", () => {
   assert.match(urls.rss, /format=rss/);
   assert.match(urls.iframe, /schedule-embed\.html/);
   assert.match(iframeSnippet(urls.iframe), /<iframe/);
+  assert.match(urls.club, /dataset=club/);
+  assert.match(urls.eventsRss, /format=rss&dataset=events/);
+  assert.match(urls.clubIframe, /club-embed\.html\?location=temp-democlub-1&secret=floq_ingest_abc/);
+  assert.match(iframeSnippet(urls.clubIframe, "Club events and team"), /title="Club events and team"/);
   const rss = buildScheduleRss({
     venueName: "Aurelia",
     feedUrl: urls.rss,

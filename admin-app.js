@@ -25,6 +25,8 @@
   const MASTER_ADMIN_EMAILS = (window.SHOUTOUT_MASTER_ADMIN_EMAILS || window.SHOUTOUT_ADMIN_EMAILS || []).map(x => x.toLowerCase());
   let adminUsers = [];
   let adminDesignations = [];
+  const featuredStaffDraft = new Map();
+  let featuredStaffConsentSig = "";
   let selectedElectionUid = "";
   let pendingWorkerRows = [];
   let workerAssociationRequests = [];
@@ -354,7 +356,10 @@
     if (byId("clubCommerceEnabled")) byId("clubCommerceEnabled").checked = !!publicClubProfile.commerceEnabled;
     if (byId("clubCommerceStoreName")) byId("clubCommerceStoreName").value = publicClubProfile.commerceStoreName || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`;
     if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
-    if (byId("clubProfileFeaturedStaff")) byId("clubProfileFeaturedStaff").value = peopleLines(publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff);
+    featuredStaffDraft.clear();
+    featuredStaffConsentSig = publicClubProfile.featuredStaffPhotoConsent?.photoSignature || "";
+    renderFeaturedStaffPicker();
+    loadWebsiteFeedStatus();
     if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
     if (byId("clubProfilePublished")) byId("clubProfilePublished").checked = publicClubProfile.publicProfilePublished !== false;
     const sectionSettings = publicClubProfile.publicProfileSections || {};
@@ -478,6 +483,8 @@
     const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
     const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("clubProfileFloqrHandle")?.value || "") || "";
     const displayUrl = stableVenueDisplayUrl();
+    const featuredStaff = window.FLOQRFeaturedStaff.toFeatured(featuredStaffRows());
+    const staffConsent = featuredStaffConsentPayload(featuredStaff);
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -513,7 +520,8 @@
       commerceEnabled:!!byId("clubCommerceEnabled")?.checked,
       commerceStoreName:byId("clubCommerceStoreName")?.value.trim() || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`,
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
-      featuredStaff:parsePeopleLines(byId("clubProfileFeaturedStaff")?.value || "", "Service Team"),
+      featuredStaff,
+      ...staffConsent,
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
       VenueSupports96x48: screenFlags.VenueSupports96x48,
       VenueSupports64x48: screenFlags.VenueSupports64x48,
@@ -2074,6 +2082,206 @@
     }).join("");
     renderEmployeeDesignations();
     renderElectionMatches();
+    renderFeaturedStaffPicker();
+  }
+
+  function featuredStaffText(key, params = {}, fallback = "") {
+    const fullKey = `featuredStaff.${key}`;
+    const value = window.FLOQRI18n?.t ? window.FLOQRI18n.t(fullKey, params) : "";
+    if (value && value !== fullKey) return value;
+    return fallback.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+  }
+
+  function featuredStaffRows() {
+    const api = window.FLOQRFeaturedStaff;
+    const rows = api.buildRows({
+      roster: clubRoster(),
+      featured: publicClubProfile.featuredStaff || publicClubProfile.featuredServiceStaff || [],
+      rolesOf: rolesAtThisClub
+    });
+    return api.applyDraft(rows, featuredStaffDraft);
+  }
+
+  function updateFeaturedStaffDraft(key, change) {
+    featuredStaffDraft.set(key, {...(featuredStaffDraft.get(key) || {}), ...change});
+  }
+
+  function featuredStaffRowHtml(row) {
+    const photos = row.photos.map(url => `<button type="button" class="featured-staff-photo${url === row.photoUrl ? " selected" : ""}" data-fs-photo="${esc(url)}" aria-pressed="${url === row.photoUrl}" title="${esc(featuredStaffText("photoOption", {}, "Use this photo"))}"><img src="${esc(url)}" alt="" loading="lazy"/></button>`).join("");
+    const avatar = row.photoUrl
+      ? `<img src="${esc(row.photoUrl)}" alt=""/>`
+      : `<span>${esc(String(row.name || "?").slice(0, 1).toUpperCase())}</span>`;
+    const subtitle = row.roles.length ? row.roles.join(", ") : featuredStaffText("notOnFloqr", {}, "Added by hand");
+    return `<div class="featured-staff-row${row.checked ? " checked" : ""}" data-fs-key="${esc(row.key)}">
+      <label class="featured-staff-pick">
+        <input type="checkbox" data-fs-check ${row.checked ? "checked" : ""}/>
+        <span class="featured-staff-avatar">${avatar}</span>
+        <span class="featured-staff-name"><strong>${esc(row.name)}</strong><small>${esc(subtitle)}</small></span>
+      </label>
+      <div class="featured-staff-details${row.checked ? "" : " hidden"}">
+        <label>${esc(featuredStaffText("roleLabel", {}, "Role on the club page"))}<input data-fs-role value="${esc(row.role)}" maxlength="40"/></label>
+        <div class="featured-staff-photo-label">${esc(featuredStaffText("photoLabel", {}, "Photo"))}</div>
+        <div class="featured-staff-photos">
+          ${photos || `<span class="sub small">${esc(featuredStaffText("noPhoto", {}, "No photos yet. Upload one."))}</span>`}
+          <label class="buttonlike featured-staff-upload">${esc(featuredStaffText("upload", {}, "Upload from computer"))}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-fs-upload hidden/></label>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderFeaturedStaffPicker() {
+    const wrap = byId("featuredStaffPicker");
+    if (!wrap || !window.FLOQRFeaturedStaff) return;
+    const rows = featuredStaffRows();
+    const selected = rows.filter(row => row.checked).length;
+    setText("featuredStaffCount", rows.length ? featuredStaffText("selected", {count: selected}, "{count} selected") : "");
+    wrap.innerHTML = rows.length
+      ? rows.map(featuredStaffRowHtml).join("")
+      : `<p class="sub">${esc(featuredStaffText("empty", {}, "No staff yet. Approve or elect people in Employee / Worker Network, then tick who to feature here."))}</p>`;
+    wrap.querySelectorAll("[data-fs-key]").forEach(rowEl => {
+      const key = rowEl.dataset.fsKey;
+      rowEl.querySelector("[data-fs-check]")?.addEventListener("change", event => {
+        updateFeaturedStaffDraft(key, {checked: event.target.checked});
+        renderFeaturedStaffPicker();
+        setText("featuredStaffStatus", featuredStaffText("saveHint", {}, "Changes go live when you press Save Public Profile."));
+      });
+      rowEl.querySelector("[data-fs-role]")?.addEventListener("input", event => {
+        updateFeaturedStaffDraft(key, {role: event.target.value});
+      });
+      rowEl.querySelectorAll("[data-fs-photo]").forEach(button => button.addEventListener("click", () => {
+        updateFeaturedStaffDraft(key, {photoUrl: button.dataset.fsPhoto, photoStoragePath: ""});
+        renderFeaturedStaffPicker();
+      }));
+      rowEl.querySelector("[data-fs-upload]")?.addEventListener("change", event => {
+        const name = rowEl.querySelector(".featured-staff-name strong")?.textContent || "";
+        uploadFeaturedStaffPhoto(key, name, event.target.files?.[0]);
+      });
+    });
+    syncFeaturedStaffConsent(rows);
+  }
+
+  function featuredStaffPhotoSig(rows = featuredStaffRows()) {
+    return window.FLOQRFeaturedStaff.photoSignature(window.FLOQRFeaturedStaff.toFeatured(rows));
+  }
+
+  function syncFeaturedStaffConsent(rows) {
+    const box = byId("featuredStaffPhotoConsent");
+    if (!box) return;
+    if (!box.dataset.bound) {
+      box.dataset.bound = "1";
+      box.addEventListener("change", () => {
+        featuredStaffConsentSig = box.checked ? featuredStaffPhotoSig() : "";
+      });
+    }
+    const sig = featuredStaffPhotoSig(rows);
+    box.checked = !!sig && sig === featuredStaffConsentSig;
+    const stored = publicClubProfile.featuredStaffPhotoConsent;
+    const date = stored?.confirmedAtIso ? new Date(stored.confirmedAtIso).toLocaleDateString() : "";
+    setText("featuredStaffConsentRecord", stored && sig && stored.photoSignature === sig
+      ? featuredStaffText("consentRecorded", {email: stored.confirmedByEmail || "", date}, "Consent confirmed by {email} on {date}.")
+      : "");
+  }
+
+  function featuredStaffConsentPayload(featured) {
+    const api = window.FLOQRFeaturedStaff;
+    const sig = api.photoSignature(featured);
+    if (!sig) return {};
+    const stored = publicClubProfile.featuredStaffPhotoConsent;
+    if (!api.needsPhotoConsent(featured, stored)) return {featuredStaffPhotoConsent: stored};
+    if (!byId("featuredStaffPhotoConsent")?.checked || featuredStaffConsentSig !== sig) {
+      throw new Error(featuredStaffText("consentRequired", {}, "Tick the photo consent box before publishing staff photos."));
+    }
+    return {
+      featuredStaffPhotoConsent: {
+        photoSignature: sig,
+        photoCount: featured.filter(entry => entry.photoUrl).length,
+        confirmedByUid: auth.currentUser?.uid || "",
+        confirmedByEmail: safeUser(auth.currentUser),
+        confirmedAtIso: new Date().toISOString()
+      }
+    };
+  }
+
+  // Design notes: .cursor/rules/design-notes-club-website-feed.mdc
+  let websiteFeedConfigured = false;
+
+  function websiteFeedText(key, params = {}, fallback = "") {
+    const value = window.FLOQRI18n?.t?.(`websiteFeed.${key}`, params);
+    return value && value !== `websiteFeed.${key}` ? value : fallback;
+  }
+
+  async function loadWebsiteFeedStatus() {
+    if (!byId("websiteFeedStatus") || !locationId) return;
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("getVenueIngestEndpoints");
+      const {data} = await callable({locationId});
+      websiteFeedConfigured = !!data?.configured;
+      setText("websiteFeedStatus", websiteFeedConfigured
+        ? websiteFeedText("active", {prefix: data.secretPrefix || ""}, "Feed key active ({prefix}). Generate a new one to see the links again.")
+        : websiteFeedText("none", {}, "No feed key yet."));
+    } catch (error) {
+      setText("websiteFeedStatus", websiteFeedText("statusFailed", {}, "Could not check the feed key. You may not have permission for this venue."));
+    }
+  }
+
+  async function generateWebsiteFeed() {
+    if (websiteFeedConfigured && !window.confirm(websiteFeedText("rotateWarning", {}, "Generating a new key turns off the old links, including the staff schedule links. Update your website afterwards."))) return;
+    const button = byId("websiteFeedGenerateBtn");
+    if (button) button.disabled = true;
+    setText("websiteFeedStatus", websiteFeedText("generating", {}, "Generating…"));
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("rotateVenueIngestSecret");
+      const {data} = await callable({locationId});
+      const urls = data?.urls || {};
+      if (!urls.clubIframe) throw new Error("Feed links missing. Functions may need a redeploy.");
+      byId("websiteFeedIframe").value = data.clubIframeSnippet || `<iframe src="${urls.clubIframe}" loading="lazy" style="width:100%;min-height:640px;border:0"></iframe>`;
+      byId("websiteFeedJson").value = urls.club || "";
+      byId("websiteFeedRss").value = urls.eventsRss || "";
+      byId("websiteFeedOutput").hidden = false;
+      websiteFeedConfigured = true;
+      setText("websiteFeedStatus", websiteFeedText("ready", {}, "New feed key ready. Copy the links below."));
+    } catch (error) {
+      setText("websiteFeedStatus", websiteFeedText("failed", {message: error.message || String(error)}, "Could not generate the feed: {message}"));
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function copyWebsiteFeedIframe() {
+    const value = byId("websiteFeedIframe")?.value || "";
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setText("websiteFeedStatus", websiteFeedText("copied", {}, "Iframe code copied."));
+    } catch (error) {
+      byId("websiteFeedIframe").select();
+    }
+  }
+
+  async function uploadFeaturedStaffPhoto(key, name, file) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type || "")) {
+      setText("featuredStaffStatus", featuredStaffText("notImage", {}, "Choose an image file (JPG, PNG, WebP or GIF)."));
+      return;
+    }
+    if (!storage || file.size > 10 * 1024 * 1024) {
+      setText("featuredStaffStatus", featuredStaffText("uploadFailed", {}, "The photo could not be uploaded. Try a JPG or PNG under 10 MB."));
+      return;
+    }
+    setText("featuredStaffStatus", featuredStaffText("uploading", {}, "Uploading photo…"));
+    try {
+      const path = `clubMedia/${locationId}/featuredStaff/${Date.now()}-${cleanFileName(file.name)}`;
+      const ref = storage.ref(path);
+      await ref.put(file, {contentType: file.type});
+      const url = await ref.getDownloadURL();
+      const uploaded = [...(featuredStaffDraft.get(key)?.uploaded || []), url];
+      updateFeaturedStaffDraft(key, {photoUrl: url, photoStoragePath: path, uploaded, checked: true});
+      renderFeaturedStaffPicker();
+      setText("featuredStaffStatus", featuredStaffText("uploaded", {name}, "Photo added for {name}. Save Public Profile to publish."));
+    } catch (error) {
+      console.warn("featured staff photo upload", error?.code || error?.message || error);
+      setText("featuredStaffStatus", featuredStaffText("uploadFailed", {}, "The photo could not be uploaded. Try a JPG or PNG under 10 MB."));
+    }
   }
 
   function workerRoleLabel(request = {}) {
@@ -2797,6 +3005,8 @@
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("websiteFeedGenerateBtn", generateWebsiteFeed);
+    bind("websiteFeedCopyBtn", copyWebsiteFeedIframe);
     bind("clubStripeConnectBtn", startClubConnectOnboarding);
     bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
     bind("refreshReconciliationBtn", loadClubPaymentLedger);

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title data-i18n="page.clubEmbed.title">Club events and team</title>
+  <link rel="stylesheet" href="./club-embed.css?v=s3.1.20"/>
+</head>
+<body class="club-embed" data-floqr-public>
+<main class="club-embed-shell">
+  <header class="club-embed-head">
+    <img id="clubEmbedLogo" class="club-embed-logo" alt="" hidden/>
+    <div>
+      <h1 id="clubEmbedName" data-i18n="page.clubEmbed.title">Club events and team</h1>
+      <p id="clubEmbedTagline" class="club-embed-sub"></p>
+    </div>
+  </header>
+  <p id="clubEmbedStatus" class="club-embed-status" role="status" data-i18n="page.clubEmbed.loading">Loading&hellip;</p>
+  <section id="clubEmbedEvents" class="club-embed-section" data-embed-section="events" hidden>
+    <h2 data-i18n="page.clubEmbed.events">Upcoming events</h2>
+    <div class="club-embed-events" data-embed-list></div>
+  </section>
+  <section id="clubEmbedDjs" class="club-embed-section" data-embed-section="djs" hidden>
+    <h2 data-i18n="page.clubEmbed.djs">DJs</h2>
+    <div class="club-embed-people" data-embed-list></div>
+  </section>
+  <section id="clubEmbedStaff" class="club-embed-section" data-embed-section="staff" hidden>
+    <h2 data-i18n="page.clubEmbed.staff">Our team</h2>
+    <div class="club-embed-people" data-embed-list></div>
+  </section>
+  <section id="clubEmbedGallery" class="club-embed-section" data-embed-section="gallery" hidden>
+    <h2 data-i18n="page.clubEmbed.gallery">Gallery</h2>
+    <div class="club-embed-gallery" data-embed-list></div>
+  </section>
+  <footer class="club-embed-foot">
+    <a id="clubEmbedOpen" target="_blank" rel="noopener" hidden data-i18n="page.clubEmbed.openOnFloqr">Open on FLOQR</a>
+    <span data-i18n="page.clubEmbed.poweredBy">Powered by FLOQR</span>
+  </footer>
+</main>
+<script src="./floqr-i18n.js?v=s3.1.20"></script>
+<script src="./club-embed.js?v=s3.1.20"></script>
+</body>
+</html>

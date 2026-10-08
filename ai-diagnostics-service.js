@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.18";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.20";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,13 +1284,32 @@
       ]
     },
     {
+      version: "s3.1.20-club-feed-floqai",
+      title: "Club Admin website feed (iframe / JSON / RSS of events, DJs, featured staff, gallery), staff photo consent before publishing pictures, and FloqAi on its own page",
+      checks: [
+        {label:"Club feed datasets", file:"functions/club-public-feed-core.js", includes:["function staffView(", "function buildEventsRss("]},
+        {label:"Website feed card", file:"admin.html", includes:["id=\"websiteFeedGenerateBtn\""]},
+        {label:"Club website iframe", file:"club-embed.js", includes:["dataset"]},
+        {label:"FloqAi page", file:"floqai.html", includes:["data-floqr-feature=\"floqAi\""]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.20\""]}
+      ]
+    },
+    {
+      version: "s3.1.19-featured-staff-picker",
+      title: "Club Admin → Club Public Profile: Featured service staff is a checkbox list of the club's staff; each person's photo is one of their FLOQR pictures or an upload from the computer (no photo URLs)",
+      checks: [
+        {label:"Featured staff picker logic", file:"floqr-featured-staff.js", includes:["function buildRows(", "function toFeatured("]},
+        {label:"Picker in Club Public Profile", file:"admin.html", includes:["id=\"featuredStaffPicker\"", "floqr-featured-staff.js"]},
+        {label:"Photo upload to club media", file:"admin-app.js", includes:["function uploadFeaturedStaffPhoto("]}
+      ]
+    },
+    {
       version: "s3.1.18-recommendation-help",
       title: "ShoutOut Recommendations: one ? per card (AI Recommendations, Trending, Generic); status messages stay visible; help localized in every language",
       checks: [
         {label:"Declarative recommendation help", file:"index.html", includes:["data-floqr-help-id=\"help-ai-recommendations\"", "data-floqr-help-id=\"help-trending-shoutouts\""]},
         {label:"Status text stays visible", file:"patron-app.js", includes:["data-keep-visible='true'>${esc(emptyText)}"]},
-        {label:"Recommendation help in repository", file:"floqai-help-repository.js", includes:["id: \"help-ai-recommendations\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.18\""]}
+        {label:"Recommendation help in repository", file:"floqai-help-repository.js", includes:["id: \"help-ai-recommendations\""]}
       ]
     },
     {

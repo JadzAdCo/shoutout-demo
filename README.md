@@ -1,4 +1,8 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.18 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.20 (stable)
+
+- s3.1.20: Club Admin → Club Public Profile → **Website feed** generates a private link for the club's official website: an iframe, a JSON feed, and an events RSS feed with upcoming events, featured DJs, featured staff, and gallery photos (only sections shown on the public profile). Featured staff photos now need a consent confirmation before they publish. FloqAi opens on its own page (`floqai.html`) instead of bouncing to event search.
+
+- s3.1.19: Club Admin → Club Public Profile → **Featured service staff** is now a checkbox list instead of a "Name | Role | Bio | Photo URL" text box. It lists everyone already featured plus the club's staff from Employee / Worker Network. Tick who appears on the public club page, adjust the role shown under the name, and pick the photo: one of the person's own FLOQR pictures, or **Upload from computer** (saved to the club's media). No photo URLs. The public page logic is unchanged (it still shows the saved `featuredStaff` list). Labels and help are translated into all 11 languages.
 
 - s3.1.18: ShoutOut composer → ShoutOut Recommendations shows a single **?** beside each heading (ShoutOut Recommendations, AI Recommendations, Trending ShoutOuts, Generic ShoutOuts). The old under-heading info popouts are gone, and the "Type a message…" / "Building personalized ShoutOut ideas…" status lines stay visible instead of turning into a second **?**. The four help topics are in FloqAi search and translated into every supported language. AI Recommendations call Gemini through `aiSuggestShoutOut`; until Gemini API credits are topped up the server returns local fallback ideas.
 
