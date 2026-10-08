@@ -397,7 +397,7 @@
       return snap.docs.map(d => ({id:d.id, ...d.data()}));
     } catch(e) {
       console.warn(`Could not read ${name}:`, e.message);
-      return [];
+      return window.FLOQRAccessNotice?.report(name, e) || [];
     }
   }
 

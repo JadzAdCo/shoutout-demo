@@ -38,15 +38,6 @@
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  function isDisplayableShoutout(row = {}) {
-    const status = String(row.status || "").toLowerCase();
-    const payment = String(row.paymentStatus || row.payment || "").toLowerCase();
-    if (row.displayed === true || row.onDisplay === true) return true;
-    if (["approved", "paid", "displayed", "displaying", "live", "completed"].includes(status)) return true;
-    if (["paid", "succeeded", "complete", "completed"].includes(payment)) return true;
-    return false;
-  }
-
   function hashTag(value) {
     const raw = String(value || "").trim().replace(/^#/, "");
     if (!raw) return "";
@@ -64,19 +55,6 @@
   function eventTagFor(row = {}) {
     const tag = row.eventTag || row.eventName || row.eventLabel || "";
     return tag ? hashTag(tag) : "";
-  }
-
-  function submitterName(row = {}) {
-    const submittedBy = row.submittedBy;
-    const submittedByLabel = typeof submittedBy === "string"
-      ? submittedBy
-      : (submittedBy?.displayName || submittedBy?.email || submittedBy?.name || "");
-    return row.submittedByName
-      || row.displayName
-      || row.submittedByDisplayName
-      || submittedByLabel
-      || row.submittedByEmail
-      || "ShoutOut";
   }
 
   function initial(name) {
@@ -108,45 +86,32 @@
     if (!currentUser) return [];
     let rows = [];
     try {
-      const snap = await db.collection("shoutouts").orderBy("submittedAt", "desc").limit(60).get();
-      rows = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const result = await firebase.app().functions("us-central1").httpsCallable("getShoutoutStories")({});
+      rows = Array.isArray(result?.data?.stories) ? result.data.stories : [];
     } catch (error) {
-      try {
-        const snap = await db.collection("shoutouts").limit(80).get();
-        rows = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      } catch (fallbackError) {
-        console.warn("Mingl Gist shoutouts load failed", fallbackError || error);
-        return [];
-      }
+      return window.FLOQRAccessNotice?.report("shoutouts", error) || [];
     }
-    return rows
-      .filter(isDisplayableShoutout)
-      .sort((a, b) => toMillis(b.submittedAt || b.approvedAt || b.createdAt) - toMillis(a.submittedAt || a.approvedAt || a.createdAt))
-      .slice(0, 40)
-      .map((row) => {
-        const name = submitterName(row);
-        const clubChip = clubTagFor(row);
-        const eventChip = eventTagFor(row);
-        const chips = [clubChip, eventChip].filter(Boolean);
-        const mediaUrl = row.mediaUrl || row.image || row.enhancedMediaUrl || row.originalMediaUrl || "";
-        return {
-          id: `shoutout:${row.id}`,
-          ringId: `user:${row.submittedByUid || name}`,
-          type: "shoutout",
-          authorUid: row.submittedByUid || "",
-          submittedByUid: row.submittedByUid || "",
-          authorName: name,
-          avatarUrl: row.submitterPhotoURL || row.photoURL || "",
-          mediaUrl,
-          mediaType: row.mediaType || "",
-          title: row.mainText || row.main || "ShoutOut",
-          body: row.subText || row.sub || [row.locationName || row.clubName, row.city].filter(Boolean).join(" · "),
-          chips,
-          createdAt: toMillis(row.submittedAt || row.approvedAt || row.createdAt),
-          ctaLabel: "",
-          ctaHref: ""
-        };
-      });
+    return rows.map((row) => {
+      const name = row.authorName || "ShoutOut";
+      const chips = [clubTagFor(row), eventTagFor(row)].filter(Boolean);
+      return {
+        id: `shoutout:${row.id}`,
+        ringId: `user:${row.submittedByUid || name}`,
+        type: "shoutout",
+        authorUid: row.submittedByUid || "",
+        submittedByUid: row.submittedByUid || "",
+        authorName: name,
+        avatarUrl: row.avatarUrl || "",
+        mediaUrl: row.mediaUrl || "",
+        mediaType: row.mediaType || "",
+        title: row.mainText || "ShoutOut",
+        body: row.subText || [row.locationName, row.city].filter(Boolean).join(" · "),
+        chips,
+        createdAt: Number(row.createdAtMs || 0),
+        ctaLabel: "",
+        ctaHref: ""
+      };
+    });
   }
 
   async function loadMinglGistStories() {

@@ -15,6 +15,7 @@ module.exports = {
   ...require("./venue-ingest-functions"),
   ...require("./data-classification-functions"),
   ...require("./people-directory-functions"),
+  ...require("./shoutout-stories-functions"),
   ...require("./suprstr-functions"),
   ...require("./privacy-dsar-functions"),
   ...require("./venue-geocode-functions"),

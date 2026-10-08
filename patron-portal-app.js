@@ -480,14 +480,14 @@
       const snap = await db.collection(name).limit(limit).get();
       const rows = snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
       return filterFn ? rows.filter(filterFn) : rows;
-    } catch(e) { return []; }
+    } catch(e) { return window.FLOQRAccessNotice?.report(name, e) || []; }
   }
 
   async function getParticipantCollectionSafe(name, uid, limit=1000) {
     try {
       const snap = await db.collection(name).where("participants", "array-contains", uid).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
-    } catch(e) { return []; }
+    } catch(e) { return window.FLOQRAccessNotice?.report(name, e) || []; }
   }
 
   async function queryCollectionSafe(name, field, value, limit=150) {
@@ -495,7 +495,7 @@
     try {
       const snap = await db.collection(name).where(field, "==", value).limit(limit).get();
       return snap.docs.map(d => ({id:d.id, _collection:name, ...d.data()}));
-    } catch (e) { return []; }
+    } catch (e) { return window.FLOQRAccessNotice?.report(name, e) || []; }
   }
 
   async function getDocsByIdsSafe(name, ids = [], limit=150) {
@@ -3522,17 +3522,24 @@
     const needle = byId("diagnosticShoutoutRef").value.trim();
     if (!needle) { setText("shoutoutDiagnosticReport", "Enter a reference number or document id."); return; }
     setText("shoutoutDiagnosticReport", "Searching ShoutOut records...");
-    const [pending, liveContent, notifications, audit] = await Promise.all([
-      getCollectionSafe("shoutouts", x => x.id === needle || x.referenceNumber === needle || x.shoutoutId === needle),
-      getCollectionSafe("liveContent", x => x.id === needle || x.referenceNumber === needle || x.shoutoutId === needle),
-      getCollectionSafe("inboxNotifications", x => x.referenceNumber === needle || x.shoutoutId === needle || x.id === needle),
-      getCollectionSafe("shoutoutAudit", x => x.referenceNumber === needle || x.shoutoutId === needle || x.id === needle)
+    const matches = x => x.id === needle || x.referenceNumber === needle || x.shoutoutId === needle;
+    const auditReadable = db.collection("shoutoutAudit").where("shoutoutId", "==", needle).limit(50).get()
+      .then(snap => snap.docs.map(d => ({id:d.id, ...d.data()})))
+      .catch(() => null);
+    const [ownShoutouts, byDocId, liveContent, ownInbox, audit] = await Promise.all([
+      getUserScopedRows("shoutouts", user, [["submittedByUid", "uid"], ["submittedBy", "email"], ["submittedBy", "phone"]]),
+      getDocsByIdsSafe("shoutouts", [needle], 1),
+      getCollectionSafe("liveContent", matches),
+      getUserScopedRows("inboxNotifications", user, [["recipientUid", "uid"], ["recipientEmail", "email"]]),
+      auditReadable
     ]);
+    const pending = uniqueRows([ownShoutouts.filter(matches), byDocId]);
+    const notifications = ownInbox.filter(matches);
     const rows = [
       ["Pending ShoutOut queue", pending.length ? pending.map(x => `${x.referenceNumber || x.id} - ${x.status || "pending"} - ${x.locationName || x.clubLocationId || ""}`).join(" | ") : "Not found"],
       ["Live display content", liveContent.length ? liveContent.map(x => `${x.referenceNumber || x.id} - ${x.status || "live"} - ${x.locationName || x.clubLocationId || ""}`).join(" | ") : "Not found"],
       ["System messages", notifications.length ? notifications.map(x => `${x.title || x.subject || "Notification"} - ${fmtDate(x.createdAt)}`).join(" | ") : "Not found"],
-      ["Audit trail", audit.length ? audit.map(x => `${x.action || "audit"} - ${fmtDate(x.createdAt)} - ${x.actorEmail || ""}`).join(" | ") : "Not found"]
+      ["Audit trail", audit === null ? "Available to Master Admins only" : audit.length ? audit.map(x => `${x.action || "audit"} - ${fmtDate(x.createdAt)} - ${x.actorEmail || ""}`).join(" | ") : "Not found"]
     ];
     byId("shoutoutDiagnosticReport").innerHTML = simpleRows(rows);
   }
@@ -3939,8 +3946,9 @@
   }
 
   async function setServiceMemberRequest(requestId, status, clubLocationId) {
-    const requests = await getCollectionSafe("workerAssociationRequests", x => x.id === requestId, 50);
-    const request = requests.find(item => item.id === requestId);
+    const requestSnap = await db.collection("workerAssociationRequests").doc(requestId).get()
+      .catch(e => { window.FLOQRAccessNotice?.report("workerAssociationRequests", e); return null; });
+    const request = requestSnap?.exists ? {id: requestSnap.id, ...requestSnap.data()} : null;
     if (!request) return;
     const role = smWorkerRoleLabel(request);
     const uid = request.uid || request.workerUid;
@@ -4339,7 +4347,11 @@
     setText("portalStatus", "");
     Promise.all([
       window.FLOQRPeople?.listSafe("contacts") || [],
-      getCollectionSafe("clubEmployeeDesignations", null, 300)
+      Promise.all([
+        queryCollectionSafe("clubEmployeeDesignations", "workerUid", user.uid, 100),
+        queryCollectionSafe("clubEmployeeDesignations", "uid", user.uid, 100),
+        queryCollectionSafe("clubEmployeeDesignations", "isCSR", true, 300)
+      ]).then(groups => [...new Map(groups.flat().map(row => [row.id, row])).values()])
     ]).then(async ([allUsers, employeeDesignations]) => {
       currentPortalUsers = allUsers;
       currentPortalDesignations = employeeDesignations;

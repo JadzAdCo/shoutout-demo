@@ -1920,7 +1920,7 @@
       return filterFn ? rows.filter(filterFn) : rows;
     } catch(e) {
       console.warn(`Could not read ${name}:`, e.message);
-      return [];
+      return window.FLOQRAccessNotice?.report(name, e) || [];
     }
   }
 
@@ -3869,7 +3869,8 @@
     if (!pastShoutoutMemoryPromise) {
       pastShoutoutMemoryPromise = (async () => {
         try {
-          const rows = await getCollectionSafe("shoutouts", item => item.submittedByUid === currentUser.uid || item.submittedBy === safeUser(), 60);
+          const snap = await db.collection("shoutouts").where("submittedByUid", "==", currentUser.uid).limit(60).get();
+          const rows = snap.docs.map(d => ({id:d.id, ...d.data()}));
           return rows.slice(0, 12).map(item => ({
             mainText:item.mainText || "",
             subText:item.subText || "",
@@ -3878,7 +3879,7 @@
             location:item.locationName || item.clubName || ""
           }));
         } catch (error) {
-          return [];
+          return window.FLOQRAccessNotice?.report("shoutouts", error) || [];
         }
       })();
     }

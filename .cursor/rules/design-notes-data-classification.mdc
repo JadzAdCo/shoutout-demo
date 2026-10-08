@@ -156,6 +156,7 @@ Firestore `dataClassification/{collection}` (+ optional `fields.{field}` overrid
 - Oct 7 2026 — proposal written; waiting for owner approval (or changes) before phase 1.
 - Oct 8 2026 — **owner approved all phases** ("build phase 1 now, then continue phases 2–5"). Phase 3 production migration still runs dry-run first and needs an explicit owner go-ahead before writing production data.
 - Oct 8 2026 2:22 PM — owner replied **"all"**: fix every exposure-report gap (69 gaps / 45 collections) in staged, tested deploys.
+- Oct 8 2026 — Stages 2–3 built in the workspace (s3.1.24, 0 gaps); held from Pages / deploy until the Stage 1 rules deploy is approved and confirmed.
 
 ## Rules Stage 1 (s3.1.23) — 69 → 37 gaps, 45 → 24 collections
 
@@ -177,3 +178,37 @@ Pitfall that drives every stage: every page loads through `getCollectionSafe`, w
 Known follow-up (not changed — `functions/suprstr-functions.js` carries unrelated uncommitted work): `suprstrSessions` is public-read for the kiosk and stores `broadcasterEmail`; drop that field from the session doc (keep it on `suprstarRequests`).
 
 Tests: `functions/rules-tightening.test.js` (rules text, exposure count, projection matrix, client switch-over). Stage 2 / 3 remaining (24 collections): club data loaded by Club Admin / patron pages with unfiltered `getCollectionSafe` scans (`shoutouts`, `guestListRequests`, `clubEmployeeDesignations`, `workerAssociationRequests`, `roleRequests`, `clubRoleActivity`, `clubRolePolicies`, `clubNotificationSettings`, `clubMessagingCredits`, `clubMarketingCampaigns`, `clubAdminNotifications`, `notifications`, `pickupRequests`, `entityFollows`) and published listings edited by any signed-in user (`clubs`, `events`, `clubMedia`, `clubLocationAliases`, `clubTemplateVariants`, `djProfiles`, `promoterProfiles`, `liveContent`, `guestListCampaigns`, `displayDevices`). Each needs its loaders changed to club-filtered queries (rules provable from `where(clubLocationId == …)`) or callables before the rule tightens.
+
+## Rules Stages 2–3 (s3.1.24, workspace only until Stage 1 rules are deployed) — 37 → 0 gaps
+
+New rule helpers: `isClubWorker(clubId)` (designation `{clubId}_{uid}` exists, not rejected/removed/revoked), `isClubStaff` = manager or worker (matches the `clubConfidential` tier), `ownsSubmission(data, uidField, contactField)` (uid, token email or token phone — **direct field access**, not `map.get`, so owner queries filtered on that field can be proven), `keepsField(field)`.
+
+Silent-empty fix: `floqr-access-notice.js` (`FLOQRAccessNotice.report(name, error, fallback)`) — every page-level `getCollectionSafe` / `queryCollection*` catch reports; banner says "hidden because your account does not have access" (permission-denied) or "could not load" (anything else). Chrome keys `access.denied|failed|dismiss` in all 11 packs. Loaded on admin, index, patron-portal, promoter-admin, master-admin, mingl-chat, mingl-gist.
+
+| Collection | Rule now | Client change |
+|---|---|---|
+| `shoutouts` | read: master, owner, club staff; update: master, club manager (club/owner fixed), owner edit (no payment/approval fields, status only → pending/cancelled); delete: master, club manager | Club Admin reports + display reset query by `clubLocationId`; Search memory queries own uid; portal diagnostic uses own rows + doc id (audit "Master Admins only"); Mingl Gist → `getShoutoutStories` callable (System job `shoutoutStories`, never email/phone, https media only) |
+| `guestListRequests` | create: own uid + club; read: master, owner (uid / guestEmail), club staff; update/delete: master, club manager | Club Admin queries by club. Promoter reports: Master Admin only today (both promoter admins are Master Admins); real promoter accounts need a server mapping + callable |
+| `clubEmployeeDesignations` | read: master, own (`workerUid`/`uid`), `isCSR == true` (members message CSRs — justified exception), club staff; writes: master, club manager, club fixed | Club Admin queries by club; My Profile merges own + CSR queries (recipient list now CSR-only; untagged rows no longer listed) |
+| `workerAssociationRequests` | create: consent + own `workerUid`; read: master, own, club manager; update/delete: master, club manager | My Profile approve reads one doc by id |
+| `roleRequests` | create: own `uid`; read: master, own; update/delete: master | none |
+| `clubAdminNotifications` | create: own `workerUid`; read/update/delete: master, club manager | none |
+| `clubRoleActivity` | create: own uid + club staff; read: master, club manager, submitter; update/delete: master, club manager | none (already club-filtered) |
+| `clubRolePolicies` | read: staff; write: manager (doc id = club) | none |
+| `clubNotificationSettings`, `clubMessagingCredits` | manager / master (doc id = club); credits server-written | none |
+| `clubMarketingCampaigns` | read: master, club manager; write: master (Functions write) | none |
+| `entityFollows` | read: own, or missing doc; create/update: own `followerUid`; delete: own, master | none |
+| `pickupRequests` | read/update: owner (owner, payment, order fixed); create: own; delete: master | none |
+| `notifications` | master only (no client reader/writer) | none |
+| `clubs`, `clubLocationAliases`, `displayDevices` | public read; writes Master Admin | none |
+| `events` | public read; create/update: master or manager of `clubLocationId`/`locationId`; delete: master or manager | none |
+| `clubMedia`, `guestListCampaigns` | public read; writes club manager (campaign create: staff) / master | none |
+| `clubTemplateVariants` | signed-in read (public catalog); create adds club-manager check; update/delete: manager / master | none |
+| `liveContent` | public read; write: master, manager (doc id = club) | none |
+| `djProfiles`, `promoterProfiles` | public read; write: self (doc id = uid) / master | none |
+
+Tests: `functions/rules-tightening-stage-2-3.test.js` (exposure report empty, no bare `signedIn()` writes, scoping, loaders, notice + i18n, Gist projection). No production data migration.
+
+Not changed (described for the owner): `admin-scheduling.js` `loadWorkers` already queries designations by club (works); its per-worker `users/{uid}` read has failed since Stage 1 and falls back to designation names — switch to `FLOQRPeople.listSafe("club", {clubLocationId})`. `functions/suprstr-functions.js`: drop `broadcasterEmail` from `suprstrSessions`.
+
+Deploy order once Stage 1 rules are confirmed: Functions `getShoutoutStories` → Pages s3.1.24 → `firestore:rules`.
