@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.22";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.23";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,13 +1284,21 @@
       ]
     },
     {
+      version: "s3.1.23-rules-stage-1",
+      title: "Security rules Stage 1: profiles, messages, Inbox, door codes and SupRstR board signaling are limited to the people involved; other members' profiles load through the people directory",
+      checks: [
+        {label:"People directory helper", file:"floqr-people-directory.js", includes:["getPeopleDirectory"]},
+        {label:"Mingl uses directory", file:"patron-app.js", includes:["FLOQRPeople"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.23\""]}
+      ]
+    },
+    {
       version: "s3.1.22-data-classification-review",
       title: "Data classification: one Save all classifications button, per-row status and recommendations, Needs review filter, and a What needs fixing list",
       checks: [
         {label:"Save all button", file:"master-admin.html", includes:["id=\"dataClassSaveAllBtn\""]},
         {label:"Review guidance", file:"floqr-data-classification.js", includes:["function reviewNotes(", "function fixList("]},
-        {label:"Save all call", file:"master-data-classification.js", includes:["saveAllDataClassifications"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.22\""]}
+        {label:"Save all call", file:"master-data-classification.js", includes:["saveAllDataClassifications"]}
       ]
     },
     {

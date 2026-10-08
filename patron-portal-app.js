@@ -2570,6 +2570,7 @@
         subject:"Friend or Mingl Request Approved",
         body:"Both patrons approved. Mingl Chat is now open.",
         recipientUid:requestOtherUid(connection, user),
+        createdByUid:user.uid,
         connectionId,
         link: window.FLOQRNav?.portalLink("./mingl-chat.html", { room: roomId }) || `./mingl-chat.html?room=${roomId}&v=29.09.8&from=portal`,
         read:false,
@@ -2611,6 +2612,7 @@
           subject:"Friend or Mingl Request Update",
           body:`${currentProfile.displayName || user.displayName || "A FLOQR patron"} declined the Friend or Mingl Request.`,
           recipientUid:requesterUid,
+          createdByUid:user.uid,
           connectionId,
           read:false,
           createdAt:fieldValue()
@@ -3977,6 +3979,7 @@
         clubLocationId,
         senderUid: "system",
         senderName: "System Message",
+        createdByUid: auth.currentUser?.uid || "",
         read: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -4335,7 +4338,7 @@
     renderPortalMinglChats(chats, user);
     setText("portalStatus", "");
     Promise.all([
-      getCollectionSafe("users", null, 500),
+      window.FLOQRPeople?.listSafe("contacts") || [],
       getCollectionSafe("clubEmployeeDesignations", null, 300)
     ]).then(async ([allUsers, employeeDesignations]) => {
       currentPortalUsers = allUsers;

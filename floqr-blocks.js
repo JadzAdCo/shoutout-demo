@@ -141,6 +141,7 @@
     try {
       await db.collection("inboxNotifications").add({
         recipientUid: blockerUid,
+        createdByUid: blockerUid,
         type: "unminglConfirm",
         title: "UnMingl applied",
         body: `You UnMingl'd ${summaries[blockedUid].displayName}. They can no longer use your public profile, public services, Mingl Chat, or Mingl Gist.`,

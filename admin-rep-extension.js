@@ -97,6 +97,7 @@
               : "You can add search tags to this venue's templates.",
             recipientUid: change.uid,
             recipientEmail: String(change.email || "").toLowerCase(),
+            createdByUid: firebase.auth().currentUser?.uid || "",
             clubLocationId: locationId,
             link: `./template-tags.html?location=${encodeURIComponent(locationId)}&v=${window.FLOQRNav?.appVersion || ""}`,
             read: false,

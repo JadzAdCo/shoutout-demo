@@ -54,7 +54,7 @@
     const email = (auth.currentUser?.email || "").toLowerCase();
     const allowed = getAllowedPromoters(email);
     const start = getPeriodStart(byId("periodFilter").value);
-    const [guestLists, users] = await Promise.all([getCollectionSafe("guestListRequests"), getCollectionSafe("users")]);
+    const [guestLists, users] = await Promise.all([getCollectionSafe("guestListRequests"), window.FLOQRPeople?.listSafe("referrals") || []]);
 
     const filteredGuests = guestLists.filter(x => isAllowed(allowed, x.promoterId)).filter(x => inPeriod(x, "submittedAt", start));
     const filteredUsers = users.filter(x => isAllowed(allowed, x.referredByPromoterId)).filter(x => inPeriod(x, "createdAt", start) || inPeriod(x, "updatedAt", start));
