@@ -1,0 +1,64 @@
+---
+description: Staff marketing media consent (mmc-2026-10) — required checkbox when a patron opts in as a service member / venue or event team member; venues may use name, role, published photos/videos for websites, flyers, Instagram/Facebook/TikTok/YouTube; withdrawable in My Profile; Club Admin status labels; rules + callable
+alwaysApply: false
+---
+
+# Staff marketing media consent (mmc-2026-10)
+
+Resume: `@staff-consent$` / `$mmc$`.
+
+Owner (Oct 8 2026): when a patron opts in to be a venue / event employee or service team member, they must consent that the venue or event entity and its admins/managers may use their selected data (published images) for broad marketing — websites, flyers, Instagram, Facebook, TikTok, YouTube — without further consent. Owner is unsure of the legal implications → **counsel must review the wording before production cutover** (see Legal below).
+
+## Contract
+
+- Module `floqr-staff-marketing-consent.js` (`window.FLOQRStaffMarketingConsent` + `module.exports`). Server mirror `functions/staff-marketing-consent-core.js`; `functions/staff-marketing-consent.test.js` asserts parity.
+- **Version id** `mmc-2026-10`. **Text hash** = SHA-256 of the four English paragraphs (`staffConsent.p1`–`p4`) joined by a blank line. Any wording change → new version id + new hash in both files + new i18n strings; old records keep their version, and Club Admin shows them as given (`current: false` is available for a re-ask flow later).
+- Chrome keys `staffConsent.*` (20 × 11 packs). Help id `help-staff-marketing-consent` (patron, serviceMember, venueAdmin).
+
+## Opt-in paths (all gated; box unticked on every render, button disabled until ticked, submit refuses without it)
+
+| Path | Code | Writes |
+|---|---|---|
+| My Profile → Elect to become a service member | `patron-portal-app.js` `electBecomeServiceMember` (`#becomeSmConsentMount`) | `users` `IsServiceMember=1` + `marketingMediaConsent` |
+| My Profile → Services & Service Members → Request access | `submitServiceMemberRequest` (`#smRequestConsentMount`) | `roleRequests` + `workerAssociationRequests` stamped; `users.marketingMediaConsent` |
+| `role-request.html` | `role-request-app.js` `submitRoleRequest` (`#roleConsentMount`) | same as above |
+
+Not opt-in (no patron action): Club Admin **Elect Patron for Role** / Review & elect, Master Admin `assignVenueEmployee`, AI discovery seeding. Those people show **Marketing consent: not recorded** until they give it in My Profile. `admin.html` Master Admin assignment `roleRequests` (`requestKind: "masterAdminAssignment"`) is exempt.
+
+## Fields
+
+`users/{uid}.marketingMediaConsent` (user-writable; merge):
+`{accepted: 1|0, version, textHash, acceptedAtMs, acceptedAtIso, source: portal-elect|portal-request|role-request|portal-manage, lang, withdrawnAtMs, withdrawnAtIso}` (+ `serverRecordedAtMs`, `lastLogId` when the callable ran).
+
+Request docs (`roleRequests`, `workerAssociationRequests`, and the `djProfiles` / `promoterProfiles` copy): `marketingMediaConsentAccepted: 1`, `marketingMediaConsentVersion`, `marketingMediaConsentTextHash`, `marketingMediaConsentAtMs`.
+
+`clubEmployeeDesignations` on approve (Club Admin `approveWorkerRequest`, portal `setServiceMemberRequest`): `designationStamp(request)` copies accepted/version/atMs.
+
+Status priority (`statusOf(profile, designation)`): live user record (carries withdrawal) → designation stamp → none.
+
+## Withdrawal
+
+My Profile → Services & Service Members → **Marketing consent** card (`#staffConsentManageCard`): status line, **Withdraw marketing consent** (confirm dialog) or the consent block + **Give marketing consent**. Withdraw writes `{accepted: 0, withdrawnAtMs, withdrawnAtIso}` (merge keeps version history). Withdrawal stops **new** marketing use only; already printed / posted materials need not be recalled. It does **not** remove service membership or venue links. A new venue request after withdrawal requires ticking again (re-accepts).
+
+## Server enforcement (needs deploy)
+
+- `firestore.rules`: `users` create/update refuse the `IsServiceMember` 0 → 1 transition unless `marketingMediaConsent.accepted == 1` (existing service members unaffected); `workerAssociationRequests` create and `roleRequests` create (except `masterAdminAssignment`) require `marketingMediaConsentAccepted == 1` + non-empty version.
+- Callable `recordStaffMarketingConsent` (us-central1, `functions/staff-marketing-consent-functions.js`): auth required; accept must carry the current version + text hash (stale page → `invalid-argument`); throttle 20 / 10 min per uid (`staffMarketingConsentThrottle`); writes append-only `staffMarketingConsentLogs` (uid, email, action, version, hash, full English text, source, lang, clubLocationIds, hashed IP, UA, ISO time) and server-stamps `users.marketingMediaConsent`. Logs have no client rules (default deny) — Functions / console only.
+- Client calls the callable best-effort after its own Firestore write, so the UI works before the Functions deploy; the log is the evidence record once deployed.
+
+## Club Admin
+
+`admin-app.js` `staffConsentLabel(uid)` / `staffConsentState(uid)`: Employee / Worker Network roster rows and Featured service staff picker rows show **Marketing consent: given on {date} / withdrawn on {date} / not recorded** (`.staff-consent-status[data-consent-state]`). The s3.1.20 photo attestation (`featuredStaffConsentPayload`, `#featuredStaffPhotoConsent`) is unchanged and still required.
+
+## Legal (open — counsel review recommended)
+
+- Wording is plain-English, non-exclusive, royalty-free, scoped to promoting the venue and its events, excludes private contact data, and is withdrawable — required for GDPR-style consent (Art. 7(3)); "no further consent" is framed as "for each new use while this consent is active".
+- Employment context: EU regulators treat employee consent as rarely "freely given". Counsel should decide whether venues should rely on a separate lawful basis / written model release, whether the checkbox may be a condition of joining a team, and minors / under-18 staff handling.
+- Image / publicity rights (US right of publicity, EU image rights) and platform terms vary by country; consider a per-venue model release for paid ads.
+- FLOQR records the patron's consent; the venue remains controller of its own marketing use. Recommend a Terms clause binding venues to honor withdrawal and the no-contact-data rule.
+
+## FIX PROMPT
+
+```
+Staff marketing consent mmc-2026-10: required unticked checkbox (FLOQRStaffMarketingConsent.mount) on portal elect, portal request, role-request; users.marketingMediaConsent + request stamps + designationStamp on approve; withdraw in My Profile Services tab; Club Admin roster + featured staff labels; rules gate IsServiceMember 0→1 and request creates; callable recordStaffMarketingConsent logs evidence. Wording change = new version + hash in both modules. Design notes: design-notes-staff-marketing-consent.mdc
+```

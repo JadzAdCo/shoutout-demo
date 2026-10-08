@@ -201,6 +201,7 @@
         <div id="becomeServiceMemberCard" class="card hidden">
           <h2 data-i18n="nav.serviceMembers">Services &amp; Service Members</h2>
           <p class="sub small" data-i18n="portal.becomeServiceMember.intro">This tab is for nightlife staff and other service roles. While you are registered as a patron only, it stays hidden. Tap the button below to elect as a service member and open this tab.</p>
+          <div id="becomeSmConsentMount" class="staff-marketing-consent-mount"></div>
           <button id="becomeServiceMemberBtn" class="primary" type="button" data-i18n="portal.becomeServiceMember.btn">Elect to become a service member</button>
         </div>
       </section>
@@ -681,6 +682,7 @@
             <label data-i18n="portal.serviceMembers.clubsLabel">Select one or more clubs/events you work with</label>
             <div id="smVenuePickerMount" class="floqr-venue-picker-mount"></div>
             <label data-i18n="portal.serviceMembers.notesLabel">Notes<textarea id="smRoleNotes" data-i18n-placeholder="portal.serviceMembers.notesPlaceholder" placeholder="Optional notes for the club (schedule, residency, promoter company, etc.)"></textarea></label>
+            <div id="smRequestConsentMount" class="staff-marketing-consent-mount"></div>
             <button id="smSubmitRoleRequestBtn" class="primary" type="button" data-i18n="portal.serviceMembers.submitBtn">Submit Club Association Request</button>
             <p id="smRoleStatus" class="status portal-service-members-status" aria-live="polite"></p>
           </div>
@@ -712,6 +714,21 @@
             <div id="smElectMatches" class="report-block"></div>
             <p id="smAdminStatus" class="status portal-service-members-status" aria-live="polite"></p>
           </div>
+        </div>
+        <div id="staffConsentManageCard" class="card">
+          <h2
+            data-floqr-help-id="help-staff-marketing-consent"
+            data-floqr-help-title="Staff marketing consent"
+            data-floqr-help-body="When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, YouTube and similar) without asking you again for each use. They may not publish your phone number or email. You can withdraw at any time in My Profile on the Services &amp; Service Members tab. This stops new marketing; materials already printed or posted do not have to be recalled. Club Admins see each staff member's consent status in Employee / Worker Network and Featured service staff."
+            data-floqr-help-search="marketing consent|staff marketing consent|use my photos|club can use my photos|withdraw marketing consent|photo consent staff|instagram consent|flyer photo consent"
+          ><span data-i18n="staffConsent.manageTitle">Marketing consent</span></h2>
+          <p id="staffConsentStatus" class="sub"></p>
+          <div id="staffConsentGiveMount" class="staff-marketing-consent-mount hidden"></div>
+          <div class="queue-actions">
+            <button id="staffConsentWithdrawBtn" type="button" class="hidden" data-i18n="staffConsent.withdrawBtn">Withdraw marketing consent</button>
+            <button id="staffConsentGiveBtn" type="button" class="primary hidden" data-i18n="staffConsent.giveBtn">Give marketing consent</button>
+          </div>
+          <p id="staffConsentManageStatus" class="status" aria-live="polite"></p>
         </div>
       </section>
     </div>
@@ -750,6 +767,7 @@
 <script src="./floqr-service-access.js?v=s3.0.30"></script>
 <script src="./floqr-venue-picker.js?v=s3.1.20"></script>
 <script src="./floqr-employee-network.js?v=s3.1.20"></script>
+<script src="./floqr-staff-marketing-consent.js?v=s3.1.20"></script>
 <script src="./floqr-canonical.js?v=s3.0.103"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.0.103"></script>
 <script src="./floqr-consent-mode.js?v=s3.0.103"></script>

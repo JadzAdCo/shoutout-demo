@@ -1398,6 +1398,19 @@
       page: "admin.html"
     },
     {
+      id: "help-staff-marketing-consent",
+      title: "Staff marketing consent",
+      body: "When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, YouTube and similar) without asking you again for each use. They may not publish your phone number or email. You can withdraw at any time in My Profile on the Services & Service Members tab. This stops new marketing; materials already printed or posted do not have to be recalled. Club Admins see each staff member's consent status in Employee / Worker Network and Featured service staff.",
+      searchPhrases: ["marketing consent", "staff marketing consent", "use my photos", "club can use my photos", "withdraw marketing consent", "photo consent staff", "instagram consent", "flyer photo consent"],
+      links: [
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
       id: "help-featured-staff",
       title: "Featured service staff",
       body: "Tick the staff you want on your public club page. For each person, tap one of their FLOQR photos or choose Upload from computer. You can change the role shown under their name. Press Save Public Profile to publish your changes. Before publishing photos, get each person's agreement and tick the photo consent box.",

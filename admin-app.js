@@ -1829,6 +1829,22 @@
     return adminUsers.filter(isLinkedToThisClub).filter(profile => rolesAtThisClub(profile).length);
   }
 
+  // Design notes: .cursor/rules/design-notes-staff-marketing-consent.mdc
+  function staffConsentLabel(uid) {
+    const api = window.FLOQRStaffMarketingConsent;
+    if (!api || !uid) return "";
+    const profile = adminUsers.find(x => (x.uid || x.id) === uid) || {};
+    const designation = window.FLOQREmployeeNetwork?.designationFor(uid, adminDesignations) || null;
+    return api.adminLabel(profile, designation);
+  }
+
+  function staffConsentState(uid) {
+    const api = window.FLOQRStaffMarketingConsent;
+    if (!api || !uid) return "none";
+    const profile = adminUsers.find(x => (x.uid || x.id) === uid) || {};
+    return api.statusOf(profile, window.FLOQREmployeeNetwork?.designationFor(uid, adminDesignations) || null).state;
+  }
+
   function employeeSearchText(profile = {}) {
     return [
       profile.displayName, profile.fullName, profile.username, profile.email, profile.city, profile.country,
@@ -2008,6 +2024,7 @@
           <strong>${esc(profile.displayName || profile.fullName || profile.username || profile.email || "Club worker")}</strong>
           <p>${esc(profile.username ? `@${profile.username}` : profile.email || "")}</p>
           <small>${esc(roles.join(", ") || "Approved worker")}${company ? ` - ${esc(company)}` : ""}</small>
+          <small class="staff-consent-status" data-consent-state="${esc(staffConsentState(uid))}">${esc(staffConsentLabel(uid))}</small>
         </div>
         ${canBeCSR ? `<button type="button" data-uid="${esc(uid)}" data-action="${checked ? "remove" : "add"}">${checked ? "Remove CSR" : "Designate CSR"}</button>` : `<span class="status-pill">${roles.includes("Promoter") ? "Promoter / affiliate" : roles[0] || "Worker"}</span>`}
       </div>`;
@@ -2116,7 +2133,7 @@
       <label class="featured-staff-pick">
         <input type="checkbox" data-fs-check ${row.checked ? "checked" : ""}/>
         <span class="featured-staff-avatar">${avatar}</span>
-        <span class="featured-staff-name"><strong>${esc(row.name)}</strong><small>${esc(subtitle)}</small></span>
+        <span class="featured-staff-name"><strong>${esc(row.name)}</strong><small>${esc(subtitle)}</small>${row.uid ? `<small class="staff-consent-status" data-consent-state="${esc(staffConsentState(row.uid))}">${esc(staffConsentLabel(row.uid))}</small>` : ""}</span>
       </label>
       <div class="featured-staff-details${row.checked ? "" : " hidden"}">
         <label>${esc(featuredStaffText("roleLabel", {}, "Role on the club page"))}<input data-fs-role value="${esc(row.role)}" maxlength="40"/></label>
@@ -2301,7 +2318,7 @@
     const uid = row.uid;
     if (!uid) throw new Error("Worker request has no account id.");
     const role = row.role;
-    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:row.request.email || "", workerName:name, workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+    await db.collection("clubEmployeeDesignations").doc(designationId(uid)).set({clubLocationId:locationId, clubLocationName:loc.locationName || locationId, workerUid:uid, workerEmail:row.request.email || "", workerName:name, workerRoles:firebase.firestore.FieldValue.arrayUnion(role), roleElectionType:role, ...(window.FLOQRStaffMarketingConsent?.designationStamp?.(row.request) || {}), status:"approved", approvedByUid:auth.currentUser?.uid || "", updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
     // Firestore rules only let a patron update their own users doc; the designation row above is the club link.
     try {
       await db.collection("users").doc(uid).set({approvedRoles:firebase.firestore.FieldValue.arrayUnion(role), approvedLocations:firebase.firestore.FieldValue.arrayUnion(locationId), updatedAt:firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
