@@ -1,0 +1,103 @@
+---
+description: PROPOSAL (awaiting owner approval, Oct 2026) — FLOQR data classification + DLP architecture with five access datapoints and a Master Admin Security → Data classification tab. Do not build until approved.
+alwaysApply: false
+---
+
+# Data classification & data security — PROPOSAL (not built)
+
+Resume: `@data-class$`. Status: **awaiting owner approval** (requested Oct 7 2026). Build only after the owner approves; record the decision here.
+
+## Owner ask
+
+Evaluate current data classification, propose an architecture, then (after approval) build classification logic + workflow, with a Master Admin **Security → Data classification** tab. Datapoints: `isPatronAccessible`, `isRegularEmployeeAccessible`, `isPrivilegedEmployeeAccessible`, `isClubAdminAccessible`, `isMasterAdminAccessible`. Translation required.
+
+## Evaluation — where we are today
+
+| Area | Today | Gap |
+|---|---|---|
+| Classification register | **None.** No collection/field carries a sensitivity label. | No single answer to “who may see field X”. |
+| Firestore rules (~125 collections) | ~24 public-read (venues, events, templates, Display kiosk docs), ~32 Master-only (logs, audit, ledgers), the rest scoped per collection with hand-written helpers. | Rules are correct per collection but not derived from a policy; new collections get ad-hoc rules. |
+| Over-exposure (open findings) | `users` (email, phone) readable by **any signed-in user**; `inboxNotifications` readable by any signed-in user; `clubEmployeeDesignations` open to signed-in users. | PII spillage across patrons / clubs. |
+| Roles | Spread across `feature-gates.js`, `floqr-feature-services.js`, `shared-data.js` email lists, `functions/*` `PRIVILEGED_EMAILS`, rules `isMasterAdmin()` (claim **or** email list, lists disagree `bands.don` vs `bans.don`). | No single role source; no custom claims for club roles. |
+| FloqAi / help | Audience tags `patron / serviceMember / venueAdmin / masterAdmin` filter help + intents **in the browser** (`canAccessHelpEntry`). | UX only — anything in the Pages bundle is readable by anyone. |
+| Public feeds | `venuePublicFeed` (secret key, published data only, consent-gated staff photos). | Fine — becomes the model for “Public” class. |
+| Logs | Twilio/mail/compliance logs Master-only, codes HMAC’d, audit chain for Features & Services. | Good; no field-level masking for Club Admin views of logs. |
+
+## Proposed model
+
+### 1. Five access tiers (the owner’s datapoints) + Public
+
+Tiers are **cumulative upward** unless an item is explicitly “own record only”:
+
+| Tier datapoint | Who | Resolved from |
+|---|---|---|
+| `isPatronAccessible` | any signed-in patron (own data + public data) | Firebase Auth |
+| `isRegularEmployeeAccessible` | staff linked to the club (waiter, barman, bottle service, DJ…) | non-rejected `clubEmployeeDesignations` for that club |
+| `isPrivilegedEmployeeAccessible` | staff with a designated permission (`manageSchedules`, door, cashier, manager) | `rolePermissions` on the designation |
+| `isClubAdminAccessible` | Club Admin of that club | `clubAdminAssignments` active / club `adminUids` |
+| `isMasterAdminAccessible` | Master Admin (all data) | custom claim `masterAdmin` (replaces email lists) |
+
+Plus `public` (no sign-in: venue page, events, Display kiosk docs, feeds). Club tiers are **scoped to `locationId`** — a Club Admin of club A is a patron at club B.
+
+Each item stores all five as `0|1` (owner’s naming), plus derived `classificationLevel`:
+
+| Level | Meaning | Typical tier pattern (P / RE / PE / CA / MA) |
+|---|---|---|
+| `public` | Published on purpose | 1 1 1 1 1 + no sign-in |
+| `internal` | Signed-in FLOQR users | 1 1 1 1 1 |
+| `clubConfidential` | Club operations | 0 1 1 1 1 (schedules) or 0 0 1 1 1 (payroll-ish) |
+| `restricted` | PII, payments, security logs | 0 0 0 1 1 (club-scoped) or 0 0 0 0 1 |
+| `secret` | Credentials, OTP, hashes | never readable by clients (Functions only) |
+
+Owner record (`own`) flag: patrons always read **their own** `users/{uid}`, orders, inbox — independent of tier.
+
+### 2. Classification register (source of truth)
+
+Firestore `dataClassification/{collection}` (+ optional `fields.{field}` overrides):
+
+```
+{ collection, description, owner: "club|patron|platform",
+  scopeField: "locationId|clubLocationId|uid|null",
+  isPatronAccessible, isRegularEmployeeAccessible, isPrivilegedEmployeeAccessible,
+  isClubAdminAccessible, isMasterAdminAccessible, ownRecordReadable,
+  classificationLevel, containsPII, retentionDays, fields: { email: {...same flags} },
+  revision, updatedByEmail, updatedAtMs, lastChangeReason }
+```
+
+- Packaged default catalog in `functions/data-classification-core.js` (mirrored client `floqr-data-classification.js`, parity test — same pattern as Features & Services). Seeded on first Master Admin unlock.
+- Writes only via SOS2FA callables (`setDataClassification`, reason ≥ 8, chained audit — reuse `featureServiceAuditLogs` chain or a sibling `dataSecurityAuditLogs`).
+
+### 3. Enforcement (the important part — defense in depth)
+
+1. **Rules generation, not runtime lookup.** Firestore rules cannot cheaply read a register per request. A build script `scripts/generate-classified-rules.js` turns the packaged catalog into rule helpers (`canReadClassified(collection, scopeId)`), and a test fails if `firestore.rules` drifts from the catalog. Changing a tier in the Master Admin tab marks “rules out of date” until the next rules deploy (shown as a red banner).
+2. **Custom claims for roles** (`masterAdmin`, `clubRoles: {locationId: "RE|PE|CA"}`), written by a trigger on designations/assignments, so rules can check tiers without extra reads. Removes the email lists (fixes the `bands/bans` mismatch).
+3. **Sensitive-field split** — PII leaves broadly-readable docs: `users/{uid}` keeps public profile fields; email/phone move to `userPrivate/{uid}` (self + Master Admin, Club Admin via callable with reason). Same for `clubEmployeeDesignations` contact fields. This closes open findings 1–3.
+4. **Callable gate for cross-tier reads** — `getClassifiedRecords({collection, locationId, fields})` (Admin SDK) applies field masking from the register for Club Admin / staff views, logs `data.read` for `restricted`.
+5. **FloqAi server answers** — `getFloqAiIntents` returns only intents/help whose classification fits the caller (moves the filter off the client).
+6. **DLP checks** — Functions tests scan help bodies, public feeds, and Display docs for PII patterns (email, phone, tokens); outbound email/SMS templates validated against `restricted` fields; feed/iframe output already allow-lists fields.
+
+### 4. Master Admin → Security → Data classification (tab)
+
+- Sub-tab `dataClassification` in `#securitySubtabs` (`master.securityDataClassification`).
+- Grid: collection · level badge · five tier toggles (P / RE / PE / CA / MA) · own-record · PII · retention · “rules in sync” dot.
+- Row drawer: field overrides, description, owner, change history (from the audit chain).
+- Actions: Save (SOS2FA + reason), Verify audit chain, Export register (CSV/JSON for auditors), **Access simulator** (“what can a Regular Employee of Club X read?”) and **Exposure report** (collections where rules are broader than the register — today: `users`, `inboxNotifications`, `clubEmployeeDesignations`).
+- i18n: Master-only help may stay English per translation policy, but the tab chrome keys go into all 11 packs (chrome parity).
+
+### 5. Rollout phases (each shippable)
+
+1. Register + packaged catalog + Master Admin tab (read-only simulator + exposure report). No behavior change.
+2. Custom claims trigger; rules accept claim **or** legacy check.
+3. PII split (`userPrivate`, designation contacts) + rule tightening for the three open findings; migration script (dry-run first, owner go-ahead before running on production).
+4. Rules generator + drift test; register edits become “pending deploy”.
+5. Server-side FloqAi intents; DLP content tests; field masking callable.
+
+### Risks
+
+- Phase 3 touches every page that reads another user’s email/phone (Employee Network, picker, scheduling notify). Needs a full click-path pass.
+- Rules size limits (~256 KB / 1000 expressions) — generator must emit shared helpers, not per-field expressions.
+- Club staff with multiple clubs → claims map can grow; cap and fall back to callable.
+
+## Decision log
+
+- Oct 7 2026 — proposal written; waiting for owner approval (or changes) before phase 1.

@@ -56,10 +56,32 @@ test("Club Admin uses the checkbox picker, not a URL text box, for featured staf
   assert.match(html, /data-floqr-help-id="help-featured-staff"/);
   assert.ok(html.indexOf("floqr-featured-staff.js") < html.indexOf("admin-app.js"));
   const app = read("admin-app.js");
-  assert.match(app, /featuredStaff:window\.FLOQRFeaturedStaff\.toFeatured\(featuredStaffRows\(\)\)/);
+  assert.match(app, /const featuredStaff = window\.FLOQRFeaturedStaff\.toFeatured\(featuredStaffRows\(\)\)/);
+  assert.match(app, /featuredStaff,\s*\n\s*\.\.\.staffConsent,/);
   assert.match(app, /accept="image\/jpeg,image\/png,image\/webp,image\/gif" data-fs-upload/);
   assert.match(app, /clubMedia\/\$\{locationId\}\/featuredStaff\//);
   assert.doesNotMatch(app, /clubProfileFeaturedStaff/);
+});
+
+test("photo consent is needed when published staff photos are new or changed", () => {
+  const featured = [{name: "Priya Shah", uid: "u1", photoUrl: PHOTO_A}, {name: "Marcus Hale"}];
+  const sig = FS.photoSignature(featured);
+  assert.equal(sig, `uid:u1|${PHOTO_A}`, "only entries with a photo count");
+  assert.equal(FS.needsPhotoConsent(featured, null), true);
+  assert.equal(FS.needsPhotoConsent(featured, {photoSignature: sig}), false);
+  assert.equal(FS.needsPhotoConsent([{...featured[0], photoUrl: PHOTO_B}], {photoSignature: sig}), true, "changed photo");
+  assert.equal(FS.needsPhotoConsent([{name: "Marcus Hale"}], null), false, "no photos, no consent needed");
+});
+
+test("Club Admin shows the photo consent notice and blocks saving photos without it", () => {
+  const html = read("admin.html");
+  assert.match(html, /id="featuredStaffPhotoConsent" type="checkbox"/);
+  assert.match(html, /data-i18n="featuredStaff\.consentNotice"/);
+  const app = read("admin-app.js");
+  assert.match(app, /function featuredStaffConsentPayload\(/);
+  assert.match(app, /featuredStaffText\("consentRequired"/);
+  assert.match(app, /confirmedByEmail: safeUser\(auth\.currentUser\)/);
+  assert.ok(app.indexOf("featuredStaffConsentPayload(featuredStaff)") < app.indexOf('db.collection("clubLocations").doc(locationId).set(payload'), "consent checked before the write");
 });
 
 test("club profile page still renders featuredStaff unchanged", () => {

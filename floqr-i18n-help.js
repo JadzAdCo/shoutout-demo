@@ -6,9 +6,17 @@
 
   const packs = {
     ru: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Спросите FloqAi о чём угодно в FLOQR своими словами: события и клубы, ShoutOut, Mingl, RydR, BartR, supRstar, ваш профиль, расписания персонала или инструменты Club Admin. В результатах только то, что доступно вашему аккаунту. Гости, персонал, Club Admins и Master Admins видят свои ответы."
+      },
+      "help-club-website-feed": {
+        title: "Фид для сайта клуба",
+        body: "Показывайте опубликованную страницу клуба FLOQR на своём сайте. Нажмите «Создать ключ и ссылки», затем вставьте код iframe на сайт или передайте веб-администратору ссылку JSON или RSS. Фид показывает ближайшие события, избранных диджеев, избранный персонал, галерею и контакты с учётом настроек публичной страницы. Фото персонала появляются, только если согласие на фото подтверждено. Новый ключ отключает старые ссылки, включая ссылки на расписание персонала."
+      },
       "help-featured-staff": {
         title: "Избранный персонал",
-        body: "Отметьте сотрудников для публичной страницы клуба. Для каждого нажмите на одно из его фото в FLOQR или выберите «Загрузить с компьютера». Роль под именем можно изменить. Нажмите «Save Public Profile», чтобы опубликовать."
+        body: "Отметьте сотрудников для публичной страницы клуба. Для каждого нажмите на одно из его фото в FLOQR или выберите «Загрузить с компьютера». Роль под именем можно изменить. Нажмите «Save Public Profile», чтобы опубликовать. Перед публикацией фото получите согласие каждого человека и отметьте поле согласия на фото."
       },
       "help-shoutout-recommendations": {
         title: "Рекомендации ShoutOut",
@@ -30,9 +38,7 @@
       "help-beta-tester": {
 
         title: "Бета-тестирование",
-
         body: "Иногда FLOQR приглашает посетителей попробовать новые функции раньше других. Приглашение приходит во «Входящие»; откройте его, войдя в тот же аккаунт, и нажмите «Принять». После этого в поиске с меткой «Бета» появятся только функции, которые FLOQR выбрал для вас. Во время тестирования они могут меняться или отключаться. Приглашение действует 7 дней и только для аккаунта, на который отправлено."
-
       },
       "help-location-search": {
         title: "Поиск с учётом местоположения",
@@ -240,9 +246,17 @@
       }
     },
     nl: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Vraag FloqAi alles over FLOQR in je eigen woorden: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, supRstar, je profiel, personeelsroosters of Club Admin-tools. De resultaten tonen alleen wat jouw account mag gebruiken. Bezoekers, personeel, Club Admins en Master Admins zien elk hun eigen antwoorden."
+      },
+      "help-club-website-feed": {
+        title: "Feed voor de clubwebsite",
+        body: "Toon je gepubliceerde FLOQR-clubpagina op je eigen website. Tik op ‘Sleutel en links aanmaken’ en plak de iframe-code in je website, of geef je webbeheerder de JSON- of RSS-link. De feed toont komende evenementen, uitgelichte dj’s, uitgelicht personeel, de galerij en contactgegevens, volgens je instellingen voor de openbare pagina. Foto’s van personeel verschijnen alleen als de fototoestemming is bevestigd. Een nieuwe sleutel schakelt de oude links uit, ook de links van het personeelsrooster."
+      },
       "help-featured-staff": {
         title: "Uitgelicht servicepersoneel",
-        body: "Vink het personeel aan dat op de openbare clubpagina moet staan. Tik voor elke persoon op een van hun FLOQR-foto’s of kies ‘Uploaden vanaf computer’. Je kunt de rol onder hun naam aanpassen. Tik op ‘Save Public Profile’ om te publiceren."
+        body: "Vink het personeel aan dat op de openbare clubpagina moet staan. Tik voor elke persoon op een van hun FLOQR-foto’s of kies ‘Uploaden vanaf computer’. Je kunt de rol onder hun naam aanpassen. Tik op ‘Save Public Profile’ om te publiceren. Vraag vóór het publiceren van foto’s ieders toestemming en vink het vakje voor fototoestemming aan."
       },
       "help-shoutout-recommendations": {
         title: "ShoutOut-aanbevelingen",
@@ -264,9 +278,7 @@
       "help-beta-tester": {
 
         title: "Bètatesten",
-
         body: "FLOQR nodigt soms bezoekers uit om nieuwe functies vroeg te proberen. De uitnodiging komt in je Inbox; open die terwijl je bent ingelogd op hetzelfde account en kies Accepteren. Alleen de functies die FLOQR voor jou heeft gekozen verschijnen dan bij Zoeken met het label Bèta. Ze kunnen tijdens het testen veranderen of worden uitgezet. Uitnodigingen verlopen na 7 dagen en werken alleen voor het account waarnaar ze zijn gestuurd."
-
       },
       "help-location-search": {
         title: "Zoeken op locatie",
@@ -474,9 +486,17 @@
       }
     },
     fr: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Demandez à FloqAi tout ce qui concerne FLOQR, avec vos mots : événements et clubs, ShoutOut, Mingl, RydR, BartR, supRstar, votre profil, les plannings du personnel ou les outils Club Admin. Les résultats ne montrent que ce que votre compte peut utiliser. Clients, personnel, Club Admins et Master Admins voient chacun leurs propres réponses."
+      },
+      "help-club-website-feed": {
+        title: "Flux pour le site du club",
+        body: "Affichez votre page de club FLOQR publiée sur votre propre site. Appuyez sur « Générer la clé et les liens », puis collez le code iframe dans votre site ou donnez le lien JSON ou RSS à votre webmaster. Le flux montre les événements à venir, les DJ et le personnel mis en avant, la galerie et les coordonnées, selon vos réglages de page publique. Les photos du personnel n’apparaissent que si le consentement photo est confirmé. Générer une nouvelle clé désactive les anciens liens, y compris ceux du planning du personnel."
+      },
       "help-featured-staff": {
         title: "Personnel mis en avant",
-        body: "Cochez les membres du personnel à afficher sur la page publique du club. Pour chaque personne, touchez une de ses photos FLOQR ou choisissez « Importer depuis l’ordinateur ». Vous pouvez modifier le rôle affiché sous son nom. Appuyez sur « Save Public Profile » pour publier."
+        body: "Cochez les membres du personnel à afficher sur la page publique du club. Pour chaque personne, touchez une de ses photos FLOQR ou choisissez « Importer depuis l’ordinateur ». Vous pouvez modifier le rôle affiché sous son nom. Appuyez sur « Save Public Profile » pour publier. Avant de publier des photos, obtenez l’accord de chaque personne et cochez la case de consentement photo."
       },
       "help-shoutout-recommendations": {
         title: "Recommandations ShoutOut",
@@ -498,9 +518,7 @@
       "help-beta-tester": {
 
         title: "Tests bêta",
-
         body: "FLOQR invite parfois des clients à essayer de nouvelles fonctionnalités en avant-première. L'invitation arrive dans votre boîte de réception ; ouvrez-la en étant connecté au même compte et choisissez Accepter. Seules les fonctionnalités que FLOQR a choisies pour vous apparaissent alors dans la recherche avec l'étiquette Bêta. Elles peuvent changer ou être désactivées pendant les tests. Les invitations expirent après 7 jours et ne fonctionnent que pour le compte destinataire."
-
       },
       "help-location-search": {
         title: "Recherche selon votre position",
@@ -708,9 +726,17 @@
       }
     },
     de: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Frag FloqAi alles über FLOQR in deinen eigenen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, supRstar, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Die Ergebnisse zeigen nur, was dein Konto nutzen darf. Gäste, Personal, Club Admins und Master Admins sehen jeweils ihre eigenen Antworten."
+      },
+      "help-club-website-feed": {
+        title: "Feed für die Club-Website",
+        body: "Zeige deine veröffentlichte FLOQR-Clubseite auf deiner eigenen Website. Tippe auf „Schlüssel und Links erzeugen“ und füge den iframe-Code in deine Website ein oder gib deinem Webadmin den JSON- oder RSS-Link. Der Feed zeigt kommende Events, hervorgehobene DJs und hervorgehobenes Personal, die Galerie und Kontaktdaten gemäß deinen Einstellungen für die öffentliche Seite. Fotos des Personals erscheinen nur, wenn die Foto-Einwilligung bestätigt ist. Ein neuer Schlüssel deaktiviert die alten Links, auch die Links zum Mitarbeiterplan."
+      },
       "help-featured-staff": {
         title: "Hervorgehobenes Servicepersonal",
-        body: "Hake das Personal an, das auf der öffentlichen Clubseite erscheinen soll. Tippe für jede Person auf eines ihrer FLOQR-Fotos oder wähle „Vom Computer hochladen“. Du kannst die Rolle unter dem Namen ändern. Tippe auf „Save Public Profile“, um zu veröffentlichen."
+        body: "Hake das Personal an, das auf der öffentlichen Clubseite erscheinen soll. Tippe für jede Person auf eines ihrer FLOQR-Fotos oder wähle „Vom Computer hochladen“. Du kannst die Rolle unter dem Namen ändern. Tippe auf „Save Public Profile“, um zu veröffentlichen. Hole vor dem Veröffentlichen von Fotos die Zustimmung jeder Person ein und hake das Feld zur Foto-Einwilligung an."
       },
       "help-shoutout-recommendations": {
         title: "ShoutOut-Empfehlungen",
@@ -732,9 +758,7 @@
       "help-beta-tester": {
 
         title: "Beta-Tests",
-
         body: "FLOQR lädt Gäste manchmal ein, neue Funktionen vorab auszuprobieren. Die Einladung kommt in Ihren Posteingang; öffnen Sie sie, während Sie mit demselben Konto angemeldet sind, und wählen Sie Annehmen. Nur die Funktionen, die FLOQR für Sie ausgewählt hat, erscheinen dann in der Suche mit dem Label Beta. Sie können sich während des Tests ändern oder abgeschaltet werden. Einladungen laufen nach 7 Tagen ab und gelten nur für das Konto, an das sie gesendet wurden."
-
       },
       "help-location-search": {
         title: "Standortbezogene Suche",
@@ -942,9 +966,17 @@
       }
     },
     es: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Pregunta a FloqAi lo que quieras sobre FLOQR con tus palabras: eventos y clubs, ShoutOut, Mingl, RydR, BartR, supRstar, tu perfil, horarios del personal o herramientas de Club Admin. Los resultados solo incluyen lo que tu cuenta puede usar. Clientes, personal, Club Admins y Master Admins ven cada uno sus propias respuestas."
+      },
+      "help-club-website-feed": {
+        title: "Feed para la web del club",
+        body: "Muestra tu página de club de FLOQR publicada en tu propia web. Pulsa «Generar clave y enlaces» y pega el código iframe en tu web, o da el enlace JSON o RSS a tu administrador web. El feed muestra próximos eventos, DJ y personal destacados, la galería y los datos de contacto, según los controles de tu página pública. Las fotos del personal solo aparecen si el consentimiento de fotos está confirmado. Generar una clave nueva desactiva los enlaces anteriores, incluidos los del horario del personal."
+      },
       "help-featured-staff": {
         title: "Personal destacado",
-        body: "Marca el personal que quieres en la página pública del club. Para cada persona, toca una de sus fotos de FLOQR o elige «Subir desde el ordenador». Puedes cambiar el puesto que aparece bajo su nombre. Pulsa «Save Public Profile» para publicar."
+        body: "Marca el personal que quieres en la página pública del club. Para cada persona, toca una de sus fotos de FLOQR o elige «Subir desde el ordenador». Puedes cambiar el puesto que aparece bajo su nombre. Pulsa «Save Public Profile» para publicar. Antes de publicar fotos, consigue el permiso de cada persona y marca la casilla de consentimiento de fotos."
       },
       "help-shoutout-recommendations": {
         title: "Recomendaciones de ShoutOut",
@@ -966,9 +998,7 @@
       "help-beta-tester": {
 
         title: "Pruebas beta",
-
         body: "FLOQR a veces invita a clientes a probar funciones nuevas antes que nadie. La invitación llega a tu bandeja de entrada; ábrela con la sesión iniciada en la misma cuenta y elige Aceptar. Solo las funciones que FLOQR eligió para ti aparecerán en la búsqueda con la etiqueta Beta. Pueden cambiar o desactivarse durante las pruebas. Las invitaciones caducan a los 7 días y solo sirven para la cuenta a la que se enviaron."
-
       },
       "help-location-search": {
         title: "Búsqueda según tu ubicación",
@@ -1176,9 +1206,17 @@
       }
     },
     it: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Chiedi a FloqAi qualsiasi cosa su FLOQR con parole tue: eventi e club, ShoutOut, Mingl, RydR, BartR, supRstar, il tuo profilo, gli orari del personale o gli strumenti Club Admin. I risultati includono solo ciò che il tuo account può usare. Clienti, personale, Club Admin e Master Admin vedono ognuno le proprie risposte."
+      },
+      "help-club-website-feed": {
+        title: "Feed per il sito del club",
+        body: "Mostra la pagina del club FLOQR pubblicata sul tuo sito. Tocca «Genera chiave e link», poi incolla il codice iframe nel sito o dai il link JSON o RSS al tuo webmaster. Il feed mostra prossimi eventi, DJ e personale in evidenza, galleria e contatti, secondo le impostazioni della pagina pubblica. Le foto del personale compaiono solo se il consenso per le foto è confermato. Generare una nuova chiave disattiva i vecchi link, compresi quelli dell’orario del personale."
+      },
       "help-featured-staff": {
         title: "Personale in evidenza",
-        body: "Seleziona il personale da mostrare nella pagina pubblica del club. Per ogni persona tocca una delle sue foto FLOQR o scegli «Carica dal computer». Puoi cambiare il ruolo mostrato sotto il nome. Tocca «Save Public Profile» per pubblicare."
+        body: "Seleziona il personale da mostrare nella pagina pubblica del club. Per ogni persona tocca una delle sue foto FLOQR o scegli «Carica dal computer». Puoi cambiare il ruolo mostrato sotto il nome. Tocca «Save Public Profile» per pubblicare. Prima di pubblicare foto, ottieni il consenso di ogni persona e seleziona la casella del consenso per le foto."
       },
       "help-shoutout-recommendations": {
         title: "Consigli ShoutOut",
@@ -1200,9 +1238,7 @@
       "help-beta-tester": {
 
         title: "Test beta",
-
         body: "FLOQR a volte invita i clienti a provare in anteprima nuove funzioni. L'invito arriva nella tua Posta in arrivo; aprilo mentre sei connesso allo stesso account e scegli Accetta. Solo le funzioni che FLOQR ha scelto per te compariranno nella ricerca con l'etichetta Beta. Possono cambiare o essere disattivate durante i test. Gli inviti scadono dopo 7 giorni e valgono solo per l'account a cui sono stati inviati."
-
       },
       "help-location-search": {
         title: "Ricerca in base alla posizione",
@@ -1410,9 +1446,17 @@
       }
     },
     pt: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Pergunte ao FloqAi qualquer coisa sobre o FLOQR com suas palavras: eventos e clubes, ShoutOut, Mingl, RydR, BartR, supRstar, seu perfil, escalas da equipe ou ferramentas de Club Admin. Os resultados mostram só o que sua conta pode usar. Clientes, equipe, Club Admins e Master Admins veem cada um as próprias respostas."
+      },
+      "help-club-website-feed": {
+        title: "Feed para o site do clube",
+        body: "Mostre a página do clube publicada no FLOQR no seu próprio site. Toque em “Gerar chave e links” e cole o código iframe no site, ou passe o link JSON ou RSS para o administrador do site. O feed mostra próximos eventos, DJs e equipe em destaque, galeria e contatos, conforme os controles da página pública. As fotos da equipe só aparecem quando o consentimento de fotos está confirmado. Gerar uma nova chave desativa os links antigos, inclusive os da escala da equipe."
+      },
       "help-featured-staff": {
         title: "Equipe em destaque",
-        body: "Marque a equipe que deve aparecer na página pública do clube. Para cada pessoa, toque em uma das fotos dela no FLOQR ou escolha “Enviar do computador”. Você pode mudar a função exibida abaixo do nome. Toque em “Save Public Profile” para publicar."
+        body: "Marque a equipe que deve aparecer na página pública do clube. Para cada pessoa, toque em uma das fotos dela no FLOQR ou escolha “Enviar do computador”. Você pode mudar a função exibida abaixo do nome. Toque em “Save Public Profile” para publicar. Antes de publicar fotos, obtenha a concordância de cada pessoa e marque a caixa de consentimento de fotos."
       },
       "help-shoutout-recommendations": {
         title: "Recomendações de ShoutOut",
@@ -1434,9 +1478,7 @@
       "help-beta-tester": {
 
         title: "Testes beta",
-
         body: "A FLOQR convida por vezes clientes a experimentar novas funcionalidades mais cedo. O convite chega à sua Caixa de entrada; abra-o com sessão iniciada na mesma conta e escolha Aceitar. Só as funcionalidades que a FLOQR escolheu para si passam a aparecer na pesquisa com a etiqueta Beta. Podem mudar ou ser desativadas durante os testes. Os convites expiram após 7 dias e só funcionam para a conta a que foram enviados."
-
       },
       "help-location-search": {
         title: "Pesquisa por localização",
@@ -1644,9 +1686,17 @@
       }
     },
     el: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Ρωτήστε το FloqAi οτιδήποτε για το FLOQR με δικά σας λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, supRstar, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Τα αποτελέσματα περιλαμβάνουν μόνο ό,τι μπορεί να χρησιμοποιήσει ο λογαριασμός σας. Θαμώνες, προσωπικό, Club Admins και Master Admins βλέπουν ο καθένας τις δικές του απαντήσεις."
+      },
+      "help-club-website-feed": {
+        title: "Ροή για τον ιστότοπο του κλαμπ",
+        body: "Δείξτε τη δημοσιευμένη σελίδα του κλαμπ στο FLOQR στον δικό σας ιστότοπο. Πατήστε «Δημιουργία κλειδιού και συνδέσμων» και επικολλήστε τον κώδικα iframe στον ιστότοπο ή δώστε τον σύνδεσμο JSON ή RSS στον διαχειριστή του. Η ροή δείχνει επερχόμενες εκδηλώσεις, προβεβλημένους DJ και προσωπικό, τη συλλογή και τα στοιχεία επικοινωνίας, σύμφωνα με τις ρυθμίσεις της δημόσιας σελίδας. Οι φωτογραφίες του προσωπικού εμφανίζονται μόνο όταν η συγκατάθεση έχει επιβεβαιωθεί. Ένα νέο κλειδί απενεργοποιεί τους παλιούς συνδέσμους, και αυτούς του προγράμματος προσωπικού."
+      },
       "help-featured-staff": {
         title: "Προβεβλημένο προσωπικό",
-        body: "Επιλέξτε το προσωπικό για τη δημόσια σελίδα του κλαμπ. Για κάθε άτομο, πατήστε μία από τις φωτογραφίες του στο FLOQR ή επιλέξτε «Μεταφόρτωση από υπολογιστή». Μπορείτε να αλλάξετε τον ρόλο κάτω από το όνομα. Πατήστε «Save Public Profile» για δημοσίευση."
+        body: "Επιλέξτε το προσωπικό για τη δημόσια σελίδα του κλαμπ. Για κάθε άτομο, πατήστε μία από τις φωτογραφίες του στο FLOQR ή επιλέξτε «Μεταφόρτωση από υπολογιστή». Μπορείτε να αλλάξετε τον ρόλο κάτω από το όνομα. Πατήστε «Save Public Profile» για δημοσίευση. Πριν δημοσιεύσετε φωτογραφίες, πάρτε τη συμφωνία κάθε ατόμου και επιλέξτε το πλαίσιο συγκατάθεσης."
       },
       "help-shoutout-recommendations": {
         title: "Προτάσεις ShoutOut",
@@ -1668,9 +1718,7 @@
       "help-beta-tester": {
 
         title: "Δοκιμές beta",
-
         body: "Το FLOQR προσκαλεί κάποιες φορές πελάτες να δοκιμάσουν νωρίτερα νέες λειτουργίες. Η πρόσκληση έρχεται στα Εισερχόμενα· ανοίξτε την ενώ είστε συνδεδεμένοι στον ίδιο λογαριασμό και επιλέξτε Αποδοχή. Μόνο οι λειτουργίες που επέλεξε το FLOQR για εσάς εμφανίζονται τότε στην αναζήτηση με την ετικέτα Beta. Μπορεί να αλλάξουν ή να απενεργοποιηθούν κατά τις δοκιμές. Οι προσκλήσεις λήγουν μετά από 7 ημέρες και ισχύουν μόνο για τον λογαριασμό στον οποίο στάλθηκαν."
-
       },
       "help-location-search": {
         title: "Αναζήτηση με βάση την τοποθεσία",
@@ -1878,9 +1926,17 @@
       }
     },
     pl: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "Zapytaj FloqAi o wszystko w FLOQR własnymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, supRstar, Twój profil, grafiki personelu lub narzędzia Club Admin. Wyniki obejmują tylko to, z czego może korzystać Twoje konto. Goście, personel, Club Admini i Master Admini widzą własne odpowiedzi."
+      },
+      "help-club-website-feed": {
+        title: "Kanał dla strony klubu",
+        body: "Pokaż opublikowaną stronę klubu FLOQR na własnej stronie. Naciśnij „Utwórz klucz i linki”, a potem wklej kod iframe na stronę albo przekaż webmasterowi link JSON lub RSS. Kanał pokazuje nadchodzące wydarzenia, wyróżnionych DJ-ów i personel, galerię oraz dane kontaktowe zgodnie z ustawieniami strony publicznej. Zdjęcia personelu pojawiają się tylko po potwierdzeniu zgody na zdjęcia. Nowy klucz wyłącza stare linki, także linki do grafiku personelu."
+      },
       "help-featured-staff": {
         title: "Wyróżniony personel",
-        body: "Zaznacz pracowników, którzy mają być na publicznej stronie klubu. Dla każdej osoby dotknij jednego z jej zdjęć w FLOQR lub wybierz „Prześlij z komputera”. Możesz zmienić rolę pod imieniem. Naciśnij „Save Public Profile”, aby opublikować."
+        body: "Zaznacz pracowników, którzy mają być na publicznej stronie klubu. Dla każdej osoby dotknij jednego z jej zdjęć w FLOQR lub wybierz „Prześlij z komputera”. Możesz zmienić rolę pod imieniem. Naciśnij „Save Public Profile”, aby opublikować. Przed opublikowaniem zdjęć uzyskaj zgodę każdej osoby i zaznacz pole zgody na zdjęcia."
       },
       "help-shoutout-recommendations": {
         title: "Rekomendacje ShoutOut",
@@ -1902,9 +1958,7 @@
       "help-beta-tester": {
 
         title: "Testy beta",
-
         body: "FLOQR czasem zaprasza gości do wcześniejszego wypróbowania nowych funkcji. Zaproszenie trafia do skrzynki odbiorczej; otwórz je, będąc zalogowanym na to samo konto, i wybierz Akceptuj. W wyszukiwaniu z etykietą Beta pojawią się tylko funkcje, które FLOQR dla Ciebie wybrał. Mogą się zmieniać lub zostać wyłączone w trakcie testów. Zaproszenia wygasają po 7 dniach i działają tylko dla konta, na które je wysłano."
-
       },
       "help-location-search": {
         title: "Wyszukiwanie według lokalizacji",
@@ -2112,9 +2166,17 @@
       }
     },
     ar: {
+      "help-floqai-page": {
+        title: "FloqAi",
+        body: "اسأل FloqAi عن أي شيء في FLOQR بكلماتك: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وsupRstar وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تتضمن النتائج فقط ما يمكن لحسابك استخدامه. يرى الرواد والطاقم ومسؤولو النوادي ومسؤولو المنصة كلٌّ إجاباته الخاصة."
+      },
+      "help-club-website-feed": {
+        title: "موجز موقع النادي",
+        body: "اعرض صفحة ناديك المنشورة على FLOQR في موقعك الخاص. اضغط «إنشاء المفتاح والروابط»، ثم الصق رمز iframe في موقعك أو أعطِ مسؤول الموقع رابط JSON أو RSS. يعرض الموجز الفعاليات القادمة ومنسقي الموسيقى والطاقم المميزين ومعرض الصور وبيانات التواصل وفق إعدادات صفحتك العامة. لا تظهر صور الطاقم إلا بعد تأكيد الموافقة على الصور. إنشاء مفتاح جديد يعطّل الروابط القديمة، بما فيها روابط جدول الطاقم."
+      },
       "help-featured-staff": {
         title: "طاقم الخدمة المميز",
-        body: "حدّد أفراد الطاقم الذين تريدهم في صفحة النادي العامة. لكل شخص، اضغط على إحدى صوره في FLOQR أو اختر «رفع من الكمبيوتر». يمكنك تغيير الدور الظاهر تحت اسمه. اضغط «Save Public Profile» للنشر."
+        body: "حدّد أفراد الطاقم الذين تريدهم في صفحة النادي العامة. لكل شخص، اضغط على إحدى صوره في FLOQR أو اختر «رفع من الكمبيوتر». يمكنك تغيير الدور الظاهر تحت اسمه. اضغط «Save Public Profile» للنشر. قبل نشر الصور، احصل على موافقة كل شخص وحدّد مربع الموافقة على الصور."
       },
       "help-shoutout-recommendations": {
         title: "توصيات ShoutOut",
@@ -2136,9 +2198,7 @@
       "help-beta-tester": {
 
         title: "الاختبار التجريبي",
-
         body: "تدعو FLOQR أحيانًا الزوار لتجربة ميزات جديدة مبكرًا. تصل الدعوة إلى صندوق الوارد؛ افتحها وأنت مسجّل الدخول بالحساب نفسه واختر قبول. ستظهر بعد ذلك في البحث مع شارة تجريبي الميزات التي اختارتها FLOQR لك فقط. قد تتغير أو تُوقَف أثناء الاختبار. تنتهي صلاحية الدعوات بعد 7 أيام ولا تعمل إلا للحساب الذي أُرسلت إليه."
-
       },
       "help-location-search": {
         title: "البحث حسب الموقع",

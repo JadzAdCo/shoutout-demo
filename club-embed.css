@@ -1,0 +1,25 @@
+body.club-embed{margin:0;background:#0b1220;color:#e8f0ff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.club-embed.theme-light{background:#fff;color:#111827}
+.club-embed-shell{padding:16px 18px 20px;display:grid;gap:16px}
+.club-embed-head{display:flex;gap:12px;align-items:center}
+.club-embed-logo{width:56px;height:56px;border-radius:14px;object-fit:cover;background:#1f2a44}
+.club-embed-head h1{margin:0;font-size:22px}
+.club-embed-sub{margin:2px 0 0;opacity:.75;font-size:14px}
+.club-embed-status{margin:0;opacity:.75;font-size:14px}
+.club-embed-section h2{margin:0 0 10px;font-size:17px;letter-spacing:.02em}
+.club-embed-events{display:grid;gap:10px}
+.club-embed-event{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.06)}
+.theme-light .club-embed-event,.theme-light .club-embed-person{background:#f3f4f6}
+.club-embed-event img,.club-embed-event .club-embed-flyer{width:72px;height:72px;border-radius:10px;object-fit:cover;background:#1f2a44}
+.club-embed-event strong{display:block;font-size:15px}
+.club-embed-event small{display:block;opacity:.75;margin-top:2px}
+.club-embed-event a{display:inline-block;margin-top:6px;color:#7cc4ff;font-weight:600;text-decoration:none}
+.club-embed-people{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.club-embed-person{padding:10px;border-radius:14px;background:rgba(255,255,255,.06);text-align:center}
+.club-embed-person img,.club-embed-person .club-embed-initial{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#1f2a44;font-size:30px;font-weight:700;color:#e8f0ff}
+.club-embed-person strong{display:block;font-size:14px}
+.club-embed-person small{display:block;opacity:.75}
+.club-embed-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.club-embed-gallery img,.club-embed-gallery video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:#1f2a44}
+.club-embed-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;opacity:.75}
+.club-embed-foot a{color:inherit;font-weight:600}

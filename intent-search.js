@@ -739,7 +739,7 @@
       blurb: "Pick a club, choose a template (free Black & White Classic, or FloqAi for paid themes), pay if needed, and send to the live display.",
       links: [
         {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
-        {label: "Ask FloqAi for templates", href: `./?v=${APP_V}&start=intent`}
+        {label: "Ask FloqAi for templates", href: `./floqai.html?v=${APP_V}`}
       ],
       patterns: [/how\s+(do\s+i|to)\s+(throw|send|make)\s*(a\s*)?shout/, /want\s+to\s+(throw|send)\s*(a\s*)?shout/]
     },
@@ -761,7 +761,7 @@
       blurb: "Search Soccer, Jersey, or a country/club name (Tanzania, Chelsea). Cards show the real LED kit. Pick name + 2-character mark. Boards: 96×48, 64×48, 64×32.",
       links: [
         {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`},
-        {label: "Ask FloqAi for jersey templates", href: `./?v=${APP_V}&start=intent`}
+        {label: "Ask FloqAi for jersey templates", href: `./floqai.html?v=${APP_V}`}
       ],
       patterns: [/soccer\s*jersey/, /\bjersey\b/, /tanzania\s*jersey/, /football\s*kit/, /country\s*jersey/, /club\s*jersey/]
     },
@@ -1033,6 +1033,14 @@
       .replace(/"/g, "&quot;");
   }
 
+  function tr(key, fallback) {
+    try {
+      const out = global.FLOQRI18n?.t?.(key);
+      if (out && out !== key) return out;
+    } catch (_) {}
+    return fallback;
+  }
+
   function renderHelpCard(intent) {
     const steps = (intent.steps || []).map(step => `<li>${esc(step)}</li>`).join("");
     const links = (intent.links || []).map(link =>
@@ -1040,7 +1048,7 @@
     ).join("");
     return `
       <article class="card intent-result-card intent-help-card" data-intent="${esc(intent.id)}" data-kind="help">
-        <p class="eyebrow">I want to be able to…</p>
+        <p class="eyebrow">${esc(tr("floqai.wantTo", "I want to be able to…"))}</p>
         <strong>${esc(intent.label)}</strong>
         <span>${esc(intent.blurb)}</span>
         ${steps ? `<ol class="intent-help-steps">${steps}</ol>` : ""}
@@ -1063,7 +1071,7 @@
       return;
     }
     if (!intents.length) {
-      container.innerHTML = `<div class="card intent-result-empty"><strong>No clear match yet</strong><p class="sub small">Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a help-popout phrase like “Onboarding” / “link to onboarding.”</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">Onboarding / role access</a><a href="./?v=${APP_V}&start=search">Open classic Search</a></div></div>`;
+      container.innerHTML = `<div class="card intent-result-empty"><strong>${esc(tr("floqai.noMatch", "No clear match yet"))}</strong><p class="sub small">${esc(tr("floqai.noMatchHint", "Try a product (Mingl, RydR, BartR, ShoutOut), a goal like “I want to be a Club Admin,” or a phrase like “Onboarding”."))}</p><div class="floqai-help-links"><a href="${vUrl("./role-request.html", {from: "floqai"})}">${esc(tr("floqai.onboardingLink", "Onboarding / role access"))}</a><a href="./?v=${APP_V}&start=search">${esc(tr("floqai.classicSearch", "Open classic Search"))}</a></div></div>`;
       return;
     }
     container.innerHTML = intents.map(intent =>

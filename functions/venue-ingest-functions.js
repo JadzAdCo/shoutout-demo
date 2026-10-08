@@ -19,6 +19,10 @@ const {
   DEFAULT_ORIGIN,
   DEFAULT_API
 } = require("./venue-ingest-core");
+const crypto = require("crypto");
+const clubFeed = require("./club-public-feed-core");
+
+const CLUB_DATASETS = new Set(["profile", "staff", "djs", "events", "gallery", "club", "all"]);
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -62,16 +66,36 @@ function ownerKey(locationId) {
   return `club:${text(locationId, 160)}`;
 }
 
-function publicProfileView(club = {}, locationId = "") {
+async function loadPublicEvents(locationId) {
+  const rows = new Map();
+  for (const field of ["locationId", "clubLocationId"]) {
+    const snap = await db.collection("events").where(field, "==", locationId).limit(80).get();
+    snap.docs.forEach(doc => rows.set(doc.id, {id: doc.id, ...doc.data()}));
+  }
+  return Array.from(rows.values());
+}
+
+async function loadPublicMedia(locationId) {
+  const snap = await db.collection("clubMedia").where("clubLocationId", "==", locationId).limit(40).get();
+  return snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+}
+
+async function clubDatasets(club, locationId, dataset) {
+  const want = key => dataset === key || dataset === "club" || dataset === "all";
+  if (!clubFeed.isProfilePublished(club)) {
+    return {published: false};
+  }
+  const [events, media] = await Promise.all([
+    want("events") ? loadPublicEvents(locationId) : [],
+    want("gallery") ? loadPublicMedia(locationId) : []
+  ]);
   return {
-    locationId,
-    name: text(club.locationName || club.brandName || club.name, 160),
-    tagline: text(club.tagline, 200),
-    address: text(club.address || club.formattedAddress, 220),
-    city: text(club.city, 80),
-    phone: text(club.publicPhone || club.phone, 40),
-    website: text(club.website, 200),
-    timeZone: text(club.timeZone, 80)
+    published: true,
+    profile: want("profile") ? clubFeed.profileView(club, locationId, DEFAULT_ORIGIN) : undefined,
+    staff: want("staff") ? clubFeed.staffView(club) : undefined,
+    djs: want("djs") ? clubFeed.djsView(club) : undefined,
+    events: want("events") ? clubFeed.eventsView(events, Date.now(), club) : undefined,
+    gallery: want("gallery") ? clubFeed.galleryView(media, club) : undefined
   };
 }
 
@@ -161,21 +185,60 @@ async function handlePublicVenueCalendar(req, res) {
   const club = clubSnap.data() || {};
   const venueName = text(club.locationName || club.brandName || locationId, 160);
   const revision = Number(club.publicScheduleRevision || 0) || 0;
-  const etag = `"sched-${locationId}-${revision}"`;
-  setCors(res, revision);
-  res.set("ETag", etag);
-  if (text(req.get("if-none-match"), 80) === etag) {
-    res.status(304).send("");
-    return;
+  const wantClub = CLUB_DATASETS.has(dataset);
+  if (!wantClub) {
+    const etag = `"sched-${locationId}-${revision}"`;
+    setCors(res, revision);
+    res.set("ETag", etag);
+    if (text(req.get("if-none-match"), 80) === etag) {
+      res.status(304).send("");
+      return;
+    }
   }
   const wantSchedule = dataset === "schedule" || dataset === "all" || dataset === "calendar";
-  const wantHours = dataset === "hours" || dataset === "all";
-  const wantProfile = dataset === "profile" || dataset === "all";
+  const wantHours = dataset === "hours" || dataset === "all" || dataset === "club";
   const assignments = wantSchedule
     ? await loadConfirmedPublicAssignments(locationId, {id: locationId, name: venueName})
     : [];
+  const clubData = wantClub ? await clubDatasets(club, locationId, dataset) : {};
   const urls = feedUrls({locationId, secret, origin: DEFAULT_ORIGIN, apiBase: DEFAULT_API});
   console.info("publicVenueCalendar.ok", {locationId, dataset, count: assignments.length, revision});
+  if (wantClub) {
+    const body = format === "rss"
+      ? clubFeed.buildEventsRss({
+        venueName,
+        feedUrl: urls.eventsRss,
+        pageUrl: clubFeed.profileView(club, locationId, DEFAULT_ORIGIN).publicPageUrl,
+        events: clubData.published ? (clubData.events || clubFeed.eventsView(await loadPublicEvents(locationId), Date.now(), club)) : []
+      })
+      : JSON.stringify({
+        ok: true,
+        locationId,
+        venueName,
+        dataset,
+        published: clubData.published,
+        revision,
+        assignments: wantSchedule ? assignments : undefined,
+        shifts: wantSchedule ? assignments : undefined,
+        hours: wantHours && clubData.published ? publicHoursView(club) : undefined,
+        profile: clubData.profile,
+        staff: clubData.staff,
+        djs: clubData.djs,
+        events: clubData.events,
+        gallery: clubData.gallery,
+        embeds: {iframe: urls.iframe, rss: urls.rss, json: urls.json, clubIframe: urls.clubIframe, eventsRss: urls.eventsRss, club: urls.club}
+      });
+    const etag = `"club-${crypto.createHash("sha1").update(body).digest("hex").slice(0, 20)}"`;
+    res.set("Cache-Control", "public, max-age=60, must-revalidate");
+    res.set("ETag", etag);
+    if (text(req.get("if-none-match"), 80) === etag) {
+      res.status(304).send("");
+      return;
+    }
+    res.set("Content-Type", format === "rss" ? "application/rss+xml; charset=utf-8" : "application/json; charset=utf-8");
+    res.status(200).send(body);
+    return;
+  }
   if (format === "rss") {
     res.set("Content-Type", "application/rss+xml; charset=utf-8");
     res.status(200).send(buildScheduleRss({
@@ -202,7 +265,6 @@ async function handlePublicVenueCalendar(req, res) {
     assignments: wantSchedule ? assignments : undefined,
     shifts: wantSchedule ? assignments : undefined,
     hours: wantHours ? publicHoursView(club) : undefined,
-    profile: wantProfile ? publicProfileView(club, locationId) : undefined,
     embeds: {
       iframe: urls.iframe,
       rss: urls.rss,
@@ -233,6 +295,7 @@ exports.rotateVenueIngestSecret = onCall({region: "us-central1", timeoutSeconds:
     secretPrefix: obfuscateSecret(secret),
     urls,
     iframeSnippet: iframeSnippet(urls.iframe),
+    clubIframeSnippet: iframeSnippet(urls.clubIframe, "Club events and team"),
     warning: "ONE-TIME REVEAL: copy the secret and URLs now. The full secret is not shown again until you rotate."
   };
 });
@@ -256,6 +319,9 @@ exports.getVenueIngestEndpoints = onCall({region: "us-central1", timeoutSeconds:
       json: `${urls.json}`,
       rss: `${urls.rss}`,
       iframe: `${urls.iframe}`,
+      club: urls.club,
+      eventsRss: urls.eventsRss,
+      clubIframe: urls.clubIframe,
       apiBase: DEFAULT_API
     },
     hint: configured
@@ -264,8 +330,10 @@ exports.getVenueIngestEndpoints = onCall({region: "us-central1", timeoutSeconds:
   };
 });
 
-/** Public GET: Confirmed assignments only. ?location=&secret=&format=json|rss&dataset=schedule|hours|profile|all
- * status= query is ignored. Never returns Draft / Pending / Open / cancelled.
+/** Public GET: ?location=&secret=&format=json|rss&dataset=schedule|hours|profile|staff|djs|events|gallery|club|all
+ * Schedule = Confirmed assignments only (status= ignored). Club datasets require a published public profile;
+ * staff photos only when the Club Admin photo-consent signature covers them.
+ * Design notes: .cursor/rules/design-notes-club-website-feed.mdc
  */
 exports.venuePublicFeed = onRequest({
   region: "us-central1",

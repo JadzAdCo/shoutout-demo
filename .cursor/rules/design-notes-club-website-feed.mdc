@@ -1,0 +1,66 @@
+---
+description: Club website feed — published club page data (events, DJs, featured staff, gallery, profile) for the club's own website via secret JSON API, events RSS, and club-embed.html iframe (s3.1.20)
+alwaysApply: false
+---
+
+# Club website feed (s3.1.20)
+
+Resume: `@club-feed$` / `$website-feed$`.
+
+Owner ask (Oct 7 2026): data pushed to a club's FLOQR public profile must be usable on the club's official website (schedule, approved staff list + pictures, events…). Club Admins and their web admin consume it.
+
+## Technology choice
+
+One secret-keyed HTTPS endpoint, three outputs — reuses the existing `venuePublicFeed` (no new infra):
+
+| Output | For | Why |
+|---|---|---|
+| **iframe** `club-embed.html?location=&secret=[&sections=events,djs,staff,gallery][&theme=light][&lang=fr]` | Non-technical admins (Wix, Squarespace, WordPress) | Paste once, always current, styled, i18n |
+| **JSON API** `venuePublicFeed?…&dataset=club` | Web admins building their own layout | CORS `*`, ETag, cacheable |
+| **RSS** `venuePublicFeed?…&format=rss&dataset=events` | CMS widgets, Zapier, newsletters | Universal reader format |
+
+Not chosen: open public API without key (scraping, abuse), webhooks (club sites rarely host receivers), oEmbed (no consumer benefit over iframe).
+
+## Endpoint contract (`functions/venue-ingest-functions.js`)
+
+`GET venuePublicFeed | publicVenueCalendar ?location=&secret=&format=json|rss&dataset=…`
+
+- `schedule` (default) / `hours` — unchanged (Confirmed shifts only; ETag `sched-{id}-{publicScheduleRevision}`).
+- Club datasets `profile | staff | djs | events | gallery | club | all` → `clubDatasets()`:
+  - Gate: `isProfilePublished` (`publicProfilePublished !== false`, `publicVisible !== false`, not `offboarded`). Unpublished → `{ok:true, published:false}` and no club data.
+  - Honors **Public page controls** (`publicProfileSections`): `featuredStaff`, `featuredDjs`, `upcomingEvents`, `gallery`, `contact` (phone/email/socials).
+  - Staff photos only when `featuredStaffPhotoConsent.photoSignature === photoSignature(featuredStaff)` (same algorithm as `floqr-featured-staff.js`; parity test). Otherwise name/role/instagram only.
+  - `club` = profile + hours + staff + djs + events + gallery. `all` = that + schedule (back-compat keys `assignments`, `shifts`, `embeds.iframe|rss|json`).
+  - ETag = sha1 of the body (data changes without a schedule revision bump); `Cache-Control: public, max-age=60`.
+- Profile reads the fields Club Admin saves: `officialWebsite || website`, `publicPhone || telephone || phone` (old `publicProfileView` read `website`/`phone` only — fixed by removal).
+- Events: `events` where `locationId|clubLocationId == id`, drop `deleted/cancelled/rejected/draft`, upcoming (≥ now − 12 h) first, max 30, https image/ticket only.
+- Pure shaping: `functions/club-public-feed-core.js` (no Firebase). Tests: `functions/club-public-feed.test.js`, `venue-ingest-core.test.js`.
+
+## Key / secret
+
+- `venueIngestSecrets/{locationId}` holds only `secretHash` + `secretPrefix`. One key per venue serves **both** the staff schedule links and the club feed.
+- `rotateVenueIngestSecret` (callable, `canManageClub`) returns the secret once plus `urls` (`json, rss, hours, profile, all, iframe, club, staff, events, gallery, eventsRss, clubIframe`) and `iframeSnippet` / `clubIframeSnippet`. `getVenueIngestEndpoints` returns `configured` + prefix + templates.
+- The key is a **publish token**, not a secret from the public: anyone viewing the club website's HTML can read it. Only publishable data goes through the feed. Rotate to revoke.
+- Rotating breaks every old link (schedule + club). Club Admin UI warns and `confirm()`s when a key already exists.
+
+## Club Admin UI
+
+`admin.html` → Club Public Profile → `.website-feed-card` under Save Public Profile: status (`getVenueIngestEndpoints`), **Generate feed key and links** (`rotateVenueIngestSecret`), one-time outputs (iframe code, JSON link, RSS link), Copy. `admin-scheduling.js` website-ingest block stays as is (schedule-only).
+
+## Public iframe
+
+`club-embed.html` / `.js` / `.css`: `data-floqr-public` (no session redirect), no Firebase SDK, no `firebase-config.js`, `referrer: no-referrer`. Fetches `dataset=club`. `?lang=` forces a supported language (no persist to a user). Escapes all text; only https media.
+
+## i18n / help
+
+Chrome `websiteFeed.*` (16) + `page.clubEmbed.*` (13) × 11 packs. Help `help-club-website-feed` (venueAdmin) in `admin.html`, `floqai-help-repository.js`, `_help-en.json`, 10 help packs. Script: `scripts/add-club-website-feed-i18n.js`.
+
+## Cutover
+
+`DEFAULT_ORIGIN` (github.io) builds `clubIframe` + `publicPageUrl`. At cutover switch to `https://www.floqr.com` (see `cutoffrequirement.mdc`); existing iframes on club sites keep working only while Pages stays up — tell clubs to re-copy the iframe after cutover. API host (cloudfunctions) is unaffected.
+
+## Next (not built)
+
+- Per-venue usage counter + abuse alert; Firestore-backed rate limit (current limiter is in-memory per instance, 60/min per IP+venue).
+- Optional `allowedOrigins` per venue (frame-ancestors / CORS allowlist).
+- Auto-height `postMessage` for the iframe.

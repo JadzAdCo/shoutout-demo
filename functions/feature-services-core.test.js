@@ -203,7 +203,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   ["minglBtnCard", "bartrBtnCard", "rydrBtnCard", "suprstrBtnCard", "intentSearchBtnCard"].forEach(id => {
     assert.match(html, new RegExp(`id="${id}" class="[^"]*\\bhidden\\b[^"]*"[^>]*data-feature-key=`), id);
   });
-  assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.110/);
+  assert.match(html, /floqr-feature-services\.js\?v=s3\.1\.20/);
   const app = read("patron-app.js");
   assert.match(app, /FLOQRFeatureServices\?\.applySearchUi/);
   assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("floqAi"\)/, "start=intent must not bypass the floqAi gate");
@@ -221,7 +221,7 @@ test("test-feature satellite pages are guarded", () => {
   Object.entries(pages).forEach(([file, key]) => {
     const html = read(file);
     assert.match(html, new RegExp(`<body[^>]*data-floqr-feature="${key}"`), file);
-    assert.match(html, /floqr-feature-services\.js\?v=s3\.0\.110/, file);
+    assert.match(html, /floqr-feature-services\.js\?v=s3\.1\.20/, file);
     assert.doesNotMatch(html, /data-floqr-feature-signed-out="allow"/, `${file} must send signed-out visitors to sign-in`);
   });
   assert.match(guard, /if \(!root\.FLOQRSessionShell\?\.redirectToLogin\?\.\(\)\) showDenied\(doc\)/);

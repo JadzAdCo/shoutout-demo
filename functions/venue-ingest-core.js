@@ -61,13 +61,19 @@ function feedUrls({locationId = "", secret = "", origin = DEFAULT_ORIGIN, apiBas
     hours: `${api}?${qs}&format=json&dataset=hours`,
     profile: `${api}?${qs}&format=json&dataset=profile`,
     all: `${api}?${qs}&format=json&dataset=all`,
-    iframe: `${site}/schedule-embed.html?${qs}`
+    iframe: `${site}/schedule-embed.html?${qs}`,
+    club: `${api}?${qs}&format=json&dataset=club`,
+    staff: `${api}?${qs}&format=json&dataset=staff`,
+    events: `${api}?${qs}&format=json&dataset=events`,
+    gallery: `${api}?${qs}&format=json&dataset=gallery`,
+    eventsRss: `${api}?${qs}&format=rss&dataset=events`,
+    clubIframe: `${site}/club-embed.html?${qs}`
   };
 }
 
-function iframeSnippet(iframeUrl = "") {
+function iframeSnippet(iframeUrl = "", title = "Staff schedule") {
   const src = xmlEscape(iframeUrl);
-  return `<iframe src="${src}" title="Staff schedule" loading="lazy" referrerpolicy="no-referrer" style="width:100%;min-height:520px;border:0;border-radius:16px;background:#0b1220"></iframe>`;
+  return `<iframe src="${src}" title="${xmlEscape(title)}" loading="lazy" referrerpolicy="no-referrer" style="width:100%;min-height:520px;border:0;border-radius:16px;background:#0b1220"></iframe>`;
 }
 
 function buildScheduleRss({venueName = "FLOQR", feedUrl = "", shifts = []} = {}) {

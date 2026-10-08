@@ -26,6 +26,7 @@
   let adminUsers = [];
   let adminDesignations = [];
   const featuredStaffDraft = new Map();
+  let featuredStaffConsentSig = "";
   let selectedElectionUid = "";
   let pendingWorkerRows = [];
   let workerAssociationRequests = [];
@@ -356,7 +357,9 @@
     if (byId("clubCommerceStoreName")) byId("clubCommerceStoreName").value = publicClubProfile.commerceStoreName || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`;
     if (byId("clubProfileFeaturedDjs")) byId("clubProfileFeaturedDjs").value = peopleLines(publicClubProfile.featuredDjs);
     featuredStaffDraft.clear();
+    featuredStaffConsentSig = publicClubProfile.featuredStaffPhotoConsent?.photoSignature || "";
     renderFeaturedStaffPicker();
+    loadWebsiteFeedStatus();
     if (byId("clubProfilePromotionGroups")) byId("clubProfilePromotionGroups").value = peopleLines(publicClubProfile.promotionGroups || publicClubProfile.featuredPromotionGroups);
     if (byId("clubProfilePublished")) byId("clubProfilePublished").checked = publicClubProfile.publicProfilePublished !== false;
     const sectionSettings = publicClubProfile.publicProfileSections || {};
@@ -480,6 +483,8 @@
     const locationLabel = window.FLOQRAddress?.publicLocation(addressRecord) || [city, country].filter(Boolean).join(", ");
     const floqrHandle = window.FLOQRIdentity?.normalizeFloqrHandle?.(byId("clubProfileFloqrHandle")?.value || "") || "";
     const displayUrl = stableVenueDisplayUrl();
+    const featuredStaff = window.FLOQRFeaturedStaff.toFeatured(featuredStaffRows());
+    const staffConsent = featuredStaffConsentPayload(featuredStaff);
     const payload = {
       logoUrl:byId("clubProfileLogoUrl")?.value.trim() || "",
       tagline:byId("clubProfileTagline")?.value.trim() || "",
@@ -515,7 +520,8 @@
       commerceEnabled:!!byId("clubCommerceEnabled")?.checked,
       commerceStoreName:byId("clubCommerceStoreName")?.value.trim() || `${publicClubProfile.locationName || loc.locationName || "Club"} Shop`,
       featuredDjs:parsePeopleLines(byId("clubProfileFeaturedDjs")?.value || "", "DJ"),
-      featuredStaff:window.FLOQRFeaturedStaff.toFeatured(featuredStaffRows()),
+      featuredStaff,
+      ...staffConsent,
       promotionGroups:parsePeopleLines(byId("clubProfilePromotionGroups")?.value || "", "Promotion Group"),
       VenueSupports96x48: screenFlags.VenueSupports96x48,
       VenueSupports64x48: screenFlags.VenueSupports64x48,
@@ -2151,6 +2157,105 @@
         uploadFeaturedStaffPhoto(key, name, event.target.files?.[0]);
       });
     });
+    syncFeaturedStaffConsent(rows);
+  }
+
+  function featuredStaffPhotoSig(rows = featuredStaffRows()) {
+    return window.FLOQRFeaturedStaff.photoSignature(window.FLOQRFeaturedStaff.toFeatured(rows));
+  }
+
+  function syncFeaturedStaffConsent(rows) {
+    const box = byId("featuredStaffPhotoConsent");
+    if (!box) return;
+    if (!box.dataset.bound) {
+      box.dataset.bound = "1";
+      box.addEventListener("change", () => {
+        featuredStaffConsentSig = box.checked ? featuredStaffPhotoSig() : "";
+      });
+    }
+    const sig = featuredStaffPhotoSig(rows);
+    box.checked = !!sig && sig === featuredStaffConsentSig;
+    const stored = publicClubProfile.featuredStaffPhotoConsent;
+    const date = stored?.confirmedAtIso ? new Date(stored.confirmedAtIso).toLocaleDateString() : "";
+    setText("featuredStaffConsentRecord", stored && sig && stored.photoSignature === sig
+      ? featuredStaffText("consentRecorded", {email: stored.confirmedByEmail || "", date}, "Consent confirmed by {email} on {date}.")
+      : "");
+  }
+
+  function featuredStaffConsentPayload(featured) {
+    const api = window.FLOQRFeaturedStaff;
+    const sig = api.photoSignature(featured);
+    if (!sig) return {};
+    const stored = publicClubProfile.featuredStaffPhotoConsent;
+    if (!api.needsPhotoConsent(featured, stored)) return {featuredStaffPhotoConsent: stored};
+    if (!byId("featuredStaffPhotoConsent")?.checked || featuredStaffConsentSig !== sig) {
+      throw new Error(featuredStaffText("consentRequired", {}, "Tick the photo consent box before publishing staff photos."));
+    }
+    return {
+      featuredStaffPhotoConsent: {
+        photoSignature: sig,
+        photoCount: featured.filter(entry => entry.photoUrl).length,
+        confirmedByUid: auth.currentUser?.uid || "",
+        confirmedByEmail: safeUser(auth.currentUser),
+        confirmedAtIso: new Date().toISOString()
+      }
+    };
+  }
+
+  // Design notes: .cursor/rules/design-notes-club-website-feed.mdc
+  let websiteFeedConfigured = false;
+
+  function websiteFeedText(key, params = {}, fallback = "") {
+    const value = window.FLOQRI18n?.t?.(`websiteFeed.${key}`, params);
+    return value && value !== `websiteFeed.${key}` ? value : fallback;
+  }
+
+  async function loadWebsiteFeedStatus() {
+    if (!byId("websiteFeedStatus") || !locationId) return;
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("getVenueIngestEndpoints");
+      const {data} = await callable({locationId});
+      websiteFeedConfigured = !!data?.configured;
+      setText("websiteFeedStatus", websiteFeedConfigured
+        ? websiteFeedText("active", {prefix: data.secretPrefix || ""}, "Feed key active ({prefix}). Generate a new one to see the links again.")
+        : websiteFeedText("none", {}, "No feed key yet."));
+    } catch (error) {
+      setText("websiteFeedStatus", websiteFeedText("statusFailed", {}, "Could not check the feed key. You may not have permission for this venue."));
+    }
+  }
+
+  async function generateWebsiteFeed() {
+    if (websiteFeedConfigured && !window.confirm(websiteFeedText("rotateWarning", {}, "Generating a new key turns off the old links, including the staff schedule links. Update your website afterwards."))) return;
+    const button = byId("websiteFeedGenerateBtn");
+    if (button) button.disabled = true;
+    setText("websiteFeedStatus", websiteFeedText("generating", {}, "Generating…"));
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("rotateVenueIngestSecret");
+      const {data} = await callable({locationId});
+      const urls = data?.urls || {};
+      if (!urls.clubIframe) throw new Error("Feed links missing. Functions may need a redeploy.");
+      byId("websiteFeedIframe").value = data.clubIframeSnippet || `<iframe src="${urls.clubIframe}" loading="lazy" style="width:100%;min-height:640px;border:0"></iframe>`;
+      byId("websiteFeedJson").value = urls.club || "";
+      byId("websiteFeedRss").value = urls.eventsRss || "";
+      byId("websiteFeedOutput").hidden = false;
+      websiteFeedConfigured = true;
+      setText("websiteFeedStatus", websiteFeedText("ready", {}, "New feed key ready. Copy the links below."));
+    } catch (error) {
+      setText("websiteFeedStatus", websiteFeedText("failed", {message: error.message || String(error)}, "Could not generate the feed: {message}"));
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function copyWebsiteFeedIframe() {
+    const value = byId("websiteFeedIframe")?.value || "";
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setText("websiteFeedStatus", websiteFeedText("copied", {}, "Iframe code copied."));
+    } catch (error) {
+      byId("websiteFeedIframe").select();
+    }
   }
 
   async function uploadFeaturedStaffPhoto(key, name, file) {
@@ -2900,6 +3005,8 @@
     bind("adminMfaVerifyBtn", verifyAdminMfaCode);
     bind("adminMfaCancelBtn", logout);
     bind("saveClubPublicProfileBtn", saveClubPublicProfile);
+    bind("websiteFeedGenerateBtn", generateWebsiteFeed);
+    bind("websiteFeedCopyBtn", copyWebsiteFeedIframe);
     bind("clubStripeConnectBtn", startClubConnectOnboarding);
     bind("clubStripeConnectRefreshBtn", refreshClubConnectStatus);
     bind("refreshReconciliationBtn", loadClubPaymentLedger);

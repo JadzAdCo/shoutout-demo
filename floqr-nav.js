@@ -5,7 +5,7 @@
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Generated in-app links (Venue Links, FloqAi, Back) stamp this at render time.
      Never copy the page's ?v= — old bookmarks would keep minting old Club Admin URLs. */
-  const APP_V = "s3.1.19";
+  const APP_V = "s3.1.20";
 
   function navT(key, fallback) {
     try {
@@ -197,12 +197,15 @@
     applyStartPage(showPage) {
       if (typeof showPage !== "function") return;
       const start = String(qs("start") || "").toLowerCase();
-      if (start === "intent" || start === "ask" || start === "wish") showPage("intentSearchPage");
+      if (start === "intent" || start === "ask" || start === "wish") {
+        const q = qs("q");
+        global.location.replace(buildUrl("./floqai.html", { v: APP_V, ...(q ? { q } : {}) }));
+      }
       else if (start === "search" || start === "categories" || start === "category") showPage("categoryPage");
       else if (start === "mingl") showPage("minglLandingPage");
     },
     intentSearchHome() {
-      return `./?v=${APP_V}&start=intent`;
+      return buildUrl("./floqai.html", { v: APP_V });
     }
   };
 

@@ -10,7 +10,7 @@ const FEATURE_CATALOG = Object.freeze([
   {key: "bartr", label: "Trade by BartR", patronGate: "bartr", route: "./commerce.html?from=search", sortOrder: 30, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "rydr", label: "RydR", patronGate: "rydr", route: "./rydr.html?from=search", sortOrder: 40, IsFeatureEnabled: 0, IsTestFeature: 1},
   {key: "supRstar", label: "supRstar", patronGate: "", route: "./suprstr-search.html?from=search", sortOrder: 50, IsFeatureEnabled: 0, IsTestFeature: 1},
-  {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./?start=intent", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1}
+  {key: "floqAi", label: "FloqAi", patronGate: "floqAi", route: "./floqai.html", sortOrder: 60, IsFeatureEnabled: 0, IsTestFeature: 1}
 ].map(row => Object.freeze(row)));
 
 const FEATURE_KEYS = Object.freeze(FEATURE_CATALOG.map(row => row.key));

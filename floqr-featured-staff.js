@@ -137,7 +137,20 @@
     });
   }
 
-  const api = {normalize, photoOptions, keyFor, primaryRole, buildRows, applyDraft, toFeatured};
+  function photoSignature(featured = []) {
+    return (Array.isArray(featured) ? featured : [])
+      .filter(entry => entry && entryPhoto(entry))
+      .map(entry => `${keyFor(entry)}|${entryPhoto(entry)}`)
+      .sort()
+      .join("\n");
+  }
+
+  function needsPhotoConsent(featured = [], consent = null) {
+    const signature = photoSignature(featured);
+    return !!signature && (!consent || consent.photoSignature !== signature);
+  }
+
+  const api = {normalize, photoOptions, keyFor, primaryRole, buildRows, applyDraft, toFeatured, photoSignature, needsPhotoConsent};
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.FLOQRFeaturedStaff = api;

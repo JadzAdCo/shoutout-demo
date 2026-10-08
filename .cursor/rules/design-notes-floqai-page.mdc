@@ -1,0 +1,40 @@
+---
+description: FloqAi standalone page floqai.html (s3.1.20) — every FloqAi entry point lands there, feature-guarded, audience-filtered contextual search; old ?start=intent redirects
+alwaysApply: false
+---
+
+# FloqAi page (s3.1.20)
+
+Resume: `@floqai-page$`.
+
+Owner (Oct 7 2026): clicking FloqAi on the profile card went to a FloqAi search page and then to Event search. Wrong — FloqAi defaults to **its own page**, general contextual search over everything the viewer may use.
+
+## Root cause of the bounce
+
+`featureServices/floqAi` live = `IsFeatureEnabled 0, IsTestFeature 1` → state **off**. `patron-app.js` `continueToMainCategories` saw `#intentSearchPage` active with `!featureServiceAllows("floqAi")` and called `showPage("categoryPage")` (Event search). The flag is still the gate; only the UX changed.
+
+## Routing
+
+| Entry | Target |
+|---|---|
+| Profile card FloqAi (`global-profile-status.js` → `FLOQRNav.intentSearchHome()`) | `./floqai.html?v=APP_V` |
+| Search tile `#intentSearchBtnCard` | `./floqai.html?v=…&from=search` |
+| Feature catalog route (`floqr-feature-services.js` + `functions/feature-services-core.js`, parity test) | `./floqai.html` |
+| Old `./?start=intent|ask|wish[&q=]` (`FLOQRNav.applyStartPage`) | `location.replace(./floqai.html?v=…[&q=])` |
+| `floqai-search.html` | redirect to `floqai.html` (keeps `q`) |
+
+The index `#intentSearchPage` section stays (template-mode FloqAi on the composer still uses `floqai-search.js`); the `continueToMainCategories` fallback stays as a safety net (test asserts it).
+
+## Page
+
+`floqai.html` + `floqai-page.js`: satellite — `floqr-session-shell.js` (signed out → general sign-in with `returnTo=floqai.html`), `<body data-floqr-feature="floqAi">` (off / not granted → “This feature isn't available on your account yet.” + Back to Search, `logFeatureAccessAttempt`), never a silent bounce. Reuses `#intentSearchPage.active` markup so `floqai-search.js` agent + `floqai-search.css` work unchanged. `?q=` prefills.
+
+## Audience filtering
+
+`intent-search.js` `allIntents()` filters product + help intents by `FLOQRHelpRepository.canAccessHelpEntry({audiences}, flags)`; flags come from `syncHelpAudienceFromAuth()` (`users/{uid}` + token claims → `IsPatron / IsServiceMember / IsVenueAdmin / IsMasterAdmin`). The page shows the scope line (`floqai.scope*`). This is **UX filtering only** — the data each link opens is enforced by Firestore rules / callables. Server-side classification is the data-classification proposal (`design-notes-data-classification.mdc`).
+
+## Owner action
+
+FloqAi stays invisible until Master Admin → Features & Services sets **FloqAi** `IsFeatureEnabled = 1` (Test = beta testers + Master Admins; Live = everyone). Do not flip it through MCP/Admin SDK — that skips the SOS2FA audit chain.
+
+i18n: chrome `page.floqai.title` + `floqai.*` (15 × 11 packs); help `help-floqai-page` (all audiences). Script `scripts/add-floqai-page-i18n.js`. Tests `functions/floqai-page.test.js`.

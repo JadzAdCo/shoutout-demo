@@ -48,7 +48,7 @@ Server: `featureState` / `canAccessFeature` / `searchTileVisible` / `betaGrantsF
 
 Enforcement points:
 
-1. **Search tiles** — `index.html` ships non-ShoutOut tiles with `hidden`; `patron-app.js` `continueToMainCategories` → `FLOQRFeatureServices.load` + `applySearchUi` (runs after `applyPatronGateUi`) using `searchVisible`. Test tiles get `.feature-beta` pill (`cat.betaPill`). `?start=intent` falls back to categories when `floqAi` is not allowed.
+1. **Search tiles** — `index.html` ships non-ShoutOut tiles with `hidden`; `patron-app.js` `continueToMainCategories` → `FLOQRFeatureServices.load` + `applySearchUi` (runs after `applyPatronGateUi`) using `searchVisible`. Test tiles get `.feature-beta` pill (`cat.betaPill`). `?start=intent` now redirects to `floqai.html` (s3.1.20, guarded page — see `design-notes-floqai-page.mdc`); the in-index fallback to categories stays as a safety net.
 2. **Satellite pages** — `<body data-floqr-feature="key">` + `floqr-feature-services.js`: hides body until checked. **Signed out → `FLOQRSessionShell.redirectToLogin()`** (general sign-in, see below); `data-floqr-feature-signed-out="allow"` was removed everywhere in s3.0.110. Signed in but denied → “This feature isn't available on your account yet.” + Back to Search, and `logFeatureAccessAttempt` records it. 8 s timeout = deny. Guarded: `commerce.html` (bartr), `pickup.html` + `rydr.html` (rydr), `suprstr-search.html` + `suprstar-preview.html` (supRstar), `mingl-chat.html` + `mingl-gist.html` (mingl).
 3. **Server** — `assertFeatureAccess(auth, key)` in `createFloqrCheckoutSession` (`CHECKOUT_FEATURE_KEYS`) and `requestTeslaRobotaxiPickup`; denial detail carries `state` + `surface: "server"`. Client guards are UX; the server check is the control.
 
