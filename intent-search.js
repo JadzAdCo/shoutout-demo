@@ -860,6 +860,61 @@
 
   const INTENTS = [...HELP_INTENTS, ...PRODUCT_INTENTS];
 
+  // Classification of every curated intent (data classification register). An intent missing here is never shown.
+  // Design notes: .cursor/rules/design-notes-data-classification.mdc
+  const INTENT_AUDIENCES = Object.freeze({
+    "venue-search": ["public"],
+    "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
+    "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], suprstr: ["patron"], clubs: ["patron"],
+    "help-post-ad": ["patron"], "help-suprstr": ["patron"], "help-club-admin": ["patron"],
+    "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
+    "help-my-profile": ["patron"], "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
+    "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
+    "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],
+    "help-nfl-jersey": ["patron"], "help-soccer-jersey": ["patron"], "help-sell-bartr": ["patron"],
+    "help-vip": ["patron"], "help-onboarding": ["patron"], "help-general": ["patron"],
+    "help-schedule-confirm": ["serviceMember"], "help-staff-worksheet": ["serviceMember"],
+    "help-scheduling": ["serviceMember"], "help-staff-schedule-user-guide": ["serviceMember"],
+    "help-create-publish-schedule": ["privilegedEmployee"], "help-multi-delete-shifts": ["privilegedEmployee"],
+    "help-staff-schedule-grid": ["privilegedEmployee"],
+    "help-club-notification-subscriptions": ["venueAdmin"], "help-schedule-message-templates": ["venueAdmin"],
+    "help-club-display-screens": ["venueAdmin"], "help-venue-website-ingest": ["venueAdmin"],
+    "help-venue-hours-calendar": ["venueAdmin"],
+    "help-translation-overrides": ["masterAdmin"], "help-template-catalog-report": ["masterAdmin"],
+    "help-venue-crawl-datapoints": ["masterAdmin"], "help-mail-logging": ["masterAdmin"]
+  });
+
+  /** Local tier from the help repository's viewer flags (UX only; the server callable is the control). */
+  function localViewerRole(flags) {
+    const on = value => /^(1|true|yes)$/i.test(String(value ?? ""));
+    if (on(flags.IsMasterAdmin)) return "master";
+    if (on(flags.IsVenueAdmin)) return "clubAdmin";
+    if (on(flags.IsServiceMember)) return "regular";
+    if (on(flags.IsPatron)) return "patron";
+    return global.firebase?.auth?.().currentUser ? "patron" : "anonymous";
+  }
+
+  function locallyAllowed(audiences, sourceId, flags) {
+    const DC = global.FLOQRDataClassification;
+    if (DC?.classifyAudiences) {
+      const row = DC.classifyAudiences(audiences, sourceId);
+      return !!row && DC.access(row, {role: localViewerRole(flags)}) === "yes";
+    }
+    const repo = global.FLOQRHelpRepository;
+    return audiences.some(key => {
+      if (key === "public") return true;
+      if (key === "privilegedEmployee") return repo?.canAccessHelpEntry?.({audiences: ["venueAdmin"]}, flags) === true;
+      return repo?.canAccessHelpEntry?.({audiences: [key]}, flags) === true;
+    });
+  }
+
+  /** Server verdict hook (floqai-access.js). Without it, the local classification decides. */
+  function serverAllows(sourceId) {
+    const gate = global.FLOQRFloqAiAccess;
+    if (!gate?.isActive?.()) return true;
+    return gate.verdict(sourceId) === "allow";
+  }
+
   function normalizePhrase(value) {
     return String(value || "")
       .toLowerCase()
@@ -910,22 +965,13 @@
     const repo = global.FLOQRHelpRepository;
     const flags = repo?.getViewerAccessFlags?.() || {IsPatron: 0, IsServiceMember: 0, IsVenueAdmin: 0, IsMasterAdmin: 0};
     // Help repository first (includes every "?" popout verbiage), then curated product/help intents.
-    [...collectPopoutIntents(), ...INTENTS].forEach(intent => {
-      const audiences = Array.isArray(intent.audiences) && intent.audiences.length
-        ? intent.audiences
-        : (intent.kind === "help" ? ["patron"] : ["patron"]);
-      // Product + help intents both require partition access from user datapoints.
-      const allowed = typeof repo?.canAccessHelpEntry === "function"
-        ? repo.canAccessHelpEntry({audiences}, flags)
-        : audiences.some(key => {
-          if (flags.IsMasterAdmin) return true;
-          if (key === "patron") return !!flags.IsPatron;
-          if (key === "serviceMember") return !!flags.IsServiceMember;
-          if (key === "venueAdmin") return !!flags.IsVenueAdmin;
-          if (key === "masterAdmin") return !!flags.IsMasterAdmin;
-          return false;
-        });
-      if (!allowed) return;
+    // Translated copies keep the source entry id, so they inherit its classification.
+    const fromRepo = collectPopoutIntents().map(intent => ({...intent, sourceId: `help:${intent.id}`}));
+    const curated = INTENTS.map(intent => ({...intent, sourceId: `intent:${intent.id}`, audiences: INTENT_AUDIENCES[intent.id] || []}));
+    [...fromRepo, ...curated].forEach(intent => {
+      const audiences = Array.isArray(intent.audiences) ? intent.audiences : [];
+      if (!audiences.length) return;
+      if (!locallyAllowed(audiences, intent.sourceId, flags)) return;
       const key = intent.id || intent.label;
       if (seen.has(key)) {
         const existing = merged.find(row => (row.id || row.label) === key);
@@ -963,6 +1009,8 @@
     if (parsed.place) details.push(t("cat.floqaiIn", {place: parsed.place.label}, `in ${parsed.place.label}`));
     return {
       id: "venue-search",
+      sourceId: "intent:venue-search",
+      audiences: INTENT_AUDIENCES["venue-search"],
       kind: "product",
       label: t("cat.floqaiSearching", {type: typeLabel}, `Searching ${typeLabel}`),
       blurb: details.length ? details.join(" · ") : String(raw).trim(),
@@ -977,9 +1025,20 @@
     const venue = venueSearchIntent(raw, q);
     if (venue) {
       const rest = matchIntentsByScore(q).filter(intent => intent.id !== "clubs" && intent.kind !== "help");
-      return [venue, ...rest.slice(0, 2)];
+      const flags = global.FLOQRHelpRepository?.getViewerAccessFlags?.() || {};
+      const head = locallyAllowed(venue.audiences, venue.sourceId, flags) ? [venue] : [];
+      return enforceServerVerdicts([...head, ...rest.slice(0, 2)]);
     }
-    return matchIntentsByScore(q);
+    return enforceServerVerdicts(matchIntentsByScore(q));
+  }
+
+  /** Shows only results the server cleared; asks it about the rest (the page re-runs the search when verdicts land). */
+  function enforceServerVerdicts(list) {
+    const gate = global.FLOQRFloqAiAccess;
+    if (!gate?.isActive?.()) return list;
+    const unknown = list.map(intent => intent.sourceId).filter(id => id && gate.verdict(id) === undefined);
+    if (unknown.length) gate.request(unknown);
+    return list.filter(intent => intent.sourceId && serverAllows(intent.sourceId));
   }
 
   function matchIntentsByScore(q) {
@@ -1068,6 +1127,10 @@
     if (!container) return;
     if (!String(query || "").trim()) {
       container.innerHTML = "";
+      return;
+    }
+    if (!intents.length && global.FLOQRFloqAiAccess?.hasPending?.()) {
+      container.innerHTML = `<div class="card intent-result-empty" role="status"><p class="sub small">${esc(tr("floqai.checkingAccess", "Checking what your account can see…"))}</p></div>`;
       return;
     }
     if (!intents.length) {
@@ -1165,6 +1228,7 @@
     INTENTS,
     HELP_INTENTS,
     PRODUCT_INTENTS,
+    INTENT_AUDIENCES,
     helpRepository: () => global.FLOQRHelpRepository || null
   };
 })(window);

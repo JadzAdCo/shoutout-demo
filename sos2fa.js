@@ -14,6 +14,7 @@
     "templateManagement",
     "recommendationModeration",
     "featuresServices",
+    "dataClassification",
     "adApprovalQueue",
     "adLiveCampaigns",
     "adStatsPanel",

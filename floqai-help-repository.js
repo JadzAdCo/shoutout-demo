@@ -704,6 +704,19 @@
       page: "index.html#floqAiHelpPopout"
     },
     {
+      id: "help-data-classification",
+      title: "Data classification",
+      body: "Each row is a Firestore collection. Tick who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make a collection Secret. System is the FLOQR server: it always has access, only from server code for a stated job, and it never gives a person more than their own tier. Every change needs SOS2FA and a reason and is written to the audit trail on Features & Services. FloqAi only shows answers that the reader's tier allows. Run the exposure report to find collections that the live security rules leave more open than this register.",
+      searchPhrases: [
+        "data classification", "classify data", "who can read", "data access", "personal data", "pii",
+        "retention", "exposure report", "system access", "security tab", "floqai access"
+      ],
+      links: [{label: "Open Data classification", href: `./master-admin.html?v=${APP_V}#dataClassification`}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#dataClassification"
+    },
+    {
       id: "help-donpapi-led-wall",
       title: "DonPapi ShoutOut LED wall",
       body: "VIP ShoutOuts are carried by busboys on the handheld DonPapi LED wall — held in the air in front of patrons with the shoutout message on the center screen (club name at the top, glowing white scalloped border). Table LEDs (64×32) and portrait walls (960×1900) remain for other formats.",
@@ -1396,6 +1409,19 @@
       audiences: ["venueAdmin"],
       source: "help-repository-seed",
       page: "admin.html"
+    },
+    {
+      id: "help-staff-marketing-consent",
+      title: "Staff marketing consent",
+      body: "When you join a venue or event team, you must tick the marketing consent box. It lets that venue or event organizer, and its admins and managers, use your FLOQR name, role, and published photos and videos on their websites, flyers, and social media (Instagram, Facebook, TikTok, YouTube and similar) without asking you again for each use. They may not publish your phone number or email. You can withdraw at any time in My Profile on the Services & Service Members tab. This stops new marketing; materials already printed or posted do not have to be recalled. Club Admins see each staff member's consent status in Employee / Worker Network and Featured service staff.",
+      searchPhrases: ["marketing consent", "staff marketing consent", "use my photos", "club can use my photos", "withdraw marketing consent", "photo consent staff", "instagram consent", "flyer photo consent"],
+      links: [
+        {label: "Services & Service Members", href: vUrl("./patron-portal.html", {from: "floqai", tab: "service-members"})},
+        {label: "Club Admin Employee/Workers", href: vUrl("./admin.html", {from: "floqai", tab: "employees"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
     },
     {
       id: "help-featured-staff",

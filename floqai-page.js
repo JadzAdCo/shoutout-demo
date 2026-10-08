@@ -14,8 +14,11 @@
     masterAdmin: ["floqai.scopeMasterAdmin", "Showing answers for Master Admin (all areas)."],
     venueAdmin: ["floqai.scopeVenueAdmin", "Showing answers for Club Admin, staff, and patrons."],
     serviceMember: ["floqai.scopeServiceMember", "Showing answers for staff and patrons."],
-    patron: ["floqai.scopePatron", "Showing answers for patrons."]
+    patron: ["floqai.scopePatron", "Showing answers for patrons."],
+    anonymous: ["floqai.scopePublic", "Showing public answers. Sign in to see answers for your account."]
   };
+  const SERVER_ROLE_SCOPE = {master: "masterAdmin", clubAdmin: "venueAdmin", privileged: "serviceMember", regular: "serviceMember", patron: "patron", anonymous: "anonymous"};
+  const access = () => window.FLOQRFloqAiAccess;
 
   function ensureFirebase() {
     try {
@@ -26,7 +29,7 @@
   }
 
   function showScope() {
-    const audience = window.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
+    const audience = SERVER_ROLE_SCOPE[access()?.role?.()] || window.FLOQRHelpRepository?.getViewerAudience?.() || "patron";
     const [key, fallback] = SCOPE_KEYS[audience] || SCOPE_KEYS.patron;
     const el = byId("floqAiScopeNote");
     if (el) el.textContent = t(key, fallback);
@@ -60,6 +63,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     ensureFirebase();
+    access()?.activate?.();
+    access()?.onChange?.(() => { showScope(); rerun(); });
     nav()?.applyGlobalBack?.("floqrGlobalBack");
     window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
     window.FLOQRIntentSearch?.bindIntentSearch({
@@ -80,6 +85,7 @@
     input?.focus();
     showScope();
     window.firebase?.auth?.().onAuthStateChanged(async () => {
+      access()?.reset?.();
       try { await window.FLOQRIntentSearch?.syncHelpAudienceFromAuth?.(); } catch (_) {}
       showScope();
       rerun();

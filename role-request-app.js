@@ -17,6 +17,9 @@
   const db = firebase.firestore();
 
   let venuePicker = null;
+  let consentForm = null;
+  // Design notes: .cursor/rules/design-notes-staff-marketing-consent.mdc
+  const consentApi = () => window.FLOQRStaffMarketingConsent || null;
 
   function mountVenuePicker() {
     const mount = byId("roleVenuePickerMount");
@@ -59,6 +62,11 @@
       setText("roleStatus", translated && translated !== key ? translated : `You already sent a request to ${clubs}. Remove that club and try again.`);
       return;
     }
+    if (!consentApi() || !consentForm?.isChecked()) {
+      setText("roleStatus", consentApi()?.t?.("staffConsent.required") || "Tick the marketing consent box to continue.");
+      return;
+    }
+    const consent = consentApi().acceptedRecord({source: "role-request", lang: window.FLOQRI18n?.getLanguage?.() || "en"});
 
     const request = {
       uid: user.uid,
@@ -68,6 +76,7 @@
       serviceSubtype,
       notes,
       relatedLocations,
+      ...consentApi().requestStamp(consent),
       status: "pending",
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -106,9 +115,12 @@
       electedRequestMadeTo: firebase.firestore.FieldValue.arrayUnion(...venueNames),
       publicProfileType: access.publicProfileTypeForSpecialty?.(serviceSubtype) || "patron",
       serviceSubtype,
+      marketingMediaConsent: consent,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
     await batch.commit();
+    consentApi().recordOnServer(firebase, "accept", consent, {clubLocationIds: relatedLocations});
+    consentForm.reset();
 
     if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
     if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
@@ -127,6 +139,7 @@
     access.fillSpecialtySelect?.(byId("serviceSpecialty"));
     applyTypeFromQuery();
     mountVenuePicker();
+    consentForm = consentApi()?.mount(byId("roleConsentMount"), {idPrefix: "role", buttons: [byId("submitRoleRequestBtn")]}) || null;
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",

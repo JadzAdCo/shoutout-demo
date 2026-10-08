@@ -692,6 +692,14 @@ button.danger,.danger{background:linear-gradient(90deg,#ff4f7a,#ff8a5c);color:#1
 .featured-staff-consent{display:grid;gap:6px;margin-top:12px;padding:12px;border:1px solid rgba(255,196,77,.55);border-radius:14px;background:rgba(255,196,77,.08)}
 .featured-staff-consent .consent-line{display:flex;align-items:flex-start;gap:10px;margin:0;font-weight:700}
 .featured-staff-consent .consent-line input{flex:0 0 auto;width:22px;height:22px;margin-top:1px}
+.staff-marketing-consent{display:grid;gap:6px;margin:12px 0;padding:12px;border:1px solid rgba(255,196,77,.55);border-radius:14px;background:rgba(255,196,77,.08)}
+.staff-marketing-consent h3,.staff-marketing-consent p{margin:0}
+.staff-marketing-consent-check{display:flex;align-items:flex-start;gap:10px;margin:4px 0 0;font-weight:700}
+.staff-marketing-consent-check input{flex:0 0 auto;width:22px;height:22px;margin-top:1px}
+.staff-consent-status{display:block}
+.featured-staff-name .staff-consent-status{white-space:normal}
+.staff-consent-status[data-consent-state="given"]{color:#7fe0a0}
+.staff-consent-status[data-consent-state="withdrawn"]{color:#ffb4a8}
 .website-feed-card{display:grid;gap:8px;margin-top:14px}
 .website-feed-output{display:grid;gap:8px}
 .website-feed-output textarea,.website-feed-output input{font-family:ui-monospace,Consolas,monospace;font-size:12px}

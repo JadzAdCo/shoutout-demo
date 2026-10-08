@@ -87,6 +87,7 @@
     "templateManagement",
     "recommendationModeration",
     "featuresServices",
+    "dataClassification",
     "adApprovalQueue",
     "adLiveCampaigns",
     "adStatsPanel",
@@ -96,6 +97,7 @@
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
   const PANEL_LABELS = {
     featuresServices: "Features & Services",
+    dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
     adLiveCampaigns: "Ad Management · Live & scheduled",
     adStatsPanel: "Ad Management · Stats",
@@ -242,6 +244,9 @@
       }
       if (panelId === "featuresServices") {
         window.FLOQRMasterFeatureServices?.mount?.();
+      }
+      if (panelId === "dataClassification") {
+        window.FLOQRMasterDataClassification?.mount?.();
       }
       if (AD_MGMT_PANEL_IDS.includes(panelId)) {
         window.FLOQRMasterAdManagement?.mount?.(panelId);

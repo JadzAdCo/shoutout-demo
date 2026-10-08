@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.20 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.21 (stable)
+
+- s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. FloqAi now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.
 
 - s3.1.20: Club Admin → Club Public Profile → **Website feed** generates a private link for the club's official website: an iframe, a JSON feed, and an events RSS feed with upcoming events, featured DJs, featured staff, and gallery photos (only sections shown on the public profile). Featured staff photos now need a consent confirmation before they publish. FloqAi opens on its own page (`floqai.html`) instead of bouncing to event search.
 

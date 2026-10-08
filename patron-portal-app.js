@@ -267,6 +267,107 @@
     };
   }
 
+  // Design notes: .cursor/rules/design-notes-staff-marketing-consent.mdc
+  const staffConsentForms = {};
+
+  function staffConsentApi() {
+    return window.FLOQRStaffMarketingConsent || null;
+  }
+
+  function staffConsentText(key, vars = {}) {
+    return staffConsentApi()?.t?.(`staffConsent.${key}`, vars) || "";
+  }
+
+  function staffConsentLang() {
+    return window.FLOQRI18n?.getLanguage?.() || currentProfile?.uiLanguage || "en";
+  }
+
+  /** Returns a fresh accepted record when the form's box is ticked; otherwise reports and returns null. */
+  function takeStaffConsent(formKey, statusElId, source) {
+    const api = staffConsentApi();
+    const form = staffConsentForms[formKey];
+    if (!api || !form?.isChecked()) {
+      setText(statusElId, staffConsentText("required") || "Tick the marketing consent box to continue.");
+      byId(statusElId)?.scrollIntoView?.({behavior: "smooth", block: "nearest"});
+      return null;
+    }
+    return api.acceptedRecord({source, lang: staffConsentLang()});
+  }
+
+  function mountStaffConsentForms() {
+    const api = staffConsentApi();
+    if (!api) return;
+    if (!staffConsentForms.elect) {
+      staffConsentForms.elect = api.mount(byId("becomeSmConsentMount"), {idPrefix: "becomeSm", buttons: [byId("becomeServiceMemberBtn")]});
+    }
+    if (!staffConsentForms.request) {
+      staffConsentForms.request = api.mount(byId("smRequestConsentMount"), {idPrefix: "smRequest", buttons: [byId("smSubmitRoleRequestBtn")]});
+    }
+    if (!staffConsentForms.manage) {
+      staffConsentForms.manage = api.mount(byId("staffConsentGiveMount"), {idPrefix: "staffManage", buttons: [byId("staffConsentGiveBtn")], help: false});
+    }
+  }
+
+  function renderStaffConsentManager() {
+    const api = staffConsentApi();
+    if (!api || !byId("staffConsentManageCard")) return;
+    const active = api.isActive(currentProfile || {});
+    setText("staffConsentStatus", api.patronStatusText(currentProfile || {}));
+    byId("staffConsentWithdrawBtn")?.classList.toggle("hidden", !active);
+    byId("staffConsentGiveBtn")?.classList.toggle("hidden", active);
+    byId("staffConsentGiveMount")?.classList.toggle("hidden", active);
+  }
+
+  function applyStaffConsentLocally(patch) {
+    currentProfile = {
+      ...currentProfile,
+      marketingMediaConsent: {...(currentProfile?.marketingMediaConsent || {}), ...patch}
+    };
+    renderStaffConsentManager();
+  }
+
+  async function giveStaffConsent() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const consent = takeStaffConsent("manage", "staffConsentManageStatus", "portal-manage");
+    if (!consent) return;
+    try {
+      await db.collection("users").doc(user.uid).set({
+        marketingMediaConsent: consent,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    } catch (error) {
+      console.warn("Staff marketing consent save failed:", error?.code || error?.message);
+      setText("staffConsentManageStatus", staffConsentText("saveFailed"));
+      return;
+    }
+    staffConsentApi().recordOnServer(firebase, "accept", consent);
+    staffConsentForms.manage?.reset();
+    applyStaffConsentLocally(consent);
+    setText("staffConsentManageStatus", staffConsentText("givenDone"));
+  }
+
+  async function withdrawStaffConsent() {
+    const user = auth.currentUser;
+    const api = staffConsentApi();
+    if (!user || !api) return;
+    if (!window.confirm(staffConsentText("withdrawConfirm"))) return;
+    const record = api.withdrawnRecord();
+    try {
+      await db.collection("users").doc(user.uid).set({
+        marketingMediaConsent: record,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge: true});
+    } catch (error) {
+      console.warn("Staff marketing consent withdrawal failed:", error?.code || error?.message);
+      setText("staffConsentManageStatus", staffConsentText("saveFailed"));
+      return;
+    }
+    api.recordOnServer(firebase, "withdraw");
+    applyStaffConsentLocally(record);
+    setText("staffConsentManageStatus", staffConsentText("withdrawnDone"));
+  }
+
   function actionFeedback(messages, action) {
     if (window.FLOQRActionFeedback?.run) return window.FLOQRActionFeedback.run(messages, action);
     return action();
@@ -3702,18 +3803,25 @@
       setText("portalStatus", "Please sign in first.");
       return;
     }
+    const consent = takeStaffConsent("elect", "portalStatus", "portal-elect");
+    if (!consent) return;
     await db.collection("users").doc(user.uid).set(serviceMembershipPatch({
       memberType: /^patron$/i.test(memberTypeLabel(currentProfile)) ? "Service Member" : memberTypeLabel(currentProfile),
       memberLevel: /^patron$/i.test(memberTypeLabel(currentProfile)) ? "Service Member" : (currentProfile.memberLevel || memberTypeLabel(currentProfile)),
+      marketingMediaConsent: consent,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }), {merge: true});
+    staffConsentApi().recordOnServer(firebase, "accept", consent);
+    staffConsentForms.elect?.reset();
     currentProfile = {
       ...currentProfile,
       IsPatron: 0,
       IsServiceMember: 1,
       IsserviceMember: 1,
-      serviceMember: true
+      serviceMember: true,
+      marketingMediaConsent: consent
     };
+    renderStaffConsentManager();
     setText("portalStatus", "You are now a service member. The Services & Service Members tab is available.");
     await renderStaffCalendarLinks(user, currentPortalDesignations);
     showPortalPanel("portalServiceMembers", "portalServiceMembers");
@@ -3747,6 +3855,8 @@
         `You already sent a request to ${alreadyRequested.join(", ")}. Remove that club and try again.`);
       return;
     }
+    const consent = takeStaffConsent("request", "smRoleStatus", "portal-request");
+    if (!consent) return;
     const request = {
       uid: user.uid,
       email: user.email || "",
@@ -3755,6 +3865,7 @@
       serviceSubtype,
       notes,
       relatedLocations,
+      ...staffConsentApi().requestStamp(consent),
       status: "pending",
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -3792,9 +3903,13 @@
       serviceSubtype,
       memberType: serviceSubtype,
       memberLevel: serviceSubtype,
+      marketingMediaConsent: consent,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }), {merge: true});
     await batch.commit();
+    staffConsentApi().recordOnServer(firebase, "accept", consent, {clubLocationIds: relatedLocations});
+    staffConsentForms.request?.reset();
+    applyStaffConsentLocally(consent);
     if (roleType === "dj") await db.collection("djProfiles").doc(user.uid).set(request, {merge: true});
     if (roleType === "promoter") await db.collection("promoterProfiles").doc(user.uid).set(request, {merge: true});
     showSmStatus("smRoleStatus", "statusSubmitted", {count: relatedLocations.length},
@@ -3836,6 +3951,7 @@
         workerName: request.publicName || request.displayName || request.email || "Club worker",
         workerRoles: firebase.firestore.FieldValue.arrayUnion(role),
         roleElectionType: role,
+        ...(staffConsentApi()?.designationStamp?.(request) || {}),
         status: "approved",
         approvedByUid: auth.currentUser?.uid || "",
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -4067,6 +4183,7 @@
       window.FLOQRI18n?.applyDom?.();
     } catch (_) {}
     fillProfileForm(profile, user);
+    renderStaffConsentManager();
     try {
       const policyHref = window.FLOQRCanonical?.privacyPolicyUrl?.("s3.0.103") || "./privacy.html?v=s3.0.103";
       const dnsHref = `${policyHref}#do-not-sell`;
@@ -4321,6 +4438,7 @@
       renderLanguageSettingsReport(currentLanguageSettings);
       if (currentProfile) renderPolicies(currentProfile);
       window.FLOQRI18n?.applyDom?.();
+      renderStaffConsentManager();
       renderUiLanguagePreview();
     });
     bind("saveMinglFriendSettingsBtn", saveMinglFriendSettings);
@@ -4330,6 +4448,9 @@
     serviceAccess.fillSpecialtySelect?.(byId("smServiceSpecialty"));
     initSmVenuePicker();
     bind("becomeServiceMemberBtn", electBecomeServiceMember);
+    mountStaffConsentForms();
+    bind("staffConsentGiveBtn", giveStaffConsent);
+    bind("staffConsentWithdrawBtn", withdrawStaffConsent);
     bind("smElectBtn", () => electServiceMember());
     byId("smElectSearch")?.addEventListener("input", renderServiceMemberElectMatches);
     byId("smAdminClubSelect")?.addEventListener("change", () => {

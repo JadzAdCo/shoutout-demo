@@ -553,4 +553,7 @@ exports.verifyFeatureServiceAuditChain = onCall(CALL_OPTS, async request => {
   return {ok, checked: verdict.checked, brokenAt: verdict.brokenAt, issue: verdict.issue || (headMatches ? "" : "head-mismatch"), headSeq: Number(headData.seq || 0)};
 });
 
-exports.__featureServiceHelpers = {assertFeatureAccess, viewerFor, loadFeature, UNAVAILABLE_MESSAGE};
+exports.__featureServiceHelpers = {
+  assertFeatureAccess, viewerFor, loadFeature, UNAVAILABLE_MESSAGE,
+  assertAdmin, auditRecord, appendChainedAudit, writeChainedAudit, writeUnchainedAudit, headRef
+};

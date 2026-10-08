@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-staff-marketing-consent": {
+        title: "Согласие персонала на маркетинг",
+        body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Спросите FloqAi о чём угодно в FLOQR своими словами: события и клубы, ShoutOut, Mingl, RydR, BartR, supRstar, ваш профиль, расписания персонала или инструменты Club Admin. В результатах только то, что доступно вашему аккаунту. Гости, персонал, Club Admins и Master Admins видят свои ответы."
@@ -246,6 +250,10 @@
       }
     },
     nl: {
+      "help-staff-marketing-consent": {
+        title: "Marketingtoestemming voor personeel",
+        body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Vraag FloqAi alles over FLOQR in je eigen woorden: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, supRstar, je profiel, personeelsroosters of Club Admin-tools. De resultaten tonen alleen wat jouw account mag gebruiken. Bezoekers, personeel, Club Admins en Master Admins zien elk hun eigen antwoorden."
@@ -486,6 +494,10 @@
       }
     },
     fr: {
+      "help-staff-marketing-consent": {
+        title: "Consentement marketing du personnel",
+        body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Demandez à FloqAi tout ce qui concerne FLOQR, avec vos mots : événements et clubs, ShoutOut, Mingl, RydR, BartR, supRstar, votre profil, les plannings du personnel ou les outils Club Admin. Les résultats ne montrent que ce que votre compte peut utiliser. Clients, personnel, Club Admins et Master Admins voient chacun leurs propres réponses."
@@ -726,6 +738,10 @@
       }
     },
     de: {
+      "help-staff-marketing-consent": {
+        title: "Marketing-Einwilligung für Personal",
+        body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Frag FloqAi alles über FLOQR in deinen eigenen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, supRstar, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Die Ergebnisse zeigen nur, was dein Konto nutzen darf. Gäste, Personal, Club Admins und Master Admins sehen jeweils ihre eigenen Antworten."
@@ -966,6 +982,10 @@
       }
     },
     es: {
+      "help-staff-marketing-consent": {
+        title: "Consentimiento de marketing del personal",
+        body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Pregunta a FloqAi lo que quieras sobre FLOQR con tus palabras: eventos y clubs, ShoutOut, Mingl, RydR, BartR, supRstar, tu perfil, horarios del personal o herramientas de Club Admin. Los resultados solo incluyen lo que tu cuenta puede usar. Clientes, personal, Club Admins y Master Admins ven cada uno sus propias respuestas."
@@ -1206,6 +1226,10 @@
       }
     },
     it: {
+      "help-staff-marketing-consent": {
+        title: "Consenso marketing del personale",
+        body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Chiedi a FloqAi qualsiasi cosa su FLOQR con parole tue: eventi e club, ShoutOut, Mingl, RydR, BartR, supRstar, il tuo profilo, gli orari del personale o gli strumenti Club Admin. I risultati includono solo ciò che il tuo account può usare. Clienti, personale, Club Admin e Master Admin vedono ognuno le proprie risposte."
@@ -1446,6 +1470,10 @@
       }
     },
     pt: {
+      "help-staff-marketing-consent": {
+        title: "Consentimento de marketing da equipe",
+        body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Pergunte ao FloqAi qualquer coisa sobre o FLOQR com suas palavras: eventos e clubes, ShoutOut, Mingl, RydR, BartR, supRstar, seu perfil, escalas da equipe ou ferramentas de Club Admin. Os resultados mostram só o que sua conta pode usar. Clientes, equipe, Club Admins e Master Admins veem cada um as próprias respostas."
@@ -1686,6 +1714,10 @@
       }
     },
     el: {
+      "help-staff-marketing-consent": {
+        title: "Συγκατάθεση μάρκετινγκ προσωπικού",
+        body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Ρωτήστε το FloqAi οτιδήποτε για το FLOQR με δικά σας λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, supRstar, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Τα αποτελέσματα περιλαμβάνουν μόνο ό,τι μπορεί να χρησιμοποιήσει ο λογαριασμός σας. Θαμώνες, προσωπικό, Club Admins και Master Admins βλέπουν ο καθένας τις δικές του απαντήσεις."
@@ -1926,6 +1958,10 @@
       }
     },
     pl: {
+      "help-staff-marketing-consent": {
+        title: "Zgoda marketingowa personelu",
+        body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "Zapytaj FloqAi o wszystko w FLOQR własnymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, supRstar, Twój profil, grafiki personelu lub narzędzia Club Admin. Wyniki obejmują tylko to, z czego może korzystać Twoje konto. Goście, personel, Club Admini i Master Admini widzą własne odpowiedzi."
@@ -2166,6 +2202,10 @@
       }
     },
     ar: {
+      "help-staff-marketing-consent": {
+        title: "موافقة الطاقم على التسويق",
+        body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."
+      },
       "help-floqai-page": {
         title: "FloqAi",
         body: "اسأل FloqAi عن أي شيء في FLOQR بكلماتك: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وsupRstar وملفك الشخصي وجداول الطاقم وأدوات Club Admin. تتضمن النتائج فقط ما يمكن لحسابك استخدامه. يرى الرواد والطاقم ومسؤولو النوادي ومسؤولو المنصة كلٌّ إجاباته الخاصة."
