@@ -229,3 +229,85 @@ test("Master Admin Security → Data classification panel is wired and SOS2FA-ga
   assert.ok(/floqr-data-classification\.js[\s\S]*floqai-access\.js[\s\S]*intent-search\.js/.test(floqai));
   assert.ok(floqai.includes('data-floqr-feature="floqAi"'));
 });
+
+test("Save all validates every row and needs a reason", () => {
+  const row = {...dc.normalize("users", null)};
+  assert.throws(() => dc.validateSaveAll({rows: [row], reason: "short"}), /reason/);
+  assert.throws(() => dc.validateSaveAll({rows: [], reason: "Reviewed register"}), /Nothing to save/);
+  assert.throws(() => dc.validateSaveAll({rows: [{...row, collection: "nope"}], reason: "Reviewed register"}), /Unknown collection/);
+  assert.throws(() => dc.validateSaveAll({rows: [row, row], reason: "Reviewed register"}), /listed twice/);
+  const {next, reason} = dc.validateSaveAll({rows: [{...row, isPatronAccessible: 1, isMasterAdminAccessible: 1}], reason: " Reviewed register "});
+  assert.equal(reason, "Reviewed register");
+  assert.equal(next.users.isClubAdminAccessible, 1, "tiers are cumulative on save");
+  assert.equal(next.users[dc.SYSTEM_FLAG], 1);
+});
+
+test("Save all plans: creates never-saved rows, writes only changed saved rows, fits one transaction", () => {
+  const empty = dc.planSaveAll({}, {});
+  assert.equal(empty.writes.length, dc.COLLECTIONS.length, "first Save all creates every row from the packaged defaults");
+  assert.ok(empty.writes.every(write => write.created && write.after.revision === 1));
+  assert.ok(empty.writes.length + 2 <= dc.MAX_TX_WRITES);
+
+  const saved = Object.fromEntries(dc.COLLECTIONS.map(collection => [collection, {...dc.normalize(collection, null), revision: 3}]));
+  const none = dc.planSaveAll({}, saved);
+  assert.equal(none.writes.length, 0);
+  assert.equal(none.unchanged.length, dc.COLLECTIONS.length);
+
+  const edit = {...dc.normalize("aiIndex", null), isPublicAccessible: 1};
+  const {next} = dc.validateSaveAll({rows: [edit, dc.normalize("users", null)], reason: "Open venue index to visitors"});
+  const plan = dc.planSaveAll(next, saved);
+  assert.deepEqual(plan.writes.map(write => write.collection), ["aiIndex"]);
+  assert.equal(plan.writes[0].after.revision, 4);
+  assert.ok(plan.writes[0].changed.includes("isPublicAccessible"));
+});
+
+test("review guidance flags owner judgment and rules gaps; status follows save state", () => {
+  const users = dc.normalize("users", null);
+  assert.deepEqual(dc.reviewNotes(users, []).decide, []);
+  assert.deepEqual(dc.reviewNotes({...users, isPatronAccessible: 1}, []).decide, ["piiPatron"]);
+  assert.deepEqual(dc.reviewNotes({...users, isPublicAccessible: 1}, []).decide, ["piiPublic"]);
+  const issues = [{collection: "users", kind: "readBroader"}, {collection: "users", kind: "writeOpen"}];
+  assert.deepEqual(dc.reviewNotes(users, issues).fix, ["rulesRead", "rulesWrite"]);
+
+  Object.keys(dc.REVIEW_RECOMMENDATIONS).forEach(collection => assert.ok(dc.COLLECTIONS.includes(collection), collection));
+  const judged = dc.reviewNotes(dc.normalize("patronRanks", null), []);
+  assert.equal(judged.recommendation, "patronRanks");
+  assert.deepEqual(dc.rowStatus({saved: false, edited: false, notes: judged}), {status: "default", needsReview: true});
+  assert.deepEqual(dc.rowStatus({saved: true, edited: false, notes: judged}), {status: "saved", needsReview: false}, "saving confirms the judgment");
+  assert.deepEqual(dc.rowStatus({saved: true, edited: true, notes: judged}), {status: "edited", needsReview: true});
+  const risky = dc.reviewNotes({...users, isPublicAccessible: 1}, []);
+  assert.equal(dc.rowStatus({saved: true, edited: false, notes: risky}).needsReview, true, "personal data opened to everyone stays flagged");
+});
+
+test("fix list groups the live exposure report by kind of gap", () => {
+  const rows = dc.COLLECTIONS.map(collection => dc.normalize(collection, null));
+  const issues = dc.exposureReport(rows, dc.parseRulesAccess(rules));
+  const list = dc.fixList(issues);
+  assert.ok(list.every(entry => dc.FIX_GROUPS.includes(entry.group) && entry.collections.length));
+  const byGroup = Object.fromEntries(list.map(entry => [entry.group, entry.collections]));
+  if (issues.some(issue => issue.collection === "users" && issue.kind === "readBroader")) assert.ok(byGroup.piiRead.includes("users"));
+  const total = new Set(issues.map(issue => `${dc.fixGroupFor(issue)}:${issue.collection}`)).size;
+  assert.equal(list.reduce((sum, entry) => sum + entry.collections.length, 0), total);
+});
+
+test("saveAllDataClassifications is SOS2FA-gated, chained in one transaction, and the panel has one Save all button", () => {
+  const fns = read("functions/data-classification-functions.js");
+  const body = fns.slice(fns.indexOf("exports.saveAllDataClassifications"), fns.indexOf("// ---- FloqAi enforcement"));
+  assert.ok(body.includes('audit.assertAdmin(request, "dataClass.saveAll")'));
+  assert.ok(body.includes("core.validateSaveAll") && body.includes("core.planSaveAll"));
+  assert.ok(body.includes("db.runTransaction") && body.includes("audit.appendChainedAudit(tx, head"));
+  assert.ok(body.includes('eventType: "dataClass.savedAll"'));
+  assert.ok(/!changed\.length && snap\.exists/.test(fns), "per-row Save may create a never-saved row");
+
+  const html = read("master-admin.html");
+  assert.ok(html.includes('id="dataClassSaveAllBtn"'));
+  assert.ok(!html.includes("dataClassSeedBtn"), "the separate seed button is gone");
+  assert.ok(html.includes('id="dataClassOnlyReview"') && html.includes('id="dataClassFixList"') && html.includes('data-i18n="dataClass.purposeTitle"'));
+  assert.ok(!/Keep \(days\)/.test(html));
+  const panel = read("master-data-classification.js");
+  assert.ok(panel.includes('call("saveAllDataClassifications"'));
+  assert.ok(panel.includes("DC().reviewNotes") && panel.includes("DC().rowStatus") && panel.includes("DC().fixList"));
+  const i18n = read("floqr-i18n.js");
+  Object.values(dc.REVIEW_RECOMMENDATIONS).forEach(key => assert.ok(i18n.includes(`"dataClass.rec.${key}"`), key));
+  dc.FIX_GROUPS.forEach(group => assert.ok(i18n.includes(`"dataClass.fix.${group}.title"`), group));
+});

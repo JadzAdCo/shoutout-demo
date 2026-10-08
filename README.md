@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.21 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.22 (stable)
+
+- s3.1.22: Data classification explains what to do at the top, saves every row with one **Save all classifications** button (SOS2FA + reason, one audit record), shows each row as Saved / Default / Edited / Needs review with a recommendation, filters to rows that need review, and lists what needs fixing in the live security rules. The retention column is now **Delete after (days)**.
 
 - s3.1.21: Master Admin → Security → **Data classification** lists every Firestore collection with who may read it (Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, own record), personal data, retention, a read-only System column, a role simulator, and an exposure report against the live security rules. FloqAi now shows only answers that your account's classification allows, checked on the server. Staff marketing media consent is recorded when a patron joins a venue or event team.
 
