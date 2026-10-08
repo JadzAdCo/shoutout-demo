@@ -1,0 +1,411 @@
+{
+  "help": {
+    "floqai-ask-floqr": [
+      "venueAdmin"
+    ],
+    "help-ad-campaign-mgmt": [
+      "masterAdmin"
+    ],
+    "help-ad-campaign-status-badge": [
+      "masterAdmin"
+    ],
+    "help-ad-campaigns": [
+      "patron"
+    ],
+    "help-ai-recommendations": [
+      "patron"
+    ],
+    "help-app-language": [
+      "masterAdmin"
+    ],
+    "help-archived-shoutouts": [
+      "patron"
+    ],
+    "help-become-club-admin": [
+      "venueAdmin"
+    ],
+    "help-become-dj": [
+      "serviceMember"
+    ],
+    "help-become-promoter": [
+      "serviceMember"
+    ],
+    "help-beta-tester": [
+      "patron"
+    ],
+    "help-club-admin-affiliation": [
+      "masterAdmin"
+    ],
+    "help-club-display-screens": [
+      "venueAdmin"
+    ],
+    "help-club-in-app-marketing": [
+      "venueAdmin"
+    ],
+    "help-club-marketing-campaigns": [
+      "venueAdmin"
+    ],
+    "help-club-messaging-credit": [
+      "venueAdmin"
+    ],
+    "help-club-messaging-logs": [
+      "masterAdmin"
+    ],
+    "help-club-notification-subscriptions": [
+      "venueAdmin"
+    ],
+    "help-club-sms-notification": [
+      "venueAdmin"
+    ],
+    "help-club-template-repository": [
+      "venueAdmin"
+    ],
+    "help-club-website-feed": [
+      "venueAdmin"
+    ],
+    "help-club-whatsapp-notification": [
+      "venueAdmin"
+    ],
+    "help-completed-shoutouts": [
+      "patron"
+    ],
+    "help-create-publish-schedule": [
+      "venueAdmin"
+    ],
+    "help-data-classification": [
+      "masterAdmin"
+    ],
+    "help-default-template": [
+      "patron"
+    ],
+    "help-display-idle-default": [
+      "venueAdmin"
+    ],
+    "help-do-not-sell": [
+      "patron"
+    ],
+    "help-donpapi-led-wall": [
+      "patron"
+    ],
+    "help-employee-network": [
+      "venueAdmin"
+    ],
+    "help-featured-staff": [
+      "venueAdmin"
+    ],
+    "help-features-services": [
+      "masterAdmin"
+    ],
+    "help-floqai-audience-sections": [
+      "masterAdmin"
+    ],
+    "help-floqai-page": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-floqai-template-search": [
+      "patron"
+    ],
+    "help-football-intro": [
+      "patron"
+    ],
+    "help-general-notifications": [
+      "patron"
+    ],
+    "help-generic-shoutouts": [
+      "patron"
+    ],
+    "help-heist-enable-64x48": [
+      "masterAdmin"
+    ],
+    "help-location-search": [
+      "patron"
+    ],
+    "help-mail-logging": [
+      "masterAdmin"
+    ],
+    "help-master-ad-approval": [
+      "masterAdmin"
+    ],
+    "help-master-ad-intake": [
+      "masterAdmin"
+    ],
+    "help-master-ad-live": [
+      "masterAdmin"
+    ],
+    "help-master-ad-settings": [
+      "masterAdmin"
+    ],
+    "help-master-ad-stats": [
+      "masterAdmin"
+    ],
+    "help-master-completed-log": [
+      "masterAdmin"
+    ],
+    "help-master-network-intelligence": [
+      "masterAdmin"
+    ],
+    "help-master-ops-status": [
+      "masterAdmin"
+    ],
+    "help-master-shoutout-retention": [
+      "masterAdmin"
+    ],
+    "help-mingl-requests": [
+      "patron"
+    ],
+    "help-mingl-search": [
+      "patron"
+    ],
+    "help-multi-delete-shifts": [
+      "venueAdmin"
+    ],
+    "help-my-profile": [
+      "patron"
+    ],
+    "help-network-promoters": [
+      "masterAdmin"
+    ],
+    "help-onboarding": [
+      "masterAdmin"
+    ],
+    "help-public-media-sharing": [
+      "patron"
+    ],
+    "help-role-profiles": [
+      "venueAdmin"
+    ],
+    "help-schedule-confirm": [
+      "venueAdmin"
+    ],
+    "help-schedule-message-templates": [
+      "venueAdmin"
+    ],
+    "help-service-members": [
+      "venueAdmin"
+    ],
+    "help-shoutout-recommendations": [
+      "patron"
+    ],
+    "help-soccer-jersey": [
+      "patron"
+    ],
+    "help-sos2fa-entity-mgmt": [
+      "masterAdmin"
+    ],
+    "help-sos2fa-request-channels": [
+      "masterAdmin"
+    ],
+    "help-staff-marketing-consent": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-staff-schedule-user-guide": [
+      "venueAdmin"
+    ],
+    "help-staff-scheduling": [
+      "venueAdmin"
+    ],
+    "help-staff-week-calendar": [
+      "venueAdmin"
+    ],
+    "help-staff-worksheet": [
+      "venueAdmin"
+    ],
+    "help-suprstar": [
+      "patron"
+    ],
+    "help-template-catalog-report": [
+      "venueAdmin"
+    ],
+    "help-template-preview": [
+      "patron"
+    ],
+    "help-template-tags": [
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-tengo-muchos-dolares": [
+      "patron"
+    ],
+    "help-translation-overrides": [
+      "masterAdmin"
+    ],
+    "help-trending-shoutouts": [
+      "patron"
+    ],
+    "help-twilio-compliance-logs": [
+      "masterAdmin"
+    ],
+    "help-twilio-logging": [
+      "masterAdmin"
+    ],
+    "help-venue-crawl-datapoints": [
+      "masterAdmin"
+    ],
+    "help-venue-hours-calendar": [
+      "venueAdmin"
+    ],
+    "help-venue-links": [
+      "masterAdmin"
+    ],
+    "help-venue-onboarding": [
+      "masterAdmin"
+    ],
+    "help-venue-website-ingest": [
+      "venueAdmin"
+    ],
+    "help-welcome": [
+      "patron"
+    ]
+  },
+  "intents": {
+    "ad-campaigns": [
+      "patron"
+    ],
+    "bartr": [
+      "patron"
+    ],
+    "clubs": [
+      "patron"
+    ],
+    "football-intro": [
+      "patron"
+    ],
+    "help-app-language": [
+      "patron"
+    ],
+    "help-club-admin": [
+      "patron"
+    ],
+    "help-club-display-screens": [
+      "venueAdmin"
+    ],
+    "help-club-notification-subscriptions": [
+      "venueAdmin"
+    ],
+    "help-create-publish-schedule": [
+      "privilegedEmployee"
+    ],
+    "help-dj": [
+      "patron"
+    ],
+    "help-do-not-sell": [
+      "patron"
+    ],
+    "help-donpapi-led-wall": [
+      "patron"
+    ],
+    "help-general": [
+      "patron"
+    ],
+    "help-general-notifications": [
+      "patron"
+    ],
+    "help-guest-list": [
+      "patron"
+    ],
+    "help-hospitality": [
+      "patron"
+    ],
+    "help-mail-logging": [
+      "masterAdmin"
+    ],
+    "help-media-creator": [
+      "patron"
+    ],
+    "help-multi-delete-shifts": [
+      "privilegedEmployee"
+    ],
+    "help-my-profile": [
+      "patron"
+    ],
+    "help-nfl-jersey": [
+      "patron"
+    ],
+    "help-onboarding": [
+      "patron"
+    ],
+    "help-post-ad": [
+      "patron"
+    ],
+    "help-promoter": [
+      "patron"
+    ],
+    "help-role-profiles": [
+      "patron"
+    ],
+    "help-schedule-confirm": [
+      "serviceMember"
+    ],
+    "help-schedule-message-templates": [
+      "venueAdmin"
+    ],
+    "help-scheduling": [
+      "serviceMember"
+    ],
+    "help-sell-bartr": [
+      "patron"
+    ],
+    "help-service-member": [
+      "patron"
+    ],
+    "help-shoutout": [
+      "patron"
+    ],
+    "help-soccer-jersey": [
+      "patron"
+    ],
+    "help-staff-schedule-grid": [
+      "privilegedEmployee"
+    ],
+    "help-staff-schedule-user-guide": [
+      "serviceMember"
+    ],
+    "help-staff-worksheet": [
+      "serviceMember"
+    ],
+    "help-suprstr": [
+      "patron"
+    ],
+    "help-template-catalog-report": [
+      "masterAdmin"
+    ],
+    "help-translation-overrides": [
+      "masterAdmin"
+    ],
+    "help-venue-crawl-datapoints": [
+      "masterAdmin"
+    ],
+    "help-venue-hours-calendar": [
+      "venueAdmin"
+    ],
+    "help-venue-website-ingest": [
+      "venueAdmin"
+    ],
+    "help-vip": [
+      "patron"
+    ],
+    "mingl": [
+      "patron"
+    ],
+    "rydr": [
+      "patron"
+    ],
+    "shoutout": [
+      "patron"
+    ],
+    "suprstr": [
+      "patron"
+    ],
+    "tengo-muchos-dolares": [
+      "patron"
+    ],
+    "venue-search": [
+      "public"
+    ]
+  }
+}

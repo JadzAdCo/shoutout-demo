@@ -1,11 +1,52 @@
 ---
-description: PROPOSAL (awaiting owner approval, Oct 2026) — FLOQR data classification + DLP architecture with five access datapoints and a Master Admin Security → Data classification tab. Do not build until approved.
+description: FLOQR data classification (approved Oct 8 2026; phase 1 + FloqAi enforcement shipped s3.1.21) — five tier datapoints + Public/own/PII/retention, server-only System tier, Master Admin Security → Data classification, FloqAi results filtered by classification server-side (getFloqAiAccess).
 alwaysApply: false
 ---
 
-# Data classification & data security — PROPOSAL (not built)
+# Data classification & data security
 
-Resume: `@data-class$`. Status: **awaiting owner approval** (requested Oct 7 2026). Build only after the owner approves; record the decision here.
+Resume: `@data-class$`. Status: **approved Oct 8 2026**. Phase 1 (register + Master Admin tab + exposure report) and FloqAi enforcement (phase 5 pulled forward) shipped in **s3.1.21**. Phases 2–4 open; phase 3 needs an explicit owner go-ahead before writing production data. The proposal text below is kept for history; the "Shipped (s3.1.21)" section wins where they differ.
+
+## Shipped (s3.1.21)
+
+### Register
+
+- `functions/data-classification-core.js` (UMD) is the packaged catalog and access model; `floqr-data-classification.js` is a byte-identical copy served to the browser (`scripts/sync-data-classification-client.js`; a test enforces equality).
+- Every collection in `firestore.rules` has a catalog row, including nested `suprstrSessions/callerCandidates` and `/calleeCandidates` (test fails otherwise). Row datapoints: `isPublicAccessible`, the five tiers, `ownRecordReadable`, `containsPII`, `retentionDays`, `isSystemAccessible` (always 1), plus derived `classificationLevel` (public / internal / clubConfidential / restricted / secret) and `scope` (platform | club).
+- Tiers are cumulative upward; own-record implies Master Admin. Saved overrides live in `dataClassification/{collection with / → __}` — Master Admin read, writes only via SOS2FA callables `seedDataClassification` / `setDataClassification` / `logDataClassificationExport` on the Features & Services audit chain (`dataClass.seeded|changed|exported`).
+- **Field rows** (`FIELD_CATALOG`, release-only, shown read-only in the tab): `users.marketingMediaConsent` = restricted, own-record readable, Club Admin of the affiliated club (club scope); `users.email` / `users.phone` ownMaster; `clubEmployeeDesignations.workerEmail` / `workerPhone` ownClubAdmin. Consent collections: `staffMarketingConsentLogs` ownClubAdmin + PII, `staffMarketingConsentThrottle` secret; rules = Master Admin read / server write, throttles closed.
+- Classification is **not yet** enforced by Firestore rules (phase 4). The tab’s exposure report (parses the served `./firestore.rules`) lists where rules are broader than the register — 70+ rows at ship time (`users`, `inboxNotifications`, `clubEmployeeDesignations`, `messages`, `roleRequests` reads; signed-in writes on `events`, `inboxNotifications`, …).
+
+### System tier (platform server identity)
+
+`isSystemAccessible` is always 1 and cannot be edited (`validateChange` forces it; not in `FLAGS`). Controls:
+
+1. **Server-only.** `system` is in `ROLES` but not `CLIENT_ROLES`; `resolveViewerRole` never returns it; `access(row, {role: "system"})` is "no" unless the caller passes `server: true` (only server code does). No custom claim or user field grants it.
+2. **Least privilege per job.** `SYSTEM_JOBS` lists each job’s purpose and allowlisted collections; `systemJob(job, collection)` throws otherwise. `getFloqAiAccess` reads only through `systemCollection()` (job `floqAiAccess`).
+3. **Audited purpose.** Each FloqAi access check writes a structured Cloud Logging line (`event: floqai.access`, job, purpose, role, counts, App Check verdict). Restricted / secret / unclassified denials also write an unchained `floqai.content_denied` row to `featureServiceAuditLogs` (throttled 20 / 10 min per uid or hashed IP in `floqAiAccessThrottle`).
+4. **App Check / auth on the fronting callable.** Verdict recorded (`appCheck: verified|missing`); enforcement stays off until hubs send tokens (see App Check note). Auth optional — signed-out callers resolve to `anonymous`.
+5. **Never returns more than the caller’s tier.** The callable returns only allowed/denied ids, the caller’s role name, and a club count — never levels, club ids, or other people’s data.
+- Honest gaps: other existing Functions still use the Admin SDK directly and have not moved onto `systemJob`; help copy still ships in the public JS bundle, so classification controls what FloqAi **shows**, not secrecy of the text.
+
+### FloqAi enforcement
+
+- Every FloqAi source has an id: `help:<repository id>` or `intent:<curated id>` (`venue-search` is `intent:venue-search`, public). Repository entries carry `audiences`; curated intents are classified in `INTENT_AUDIENCES` in `intent-search.js`. Audience → datapoint: public → isPublicAccessible, patron, serviceMember → regular, privilegedEmployee, venueAdmin → clubAdmin, masterAdmin.
+- **Fail closed:** an intent with no `INTENT_AUDIENCES` entry, a malformed id, or an id missing from the server manifest is never shown. Runtime-only DOM popouts (`popout-*`) are not in the manifest, so the server denies them; durable copy must be seeded in the repository.
+- **Translations inherit:** localized help keeps the source entry id; the check always runs on the source id (test with a stub localizer).
+- **Server:** `functions/floqai-content-classes.json` (built by `scripts/build-floqai-content-classes.js`, drift test) + `getFloqAiAccess({sourceIds ≤ 60})` → keeps the `featureServices/floqAi` guard (`assertFeatureAccess`), resolves role from server facts (Master Admin via `viewerFor`; Club Admin via `clubLocations.adminUids|masterAdminUids|adminEmails` + active `clubAdminAssignments`; staff via non-rejected `clubEmployeeDesignations`, privileged when `rolePermissions` non-empty), ignores anything role-like in the request.
+- **Client:** `floqai-access.js` (`FLOQRFloqAiAccess`) batches ids, caches verdicts per viewer (reset on auth change), and `intent-search.js` renders only server-allowed ids on `floqai.html` (“Checking what your account can see…” while pending). If the callable is unreachable it falls back to the packaged local classification (still fail closed); a feature denial hides everything. `index.html` keeps the local path only.
+- Club Admin “scoped to their club”: FloqAi content is platform-scoped help today; club-scoped data (venue records) stays behind rules / venue callables.
+
+### Master Admin → Security → Data classification
+
+Grid (Public, five tiers, read-only System column, Own, PII, retention, level, rules read/write breadth, per-row Save with reason), sensitive-fields table, simulator (all roles incl. System), exposure report, Export CSV (logged). Panel is SOS2FA-gated (`ENTITY_MGMT_PANELS`). Chrome keys `dataClass.*` + `master.securityDataClassification` in all 11 packs; help `help-data-classification` (masterAdmin, English).
+
+### Still open
+
+- Phase 2: custom claims (`role`, `clubIds`) trigger; rules accept claim or legacy check.
+- Phase 3: PII split (e.g. `users` → `userPrivate`) — dry-run script only; owner go-ahead required before production writes.
+- Phase 4: rules generated from the register + drift test; close the exposure rows.
+- Move remaining Admin SDK jobs onto `SYSTEM_JOBS`; App Check enforcement when metrics are healthy.
 
 ## Owner ask
 
@@ -101,3 +142,4 @@ Firestore `dataClassification/{collection}` (+ optional `fields.{field}` overrid
 ## Decision log
 
 - Oct 7 2026 — proposal written; waiting for owner approval (or changes) before phase 1.
+- Oct 8 2026 — **owner approved all phases** ("build phase 1 now, then continue phases 2–5"). Phase 3 production migration still runs dry-run first and needs an explicit owner go-ahead before writing production data.

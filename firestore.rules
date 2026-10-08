@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.1.11-template-rbac
+// FLOQR FIRESTORE RULES VERSION: s3.1.21-data-classification
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.11-template-rbac
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.0-ads-server-only
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.108-feature-services-beta
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.0.103-privacy-consents-owner
@@ -110,6 +111,33 @@ service cloud.firestore {
  "stripeConnectLivemode",
  "stripeConnectUpdatedAt"
  ]);
+ }
+
+ // Design notes: .cursor/rules/design-notes-staff-marketing-consent.mdc
+ function hasStaffMarketingConsent(data) {
+ return data.get("marketingMediaConsent", null) is map
+ && data.marketingMediaConsent.get("accepted", 0) == 1;
+ }
+
+ function isServiceMemberFlag(data) {
+ return data.get("IsServiceMember", 0) in [1, "1", true, "true", "yes"];
+ }
+
+ function createsServiceMemberWithoutConsent() {
+ return isServiceMemberFlag(request.resource.data)
+ && !hasStaffMarketingConsent(request.resource.data);
+ }
+
+ function startsServiceMembershipWithoutConsent() {
+ return isServiceMemberFlag(request.resource.data)
+ && !isServiceMemberFlag(resource.data)
+ && !hasStaffMarketingConsent(request.resource.data);
+ }
+
+ function optInRequestHasConsent() {
+ return request.resource.data.get("marketingMediaConsentAccepted", 0) == 1
+ && request.resource.data.get("marketingMediaConsentVersion", "") is string
+ && request.resource.data.get("marketingMediaConsentVersion", "").size() > 0;
  }
 
  function preservesStripeBindingFields() {
@@ -390,10 +418,12 @@ service cloud.firestore {
 
  match /users/{userId} {
  allow create: if isSelf(userId)
- && !hasBackendOnlyIdentityFields(request.resource.data);
+ && !hasBackendOnlyIdentityFields(request.resource.data)
+ && !createsServiceMemberWithoutConsent();
  allow read: if signedIn();
  allow update: if isSelf(userId)
- && preservesBackendOnlyIdentityFields();
+ && preservesBackendOnlyIdentityFields()
+ && !startsServiceMembershipWithoutConsent();
  allow delete: if isParticipant()
  && isDiagnosticResource();
  }
@@ -448,6 +478,26 @@ service cloud.firestore {
  match /featureServiceAuditHead/{docId} {
  allow read: if isMasterAdmin();
  allow write: if false;
+ }
+
+ // Data classification register: Master Admin read; writes only via SOS2FA callables.
+ match /dataClassification/{docId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /floqAiAccessThrottle/{uid} {
+ allow read, write: if false;
+ }
+
+ // Staff marketing media consent evidence: written only by recordStaffMarketingConsent.
+ match /staffMarketingConsentLogs/{logId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /staffMarketingConsentThrottle/{uid} {
+ allow read, write: if false;
  }
 
  match /featureServiceAccessThrottle/{uid} {
@@ -796,7 +846,8 @@ service cloud.firestore {
  }
 
  match /workerAssociationRequests/{id} {
- allow read, create, update, delete: if signedIn();
+ allow create: if signedIn() && optInRequestHasConsent();
+ allow read, update, delete: if signedIn();
  }
 
  match /clubAdminNotifications/{id} {
@@ -844,7 +895,9 @@ service cloud.firestore {
  }
 
  match /roleRequests/{id} {
- allow create, read, update, delete: if signedIn();
+ allow create: if signedIn()
+ && (request.resource.data.get("requestKind", "") == "masterAdminAssignment" || optInRequestHasConsent());
+ allow read, update, delete: if signedIn();
  }
 
  match /clubEmployeeDesignations/{id} {

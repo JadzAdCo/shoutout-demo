@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.20";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.21";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,14 +1284,24 @@
       ]
     },
     {
+      version: "s3.1.21-data-classification",
+      title: "Data classification register with a Master Admin Security tab, server-only System tier, FloqAi results filtered by classification on the server, and staff marketing media consent",
+      checks: [
+        {label:"Classification core", file:"floqr-data-classification.js", includes:["function filterContent(", "SYSTEM_JOBS"]},
+        {label:"Security tab", file:"master-admin.html", includes:["id=\"dataClassification\""]},
+        {label:"FloqAi access gate", file:"floqai-access.js", includes:["getFloqAiAccess"]},
+        {label:"FloqAi classified intents", file:"intent-search.js", includes:["INTENT_AUDIENCES"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.21\""]}
+      ]
+    },
+    {
       version: "s3.1.20-club-feed-floqai",
       title: "Club Admin website feed (iframe / JSON / RSS of events, DJs, featured staff, gallery), staff photo consent before publishing pictures, and FloqAi on its own page",
       checks: [
         {label:"Club feed datasets", file:"functions/club-public-feed-core.js", includes:["function staffView(", "function buildEventsRss("]},
         {label:"Website feed card", file:"admin.html", includes:["id=\"websiteFeedGenerateBtn\""]},
         {label:"Club website iframe", file:"club-embed.js", includes:["dataset"]},
-        {label:"FloqAi page", file:"floqai.html", includes:["data-floqr-feature=\"floqAi\""]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.20\""]}
+        {label:"FloqAi page", file:"floqai.html", includes:["data-floqr-feature=\"floqAi\""]}
       ]
     },
     {

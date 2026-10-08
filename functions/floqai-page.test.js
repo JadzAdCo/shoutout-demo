@@ -12,7 +12,7 @@ test("FloqAi has its own page and every entry point goes there", () => {
   const nav = read("floqr-nav.js");
   assert.match(nav, /intentSearchHome\(\) \{\s*return buildUrl\("\.\/floqai\.html", \{ v: APP_V \}\);/);
   assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/floqai\.html"/, "old ?start=intent links redirect");
-  assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*href="\.\/floqai\.html\?v=s3\.1\.20&from=search"/);
+  assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*href="\.\/floqai\.html\?v=s3\.1\.\d+&from=search"/);
   assert.match(read("floqai-search.html"), /location\.replace\("\.\/floqai\.html/);
   assert.match(read("floqr-feature-services.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
   assert.match(read("functions/feature-services-core.js"), /key: "floqAi"[^}]*route: "\.\/floqai\.html"/);
@@ -33,7 +33,7 @@ test("FloqAi page is a guarded satellite with audience-filtered search", () => {
   assert.match(page, /bindIntentSearch\(/);
   assert.match(page, /syncHelpAudienceFromAuth/);
   assert.match(page, /getViewerAudience/);
-  assert.match(read("intent-search.js"), /canAccessHelpEntry\(\{audiences\}, flags\)/, "results filtered by viewer access flags");
+  assert.match(read("intent-search.js"), /locallyAllowed\(audiences, intent\.sourceId, flags\)/, "results filtered by classification for the viewer");
 });
 
 test("FloqAi page chrome is localized", () => {
