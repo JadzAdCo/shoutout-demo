@@ -34,6 +34,27 @@
   margin-left:0 !important;
   align-self:center;
 }
+.help-popout summary,
+.help-popout .help-popout-body,
+.help-popout > div:not(summary){
+  text-transform:none;
+  letter-spacing:normal;
+  word-spacing:normal;
+  font-style:normal;
+  text-shadow:none;
+  text-align:left;
+}
+.help-popout summary{line-height:1}
+:where(.card,.notice,.login-card,.queue-item):where(:has(details.help-popout[open])){position:relative;z-index:40}
+.help-popout .help-popout-body,
+.help-popout > div:not(summary){
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  font-size:14px;
+  font-weight:500;
+  line-height:1.45;
+  white-space:normal;
+  overflow-wrap:break-word;
+}
 h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
   width:fit-content !important;
   max-width:100%;

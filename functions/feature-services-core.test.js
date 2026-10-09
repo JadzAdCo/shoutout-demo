@@ -295,7 +295,7 @@ test("Master Admin Features & Services tab is SOS2FA gated", () => {
   const html = read("master-admin.html");
   assert.match(html, /data-panel="featuresServices"/);
   assert.match(html, /<section id="featuresServices"/);
-  assert.match(html, /master-feature-services\.js\?v=s3\.0\.110/);
+  assert.match(html, /master-feature-services\.js\?v=s3\.1\.29/);
   assert.match(html, /id="betaInviteFeatures"/);
   const app = read("master-feature-services.js");
   assert.match(app, /httpsCallable\("setBetaTesterFeatures"\)|call\("setBetaTesterFeatures"/);

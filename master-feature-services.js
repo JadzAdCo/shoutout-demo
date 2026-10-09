@@ -348,23 +348,49 @@
     return [row.targetType, row.targetId].filter(Boolean).join(": ");
   }
 
+  function auditWhen(row) {
+    const iso = String(row.createdAtIso || "");
+    return iso ? iso.replace("T", " ").replace(/\.\d+Z$/, "Z") : formatWhen(row.createdAtMs);
+  }
+
+  function truncated(value, className = "") {
+    const text = String(value == null ? "" : value);
+    return text ? `<span class="audit-trunc ${className}" title="${esc(text)}">${esc(text)}</span>` : "";
+  }
+
+  function auditChange(row) {
+    if (!row.before && !row.after) return "";
+    const text = `${JSON.stringify(row.before || {}, null, 1)}\n→\n${JSON.stringify(row.after || {}, null, 1)}`;
+    return `<details class="audit-change"><summary>Before → after</summary><pre class="audit-json">${esc(text)}</pre></details>`;
+  }
+
+  function outcomeKey(outcome) {
+    const value = String(outcome || "").toLowerCase();
+    return ["success", "denied", "failure"].includes(value) ? value : "other";
+  }
+
+  function auditRowHtml(row) {
+    const seq = row.chained ? `<span class="audit-seq">#${esc(row.seq)}</span>` : "";
+    const hash = row.chained && row.hash ? truncated(row.hash, "audit-mono") : "";
+    const role = row.actorRole ? `<small class="audit-sub">${esc(row.actorRole)}</small>` : "";
+    return `<tr class="audit-row">
+      <td data-label="When (UTC)"><time datetime="${esc(row.createdAtIso || "")}">${esc(auditWhen(row))}</time>${seq}${hash}</td>
+      <td data-label="Event"><code class="audit-event">${esc(row.eventType || "—")}</code>${auditChange(row)}</td>
+      <td data-label="Who">${truncated(row.actorEmail || row.actorUid || "—")}${role}${truncated(row.sourceIpTruncated, "audit-mono")}</td>
+      <td data-label="Target">${truncated(auditTarget(row)) || "—"}</td>
+      <td data-label="Outcome"><span class="audit-outcome is-${outcomeKey(row.outcome)}">${esc(row.outcome || "—")}</span></td>
+      <td data-label="Reason">${esc(row.reason || "—")}</td>
+    </tr>`;
+  }
+
   async function loadAudit() {
     const tbody = byId("featureAuditRows");
     if (!tbody) return;
     try {
       const snap = await db().collection("featureServiceAuditLogs").orderBy("createdAtMs", "desc").limit(AUDIT_LIMIT).get();
-      tbody.innerHTML = snap.empty ? "<tr><td colspan=\"6\">No activity yet.</td></tr>" : snap.docs.map(doc => {
-        const row = doc.data();
-        const change = row.before || row.after ? `<br/><small>${esc(JSON.stringify(row.before || {}))} → ${esc(JSON.stringify(row.after || {}))}</small>` : "";
-        return `<tr>
-          <td>${esc(row.createdAtIso || formatWhen(row.createdAtMs))}${row.chained ? ` <small>#${esc(row.seq)}</small>` : ""}</td>
-          <td>${esc(row.eventType)}${change}</td>
-          <td>${esc(row.actorEmail || row.actorUid || "—")}<br/><small>${esc(row.actorRole || "")} ${esc(row.sourceIpTruncated || "")}</small></td>
-          <td>${esc(auditTarget(row))}</td>
-          <td>${esc(row.outcome)}</td>
-          <td>${esc(row.reason || "")}</td>
-        </tr>`;
-      }).join("");
+      tbody.innerHTML = snap.empty
+        ? "<tr class=\"audit-empty\"><td colspan=\"6\">No activity yet.</td></tr>"
+        : snap.docs.map(doc => auditRowHtml(doc.data())).join("");
     } catch (error) {
       setStatus("featureAuditStatus", `Could not load audit trail: ${errorText(error)}`);
     }
@@ -422,5 +448,5 @@
     loadAll();
   }
 
-  root.FLOQRMasterFeatureServices = {mount, refreshFeatures, loadAudit};
+  root.FLOQRMasterFeatureServices = {mount, refreshFeatures, loadAudit, auditRowHtml};
 })(window);
