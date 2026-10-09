@@ -230,6 +230,12 @@ test("every Functions Master Admin check goes through admin-trust", () => {
   files.forEach(file => {
     const src = read(file);
     assert.doesNotMatch(src, /MASTER_ADMIN_EMAILS\.includes\(/, `${file}: inline admin email check`);
+    assert.doesNotMatch(src, /data\.masterAdmin === true|profile\?\.superAdmin === true/, `${file}: trusts a users-doc admin flag`);
+    if (src.includes('doc("masterAdmins")')) {
+      const fn = (src.match(/async function isMasterAdminAuth\(authContext = \{\}\) \{[\s\S]*?\r?\n\}/) || [""])[0];
+      assert.match(fn, /isServerAdminAuth\(authContext\)/, `${file}: admin-trust first`);
+      assert.match(fn, /email_verified !== true\) return false/, `${file}: platformSettings list needs a verified email`);
+    }
   });
 });
 

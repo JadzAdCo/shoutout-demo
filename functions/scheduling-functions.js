@@ -3,6 +3,7 @@
 
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {isServerAdminAuth} = require("./admin-trust");
 const {
   normalizeShiftStatus,
   publishedShiftStatus,
@@ -56,6 +57,8 @@ async function bumpPublicScheduleRevision(ownerType, ownerId, previousStatus, ne
 }
 
 async function isMasterAdminAuth(authContext = {}) {
+  if (isServerAdminAuth(authContext)) return true;
+  if (authContext.token?.email_verified !== true) return false;
   const email = String(authContext.token?.email || "").toLowerCase();
   if (!email) return false;
   const snap = await db.collection("platformSettings").doc("masterAdmins").get();

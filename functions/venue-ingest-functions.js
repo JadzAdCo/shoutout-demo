@@ -21,6 +21,7 @@ const {
 } = require("./venue-ingest-core");
 const crypto = require("crypto");
 const clubFeed = require("./club-public-feed-core");
+const {isServerAdminAuth} = require("./admin-trust");
 
 const CLUB_DATASETS = new Set(["profile", "staff", "djs", "events", "gallery", "club", "all"]);
 
@@ -32,6 +33,8 @@ function text(value = "", max = 500) {
 }
 
 async function isMasterAdminAuth(authContext = {}) {
+  if (isServerAdminAuth(authContext)) return true;
+  if (authContext.token?.email_verified !== true) return false;
   const email = String(authContext.token?.email || "").toLowerCase();
   if (!email) return false;
   const snap = await db.collection("platformSettings").doc("masterAdmins").get();

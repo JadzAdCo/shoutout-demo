@@ -46,6 +46,7 @@ $files = @(
   "functions/seed-and-storage-lockdown.test.js",
   "functions/shoutout-compliance-functions.js",
   "functions/sos2fa-functions.js",
+  "functions/venue-ingest-functions.js",
   "guest-list.html",
   "index.html",
   "master-admin.html",
@@ -74,6 +75,7 @@ $files = @(
   "scripts/bump-s3-1-26-admin-trust.js",
   "scripts/bump-s3-1-26.js",
   "scripts/drop-typo-admin-email.js",
+  "scripts/patch-main-demo-seed-admin.js",
   "scripts/patch-main-suprstr-session-email.js",
   "scripts/run-rules-emulator-tests.ps1",
   "seed-v29-09-14.html",
@@ -133,7 +135,9 @@ if ($LASTEXITCODE -ne 0) { throw "Could not drop the typo admin address on main"
 $typo = Select-String -Path (Join-Path $stage "*.js"), (Join-Path $stage "*.html"), (Join-Path $stage "*.rules"), (Join-Path $stage "functions/*.js") -Pattern "bands\.don@gmail\.com" -List |
   Where-Object { $_.Filename -notlike "*.test.js" }
 if ($typo) { throw "Typo admin address still on main: $(($typo | ForEach-Object { $_.Filename }) -join ', ')" }
-$files += "functions/package.json", "functions/suprstr-functions.js", "feature-gates.js"
+node (Join-Path $stage "scripts/patch-main-demo-seed-admin.js")
+if ($LASTEXITCODE -ne 0) { throw "Could not patch demo-seed-functions.js on main" }
+$files += "functions/package.json", "functions/suprstr-functions.js", "functions/demo-seed-functions.js", "feature-gates.js"
 
 Push-Location $stage
 try {
