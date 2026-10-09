@@ -1,0 +1,63 @@
+---
+description: LED board fit (s3.1.25) — Firestore board size wins over packaged venue data, only approved/live ShoutOuts render with a default expiry, safe-margin whole-word text fit, native-pixel preview frames. C (classicFitStyle compact sizing) and D (display health diagnostics) intentionally untouched.
+alwaysApply: false
+---
+
+# LED board fit (s3.1.25)
+
+Resume: `@board-fit$` / `$led-fit$`.
+
+Modules: `floqr-board-fit.js` → `window.FLOQRBoardFit` (also `module.exports` for tests) and `floqr-board-frame.js` → `window.FLOQRBoardFrame`. Tests: `functions/board-fit.test.js`, `functions/display-text-fit.test.js`. `display-app.js` keeps a fallback path for every call so it still works on pages that do not load the modules (local QA pages).
+
+## A — Board size: Firestore wins
+
+`display-app.js` `mergeLiveVenue(packagedLoc, live)` → `FLOQRBoardFit.mergeVenueForDisplay`, then `FLOQRScreenDatapoints.applyVenue`.
+
+| Field | Rule |
+|---|---|
+| `primaryDisplayScreenFormatId` | live `primaryDisplayScreenFormatId` → live `displayType` → live `screenFormatId` → packaged (same order) |
+| `secondaryDisplayScreenFormatId` | live → packaged → merged primary |
+| `displayScreenFormatIds` | live list when non-empty, else packaged (no union) |
+| `VenueSupports96x48/64x48/64x32` | live when explicit `0|1`, else packaged when explicit, else unset |
+| everything else | `{...packaged, ...live}` |
+
+Unchanged semantics kept in `mergeLiveVenue`: `displayFooterBrand` (live → packaged → "FLOQR ShoutOut"), `ledPanel`, `approvedDisplayIps` (live or `[]`), `displayIpRestrictionEnabled === true`, `displayTokenRequired`. `FLOQRBoardFit.effectiveBoardSize` reports `{formatId, source: firestore|packaged|default}` for diagnostics.
+
+## B — Only approved/live content renders
+
+`isRenderableLiveContent(data)` → `FLOQRBoardFit.liveContentDecision(data) === "live"`: status `approved` or `live` **and** non-blank `mainText` or a `mediaUrl`. Any other status (pending, rejected, played, expired, preview, default, empty) shows the idle club board (`defaultClubDisplayPayload`). The live snapshot keeps the literal `const isIdleDoc = !doc.exists || isIdlePayload(payload) || …` — `ai-diagnostics-service.js` greps for it.
+
+Expiry (`liveContentExpiresMillis` → `FLOQRBoardFit.liveExpiryMillis`), first match wins:
+
+1. `expiresAt` / `liveUntil` / `playedUntil`
+2. `approvedAt` + `displayDurationSeconds` (default 600)
+3. `updatedAt` / `createdAt` + duration
+4. first-seen + duration — first-seen persisted in `localStorage["floqr.liveFirstSeen.<liveContentDocId>"]` keyed by `livePlaybackKey`, so a Xibo reload does not restart the clock.
+
+On expiry the board shows the idle board and remembers `expiredLiveKey` so the same doc does not replay.
+
+## E — Text fit
+
+- Words are never split (`pushWrapped` puts an over-long word on its own row; `packAllWordsIntoRows` / `packWordsWithoutSplitting` grow the per-row budget instead of slicing) and never dropped: if the line-break pass would drop words, all words are repacked. The template character cap (`maxMainCharacters`) still applies, via `wholeWordSlice` — it ends at the last whole word, never mid-word.
+- Classic (`.classic-board-lines > b`) and text-overlay (`.text-overlay-lines > b`) rows render as `<b style="--fit-size…"><span class="board-fit-run">…</span></b>`. `FLOQRBoardFit.scheduleFit(canvas)` runs at the end of `render` (and the jersey branch) on paint, next frames, `document.fonts.ready`, and ResizeObserver.
+- Each row keeps its designed `--fit-size`. Only a row whose run would exceed the row minus the safe margin (**4 % each side horizontally, 6 % vertically**) gets an inline `font-size: Npx !important`. Floor `MIN_SCALE` 0.3 of the designed size.
+- `fitDisplayMessageLines` (full/split templates) binary-searches against the same safe width/height.
+- Identity pill `.classic-identity-shell strong` shrinks instead of ellipsis (`text-overflow: clip` once fitted).
+- Wider boards fit more naturally because the measurement is in real pixels.
+
+## Preview fidelity
+
+- `FLOQRBoardFrame.mount(iframe, formatId, {maxHeight})` wraps the iframe in `.floqr-board-frame`, sizes the iframe to the board's native pixels (`FLOQR_DISPLAY_FORMATS[id].pixelWidth/pixelHeight`: 96×48 = 624×312, 64×48 = 416×312, 64×32 = 416×208) and CSS-transform scales it to the host (ResizeObserver). `vw`/`px` clamps and `@media(max-width:760px)` inside display.css therefore behave exactly as on the LED.
+- Used by `patron-app.js` `updatePreview` (`#previewFrame`), `floqr-template-preview.js` (template preview modal), and Club Admin `#liveFrame` (packaged primary size).
+- `display-app.js` preview mode (`isUrlPreviewMode`): `paintUrlPreviewNow()` paints from packaged data at once, then `hydrateUrlPreviewFromFirestore()` loads Firestore templates + venue (same `mergeLiveVenue`) and re-renders the last payload given to `window.renderShoutOutDisplay` (or rebuilds the URL payload). Preview never calls Display Security.
+- Preview URLs still never carry `?v=`; Xibo URLs stay `display.html?location=` / `display2.html?location=`.
+
+## Intentionally untouched
+
+- **C:** `classicFitStyle` compact / primary-format logic (Display 2 sizing on `64x32` uses `loc.primaryDisplayScreenFormatId`). Guarded by a test in `board-fit.test.js`.
+- **D:** display health / error diagnostics.
+
+## Known limits
+
+- The neon / full template sub line (`#displaySub`) and @handles are capped by `maxSubCharacters` / handle caps before render; that is a data cap, not CSS clipping. The composer enforces the same caps.
+- Club Admin `#liveFrame` sizes from the packaged venue row (admin-app does not merge Firestore there yet).

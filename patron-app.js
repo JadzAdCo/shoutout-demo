@@ -3692,7 +3692,9 @@
     };
     if(frame) {
       const format = window.FLOQR_DISPLAY_FORMATS?.[previewPayload.screenFormatId];
-      if (format) {
+      if (window.FLOQRBoardFrame) {
+        window.FLOQRBoardFrame.mount(frame, previewPayload.screenFormatId);
+      } else if (format) {
         frame.style.aspectRatio = `${format.pixelWidth} / ${format.pixelHeight}`;
         frame.style.height = "auto";
       }

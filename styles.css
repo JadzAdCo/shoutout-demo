@@ -1070,6 +1070,8 @@ html.floqr-session-ready [data-floqr-auth-chrome]{display:none!important}
 .template-preview-sizes button.active{background:#ffe27a;color:#111;border-color:#ffe27a}
 .template-preview-stage{background:#000;border-radius:10px;overflow:hidden}
 .template-preview-stage iframe{display:block;width:100%;border:0;background:#000}
+.floqr-board-frame{position:relative;width:100%;margin:0 auto;overflow:hidden;background:#000;border-radius:14px}
+.floqr-board-frame iframe{display:block;background:#000}
 .template-tags-list{display:grid;gap:10px;margin-top:10px}
 .template-tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 .template-tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:rgba(255,226,122,.16);border:1px solid rgba(255,226,122,.4);font-size:.85rem}
