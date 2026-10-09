@@ -15,6 +15,7 @@ Why: SOS2FA codes travel only by SendGrid email and Twilio SMS. Both accounts we
 - Throttle `sos2faRecoveryAttempts/{uid}`: 5 per hour (transaction), reset on success. Rules: no client access.
 - Success writes a normal `sos2faSessions` doc (`scope: entityManagement`, `via: "recovery-code"`, 1 h). Audit actions: `sos2fa_recovery_verified` / `_failed` / `_denied`.
 - UI: `master-admin.html` SOS2FA gate `<details class="sos2fa-recovery">` → `sos2fa.js` `verifyRecoveryCode`.
+- s3.1.28 (Oct 9 2026 owner decision): the normal Request SOS2FA Code / Verify path is open to **any Master Admin** (claim or verified listed email), not only the Super Admin. The recovery box follows the server and is shown only when `canUseRecoveryCode` (listed email + `emailVerified`) — claim holders with an unverified email (e.g. don.b, Microsoft) use the emailed code instead.
 
 ## Removal (when SendGrid / Twilio are paid)
 
