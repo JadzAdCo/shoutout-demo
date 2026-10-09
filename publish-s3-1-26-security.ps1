@@ -146,7 +146,7 @@ try {
   }
   if ($missing.Count) { throw "Missing referenced assets on main: $($missing -join ', ')" }
   foreach ($page in "display.html", "display2.html") {
-    if ((Get-Content $page -Raw) -match 'display2?\.html\?location=[^"'']*[?&]v=') { throw "${page}: Xibo URL must not carry ?v=" }
+    if ((Get-Content $page -Raw) -match 'display2?\.html\?location=[^"''\s<>]*[?&]v=') { throw "${page}: Xibo URL must not carry ?v=" }
   }
   node scripts/i18n-coverage-report.js | Select-Object -Last 1
   if ($LASTEXITCODE -ne 0) { throw "i18n coverage failed on staged main tree" }
