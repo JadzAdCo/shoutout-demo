@@ -24,6 +24,7 @@ service firebase.storage {
 
     // Mirrors firestore.rules isMasterAdmin() / isClubManager(). Storage rules may read at most
     // 2 Firestore docs per request: clubLocations/{id} + clubAdminAssignments/{id}_{uid}.
+    // The Storage service agent needs roles/firebaserules.firestoreServiceAgent; --non-interactive deploys skip that grant check.
     // Design notes: .cursor/rules/design-notes-data-classification.mdc → "Seed endpoints + clubMedia storage"
     function isStorageMasterAdmin() {
       return request.auth != null
