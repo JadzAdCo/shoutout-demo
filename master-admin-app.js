@@ -1,7 +1,8 @@
 /* master-admin-app.js v29.09.94
    Clean Master Admin app.
    Domain enforcement is disabled during development.
-   Access is controlled by SHOUTOUT_MASTER_ADMIN_EMAILS + Google/Microsoft provider.
+   Access is controlled by the masterAdmin/superAdmin token claim, or SHOUTOUT_MASTER_ADMIN_EMAILS with a
+   verified email, plus Google/Microsoft provider.
 */
 (function () {
   "use strict";
@@ -347,18 +348,20 @@
     }
   }
 
-  function masterSecurityCheck(user) {
+  function masterSecurityCheck(user, claims) {
     if (!user) return { ok:false, reason:"Not signed in." };
 
     const email = safeUser(user);
     const domain = getEmailDomain(email);
     const providers = getProviderIds(user);
+    // Server-issued claim; some IdPs (Microsoft) report email_verified=false for real work accounts.
+    const hasAdminClaim = claims?.masterAdmin === true || claims?.superAdmin === true;
 
     if (!email || email === "unknown" || !email.includes("@")) {
       return { ok:false, reason:"Master Admin requires email-based Google or Microsoft sign-in." };
     }
 
-    if (!MASTER_ADMIN_EMAILS.includes(email)) {
+    if (!hasAdminClaim && !MASTER_ADMIN_EMAILS.includes(email)) {
       return { ok:false, reason:`${email} is not listed in SHOUTOUT_MASTER_ADMIN_EMAILS.` };
     }
 
@@ -372,13 +375,15 @@
       return { ok:false, reason:`Master Admin email must belong to ${ALLOWED_DOMAINS.join(" or ")}.` };
     }
 
-    if (REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
+    if (!hasAdminClaim && REQUIRE_VERIFIED_EMAIL && user.emailVerified === false) {
       return { ok:false, reason:"Master Admin email must be verified by the provider." };
     }
 
-    const domainMessage = ENFORCE_DOMAINS
-      ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
-      : "Domain enforcement disabled; explicit email allow-list is active.";
+    const domainMessage = hasAdminClaim
+      ? "Master Admin claim present on the sign-in token."
+      : ENFORCE_DOMAINS
+        ? `Domain enforcement enabled for ${ALLOWED_DOMAINS.join(" or ")}.`
+        : "Domain enforcement disabled; explicit email allow-list is active.";
 
     const mfaMessage = hasFirebaseMfaEnrollment(user)
       ? "Firebase MFA enrollment detected."
@@ -2003,7 +2008,15 @@
       if (result?.user) setText("masterStatus", `Microsoft redirect sign-in completed: ${result.user.email || result.user.displayName || result.user.uid}`);
     }).catch(e => setText("masterStatus", masterAuthErrorMessage(e)));
 
-    auth.onAuthStateChanged(user => {
+    async function readTokenClaims(user) {
+      try {
+        return (await user.getIdTokenResult(true)).claims || {};
+      } catch (_) {
+        try { return (await user.getIdTokenResult()).claims || {}; } catch (__) { return {}; }
+      }
+    }
+
+    auth.onAuthStateChanged(async user => {
       if (!user) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");
@@ -2019,7 +2032,9 @@
         return;
       }
 
-      const check = masterSecurityCheck(user);
+      const claims = await readTokenClaims(user);
+      if (auth.currentUser?.uid !== user.uid) return;
+      const check = masterSecurityCheck(user, claims);
       if (!check.ok) {
         byId("masterLogin").classList.remove("hidden");
         byId("masterPanel").classList.add("hidden");
