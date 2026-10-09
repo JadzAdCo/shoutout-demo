@@ -1,17 +1,23 @@
-[CmdletBinding()] param([Parameter(Mandatory = $true)][string]$Commit, [switch]$AllowDrift)
+[CmdletBinding()] param(
+  [Parameter(Mandatory = $true)][string]$Commit,
+  [string[]]$Bases = @("d37da5b", "e640a5d"),
+  [switch]$AllowDrift
+)
 $ErrorActionPreference = "Stop"
 $env:GIT_PAGER = "cat"
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
 $stage = Join-Path $root ".publish-s3-1-26-security"
 $git = "C:\Program Files\Git\cmd\git.exe"
-# functions/suprstr-functions.js and functions/package.json differ on main: patched in place below, never overwritten.
+# feature-gates.js, functions/suprstr-functions.js and functions/package.json differ on main: patched in place below, never overwritten.
 $files = @(
   ".github/workflows/rules-emulator-tests.yml",
+  "FLOQR-WORDLIST.md",
   "README.md",
   "admin.html",
   "ai-diagnostics-service.js",
   "ai-index-service.js",
+  "beta-invite.html",
   "club-embed.html",
   "club-profile.html",
   "commerce.html",
@@ -19,62 +25,85 @@ $files = @(
   "floqai-search.html",
   "floqai.html",
   "floqr-blocks.js",
+  "floqr-feature-services.js",
   "floqr-nav.js",
+  "functions/ad-functions.js",
   "functions/admin-trust.js",
   "functions/ai-discovery-functions.js",
   "functions/commerce-functions.js",
   "functions/display-security-functions.js",
+  "functions/feature-gate-functions.js",
+  "functions/feature-services-core.test.js",
   "functions/feature-services-functions.js",
+  "functions/marketing-campaign-functions.js",
+  "functions/messaging-functions.js",
   "functions/otp-attempts.js",
+  "functions/privacy-dsar-functions.js",
   "functions/rules-tightening.test.js",
   "functions/scheduling-functions.js",
   "functions/security-phase0.test.js",
   "functions/security-phase1-rules.test.js",
   "functions/seed-and-storage-lockdown.test.js",
+  "functions/shoutout-compliance-functions.js",
   "functions/sos2fa-functions.js",
   "guest-list.html",
   "index.html",
   "master-admin.html",
   "mingl-chat.html",
   "mingl-gist.html",
+  "onboard-dc-venues.html",
   "patron-app.js",
   "patron-portal-app.js",
   "patron-portal.html",
+  "pickup.html",
   "promoter-admin.html",
   "role-request.html",
   "rules-tests/firestore-messages.test.js",
   "rules-tests/firestore-mingl-chat.test.js",
   "rules-tests/firestore-mingl-connections.test.js",
+  "rules-tests/firestore-phase0-deny.test.js",
   "rules-tests/firestore-suprstr-aiindex-display.test.js",
   "rules-tests/firestore-users.test.js",
   "rules-tests/helpers.js",
   "rules-tests/package-lock.json",
   "rules-tests/package.json",
+  "rules-tests/storage-club-media.test.js",
   "rules-tests/storage-mingl.test.js",
+  "rydr.html",
   "scripts/add-security-phase1-tests.js",
+  "scripts/bump-s3-1-26-admin-trust.js",
   "scripts/bump-s3-1-26.js",
+  "scripts/drop-typo-admin-email.js",
   "scripts/patch-main-suprstr-session-email.js",
   "scripts/run-rules-emulator-tests.ps1",
+  "seed-v29-09-14.html",
   "services.html",
+  "shared-data.js",
+  "sos2fa.js",
   "storage.rules",
+  "suprstar-preview.html",
+  "suprstr-search.html",
   "template-tags.html"
 )
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 & $git clone --depth 1 -b main "https://github.com/JadzAdCo/shoutout-demo.git" $stage
 if ($LASTEXITCODE -ne 0) { throw "Clone failed" }
 
-# Drift check: main must still match the workspace parent for every file we overwrite.
+# Drift check: for every file we overwrite, main must equal a workspace base (or this commit, when re-publishing).
+function Get-RefText([string]$ref, [string]$rel) {
+  $t = & $git -C $root show "${ref}:$rel" 2>$null
+  if ($LASTEXITCODE -ne 0) { return $null }
+  return (($t -join "`n") -replace "`r", "").TrimEnd()
+}
 $drift = @()
 $ErrorActionPreference = "Continue"
 foreach ($rel in $files) {
   $onMain = Join-Path $stage $rel
-  $before = & $git -C $root show "${Commit}~1:$rel" 2>$null
-  $hadBefore = $LASTEXITCODE -eq 0
-  if (!(Test-Path $onMain)) { if ($hadBefore) { $drift += "$rel (missing on main)" }; continue }
-  if (!$hadBefore) { $drift += "$rel (on main, new in workspace)"; continue }
-  $mainText = ((Get-Content $onMain -Raw -Encoding UTF8) -replace "`r`n", "`n").TrimEnd()
-  $parentText = (($before -join "`n") -replace "`r`n", "`n").TrimEnd()
-  if ($mainText -ne $parentText) { $drift += "$rel (main differs from ${Commit}~1)" }
+  $known = @($Bases + $Commit | ForEach-Object { Get-RefText $_ $rel })
+  $inBase = ($Bases | Where-Object { $null -ne (Get-RefText $_ $rel) }).Count -gt 0
+  if (!(Test-Path $onMain)) { if ($inBase) { $drift += "$rel (missing on main)" }; continue }
+  $mainText = ((Get-Content $onMain -Raw -Encoding UTF8) -replace "`r", "").TrimEnd()
+  if ($known -notcontains $mainText) { $drift += "$rel (main differs from $($Bases -join '/') and $Commit)" }
 }
 $ErrorActionPreference = "Stop"
 if ($drift.Count) {
@@ -99,7 +128,12 @@ node (Join-Path $stage "scripts/add-security-phase1-tests.js")
 if ($LASTEXITCODE -ne 0) { throw "Could not register security tests on main" }
 node (Join-Path $stage "scripts/patch-main-suprstr-session-email.js")
 if ($LASTEXITCODE -ne 0) { throw "Could not patch suprstr-functions.js on main" }
-$files += "functions/package.json", "functions/suprstr-functions.js"
+node (Join-Path $stage "scripts/drop-typo-admin-email.js") $stage
+if ($LASTEXITCODE -ne 0) { throw "Could not drop the typo admin address on main" }
+$typo = Select-String -Path (Join-Path $stage "*.js"), (Join-Path $stage "*.html"), (Join-Path $stage "*.rules"), (Join-Path $stage "functions/*.js") -Pattern "bands\.don@gmail\.com" -List |
+  Where-Object { $_.Filename -notlike "*.test.js" }
+if ($typo) { throw "Typo admin address still on main: $(($typo | ForEach-Object { $_.Filename }) -join ', ')" }
+$files += "functions/package.json", "functions/suprstr-functions.js", "feature-gates.js"
 
 Push-Location $stage
 try {
@@ -135,10 +169,17 @@ try {
   & $git add -- $files
   & $git diff --cached --quiet
   if ($LASTEXITCODE -ne 0) {
-    & $git commit -m "fix: s3.1.26 security phase 0 + 1 - server-only admin trust, OTP lockout, Mingl/messages/aiIndex/supRstar rules, Mingl media members"
+    & $git commit -m "fix: s3.1.26 security phase 0 + 1 - server-only admin trust, verified-email admin lists, OTP lockout, Mingl/messages/aiIndex/supRstar rules, Mingl media members"
     if ($LASTEXITCODE -ne 0) { throw "Commit failed" }
     & $git -c credential.helper= -c credential.helper=manager push origin main
-    if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }
+    if ($LASTEXITCODE -ne 0) {
+      # Someone else pushed to main meanwhile: rebase this one commit and retry once.
+      & $git fetch --depth 20 origin main
+      & $git rebase origin/main
+      if ($LASTEXITCODE -ne 0) { & $git rebase --abort; throw "Pages push rejected and rebase conflicted; rerun the script" }
+      & $git -c credential.helper= -c credential.helper=manager push origin main
+      if ($LASTEXITCODE -ne 0) { throw "Pages push failed" }
+    }
     & $git log -1 --format="%H %s"
   } else {
     Write-Host "No file changes on main"
