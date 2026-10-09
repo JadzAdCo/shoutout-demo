@@ -115,7 +115,7 @@ Open:
 
 1. **Open mail relay — remind the owner at the next security review** (deferred Oct 9 2026): `emailFloqrPreviewLinks` (+ `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail unauthenticated, any `to`. Internal user-to-group messaging (club owners, CSR, FloqR Support) is by design and stays; lock only anonymous / arbitrary-recipient sends. These four were deliberately **not** redeployed in s3.1.26. Details: `design-notes-data-classification.mdc` → Seed endpoints.
 2. **Email/Password provider still enabled** in Firebase Auth (owner action: Console → Authentication → Sign-in method → Email/Password → Disable). No client uses password or email-link sign-in; the 44 password accounts are all seeded `@floqr-demo.com` demo users who sign in by email OTP. The verified-email admin check below already removes the admin-takeover path, so this is defense in depth.
-3. **`don.b@jadzholdings.com` lost email-list Master Admin** — its Microsoft sign-in reports `emailVerified=false`. Owner decides: grant the `masterAdmin` custom claim to that uid, or leave it as a patron account.
+3. ~~**`don.b@jadzholdings.com` lost email-list Master Admin**~~ — resolved, see the Oct 9 2026 claim grant below.
 4. **Club Admin `adminEmails` checks** (rules `isClubManager` / Storage `isClubLocationAdmin` / Functions club checks) still trust an unverified token email — Phase 1 (needs a Microsoft-verified path first so Club Admins are not locked out).
 5. Public seed pages / `demo-seed-functions.js` carry a default demo password fallback — rotate to an env-only value (Phase 1).
 
@@ -128,6 +128,7 @@ Fixed and **DEPLOYED Oct 9 2026** (s3.1.26; Pages `main` 9ab4266 + 52a8225, 131 
 - `assignVenueEmployee` / `removeVenueEmployee` need SOS2FA. Mingl chat / connections / blocks, `messages` system sender, `aiIndex` writes, Mingl chat Storage, supRstar answers tightened — `design-notes-data-classification.mdc` → "Security Phase 0 + 1 (s3.1.26)".
 - s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` in `hasBackendOnlyIdentityFields`.
 - Abuse scan Oct 9 2026: 0 `users` docs with superAdmin / masterAdmin / isMasterAdmin / admin roles; only the owner uid ever requested or held an SOS2FA code/session; no Auth account for the typo address.
+- Oct 9 2026: don.b@jadzholdings.com (Microsoft, unverified email) granted masterAdmin custom claim by owner decision; email-list path requires email_verified. Uid `PQjxPJqFTrQ1wfelyFE30DF6t1D2`; claims before `{}`, after `{masterAdmin: true}` (Identity Toolkit `accounts:update`, merged). Honored by `admin-trust.js`, rules `isMasterAdmin()`, Storage, SOS2FA server; `master-admin-app.js` reads `getIdTokenResult(true)` claims since s3.1.27. **Revoke:** set `customAttributes` without `masterAdmin` (or `masterAdmin: false`) for that uid via Admin SDK `setCustomUserClaims` / `accounts:update`, merging other claims, then `revokeRefreshTokens(uid)` so the old ID token stops working within the hour. The SOS2FA **client** (`sos2fa.js`) still offers the code only to Super Admin (`SHOUTOUT_SUPER_ADMIN_EMAILS` / `superAdmin`) — this account cannot unlock Entity Management from the UI unless the owner widens that.
 
 ## Improvements (recommended next)
 
