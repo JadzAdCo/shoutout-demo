@@ -79,6 +79,42 @@ service cloud.firestore {
  );
  }
 
+ // Stage 2/3: a worker designated at the club (designation id = clubId + "_" + uid, not rejected).
+ function isClubWorker(clubId) {
+ return signedIn()
+ && clubId is string
+ && clubId.size() > 0
+ && exists(/databases/$(database)/documents/clubEmployeeDesignations/$(clubId + "_" + request.auth.uid))
+ && !(get(/databases/$(database)/documents/clubEmployeeDesignations/$(clubId + "_" + request.auth.uid)).data.get("status", "approved") in ["rejected", "removed", "revoked"]);
+ }
+
+ function isClubStaff(clubId) {
+ return isClubManager(clubId) || isClubWorker(clubId);
+ }
+
+ function tokenEmail() {
+ return request.auth.token.get("email", "");
+ }
+
+ function tokenPhone() {
+ return request.auth.token.get("phone_number", "");
+ }
+
+ // Patron owns a record by uid, or by the email / phone it was submitted with.
+ // Direct field access (not map.get) so owner queries filtered on that field can be proven.
+ function ownsSubmission(data, uidField, contactField) {
+ return signedIn()
+ && (
+ data[uidField] == request.auth.uid
+ || (tokenEmail() != "" && data[contactField] == tokenEmail())
+ || (tokenPhone() != "" && data[contactField] == tokenPhone())
+ );
+ }
+
+ function keepsField(field) {
+ return request.resource.data.get(field, "") == resource.data.get(field, "");
+ }
+
  function hasBackendOnlyIdentityFields(data) {
  return data.keys().hasAny([
  "masterAdmin",
@@ -281,10 +317,18 @@ service cloud.firestore {
  && request.auth.uid in request.resource.data.participants;
  }
 
+ // Direct field checks first: list queries (where field == value) are only provable against them, not map.get() defaults.
  function isMessageParty(data) {
  return signedIn()
  && (
- data.get("senderUid", "") == request.auth.uid
+ data.senderUid == request.auth.uid
+ || data.recipientUid == request.auth.uid
+ || (request.auth.token.email is string
+ && request.auth.token.email != ""
+ && (data.recipientEmail == request.auth.token.email
+ || data.senderEmail == request.auth.token.email))
+ || request.auth.uid in data.participants
+ || data.get("senderUid", "") == request.auth.uid
  || data.get("recipientUid", "") == request.auth.uid
  || (request.auth.token.email is string
  && request.auth.token.email != ""
@@ -303,7 +347,11 @@ service cloud.firestore {
  function isInboxRecipient(data) {
  return signedIn()
  && (
- data.get("recipientUid", "") == request.auth.uid
+ data.recipientUid == request.auth.uid
+ || (request.auth.token.email is string
+ && request.auth.token.email != ""
+ && data.recipientEmail == request.auth.token.email)
+ || data.get("recipientUid", "") == request.auth.uid
  || (request.auth.token.email is string
  && request.auth.token.email != ""
  && data.get("recipientEmail", "") == request.auth.token.email)
@@ -496,7 +544,7 @@ service cloud.firestore {
 
  match /clubs/{id} {
  allow read: if true;
- allow write: if signedIn();
+ allow write: if isMasterAdmin();
  }
 
  match /clubLocations/{id} {
@@ -572,7 +620,7 @@ service cloud.firestore {
 
  match /clubLocationAliases/{aliasId} {
  allow read: if true;
- allow write: if signedIn();
+ allow write: if isMasterAdmin();
  }
 
  match /clubAdminAssignments/{assignmentId} {
@@ -613,7 +661,10 @@ service cloud.firestore {
 
  match /events/{id} {
  allow read: if true;
- allow write: if signedIn();
+ allow create, update: if isMasterAdmin()
+ || isClubManager(request.resource.data.get("clubLocationId", request.resource.data.get("locationId", "")));
+ allow delete: if isMasterAdmin()
+ || isClubManager(resource.data.get("clubLocationId", resource.data.get("locationId", "")));
  }
 
  match /templates/{id} {
@@ -729,21 +780,40 @@ service cloud.firestore {
  && request.resource.data.mainText.size() <= 120;
  }
 
+ // Owner edits keep the club, the owner and every payment / approval field; status only back to pending or cancelled.
+ function isOwnerShoutoutEdit() {
+ return ownsSubmission(resource.data, "submittedByUid", "submittedBy")
+ && keepsField("submittedByUid")
+ && keepsField("clubLocationId")
+ && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+ "paymentStatus", "payment", "paid", "paidAt", "amountCents", "serviceOrderId", "orderId",
+ "stripeSessionId", "approvedAt", "approvedBy", "approvedByUid", "rejectedAt", "rejectedBy",
+ "displayed", "onDisplay", "liveAt", "endedAt"
+ ])
+ && (keepsField("status") || request.resource.data.get("status", "") in ["pending", "cancelled"]);
+ }
+
  match /shoutouts/{id} {
  allow create: if validPatronShoutoutCreate() || validFreePatronShoutoutCreate();
- allow read, update, delete: if signedIn();
+ allow read: if isMasterAdmin()
+ || ownsSubmission(resource.data, "submittedByUid", "submittedBy")
+ || isClubStaff(resource.data.clubLocationId);
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.clubLocationId) && keepsField("clubLocationId") && keepsField("submittedByUid"))
+ || isOwnerShoutoutEdit();
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
  }
 
  match /liveContent/{id} {
  allow read: if true;
- allow write: if signedIn();
+ allow write: if isMasterAdmin() || isClubManager(id);
  }
 
  // LED player device → club binding. Public read so display.html?ip= can resolve without auth.
- // Master Admin / signed-in operators write bindings (ip, locationId).
+ // Only Master Admins write bindings (ip, locationId).
  match /displayDevices/{deviceId} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create, update, delete: if isMasterAdmin();
  }
 
  // Display page access attempts (IP + UA). Written only by Cloud Functions (Admin SDK).
@@ -759,13 +829,23 @@ service cloud.firestore {
  }
 
  match /guestListRequests/{id} {
- allow create: if signedIn();
- allow read, update, delete: if signedIn();
+ allow create: if signedIn()
+ && request.resource.data.submittedByUid == request.auth.uid
+ && request.resource.data.clubLocationId is string;
+ allow read: if isMasterAdmin()
+ || ownsSubmission(resource.data, "submittedByUid", "guestEmail")
+ || isClubStaff(resource.data.clubLocationId);
+ allow update, delete: if isMasterAdmin()
+ || (isClubManager(resource.data.clubLocationId) && keepsField("clubLocationId") && keepsField("submittedByUid"));
  }
 
  match /guestListCampaigns/{id} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create: if isMasterAdmin()
+ || isClubStaff(request.resource.data.get("clubLocationId", ""));
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.get("clubLocationId", "")) && keepsField("clubLocationId"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.get("clubLocationId", ""));
  }
 
  match /commerceProducts/{id} {
@@ -869,8 +949,16 @@ service cloud.firestore {
  allow read, write: if false;
  }
 
+ // Follow docs are {entityId}_{uid}; reading a missing doc only tells the caller they do not follow yet.
  match /entityFollows/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read: if isMasterAdmin()
+ || (signedIn() && resource == null)
+ || (signedIn() && resource.data.followerUid == request.auth.uid);
+ allow create: if signedIn() && request.resource.data.followerUid == request.auth.uid;
+ allow update: if signedIn()
+ && resource.data.followerUid == request.auth.uid
+ && request.resource.data.followerUid == request.auth.uid;
+ allow delete: if isMasterAdmin() || (signedIn() && resource.data.followerUid == request.auth.uid);
  }
 
  match /audienceCampaigns/{id} {
@@ -878,26 +966,44 @@ service cloud.firestore {
  }
 
  match /pickupRequests/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read: if isMasterAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+ allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+ allow update: if signedIn()
+ && resource.data.ownerUid == request.auth.uid
+ && keepsField("ownerUid")
+ && !request.resource.data.diff(resource.data).affectedKeys().hasAny(["payment", "serviceOrderId"]);
+ allow delete: if isMasterAdmin();
  }
 
+ // Doc id = club id.
  match /clubRolePolicies/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read: if isMasterAdmin() || isClubStaff(id);
+ allow create, update, delete: if isMasterAdmin() || isClubManager(id);
  }
 
  match /clubRoleActivity/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read: if isMasterAdmin()
+ || isClubManager(resource.data.clubLocationId)
+ || (signedIn() && resource.data.submittedByUid == request.auth.uid);
+ allow create: if signedIn()
+ && request.resource.data.submittedByUid == request.auth.uid
+ && isClubStaff(request.resource.data.get("clubLocationId", ""));
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.clubLocationId) && keepsField("clubLocationId") && keepsField("submittedByUid"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
  }
 
+ // Doc id = club id.
  match /clubNotificationSettings/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read, create, update, delete: if isMasterAdmin() || isClubManager(id);
  }
  match /clubMessagingCredits/{id} {
- allow read: if signedIn();
+ allow read: if isMasterAdmin() || isClubManager(id);
  allow create, update, delete: if false;
  }
  match /clubMarketingCampaigns/{id} {
- allow read, create, update, delete: if signedIn();
+ allow read: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
+ allow create, update, delete: if isMasterAdmin();
  }
  match /clubDailyAuthCodes/{id} {
  allow read: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
@@ -915,12 +1021,23 @@ service cloud.firestore {
  }
 
  match /workerAssociationRequests/{id} {
- allow create: if signedIn() && optInRequestHasConsent();
- allow read, update, delete: if signedIn();
+ allow create: if signedIn()
+ && optInRequestHasConsent()
+ && request.resource.data.workerUid == request.auth.uid
+ && request.resource.data.clubLocationId is string;
+ allow read: if isMasterAdmin()
+ || (signedIn() && resource.data.workerUid == request.auth.uid)
+ || isClubManager(resource.data.clubLocationId);
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.clubLocationId) && keepsField("clubLocationId") && keepsField("workerUid"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
  }
 
  match /clubAdminNotifications/{id} {
- allow read, create, update, delete: if signedIn();
+ allow create: if signedIn()
+ && request.resource.data.workerUid == request.auth.uid
+ && request.resource.data.clubLocationId is string;
+ allow read, update, delete: if isMasterAdmin() || isClubManager(resource.data.clubLocationId);
  }
 
  match /clubOnboardingRecords/{id} {
@@ -933,7 +1050,10 @@ service cloud.firestore {
 
  match /clubMedia/{id} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create: if isMasterAdmin() || isClubManager(request.resource.data.get("clubLocationId", ""));
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.get("clubLocationId", "")) && keepsField("clubLocationId"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.get("clubLocationId", ""));
  }
 
  match /messages/{id} {
@@ -968,18 +1088,30 @@ service cloud.firestore {
  allow create, read, update, delete: if isMasterAdmin();
  }
 
+ // Legacy collection with no client reader or writer; Master Admin only.
  match /notifications/{id} {
- allow create, read, update, delete: if signedIn();
+ allow create, read, update, delete: if isMasterAdmin();
  }
 
  match /roleRequests/{id} {
  allow create: if signedIn()
+ && request.resource.data.uid == request.auth.uid
  && (request.resource.data.get("requestKind", "") == "masterAdminAssignment" || optInRequestHasConsent());
- allow read, update, delete: if signedIn();
+ allow read: if isMasterAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+ allow update, delete: if isMasterAdmin();
  }
 
+ // Staff marked customer service (isCSR) are readable by members so they can be messaged.
  match /clubEmployeeDesignations/{id} {
- allow create, read, update, delete: if signedIn();
+ allow read: if isMasterAdmin()
+ || (signedIn() && resource.data.workerUid == request.auth.uid)
+ || (signedIn() && resource.data.uid == request.auth.uid)
+ || (signedIn() && resource.data.isCSR == true)
+ || isClubStaff(resource.data.clubLocationId);
+ allow create: if isMasterAdmin() || isClubManager(request.resource.data.get("clubLocationId", ""));
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.get("clubLocationId", "")) && keepsField("clubLocationId"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.get("clubLocationId", ""));
  }
 
  match /patronRanks/{id} {
@@ -1132,14 +1264,15 @@ service cloud.firestore {
  allow create, update, delete: if false;
  }
 
+ // Doc id = the DJ's / promoter's uid.
  match /djProfiles/{id} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create, update, delete: if isSelf(id) || isMasterAdmin();
  }
 
  match /promoterProfiles/{id} {
  allow read: if true;
- allow create, update, delete: if signedIn();
+ allow create, update, delete: if isSelf(id) || isMasterAdmin();
  }
 
  match /shoutoutRecommendations/{id} {
@@ -1276,9 +1409,12 @@ service cloud.firestore {
  allow create: if signedIn()
  && request.resource.data.ownerUid == request.auth.uid
  && request.resource.data.variantScope == "club"
- && request.resource.data.clubLocationId is string;
+ && request.resource.data.clubLocationId is string
+ && (isMasterAdmin() || isClubManager(request.resource.data.clubLocationId));
 
- allow update, delete: if signedIn();
+ allow update: if isMasterAdmin()
+ || (isClubManager(resource.data.get("clubLocationId", "")) && keepsField("clubLocationId") && keepsField("ownerUid"));
+ allow delete: if isMasterAdmin() || isClubManager(resource.data.get("clubLocationId", ""));
  }
 
  match /aiTemplatePromptHistory/{id} {

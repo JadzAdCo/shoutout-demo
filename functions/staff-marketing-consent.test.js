@@ -169,7 +169,7 @@ test("Firestore rules refuse opt-in without consent", () => {
   assert.match(users, /allow create:[\s\S]*!createsServiceMemberWithoutConsent\(\)/);
   assert.match(users, /allow update:[\s\S]*!startsServiceMembershipWithoutConsent\(\)/);
   assert.match(rules, /function startsServiceMembershipWithoutConsent\(\) \{[\s\S]*?!isServiceMemberFlag\(resource\.data\)/, "only the 0 → 1 transition needs consent");
-  assert.match(rulesBlock(rules, "/workerAssociationRequests/{id}"), /allow create: if signedIn\(\) && optInRequestHasConsent\(\);/);
+  assert.match(rulesBlock(rules, "/workerAssociationRequests/{id}"), /allow create: if signedIn\(\)\s*&& optInRequestHasConsent\(\)/);
   const roles = rulesBlock(rules, "/roleRequests/{id}");
   assert.match(roles, /allow create: if signedIn\(\)[\s\S]*masterAdminAssignment[\s\S]*optInRequestHasConsent\(\)/);
   assert.doesNotMatch(roles, /allow create, read/);

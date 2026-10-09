@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.23";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.24";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,12 +1284,20 @@
       ]
     },
     {
+      version: "s3.1.24-rules-stages-2-3",
+      title: "Security rules Stages 2-3: ShoutOuts, guest lists, staff, follows, rides and club settings are limited to their owner and that club's team; pages show a notice when something is hidden instead of an empty list",
+      checks: [
+        {label:"Access notice", file:"floqr-access-notice.js", includes:["FLOQRAccessNotice"]},
+        {label:"Mingl Gist stories callable", file:"mingl-gist-app.js", includes:["getShoutoutStories"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.24\""]}
+      ]
+    },
+    {
       version: "s3.1.23-rules-stage-1",
       title: "Security rules Stage 1: profiles, messages, Inbox, door codes and SupRstR board signaling are limited to the people involved; other members' profiles load through the people directory",
       checks: [
         {label:"People directory helper", file:"floqr-people-directory.js", includes:["getPeopleDirectory"]},
-        {label:"Mingl uses directory", file:"patron-app.js", includes:["FLOQRPeople"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.23\""]}
+        {label:"Mingl uses directory", file:"patron-app.js", includes:["FLOQRPeople"]}
       ]
     },
     {

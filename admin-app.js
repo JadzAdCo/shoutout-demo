@@ -2085,7 +2085,7 @@
   async function loadEmployeeDesignations() {
     const [users, designations, requests] = await Promise.all([
       window.FLOQRPeople?.listSafe("club", {clubLocationId:locationId}) || [],
-      getCollectionSafe("clubEmployeeDesignations"),
+      queryCollectionWhere("clubEmployeeDesignations", "clubLocationId", locationId, 500),
       queryCollectionWhere("workerAssociationRequests", "clubLocationId", locationId, 200)
     ]);
     adminUsers = users;
@@ -2744,7 +2744,7 @@
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, {merge: true});
       } else if (priorRef) {
-        const prior = await db.collection("shoutouts").where("referenceNumber", "==", priorRef).limit(5).get();
+        const prior = await db.collection("shoutouts").where("clubLocationId", "==", locationId).where("referenceNumber", "==", priorRef).limit(5).get();
         await Promise.all(prior.docs.map(doc => doc.ref.set({
           status: "ended",
           endedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2789,7 +2789,7 @@
       return snap.docs.map(d => ({id: d.id, ...d.data()}));
     } catch (e) {
       console.warn(`Could not query ${name}:`, e.message);
-      return [];
+      return window.FLOQRAccessNotice?.report(name, e) || [];
     }
   }
 
@@ -2799,17 +2799,17 @@
       return snap.docs.map(d => ({id:d.id, ...d.data()}));
     } catch(e) {
       console.warn(`Could not read ${name}:`, e.message);
-      return [];
+      return window.FLOQRAccessNotice?.report(name, e) || [];
     }
   }
 
   async function loadReports() {
     const [users, shoutouts, liveDocs, events, guestLists, templateDocs] = await Promise.all([
       window.FLOQRPeople?.listSafe("club", {clubLocationId:locationId}) || [],
-      getCollectionSafe("shoutouts"),
+      queryCollectionWhere("shoutouts", "clubLocationId", locationId, 500),
       getCollectionSafe("liveContent"),
       getCollectionSafe("events"),
-      getCollectionSafe("guestListRequests"),
+      queryCollectionWhere("guestListRequests", "clubLocationId", locationId, 500),
       getCollectionSafe("templates")
     ]);
 

@@ -535,7 +535,8 @@
     floqAiAccess: {purpose: "Resolve the caller's tier so FloqAi shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "floqAiAccessThrottle", "betaTesters"]},
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
     dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]},
-    peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]}
+    peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
+    shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]}
   };
 
   function systemJob(job, collection) {

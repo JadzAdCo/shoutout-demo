@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.23 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.24 (stable)
+
+- s3.1.24: Security rules Stages 2-3. ShoutOuts and guest list requests are visible to the patron who sent them and to that club's team; staff rosters, role requests, club settings, messaging credits and marketing campaigns are limited to the club's admins (customer service staff stay reachable); follows and RydR rides are private to their owner; club listings, events, media, live boards and DJ / promoter profiles can only be changed by their owner, the club's admins or Master Admins. Mingl Gist loads ShoutOut stories without the sender's contact details, and pages show a notice when something is hidden or could not load instead of an empty list.
 
 - s3.1.23: Security rules Stage 1. Patron profiles are readable only by their owner and Master Admins; Search, Mingl, Services, My Profile, Club Admin and promoter reports load other members through the people directory, which leaves out contact details, consents, payment and security fields (Club Admins still see contacts for their own staff). Messages and Inbox are limited to the people in them, door codes and club message logs are server-written, and the SupRstR board can only add connection data to a live session.
 

@@ -38,7 +38,7 @@
   }
   async function getCollectionSafe(name, limit=1000) {
     try { const snap = await db.collection(name).limit(limit).get(); return snap.docs.map(d => ({id:d.id, ...d.data()})); }
-    catch(e) { console.warn(`Could not read ${name}:`, e.message); return []; }
+    catch(e) { console.warn(`Could not read ${name}:`, e.message); return window.FLOQRAccessNotice?.report(name, e) || []; }
   }
   function simpleRows(rows) {
     return `<div class="report-table">${rows.map(([k,v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`;
