@@ -9,13 +9,26 @@
 <body>
 <main class="app admin-shell" style="max-width:920px;margin:24px auto;padding:18px">
   <h1>Execute v29.09.14 seeds</h1>
-  <p class="sub">Master Admin only. Seeds DC club spot ads into the advertisement pool, and enables Lucy/Cobra BartR with 20 art/jewelry/accessory products (Stripe-testable via BartR checkout).</p>
-  <p id="status" class="status">Checking auth…</p>
-  <button id="loginBtn" type="button">Sign in with Google</button>
+  <p class="sub">Master Admin only. Seeds DC club spot ads into the advertisement pool, and adds the Lucy/Cobra BartR demo catalog (20 art/jewelry/accessory products). The catalog seed only adds what is missing — it never changes products or store settings that already exist.</p>
+  <p id="status" class="status">Restoring your FLOQR session…</p>
+  <section class="card" data-floqr-auth-chrome style="margin-top:12px">
+    <h2>SOS2FA unlock</h2>
+    <p class="sub small">The BartR catalog seed needs an unlocked SOS2FA session (same as Entity Management).</p>
+    <div id="sos2faActions" class="queue-actions" style="flex-wrap:wrap;gap:8px">
+      <button id="sos2faSendBtn" type="button">Request SOS2FA code</button>
+      <input id="sos2faCode" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code"/>
+      <button id="sos2faVerifyBtn" type="button">Verify code</button>
+      <input id="sos2faRecoveryCode" placeholder="Recovery code" autocomplete="off"/>
+      <button id="sos2faRecoveryBtn" type="button">Use recovery code</button>
+      <button id="sos2faLockBtn" type="button">Lock</button>
+    </div>
+    <p id="sos2faStatus" class="status"></p>
+  </section>
   <div class="queue-actions" style="margin-top:12px;flex-wrap:wrap;gap:8px">
     <button id="seedSpotBtn" class="primary" type="button" disabled>Seed DC spot ad pool</button>
-    <button id="seedLucyBtn" class="primary" type="button" disabled>Enable Lucy/Cobra BartR + 20 products</button>
+    <button id="seedLucyBtn" class="primary" type="button" disabled>Add missing Lucy/Cobra BartR products</button>
   </div>
+  <label style="display:block;margin-top:12px">Reason (saved in the audit trail, at least 8 characters)<input id="seedReason" maxlength="500" placeholder="Why are you seeding this catalog?"/></label>
   <label style="display:block;margin-top:12px">Optional sellerUid override<input id="sellerUid" placeholder="Leave blank to auto-find Lucy/Cobra"/></label>
   <pre id="report" class="report-block" style="white-space:pre-wrap;margin-top:16px"></pre>
 </main>
@@ -24,6 +37,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.14"></script>
 <script src="./floqr-session-shell.js?v=s3.0.110"></script>
+<script>
+  window.SHOUTOUT_SUPER_ADMIN_EMAILS = window.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"];
+</script>
+<script src="./sos2fa.js?v=s3.1.24"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script>
 (function () {
@@ -32,19 +49,35 @@
   const fn = firebase.app().functions("us-central1");
   const status = document.getElementById("status");
   const report = document.getElementById("report");
-  const MASTER = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"].map(x => x.toLowerCase());
   const spotBtn = document.getElementById("seedSpotBtn");
   const lucyBtn = document.getElementById("seedLucyBtn");
+  const SCOPE = "entityManagement";
 
-  document.getElementById("loginBtn").onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-  auth.onAuthStateChanged(user => {
-    const ok = user && MASTER.includes(String(user.email || "").toLowerCase());
-    status.textContent = user
-      ? (ok ? `Signed in as ${user.email}. Ready.` : `Signed in as ${user.email}, Master Admin required.`)
-      : "Sign in with a Master Admin Google account.";
+  function isMaster(user) {
+    return !!user && window.FLOQRSOS2FA.isSuperAdminUser(user);
+  }
+
+  function refreshButtons() {
+    const user = auth.currentUser;
+    const ok = isMaster(user);
     spotBtn.disabled = !ok;
-    lucyBtn.disabled = !ok;
+    lucyBtn.disabled = !ok || !window.FLOQRSOS2FA.isUnlocked(SCOPE);
+    if (!user) return;
+    if (!ok) status.textContent = `Signed in as ${user.email}, Master Admin required.`;
+    else if (lucyBtn.disabled) status.textContent = `Signed in as ${user.email}. Unlock SOS2FA to seed the BartR catalog.`;
+    else status.textContent = `Signed in as ${user.email}. Ready.`;
+  }
+
+  window.FLOQRSessionShell.bind({
+    auth,
+    chrome: "[data-floqr-auth-chrome]",
+    statusEl: "#status",
+    onUser: () => {
+      window.FLOQRSOS2FA.mount({scope: SCOPE, onUnlocked: refreshButtons});
+      refreshButtons();
+    }
   });
+  document.getElementById("sos2faLockBtn").addEventListener("click", () => setTimeout(refreshButtons, 0));
 
   spotBtn.onclick = async () => {
     try {
@@ -61,12 +94,22 @@
 
   lucyBtn.onclick = async () => {
     try {
-      status.textContent = "Enabling Lucy/Cobra BartR catalog…";
+      const reason = document.getElementById("seedReason").value.trim();
+      if (reason.length < 8) {
+        status.textContent = "Enter a reason of at least 8 characters. It is saved in the audit trail.";
+        return;
+      }
+      const sos2faSessionId = window.FLOQRSOS2FA.getSessionId(SCOPE);
+      if (!sos2faSessionId) {
+        refreshButtons();
+        return;
+      }
+      status.textContent = "Adding missing Lucy/Cobra BartR products…";
       const sellerUid = document.getElementById("sellerUid").value.trim();
-      const payload = sellerUid ? {sellerUid} : {query: "lucy|cobra"};
+      const payload = {...(sellerUid ? {sellerUid} : {query: "lucy|cobra"}), reason, sos2faSessionId};
       const result = await fn.httpsCallable("seedLucyCobraBartrCatalog")(payload);
       report.textContent = JSON.stringify(result.data, null, 2);
-      status.textContent = `BartR ready for ${result.data?.sellerName || "seller"} — ${result.data?.productsCreated || 0} products created.`;
+      status.textContent = `BartR catalog for ${result.data?.sellerName || "seller"} — ${result.data?.productsCreated || 0} products added, ${result.data?.productsSkippedExisting || 0} already there.`;
     } catch (error) {
       status.textContent = error.message || String(error);
       report.textContent = String(error?.details || error?.stack || error);

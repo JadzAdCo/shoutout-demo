@@ -1,7 +1,9 @@
 rules_version = '2';
 
-// FLOQR STORAGE RULES VERSION: s3.1.0-ad-media
-// EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.0-ad-media or newer
+// FLOQR STORAGE RULES VERSION: s3.1.25-club-media-admins
+// EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.25-club-media-admins or newer
+// - clubMedia/{clubLocationId}/... writes/deletes: Master Admin or a Club Admin of that club only
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: s3.1.0-ad-media
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v29.06
 // - adMedia/{uid}/... ad flyers (image < 8 MB) and videos (< 60 MB, length checked by Functions)
 // - adIntake/... SMS / WhatsApp ad media, written by Functions only
@@ -19,6 +21,51 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+
+    // Mirrors firestore.rules isMasterAdmin() / isClubManager(). Storage rules may read at most
+    // 2 Firestore docs per request: clubLocations/{id} + clubAdminAssignments/{id}_{uid}.
+    // Design notes: .cursor/rules/design-notes-data-classification.mdc → "Seed endpoints + clubMedia storage"
+    function isStorageMasterAdmin() {
+      return request.auth != null
+        && (
+          request.auth.token.masterAdmin == true
+          || request.auth.token.email in [
+            "bands.don@gmail.com",
+            "bans.don@gmail.com",
+            "don.b@jadzholdings.com"
+          ]
+        );
+    }
+
+    function clubLocationData(clubId) {
+      return firestore.get(/databases/(default)/documents/clubLocations/$(clubId)).data;
+    }
+
+    function isClubLocationAdmin(clubId) {
+      return firestore.exists(/databases/(default)/documents/clubLocations/$(clubId))
+        && (
+          request.auth.uid in clubLocationData(clubId).get("adminUids", [])
+          || request.auth.uid in clubLocationData(clubId).get("masterAdminUids", [])
+          || (
+            request.auth.token.email is string
+            && request.auth.token.email in clubLocationData(clubId).get("adminEmails", [])
+          )
+        );
+    }
+
+    function hasActiveClubAdminAssignment(clubId) {
+      return firestore.exists(/databases/(default)/documents/clubAdminAssignments/$(clubId + "_" + request.auth.uid))
+        && firestore.get(/databases/(default)/documents/clubAdminAssignments/$(clubId + "_" + request.auth.uid)).data.get("status", "") == "active";
+    }
+
+    function isClubMediaManager(clubId) {
+      return request.auth != null
+        && (
+          isStorageMasterAdmin()
+          || isClubLocationAdmin(clubId)
+          || hasActiveClubAdminAssignment(clubId)
+        );
+    }
 
     match /shoutouts/{userId}/{allPaths=**} {
       allow read: if request.auth != null;
@@ -104,14 +151,14 @@ service firebase.storage {
     match /clubMedia/{clubLocationId}/{allPaths=**} {
       allow read: if true;
 
-      allow create, update: if request.auth != null
+      allow create, update: if isClubMediaManager(clubLocationId)
         && request.resource.size < 60 * 1024 * 1024
         && (
           request.resource.contentType.matches('image/.*') ||
           request.resource.contentType.matches('video/.*')
         );
 
-      allow delete: if request.auth != null;
+      allow delete: if isClubMediaManager(clubLocationId);
     }
 
     match /spotAds/{userId}/{allPaths=**} {
