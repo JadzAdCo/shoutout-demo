@@ -53,7 +53,7 @@ test("messages: parties read; senders create as themselves; parties cannot be re
   const messages = block("messages");
   assert.match(messages, /allow read: if isMasterAdmin\(\) \|\| isMessageParty\(resource\.data\);/);
   assert.ok(messages.includes('request.resource.data.get("senderUid", "") == request.auth.uid'));
-  assert.ok(messages.includes('request.resource.data.get("requesterUid", "") == request.auth.uid'), "system Mingl request is tied to the requester");
+  assert.ok(!/== "system"/.test(messages), "clients cannot write senderUid \"system\" (Functions only)");
   assert.match(messages, /keepsMessageParties\(\)/);
   assert.ok(!/if signedIn\(\);/.test(messages));
 });

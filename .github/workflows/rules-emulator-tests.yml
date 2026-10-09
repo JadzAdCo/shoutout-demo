@@ -1,0 +1,54 @@
+name: Rules Emulator Tests
+
+on:
+  push:
+    branches: [main, test, master]
+    paths:
+      - firestore.rules
+      - storage.rules
+      - rules-tests/**
+      - firebase.json
+      - .github/workflows/rules-emulator-tests.yml
+  pull_request:
+    branches: [main, test, master]
+    paths:
+      - firestore.rules
+      - storage.rules
+      - rules-tests/**
+      - firebase.json
+      - .github/workflows/rules-emulator-tests.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rules-emulator-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rules-tests:
+    name: Firestore + Storage rules (emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: rules-tests/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install rules-tests dependencies
+        working-directory: rules-tests
+        run: npm ci --no-audit --no-fund
+
+      - name: Run rules tests in the Firestore + Storage emulators
+        # Repo root: emulators:exec reads firebase.json (ports 8080 / 9199) from here.
+        run: npx --yes firebase-tools@15 emulators:exec --only firestore,storage --project demo-floqr-rules "npm --prefix rules-tests test"

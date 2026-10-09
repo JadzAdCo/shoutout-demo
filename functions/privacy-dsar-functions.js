@@ -11,6 +11,7 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 const auth = admin.auth();
 
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map((x) => x.trim().toLowerCase())
@@ -31,8 +32,7 @@ function text(value, max = 240) {
 }
 
 function isMasterAdmin(authContext = {}) {
-  const email = text(authContext.token?.email, 200).toLowerCase();
-  return authContext.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  return isServerAdminAuth(authContext);
 }
 
 async function queryByUid(collection, field, uid, limit = 80) {

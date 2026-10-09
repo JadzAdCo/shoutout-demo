@@ -4,6 +4,7 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
+const {isServerAdminAuth} = require("./admin-trust");
 const {
   makeClock,
   normalizeWeekHours,
@@ -44,17 +45,8 @@ function text(value = "", max = 200) {
 
 async function assertMasterAdmin(auth) {
   if (!auth?.uid) throw new HttpsError("unauthenticated", "Sign in required.");
-  const email = String(auth.token?.email || "").toLowerCase();
-  if (auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email)) return;
-  const snap = await db.collection("platformSettings").doc("masterAdmins").get();
-  const emails = snap.exists && Array.isArray(snap.data()?.emails)
-    ? snap.data().emails.map((v) => String(v).toLowerCase())
-    : [];
-  if (emails.includes(email)) return;
-  const record = await db.collection("users").doc(auth.uid).get();
-  const data = record.exists ? record.data() || {} : {};
-  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return;
-  throw new HttpsError("permission-denied", `Master Admin only (${email || "no email on token"}).`);
+  if (isServerAdminAuth(auth)) return;
+  throw new HttpsError("permission-denied", "Master Admin only.");
 }
 
 function dayHours(openH, openM, openMer, closeH, closeM, closeMer, closed = false) {

@@ -4,20 +4,14 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+const {SERVER_ADMIN_EMAILS, isServerAdminAuth} = require("./admin-trust");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
-  .split(",")
-  .map(x => x.trim().toLowerCase())
-  .filter(Boolean);
-
 /* Master Admin = Super Admin */
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
-  .split(",")
-  .map(x => x.trim().toLowerCase())
-  .filter(Boolean);
+const MASTER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
+const SUPER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 
 const DEFAULT_PATRON_GATES = {bartr:true, rydr:true, mingl:true, floqAi:true, shoutOut:true};
 const DEFAULT_VENUE_GATES = {uberAds:true, windowAds:true, bartrStores:true, shoutOut:true, supRstar:true};
@@ -36,26 +30,8 @@ function text(value, max = 200) {
   return String(value == null ? "" : value).trim().slice(0, max);
 }
 
-function emailOf(authContext = {}) {
-  return text(authContext.token?.email, 200).toLowerCase();
-}
-
-function isSuperAdminAuth(authContext = {}, profile = null) {
-  const email = emailOf(authContext);
-  if (SUPER_ADMIN_EMAILS.includes(email)) return true;
-  if (authContext.token?.superAdmin === true) return true;
-  if (profile?.superAdmin === true) return true;
-  return false;
-}
-
-async function assertMasterAdmin(request) {
-  if (!request.auth) throw new HttpsError("unauthenticated", "Master Admin sign-in is required.");
-  const email = emailOf(request.auth);
-  if (request.auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email)) return email;
-  const snap = await db.collection("users").doc(request.auth.uid).get();
-  const data = snap.exists ? snap.data() || {} : {};
-  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return email;
-  throw new HttpsError("permission-denied", "Master Admin access is required.");
+function isSuperAdminAuth(authContext = {}) {
+  return isServerAdminAuth(authContext);
 }
 
 function normalizePatronGates(raw = {}) {
@@ -91,10 +67,20 @@ async function loadUserByIdOrEmail(entityId = "", entityEmail = "") {
   return null;
 }
 
-function protectSuperAdminEntity(row, entityType) {
+/** Super Admin = Auth custom claim or verified server-list email on the Auth record; users/{uid} fields are patron-editable. */
+async function isSuperAdminUid(uid) {
+  if (!uid) return false;
+  try {
+    const record = await admin.auth().getUser(uid);
+    return isServerAdminAuth({uid, token: {...(record.customClaims || {}), email: record.email || "", email_verified: record.emailVerified === true}});
+  } catch (_) {
+    return false;
+  }
+}
+
+async function protectSuperAdminEntity(row, entityType) {
   if (!row) return;
-  const email = text(row.email, 200).toLowerCase();
-  if (isSuperAdminAuth({token:{email}}, row) || SUPER_ADMIN_EMAILS.includes(email) || row.superAdmin === true) {
+  if (await isSuperAdminUid(row.uid)) {
     throw new HttpsError("failed-precondition", `Super Admin cannot be ${entityType === "disable" ? "disabled" : "offboarded"} via this tool.`);
   }
 }
@@ -174,7 +160,7 @@ exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, m
   if (entityType === "user" || entityType === "patron" || entityType === "entity") {
     const user = await loadUserByIdOrEmail(entityId, request.data?.email);
     if (!user?.uid) throw new HttpsError("not-found", "Patron/entity not found.");
-    protectSuperAdminEntity(user, enabled ? "enable" : "disable");
+    await protectSuperAdminEntity(user, enabled ? "enable" : "disable");
     await db.collection("users").doc(user.uid).set({
       appEnabled: enabled,
       status: enabled ? (user.status === "offboarded" ? "offboarded" : "active") : "disabled",
@@ -282,7 +268,7 @@ exports.offboardEntity = onCall({region:"us-central1", timeoutSeconds:60, memory
   if (entityType === "user" || entityType === "patron" || entityType === "entity") {
     const user = await loadUserByIdOrEmail(entityId, request.data?.email);
     if (!user?.uid) throw new HttpsError("not-found", "Patron/entity not found.");
-    protectSuperAdminEntity(user, "offboard");
+    await protectSuperAdminEntity(user, "offboard");
     const expected = text(user.displayName || user.fullName || user.floqrHandle || user.email || user.uid, 200);
     if (confirmName.toLowerCase() !== expected.toLowerCase() && confirmName.toLowerCase() !== text(user.email, 200).toLowerCase() && confirmName.toLowerCase() !== user.uid.toLowerCase()) {
       throw new HttpsError("failed-precondition", `Confirmation name must match "${expected}", email, or uid.`);

@@ -20,6 +20,8 @@ const {
   recoveryCodeMatches,
   nextRecoveryAttempt
 } = require("./sos2fa-core");
+const {SERVER_ADMIN_EMAILS, isServerAdminAuth} = require("./admin-trust");
+const {evaluateOtpAttempt} = require("./otp-attempts");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -42,14 +44,7 @@ const MAX_ATTEMPTS = 5;
 const WRONG_RECOVERY_MESSAGE = "Wrong recovery code.";
 
 /* Master Admin = Super Admin */
-const SUPER_ADMIN_EMAILS = String(
-  process.env.FLOQR_SUPER_ADMIN_EMAILS ||
-  process.env.FLOQR_MASTER_ADMIN_EMAILS ||
-  "bans.don@gmail.com,don.b@jadzholdings.com"
-)
-  .split(",")
-  .map(x => x.trim().toLowerCase())
-  .filter(Boolean);
+const SUPER_ADMIN_EMAILS = SERVER_ADMIN_EMAILS;
 
 function text(value, max = 200) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -92,21 +87,10 @@ function codeHash(uid, code) {
   return crypto.createHmac("sha256", secret).update(`${uid}:${String(code).trim()}`).digest("hex");
 }
 
-function isSuperAdminAuth(authContext = {}, profile = null) {
-  const email = emailOf(authContext);
-  if (SUPER_ADMIN_EMAILS.includes(email)) return true;
-  if (authContext.token?.superAdmin === true) return true;
-  if (profile?.superAdmin === true) return true;
-  return false;
-}
-
 async function assertSuperAdmin(request) {
   if (!request.auth) throw new HttpsError("unauthenticated", "Super Admin sign-in is required.");
   const email = emailOf(request.auth);
-  if (isSuperAdminAuth(request.auth)) return email;
-  const snap = await db.collection("users").doc(request.auth.uid).get();
-  const profile = snap.exists ? snap.data() || {} : {};
-  if (isSuperAdminAuth(request.auth, profile)) return email;
+  if (isServerAdminAuth(request.auth)) return email;
   throw new HttpsError("permission-denied", "Super Admin access is required.");
 }
 
@@ -303,39 +287,58 @@ exports.verifySos2faCode = onCall({region: "us-central1", secrets: [SOS2FA_PEPPE
   const sessionId = crypto.randomBytes(24).toString("hex");
   const sessionRef = db.collection("sos2faSessions").doc(sessionId);
   const expiresAtMs = Date.now() + SESSION_TTL_MS;
+  const providedHash = codeHash(uid, code);
 
-  try {
-    await db.runTransaction(async transaction => {
-      const snap = await transaction.get(ref);
-      if (!snap.exists) throw new HttpsError("not-found", "Request a SOS2FA code first.");
-      const data = snap.data() || {};
-      if (data.used) throw new HttpsError("permission-denied", "This SOS2FA code was already used. Request a new SOS2FA code.");
-      if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) {
-        throw new HttpsError("deadline-exceeded", "This SOS2FA code expired. Request a new SOS2FA code.");
-      }
-      if (Number(data.attempts || 0) >= MAX_ATTEMPTS) {
-        throw new HttpsError("resource-exhausted", "Too many attempts. Request a new SOS2FA code.");
-      }
-      const expected = String(data.codeHash || "");
-      const actual = codeHash(uid, code);
-      if (!expected || expected.length !== actual.length || !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(actual))) {
-        transaction.update(ref, {attempts: admin.firestore.FieldValue.increment(1)});
-        throw new HttpsError("permission-denied", "Wrong code entered, please enter the correct code to proceed");
-      }
-      transaction.update(ref, {used: true, verifiedAt: admin.firestore.FieldValue.serverTimestamp()});
-      transaction.set(sessionRef, {
+  let verdict = null;
+  await db.runTransaction(async transaction => {
+    const snap = await transaction.get(ref);
+    if (!snap.exists) {
+      verdict = {outcome: "missing"};
+      return;
+    }
+    const data = snap.data() || {};
+    verdict = evaluateOtpAttempt({
+      storedHash: data.codeHash,
+      providedHash,
+      attempts: data.attempts,
+      maxAttempts: MAX_ATTEMPTS,
+      expiresAtMs: data.expiresAt?.toMillis?.() || 0,
+      nowMs: Date.now(),
+      consumed: data.used === true,
+      locked: data.locked === true
+    });
+    if (verdict.outcome === "wrong") {
+      transaction.update(ref, verdict.lock
+        ? {attempts: verdict.nextAttempts, locked: true, lockedAt: admin.firestore.FieldValue.serverTimestamp()}
+        : {attempts: verdict.nextAttempts});
+      return;
+    }
+    if (verdict.outcome !== "ok") return;
+    transaction.update(ref, {used: true, verifiedAt: admin.firestore.FieldValue.serverTimestamp()});
+    transaction.set(sessionRef, {
+      uid,
+      email,
+      scope: "entityManagement",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAtMs
+    });
+  });
+
+  if (!verdict || verdict.outcome !== "ok") {
+    const outcome = verdict?.outcome || "missing";
+    if (outcome === "wrong" || outcome === "locked") {
+      await writeEntityManagementAudit({
         uid,
         email,
-        scope: "entityManagement",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        expiresAtMs
+        action: "sos2fa_verify_failed",
+        detail: {reason: outcome === "wrong" ? "wrong_code" : "locked", attempts: verdict.nextAttempts, locked: verdict.lock === true}
       });
-    });
-  } catch (error) {
-    if (error instanceof HttpsError && error.message === "Wrong code entered, please enter the correct code to proceed") {
-      await writeEntityManagementAudit({uid, email, action: "sos2fa_verify_failed", detail: {reason: "wrong_code"}});
     }
-    throw error;
+    if (outcome === "missing") throw new HttpsError("not-found", "Request a SOS2FA code first.");
+    if (outcome === "consumed") throw new HttpsError("permission-denied", "This SOS2FA code was already used. Request a new SOS2FA code.");
+    if (outcome === "expired") throw new HttpsError("deadline-exceeded", "This SOS2FA code expired. Request a new SOS2FA code.");
+    if (outcome === "locked" || verdict.lock) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new SOS2FA code.");
+    throw new HttpsError("permission-denied", "Wrong code entered, please enter the correct code to proceed");
   }
 
   await writeEntityManagementAudit({uid, email, action: "sos2fa_verified", detail: {sessionId}, sessionId});
@@ -454,7 +457,7 @@ async function resolvePatronByEmailOrUid({patronUid = "", patronEmail = ""} = {}
 }
 
 exports.assignVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
-  const actorEmail = await assertSuperAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubLocationId = text(request.data?.clubLocationId || request.data?.clubId, 120);
   const role = normalizeStaffRole(request.data?.role);
   if (!clubLocationId) throw new HttpsError("invalid-argument", "clubLocationId is required.");
@@ -526,14 +529,15 @@ exports.assignVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30,
     uid: request.auth.uid,
     email: actorEmail,
     action: "assign_venue_employee",
-    detail: {clubLocationId, patronUid, patronEmail: email, role, withoutSelfElection: true}
+    detail: {clubLocationId, patronUid, patronEmail: email, role, withoutSelfElection: true},
+    sessionId
   });
 
   return {ok: true, assignmentId, clubLocationId, patronUid, patronEmail: email, role, status: "active"};
 });
 
 exports.removeVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30, memory: "256MiB"}, async request => {
-  const actorEmail = await assertSuperAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubLocationId = text(request.data?.clubLocationId || request.data?.clubId, 120);
   const patronUid = text(request.data?.patronUid, 128);
   const role = normalizeStaffRole(request.data?.role);
@@ -583,7 +587,8 @@ exports.removeVenueEmployee = onCall({region: "us-central1", timeoutSeconds: 30,
     uid: request.auth.uid,
     email: actorEmail,
     action: "remove_venue_employee",
-    detail: {clubLocationId, patronUid, role: role || row.roleElectionType || ""}
+    detail: {clubLocationId, patronUid, role: role || row.roleElectionType || ""},
+    sessionId
   });
   return {ok: true, clubLocationId, patronUid};
 });

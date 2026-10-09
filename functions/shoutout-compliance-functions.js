@@ -17,6 +17,7 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 const storage = admin.storage();
 
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map((x) => x.trim().toLowerCase())
@@ -65,7 +66,7 @@ function emailOf(authContext = {}) {
 function assertMasterAdmin(request) {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
   const email = emailOf(request.auth);
-  if (request.auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email)) return email;
+  if (isServerAdminAuth(request.auth)) return email;
   throw new HttpsError("permission-denied", "Master Admin access is required.");
 }
 
@@ -587,7 +588,7 @@ const stampShoutoutActorContext = onCall({region: "us-central1"}, async (request
   const ownerUid = text(data.submittedByUid || data.ownerUid, 128);
   const email = emailOf(request.auth);
   const isOwner = ownerUid && ownerUid === request.auth.uid;
-  const isMaster = request.auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  const isMaster = isServerAdminAuth(request.auth);
   if (!isOwner && !isMaster) throw new HttpsError("permission-denied", "Only the submitter or Master Admin can stamp actor context.");
   const clientIp = extractClientIp(request);
   const actor = await enrichActorIdentity({

@@ -8,6 +8,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
@@ -24,10 +25,8 @@ function randomToken(bytes = 32) {
 }
 
 function isMasterAdminAuth(authContext = {}) {
-  const uid = authContext.uid || "";
-  const email = text(authContext.token?.email, 200).toLowerCase();
-  if (!uid) return false;
-  return authContext.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  if (!authContext.uid) return false;
+  return isServerAdminAuth(authContext);
 }
 
 async function isClubManagerAuth(authContext, clubId) {
@@ -288,7 +287,6 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       displayBoard,
       liveDocId: liveId,
       broadcasterUid: uid,
-      broadcasterEmail: email,
       status: "waiting",
       liveDurationSeconds,
       liveEndsAtMs,

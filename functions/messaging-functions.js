@@ -36,6 +36,7 @@ const TWILIO_WHATSAPP_FROM = defineSecret("TWILIO_WHATSAPP_FROM");
 const CLUB_AUTH_CODE_PEPPER = defineSecret("CLUB_AUTH_CODE_PEPPER");
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
@@ -82,8 +83,7 @@ function twilioReady(creds = twilioCredentials()) {
 }
 
 function isMasterAdminAuth(authContext = {}) {
-  const email = text(authContext.token?.email, 200).toLowerCase();
-  return authContext.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  return isServerAdminAuth(authContext);
 }
 
 async function canManageClubMessaging(clubLocationId, authContext = {}) {

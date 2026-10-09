@@ -28,6 +28,7 @@ const {
 } = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
 const RECEIPT_FROM_EMAIL = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
@@ -431,10 +432,8 @@ function normalizedServiceRole(value = "") {
 }
 
 async function isMasterAdminAuth(authContext = {}) {
-  const uid = authContext.uid || "";
-  const email = text(authContext.token?.email, 200).toLowerCase();
-  if (!uid) return false;
-  return authContext.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  if (!authContext.uid) return false;
+  return isServerAdminAuth(authContext);
 }
 
 async function canManageClubFinances(clubId, authContext = {}) {
@@ -547,9 +546,19 @@ async function canPublishForEntity(entityId, authContext = {}) {
   if (entityId.includes(":")) {
     const [memberUid, requestedRole] = entityId.split(":", 2);
     if (memberUid !== uid) return false;
-    const userSnap = await db.collection("users").doc(uid).get();
+    const wanted = normalizedServiceRole(requestedRole);
+    if (!wanted) return false;
+    const [userSnap, designations] = await Promise.all([
+      db.collection("users").doc(uid).get(),
+      db.collection("clubEmployeeDesignations").where("workerUid", "==", uid).limit(40).get()
+    ]);
     const approvedRoles = userSnap.exists && Array.isArray(userSnap.data()?.approvedRoles) ? userSnap.data().approvedRoles.map(normalizedServiceRole) : [];
-    return approvedRoles.includes(normalizedServiceRole(requestedRole));
+    if (approvedRoles.includes(wanted)) return true;
+    return designations.docs.some(doc => {
+      const row = doc.data() || {};
+      if (!["active", "approved", "elected"].includes(text(row.status, 40).toLowerCase())) return false;
+      return [row.roleElectionType, ...(Array.isArray(row.workerRoles) ? row.workerRoles : [])].map(normalizedServiceRole).includes(wanted);
+    });
   }
   if (entityId === uid) return true;
   const clubSnap = await db.collection("clubLocations").doc(entityId).get();

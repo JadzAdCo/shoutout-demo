@@ -204,8 +204,14 @@
 
   async function upsertAiIndex(db, id, record) {
     if (!db || !id || !record || !safeCanIndex(record, {uid: record.ownerUid})) return false;
-    await db.collection("aiIndex").doc(id).set(record, {merge:true});
-    return true;
+    try {
+      await db.collection("aiIndex").doc(id).set(record, {merge:true});
+      return true;
+    } catch (error) {
+      // aiIndex writes are Master Admin only; a Club Admin or patron save must not fail on the index step.
+      if (error?.code === "permission-denied") return false;
+      throw error;
+    }
   }
 
   window.FLOQRAIIndex = {

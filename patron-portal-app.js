@@ -4070,7 +4070,12 @@
       memberLevel: role,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    await db.collection("users").doc(uid).set(electPatch, {merge: true});
+    try {
+      await db.collection("users").doc(uid).set(electPatch, {merge: true});
+    } catch (error) {
+      // Roles on another patron's profile are backend-only; the designation saved above is what grants the role.
+      if (error?.code !== "permission-denied") throw error;
+    }
     setText("smAdminStatus", `${match.displayName || match.email || "Patron"} elected as ${role} for ${clubLocationLabel(clubLocationId)}.`);
   }
 

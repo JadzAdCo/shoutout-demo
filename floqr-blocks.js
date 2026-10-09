@@ -100,18 +100,23 @@
     }, {merge: true});
 
     const roomId = `mingl_${id}`;
-    await db.collection("chatRooms").doc(roomId).set({
-      id: roomId,
-      type: "mingl",
-      connectionId: id,
-      participants,
-      status: "closed",
-      blocked: true,
-      blockedByUid: blockerUid,
-      blockedAt: now,
-      lastMessage: "UnMingl: this chat is closed.",
-      updatedAt: now
-    }, {merge: true});
+    try {
+      await db.collection("chatRooms").doc(roomId).set({
+        id: roomId,
+        type: "mingl",
+        connectionId: id,
+        participants,
+        status: "closed",
+        blocked: true,
+        blockedByUid: blockerUid,
+        blockedAt: now,
+        lastMessage: "UnMingl: this chat is closed.",
+        updatedAt: now
+      }, {merge: true});
+    } catch (error) {
+      // No chat room exists for a patron you never Mingled with; the block above still applies.
+      if (error?.code !== "permission-denied") throw error;
+    }
 
     try {
       await db.collection("chatMessages").add({
