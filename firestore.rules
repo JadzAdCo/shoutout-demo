@@ -317,10 +317,18 @@ service cloud.firestore {
  && request.auth.uid in request.resource.data.participants;
  }
 
+ // Direct field checks first: list queries (where field == value) are only provable against them, not map.get() defaults.
  function isMessageParty(data) {
  return signedIn()
  && (
- data.get("senderUid", "") == request.auth.uid
+ data.senderUid == request.auth.uid
+ || data.recipientUid == request.auth.uid
+ || (request.auth.token.email is string
+ && request.auth.token.email != ""
+ && (data.recipientEmail == request.auth.token.email
+ || data.senderEmail == request.auth.token.email))
+ || request.auth.uid in data.participants
+ || data.get("senderUid", "") == request.auth.uid
  || data.get("recipientUid", "") == request.auth.uid
  || (request.auth.token.email is string
  && request.auth.token.email != ""
@@ -339,7 +347,11 @@ service cloud.firestore {
  function isInboxRecipient(data) {
  return signedIn()
  && (
- data.get("recipientUid", "") == request.auth.uid
+ data.recipientUid == request.auth.uid
+ || (request.auth.token.email is string
+ && request.auth.token.email != ""
+ && data.recipientEmail == request.auth.token.email)
+ || data.get("recipientUid", "") == request.auth.uid
  || (request.auth.token.email is string
  && request.auth.token.email != ""
  && data.get("recipientEmail", "") == request.auth.token.email)
