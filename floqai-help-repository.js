@@ -1110,15 +1110,18 @@
     },
     {
       id: "help-master-network-intelligence",
-      title: "Network Intelligence Center",
-      body: "Master Admins can view all venues, all ShoutOut queues, all reports, advertiser data, reconciliation summaries, and network-level analytics. After Google or Microsoft sign-in against the Master Admin allow-list, verification confirms Master admin verified along with providers, domain-enforcement notes, and MFA guidance. This portal is FLOQR internal use only.",
+      title: "All Locations",
+      body: "This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOuts counts ShoutOuts waiting for approval at every venue; Estimated Network Revenue is a rough estimate from pending ShoutOuts and live boards, not booked revenue. Top Locations lists the venues with the most pending ShoutOuts. To work on one venue, open Entity Management → Manage Entities, unlock with SOS2FA, search for the venue and use Manage selected, or open Venue Links to copy its Club Admin and Display links. Master Admin is for FLOQR internal use only.",
       searchPhrases: [
-        "network intelligence", "network intelligence center", "master admins can view", "master admin verified",
-        "all venues", "network view", "floqr master admin", "master admin portal", "all locations"
+        "all locations", "network intelligence center", "network intelligence", "location picker", "pick a location",
+        "choose a venue", "network dashboard locations", "which venue am i looking at", "total locations",
+        "all pending shoutouts", "estimated network revenue", "top locations", "all venues", "network view",
+        "floqr master admin", "master admin portal"
       ],
       links: [
-        {label: "Master Admin", href: vUrl("./master-admin.html", {from: "floqai"})},
-        {label: "Network Dashboard", href: vUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"}
+        {label: "Network Dashboard", href: vUrl("./master-admin.html", {from: "floqai"}) + "#networkDashboard", search: "network dashboard"},
+        {label: "Manage Entities", href: vUrl("./master-admin.html", {from: "floqai"}) + "#entityManagement", search: "manage entities"},
+        {label: "Venue Links", href: vUrl("./master-admin.html", {from: "floqai"}) + "#clubAdminUrls", search: "venue links"}
       ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",

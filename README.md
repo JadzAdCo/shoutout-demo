@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.28 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.29 (stable)
+
+- s3.1.29: Master Admin layout. Features & Services → Feature & beta activity reads as a proper table on PC and as label / value cards on tablet and phone (long emails, IPs and hashes are shortened with the full value on hover; before / after changes open on demand). Tables inside Master Admin report boxes no longer squeeze columns to one letter per line. The stray ? beside the Network Intelligence Center title is gone; its help now sits on the All Locations card and explains what the network numbers mean and how to open one venue. Help popouts inside big headings use normal readable text.
 
 - s3.1.28: Any Master Admin can unlock Entity Management with SOS2FA (Request SOS2FA Code, then Verify & unlock), not only the Super Admin. Master Admin means the server-issued `masterAdmin` / `superAdmin` sign-in claim, or a listed email that is verified. The code goes to the signed-in account's own email (and SMS when set). The break-glass recovery code is still offered only to listed accounts with a verified email.
 - s3.1.27: Master Admin page accepts the server-issued `masterAdmin` / `superAdmin` sign-in claim, so a Master Admin whose Microsoft account reports an unverified email can open it. Without a claim, the listed email still has to be verified.

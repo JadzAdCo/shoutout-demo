@@ -109,6 +109,12 @@ Record fields (`buildAuditRecord`): `eventType`, `outcome` success|failure|denie
 
 Denials are unchained on purpose (no contention on the head doc from abusive traffic).
 
+### Audit trail UI (s3.1.29)
+
+Bug: `styles.css` `.report-block{overflow-wrap:anywhere}` is inherited by table cells, which drops every cell's min-content to one character; with `table-layout:auto` the huge `dataClass.savedAll` before/after JSON took the whole width and the other columns wrapped letter by letter. Fix: `admin.css` `.report-block table th/td{overflow-wrap:break-word}` (all Master Admin tables in report boxes, incl. Display access log, data classification, translation overrides, ad tables); the feature audit uses `.audit-log-table` (`table-layout:fixed`, sticky head), `master-feature-services.js` `auditRowHtml` renders `data-label` cells, ellipsis + `title` for email / IP / hash / target (`.audit-trunc`), before/after in a collapsed `<details class="audit-change">` (`pre`, `word-break:break-all` only there). ≤900px: label/value cards (`td::before{content:attr(data-label)}`); ≤480px: label above value. Test `functions/master-admin-audit-hero-help.test.js`.
+
+Master Admin hero: the help that sat on the `Network Intelligence Center` h1 (orphan `?`, popout inherited the h1's uppercase / -.05em tracking) moved to the **All Locations** card heading, same repository id `help-master-network-intelligence` (title now "All Locations", `masterAdmin`) so `functions/floqai-content-classes.json` is unchanged and `getFloqAiAccess` needs no redeploy.
+
 ## Security findings
 
 Open:
