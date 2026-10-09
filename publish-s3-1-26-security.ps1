@@ -100,7 +100,7 @@ $ErrorActionPreference = "Continue"
 foreach ($rel in $files) {
   $onMain = Join-Path $stage $rel
   $known = @($Bases + $Commit | ForEach-Object { Get-RefText $_ $rel })
-  $inBase = ($Bases | Where-Object { $null -ne (Get-RefText $_ $rel) }).Count -gt 0
+  $inBase = $null -ne (Get-RefText $Bases[0] $rel)
   if (!(Test-Path $onMain)) { if ($inBase) { $drift += "$rel (missing on main)" }; continue }
   $mainText = ((Get-Content $onMain -Raw -Encoding UTF8) -replace "`r", "").TrimEnd()
   if ($known -notcontains $mainText) { $drift += "$rel (main differs from $($Bases -join '/') and $Commit)" }
