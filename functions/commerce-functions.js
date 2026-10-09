@@ -2404,20 +2404,29 @@ exports.requestTeslaRobotaxiPickup = onCall({region:"us-central1", timeoutSecond
   };
 });
 
+/** Master Admin system write: SOS2FA + reason, missing-only, chained audit.
+ * Design notes: .cursor/rules/design-notes-data-classification.mdc → "Seed endpoints + clubMedia storage" */
 exports.seedLucyCobraBartrCatalog = onCall({region:"us-central1", timeoutSeconds:60, memory:"512MiB"}, async request => {
-  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  if (!await isMasterAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master Admin required.");
+  const audit = require("./feature-services-functions").__featureServiceHelpers;
+  const seedCore = require("./bartr-seed-core");
+  const {sessionId} = await audit.assertAdmin(request, "bartr.seed");
+  let reason;
+  try {
+    reason = require("./feature-services-core").validateReason(request.data?.reason);
+  } catch (error) {
+    throw new HttpsError("invalid-argument", error.message);
+  }
 
+  let seller = null;
   if (request.data?.sellerUid) {
     const forced = text(request.data.sellerUid, 160);
     const snap = await db.collection("users").doc(forced).get();
     if (!snap.exists) throw new HttpsError("not-found", "Forced sellerUid not found.");
-    var seller = {uid: forced, ...snap.data()};
+    seller = {uid: forced, ...snap.data()};
   } else {
     const needles = String(request.data?.query || "lucy|cobra").toLowerCase().split("|").map(x => x.trim()).filter(Boolean);
     const usersSnap = await db.collection("users").limit(500).get();
     const shoutoutsSnap = await db.collection("shoutouts").limit(500).get();
-    seller = null;
     for (const doc of shoutoutsSnap.docs) {
       const row = doc.data() || {};
       const blob = `${row.submittedBy || ""} ${row.displayName || ""} ${row.patronName || ""} ${row.mainText || ""} ${row.subText || ""}`.toLowerCase();
@@ -2437,88 +2446,42 @@ exports.seedLucyCobraBartrCatalog = onCall({region:"us-central1", timeoutSeconds
     if (!seller?.uid) throw new HttpsError("not-found", "No user matching Lucy/Cobra found. Pass { sellerUid }.");
   }
 
-  const storeName = text(seller.commerceStoreName || `${seller.displayName || seller.username || "Lucy Cobra"} Arts`, 120);
-  await db.collection("users").doc(seller.uid).set({
-    country: "United States",
-    commerceEnabled: true,
-    commerceStoreName: storeName,
-    commerceContact: text(seller.email || request.auth.token?.email || "arts@floqr.app", 200),
-    commerceRefundPolicy: "Unused physical art items may be returned within 14 days unused and in original packaging. Custom commissions are final sale.",
-    publicProfileVisibility: seller.publicProfileVisibility || "public",
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
-  }, {merge: true});
-
-  const catalog = [
-    {name:"Sunset Over Dupont (oil)", category:"Artwork", productType:"physical", priceCents:18500, desc:"Original oil painting, 16x20 framed."},
-    {name:"Neon Corridor Study", category:"Artwork", productType:"physical", priceCents:9200, desc:"Acrylic on canvas nightlife study."},
-    {name:"Mediterranean Rooftop Light", category:"Artwork", productType:"physical", priceCents:12400, desc:"Watercolor inspired by rooftop evenings."},
-    {name:"Abstract Bassline #3", category:"Artwork", productType:"physical", priceCents:7800, desc:"Mixed media abstract for lounge walls."},
-    {name:"Portrait: Midnight Patron", category:"Artwork", productType:"physical", priceCents:21000, desc:"Charcoal portrait series print + frame option."},
-    {name:"Gold Leaf Mini Series (set of 3)", category:"Artwork", productType:"physical", priceCents:6500, desc:"Three small gold-leaf panels."},
-    {name:"Club Geometry Print", category:"Artwork", productType:"physical", priceCents:4500, desc:"Limited giclee print, signed."},
-    {name:"City Rain Reflections", category:"Artwork", productType:"physical", priceCents:9900, desc:"Oil on board, urban night rain."},
-    {name:"Hammered Brass Cuff", category:"Jewelry", productType:"physical", priceCents:6800, desc:"Hand-hammered brass cuff bracelet."},
-    {name:"Resin Drop Earrings", category:"Jewelry", productType:"physical", priceCents:3200, desc:"Lightweight resin and gold-tone earrings."},
-    {name:"Beaded Night Collar", category:"Jewelry", productType:"physical", priceCents:5400, desc:"Statement beaded collar necklace."},
-    {name:"Silver Stack Ring Set", category:"Jewelry", productType:"physical", priceCents:4100, desc:"Three textured sterling-finish rings."},
-    {name:"Enamel Pin: Throw a ShoutOut", category:"Jewelry", productType:"physical", priceCents:1800, desc:"Hard enamel pin for jackets and bags."},
-    {name:"Gallery Float Frame 16x20", category:"Art accessories", productType:"physical", priceCents:5200, desc:"Black gallery float frame, ready to hang."},
-    {name:"Walnut Shadow Box Frame", category:"Art accessories", productType:"physical", priceCents:7400, desc:"Deep walnut shadow box for mixed media."},
-    {name:"Pro Acrylic Brush Set (12)", category:"Art accessories", productType:"physical", priceCents:3600, desc:"Synthetic brush set for acrylic and oil."},
-    {name:"Palette Knife Kit", category:"Art accessories", productType:"physical", priceCents:2800, desc:"Five stainless palette knives."},
-    {name:"Artist Travel Case", category:"Art accessories", productType:"physical", priceCents:8900, desc:"Compact hard case for brushes and tubes."},
-    {name:"Linen Canvas Pack (5)", category:"Art accessories", productType:"physical", priceCents:4700, desc:"Pre-stretched linen canvases, assorted."},
-    {name:"Archival Print Sleeve Bundle", category:"Art accessories", productType:"physical", priceCents:2200, desc:"Acid-free sleeves for print editions."}
-  ];
-
-  const svgFor = (title, accent) => {
-    const t = String(title || "Art").slice(0, 28).replace(/[<>&]/g, "");
-    const raw = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><rect width="600" height="600" fill="#14121c"/><circle cx="180" cy="160" r="140" fill="${accent}" opacity=".35"/><circle cx="420" cy="420" r="160" fill="#ff64d8" opacity=".25"/><text x="300" y="300" fill="#fff" font-size="28" text-anchor="middle" font-family="Georgia, serif">${t}</text></svg>`;
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(raw)}`;
-  };
-  const accents = ["#dfff5a", "#7ad7ff", "#ffb347", "#c4a1ff", "#ff6b9d"];
-  const existing = await db.collection("commerceProducts").where("sellerUid", "==", seller.uid).limit(50).get();
-  const existingNames = new Set(existing.docs.map(d => String((d.data() || {}).name || "").toLowerCase()));
-  const created = [];
+  const profilePatch = seedCore.missingProfilePatch(seller, seedCore.sellerProfileDefaults(seller));
+  const storeName = text(seller.commerceStoreName || profilePatch.commerceStoreName, 120);
+  const existing = await db.collection("commerceProducts").where("sellerUid", "==", seller.uid).limit(500).get();
+  const toCreate = seedCore.productsToCreate(seedCore.LUCY_COBRA_CATALOG, existing.docs.map(doc => doc.data() || {}));
   const now = admin.firestore.FieldValue.serverTimestamp();
-  for (let i = 0; i < catalog.length; i += 1) {
-    const item = catalog[i];
-    if (existingNames.has(item.name.toLowerCase())) continue;
+  const batch = db.batch();
+  if (Object.keys(profilePatch).length) {
+    batch.set(db.collection("users").doc(seller.uid), {...profilePatch, updatedAt: now}, {merge: true});
+  }
+  const created = toCreate.map(item => {
+    const index = seedCore.LUCY_COBRA_CATALOG.indexOf(item);
     const ref = db.collection("commerceProducts").doc();
-    await ref.set({
-      sellerEntityId: seller.uid,
-      sellerEntityType: "member",
-      sellerUid: seller.uid,
-      sellerName: storeName,
-      sellerCountry: "United States",
-      marketplaceCountry: "US",
-      marketplace: "bartr",
-      name: item.name,
-      category: item.category,
-      productType: item.productType,
-      previewMediaType: "image",
-      mediaLicense: "",
-      priceCents: item.priceCents,
-      inventory: 8 + (i % 5),
-      imageUrl: svgFor(item.name, accents[i % accents.length]),
-      description: item.desc,
-      requiresShipping: true,
-      active: true,
-      refundPolicySnapshot: "Unused physical art items may be returned within 14 days unused and in original packaging.",
-      contactSnapshot: text(seller.email || "", 200),
-      seededBy: "seedLucyCobraBartrCatalog",
+    batch.create(ref, {
+      ...seedCore.productDoc(item, index, {sellerUid: seller.uid, storeName, contact: seller.email || profilePatch.commerceContact}),
       createdAt: now,
       updatedAt: now
     });
-    created.push({id: ref.id, name: item.name, priceCents: item.priceCents});
-  }
+    return {id: ref.id, name: item.name, priceCents: item.priceCents};
+  });
+  await batch.commit();
+  await audit.writeChainedAudit(audit.auditRecord(request, {
+    eventType: "bartr.catalog_seeded",
+    target: {type: "bartrSeller", id: seller.uid},
+    after: {productsCreated: created.length, productIds: created.map(row => row.id), profileFieldsSet: Object.keys(profilePatch)},
+    reason,
+    sessionId,
+    detail: {source: seedCore.SEED_SOURCE, productsSkippedExisting: seedCore.LUCY_COBRA_CATALOG.length - created.length}
+  }));
 
   return {
     sellerUid: seller.uid,
     sellerName: storeName,
-    commerceEnabled: true,
+    commerceEnabled: seller.commerceEnabled === undefined ? true : seller.commerceEnabled === true,
+    profileFieldsSet: Object.keys(profilePatch),
     productsCreated: created.length,
-    productsSkippedExisting: catalog.length - created.length,
+    productsSkippedExisting: seedCore.LUCY_COBRA_CATALOG.length - created.length,
     products: created
   };
 });
@@ -2544,141 +2507,6 @@ exports.seedDcSpotAdPool = onCall({region:"us-central1", timeoutSeconds:60, memo
   }
   await batch.commit();
   return {seeded: n};
-});
-
-/** HTTP seed so BartR can be filled without a callable auth session. Creates demo seller if Lucy/Cobra missing. */
-exports.seedLucyCobraBartrCatalogHttp = onRequest({
-  region: "us-central1",
-  timeoutSeconds: 60,
-  memory: "512MiB",
-  cors: true
-}, async (req, res) => {
-  try {
-    if (req.method !== "POST" && req.method !== "GET") {
-      res.status(405).json({ok: false, error: "Method not allowed"});
-      return;
-    }
-    const DEMO_UID = "lucy-cobra-arts";
-    let seller = null;
-    const needles = ["lucy", "cobra"];
-    const shoutoutsSnap = await db.collection("shoutouts").limit(500).get();
-    for (const doc of shoutoutsSnap.docs) {
-      const row = doc.data() || {};
-      const blob = `${row.submittedBy || ""} ${row.displayName || ""} ${row.patronName || ""} ${row.mainText || ""} ${row.subText || ""}`.toLowerCase();
-      if (!needles.some(n => blob.includes(n))) continue;
-      const uid = row.submittedByUid;
-      if (!uid) continue;
-      const userSnap = await db.collection("users").doc(uid).get();
-      if (userSnap.exists) {
-        seller = {uid, ...userSnap.data()};
-        break;
-      }
-    }
-    if (!seller) {
-      const usersSnap = await db.collection("users").limit(500).get();
-      for (const doc of usersSnap.docs) {
-        const row = {uid: doc.id, ...doc.data()};
-        const blob = `${row.displayName || ""} ${row.fullName || ""} ${row.username || ""} ${row.email || ""}`.toLowerCase();
-        if (needles.some(n => blob.includes(n))) {
-          seller = row;
-          break;
-        }
-      }
-    }
-    if (!seller?.uid) {
-      seller = {
-        uid: DEMO_UID,
-        displayName: "Lucy Cobra",
-        username: "lucycobra",
-        email: "bans.don@gmail.com"
-      };
-    }
-    const storeName = text(seller.commerceStoreName || `${seller.displayName || "Lucy Cobra"} Arts`, 120);
-    await db.collection("users").doc(seller.uid).set({
-      displayName: seller.displayName || "Lucy Cobra",
-      username: seller.username || "lucycobra",
-      email: seller.email || "bans.don@gmail.com",
-      country: "United States",
-      commerceEnabled: true,
-      commerceStoreName: storeName,
-      commerceContact: text(seller.email || "bans.don@gmail.com", 200),
-      commerceRefundPolicy: "Unused physical art items may be returned within 14 days unused and in original packaging. Custom commissions are final sale.",
-      publicProfileVisibility: "public",
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, {merge: true});
-
-    const catalog = [
-      {name:"Sunset Over Dupont (oil)", category:"Artwork", productType:"physical", priceCents:18500, desc:"Original oil painting, 16x20 framed."},
-      {name:"Neon Corridor Study", category:"Artwork", productType:"physical", priceCents:9200, desc:"Acrylic on canvas nightlife study."},
-      {name:"Mediterranean Rooftop Light", category:"Artwork", productType:"physical", priceCents:12400, desc:"Watercolor inspired by rooftop evenings."},
-      {name:"Abstract Bassline #3", category:"Artwork", productType:"physical", priceCents:7800, desc:"Mixed media abstract for lounge walls."},
-      {name:"Portrait: Midnight Patron", category:"Artwork", productType:"physical", priceCents:21000, desc:"Charcoal portrait series print + frame option."},
-      {name:"Gold Leaf Mini Series (set of 3)", category:"Artwork", productType:"physical", priceCents:6500, desc:"Three small gold-leaf panels."},
-      {name:"Club Geometry Print", category:"Artwork", productType:"physical", priceCents:4500, desc:"Limited giclee print, signed."},
-      {name:"City Rain Reflections", category:"Artwork", productType:"physical", priceCents:9900, desc:"Oil on board, urban night rain."},
-      {name:"Hammered Brass Cuff", category:"Jewelry", productType:"physical", priceCents:6800, desc:"Hand-hammered brass cuff bracelet."},
-      {name:"Resin Drop Earrings", category:"Jewelry", productType:"physical", priceCents:3200, desc:"Lightweight resin and gold-tone earrings."},
-      {name:"Beaded Night Collar", category:"Jewelry", productType:"physical", priceCents:5400, desc:"Statement beaded collar necklace."},
-      {name:"Silver Stack Ring Set", category:"Jewelry", productType:"physical", priceCents:4100, desc:"Three textured sterling-finish rings."},
-      {name:"Enamel Pin: Throw a ShoutOut", category:"Jewelry", productType:"physical", priceCents:1800, desc:"Hard enamel pin for jackets and bags."},
-      {name:"Gallery Float Frame 16x20", category:"Art accessories", productType:"physical", priceCents:5200, desc:"Black gallery float frame, ready to hang."},
-      {name:"Walnut Shadow Box Frame", category:"Art accessories", productType:"physical", priceCents:7400, desc:"Deep walnut shadow box for mixed media."},
-      {name:"Pro Acrylic Brush Set (12)", category:"Art accessories", productType:"physical", priceCents:3600, desc:"Synthetic brush set for acrylic and oil."},
-      {name:"Palette Knife Kit", category:"Art accessories", productType:"physical", priceCents:2800, desc:"Five stainless palette knives."},
-      {name:"Artist Travel Case", category:"Art accessories", productType:"physical", priceCents:8900, desc:"Compact hard case for brushes and tubes."},
-      {name:"Linen Canvas Pack (5)", category:"Art accessories", productType:"physical", priceCents:4700, desc:"Pre-stretched linen canvases, assorted."},
-      {name:"Archival Print Sleeve Bundle", category:"Art accessories", productType:"physical", priceCents:2200, desc:"Acid-free sleeves for print editions."}
-    ];
-
-    const existing = await db.collection("commerceProducts").where("sellerUid", "==", seller.uid).limit(50).get();
-    const existingNames = new Set(existing.docs.map(d => String((d.data() || {}).name || "").toLowerCase()));
-    const created = [];
-    const now = admin.firestore.FieldValue.serverTimestamp();
-    for (let i = 0; i < catalog.length; i += 1) {
-      const item = catalog[i];
-      if (existingNames.has(item.name.toLowerCase())) continue;
-      const ref = db.collection("commerceProducts").doc();
-      const accent = encodeURIComponent(["dfff5a", "7ad7ff", "ffb347", "c4a1ff", "ff6b9d"][i % 5]);
-      const label = encodeURIComponent(item.name.slice(0, 28));
-      await ref.set({
-        sellerEntityId: seller.uid,
-        sellerEntityType: "member",
-        sellerUid: seller.uid,
-        sellerName: storeName,
-        sellerCountry: "United States",
-        marketplaceCountry: "US",
-        marketplace: "bartr",
-        name: item.name,
-        category: item.category,
-        productType: item.productType,
-        previewMediaType: "image",
-        mediaLicense: "",
-        priceCents: item.priceCents,
-        inventory: 8 + (i % 5),
-        imageUrl: `https://placehold.co/600x600/${accent}/14121c/png?text=${label}`,
-        description: item.desc,
-        requiresShipping: true,
-        active: true,
-        refundPolicySnapshot: "Unused physical art items may be returned within 14 days unused and in original packaging.",
-        contactSnapshot: text(seller.email || "bans.don@gmail.com", 200),
-        seededBy: "seedLucyCobraBartrCatalogHttp",
-        createdAt: now,
-        updatedAt: now
-      });
-      created.push({id: ref.id, name: item.name, priceCents: item.priceCents});
-    }
-
-    res.status(200).json({
-      ok: true,
-      sellerUid: seller.uid,
-      sellerName: storeName,
-      productsCreated: created.length,
-      productsSkippedExisting: catalog.length - created.length,
-      commerceUrl: "https://jadzadco.github.io/shoutout-demo/commerce.html?v=29.09.14"
-    });
-  } catch (error) {
-    res.status(500).json({ok: false, error: error?.message || String(error)});
-  }
 });
 
 /** Master Admin: deliver a sample final paid-shoutout receipt (Inbox + email PDF ± SMS) without Stripe. */
