@@ -547,9 +547,19 @@ async function canPublishForEntity(entityId, authContext = {}) {
   if (entityId.includes(":")) {
     const [memberUid, requestedRole] = entityId.split(":", 2);
     if (memberUid !== uid) return false;
-    const userSnap = await db.collection("users").doc(uid).get();
+    const wanted = normalizedServiceRole(requestedRole);
+    if (!wanted) return false;
+    const [userSnap, designations] = await Promise.all([
+      db.collection("users").doc(uid).get(),
+      db.collection("clubEmployeeDesignations").where("workerUid", "==", uid).limit(40).get()
+    ]);
     const approvedRoles = userSnap.exists && Array.isArray(userSnap.data()?.approvedRoles) ? userSnap.data().approvedRoles.map(normalizedServiceRole) : [];
-    return approvedRoles.includes(normalizedServiceRole(requestedRole));
+    if (approvedRoles.includes(wanted)) return true;
+    return designations.docs.some(doc => {
+      const row = doc.data() || {};
+      if (!["active", "approved", "elected"].includes(text(row.status, 40).toLowerCase())) return false;
+      return [row.roleElectionType, ...(Array.isArray(row.workerRoles) ? row.workerRoles : [])].map(normalizedServiceRole).includes(wanted);
+    });
   }
   if (entityId === uid) return true;
   const clubSnap = await db.collection("clubLocations").doc(entityId).get();

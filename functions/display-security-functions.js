@@ -36,13 +36,12 @@ function emailOf(authContext = {}) {
   return text(authContext.token?.email, 200).toLowerCase();
 }
 
+const {isServerAdminAuth} = require("./admin-trust");
+
 async function assertMasterAdmin(request) {
   if (!request.auth) throw new HttpsError("unauthenticated", "Master Admin sign-in is required.");
   const email = emailOf(request.auth);
-  if (request.auth.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email)) return email;
-  const snap = await db.collection("users").doc(request.auth.uid).get();
-  const data = snap.exists ? snap.data() || {} : {};
-  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return email;
+  if (isServerAdminAuth(request.auth)) return email;
   throw new HttpsError("permission-denied", "Master Admin access is required.");
 }
 

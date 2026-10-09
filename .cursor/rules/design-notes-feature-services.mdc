@@ -113,8 +113,12 @@ Denials are unchained on purpose (no contention on the head doc from abusive tra
 
 1. **`users` readable by any signed-in user** (PII: email, phone). Restrict to self + Master Admin + scoped venue staff; move patron search for admins to a callable.
 2. **`inboxNotifications` readable by any signed-in user.** Beta invite links stay safe only because invites are uid-bound. Restrict to `recipientUid == auth.uid`.
-3. **Admin email lists disagree**: client/rules include `bands.don@gmail.com`; Functions `sos2fa` / `PRIVILEGED_EMAILS` use `bans.don@gmail.com`. Pick one source (custom claims `masterAdmin: true`) and remove email lists.
-4. Fixed in s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` were self-writable on `users/{uid}` and trusted by the server — now in `hasBackendOnlyIdentityFields`.
+3. **Admin email lists disagree**: client/rules include `bands.don@gmail.com`; Functions `sos2fa` / `PRIVILEGED_EMAILS` use `bans.don@gmail.com`. s3.1.26: server trust is unified in `functions/admin-trust.js` (claim or server list containing **both** spellings) — still open: owner must confirm the real inbox, then drop the typo everywhere and move to custom claims `masterAdmin: true`.
+4. **Open mail relay — remind the owner at the next security review** (deferred Oct 9 2026): `emailFloqrPreviewLinks` (+ `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail unauthenticated, any `to`. Internal user-to-group messaging (club owners, CSR, FloqR Support) is by design and stays; lock only anonymous / arbitrary-recipient sends. Details: `design-notes-data-classification.mdc` → Seed endpoints.
+5. Fixed in s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` were self-writable on `users/{uid}` and trusted by the server — now in `hasBackendOnlyIdentityFields`.
+6. Fixed in s3.1.26: the `users` rule used `changedKeys()`, so a patron could still **add** a protected field that was absent (e.g. `superAdmin`) — now `affectedKeys()` everywhere. `isPrivilegedProfile` / `viewerFor` / `assertSuperAdmin` / `assertMasterAdmin` no longer trust any `users` field (claim or server list only).
+7. Fixed in s3.1.26: SOS2FA / email OTP attempt counter rolled back on a wrong code (unlimited guesses) — verdict now commits before the throw.
+8. Fixed in s3.1.26: `assignVenueEmployee` / `removeVenueEmployee` require an SOS2FA session. Mingl chat / connections / blocks, `messages` system sender, `aiIndex` writes, Mingl chat Storage and supRstar answers tightened — see `design-notes-data-classification.mdc` → "Security Phase 0 + 1 (s3.1.26)".
 
 ## Improvements (recommended next)
 

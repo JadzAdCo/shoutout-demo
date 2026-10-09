@@ -1,5 +1,5 @@
 ---
-description: FLOQR data classification (approved Oct 8 2026; phase 1 + FloqAi enforcement shipped s3.1.21) — five tier datapoints + Public/own/PII/retention, server-only System tier, Master Admin Security → Data classification, FloqAi results filtered by classification server-side (getFloqAiAccess).
+description: FLOQR data classification (approved Oct 8 2026; phase 1 + FloqAi enforcement shipped s3.1.21; security Phase 0 + 1 privilege/Mingl/supRstar hardening s3.1.26) — five tier datapoints + Public/own/PII/retention, server-only System tier, Master Admin Security → Data classification, FloqAi results filtered by classification server-side (getFloqAiAccess).
 alwaysApply: false
 ---
 
@@ -175,7 +175,7 @@ Pitfall that drives every stage: every page loads through `getCollectionSafe`, w
 | `patronRanks`, `approvedShoutOutLibrary`, `translationSettings` | public read kept; writes Master Admin | none |
 | `aiRecommendations` | create: master or own `uid`/`recipientUid` | none |
 
-Known follow-up (not changed — `functions/suprstr-functions.js` carries unrelated uncommitted work): `suprstrSessions` is public-read for the kiosk and stores `broadcasterEmail`; drop that field from the session doc (keep it on `suprstarRequests`).
+Fixed in s3.1.26: `suprstrSessions` no longer stores `broadcasterEmail` (kept on `suprstarRequests`).
 
 Tests: `functions/rules-tightening.test.js` (rules text, exposure count, projection matrix, client switch-over). Stage 2 / 3 remaining (24 collections): club data loaded by Club Admin / patron pages with unfiltered `getCollectionSafe` scans (`shoutouts`, `guestListRequests`, `clubEmployeeDesignations`, `workerAssociationRequests`, `roleRequests`, `clubRoleActivity`, `clubRolePolicies`, `clubNotificationSettings`, `clubMessagingCredits`, `clubMarketingCampaigns`, `clubAdminNotifications`, `notifications`, `pickupRequests`, `entityFollows`) and published listings edited by any signed-in user (`clubs`, `events`, `clubMedia`, `clubLocationAliases`, `clubTemplateVariants`, `djProfiles`, `promoterProfiles`, `liveContent`, `guestListCampaigns`, `displayDevices`). Each needs its loaders changed to club-filtered queries (rules provable from `where(clubLocationId == …)`) or callables before the rule tightens.
 
@@ -209,7 +209,7 @@ Silent-empty fix: `floqr-access-notice.js` (`FLOQRAccessNotice.report(name, erro
 
 Tests: `functions/rules-tightening-stage-2-3.test.js` (exposure report empty, no bare `signedIn()` writes, scoping, loaders, notice + i18n, Gist projection). No production data migration.
 
-Not changed (described for the owner): `admin-scheduling.js` `loadWorkers` already queries designations by club (works); its per-worker `users/{uid}` read has failed since Stage 1 and falls back to designation names — switch to `FLOQRPeople.listSafe("club", {clubLocationId})`. `functions/suprstr-functions.js`: drop `broadcasterEmail` from `suprstrSessions`.
+Not changed (described for the owner): `admin-scheduling.js` `loadWorkers` already queries designations by club (works); its per-worker `users/{uid}` read has failed since Stage 1 and falls back to designation names — switch to `FLOQRPeople.listSafe("club", {clubLocationId})`. `broadcasterEmail` was dropped from `suprstrSessions` in s3.1.26.
 
 Deploy order once Stage 1 rules are confirmed: Functions `getShoutoutStories` → Pages s3.1.24 → `firestore:rules`.
 
@@ -223,5 +223,35 @@ Deploy order once Stage 1 rules are confirmed: Functions `getShoutoutStories` �
 - Caller: `seed-v29-09-14.html` (session shell, SOS2FA unlock incl. recovery code, reason field).
 - Still Master Admin–only callables without SOS2FA (not public): `seedDcSpotAdPool` (merge-overwrites `spotAdCampaigns/{id}`), `sendTestPaidShoutoutReceipt`.
 - Other `onRequest` endpoints are webhooks (Stripe, SendGrid events, Twilio, inbound messaging, ad intake — each must verify its provider signature) or public feeds (`venuePublicFeed` / `publicVenueCalendar`, secret-keyed, read-only). **Open finding:** `emailFloqrPreviewLinks` (and one-shot `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail on an unauthenticated GET/POST; `emailFloqrPreviewLinks` accepts any `to`, `note` and `links` → open relay from the FLOQR sender. Needs a callable (Master Admin) or a shared secret header; the post-deploy QC email step depends on it.
+  - **Owner decision (Oct 9 2026): deferred — RAISE AT THE NEXT SECURITY REVIEW.** By design, signed-in users can send internal email-like messages to selected FLOQR groups (club owners, CSRs, FloqR Support); those stay. The fix only needs to stop *anonymous / arbitrary-recipient* sends: require a signed-in caller and restrict `to` to internal FLOQR recipients (or route through Inbox), keeping the post-deploy preview email working.
+
+## Security Phase 0 + 1 (s3.1.26, Oct 9 2026)
+
+Rules header `s3.1.26-security-phase-1`; storage header `s3.1.26-mingl-media-members`. Tests: `functions/security-phase0.test.js` (OTP attempt logic, admin trust), `functions/security-phase1-rules.test.js` (rules source contract), `rules-tests/` (emulator allow/deny suite, `scripts/run-rules-emulator-tests.ps1`, GitHub workflow `rules-emulator-tests.yml`, needs Java 21).
+
+### Phase 0 — privilege trust
+
+- **Diffs:** every `diff(resource.data).changedKeys()` → `affectedKeys()`. `changedKeys` ignores added/removed keys, so a patron could *add* `superAdmin`, `approvedRoles`, `IsBetaTester`… to their own `users` doc. Never use `changedKeys` for allowlists or protected-field checks (test fails on any occurrence).
+- **Server admin trust** (`functions/admin-trust.js`): token claim `masterAdmin`/`superAdmin` **or** the server email list (`bands.don@gmail.com`, `bans.don@gmail.com`, `don.b@jadzholdings.com` + `FLOQR_MASTER_ADMIN_EMAILS` / `FLOQR_SUPER_ADMIN_EMAILS`). `assertSuperAdmin` (SOS2FA), both `assertMasterAdmin`s (display security, AI discovery), and Features & Services `isPrivilegedProfile` / `viewerFor` no longer read `users/{uid}` role fields. Both spellings are listed on purpose until the owner confirms which inbox is real (`bans.don` is the account that signs in; `bands.don` is believed to be a typo — whoever registers it would be a Master Admin in rules/client lists).
+- **approvedRoles / approvedLocations:** backend-only on `users` (rules). Server checks that relied on them (`canPublishForEntity`, scheduling manager check) verify against server-written sources; client writers that mirror them onto *other* users (`admin-app.js` ~1997/~2327, `patron-portal-app.js` ~3970/~4067) have always been denied by rules and are now all non-fatal; the `clubEmployeeDesignations` row they write first is what grants the role. Rules: `isMasterAdmin()` reads the claim via `token.get("masterAdmin", false)` and `isParticipant()` has no `is list` test — both are required for list queries (`array-contains participants`) to be provable.
+- **SOS2FA on venue employee assignment:** `assignVenueEmployee` / `removeVenueEmployee` require an `entityManagement` SOS2FA session; Master Admin UI passes it.
+- **OTP attempt counter:** `verifySos2faCode` / `verifyEmailOtp` (and recovery code) used to `throw` inside the transaction, rolling back the `attempts++` → unlimited guesses. Now `otp-attempts.js` `evaluateOtpAttempt` decides, the transaction records the verdict and commits, and the callable throws afterwards (same pattern as WhatsApp OTP).
+
+### Phase 1 — rules
+
+| Area | Rule now |
+|---|---|
+| `chatRooms` | read: master or participant. create: master or a valid Mingl room (`type mingl`, id `mingl_<connectionId>`, two participants = the connection's pair, connection `mutual`). update: master or participant keeping type/id/connectionId/members, while mutual or closing. Non-Mingl escape branches removed; non-Mingl → Mingl conversion impossible. |
+| `chatMessages` | read: master or participant. create: master or Mingl message by `senderUid == auth.uid` (or the Mingl system-message helper) in an existing Mingl room, same members as the room, connection mutual. update: master or narrow helpers (own edit, read receipt, background consent, delete-after-read). delete: master, sender, diagnostic participant. |
+| `messages` | create: `senderUid == auth.uid` (master excepted). Client `senderUid: "system"` refused — System Messages come from Functions. `keepsMessageParties` also pins `senderEmail` and `participants`. |
+| `minglConnections` | create: `pending` with `requestedBy == auth`, `requestedTo` the other participant (exactly 2), or `blocked` with `blockedByUid == auth` (UnMingl of a stranger). Only `requestedTo` moves pending → mutual. A block is changed only by its blocker and never straight to mutual. Members immutable; requester/target change only for a fresh request after a closed one. |
+| `userBlocks` | create by `blockedBy == auth` (pair only); update only by the blocker (or a re-block after an unblock); delete by blocker. |
+| `aiIndex` | writes Master Admin (Functions use Admin SDK). `ai-index-service.js` treats permission-denied as "not indexed" so Club Admin / template saves keep working. |
+| `suprstrSessions` | board answer is **write-once** (`answer` must be null before), keys only `answer/status/answeredAt/updatedAt`, `answer {type:"answer", sdp ≤ 20 000}`. Broadcaster cannot overwrite an existing answer. `broadcasterEmail` dropped from the public session doc (kept on `suprstarRequests`). |
+| Storage `mingl-chat/{uid}/{roomId}`, `mingl-chat-backgrounds/{uid}/{roomId}` | read: uploader or room participant; write: uploader who is a participant (Master Admin may write diagnostics). One cross-service read (`chatRooms/{roomId}`). Same dependency as clubMedia (s3.1.25): the Storage service agent holds `roles/firebaserules.firestoreServiceAgent` (owner granted it Oct 9 2026 via an interactive `firebase deploy --only storage`); without it every cross-service check denies. |
+
+Left as-is on purpose: `shoutouts/`, `template-backgrounds/`, `profileMedia/` storage stay "any signed-in read"; `calleeCandidates` stay anonymous (shape-limited) for Xibo.
+
+Pending (owner action): supRstar board identity via a display-token-derived custom token (`getSuprstrDisplaySession` → `createCustomToken(uid, {displayLocationId})`, needs Service Account Token Creator on the Functions runtime SA); until then a re-joining board cannot overwrite an answer and must wait for the phone's next offer.
 
 **clubMedia storage** (`storage.rules` `s3.1.25-club-media-admins`): read stays public (Display, Search, club profile). Create / update / delete under `clubMedia/{clubLocationId}/...` = Master Admin (token claim or the same email list as `firestore.rules` `isMasterAdmin`) **or** a Club Admin of that club — `clubLocations/{id}.adminUids | masterAdminUids | adminEmails`, or `clubAdminAssignments/{id}_{uid}.status == "active"` (same sources as `isClubManager`). Images/videos only, < 60 MB. Storage rules may read at most **2** Firestore docs per request; the helper reads exactly `clubLocations/{id}` + the assignment doc — do not add a third lookup. Demo Club Admin emails that `admin-app.js` maps to `temp-democlub-N` without a roster entry cannot upload (they already could not write the `clubMedia` Firestore docs).

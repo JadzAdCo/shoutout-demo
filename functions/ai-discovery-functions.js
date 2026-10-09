@@ -20,6 +20,8 @@ const EMAIL_OTP_PEPPER = defineSecret("EMAIL_OTP_PEPPER");
 const GOOGLE_PLACES_API_KEY = defineSecret("GOOGLE_PLACES_API_KEY");
 const EMAIL_OTP_FROM = process.env.FLOQR_EMAIL_OTP_FROM || "bans.don@gmail.com";
 const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
+const {isServerAdminAuth} = require("./admin-trust");
+const {evaluateOtpAttempt} = require("./otp-attempts");
 const venueDatapoints = require("./venue-datapoint-extract");
 const {sendSystemMail} = require("./mail-log");
 const {
@@ -832,11 +834,7 @@ async function sendEmailOtp(email, code) {
 
 async function assertMasterAdmin(request) {
   if (!request.auth) throw new HttpsError("unauthenticated", "Master Admin sign-in is required.");
-  const email = String(request.auth.token?.email || "").toLowerCase();
-  if (MASTER_ADMIN_EMAILS.includes(email) || request.auth.token?.masterAdmin === true) return;
-  const record = await db.collection("users").doc(request.auth.uid).get();
-  const data = record.exists ? record.data() || {} : {};
-  if (data.masterAdmin === true || (data.roles || []).includes("masterAdmin")) return;
+  if (isServerAdminAuth(request.auth)) return;
   throw new HttpsError("permission-denied", "Master Admin access is required.");
 }
 
@@ -1407,21 +1405,35 @@ exports.verifyEmailOtp = onCall({region:"us-central1", secrets:[EMAIL_OTP_PEPPER
   const code = String(request.data?.code || "").trim().toUpperCase();
   if (!challengeId || !/^[A-Z2-9]{8}$/.test(code)) throw new HttpsError("invalid-argument", "Enter the 8-character email code.");
   const ref = db.collection("emailOtpChallenges").doc(challengeId);
-  const token = await db.runTransaction(async transaction => {
+  const providedHash = otpHash(email, code);
+  const verdict = await db.runTransaction(async transaction => {
     const snap = await transaction.get(ref);
-    if (!snap.exists) throw new HttpsError("not-found", "The sign-in code was not found. Request a new code.");
+    if (!snap.exists) return {outcome:"missing"};
     const data = snap.data() || {};
-    if (data.email !== email || data.used) throw new HttpsError("permission-denied", "This code cannot be used.");
-    if ((data.expiresAt?.toMillis?.() || 0) < Date.now()) throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
-    if (Number(data.attempts || 0) >= 5) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
-    if (!crypto.timingSafeEqual(Buffer.from(data.codeHash, "hex"), Buffer.from(otpHash(email, code), "hex"))) {
-      transaction.update(ref, {attempts:admin.firestore.FieldValue.increment(1)});
-      throw new HttpsError("permission-denied", "The email code is incorrect.");
+    if (data.email !== email) return {outcome:"consumed"};
+    const result = evaluateOtpAttempt({
+      storedHash:data.codeHash,
+      providedHash,
+      attempts:data.attempts,
+      maxAttempts:5,
+      expiresAtMs:data.expiresAt?.toMillis?.() || 0,
+      nowMs:Date.now(),
+      consumed:data.used === true,
+      locked:data.locked === true
+    });
+    if (result.outcome === "wrong") {
+      transaction.update(ref, result.lock ? {attempts:result.nextAttempts, locked:true} : {attempts:result.nextAttempts});
+    } else if (result.outcome === "ok") {
+      transaction.update(ref, {used:true, verifiedAt:admin.firestore.FieldValue.serverTimestamp()});
     }
-    transaction.update(ref, {used:true, verifiedAt:admin.firestore.FieldValue.serverTimestamp()});
-    return true;
+    return result;
   });
-  if (!token) throw new HttpsError("internal", "Email verification failed.");
+  const outcome = verdict?.outcome || "missing";
+  if (outcome === "missing") throw new HttpsError("not-found", "The sign-in code was not found. Request a new code.");
+  if (outcome === "consumed") throw new HttpsError("permission-denied", "This code cannot be used.");
+  if (outcome === "expired") throw new HttpsError("deadline-exceeded", "This code expired. Request a new code.");
+  if (outcome === "locked" || verdict.lock) throw new HttpsError("resource-exhausted", "Too many attempts. Request a new code.");
+  if (outcome !== "ok") throw new HttpsError("permission-denied", "The email code is incorrect.");
   let user;
   try { user = await admin.auth().getUserByEmail(email); }
   catch (error) {

@@ -8,7 +8,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
   .filter(Boolean);
@@ -233,7 +233,6 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
   const displayBoard = boardFromRaw(req.displayBoard);
   const liveId = liveDocId(locationId, displayBoard);
   const uid = request.auth.uid;
-  const email = text(request.auth.token?.email, 200).toLowerCase();
   const sessionRef = db.collection("suprstrSessions").doc();
   const liveRef = db.collection("suprstrLive").doc(liveId);
   const now = admin.firestore.Timestamp.now();
@@ -257,7 +256,6 @@ exports.startSuprstrLive = onCall({region: "us-central1"}, async (request) => {
       displayBoard,
       liveDocId: liveId,
       broadcasterUid: uid,
-      broadcasterEmail: email,
       status: "waiting",
       offer: null,
       answer: null,

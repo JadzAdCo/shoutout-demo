@@ -1,7 +1,9 @@
 rules_version = '2';
 
-// FLOQR STORAGE RULES VERSION: s3.1.25-club-media-admins
-// EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.25-club-media-admins or newer
+// FLOQR STORAGE RULES VERSION: s3.1.26-mingl-media-members
+// EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.26-mingl-media-members or newer
+// - mingl-chat/ and mingl-chat-backgrounds/: read by the uploader or a member of chatRooms/{roomId}; upload by a member
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: s3.1.25-club-media-admins
 // - clubMedia/{clubLocationId}/... writes/deletes: Master Admin or a Club Admin of that club only
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: s3.1.0-ad-media
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: v29.06
@@ -29,7 +31,7 @@ service firebase.storage {
     function isStorageMasterAdmin() {
       return request.auth != null
         && (
-          request.auth.token.masterAdmin == true
+          request.auth.token.get("masterAdmin", false) == true
           || request.auth.token.email in [
             "bands.don@gmail.com",
             "bans.don@gmail.com",
@@ -122,11 +124,28 @@ service firebase.storage {
         && request.auth.uid == userId;
     }
 
-    match /mingl-chat/{userId}/{roomId}/{allPaths=**} {
-      allow read: if request.auth != null;
+    // Mingl chat media: the uploader or a member of chatRooms/{roomId} (1 Firestore read).
+    // Master Admin may upload without a room for Diagnostics smoke tests.
+    function isChatRoomMember(roomId) {
+      return request.auth != null
+        && request.auth.uid in firestore.get(/databases/(default)/documents/chatRooms/$(roomId)).data.get("participants", []);
+    }
 
-      allow create, update: if request.auth != null
+    function canReadChatMedia(userId, roomId) {
+      return request.auth != null
+        && (request.auth.uid == userId || isChatRoomMember(roomId));
+    }
+
+    function canWriteChatMedia(userId, roomId) {
+      return request.auth != null
         && request.auth.uid == userId
+        && (isStorageMasterAdmin() || isChatRoomMember(roomId));
+    }
+
+    match /mingl-chat/{userId}/{roomId}/{allPaths=**} {
+      allow read: if canReadChatMedia(userId, roomId);
+
+      allow create, update: if canWriteChatMedia(userId, roomId)
         && request.resource.size < 30 * 1024 * 1024
         && (
           request.resource.contentType.matches('image/.*') ||
@@ -138,10 +157,9 @@ service firebase.storage {
     }
 
     match /mingl-chat-backgrounds/{userId}/{roomId}/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if canReadChatMedia(userId, roomId);
 
-      allow create, update: if request.auth != null
-        && request.auth.uid == userId
+      allow create, update: if canWriteChatMedia(userId, roomId)
         && request.resource.size < 8 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
 

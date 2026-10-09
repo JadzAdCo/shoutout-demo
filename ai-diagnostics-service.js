@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.25";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.26";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,13 +1284,22 @@
       ]
     },
     {
+      version: "s3.1.26-security-phase-1",
+      title: "Security: admin rights come only from the server, wrong codes now count toward the lockout, and Mingl chats, blocks, inbox messages and supRstar streams can only be changed by the people they belong to",
+      checks: [
+        {label:"Rules version", file:"firestore.rules", includes:["s3.1.26-security-phase-1", "function isValidNewMinglRoom(", "function minglStatusTransitionOk("]},
+        {label:"Mingl request sender", file:"patron-app.js", includes:["messageType:\"mingl_request\", senderUid:currentUser.uid"]},
+        {label:"Search index write tolerates denial", file:"ai-index-service.js", includes:["permission-denied"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.26\""]}
+      ]
+    },
+    {
       version: "s3.1.25-board-fit",
       title: "LED boards: the board size set in Club Admin wins, only approved ShoutOuts play (then return to the idle board), every word stays whole and shrinks only when it would not fit, and previews render at the board's real pixel size",
       checks: [
         {label:"Board fit module", file:"floqr-board-fit.js", includes:["window.FLOQRBoardFit", "function mergeVenueForDisplay(", "function liveContentDecision("]},
         {label:"Native-size preview frame", file:"floqr-board-frame.js", includes:["window.FLOQRBoardFrame", "function mount("]},
-        {label:"Display uses Firestore-first venue merge", file:"display-app.js", includes:["function mergeLiveVenue(", "function isRenderableLiveContent(", "hydrateUrlPreviewFromFirestore()"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.25\""]}
+        {label:"Display uses Firestore-first venue merge", file:"display-app.js", includes:["function mergeLiveVenue(", "function isRenderableLiveContent(", "hydrateUrlPreviewFromFirestore()"]}
       ]
     },
     {

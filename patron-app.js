@@ -2158,7 +2158,7 @@
     const writes = [
       db.collection("inboxNotifications").add({recipientUid:targetUid, recipientEmail:targetProfile.email || "", type:"minglRequest", ...base}),
       db.collection("inboxNotifications").add({recipientUid:currentUser.uid, recipientEmail:currentUser.email || "", type:"minglRequestReceipt", ...base}),
-      db.collection("messages").add({messageType:"mingl_request", senderUid:"system", senderName:"System Message", recipientUid:targetUid, recipientEmail:targetProfile.email || "", ...base}),
+      db.collection("messages").add({messageType:"mingl_request", senderUid:currentUser.uid, senderEmail:currentUser.email || "", senderName:base.requesterName, recipientUid:targetUid, recipientEmail:targetProfile.email || "", ...base}),
       db.collection("minglAudit").add({type:"mingl_request", actorUid:currentUser.uid, participants:[currentUser.uid, targetUid], ...base})
     ];
     await Promise.allSettled(writes);

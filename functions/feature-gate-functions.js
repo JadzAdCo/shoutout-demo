@@ -3,16 +3,18 @@
  */
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
+const {assertSos2faSession, writeEntityManagementAudit} = require("./sos2fa-functions");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bands.don@gmail.com,bans.don@gmail.com,don.b@jadzholdings.com")
+const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
 
-const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || "bands.don@gmail.com")
+/* Master Admin = Super Admin */
+const SUPER_ADMIN_EMAILS = String(process.env.FLOQR_SUPER_ADMIN_EMAILS || process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(x => x.trim().toLowerCase())
   .filter(Boolean);
@@ -98,7 +100,7 @@ function protectSuperAdminEntity(row, entityType) {
 }
 
 exports.setPatronFeatureGates = onCall({region:"us-central1", timeoutSeconds:30, memory:"256MiB"}, async request => {
-  const actorEmail = await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const gates = normalizePatronGates(request.data?.gates || request.data || {});
   const payload = {
     ...gates,
@@ -107,11 +109,18 @@ exports.setPatronFeatureGates = onCall({region:"us-central1", timeoutSeconds:30,
     updatedByEmail: actorEmail
   };
   await db.collection("platformSettings").doc("patronFeatureGates").set(payload, {merge:true});
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "set_patron_feature_gates",
+    detail: {gates},
+    sessionId
+  });
   return {ok:true, gates};
 });
 
 exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, memory:"256MiB"}, async request => {
-  const actorEmail = await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const entityType = text(request.data?.entityType || "club", 40).toLowerCase();
   const entityId = text(request.data?.entityId, 120);
   const enabled = request.data?.enabled !== false;
@@ -133,6 +142,13 @@ exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, m
       disabledByEmail: enabled ? null : actorEmail,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: enabled ? "entity_enabled" : "entity_disabled",
+      detail: {entityType: "club", entityId, appEnabled: enabled},
+      sessionId
+    });
     return {ok:true, entityType:"club", entityId, appEnabled:enabled};
   }
 
@@ -145,6 +161,13 @@ exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, m
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       disabledByEmail: enabled ? null : actorEmail
     }, {merge:true});
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: enabled ? "entity_enabled" : "entity_disabled",
+      detail: {entityType: "event", entityId, appEnabled: enabled},
+      sessionId
+    });
     return {ok:true, entityType:"event", entityId, appEnabled:enabled};
   }
 
@@ -159,6 +182,13 @@ exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, m
       disabledByUid: enabled ? null : request.auth.uid,
       disabledByEmail: enabled ? null : actorEmail
     }, {merge:true});
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: enabled ? "entity_enabled" : "entity_disabled",
+      detail: {entityType: "user", entityId: user.uid, appEnabled: enabled},
+      sessionId
+    });
     return {ok:true, entityType:"user", entityId:user.uid, appEnabled:enabled};
   }
 
@@ -166,7 +196,7 @@ exports.setEntityAppEnabled = onCall({region:"us-central1", timeoutSeconds:30, m
 });
 
 exports.setVenueFeatureGates = onCall({region:"us-central1", timeoutSeconds:30, memory:"256MiB"}, async request => {
-  const actorEmail = await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const clubId = text(request.data?.clubId || request.data?.entityId, 120);
   if (!clubId) throw new HttpsError("invalid-argument", "clubId is required.");
   const gates = normalizeVenueGates(request.data?.gates || request.data?.featureGates || {});
@@ -177,11 +207,18 @@ exports.setVenueFeatureGates = onCall({region:"us-central1", timeoutSeconds:30, 
     featureGatesUpdatedByEmail: actorEmail,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, {merge:true});
+  await writeEntityManagementAudit({
+    uid: request.auth.uid,
+    email: actorEmail,
+    action: "set_venue_feature_gates",
+    detail: {clubId, featureGates: gates},
+    sessionId
+  });
   return {ok:true, clubId, featureGates:gates};
 });
 
 exports.offboardEntity = onCall({region:"us-central1", timeoutSeconds:60, memory:"512MiB"}, async request => {
-  const actorEmail = await assertMasterAdmin(request);
+  const {email: actorEmail, sessionId} = await assertSos2faSession(request);
   const entityType = text(request.data?.entityType || "club", 40).toLowerCase();
   const entityId = text(request.data?.entityId, 120);
   const confirmName = text(request.data?.confirmName, 200);
@@ -232,6 +269,13 @@ exports.offboardEntity = onCall({region:"us-central1", timeoutSeconds:60, memory
       }, {merge:true});
     } catch (e) {}
 
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: "entity_offboarded",
+      detail: {entityType: "club", entityId},
+      sessionId
+    });
     return {ok:true, entityType:"club", entityId, offboarded:true};
   }
 
@@ -262,6 +306,13 @@ exports.offboardEntity = onCall({region:"us-central1", timeoutSeconds:60, memory
       offboardedByEmail: actorEmail,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, {merge:true});
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: "entity_offboarded",
+      detail: {entityType: "user", entityId: user.uid},
+      sessionId
+    });
     return {ok:true, entityType:"user", entityId:user.uid, offboarded:true};
   }
 
@@ -288,6 +339,13 @@ exports.offboardEntity = onCall({region:"us-central1", timeoutSeconds:60, memory
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       title: expected
     }, {merge:true});
+    await writeEntityManagementAudit({
+      uid: request.auth.uid,
+      email: actorEmail,
+      action: "entity_offboarded",
+      detail: {entityType: "event", entityId},
+      sessionId
+    });
     return {ok:true, entityType:"event", entityId, offboarded:true};
   }
 

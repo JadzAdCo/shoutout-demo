@@ -71,10 +71,15 @@ async function canManageOwner(ownerType, ownerId, authContext = {}) {
   if (ownerType === "promoterCompany") {
     const sub = await db.collection("schedulingSubscriptions").doc(ownerKey(ownerType, ownerId)).get();
     if (sub.exists && text(sub.data()?.ownerUid, 160) === uid) return true;
-    const userSnap = await db.collection("users").doc(uid).get();
-    const roles = userSnap.exists && Array.isArray(userSnap.data()?.approvedRoles) ? userSnap.data().approvedRoles : [];
-    const company = text(userSnap.data()?.promoterCompany || userSnap.data()?.promotionCompany || "", 160).toLowerCase();
-    return roles.some(r => /promot/i.test(String(r))) && company && company === ownerId.toLowerCase();
+    // Company comes from club-manager-written designations; users.promoterCompany is patron-editable.
+    const designations = await db.collection("clubEmployeeDesignations").where("workerUid", "==", uid).limit(40).get();
+    return designations.docs.some(doc => {
+      const row = doc.data() || {};
+      if (!["active", "approved", "elected"].includes(text(row.status, 40).toLowerCase())) return false;
+      const roles = [row.roleElectionType, ...(Array.isArray(row.workerRoles) ? row.workerRoles : [])];
+      const company = text(row.promoterCompany, 160).toLowerCase();
+      return roles.some(r => /promot/i.test(String(r || ""))) && !!company && company === ownerId.toLowerCase();
+    });
   }
   // club
   const email = String(authContext.token?.email || "").toLowerCase();

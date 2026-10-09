@@ -16,10 +16,7 @@ const C = core.COLLECTIONS;
 const PACKAGE_VERSION = `s${pkg.version}`;
 const PROMOTION_WORKFLOW_URL = process.env.FLOQR_PROMOTION_WORKFLOW_URL
   || "https://github.com/JadzAdCo/shoutout-demo/actions/workflows/promote-test-to-main.yml";
-const PRIVILEGED_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
-  .split(",")
-  .map(value => value.trim().toLowerCase())
-  .filter(Boolean);
+const {isServerAdminAuth, isServerAdminEmail} = require("./admin-trust");
 const CALL_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
 const UNAVAILABLE_MESSAGE = "This feature isn't available on your account yet.";
 
@@ -93,17 +90,19 @@ function asHttps(error) {
   return new HttpsError("internal", "Features & Services request failed. Try again.");
 }
 
-function isPrivilegedProfile(email, data = {}) {
-  if (PRIVILEGED_EMAILS.includes(text(email, 200).toLowerCase())) return true;
-  return data.masterAdmin === true || data.superAdmin === true || (Array.isArray(data.roles) && data.roles.includes("masterAdmin"));
+/** Invite target check: Auth custom claims + server email list. users/{uid} fields are patron-editable and ignored. */
+async function isPrivilegedProfile(uid, email) {
+  if (isServerAdminEmail(email)) return true;
+  try {
+    const record = await admin.auth().getUser(uid);
+    return isServerAdminAuth({token: {...(record.customClaims || {}), email: record.email || ""}});
+  } catch (_) {
+    return false;
+  }
 }
 
 async function isPrivilegedAuth(auth) {
-  if (!auth) return false;
-  if (auth.token?.masterAdmin === true || auth.token?.superAdmin === true) return true;
-  if (isPrivilegedProfile(auth.token?.email)) return true;
-  const snap = await db.collection("users").doc(auth.uid).get();
-  return isPrivilegedProfile("", snap.exists ? snap.data() || {} : {});
+  return isServerAdminAuth(auth);
 }
 
 /** Master Admins are never beta testers, even if a betaTesters doc exists for them. */
@@ -243,7 +242,7 @@ exports.createBetaInvite = onCall(CALL_OPTS, async request => {
   ]);
   if (!userSnap.exists) throw new HttpsError("not-found", "Patron not found.");
   const user = userSnap.data() || {};
-  if (isPrivilegedProfile(user.email, user)) {
+  if (await isPrivilegedProfile(targetUid, user.email)) {
     await writeUnchainedAudit(auditRecord(request, {
       eventType: "beta.invite_denied",
       outcome: "denied",

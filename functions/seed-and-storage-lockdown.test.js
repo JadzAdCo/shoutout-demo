@@ -132,8 +132,11 @@ test("storage.rules: clubMedia writes and deletes need Master Admin or a Club Ad
   assert.match(assignment, /clubAdminAssignments\/\$\(clubId \+ "_" \+ request\.auth\.uid\)/);
   assert.match(assignment, /== "active"/);
 
-  const docPaths = new Set([...storage.matchAll(/firestore\.(?:get|exists)\(\/databases\/\(default\)\/documents\/(\w+)\//g)].map(m => m[1]));
-  assert.deepEqual([...docPaths].sort(), ["clubAdminAssignments", "clubLocations"], "Storage rules may read at most 2 Firestore docs");
+  const docPaths = text => [...new Set([...text.matchAll(/firestore\.(?:get|exists)\(\/databases\/\(default\)\/documents\/(\w+)\//g)].map(m => m[1]))].sort();
+  const clubMediaReads = docPaths(location + assignment);
+  assert.deepEqual(clubMediaReads, ["clubAdminAssignments", "clubLocations"], "clubMedia checks may read at most 2 Firestore docs");
+  assert.deepEqual(docPaths(bracedBlock(storage, "function isChatRoomMember(")), ["chatRooms"], "Mingl media checks read only the chat room");
+  assert.deepEqual(docPaths(storage), ["chatRooms", "clubAdminAssignments", "clubLocations"], "no other cross-service reads");
 
   const emails = text => [...bracedBlock(text, "function " + (text === storage ? "isStorageMasterAdmin(" : "isMasterAdmin("))
     .matchAll(/"([^"]+@[^"]+)"/g)].map(m => m[1]).sort();
