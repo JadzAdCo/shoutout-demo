@@ -161,7 +161,7 @@ Goal: admins and patrons stop sharing one login path and one origin. Patrons kee
 
 - **Custom claims**, set only by Functions: `role: "masterAdmin" | "venueAdmin" | "serviceMember"`, `venueIds: [...]`, `tenant: "admins"`. Beta testers get `betaFeatures: ["bartr", ...]` on the **patron** tenant only.
 - Admin callables check `request.auth.token.firebase.tenant === "admins"` **and** the role claim. Patron callables reject the admin tenant for patron-only flows (no admin placing patron orders as a shortcut).
-- Firestore rules: `request.auth.token.role == "masterAdmin"` replaces `isMasterAdminEmail()`; fixes the `bands.don` / `bans.don` mismatch by deleting the lists.
+- Firestore rules: `request.auth.token.role == "masterAdmin"` replaces `isMasterAdminEmail()` and deletes the email lists (the `bands.don` / `bans.don` mismatch itself was already fixed in s3.1.26: single spelling `bans.don@gmail.com`).
 - Disjoint roles stay enforced: granting `betaFeatures` refuses any uid that holds an admin claim; creating an admin removes beta grants.
 
 ### Migration in phases (each phase shippable on its own)
