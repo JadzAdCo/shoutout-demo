@@ -40,7 +40,7 @@
 <script>
   window.SHOUTOUT_SUPER_ADMIN_EMAILS = window.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bans.don@gmail.com", "don.b@jadzholdings.com"];
 </script>
-<script src="./sos2fa.js?v=s3.1.26"></script>
+<script src="./sos2fa.js?v=s3.1.28"></script>
 <script src="./dc-spot-ad-campaigns.js?v=29.09.14"></script>
 <script>
 (function () {
@@ -73,8 +73,8 @@
     chrome: "[data-floqr-auth-chrome]",
     statusEl: "#status",
     onUser: () => {
-      window.FLOQRSOS2FA.mount({scope: SCOPE, onUnlocked: refreshButtons});
       refreshButtons();
+      Promise.resolve(window.FLOQRSOS2FA.mount({scope: SCOPE, onUnlocked: refreshButtons})).finally(refreshButtons);
     }
   });
   document.getElementById("sos2faLockBtn").addEventListener("click", () => setTimeout(refreshButtons, 0));

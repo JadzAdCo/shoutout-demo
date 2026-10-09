@@ -1,5 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.27 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.28 (stable)
 
+- s3.1.28: Any Master Admin can unlock Entity Management with SOS2FA (Request SOS2FA Code, then Verify & unlock), not only the Super Admin. Master Admin means the server-issued `masterAdmin` / `superAdmin` sign-in claim, or a listed email that is verified. The code goes to the signed-in account's own email (and SMS when set). The break-glass recovery code is still offered only to listed accounts with a verified email.
 - s3.1.27: Master Admin page accepts the server-issued `masterAdmin` / `superAdmin` sign-in claim, so a Master Admin whose Microsoft account reports an unverified email can open it. Without a claim, the listed email still has to be verified.
 - s3.1.26: Security. Admin rights are decided only by the server (never by fields a patron can edit on their own profile), wrong SOS2FA / email codes now count toward the lockout, and assigning venue employees needs an SOS2FA session. Mingl chats, Mingl requests, blocks, inbox messages, Mingl photos and supRstar streams can only be read or changed by the people they belong to; the search index is written by Master Admins only. Master Admin by email now needs a verified email (rules + Functions), the unowned typo admin address is gone from every list, and Super Admin offboard protection reads the sign-in account (not the patron profile).
 

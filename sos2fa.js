@@ -1,11 +1,15 @@
-/* SOS2FA — Super Admin SMS gate for Entity Management (server-side Twilio OTP). */
+/* SOS2FA — Master Admin one-time code gate for Entity Management (server-side Email / SMS OTP).
+   Design notes: .cursor/rules/design-notes-feature-services.mdc */
 (function (root) {
   "use strict";
 
   const STORAGE_PREFIX = "floqr_sos2fa_";
   const DEFAULT_TTL_MS = 60 * 60 * 1000;
   const WRONG_CODE_MESSAGE = "Wrong code entered, please enter the correct code to proceed";
-  const SUPER_ADMIN_EMAILS = (root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bans.don@gmail.com"]).map(x => String(x).toLowerCase());
+  const lowerList = list => (list || []).map(x => String(x).trim().toLowerCase()).filter(Boolean);
+  const SUPER_ADMIN_EMAILS = lowerList(root.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bans.don@gmail.com"]);
+  const MASTER_ADMIN_EMAILS = lowerList(root.SHOUTOUT_MASTER_ADMIN_EMAILS || root.SHOUTOUT_ADMIN_EMAILS);
+  const LISTED_ADMIN_EMAILS = [...new Set([...MASTER_ADMIN_EMAILS, ...SUPER_ADMIN_EMAILS])];
   const ENTITY_MGMT_PANELS = [
     "clubAdminUrls",
     "entityManagement",
@@ -26,6 +30,8 @@
   let functions = null;
   let challengeRequested = false;
   const unlockCallbacks = new Map();
+  const claimsByUid = new Map();
+  const pendingClaims = new Map();
 
   function byId(id) {
     return document.getElementById(id);
@@ -35,15 +41,54 @@
     return String(value || "").trim().toLowerCase();
   }
 
-  function isSuperAdminUser(user, profile) {
-    const email = normalizeEmail(user?.email || profile?.email);
-    if (SUPER_ADMIN_EMAILS.includes(email)) return true;
-    if (profile?.superAdmin === true) return true;
-    if (user?.superAdmin === true) return true;
+  function hasAdminClaim(claims) {
+    return claims?.masterAdmin === true || claims?.superAdmin === true;
+  }
+
+  function hasVerifiedListedEmail(user) {
+    return user?.emailVerified === true && LISTED_ADMIN_EMAILS.includes(normalizeEmail(user.email));
+  }
+
+  /* Same trust as functions/admin-trust.js isServerAdminAuth: claim, or listed email that is verified.
+     Profile fields are patron-editable and never count. */
+  function isMasterAdminUser(user, claims) {
+    if (!user) return false;
+    const resolved = claims === undefined ? claimsByUid.get(user.uid) : claims;
+    return hasAdminClaim(resolved) || hasVerifiedListedEmail(user);
+  }
+
+  /* verifySos2faRecoveryCode accepts only a listed email with email_verified === true (no claim path). */
+  function canUseRecoveryCode(user) {
+    return hasVerifiedListedEmail(user);
+  }
+
+  async function readClaims(user) {
     try {
-      if (root.FLOQRFeatureGates?.isSuperAdmin?.(email, profile || user)) return true;
-    } catch (_) {}
-    return false;
+      return (await user.getIdTokenResult(true))?.claims || {};
+    } catch (_) {
+      try {
+        return (await user.getIdTokenResult())?.claims || {};
+      } catch (__) {
+        return {};
+      }
+    }
+  }
+
+  function loadClaims(user, {force = false} = {}) {
+    if (!user) return Promise.resolve({});
+    if (!force && claimsByUid.has(user.uid)) return Promise.resolve(claimsByUid.get(user.uid));
+    if (!force && pendingClaims.has(user.uid)) return pendingClaims.get(user.uid);
+    const pending = readClaims(user).then(claims => {
+      claimsByUid.set(user.uid, claims);
+      pendingClaims.delete(user.uid);
+      return claims;
+    });
+    pendingClaims.set(user.uid, pending);
+    return pending;
+  }
+
+  function syncRecoveryUi(user) {
+    document.querySelectorAll(".sos2fa-recovery").forEach(el => el.classList.toggle("hidden", !canUseRecoveryCode(user)));
   }
 
   function isEntityMgmtPanel(panelId) {
@@ -166,9 +211,9 @@
 
   async function sendCode() {
     const authUser = firebase.auth().currentUser;
-    if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
-    if (!isSuperAdminUser(authUser)) {
-      throw new Error("SOS2FA Entity Management unlock is limited to Super Admin.");
+    if (!authUser) throw new Error("Sign in as a Master Admin before SOS2FA.");
+    if (!isMasterAdminUser(authUser, await loadClaims(authUser))) {
+      throw new Error("SOS2FA Entity Management unlock is limited to Master Admins.");
     }
     setStatus("Requesting SOS2FA code…");
     const result = await callable("requestSos2faCode")({});
@@ -181,7 +226,7 @@
 
   async function verifyCode({code} = {}) {
     const authUser = firebase.auth().currentUser;
-    if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
+    if (!authUser) throw new Error("Sign in as a Master Admin before SOS2FA.");
     const sms = String(code || byId("sos2faCode")?.value || "").trim();
     if (!/^\d{6}$/.test(sms)) throw new Error("Enter the six-digit SOS2FA code.");
     if (!challengeRequested) throw new Error("Request SOS2FA Code first.");
@@ -208,7 +253,10 @@
 
   async function verifyRecoveryCode() {
     const authUser = firebase.auth().currentUser;
-    if (!authUser) throw new Error("Sign in as Super Admin before SOS2FA.");
+    if (!authUser) throw new Error("Sign in as a Master Admin before SOS2FA.");
+    if (!canUseRecoveryCode(authUser)) {
+      throw new Error("The recovery code is limited to the listed Super Admin accounts with a verified email. Use Request SOS2FA Code.");
+    }
     const input = byId("sos2faRecoveryCode");
     const recoveryCode = String(input?.value || "").trim();
     if (!recoveryCode) throw new Error("Enter the recovery code.");
@@ -224,14 +272,17 @@
     return true;
   }
 
-  async function requireUnlock(scope, options = {}) {
+  async function requireUnlock(scope) {
     const authUser = firebase.auth().currentUser;
     if (!authUser) {
       syncGateUi(scope, false);
       return false;
     }
-    if (!isSuperAdminUser(authUser, options.profile)) {
-      setStatus("Only Super Admin may unlock Entity Management with SOS2FA.");
+    const claims = await loadClaims(authUser);
+    if (firebase.auth().currentUser?.uid !== authUser.uid) return false;
+    syncRecoveryUi(authUser);
+    if (!isMasterAdminUser(authUser, claims)) {
+      setStatus("Only a Master Admin may unlock Entity Management with SOS2FA.");
       syncGateUi(scope, false);
       byId("sos2faActions")?.classList.add("hidden");
       byId("sos2faSendBtn")?.classList.add("hidden");
@@ -321,7 +372,11 @@
     name: "SOS2FA",
     fullName: "Social OS 2FA",
     ENTITY_MGMT_PANELS,
-    isSuperAdminUser,
+    isMasterAdminUser,
+    // Older callers (seed tools) use this name; it is the Master Admin check.
+    isSuperAdminUser: isMasterAdminUser,
+    canUseRecoveryCode,
+    loadClaims,
     isEntityMgmtPanel,
     isUnlocked,
     getSessionId,
