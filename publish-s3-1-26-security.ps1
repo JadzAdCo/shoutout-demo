@@ -33,6 +33,8 @@ $files = @(
   "functions/commerce-functions.js",
   "functions/display-security-functions.js",
   "functions/feature-gate-functions.js",
+  "functions/floqr-demo-accounts.js",
+  "functions/floqr-demo-accounts.test.js",
   "functions/feature-services-core.test.js",
   "functions/feature-services-functions.js",
   "functions/marketing-campaign-functions.js",

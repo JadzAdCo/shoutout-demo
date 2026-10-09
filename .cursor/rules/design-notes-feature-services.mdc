@@ -109,16 +109,25 @@ Record fields (`buildAuditRecord`): `eventType`, `outcome` success|failure|denie
 
 Denials are unchained on purpose (no contention on the head doc from abusive traffic).
 
-## Security findings (open — not fixed in s3.0.108)
+## Security findings
 
-1. **`users` readable by any signed-in user** (PII: email, phone). Restrict to self + Master Admin + scoped venue staff; move patron search for admins to a callable.
-2. **`inboxNotifications` readable by any signed-in user.** Beta invite links stay safe only because invites are uid-bound. Restrict to `recipientUid == auth.uid`.
-3. **Admin email lists disagree**: client/rules include `bands.don@gmail.com`; Functions `sos2fa` / `PRIVILEGED_EMAILS` use `bans.don@gmail.com`. s3.1.26: server trust is unified in `functions/admin-trust.js` (claim or server list containing **both** spellings) — still open: owner must confirm the real inbox, then drop the typo everywhere and move to custom claims `masterAdmin: true`.
-4. **Open mail relay — remind the owner at the next security review** (deferred Oct 9 2026): `emailFloqrPreviewLinks` (+ `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail unauthenticated, any `to`. Internal user-to-group messaging (club owners, CSR, FloqR Support) is by design and stays; lock only anonymous / arbitrary-recipient sends. Details: `design-notes-data-classification.mdc` → Seed endpoints.
-5. Fixed in s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` were self-writable on `users/{uid}` and trusted by the server — now in `hasBackendOnlyIdentityFields`.
-6. Fixed in s3.1.26: the `users` rule used `changedKeys()`, so a patron could still **add** a protected field that was absent (e.g. `superAdmin`) — now `affectedKeys()` everywhere. `isPrivilegedProfile` / `viewerFor` / `assertSuperAdmin` / `assertMasterAdmin` no longer trust any `users` field (claim or server list only).
-7. Fixed in s3.1.26: SOS2FA / email OTP attempt counter rolled back on a wrong code (unlimited guesses) — verdict now commits before the throw.
-8. Fixed in s3.1.26: `assignVenueEmployee` / `removeVenueEmployee` require an SOS2FA session. Mingl chat / connections / blocks, `messages` system sender, `aiIndex` writes, Mingl chat Storage and supRstar answers tightened — see `design-notes-data-classification.mdc` → "Security Phase 0 + 1 (s3.1.26)".
+Open:
+
+1. **Open mail relay — remind the owner at the next security review** (deferred Oct 9 2026): `emailFloqrPreviewLinks` (+ `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail unauthenticated, any `to`. Internal user-to-group messaging (club owners, CSR, FloqR Support) is by design and stays; lock only anonymous / arbitrary-recipient sends. These four were deliberately **not** redeployed in s3.1.26. Details: `design-notes-data-classification.mdc` → Seed endpoints.
+2. **Email/Password provider still enabled** in Firebase Auth (owner action: Console → Authentication → Sign-in method → Email/Password → Disable). No client uses password or email-link sign-in; the 44 password accounts are all seeded `@floqr-demo.com` demo users who sign in by email OTP. The verified-email admin check below already removes the admin-takeover path, so this is defense in depth.
+3. **`don.b@jadzholdings.com` lost email-list Master Admin** — its Microsoft sign-in reports `emailVerified=false`. Owner decides: grant the `masterAdmin` custom claim to that uid, or leave it as a patron account.
+4. **Club Admin `adminEmails` checks** (rules `isClubManager` / Storage `isClubLocationAdmin` / Functions club checks) still trust an unverified token email — Phase 1 (needs a Microsoft-verified path first so Club Admins are not locked out).
+5. Public seed pages / `demo-seed-functions.js` carry a default demo password fallback — rotate to an env-only value (Phase 1).
+
+Fixed and **DEPLOYED Oct 9 2026** (s3.1.26; Pages `main` 9ab4266 + 52a8225, 131 Functions, Firestore rules `s3.1.26-security-phase-1`, Storage rules `s3.1.26-mingl-media-members`):
+
+- `users` and `inboxNotifications` reads restricted to self / recipient + Master Admin (shipped s3.1.23; patron search via `getPeopleDirectory`).
+- Admin email lists unified: unowned typo `bands.don@gmail.com` (no Auth account) removed from every list; rules, Storage and `functions/admin-trust.js` accept a list email **only with `email_verified == true`** (claim `masterAdmin` unchanged). Every Functions Master Admin check goes through `admin-trust` (incl. scheduling / venue ingest / demo seed); `security-phase0.test.js` fails on any inline `MASTER_ADMIN_EMAILS.includes(` or users-doc admin flag.
+- `changedKeys()` → `affectedKeys()` everywhere (a patron could **add** an absent protected field). `isPrivilegedProfile` / `viewerFor` / `assertSuperAdmin` / `assertMasterAdmin` / Super Admin offboard protection read the Auth record or claims, never `users` fields.
+- SOS2FA / email OTP attempt counter commits before the throw (no unlimited guesses).
+- `assignVenueEmployee` / `removeVenueEmployee` need SOS2FA. Mingl chat / connections / blocks, `messages` system sender, `aiIndex` writes, Mingl chat Storage, supRstar answers tightened — `design-notes-data-classification.mdc` → "Security Phase 0 + 1 (s3.1.26)".
+- s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` in `hasBackendOnlyIdentityFields`.
+- Abuse scan Oct 9 2026: 0 `users` docs with superAdmin / masterAdmin / isMasterAdmin / admin roles; only the owner uid ever requested or held an SOS2FA code/session; no Auth account for the typo address.
 
 ## Improvements (recommended next)
 
