@@ -157,7 +157,8 @@
     root.querySelector("[data-preview-note]").textContent = tt("templatePreview.note", {}, "Sample text and pictures. Your ShoutOut shows your own words and photos.");
     const show = formatId => {
       const fmt = global.FLOQR_DISPLAY_FORMATS?.[formatId];
-      frame.style.aspectRatio = fmt ? `${fmt.pixelWidth} / ${fmt.pixelHeight}` : "2 / 1";
+      if (global.FLOQRBoardFrame) global.FLOQRBoardFrame.mount(frame, formatId, {maxHeight: "min(70vh, 560px)"});
+      else frame.style.aspectRatio = fmt ? `${fmt.pixelWidth} / ${fmt.pixelHeight}` : "2 / 1";
       frame.src = previewUrl(template, {...options, formatId});
       sizes.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.previewFormat === formatId));
     };

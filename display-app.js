@@ -343,6 +343,7 @@
     }).join("");
   }
 
+  /** Words are never split: a word longer than maxChars gets its own row and the board fitter shrinks it. */
   function pushWrapped(rows, words, maxRows, maxChars) {
     let line = "";
     words.forEach(word => {
@@ -350,8 +351,7 @@
       if (glyphLen(word) > maxChars) {
         if (line && rows.length < maxRows) rows.push(line);
         line = "";
-        const chars = glyphs(word);
-        for (let i = 0; i < chars.length && rows.length < maxRows; i += maxChars) rows.push(chars.slice(i, i + maxChars).join(""));
+        if (rows.length < maxRows) rows.push(word);
         return;
       }
       const next = line ? `${line} ${word}` : word;
@@ -373,27 +373,33 @@
     const rows = Math.max(1, maxRows);
     const list = (words || []).filter(Boolean);
     if (!list.length) return [""];
-    let budget = Math.max(1, softMaxChars || 16);
-    for (let attempt = 0; attempt < 48; attempt += 1) {
+    const longest = Math.max(...list.map(glyphLen));
+    let budget = Math.max(1, softMaxChars || 16, longest);
+    for (;;) {
       const out = [];
-      pushWrapped(out, list, rows, budget);
-      const packed = out.join(" ").replace(/\s+/g, " ").trim();
-      const source = list.join(" ").replace(/\s+/g, " ").trim();
-      if (packed === source || glyphLen(packed) >= glyphLen(source)) {
+      let line = "";
+      list.forEach(word => {
+        const next = line ? `${line} ${word}` : word;
+        if (glyphLen(next) <= budget) line = next;
+        else { out.push(line); line = word; }
+      });
+      if (line) out.push(line);
+      if (out.length <= rows) {
         while (out.length < rows) out.push("");
-        return out.slice(0, rows);
+        return out;
       }
-      budget += 2;
+      budget += 1;
     }
-    // Last resort: force equal-ish slices so nothing is lost.
-    const all = list.join(" ");
-    const chars = glyphs(all);
-    const per = Math.ceil(chars.length / rows) || 1;
-    const forced = [];
-    for (let i = 0; i < rows; i += 1) {
-      forced.push(chars.slice(i * per, (i + 1) * per).join("").trim());
-    }
-    return forced.map((row, i) => row || (i === 0 ? all : ""));
+  }
+
+  /** Cut at a glyph ceiling without leaving half a word at the end. */
+  function wholeWordSlice(text, max) {
+    const cut = glyphSlice(text, 0, max);
+    if (glyphLen(text) <= max) return cut;
+    const nextChar = glyphs(text)[max] || "";
+    if (/\s/.test(nextChar) || /\s$/.test(cut)) return cut.trimEnd();
+    const lastSpace = cut.search(/\s\S*$/);
+    return lastSpace > 0 ? cut.slice(0, lastSpace).trimEnd() : cut;
   }
 
   function displayTextRows(mainText, caps = {}, options = {}) {
@@ -411,12 +417,10 @@
       .replace(/\r\n?/g, "\n")
       .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ");
     if (uppercase) prepared = prepared.toUpperCase();
-    prepared = glyphSlice(prepared, 0, hardCeiling);
+    prepared = wholeWordSlice(prepared, hardCeiling);
+    const allWords = prepared.replace(/\n+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
 
-    if (preserveAll) {
-      const words = prepared.replace(/\n+/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-      return packAllWordsIntoRows(words, maxRows, maxChars);
-    }
+    if (preserveAll) return packAllWordsIntoRows(allWords, maxRows, maxChars);
 
     const rows = [];
     prepared.split(/\n+/).forEach(sourceLine => {
@@ -424,6 +428,8 @@
       const words = sourceLine.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
       pushWrapped(rows, words, maxRows, maxChars);
     });
+    const placed = rows.join(" ").split(/\s+/).filter(Boolean).length;
+    if (placed < allWords.length) return packAllWordsIntoRows(allWords, maxRows, maxChars).filter((row, i) => row || i === 0);
 
     return (rows.length ? rows : [""]).slice(0, maxRows);
   }
@@ -441,8 +447,10 @@
     if (!host) return 0;
     const lines = Array.from(host.querySelectorAll(":scope > span, :scope > b"));
     if (!lines.length) return 0;
-    const width = host.clientWidth || host.parentElement?.clientWidth || 0;
-    const height = host.clientHeight || host.parentElement?.clientHeight || 0;
+    const safeX = window.FLOQRBoardFit?.SAFE_X ?? 0.04;
+    const safeY = window.FLOQRBoardFit?.SAFE_Y ?? 0.06;
+    const width = Math.floor((host.clientWidth || host.parentElement?.clientWidth || 0) * (1 - 2 * safeX));
+    const height = Math.floor((host.clientHeight || host.parentElement?.clientHeight || 0) * (1 - 2 * safeY));
     if (width < 24) return 0;
     const minPx = Math.max(10, Number(options.minPx || 14));
     const lineCount = Math.max(1, lines.length);
@@ -471,9 +479,9 @@
       apply(mid);
       let overflow = false;
       lines.forEach(el => {
-        if (el.scrollWidth > width + 2) overflow = true;
+        if (el.scrollWidth > width) overflow = true;
       });
-      if (height > 24 && host.scrollHeight > height + 4) overflow = true;
+      if (height > 24 && host.scrollHeight > height) overflow = true;
       if (overflow) hi = mid - 1;
       else lo = mid;
     }
@@ -1413,6 +1421,39 @@
     render(defaultClubDisplayPayload());
   }
 
+  /** Only approved/live ShoutOuts with copy or media reach the board; anything else shows the idle club board. */
+  function isRenderableLiveContent(data = {}) {
+    if (window.FLOQRBoardFit) return window.FLOQRBoardFit.liveContentDecision(data) === "live";
+    const status = String(data?.status || "").toLowerCase();
+    const hasLiveMessage = !!(String(data?.mainText || "").trim() || data?.mediaUrl);
+    return (status === "approved" || status === "live") && hasLiveMessage;
+  }
+
+  /** First time this board saw a ShoutOut, kept across Xibo reloads so the default expiry does not restart. */
+  function liveFirstSeenMillis(key = "") {
+    const storageKey = `floqr.liveFirstSeen.${liveContentDocId(locationId)}`;
+    const now = Date.now();
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
+      if (saved && saved.key === key && Number(saved.at) > 0) return Number(saved.at);
+      window.localStorage.setItem(storageKey, JSON.stringify({key, at: now}));
+    } catch (_) {}
+    return now;
+  }
+
+  function liveContentExpiresMillis(data = {}, key = "") {
+    const firstSeen = liveFirstSeenMillis(key);
+    if (window.FLOQRBoardFit) {
+      return window.FLOQRBoardFit.liveExpiryMillis(data, firstSeen, DEFAULT_LIVE_SHOUTOUT_SECONDS).expiresMs;
+    }
+    const toMs = value => value?.toMillis?.() || (typeof value === "number" ? value : 0);
+    const explicit = toMs(data.expiresAt) || toMs(data.liveUntil) || toMs(data.playedUntil);
+    if (explicit) return explicit;
+    const durationMs = Math.max(1, Number(data.displayDurationSeconds || DEFAULT_LIVE_SHOUTOUT_SECONDS)) * 1000;
+    const startedMs = toMs(data.approvedAt) || toMs(data.updatedAt) || toMs(data.createdAt) || firstSeen;
+    return startedMs + durationMs;
+  }
+
   function renderTimedLiveContent(data = {}) {
     if (liveContentExpiryTimer) {
       window.clearTimeout(liveContentExpiryTimer);
@@ -1420,11 +1461,8 @@
     }
     const status = String(data.status || "").toLowerCase();
     const key = livePlaybackKey(data);
-    const approvedMillis = data.approvedAt?.toMillis?.() || 0;
-    const explicitExpires = data.expiresAt?.toMillis?.() || data.liveUntil?.toMillis?.() || data.playedUntil?.toMillis?.() || 0;
-    const durationSeconds = Math.max(1, Number(data.displayDurationSeconds || DEFAULT_LIVE_SHOUTOUT_SECONDS));
-    const expiresMillis = explicitExpires || (approvedMillis ? approvedMillis + durationSeconds * 1000 : 0);
     const liveShoutout = status === "approved" || status === "live";
+    const expiresMillis = liveShoutout ? liveContentExpiresMillis(data, key) : 0;
     if (liveShoutout && expiredLiveKey && key === expiredLiveKey) {
       resetDisplayToDefault();
       return;
@@ -1445,6 +1483,10 @@
       expiredLiveKey = "";
     }
     render(data);
+  }
+
+  function boardRowHtml(row, style) {
+    return window.FLOQRBoardFit ? window.FLOQRBoardFit.rowHtml(row, style, esc) : `<b style="${style}">${esc(row)}</b>`;
   }
 
   function classicFitStyle(row, rows, textSizePercent = 16) {
@@ -2070,6 +2112,7 @@
           if (canvas.classList.contains("split-media-phase-copy")) fitNflShoutPanel(byId("displayNflShoutPanel"));
         });
       }
+      window.FLOQRBoardFit?.scheduleFit(canvas);
       markDisplayReady();
       return;
     }
@@ -2093,7 +2136,7 @@
         const rows = mainText.trim()
           ? classicBoardRows(mainText, textCaps)
           : Array(Math.max(1, Number(textCaps.lineCount || 3))).fill("");
-        byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
+        byId("displayMain").innerHTML = `<span class="text-overlay-lines text-overlay-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
       }
       if (t.identityRail !== false) {
         renderHeistIdentityRail(t, subText);
@@ -2120,7 +2163,7 @@
         ? classicIdentityPresentation("", {brand: DEFAULT_FLOQR_CARD_BRAND})
         : classicIdentityPresentation(cardValue, {asHandle: true});
       byId("displayMain").classList.add("classic-bw-board");
-      byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => `<b style="${classicFitStyle(row, rows, mainSize)}">${esc(row)}</b>`).join("")}</span>`;
+      byId("displayMain").innerHTML = `<span class="classic-board-lines classic-board-lines-${rows.length}" style="--board-lines:${rows.length}" data-line-count="${rows.length}">${rows.map(row => boardRowHtml(row, classicFitStyle(row, rows, mainSize))).join("")}</span>`;
       if (!isIdleCta && !cardValue) {
         byId("displaySub").classList.add("classic-bw-sub-hidden");
         byId("displaySub").removeAttribute("aria-label");
@@ -2188,6 +2231,7 @@
         byId("displaySub").textContent = subText;
       }
     }
+    window.FLOQRBoardFit?.scheduleFit(canvas);
     markDisplayReady();
   }
   function showDisplayAccessDenied(info = {}) {
@@ -2272,7 +2316,61 @@
     }
   }
 
-  window.renderShoutOutDisplay = render;
+  /** Club Admin (Firestore) board sizes win over packaged shared-data.js; packaged values only fill gaps. */
+  function mergeLiveVenue(packagedLoc = {}, live = {}) {
+    let merged;
+    if (window.FLOQRBoardFit) {
+      merged = window.FLOQRBoardFit.mergeVenueForDisplay(packagedLoc, live);
+    } else {
+      const liveIds = Array.isArray(live.displayScreenFormatIds) ? live.displayScreenFormatIds.map(String).filter(Boolean) : [];
+      merged = {
+        ...packagedLoc,
+        ...live,
+        primaryDisplayScreenFormatId: live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || packagedLoc.primaryDisplayScreenFormatId,
+        secondaryDisplayScreenFormatId: live.secondaryDisplayScreenFormatId || packagedLoc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || packagedLoc.primaryDisplayScreenFormatId,
+        displayScreenFormatIds: liveIds.length ? liveIds : (packagedLoc.displayScreenFormatIds || [])
+      };
+      ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"].forEach(key => {
+        const liveVal = live[key];
+        if (liveVal === 0 || liveVal === 1 || liveVal === "0" || liveVal === "1") merged[key] = Number(liveVal);
+      });
+    }
+    merged.displayFooterBrand = live.displayFooterBrand || packagedLoc.displayFooterBrand || "FLOQR ShoutOut";
+    merged.ledPanel = live.ledPanel || packagedLoc.ledPanel;
+    merged.approvedDisplayIps = live.approvedDisplayIps || [];
+    merged.displayIpRestrictionEnabled = live.displayIpRestrictionEnabled === true;
+    merged.displayTokenRequired = live.displayTokenRequired;
+    if (window.FLOQRScreenDatapoints?.applyVenue) window.FLOQRScreenDatapoints.applyVenue(merged);
+    return merged;
+  }
+
+  let lastRenderedPayload = null;
+  window.renderShoutOutDisplay = payload => {
+    lastRenderedPayload = payload && typeof payload === "object" ? {...payload} : null;
+    return render(payload);
+  };
+
+  /** Preview paints packaged data at once, then repaints with Firestore templates + venue so it matches the board. No Display Security here. */
+  async function hydrateUrlPreviewFromFirestore() {
+    const packagedLoc = getStaticLocation(locationId);
+    let changed = false;
+    try {
+      await persistenceReady;
+      await hydrateTemplatesFromFirestore();
+      changed = true;
+    } catch (_) {}
+    try {
+      const clubDoc = await db.collection("clubLocations").doc(locationId).get();
+      if (clubDoc.exists) {
+        loc = mergeLiveVenue(packagedLoc, clubDoc.data() || {});
+        if (!qs("screen", qs("screenFormatId", ""))) screenFormatOverride = boardAssignedFormatId(loc);
+        changed = true;
+      }
+    } catch (_) {}
+    if (!changed) return;
+    if (lastRenderedPayload) render({...lastRenderedPayload, screenFormatId: lastRenderedPayload.screenFormatId || screenFormatOverride});
+    else render(buildUrlPreviewPayload());
+  }
 
   document.addEventListener("DOMContentLoaded", async () => {
     screenFormatOverride = isUrlPreviewMode()
@@ -2281,6 +2379,7 @@
     // Composer / QA URLs include template or preview=1. Xibo stays location-only and still uses Display Security.
     if (isUrlPreviewMode()) {
       paintUrlPreviewNow();
+      hydrateUrlPreviewFromFirestore();
       return;
     }
     await persistenceReady;
@@ -2294,31 +2393,7 @@
     await hydrateTemplatesFromFirestore();
     try {
       const clubDoc = await db.collection("clubLocations").doc(locationId).get();
-      if (clubDoc.exists) {
-        const live = clubDoc.data() || {};
-        loc = {
-          ...loc,
-          ...live,
-          primaryDisplayScreenFormatId: packagedLoc.primaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || live.displayType || live.screenFormatId || loc.primaryDisplayScreenFormatId,
-          secondaryDisplayScreenFormatId: packagedLoc.secondaryDisplayScreenFormatId || live.secondaryDisplayScreenFormatId || loc.secondaryDisplayScreenFormatId || live.primaryDisplayScreenFormatId || loc.primaryDisplayScreenFormatId,
-          displayScreenFormatIds: Array.from(new Set([
-            ...(Array.isArray(packagedLoc.displayScreenFormatIds) ? packagedLoc.displayScreenFormatIds : []),
-            ...(Array.isArray(live.displayScreenFormatIds) ? live.displayScreenFormatIds : loc.displayScreenFormatIds || [])
-          ].map(String).filter(Boolean))),
-          displayFooterBrand: live.displayFooterBrand || loc.displayFooterBrand || "FLOQR ShoutOut",
-          ledPanel: live.ledPanel || loc.ledPanel,
-          approvedDisplayIps: live.approvedDisplayIps || [],
-          displayIpRestrictionEnabled: live.displayIpRestrictionEnabled === true,
-          displayTokenRequired: live.displayTokenRequired
-        };
-        ["VenueSupports96x48", "VenueSupports64x48", "VenueSupports64x32"].forEach(key => {
-          const liveVal = live[key];
-          const liveExplicit = liveVal === 0 || liveVal === 1 || liveVal === "0" || liveVal === "1";
-          if (liveExplicit) loc[key] = liveVal;
-          else if (packagedLoc[key] === 1 || packagedLoc[key] === "1") loc[key] = 1;
-        });
-        if (window.FLOQRScreenDatapoints?.applyVenue) window.FLOQRScreenDatapoints.applyVenue(loc);
-      }
+      if (clubDoc.exists) loc = mergeLiveVenue(packagedLoc, clubDoc.data() || {});
     } catch (e) {}
     if (!screenFormatOverride && isUrlPreviewMode()) {
       screenFormatOverride = boardAssignedFormatId(loc);
@@ -2337,9 +2412,7 @@
       db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
         if (!doc.exists) return;
         const data = doc.data() || {};
-        const status = String(data.status || "").toLowerCase();
-        const hasLiveMessage = !!(String(data.mainText || "").trim() || data.mediaUrl);
-        if (status === "approved" && hasLiveMessage) {
+        if (isRenderableLiveContent(data)) {
           if (!data.screenFormatId) data.screenFormatId = boardAssignedFormatId(loc);
           renderTimedLiveContent(data);
         }
@@ -2347,10 +2420,8 @@
       return;
     }
     db.collection("liveContent").doc(liveContentDocId(locationId)).onSnapshot(doc => {
-      let payload = doc.exists ? doc.data() : defaultClubDisplayPayload();
-      const status = String(payload.status || "").toLowerCase();
-      const hasLiveMessage = !!(String(payload.mainText || "").trim() || payload.mediaUrl);
-      const isIdleDoc = !doc.exists || isIdlePayload(payload) || (!status && !hasLiveMessage);
+      let payload = doc.exists ? (doc.data() || {}) : defaultClubDisplayPayload();
+      const isIdleDoc = !doc.exists || isIdlePayload(payload) || !isRenderableLiveContent(payload);
       if (isIdleDoc || (DISPLAY_BOARD === "secondary" && isLegacyShoutOutIdleText(payload.mainText))) {
         payload = defaultClubDisplayPayload();
       }

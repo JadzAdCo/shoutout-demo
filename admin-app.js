@@ -94,7 +94,10 @@
     const display2Link = byId("display2Link");
     if (display2Link) display2Link.href = stableVenueSecondaryDisplayUrl();
     const liveFrame = byId("liveFrame");
-    if (liveFrame) liveFrame.src = locationId ? stableVenueDisplayUrl() : "about:blank";
+    if (liveFrame) {
+      window.FLOQRBoardFrame?.mount(liveFrame, loc?.primaryDisplayScreenFormatId || loc?.displayType || "", {maxHeight: "360px"});
+      liveFrame.src = locationId ? stableVenueDisplayUrl() : "about:blank";
+    }
     const publicLink = byId("clubPublicProfileLink");
     if (publicLink) publicLink.href = window.FLOQRNav?.adminLink("./club-profile.html", { location: locationId }) || `./club-profile.html?location=${encodeURIComponent(locationId)}&v=29.09.8&from=admin`;
     const roleProfilesLink = byId("adminRoleProfilesLink");

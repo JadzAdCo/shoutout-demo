@@ -34,7 +34,7 @@
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
   const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.0.12";
-  const PREVIEW_LINKS_PACKAGE = "s3.1.24";
+  const PREVIEW_LINKS_PACKAGE = "s3.1.25";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -1284,12 +1284,21 @@
       ]
     },
     {
+      version: "s3.1.25-board-fit",
+      title: "LED boards: the board size set in Club Admin wins, only approved ShoutOuts play (then return to the idle board), every word stays whole and shrinks only when it would not fit, and previews render at the board's real pixel size",
+      checks: [
+        {label:"Board fit module", file:"floqr-board-fit.js", includes:["window.FLOQRBoardFit", "function mergeVenueForDisplay(", "function liveContentDecision("]},
+        {label:"Native-size preview frame", file:"floqr-board-frame.js", includes:["window.FLOQRBoardFrame", "function mount("]},
+        {label:"Display uses Firestore-first venue merge", file:"display-app.js", includes:["function mergeLiveVenue(", "function isRenderableLiveContent(", "hydrateUrlPreviewFromFirestore()"]},
+        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.25\""]}
+      ]
+    },
+    {
       version: "s3.1.24-rules-stages-2-3",
       title: "Security rules Stages 2-3: ShoutOuts, guest lists, staff, follows, rides and club settings are limited to their owner and that club's team; pages show a notice when something is hidden instead of an empty list",
       checks: [
         {label:"Access notice", file:"floqr-access-notice.js", includes:["FLOQRAccessNotice"]},
-        {label:"Mingl Gist stories callable", file:"mingl-gist-app.js", includes:["getShoutoutStories"]},
-        {label:"Preview links package", file:"ai-diagnostics-service.js", includes:["PREVIEW_LINKS_PACKAGE = \"s3.1.24\""]}
+        {label:"Mingl Gist stories callable", file:"mingl-gist-app.js", includes:["getShoutoutStories"]}
       ]
     },
     {

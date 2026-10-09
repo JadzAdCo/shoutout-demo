@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.24 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.25 (stable)
+
+- s3.1.25: LED boards. The board size a club sets in Club Admin now wins over the packaged default; only approved ShoutOuts play on the board and anything else shows the club's idle board; an approved ShoutOut without an end time returns to the idle board after 10 minutes (even if the player reloads). Board text keeps its designed size and only shrinks when a line would not fit inside a small safe margin, words are never split or dropped, and the @handle pill shrinks instead of being cut off. ShoutOut and template previews render at the board's real pixel size so they look the same as the board.
 
 - s3.1.24: Security rules Stages 2-3. ShoutOuts and guest list requests are visible to the patron who sent them and to that club's team; staff rosters, role requests, club settings, messaging credits and marketing campaigns are limited to the club's admins (customer service staff stay reachable); follows and RydR rides are private to their owner; club listings, events, media, live boards and DJ / promoter profiles can only be changed by their owner, the club's admins or Master Admins. Mingl Gist loads ShoutOut stories without the sender's contact details, and pages show a notice when something is hidden or could not load instead of an empty list.
 

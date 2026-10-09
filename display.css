@@ -1918,3 +1918,6 @@ body.suprstr-live-active .heist-brand-slide{
 .display-canvas.display-access-denied .display-denied-sub{
   display:none;
 }
+
+/* s3.1.25 board fit: measurable row run (floqr-board-fit.js). Design notes: .cursor/rules/design-notes-board-fit.mdc */
+.board-fit-run{display:inline-block;white-space:nowrap;flex:0 0 auto;max-width:none}
