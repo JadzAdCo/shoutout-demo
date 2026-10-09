@@ -95,7 +95,7 @@ async function isPrivilegedProfile(uid, email) {
   if (isServerAdminEmail(email)) return true;
   try {
     const record = await admin.auth().getUser(uid);
-    return isServerAdminAuth({token: {...(record.customClaims || {}), email: record.email || ""}});
+    return isServerAdminAuth({token: {...(record.customClaims || {}), email: record.email || "", email_verified: record.emailVerified === true}});
   } catch (_) {
     return false;
   }

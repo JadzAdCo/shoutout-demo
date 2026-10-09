@@ -2289,10 +2289,10 @@ exports.sendFloqrPreviewLinksEmail = onCall({
   memory: "256MiB"
 }, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
-  const email = String(request.auth.token?.email || "").trim().toLowerCase();
-  if (!MASTER_ADMIN_EMAILS.includes(email) && request.auth.token?.masterAdmin !== true) {
+  if (!isServerAdminAuth(request.auth)) {
     throw new HttpsError("permission-denied", "Master Admin access is required.");
   }
+  const email = String(request.auth.token?.email || "").trim().toLowerCase();
   const data = request.data || {};
   const toEmail = String(data.to || email || PREVIEW_LINKS_DEFAULT_TO).trim().toLowerCase();
   const packageVersion = String(data.package || data.v || "s3.0.7").trim();

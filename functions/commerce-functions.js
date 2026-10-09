@@ -28,6 +28,7 @@ const {
 } = require("./receipt-delivery");
 const DEFAULT_ORIGIN = "https://jadzadco.github.io/shoutout-demo";
 const RECEIPT_FROM_EMAIL = process.env.FLOQR_EMAIL_OTP_FROM || "login@floqr.com";
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",")
   .map(value => value.trim().toLowerCase())
@@ -431,10 +432,8 @@ function normalizedServiceRole(value = "") {
 }
 
 async function isMasterAdminAuth(authContext = {}) {
-  const uid = authContext.uid || "";
-  const email = text(authContext.token?.email, 200).toLowerCase();
-  if (!uid) return false;
-  return authContext.token?.masterAdmin === true || MASTER_ADMIN_EMAILS.includes(email);
+  if (!authContext.uid) return false;
+  return isServerAdminAuth(authContext);
 }
 
 async function canManageClubFinances(clubId, authContext = {}) {

@@ -36,13 +36,21 @@ test("admin-trust: token claims grant admin", () => {
   assert.equal(isServerAdminAuth({uid: "u1", token: {masterAdmin: "true"}}), false, "only boolean true claims count");
 });
 
-test("admin-trust: allowlisted emails grant admin, both bands/bans spellings", () => {
-  ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"].forEach(email => {
+test("admin-trust: allowlisted emails grant admin only when the token email is verified", () => {
+  ["bans.don@gmail.com", "don.b@jadzholdings.com"].forEach(email => {
     assert.ok(SERVER_ADMIN_EMAILS.includes(email), email);
     assert.equal(isServerAdminEmail(email), true, email);
-    assert.equal(isServerAdminAuth({uid: "u1", token: {email}}), true, email);
+    assert.equal(isServerAdminAuth({uid: "u1", token: {email, email_verified: true}}), true, email);
+    assert.equal(isServerAdminAuth({uid: "u1", token: {email}}), false, `${email} without email_verified`);
+    assert.equal(isServerAdminAuth({uid: "u1", token: {email, email_verified: false}}), false, `${email} unverified`);
+    assert.equal(isServerAdminAuth({uid: "u1", token: {email, email_verified: "true"}}), false, "only boolean true counts");
   });
-  assert.equal(isServerAdminAuth({uid: "u1", token: {email: "  BANS.DON@gmail.com "}}), true, "case and whitespace insensitive");
+  assert.equal(isServerAdminAuth({uid: "u1", token: {email: "  BANS.DON@gmail.com ", email_verified: true}}), true, "case and whitespace insensitive");
+});
+
+test("admin-trust: the unowned typo address is not an admin", () => {
+  assert.equal(SERVER_ADMIN_EMAILS.includes("bands.don@gmail.com"), false);
+  assert.equal(isServerAdminAuth({uid: "u1", token: {email: "bands.don@gmail.com", email_verified: true}}), false);
 });
 
 test("admin-trust: env list merges with the defaults", () => {
@@ -54,7 +62,7 @@ test("admin-trust: env list merges with the defaults", () => {
     assert.equal(fresh.isServerAdminEmail("ops@example.com"), true);
     assert.equal(fresh.isServerAdminEmail("second@example.com"), true);
     assert.equal(fresh.isServerAdminEmail("bans.don@gmail.com"), true, "defaults are never dropped by the env list");
-    assert.equal(fresh.isServerAdminEmail("bands.don@gmail.com"), true);
+    assert.equal(fresh.isServerAdminEmail("bands.don@gmail.com"), false);
   } finally {
     if (previous === undefined) delete process.env.FLOQR_MASTER_ADMIN_EMAILS;
     else process.env.FLOQR_MASTER_ADMIN_EMAILS = previous;
@@ -202,6 +210,38 @@ test("verifyEmailOtp records failures and throws only after the transaction comm
   const after = body.slice(body.indexOf(tx) + tx.length);
   assert.match(after, /throw new HttpsError\("permission-denied", "The email code is incorrect\."\)/);
   assert.match(after, /throw new HttpsError\("resource-exhausted"/);
+});
+
+test("feature-gate Super Admin protection reads the Auth record, never users/{uid} fields", () => {
+  const fg = read("feature-gate-functions.js");
+  assert.match(fg, /require\("\.\/admin-trust"\)/);
+  assert.doesNotMatch(fg, /row\.superAdmin|profile\?\.superAdmin|data\.masterAdmin|\(data\.roles/);
+  assert.doesNotMatch(fg, /async function assertMasterAdmin\(/);
+  const lookup = bracedBlock(fg, "async function isSuperAdminUid(");
+  assert.match(lookup, /admin\.auth\(\)\.getUser\(uid\)/);
+  assert.match(lookup, /email_verified: record\.emailVerified === true/);
+  const protect = bracedBlock(fg, "async function protectSuperAdminEntity(");
+  assert.match(protect, /await isSuperAdminUid\(row\.uid\)/);
+  assert.equal((fg.match(/await protectSuperAdminEntity\(user,/g) || []).length, 2);
+});
+
+test("every Functions Master Admin check goes through admin-trust", () => {
+  const files = fs.readdirSync(__dirname).filter(f => f.endsWith(".js") && !f.endsWith(".test.js"));
+  files.forEach(file => {
+    const src = read(file);
+    assert.doesNotMatch(src, /MASTER_ADMIN_EMAILS\.includes\(/, `${file}: inline admin email check`);
+  });
+});
+
+test("rules admin email lists require a verified email and match each other", () => {
+  const block = (src, name) => bracedBlock(src, `function ${name}(`);
+  const fsRules = block(read("../firestore.rules"), "isMasterAdmin");
+  const stRules = block(read("../storage.rules"), "isStorageMasterAdmin");
+  [fsRules, stRules].forEach(body => {
+    assert.match(body, /request\.auth\.token\.get\("email_verified", false\) == true\s*&& request\.auth\.token\.get\("email", ""\) in \[/);
+    assert.match(body, /request\.auth\.token\.get\("masterAdmin", false\) == true/);
+    assert.doesNotMatch(body, /bands\.don/);
+  });
 });
 
 test("approvedRoles is not the only signal for member publishing or promoter scheduling", () => {

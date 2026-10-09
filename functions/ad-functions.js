@@ -30,6 +30,7 @@ const TWILIO_SECRETS = [TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBE
 const STRIPE_API_VERSION = "2026-06-24.dahlia";
 const DEFAULT_ORIGIN = process.env.FLOQR_PUBLIC_ORIGIN || "https://jadzadco.github.io/shoutout-demo";
 const RETURN_ORIGINS = [DEFAULT_ORIGIN, "https://jadzadco.github.io/shoutout-demo", "https://www.floqr.com"];
+const {isServerAdminAuth} = require("./admin-trust");
 const MASTER_ADMIN_EMAILS = String(process.env.FLOQR_MASTER_ADMIN_EMAILS || "bans.don@gmail.com,don.b@jadzholdings.com")
   .split(",").map(v => v.trim().toLowerCase()).filter(Boolean);
 const APP_V = "s3.1.0";
@@ -80,7 +81,7 @@ function emailOf(auth) {
 }
 
 function isMasterAdminAuth(auth) {
-  return !!auth && (auth.token?.masterAdmin === true || auth.token?.superAdmin === true || MASTER_ADMIN_EMAILS.includes(emailOf(auth)));
+  return isServerAdminAuth(auth);
 }
 
 function requireAuth(request) {

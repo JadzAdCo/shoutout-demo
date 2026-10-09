@@ -20,7 +20,8 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
 // - s3.1.26: every key guard uses diff().affectedKeys() (added/removed keys count); chat/Mingl membership + consent,
-//   userBlocks blocker-only, client "system" messages denied, aiIndex Master Admin writes, supRstar answer write-once
+//   userBlocks blocker-only, client "system" messages denied, aiIndex Master Admin writes, supRstar answer write-once;
+//   Master Admin email list needs email_verified (masterAdmin claim unchanged); unowned typo address removed
 //   Design notes: .cursor/rules/design-notes-data-classification.mdc → "Security Phase 0 + 1 (s3.1.26)"
 // - minglGists public read; signed-in create for own authorUid; update/delete own or master
 // - clubLocationAliases read/write support for Master Admin duplicate record merge aliases
@@ -51,11 +52,13 @@ service cloud.firestore {
  return signedIn()
  && (
  request.auth.token.get("masterAdmin", false) == true
- || request.auth.token.email in [
- "bands.don@gmail.com",
+ || (
+ request.auth.token.get("email_verified", false) == true
+ && request.auth.token.get("email", "") in [
  "bans.don@gmail.com",
  "don.b@jadzholdings.com"
  ]
+ )
  );
  }
 

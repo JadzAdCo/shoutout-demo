@@ -3,6 +3,7 @@ rules_version = '2';
 // FLOQR STORAGE RULES VERSION: s3.1.26-mingl-media-members
 // EXPECTED DEPLOYED STORAGE RULES VERSION: s3.1.26-mingl-media-members or newer
 // - mingl-chat/ and mingl-chat-backgrounds/: read by the uploader or a member of chatRooms/{roomId}; upload by a member
+// - Master Admin email list needs email_verified (masterAdmin claim unchanged); unowned typo address removed
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: s3.1.25-club-media-admins
 // - clubMedia/{clubLocationId}/... writes/deletes: Master Admin or a Club Admin of that club only
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR STORAGE RULES VERSION: s3.1.0-ad-media
@@ -32,11 +33,13 @@ service firebase.storage {
       return request.auth != null
         && (
           request.auth.token.get("masterAdmin", false) == true
-          || request.auth.token.email in [
-            "bands.don@gmail.com",
-            "bans.don@gmail.com",
-            "don.b@jadzholdings.com"
-          ]
+          || (
+            request.auth.token.get("email_verified", false) == true
+            && request.auth.token.get("email", "") in [
+              "bans.don@gmail.com",
+              "don.b@jadzholdings.com"
+            ]
+          )
         );
     }
 

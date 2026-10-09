@@ -4,14 +4,13 @@
   New model: club/location records are unique. A brand can have many locations.
 */
 window.SHOUTOUT_MASTER_ADMIN_EMAILS = [
-  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
 
 /* Super Admin = primary Master Admin; exempt from global patron feature disables and offboard/disable via entity tools. */
 window.SHOUTOUT_SUPER_ADMIN_EMAILS = [
-  "bands.don@gmail.com"
+  "bans.don@gmail.com"
 ];
 
 /*
@@ -48,7 +47,6 @@ window.FLOQR_AI_GRAMMAR_FUNCTION = "aiSuggestGrammarCorrection";
 window.FLOQR_OBSOLETE_LOCATION_IDS = ["heist-houston-tx", "heist-houston", "heist-houston-texas"];
 
 window.SHOUTOUT_ADMIN_EMAILS = [
-  "bands.don@gmail.com",
   "bans.don@gmail.com",
   "don.b@jadzholdings.com"
 ];
@@ -972,7 +970,6 @@ window.SHOUTOUT_EVENTS = {
   Remove this exception in production.
 */
 window.SHOUTOUT_MASTER_ADMIN_TEMPORARY_EXCEPTION_EMAILS = [
-  "bands.don@gmail.com",
   "bans.don@gmail.com"
 ];
 

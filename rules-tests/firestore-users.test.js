@@ -22,9 +22,19 @@ describe("users/{uid} — create", () => {
     await assertSucceeds(setDoc(aliceDoc(), { displayName: "Alice", uiLanguage: "en" }));
   });
 
-  test("alice cannot create her profile with superAdmin: true", async () => {
-    await assertFails(setDoc(aliceDoc(), { displayName: "Alice", superAdmin: true }));
-  });
+  const createPrivileged = [
+    ["superAdmin: true", { superAdmin: true }],
+    ["masterAdmin: true", { masterAdmin: true }],
+    ["roles: [masterAdmin]", { roles: ["masterAdmin"] }],
+    ["approvedRoles: [Club Admin]", { approvedRoles: ["Club Admin"] }],
+    ["approvedLocations", { approvedLocations: ["club1"] }],
+    ["IsBetaTester: 1", { IsBetaTester: 1 }]
+  ];
+  for (const [label, extra] of createPrivileged) {
+    test(`alice cannot create her profile with ${label}`, async () => {
+      await assertFails(setDoc(aliceDoc(), { displayName: "Alice", ...extra }));
+    });
+  }
 
   test("alice cannot create bob's profile", async () => {
     await assertFails(setDoc(doc(who.alice.firestore(), "users/bob"), { displayName: "Bob" }));
@@ -47,6 +57,9 @@ describe("users/{uid} — privileged fields are backend-only on update", () => {
   for (const [label, patch] of privileged) {
     test(`alice cannot add ${label} to her own profile`, async () => {
       await assertFails(updateDoc(aliceDoc(), patch));
+    });
+    test(`alice cannot merge-set ${label} onto her own profile`, async () => {
+      await assertFails(setDoc(aliceDoc(), patch, { merge: true }));
     });
   }
 

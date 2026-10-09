@@ -45,7 +45,12 @@ const IDENTITIES = {
   alice: { uid: "alice", token: { email: "alice@example.com", email_verified: true } },
   bob: { uid: "bob", token: { email: "bob@example.com", email_verified: true } },
   mallory: { uid: "mallory", token: { email: "mallory@example.com", email_verified: true } },
-  owner: { uid: "owner", token: { email: "bans.don@gmail.com", email_verified: true } }
+  owner: { uid: "owner", token: { email: "bans.don@gmail.com", email_verified: true } },
+  // Same allowlisted address, unverified (e.g. a password sign-up): must not be Master Admin.
+  ownerUnverified: { uid: "owner-unverified", token: { email: "bans.don@gmail.com", email_verified: false } },
+  // The removed typo address, even verified, is not on any list.
+  typo: { uid: "typo", token: { email: "bands.don@gmail.com", email_verified: true } },
+  claimAdmin: { uid: "claim-admin", token: { masterAdmin: true } }
 };
 
 /** Lazily-created, per-file auth contexts: who.alice.firestore(), who.anon.storage(), … */
@@ -64,6 +69,9 @@ function contexts(env) {
     get bob() { return get("bob"); },
     get mallory() { return get("mallory"); },
     get owner() { return get("owner"); },
+    get ownerUnverified() { return get("ownerUnverified"); },
+    get typo() { return get("typo"); },
+    get claimAdmin() { return get("claimAdmin"); },
     get anon() { return get("anon"); }
   };
 }

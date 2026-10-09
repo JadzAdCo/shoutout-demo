@@ -63,7 +63,7 @@
   }
 
   // UI hint only; firestore.rules isMasterAdmin() and the callables are the enforcement point.
-  const RULES_MASTER_ADMIN_EMAILS = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"];
+  const RULES_MASTER_ADMIN_EMAILS = ["bans.don@gmail.com", "don.b@jadzholdings.com"];
 
   function isMasterAdminUser(user, profile) {
     if (!user) return false;

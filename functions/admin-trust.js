@@ -1,9 +1,9 @@
-/* Server-side Master / Super Admin trust: token claims or the server email list only.
+/* Server-side Master / Super Admin trust: token claims, or the server email list with a verified email.
    Never reads users/{uid} fields — those are patron-editable.
    Design notes: .cursor/rules/design-notes-feature-services.mdc */
 "use strict";
 
-const DEFAULT_ADMIN_EMAILS = ["bands.don@gmail.com", "bans.don@gmail.com", "don.b@jadzholdings.com"];
+const DEFAULT_ADMIN_EMAILS = ["bans.don@gmail.com", "don.b@jadzholdings.com"];
 
 function parseEmailList(raw) {
   return String(raw || "")
@@ -27,7 +27,8 @@ function isServerAdminAuth(auth) {
   const token = auth && auth.token;
   if (!token) return false;
   if (token.masterAdmin === true || token.superAdmin === true) return true;
-  return isServerAdminEmail(token.email);
+  // An unverified token email (password sign-up, some IdPs) is only a claim, not proof of the inbox.
+  return token.email_verified === true && isServerAdminEmail(token.email);
 }
 
 module.exports = {SERVER_ADMIN_EMAILS, isServerAdminEmail, isServerAdminAuth};
