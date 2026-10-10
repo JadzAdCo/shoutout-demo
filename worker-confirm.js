@@ -10,6 +10,12 @@
       .replace(/"/g, "&quot;");
   }
 
+  function tr(key, fallback, vars = {}) {
+    const value = root.FLOQRI18n?.t?.(key, vars);
+    if (value && value !== key) return value;
+    return Object.keys(vars).reduce((text, name) => text.split(`{${name}}`).join(String(vars[name])), fallback);
+  }
+
   function pendingShifts(shifts = []) {
     return (Array.isArray(shifts) ? shifts : []).filter(row => {
       const status = String(row.status || "") === "approved" ? "confirmed" : String(row.status || "");
@@ -17,22 +23,23 @@
     });
   }
 
-  function render(host, {shifts = [], focusId = "", emptyMessage = "No shifts are waiting for your confirmation."} = {}) {
+  function render(host, {shifts = [], focusId = "", emptyMessage = ""} = {}) {
     if (!host) return [];
     const rows = pendingShifts(shifts);
     if (!rows.length) {
-      host.innerHTML = `<p class="sub">${esc(emptyMessage)}</p>`;
+      const message = emptyMessage || tr("sched.noneWaiting", "No shifts are waiting for your confirmation.");
+      host.innerHTML = `<p class="sub">${esc(message)}</p>`;
       return [];
     }
     const card = root.FLOQRAssignmentCard;
     host.innerHTML = `
-      <label class="worker-confirm-selectall"><input type="checkbox" data-worker-select-all/> Select all (${rows.length})</label>
+      <label class="worker-confirm-selectall"><input type="checkbox" data-worker-select-all/> ${esc(tr("sched.selectAll", "Select all ({count})", {count: rows.length}))}</label>
       <div class="worker-confirm-list">
         ${rows.map(shift => {
           const checked = focusId && shift.id === focusId ? " checked" : "";
           const html = card?.render
             ? card.render(shift, {kind: "pending", interactive: false})
-            : `<article class="assignment-card is-pending"><strong>${esc(shift.assigneeName || "You")}</strong><p>${esc(shift.startsAtLabel || "")} – ${esc(shift.endsAtLabel || "")}</p><p>Pending</p></article>`;
+            : `<article class="assignment-card is-pending"><strong>${esc(shift.assigneeName || tr("sched.youCap", "You"))}</strong><p>${esc(shift.startsAtLabel || "")} – ${esc(shift.endsAtLabel || "")}</p><p>${esc(tr("sched.cardPending", "Pending"))}</p></article>`;
           return `<label class="worker-confirm-row${focusId === shift.id ? " is-focused" : ""}">
             <input type="checkbox" data-worker-shift="${esc(shift.id)}"${checked}/>
             ${html}
@@ -40,8 +47,8 @@
         }).join("")}
       </div>
       <div class="queue-actions worker-confirm-actions">
-        <button type="button" class="primary" data-worker-approve>Approve selected</button>
-        <button type="button" data-worker-decline>Decline selected</button>
+        <button type="button" class="primary" data-worker-approve>${esc(tr("sched.approveSelected", "Approve selected"))}</button>
+        <button type="button" data-worker-decline>${esc(tr("sched.declineSelected", "Decline selected"))}</button>
       </div>`;
     const selectAll = host.querySelector("[data-worker-select-all]");
     const boxes = () => Array.from(host.querySelectorAll("[data-worker-shift]"));

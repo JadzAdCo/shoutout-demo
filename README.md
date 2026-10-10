@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.34 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.35 (stable)
+
+- s3.1.35: FloqAi and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.
 
 - s3.1.34: Staff Scheduling (scheduling.html) finishes signing in again: the page app now starts Firebase itself, so a signed-in patron, Club Admin or Master Admin no longer sees "Restoring your FLOQR session…" forever. The free-text "Owner id" box is replaced by a Schedule for picker (My DJ schedule / Club / Promoting company) that lists only the clubs and companies you may manage (Master Admins get every club with search). Stored owner ids are unchanged. The Subscription card stays visible after sign-in, and choosing a club no longer writes to the club record.
 

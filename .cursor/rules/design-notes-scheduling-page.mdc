@@ -1,5 +1,5 @@
 ---
-description: Staff Scheduling page (scheduling.html) — who it is for, satellite sign-in, Schedule for owner picker (s3.1.34)
+description: Staff Scheduling page (scheduling.html) — who it is for, satellite sign-in, Schedule for owner picker (s3.1.34), Assign to name picker + full localization + version-safe links (s3.1.35)
 alwaysApply: false
 ---
 
@@ -30,4 +30,22 @@ Second bug: `data-floqr-auth-chrome` was on the Subscription card, so a signed-i
 
 Help: `help-scheduling-schedule-for` on the **Schedule for** h2 (not the page h1), venueAdmin + serviceMember; in `functions/floqai-content-classes.json` (FloqAi shows it only after `getFloqAiAccess` is redeployed with that manifest). Test: `functions/scheduling-owner-picker.test.js`.
 
-Not done: "Assignee uid" on Create shift is still free text (the Club Admin tab has a roster picker in `admin-scheduling.js`, which is owner-frozen).
+## Assign to picker (s3.1.35)
+
+"Assignee uid / name" free text is gone. `<select id="portalAssignee">` lists people as **name · role** (search box above 8 rows, matches name/role/email, never uid). The option value is the uid, sent unchanged as `createScheduleShift.assigneeUid`; `assigneeName` comes from the picked row. Picking a person fills **Notify by email** / **Notify by SMS / WhatsApp** (editable). Pure helpers: `scheduling-assignee-picker.js` (`FLOQRScheduleAssignees`); test `functions/scheduling-assignee-picker.test.js`. `admin-scheduling.js` untouched (read for its roster query only).
+
+| Owner | Roster (Firestore, rules-safe) | `getPeopleDirectory` |
+|---|---|---|
+| club | `clubEmployeeDesignations` where `clubLocationId == id` (club staff / Master Admin may read) | `mode: "club"`; non-Master keeps only affiliated rows (club mode adds a `phone` key only for people tied to the club) |
+| promoterCompany | Master Admin: designations where `promoterCompany == id`. Others: designations at each club where they themselves promote for that company, filtered to the company (a direct company query is rejected by rules) | `mode: "services"` (+ `"public"` for Master Admin) |
+| dj | — | `mode: "services"` (+ `"public"` for Master Admin) |
+
+You are always listed first (`(you)`), then team, then everyone else. Rejected designations are skipped.
+
+## Localization (s3.1.35)
+
+Every label, placeholder and status on the page is a `sched.*` chrome key (11 packs), including `worker-confirm.js` (Select all / Approve selected / Decline selected) and `assignment-card.js` status labels (Draft / Pending / Confirmed / Unfilled) — both fall back to English when `FLOQRI18n` is not loaded (schedule-embed, Node tests). The subscription badge says **Paid this month / Not paid this month**; internal field names (`staffSchedulingPaid`) are never shown.
+
+## Version links (s3.1.35)
+
+The owner saw the old page at `scheduling.html?v=s3.1.26&from=floqai`: Pages served the new file for that URL; the browser showed its cached copy (Pages `max-age=600`) and the link came from a FloqAi tab opened before the s3.1.32 nav fix. Since s3.1.35 `floqai-help-repository.js` / `intent-search.js` read `FLOQRNav.appVersion` at call time with **no** fallback version (no nav → no `v`), pages load `floqr-nav.js` before them, and the bump script re-stamps static hub links. `functions/app-version-sync.test.js` fails on hardcoded `?v=` literals or version fallbacks in link builders, wrong script order, or stale hub links.

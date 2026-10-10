@@ -4,15 +4,34 @@
   const byId = id => document.getElementById(id);
   const params = new URL(location.href).searchParams;
   const owners = window.FLOQRScheduleOwners;
+  const people = window.FLOQRScheduleAssignees;
 
-  function t(key, fallback) {
-    const value = window.FLOQRI18n?.t?.(key);
-    return value && value !== key ? value : fallback;
+  function t(key, fallback, vars = {}) {
+    const value = window.FLOQRI18n?.t?.(key, vars);
+    if (value && value !== key) return value;
+    return Object.keys(vars).reduce((text, name) => text.split(`{${name}}`).join(String(vars[name])), fallback);
   }
 
   function setStatus(message) {
     const el = byId("schedulingPortalStatus");
     if (el) el.textContent = message || "";
+  }
+
+  function setText(id, value) {
+    const el = byId(id);
+    if (el) el.textContent = value;
+  }
+
+  const STATUS_KEYS = {
+    pending: ["sched.statusPending", "pending"],
+    confirmed: ["sched.statusConfirmed", "confirmed"],
+    declined: ["sched.statusDeclined", "declined"],
+    draft: ["sched.statusDraft", "draft"]
+  };
+
+  function statusLabel(status) {
+    const pair = STATUS_KEYS[status];
+    return pair ? t(pair[0], pair[1]) : status;
   }
 
   let auth;
@@ -37,9 +56,12 @@
     isMaster: false,
     clubs: [],
     companies: [],
+    myDesignations: [],
     requested: owners?.parseOwnerParam(params.get("owner") || "") || null,
     selected: {club: "", promoterCompany: ""}
   };
+
+  const assigneeState = {key: "", seq: 0, loading: false, sources: null, selected: ""};
 
   function esc(value) {
     return String(value || "")
@@ -156,6 +178,7 @@
         queryDocs(db.collection("clubEmployeeDesignations").where("workerUid", "==", user.uid).limit(60))
       ]);
       const designations = designationDocs.map(doc => doc.data() || {});
+      pickerState.myDesignations = designations;
       const ids = owners.managedClubIds({
         profile: profileDocs[0]?.data() || {},
         assignments: assignmentDocs.map(doc => doc.data() || {}),
@@ -188,6 +211,119 @@
     renderOwnerPicker();
   }
 
+  async function directoryRows(request) {
+    try {
+      return (await callable("getPeopleDirectory")(request))?.data?.people || [];
+    } catch (error) {
+      console.warn("[scheduling] people directory skipped", error?.code || error?.message || error);
+      return [];
+    }
+  }
+
+  async function rosterDocs(type, id) {
+    const db = firebase.firestore();
+    if (type === "club") {
+      return queryDocs(db.collection("clubEmployeeDesignations").where("clubLocationId", "==", id).limit(200));
+    }
+    if (type !== "promoterCompany") return [];
+    if (pickerState.isMaster) {
+      return queryDocs(db.collection("clubEmployeeDesignations").where("promoterCompany", "==", id).limit(200));
+    }
+    const clubIds = [...new Set(pickerState.myDesignations
+      .filter(row => String(row.promoterCompany || "").trim().toLowerCase() === id.toLowerCase())
+      .map(row => String(row.clubLocationId || "").trim())
+      .filter(Boolean))].slice(0, 10);
+    const lists = await Promise.all(clubIds.map(clubId =>
+      queryDocs(db.collection("clubEmployeeDesignations").where("clubLocationId", "==", clubId).limit(200))));
+    return lists.flat();
+  }
+
+  function directoryRequests(type, id) {
+    if (type === "club") return [{mode: "club", clubLocationId: id}];
+    return pickerState.isMaster ? [{mode: "services"}, {mode: "public"}] : [{mode: "services"}];
+  }
+
+  async function loadAssignees() {
+    const user = auth.currentUser;
+    const type = ownerType();
+    const id = ownerId();
+    const key = `${type}:${id}`;
+    if (!user || !id || key === assigneeState.key) {
+      renderAssigneePicker();
+      return;
+    }
+    const seq = ++assigneeState.seq;
+    Object.assign(assigneeState, {key, loading: true, sources: null, selected: ""});
+    renderAssigneePicker();
+    const [docs, ...lists] = await Promise.all([
+      rosterDocs(type, id),
+      ...directoryRequests(type, id).map(directoryRows)
+    ]);
+    if (seq !== assigneeState.seq) return;
+    let directory = lists.flat();
+    if (type === "club" && !pickerState.isMaster) {
+      directory = directory.filter(row => Object.prototype.hasOwnProperty.call(row, "phone"));
+    }
+    assigneeState.sources = {
+      self: {uid: user.uid, name: String(user.displayName || "").trim(), email: user.email || "", phone: user.phoneNumber || ""},
+      roster: people.rosterFromDesignations(docs.map(doc => doc.data() || {}), {ownerType: type, ownerId: id}),
+      directory
+    };
+    assigneeState.loading = false;
+    renderAssigneePicker();
+  }
+
+  function assigneeOptions() {
+    if (!assigneeState.sources) return [];
+    return people.assigneeOptions({
+      ...assigneeState.sources,
+      labels: {you: t("sched.you", "you"), member: t("sched.member", "Member"), team: t("sched.team", "Team")}
+    });
+  }
+
+  function selectedAssignee() {
+    const uid = byId("portalAssignee")?.value || "";
+    return uid ? assigneeOptions().find(option => option.value === uid) || null : null;
+  }
+
+  function renderAssigneePicker() {
+    const select = byId("portalAssignee");
+    const hint = byId("portalAssigneeHint");
+    if (!select) return;
+    const all = assigneeOptions();
+    const showSearch = all.length > 8;
+    byId("portalAssigneeSearchWrap")?.classList.toggle("hidden", !showSearch);
+    const shown = people.filterPeople(all, showSearch ? byId("portalAssigneeSearch")?.value || "" : "");
+    const keep = assigneeState.selected;
+    select.innerHTML = "";
+    const blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = t("sched.choosePerson", "Choose a person");
+    select.appendChild(blank);
+    shown.forEach(option => {
+      const el = document.createElement("option");
+      el.value = option.value;
+      el.textContent = option.label;
+      select.appendChild(el);
+    });
+    select.value = keep && shown.some(option => option.value === keep) ? keep : "";
+    if (!hint) return;
+    hint.textContent = assigneeState.loading
+      ? t("sched.loadingPeople", "Loading people…")
+      : !all.length
+        ? t("sched.noPeople", "No one to assign yet. People appear here once they join this team.")
+        : !shown.length ? t("sched.noMatch", "No match. Try another name.") : "";
+  }
+
+  function onAssigneeChange() {
+    assigneeState.selected = byId("portalAssignee")?.value || "";
+    const person = selectedAssignee();
+    const email = byId("portalAssigneeEmail");
+    const phone = byId("portalAssigneePhone");
+    if (email) email.value = person?.email || "";
+    if (phone) phone.value = person?.phone || "";
+  }
+
   function isPaidAccess(access) {
     if (!access) return false;
     const flag = access.staffSchedulingPaid ?? access.paid;
@@ -215,7 +351,7 @@
   async function refresh() {
     const seq = ++refreshSeq;
     if (!auth.currentUser) {
-      setStatus("Sign in to manage schedules.");
+      setStatus(t("sched.signInToManage", "Sign in to manage schedules."));
       return;
     }
     const id = ownerId();
@@ -223,7 +359,7 @@
       setStatus(t("sched.chooseOwner", "Choose a club or company under Schedule for first."));
       return;
     }
-    setStatus("Loading subscription…");
+    setStatus(t("sched.loadingSubscription", "Loading subscription…"));
     const venuePaid = await readClubPaidFlag(id);
     let access = {};
     try {
@@ -238,36 +374,30 @@
     let paid = isPaidAccess(access);
     if (venuePaid === 1) paid = true;
     if (venuePaid === 0) paid = false;
-    const monthStatus = access.monthStatus || access.status || (paid ? "paid this month" : "not paid this month");
+    const monthStatus = paid
+      ? t("sched.paidThisMonth", "Paid this month")
+      : t("sched.notPaidThisMonth", "Not paid this month");
     const ever = access.everSubscribed === true || access.cta === "resubscribe";
     const cta = paid ? "none" : (access.cta || (ever ? "resubscribe" : "subscribe"));
-    byId("portalSubBadge").textContent = paid
-      ? `staffSchedulingPaid=1 · ${monthStatus}`
-      : `staffSchedulingPaid=0 · ${monthStatus}`;
+    const resub = cta === "resubscribe";
+    setText("portalSubBadge", monthStatus);
     byId("portalSubscribeGate")?.classList.toggle("hidden", paid);
     byId("portalBuySubBtn")?.classList.toggle("hidden", paid);
-    if (byId("portalBuySubBtn")) {
-      byId("portalBuySubBtn").textContent = cta === "resubscribe" ? "Resubscribe $20/mo" : "Subscribe $20/mo";
-    }
-    if (byId("portalSubscribeTitle")) {
-      byId("portalSubscribeTitle").textContent = cta === "resubscribe"
-        ? "Resubscribe · not paid this month"
-        : "Activate Staff Scheduling";
-    }
-    if (byId("portalSubscribeCopy")) {
-      byId("portalSubscribeCopy").innerHTML = cta === "resubscribe"
-        ? "Prior subscriber detected. Status is <code>not paid this month</code>. Resubscribe to restore <code>paid this month</code> and the calendar."
-        : "Subscribe to publish shifts. Payment sets <code>staffSchedulingPaid=1</code> and status <code>paid this month</code>.";
-    }
+    setText("portalBuySubBtn", resub ? t("sched.resubscribe", "Resubscribe $20/mo") : t("sched.subscribe", "Subscribe $20/mo"));
+    setText("portalSubscribeTitle", resub
+      ? t("sched.resubscribeTitle", "Resubscribe · not paid this month")
+      : t("sched.activateTitle", "Activate Staff Scheduling"));
+    setText("portalSubscribeCopy", resub
+      ? t("sched.resubscribeCopy", "This calendar was subscribed before but is not paid this month. Resubscribe to unlock it again.")
+      : t("sched.subscribeCopy", "Subscribe to publish shifts on this calendar. After payment the calendar unlocks for the month."));
     byId("portalWorkspace")?.classList.toggle("hidden", !paid);
     byId("portalCalendarHint")?.classList.toggle("hidden", !paid);
-    setStatus(
-      paid
-        ? `Calendar unlocked · ${monthStatus}.`
-        : `${cta === "resubscribe" ? "Resubscribe" : "Subscribe"} required · ${monthStatus}.`
-    );
+    setStatus(paid
+      ? t("sched.calendarUnlocked", "Calendar unlocked · {status}.", {status: monthStatus})
+      : t("sched.subscribeRequired", "Subscription needed · {status}.", {status: monthStatus}));
 
     if (paid) {
+      loadAssignees().catch(error => setStatus(error.message));
       try {
         const listResult = (await callable("listScheduleShifts")({
           ownerType: ownerType(),
@@ -280,7 +410,7 @@
         }
       }
     } else if (byId("portalShiftList")) {
-      byId("portalShiftList").innerHTML = "<p class='sub'>Subscribe to unlock the calendar engine.</p>";
+      byId("portalShiftList").innerHTML = `<p class='sub'>${esc(t("sched.subscribeToUnlock", "Subscribe to unlock this calendar."))}</p>`;
     }
 
     try {
@@ -291,7 +421,9 @@
     }
 
     const focusShift = params.get("shift");
-    if (focusShift) setStatus("Review the highlighted shift under My assignments, tick it, then Approve selected. Opening this page does not confirm.");
+    if (focusShift) {
+      setStatus(t("sched.reviewFocus", "Review the highlighted shift under My assignments, tick it, then Approve selected. Opening this page does not confirm."));
+    }
   }
 
   function renderMyAssignments(el, shifts) {
@@ -300,7 +432,7 @@
       api.render(el, {
         shifts,
         focusId: params.get("shift") || "",
-        emptyMessage: "No pending assignments for this account."
+        emptyMessage: t("sched.noAssignments", "No pending assignments for this account.")
       });
       api.bind(el, {
         onApprove: ids => respondSelected(ids, "approve"),
@@ -313,10 +445,12 @@
 
   async function respondSelected(ids, decision) {
     if (!ids.length) {
-      setStatus("Tick at least one pending shift, then Approve selected or Decline selected.");
+      setStatus(t("sched.tickFirst", "Tick at least one pending shift, then Approve selected or Decline selected."));
       return;
     }
-    setStatus(`${decision === "approve" ? "Approving" : "Declining"} ${ids.length}…`);
+    setStatus(decision === "approve"
+      ? t("sched.approvingN", "Approving {count}…", {count: ids.length})
+      : t("sched.decliningN", "Declining {count}…", {count: ids.length}));
     try {
       await callable("respondToScheduleShifts")({shiftIds: ids, decision, from: "scheduling-portal"});
     } catch (error) {
@@ -326,31 +460,33 @@
         await callable("respondToScheduleShift")({shiftId, decision, from: "scheduling-portal"});
       }
     }
-    setStatus(decision === "approve" ? "Selected shifts confirmed." : "Selected shifts declined.");
+    setStatus(decision === "approve"
+      ? t("sched.approvedSelected", "Selected shifts confirmed.")
+      : t("sched.declinedSelected", "Selected shifts declined."));
     await refresh();
   }
 
   function renderShiftList(el, shifts, opts = {}) {
     if (!el) return;
     if (!shifts.length) {
-      el.innerHTML = "<p class='sub'>No shifts.</p>";
+      el.innerHTML = `<p class='sub'>${esc(t("sched.noShifts", "No shifts."))}</p>`;
       return;
     }
     el.innerHTML = shifts.map(shift => {
       const status = String(shift.status || "") === "approved" ? "confirmed" : String(shift.status || "");
       const actions = opts.assignee && status === "pending"
         ? `<div class="queue-actions">
-            <button type="button" data-approve="${esc(shift.id)}">Confirm shift</button>
-            <button type="button" data-decline="${esc(shift.id)}">Decline</button>
+            <button type="button" data-approve="${esc(shift.id)}">${esc(t("sched.confirmShift", "Confirm shift"))}</button>
+            <button type="button" data-decline="${esc(shift.id)}">${esc(t("sched.decline", "Decline"))}</button>
           </div>`
         : opts.manager && ["draft", "pending", "confirmed", "declined"].includes(status) && shift.id
-          ? `<div class="queue-actions"><button type="button" data-delete="${esc(shift.id)}">Delete</button></div>`
+          ? `<div class="queue-actions"><button type="button" data-delete="${esc(shift.id)}">${esc(t("sched.delete", "Delete"))}</button></div>`
           : "";
       return `<div class="report-row${params.get("shift") === shift.id ? " is-focused" : ""}">
-        <strong>${esc(shift.roleLabel || "Shift")} · ${esc(shift.assigneeName || "")}</strong>
-        <span>${esc(shift.ownerName || shift.ownerKey || "")}</span>
+        <strong>${esc(shift.roleLabel || t("sched.shiftFallback", "Shift"))} · ${esc(shift.assigneeName || "")}</strong>
+        <span>${esc(shift.ownerName || "")}</span>
         <span>${esc(shift.startsAtLabel || shift.startsAt || "")} → ${esc(shift.endsAtLabel || shift.endsAt || "")}</span>
-        <span class="tag">${esc(status)}</span>
+        <span class="tag">${esc(statusLabel(status))}</span>
         ${actions}
       </div>`;
     }).join("");
@@ -366,17 +502,20 @@
   }
 
   async function respond(shiftId, decision) {
-    setStatus(`${decision === "approve" ? "Approving" : "Declining"}…`);
+    const approve = decision === "approve";
+    setStatus(approve
+      ? t("sched.approvingN", "Approving {count}…", {count: 1})
+      : t("sched.decliningN", "Declining {count}…", {count: 1}));
     await callable("respondToScheduleShift")({shiftId, decision});
-    setStatus(`Shift ${decision}d.`);
+    setStatus(approve ? t("sched.shiftApproved", "Shift confirmed.") : t("sched.shiftDeclined", "Shift declined."));
     await refresh();
   }
 
   async function deleteShift(shiftId) {
-    if (!shiftId || !window.confirm("Delete this shift?")) return;
-    setStatus("Deleting shift…");
+    if (!shiftId || !window.confirm(t("sched.deleteConfirm", "Delete this shift?"))) return;
+    setStatus(t("sched.deleting", "Deleting shift…"));
     await callable("deleteScheduleShift")({shiftId});
-    setStatus("Shift deleted.");
+    setStatus(t("sched.deleted", "Shift deleted."));
     await refresh();
   }
 
@@ -399,25 +538,25 @@
     const id = ownerId();
     const startsAt = byId("portalStartsAt")?.value;
     const endsAt = byId("portalEndsAt")?.value;
-    const assigneeUid = String(byId("portalAssigneeUid")?.value || "").trim();
-    if (!assigneeUid) throw new Error("Assignee uid is required.");
-    if (!startsAt || !endsAt) throw new Error("Start and end are required.");
-    setStatus("Creating shift…");
+    const person = selectedAssignee();
+    if (!person) throw new Error(t("sched.chooseAssignee", "Choose who this shift is for."));
+    if (!startsAt || !endsAt) throw new Error(t("sched.needTimes", "Start and end are required."));
+    setStatus(t("sched.creating", "Creating shift…"));
     await callable("createScheduleShift")({
       ownerType: ownerType(),
       ownerId: id,
       ownerName: ownerName(),
-      assigneeUid,
-      assigneeName: byId("portalAssigneeName")?.value?.trim() || "",
+      assigneeUid: person.value,
+      assigneeName: person.name,
       assigneeEmail: byId("portalAssigneeEmail")?.value?.trim() || "",
       assigneePhone: byId("portalAssigneePhone")?.value?.trim() || "",
-      roleLabel: byId("portalRole")?.value?.trim() || "Shift",
+      roleLabel: byId("portalRole")?.value?.trim() || t("sched.shiftFallback", "Shift"),
       startsAt: new Date(startsAt).toISOString(),
       endsAt: new Date(endsAt).toISOString(),
       notes: byId("portalNotes")?.value?.trim() || "",
       notify: true
     });
-    setStatus("Pending shift created. Worker must confirm via Inbox / Email / SMS / WhatsApp.");
+    setStatus(t("sched.created", "Pending shift created. The person confirms it from Inbox, Email, SMS or WhatsApp."));
     await refresh();
   }
 
@@ -450,7 +589,12 @@
       refresh().catch(error => setStatus(error.message));
     });
     byId("portalOwnerSearch")?.addEventListener("input", renderOwnerPicker);
-    window.addEventListener("floqr:ui-language", renderOwnerPicker);
+    byId("portalAssignee")?.addEventListener("change", onAssigneeChange);
+    byId("portalAssigneeSearch")?.addEventListener("input", renderAssigneePicker);
+    window.addEventListener("floqr:ui-language", () => {
+      renderOwnerPicker();
+      renderAssigneePicker();
+    });
     renderOwnerPicker();
     if (!shell?.bind) {
       setStatus(t("sched.firebaseError", "FLOQR could not start on this page. Refresh the page."));

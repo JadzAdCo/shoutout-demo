@@ -232,7 +232,7 @@ test("Demo Svc / Emp Mgmt tab label exists in all 11 chrome packs", () => {
 
 test("old demo-signin.html redirects to the Master Admin tab", () => {
   const html = read("demo-signin.html");
-  assert.match(html, /location\.replace\("\.\/master-admin\.html\?v=s3\.1\.31#demoEmployees"\)/);
+  assert.match(html, /location\.replace\("\.\/master-admin\.html\?v=s\d+\.\d+\.\d+#demoEmployees"\)/);
   assert.match(html, /<body data-floqr-public>/);
   assert.ok(!fs.existsSync(path.join(root, "demo-signin.js")));
 });

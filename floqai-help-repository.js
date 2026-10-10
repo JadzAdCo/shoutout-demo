@@ -4,7 +4,9 @@
 (function (global) {
   "use strict";
 
-  const APP_V = (global.FLOQRNav && global.FLOQRNav.appVersion) || "29.09.49";
+  function appV() {
+    return (global.FLOQRNav && global.FLOQRNav.appVersion) || "";
+  }
   const byId = new Map();
   /** Canonical FloqAi help partitions (one audience key each). */
   const HELP_PARTITIONS = {
@@ -29,8 +31,9 @@
   };
 
   function vUrl(path, params = {}) {
-    const qs = new URLSearchParams({v: APP_V, ...params});
-    return `${path}?${qs.toString()}`;
+    const v = appV();
+    const qs = new URLSearchParams(v ? {v, ...params} : {...params}).toString();
+    return qs ? `${path}?${qs}` : path;
   }
 
   function normalize(value) {
@@ -340,7 +343,7 @@
         helpPartition: entry.helpPartition || HELP_PARTITIONS[(entry.audiences || ["patron"])[0]] || HELP_PARTITIONS.patron,
         links: (entry.links || []).length
           ? entry.links
-          : [{label: localized.title || entry.title, href: `./floqai.html?v=${APP_V}`}],
+          : [{label: localized.title || entry.title, href: vUrl("./floqai.html")}],
         searchPhrases,
         patterns: []
       };
@@ -355,7 +358,7 @@
       body: "Ask FloqR with FloqAi — tap the animated mark or wait for the prompt, then type what you want in plain words. Products: Mingl, RydR, BartR, ShoutOut, SupRstR (superstar), clubs. Goals: say “I want to be able to…” (e.g. become a Club Admin) or “make me a superstar” for steps and links.",
       searchPhrases: ["ask floqr", "floqai", "plain words", "i want to be able to", "help", "make me a superstar"],
       links: [
-        {label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`},
+        {label: "Open FloqAi", href: vUrl("./floqai.html")},
         {label: "Open SupRstR", href: vUrl("./suprstr-search.html", {from: "floqai"})}
       ],
       source: "help-repository-seed",
@@ -366,7 +369,7 @@
       title: "FloqAi",
       body: "Ask FloqAi anything about FLOQR in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, supRstar, your profile, staff schedules, or Club Admin tools. Results only include what your account can use. Patrons, staff, Club Admins, and Master Admins each see their own answers.",
       searchPhrases: ["floqai", "floqai page", "ask floqai", "general search", "search everything", "what can i search"],
-      links: [{label: "Open FloqAi", href: `./floqai.html?v=${APP_V}`}],
+      links: [{label: "Open FloqAi", href: vUrl("./floqai.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
       page: "floqai.html#floqAiHelpPopout"
@@ -377,7 +380,7 @@
       body: "Search Soccer, Jersey, or a country/club (Tanzania, Chelsea). Each photo kit card is the LED back you will see on ShoutOut — Soccer · Jersey · Country or Club. Sizes 96×48, 64×48, 64×32. Name and 2-character mark overlay the kit; numbers stay center-justified.",
       searchPhrases: ["soccer jersey", "jersey", "tanzania jersey", "football kit", "country jersey", "club jersey", "chelsea jersey"],
       links: [
-        {label: "Start ShoutOut", href: `./?v=${APP_V}&start=search`}
+        {label: "Start ShoutOut", href: vUrl("./", {start: "search"})}
       ],
       source: "help-repository-seed"
     },
@@ -712,7 +715,7 @@
         "retention", "exposure report", "system access", "security tab", "floqai access",
         "save all classifications", "needs review", "what needs fixing", "delete after", "seed classification"
       ],
-      links: [{label: "Open Data classification", href: `./master-admin.html?v=${APP_V}#dataClassification`}],
+      links: [{label: "Open Data classification", href: `${vUrl("./master-admin.html")}#dataClassification`}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html#dataClassification"
@@ -1370,7 +1373,7 @@
       title: "About Mingl search",
       body: "Search public profiles by shared interests, lifestyle, music, travel, food, events, cars, city, username, or who you want to meet.",
       searchPhrases: ["mingl search", "search people", "mingl social playground", "find people"],
-      links: [{label: "Open Mingl", href: `./?v=${APP_V}&start=mingl`}],
+      links: [{label: "Open Mingl", href: vUrl("./", {start: "mingl"})}],
       source: "help-repository-seed",
       page: "index.html#mingl"
     },
@@ -1379,7 +1382,7 @@
       title: "Default Template",
       body: "Free Traditional Black and White Classic. Templates made only for this venue, such as Football Intro or Tengo muchos dólares, are listed under Exclusive at the venue name. Use FloqAi below for Sports, Jersey, VIP, Humor, Cars, Video, Pictures, and Ballers templates.",
       searchPhrases: ["default template", "black and white", "classic shoutout", "exclusive templates", "venue exclusive"],
-      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"
     },
@@ -1388,7 +1391,7 @@
       title: "FloqAi template search",
       body: "Tap the moving FloqAi mark (or wait for its speech bubbles), then ask for Sports, Jersey, NBA, NFL, Cars, Humor, VIP, Video, Pictures, or Ballers.",
       searchPhrases: ["floqai template", "sports jersey", "nba nfl cars humor"],
-      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
       source: "help-repository-seed",
       page: "index.html#templates"
     },
@@ -1397,7 +1400,7 @@
       title: "Football Intro",
       body: "A $30, 20-second stadium intro for four players, offered at Zebbies Garden DC, Heist Washington DC and Aurelia. Type “Football Intro” in Search, pick one of those venues, then upload four photos you have permission to use. Plays on 96×48 displays only.",
       searchPhrases: ["football intro", "zebbies all stars", "zebbies all star", "all-stars template", "team intro", "four player intro"],
-      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1407,7 +1410,7 @@
       title: "Tengo muchos dólares",
       body: "$30 Heist Washington DC exclusive. Your message plays in front of the vault for 5 seconds; then the vault door blows open and $100 bills splash behind your words for 10 seconds. The board closes with the HEIST logo over Washington DC, then loops. Type “Tengo muchos dólares” in Search, then enter only a name or pick an @Instagram / @Mingl handle (max 14). The board shows the name and types “Tengo muchos dólares... I just did a heist!” letter by letter. Plays on 96×48 displays only.",
       searchPhrases: ["tengo muchos dolares", "tengo mucho dolares", "tendo mucho dolares", "tendo mucho", "just did a heist", "heist name shoutout", "money rain", "dollar bills", "vault template", "heist vault", "vault explosion", "money splash"],
-      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1490,7 +1493,7 @@
       title: "Preview a template",
       body: "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos.",
       searchPhrases: ["preview template", "template preview", "see template", "try template", "what does the template look like"],
-      links: [{label: "Throw a ShoutOut", href: `./?v=${APP_V}&start=search`}],
+      links: [{label: "Throw a ShoutOut", href: vUrl("./", {start: "search"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "index.html#templates"
@@ -1510,7 +1513,7 @@
       title: "About Mingl Requests",
       body: "Sent and received Friend or Mingl Requests appear here. Requests stay on the main Mingl page; accepted conversations open in Mingl Chat.",
       searchPhrases: ["mingl requests", "friend request", "mingl chat"],
-      links: [{label: "Open Mingl", href: `./?v=${APP_V}&start=mingl`}],
+      links: [{label: "Open Mingl", href: vUrl("./", {start: "mingl"})}],
       source: "help-repository-seed",
       page: "index.html#mingl"
     }
