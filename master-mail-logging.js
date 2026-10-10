@@ -128,7 +128,7 @@
       <p>TLS: ${esc(tlsLabel(row))}</p>
       <p>SendGrid message id: ${esc(row.sendgridMessageId || "—")}</p>
       ${row.error ? `<p>Error: ${esc(row.error)}</p>` : ""}
-      ${row.bodyRedacted ? "<p class=\"sub small\">OTP / secret digits are redacted in stored content.</p>" : ""}
+      ${row.bodyRedacted ? `<p class="sub small">Sign-in / SOS2FA mail: the body is not stored. Template: ${esc(row.bodyTemplateId || row.kind || "—")}</p>${row.bodyPreview ? `<h3>Masked preview</h3><pre class="report-block">${esc(row.bodyPreview)}</pre>` : ""}` : ""}
       <h3>Request headers</h3>
       <pre class="report-block">${esc(headerBlock(row.requestHeaders))}</pre>
       <h3>Response headers</h3>

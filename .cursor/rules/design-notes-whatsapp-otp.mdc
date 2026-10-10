@@ -53,7 +53,7 @@ All via `functions/twilio-log.js` with `forceSecurity: true` (every row also lan
 | `auth-otp-status` | `twilioWhatsAppLogs` | Polled delivery status + Twilio error code |
 | `auth-otp-verify` | `twilioFeatureLogs` | `verified` / `rejected` / `expired` / `locked` (+ `actorUid` on success) |
 
-Every row carries `extra.consent = {type: "user-initiated", surface, notice: "otp.whatsappNote"}`. Phones are masked + hashed; codes never stored in clear (`redactSecrets` masks 6-digit runs). Master Admin → Twilio tabs show them.
+Every row carries `extra.consent = {type: "user-initiated", surface, notice: "otp.whatsappNote"}`. Phones are masked + hashed; codes never stored in clear (`redactSecrets` masks 6-digit runs). System mail (s3.1.32): `functions/secret-redaction.js` `redactSecrets` also masks 8-char email OTP codes (`A-HJ-NP-Z2-9`) and any token after a `code` / `OTP` / `passcode` / `recovery code` label, on **every** stored subject/body; `redactBody` mails (email OTP, SOS2FA) store **no body** — only `bodyTemplateId` + masked `bodyPreview` (`bodyStored: false`). Test: `functions/mail-log-redaction.test.js`. Open: `twilio-log.js` still masks only 6-digit runs, so the 6-char alphanumeric club daily code in SMS/WhatsApp alert bodies can be logged in clear — switch it to the shared module (redeploy messaging, whatsapp-otp, marketing, ad, twilio-debugger functions). Master Admin → Twilio tabs show them.
 
 ## FIX PROMPT
 

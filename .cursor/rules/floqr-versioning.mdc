@@ -26,7 +26,7 @@ Retired: `v29.09.N`. Treat those strings as historical cache keys only.
 - **Minor (`s3.1.0`)** — new user-visible feature that stays compatible.
 - **Patch (`s3.0.1`)** — fix, copy, help, diagnostics, CSS.
 
-This workspace’s current stable is **s3.0.0**.
+This workspace’s current stable is **s3.1.32**.
 
 ## Checklist
 
@@ -34,4 +34,5 @@ This workspace’s current stable is **s3.0.0**.
 - [ ] Display Xibo URLs stay location-only
 - [ ] Generated in-app links (Venue Links, FloqAi, Inbox landings) use `FLOQRNav.appVersion` — never a hardcoded `29.09.N` and never the current page's `?v=` (old bookmarks would keep minting old URLs)
 - [ ] Functions `package.json` / preview-email `package` use the same id
+- [ ] `floqr-nav.js` `APP_V` (= `FLOQRNav.appVersion`) equals `s` + `functions/package.json` version and README CURRENT PACKAGE, and every page's `floqr-nav.js?v=` matches — enforced by `functions/app-version-sync.test.js`; copy `scripts/bump-s3-1-32.js` (anchored, idempotent, takes a repo root so it runs on main's own copies) for the next bump
 - [ ] README “CURRENT PACKAGE” line updated when publishing
