@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>Demo sign-in code | FLOQR Master Admin</title>
+  <link rel="stylesheet" href="./styles.css?v=s3.1.26"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.30"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.30"/>
+  <style>
+    .demo-signin-shell{max-width:760px;margin:24px auto;padding:0 16px}
+    .demo-signin-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+    .demo-signin-row label{flex:1 1 180px}
+    .demo-signin-email{font-family:ui-monospace,Consolas,monospace;font-size:15px;word-break:break-all}
+    .demo-signin-code{font-family:ui-monospace,Consolas,monospace;font-size:clamp(34px,9vw,56px);font-weight:900;letter-spacing:.18em;text-align:center;padding:18px 8px;margin:12px 0;border:2px dashed var(--line,#555);border-radius:14px;user-select:all}
+    .demo-signin-code.is-expired{opacity:.35;text-decoration:line-through}
+    .demo-signin-countdown{text-align:center;font-weight:800;font-size:18px}
+    .demo-signin-steps li{margin:6px 0}
+    .demo-signin-url{font-family:ui-monospace,Consolas,monospace;word-break:break-all}
+    @media (max-width:560px){.demo-signin-row{display:grid;grid-template-columns:1fr}.demo-signin-row button{width:100%}}
+  </style>
+</head>
+<body>
+<main class="app admin-shell demo-signin-shell">
+  <a class="global-back-btn buttonlike" href="./master-admin.html?v=s3.1.31">&larr; Back to Master Admin</a>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">FLOQR Master Admin</p>
+      <h1>Demo sign-in code</h1>
+      <p class="sub">Sign in as a FLOQR demo account (temp_role_number@floqr-demo.com) while email codes are not being delivered.</p>
+      <p id="demoSigninStatus" class="status" role="status" aria-live="polite">Restoring your FLOQR session…</p>
+    </div>
+  </header>
+
+  <div class="card hidden" data-floqr-auth-chrome>
+    <a class="buttonlike" href="./master-admin.html?v=s3.1.31">Open Master Admin</a>
+  </div>
+
+  <section id="demoSigninSos2fa" class="card hidden">
+    <h2>SOS2FA unlock</h2>
+    <p class="sub small">Generating a demo sign-in code needs an unlocked SOS2FA session (same as Entity Management).</p>
+    <div id="sos2faActions" class="queue-actions" style="flex-wrap:wrap;gap:8px">
+      <button id="sos2faSendBtn" type="button">Request SOS2FA code</button>
+      <input id="sos2faCode" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code"/>
+      <button id="sos2faVerifyBtn" type="button">Verify code</button>
+      <span class="sos2fa-recovery hidden">
+        <input id="sos2faRecoveryCode" placeholder="Recovery code" autocomplete="off"/>
+        <button id="sos2faRecoveryBtn" type="button">Use recovery code</button>
+      </span>
+      <button id="sos2faLockBtn" type="button">Lock</button>
+    </div>
+    <p id="sos2faStatus" class="status" aria-live="polite"></p>
+  </section>
+
+  <section id="demoSigninForm" class="card hidden">
+    <h2
+      data-floqr-help-id="help-master-demo-signin"
+      data-floqr-help-title="Demo sign-in code"
+      data-floqr-help-search="demo sign-in code|sign in as demo account|floqr-demo|email code not arriving"
+      data-floqr-help-body="Unlock SOS2FA, pick the role and number, press Generate and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here."
+    >Demo account</h2>
+    <div class="demo-signin-row">
+      <label>Role
+        <select id="demoRole"></select>
+      </label>
+      <label>Number
+        <select id="demoNumber"></select>
+      </label>
+    </div>
+    <label id="demoCustomWrap" class="hidden">Demo email
+      <input id="demoCustomEmail" type="email" autocomplete="off" placeholder="temp_role_1@floqr-demo.com"/>
+    </label>
+    <p class="sub small">Signs in as <span id="demoEmailPreview" class="demo-signin-email"></span></p>
+    <div class="queue-actions" style="margin-top:12px">
+      <button id="demoGenerateBtn" class="primary" type="button" disabled>Generate sign-in code</button>
+    </div>
+  </section>
+
+  <section id="demoSigninResult" class="card hidden" aria-live="polite">
+    <h2>Sign-in code for <span id="demoResultEmail" class="demo-signin-email"></span></h2>
+    <div id="demoResultCode" class="demo-signin-code"></div>
+    <p id="demoResultCountdown" class="demo-signin-countdown"></p>
+    <div class="queue-actions" style="flex-wrap:wrap;gap:8px">
+      <button id="demoCopyCodeBtn" type="button">Copy code</button>
+      <button id="demoCopyEmailBtn" type="button">Copy email</button>
+      <button id="demoClearBtn" type="button">Hide code</button>
+    </div>
+    <ol class="demo-signin-steps">
+      <li>Open a private (incognito) window so your Master Admin session stays signed in here.</li>
+      <li>Go to <span id="demoSearchUrl" class="demo-signin-url"></span></li>
+      <li>Press <strong>Continue with your own Email</strong> and type the demo email.</li>
+      <li>Press <strong>I already have a code</strong> (do not press Send), enter the code, then <strong>Verify and Continue</strong>.</li>
+    </ol>
+    <p class="sub small">The code works once, for 10 minutes, and only for this demo account. Generating a new code replaces this one.</p>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
+<script src="./firebase-config.js?v=s3.0.67"></script>
+<script src="./floqr-session-shell.js?v=s3.0.110"></script>
+<script>window.SHOUTOUT_SUPER_ADMIN_EMAILS = window.SHOUTOUT_SUPER_ADMIN_EMAILS || ["bans.don@gmail.com"];</script>
+<script src="./sos2fa.js?v=s3.1.28"></script>
+<script src="./floqai-help-repository.js?v=s3.1.31"></script>
+<script src="./help-attach.js?v=s3.1.29"></script>
+<script src="./floqr-reason-prompt.js?v=s3.1.30"></script>
+<script src="./demo-signin.js?v=s3.1.31"></script>
+</body>
+</html>

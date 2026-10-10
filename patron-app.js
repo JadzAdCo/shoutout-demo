@@ -1602,20 +1602,48 @@
       }
       byId("emailOtpCode")?.focus();
     } catch (error) {
-      setText("emailOtpStatus", error?.message || "The email code could not be sent.");
+      const message = error?.message || "The email code could not be sent.";
+      setText("emailOtpStatus", email.endsWith("@floqr-demo.com") ? `${message} ${emailHaveCodeHint()}` : message);
     }
+  }
+  function emailHaveCodeHint() {
+    return otpText("app.emailHaveCodeHint", "Enter the 8-character code you were given, then press Verify and Continue.");
+  }
+  /* Same id the server uses for the challenge (sha256 of the email), so a code issued elsewhere can be verified here. */
+  async function emailOtpChallengeIdFor(email) {
+    if (!window.crypto?.subtle || !window.TextEncoder) return emailOtpChallengeId;
+    const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(email));
+    return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
+  }
+  function useExistingEmailOtpCode() {
+    const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
+    if (!email) {
+      setText("emailOtpStatus", otpText("app.emailHaveCodeNeedEmail", "Type the email address the code is for, then enter the code."));
+      byId("emailOtpAddress")?.focus?.();
+      return;
+    }
+    const demoHint = brokenDemoEmailHint(email);
+    if (demoHint) { setText("emailOtpStatus", demoHint); byId("emailOtpAddress")?.focus?.(); return; }
+    clearInterval(emailOtpTimer);
+    emailOtpTimer = null;
+    emailOtpExpiresAt = 0;
+    setText("emailOtpStatus", emailHaveCodeHint());
+    byId("emailOtpCode")?.focus?.();
   }
   async function verifyEmailOtp() {
     const email = String(byId("emailOtpAddress")?.value || "").trim().toLowerCase();
     const code = String(byId("emailOtpCode")?.value || "").trim().toUpperCase();
-    if (!functions || !emailOtpChallengeId) { setText("emailOtpStatus", "Request a new code first."); return; }
+    if (!functions) { setText("emailOtpStatus", "Firebase Functions is unavailable on this page."); return; }
+    if (!email) { setText("emailOtpStatus", "Enter your email address first."); byId("emailOtpAddress")?.focus?.(); return; }
     if (!/^[A-Z2-9]{8}$/.test(code)) {
       setText("emailOtpStatus", "Enter the 8-character code from the email (not the Master Admin QA ref).");
       return;
     }
     try {
+      const challengeId = await emailOtpChallengeIdFor(email);
+      if (!challengeId) { setText("emailOtpStatus", "Request a new code first."); return; }
       setText("emailOtpStatus", "Verifying code...");
-      const response = await functions.httpsCallable("verifyEmailOtp")({email, code, challengeId:emailOtpChallengeId});
+      const response = await functions.httpsCallable("verifyEmailOtp")({email, code, challengeId});
       await auth.signInWithCustomToken(response.data.customToken);
       clearInterval(emailOtpTimer);
       emailOtpTimer = null;
@@ -4761,7 +4789,7 @@
       resetUserLocationContext();
       if (byId("listingPage")?.classList.contains("active")) renderGrid();
     });
-    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showWhatsAppOtpBtn", showWhatsAppOtpPanel); bind("requestWhatsAppOtpBtn", requestWhatsAppOtp); bind("verifyWhatsAppOtpBtn", verifyWhatsAppOtp); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
+    bind("googleLoginBtn", loginGoogle); bind("facebookLoginBtn", loginFacebook); bind("microsoftLoginBtn", loginMicrosoft); bind("showEmailOtpBtn", showEmailOtpPanel); bind("requestEmailOtpBtn", requestEmailOtp); bind("emailOtpHaveCodeBtn", useExistingEmailOtpCode); bind("verifyEmailOtpBtn", verifyEmailOtp); bind("emailOtpSentCloseBtn", closeEmailOtpSentModal); bind("emailOtpSentCloseX", closeEmailOtpSentModal); bind("showWhatsAppOtpBtn", showWhatsAppOtpPanel); bind("requestWhatsAppOtpBtn", requestWhatsAppOtp); bind("verifyWhatsAppOtpBtn", verifyWhatsAppOtp); bind("showSmsOtpBtn", showSmsOtpPanel); bind("sendOtpBtn", sendPhoneCode); bind("verifyOtpBtn", verifyPhoneCode);
     bind("dropdownSignInBtn", () => {
       byId("userDropdown")?.classList.add("hidden");
       showPage("landingPage");
