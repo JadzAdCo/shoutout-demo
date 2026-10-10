@@ -12,3 +12,10 @@ After publishing FLOQR changes (especially to GitHub Pages `main` or any `functi
 3. **Local gate** — when functions/rules/shared-data contracts changed, run `npm test` in `functions/` and fix failures before (or immediately after) push.
 4. **Deploy completeness** — Pages build success ≠ Firebase Functions deploy. Automatic Functions deploy only runs on `workflow_dispatch` with `deploy=true` after tests pass. Say so explicitly if backend changes are Pages-only.
 5. **Preview email last** — send `emailFloqrPreviewLinks` / Diagnostics preview email only after the CI quality gate is green (see `STANDARD-AFTER-DEPLOYMENT.md` steps 7–8).
+
+## Functions deploy source of truth (Oct 10 2026)
+
+- Deploy Functions **only** from a clean `git archive` of **`origin/main`**, after the change is published there. Never from the workspace tree or a workspace commit.
+- Before any deploy, `origin/workspace/v29-08` must carry exactly main's `functions/`, `firestore.rules`, `storage.rules`: `node scripts/check-functions-sync.js --workspace origin/workspace/v29-08` must exit 0. Out of sync → `git checkout origin/main -- <files>`, commit, push, then deploy. `deploy-reconcile.ps1` runs the check, tests the main export, and deploys in batches of 40 (`-Functions a,b,c`).
+- Why: s3.1.33 deployed 108 functions from workspace `51a730a`, which lacked main's supRstar code; `startSuprstrLive` / `approveSuprstarRequest` regressed until redeployed from main. Every deployed function runs the whole `functions/` bundle, so one stale module rolls back every export deployed with it.
+- Production state per function: `firebase functions:list --json` → `source.storageSource.generation` (upload time, µs) groups functions by deploy.

@@ -40,6 +40,7 @@ This workspace’s current stable is **s3.1.37**.
 - [ ] Every asset tag `?v=` equals the package (bump script re-stamps all of them)
 - [ ] Display Xibo URLs stay location-only
 - [ ] Functions `package.json` / preview-email `package` use the same id
+- [ ] Functions deploy only from a clean archive of `origin/main`; `node scripts/check-functions-sync.js --workspace origin/workspace/v29-08` exits 0 first (see `post-deploy-qc.mdc`)
 - [ ] `floqr-nav.js` `APP_V` (= `FLOQRNav.appVersion`) equals `s` + `functions/package.json` version and README CURRENT PACKAGE — enforced by `functions/app-version-sync.test.js`; copy `scripts/bump-s3-1-37.js` (anchored, idempotent, takes a repo root so it runs on main's own copies; strips page-link versions and re-stamps every asset tag) for the next bump
 - [ ] Link builders (`floqai-help-repository.js`, `intent-search.js`, …) use `pageUrl` / `FLOQRNav` — never add `v`; pages load `floqr-nav.js` before them (same test)
 - [ ] README “CURRENT PACKAGE” line updated when publishing
