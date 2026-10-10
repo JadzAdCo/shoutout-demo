@@ -148,7 +148,10 @@ test("Features & Services table: plain-language headers, Revision N, link inside
   assert.doesNotMatch(app, />r\$\{/);
   assert.match(app, /Off — set Enable Feature to 1 to open it\./);
   assert.match(app, /function featureCell\(/);
-  assert.match(read("admin.css"), /\.feature-flags-table/);
+  const css = read("admin.css");
+  assert.match(css, /\.feature-flags-table \.feature-flag-toggle\{display:inline-flex/, "checkbox and 0/1 stay on one line");
+  assert.match(css, /\.feature-save-cell button\{white-space:nowrap\}/);
+  assert.match(css, /@media \(max-width:900px\)\{\s*\.feature-flags-wrap/, "tablet/phone cards");
 });
 
 test("reason is asked after Save in the shared prompt — no standing input, no window.prompt", () => {
