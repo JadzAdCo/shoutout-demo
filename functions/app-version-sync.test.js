@@ -40,8 +40,10 @@ const LINK_BUILDERS = [
   "floqai-access.js",
   "scheduling-portal.js",
   "scheduling-owner-picker.js",
-  "scheduling-assignee-picker.js"
+  "scheduling-assignee-picker.js",
+  "floqr-session-shell.js"
 ];
+const APP_LINK_STAMPERS = ["patron-portal-app.js", "admin-app.js", "floqr-session-shell.js"];
 const HUB_LINK = /\.\/(?:floqai|scheduling|patron-portal|admin|master-admin)\.html\?(?:[^"'\s#<>]*?(?:&amp;|&))?v=([^"'&\s#<>]+)/g;
 const rootDir = path.resolve(__dirname, "..");
 const htmlPages = () => fs.readdirSync(rootDir).filter((name) => name.endsWith(".html"));
@@ -71,6 +73,51 @@ test("FloqAi help links stamp FLOQRNav.appVersion, and carry no version at all w
   assert.ok(versions.length > 20, `found ${versions.length} stamped links`);
   assert.deepEqual([...new Set(versions)], [pkgVersion]);
   assert.doesNotMatch(load(undefined), /[?&]v=[A-Za-z0-9]/);
+});
+
+function generatedHrefs(appVersion) {
+  const win = {URLSearchParams, URL, console, FLOQRNav: appVersion == null ? undefined : {appVersion}};
+  win.window = win;
+  vm.runInNewContext(read("floqai-help-repository.js"), win);
+  vm.runInNewContext(read("intent-search.js"), win);
+  const everyone = {IsPatron: 1, IsServiceMember: 1, IsVenueAdmin: 1, IsMasterAdmin: 1};
+  const {PRODUCT_INTENTS, HELP_INTENTS} = win.FLOQRIntentSearch;
+  const json = JSON.stringify([win.FLOQRHelpRepository.toSearchIntents(everyone), PRODUCT_INTENTS, HELP_INTENTS]);
+  return [...json.matchAll(/"href":"([^"]*)"/g)].map((hit) => hit[1]).filter((href) => href.startsWith("./"));
+}
+
+const isBoard = (href) => /(?:^|\/)display2?\.html(?:[?#]|$)/i.test(href);
+
+test("FloqAi links always open with ?v=<package> — never ?&, v=& or an empty v; Display boards get no v", () => {
+  const hrefs = generatedHrefs(pkgVersion);
+  assert.ok(hrefs.length > 50, `found ${hrefs.length} links`);
+  const bad = hrefs.filter((href) => {
+    if (/\?&|[?&]v=(?:&|#|$)|\?(?:#|$)/.test(href)) return true;
+    if (isBoard(href)) return /[?&]v=/.test(href);
+    return !new RegExp(`\\?v=${pkgVersion.replace(/\./g, "\\.")}(?:&|#|$)`).test(href);
+  });
+  assert.deepEqual(bad, []);
+  assert.ok(hrefs.includes(`./scheduling.html?v=${pkgVersion}&from=floqai`));
+});
+
+test("an empty FLOQRNav.appVersion never mints ?&from=floqai or v=", () => {
+  for (const version of ["", "   ", undefined]) {
+    const bad = generatedHrefs(version).filter((href) => /\?&|[?&]v=|\?(?:#|$)/.test(href));
+    assert.deepEqual(bad, [], `appVersion=${JSON.stringify(version)}`);
+  }
+  assert.ok(generatedHrefs("").includes("./scheduling.html?from=floqai"));
+});
+
+test("app link stampers take v from FLOQRNav, never a hardcoded package", () => {
+  const hits = APP_LINK_STAMPERS.flatMap((file) => {
+    const src = read(file);
+    return [
+      ...src.matchAll(/searchParams\.set\(\s*["']v["']\s*,\s*["'][^"']*["']\s*\)/g),
+      ...src.matchAll(/(?:appVersion|get\(["']v["']\))\s*\|\|\s*["'](?:s?\d+\.\d+[^"']*)["']/g),
+      ...src.matchAll(/CURRENT_VERSION\s*=\s*["'][^"']+["']/g)
+    ].map((hit) => `${file}: ${hit[0]}`);
+  });
+  assert.deepEqual(hits, []);
 });
 
 test("pages load floqr-nav.js before the FloqAi link builders", () => {

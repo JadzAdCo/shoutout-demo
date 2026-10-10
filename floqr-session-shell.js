@@ -3,10 +3,27 @@
 (function (root) {
   "use strict";
 
-  const SIGNED_OUT_EMBED =
-    "You're signed in on FLOQR My Profile — restoring that session here. If this stays blank, refresh My Profile (not Google on this panel).";
-  const SIGNED_OUT_STANDALONE =
-    "Opening the FLOQR sign-in page. After you sign in, you come straight back here.";
+  const COPY = {
+    "session.embedSignedOut":
+      "You're signed in on FLOQR My Profile — restoring that session here. If this stays blank, refresh My Profile (not Google on this panel).",
+    "session.standaloneSignedOut":
+      "Opening the FLOQR sign-in page. After you sign in, you come straight back here.",
+    "session.restoring": "Restoring your FLOQR session…",
+    "session.openMyProfile": "Open My Profile & Settings",
+    "session.popupBlocked": "Sign in on My Profile & Settings first. Google popups are not used inside this panel."
+  };
+
+  function t(key) {
+    try {
+      const out = root.FLOQRI18n?.t?.(key);
+      if (out && out !== key) return out;
+    } catch (_error) { /* fall back to English */ }
+    return COPY[key];
+  }
+
+  function appVersion() {
+    return String(root.FLOQRNav?.appVersion || "").trim();
+  }
 
   function params() {
     try {
@@ -51,9 +68,9 @@
   }
 
   function portalSignInHref() {
-    const v = params().get("v") || "s3.0.3";
+    const v = appVersion() || params().get("v") || "";
     const next = new URL("./patron-portal.html", location.href);
-    next.searchParams.set("v", v);
+    if (v) next.searchParams.set("v", v);
     next.searchParams.set("from", "session-shell");
     return `${next.pathname}${next.search}`;
   }
@@ -68,7 +85,7 @@
   function loginHref() {
     const file = String(location.pathname || "").split("/").pop() || "index.html";
     const q = new URLSearchParams();
-    const v = root.FLOQRNav?.appVersion || params().get("v") || "";
+    const v = appVersion() || params().get("v") || "";
     if (v) q.set("v", v);
     q.set("profileRequired", "sign-in");
     q.set("returnTo", `${file}${location.search}${location.hash}`);
@@ -84,7 +101,7 @@
 
   function popupBlocked(statusEl) {
     if (!isEmbedded()) return false;
-    setStatus(statusEl, "Sign in on My Profile & Settings first. Google popups are not used inside this panel.");
+    setStatus(statusEl, t("session.popupBlocked"));
     return true;
   }
 
@@ -112,18 +129,26 @@
       setHidden(chrome, false);
       const host = resolveEls(chrome)[0];
       if (host && !host.querySelector("[data-floqr-session-portal-link]")) {
+        // A plain status line, never `p.sub.small` (helper-popouts would turn it into a `?` on the hero h1).
         const p = document.createElement("p");
-        p.className = "sub small";
+        p.className = "floqr-session-hint small";
+        p.dataset.keepVisible = "true";
         p.setAttribute("data-floqr-session-portal-link", "1");
-        p.innerHTML = `<a class="buttonlike" href="${portalSignInHref()}" target="_parent" rel="noopener">Open My Profile &amp; Settings</a>`;
+        const a = document.createElement("a");
+        a.className = "buttonlike";
+        a.href = portalSignInHref();
+        a.target = "_parent";
+        a.rel = "noopener";
+        a.textContent = t("session.openMyProfile");
+        p.appendChild(a);
         host.appendChild(p);
       }
-      setStatus(statusEl, SIGNED_OUT_EMBED);
+      setStatus(statusEl, t("session.embedSignedOut"));
     } else {
       // Standalone pages hand off to the general sign-in (every provider + OTP), never a page-local Google button.
       setHidden(chrome, false);
       setHidden(loginButtons, true);
-      setStatus(statusEl, SIGNED_OUT_STANDALONE);
+      setStatus(statusEl, t("session.standaloneSignedOut"));
     }
   }
 
@@ -163,7 +188,7 @@
     const auth = options.auth;
     if (!auth) return {embedded: isEmbedded(), ready: Promise.resolve(null)};
     applyEmbedChrome();
-    setStatus(options.statusEl, options.restoringMessage || "Restoring your FLOQR session…");
+    setStatus(options.statusEl, options.restoringMessage || t("session.restoring"));
     if (auth.currentUser) {
       paintAuthChrome({chrome: options.chrome, loginButtons: options.loginButtons, statusEl: options.statusEl, user: auth.currentUser});
     } else {

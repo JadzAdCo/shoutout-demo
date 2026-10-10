@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.35 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.36 (stable)
+
+- s3.1.36: FloqAi links always open as ?v=<current package>&from=floqai — never an empty v, never "?&", and Display board links never get a v. My Profile / Club Admin / sign-in links stop falling back to old package numbers. Embedded pages (My Profile Work Calendar, Scheduling) show the "signed in on My Profile" hint as a small translated status line instead of a ? beside the big page title; help is never attached to a page's hero title.
 
 - s3.1.35: FloqAi and help links always carry the current package — no old "29.09" fallback when a page loads them before floqr-nav.js, and static hub links (FloqAi, Scheduling, My Profile, Club Admin, Master Admin) follow each release. Staff Scheduling: "Assignee uid" becomes an "Assign to" picker that lists people by name and role (club team, promoting-company team, service members; Master Admins see the FLOQR directory) and fills their email / phone for notify. Every label and status on the page, plus the shift confirm list and assignment cards, is translated in all 11 languages.
 

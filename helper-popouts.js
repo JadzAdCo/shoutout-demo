@@ -8,6 +8,7 @@
     if (node.id) return false;
     if (node.classList.contains("status") || node.id?.toLowerCase().includes("status")) return false;
     if (node.dataset.keepVisible === "true") return false;
+    if (node.closest("[data-floqr-auth-chrome], [data-floqr-session-portal-link]")) return false;
     return node.matches("p.sub.small, p.helper-text, .helper-text");
   }
 
