@@ -11,6 +11,7 @@
 const crypto = require("crypto");
 const https = require("https");
 const admin = require("firebase-admin");
+const {redactSecrets: sharedRedactSecrets, redactDeep: sharedRedactDeep} = require("./secret-redaction");
 
 const TWILIO_HOST = "api.twilio.com";
 const TLS_MIN = "TLSv1.3";
@@ -66,11 +67,13 @@ function stripPci(value) {
 }
 
 function redactSecrets(value) {
-  return String(value == null ? "" : value)
+  return sharedRedactSecrets(String(value == null ? "" : value)
     .replace(/\bAC[a-f0-9]{32}\b/gi, "AC[redacted]")
-    .replace(/\bSK[a-f0-9]{32}\b/gi, "SK[redacted]")
-    .replace(/\bBearer\s+\S+/gi, "Bearer [redacted]")
-    .replace(/\b\d{6}\b/g, "••••••");
+    .replace(/\bSK[a-f0-9]{32}\b/gi, "SK[redacted]"));
+}
+
+function redactDeep(value) {
+  return sharedRedactDeep(value, redactSecrets);
 }
 
 function digitsOnly(value) {
@@ -200,9 +203,9 @@ async function writeTwilioLog({
     diagnosticPurged: false,
     diagnostic: {
       body: clip(safeBody, BODY_MAX),
-      requestHeaders: requestHeaders && typeof requestHeaders === "object" ? requestHeaders : {},
-      responseHeaders: responseHeaders && typeof responseHeaders === "object" ? responseHeaders : {},
-      extra: extra && typeof extra === "object" ? extra : {}
+      requestHeaders: requestHeaders && typeof requestHeaders === "object" ? redactDeep(requestHeaders) : {},
+      responseHeaders: responseHeaders && typeof responseHeaders === "object" ? redactDeep(responseHeaders) : {},
+      extra: extra && typeof extra === "object" ? redactDeep(extra) : {}
     },
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     createdAtMs: now
@@ -524,6 +527,7 @@ module.exports = {
   maskPhone,
   hashPhone,
   redactSecrets,
+  redactDeep,
   isSecurityRelevant,
   writeTwilioLog,
   sendTwilioMessagesApi,

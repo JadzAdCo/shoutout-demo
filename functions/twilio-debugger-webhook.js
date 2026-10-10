@@ -12,7 +12,7 @@ const crypto = require("crypto");
 const admin = require("firebase-admin");
 const {onRequest} = require("firebase-functions/v2/https");
 
-const {writeTwilioLog} = require("./twilio-log");
+const {writeTwilioLog, redactSecrets, redactDeep} = require("./twilio-log");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -210,7 +210,9 @@ exports.twilioDebuggerWebhook = onRequest({
   const parentAccountSid = text(form.ParentAccountSid || form.parentAccountSid, 80);
   const timestamp = text(form.Timestamp || form.timestamp, 80);
   const payloadType = text(form.PayloadType || form.payloadType, 80) || "application/json";
-  const {raw: payloadRaw, parsed} = parsePayload(form.Payload ?? form.payload);
+  const {raw: rawPayload, parsed: rawParsed} = parsePayload(form.Payload ?? form.payload);
+  const payloadRaw = redactSecrets(rawPayload);
+  const parsed = rawParsed && typeof rawParsed === "object" ? redactDeep(rawParsed) : rawParsed;
   const summary = summarizePayload(parsed);
   const securityRelevant = isSecurityRelevant(level, summary);
 
