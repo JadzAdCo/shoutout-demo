@@ -87,6 +87,7 @@
     "clubOnboarding",
     "templateManagement",
     "recommendationModeration",
+    "demoEmployees",
     "featuresServices",
     "dataClassification",
     "adApprovalQueue",
@@ -111,6 +112,7 @@
     clubOnboarding: "Entity Onboarding",
     templateManagement: "Template Management",
     recommendationModeration: "Unapproved Recommendations",
+    demoEmployees: "Demo Svc / Emp Mgmt",
     networkDashboard: "Network Dashboard",
     translationOverrides: "Translation Overrides"
   };
@@ -245,6 +247,9 @@
       }
       if (panelId === "featuresServices") {
         window.FLOQRMasterFeatureServices?.mount?.();
+      }
+      if (panelId === "demoEmployees") {
+        window.FLOQRMasterDemoEmployees?.mount?.();
       }
       if (panelId === "dataClassification") {
         window.FLOQRMasterDataClassification?.mount?.();

@@ -164,25 +164,77 @@ test("Welcome-card code strings exist in all 11 chrome packs", () => {
   }
 });
 
-test("demo-signin.html is a Master Admin satellite with SOS2FA and help beside the heading", () => {
-  const html = read("demo-signin.html");
-  assert.match(html, /href="\.\/floqr-reason-prompt\.css\?v=/);
-  assert.doesNotMatch(html, /id="demoReason"|placeholder="Why/, "reason is asked after Generate, never a standing input");
-  const order = ["firebase-config.js", "floqr-session-shell.js", "sos2fa.js", "floqai-help-repository.js", "help-attach.js", "floqr-reason-prompt.js", "demo-signin.js"]
+test("Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help beside the heading", () => {
+  const html = read("master-admin.html");
+  const group = html.slice(html.indexOf('id="entityManagementSubtabs"'), html.indexOf("</div>", html.indexOf('id="entityManagementSubtabs"')));
+  assert.match(group, /data-panel="demoEmployees" type="button" data-i18n="master\.demoEmployees">Demo Svc \/ Emp Mgmt<\/button>/);
+  const section = html.slice(html.indexOf('<section id="demoEmployees"'), html.indexOf("</section>", html.indexOf('<section id="demoEmployees"')));
+  assert.match(section, /data-entity-mgmt-gated="true"/);
+  assert.match(section, /data-floqr-help-id="help-master-demo-signin"/);
+  for (const id of ["demoEmpSearch", "demoEmpSelect", "demoEmpList", "demoEmpGenerateSelectedBtn", "demoEmpRole", "demoEmpNumber", "demoEmpManualGenerateBtn", "demoEmpCode", "demoEmpCountdown", "demoEmpCopyCodeBtn", "demoEmpRecent"]) {
+    assert.match(section, new RegExp(`id="${id}"`), id);
+  }
+  assert.doesNotMatch(section, /id="demoReason"|placeholder="Why/, "reason is asked after Generate, never a standing input");
+  assert.match(html, /href="\.\/master-demo-employees\.css\?v=s3\.1\.31"/);
+  const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "floqai-help-repository.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
     .map(file => html.indexOf(`src="./${file}?v=`));
   order.forEach((at, i) => assert.ok(at > 0 && (i === 0 || at > order[i - 1]), `script order ${i}`));
-  assert.match(html, /data-floqr-auth-chrome/);
-  assert.match(html, /data-floqr-help-id="help-master-demo-signin"/);
-  assert.match(html, /class="sos2fa-recovery hidden"/);
-  assert.doesNotMatch(html, /display2?\.html\?location=/);
-  const js = read("demo-signin.js");
-  assert.match(js, /FLOQRSessionShell\.bind\(/);
-  assert.match(js, /isMasterAdminUser\(user, claims\)/);
-  assert.match(js, /httpsCallable\("issueDemoSignInCode"\)\(\{email, reason, sos2faSessionId\}\)/);
-  assert.doesNotMatch(js, /localStorage|sessionStorage|console\.log/);
-  assert.match(js, /FLOQRReasonPrompt[\s\S]*prompt\.ask\(\{summary: `Demo sign-in code for \$\{email\}`, minLength: MIN_REASON/);
-  assert.doesNotMatch(js, /window\.prompt|[^.\w]prompt\(/);
-  assert.ok(js.indexOf("await askReason(email)") < js.indexOf("httpsCallable(\"issueDemoSignInCode\")"));
+  for (const file of ["sos2fa.js", "master-admin-app.js"]) {
+    const src = read(file);
+    const list = src.slice(src.indexOf("ENTITY_MGMT_PANEL"), src.indexOf("];", src.indexOf("ENTITY_MGMT_PANEL")));
+    assert.match(list, /"demoEmployees"/, `${file} gates the panel behind SOS2FA`);
+  }
+  assert.match(read("master-admin-app.js"), /panelId === "demoEmployees"\) \{\s*window\.FLOQRMasterDemoEmployees\?\.mount\?\.\(\);/);
+});
+
+test("demo employee tab: SOS2FA before data, reason prompt before the callable, no code kept", () => {
+  const js = read("master-demo-employees.js");
+  assert.match(js, /httpsCallable\("issueDemoSignInCode"\)\(\{email: target, reason, sos2faSessionId\}\)/);
+  assert.ok(js.indexOf("getSessionId?.(SCOPE)") < js.indexOf("await askReason(target)"));
+  assert.ok(js.indexOf("await askReason(target)") < js.indexOf('httpsCallable("issueDemoSignInCode")'));
+  assert.match(js, /prompt\.ask\(\{summary: `Demo sign-in code for \$\{email\}`, minLength: MIN_REASON/);
+  assert.doesNotMatch(js, /window\.prompt|[^.\w]prompt\(|localStorage|sessionStorage|console\.log/);
+  const mount = js.slice(js.indexOf("function mount()"), js.indexOf("const api ="));
+  assert.ok(mount.indexOf("if (!unlocked())") < mount.indexOf("refresh()"), "data loads only after unlock");
+  assert.match(js, /collection\("featureServiceAuditLogs"\)\.where\("eventType", "==", AUDIT_EVENT\)/);
+  assert.match(js, /AUDIT_EVENT = "demo\.signin_code_issued"/);
+});
+
+test("demo employee roster: 80 packaged accounts, Firestore profiles merge in, search filters name/email/role/club", () => {
+  const showcase = require("../floqr-temp-qa-showcase.js");
+  const win = {FLOQRTempQaShowcase: showcase, addEventListener() {}};
+  vm.runInContext(read("master-demo-employees.js"), vm.createContext({window: win, globalThis: win, URL, document: {}}));
+  const api = win.FLOQRMasterDemoEmployees;
+  const seed = api.seedRoster();
+  assert.equal(seed.length, 80);
+  assert.ok(seed.every(row => /^temp_[a-z]+_\d+@floqr-demo\.com$/.test(row.email)));
+  const waitress = seed.find(row => row.email === "temp_waitress_1@floqr-demo.com");
+  assert.equal(waitress.club, showcase.CLUBS[0].brand);
+  assert.ok(waitress.name);
+  const merged = api.mergeProfile(seed, "uid-1", {email: "temp_waitress_1@floqr-demo.com", displayName: "Priya QA", approvedRoles: ["waitress"], affiliatedClubName: "Aurelia"});
+  const row = merged.find(r => r.email === "temp_waitress_1@floqr-demo.com");
+  assert.equal(row.hasProfile, true);
+  assert.equal(row.name, "Priya QA");
+  assert.equal(merged.length, 80);
+  assert.equal(api.mergeProfile(seed, "x", {email: "bans.don@gmail.com"}).length, 80, "real accounts never join the roster");
+  assert.equal(api.mergeProfile(seed, "y", {email: "temp_host_3@floqr-demo.com"}).length, 81, "extra demo roles appear");
+  assert.equal(api.matches(row, "priya aurelia"), true);
+  assert.equal(api.matches(row, "waitress"), true);
+  assert.equal(api.matches(row, "bartender"), false);
+  assert.deepEqual(JSON.parse(JSON.stringify(api.parseDemoEmail("temp_dj_10@floqr-demo.com"))), {roleKey: "dj", n: 10});
+  assert.equal(api.parseDemoEmail("temp_dj_1@floqr-demo.com.evil.io"), null);
+});
+
+test("Demo Svc / Emp Mgmt tab label exists in all 11 chrome packs", () => {
+  const count = (read("floqr-i18n.js").match(/"master\.demoEmployees":/g) || []).length;
+  assert.equal(count, 11);
+});
+
+test("old demo-signin.html redirects to the Master Admin tab", () => {
+  const html = read("demo-signin.html");
+  assert.match(html, /location\.replace\("\.\/master-admin\.html\?v=s3\.1\.31#demoEmployees"\)/);
+  assert.match(html, /<body data-floqr-public>/);
+  assert.ok(!fs.existsSync(path.join(root, "demo-signin.js")));
 });
 
 test("FloqAi help entry is Master Admin only and classified", () => {
@@ -192,6 +244,8 @@ test("FloqAi help entry is Master Admin only and classified", () => {
   const entry = win.FLOQRHelpRepository.entries().find(row => row.id === "help-master-demo-signin");
   assert.ok(entry);
   assert.deepEqual([...entry.audiences], ["masterAdmin"]);
+  for (const phrase of ["demo employee code", "temp code", "demo sign in", "sign in as demo"]) assert.ok(entry.searchPhrases.includes(phrase), phrase);
+  assert.match(entry.links[0].href, /master-admin\.html\?.*#demoEmployees$/);
   assert.doesNotMatch(entry.body, /sha256|challenge|EMAIL_OTP_PEPPER|design note/i);
   const classes = JSON.parse(read("functions/floqai-content-classes.json"));
   assert.deepEqual(classes.help["help-master-demo-signin"], ["masterAdmin"]);

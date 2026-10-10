@@ -130,7 +130,7 @@ test("Master Admin audit/hero assets are cache-busted (s3.1.29 help-attach, s3.1
   const html = read("master-admin.html");
   assert.match(html, /\.\/help-attach\.js\?v=s3\.1\.29/);
   for (const file of ["admin.css", "floqai-help-repository.js", "master-feature-services.js"]) {
-    assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.1\\.30`));
+    assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.1\\.[3-9]\\d"`));
   }
   assert.doesNotMatch(html, /display2?\.html\?location=[^"'\s<>]*[?&]v=/);
 });

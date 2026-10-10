@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./styles.css?v=s3.1.24"/>
   <link rel="stylesheet" href="./admin.css?v=s3.1.30"/>
   <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.1.30"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.1.31"/>
 </head>
 <body>
 <a id="floqrGlobalBack" class="global-back-btn buttonlike" href="./master-admin.html#networkDashboard">&larr; Network Intelligence Center</a>
@@ -50,6 +51,7 @@
             <button class="admin-subtab" data-panel="clubOnboarding" type="button" data-i18n="master.onboarding">Entity Onboarding</button>
             <button class="admin-subtab" data-panel="templateManagement" type="button" data-i18n="master.templates">Template Management</button>
             <button class="admin-subtab" data-panel="recommendationModeration" type="button" data-i18n="master.recommendations">Unapproved Recommendations</button>
+            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Svc / Emp Mgmt</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
@@ -780,6 +782,69 @@
           </div>
           <p id="recommendationModerationStatus" class="status">Loading recommendation queue...</p>
           <div id="recommendationModerationList" class="report-block"></div>
+        </div>
+      </section>
+
+      <section id="demoEmployees" class="admin-panel-section" data-entity-mgmt-gated="true">
+        <!-- Design notes: .cursor/rules/design-notes-demo-signin.mdc -->
+        <div class="card">
+          <p class="eyebrow">Entity management · demo employees</p>
+          <h2
+            data-floqr-help-id="help-master-demo-signin"
+            data-floqr-help-title="Demo sign-in code"
+            data-floqr-help-search="demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
+            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here."
+          >Demo Svc / Emp Mgmt</h2>
+          <p id="demoEmpStatus" class="status" aria-live="polite"></p>
+          <div class="demo-emp-search-row">
+            <label>Search demo employees
+              <input id="demoEmpSearch" type="search" autocomplete="off" placeholder="Name, email, role, or club"/>
+            </label>
+            <label>Select demo employee
+              <select id="demoEmpSelect"></select>
+            </label>
+            <button id="demoEmpGenerateSelectedBtn" class="primary" type="button">Generate code</button>
+          </div>
+          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo employees. Click a row to select it.</p>
+          <div id="demoEmpList" class="demo-emp-list"></div>
+        </div>
+
+        <div class="card">
+          <h3>Not in the list?</h3>
+          <p class="sub small">Pick the role and demo club number. The account is created the first time it signs in.</p>
+          <div class="demo-emp-search-row">
+            <label>Role<select id="demoEmpRole"></select></label>
+            <label>Demo club<select id="demoEmpNumber"></select></label>
+            <button id="demoEmpManualGenerateBtn" type="button">Generate code</button>
+          </div>
+          <p class="sub small">Signs in as <span id="demoEmpManualEmail" class="demo-emp-email"></span></p>
+        </div>
+
+        <div id="demoEmpResult" class="card hidden" aria-live="polite">
+          <h3>Sign-in code for <span id="demoEmpResultEmail" class="demo-emp-email"></span></h3>
+          <div id="demoEmpCode" class="demo-emp-code"></div>
+          <p id="demoEmpCountdown" class="demo-emp-countdown"></p>
+          <div class="queue-actions">
+            <button id="demoEmpCopyCodeBtn" type="button">Copy code</button>
+            <button id="demoEmpCopyEmailBtn" type="button">Copy email</button>
+            <button id="demoEmpHideBtn" type="button">Hide code</button>
+          </div>
+          <ol class="demo-emp-steps">
+            <li>Open a private (incognito) window so you stay signed in here.</li>
+            <li>Go to <span id="demoEmpSearchUrl" class="demo-emp-url"></span></li>
+            <li>Press <strong>Continue with your own Email</strong> and type the demo email.</li>
+            <li>Press <strong>I already have a code</strong> (do not press Send), enter the code, then <strong>Verify and Continue</strong>.</li>
+          </ol>
+          <p class="sub small">The code works once, for 10 minutes, and only for this demo account. Generating a new code replaces it.</p>
+        </div>
+
+        <div class="card">
+          <h3>Recent codes issued</h3>
+          <p class="sub small">Who issued a code, for which demo account, and when. Codes are never stored or shown here.</p>
+          <div id="demoEmpRecent" class="report-block"></div>
+          <div class="queue-actions">
+            <button id="demoEmpReloadBtn" type="button">Reload</button>
+          </div>
         </div>
       </section>
 
@@ -1692,7 +1757,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.1.30"></script>
+<script src="./floqr-i18n.js?v=s3.1.31"></script>
 <script src="./firebase-config.js?v=s3.0.67"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.1.0"></script>
@@ -1700,7 +1765,7 @@
 <script src="./floqr-temp-qa-showcase.js?v=s3.1.24"></script>
 <script src="./shared-data.js?v=s3.1.26"></script>
 <script src="./feature-gates.js?v=s3.1.26"></script>
-<script src="./sos2fa.js?v=s3.1.28"></script>
+<script src="./sos2fa.js?v=s3.1.31"></script>
 <script src="./entity-management.js?v=s3.1.24"></script>
 <script src="./ai-service.js?v=29.09.22"></script>
 <script src="./ai-index-service.js?v=s3.1.26"></script>
@@ -1708,7 +1773,7 @@
 <script src="./floqr-venue-datapoints.js?v=s3.0.97"></script>
 <script src="./ai-discovery-service.js?v=s3.0.97"></script>
 <script src="./floqr-action-feedback.js?v=29.09.22"></script>
-<script src="./floqai-help-repository.js?v=s3.1.30"></script>
+<script src="./floqai-help-repository.js?v=s3.1.31"></script>
 <script src="./floqr-i18n-help.js?v=s3.1.24"></script>
 <script src="./help-attach.js?v=s3.1.29"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
@@ -1721,12 +1786,13 @@
 <script src="./floqr-logger.js?v=29.09.90"></script>
 <script src="./payment-service.js?v=29.09.22"></script>
 <script src="./floqr-access-notice.js?v=s3.1.24"></script>
-<script src="./master-admin-app.js?v=s3.1.27"></script>
+<script src="./master-admin-app.js?v=s3.1.31"></script>
 <script src="./master-ad-management.js?v=s3.1.0"></script>
 <script src="./master-admin-translation-overrides.js?v=s3.0.88"></script>
 <script src="./floqr-feature-services.js?v=s3.1.30"></script>
 <script src="./floqr-reason-prompt.js?v=s3.1.30"></script>
 <script src="./master-feature-services.js?v=s3.1.30"></script>
+<script src="./master-demo-employees.js?v=s3.1.31"></script>
 <script src="./floqr-data-classification.js?v=s3.1.24"></script>
 <script src="./master-data-classification.js?v=s3.1.24"></script>
 <script src="./master-admin-shoutouts.js?v=s3.0.98"></script>

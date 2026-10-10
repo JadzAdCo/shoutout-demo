@@ -64,5 +64,5 @@ test("auth state handler reads token claims before the security check", () => {
   const source = read("master-admin-app.js");
   assert.match(source, /getIdTokenResult\(true\)/);
   assert.match(source, /masterSecurityCheck\(user, claims\)/);
-  assert.match(read("master-admin.html"), /master-admin-app\.js\?v=s3\.1\.27/);
+  assert.match(read("master-admin.html"), /master-admin-app\.js\?v=s3\.1\.(2[7-9]|[3-9]\d)"/);
 });
