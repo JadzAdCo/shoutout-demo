@@ -1476,6 +1476,16 @@
       page: "template-tags.html"
     },
     {
+      id: "help-scheduling-schedule-for",
+      title: "Staff Scheduling",
+      body: "Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each calendar has its own $20/month subscription. Shifts sent to you appear under My assignments, where you confirm or decline them.",
+      searchPhrases: ["staff scheduling", "schedule for", "owner id", "whose schedule", "scheduling page", "create shift", "dj schedule", "club schedule", "promoting company schedule", "plan shifts"],
+      links: [{label: "Open Staff Scheduling", href: vUrl("./scheduling.html", {from: "floqai"})}],
+      audiences: ["venueAdmin", "serviceMember"],
+      source: "help-repository-seed",
+      page: "scheduling.html"
+    },
+    {
       id: "help-template-preview",
       title: "Preview a template",
       body: "Tap Preview on any template card to watch it play on a sample board with made-up text and pictures. Switch between the display sizes this venue has. Your own ShoutOut shows your words and photos.",

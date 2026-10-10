@@ -1,0 +1,33 @@
+---
+description: Staff Scheduling page (scheduling.html) — who it is for, satellite sign-in, Schedule for owner picker (s3.1.34)
+alwaysApply: false
+---
+
+# Staff Scheduling page — `scheduling.html` (s3.1.34)
+
+Resume: `@scheduling$` / `$schedule-for$`.
+
+## Who it is for
+
+A **satellite** for the owners of a work calendar: a DJ (their own bookings), a Club Admin / schedule manager (a club), or a promoter (a promoting company). Club Admins also have the Scheduling tab in `admin.html`; this page is the stand-alone version (DJs and promoters have no Club Admin). Master Admins may manage every owner — the server's `canManageOwner` (`functions/scheduling-functions.js`) already returns true for them. Workers confirm shifts under **My assignments** (worker notify links redirect to `patron-portal.html?tab=work-calendar`).
+
+## Sign-in bug fixed in s3.1.34
+
+`firebase-config.js` only sets `window.firebaseConfig`; it never calls `initializeApp`. `scheduling-portal.js` called `firebase.auth()` at load inside `try { } catch { return; }`, so with no app it **silently exited**: nothing bound, status stuck on "Restoring your FLOQR session…", badge on "checking…", Google button left visible. `FLOQRSessionShell.requireSignIn` also gave up after 4 s with no app. Role was never the cause.
+
+Fix: page app runs `if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig)` before `firebase.auth()` (same as `services-app.js`, `pickup-app.js`), and shows a status on init failure. Every satellite page app must start Firebase itself.
+
+Second bug: `data-floqr-auth-chrome` was on the Subscription card, so a signed-in user would lose the badge + Subscribe button (the shell hides auth chrome on sign-in). The chrome is now a separate row with a **Sign in** button → `popupBlocked` (iframe) / `redirectToLogin()` (general sign-in). No Google-only button.
+
+## Schedule for picker
+
+- Segmented radios `portalOwnerType`: `dj` (My DJ schedule) · `club` · `promoterCompany` — the only three `OWNER_TYPES` on the server.
+- `<select id="portalOwnerId">` shows names; values keep the stored format: dj = uid (no input), club = `clubLocations` id, promoterCompany = `promoterCompany` text from the designation (server compares case-insensitively).
+- Sources (`scheduling-owner-picker.js` mirrors `canManageOwner`): `users.clubAdminLocationIds`, active `clubAdminAssignments` (patronUid), `clubLocations` `adminUids` / `adminEmails`, `clubEmployeeDesignations` (workerUid) with Club Admin role or `manageSchedules`, not rejected. Companies: designation status active/approved/elected + promoter role.
+- Master Admin (claim or verified listed email — UI hint only): every `clubLocations` doc (limit 1000) + distinct `promoterCompany` values, with a search box.
+- `?owner=type:id` deep links still preselect; an id not in the lists stays selectable (club label fetched).
+- Choosing an owner never writes. The old client write of `staffSchedulingPaid: 1` (demo) was removed; the server's entitlement resolver handles demo venues.
+
+Help: `help-scheduling-schedule-for` on the **Schedule for** h2 (not the page h1), venueAdmin + serviceMember; in `functions/floqai-content-classes.json` (FloqAi shows it only after `getFloqAiAccess` is redeployed with that manifest). Test: `functions/scheduling-owner-picker.test.js`.
+
+Not done: "Assignee uid" on Create shift is still free text (the Club Admin tab has a roster picker in `admin-scheduling.js`, which is owner-frozen).
