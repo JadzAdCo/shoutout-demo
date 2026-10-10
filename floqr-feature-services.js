@@ -1,7 +1,8 @@
-/* FLOQR Features & Services — Search tile visibility + test-feature page guard.
+/* FLOQR Features & Services — feature link visibility (linkState), Search tiles, test-feature page guard.
    Design notes: .cursor/rules/design-notes-feature-services.mdc */
 (function (root) {
   "use strict";
+  if (root.FLOQRFeatureServices) return;
 
   const COLLECTION = "featureServices";
   const BETA_COLLECTION = "betaTesters";
@@ -29,7 +30,16 @@
   }
 
   function defaults() {
-    return Object.fromEntries(CATALOG.map(row => [row.key, {...row, revision: 0, persisted: false}]));
+    return Object.fromEntries(CATALOG.map(row => [row.key, normalize(row.key, null)]));
+  }
+
+  // Mirrors functions/feature-services-core.js featureLinkFields (the server writes these with the flags).
+  function deriveLinkFields(row) {
+    const enabled = flag(row?.IsFeatureEnabled);
+    return {
+      enableFeatureLink: enabled,
+      enableBetaFeatureLink: enabled === 1 && flag(row?.IsTestFeature) === 1 ? 1 : 0
+    };
   }
 
   function normalize(key, raw) {
@@ -37,10 +47,19 @@
     if (!base) return null;
     const data = raw || {};
     const has = field => Object.prototype.hasOwnProperty.call(data, field);
+    const flags = {
+      IsFeatureEnabled: has("IsFeatureEnabled") ? flag(data.IsFeatureEnabled) : base.IsFeatureEnabled,
+      IsTestFeature: has("IsTestFeature") ? flag(data.IsTestFeature) : base.IsTestFeature
+    };
+    const derived = deriveLinkFields(flags);
+    const stored = has("enableFeatureLink") && has("enableBetaFeatureLink");
     return {
       ...base,
-      IsFeatureEnabled: has("IsFeatureEnabled") ? flag(data.IsFeatureEnabled) : base.IsFeatureEnabled,
-      IsTestFeature: has("IsTestFeature") ? flag(data.IsTestFeature) : base.IsTestFeature,
+      ...flags,
+      enableFeatureLink: has("enableFeatureLink") ? flag(data.enableFeatureLink) : derived.enableFeatureLink,
+      enableBetaFeatureLink: has("enableBetaFeatureLink") ? flag(data.enableBetaFeatureLink) : derived.enableBetaFeatureLink,
+      linkFieldsStored: stored,
+      linkFieldsDrifted: !!raw && (!stored || flag(data.enableFeatureLink) !== derived.enableFeatureLink || flag(data.enableBetaFeatureLink) !== derived.enableBetaFeatureLink),
       revision: Number(data.revision || 0),
       updatedByEmail: data.updatedByEmail || "",
       updatedAtMs: Number(data.updatedAtMs || 0),
@@ -101,37 +120,84 @@
     return stateOf(rows[key]) === "test";
   }
 
+  /**
+   * The one rule every feature link uses (Search tiles, profile menus, My Profile tabs, FloqAi results).
+   * show = enableFeatureLink==1 AND the access rule. beta = shown AND enableBetaFeatureLink==1 (render the Beta pill).
+   * surface "search": test features only for granted beta testers (Master Admins open them from Features & Services).
+   * Any other surface: Master Admins also see test features, because they can open them.
+   */
+  function linkState(key, {surface = "link", who = viewer, rows = features} = {}) {
+    const row = rows[key];
+    if (!row) return {key, show: false, beta: false, state: "off", enableFeatureLink: 0, enableBetaFeatureLink: 0};
+    const fields = {
+      enableFeatureLink: flag(row.enableFeatureLink ?? deriveLinkFields(row).enableFeatureLink),
+      enableBetaFeatureLink: flag(row.enableBetaFeatureLink ?? deriveLinkFields(row).enableBetaFeatureLink)
+    };
+    const allowed = surface === "search" ? searchVisible(key, who, rows) : canAccess(key, who, rows);
+    const show = fields.enableFeatureLink === 1 && allowed;
+    return {key, show, beta: show && fields.enableBetaFeatureLink === 1, state: stateOf(row), ...fields};
+  }
+
   function betaGrantsFrom(row) {
     if (!row || flag(row.IsBetaTester) !== 1 || row.status !== "active") return {};
     const raw = row.features || {};
     return Object.fromEntries(BETA_ELIGIBLE_KEYS.filter(key => flag(raw[key]) === 1).map(key => [key, 1]));
   }
 
+  async function hasAdminClaim(user) {
+    try {
+      const claims = (await user?.getIdTokenResult?.())?.claims || {};
+      return claims.masterAdmin === true || claims.superAdmin === true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  let loaded = null;
+
   async function load({db, user, profile} = {}) {
     const database = db || root.firebase?.firestore?.();
     const next = defaults();
     let betaRow = null;
+    let claimAdmin = false;
     if (database && user?.uid) {
-      const [featureSnap, betaSnap] = await Promise.all([
+      const [featureSnap, betaSnap, claim] = await Promise.all([
         database.collection(COLLECTION).get().catch(error => {
           console.warn("Features & Services unavailable; using packaged defaults", error?.message || error);
           return null;
         }),
-        database.collection(BETA_COLLECTION).doc(user.uid).get().catch(() => null)
+        database.collection(BETA_COLLECTION).doc(user.uid).get().catch(() => null),
+        hasAdminClaim(user)
       ]);
       featureSnap?.forEach(doc => {
         const row = normalize(doc.id, doc.data());
         if (row) next[doc.id] = row;
       });
       betaRow = betaSnap?.exists ? betaSnap.data() || {} : null;
+      claimAdmin = claim;
     }
     features = next;
     viewerUser = user || null;
     viewerProfile = profile || null;
-    const isMasterAdmin = isMasterAdminUser(user, profile);
+    const isMasterAdmin = claimAdmin || isMasterAdminUser(user, profile);
     const betaFeatures = isMasterAdmin ? {} : betaGrantsFrom(betaRow);
     viewer = {uid: user?.uid || "", isMasterAdmin, isBetaTester: Object.keys(betaFeatures).length > 0, betaFeatures};
-    return {features: getFeatures(), viewer: getViewer()};
+    const result = {features: getFeatures(), viewer: getViewer()};
+    loaded = {uid: user?.uid || "", promise: Promise.resolve(result)};
+    return result;
+  }
+
+  /** Loads once per signed-in uid and shares the result between surfaces on the same page. */
+  function ensureLoaded({db, user, profile} = {}) {
+    const uid = user?.uid || "";
+    if (loaded && loaded.uid === uid) return loaded.promise;
+    const promise = load({db, user, profile}).catch(error => {
+      console.warn("Feature links fell back to packaged defaults", error?.message || error);
+      loaded = null;
+      return {features: getFeatures(), viewer: getViewer()};
+    });
+    loaded = {uid, promise};
+    return promise;
   }
 
   function getViewer() {
@@ -147,8 +213,9 @@
   function applySearchUi(doc = document) {
     const betaLabel = t("cat.betaPill", "Beta");
     CATALOG.forEach(base => {
-      const allowed = searchVisible(base.key) && patronGateAllows(base);
-      const beta = allowed && isBetaOnly(base.key);
+      const link = linkState(base.key, {surface: "search"});
+      const allowed = link.show && patronGateAllows(base);
+      const beta = allowed && link.beta;
       base.buttonIds.forEach(id => {
         const el = doc.getElementById(id);
         if (!el) return;
@@ -159,6 +226,69 @@
         if (beta) el.dataset.betaLabel = betaLabel;
         else delete el.dataset.betaLabel;
       });
+    });
+  }
+
+  function ensureLinkStyles(doc) {
+    if (doc.getElementById("floqrFeatureLinkStyles")) return;
+    const style = doc.createElement("style");
+    style.id = "floqrFeatureLinkStyles";
+    style.textContent = ".feature-beta-pill{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:999px;background:#dfff5a;color:#10132a;font-size:10px;font-weight:900;letter-spacing:.04em;line-height:1.5;text-transform:uppercase;vertical-align:middle}";
+    doc.head?.appendChild(style);
+  }
+
+  function setBetaPill(el, beta, doc) {
+    const existing = el.querySelector(":scope > .feature-beta-pill");
+    el.classList.toggle("feature-beta-link", beta);
+    if (!beta) {
+      existing?.remove();
+      return;
+    }
+    const pill = existing || doc.createElement("span");
+    pill.className = "feature-beta-pill";
+    pill.textContent = t("cat.betaPill", "Beta");
+    if (!existing) el.appendChild(pill);
+  }
+
+  function setLinkVisible(el, visible, panelSelector, key) {
+    const gates = root.FLOQRTabGates;
+    if (gates?.apply) {
+      gates.apply({tab: el, panel: panelSelector || null, visible, reason: `feature-link:${key}`});
+      return;
+    }
+    el.classList.toggle("hidden", !visible);
+    el.hidden = !visible;
+    el.setAttribute("aria-hidden", visible ? "false" : "true");
+    if (!visible) el.classList.remove("active");
+    const panel = panelSelector ? root.document?.querySelector(panelSelector) : null;
+    if (panel) {
+      panel.classList.toggle("hidden", !visible);
+      if (!visible) panel.classList.remove("active");
+    }
+  }
+
+  /**
+   * Shows/hides every <… data-floqr-feature-link="key"> under scope and adds the Beta pill.
+   * Optional: data-floqr-feature-surface="search" and data-floqr-feature-panel="#panelId" (tab + panel).
+   */
+  const linkScopes = new Set();
+
+  function applyFeatureLinks(scope = root.document) {
+    const doc = scope?.ownerDocument || scope;
+    if (!scope?.querySelectorAll || !doc?.createElement) return [];
+    ensureLinkStyles(doc);
+    if (!linkScopes.size) root.addEventListener?.("floqr:ui-language", () => {
+      linkScopes.forEach(node => { if (node === doc || node.isConnected) applyFeatureLinks(node); });
+    });
+    linkScopes.add(scope);
+    return [...scope.querySelectorAll("[data-floqr-feature-link]")].map(el => {
+      const key = el.dataset.floqrFeatureLink;
+      const base = CATALOG.find(row => row.key === key);
+      const link = linkState(key, {surface: el.dataset.floqrFeatureSurface || "link"});
+      const visible = !!base && link.show && patronGateAllows(base);
+      setLinkVisible(el, visible, el.dataset.floqrFeaturePanel || "", key);
+      setBetaPill(el, visible && link.beta, doc);
+      return {key, visible, beta: visible && link.beta};
     });
   }
 
@@ -278,6 +408,7 @@
   }
 
   function autoGuard() {
+    if (document.head && document.getElementById) ensureLinkStyles(document);
     const key = document.body?.dataset?.floqrFeature;
     if (!key) return;
     guardPage({featureKey: key});
@@ -295,9 +426,13 @@
     searchVisible,
     hasBetaGrant,
     isBetaOnly,
+    deriveLinkFields,
+    linkState,
     betaGrantsFrom,
     load,
+    ensureLoaded,
     applySearchUi,
+    applyFeatureLinks,
     guardPage,
     waitForUser,
     getFeatures,

@@ -1,4 +1,5 @@
-/* global-profile-status.js s3.0.5 — translated profile pill; admin hubs open patron apps in a new tab */
+/* global-profile-status.js s3.1.30 — translated profile pill; admin hubs open patron apps in a new tab;
+   feature links follow Features & Services (FLOQRFeatureServices.linkState). */
 (function(){
   "use strict";
   if (window.__FLOQR_GLOBAL_PROFILE_STATUS__) return;
@@ -39,6 +40,30 @@
   }
   function hrefFloqAi() {
     return window.FLOQRNav?.intentSearchHome?.() || "./?start=intent";
+  }
+  let featureServicesLoading = null;
+  function ensureFeatureServices() {
+    if (window.FLOQRFeatureServices) return Promise.resolve(window.FLOQRFeatureServices);
+    if (featureServicesLoading) return featureServicesLoading;
+    featureServicesLoading = new Promise(resolve => {
+      const script = document.createElement("script");
+      const v = window.FLOQRNav?.appVersion || "";
+      script.src = `./floqr-feature-services.js${v ? `?v=${encodeURIComponent(v)}` : ""}`;
+      script.onload = () => resolve(window.FLOQRFeatureServices || null);
+      script.onerror = () => resolve(null);
+      document.head.appendChild(script);
+    });
+    return featureServicesLoading;
+  }
+  // Feature links render hidden and stay hidden unless Features & Services allows them (fail closed).
+  function featureLink(key, href, label, blank) {
+    return `<a class="profile-menu-link hidden" hidden aria-hidden="true" data-floqr-feature-link="${esc(key)}" href="${esc(href)}"${blank}>${esc(label)}</a>`;
+  }
+  async function applyFeatureLinks(dropdown, db, user, profile) {
+    const fs = await ensureFeatureServices();
+    if (!fs?.linkState || !dropdown.isConnected) return;
+    await fs.ensureLoaded({db, user, profile});
+    fs.applyFeatureLinks(dropdown);
   }
   function initials(user, profile = {}){
     const name = profile.displayName || user?.displayName || user?.email || "Patron";
@@ -103,12 +128,14 @@
       ${hint}
       <a class="profile-menu-link" href="${esc(hrefPortal("profile"))}"${blank}>${esc(t("portal.title", "My Profile and Settings"))}</a>
       <a class="profile-menu-link" href="${esc(hrefPortal("inbox"))}"${blank}>${esc(t("nav.inbox", "FloqR Inbox"))} (${esc(c.messages)})</a>
-      <a class="profile-menu-link" href="${esc(hrefMingl())}"${blank}>${esc(t("nav.minglChat", "Mingl Chat"))} (${esc(c.chats)})</a>
-      <a class="profile-menu-link" href="${esc(hrefStamp("./commerce.html", { from: "search" }))}"${blank}>${esc(t("nav.bartr", "BartR"))}</a>
-      <a class="profile-menu-link" href="${esc(hrefStamp("./rydr.html", { from: "search" }))}"${blank}>${esc(t("cat.rydr", "RydR"))}</a>
-      <a class="profile-menu-link" href="${esc(hrefFloqAi())}"${blank}>${esc(t("cat.floqai", "FloqAi"))}</a>
+      ${featureLink("mingl", hrefMingl(), `${t("nav.minglChat", "Mingl Chat")} (${c.chats})`, blank)}
+      ${featureLink("bartr", hrefStamp("./commerce.html", { from: "search" }), t("nav.bartr", "BartR"), blank)}
+      ${featureLink("rydr", hrefStamp("./rydr.html", { from: "search" }), t("cat.rydr", "RydR"), blank)}
+      ${featureLink("supRstar", hrefStamp("./suprstr-search.html", { from: "search" }), t("cat.suprstar", "supRstar"), blank)}
+      ${featureLink("floqAi", hrefFloqAi(), t("cat.floqai", "FloqAi"), blank)}
       <button id="floqrGlobalSignOutBtn" type="button">${esc(t("app.signOut", "Sign out"))}</button>`;
     dropdown.querySelector("#floqrGlobalSignOutBtn")?.addEventListener("click", () => firebase.auth().signOut());
+    applyFeatureLinks(dropdown, db, user, profile).catch(error => console.warn("Profile menu feature links", error?.message || error));
   }
   function warnAdminPatronTab() {
     const feedback = window.FLOQRActionFeedback;

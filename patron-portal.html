@@ -37,13 +37,13 @@
         <button class="admin-tab" data-panel="portalShoutouts" type="button" data-i18n="nav.myShoutouts">My ShoutOuts</button>
         <button class="admin-tab" data-panel="portalGuestLists" type="button" data-i18n="nav.guestLists">My Guest Lists</button>
         <button class="admin-tab" data-panel="portalPaidServices" type="button" data-i18n="nav.paidServices">Paid Services & Orders</button>
-        <button class="admin-tab" data-panel="portalBartrStore" type="button" data-i18n="nav.bartrStore">BartR Store</button>
+        <button class="admin-tab hidden" hidden data-panel="portalBartrStore" data-floqr-feature-link="bartr" data-floqr-feature-panel="#portalBartrStore" type="button" data-i18n="nav.bartrStore">BartR Store</button>
         <button class="admin-tab hidden" id="portalAdCampaignsTab" data-panel="portalAdCampaigns" type="button" data-i18n="nav.adCampaigns">Ad Campaigns</button>
         <button class="admin-tab" data-panel="portalMessages" type="button" data-i18n="nav.inbox">FloqR Inbox</button>
-        <button class="admin-tab" data-panel="portalMinglFriends" type="button" data-i18n="nav.minglFriends">Manage Mingl Friends</button>
-        <a class="admin-tab-link buttonlike" href="./mingl-chat.html?v=29.09.8&from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
+        <button class="admin-tab hidden" hidden data-panel="portalMinglFriends" data-floqr-feature-link="mingl" data-floqr-feature-panel="#portalMinglFriends" type="button" data-i18n="nav.minglFriends">Manage Mingl Friends</button>
+        <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="mingl" href="./mingl-chat.html?v=s3.1.30&from=portal" data-i18n="nav.minglChat">Mingl Chat</a>
         <a class="admin-tab-link buttonlike" href="./services.html?v=29.09.8&from=portal" data-i18n="nav.followServices">Follow Services</a>
-        <a class="admin-tab-link buttonlike" href="./commerce.html?v=29.09.8&from=portal" data-i18n="nav.openBartr">Open BartR</a>
+        <a class="admin-tab-link buttonlike hidden" hidden data-floqr-feature-link="bartr" href="./commerce.html?v=s3.1.30&from=portal" data-i18n="nav.openBartr">Open BartR</a>
         <button class="admin-tab hidden" id="portalWorkCalendarTab" data-panel="portalWorkCalendar" type="button" data-i18n="nav.workCalendar">Work Calendar</button>
         <button class="admin-tab hidden" id="portalServiceMembersTab" data-panel="portalServiceMembers" type="button" data-i18n="nav.serviceMembers">Services &amp; Service Members</button>
         <button class="admin-tab" data-panel="portalHelp" type="button" data-i18n="nav.help">Help</button>
@@ -744,7 +744,7 @@
 <script src="./floqr-people-directory.js?v=s3.1.26"></script>
 <script src="./floqr-app-check.js?v=s3.0.67"></script>
 <script src="./floqr-nav.js?v=s3.1.1"></script>
-<script src="./global-profile-status.js?v=s3.0.5"></script>
+<script src="./global-profile-status.js?v=s3.1.30"></script>
 <script src="./floqr-temp-qa-showcase.js?v=s3.1.26"></script>
 <script src="./shared-data.js?v=s3.1.26"></script>
 <script src="./url-media-field.js?v=29.09.17"></script>
@@ -756,6 +756,7 @@
 <script src="./ai-grammar-service.js?v=29.09.8"></script>
   <script src="./floqr-action-feedback.js?v=29.09.8"></script>
 <script src="./floqr-tab-gates.js?v=s3.0.11"></script>
+<script src="./floqr-feature-services.js?v=s3.1.30"></script>
 <script src="./floqr-i18n.js?v=s3.1.26"></script>
 <script src="./floqai-help-repository.js?v=s3.1.26"></script>
 <script src="./floqr-i18n-help.js?v=s3.1.26"></script>
@@ -777,7 +778,7 @@
 <script src="./floqr-ad-composer.js?v=s3.1.0"></script>
 <script src="./patron-ad-campaigns.js?v=s3.1.0"></script>
 <script src="./floqr-access-notice.js?v=s3.1.26"></script>
-<script src="./patron-portal-app.js?v=s3.1.26"></script>
+<script src="./patron-portal-app.js?v=s3.1.30"></script>
   <script src="./profile-access-guard.js?v=29.09.8"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));

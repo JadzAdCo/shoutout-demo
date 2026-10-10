@@ -160,6 +160,7 @@ function featureDoc(feature, request, actorEmail, reason, nowMs) {
     sortOrder: feature.sortOrder,
     IsFeatureEnabled: feature.IsFeatureEnabled,
     IsTestFeature: feature.IsTestFeature,
+    ...core.featureLinkFields(feature),
     revision: feature.revision,
     lastChangeReason: reason,
     updatedAt: FieldValue.serverTimestamp(),
@@ -179,15 +180,23 @@ exports.setFeatureServiceFlags = onCall(CALL_OPTS, async request => {
       const snap = await tx.get(ref);
       const head = await tx.get(headRef());
       const before = core.normalizeFeature(featureKey, snap.exists ? snap.data() : null);
-      const after = {...before, ...next, revision: before.revision + 1};
+      const flags = {...before, ...next};
+      const after = {...flags, ...core.featureLinkFields(flags), revision: before.revision + 1};
       const eventType = core.flagEventType(before, after);
       if (!eventType) throw new HttpsError("failed-precondition", "Nothing changed — the feature already has those values.");
       tx.set(ref, featureDoc(after, request, email, reason, nowMs), {merge: true});
+      const auditFields = row => ({
+        IsFeatureEnabled: row.IsFeatureEnabled,
+        IsTestFeature: row.IsTestFeature,
+        enableFeatureLink: row.enableFeatureLink,
+        enableBetaFeatureLink: row.enableBetaFeatureLink,
+        revision: row.revision
+      });
       const eventId = appendChainedAudit(tx, head, auditRecord(request, {
         eventType,
         target: {type: "feature", id: featureKey},
-        before: {IsFeatureEnabled: before.IsFeatureEnabled, IsTestFeature: before.IsTestFeature, revision: before.revision},
-        after: {IsFeatureEnabled: after.IsFeatureEnabled, IsTestFeature: after.IsTestFeature, revision: after.revision},
+        before: auditFields(before),
+        after: auditFields(after),
         reason,
         sessionId,
         nowMs
@@ -200,33 +209,55 @@ exports.setFeatureServiceFlags = onCall(CALL_OPTS, async request => {
   }
 });
 
+/** Seeds missing feature docs and backfills enableFeatureLink / enableBetaFeatureLink on existing docs (flags and revision untouched). */
 exports.seedFeatureServices = onCall(CALL_OPTS, async request => {
   const {email, sessionId} = await assertAdmin(request, "feature.seed");
   const nowMs = Date.now();
-  const created = await db.runTransaction(async tx => {
+  const result = await db.runTransaction(async tx => {
     const refs = core.FEATURE_KEYS.map(key => db.collection(C.features).doc(key));
     const snaps = await Promise.all(refs.map(ref => tx.get(ref)));
     const head = await tx.get(headRef());
     const missing = snaps.map((snap, i) => (snap.exists ? null : core.FEATURE_KEYS[i])).filter(Boolean);
-    if (!missing.length) return [];
+    const drifted = snaps.map((snap, i) => (snap.exists && core.linkFieldsDrifted(snap.data()) ? core.FEATURE_KEYS[i] : null)).filter(Boolean);
+    if (!missing.length && !drifted.length) return {created: [], backfilled: []};
     missing.forEach(key => {
       const feature = {...core.normalizeFeature(key, null), revision: 1};
       tx.set(db.collection(C.features).doc(key), featureDoc(feature, request, email, "Initial seed from packaged catalog", nowMs));
     });
-    appendChainedAudit(tx, head, auditRecord(request, {
+    const backfill = Object.fromEntries(drifted.map(key => {
+      const raw = snaps[core.FEATURE_KEYS.indexOf(key)].data() || {};
+      return [key, {before: {enableFeatureLink: raw.enableFeatureLink ?? null, enableBetaFeatureLink: raw.enableBetaFeatureLink ?? null}, after: core.featureLinkFields(raw)}];
+    }));
+    Object.entries(backfill).forEach(([key, row]) => {
+      tx.set(db.collection(C.features).doc(key), {...row.after, linkFieldsBackfilledAtMs: nowMs}, {merge: true});
+    });
+    const seeded = Object.fromEntries(missing.map(key => {
+      const f = core.normalizeFeature(key, null);
+      return [key, {IsFeatureEnabled: f.IsFeatureEnabled, IsTestFeature: f.IsTestFeature, ...core.featureLinkFields(f)}];
+    }));
+    const backfillBefore = Object.fromEntries(Object.entries(backfill).map(([key, row]) => [key, row.before]));
+    const backfillAfter = Object.fromEntries(Object.entries(backfill).map(([key, row]) => [key, row.after]));
+    // One chained event per call: the audit head doc is written once per transaction.
+    appendChainedAudit(tx, head, auditRecord(request, missing.length ? {
       eventType: "feature.seeded",
       target: {type: "featureCatalog", id: C.features},
-      after: Object.fromEntries(missing.map(key => {
-        const f = core.normalizeFeature(key, null);
-        return [key, {IsFeatureEnabled: f.IsFeatureEnabled, IsTestFeature: f.IsTestFeature}];
-      })),
+      after: seeded,
       reason: "Initial seed from packaged catalog",
+      detail: drifted.length ? {linksBackfilled: {before: backfillBefore, after: backfillAfter}} : null,
+      sessionId,
+      nowMs
+    } : {
+      eventType: "feature.links_backfilled",
+      target: {type: "featureCatalog", id: C.features},
+      before: backfillBefore,
+      after: backfillAfter,
+      reason: "Derived link datapoints backfilled from IsFeatureEnabled / IsTestFeature",
       sessionId,
       nowMs
     }));
-    return missing;
+    return {created: missing, backfilled: drifted};
   });
-  return {ok: true, created};
+  return {ok: true, ...result};
 });
 
 exports.createBetaInvite = onCall(CALL_OPTS, async request => {

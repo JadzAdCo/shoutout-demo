@@ -1,0 +1,211 @@
+---
+description: Features & Services — IsFeatureEnabled / IsTestFeature flags, beta testers, test branch + promotion, hash-chained audit (ISO 27001 / NIST 800-53r5)
+alwaysApply: true
+---
+
+# Features & Services (always)
+
+Resume: `@features$` / `$beta$`. Shipped in **s3.0.108**; access matrix + per-feature beta RBAC + sign-in redirect in **s3.0.110** (sections below marked s3.0.110 win over older text).
+
+Master Admin → **Features & Services** decides which Search link buttons exist for whom. Only **ShoutOut** is live by default. Everything else is a **test feature** until a Master Admin turns it Live.
+
+## Data model (Firestore)
+
+| Collection | Doc | Key fields | Read | Write |
+|---|---|---|---|---|
+| `featureServices` | `{featureKey}` | `IsFeatureEnabled` 0\|1, `IsTestFeature` 0\|1, `revision`, `updatedByEmail`, `updatedAtMs`, `lastChangeReason` | signed in | Functions only |
+| `betaTesters` | `{uid}` | `IsBetaTester` 0\|1, `status` active\|revoked, `role: "betaTester"`, **`features` {key: 0\|1}** (s3.0.110), `featuresUpdatedAtMs`, `featuresUpdatedByEmail`, `inviteId`, `invitedByEmail`, `acceptedAtMs`, `revokedByEmail`, `revokeReason` | self + Master Admin | Functions only |
+| `betaInvites` | `sha256("floqr-beta-invite:"+token)` | `targetUid`, **`features`** (grant applied on accept), `status` pending\|accepted\|declined\|revoked, `expiresAtMs` (7 days), `createdByEmail` | Master Admin | Functions only |
+| `featureServiceAccessThrottle` | `{uid}` | window start + count for `logFeatureAccessAttempt` (20 / 10 min) | nobody | Functions only |
+| `featureServiceAuditLogs` | auto | see Audit | Master Admin | Functions only |
+| `featureServiceAuditHead` | `current` | `hash`, `seq`, `eventId` | Master Admin | Functions only |
+
+Feature keys (catalog in `functions/feature-services-core.js`, mirrored in `floqr-feature-services.js`; a test asserts parity): `shoutOut` {1,0}, `mingl`, `bartr`, `rydr`, `supRstar`, `floqAi` {0,1}. Missing doc → packaged default (fail closed for non-ShoutOut). Master Admin auto-seeds missing docs on first unlock (`seedFeatureServices`).
+
+## Access matrix (s3.0.110 — by design, owner-confirmed)
+
+The two switches sit side by side on each Features & Services row. `IsFeatureEnabled` is the master switch; `IsTestFeature` only means something when `IsFeatureEnabled = 1`. A feature can have passed testing and still sit parked with `IsFeatureEnabled = 0` — the Beta flag is **not** applied then.
+
+| IsFeatureEnabled | IsTestFeature | state | Regular patron | Beta tester granted this feature | Master Admin |
+|---|---|---|---|---|---|
+| 0 | 0 or 1 | `off` | nothing | nothing | nothing (page + server denied); F&S row shows “Off” instead of the Open link |
+| 1 | 1 | `test` | hidden / denied | **Search tile** (Beta pill) + page + server | **no Search tile**; opens it from the F&S **Master Admin link**; page + server allowed |
+| 1 | 0 | `live` | yes | yes | yes |
+
+```
+state        = IsFeatureEnabled != 1 ? "off" : (IsTestFeature == 1 ? "test" : "live")
+hasBetaGrant = !isMasterAdmin && betaTesters/{uid}.IsBetaTester==1 && status=="active" && features[key]==1
+canAccess    = off → false · live → true · test → isMasterAdmin || hasBetaGrant      (pages + server)
+searchVisible= off → false · live → true · test → hasBetaGrant                       (Search tiles; Master Admins excluded)
+Search tile shown = searchVisible && legacy patronFeatureGates.patronMayUse
+```
+
+Server: `featureState` / `canAccessFeature` / `searchTileVisible` / `betaGrantsFrom` in `functions/feature-services-core.js`. Client mirror: `stateOf` / `canAccess` / `searchVisible` / `hasBetaGrant` / `betaGrantsFrom` in `floqr-feature-services.js`. `feature-services-core.test.js` runs the full matrix against **both** (server + vm-loaded client).
+
+**RBAC — Master Admins and beta testers are disjoint roles.** A privileged account (`isPrivilegedProfile`: admin email list or `users.superAdmin` / master-admin role fields) can never be a beta tester: `createBetaInvite` refuses (unchained `beta.invite_denied`), `acceptBetaInvite` refuses, and `viewerFor` forces `isBetaTester=false` even if a stale `betaTesters` row exists. A beta tester gets **only the features ticked for them** (`features` map). ShoutOut is never a beta feature (`BETA_ELIGIBLE_KEYS`).
+
+**Legacy testers (pre-s3.0.110)** have no `features` map → they see **no** test feature (fail closed). Master Admin must tick features and press **Save feature access** (`setBetaTesterFeatures`).
+
+Enforcement points:
+
+1. **Search tiles** — `index.html` ships non-ShoutOut tiles with `hidden`; `patron-app.js` `continueToMainCategories` → `FLOQRFeatureServices.load` + `applySearchUi` (runs after `applyPatronGateUi`) using `searchVisible`. Test tiles get `.feature-beta` pill (`cat.betaPill`). `?start=intent` now redirects to `floqai.html` (s3.1.20, guarded page — see `design-notes-floqai-page.mdc`); the in-index fallback to categories stays as a safety net.
+2. **Satellite pages** — `<body data-floqr-feature="key">` + `floqr-feature-services.js`: hides body until checked. **Signed out → `FLOQRSessionShell.redirectToLogin()`** (general sign-in, see below); `data-floqr-feature-signed-out="allow"` was removed everywhere in s3.0.110. Signed in but denied → “This feature isn't available on your account yet.” + Back to Search, and `logFeatureAccessAttempt` records it. 8 s timeout = deny. Guarded: `commerce.html` (bartr), `pickup.html` + `rydr.html` (rydr), `suprstr-search.html` + `suprstar-preview.html` (supRstar), `mingl-chat.html` + `mingl-gist.html` (mingl).
+3. **Server** — `assertFeatureAccess(auth, key)` in `createFloqrCheckoutSession` (`CHECKOUT_FEATURE_KEYS`) and `requestTeslaRobotaxiPickup`; denial detail carries `state` + `surface: "server"`. Client guards are UX; the server check is the control.
+
+## Feature link datapoints (s3.1.30)
+
+Two derived `0|1` fields on `featureServices/{featureKey}`:
+
+| Field | Value |
+|---|---|
+| `enableFeatureLink` | `IsFeatureEnabled` |
+| `enableBetaFeatureLink` | `IsFeatureEnabled == 1 && IsTestFeature == 1 ? 1 : 0` |
+
+- Written **only by the server**, in the same transaction as the flags: `setFeatureServiceFlags` (`after = {...flags, ...featureLinkFields(flags), revision+1}`; audit before/after carry both), `seedFeatureServices` (new docs). Never independently editable (rules keep `featureServices` Functions-write-only). Helpers: `featureLinkFields` / `linkFieldsDrifted` in `functions/feature-services-core.js`; client mirror `deriveLinkFields`.
+- **Backfill:** `seedFeatureServices` also merges the two fields into existing docs that miss or disagree (`linkFieldsBackfilledAtMs`, flags + revision untouched) and writes **one** chained event per call (`feature.seeded` with `detail.linksBackfilled`, or `feature.links_backfilled`). Master Admin F&S tab calls seed automatically when any row is drifted (SOS2FA unlock required). Until then the client derives the fields from the flags.
+- **One client API:** `FLOQRFeatureServices.linkState(key, {surface}) → {show, beta, state, …}`. `show = enableFeatureLink == 1 && access`, where access = `searchVisible` for `surface: "search"` (Master Admins excluded from test tiles) and `canAccess` everywhere else. `beta = show && enableBetaFeatureLink == 1` → append `.feature-beta-pill` (`cat.betaPill`).
+- **Master Admin profile menu shows test features with a Beta pill** (canAccess), even though Search hides them — by design (s3.1.30).
+- Surfaces (all through `linkState` / `applyFeatureLinks` with `data-floqr-feature-link="key"`, hidden via `FLOQRTabGates.apply` / `hidden`, never one-off CSS): Search tiles (`applySearchUi`), profile avatar menu (`global-profile-status.js` on satellites; `patron-app.js` `#userDropdown` on Search: Mingl Chat), My Profile tabs/links (`patron-portal.html` BartR Store tab + Manage Mingl Friends tab with `data-floqr-feature-panel`, Mingl Chat / Open BartR links), FloqAi product cards (`intent-search.js` `featureKey` + `featureLinkShown`). ShoutOut is always live. Server `assertFeatureAccess` unchanged.
+- Master Admin detection on the client also reads token claims (`masterAdmin` / `superAdmin`) so claim-only admins get the Beta menu entries.
+
+## F&S table + reason prompt (s3.1.30)
+
+- Headers: **Enable Feature** (`title` = IsFeatureEnabled) and **Enable Beta Feature** (`title` = IsTestFeature); 0/1 stays under each checkbox. Revision shows **Revision N** (`title` "Number of saved changes to this feature").
+- The Master Admin Open link lives in the Feature cell under the name + state; off rows say "Off — set Enable Feature to 1 to open it." Table on PC, label/value cards ≤900px, single column ≤480px (`admin.css` `.feature-flags-*`).
+- No standing reason input. Reason is asked after Save by `FLOQRReasonPrompt` (modal / phone bottom sheet, min 8) for row Save, tester Save feature access, Revoke, and Record promotion. Contract: `reason-prompt-on-save.mdc`.
+- Intro paragraph moved into the F&S heading `?` (`help-features-services`, masterAdmin).
+
+## Sign-in redirect on every page (s3.0.110)
+
+A forwarded / bookmarked URL opened while signed out must land on the **general** FLOQR sign-in (Search Welcome card: Google, Microsoft, Facebook, Email, SMS, WhatsApp) — never a Google-only card.
+
+- URL contract: `./?v=<APP_V>&profileRequired=sign-in&returnTo=<file?query#hash>` — same shape as `profile-access-guard.js` (hubs). `patron-app.js` `safeReturnTo` validates it (same-origin relative file only) and returns there after sign-in; Welcome status shows `app.signInToContinue`.
+- `floqr-session-shell.js`: `loginHref()`, `redirectToLogin()`, and `requireSignIn()` which **auto-runs on every page that loads the shell** (even pages that never call `bind`). It never calls `initializeApp` — it polls ≤ 4 s for an existing Firebase app (many page apps call `initializeApp` unguarded), then waits ≤ 15 s for the persisted user.
+- `bind()` no longer shows a Google button on standalone signed-out pages; it redirects instead.
+- **Never redirect:** iframes / `embed=1` / `from=portal` (they keep the “open My Profile” link), and public pages: `index`, `display`, `display2`, `display-error`, `privacy`, `translation-policy`, `auth-debug`, or any page with `<body data-floqr-public>`.
+- Hubs keep `profile-access-guard.js`; `club-profile` keeps its own redirect. s3.0.110 added the shell to `rydr.html`, `onboard-dc-venues.html`, `seed*.html`, `mobile-test-checklist.html`, `firestore-rebrand-*.html` (the `migrations/` copies are not served paths and were left alone).
+- New satellite = load the shell after `firebase-config.js`; nothing else is needed for the redirect.
+
+New feature checklist: add to both catalogs + `buttonIds`, add `data-feature-key` tile (hidden), guard its satellite page, add `assertFeatureAccess` to its paid/stateful callables, help + i18n.
+
+## Callables (`functions/feature-services-functions.js`, us-central1)
+
+All admin callables require an **SOS2FA** session (`assertSos2faSession`, scope `entityManagement`); failures log `*.denied` (unchained).
+
+`setFeatureServiceFlags` (reason ≥ 8 chars, transaction: doc + chained audit) · `seedFeatureServices` · `createBetaInvite` (`featureKeys` required, ≥ 1 eligible key; privileged target refused; Inbox row `type: betaInvite` lists the features, link `./beta-invite.html?t=…`) · `acceptBetaInvite` / `declineBetaInvite` (patron, token must match `targetUid`; accept writes `features` + `role`, refuses Master Admins) · **`setBetaTesterFeatures`** (s3.0.110; SOS2FA, reason, active tester only, “Nothing changed” guard, chained `beta.features_changed` with before/after) · `revokeBetaTester` (reason; voids pending invites) · `revokeBetaInvite` · `logFeatureCodePromotion` (returns GitHub workflow URL) · `verifyFeatureServiceAuditChain`.
+
+Patron-side logging callable **`logFeatureAccessAttempt({featureKey, page})`** (s3.0.110): signed-in only; transactional throttle 20 / 10 min per uid in `featureServiceAccessThrottle`; the **server re-evaluates** access and writes an unchained `feature.page_denied` row only when access really is denied (client cannot forge an “allowed” row or flood the chain).
+
+## Beta testers
+
+- Master Admin searches patrons (client scan of `users`, 500), ticks **Features this tester may use** (`#betaInviteFeatures`) → **Invite** → Inbox message + link copied to clipboard (share by any channel).
+- Tester list shows per-feature checkboxes + **Save feature access** (reason prompt → `setBetaTesterFeatures`).
+- `beta-invite.html` shows the granted features after Accept, or “Master Admins cannot be beta testers” (`beta.masterAdmin`).
+- Token: 32 random bytes (base64url); only its SHA-256 is stored. Link is useless on another account (`wrong-account`), after 7 days, or once used. `beta-invite.html` strips `t` from the address bar after responding and sets `no-referrer`.
+- Inbox button label: **Review beta invite** (`patron-portal-app.js` `inboxLinkLabel`).
+
+## Test branch and promotion
+
+GitHub Pages serves **one** branch (`main`). So runtime flags are the real gate (trunk-based dark launch): test code can live on `main` behind `IsTestFeature`.
+
+- `test` branch = staging code line created from `main`. `sync-main-into-test.yml` merges every push to `main` into `test` (fails loudly on conflict).
+- `functions-ci.yml` runs tests on pushes/PRs to `test`.
+- `promote-test-to-main.yml` (workflow_dispatch, inputs reason + `PROMOTE`): i18n gate + Functions tests on `test` → `merge --no-ff` into `main` → fast-forward `test` → request Pages build → dispatch Functions CI. Functions **deploy** stays a separate `deploy=true` dispatch.
+- Master Admin **Record promotion & open workflow** writes `code.promotion_requested` (chained) and opens the workflow page. No GitHub PAT is stored in Functions.
+- Order: promote code → set `IsFeatureEnabled` = 1 + `IsTestFeature` = 1 (beta testers try it on Search) → verify → set `IsTestFeature` = 0 (live for everyone). Setting `IsFeatureEnabled` = 0 parks it for everyone (Master Admins included) without losing the Test flag.
+
+## Audit (ISO/IEC 27001:2022 + NIST SP 800-53 Rev. 5)
+
+Record fields (`buildAuditRecord`): `eventType`, `outcome` success|failure|denied, `actorUid`, `actorEmail`, `actorRole`, `targetType`, `targetId`, `before`, `after`, `reason`, `detail`, `sos2faSessionHash` (sha256/16), `sourceIpTruncated` (/24 or /48), `sourceIpHash`, `userAgent`, `source`, `createdAtMs`, `createdAtIso` (UTC), server `createdAt`, `controlSets`, `retentionYears` 7, `expireAtMs`.
+
+| Control | How |
+|---|---|
+| A.8.15 / AU-2, AU-12 | Every flag, seed, invite, accept/decline, revoke, promotion, verify, and denial is logged by the server |
+| AU-3 | what / when / where / source / outcome / identity + before/after |
+| AU-8 / A.8.17 | Server clock, ISO-8601 UTC + serverTimestamp |
+| AU-9 / A.8.15 | Rules: no client writes; Master Admin read only; SHA-256 hash chain (`prevHash`, `seq`, head doc in same transaction) |
+| AU-10 | Actor uid/email + SOS2FA session hash bound into the chained hash |
+| AU-11 | 7-year retention (`expireAtMs`) — do **not** enable a Firestore TTL shorter than this |
+| CM-3 / A.8.32 | Reason required, revision counter, before/after, promotion log |
+| AC-6(9) | Denied privileged attempts logged |
+| A.8.16 | **Verify integrity** button; chain verdict itself is logged |
+
+Denials are unchained on purpose (no contention on the head doc from abusive traffic).
+
+### Audit trail UI (s3.1.29)
+
+Bug: `styles.css` `.report-block{overflow-wrap:anywhere}` is inherited by table cells, which drops every cell's min-content to one character; with `table-layout:auto` the huge `dataClass.savedAll` before/after JSON took the whole width and the other columns wrapped letter by letter. Fix: `admin.css` `.report-block table th/td{overflow-wrap:break-word}` (all Master Admin tables in report boxes, incl. Display access log, data classification, translation overrides, ad tables); the feature audit uses `.audit-log-table` (`table-layout:fixed`, sticky head), `master-feature-services.js` `auditRowHtml` renders `data-label` cells, ellipsis + `title` for email / IP / hash / target (`.audit-trunc`), before/after in a collapsed `<details class="audit-change">` (`pre`, `word-break:break-all` only there). ≤900px: label/value cards (`td::before{content:attr(data-label)}`); ≤480px: label above value. Test `functions/master-admin-audit-hero-help.test.js`.
+
+Master Admin hero: the help that sat on the `Network Intelligence Center` h1 (orphan `?`, popout inherited the h1's uppercase / -.05em tracking) moved to the **All Locations** card heading, same repository id `help-master-network-intelligence` (title now "All Locations", `masterAdmin`) so `functions/floqai-content-classes.json` is unchanged and `getFloqAiAccess` needs no redeploy.
+
+## Security findings
+
+Open:
+
+1. **Open mail relay — remind the owner at the next security review** (deferred Oct 9 2026): `emailFloqrPreviewLinks` (+ `emailV290914TestLinks`, `emailFloqrThreeDayTestPlan`, `emailMobileTestChecklist`) send SendGrid mail unauthenticated, any `to`. Internal user-to-group messaging (club owners, CSR, FloqR Support) is by design and stays; lock only anonymous / arbitrary-recipient sends. These four were deliberately **not** redeployed in s3.1.26. Details: `design-notes-data-classification.mdc` → Seed endpoints.
+2. **Email/Password provider still enabled** in Firebase Auth (owner action: Console → Authentication → Sign-in method → Email/Password → Disable). No client uses password or email-link sign-in; the 44 password accounts are all seeded `@floqr-demo.com` demo users who sign in by email OTP. The verified-email admin check below already removes the admin-takeover path, so this is defense in depth.
+3. ~~**`don.b@jadzholdings.com` lost email-list Master Admin**~~ — resolved, see the Oct 9 2026 claim grant below.
+4. **Club Admin `adminEmails` checks** (rules `isClubManager` / Storage `isClubLocationAdmin` / Functions club checks) still trust an unverified token email — Phase 1 (needs a Microsoft-verified path first so Club Admins are not locked out).
+5. Public seed pages / `demo-seed-functions.js` carry a default demo password fallback — rotate to an env-only value (Phase 1).
+
+Fixed and **DEPLOYED Oct 9 2026** (s3.1.26; Pages `main` 9ab4266 + 52a8225, 131 Functions, Firestore rules `s3.1.26-security-phase-1`, Storage rules `s3.1.26-mingl-media-members`):
+
+- `users` and `inboxNotifications` reads restricted to self / recipient + Master Admin (shipped s3.1.23; patron search via `getPeopleDirectory`).
+- Admin email lists unified: unowned typo `bands.don@gmail.com` (no Auth account) removed from every list; rules, Storage and `functions/admin-trust.js` accept a list email **only with `email_verified == true`** (claim `masterAdmin` unchanged). Every Functions Master Admin check goes through `admin-trust` (incl. scheduling / venue ingest / demo seed); `security-phase0.test.js` fails on any inline `MASTER_ADMIN_EMAILS.includes(` or users-doc admin flag.
+- `changedKeys()` → `affectedKeys()` everywhere (a patron could **add** an absent protected field). `isPrivilegedProfile` / `viewerFor` / `assertSuperAdmin` / `assertMasterAdmin` / Super Admin offboard protection read the Auth record or claims, never `users` fields.
+- SOS2FA / email OTP attempt counter commits before the throw (no unlimited guesses).
+- `assignVenueEmployee` / `removeVenueEmployee` need SOS2FA. Mingl chat / connections / blocks, `messages` system sender, `aiIndex` writes, Mingl chat Storage, supRstar answers tightened — `design-notes-data-classification.mdc` → "Security Phase 0 + 1 (s3.1.26)".
+- s3.0.108: `superAdmin`, `IsBetaTester`, `betaTester` in `hasBackendOnlyIdentityFields`.
+- Abuse scan Oct 9 2026: 0 `users` docs with superAdmin / masterAdmin / isMasterAdmin / admin roles; only the owner uid ever requested or held an SOS2FA code/session; no Auth account for the typo address.
+- Oct 9 2026: don.b@jadzholdings.com (Microsoft, unverified email) granted masterAdmin custom claim by owner decision; email-list path requires email_verified. Uid `PQjxPJqFTrQ1wfelyFE30DF6t1D2`; claims before `{}`, after `{masterAdmin: true}` (Identity Toolkit `accounts:update`, merged). Honored by `admin-trust.js`, rules `isMasterAdmin()`, Storage, SOS2FA server; `master-admin-app.js` reads `getIdTokenResult(true)` claims since s3.1.27. **Revoke:** set `customAttributes` without `masterAdmin` (or `masterAdmin: false`) for that uid via Admin SDK `setCustomUserClaims` / `accounts:update`, merging other claims, then `revokeRefreshTokens(uid)` so the old ID token stops working within the hour.
+- **Oct 9 2026 owner decision (s3.1.28): SOS2FA unlock available to any Master Admin (claim or verified listed email), not only the Super Admin.** `sos2fa.js` `isMasterAdminUser(user, claims)` mirrors `admin-trust.js` `isServerAdminAuth`: `masterAdmin === true` / `superAdmin === true` from `getIdTokenResult(true)` (cached per uid, one forced refresh per page), or `emailVerified` + email on `SHOUTOUT_MASTER_ADMIN_EMAILS` ∪ `SHOUTOUT_SUPER_ADMIN_EMAILS`. Profile fields (`users.superAdmin`) and `FLOQRFeatureGates.isSuperAdmin` no longer open the gate (server ignores them). `isSuperAdminUser` stays exported as an alias for the seed tools. Server unchanged: `requestSos2faCode` / `verifySos2faCode` / `assertSos2faSession` already go through `assertSuperAdmin` → `isServerAdminAuth`; the code is mailed to the **token email** (`emailOf(request.auth)`) even when `email_verified` is false for a claim holder (the claim is server-issued), plus SMS to `users/{uid}` phone when set. Recovery code stays listed + verified only (`canUseRecoveryCode`; the `.sos2fa-recovery` box is hidden for everyone else). Test: `functions/sos2fa-master-admin.test.js`.
+
+## Improvements (recommended next)
+
+- **Custom claims** for Master Admin and beta tester (`betaTester: true` on accept, revoke on revoke) → rules and callables stop reading user docs; force token refresh on change.
+- **Two-person rule** for turning a feature Live (second Master Admin approves) — CM-3(2)/AC-5.
+- **Percentage / venue-scoped rollout** (`rolloutPercent`, `venueIds`) and a **kill switch** field that also blocks server callables instantly.
+- **Firebase Hosting preview channel for `test`** (`firebase hosting:channel:deploy test`) so test code runs on its own URL — needs `hosting` in `firebase.json`, Auth authorized domain, App Check site key.
+- **Export audit to Cloud Logging / BigQuery sink** (WORM bucket with retention lock) for AU-4/AU-6 and SIEM alerts on `*.denied` spikes.
+- Beta invite by **email/SMS** through existing SendGrid/Twilio senders (today: Inbox + copied link).
+- Scheduled `verifyFeatureServiceAuditChain` daily with an alert on failure.
+
+## Proposal — fork into an Admin app and a Patron app (owner-requested s3.0.110, not built yet)
+
+Goal: admins and patrons stop sharing one login path and one origin. Patrons keep today’s Welcome card; admins get a separate, hardened console. Beta testers stay **patrons** with extra RBAC grants — they never touch the admin app.
+
+### Target shape
+
+| | Patron app (current) | Admin app (new) |
+|---|---|---|
+| Origin | `https://www.floqr.com` (cutover) | `https://admin.floqr.com` (separate Firebase Hosting **site** in the same project; not GitHub Pages) |
+| Pages | Search, My Profile, satellites, Display | `master-admin.html`, Club Admin console (`admin.html`), promoter admin, diagnostics, seed/onboarding tools |
+| Sign-in | Google / Microsoft / Facebook / Email / SMS (US+CA) / WhatsApp | **Workforce only:** Google Workspace or Microsoft Entra SSO (OIDC/SAML) **plus** a passkey / security key (WebAuthn) — no SMS, no WhatsApp, no Facebook |
+| Auth tenant | Identity Platform tenant `patrons` (or default) | Identity Platform tenant `admins` (multi-tenancy) — a patron account literally cannot sign in here |
+| Session | Firebase persistence on www | Short session (e.g. 8 h idle 30 min) + **SOS2FA step-up** kept for dangerous actions |
+| App Check | reCAPTCHA Enterprise key for www | Separate App Check key for admin origin; Functions enforce `enforceAppCheck` for admin callables |
+| Network | public | Optional IP allowlist / Cloud Armor (Hosting behind a load balancer) for the admin site |
+
+### Authorization model (replaces email lists)
+
+- **Custom claims**, set only by Functions: `role: "masterAdmin" | "venueAdmin" | "serviceMember"`, `venueIds: [...]`, `tenant: "admins"`. Beta testers get `betaFeatures: ["bartr", ...]` on the **patron** tenant only.
+- Admin callables check `request.auth.token.firebase.tenant === "admins"` **and** the role claim. Patron callables reject the admin tenant for patron-only flows (no admin placing patron orders as a shortcut).
+- Firestore rules: `request.auth.token.role == "masterAdmin"` replaces `isMasterAdminEmail()` and deletes the email lists (the `bands.don` / `bans.don` mismatch itself was already fixed in s3.1.26: single spelling `bans.don@gmail.com`).
+- Disjoint roles stay enforced: granting `betaFeatures` refuses any uid that holds an admin claim; creating an admin removes beta grants.
+
+### Migration in phases (each phase shippable on its own)
+
+1. **Claims first (no UX change):** a `syncRoleClaims` callable/trigger writes claims from today’s sources (admin lists, `users.superAdmin`, `betaTesters.features`, club admin designations). Rules + callables accept claim **or** legacy check. Force token refresh after changes.
+2. **Rules on claims only:** remove email lists from `firestore.rules`, `sos2fa`, `PRIVILEGED_EMAILS`; restrict `users` + `inboxNotifications` reads (open findings 1–2).
+3. **Admin Hosting site:** `firebase.json` gets a second `hosting` target (`admin`) serving only admin pages; add `admin.floqr.com` to Auth authorized domains, OAuth clients, App Check. Keep the old paths on Pages redirecting to the admin origin.
+4. **Admin tenant + SSO + passkeys:** create the `admins` tenant, move admin accounts, admin login page offers SSO + passkey only. SOS2FA remains as step-up.
+5. **Split bundles:** patron bundle drops admin JS entirely (no `master-admin-app.js` on www); admin bundle drops patron satellites. Shared code (`shared-data.js`, i18n, help) published as versioned modules both sides load.
+6. **Retire the shared path:** admin pages removed from the patron origin; `profile-access-guard.js` on www no longer knows about admin roles.
+
+Risks / notes: two authorized domains to maintain; Club Admins who are also patrons need **two accounts** (one per tenant) — document it in Club Admin help; Xibo Display URLs are unaffected (they stay on the patron/display origin, no `?v=`); deep links in admin emails must point at `admin.floqr.com`.
+
+## FIX PROMPT
+
+```
+Features & Services (s3.0.110): state = IsFeatureEnabled!=1 ? off : (IsTestFeature==1 ? test : live). Off = nobody (Master Admins too). Test = Search tile only for beta testers granted that feature (betaTesters.features[key]==1); Master Admins open it from the F&S link, never from Search; pages + server allow master || granted tester. Live = everyone. Master Admins can never be beta testers (invite/accept refuse, viewerFor forces false). setBetaTesterFeatures + logFeatureAccessAttempt (throttled, unchained denials). Signed-out satellite visitors → FLOQRSessionShell.redirectToLogin() → ./?profileRequired=sign-in&returnTo=… (never Google-only; iframes/public pages exempt). Admin writes via SOS2FA callables, reason ≥ 8, chained audit. Fork proposal: admin.floqr.com + admins tenant + custom claims. Design notes: design-notes-feature-services.mdc
+```

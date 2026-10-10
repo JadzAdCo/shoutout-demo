@@ -21,6 +21,7 @@
     {
       id: "mingl",
       kind: "product",
+      featureKey: "mingl",
       label: "Mingl",
       blurb: "Meet people, chat, and social discovery.",
       href: `./?v=${APP_V}&start=mingl`,
@@ -29,6 +30,7 @@
     {
       id: "rydr",
       kind: "product",
+      featureKey: "rydr",
       label: "RydR",
       blurb: "Robotaxi or ultra-luxury ride to the venue.",
       href: vUrl("./rydr.html", {from: "search"}),
@@ -37,6 +39,7 @@
     {
       id: "bartr",
       kind: "product",
+      featureKey: "bartr",
       label: "Trade by BartR",
       blurb: "Marketplace — barter and swag.",
       href: vUrl("./commerce.html", {from: "search"}),
@@ -76,6 +79,7 @@
     {
       id: "suprstr",
       kind: "product",
+      featureKey: "supRstar",
       label: "supRstar — go live / be a superstar",
       blurb: "Pick a venue, privately preview your camera, pay $20, get Club Admin approval, then go live on the SupRStar board.",
       href: vUrl("./suprstr-search.html", {from: "floqai"}),
@@ -959,6 +963,13 @@
     return refreshed;
   }
 
+  /** Product results for a Features & Services feature follow the same link rule as menus and tabs. */
+  function featureLinkShown(intent) {
+    const fs = global.FLOQRFeatureServices;
+    if (!intent.featureKey || !fs?.linkState) return true;
+    return fs.linkState(intent.featureKey).show;
+  }
+
   function allIntents() {
     const seen = new Set();
     const merged = [];
@@ -971,6 +982,7 @@
     [...fromRepo, ...curated].forEach(intent => {
       const audiences = Array.isArray(intent.audiences) ? intent.audiences : [];
       if (!audiences.length) return;
+      if (!featureLinkShown(intent)) return;
       if (!locallyAllowed(audiences, intent.sourceId, flags)) return;
       const key = intent.id || intent.label;
       if (seen.has(key)) {
@@ -1116,9 +1128,12 @@
   }
 
   function renderProductCard(intent) {
+    const fs = global.FLOQRFeatureServices;
+    const beta = !!(intent.featureKey && fs?.linkState?.(intent.featureKey).beta);
+    const pill = beta ? ` <span class="feature-beta-pill">${esc(tr("cat.betaPill", "Beta"))}</span>` : "";
     return `
       <a class="card intent-result-card" href="${esc(intent.href)}" data-intent="${esc(intent.id)}" data-kind="product">
-        <strong>${esc(intent.label)}</strong>
+        <strong>${esc(intent.label)}${pill}</strong>
         <span>${esc(intent.blurb)}</span>
       </a>`;
   }

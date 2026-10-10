@@ -1,0 +1,64 @@
+---
+description: Change reasons are asked in the shared FLOQRReasonPrompt after Save — never a standing reason input or window.prompt (s3.1.30)
+alwaysApply: true
+---
+
+# Reason prompt on save (always)
+
+Resume: `@reason-prompt$` / `$reason$`.
+
+When a save needs a **reason** (audit trail, CM-3 change control), the reason is typed **after** the operator presses Save, in the shared prompt. Never park a standing "Reason" text box on the screen, and never use `window.prompt` / `root.prompt`.
+
+## Module
+
+Files: `floqr-reason-prompt.js` + `floqr-reason-prompt.css` (cache-bust both `?v=`). API: `window.FLOQRReasonPrompt`.
+
+```js
+const reason = await FLOQRReasonPrompt.ask({
+  summary: "BartR: Enable Feature 0 → 1", // what is changing (shown in the prompt)
+  minLength: 8                              // server REASON_MIN
+});
+if (reason === null) { status("Cancelled — nothing was saved."); return; }
+await callable({ ...payload, reason });
+```
+
+- Returns `Promise<string|null>` (trimmed reason, or `null` on Cancel / Esc / backdrop).
+- **Desktop / tablet:** centered modal. **Phone (≤600px):** bottom sheet with safe-area padding and a keyboard offset (`visualViewport`).
+- `role="dialog"` + `aria-modal`, focus trap (Tab / Shift+Tab), Esc cancels, Enter submits (Shift+Enter = newline), focus returns to the Save button.
+- Live counter; **Save stays disabled** until the trimmed reason reaches `minLength`. The minimum and help text live **inside** the prompt, not as a yellow helper line on the page.
+- All copy comes from `FLOQRI18n` keys `reason.*` (all 11 languages).
+
+## Contract
+
+1. Check "Nothing changed" **before** prompting.
+2. The reason is sent **with** the callable; the server validates length again and stores it on the chained audit row (`reason`). Client length checks are UX only.
+3. If the module is missing, show a status error — do not fall back to `window.prompt`.
+4. Native / WebView (Capacitor, Xibo-less hybrid): the prompt is plain DOM (no `window.prompt`, which some WebViews suppress or style badly) — keep it that way; the bottom sheet follows the on-screen keyboard.
+
+## Rollout
+
+| Screen | State |
+|---|---|
+| Master Admin → Features & Services (row Save, beta tester Save feature access / Revoke, Record promotion) | **Done s3.1.30** |
+
+### Candidates still using a standing reason input or `prompt()` (not converted yet — convert only when asked)
+
+| File | Where | Today |
+|---|---|---|
+| `master-admin.html` / `master-admin-app.js` | Security → Data classification | standing `#dataClassReason` input |
+| `master-ad-management.js` | `askReason` helper (~L75), payment reference (~L234), type CLEAR (~L386) | `root.prompt` |
+| `master-admin-app.js` | purge confirm (~L1944) | `window.prompt('Type PURGE…')` |
+| `ad-campaigns.js` | ad rejection reason (~L911) | `prompt()` (optional reason) |
+| `ai-discovery-service.js` | queue soft delete reason (~L760) | `prompt()` (optional reason) |
+| `seed-v29-09-14.html` | seed reason | standing `#seedReason` input |
+| `master-admin.html` beta invite | "Note (optional)" | optional note input (not a required reason) |
+
+Non-reason `prompt()` uses (typed-word confirms, edit-message dialogs: `patron-app.js` / `patron-portal-app.js` Mingl edit + DELETE confirm, `admin-scheduling.js` staffing need) are out of scope for this rule but should move to in-page dialogs when those screens are touched.
+
+## Checklist
+
+- [ ] No standing reason input; no `prompt(` for reasons
+- [ ] `FLOQRReasonPrompt.ask({summary, minLength})` after Save, before the callable
+- [ ] Reason passed to the callable and visible in the audit trail
+- [ ] `reason.*` i18n keys present in every language; i18n gate exit 0
+- [ ] Checked as modal (~1280 / ~800) and bottom sheet (~390)
