@@ -1035,3 +1035,6 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 .ad-target-editor{display:grid;gap:10px;margin:8px 0 12px}
 .ad-target-row{display:grid;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}
 .ad-target-row select[multiple]{min-height:110px}
+.schedule-owner-types{flex-wrap:wrap}
+.schedule-owner-types label{min-width:9rem}
+.schedule-owner-types input:focus-visible+span{outline:2px solid #5eeaff;outline-offset:2px}

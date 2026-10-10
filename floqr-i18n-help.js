@@ -6,6 +6,10 @@
 
   const packs = {
     ru: {
+      "help-scheduling-schedule-for": {
+        title: "Расписание персонала",
+        body: "Планируйте смены и букинги и уведомляйте каждого через Inbox, Email, SMS или WhatsApp. В разделе «Расписание для» выберите, с чьим календарём вы работаете: «Моё расписание DJ» — ваш собственный календарь, «Клуб» — клубы, которыми вы управляете, «Промо-компания» — компании, для которых вы промоутер. У каждого календаря своя подписка за 20 $ в месяц. Смены, назначенные вам, появляются в разделе «Мои назначения», где их можно подтвердить или отклонить."
+      },
       "help-staff-marketing-consent": {
         title: "Согласие персонала на маркетинг",
         body: "Присоединяясь к команде заведения или мероприятия, вы должны отметить согласие на маркетинг. Оно позволяет этому заведению или организатору, а также его администраторам и менеджерам, использовать ваше имя в FLOQR, роль и опубликованные фото и видео на своих сайтах, флаерах и в соцсетях (Instagram, Facebook, TikTok, YouTube и похожих) без повторного запроса для каждого использования. Публиковать ваш телефон или email они не могут. Отозвать согласие можно в любой момент в разделе «Мой профиль», вкладка «Сервисы и участники сервиса». Это прекращает новый маркетинг; уже напечатанные или опубликованные материалы изымать не обязательно. Club Admins видят статус согласия каждого сотрудника в «Сети сотрудников и персонала» и в «Избранном персонале»."
@@ -250,6 +254,10 @@
       }
     },
     nl: {
+      "help-scheduling-schedule-for": {
+        title: "Personeelsplanning",
+        body: "Plan diensten en boekingen en laat iedereen het weten via Inbox, Email, SMS of WhatsApp. Kies onder 'Planning voor' aan welke agenda je werkt: 'Mijn DJ-planning' is je eigen agenda, 'Club' toont de clubs die je beheert en 'Promotiebedrijf' de bedrijven waarvoor je promoot. Elke agenda heeft een eigen abonnement van $ 20 per maand. Diensten die aan jou zijn toegewezen verschijnen onder 'Mijn toewijzingen', waar je ze bevestigt of weigert."
+      },
       "help-staff-marketing-consent": {
         title: "Marketingtoestemming voor personeel",
         body: "Wanneer je bij het team van een locatie of evenement aansluit, moet je het vakje voor marketingtoestemming aanvinken. Daarmee mogen die locatie of organisator en hun beheerders en managers je FLOQR-naam, je rol en je gepubliceerde foto’s en video’s gebruiken op hun websites, flyers en sociale media (Instagram, Facebook, TikTok, YouTube en vergelijkbare) zonder je voor elk gebruik opnieuw te vragen. Ze mogen je telefoonnummer of e-mailadres niet publiceren. Je kunt op elk moment intrekken in Mijn profiel, tabblad Services en servicemedewerkers. Dat stopt nieuwe marketing; materiaal dat al gedrukt of geplaatst is, hoeft niet te worden teruggehaald. Club Admins zien de toestemmingsstatus van elke medewerker in het Netwerk van medewerkers en personeel en bij Uitgelicht personeel."
@@ -494,6 +502,10 @@
       }
     },
     fr: {
+      "help-scheduling-schedule-for": {
+        title: "Planification du personnel",
+        body: "Planifiez des shifts et des bookings, puis prévenez chaque personne par Inbox, Email, SMS ou WhatsApp. Sous « Planning pour », choisissez le calendrier sur lequel vous travaillez : « Mon planning DJ » est votre propre calendrier, « Club » liste les clubs que vous gérez et « Société de promotion » les sociétés pour lesquelles vous faites la promotion. Chaque calendrier a son propre abonnement à 20 $/mois. Les shifts qui vous sont attribués apparaissent sous « Mes affectations », où vous les confirmez ou les refusez."
+      },
       "help-staff-marketing-consent": {
         title: "Consentement marketing du personnel",
         body: "Lorsque vous rejoignez l’équipe d’un lieu ou d’un événement, vous devez cocher la case de consentement marketing. Elle permet à ce lieu ou à cet organisateur, ainsi qu’à ses administrateurs et responsables, d’utiliser votre nom FLOQR, votre rôle et vos photos et vidéos publiées sur leurs sites web, flyers et réseaux sociaux (Instagram, Facebook, TikTok, YouTube et similaires) sans vous redemander votre accord à chaque utilisation. Ils ne peuvent pas publier votre numéro de téléphone ni votre e-mail. Vous pouvez retirer ce consentement à tout moment dans Mon profil, onglet Services et membres de service. Cela met fin aux nouvelles utilisations ; les supports déjà imprimés ou publiés n’ont pas à être retirés. Les Club Admins voient le statut de consentement de chaque membre du personnel dans Réseau des employés et du personnel et dans Personnel mis en avant."
@@ -738,6 +750,10 @@
       }
     },
     de: {
+      "help-scheduling-schedule-for": {
+        title: "Mitarbeiterplanung",
+        body: "Plane Schichten und Bookings und benachrichtige jede Person per Inbox, Email, SMS oder WhatsApp. Unter „Planen für“ wählst du, wessen Kalender du bearbeitest: „Mein DJ-Plan“ ist dein eigener Kalender, „Club“ zeigt die Clubs, die du verwaltest, und „Promo-Firma“ die Firmen, für die du promotest. Jeder Kalender hat sein eigenes Abo für 20 $/Monat. Schichten für dich erscheinen unter „Meine Einsätze“, wo du sie bestätigst oder ablehnst."
+      },
       "help-staff-marketing-consent": {
         title: "Marketing-Einwilligung für Personal",
         body: "Wenn du dem Team einer Location oder eines Events beitrittst, musst du das Feld zur Marketing-Einwilligung anhaken. Damit dürfen diese Location oder dieser Veranstalter sowie deren Admins und Manager deinen FLOQR-Namen, deine Rolle und deine veröffentlichten Fotos und Videos auf ihren Websites, Flyern und in sozialen Medien (Instagram, Facebook, TikTok, YouTube und ähnliche) nutzen, ohne dich für jede Nutzung erneut zu fragen. Deine Telefonnummer und E-Mail dürfen sie nicht veröffentlichen. Du kannst jederzeit in Mein Profil im Tab Services und Service-Mitglieder widerrufen. Das stoppt neues Marketing; bereits gedruckte oder gepostete Materialien müssen nicht zurückgerufen werden. Club Admins sehen den Einwilligungsstatus jeder Person im Mitarbeiter- und Personalnetzwerk und bei Hervorgehobenes Personal."
@@ -982,6 +998,10 @@
       }
     },
     es: {
+      "help-scheduling-schedule-for": {
+        title: "Planificación del personal",
+        body: "Planifica turnos y contrataciones y avisa a cada persona por Inbox, Email, SMS o WhatsApp. En «Horario de», elige el calendario con el que trabajas: «Mi horario de DJ» es tu propio calendario, «Club» muestra los clubs que administras y «Empresa de promoción» las empresas para las que promocionas. Cada calendario tiene su propia suscripción de 20 $/mes. Los turnos que te asignan aparecen en «Mis asignaciones», donde los confirmas o rechazas."
+      },
       "help-staff-marketing-consent": {
         title: "Consentimiento de marketing del personal",
         body: "Cuando te unes al equipo de un local o evento, debes marcar la casilla de consentimiento de marketing. Permite que ese local u organizador, y sus administradores y gerentes, usen tu nombre de FLOQR, tu rol y tus fotos y videos publicados en sus sitios web, flyers y redes sociales (Instagram, Facebook, TikTok, YouTube y similares) sin volver a pedirte permiso para cada uso. No pueden publicar tu teléfono ni tu correo electrónico. Puedes retirarlo en cualquier momento en Mi perfil, pestaña Servicios y miembros de servicio. Esto detiene el nuevo marketing; los materiales ya impresos o publicados no tienen que retirarse. Los Club Admins ven el estado del consentimiento de cada miembro del personal en Red de empleados y personal y en Personal destacado."
@@ -1226,6 +1246,10 @@
       }
     },
     it: {
+      "help-scheduling-schedule-for": {
+        title: "Pianificazione del personale",
+        body: "Pianifica turni e ingaggi, poi avvisa ogni persona tramite Inbox, Email, SMS o WhatsApp. In «Turni per» scegli il calendario su cui lavori: «Il mio calendario DJ» è il tuo calendario, «Club» elenca i club che gestisci e «Società di promozione» le società per cui fai promozione. Ogni calendario ha il proprio abbonamento da 20 $/mese. I turni assegnati a te compaiono in «I miei incarichi», dove li confermi o li rifiuti."
+      },
       "help-staff-marketing-consent": {
         title: "Consenso marketing del personale",
         body: "Quando entri nel team di un locale o di un evento, devi selezionare la casella del consenso marketing. Consente a quel locale o organizzatore, e ai suoi amministratori e manager, di usare il tuo nome FLOQR, il tuo ruolo e le tue foto e i tuoi video pubblicati su siti web, volantini e social media (Instagram, Facebook, TikTok, YouTube e simili) senza chiederti di nuovo il permesso per ogni utilizzo. Non possono pubblicare il tuo numero di telefono né la tua email. Puoi revocarlo in qualsiasi momento in Il mio profilo, scheda Servizi e membri del servizio. La revoca interrompe il nuovo marketing; i materiali già stampati o pubblicati non devono essere ritirati. I Club Admin vedono lo stato del consenso di ogni membro del personale in Rete di dipendenti e personale e in Personale in evidenza."
@@ -1470,6 +1494,10 @@
       }
     },
     pt: {
+      "help-scheduling-schedule-for": {
+        title: "Agendamento de pessoal",
+        body: "Planeje turnos e contratações e avise cada pessoa por Inbox, Email, SMS ou WhatsApp. Em «Escala de», escolha em qual agenda você está trabalhando: «Minha agenda de DJ» é a sua própria agenda, «Clube» lista os clubes que você administra e «Empresa de promoção» as empresas para as quais você promove. Cada agenda tem sua própria assinatura de US$ 20/mês. Os turnos enviados para você aparecem em «Minhas atribuições», onde você os confirma ou recusa."
+      },
       "help-staff-marketing-consent": {
         title: "Consentimento de marketing da equipe",
         body: "Quando você entra na equipe de uma casa ou evento, precisa marcar a caixa de consentimento de marketing. Ela permite que essa casa ou organizador, e seus administradores e gerentes, usem seu nome no FLOQR, sua função e suas fotos e vídeos publicados em sites, flyers e redes sociais (Instagram, Facebook, TikTok, YouTube e similares) sem pedir sua permissão novamente a cada uso. Eles não podem publicar seu telefone nem seu e-mail. Você pode retirar o consentimento a qualquer momento em Meu perfil, aba Serviços e membros do serviço. Isso interrompe novo marketing; materiais já impressos ou publicados não precisam ser recolhidos. Os Club Admins veem o status de consentimento de cada pessoa da equipe em Rede de funcionários e equipe e em Equipe em destaque."
@@ -1714,6 +1742,10 @@
       }
     },
     el: {
+      "help-scheduling-schedule-for": {
+        title: "Προγραμματισμός προσωπικού",
+        body: "Σχεδιάστε βάρδιες και κρατήσεις και ειδοποιήστε κάθε άτομο μέσω Inbox, Email, SMS ή WhatsApp. Στο «Πρόγραμμα για» επιλέξτε σε ποιο ημερολόγιο δουλεύετε: «Το πρόγραμμά μου ως DJ» είναι το δικό σας ημερολόγιο, το «Club» δείχνει τα clubs που διαχειρίζεστε και η «Εταιρεία προώθησης» τις εταιρείες για τις οποίες κάνετε προώθηση. Κάθε ημερολόγιο έχει τη δική του συνδρομή 20 $/μήνα. Οι βάρδιες που σας ανατίθενται εμφανίζονται στις «Οι αναθέσεις μου», όπου τις επιβεβαιώνετε ή τις απορρίπτετε."
+      },
       "help-staff-marketing-consent": {
         title: "Συγκατάθεση μάρκετινγκ προσωπικού",
         body: "Όταν εντάσσεστε στην ομάδα ενός χώρου ή μιας εκδήλωσης, πρέπει να επιλέξετε το πλαίσιο συγκατάθεσης μάρκετινγκ. Επιτρέπει σε αυτόν τον χώρο ή διοργανωτή, και στους διαχειριστές και υπευθύνους του, να χρησιμοποιούν το όνομά σας στο FLOQR, τον ρόλο σας και τις δημοσιευμένες φωτογραφίες και βίντεό σας σε ιστότοπους, φυλλάδια και μέσα κοινωνικής δικτύωσης (Instagram, Facebook, TikTok, YouTube και παρόμοια) χωρίς να σας ρωτούν ξανά για κάθε χρήση. Δεν επιτρέπεται να δημοσιεύουν το τηλέφωνο ή το email σας. Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή στο «Το προφίλ μου», καρτέλα «Μέλη Υπηρεσιών & Υπηρεσιών». Η ανάκληση σταματά το νέο μάρκετινγκ· υλικό που έχει ήδη τυπωθεί ή δημοσιευτεί δεν χρειάζεται να αποσυρθεί. Οι Club Admins βλέπουν την κατάσταση συγκατάθεσης κάθε μέλους του προσωπικού στο Δίκτυο υπαλλήλων και προσωπικού και στο Προβεβλημένο προσωπικό."
@@ -1958,6 +1990,10 @@
       }
     },
     pl: {
+      "help-scheduling-schedule-for": {
+        title: "Planowanie personelu",
+        body: "Planuj zmiany i bookingi, a potem powiadamiaj każdą osobę przez Inbox, Email, SMS lub WhatsApp. W sekcji „Grafik dla” wybierz, czyim kalendarzem się zajmujesz: „Mój grafik DJ” to twój własny kalendarz, „Klub” pokazuje kluby, którymi zarządzasz, a „Firma promocyjna” firmy, dla których promujesz. Każdy kalendarz ma własną subskrypcję za 20 $/miesiąc. Zmiany przypisane tobie pojawiają się w „Moje przydziały”, gdzie je potwierdzasz lub odrzucasz."
+      },
       "help-staff-marketing-consent": {
         title: "Zgoda marketingowa personelu",
         body: "Dołączając do zespołu lokalu lub wydarzenia, musisz zaznaczyć pole zgody marketingowej. Pozwala ona temu lokalowi lub organizatorowi oraz jego administratorom i menedżerom używać Twojej nazwy FLOQR, roli oraz opublikowanych zdjęć i filmów na swoich stronach, ulotkach i w mediach społecznościowych (Instagram, Facebook, TikTok, YouTube i podobne) bez ponownego pytania o każde użycie. Nie mogą publikować Twojego numeru telefonu ani adresu e-mail. Zgodę możesz wycofać w każdej chwili w sekcji Mój profil, karta Usługi i członkowie serwisu. Wycofanie zatrzymuje nowy marketing; materiałów już wydrukowanych lub opublikowanych nie trzeba wycofywać. Club Admini widzą status zgody każdej osoby w Sieci pracowników i personelu oraz w Wyróżnionym personelu."
@@ -2202,6 +2238,10 @@
       }
     },
     ar: {
+      "help-scheduling-schedule-for": {
+        title: "جداول الموظفين",
+        body: "خطّط المناوبات والحجوزات ثم أبلغ كل شخص عبر Inbox أو Email أو SMS أو WhatsApp. من «الجدول لـ» اختر التقويم الذي تعمل عليه: «جدولي كـ DJ» هو تقويمك الخاص، و«نادٍ» يعرض النوادي التي تديرها، و«شركة ترويج» يعرض الشركات التي تروّج لها. لكل تقويم اشتراكه الخاص بـ 20 دولارًا شهريًا. تظهر المناوبات المسندة إليك في «مهامي» حيث تؤكدها أو ترفضها."
+      },
       "help-staff-marketing-consent": {
         title: "موافقة الطاقم على التسويق",
         body: "عند انضمامك إلى فريق مكان أو فعالية، يجب أن تحدد مربع الموافقة على التسويق. تسمح هذه الموافقة لذلك المكان أو المنظّم ومسؤوليه ومديريه باستخدام اسمك على FLOQR ودورك وصورك ومقاطع الفيديو المنشورة على مواقعهم الإلكترونية ومنشوراتهم ووسائل التواصل الاجتماعي (Instagram وFacebook وTikTok وYouTube وما شابهها) دون أن يطلبوا إذنك مجددًا لكل استخدام. لا يجوز لهم نشر رقم هاتفك أو بريدك الإلكتروني. يمكنك سحب الموافقة في أي وقت من ملفي، علامة تبويب أعضاء الخدمات والخدمة. يوقف السحب التسويق الجديد، ولا يلزم استرجاع المواد المطبوعة أو المنشورة بالفعل. يرى Club Admins حالة موافقة كل فرد من الطاقم في شبكة الموظفين والعاملين وفي الطاقم المميز."

@@ -186,6 +186,10 @@
     "help-schedule-message-templates": [
       "venueAdmin"
     ],
+    "help-scheduling-schedule-for": [
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-service-members": [
       "venueAdmin"
     ],

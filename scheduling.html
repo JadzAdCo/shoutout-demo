@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title data-i18n="page.scheduling.heading">FLOQR Scheduling</title>
   <link rel="stylesheet" href="./styles.css?v=s3.0.1"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.0.3"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.1.34"/>
   <script>
     (function () {
       var p = new URLSearchParams(location.search);
@@ -27,42 +27,43 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Staff &amp; talent calendars</p>
-        <h1
-          data-floqr-help-id="help-staff-scheduling-portal"
-          data-floqr-help-title="FLOQR Scheduling"
-          data-floqr-help-search="staffSchedulingPaid|paid this month|not paid this month|resubscribe"
-          data-floqr-help-body="staffSchedulingPaid is 1 or 0 on the venue. schedulingSubscriptions status is paid this month or not paid this month. Paid this month unlocks the calendar. Not paid this month shows Subscribe (new) or Resubscribe (prior subscriber)."
-          data-i18n="page.scheduling.heading"
-        >FLOQR Scheduling</h1>
+        <h1 data-i18n="page.scheduling.heading">FLOQR Scheduling</h1>
         <p class="sub" data-keep-visible="true" data-i18n="page.scheduling.sub">Clubs, promoting companies, and DJs manage shifts with Email / SMS / WhatsApp notify-and-approve. <strong>$20/month</strong> when not paid this month. Events are not included.</p>
-        <p id="schedulingPortalStatus" class="status">Restoring your FLOQR session…</p>
+        <p id="schedulingPortalStatus" class="status" aria-live="polite">Restoring your FLOQR session…</p>
+        <div id="portalAuthChrome" class="queue-actions" data-floqr-auth-chrome>
+          <button id="portalSignInBtn" class="primary" type="button" data-floqr-login-btn data-i18n="sched.signIn">Sign in</button>
+        </div>
       </div>
-      <div class="card" id="portalAuthChrome" data-floqr-auth-chrome>
+      <div class="card" id="portalSubscriptionCard">
         <p class="eyebrow">Subscription</p>
         <h2 id="portalSubBadge">checking…</h2>
         <div class="queue-actions">
-          <button id="portalGoogleLoginBtn" class="primary" type="button" data-floqr-login-btn data-i18n="app.googleSignIn">Google sign-in</button>
           <button id="portalBuySubBtn" class="primary" type="button">Subscribe $20/mo</button>
         </div>
       </div>
     </header>
 
-    <div class="card">
-      <h2>Who is scheduling?</h2>
-      <div class="profile-grid">
-        <label>Owner type
-          <select id="portalOwnerType">
-            <option value="dj">DJ</option>
-            <option value="promoterCompany">Promoting company</option>
-            <option value="club">Club / lounge</option>
-          </select>
-        </label>
-        <label>Owner id<input id="portalOwnerId" placeholder="Auto for DJ (your uid) · company slug · club location id"/></label>
-        <label>Display name<input id="portalOwnerName" placeholder="DJ Nova / Apex Promotions / Club name"/></label>
+    <div class="card" id="portalScheduleForCard">
+      <h2
+        id="portalScheduleForHeading"
+        data-floqr-help-id="help-scheduling-schedule-for"
+        data-floqr-help-title="Staff Scheduling"
+        data-floqr-help-search="staff scheduling|schedule for|owner id|whose schedule|create shift|dj schedule|club schedule|promoting company schedule"
+        data-floqr-help-body="Plan shifts and bookings, then notify each person by Inbox, Email, SMS or WhatsApp. Under Schedule for, choose whose calendar you are working on: My DJ schedule is your own calendar, Club lists the clubs you manage, and Promoting company lists the companies you promote for. Each calendar has its own $20/month subscription. Shifts sent to you appear under My assignments, where you confirm or decline them."
+      ><span data-i18n="sched.scheduleFor">Schedule for</span></h2>
+      <div class="segmented-control schedule-owner-types" role="radiogroup" aria-labelledby="portalScheduleForHeading">
+        <label><input type="radio" name="portalOwnerType" value="dj" checked/><span data-i18n="sched.typeDj">My DJ schedule</span></label>
+        <label><input type="radio" name="portalOwnerType" value="club"/><span data-i18n="sched.typeClub">Club</span></label>
+        <label><input type="radio" name="portalOwnerType" value="promoterCompany"/><span data-i18n="sched.typeCompany">Promoting company</span></label>
       </div>
+      <div id="portalOwnerPick" class="profile-grid hidden">
+        <label id="portalOwnerSearchWrap" class="hidden"><span data-i18n="sched.search">Search</span><input id="portalOwnerSearch" type="search" autocomplete="off" data-i18n-placeholder="sched.searchClubs" placeholder="Type a name"/></label>
+        <label><span id="portalOwnerPickLabel" data-i18n="sched.pickClub">Club</span><select id="portalOwnerId"></select></label>
+      </div>
+      <p id="portalOwnerHint" class="sub small" data-keep-visible="true" aria-live="polite"></p>
       <div class="queue-actions">
-        <button id="portalRefreshBtn" type="button">Refresh access &amp; shifts</button>
-        <a class="buttonlike" href="./admin.html?v=29.09.98">Club Admin Scheduling tab</a>
+        <button id="portalRefreshBtn" type="button" data-i18n="sched.refresh">Refresh access &amp; shifts</button>
+        <a class="buttonlike" href="./admin.html?tab=scheduling&amp;v=s3.1.34" data-i18n="sched.clubAdminLink">Club Admin Scheduling tab</a>
       </div>
     </div>
 
@@ -98,7 +99,7 @@
     </div>
 
     <div class="card">
-      <h2>My assignments</h2>
+      <h2 data-i18n="sched.myAssignments">My assignments</h2>
       <p class="sub small" data-keep-visible="true">Published shifts stay pending until you confirm. Tick each shift (or Select all), then Approve selected. The Inbox / Email / SMS link only opens this review — it does not confirm.</p>
       <div id="portalMyShifts" class="report-block"></div>
     </div>
@@ -110,17 +111,18 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
 <script src="./firebase-config.js?v=29.09.8"></script>
-<script src="./floqr-i18n.js?v=s3.0.28"></script>
+<script src="./floqr-i18n.js?v=s3.1.34"></script>
 <script src="./floqr-session-shell.js?v=s3.0.110"></script>
-<script src="./floqai-help-repository.js?v=s3.0.1"></script>
-<script src="./floqr-i18n-help.js?v=s3.0.28"></script>
+<script src="./floqai-help-repository.js?v=s3.1.34"></script>
+<script src="./floqr-i18n-help.js?v=s3.1.34"></script>
 <script src="./help-attach.js?v=s3.0.6"></script>
 <script src="./helper-popouts.js?v=s3.0.6"></script>
-<script src="./floqr-nav.js?v=s3.1.33"></script>
+<script src="./floqr-nav.js?v=s3.1.34"></script>
 <script src="./payment-service.js?v=29.09.98"></script>
 <script src="./assignment-card.js?v=s3.0.0"></script>
 <script src="./worker-confirm.js?v=s3.0.1"></script>
-<script src="./scheduling-portal.js?v=s3.0.3"></script>
+<script src="./scheduling-owner-picker.js?v=s3.1.34"></script>
+<script src="./scheduling-portal.js?v=s3.1.34"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));
 </script>

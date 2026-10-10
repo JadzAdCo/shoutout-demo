@@ -3,11 +3,28 @@
   "use strict";
   const byId = id => document.getElementById(id);
   const params = new URL(location.href).searchParams;
+  const owners = window.FLOQRScheduleOwners;
+
+  function t(key, fallback) {
+    const value = window.FLOQRI18n?.t?.(key);
+    return value && value !== key ? value : fallback;
+  }
+
+  function setStatus(message) {
+    const el = byId("schedulingPortalStatus");
+    if (el) el.textContent = message || "";
+  }
 
   let auth;
   try {
+    // firebase-config.js only sets window.firebaseConfig; each page app starts Firebase itself.
+    if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
     auth = firebase.auth();
   } catch (error) {
+    console.error("[scheduling] Firebase init failed", error);
+    document.addEventListener("DOMContentLoaded", () => {
+      setStatus(t("sched.firebaseError", "FLOQR could not start on this page. Refresh the page."));
+    });
     return;
   }
 
@@ -15,10 +32,14 @@
     return firebase.app().functions("us-central1").httpsCallable(name);
   }
 
-  function setStatus(message) {
-    const el = byId("schedulingPortalStatus");
-    if (el) el.textContent = message || "";
-  }
+  const pickerState = {
+    user: null,
+    isMaster: false,
+    clubs: [],
+    companies: [],
+    requested: owners?.parseOwnerParam(params.get("owner") || "") || null,
+    selected: {club: "", promoterCompany: ""}
+  };
 
   function esc(value) {
     return String(value || "")
@@ -29,19 +50,142 @@
   }
 
   function ownerType() {
-    return byId("portalOwnerType")?.value || "dj";
+    return document.querySelector("input[name='portalOwnerType']:checked")?.value || "dj";
   }
 
   function ownerId() {
-    const type = ownerType();
-    const typed = String(byId("portalOwnerId")?.value || "").trim();
-    if (typed) return typed;
-    if (type === "dj") return auth.currentUser?.uid || "";
-    return "";
+    return owners.resolveOwnerId(ownerType(), byId("portalOwnerId")?.value || "", auth.currentUser?.uid || "");
   }
 
   function ownerName() {
-    return String(byId("portalOwnerName")?.value || "").trim() || ownerId();
+    if (ownerType() === "dj") {
+      const user = auth.currentUser;
+      return String(user?.displayName || user?.email?.split("@")[0] || "DJ").trim();
+    }
+    const select = byId("portalOwnerId");
+    return String(select?.selectedOptions?.[0]?.textContent || "").trim() || ownerId();
+  }
+
+  function optionsFor(type) {
+    if (type === "club") return pickerState.clubs;
+    if (type === "promoterCompany") return pickerState.companies;
+    return [];
+  }
+
+  function renderOwnerPicker() {
+    const type = ownerType();
+    const pick = byId("portalOwnerPick");
+    const select = byId("portalOwnerId");
+    const hint = byId("portalOwnerHint");
+    const searchWrap = byId("portalOwnerSearchWrap");
+    if (!pick || !select || !hint) return;
+    if (type === "dj") {
+      pick.classList.add("hidden");
+      select.innerHTML = "";
+      hint.textContent = t("sched.djAuto", "Your own DJ calendar. Nothing to choose.");
+      return;
+    }
+    const all = optionsFor(type);
+    const label = byId("portalOwnerPickLabel");
+    if (label) {
+      const key = type === "club" ? "sched.pickClub" : "sched.pickCompany";
+      label.setAttribute("data-i18n", key);
+      label.textContent = t(key, type === "club" ? "Club" : "Company");
+    }
+    if (!all.length) {
+      pick.classList.add("hidden");
+      select.innerHTML = "";
+      hint.textContent = type === "club"
+        ? t("sched.noClubs", "You don't manage a club yet. A Club Admin can give you schedule access in Club Admin.")
+        : t("sched.noCompanies", "No promoting company is linked to your account yet. A Club Admin sets it when they add you as a promoter.");
+      return;
+    }
+    pick.classList.remove("hidden");
+    const showSearch = pickerState.isMaster || all.length > 8;
+    searchWrap?.classList.toggle("hidden", !showSearch);
+    const query = showSearch ? byId("portalOwnerSearch")?.value || "" : "";
+    const shown = owners.filterOptions(all, query);
+    const keep = pickerState.selected[type];
+    select.innerHTML = "";
+    shown.forEach(option => {
+      const el = document.createElement("option");
+      el.value = option.value;
+      el.textContent = option.label;
+      select.appendChild(el);
+    });
+    if (keep && shown.some(option => option.value === keep)) select.value = keep;
+    pickerState.selected[type] = select.value || "";
+    hint.textContent = !shown.length
+      ? t("sched.noMatch", "No match. Try another name.")
+      : (pickerState.isMaster && type === "club" ? t("sched.allClubs", "Master Admin: every club is listed.") : "");
+  }
+
+  async function queryDocs(query) {
+    try {
+      return (await query.get()).docs;
+    } catch (error) {
+      console.warn("[scheduling] owner lookup skipped", error?.code || error?.message || error);
+      return [];
+    }
+  }
+
+  async function clubRows(ids) {
+    const db = firebase.firestore();
+    const snaps = await Promise.all(ids.map(id => db.collection("clubLocations").doc(id).get().catch(() => null)));
+    return ids.map((id, index) => ({id, data: snaps[index]?.exists ? snaps[index].data() : {}}));
+  }
+
+  async function loadOwners(user) {
+    const db = firebase.firestore();
+    const claims = await user.getIdTokenResult().then(result => result.claims).catch(() => ({}));
+    pickerState.isMaster = owners.isMasterAdminViewer({email: user.email, emailVerified: user.emailVerified, claims});
+    if (pickerState.isMaster) {
+      const [clubDocs, companyDocs] = await Promise.all([
+        queryDocs(db.collection("clubLocations").limit(1000)),
+        queryDocs(db.collection("clubEmployeeDesignations").where("promoterCompany", ">", "").limit(500))
+      ]);
+      pickerState.clubs = owners.clubOptions(clubDocs.map(doc => ({id: doc.id, data: doc.data()})));
+      pickerState.companies = owners.companyOptions(companyDocs.map(doc => doc.data()), {anyStatus: true});
+    } else {
+      const email = String(user.email || "").toLowerCase();
+      const [profileDocs, assignmentDocs, byUidDocs, byEmailDocs, designationDocs] = await Promise.all([
+        db.collection("users").doc(user.uid).get().then(snap => (snap.exists ? [snap] : [])).catch(() => []),
+        queryDocs(db.collection("clubAdminAssignments").where("patronUid", "==", user.uid).limit(50)),
+        queryDocs(db.collection("clubLocations").where("adminUids", "array-contains", user.uid).limit(40)),
+        email ? queryDocs(db.collection("clubLocations").where("adminEmails", "array-contains", email).limit(40)) : [],
+        queryDocs(db.collection("clubEmployeeDesignations").where("workerUid", "==", user.uid).limit(60))
+      ]);
+      const designations = designationDocs.map(doc => doc.data() || {});
+      const ids = owners.managedClubIds({
+        profile: profileDocs[0]?.data() || {},
+        assignments: assignmentDocs.map(doc => doc.data() || {}),
+        clubsByUid: byUidDocs.map(doc => doc.id),
+        clubsByEmail: byEmailDocs.map(doc => doc.id),
+        designations
+      });
+      pickerState.clubs = owners.clubOptions(await clubRows(ids));
+      pickerState.companies = owners.companyOptions(designations);
+    }
+    const requested = pickerState.requested;
+    if (requested && requested.ownerType !== "dj") {
+      const key = requested.ownerType === "club" ? "clubs" : "companies";
+      let list = owners.withRequested(pickerState[key], requested.ownerId);
+      if (requested.ownerType === "club" && list.some(option => option.requested)) {
+        const [named] = owners.clubOptions(await clubRows([requested.ownerId]));
+        if (named) list = list.map(option => (option.requested ? {...named, requested: true} : option));
+      }
+      pickerState[key] = list;
+      pickerState.selected[requested.ownerType] = pickerState[key]
+        .find(option => option.value.toLowerCase() === requested.ownerId.toLowerCase())?.value || "";
+    }
+    const type = owners.defaultOwnerType({
+      requested: requested?.ownerType,
+      clubCount: pickerState.clubs.length,
+      companyCount: pickerState.companies.length
+    });
+    const radio = document.querySelector(`input[name='portalOwnerType'][value='${type}']`);
+    if (radio) radio.checked = true;
+    renderOwnerPicker();
   }
 
   function isPaidAccess(access) {
@@ -60,25 +204,23 @@
       const raw = snap.data()?.staffSchedulingPaid;
       if (raw === 0 || raw === "0" || raw === false) return 0;
       if (raw === 1 || raw === "1" || raw === true) return 1;
-      await snap.ref.set({
-        staffSchedulingPaid: 1,
-        schedulingEntitlementSource: "demo",
-        schedulingPaidUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge: true});
-      return 1;
+      return null;
     } catch (_error) {
       return null;
     }
   }
 
+  let refreshSeq = 0;
+
   async function refresh() {
+    const seq = ++refreshSeq;
     if (!auth.currentUser) {
       setStatus("Sign in to manage schedules.");
       return;
     }
     const id = ownerId();
     if (!id) {
-      setStatus("Enter an owner id (company slug or club location), or choose DJ for your account.");
+      setStatus(t("sched.chooseOwner", "Choose a club or company under Schedule for first."));
       return;
     }
     setStatus("Loading subscription…");
@@ -92,6 +234,7 @@
     } catch (error) {
       setStatus(error?.message || String(error));
     }
+    if (seq !== refreshSeq) return;
     let paid = isPaidAccess(access);
     if (venuePaid === 1) paid = true;
     if (venuePaid === 0) paid = false;
@@ -239,7 +382,7 @@
 
   async function subscribe() {
     const id = ownerId();
-    if (!id) throw new Error("Owner id required before checkout.");
+    if (!id) throw new Error(t("sched.chooseOwner", "Choose a club or company under Schedule for first."));
     await window.FLOQRPayments.startCheckout({
       orderType: "staffSchedulingSubscription",
       payload: {
@@ -278,50 +421,47 @@
     await refresh();
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const ownerParam = params.get("owner") || "";
-    if (ownerParam.includes(":")) {
-      const [type, ...rest] = ownerParam.split(":");
-      if (byId("portalOwnerType") && ["club", "dj", "promoterCompany"].includes(type)) {
-        byId("portalOwnerType").value = type;
-        byId("portalOwnerId").value = rest.join(":");
-      }
+  async function onSignedIn(user) {
+    if (pickerState.user?.uid !== user.uid) {
+      pickerState.user = user;
+      setStatus(t("sched.loadingOwners", "Loading what you can manage…"));
+      await loadOwners(user);
     }
-    byId("portalGoogleLoginBtn")?.addEventListener("click", () => {
-      if (window.FLOQRSessionShell?.popupBlocked?.("#schedulingPortalStatus")) return;
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(error => setStatus(error.message));
+    await refresh();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const shell = window.FLOQRSessionShell;
+    byId("portalSignInBtn")?.addEventListener("click", () => {
+      if (shell?.popupBlocked?.("#schedulingPortalStatus")) return;
+      shell?.redirectToLogin?.();
     });
     byId("portalBuySubBtn")?.addEventListener("click", () => subscribe().catch(error => setStatus(error.message)));
     byId("portalRefreshBtn")?.addEventListener("click", () => refresh().catch(error => setStatus(error.message)));
     byId("portalCreateShiftBtn")?.addEventListener("click", () => createShift().catch(error => setStatus(error.message)));
-    byId("portalOwnerType")?.addEventListener("change", () => {
-      if (ownerType() === "dj" && auth.currentUser && !byId("portalOwnerId").value) {
-        byId("portalOwnerId").value = auth.currentUser.uid;
-      }
+    document.querySelectorAll("input[name='portalOwnerType']").forEach(radio => {
+      radio.addEventListener("change", () => {
+        renderOwnerPicker();
+        if (auth.currentUser) refresh().catch(error => setStatus(error.message));
+      });
     });
-    const shell = window.FLOQRSessionShell;
-    if (shell?.bind) {
-      shell.bind({
-        auth,
-        chrome: "[data-floqr-auth-chrome]",
-        loginButtons: "[data-floqr-login-btn]",
-        statusEl: "#schedulingPortalStatus",
-        onUser: user => {
-          if (ownerType() === "dj" && !byId("portalOwnerId")?.value) {
-            byId("portalOwnerId").value = user.uid;
-          }
-          refresh().catch(error => setStatus(error.message));
-        }
-      });
-    } else {
-      auth.onAuthStateChanged(user => {
-        if (user && ownerType() === "dj" && !byId("portalOwnerId")?.value) {
-          byId("portalOwnerId").value = user.uid;
-        }
-        if (user) refresh().catch(error => setStatus(error.message));
-        else setStatus("Sign in to continue.");
-      });
+    byId("portalOwnerId")?.addEventListener("change", () => {
+      pickerState.selected[ownerType()] = byId("portalOwnerId").value || "";
+      refresh().catch(error => setStatus(error.message));
+    });
+    byId("portalOwnerSearch")?.addEventListener("input", renderOwnerPicker);
+    window.addEventListener("floqr:ui-language", renderOwnerPicker);
+    renderOwnerPicker();
+    if (!shell?.bind) {
+      setStatus(t("sched.firebaseError", "FLOQR could not start on this page. Refresh the page."));
+      return;
     }
+    shell.bind({
+      auth,
+      chrome: "[data-floqr-auth-chrome]",
+      loginButtons: "[data-floqr-login-btn]",
+      statusEl: "#schedulingPortalStatus",
+      onUser: user => onSignedIn(user).catch(error => setStatus(error.message))
+    });
   });
 })();

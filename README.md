@@ -1,4 +1,6 @@
-﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.33 (stable)
+﻿ï»¿# CURRENT PACKAGE: FLOQR ShoutOut s3.1.34 (stable)
+
+- s3.1.34: Staff Scheduling (scheduling.html) finishes signing in again: the page app now starts Firebase itself, so a signed-in patron, Club Admin or Master Admin no longer sees "Restoring your FLOQR session…" forever. The free-text "Owner id" box is replaced by a Schedule for picker (My DJ schedule / Club / Promoting company) that lists only the clubs and companies you may manage (Master Admins get every club with search). Stored owner ids are unchanged. The Subscription card stays visible after sign-in, and choosing a club no longer writes to the club record.
 
 - s3.1.33: Security patch. SMS and WhatsApp logs (Twilio SMS / WhatsApp / feature / compliance logs, club message deliveries and inbound replies, Twilio debugger events) never store the club daily code, sign-in codes, passcodes or recovery codes; they are masked before the row is written. Stored Twilio request paths no longer show the full Account SID.
 
